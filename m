@@ -1,22 +1,22 @@
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH v6 kvmtool 06/13] Import VFIO headers
-Date: Mon, 18 Jun 2018 19:42:04 +0100
-Message-ID: <20180618184211.43904-7-jean-philippe.brucker@arm.com>
+Subject: [PATCH v6 kvmtool 08/13] Add PCI device passthrough using VFIO
+Date: Mon, 18 Jun 2018 19:42:06 +0100
+Message-ID: <20180618184211.43904-9-jean-philippe.brucker@arm.com>
 References: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7D8F4A0D4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:32:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D38554A0D4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:32:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QPFTTvR+1fHM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jun 2018 14:31:46 -0400 (EDT)
+ with ESMTP id RhpNSiHVC01R for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jun 2018 14:31:47 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AC984A0DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 044944A0DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:38 -0400 (EDT)
 In-Reply-To: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,740 +31,1109 @@ To: kvm@vger.kernel.org
 Cc: lorenzo.pieralisi@arm.com, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, alex.williamson@redhat.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To ensure consistency between kvmtool and the kernel, import the UAPI
-headers of the VFIO version we implement. This is from Linux v4.12.
+Assigning devices using VFIO allows the guest to have direct access to the
+device, whilst filtering accesses to sensitive areas by trapping config
+space accesses and mapping DMA with an IOMMU.
+
+This patch adds a new option to lkvm run: --vfio-pci=<BDF>. Before
+assigning a device to a VM, some preparation is required. As described in
+Linux Documentation/vfio.txt, the device driver needs to be changed to
+vfio-pci:
+
+  $ dev=0000:00:00.0
+
+  $ echo $dev > /sys/bus/pci/devices/$dev/driver/unbind
+  $ echo vfio-pci > /sys/bus/pci/devices/$dev/driver_override
+  $ echo $dev > /sys/bus/pci/drivers_probe
+
+Adding --vfio-pci=$dev to lkvm-run will pass the device to the guest.
+Multiple devices can be passed to the guest by adding more --vfio-pci
+parameters.
+
+This patch only implements PCI with INTx. MSI-X routing will be added in a
+subsequent patch, and at some point we might add support for passing
+platform devices to guests.
 
 Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- include/linux/vfio.h | 719 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 719 insertions(+)
- create mode 100644 include/linux/vfio.h
+ Makefile                 |   2 +
+ arm/pci.c                |   1 +
+ builtin-run.c            |   5 +
+ include/kvm/kvm-config.h |   3 +
+ include/kvm/pci.h        |   3 +-
+ include/kvm/vfio.h       |  71 ++++++
+ vfio/core.c              | 494 +++++++++++++++++++++++++++++++++++++++
+ vfio/pci.c               | 395 +++++++++++++++++++++++++++++++
+ 8 files changed, 973 insertions(+), 1 deletion(-)
+ create mode 100644 include/kvm/vfio.h
+ create mode 100644 vfio/core.c
+ create mode 100644 vfio/pci.c
 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+diff --git a/Makefile b/Makefile
+index 5453199b3..e3088a466 100644
+--- a/Makefile
++++ b/Makefile
+@@ -59,6 +59,8 @@ OBJS	+= main.o
+ OBJS	+= mmio.o
+ OBJS	+= pci.o
+ OBJS	+= term.o
++OBJS	+= vfio/core.o
++OBJS	+= vfio/pci.o
+ OBJS	+= virtio/blk.o
+ OBJS	+= virtio/scsi.o
+ OBJS	+= virtio/console.o
+diff --git a/arm/pci.c b/arm/pci.c
+index 744b14c26..557cfa989 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -1,5 +1,6 @@
+ #include "kvm/devices.h"
+ #include "kvm/fdt.h"
++#include "kvm/kvm.h"
+ #include "kvm/of_pci.h"
+ #include "kvm/pci.h"
+ #include "kvm/util.h"
+diff --git a/builtin-run.c b/builtin-run.c
+index b56aea7d1..443c10ba4 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -146,6 +146,11 @@ void kvm_run_set_wrapper_sandbox(void)
+ 	OPT_BOOLEAN('\0', "no-dhcp", &(cfg)->no_dhcp, "Disable kernel"	\
+ 			" DHCP in rootfs mode"),			\
+ 									\
++	OPT_GROUP("VFIO options:"),					\
++	OPT_CALLBACK('\0', "vfio-pci", NULL, "[domain:]bus:dev.fn",	\
++		     "Assign a PCI device to the virtual machine",	\
++		     vfio_device_parser, kvm),				\
++									\
+ 	OPT_GROUP("Debug options:"),					\
+ 	OPT_BOOLEAN('\0', "debug", &do_debug_print,			\
+ 			"Enable debug messages"),			\
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 386fa8c59..a052b0bc7 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -2,6 +2,7 @@
+ #define KVM_CONFIG_H_
+ 
+ #include "kvm/disk-image.h"
++#include "kvm/vfio.h"
+ #include "kvm/kvm-config-arch.h"
+ 
+ #define DEFAULT_KVM_DEV		"/dev/kvm"
+@@ -20,9 +21,11 @@
+ struct kvm_config {
+ 	struct kvm_config_arch arch;
+ 	struct disk_image_params disk_image[MAX_DISK_IMAGES];
++	struct vfio_device_params *vfio_devices;
+ 	u64 ram_size;
+ 	u8  image_count;
+ 	u8 num_net_devices;
++	u8 num_vfio_devices;
+ 	bool virtio_rng;
+ 	int active_console;
+ 	int debug_iodelay;
+diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+index 01c244bcf..274b77ea6 100644
+--- a/include/kvm/pci.h
++++ b/include/kvm/pci.h
+@@ -7,7 +7,6 @@
+ #include <endian.h>
+ 
+ #include "kvm/devices.h"
+-#include "kvm/kvm.h"
+ #include "kvm/msi.h"
+ #include "kvm/fdt.h"
+ 
+@@ -22,6 +21,8 @@
+ #define PCI_IO_SIZE		0x100
+ #define PCI_CFG_SIZE		(1ULL << 24)
+ 
++struct kvm;
++
+ union pci_config_address {
+ 	struct {
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
 new file mode 100644
-index 000000000..4e7ab4c52
+index 000000000..c434703ab
 --- /dev/null
-+++ b/include/linux/vfio.h
-@@ -0,0 +1,719 @@
-+/*
-+ * VFIO API definition
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
-+ *     Author: Alex Williamson <alex.williamson@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+#ifndef VFIO_H
-+#define VFIO_H
++++ b/include/kvm/vfio.h
+@@ -0,0 +1,71 @@
++#ifndef KVM__VFIO_H
++#define KVM__VFIO_H
 +
-+#include <linux/types.h>
-+#include <linux/ioctl.h>
++#include "kvm/parse-options.h"
++#include "kvm/pci.h"
 +
-+#define VFIO_API_VERSION	0
++#include <linux/vfio.h>
 +
++#define vfio_dev_err(vdev, fmt, ...) \
++	pr_err("%s: " fmt, (vdev)->params->name, ##__VA_ARGS__)
++#define vfio_dev_warn(vdev, fmt, ...) \
++	pr_warning("%s: " fmt, (vdev)->params->name, ##__VA_ARGS__)
++#define vfio_dev_info(vdev, fmt, ...) \
++	pr_info("%s: " fmt, (vdev)->params->name, ##__VA_ARGS__)
++#define vfio_dev_dbg(vdev, fmt, ...) \
++	pr_debug("%s: " fmt, (vdev)->params->name, ##__VA_ARGS__)
++#define vfio_dev_die(vdev, fmt, ...) \
++	die("%s: " fmt, (vdev)->params->name, ##__VA_ARGS__)
 +
-+/* Kernel & User level defines for VFIO IOCTLs. */
++/* Currently limited by num_vfio_devices */
++#define MAX_VFIO_DEVICES		256
 +
-+/* Extensions */
-+
-+#define VFIO_TYPE1_IOMMU		1
-+#define VFIO_SPAPR_TCE_IOMMU		2
-+#define VFIO_TYPE1v2_IOMMU		3
-+/*
-+ * IOMMU enforces DMA cache coherence (ex. PCIe NoSnoop stripping).  This
-+ * capability is subject to change as groups are added or removed.
-+ */
-+#define VFIO_DMA_CC_IOMMU		4
-+
-+/* Check if EEH is supported */
-+#define VFIO_EEH			5
-+
-+/* Two-stage IOMMU */
-+#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
-+
-+#define VFIO_SPAPR_TCE_v2_IOMMU		7
-+
-+/*
-+ * The No-IOMMU IOMMU offers no translation or isolation for devices and
-+ * supports no ioctls outside of VFIO_CHECK_EXTENSION.  Use of VFIO's No-IOMMU
-+ * code will taint the host kernel and should be used with extreme caution.
-+ */
-+#define VFIO_NOIOMMU_IOMMU		8
-+
-+/*
-+ * The IOCTL interface is designed for extensibility by embedding the
-+ * structure length (argsz) and flags into structures passed between
-+ * kernel and userspace.  We therefore use the _IO() macro for these
-+ * defines to avoid implicitly embedding a size into the ioctl request.
-+ * As structure fields are added, argsz will increase to match and flag
-+ * bits will be defined to indicate additional fields with valid data.
-+ * It's *always* the caller's responsibility to indicate the size of
-+ * the structure passed by setting argsz appropriately.
-+ */
-+
-+#define VFIO_TYPE	(';')
-+#define VFIO_BASE	100
-+
-+/*
-+ * For extension of INFO ioctls, VFIO makes use of a capability chain
-+ * designed after PCI/e capabilities.  A flag bit indicates whether
-+ * this capability chain is supported and a field defined in the fixed
-+ * structure defines the offset of the first capability in the chain.
-+ * This field is only valid when the corresponding bit in the flags
-+ * bitmap is set.  This offset field is relative to the start of the
-+ * INFO buffer, as is the next field within each capability header.
-+ * The id within the header is a shared address space per INFO ioctl,
-+ * while the version field is specific to the capability id.  The
-+ * contents following the header are specific to the capability id.
-+ */
-+struct vfio_info_cap_header {
-+	__u16	id;		/* Identifies capability */
-+	__u16	version;	/* Version specific to the capability ID */
-+	__u32	next;		/* Offset of next capability */
++enum vfio_device_type {
++	VFIO_DEVICE_PCI,
 +};
 +
-+/*
-+ * Callers of INFO ioctls passing insufficiently sized buffers will see
-+ * the capability chain flag bit set, a zero value for the first capability
-+ * offset (if available within the provided argsz), and argsz will be
-+ * updated to report the necessary buffer size.  For compatibility, the
-+ * INFO ioctl will not report error in this case, but the capability chain
-+ * will not be available.
-+ */
-+
-+/* -------- IOCTLs for VFIO file descriptor (/dev/vfio/vfio) -------- */
-+
-+/**
-+ * VFIO_GET_API_VERSION - _IO(VFIO_TYPE, VFIO_BASE + 0)
-+ *
-+ * Report the version of the VFIO API.  This allows us to bump the entire
-+ * API version should we later need to add or change features in incompatible
-+ * ways.
-+ * Return: VFIO_API_VERSION
-+ * Availability: Always
-+ */
-+#define VFIO_GET_API_VERSION		_IO(VFIO_TYPE, VFIO_BASE + 0)
-+
-+/**
-+ * VFIO_CHECK_EXTENSION - _IOW(VFIO_TYPE, VFIO_BASE + 1, __u32)
-+ *
-+ * Check whether an extension is supported.
-+ * Return: 0 if not supported, 1 (or some other positive integer) if supported.
-+ * Availability: Always
-+ */
-+#define VFIO_CHECK_EXTENSION		_IO(VFIO_TYPE, VFIO_BASE + 1)
-+
-+/**
-+ * VFIO_SET_IOMMU - _IOW(VFIO_TYPE, VFIO_BASE + 2, __s32)
-+ *
-+ * Set the iommu to the given type.  The type must be supported by an
-+ * iommu driver as verified by calling CHECK_EXTENSION using the same
-+ * type.  A group must be set to this file descriptor before this
-+ * ioctl is available.  The IOMMU interfaces enabled by this call are
-+ * specific to the value set.
-+ * Return: 0 on success, -errno on failure
-+ * Availability: When VFIO group attached
-+ */
-+#define VFIO_SET_IOMMU			_IO(VFIO_TYPE, VFIO_BASE + 2)
-+
-+/* -------- IOCTLs for GROUP file descriptors (/dev/vfio/$GROUP) -------- */
-+
-+/**
-+ * VFIO_GROUP_GET_STATUS - _IOR(VFIO_TYPE, VFIO_BASE + 3,
-+ *						struct vfio_group_status)
-+ *
-+ * Retrieve information about the group.  Fills in provided
-+ * struct vfio_group_info.  Caller sets argsz.
-+ * Return: 0 on succes, -errno on failure.
-+ * Availability: Always
-+ */
-+struct vfio_group_status {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_GROUP_FLAGS_VIABLE		(1 << 0)
-+#define VFIO_GROUP_FLAGS_CONTAINER_SET	(1 << 1)
-+};
-+#define VFIO_GROUP_GET_STATUS		_IO(VFIO_TYPE, VFIO_BASE + 3)
-+
-+/**
-+ * VFIO_GROUP_SET_CONTAINER - _IOW(VFIO_TYPE, VFIO_BASE + 4, __s32)
-+ *
-+ * Set the container for the VFIO group to the open VFIO file
-+ * descriptor provided.  Groups may only belong to a single
-+ * container.  Containers may, at their discretion, support multiple
-+ * groups.  Only when a container is set are all of the interfaces
-+ * of the VFIO file descriptor and the VFIO group file descriptor
-+ * available to the user.
-+ * Return: 0 on success, -errno on failure.
-+ * Availability: Always
-+ */
-+#define VFIO_GROUP_SET_CONTAINER	_IO(VFIO_TYPE, VFIO_BASE + 4)
-+
-+/**
-+ * VFIO_GROUP_UNSET_CONTAINER - _IO(VFIO_TYPE, VFIO_BASE + 5)
-+ *
-+ * Remove the group from the attached container.  This is the
-+ * opposite of the SET_CONTAINER call and returns the group to
-+ * an initial state.  All device file descriptors must be released
-+ * prior to calling this interface.  When removing the last group
-+ * from a container, the IOMMU will be disabled and all state lost,
-+ * effectively also returning the VFIO file descriptor to an initial
-+ * state.
-+ * Return: 0 on success, -errno on failure.
-+ * Availability: When attached to container
-+ */
-+#define VFIO_GROUP_UNSET_CONTAINER	_IO(VFIO_TYPE, VFIO_BASE + 5)
-+
-+/**
-+ * VFIO_GROUP_GET_DEVICE_FD - _IOW(VFIO_TYPE, VFIO_BASE + 6, char)
-+ *
-+ * Return a new file descriptor for the device object described by
-+ * the provided string.  The string should match a device listed in
-+ * the devices subdirectory of the IOMMU group sysfs entry.  The
-+ * group containing the device must already be added to this context.
-+ * Return: new file descriptor on success, -errno on failure.
-+ * Availability: When attached to container
-+ */
-+#define VFIO_GROUP_GET_DEVICE_FD	_IO(VFIO_TYPE, VFIO_BASE + 6)
-+
-+/* --------------- IOCTLs for DEVICE file descriptors --------------- */
-+
-+/**
-+ * VFIO_DEVICE_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 7,
-+ *						struct vfio_device_info)
-+ *
-+ * Retrieve information about the device.  Fills in provided
-+ * struct vfio_device_info.  Caller sets argsz.
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_device_info {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_DEVICE_FLAGS_RESET	(1 << 0)	/* Device supports reset */
-+#define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
-+#define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
-+#define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
-+#define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
-+	__u32	num_regions;	/* Max region index + 1 */
-+	__u32	num_irqs;	/* Max IRQ index + 1 */
-+};
-+#define VFIO_DEVICE_GET_INFO		_IO(VFIO_TYPE, VFIO_BASE + 7)
-+
-+/*
-+ * Vendor driver using Mediated device framework should provide device_api
-+ * attribute in supported type attribute groups. Device API string should be one
-+ * of the following corresponding to device flags in vfio_device_info structure.
-+ */
-+
-+#define VFIO_DEVICE_API_PCI_STRING		"vfio-pci"
-+#define VFIO_DEVICE_API_PLATFORM_STRING		"vfio-platform"
-+#define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
-+#define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
-+
-+/**
-+ * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
-+ *				       struct vfio_region_info)
-+ *
-+ * Retrieve information about a device region.  Caller provides
-+ * struct vfio_region_info with index value set.  Caller sets argsz.
-+ * Implementation of region mapping is bus driver specific.  This is
-+ * intended to describe MMIO, I/O port, as well as bus specific
-+ * regions (ex. PCI config space).  Zero sized regions may be used
-+ * to describe unimplemented regions (ex. unimplemented PCI BARs).
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_region_info {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_REGION_INFO_FLAG_READ	(1 << 0) /* Region supports read */
-+#define VFIO_REGION_INFO_FLAG_WRITE	(1 << 1) /* Region supports write */
-+#define VFIO_REGION_INFO_FLAG_MMAP	(1 << 2) /* Region supports mmap */
-+#define VFIO_REGION_INFO_FLAG_CAPS	(1 << 3) /* Info supports caps */
-+	__u32	index;		/* Region index */
-+	__u32	cap_offset;	/* Offset within info struct of first cap */
-+	__u64	size;		/* Region size (bytes) */
-+	__u64	offset;		/* Region offset from start of device fd */
-+};
-+#define VFIO_DEVICE_GET_REGION_INFO	_IO(VFIO_TYPE, VFIO_BASE + 8)
-+
-+/*
-+ * The sparse mmap capability allows finer granularity of specifying areas
-+ * within a region with mmap support.  When specified, the user should only
-+ * mmap the offset ranges specified by the areas array.  mmaps outside of the
-+ * areas specified may fail (such as the range covering a PCI MSI-X table) or
-+ * may result in improper device behavior.
-+ *
-+ * The structures below define version 1 of this capability.
-+ */
-+#define VFIO_REGION_INFO_CAP_SPARSE_MMAP	1
-+
-+struct vfio_region_sparse_mmap_area {
-+	__u64	offset;	/* Offset of mmap'able area within region */
-+	__u64	size;	/* Size of mmap'able area */
++struct vfio_pci_device {
++	struct pci_device_header	hdr;
 +};
 +
-+struct vfio_region_info_cap_sparse_mmap {
-+	struct vfio_info_cap_header header;
-+	__u32	nr_areas;
-+	__u32	reserved;
-+	struct vfio_region_sparse_mmap_area areas[];
++struct vfio_region {
++	struct vfio_region_info		info;
++	u64				guest_phys_addr;
++	void				*host_addr;
 +};
 +
-+/*
-+ * The device specific type capability allows regions unique to a specific
-+ * device or class of devices to be exposed.  This helps solve the problem for
-+ * vfio bus drivers of defining which region indexes correspond to which region
-+ * on the device, without needing to resort to static indexes, as done by
-+ * vfio-pci.  For instance, if we were to go back in time, we might remove
-+ * VFIO_PCI_VGA_REGION_INDEX and let vfio-pci simply define that all indexes
-+ * greater than or equal to VFIO_PCI_NUM_REGIONS are device specific and we'd
-+ * make a "VGA" device specific type to describe the VGA access space.  This
-+ * means that non-VGA devices wouldn't need to waste this index, and thus the
-+ * address space associated with it due to implementation of device file
-+ * descriptor offsets in vfio-pci.
-+ *
-+ * The current implementation is now part of the user ABI, so we can't use this
-+ * for VGA, but there are other upcoming use cases, such as opregions for Intel
-+ * IGD devices and framebuffers for vGPU devices.  We missed VGA, but we'll
-+ * use this for future additions.
-+ *
-+ * The structure below defines version 1 of this capability.
-+ */
-+#define VFIO_REGION_INFO_CAP_TYPE	2
++struct vfio_device {
++	struct device_header		dev_hdr;
++	struct vfio_device_params	*params;
++	struct vfio_group		*group;
 +
-+struct vfio_region_info_cap_type {
-+	struct vfio_info_cap_header header;
-+	__u32 type;	/* global per bus driver */
-+	__u32 subtype;	/* type specific */
++	int				fd;
++	struct vfio_device_info		info;
++	struct vfio_region		*regions;
++
++	char				*sysfs_path;
++
++	struct vfio_pci_device		pci;
 +};
 +
-+#define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
-+#define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-+
-+/* 8086 Vendor sub-types */
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-+#define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-+
-+/**
-+ * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
-+ *				    struct vfio_irq_info)
-+ *
-+ * Retrieve information about a device IRQ.  Caller provides
-+ * struct vfio_irq_info with index value set.  Caller sets argsz.
-+ * Implementation of IRQ mapping is bus driver specific.  Indexes
-+ * using multiple IRQs are primarily intended to support MSI-like
-+ * interrupt blocks.  Zero count irq blocks may be used to describe
-+ * unimplemented interrupt types.
-+ *
-+ * The EVENTFD flag indicates the interrupt index supports eventfd based
-+ * signaling.
-+ *
-+ * The MASKABLE flags indicates the index supports MASK and UNMASK
-+ * actions described below.
-+ *
-+ * AUTOMASKED indicates that after signaling, the interrupt line is
-+ * automatically masked by VFIO and the user needs to unmask the line
-+ * to receive new interrupts.  This is primarily intended to distinguish
-+ * level triggered interrupts.
-+ *
-+ * The NORESIZE flag indicates that the interrupt lines within the index
-+ * are setup as a set and new subindexes cannot be enabled without first
-+ * disabling the entire index.  This is used for interrupts like PCI MSI
-+ * and MSI-X where the driver may only use a subset of the available
-+ * indexes, but VFIO needs to enable a specific number of vectors
-+ * upfront.  In the case of MSI-X, where the user can enable MSI-X and
-+ * then add and unmask vectors, it's up to userspace to make the decision
-+ * whether to allocate the maximum supported number of vectors or tear
-+ * down setup and incrementally increase the vectors as each is enabled.
-+ */
-+struct vfio_irq_info {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_IRQ_INFO_EVENTFD		(1 << 0)
-+#define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
-+#define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
-+#define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-+	__u32	index;		/* IRQ index */
-+	__u32	count;		/* Number of IRQs within this index */
++struct vfio_device_params {
++	char				*name;
++	const char			*bus;
++	enum vfio_device_type		type;
 +};
-+#define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
 +
-+/**
-+ * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
-+ *
-+ * Set signaling, masking, and unmasking of interrupts.  Caller provides
-+ * struct vfio_irq_set with all fields set.  'start' and 'count' indicate
-+ * the range of subindexes being specified.
-+ *
-+ * The DATA flags specify the type of data provided.  If DATA_NONE, the
-+ * operation performs the specified action immediately on the specified
-+ * interrupt(s).  For example, to unmask AUTOMASKED interrupt [0,0]:
-+ * flags = (DATA_NONE|ACTION_UNMASK), index = 0, start = 0, count = 1.
-+ *
-+ * DATA_BOOL allows sparse support for the same on arrays of interrupts.
-+ * For example, to mask interrupts [0,1] and [0,3] (but not [0,2]):
-+ * flags = (DATA_BOOL|ACTION_MASK), index = 0, start = 1, count = 3,
-+ * data = {1,0,1}
-+ *
-+ * DATA_EVENTFD binds the specified ACTION to the provided __s32 eventfd.
-+ * A value of -1 can be used to either de-assign interrupts if already
-+ * assigned or skip un-assigned interrupts.  For example, to set an eventfd
-+ * to be trigger for interrupts [0,0] and [0,2]:
-+ * flags = (DATA_EVENTFD|ACTION_TRIGGER), index = 0, start = 0, count = 3,
-+ * data = {fd1, -1, fd2}
-+ * If index [0,1] is previously set, two count = 1 ioctls calls would be
-+ * required to set [0,0] and [0,2] without changing [0,1].
-+ *
-+ * Once a signaling mechanism is set, DATA_BOOL or DATA_NONE can be used
-+ * with ACTION_TRIGGER to perform kernel level interrupt loopback testing
-+ * from userspace (ie. simulate hardware triggering).
-+ *
-+ * Setting of an event triggering mechanism to userspace for ACTION_TRIGGER
-+ * enables the interrupt index for the device.  Individual subindex interrupts
-+ * can be disabled using the -1 value for DATA_EVENTFD or the index can be
-+ * disabled as a whole with: flags = (DATA_NONE|ACTION_TRIGGER), count = 0.
-+ *
-+ * Note that ACTION_[UN]MASK specify user->kernel signaling (irqfds) while
-+ * ACTION_TRIGGER specifies kernel->user signaling.
-+ */
-+struct vfio_irq_set {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_IRQ_SET_DATA_NONE		(1 << 0) /* Data not present */
-+#define VFIO_IRQ_SET_DATA_BOOL		(1 << 1) /* Data is bool (u8) */
-+#define VFIO_IRQ_SET_DATA_EVENTFD	(1 << 2) /* Data is eventfd (s32) */
-+#define VFIO_IRQ_SET_ACTION_MASK	(1 << 3) /* Mask interrupt */
-+#define VFIO_IRQ_SET_ACTION_UNMASK	(1 << 4) /* Unmask interrupt */
-+#define VFIO_IRQ_SET_ACTION_TRIGGER	(1 << 5) /* Trigger interrupt */
-+	__u32	index;
-+	__u32	start;
-+	__u32	count;
-+	__u8	data[];
++struct vfio_group {
++	unsigned long			id; /* iommu_group number in sysfs */
++	int				fd;
++	int				refs;
++	struct list_head		list;
 +};
-+#define VFIO_DEVICE_SET_IRQS		_IO(VFIO_TYPE, VFIO_BASE + 10)
 +
-+#define VFIO_IRQ_SET_DATA_TYPE_MASK	(VFIO_IRQ_SET_DATA_NONE | \
-+					 VFIO_IRQ_SET_DATA_BOOL | \
-+					 VFIO_IRQ_SET_DATA_EVENTFD)
-+#define VFIO_IRQ_SET_ACTION_TYPE_MASK	(VFIO_IRQ_SET_ACTION_MASK | \
-+					 VFIO_IRQ_SET_ACTION_UNMASK | \
-+					 VFIO_IRQ_SET_ACTION_TRIGGER)
-+/**
-+ * VFIO_DEVICE_RESET - _IO(VFIO_TYPE, VFIO_BASE + 11)
-+ *
-+ * Reset a device.
-+ */
-+#define VFIO_DEVICE_RESET		_IO(VFIO_TYPE, VFIO_BASE + 11)
++int vfio_device_parser(const struct option *opt, const char *arg, int unset);
++int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
++		    struct vfio_region *region);
++void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region);
++int vfio_pci_setup_device(struct kvm *kvm, struct vfio_device *device);
++void vfio_pci_teardown_device(struct kvm *kvm, struct vfio_device *vdev);
 +
-+/*
-+ * The VFIO-PCI bus driver makes use of the following fixed region and
-+ * IRQ index mapping.  Unimplemented regions return a size of zero.
-+ * Unimplemented IRQ types return a count of zero.
-+ */
++#endif /* KVM__VFIO_H */
+diff --git a/vfio/core.c b/vfio/core.c
+new file mode 100644
+index 000000000..6c78e89f1
+--- /dev/null
++++ b/vfio/core.c
+@@ -0,0 +1,494 @@
++#include "kvm/kvm.h"
++#include "kvm/vfio.h"
 +
-+enum {
-+	VFIO_PCI_BAR0_REGION_INDEX,
-+	VFIO_PCI_BAR1_REGION_INDEX,
-+	VFIO_PCI_BAR2_REGION_INDEX,
-+	VFIO_PCI_BAR3_REGION_INDEX,
-+	VFIO_PCI_BAR4_REGION_INDEX,
-+	VFIO_PCI_BAR5_REGION_INDEX,
-+	VFIO_PCI_ROM_REGION_INDEX,
-+	VFIO_PCI_CONFIG_REGION_INDEX,
++#include <linux/list.h>
++
++#define VFIO_DEV_DIR		"/dev/vfio"
++#define VFIO_DEV_NODE		VFIO_DEV_DIR "/vfio"
++#define IOMMU_GROUP_DIR		"/sys/kernel/iommu_groups"
++
++static int vfio_container;
++static LIST_HEAD(vfio_groups);
++static struct vfio_device *vfio_devices;
++
++static int vfio_device_pci_parser(const struct option *opt, char *arg,
++				  struct vfio_device_params *dev)
++{
++	unsigned int domain, bus, devnr, fn;
++
++	int nr = sscanf(arg, "%4x:%2x:%2x.%1x", &domain, &bus, &devnr, &fn);
++	if (nr < 4) {
++		domain = 0;
++		nr = sscanf(arg, "%2x:%2x.%1x", &bus, &devnr, &fn);
++		if (nr < 3) {
++			pr_err("Invalid device identifier %s", arg);
++			return -EINVAL;
++		}
++	}
++
++	dev->type = VFIO_DEVICE_PCI;
++	dev->bus = "pci";
++	dev->name = malloc(13);
++	if (!dev->name)
++		return -ENOMEM;
++
++	snprintf(dev->name, 13, "%04x:%02x:%02x.%x", domain, bus, devnr, fn);
++
++	return 0;
++}
++
++int vfio_device_parser(const struct option *opt, const char *arg, int unset)
++{
++	int ret = -EINVAL;
++	static int idx = 0;
++	struct kvm *kvm = opt->ptr;
++	struct vfio_device_params *dev, *devs;
++	char *cur, *buf = strdup(arg);
++
++	if (!buf)
++		return -ENOMEM;
++
++	if (idx >= MAX_VFIO_DEVICES) {
++		pr_warning("Too many VFIO devices");
++		goto out_free_buf;
++	}
++
++	devs = realloc(kvm->cfg.vfio_devices, sizeof(*dev) * (idx + 1));
++	if (!devs) {
++		ret = -ENOMEM;
++		goto out_free_buf;
++	}
++
++	kvm->cfg.vfio_devices = devs;
++	dev = &devs[idx];
++
++	cur = strtok(buf, ",");
++	if (!cur)
++		goto out_free_buf;
++
++	if (!strcmp(opt->long_name, "vfio-pci"))
++		ret = vfio_device_pci_parser(opt, cur, dev);
++	else
++		ret = -EINVAL;
++
++	if (!ret)
++		kvm->cfg.num_vfio_devices = ++idx;
++
++out_free_buf:
++	free(buf);
++
++	return ret;
++}
++
++int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
++		    struct vfio_region *region)
++{
++	void *base;
++	int ret, prot = 0;
++	/* KVM needs page-aligned regions */
++	u64 map_size = ALIGN(region->info.size, PAGE_SIZE);
++
 +	/*
-+	 * Expose VGA regions defined for PCI base class 03, subclass 00.
-+	 * This includes I/O port ranges 0x3b0 to 0x3bb and 0x3c0 to 0x3df
-+	 * as well as the MMIO range 0xa0000 to 0xbffff.  Each implemented
-+	 * range is found at it's identity mapped offset from the region
-+	 * offset, for example 0x3b0 is region_info.offset + 0x3b0.  Areas
-+	 * between described ranges are unimplemented.
++	 * We don't want to mess about trapping config accesses, so require that
++	 * they can be mmap'd. Note that for PCI, this precludes the use of I/O
++	 * BARs in the guest (we will hide them from Configuration Space, which
++	 * is trapped).
 +	 */
-+	VFIO_PCI_VGA_REGION_INDEX,
-+	VFIO_PCI_NUM_REGIONS = 9 /* Fixed user ABI, region indexes >=9 use */
-+				 /* device specific cap to define content. */
-+};
++	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_MMAP)) {
++		vfio_dev_info(vdev, "ignoring region %u, as it can't be mmap'd",
++			      region->info.index);
++		return 0;
++	}
 +
-+enum {
-+	VFIO_PCI_INTX_IRQ_INDEX,
-+	VFIO_PCI_MSI_IRQ_INDEX,
-+	VFIO_PCI_MSIX_IRQ_INDEX,
-+	VFIO_PCI_ERR_IRQ_INDEX,
-+	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_NUM_IRQS
-+};
++	if (region->info.flags & VFIO_REGION_INFO_FLAG_READ)
++		prot |= PROT_READ;
++	if (region->info.flags & VFIO_REGION_INFO_FLAG_WRITE)
++		prot |= PROT_WRITE;
 +
-+/*
-+ * The vfio-ccw bus driver makes use of the following fixed region and
-+ * IRQ index mapping. Unimplemented regions return a size of zero.
-+ * Unimplemented IRQ types return a count of zero.
-+ */
++	base = mmap(NULL, region->info.size, prot, MAP_SHARED, vdev->fd,
++		    region->info.offset);
++	if (base == MAP_FAILED) {
++		ret = -errno;
++		vfio_dev_err(vdev, "failed to mmap region %u (0x%llx bytes)",
++			     region->info.index, region->info.size);
++		return ret;
++	}
++	region->host_addr = base;
 +
-+enum {
-+	VFIO_CCW_CONFIG_REGION_INDEX,
-+	VFIO_CCW_NUM_REGIONS
-+};
++	ret = kvm__register_dev_mem(kvm, region->guest_phys_addr, map_size,
++				    region->host_addr);
++	if (ret) {
++		vfio_dev_err(vdev, "failed to register region with KVM");
++		return ret;
++	}
 +
-+enum {
-+	VFIO_CCW_IO_IRQ_INDEX,
-+	VFIO_CCW_NUM_IRQS
-+};
++	return 0;
++}
 +
-+/**
-+ * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
-+ *					      struct vfio_pci_hot_reset_info)
-+ *
-+ * Return: 0 on success, -errno on failure:
-+ *	-enospc = insufficient buffer, -enodev = unsupported for device.
-+ */
-+struct vfio_pci_dependent_device {
-+	__u32	group_id;
-+	__u16	segment;
-+	__u8	bus;
-+	__u8	devfn; /* Use PCI_SLOT/PCI_FUNC */
-+};
++void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
++{
++	munmap(region->host_addr, region->info.size);
++}
 +
-+struct vfio_pci_hot_reset_info {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u32	count;
-+	struct vfio_pci_dependent_device	devices[];
-+};
++static int vfio_configure_device(struct kvm *kvm, struct vfio_device *vdev)
++{
++	int ret;
++	struct vfio_group *group = vdev->group;
 +
-+#define VFIO_DEVICE_GET_PCI_HOT_RESET_INFO	_IO(VFIO_TYPE, VFIO_BASE + 12)
++	vdev->fd = ioctl(group->fd, VFIO_GROUP_GET_DEVICE_FD,
++			 vdev->params->name);
++	if (vdev->fd < 0) {
++		vfio_dev_warn(vdev, "failed to get fd");
 +
-+/**
-+ * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
-+ *				    struct vfio_pci_hot_reset)
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_pci_hot_reset {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u32	count;
-+	__s32	group_fds[];
-+};
++		/* The device might be a bridge without an fd */
++		return 0;
++	}
 +
-+#define VFIO_DEVICE_PCI_HOT_RESET	_IO(VFIO_TYPE, VFIO_BASE + 13)
++	vdev->info.argsz = sizeof(vdev->info);
++	if (ioctl(vdev->fd, VFIO_DEVICE_GET_INFO, &vdev->info)) {
++		ret = -errno;
++		vfio_dev_err(vdev, "failed to get info");
++		goto err_close_device;
++	}
 +
-+/* -------- API for Type1 VFIO IOMMU -------- */
++	if (vdev->info.flags & VFIO_DEVICE_FLAGS_RESET &&
++	    ioctl(vdev->fd, VFIO_DEVICE_RESET) < 0)
++		vfio_dev_warn(vdev, "failed to reset device");
 +
-+/**
-+ * VFIO_IOMMU_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 12, struct vfio_iommu_info)
-+ *
-+ * Retrieve information about the IOMMU object. Fills in provided
-+ * struct vfio_iommu_info. Caller sets argsz.
-+ *
-+ * XXX Should we do these by CHECK_EXTENSION too?
-+ */
-+struct vfio_iommu_type1_info {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
-+	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
-+};
++	vdev->regions = calloc(vdev->info.num_regions, sizeof(*vdev->regions));
++	if (!vdev->regions) {
++		ret = -ENOMEM;
++		goto err_close_device;
++	}
 +
-+#define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
++	/* Now for the bus-specific initialization... */
++	switch (vdev->params->type) {
++	case VFIO_DEVICE_PCI:
++		BUG_ON(!(vdev->info.flags & VFIO_DEVICE_FLAGS_PCI));
++		ret = vfio_pci_setup_device(kvm, vdev);
++		break;
++	default:
++		BUG_ON(1);
++		ret = -EINVAL;
++	}
 +
-+/**
-+ * VFIO_IOMMU_MAP_DMA - _IOW(VFIO_TYPE, VFIO_BASE + 13, struct vfio_dma_map)
-+ *
-+ * Map process virtual addresses to IO virtual addresses using the
-+ * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
-+ */
-+struct vfio_iommu_type1_dma_map {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
-+#define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
-+	__u64	vaddr;				/* Process virtual address */
-+	__u64	iova;				/* IO virtual address */
-+	__u64	size;				/* Size of mapping (bytes) */
-+};
++	if (ret)
++		goto err_free_regions;
 +
-+#define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
++	vfio_dev_info(vdev, "assigned to device number 0x%x in group %lu",
++		      vdev->dev_hdr.dev_num, group->id);
 +
-+/**
-+ * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
-+ *							struct vfio_dma_unmap)
-+ *
-+ * Unmap IO virtual addresses using the provided struct vfio_dma_unmap.
-+ * Caller sets argsz.  The actual unmapped size is returned in the size
-+ * field.  No guarantee is made to the user that arbitrary unmaps of iova
-+ * or size different from those used in the original mapping call will
-+ * succeed.
-+ */
-+struct vfio_iommu_type1_dma_unmap {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u64	iova;				/* IO virtual address */
-+	__u64	size;				/* Size of mapping (bytes) */
-+};
++	return 0;
 +
-+#define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
++err_free_regions:
++	free(vdev->regions);
++err_close_device:
++	close(vdev->fd);
 +
-+/*
-+ * IOCTLs to enable/disable IOMMU container usage.
-+ * No parameters are supported.
-+ */
-+#define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
-+#define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
++	return ret;
++}
 +
-+/* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
++static int vfio_configure_devices(struct kvm *kvm)
++{
++	int i, ret;
 +
-+/*
-+ * The SPAPR TCE DDW info struct provides the information about
-+ * the details of Dynamic DMA window capability.
-+ *
-+ * @pgsizes contains a page size bitmask, 4K/64K/16M are supported.
-+ * @max_dynamic_windows_supported tells the maximum number of windows
-+ * which the platform can create.
-+ * @levels tells the maximum number of levels in multi-level IOMMU tables;
-+ * this allows splitting a table into smaller chunks which reduces
-+ * the amount of physically contiguous memory required for the table.
-+ */
-+struct vfio_iommu_spapr_tce_ddw_info {
-+	__u64 pgsizes;			/* Bitmap of supported page sizes */
-+	__u32 max_dynamic_windows_supported;
-+	__u32 levels;
-+};
++	for (i = 0; i < kvm->cfg.num_vfio_devices; ++i) {
++		ret = vfio_configure_device(kvm, &vfio_devices[i]);
++		if (ret)
++			return ret;
++	}
 +
-+/*
-+ * The SPAPR TCE info struct provides the information about the PCI bus
-+ * address ranges available for DMA, these values are programmed into
-+ * the hardware so the guest has to know that information.
-+ *
-+ * The DMA 32 bit window start is an absolute PCI bus address.
-+ * The IOVA address passed via map/unmap ioctls are absolute PCI bus
-+ * addresses too so the window works as a filter rather than an offset
-+ * for IOVA addresses.
-+ *
-+ * Flags supported:
-+ * - VFIO_IOMMU_SPAPR_INFO_DDW: informs the userspace that dynamic DMA windows
-+ *   (DDW) support is present. @ddw is only supported when DDW is present.
-+ */
-+struct vfio_iommu_spapr_tce_info {
-+	__u32 argsz;
-+	__u32 flags;
-+#define VFIO_IOMMU_SPAPR_INFO_DDW	(1 << 0)	/* DDW supported */
-+	__u32 dma32_window_start;	/* 32 bit window start (bytes) */
-+	__u32 dma32_window_size;	/* 32 bit window size (bytes) */
-+	struct vfio_iommu_spapr_tce_ddw_info ddw;
-+};
++	return 0;
++}
 +
-+#define VFIO_IOMMU_SPAPR_TCE_GET_INFO	_IO(VFIO_TYPE, VFIO_BASE + 12)
++static int vfio_get_iommu_type(void)
++{
++	if (ioctl(vfio_container, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU))
++		return VFIO_TYPE1v2_IOMMU;
 +
-+/*
-+ * EEH PE operation struct provides ways to:
-+ * - enable/disable EEH functionality;
-+ * - unfreeze IO/DMA for frozen PE;
-+ * - read PE state;
-+ * - reset PE;
-+ * - configure PE;
-+ * - inject EEH error.
-+ */
-+struct vfio_eeh_pe_err {
-+	__u32 type;
-+	__u32 func;
-+	__u64 addr;
-+	__u64 mask;
-+};
++	if (ioctl(vfio_container, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU))
++		return VFIO_TYPE1_IOMMU;
 +
-+struct vfio_eeh_pe_op {
-+	__u32 argsz;
-+	__u32 flags;
-+	__u32 op;
-+	union {
-+		struct vfio_eeh_pe_err err;
++	return -ENODEV;
++}
++
++static int vfio_map_mem_bank(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
++{
++	int ret = 0;
++	struct vfio_iommu_type1_dma_map dma_map = {
++		.argsz	= sizeof(dma_map),
++		.flags	= VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE,
++		.vaddr	= (unsigned long)bank->host_addr,
++		.iova	= (u64)bank->guest_phys_addr,
++		.size	= bank->size,
 +	};
++
++	/* Map the guest memory for DMA (i.e. provide isolation) */
++	if (ioctl(vfio_container, VFIO_IOMMU_MAP_DMA, &dma_map)) {
++		ret = -errno;
++		pr_err("Failed to map 0x%llx -> 0x%llx (%llu) for DMA",
++		       dma_map.iova, dma_map.vaddr, dma_map.size);
++	}
++
++	return ret;
++}
++
++static int vfio_unmap_mem_bank(struct kvm *kvm, struct kvm_mem_bank *bank, void *data)
++{
++	struct vfio_iommu_type1_dma_unmap dma_unmap = {
++		.argsz = sizeof(dma_unmap),
++		.size = bank->size,
++		.iova = bank->guest_phys_addr,
++	};
++
++	ioctl(vfio_container, VFIO_IOMMU_UNMAP_DMA, &dma_unmap);
++
++	return 0;
++}
++
++static struct vfio_group *vfio_group_create(struct kvm *kvm, unsigned long id)
++{
++	int ret;
++	struct vfio_group *group;
++	char group_node[PATH_MAX];
++	struct vfio_group_status group_status = {
++		.argsz = sizeof(group_status),
++	};
++
++	group = calloc(1, sizeof(*group));
++	if (!group)
++		return NULL;
++
++	group->id	= id;
++	group->refs	= 1;
++
++	ret = snprintf(group_node, PATH_MAX, VFIO_DEV_DIR "/%lu", id);
++	if (ret < 0 || ret == PATH_MAX)
++		return NULL;
++
++	group->fd = open(group_node, O_RDWR);
++	if (group->fd < 0) {
++		pr_err("Failed to open IOMMU group %s", group_node);
++		goto err_free_group;
++	}
++
++	if (ioctl(group->fd, VFIO_GROUP_GET_STATUS, &group_status)) {
++		pr_err("Failed to determine status of IOMMU group %lu", id);
++		goto err_close_group;
++	}
++
++	if (!(group_status.flags & VFIO_GROUP_FLAGS_VIABLE)) {
++		pr_err("IOMMU group %lu is not viable", id);
++		goto err_close_group;
++	}
++
++	if (ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &vfio_container)) {
++		pr_err("Failed to add IOMMU group %lu to VFIO container", id);
++		goto err_close_group;
++	}
++
++	list_add(&group->list, &vfio_groups);
++
++	return group;
++
++err_close_group:
++	close(group->fd);
++err_free_group:
++	free(group);
++
++	return NULL;
++}
++
++static void vfio_group_exit(struct kvm *kvm, struct vfio_group *group)
++{
++	if (--group->refs != 0)
++		return;
++
++	ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER);
++
++	list_del(&group->list);
++	close(group->fd);
++	free(group);
++}
++
++static struct vfio_group *
++vfio_group_get_for_dev(struct kvm *kvm, struct vfio_device *vdev)
++{
++	int dirfd;
++	ssize_t ret;
++	char *group_name;
++	unsigned long group_id;
++	char group_path[PATH_MAX];
++	struct vfio_group *group = NULL;
++
++	/* Find IOMMU group for this device */
++	dirfd = open(vdev->sysfs_path, O_DIRECTORY | O_PATH | O_RDONLY);
++	if (dirfd < 0) {
++		vfio_dev_err(vdev, "failed to open '%s'", vdev->sysfs_path);
++		return NULL;
++	}
++
++	ret = readlinkat(dirfd, "iommu_group", group_path, PATH_MAX);
++	if (ret < 0) {
++		vfio_dev_err(vdev, "no iommu_group");
++		goto out_close;
++	}
++	if (ret == PATH_MAX)
++		goto out_close;
++
++	group_path[ret] = '\0';
++
++	group_name = basename(group_path);
++	errno = 0;
++	group_id = strtoul(group_name, NULL, 10);
++	if (errno)
++		goto out_close;
++
++	list_for_each_entry(group, &vfio_groups, list) {
++		if (group->id == group_id) {
++			group->refs++;
++			return group;
++		}
++	}
++
++	group = vfio_group_create(kvm, group_id);
++
++out_close:
++	close(dirfd);
++	return group;
++}
++
++static int vfio_device_init(struct kvm *kvm, struct vfio_device *vdev)
++{
++	int ret;
++	char dev_path[PATH_MAX];
++	struct vfio_group *group;
++
++	ret = snprintf(dev_path, PATH_MAX, "/sys/bus/%s/devices/%s",
++		       vdev->params->bus, vdev->params->name);
++	if (ret < 0 || ret == PATH_MAX)
++		return -EINVAL;
++
++	vdev->sysfs_path = strndup(dev_path, PATH_MAX);
++	if (!vdev->sysfs_path)
++		return -errno;
++
++	group = vfio_group_get_for_dev(kvm, vdev);
++	if (!group) {
++		free(vdev->sysfs_path);
++		return -EINVAL;
++	}
++
++	vdev->group = group;
++
++	return 0;
++}
++
++static void vfio_device_exit(struct kvm *kvm, struct vfio_device *vdev)
++{
++	vfio_group_exit(kvm, vdev->group);
++
++	switch (vdev->params->type) {
++	case VFIO_DEVICE_PCI:
++		vfio_pci_teardown_device(kvm, vdev);
++		break;
++	default:
++		vfio_dev_warn(vdev, "no teardown function for device");
++	}
++
++	close(vdev->fd);
++
++	free(vdev->regions);
++	free(vdev->sysfs_path);
++}
++
++static int vfio_container_init(struct kvm *kvm)
++{
++	int api, i, ret, iommu_type;;
++
++	/* Create a container for our IOMMU groups */
++	vfio_container = open(VFIO_DEV_NODE, O_RDWR);
++	if (vfio_container == -1) {
++		ret = errno;
++		pr_err("Failed to open %s", VFIO_DEV_NODE);
++		return ret;
++	}
++
++	api = ioctl(vfio_container, VFIO_GET_API_VERSION);
++	if (api != VFIO_API_VERSION) {
++		pr_err("Unknown VFIO API version %d", api);
++		return -ENODEV;
++	}
++
++	iommu_type = vfio_get_iommu_type();
++	if (iommu_type < 0) {
++		pr_err("VFIO type-1 IOMMU not supported on this platform");
++		return iommu_type;
++	}
++
++	/* Create groups for our devices and add them to the container */
++	for (i = 0; i < kvm->cfg.num_vfio_devices; ++i) {
++		vfio_devices[i].params = &kvm->cfg.vfio_devices[i];
++
++		ret = vfio_device_init(kvm, &vfio_devices[i]);
++		if (ret)
++			return ret;
++	}
++
++	/* Finalise the container */
++	if (ioctl(vfio_container, VFIO_SET_IOMMU, iommu_type)) {
++		ret = -errno;
++		pr_err("Failed to set IOMMU type %d for VFIO container",
++		       iommu_type);
++		return ret;
++	} else {
++		pr_info("Using IOMMU type %d for VFIO container", iommu_type);
++	}
++
++	return kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM, vfio_map_mem_bank,
++				      NULL);
++}
++
++static int vfio__init(struct kvm *kvm)
++{
++	int ret;
++
++	if (!kvm->cfg.num_vfio_devices)
++		return 0;
++
++	vfio_devices = calloc(kvm->cfg.num_vfio_devices, sizeof(*vfio_devices));
++	if (!vfio_devices)
++		return -ENOMEM;
++
++	ret = vfio_container_init(kvm);
++	if (ret)
++		return ret;
++
++	ret = vfio_configure_devices(kvm);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++dev_base_init(vfio__init);
++
++static int vfio__exit(struct kvm *kvm)
++{
++	int i;
++
++	if (!kvm->cfg.num_vfio_devices)
++		return 0;
++
++	for (i = 0; i < kvm->cfg.num_vfio_devices; i++)
++		vfio_device_exit(kvm, &vfio_devices[i]);
++
++	free(vfio_devices);
++
++	kvm__for_each_mem_bank(kvm, KVM_MEM_TYPE_RAM, vfio_unmap_mem_bank, NULL);
++	close(vfio_container);
++
++	free(kvm->cfg.vfio_devices);
++
++	return 0;
++}
++dev_base_exit(vfio__exit);
+diff --git a/vfio/pci.c b/vfio/pci.c
+new file mode 100644
+index 000000000..6b157cfa3
+--- /dev/null
++++ b/vfio/pci.c
+@@ -0,0 +1,395 @@
++#include "kvm/irq.h"
++#include "kvm/kvm.h"
++#include "kvm/kvm-cpu.h"
++#include "kvm/vfio.h"
++
++#include <sys/ioctl.h>
++#include <sys/eventfd.h>
++
++/* Wrapper around UAPI vfio_irq_set */
++struct vfio_irq_eventfd {
++	struct vfio_irq_set	irq;
++	int			fd;
 +};
 +
-+#define VFIO_EEH_PE_DISABLE		0	/* Disable EEH functionality */
-+#define VFIO_EEH_PE_ENABLE		1	/* Enable EEH functionality  */
-+#define VFIO_EEH_PE_UNFREEZE_IO		2	/* Enable IO for frozen PE   */
-+#define VFIO_EEH_PE_UNFREEZE_DMA	3	/* Enable DMA for frozen PE  */
-+#define VFIO_EEH_PE_GET_STATE		4	/* PE state retrieval        */
-+#define  VFIO_EEH_PE_STATE_NORMAL	0	/* PE in functional state    */
-+#define  VFIO_EEH_PE_STATE_RESET	1	/* PE reset in progress      */
-+#define  VFIO_EEH_PE_STATE_STOPPED	2	/* Stopped DMA and IO        */
-+#define  VFIO_EEH_PE_STATE_STOPPED_DMA	4	/* Stopped DMA only          */
-+#define  VFIO_EEH_PE_STATE_UNAVAIL	5	/* State unavailable         */
-+#define VFIO_EEH_PE_RESET_DEACTIVATE	5	/* Deassert PE reset         */
-+#define VFIO_EEH_PE_RESET_HOT		6	/* Assert hot reset          */
-+#define VFIO_EEH_PE_RESET_FUNDAMENTAL	7	/* Assert fundamental reset  */
-+#define VFIO_EEH_PE_CONFIGURE		8	/* PE configuration          */
-+#define VFIO_EEH_PE_INJECT_ERR		9	/* Inject EEH error          */
++static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr,
++			      u8 offset, void *data, int sz)
++{
++	struct vfio_region_info *info;
++	struct vfio_pci_device *pdev;
++	struct vfio_device *vdev;
++	char base[sz];
 +
-+#define VFIO_EEH_PE_OP			_IO(VFIO_TYPE, VFIO_BASE + 21)
++	pdev = container_of(pci_hdr, struct vfio_pci_device, hdr);
++	vdev = container_of(pdev, struct vfio_device, pci);
++	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
 +
-+/**
-+ * VFIO_IOMMU_SPAPR_REGISTER_MEMORY - _IOW(VFIO_TYPE, VFIO_BASE + 17, struct vfio_iommu_spapr_register_memory)
-+ *
-+ * Registers user space memory where DMA is allowed. It pins
-+ * user pages and does the locked memory accounting so
-+ * subsequent VFIO_IOMMU_MAP_DMA/VFIO_IOMMU_UNMAP_DMA calls
-+ * get faster.
-+ */
-+struct vfio_iommu_spapr_register_memory {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u64	vaddr;				/* Process virtual address */
-+	__u64	size;				/* Size of mapping (bytes) */
-+};
-+#define VFIO_IOMMU_SPAPR_REGISTER_MEMORY	_IO(VFIO_TYPE, VFIO_BASE + 17)
++	/* Dummy read in case of side-effects */
++	if (pread(vdev->fd, base, sz, info->offset + offset) != sz)
++		vfio_dev_warn(vdev, "failed to read %d bytes from Configuration Space at 0x%x",
++			      sz, offset);
++}
 +
-+/**
-+ * VFIO_IOMMU_SPAPR_UNREGISTER_MEMORY - _IOW(VFIO_TYPE, VFIO_BASE + 18, struct vfio_iommu_spapr_register_memory)
-+ *
-+ * Unregisters user space memory registered with
-+ * VFIO_IOMMU_SPAPR_REGISTER_MEMORY.
-+ * Uses vfio_iommu_spapr_register_memory for parameters.
-+ */
-+#define VFIO_IOMMU_SPAPR_UNREGISTER_MEMORY	_IO(VFIO_TYPE, VFIO_BASE + 18)
++static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
++			       u8 offset, void *data, int sz)
++{
++	struct vfio_region_info *info;
++	struct vfio_pci_device *pdev;
++	struct vfio_device *vdev;
++	void *base = pci_hdr;
 +
-+/**
-+ * VFIO_IOMMU_SPAPR_TCE_CREATE - _IOWR(VFIO_TYPE, VFIO_BASE + 19, struct vfio_iommu_spapr_tce_create)
-+ *
-+ * Creates an additional TCE table and programs it (sets a new DMA window)
-+ * to every IOMMU group in the container. It receives page shift, window
-+ * size and number of levels in the TCE table being created.
-+ *
-+ * It allocates and returns an offset on a PCI bus of the new DMA window.
-+ */
-+struct vfio_iommu_spapr_tce_create {
-+	__u32 argsz;
-+	__u32 flags;
-+	/* in */
-+	__u32 page_shift;
-+	__u32 __resv1;
-+	__u64 window_size;
-+	__u32 levels;
-+	__u32 __resv2;
-+	/* out */
-+	__u64 start_addr;
-+};
-+#define VFIO_IOMMU_SPAPR_TCE_CREATE	_IO(VFIO_TYPE, VFIO_BASE + 19)
++	pdev = container_of(pci_hdr, struct vfio_pci_device, hdr);
++	vdev = container_of(pdev, struct vfio_device, pci);
++	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
 +
-+/**
-+ * VFIO_IOMMU_SPAPR_TCE_REMOVE - _IOW(VFIO_TYPE, VFIO_BASE + 20, struct vfio_iommu_spapr_tce_remove)
-+ *
-+ * Unprograms a TCE table from all groups in the container and destroys it.
-+ * It receives a PCI bus offset as a window id.
-+ */
-+struct vfio_iommu_spapr_tce_remove {
-+	__u32 argsz;
-+	__u32 flags;
-+	/* in */
-+	__u64 start_addr;
-+};
-+#define VFIO_IOMMU_SPAPR_TCE_REMOVE	_IO(VFIO_TYPE, VFIO_BASE + 20)
++	if (pwrite(vdev->fd, data, sz, info->offset + offset) != sz)
++		vfio_dev_warn(vdev, "Failed to write %d bytes to Configuration Space at 0x%x",
++			      sz, offset);
 +
-+/* ***************************************************************** */
++	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
++		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
++			      sz, offset);
++}
 +
-+#endif /* VFIO_H */
++static int vfio_pci_parse_caps(struct vfio_device *vdev)
++{
++	struct vfio_pci_device *pdev = &vdev->pci;
++
++	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
++		return 0;
++
++	pdev->hdr.status &= ~PCI_STATUS_CAP_LIST;
++	pdev->hdr.capabilities = 0;
++
++	/* TODO: install virtual capabilities */
++
++	return 0;
++}
++
++static int vfio_pci_parse_cfg_space(struct vfio_device *vdev)
++{
++	ssize_t sz = PCI_STD_HEADER_SIZEOF;
++	struct vfio_region_info *info;
++	struct vfio_pci_device *pdev = &vdev->pci;
++
++	if (vdev->info.num_regions < VFIO_PCI_CONFIG_REGION_INDEX) {
++		vfio_dev_err(vdev, "Config Space not found");
++		return -ENODEV;
++	}
++
++	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
++	*info = (struct vfio_region_info) {
++			.argsz = sizeof(*info),
++			.index = VFIO_PCI_CONFIG_REGION_INDEX,
++	};
++
++	ioctl(vdev->fd, VFIO_DEVICE_GET_REGION_INFO, info);
++	if (!info->size) {
++		vfio_dev_err(vdev, "Config Space has size zero?!");
++		return -EINVAL;
++	}
++
++	if (pread(vdev->fd, &pdev->hdr, sz, info->offset) != sz) {
++		vfio_dev_err(vdev, "failed to read %zd bytes of Config Space", sz);
++		return -EIO;
++	}
++
++	/* Strip bit 7, that indicates multifunction */
++	pdev->hdr.header_type &= 0x7f;
++
++	if (pdev->hdr.header_type != PCI_HEADER_TYPE_NORMAL) {
++		vfio_dev_err(vdev, "unsupported header type %u",
++			     pdev->hdr.header_type);
++		return -EOPNOTSUPP;
++	}
++
++	vfio_pci_parse_caps(vdev);
++
++	return 0;
++}
++
++static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
++{
++	int i;
++	ssize_t hdr_sz;
++	struct vfio_region_info *info;
++	struct vfio_pci_device *pdev = &vdev->pci;
++
++	/* Enable exclusively MMIO and bus mastering */
++	pdev->hdr.command &= ~PCI_COMMAND_IO;
++	pdev->hdr.command |= PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER;
++
++	/* Initialise the BARs */
++	for (i = VFIO_PCI_BAR0_REGION_INDEX; i <= VFIO_PCI_BAR5_REGION_INDEX; ++i) {
++		struct vfio_region *region = &vdev->regions[i];
++		u64 base = region->guest_phys_addr;
++
++		if (!base)
++			continue;
++
++		pdev->hdr.bar_size[i] = region->info.size;
++
++		/* Construct a fake reg to match what we've mapped. */
++		pdev->hdr.bar[i] = (base & PCI_BASE_ADDRESS_MEM_MASK) |
++					PCI_BASE_ADDRESS_SPACE_MEMORY |
++					PCI_BASE_ADDRESS_MEM_TYPE_32;
++	}
++
++	/* I really can't be bothered to support cardbus. */
++	pdev->hdr.card_bus = 0;
++
++	/*
++	 * Nuke the expansion ROM for now. If we want to do this properly,
++	 * we need to save its size somewhere and map into the guest.
++	 */
++	pdev->hdr.exp_rom_bar = 0;
++
++	/* Install our fake Configuration Space */
++	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
++	hdr_sz = PCI_DEV_CFG_SIZE;
++	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
++		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
++			     hdr_sz);
++		return -EIO;
++	}
++
++	/* Register callbacks for cfg accesses */
++	pdev->hdr.cfg_ops = (struct pci_config_operations) {
++		.read	= vfio_pci_cfg_read,
++		.write	= vfio_pci_cfg_write,
++	};
++
++	pdev->hdr.irq_type = IRQ_TYPE_LEVEL_HIGH;
++
++	return 0;
++}
++
++static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
++				  size_t nr)
++{
++	int ret;
++	size_t map_size;
++	struct vfio_region *region = &vdev->regions[nr];
++
++	if (nr >= vdev->info.num_regions)
++		return 0;
++
++	region->info = (struct vfio_region_info) {
++		.argsz = sizeof(region->info),
++		.index = nr,
++	};
++
++	ret = ioctl(vdev->fd, VFIO_DEVICE_GET_REGION_INFO, &region->info);
++	if (ret) {
++		ret = -errno;
++		vfio_dev_err(vdev, "cannot get info for BAR %zu", nr);
++		return ret;
++	}
++
++	/* Ignore invalid or unimplemented regions */
++	if (!region->info.size)
++		return 0;
++
++	/* Grab some MMIO space in the guest */
++	map_size = ALIGN(region->info.size, PAGE_SIZE);
++	region->guest_phys_addr = pci_get_io_space_block(map_size);
++
++	/*
++	 * Map the BARs into the guest. We'll later need to update
++	 * configuration space to reflect our allocation.
++	 */
++	ret = vfio_map_region(kvm, vdev, region);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++static int vfio_pci_configure_dev_regions(struct kvm *kvm,
++					  struct vfio_device *vdev)
++{
++	int ret;
++	u32 bar;
++	size_t i;
++	bool is_64bit = false;
++	struct vfio_pci_device *pdev = &vdev->pci;
++
++	ret = vfio_pci_parse_cfg_space(vdev);
++	if (ret)
++		return ret;
++
++	for (i = VFIO_PCI_BAR0_REGION_INDEX; i <= VFIO_PCI_BAR5_REGION_INDEX; ++i) {
++		/* Ignore top half of 64-bit BAR */
++		if (i % 2 && is_64bit)
++			continue;
++
++		ret = vfio_pci_configure_bar(kvm, vdev, i);
++		if (ret)
++			return ret;
++
++		bar = pdev->hdr.bar[i];
++		is_64bit = (bar & PCI_BASE_ADDRESS_SPACE) ==
++			   PCI_BASE_ADDRESS_SPACE_MEMORY &&
++			   bar & PCI_BASE_ADDRESS_MEM_TYPE_64;
++	}
++
++	/* We've configured the BARs, fake up a Configuration Space */
++	return vfio_pci_fixup_cfg_space(vdev);
++}
++
++static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
++{
++	int ret;
++	int trigger_fd, unmask_fd;
++	struct vfio_irq_eventfd	trigger;
++	struct vfio_irq_eventfd	unmask;
++	struct vfio_pci_device *pdev = &vdev->pci;
++	int gsi = pdev->hdr.irq_line - KVM_IRQ_OFFSET;
++
++	struct vfio_irq_info irq_info = {
++		.argsz = sizeof(irq_info),
++		.index = VFIO_PCI_INTX_IRQ_INDEX,
++	};
++
++	ret = ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
++	if (ret || irq_info.count == 0) {
++		vfio_dev_err(vdev, "no INTx reported by VFIO");
++		return -ENODEV;
++	}
++
++	if (!(irq_info.flags & VFIO_IRQ_INFO_EVENTFD)) {
++		vfio_dev_err(vdev, "interrupt not eventfd capable");
++		return -EINVAL;
++	}
++
++	if (!(irq_info.flags & VFIO_IRQ_INFO_AUTOMASKED)) {
++		vfio_dev_err(vdev, "INTx interrupt not AUTOMASKED");
++		return -EINVAL;
++	}
++
++	/*
++	 * PCI IRQ is level-triggered, so we use two eventfds. trigger_fd
++	 * signals an interrupt from host to guest, and unmask_fd signals the
++	 * deassertion of the line from guest to host.
++	 */
++	trigger_fd = eventfd(0, 0);
++	if (trigger_fd < 0) {
++		vfio_dev_err(vdev, "failed to create trigger eventfd");
++		return trigger_fd;
++	}
++
++	unmask_fd = eventfd(0, 0);
++	if (unmask_fd < 0) {
++		vfio_dev_err(vdev, "failed to create unmask eventfd");
++		close(trigger_fd);
++		return unmask_fd;
++	}
++
++	ret = irq__add_irqfd(kvm, gsi, trigger_fd, unmask_fd);
++	if (ret)
++		goto err_close;
++
++	trigger.irq = (struct vfio_irq_set) {
++		.argsz	= sizeof(trigger),
++		.flags	= VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER,
++		.index	= VFIO_PCI_INTX_IRQ_INDEX,
++		.start	= 0,
++		.count	= 1,
++	};
++	trigger.fd = trigger_fd;
++
++	ret = ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &trigger);
++	if (ret < 0) {
++		vfio_dev_err(vdev, "failed to setup VFIO IRQ");
++		goto err_delete_line;
++	}
++
++	unmask.irq = (struct vfio_irq_set) {
++		.argsz	= sizeof(unmask),
++		.flags	= VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK,
++		.index	= VFIO_PCI_INTX_IRQ_INDEX,
++		.start	= 0,
++		.count	= 1,
++	};
++	unmask.fd = unmask_fd;
++
++	ret = ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &unmask);
++	if (ret < 0) {
++		vfio_dev_err(vdev, "failed to setup unmask IRQ");
++		goto err_remove_event;
++	}
++
++	return 0;
++
++err_remove_event:
++	/* Remove trigger event */
++	trigger.irq.flags = VFIO_IRQ_SET_DATA_NONE | VFIO_IRQ_SET_ACTION_TRIGGER;
++	trigger.irq.count = 0;
++	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &trigger);
++
++err_delete_line:
++	irq__del_irqfd(kvm, gsi, trigger_fd);
++
++err_close:
++	close(trigger_fd);
++	close(unmask_fd);
++	return ret;
++}
++
++static int vfio_pci_configure_dev_irqs(struct kvm *kvm, struct vfio_device *vdev)
++{
++	struct vfio_pci_device *pdev = &vdev->pci;
++
++	struct vfio_irq_info irq_info = {
++		.argsz = sizeof(irq_info),
++		.index = VFIO_PCI_INTX_IRQ_INDEX,
++	};
++
++	if (!pdev->hdr.irq_pin) {
++		/* TODO: add MSI support */
++		vfio_dev_err(vdev, "INTx not available, MSI-X not implemented");
++		return -ENOSYS;
++	}
++
++	return vfio_pci_enable_intx(kvm, vdev);
++}
++
++int vfio_pci_setup_device(struct kvm *kvm, struct vfio_device *vdev)
++{
++	int ret;
++
++	ret = vfio_pci_configure_dev_regions(kvm, vdev);
++	if (ret) {
++		vfio_dev_err(vdev, "failed to configure regions");
++		return ret;
++	}
++
++	vdev->dev_hdr = (struct device_header) {
++		.bus_type	= DEVICE_BUS_PCI,
++		.data		= &vdev->pci.hdr,
++	};
++
++	ret = device__register(&vdev->dev_hdr);
++	if (ret) {
++		vfio_dev_err(vdev, "failed to register VFIO device");
++		return ret;
++	}
++
++	ret = vfio_pci_configure_dev_irqs(kvm, vdev);
++	if (ret) {
++		vfio_dev_err(vdev, "failed to configure IRQs");
++		return ret;
++	}
++
++	return 0;
++}
++
++void vfio_pci_teardown_device(struct kvm *kvm, struct vfio_device *vdev)
++{
++	size_t i;
++
++	for (i = 0; i < vdev->info.num_regions; i++)
++		vfio_unmap_region(kvm, &vdev->regions[i]);
++
++	device__unregister(&vdev->dev_hdr);
++}
 -- 
 2.17.0
