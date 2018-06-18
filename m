@@ -1,25 +1,21 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.14 071/189] KVM: arm/arm64: vgic: fix possible spectre-v1 in
- vgic_mmio_read_apr()
-Date: Mon, 18 Jun 2018 10:12:47 +0200
-Message-ID: <20180618081212.145698964@linuxfoundation.org>
-References: <20180618081209.254234434@linuxfoundation.org>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v6 kvmtool 00/13] Add vfio-pci support
+Date: Mon, 18 Jun 2018 19:41:58 +0100
+Message-ID: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D58349FA8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 04:20:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 960A54A0E4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1TqFtie5wjRU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jun 2018 04:20:32 -0400 (EDT)
-Received: from mail.linuxfoundation.org (mail.linuxfoundation.org
- [140.211.169.12])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9333440192
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 04:20:32 -0400 (EDT)
-In-Reply-To: <20180618081209.254234434@linuxfoundation.org>
+ with ESMTP id PDBlSZEqoHx4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jun 2018 14:31:24 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5636C402B8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:24 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,58 +25,69 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will.deacon@arm.com>, stable@vger.kernel.org, Sasha Levin <alexander.levin@microsoft.com>, kvmarm@lists.cs.columbia.edu
+To: kvm@vger.kernel.org
+Cc: lorenzo.pieralisi@arm.com, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, alex.williamson@redhat.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+This is version six of the VFIO support in kvmtool. It addresses
+Will's comments for v5.
 
-------------------
+Implement vfio-pci support in kvmtool. Devices are assigned to the guest
+by passing "--vfio-pci [domain:]bus:dev.fn" to lkvm run, after having
+bound the device to the VFIO driver (see Documentation/vfio.txt)
 
-From: Mark Rutland <mark.rutland@arm.com>
+This time around I also tested assignment of the x540 NIC on my old x86
+desktop as well (previously only on AMD Seattle, an arm64 host). It
+worked smoothly.
 
-[ Upstream commit 5e1ca5e23b167987d5b6d8b08f2d5b7dd2d13f49 ]
+v6: git://linux-arm.org/kvmtool-jpb.git vfio/v6
+v5: https://www.spinics.net/lists/kvm/msg166119.html
 
-It's possible for userspace to control n. Sanitize n when using it as an
-array index.
+Jean-Philippe Brucker (13):
+  pci: add config operations callbacks on the PCI header
+  pci: allow to specify IRQ type for PCI devices
+  irq: add irqfd helpers
+  Extend memory bank API with memory types
+  pci: add capability helpers
+  Import VFIO headers
+  Add fls_long and roundup_pow_of_two helpers
+  Add PCI device passthrough using VFIO
+  vfio-pci: add MSI-X support
+  vfio-pci: add MSI support
+  vfio: Support non-mmappable regions
+  Introduce reserved memory regions
+  vfio: check reserved regions before mapping DMA
 
-Note that while it appears that n must be bound to the interval [0,3]
-due to the way it is extracted from addr, we cannot guarantee that
-compiler transformations (and/or future refactoring) will ensure this is
-the case, and given this is a slow path it's better to always perform
-the masking.
+ Makefile                     |    2 +
+ arm/gic.c                    |   76 ++-
+ arm/include/arm-common/gic.h |    6 +
+ arm/kvm.c                    |    2 +-
+ arm/pci.c                    |    4 +-
+ builtin-run.c                |    5 +
+ hw/pci-shmem.c               |   12 +-
+ hw/vesa.c                    |    2 +-
+ include/kvm/irq.h            |   17 +
+ include/kvm/kvm-config.h     |    3 +
+ include/kvm/kvm.h            |   54 +-
+ include/kvm/pci.h            |  118 +++-
+ include/kvm/util.h           |   14 +
+ include/kvm/vfio.h           |  127 ++++
+ include/linux/vfio.h         |  719 ++++++++++++++++++++
+ irq.c                        |   31 +
+ kvm.c                        |   99 ++-
+ mips/kvm.c                   |    6 +-
+ pci.c                        |  105 +--
+ powerpc/kvm.c                |    2 +-
+ vfio/core.c                  |  676 +++++++++++++++++++
+ vfio/pci.c                   | 1193 ++++++++++++++++++++++++++++++++++
+ virtio/net.c                 |    9 +-
+ virtio/scsi.c                |   10 +-
+ x86/kvm.c                    |    6 +-
+ 25 files changed, 3175 insertions(+), 123 deletions(-)
+ create mode 100644 include/kvm/vfio.h
+ create mode 100644 include/linux/vfio.h
+ create mode 100644 vfio/core.c
+ create mode 100644 vfio/pci.c
 
-Found by smatch.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- virt/kvm/arm/vgic/vgic-mmio-v2.c |    5 +++++
- 1 file changed, 5 insertions(+)
-
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -14,6 +14,8 @@
- #include <linux/irqchip/arm-gic.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <linux/nospec.h>
-+
- #include <kvm/iodev.h>
- #include <kvm/arm_vgic.h>
- 
-@@ -320,6 +322,9 @@ static unsigned long vgic_mmio_read_apr(
- 
- 		if (n > vgic_v3_max_apr_idx(vcpu))
- 			return 0;
-+
-+		n = array_index_nospec(n, 4);
-+
- 		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
- 		return vgicv3->vgic_ap1r[n];
- 	}
+-- 
+2.17.0
