@@ -1,22 +1,22 @@
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH v6 kvmtool 03/13] irq: add irqfd helpers
-Date: Mon, 18 Jun 2018 19:42:01 +0100
-Message-ID: <20180618184211.43904-4-jean-philippe.brucker@arm.com>
+Subject: [PATCH v6 kvmtool 04/13] Extend memory bank API with memory types
+Date: Mon, 18 Jun 2018 19:42:02 +0100
+Message-ID: <20180618184211.43904-5-jean-philippe.brucker@arm.com>
 References: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E46C4A0EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 49B444A0EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nASyb9+-rh8G for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jun 2018 14:31:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FC64A0D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:28 -0400 (EDT)
+ with ESMTP id d6TcfFlccTXI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jun 2018 14:31:30 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3DD74A0D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 14:31:30 -0400 (EDT)
 In-Reply-To: <20180618184211.43904-1-jean-philippe.brucker@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,316 +31,280 @@ To: kvm@vger.kernel.org
 Cc: lorenzo.pieralisi@arm.com, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, alex.williamson@redhat.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add helpers to add and remove IRQFD routing for both irqchips and MSIs.
-We have to make a special case of IRQ lines on ARM where the
-initialisation order goes like this:
+Introduce memory types RAM and DEVICE, along with a way for subsystems to
+query the global memory banks. This is required by VFIO, which will need
+to pin and map guest RAM so that assigned devices can safely do DMA to it.
+Depending on the architecture, the physical map is made of either one or
+two RAM regions. In addition, this new memory types API paves the way to
+reserved memory regions introduced in a subsequent patch.
 
- (1) Devices reserve their IRQ lines
- (2) VGIC is setup with VGIC_CTRL_INIT (in a late_init call)
- (3) MSIs are reserved lazily, when the guest needs them
-
-Since we cannot setup IRQFD before (2), store the IRQFD routing for IRQ
-lines temporarily until we're ready to submit them.
+For the moment we put vesa and ivshmem memory into the DEVICE category, so
+they don't have to be pinned. This means that physical devices assigned
+with VFIO won't be able to DMA to the vesa frame buffer or ivshmem. In
+order to do that, simply changing the type to "RAM" would work. But to
+keep the types consistent, it would be better to introduce flags such as
+KVM_MEM_TYPE_DMA that would complement both RAM and DEVICE type. We could
+then reuse the API for generating firmware information (that is, for x86
+bios; DT supports reserved-memory description).
 
 Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- arm/gic.c                    | 76 +++++++++++++++++++++++++++++++++++-
- arm/include/arm-common/gic.h |  6 +++
- hw/pci-shmem.c               |  8 +---
- include/kvm/irq.h            | 17 ++++++++
- irq.c                        | 31 +++++++++++++++
- virtio/net.c                 |  9 +----
- virtio/scsi.c                | 10 ++---
- 7 files changed, 135 insertions(+), 22 deletions(-)
+ arm/kvm.c         |  2 +-
+ hw/pci-shmem.c    |  4 ++--
+ hw/vesa.c         |  2 +-
+ include/kvm/kvm.h | 44 +++++++++++++++++++++++++++++++++++++++++++-
+ kvm.c             | 31 ++++++++++++++++++++++++++++++-
+ mips/kvm.c        |  6 +++---
+ powerpc/kvm.c     |  2 +-
+ x86/kvm.c         |  6 +++---
+ 8 files changed, 84 insertions(+), 13 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 238a75c70..abcbcc091 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -17,6 +17,16 @@ static u64 gic_redists_base;
- static u64 gic_redists_size;
- static u64 gic_msi_base;
- static u64 gic_msi_size = 0;
-+static bool vgic_is_init = false;
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 2ab436e8d..b824f637e 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -34,7 +34,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 	phys_size	= kvm->ram_size;
+ 	host_mem	= kvm->ram_start;
+ 
+-	err = kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ 	if (err)
+ 		die("Failed to register %lld bytes of memory at physical "
+ 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+index 107043e9d..f92bc7554 100644
+--- a/hw/pci-shmem.c
++++ b/hw/pci-shmem.c
+@@ -387,8 +387,8 @@ int pci_shmem__init(struct kvm *kvm)
+ 	if (mem == NULL)
+ 		return -EINVAL;
+ 
+-	kvm__register_mem(kvm, shmem_region->phys_addr, shmem_region->size,
+-			  mem);
++	kvm__register_dev_mem(kvm, shmem_region->phys_addr, shmem_region->size,
++			      mem);
+ 	return 0;
+ }
+ dev_init(pci_shmem__init);
+diff --git a/hw/vesa.c b/hw/vesa.c
+index a9a1d3e2c..f3c5114cf 100644
+--- a/hw/vesa.c
++++ b/hw/vesa.c
+@@ -73,7 +73,7 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+ 	if (mem == MAP_FAILED)
+ 		ERR_PTR(-errno);
+ 
+-	kvm__register_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
++	kvm__register_dev_mem(kvm, VESA_MEM_ADDR, VESA_MEM_SIZE, mem);
+ 
+ 	vesafb = (struct framebuffer) {
+ 		.width			= VESA_WIDTH,
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index 90463b8c3..19f7d265c 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -34,6 +34,14 @@ enum {
+ 	KVM_VMSTATE_PAUSED,
+ };
+ 
++enum kvm_mem_type {
++	KVM_MEM_TYPE_RAM	= 1 << 0,
++	KVM_MEM_TYPE_DEVICE	= 1 << 1,
 +
-+struct kvm_irqfd_line {
-+	unsigned int		gsi;
-+	int			trigger_fd;
-+	int			resample_fd;
-+	struct list_head	list;
++	KVM_MEM_TYPE_ALL	= KVM_MEM_TYPE_RAM
++				| KVM_MEM_TYPE_DEVICE
 +};
 +
-+static LIST_HEAD(irqfd_lines);
+ struct kvm_ext {
+ 	const char *name;
+ 	int code;
+@@ -44,6 +52,7 @@ struct kvm_mem_bank {
+ 	u64			guest_phys_addr;
+ 	void			*host_addr;
+ 	u64			size;
++	enum kvm_mem_type	type;
+ };
  
- int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ struct kvm {
+@@ -90,7 +99,22 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+ void kvm__irq_trigger(struct kvm *kvm, int irq);
+ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+-int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
++int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
++		      enum kvm_mem_type type);
++static inline int kvm__register_ram(struct kvm *kvm, u64 guest_phys, u64 size,
++				    void *userspace_addr)
++{
++	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
++				 KVM_MEM_TYPE_RAM);
++}
++
++static inline int kvm__register_dev_mem(struct kvm *kvm, u64 guest_phys,
++					u64 size, void *userspace_addr)
++{
++	return kvm__register_mem(kvm, guest_phys, size, userspace_addr,
++				 KVM_MEM_TYPE_DEVICE);
++}
++
+ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+ 		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+ 			void *ptr);
+@@ -117,6 +141,24 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr);
+ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 				 const char *kernel_cmdline);
+ 
++static inline const char *kvm_mem_type_to_string(enum kvm_mem_type type)
++{
++	switch (type) {
++	case KVM_MEM_TYPE_ALL:
++		return "(all)";
++	case KVM_MEM_TYPE_RAM:
++		return "RAM";
++	case KVM_MEM_TYPE_DEVICE:
++		return "device";
++	}
++
++	return "???";
++}
++
++int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
++			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
++			   void *data);
++
+ /*
+  * Debugging
+  */
+diff --git a/kvm.c b/kvm.c
+index f8f2fdc2c..e9c3c5fcb 100644
+--- a/kvm.c
++++ b/kvm.c
+@@ -182,7 +182,8 @@ core_exit(kvm__exit);
+  * memory regions to it. Therefore, be careful if you use this function for
+  * registering memory regions for emulating hardware.
+  */
+-int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr)
++int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size,
++		      void *userspace_addr, enum kvm_mem_type type)
  {
-@@ -38,6 +48,26 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ 	struct kvm_userspace_memory_region mem;
+ 	struct kvm_mem_bank *bank;
+@@ -196,6 +197,7 @@ int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace
+ 	bank->guest_phys_addr		= guest_phys;
+ 	bank->host_addr			= userspace_addr;
+ 	bank->size			= size;
++	bank->type			= type;
+ 
+ 	mem = (struct kvm_userspace_memory_region) {
+ 		.slot			= kvm->mem_slots++,
+@@ -245,6 +247,33 @@ u64 host_to_guest_flat(struct kvm *kvm, void *ptr)
  	return 0;
  }
  
-+static int irq__setup_irqfd_lines(struct kvm *kvm)
++/*
++ * Iterate over each registered memory bank. Call @fun for each bank with @data
++ * as argument. @type is a bitmask that allows to filter banks according to
++ * their type.
++ *
++ * If one call to @fun returns a non-zero value, stop iterating and return the
++ * value. Otherwise, return zero.
++ */
++int kvm__for_each_mem_bank(struct kvm *kvm, enum kvm_mem_type type,
++			   int (*fun)(struct kvm *kvm, struct kvm_mem_bank *bank, void *data),
++			   void *data)
 +{
 +	int ret;
-+	struct kvm_irqfd_line *line, *tmp;
++	struct kvm_mem_bank *bank;
 +
-+	list_for_each_entry_safe(line, tmp, &irqfd_lines, list) {
-+		ret = irq__common_add_irqfd(kvm, line->gsi, line->trigger_fd,
-+					    line->resample_fd);
-+		if (ret < 0) {
-+			pr_err("Failed to register IRQFD");
-+			return ret;
-+		}
-+
-+		list_del(&line->list);
-+		free(line);
-+	}
-+
-+	return 0;
-+}
-+
- static int irq__routing_init(struct kvm *kvm)
- {
- 	int r;
-@@ -292,7 +322,9 @@ static int gic__init_gic(struct kvm *kvm)
- 	kvm->msix_needs_devid = kvm__supports_vm_extension(kvm,
- 							   KVM_CAP_MSI_DEVID);
- 
--	return 0;
-+	vgic_is_init = true;
-+
-+	return irq__setup_irqfd_lines(kvm);
- }
- late_init(gic__init_gic)
- 
-@@ -372,3 +404,45 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
- 	kvm__irq_line(kvm, irq, VIRTIO_IRQ_HIGH);
- 	kvm__irq_line(kvm, irq, VIRTIO_IRQ_LOW);
- }
-+
-+int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-+		   int resample_fd)
-+{
-+	struct kvm_irqfd_line *line;
-+
-+	if (vgic_is_init)
-+		return irq__common_add_irqfd(kvm, gsi, trigger_fd, resample_fd);
-+
-+	/* Postpone the routing setup until we have a distributor */
-+	line = malloc(sizeof(*line));
-+	if (!line)
-+		return -ENOMEM;
-+
-+	*line = (struct kvm_irqfd_line) {
-+		.gsi		= gsi,
-+		.trigger_fd	= trigger_fd,
-+		.resample_fd	= resample_fd,
-+	};
-+	list_add(&line->list, &irqfd_lines);
-+
-+	return 0;
-+}
-+
-+void gic__del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd)
-+{
-+	struct kvm_irqfd_line *line;
-+
-+	if (vgic_is_init) {
-+		irq__common_del_irqfd(kvm, gsi, trigger_fd);
-+		return;
-+	}
-+
-+	list_for_each_entry(line, &irqfd_lines, list) {
-+		if (line->gsi != gsi)
++	list_for_each_entry(bank, &kvm->mem_banks, list) {
++		if (type != KVM_MEM_TYPE_ALL && !(bank->type & type))
 +			continue;
 +
-+		list_del(&line->list);
-+		free(line);
-+		break;
++		ret = fun(kvm, bank, data);
++		if (ret)
++			break;
 +	}
++
++	return ret;
 +}
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index ae253c059..1125d601f 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -37,4 +37,10 @@ int gic__create(struct kvm *kvm, enum irqchip_type type);
- int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
- void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
- 
-+int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-+		   int resample_fd);
-+void gic__del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd);
-+#define irq__add_irqfd gic__add_irqfd
-+#define irq__del_irqfd gic__del_irqfd
 +
- #endif /* ARM_COMMON__GIC_H */
-diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-index 512b5b069..107043e9d 100644
---- a/hw/pci-shmem.c
-+++ b/hw/pci-shmem.c
-@@ -127,7 +127,6 @@ static void callback_mmio_msix(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len
- int pci_shmem__get_local_irqfd(struct kvm *kvm)
+ int kvm__recommended_cpus(struct kvm *kvm)
  {
- 	int fd, gsi, r;
--	struct kvm_irqfd irqfd;
+ 	int ret;
+diff --git a/mips/kvm.c b/mips/kvm.c
+index 24bd65076..211770da0 100644
+--- a/mips/kvm.c
++++ b/mips/kvm.c
+@@ -28,21 +28,21 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size;
+ 		host_mem   = kvm->ram_start;
  
- 	if (local_fd == 0) {
- 		fd = eventfd(0, 0);
-@@ -143,12 +142,7 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
- 			gsi = pci_shmem_pci_device.irq_line;
- 		}
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ 	} else {
+ 		/* one region for memory that fits below MMIO range */
+ 		phys_start = 0;
+ 		phys_size  = KVM_MMIO_START;
+ 		host_mem   = kvm->ram_start;
  
--		irqfd = (struct kvm_irqfd) {
--			.fd = fd,
--			.gsi = gsi,
--		};
--
--		r = ioctl(kvm->vm_fd, KVM_IRQFD, &irqfd);
-+		r = irq__add_irqfd(kvm, gsi, fd, -1);
- 		if (r < 0)
- 			return r;
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
  
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index 8ba8b7405..2a3f8c9dc 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -7,6 +7,7 @@
- #include <linux/list.h>
- #include <linux/kvm.h>
+ 		/* one region for rest of memory */
+ 		phys_start = KVM_MMIO_START + KVM_MMIO_SIZE;
+ 		phys_size  = kvm->ram_size - KVM_MMIO_START;
+ 		host_mem   = kvm->ram_start + KVM_MMIO_START;
  
-+#include "kvm/kvm-arch.h"
- #include "kvm/msi.h"
- 
- struct kvm;
-@@ -35,4 +36,20 @@ void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
- bool irq__can_signal_msi(struct kvm *kvm);
- int irq__signal_msi(struct kvm *kvm, struct kvm_msi *msi);
- 
-+/*
-+ * The function takes two eventfd arguments, trigger_fd and resample_fd. If
-+ * resample_fd is <= 0, resampling is disabled and the IRQ is edge-triggered
-+ */
-+int irq__common_add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-+			   int resample_fd);
-+void irq__common_del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd);
-+
-+#ifndef irq__add_irqfd
-+#define irq__add_irqfd irq__common_add_irqfd
-+#endif
-+
-+#ifndef irq__del_irqfd
-+#define irq__del_irqfd irq__common_del_irqfd
-+#endif
-+
- #endif
-diff --git a/irq.c b/irq.c
-index c89604cc1..cdcf99233 100644
---- a/irq.c
-+++ b/irq.c
-@@ -170,6 +170,37 @@ void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
- 		die_perror("KVM_SET_GSI_ROUTING");
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ 	}
  }
  
-+int irq__common_add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
-+			   int resample_fd)
-+{
-+	struct kvm_irqfd irqfd = {
-+		.fd		= trigger_fd,
-+		.gsi		= gsi,
-+		.flags		= resample_fd > 0 ? KVM_IRQFD_FLAG_RESAMPLE : 0,
-+		.resamplefd	= resample_fd,
-+	};
-+
-+	/* If we emulate MSI routing, translate the MSI to the corresponding IRQ */
-+	if (msi_routing_ops->translate_gsi)
-+		irqfd.gsi = msi_routing_ops->translate_gsi(kvm, gsi);
-+
-+	return ioctl(kvm->vm_fd, KVM_IRQFD, &irqfd);
-+}
-+
-+void irq__common_del_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd)
-+{
-+	struct kvm_irqfd irqfd = {
-+		.fd		= trigger_fd,
-+		.gsi		= gsi,
-+		.flags		= KVM_IRQFD_FLAG_DEASSIGN,
-+	};
-+
-+	if (msi_routing_ops->translate_gsi)
-+		irqfd.gsi = msi_routing_ops->translate_gsi(kvm, gsi);
-+
-+	ioctl(kvm->vm_fd, KVM_IRQFD, &irqfd);
-+}
-+
- int __attribute__((weak)) irq__exit(struct kvm *kvm)
- {
- 	free(irq_routing);
-diff --git a/virtio/net.c b/virtio/net.c
-index 419a5e301..f95258caa 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -602,23 +602,18 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- {
- 	struct net_dev *ndev = dev;
--	struct kvm_irqfd irq;
- 	struct vhost_vring_file file;
- 	int r;
+diff --git a/powerpc/kvm.c b/powerpc/kvm.c
+index c738c1d61..702d67dca 100644
+--- a/powerpc/kvm.c
++++ b/powerpc/kvm.c
+@@ -79,7 +79,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		    "overlaps MMIO!\n",
+ 		    phys_size);
  
- 	if (ndev->vhost_fd == 0)
- 		return;
+-	kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++	kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ }
  
--	irq = (struct kvm_irqfd) {
--		.gsi	= gsi,
--		.fd	= eventfd(0, 0),
--	};
- 	file = (struct vhost_vring_file) {
- 		.index	= vq,
--		.fd	= irq.fd,
-+		.fd	= eventfd(0, 0),
- 	};
+ void kvm__arch_set_cmdline(char *cmdline, bool video)
+diff --git a/x86/kvm.c b/x86/kvm.c
+index d8751e9a5..3e0f0b743 100644
+--- a/x86/kvm.c
++++ b/x86/kvm.c
+@@ -98,7 +98,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size;
+ 		host_mem   = kvm->ram_start;
  
--	r = ioctl(kvm->vm_fd, KVM_IRQFD, &irq);
-+	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
- 	if (r < 0)
- 		die_perror("KVM_IRQFD failed");
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ 	} else {
+ 		/* First RAM range from zero to the PCI gap: */
  
-diff --git a/virtio/scsi.c b/virtio/scsi.c
-index 58d2353a1..a429ac85a 100644
---- a/virtio/scsi.c
-+++ b/virtio/scsi.c
-@@ -1,6 +1,7 @@
- #include "kvm/virtio-scsi.h"
- #include "kvm/virtio-pci-dev.h"
- #include "kvm/disk-image.h"
-+#include "kvm/irq.h"
- #include "kvm/kvm.h"
- #include "kvm/pci.h"
- #include "kvm/ioeventfd.h"
-@@ -97,22 +98,17 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- {
- 	struct vhost_vring_file file;
- 	struct scsi_dev *sdev = dev;
--	struct kvm_irqfd irq;
- 	int r;
+@@ -106,7 +106,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = KVM_32BIT_GAP_START;
+ 		host_mem   = kvm->ram_start;
  
- 	if (sdev->vhost_fd == 0)
- 		return;
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
  
--	irq = (struct kvm_irqfd) {
--		.gsi	= gsi,
--		.fd	= eventfd(0, 0),
--	};
- 	file = (struct vhost_vring_file) {
- 		.index	= vq,
--		.fd	= irq.fd,
-+		.fd	= eventfd(0, 0),
- 	};
+ 		/* Second RAM range from 4GB to the end of RAM: */
  
--	r = ioctl(kvm->vm_fd, KVM_IRQFD, &irq);
-+	r = irq__add_irqfd(kvm, gsi, file.fd, -1);
- 	if (r < 0)
- 		die_perror("KVM_IRQFD failed");
+@@ -114,7 +114,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		phys_size  = kvm->ram_size - phys_start;
+ 		host_mem   = kvm->ram_start + phys_start;
+ 
+-		kvm__register_mem(kvm, phys_start, phys_size, host_mem);
++		kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+ 	}
+ }
  
 -- 
 2.17.0
