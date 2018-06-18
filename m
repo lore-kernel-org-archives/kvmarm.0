@@ -1,18 +1,39 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.16 107/279] KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_mmio_read_apr()
-Date: Mon, 18 Jun 2018 10:11:32 +0200
-Message-ID: <20180618080613.251884990@linuxfoundation.org>
-References: <20180618080608.851973560@linuxfoundation.org>
+Subject: [PATCH 4.14 071/189] KVM: arm/arm64: vgic: fix possible spectre-v1 in
+ vgic_mmio_read_apr()
+Date: Mon, 18 Jun 2018 10:12:47 +0200
+Message-ID: <20180618081212.145698964@linuxfoundation.org>
+References: <20180618081209.254234434@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180618080608.851973560@linuxfoundation.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D58349FA8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 04:20:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1TqFtie5wjRU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jun 2018 04:20:32 -0400 (EDT)
+Received: from mail.linuxfoundation.org (mail.linuxfoundation.org
+ [140.211.169.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9333440192
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jun 2018 04:20:32 -0400 (EDT)
+In-Reply-To: <20180618081209.254234434@linuxfoundation.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Sasha Levin <alexander.levin@microsoft.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will.deacon@arm.com>, stable@vger.kernel.org, Sasha Levin <alexander.levin@microsoft.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.16-stable review patch.  If anyone has any objections, please let me know.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -53,7 +74,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  #include <kvm/iodev.h>
  #include <kvm/arm_vgic.h>
  
-@@ -324,6 +326,9 @@ static unsigned long vgic_mmio_read_apr(
+@@ -320,6 +322,9 @@ static unsigned long vgic_mmio_read_apr(
  
  		if (n > vgic_v3_max_apr_idx(vcpu))
  			return 0;
