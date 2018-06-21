@@ -1,106 +1,220 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v2 0/5] Add virtio-iommu driver
-Date: Thu, 21 Jun 2018 20:06:50 +0100
-Message-ID: <20180621190655.56391-1-jean-philippe.brucker@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v2 4/5] iommu/virtio: Add event queue
+Date: Thu, 21 Jun 2018 20:06:54 +0100
+Message-ID: <20180621190655.56391-5-jean-philippe.brucker@arm.com>
+References: <20180621190655.56391-1-jean-philippe.brucker@arm.com>
+Return-path: <virtio-dev-return-4473-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <20180621190655.56391-1-jean-philippe.brucker@arm.com>
+To: iommu@lists.linux-foundation.org, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, devicetree@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: joro@8bytes.org, alex.williamson@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, mst@redhat.com, jasowang@redhat.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, eric.auger@redhat.com, peterx@redhat.com, bharat.bhushan@nxp.com, tnowicki@caviumnetworks.com, jayachandran.nair@cavium.com, kevin.tian@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SW1wbGVtZW50IHRoZSBiYXNlIHZpcnRpby1pb21tdSBkcml2ZXIsIGZvbGxvd2luZyB2ZXJzaW9u
-IDAuNyBvZiB0aGUKc3BlY2lmaWNhdGlvbiBbMV0uCgpDaGFuZ2VzIHNpbmNlIGxhc3QgdmVyc2lv
-biBbMl06CiogQWRkcmVzcyBjb21tZW50cywgdGhhbmtzIGFnYWluIGZvciB0aGUgcmV2aWV3Lgoq
-IEFzIHN1Z2dlc3RlZCwgYWRkIGEgRFQgYmluZGluZyBkZXNjcmlwdGlvbiBpbiBwYXRjaCAxLgoq
-IERlcGVuZCBvbiBWSVJUSU9fTU1JTz15IHRvIGZpeCBhIGJ1aWxkIGZhaWx1cmXCuQoqIFN3aXRj
-aCB0byB2MC43IG9mIHRoZSBzcGVjLCB3aGljaCBjaGFuZ2VzIHJlc3ZfbWVtIHBhcmFtZXRlcnMg
-YW5kIGFkZHMKICBhbiBNTUlPIGZsYWcuIFRoZXNlIGFyZSB0cml2aWFsIGJ1dCBub3QgYmFja3dh
-cmQgY29tcGF0aWJsZS4gT25jZQogIGRldmljZSBvciBkcml2ZXIgaXMgdXBzdHJlYW0sIHVwZGF0
-ZXMgdG8gdGhlIHNwZWMgd2lsbCByZWx5IG9uIGZlYXR1cmUKICBiaXRzIHRvIHN0YXkgY29tcGF0
-aWJsZSB3aXRoIHRoaXMgY29kZS4KKiBJbXBsZW1lbnQgdGhlIG5ldyB0bGJfc3luYyBpbnRlcmZh
-Y2UsIGJ5IHNwbGl0dGluZyBhZGRfcmVxKCkgYW5kCiAgc3luY19yZXEoKS4gSSBub3RpY2VkIGEg
-c21hbGwgaW1wcm92ZW1lbnQgb24gbmV0cGVyZiBzdHJlYW0gYmVjYXVzZQogIHRoZSBzeW5jaHJv
-bm91cyBpb21tdV91bm1hcCgpIGFsc28gYmVuZWZpdHMgZnJvbSB0aGlzLiBPdGhlcgogIGV4cGVy
-aW1lbnRzLCBzdWNoIGFzIHVzaW5nIGttZW1fY2FjaGUgZm9yIHJlcXVlc3RzIGluc3RlYWQgb2Yg
-a21hbGxvYywKICBkaWRuJ3Qgc2hvdyBhbnkgaW1wcm92ZW1lbnQuCgpEcml2ZXIgaXMgYXZhaWxh
-YmxlIG9uIGJyYW5jaCB2aXJ0aW8taW9tbXUvdjAuNyBbM10sIGFuZCB0aGUgeDg2K0FDUEkKcHJv
-dG90eXBlIGlzIG9uIGJyYW5jaCB2aXJ0aW8taW9tbXUvZGV2ZWwuIFRoYXQgeDg2IGNvZGUgaGFz
-bid0IGNoYW5nZWQsCml0IHN0aWxsIHJlcXVpcmVzIHRoZSBETUEgaWZkZWZmZXJ5IGFuZCBJIGxh
-Y2sgdGhlIGV4cGVydGlzZSB0byB0aWR5IGl0CnVwLiBUaGUga3ZtdG9vbCBleGFtcGxlIGRldmlj
-ZSBoYXMgYmVlbiBjbGVhbmVkIHVwIGFuZCBpcyBhdmFpbGFibGUgb24KYnJhbmNoIHZpcnRpby1p
-b21tdS92MC43IFs0XS4KCkZlZWRiYWNrIHdlbGNvbWUhCgpUaGFua3MsCkplYW4KClsxXSB2aXJ0
-aW8taW9tbXUgc3BlY2lmaWNhdGlvbiB2MC43CiAgICBodHRwczovL3d3dy5zcGluaWNzLm5ldC9s
-aXN0cy9saW51eC12aXJ0dWFsaXphdGlvbi9tc2czNDEyNy5odG1sClsyXSB2aXJ0aW8taW9tbXUg
-ZHJpdmVyIHYxCiAgICBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9rdm0vbXNnMTY0MzIy
-Lmh0bWwKWzNdIGdpdDovL2xpbnV4LWFybS5vcmcvbGludXgtanBiLmdpdCB2aXJ0aW8taW9tbXUv
-djAuNwogICAgaHR0cDovL3d3dy5saW51eC1hcm0ub3JnL2dpdD9wPWxpbnV4LWpwYi5naXQ7YT1z
-aG9ydGxvZztoPXJlZnMvaGVhZHMvdmlydGlvLWlvbW11L3YwLjcKWzRdIGdpdDovL2xpbnV4LWFy
-bS5vcmcva3ZtdG9vbC1qcGIuZ2l0IHZpcnRpby1pb21tdS92MC43IAoKICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIC0tLQrCuSBBIHdvcmQgb24gdGhlIG1vZHVsZSBzdG9yeS4gQmVj
-YXVzZSBvZiBjb21wbGV4IGRlcGVuZGVuY2llcyBJT01NVQpkcml2ZXJzIGNhbm5vdCB5ZXQgYmUg
-LmtvIG1vZHVsZXMuIEVuYWJsaW5nIGl0IGlzIG91dHNpZGUgdGhlIHNjb3BlIG9mCnRoaXMgc2Vy
-aWVzIGJ1dCBJIGhhdmUgYSBzbWFsbCBwcm90b3R5cGUgb24gYnJhbmNoIHZpcnRpby1pb21tdS8K
-bW9kdWxlLWRldmVsLiBJdCBzZWVtcyBkZXNpcmFibGUgc2luY2Ugc29tZSBkaXN0cm9zIGN1cnJl
-bnRseSBzaGlwIHRoZQp0cmFuc3BvcnQgY29kZSBhcyBtb2R1bGUgYW5kIGFyZSB1bmxpa2VseSB0
-byBjaGFuZ2UgdGhpcyBvbiBvdXIgYWNjb3VudC4KTm90ZSB0aGF0IHRoaXMgc2VyaWVzIHdvcmtz
-IGZpbmUgd2l0aCBhcm02NCBkZWZjb25maWcsIHdoaWNoIHNlbGVjdHMKVklSVElPX01NSU89eS4K
-CkkgY291bGQgdXNlIHNvbWUgaGVscCB0byBjbGVhbiB0aGlzIHVwLiBDdXJyZW50bHkgbXkgc29s
-dXRpb24gaXMgdG8gc3BsaXQKdmlydGlvLWlvbW11IGludG8gYSBtb2R1bGUgYW5kIGEgMy1saW5l
-cyBidWlsdC1pbiBzdHViLCB3aGljaCBpc24ndApncmFjZWZ1bCBidXQgY291bGQgaGF2ZSBiZWVu
-IHdvcnNlLgoKS2VlcGluZyB0aGUgd2hvbGUgdmlydGlvLWlvbW11IGRyaXZlciBhcyBidWlsdGlu
-IHdvdWxkIHJlcXVpcmUgYWNjZXNzaW5nCmFueSB2aXJ0aW8gdXRpbGl0eSB0aHJvdWdoIGdldF9z
-eW1ib2wuIFNvIGZhciB3ZSBvbmx5IGhhdmUgc2V2ZW4gb2YKdGhvc2UgYW5kIGNvdWxkIGtlZXAg
-YSBsaXN0IG9mIHBvaW50ZXIgb3BzLCBidXQgSSBmaW5kIHRoaXMgc29sdXRpb24KdGVycmlibGUu
-IElmIHZpcnRpbyBvciB2aXJ0aW9fbW1pbyBpcyBhIG1vZHVsZSwgdmlydGlvLWlvbW11IGFsc28g
-bmVlZHMKdG8gYmUgb25lLgoKVGhlIG1pbmltYWwgc2V0IG9mIGNoYW5nZXMgdG8gbWFrZSBhIG1v
-ZHVsZSBvdXQgb2YgYW4gT0YtYmFzZWQgSU9NTVUKZHJpdmVyIHNlZW1zIHRvIGJlOgoqIEV4cG9y
-dCBJT01NVSBzeW1ib2xzIHVzZWQgYnkgZHJpdmVycwoqIERvbid0IGdpdmUgdXAgZGVmZXJyaW5n
-IHByb2JlIGluIG9mX2lvbW11CiogTW92ZSBJT01NVSBPRiB0YWJsZXMgdG8gLnJvZGF0YQoqIENy
-ZWF0ZSBhIHN0YXRpYyB2aXJ0aW8taW9tbXUgc3R1YiB0aGF0IGRlY2xhcmVzIHRoZSB2aXJ0aW8t
-aW9tbXUgT0YKICB0YWJsZSBlbnRyeS4gVGhlIGJ1aWxkIHN5c3RlbSBkb2Vzbid0IHBpY2sgdXAg
-SU9NTVVfT0ZfREVDTEFSRSB3aGVuCiAgZG9uZSBmcm9tIGFuIG9iamVjdCBkZXN0aW5lZCB0byBi
-ZSBidWlsdCBhcyBtb2R1bGUgOigKKiBDcmVhdGUgYSBkZXZpY2VfbGluayBiZXR3ZWVuIGVuZHBv
-aW50IGFuZCBJT01NVSwgdG8gZW5zdXJlIHRoYXQKICByZW1vdmluZyB0aGUgSU9NTVUgZHJpdmVy
-IGFsc28gdW5iaW5kcyB0aGUgZW5kcG9pbnQgZHJpdmVyLiBQdXR0aW5nCiAgdGhpcyBpbiBJT01N
-VSBjb3JlIHNlZW1zIGxpa2UgYSBiZXR0ZXIgYXBwcm9hY2ggc2luY2UgZXZlbiB3aGVuIG5vdAog
-IGJ1aWx0IGFzIG1vZHVsZSwgdW5iaW5kaW5nIGFuIElPTU1VIGRldmljZSB2aWEgc3lzZnMgd2ls
-bCBjYXVzZQogIGNyYXNoZXMuCgpXaXRoIHRoaXMsIGFzIGxvbmcgYXMgdmlydGlvLW1taW8gaXNu
-J3QgbG9hZGVkLCB0aGUgT0YgY29kZSBkZWZlcnMgcHJvYmUKb2YgZW5kcG9pbnRzIHRoYXQgZGVw
-ZW5kIG9uIHZpcnRpby1pb21tdS4gT25jZSB2aXJ0aW8tbW1pbyBpcyBsb2FkZWQsCnRoZSBwcm9i
-ZSBpcyBzdGlsbCBkZWZlcnJlZCB1bnRpbCB2aXJ0aW8taW9tbXUgcmVnaXN0ZXJzIGl0c2VsZiB0
-byB0aGUKdmlydGlvIGJ1cy4gT25jZSB2aXJ0aW8taW9tbXUgaXMgbG9hZGVkLCBwcm9iZSBvZiBl
-bmRwb2ludHMgbWFuYWdlZCBieQp0aGUgSU9NTVUgZm9sbG93cy4KCkknbGwgaW52ZXN0aWdhdGUg
-QUNQSSBJT1JUIHdoZW4gSSBmaW5kIHNvbWUgdGltZSwgdGhvdWdoIEkgZG9uJ3QgZXhwZWN0Cm11
-Y2ggY29tcGxpY2F0aW9uIGFuZCBzdWdnZXN0IHdlIHRhY2tsZSBvbmUgcHJvYmxlbSBhdCBhIHRp
-bWUuIFNpbmNlIGl0CmlzIGEgbHV4dXJ5IHRoYXQgcmVxdWlyZXMgY2hhbmdlcyB0byB0aGUgSU9N
-TVUgY29yZSwgbW9kdWxlIHN1cHBvcnQgaXMKbGVmdCBhcyBhIGZ1dHVyZSBpbXByb3ZlbWVudC4K
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC0tLQoKSmVhbi1QaGlsaXBwZSBCcnVj
-a2VyICg1KToKICBkdC1iaW5kaW5nczogdmlydGlvOiBTcGVjaWZ5ICNpb21tdS1jZWxscyB2YWx1
-ZSBmb3IgYSB2aXJ0aW8taW9tbXUKICBpb21tdTogQWRkIHZpcnRpby1pb21tdSBkcml2ZXIKICBp
-b21tdS92aXJ0aW86IEFkZCBwcm9iZSByZXF1ZXN0CiAgaW9tbXUvdmlydGlvOiBBZGQgZXZlbnQg
-cXVldWUKICB2ZmlvOiBBbGxvdyB0eXBlLTEgSU9NTVUgaW5zdGFudGlhdGlvbiBmb3IgQVJNCgog
-Li4uL2RldmljZXRyZWUvYmluZGluZ3MvdmlydGlvL21taW8udHh0ICAgICAgIHwgICAgOCArCiBN
-QUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICA2ICsKIGRy
-aXZlcnMvaW9tbXUvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgMTEgKwogZHJp
-dmVycy9pb21tdS9NYWtlZmlsZSAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgMSArCiBkcml2
-ZXJzL2lvbW11L3ZpcnRpby1pb21tdS5jICAgICAgICAgICAgICAgICAgfCAxMTY0ICsrKysrKysr
-KysrKysrKysrCiBkcml2ZXJzL3ZmaW8vS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgICAgICAg
-fCAgICAyICstCiBpbmNsdWRlL3VhcGkvbGludXgvdmlydGlvX2lkcy5oICAgICAgICAgICAgICAg
-fCAgICAxICsKIGluY2x1ZGUvdWFwaS9saW51eC92aXJ0aW9faW9tbXUuaCAgICAgICAgICAgICB8
-ICAxNzIgKysrCiA4IGZpbGVzIGNoYW5nZWQsIDEzNjQgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlv
-bigtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvaW9tbXUvdmlydGlvLWlvbW11LmMKIGNy
-ZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL3VhcGkvbGludXgvdmlydGlvX2lvbW11LmgKCi0tIAoy
-LjE3LjAKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmlv
-bW11IG1haWxpbmcgbGlzdAppb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczov
-L2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9pb21tdQ==
+The event queue offers a way for the device to report access faults from
+endpoints. It is implemented on virtqueue #1. Whenever the host needs to
+signal a fault, it fills one of the buffers offered by the guest and
+interrupts it.
+
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+---
+ drivers/iommu/virtio-iommu.c      | 116 +++++++++++++++++++++++++++---
+ include/uapi/linux/virtio_iommu.h |  18 +++++
+ 2 files changed, 125 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+index 29ce9f4398ef..c075404e97d6 100644
+--- a/drivers/iommu/virtio-iommu.c
++++ b/drivers/iommu/virtio-iommu.c
+@@ -29,7 +29,8 @@
+ #define MSI_IOVA_LENGTH			0x100000
+ 
+ #define VIOMMU_REQUEST_VQ		0
+-#define VIOMMU_NR_VQS			1
++#define VIOMMU_EVENT_VQ			1
++#define VIOMMU_NR_VQS			2
+ 
+ #define VIOMMU_REQUEST_TIMEOUT		10000 /* 10s */
+ 
+@@ -43,6 +44,7 @@ struct viommu_dev {
+ 	struct virtqueue		*vqs[VIOMMU_NR_VQS];
+ 	spinlock_t			request_lock;
+ 	struct list_head		requests;
++	void				*evts;
+ 
+ 	/* Device configuration */
+ 	struct iommu_domain_geometry	geometry;
+@@ -84,6 +86,15 @@ struct viommu_request {
+ 	char				buf[];
+ };
+ 
++#define VIOMMU_FAULT_RESV_MASK		0xffffff00
++
++struct viommu_event {
++	union {
++		u32			head;
++		struct virtio_iommu_fault fault;
++	};
++};
++
+ #define to_viommu_domain(domain)	\
+ 	container_of(domain, struct viommu_domain, domain)
+ 
+@@ -507,6 +518,69 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
+ 	return ret;
+ }
+ 
++static int viommu_fault_handler(struct viommu_dev *viommu,
++				struct virtio_iommu_fault *fault)
++{
++	char *reason_str;
++
++	u8 reason	= fault->reason;
++	u32 flags	= le32_to_cpu(fault->flags);
++	u32 endpoint	= le32_to_cpu(fault->endpoint);
++	u64 address	= le64_to_cpu(fault->address);
++
++	switch (reason) {
++	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
++		reason_str = "domain";
++		break;
++	case VIRTIO_IOMMU_FAULT_R_MAPPING:
++		reason_str = "page";
++		break;
++	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
++	default:
++		reason_str = "unknown";
++		break;
++	}
++
++	/* TODO: find EP by ID and report_iommu_fault */
++	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
++		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
++				    reason_str, endpoint, address,
++				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
++				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
++				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
++	else
++		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
++				    reason_str, endpoint);
++	return 0;
++}
++
++static void viommu_event_handler(struct virtqueue *vq)
++{
++	int ret;
++	unsigned int len;
++	struct scatterlist sg[1];
++	struct viommu_event *evt;
++	struct viommu_dev *viommu = vq->vdev->priv;
++
++	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
++		if (len > sizeof(*evt)) {
++			dev_err(viommu->dev,
++				"invalid event buffer (len %u != %zu)\n",
++				len, sizeof(*evt));
++		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
++			viommu_fault_handler(viommu, &evt->fault);
++		}
++
++		sg_init_one(sg, evt, sizeof(*evt));
++		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
++		if (ret)
++			dev_err(viommu->dev, "could not add event buffer\n");
++	}
++
++	if (!virtqueue_kick(vq))
++		dev_err(viommu->dev, "kick failed\n");
++}
++
+ /* IOMMU API */
+ 
+ static struct iommu_domain *viommu_domain_alloc(unsigned type)
+@@ -893,16 +967,35 @@ static struct iommu_ops viommu_ops = {
+ static int viommu_init_vqs(struct viommu_dev *viommu)
+ {
+ 	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
+-	const char *name = "request";
+-	void *ret;
++	const char *names[] = { "request", "event" };
++	vq_callback_t *callbacks[] = {
++		NULL, /* No async requests */
++		viommu_event_handler,
++	};
+ 
+-	ret = virtio_find_single_vq(vdev, NULL, name);
+-	if (IS_ERR(ret)) {
+-		dev_err(viommu->dev, "cannot find VQ\n");
+-		return PTR_ERR(ret);
+-	}
++	return virtio_find_vqs(vdev, VIOMMU_NR_VQS, viommu->vqs, callbacks,
++			       names, NULL);
++}
+ 
+-	viommu->vqs[VIOMMU_REQUEST_VQ] = ret;
++static int viommu_fill_evtq(struct viommu_dev *viommu)
++{
++	int i, ret;
++	struct scatterlist sg[1];
++	struct viommu_event *evts;
++	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
++	size_t nr_evts = vq->num_free;
++
++	viommu->evts = evts = devm_kmalloc_array(viommu->dev, nr_evts,
++						 sizeof(*evts), GFP_KERNEL);
++	if (!evts)
++		return -ENOMEM;
++
++	for (i = 0; i < nr_evts; i++) {
++		sg_init_one(sg, &evts[i], sizeof(*evts));
++		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
++		if (ret)
++			return ret;
++	}
+ 
+ 	return 0;
+ }
+@@ -967,6 +1060,11 @@ static int viommu_probe(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
++	/* Populate the event queue with buffers */
++	ret = viommu_fill_evtq(viommu);
++	if (ret)
++		goto err_free_vqs;
++
+ 	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
+ 				     virtio_bus_name(vdev));
+ 	if (ret)
+diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
+index 2fd802a860cd..4e501d34267a 100644
+--- a/include/uapi/linux/virtio_iommu.h
++++ b/include/uapi/linux/virtio_iommu.h
+@@ -151,4 +151,22 @@ union virtio_iommu_req {
+ 	struct virtio_iommu_req_probe		probe;
+ };
+ 
++/* Fault types */
++#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
++#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
++#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
++
++#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
++#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
++#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
++#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
++
++struct virtio_iommu_fault {
++	__u8					reason;
++	__u8					padding[3];
++	__le32					flags;
++	__le32					endpoint;
++	__le64					address;
++} __packed;
++
+ #endif
+-- 
+2.17.0
