@@ -1,23 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 08/16] KVM: arm64: Support dynamically hideable system
- registers
-Date: Thu, 21 Jun 2018 15:57:32 +0100
-Message-ID: <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH 12/16] KVM: arm64/sve: Context switch the SVE registers
+Date: Thu, 21 Jun 2018 15:57:36 +0100
+Message-ID: <1529593060-542-13-git-send-email-Dave.Martin@arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F0004A0FE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE8874A0E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8WZVcOsfxBBe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jun 2018 10:46:54 -0400 (EDT)
+ with ESMTP id 4ykjotJ2qANt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Jun 2018 10:47:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1E3B4A0CC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:46:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8B5B4A0E6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:01 -0400 (EDT)
 In-Reply-To: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,144 +31,159 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Some system registers may or may not logically exist for a vcpu
-depending on whether certain architectural features are enabled for
-the vcpu.
+In order to give each vcpu its own view of the SVE registers, this
+patch adds context storage via a new sve_state pointer in struct
+vcpu_arch.  An additional member sve_max_vl is also added for each
+vcpu, to determine the maximum vector length visible to the guest
+and thus the value to be configured in ZCR_EL2.LEN while the is
+active.  This also determines the layout and size of the storage in
+sve_state, which is read and written by the same backend functions
+that are used for context-switching the SVE state for host tasks.
 
-In order to avoid spuriously emulating access to these registers
-when they should not exist, or allowing the registers to be
-spuriously enumerated or saved/restored through the ioctl
-interface, a means is needed to allow registers to be hidden
-depending on the vcpu configuration.
+On SVE-enabled vcpus, SVE access traps are now handled by switching
+in the vcpu's SVE context and disabling the trap before returning
+to the guest.  On other vcpus, the trap is not handled and an exit
+back to the host occurs, where the handle_sve() fallback path
+reflects an undefined instruction exception back to the guest,
+consistently with the behaviour of non-SVE-capable hardware (as was
+done unconditionally prior to this patch).
 
-In order to support this in a flexible way, this patch adds a
-check_present() method to struct sys_reg_desc, and updates the
-generic system register access and enumeration code to be aware of
-it:  if check_present() returns false, the code behaves as if the
-register did not exist.
-
-For convenience, the complete check is wrapped up in a new helper
-sys_reg_present().
-
-An attempt has been made to hook the new check into the generic
-accessors for trapped system registers.  This should reduce the
-potential for future surprises, although the redundant check will
-add a small cost.  No system register depends on this functionality
-yet, and some paths needing the check may also need attention.
-
-Naturally, this facility makes sense only for registers that are
-trapped.
+No SVE handling is added on non-VHE-only paths, since VHE is an
+architectural and Kconfig prerequisite of SVE.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 20 +++++++++++++++-----
- arch/arm64/kvm/sys_regs.h | 11 +++++++++++
- 2 files changed, 26 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/fpsimd.c           |  5 +++--
+ arch/arm64/kvm/hyp/switch.c       | 43 ++++++++++++++++++++++++++++++---------
+ 3 files changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a436373..31a351a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1840,7 +1840,7 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f331abf..d2084ae 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -211,6 +211,8 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
  
- 	r = find_reg(params, table, num);
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
++	void *sve_state;
++	unsigned int sve_max_vl;
  
--	if (r) {
-+	if (likely(r) && sys_reg_present(vcpu, r)) {
- 		perform_access(vcpu, params, r);
- 		return 0;
+ 	/* HYP configuration */
+ 	u64 hcr_el2;
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 872008c..44cf783 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -86,10 +86,11 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+ 
+ 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+ 		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.gp_regs.fp_regs,
+-					 NULL, sve_max_vl);
++					 vcpu->arch.sve_state,
++					 vcpu->arch.sve_max_vl);
+ 
+ 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
+-		clear_thread_flag(TIF_SVE);
++		update_thread_flag(TIF_SVE, vcpu_has_sve(&vcpu->arch));
  	}
-@@ -2016,7 +2016,7 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	if (!r)
- 		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
--	if (likely(r)) {
-+	if (likely(r) && sys_reg_present(vcpu, r)) {
- 		perform_access(vcpu, params, r);
- 	} else {
- 		kvm_err("Unsupported guest sys_reg access at: %lx\n",
-@@ -2313,6 +2313,9 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (!r)
- 		return get_invariant_sys_reg(reg->id, uaddr);
- 
-+	if (!sys_reg_present(vcpu, r))
-+		return -ENOENT;
-+
- 	if (r->get_user)
- 		return (r->get_user)(vcpu, r, reg, uaddr);
- 
-@@ -2334,6 +2337,9 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (!r)
- 		return set_invariant_sys_reg(reg->id, uaddr);
- 
-+	if (!sys_reg_present(vcpu, r))
-+		return -ENOENT;
-+
- 	if (r->set_user)
- 		return (r->set_user)(vcpu, r, reg, uaddr);
- 
-@@ -2390,7 +2396,8 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- 	return true;
  }
  
--static int walk_one_sys_reg(const struct sys_reg_desc *rd,
-+static int walk_one_sys_reg(struct kvm_vcpu *vcpu,
-+			    const struct sys_reg_desc *rd,
- 			    u64 __user **uind,
- 			    unsigned int *total)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d496ef5..98df5c1 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -98,8 +98,13 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	val &= ~CPACR_EL1_ZEN;
+-	if (!update_fp_enabled(vcpu))
++
++	if (update_fp_enabled(vcpu)) {
++		if (vcpu_has_sve(&vcpu->arch))
++			val |= CPACR_EL1_ZEN;
++	} else {
+ 		val &= ~CPACR_EL1_FPEN;
++	}
+ 
+ 	write_sysreg(val, cpacr_el1);
+ 
+@@ -114,6 +119,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
++
+ 	if (!update_fp_enabled(vcpu))
+ 		val |= CPTR_EL2_TFP;
+ 
+@@ -329,16 +335,22 @@ static bool __hyp_text __skip_instr(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
++static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu,
++					   bool guest_has_sve)
  {
-@@ -2401,6 +2408,9 @@ static int walk_one_sys_reg(const struct sys_reg_desc *rd,
- 	if (!(rd->reg || rd->get_user))
- 		return 0;
+ 	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
  
-+	if (!sys_reg_present(vcpu, rd))
-+		return 0;
+-	if (has_vhe())
+-		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
+-			     cpacr_el1);
+-	else
++	if (has_vhe()) {
++		u64 reg = read_sysreg(cpacr_el1) | CPACR_EL1_FPEN;
 +
- 	if (!copy_reg_to_user(rd, uind))
- 		return -EFAULT;
- 
-@@ -2429,9 +2439,9 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 		int cmp = cmp_sys_reg(i1, i2);
- 		/* target-specific overrides generic entry. */
- 		if (cmp <= 0)
--			err = walk_one_sys_reg(i1, &uind, &total);
-+			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
- 		else
--			err = walk_one_sys_reg(i2, &uind, &total);
-+			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
- 
- 		if (err)
- 			return err;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index cd710f8..dfbb342 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -22,6 +22,9 @@
- #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
- #define __ARM64_KVM_SYS_REGS_LOCAL_H__
- 
-+#include <linux/compiler.h>
-+#include <linux/types.h>
++		if (system_supports_sve() && guest_has_sve)
++			reg |= CPACR_EL1_ZEN;
 +
- struct sys_reg_params {
- 	u8	Op0;
- 	u8	Op1;
-@@ -61,8 +64,16 @@ struct sys_reg_desc {
- 			const struct kvm_one_reg *reg, void __user *uaddr);
- 	int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			const struct kvm_one_reg *reg, void __user *uaddr);
-+	bool (*check_present)(const struct kvm_vcpu *vpcu,
-+			      const struct sys_reg_desc *rd);
- };
++		write_sysreg(reg, cpacr_el1);
++	} else {
+ 		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
+ 			     cptr_el2);
++	}
  
-+static inline bool sys_reg_present(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	return likely(!rd->check_present) || rd->check_present(vcpu, rd);
-+}
-+
- static inline void print_sys_reg_instr(const struct sys_reg_params *p)
+ 	isb();
+ 
+@@ -361,7 +373,13 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
+ 	}
+ 
+-	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
++	if (system_supports_sve() && guest_has_sve)
++		sve_load_state((char *)vcpu->arch.sve_state +
++					sve_ffr_offset(vcpu->arch.sve_max_vl),
++			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
++			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
++	else
++		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+ 
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+@@ -380,6 +398,8 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+  */
+ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
  {
- 	/* Look, we even formatted it for you to paste into the table! */
++	bool guest_has_sve;
++
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+ 
+@@ -397,10 +417,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * and restore the guest context lazily.
+ 	 * If FP/SIMD is not implemented, handle the trap and inject an
+ 	 * undefined instruction exception to the guest.
++	 * Similarly for trapped SVE accesses.
+ 	 */
+-	if (system_supports_fpsimd() &&
+-	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
+-		return __hyp_switch_fpsimd(vcpu);
++	guest_has_sve = vcpu_has_sve(&vcpu->arch);
++	if ((system_supports_fpsimd() &&
++	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD) ||
++	    (guest_has_sve && kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SVE))
++		return __hyp_switch_fpsimd(vcpu, guest_has_sve);
+ 
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
 -- 
 2.1.4
