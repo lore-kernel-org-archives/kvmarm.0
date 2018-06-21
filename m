@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 16/16] KVM: arm64/sve: Report and enable SVE API
- extensions for userspace
-Date: Thu, 21 Jun 2018 15:57:40 +0100
-Message-ID: <1529593060-542-17-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH 11/16] KVM: arm64/sve: System register context switch and
+ access support
+Date: Thu, 21 Jun 2018 15:57:35 +0100
+Message-ID: <1529593060-542-12-git-send-email-Dave.Martin@arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 407C44A0E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D74D4A0DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ydi4Lzu7W1bA for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jun 2018 10:47:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8C74A0EF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:09 -0400 (EDT)
+ with ESMTP id 56ou25nWxeCT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Jun 2018 10:47:13 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 144014A0DA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jun 2018 10:47:00 -0400 (EDT)
 In-Reply-To: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,134 +32,128 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch reports the availability of KVM SVE support to userspace
-via a new vcpu feature flag KVM_ARM_VCPU_SVE.  This flag is
-reported via the KVM_ARM_PREFERRED_TARGET ioctl.
+This patch adds the necessary support for context switching ZCR_EL1
+for each vcpu.
 
-Userspace can enable the feature by setting the flag for
-KVM_ARM_VCPU_INIT.  Without this flag set, SVE-related ioctls and
-register access extensions are hidden, and SVE remains disabled
-unconditionally for the guest.  This ensures that non-SVE-aware KVM
-userspace does not receive a vcpu that it does not understand how
-to snapshot or restore correctly.
+The ID_AA64PFR0_EL1 emulation code is updated to expose the
+presence of SVE to the guest if appropriate, and ioctl() access to
+ZCR_EL1 is also added.
 
-Storage is allocated for the SVE register state at vcpu init time,
-sufficient for the maximum vector length to be exposed to the vcpu.
-No attempt is made to allocate the storage lazily for now.  Also,
-no attempt is made to resize the storage dynamically, since the
-effective vector length of the vcpu can change at each EL0/EL1
-transition.  The storage is freed at the vcpu uninit hook.
-
-No particular attempt is made to prevent userspace from creating a
-mix of vcpus some of which have SVE enabled and some of which have
-it disabled.  This may or may not be useful, but it reflects the
-underlying architectural behaviour.
+In the context switch code itself, ZCR_EL1 is context switched if
+the host is SVE-capable, irrespectively for now of whether SVE is
+exposed to the guest or not.  Adding a dynamic vcpu_has_sve() check
+may lose as much performance as would be gained in this simple
+case.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  6 +++---
- arch/arm64/include/uapi/asm/kvm.h |  1 +
- arch/arm64/kvm/guest.c            | 19 +++++++++++++------
- arch/arm64/kvm/reset.c            | 14 ++++++++++++++
- 4 files changed, 31 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/include/asm/sysreg.h   |  3 +++
+ arch/arm64/kvm/hyp/sysreg-sr.c    |  5 +++++
+ arch/arm64/kvm/sys_regs.c         | 14 +++++++++-----
+ 4 files changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d2084ae..d956cf2 100644
+index 609d08b..f331abf 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -44,7 +44,7 @@
+@@ -111,6 +111,7 @@ enum vcpu_sysreg {
+ 	SCTLR_EL1,	/* System Control Register */
+ 	ACTLR_EL1,	/* Auxiliary Control Register */
+ 	CPACR_EL1,	/* Coprocessor Access Control */
++	ZCR_EL1,	/* SVE Control */
+ 	TTBR0_EL1,	/* Translation Table Base Register 0 */
+ 	TTBR1_EL1,	/* Translation Table Base Register 1 */
+ 	TCR_EL1,	/* Translation Control Register */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index a8f8481..6476dbd 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -416,6 +416,9 @@
+ #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+ #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
++/* VHE encodings for architectural EL0/1 system registers */
++#define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
++
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_EE    (1 << 25)
+ #define SCTLR_ELx_IESB	(1 << 21)
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 35bc168..0f4046a 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -21,6 +21,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/sysreg.h>
  
--#define KVM_VCPU_MAX_FEATURES 4
-+#define KVM_VCPU_MAX_FEATURES 5
- 
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-@@ -439,8 +439,8 @@ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
--static inline int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu) { return 0; }
--static inline void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
-+int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu);
-+void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu);
- 
- void kvm_arm_init_debug(void);
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index f54a9b0..6acf276 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -101,6 +101,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_SVE		4 /* Allow SVE for guest */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 5152362..fb7f6aa 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -58,6 +58,16 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
- 	return 0;
+ /*
+  * Non-VHE: Both host and guest must save everything.
+@@ -57,6 +58,8 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+ 	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+ 	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
++	if (system_supports_sve()) /* implies has_vhe() */
++		ctxt->sys_regs[ZCR_EL1]	= read_sysreg_s(SYS_ZCR_EL12);
+ 	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
+ 	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
+ 	ctxt->sys_regs[TCR_EL1]		= read_sysreg_el1(tcr);
+@@ -129,6 +132,8 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
+ 	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
+ 	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
++	if (system_supports_sve()) /* implies has_vhe() */
++		write_sysreg_s(ctxt->sys_regs[ZCR_EL1],	SYS_ZCR_EL12);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	ttbr0);
+ 	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	ttbr1);
+ 	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	tcr);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 87d2468..dcaf6e5 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -986,6 +986,12 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu)
++static bool sve_check_present(const struct kvm_vcpu *vcpu,
++			      const struct sys_reg_desc *rd)
 +{
-+	return 0;
++	return vcpu_has_sve(&vcpu->arch);
 +}
 +
-+void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
-+{
-+	kfree(vcpu->arch.sve_state);
-+}
-+
- static u64 core_reg_offset_from_id(u64 id)
- {
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
-@@ -600,12 +610,9 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		       struct sys_reg_desc const *r, bool raz)
+@@ -999,10 +1005,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 	else
+ 		val = read_sanitised_ftr_reg(id);
  
- 	memset(init, 0, sizeof(*init));
+-	if (id == SYS_ID_AA64PFR0_EL1) {
+-		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+-			kvm_debug("SVE unsupported for guests, suppressing\n");
+-
++	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(&vcpu->arch)) {
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 	} else if (id == SYS_ID_AA64MMFR1_EL1) {
+ 		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+@@ -1240,7 +1243,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
+-	ID_UNALLOCATED(4,4),
++	ID_SANITISED_IF(ID_AA64ZFR0_EL1, sve_check_present),
+ 	ID_UNALLOCATED(4,5),
+ 	ID_UNALLOCATED(4,6),
+ 	ID_UNALLOCATED(4,7),
+@@ -1277,6 +1280,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
--	/*
--	 * For now, we don't return any features.
--	 * In future, we might use features to return target
--	 * specific features available for the preferred
--	 * target type.
--	 */
-+	/* KVM_ARM_VCPU_SVE understood by KVM_VCPU_INIT */
-+	init->features[0] = 1 << KVM_ARM_VCPU_SVE;
-+
- 	init->target = (__u32)target;
- 
- 	return 0;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index a74311b..f63a791 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -110,6 +110,20 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 			cpu_reset = &default_regs_reset;
- 		}
- 
-+		if (system_supports_sve() &&
-+		    test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
-+			vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_SVE;
-+
-+			vcpu->arch.sve_max_vl = sve_max_virtualisable_vl;
-+
-+			vcpu->arch.sve_state = kzalloc(
-+				SVE_SIG_REGS_SIZE(
-+					sve_vq_from_vl(vcpu->arch.sve_max_vl)),
-+				GFP_KERNEL);
-+			if (!vcpu->arch.sve_state)
-+				return -ENOMEM;
-+		}
-+
- 		break;
- 	}
- 
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+ 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .check_present = sve_check_present },
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
 -- 
 2.1.4
