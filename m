@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 7/8] KVM: Enforce error in ioctl for compat tasks when
- !KVM_COMPAT
-Date: Fri, 22 Jun 2018 13:49:52 +0100
-Message-ID: <20180622124953.12355-8-marc.zyngier@arm.com>
+Subject: [PATCH 8/8] KVM: arm64: Prevent KVM_COMPAT from being selected
+Date: Fri, 22 Jun 2018 13:49:53 +0100
+Message-ID: <20180622124953.12355-9-marc.zyngier@arm.com>
 References: <20180622124953.12355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3A9F4A0FC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:39:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 978C84A0E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:39:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QPBLLqtvmoTD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jun 2018 08:38:49 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AFD74A0DC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:43 -0400 (EDT)
+ with ESMTP id nuX3WIgdvFAJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jun 2018 08:38:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02DD44A0DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:46 -0400 (EDT)
 In-Reply-To: <20180622124953.12355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,59 +31,29 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGN1cnJlbnQgYmVoYXZpb3VyIG9mIHRoZSBjb21wYXQgaW9jdGxzIGlzIGEgYml0IG9kZC4K
-V2UgcHJvdmlkZSBhIGNvbXBhdF9pb2N0bCBtZXRob2Qgd2hlbiBLVk1fQ09NUEFUIGlzIHNldCwg
-YW5kIE5VTEwKb3RoZXJ3aXNlLiBCdXQgTlVMTCBtZWFucyB0aGF0IHRoZSBub3JtYWwsIG5vbi1j
-b21wYXQgaW9jdGwgc2hvdWxkCmJlIHVzZWQgZGlyZWN0bHkgZm9yIGNvbXBhdCB0YXNrcywgYW5k
-IHRoZXJlIGlzIG5vIHdheSB0byBhY3R1YWxseQpwcmV2ZW50IGEgY29tcGF0IHRhc2sgZnJvbSBp
-c3N1ZWluZyBLVk0gaW9jdGxzLgoKVGhpcyBwYXRjaCBjaGFuZ2VzIHRoaXMgYmVoYXZpb3VyLCBi
-eSBhbHdheXMgcmVnaXN0ZXJpbmcgYSBjb21wYXRfaW9jdGwKbWV0aG9kLCBldmVuIGlmIEtWTV9D
-T01QQVQgaXMgbm90IHNlbGVjdGVkLiBJbiB0aGF0IGNhc2UsIHRoZSBjYWxsYmFjawp3aWxsIGFs
-d2F5cyByZXR1cm4gLUVJTlZBTC4KCkZpeGVzOiBkZThlNWQ3NDQwNTE1NjhjOGFhZCAoIktWTTog
-RGlzYWJsZSBjb21wYXQgaW9jdGwgZm9yIHMzOTAiKQpSZXBvcnRlZC1ieTogTWFyayBSdXRsYW5k
-IDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KQWNrZWQtYnk6IENocmlzdGlhbiBCb3JudHJhZWdlciA8
-Ym9ybnRyYWVnZXJAZGUuaWJtLmNvbT4KQWNrZWQtYnk6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21h
-ckByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBh
-cm0uY29tPgotLS0KIHZpcnQva3ZtL2t2bV9tYWluLmMgfCAxOSArKysrKysrKystLS0tLS0tLS0t
-CiAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkKCmRpZmYg
-LS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYwppbmRleCBh
-ZGEyMWY0N2YyMmIuLjhiNDc1MDdmYWFiNSAxMDA2NDQKLS0tIGEvdmlydC9rdm0va3ZtX21haW4u
-YworKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCkBAIC0xMTYsNiArMTE2LDExIEBAIHN0YXRpYyBs
-b25nIGt2bV92Y3B1X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxlLCB1bnNpZ25lZCBpbnQgaW9jdGws
-CiAjaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKIHN0YXRpYyBsb25nIGt2bV92Y3B1X2NvbXBhdF9p
-b2N0bChzdHJ1Y3QgZmlsZSAqZmlsZSwgdW5zaWduZWQgaW50IGlvY3RsLAogCQkJCSAgdW5zaWdu
-ZWQgbG9uZyBhcmcpOworI2RlZmluZSBLVk1fQ09NUEFUKGMpCS5jb21wYXRfaW9jdGwJPSAoYykK
-KyNlbHNlCitzdGF0aWMgbG9uZyBrdm1fbm9fY29tcGF0X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxl
-LCB1bnNpZ25lZCBpbnQgaW9jdGwsCisJCQkJdW5zaWduZWQgbG9uZyBhcmcpIHsgcmV0dXJuIC1F
-SU5WQUw7IH0KKyNkZWZpbmUgS1ZNX0NPTVBBVChjKQkuY29tcGF0X2lvY3RsCT0ga3ZtX25vX2Nv
-bXBhdF9pb2N0bAogI2VuZGlmCiBzdGF0aWMgaW50IGhhcmR3YXJlX2VuYWJsZV9hbGwodm9pZCk7
-CiBzdGF0aWMgdm9pZCBoYXJkd2FyZV9kaXNhYmxlX2FsbCh2b2lkKTsKQEAgLTIzOTYsMTEgKzI0
-MDEsOSBAQCBzdGF0aWMgaW50IGt2bV92Y3B1X3JlbGVhc2Uoc3RydWN0IGlub2RlICppbm9kZSwg
-c3RydWN0IGZpbGUgKmZpbHApCiBzdGF0aWMgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyBrdm1fdmNw
-dV9mb3BzID0gewogCS5yZWxlYXNlICAgICAgICA9IGt2bV92Y3B1X3JlbGVhc2UsCiAJLnVubG9j
-a2VkX2lvY3RsID0ga3ZtX3ZjcHVfaW9jdGwsCi0jaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKLQku
-Y29tcGF0X2lvY3RsICAgPSBrdm1fdmNwdV9jb21wYXRfaW9jdGwsCi0jZW5kaWYKIAkubW1hcCAg
-ICAgICAgICAgPSBrdm1fdmNwdV9tbWFwLAogCS5sbHNlZWsJCT0gbm9vcF9sbHNlZWssCisJS1ZN
-X0NPTVBBVChrdm1fdmNwdV9jb21wYXRfaW9jdGwpLAogfTsKIAogLyoKQEAgLTI4MjQsMTAgKzI4
-MjcsOCBAQCBzdGF0aWMgaW50IGt2bV9kZXZpY2VfcmVsZWFzZShzdHJ1Y3QgaW5vZGUgKmlub2Rl
-LCBzdHJ1Y3QgZmlsZSAqZmlscCkKIAogc3RhdGljIGNvbnN0IHN0cnVjdCBmaWxlX29wZXJhdGlv
-bnMga3ZtX2RldmljZV9mb3BzID0gewogCS51bmxvY2tlZF9pb2N0bCA9IGt2bV9kZXZpY2VfaW9j
-dGwsCi0jaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKLQkuY29tcGF0X2lvY3RsID0ga3ZtX2Rldmlj
-ZV9pb2N0bCwKLSNlbmRpZgogCS5yZWxlYXNlID0ga3ZtX2RldmljZV9yZWxlYXNlLAorCUtWTV9D
-T01QQVQoa3ZtX2RldmljZV9pb2N0bCksCiB9OwogCiBzdHJ1Y3Qga3ZtX2RldmljZSAqa3ZtX2Rl
-dmljZV9mcm9tX2ZpbHAoc3RydWN0IGZpbGUgKmZpbHApCkBAIC0zMTY1LDEwICszMTY2LDggQEAg
-c3RhdGljIGxvbmcga3ZtX3ZtX2NvbXBhdF9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKIHN0YXRp
-YyBzdHJ1Y3QgZmlsZV9vcGVyYXRpb25zIGt2bV92bV9mb3BzID0gewogCS5yZWxlYXNlICAgICAg
-ICA9IGt2bV92bV9yZWxlYXNlLAogCS51bmxvY2tlZF9pb2N0bCA9IGt2bV92bV9pb2N0bCwKLSNp
-ZmRlZiBDT05GSUdfS1ZNX0NPTVBBVAotCS5jb21wYXRfaW9jdGwgICA9IGt2bV92bV9jb21wYXRf
-aW9jdGwsCi0jZW5kaWYKIAkubGxzZWVrCQk9IG5vb3BfbGxzZWVrLAorCUtWTV9DT01QQVQoa3Zt
-X3ZtX2NvbXBhdF9pb2N0bCksCiB9OwogCiBzdGF0aWMgaW50IGt2bV9kZXZfaW9jdGxfY3JlYXRl
-X3ZtKHVuc2lnbmVkIGxvbmcgdHlwZSkKQEAgLTMyNTksOCArMzI1OCw4IEBAIHN0YXRpYyBsb25n
-IGt2bV9kZXZfaW9jdGwoc3RydWN0IGZpbGUgKmZpbHAsCiAKIHN0YXRpYyBzdHJ1Y3QgZmlsZV9v
-cGVyYXRpb25zIGt2bV9jaGFyZGV2X29wcyA9IHsKIAkudW5sb2NrZWRfaW9jdGwgPSBrdm1fZGV2
-X2lvY3RsLAotCS5jb21wYXRfaW9jdGwgICA9IGt2bV9kZXZfaW9jdGwsCiAJLmxsc2VlawkJPSBu
-b29wX2xsc2VlaywKKwlLVk1fQ09NUEFUKGt2bV9kZXZfaW9jdGwpLAogfTsKIAogc3RhdGljIHN0
-cnVjdCBtaXNjZGV2aWNlIGt2bV9kZXYgPSB7Ci0tIAoyLjE3LjEKCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
-QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
-bWFuL2xpc3RpbmZvL2t2bWFybQo=
+There is very little point in trying to support the 32bit KVM/arm API
+on arm64, and this was never an anticipated use case.
+
+Let's make it clear by not selecting KVM_COMPAT.
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 72143cfaf6ec..ea434ddc8499 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -47,7 +47,7 @@ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 
+ config KVM_COMPAT
+        def_bool y
+-       depends on KVM && COMPAT && !S390
++       depends on KVM && COMPAT && !(S390 || ARM64)
+ 
+ config HAVE_KVM_IRQ_BYPASS
+        bool
+-- 
+2.17.1
