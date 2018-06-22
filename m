@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 6/8] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE
- aligned in unmap_stage2_range
-Date: Fri, 22 Jun 2018 13:49:51 +0100
-Message-ID: <20180622124953.12355-7-marc.zyngier@arm.com>
+Subject: [PATCH 7/8] KVM: Enforce error in ioctl for compat tasks when
+ !KVM_COMPAT
+Date: Fri, 22 Jun 2018 13:49:52 +0100
+Message-ID: <20180622124953.12355-8-marc.zyngier@arm.com>
 References: <20180622124953.12355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E82BD40192
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:39:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3A9F4A0FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:39:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3J2DNR+GroFy for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jun 2018 08:38:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C05454A0DB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:40 -0400 (EDT)
+ with ESMTP id QPBLLqtvmoTD for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jun 2018 08:38:49 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AFD74A0DC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:43 -0400 (EDT)
 In-Reply-To: <20180622124953.12355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,65 +29,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Jia He <hejianet@gmail.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jia He <hejianet@gmail.com>
-
-There is a panic in armv8a server(QDF2400) under memory pressure tests
-(start 20 guests and run memhog in the host).
-
----------------------------------begin--------------------------------
-[35380.800950] BUG: Bad page state in process qemu-kvm  pfn:dd0b6
-[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
-mapping:          (null) index:0x0
-[35380.815024] flags: 0x1fffc00000000000()
-[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
-ffffecf981470000
-[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
-0000000000000000
-[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
-mapping:          (null) index:0x0
-[35380.815024] flags: 0x1fffc00000000000()
-[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
-ffffecf981470000
-[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
-0000000000000000
-[35380.834294] page dumped because: nonzero _refcount
-[...]
---------------------------------end--------------------------------------
-
-The root cause might be what was fixed at [1]. But from the KVM points of
-view, it would be better if the issue was caught earlier.
-
-If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
-wrong(more or less) page range. Hence it caused the "BUG: Bad page
-state"
-
-Let's WARN in that case, so that the issue is obvious.
-
-[1] https://lkml.org/lkml/2018/5/3/1042
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: jia.he@hxt-semitech.com
-[maz: tidied up commit message]
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/mmu.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 8d90de213ce9..1d90d79706bd 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -297,6 +297,8 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
- 	phys_addr_t next;
- 
- 	assert_spin_locked(&kvm->mmu_lock);
-+	WARN_ON(size & ~PAGE_MASK);
-+
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		/*
--- 
-2.17.1
+VGhlIGN1cnJlbnQgYmVoYXZpb3VyIG9mIHRoZSBjb21wYXQgaW9jdGxzIGlzIGEgYml0IG9kZC4K
+V2UgcHJvdmlkZSBhIGNvbXBhdF9pb2N0bCBtZXRob2Qgd2hlbiBLVk1fQ09NUEFUIGlzIHNldCwg
+YW5kIE5VTEwKb3RoZXJ3aXNlLiBCdXQgTlVMTCBtZWFucyB0aGF0IHRoZSBub3JtYWwsIG5vbi1j
+b21wYXQgaW9jdGwgc2hvdWxkCmJlIHVzZWQgZGlyZWN0bHkgZm9yIGNvbXBhdCB0YXNrcywgYW5k
+IHRoZXJlIGlzIG5vIHdheSB0byBhY3R1YWxseQpwcmV2ZW50IGEgY29tcGF0IHRhc2sgZnJvbSBp
+c3N1ZWluZyBLVk0gaW9jdGxzLgoKVGhpcyBwYXRjaCBjaGFuZ2VzIHRoaXMgYmVoYXZpb3VyLCBi
+eSBhbHdheXMgcmVnaXN0ZXJpbmcgYSBjb21wYXRfaW9jdGwKbWV0aG9kLCBldmVuIGlmIEtWTV9D
+T01QQVQgaXMgbm90IHNlbGVjdGVkLiBJbiB0aGF0IGNhc2UsIHRoZSBjYWxsYmFjawp3aWxsIGFs
+d2F5cyByZXR1cm4gLUVJTlZBTC4KCkZpeGVzOiBkZThlNWQ3NDQwNTE1NjhjOGFhZCAoIktWTTog
+RGlzYWJsZSBjb21wYXQgaW9jdGwgZm9yIHMzOTAiKQpSZXBvcnRlZC1ieTogTWFyayBSdXRsYW5k
+IDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4KQWNrZWQtYnk6IENocmlzdGlhbiBCb3JudHJhZWdlciA8
+Ym9ybnRyYWVnZXJAZGUuaWJtLmNvbT4KQWNrZWQtYnk6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21h
+ckByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBh
+cm0uY29tPgotLS0KIHZpcnQva3ZtL2t2bV9tYWluLmMgfCAxOSArKysrKysrKystLS0tLS0tLS0t
+CiAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkKCmRpZmYg
+LS1naXQgYS92aXJ0L2t2bS9rdm1fbWFpbi5jIGIvdmlydC9rdm0va3ZtX21haW4uYwppbmRleCBh
+ZGEyMWY0N2YyMmIuLjhiNDc1MDdmYWFiNSAxMDA2NDQKLS0tIGEvdmlydC9rdm0va3ZtX21haW4u
+YworKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCkBAIC0xMTYsNiArMTE2LDExIEBAIHN0YXRpYyBs
+b25nIGt2bV92Y3B1X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxlLCB1bnNpZ25lZCBpbnQgaW9jdGws
+CiAjaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKIHN0YXRpYyBsb25nIGt2bV92Y3B1X2NvbXBhdF9p
+b2N0bChzdHJ1Y3QgZmlsZSAqZmlsZSwgdW5zaWduZWQgaW50IGlvY3RsLAogCQkJCSAgdW5zaWdu
+ZWQgbG9uZyBhcmcpOworI2RlZmluZSBLVk1fQ09NUEFUKGMpCS5jb21wYXRfaW9jdGwJPSAoYykK
+KyNlbHNlCitzdGF0aWMgbG9uZyBrdm1fbm9fY29tcGF0X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxl
+LCB1bnNpZ25lZCBpbnQgaW9jdGwsCisJCQkJdW5zaWduZWQgbG9uZyBhcmcpIHsgcmV0dXJuIC1F
+SU5WQUw7IH0KKyNkZWZpbmUgS1ZNX0NPTVBBVChjKQkuY29tcGF0X2lvY3RsCT0ga3ZtX25vX2Nv
+bXBhdF9pb2N0bAogI2VuZGlmCiBzdGF0aWMgaW50IGhhcmR3YXJlX2VuYWJsZV9hbGwodm9pZCk7
+CiBzdGF0aWMgdm9pZCBoYXJkd2FyZV9kaXNhYmxlX2FsbCh2b2lkKTsKQEAgLTIzOTYsMTEgKzI0
+MDEsOSBAQCBzdGF0aWMgaW50IGt2bV92Y3B1X3JlbGVhc2Uoc3RydWN0IGlub2RlICppbm9kZSwg
+c3RydWN0IGZpbGUgKmZpbHApCiBzdGF0aWMgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyBrdm1fdmNw
+dV9mb3BzID0gewogCS5yZWxlYXNlICAgICAgICA9IGt2bV92Y3B1X3JlbGVhc2UsCiAJLnVubG9j
+a2VkX2lvY3RsID0ga3ZtX3ZjcHVfaW9jdGwsCi0jaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKLQku
+Y29tcGF0X2lvY3RsICAgPSBrdm1fdmNwdV9jb21wYXRfaW9jdGwsCi0jZW5kaWYKIAkubW1hcCAg
+ICAgICAgICAgPSBrdm1fdmNwdV9tbWFwLAogCS5sbHNlZWsJCT0gbm9vcF9sbHNlZWssCisJS1ZN
+X0NPTVBBVChrdm1fdmNwdV9jb21wYXRfaW9jdGwpLAogfTsKIAogLyoKQEAgLTI4MjQsMTAgKzI4
+MjcsOCBAQCBzdGF0aWMgaW50IGt2bV9kZXZpY2VfcmVsZWFzZShzdHJ1Y3QgaW5vZGUgKmlub2Rl
+LCBzdHJ1Y3QgZmlsZSAqZmlscCkKIAogc3RhdGljIGNvbnN0IHN0cnVjdCBmaWxlX29wZXJhdGlv
+bnMga3ZtX2RldmljZV9mb3BzID0gewogCS51bmxvY2tlZF9pb2N0bCA9IGt2bV9kZXZpY2VfaW9j
+dGwsCi0jaWZkZWYgQ09ORklHX0tWTV9DT01QQVQKLQkuY29tcGF0X2lvY3RsID0ga3ZtX2Rldmlj
+ZV9pb2N0bCwKLSNlbmRpZgogCS5yZWxlYXNlID0ga3ZtX2RldmljZV9yZWxlYXNlLAorCUtWTV9D
+T01QQVQoa3ZtX2RldmljZV9pb2N0bCksCiB9OwogCiBzdHJ1Y3Qga3ZtX2RldmljZSAqa3ZtX2Rl
+dmljZV9mcm9tX2ZpbHAoc3RydWN0IGZpbGUgKmZpbHApCkBAIC0zMTY1LDEwICszMTY2LDggQEAg
+c3RhdGljIGxvbmcga3ZtX3ZtX2NvbXBhdF9pb2N0bChzdHJ1Y3QgZmlsZSAqZmlscCwKIHN0YXRp
+YyBzdHJ1Y3QgZmlsZV9vcGVyYXRpb25zIGt2bV92bV9mb3BzID0gewogCS5yZWxlYXNlICAgICAg
+ICA9IGt2bV92bV9yZWxlYXNlLAogCS51bmxvY2tlZF9pb2N0bCA9IGt2bV92bV9pb2N0bCwKLSNp
+ZmRlZiBDT05GSUdfS1ZNX0NPTVBBVAotCS5jb21wYXRfaW9jdGwgICA9IGt2bV92bV9jb21wYXRf
+aW9jdGwsCi0jZW5kaWYKIAkubGxzZWVrCQk9IG5vb3BfbGxzZWVrLAorCUtWTV9DT01QQVQoa3Zt
+X3ZtX2NvbXBhdF9pb2N0bCksCiB9OwogCiBzdGF0aWMgaW50IGt2bV9kZXZfaW9jdGxfY3JlYXRl
+X3ZtKHVuc2lnbmVkIGxvbmcgdHlwZSkKQEAgLTMyNTksOCArMzI1OCw4IEBAIHN0YXRpYyBsb25n
+IGt2bV9kZXZfaW9jdGwoc3RydWN0IGZpbGUgKmZpbHAsCiAKIHN0YXRpYyBzdHJ1Y3QgZmlsZV9v
+cGVyYXRpb25zIGt2bV9jaGFyZGV2X29wcyA9IHsKIAkudW5sb2NrZWRfaW9jdGwgPSBrdm1fZGV2
+X2lvY3RsLAotCS5jb21wYXRfaW9jdGwgICA9IGt2bV9kZXZfaW9jdGwsCiAJLmxsc2VlawkJPSBu
+b29wX2xsc2VlaywKKwlLVk1fQ09NUEFUKGt2bV9kZXZfaW9jdGwpLAogfTsKIAogc3RhdGljIHN0
+cnVjdCBtaXNjZGV2aWNlIGt2bV9kZXYgPSB7Ci0tIAoyLjE3LjEKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
