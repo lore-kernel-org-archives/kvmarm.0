@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 5/8] KVM: arm64: Avoid mistaken attempts to save SVE state for
- vcpus
-Date: Fri, 22 Jun 2018 13:49:50 +0100
-Message-ID: <20180622124953.12355-6-marc.zyngier@arm.com>
+Subject: [PATCH 6/8] KVM: arm/arm64: add WARN_ON if size is not PAGE_SIZE
+ aligned in unmap_stage2_range
+Date: Fri, 22 Jun 2018 13:49:51 +0100
+Message-ID: <20180622124953.12355-7-marc.zyngier@arm.com>
 References: <20180622124953.12355-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6BF24A0F8
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E82BD40192
  for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:39:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LRK-Of3gFeeA for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 3J2DNR+GroFy for <kvmarm@lists.cs.columbia.edu>;
  Fri, 22 Jun 2018 08:38:47 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0778F4A0D9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:38 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C05454A0DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jun 2018 08:38:40 -0400 (EDT)
 In-Reply-To: <20180622124953.12355-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,56 +29,65 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Jia He <hejianet@gmail.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Dave Martin <Dave.Martin@arm.com>
+From: Jia He <hejianet@gmail.com>
 
-Commit e6b673b ("KVM: arm64: Optimise FPSIMD handling to reduce
-guest/host thrashing") uses fpsimd_save() to save the FPSIMD state
-for a vcpu when scheduling the vcpu out.  However, currently
-current's value of TIF_SVE is restored before calling fpsimd_save()
-which means that fpsimd_save() may erroneously attempt to save SVE
-state from the vcpu.  This enables current's vector state to be
-polluted with guest data.  current->thread.sve_state may be
-unallocated or not large enough, so this can also trigger a NULL
-dereference or buffer overrun.
+There is a panic in armv8a server(QDF2400) under memory pressure tests
+(start 20 guests and run memhog in the host).
 
-Instead of this, TIF_SVE should be configured properly for the
-guest when calling fpsimd_save() with the vcpu context loaded.
+---------------------------------begin--------------------------------
+[35380.800950] BUG: Bad page state in process qemu-kvm  pfn:dd0b6
+[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
+mapping:          (null) index:0x0
+[35380.815024] flags: 0x1fffc00000000000()
+[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
+ffffecf981470000
+[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
+0000000000000000
+[35380.805825] page:ffff7fe003742d80 count:-4871 mapcount:-2126053375
+mapping:          (null) index:0x0
+[35380.815024] flags: 0x1fffc00000000000()
+[35380.818845] raw: 1fffc00000000000 0000000000000000 0000000000000000
+ffffecf981470000
+[35380.826569] raw: dead000000000100 dead000000000200 ffff8017c001c000
+0000000000000000
+[35380.834294] page dumped because: nonzero _refcount
+[...]
+--------------------------------end--------------------------------------
 
-This patch ensures this by delaying restoration of current's
-TIF_SVE until after the call to fpsimd_save().
+The root cause might be what was fixed at [1]. But from the KVM points of
+view, it would be better if the issue was caught earlier.
 
-Fixes: e6b673b741ea ("KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing")
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+If the size is not PAGE_SIZE aligned, unmap_stage2_range might unmap the
+wrong(more or less) page range. Hence it caused the "BUG: Bad page
+state"
+
+Let's WARN in that case, so that the issue is obvious.
+
+[1] https://lkml.org/lkml/2018/5/3/1042
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: jia.he@hxt-semitech.com
+[maz: tidied up commit message]
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/fpsimd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ virt/kvm/arm/mmu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 98d19d1afa50..aac7808ce216 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -103,9 +103,6 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 8d90de213ce9..1d90d79706bd 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -297,6 +297,8 @@ static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+ 	phys_addr_t next;
  
- 	local_irq_save(flags);
- 
--	update_thread_flag(TIF_SVE,
--			   vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE);
--
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
- 		/* Clean guest FP state to memory and invalidate cpu view */
- 		fpsimd_save();
-@@ -124,5 +121,8 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
- 	}
- 
-+	update_thread_flag(TIF_SVE,
-+			   vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE);
+ 	assert_spin_locked(&kvm->mmu_lock);
++	WARN_ON(size & ~PAGE_MASK);
 +
- 	local_irq_restore(flags);
- }
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+ 		/*
 -- 
 2.17.1
