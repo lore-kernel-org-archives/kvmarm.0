@@ -1,14 +1,13 @@
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [GIT PULL] KVM/arm updates for 4.18-rc2
-Date: Fri, 22 Jun 2018 16:33:08 +0200
-Message-ID: <20180622143307.GA2377@flask>
-References: <20180622124953.12355-1-marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH 1/4] KVM: arm/arm64: GICv2 IGROUPR should read as zero
+Date: Mon, 25 Jun 2018 00:11:00 +0200
+Message-ID: <20180624221103.15055-2-christoffer.dall@arm.com>
+References: <20180624221103.15055-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180622124953.12355-1-marc.zyngier@arm.com>
+In-Reply-To: <20180624221103.15055-1-christoffer.dall@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -18,19 +17,39 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, jia.he@hxt-semitech.com, Christian Borntraeger <borntraeger@de.ibm.com>, Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2018-06-22 13:49+0100, Marc Zyngier:
-> Radim, Paolo,
-> 
-> This is the first batch of fixes for 4.18, mostly dealing with the
-> fallout from Dave's lazy FPSIMD handling. We also have the disabling
-> of the compat interface on arm64 (it never had it the first place),
-> and a relaxation on the alignment of the GICv3 compatibility
-> interface.
-> 
-> Please pull.
+We currently don't support grouping in the emulated VGIC, which is a
+known defect on KVM (not hurting any currently used guests as far as
+we're aware). This is currently handled by treating all interrupts as
+group 0 interrupts for an emulated GICv2 and always signaling interrupts
+as group 0 to the virtual CPU interface.
 
-Pulled, thanks.
+However, when reading which group interrupts belongs to in the guest
+from the emulated VGIC, the VGIC currently reports group 1 instead of
+group 0, which is misleading.  Fix this temporarily before introducing
+full group support by changing the hander to _raz instead of _rao.
+
+Fixes: fb848db39661a "KVM: arm/arm64: vgic-new: Add GICv2 MMIO handling framework"
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index ffc587bf4742..8d18f89397d3 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -362,7 +362,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
+-		vgic_mmio_read_rao, vgic_mmio_write_wi, NULL, NULL, 1,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
+ 		VGIC_ACCESS_32bit),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
+ 		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
+-- 
+2.17.1
