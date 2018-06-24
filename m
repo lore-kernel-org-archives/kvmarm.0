@@ -1,139 +1,79 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 2/4] KVM: arm/arm64: vgic: Add group field to struct irq
-Date: Mon, 25 Jun 2018 00:11:01 +0200
-Message-ID: <20180624221103.15055-3-christoffer.dall@arm.com>
-References: <20180624221103.15055-1-christoffer.dall@arm.com>
+Subject: [PATCH 0/4] KVM: arm/arm64: vgic: Virtual interrupt grouping support
+Date: Mon, 25 Jun 2018 00:10:59 +0200
+Message-ID: <20180624221103.15055-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180624221103.15055-1-christoffer.dall@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12F0B4A0DC
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jun 2018 17:59:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4GdDpz40Wkhj for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 24 Jun 2018 17:59:17 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9363C4048A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 Jun 2018 17:59:17 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for proper group 0 and group 1 support in the vgic, we
-add a field in the struct irq to store the group of all interrupts.
+This small series addresses a peculiarity of the current VGIC
+implementation, namely that we don't support interrupt grouping.
 
-We initialize the group to group 0 when emulating GICv2 and to group 1
-when emulating GICv3, just like we treat them today.  LPIs are always
-group 1.  We also continue to ignore writes from the guest, preserving
-existing functionality, for now.
+KVM either implements a GICv2 without support for the security
+extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
+security extensions, group 0 interrupts can be configured to be either
+signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
+always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
+and group 0 interrupts are always FIQs, and there is no concept of
+secure vs. non-secure group 1 interrupts when DS=1.
 
-Finally, we also add this field to the vgic debug logic to show the
-group for all interrupts.
+We were treating all interrupts on GICv2 as group 0, but yet telling the
+geust that they were group 1.  The first patch changes this behavior,
+which seems to have no effect on no known guests, but still.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- include/kvm/arm_vgic.h         |  1 +
- virt/kvm/arm/vgic/vgic-debug.c |  8 +++++---
- virt/kvm/arm/vgic/vgic-init.c  | 11 +++++++++--
- virt/kvm/arm/vgic/vgic-its.c   |  1 +
- 4 files changed, 16 insertions(+), 5 deletions(-)
+The remaining patches introduce proper interrupt grouping support, along
+with MMIO accessors for the VM and userspace to retrieve and set the
+which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
+interrupts as per the architecture, and there is no way to modify this
+configuration (no IGROUPR registers for LPIs or equivalent ITS
+commands).
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index cfdd2484cc42..d2d578d099de 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -133,6 +133,7 @@ struct vgic_irq {
- 	u8 source;			/* GICv2 SGIs only */
- 	u8 active_source;		/* GICv2 SGIs only */
- 	u8 priority;
-+	u8 group;			/* 0 == group 0, 1 == group 1 */
- 	enum vgic_irq_config config;	/* Level or edge */
- 
- 	/*
-diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
-index c589d4c2b478..d3a403f63010 100644
---- a/virt/kvm/arm/vgic/vgic-debug.c
-+++ b/virt/kvm/arm/vgic/vgic-debug.c
-@@ -148,6 +148,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
- 
- 	seq_printf(s, "P=pending_latch, L=line_level, A=active\n");
- 	seq_printf(s, "E=enabled, H=hw, C=config (level=1, edge=0)\n");
-+	seq_printf(s, "G=group\n");
- }
- 
- static void print_header(struct seq_file *s, struct vgic_irq *irq,
-@@ -162,8 +163,8 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
- 	}
- 
- 	seq_printf(s, "\n");
--	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHC     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
--	seq_printf(s, "---------------------------------------------------------------\n");
-+	seq_printf(s, "%s%2d TYP   ID TGT_ID PLAEHCG     HWID   TARGET SRC PRI VCPU_ID\n", hdr, id);
-+	seq_printf(s, "----------------------------------------------------------------\n");
- }
- 
- static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
-@@ -182,7 +183,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 
- 	seq_printf(s, "       %s %4d "
- 		      "    %2d "
--		      "%d%d%d%d%d%d "
-+		      "%d%d%d%d%d%d%d "
- 		      "%8d "
- 		      "%8x "
- 		      " %2x "
-@@ -197,6 +198,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			irq->enabled,
- 			irq->hw,
- 			irq->config == VGIC_CONFIG_LEVEL,
-+			irq->group,
- 			irq->hwintid,
- 			irq->mpidr,
- 			irq->source,
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 2673efce65f3..146a1bbb05c8 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -175,10 +175,13 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- 		irq->vcpu = NULL;
- 		irq->target_vcpu = vcpu0;
- 		kref_init(&irq->refcount);
--		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
-+		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
- 			irq->targets = 0;
--		else
-+			irq->group = 0;
-+		} else {
- 			irq->mpidr = 0;
-+			irq->group = 1;
-+		}
- 	}
- 	return 0;
- }
-@@ -227,6 +230,10 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 			/* PPIs */
- 			irq->config = VGIC_CONFIG_LEVEL;
- 		}
-+		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
-+			irq->group = 0;
-+		else
-+			irq->group = 1;
- 	}
- 
- 	if (!irqchip_in_kernel(vcpu->kvm))
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4ed79c939fb4..92840c06fcd7 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -71,6 +71,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	kref_init(&irq->refcount);
- 	irq->intid = intid;
- 	irq->target_vcpu = vcpu;
-+	irq->group = 1;
- 
- 	spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 
+Lightly tested on Seattle, TX1, and the foundation model.  I've run a
+GICv2 guest on a GICv3 host on the foundation model.
+
+Applies to v4.18-rc1.
+
+Christoffer Dall (4):
+  KVM: arm/arm64: GICv2 IGROUPR should read as zero
+  KVM: arm/arm64: vgic: Add group field to struct irq
+  KVM: arm/arm64: Signal IRQs using their configured group
+  KVM: arm/arm64: vgic: Allow VMs to configure interrupt groups
+
+ include/kvm/arm_vgic.h           |  1 +
+ include/linux/irqchip/arm-gic.h  |  1 +
+ virt/kvm/arm/vgic/vgic-debug.c   |  8 ++++---
+ virt/kvm/arm/vgic/vgic-init.c    | 11 +++++++--
+ virt/kvm/arm/vgic/vgic-its.c     |  1 +
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 38 ++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  6 +++++
+ virt/kvm/arm/vgic/vgic-v2.c      |  3 +++
+ virt/kvm/arm/vgic/vgic-v3.c      |  6 +----
+ 11 files changed, 67 insertions(+), 12 deletions(-)
+
 -- 
 2.17.1
