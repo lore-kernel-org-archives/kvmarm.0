@@ -1,102 +1,81 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 3/4] KVM: arm/arm64: Signal IRQs using their configured
- group
-Date: Mon, 25 Jun 2018 11:00:59 +0100
-Message-ID: <89debd42-643e-959d-09ab-929c13284802@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 0/4] KVM: arm/arm64: vgic: Virtual interrupt grouping
+ support
+Date: Mon, 25 Jun 2018 12:05:07 +0200
+Message-ID: <20180625100507.GE8004@C02W217FHV2R.local>
 References: <20180624221103.15055-1-christoffer.dall@arm.com>
- <20180624221103.15055-4-christoffer.dall@arm.com>
+ <16588d45-5f24-90ff-57ca-6c670cc2c96c@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3843749FA8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jun 2018 05:49:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id luHPTXLGhsdm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jun 2018 05:48:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF60249FAC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jun 2018 05:48:48 -0400 (EDT)
-In-Reply-To: <20180624221103.15055-4-christoffer.dall@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <16588d45-5f24-90ff-57ca-6c670cc2c96c@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 24/06/18 23:11, Christoffer Dall wrote:
-> Now when we have a group configuration on the struct IRQ, use this state
-> when populating the LR and signaling interrupts as either group 0 or
-> group 1 to the VM.  Depending on the model of the emulated GIC, and the
-> guest's configuration of the VMCR, interrupts may be signaled as IRQs or
-> FIQs to the VM.
+On Mon, Jun 25, 2018 at 10:59:06AM +0100, Andre Przywara wrote:
+> Hi,
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
-> ---
->  include/linux/irqchip/arm-gic.h | 1 +
->  virt/kvm/arm/vgic/vgic-v2.c     | 3 +++
->  virt/kvm/arm/vgic/vgic-v3.c     | 6 +-----
->  3 files changed, 5 insertions(+), 5 deletions(-)
+> On 24/06/18 23:10, Christoffer Dall wrote:
+> > This small series addresses a peculiarity of the current VGIC
+> > implementation, namely that we don't support interrupt grouping.
 > 
-> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-> index 68d8b1f73682..3fa74b917a82 100644
-> --- a/include/linux/irqchip/arm-gic.h
-> +++ b/include/linux/irqchip/arm-gic.h
-> @@ -94,6 +94,7 @@
->  #define GICH_LR_PENDING_BIT		(1 << 28)
->  #define GICH_LR_ACTIVE_BIT		(1 << 29)
->  #define GICH_LR_EOI			(1 << 19)
-> +#define GICH_LR_GROUP1			(1 << 30)
->  #define GICH_LR_HW			(1 << 31)
->  
->  #define GICH_VMCR_ENABLE_GRP0_SHIFT	0
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index a5f2e44f1c33..df5e6a6e3186 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -159,6 +159,9 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  		}
->  	}
->  
-> +	if (irq->group)
-> +		val |= GICH_LR_GROUP1;
-> +
->  	if (irq->hw) {
->  		val |= GICH_LR_HW;
->  		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index ff7dc890941a..4f64228e4b3d 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -197,11 +197,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->  	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
->  		irq->line_level = false;
->  
-> -	/*
-> -	 * We currently only support Group1 interrupts, which is a
-> -	 * known defect. This needs to be addressed at some point.
-> -	 */
-> -	if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> +	if (irq->group)
->  		val |= ICH_LR_GROUP;
->  
->  	val |= (u64)irq->priority << ICH_LR_PRIORITY_SHIFT;
+> Nice one and seems straight forward enough.
+> Just curious: Were there any complaints or even users of FIQs and/or
+> interrupt grouping?
 > 
+
+No, but the behavior wasn't strictly architecturally compliant so it was
+on the table for the GICv2-on-GICv3 fixes that Marc was working on a
+while back.
+
+> > KVM either implements a GICv2 without support for the security
+> > extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
+> > security extensions, group 0 interrupts can be configured to be either
+> > signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
+> > always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
+> > and group 0 interrupts are always FIQs, and there is no concept of
+> > secure vs. non-secure group 1 interrupts when DS=1.
+> > 
+> > We were treating all interrupts on GICv2 as group 0, but yet telling the
+> > geust that they were group 1.  The first patch changes this behavior,
+> > which seems to have no effect on no known guests, but still.
+> > 
+> > The remaining patches introduce proper interrupt grouping support, along
+> > with MMIO accessors for the VM and userspace to retrieve and set the
+> > which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
+> > interrupts as per the architecture, and there is no way to modify this
+> > configuration (no IGROUPR registers for LPIs or equivalent ITS
+> > commands).
+> > 
+> > Lightly tested on Seattle, TX1, and the foundation model.  I've run a
+> > GICv2 guest on a GICv3 host on the foundation model.
+> 
+> I take it those were regression tests with Linux guests?
+> Do we have any means of testing this with guests which actually use
+> different groups or FIQs? Does kvm-unit-tests cover this?
+
+I don't think so.  I did run kvm-unit-tests on a GICv3 system and didn't
+observe anything.  I think I forgot to run it on a GICv2 system, I'll
+expand coverage for the next round.
+
+> 
+> Did you do any tests on 32 bit? I am going to fire up something on my
+> Midway later today ...
+> 
+
+Yes, I ran it on my cubietruck.
+
+Thanks,
+-Christoffer
