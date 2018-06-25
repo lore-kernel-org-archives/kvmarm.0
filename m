@@ -1,18 +1,14 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm/arm64: vgic: Allow VMs to configure
- interrupt groups
-Date: Mon, 25 Jun 2018 10:44:17 +0100
-Message-ID: <4c2f318d-29be-fb1a-3bb2-56bb56be1420@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/4] KVM: arm/arm64: vgic: Virtual interrupt grouping
+ support
+Date: Mon, 25 Jun 2018 10:52:41 +0100
+Message-ID: <CAFEAcA_C6Voh_6Ljj9--cbo14X_uWTOekM30dU=Rp9CtZK-6ow@mail.gmail.com>
 References: <20180624221103.15055-1-christoffer.dall@arm.com>
- <20180624221103.15055-5-christoffer.dall@arm.com>
- <2f5feed6-c026-1871-25e4-943123c8b977@arm.com>
- <20180625093406.GC8004@C02W217FHV2R.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180625093406.GC8004@C02W217FHV2R.local>
-Content-Language: en-GB
+In-Reply-To: <20180624221103.15055-1-christoffer.dall@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -23,85 +19,39 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/06/18 10:34, Christoffer Dall wrote:
-> On Mon, Jun 25, 2018 at 09:19:07AM +0100, Marc Zyngier wrote:
->> On 24/06/18 23:11, Christoffer Dall wrote:
->>> Implement the required MMIO accessors for GICv2 and GICv3 for the
->>> IGROUPR distributor and redistributor registers.
->>>
->>> This can allow guests to change behavior compared to running on previous
->>> versions of KVM, but only to align with the architecture and hardware
->>> implementations.
->>>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
->>>  virt/kvm/arm/vgic/vgic-mmio-v3.c |  2 +-
->>>  virt/kvm/arm/vgic/vgic-mmio.c    | 38 ++++++++++++++++++++++++++++++++
->>>  virt/kvm/arm/vgic/vgic-mmio.h    |  6 +++++
->>>  4 files changed, 46 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> index 8d18f89397d3..ff3834d16ac9 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
->>> @@ -362,7 +362,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->>>  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
->>>  		VGIC_ACCESS_32bit),
->>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
->>> -		vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
->>> +		vgic_mmio_read_group, vgic_mmio_write_group, NULL, NULL, 1,
->>>  		VGIC_ACCESS_32bit),
->>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
->>>  		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> index 287784095b5b..76e422859745 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> @@ -451,7 +451,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
->>>  		vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
->>>  		VGIC_ACCESS_32bit),
->>>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
->>> -		vgic_mmio_read_rao, vgic_mmio_write_wi, NULL, NULL, 1,
->>> +		vgic_mmio_read_group, vgic_mmio_write_group, NULL, NULL, 1,
->>>  		VGIC_ACCESS_32bit),
->>>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
->>>  		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
->>
->> I think you're missing the GICR_IGROUPR accessor in the redistributor
->> (despite mentioning it in the commit message).
->>
-> 
-> Indeed.  I fixed this up on my kernel.org branch (vgic-group-fixes), and
-> the fix is pretty trivial:
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 76e422859745..d2acad07dd30 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -524,7 +524,7 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
->  
->  static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
->  	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
-> -		vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
-> +		vgic_mmio_read_group, vgic_mmio_write_group, 4,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
->  		vgic_mmio_read_enable, vgic_mmio_write_senable, 4,
-> 
-> I did a test on the model using both GICv3 and GICv2-on-GICv3, seems
-> happy still.
-> 
-> Do you want me to send a v2, or do you prefer to fix this up locally?
-I can fix that myself. But this raises another question: As this change
-is obviously observable by the guest, should we consider bumping up the
-IIDR revision field?
+On 24 June 2018 at 23:10, Christoffer Dall <christoffer.dall@arm.com> wrote:
+> This small series addresses a peculiarity of the current VGIC
+> implementation, namely that we don't support interrupt grouping.
+>
+> KVM either implements a GICv2 without support for the security
+> extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
+> security extensions, group 0 interrupts can be configured to be either
+> signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
+> always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
+> and group 0 interrupts are always FIQs, and there is no concept of
+> secure vs. non-secure group 1 interrupts when DS=1.
+>
+> We were treating all interrupts on GICv2 as group 0, but yet telling the
+> geust that they were group 1.  The first patch changes this behavior,
+> which seems to have no effect on no known guests, but still.
+>
+> The remaining patches introduce proper interrupt grouping support, along
+> with MMIO accessors for the VM and userspace to retrieve and set the
+> which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
+> interrupts as per the architecture, and there is no way to modify this
+> configuration (no IGROUPR registers for LPIs or equivalent ITS
+> commands).
 
-Thanks,
+How do we handle migration compatibility here? For instance if
+we have a guest running on an old kernel with GICv2, presumably
+it reports the GICD_IGROUPRn to userspace as being all-1 (but
+they behave as group 0); then when we load on the new kernel
+the new kernel will honour the IGROUPRn values and the interrupts
+will start behaving like group 1 ? Maybe this works because the
+guest is expecting them to be signalled as IRQ either way...
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+thanks
+-- PMM
