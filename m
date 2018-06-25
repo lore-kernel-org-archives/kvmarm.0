@@ -1,75 +1,122 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 0/4] KVM: arm/arm64: vgic: Virtual interrupt grouping
- support
-Date: Mon, 25 Jun 2018 13:56:03 +0200
-Message-ID: <20180625115603.GG8004@C02W217FHV2R.local>
-References: <20180624221103.15055-1-christoffer.dall@arm.com>
- <CAFEAcA_C6Voh_6Ljj9--cbo14X_uWTOekM30dU=Rp9CtZK-6ow@mail.gmail.com>
- <20180625101347.GF8004@C02W217FHV2R.local>
+From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v2 2/5] iommu: Add virtio-iommu driver
+Date: Mon, 25 Jun 2018 18:52:15 +0100
+Message-ID: <d52ea647-8caf-d973-be2a-f54e4d9ce074@arm.com>
+References: <20180621190655.56391-1-jean-philippe.brucker@arm.com>
+	<20180621190655.56391-3-jean-philippe.brucker@arm.com>
+	<20180622033720-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180625101347.GF8004@C02W217FHV2R.local>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180622033720-mutt-send-email-mst-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org" <jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 25, 2018 at 12:13:47PM +0200, Christoffer Dall wrote:
-> On Mon, Jun 25, 2018 at 10:52:41AM +0100, Peter Maydell wrote:
-> > On 24 June 2018 at 23:10, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> > > This small series addresses a peculiarity of the current VGIC
-> > > implementation, namely that we don't support interrupt grouping.
-> > >
-> > > KVM either implements a GICv2 without support for the security
-> > > extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
-> > > security extensions, group 0 interrupts can be configured to be either
-> > > signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
-> > > always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
-> > > and group 0 interrupts are always FIQs, and there is no concept of
-> > > secure vs. non-secure group 1 interrupts when DS=1.
-> > >
-> > > We were treating all interrupts on GICv2 as group 0, but yet telling the
-> > > geust that they were group 1.  The first patch changes this behavior,
-> > > which seems to have no effect on no known guests, but still.
-> > >
-> > > The remaining patches introduce proper interrupt grouping support, along
-> > > with MMIO accessors for the VM and userspace to retrieve and set the
-> > > which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
-> > > interrupts as per the architecture, and there is no way to modify this
-> > > configuration (no IGROUPR registers for LPIs or equivalent ITS
-> > > commands).
-> > 
-> > How do we handle migration compatibility here? For instance if
-> > we have a guest running on an old kernel with GICv2, presumably
-> > it reports the GICD_IGROUPRn to userspace as being all-1 (but
-> > they behave as group 0); then when we load on the new kernel
-> > the new kernel will honour the IGROUPRn values and the interrupts
-> > will start behaving like group 1 ? Maybe this works because the
-> > guest is expecting them to be signalled as IRQ either way...
-> > 
+On 22/06/18 01:51, Michael S. Tsirkin wrote:
+>> +VIRTIO IOMMU DRIVER
+>> +M:	Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+>> +S:	Maintained
+>> +F:	drivers/iommu/virtio-iommu.c
+>> +F:	include/uapi/linux/virtio_iommu.h
+>> +
+>>  VIRTUAL BOX GUEST DEVICE DRIVER
+>>  M:	Hans de Goede <hdegoede-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>>  M:	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
 > 
-> Interesting.  For GICv2, I think this will actually break, and the
-> migrated Linux guest won't see any interrupts anymore (Linux only sets
-> bit 0 in GICD_CTLR).  For GICv3, everything stays group 1 unless the
-> guest is specifically trying to configure group 0 for something.
-> 
-> I suppose this means we need to let userspace request
-> ARCH_COMPLIANT_GICV2 and otherwise ignore userspace writes to IGROUPR?
-> 
-Alternatively, we could deny (fail) migration where the
-GICD_IIDR.Revision does not match the source, and just let userspace fix
-things up.  Thoughts?
+> Please add the virtualization mailing list.
 
-Thanks,
--Christoffer
+Ok. For the driver get_maintainer.pl now outputs the iommu and
+virtualizations lists, as well as Joerg Roedel. For the header it
+outputs the virtualization list, Jason and you.
+
+>> +#define VIOMMU_REQUEST_TIMEOUT		10000 /* 10s */
+> 
+> Where does this come from? Do you absolutely have to have
+> an arbitrary timeout?
+
+It isn't necessary but very useful for development, and I wonder if
+we could keep it behind an #ifdef DEBUG. Some requests are sent from
+hardirq-safe context (because device driver are allowed to call
+iommu_map/unmap from an IRQ handler), where they would lock the CPU if
+the IOMMU device misbehaves. The timeout is here to provide a little
+more info to developers, instead of a generic RCU lockup message.
+
+On the other hand allowing unmap requests to timeout might pose a
+security risk (freeing pages that are still used by endpoints). So I
+think moving this behind a DEBUG would be better.
+
+>> +static int viommu_probe(struct virtio_device *vdev)
+>> +{
+>> +	struct device *parent_dev = vdev->dev.parent;
+>> +	struct viommu_dev *viommu = NULL;
+>> +	struct device *dev = &vdev->dev;
+>> +	u64 input_start = 0;
+>> +	u64 input_end = -1UL;
+>> +	int ret;
+> 
+> Please validate that device has VIRTIO_F_VERSION_1 -
+> we don't ever want new devices to grow legacy
+> interfaces.
+
+Agreed. In this case I think I can also remove from the device
+specification all legacy paragraphs, that cater for missing FEATURES_OK
+status and native endianess.
+
+For the record, all kvmtool devices on my branch now default to virtio
+version 1, since they need the VIRTIO_F_IOMMU_PLATFORM bit.
+
+>> +struct virtio_iommu_config {
+>> +	/* Supported page sizes */
+>> +	__u64					page_size_mask;
+>> +	/* Supported IOVA range */
+>> +	struct virtio_iommu_range {
+>> +		__u64				start;
+>> +		__u64				end;
+>> +	} input_range;
+>> +	/* Max domain ID size */
+>> +	__u8					domain_bits;
+>> +} __packed;
+> 
+> Please pad structs so each field and all of it are size aligned and avoid __packed.
+> 
+> Applies below too.
+
+Ok, I'll clean this up (as well as the structs in the device spec). I
+think the only struct that needs more padding is virtio_iommu_fault. The
+total size of the attach request is 20 bytes, not aligned on 64 bits,
+but it probably doesn't need to change. virtio_blk_req for example has
+an odd size and I don't think that caused any problem (?).
+
+>> +union virtio_iommu_req {
+>> +	struct virtio_iommu_req_head		head;
+>> +
+>> +	struct virtio_iommu_req_attach		attach;
+>> +	struct virtio_iommu_req_detach		detach;
+>> +	struct virtio_iommu_req_map		map;
+>> +	struct virtio_iommu_req_unmap		unmap;
+>> +};
+> 
+> Such unions are problematic: if you add an option of a larger structure
+> down the road, do all requests grow automatically?
+
+Yes, requests don't have a fixed size, and the next extension adds two
+slightly larger requests. I'm also in favor of removing the union, and
+letting implementations redefine it if needed. At the moment this union
+is only used by kvmtool for parsing requests, not by QEMU or the Linux
+driver.
+
+Thanks a lot for the comments
+
+Jean
