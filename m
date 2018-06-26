@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v5 04/20] ACPI / APEI: Switch NOTIFY_SEA to use the estatus
- queue
-Date: Tue, 26 Jun 2018 18:01:00 +0100
-Message-ID: <20180626170116.25825-5-james.morse@arm.com>
+Subject: [PATCH v5 07/20] arm64: KVM/mm: Move SEA handling behind a single
+ 'claim' interface
+Date: Tue, 26 Jun 2018 18:01:03 +0100
+Message-ID: <20180626170116.25825-8-james.morse@arm.com>
 References: <20180626170116.25825-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A9F4A0F0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92A534A0FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R255jVnJwrbu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jun 2018 12:50:09 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 948484A10B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:49:59 -0400 (EDT)
+ with ESMTP id dRNddL2lZtZu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jun 2018 12:50:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E154C4A104
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:10 -0400 (EDT)
 In-Reply-To: <20180626170116.25825-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,85 +32,231 @@ To: linux-acpi@vger.kernel.org
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the estatus queue can be used by more than one notification
-method, we can move notifications that have NMI-like behaviour over to
-it, and start abstracting GHES's single in_nmi() path.
+To split up APEIs in_nmi() path, we need the nmi-like callers to always
+be in_nmi(). Add a helper to do the work and claim the notification.
 
-Switch NOTIFY_SEA over to use the estatus queue. This makes it behave
-in the same way as x86's NOTIFY_NMI.
+When KVM or the arch code takes an exception that might be a RAS
+notification, it asks the APEI firmware-first code whether it wants
+to claim the exception. We can then go on to see if (a future)
+kernel-first mechanism wants to claim the notification, before
+falling through to the existing default behaviour.
+
+The NOTIFY_SEA code was merged before we had multiple, possibly
+interacting, NMI-like notifications and the need to consider kernel
+first in the future. Make the 'claiming' behaviour explicit.
+
+As we're restructuring the APEI code to allow multiple NMI-like
+notifications, any notification that might interrupt interrupts-masked
+code must always be wrapped in nmi_enter()/nmi_exit(). This allows APEI
+to use in_nmi() to use the right fixmap entries.
+
+We mask SError over this window to prevent an asynchronous RAS error
+arriving and tripping 'nmi_enter()'s BUG_ON(in_nmi()).
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
----
- drivers/acpi/apei/ghes.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index d7c46236b353..150fb184c7cb 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -58,6 +58,10 @@
+---
+Why does apei_claim_sea() take a pt_regs? This gets used later to take
+APEI by the hand through NMI->IRQ context, depending on what we
+interrupted.
+
+Changes since v4:
+ * Made irqs-unmasked comment a lockdep assert.
+
+Changes since v3:
+ * Removed spurious whitespace change
+ * Updated comment in acpi.c to cover SError masking
+
+Changes since v2:
+ * Added dummy definition for !ACPI and culled IS_ENABLED() checks.
+
+squash: make 'call with irqs unmaksed' a lockdep assert, much better
+---
+ arch/arm64/include/asm/acpi.h      |  4 ++++
+ arch/arm64/include/asm/daifflags.h |  1 +
+ arch/arm64/include/asm/kvm_ras.h   | 16 +++++++++++++++-
+ arch/arm64/kernel/acpi.c           | 30 ++++++++++++++++++++++++++++++
+ arch/arm64/mm/fault.c              | 29 +++++------------------------
+ 5 files changed, 55 insertions(+), 25 deletions(-)
+
+diff --git a/arch/arm64/include/asm/acpi.h b/arch/arm64/include/asm/acpi.h
+index 0db62a4cbce2..bfd23f0f0060 100644
+--- a/arch/arm64/include/asm/acpi.h
++++ b/arch/arm64/include/asm/acpi.h
+@@ -16,6 +16,7 @@
+ #include <linux/psci.h>
  
- #define GHES_PFX	"GHES: "
+ #include <asm/cputype.h>
++#include <asm/ptrace.h>
+ #include <asm/smp_plat.h>
+ #include <asm/tlbflush.h>
  
-+#if defined(CONFIG_HAVE_ACPI_APEI_NMI) || defined(CONFIG_ACPI_APEI_SEA)
-+#define WANT_NMI_ESTATUS_QUEUE	1
-+#endif
-+
- #define GHES_ESTATUS_MAX_SIZE		65536
- #define GHES_ESOURCE_PREALLOC_MAX_SIZE	65536
- 
-@@ -681,7 +685,7 @@ static void ghes_estatus_cache_add(
- 	rcu_read_unlock();
- }
- 
--#ifdef CONFIG_HAVE_ACPI_APEI_NMI
-+#ifdef WANT_NMI_ESTATUS_QUEUE
- /*
-  * Handlers for CPER records may not be NMI safe. For example,
-  * memory_failure_queue() takes spinlocks and calls schedule_work_on().
-@@ -861,7 +865,7 @@ static void ghes_nmi_init_cxt(void)
- 
- #else
- static inline void ghes_nmi_init_cxt(void) { }
--#endif /* CONFIG_HAVE_ACPI_APEI_NMI */
-+#endif /* WANT_NMI_ESTATUS_QUEUE */
- 
- static int ghes_ack_error(struct acpi_hest_generic_v2 *gv2)
- {
-@@ -977,20 +981,13 @@ static LIST_HEAD(ghes_sea);
+@@ -130,6 +131,9 @@ static inline const char *acpi_get_enable_method(int cpu)
   */
- int ghes_notify_sea(void)
- {
--	struct ghes *ghes;
+ #define acpi_disable_cmcff 1
+ pgprot_t arch_apei_get_mem_attribute(phys_addr_t addr);
++int apei_claim_sea(struct pt_regs *regs);
++#else
++static inline int apei_claim_sea(struct pt_regs *regs) { return -ENOENT; }
+ #endif /* CONFIG_ACPI_APEI */
+ 
+ #ifdef CONFIG_ACPI_NUMA
+diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+index 22e4c83de5a5..cbd753855bf3 100644
+--- a/arch/arm64/include/asm/daifflags.h
++++ b/arch/arm64/include/asm/daifflags.h
+@@ -20,6 +20,7 @@
+ 
+ #define DAIF_PROCCTX		0
+ #define DAIF_PROCCTX_NOIRQ	PSR_I_BIT
++#define DAIF_ERRCTX		(PSR_I_BIT | PSR_A_BIT)
+ 
+ /* mask/save/unmask/restore all exceptions, including interrupts. */
+ static inline void local_daif_mask(void)
+diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
+index 5f72b07b7912..5b56e7e297b1 100644
+--- a/arch/arm64/include/asm/kvm_ras.h
++++ b/arch/arm64/include/asm/kvm_ras.h
+@@ -4,8 +4,22 @@
+ #ifndef __ARM64_KVM_RAS_H__
+ #define __ARM64_KVM_RAS_H__
+ 
++#include <linux/acpi.h>
++#include <linux/errno.h>
+ #include <linux/types.h>
+ 
+-int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr);
++#include <asm/acpi.h>
++
++/*
++ * Was this synchronous external abort a RAS notification?
++ * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
++ */
++static inline int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
++{
++	/* apei_claim_sea(NULL) expects to mask interrupts itself */
++	lockdep_assert_irqs_enabled();
++
++	return apei_claim_sea(NULL);
++}
+ 
+ #endif /* __ARM64_KVM_RAS_H__ */
+diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
+index 7b09487ff8fb..df2c6bff8c58 100644
+--- a/arch/arm64/kernel/acpi.c
++++ b/arch/arm64/kernel/acpi.c
+@@ -33,6 +33,8 @@
+ 
+ #ifdef CONFIG_ACPI_APEI
+ # include <linux/efi.h>
++# include <acpi/ghes.h>
++# include <asm/daifflags.h>
+ # include <asm/pgtable.h>
+ #endif
+ 
+@@ -261,4 +263,32 @@ pgprot_t arch_apei_get_mem_attribute(phys_addr_t addr)
+ 		return __pgprot(PROT_NORMAL_NC);
+ 	return __pgprot(PROT_DEVICE_nGnRnE);
+ }
++
++
++/*
++ * Claim Synchronous External Aborts as a firmware first notification.
++ *
++ * Used by KVM and the arch do_sea handler.
++ * @regs may be NULL when called from process context.
++ */
++int apei_claim_sea(struct pt_regs *regs)
++{
++	int err = -ENOENT;
++	unsigned long current_flags = arch_local_save_flags();
++
++	if (!IS_ENABLED(CONFIG_ACPI_APEI_SEA))
++		return err;
++
++	/*
++	 * SEA can interrupt SError, mask it and describe this as an NMI so
++	 * that APEI defers the handling.
++	 */
++	local_daif_restore(DAIF_ERRCTX);
++	nmi_enter();
++	err = ghes_notify_sea();
++	nmi_exit();
++	local_daif_restore(current_flags);
++
++	return err;
++}
+ #endif
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 167772fe4360..fb2761172cd4 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -18,6 +18,7 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include <linux/acpi.h>
+ #include <linux/extable.h>
+ #include <linux/signal.h>
+ #include <linux/mm.h>
+@@ -33,6 +34,7 @@
+ #include <linux/preempt.h>
+ #include <linux/hugetlb.h>
+ 
++#include <asm/acpi.h>
+ #include <asm/bug.h>
+ #include <asm/cmpxchg.h>
+ #include <asm/cpufeature.h>
+@@ -45,8 +47,6 @@
+ #include <asm/tlbflush.h>
+ #include <asm/traps.h>
+ 
+-#include <acpi/ghes.h>
+-
+ struct fault_info {
+ 	int	(*fn)(unsigned long addr, unsigned int esr,
+ 		      struct pt_regs *regs);
+@@ -631,19 +631,10 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
+ 	inf = esr_to_fault_info(esr);
+ 
+ 	/*
+-	 * Synchronous aborts may interrupt code which had interrupts masked.
+-	 * Before calling out into the wider kernel tell the interested
+-	 * subsystems.
++	 * Return value ignored as we rely on signal merging.
++	 * Future patches will make this more robust.
+ 	 */
+-	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA)) {
+-		if (interrupts_enabled(regs))
+-			nmi_enter();
+-
+-		ghes_notify_sea();
+-
+-		if (interrupts_enabled(regs))
+-			nmi_exit();
+-	}
++	apei_claim_sea(regs);
+ 
+ 	clear_siginfo(&info);
+ 	info.si_signo = inf->sig;
+@@ -725,16 +716,6 @@ static const struct fault_info fault_info[] = {
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 63"			},
+ };
+ 
+-int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
+-{
 -	int ret = -ENOENT;
 -
--	rcu_read_lock();
--	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
--		if (!ghes_proc(ghes))
--			ret = 0;
--	}
--	rcu_read_unlock();
+-	if (IS_ENABLED(CONFIG_ACPI_APEI_SEA))
+-		ret = ghes_notify_sea();
+-
 -	return ret;
-+	return ghes_estatus_queue_notified(&ghes_sea);
- }
- 
- static void ghes_sea_add(struct ghes *ghes)
+-}
+-
+ asmlinkage void __exception do_mem_abort(unsigned long addr, unsigned int esr,
+ 					 struct pt_regs *regs)
  {
-+	ghes_estatus_queue_grow_pool(ghes);
-+
- 	mutex_lock(&ghes_list_mutex);
- 	list_add_rcu(&ghes->list, &ghes_sea);
- 	mutex_unlock(&ghes_list_mutex);
-@@ -1002,6 +999,8 @@ static void ghes_sea_remove(struct ghes *ghes)
- 	list_del_rcu(&ghes->list);
- 	mutex_unlock(&ghes_list_mutex);
- 	synchronize_rcu();
-+
-+	ghes_estatus_queue_shrink_pool(ghes);
- }
- #else /* CONFIG_ACPI_APEI_SEA */
- static inline void ghes_sea_add(struct ghes *ghes) { }
 -- 
 2.17.1
