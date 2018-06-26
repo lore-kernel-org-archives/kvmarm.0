@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v5 05/20] ACPI / APEI: Make estatus queue a Kconfig symbol
-Date: Tue, 26 Jun 2018 18:01:01 +0100
-Message-ID: <20180626170116.25825-6-james.morse@arm.com>
+Subject: [PATCH v5 06/20] KVM: arm/arm64: Add kvm_ras.h to collect kvm
+ specific RAS plumbing
+Date: Tue, 26 Jun 2018 18:01:02 +0100
+Message-ID: <20180626170116.25825-7-james.morse@arm.com>
 References: <20180626170116.25825-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 400B54A0EC
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3154A0EC
  for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YEIP5Ydy9gyG for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id DJjcBfnlLn1I for <kvmarm@lists.cs.columbia.edu>;
  Tue, 26 Jun 2018 12:50:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 662B54A10C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:03 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 308214A10D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jun 2018 12:50:07 -0400 (EDT)
 In-Reply-To: <20180626170116.25825-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,104 +32,144 @@ To: linux-acpi@vger.kernel.org
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that there are two users of the estatus queue, and likely to be more,
-make it a Kconfig symbol selected by the appropriate notification. We
-can move the ARCH_HAVE_NMI_SAFE_CMPXCHG checks in here too.
+To split up APEIs in_nmi() path, we need any nmi-like callers to always
+be in_nmi(). KVM shouldn't have to know about this, pull the RAS plumbing
+out into a header file.
+
+Currently guest synchronous external aborts are claimed as RAS
+notifications by handle_guest_sea(), which is hidden in the arch codes
+mm/fault.c. 32bit gets a dummy declaration in system_misc.h.
+
+There is going to be more of this in the future if/when we support
+the SError-based firmware-first notification mechanism and/or
+kernel-first notifications for both synchronous external abort and
+SError. Each of these will come with some Kconfig symbols and a
+handful of header files.
+
+Create a header file for all this.
+
+This patch gives handle_guest_sea() a 'kvm_' prefix, and moves the
+declarations to kvm_ras.h as preparation for a future patch that moves
+the ACPI-specific RAS code out of mm/fault.c.
 
 Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
 ---
- drivers/acpi/apei/Kconfig |  6 ++++++
- drivers/acpi/apei/ghes.c  | 12 +++---------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ arch/arm/include/asm/kvm_ras.h       | 14 ++++++++++++++
+ arch/arm/include/asm/system_misc.h   |  5 -----
+ arch/arm64/include/asm/kvm_ras.h     | 11 +++++++++++
+ arch/arm64/include/asm/system_misc.h |  2 --
+ arch/arm64/mm/fault.c                |  2 +-
+ virt/kvm/arm/mmu.c                   |  4 ++--
+ 6 files changed, 28 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/include/asm/kvm_ras.h
+ create mode 100644 arch/arm64/include/asm/kvm_ras.h
 
-diff --git a/drivers/acpi/apei/Kconfig b/drivers/acpi/apei/Kconfig
-index 52ae5438edeb..2b191e09b647 100644
---- a/drivers/acpi/apei/Kconfig
-+++ b/drivers/acpi/apei/Kconfig
-@@ -4,6 +4,7 @@ config HAVE_ACPI_APEI
- 
- config HAVE_ACPI_APEI_NMI
- 	bool
-+	select ACPI_APEI_GHES_ESTATUS_QUEUE
- 
- config ACPI_APEI
- 	bool "ACPI Platform Error Interface (APEI)"
-@@ -33,6 +34,10 @@ config ACPI_APEI_GHES
- 	  by firmware to produce more valuable hardware error
- 	  information for Linux.
- 
-+config ACPI_APEI_GHES_ESTATUS_QUEUE
-+	bool
-+	depends on ACPI_APEI_GHES && ARCH_HAVE_NMI_SAFE_CMPXCHG
+diff --git a/arch/arm/include/asm/kvm_ras.h b/arch/arm/include/asm/kvm_ras.h
+new file mode 100644
+index 000000000000..aaff56bf338f
+--- /dev/null
++++ b/arch/arm/include/asm/kvm_ras.h
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2018 - Arm Ltd
 +
- config ACPI_APEI_PCIEAER
- 	bool "APEI PCIe AER logging/recovering support"
- 	depends on ACPI_APEI && PCIEAER
-@@ -43,6 +48,7 @@ config ACPI_APEI_PCIEAER
- config ACPI_APEI_SEA
- 	bool "APEI Synchronous External Abort logging/recovering support"
- 	depends on ARM64 && ACPI_APEI_GHES
-+	select ACPI_APEI_GHES_ESTATUS_QUEUE
- 	default y
- 	help
- 	  This option should be enabled if the system supports
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 150fb184c7cb..2880547e13b8 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -58,10 +58,6 @@
++#ifndef __ARM_KVM_RAS_H__
++#define __ARM_KVM_RAS_H__
++
++#include <linux/types.h>
++
++static inline int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
++{
++	return -1;
++}
++
++#endif /* __ARM_KVM_RAS_H__ */
+diff --git a/arch/arm/include/asm/system_misc.h b/arch/arm/include/asm/system_misc.h
+index 8e76db83c498..66f6a3ae68d2 100644
+--- a/arch/arm/include/asm/system_misc.h
++++ b/arch/arm/include/asm/system_misc.h
+@@ -38,11 +38,6 @@ static inline void harden_branch_predictor(void)
  
- #define GHES_PFX	"GHES: "
+ extern unsigned int user_debug;
  
--#if defined(CONFIG_HAVE_ACPI_APEI_NMI) || defined(CONFIG_ACPI_APEI_SEA)
--#define WANT_NMI_ESTATUS_QUEUE	1
--#endif
+-static inline int handle_guest_sea(phys_addr_t addr, unsigned int esr)
+-{
+-	return -1;
+-}
 -
- #define GHES_ESTATUS_MAX_SIZE		65536
- #define GHES_ESOURCE_PREALLOC_MAX_SIZE	65536
+ #endif /* !__ASSEMBLY__ */
  
-@@ -685,7 +681,7 @@ static void ghes_estatus_cache_add(
- 	rcu_read_unlock();
- }
+ #endif /* __ASM_ARM_SYSTEM_MISC_H */
+diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
+new file mode 100644
+index 000000000000..5f72b07b7912
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_ras.h
+@@ -0,0 +1,11 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) 2018 - Arm Ltd
++
++#ifndef __ARM64_KVM_RAS_H__
++#define __ARM64_KVM_RAS_H__
++
++#include <linux/types.h>
++
++int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr);
++
++#endif /* __ARM64_KVM_RAS_H__ */
+diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
+index 28893a0b141d..48ded3628a89 100644
+--- a/arch/arm64/include/asm/system_misc.h
++++ b/arch/arm64/include/asm/system_misc.h
+@@ -45,8 +45,6 @@ extern void __show_regs(struct pt_regs *);
  
--#ifdef WANT_NMI_ESTATUS_QUEUE
-+#ifdef CONFIG_ACPI_APEI_GHES_ESTATUS_QUEUE
- /*
-  * Handlers for CPER records may not be NMI safe. For example,
-  * memory_failure_queue() takes spinlocks and calls schedule_work_on().
-@@ -727,7 +723,6 @@ static void ghes_print_queued_estatus(void)
- /* Save estatus for further processing in IRQ context */
- static void __process_error(struct ghes *ghes)
+ extern void (*arm_pm_restart)(enum reboot_mode reboot_mode, const char *cmd);
+ 
+-int handle_guest_sea(phys_addr_t addr, unsigned int esr);
+-
+ #endif	/* __ASSEMBLY__ */
+ 
+ #endif	/* __ASM_SYSTEM_MISC_H */
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index b8eecc7b9531..167772fe4360 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -725,7 +725,7 @@ static const struct fault_info fault_info[] = {
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 63"			},
+ };
+ 
+-int handle_guest_sea(phys_addr_t addr, unsigned int esr)
++int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
  {
--#ifdef CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG
- 	u32 len, node_len;
- 	struct ghes_estatus_node *estatus_node;
- 	struct acpi_hest_generic_status *estatus;
-@@ -747,7 +742,6 @@ static void __process_error(struct ghes *ghes)
- 	estatus = GHES_ESTATUS_FROM_NODE(estatus_node);
- 	memcpy(estatus, ghes->estatus, len);
- 	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
--#endif
- }
+ 	int ret = -ENOENT;
  
- static int _in_nmi_notify_one(struct ghes *ghes)
-@@ -786,7 +780,7 @@ static int ghes_estatus_queue_notified(struct list_head *rcu_list)
- 	}
- 	rcu_read_unlock();
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 1d90d79706bd..15b85c10f6db 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -27,10 +27,10 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_mmio.h>
++#include <asm/kvm_ras.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/virt.h>
+-#include <asm/system_misc.h>
  
--	if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) && !ret)
-+	if (!ret)
- 		irq_work_queue(&ghes_proc_irq_work);
+ #include "trace.h"
  
- 	return ret;
-@@ -865,7 +859,7 @@ static void ghes_nmi_init_cxt(void)
+@@ -1650,7 +1650,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * For RAS the host kernel may handle this abort.
+ 		 * There is no need to pass the error into the guest.
+ 		 */
+-		if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
++		if (!kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
+ 			return 1;
  
- #else
- static inline void ghes_nmi_init_cxt(void) { }
--#endif /* WANT_NMI_ESTATUS_QUEUE */
-+#endif /* CONFIG_ACPI_APEI_GHES_ESTATUS_QUEUE */
- 
- static int ghes_ack_error(struct acpi_hest_generic_v2 *gv2)
- {
+ 		if (unlikely(!is_iabt)) {
 -- 
 2.17.1
