@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
- present
-Date: Wed, 27 Jun 2018 13:20:54 +0100
-Message-ID: <20180627122058.8210-3-marc.zyngier@arm.com>
+Subject: [PATCH v3 3/6] arm64: KVM: Avoid marking pages as XN in Stage-2 if
+ CTR_EL0.DIC is set
+Date: Wed, 27 Jun 2018 13:20:55 +0100
+Message-ID: <20180627122058.8210-4-marc.zyngier@arm.com>
 References: <20180627122058.8210-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18B9B4A0E0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jun 2018 08:09:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 494F74A101
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jun 2018 08:09:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QD3414zsL9Dl for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jun 2018 08:08:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C5544A101
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jun 2018 08:08:57 -0400 (EDT)
+ with ESMTP id puqhV1x+E5tx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jun 2018 08:08:59 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAA624A10C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jun 2018 08:08:58 -0400 (EDT)
 In-Reply-To: <20180627122058.8210-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,44 +32,47 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Set/Way handling is one of the ugliest corners of KVM. We shouldn't
-have to handle that, but better safe than sorry.
+On systems where CTR_EL0.DIC is set, we don't need to perform
+icache invalidation to guarantee that we'll fetch the right
+instruction stream.
 
-Thankfully, FWB fixes this for us by not requiering any maintenance
-(the guest is forced to use cacheable memory, no matter what it says,
-and the whole system is garanteed to be cache coherent), which means
-we don't have to emulate S/W CMOs, and don't have to track VM ops either.
+This also means that taking a permission fault to invalidate the
+icache is an unnecessary overhead.
 
-We still have to trap S/W though, if only to prevent the guest from
-doing something bad.
+On such systems, we can safely leave the page as being executable.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/pgtable-prot.h | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a4363735d3f8..774d72155904 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -194,7 +194,16 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
- 	if (!p->is_write)
- 		return read_from_write_only(vcpu, p, r);
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index c66c3047400e..78b942c1bea4 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -77,8 +77,18 @@
+ 		__val;							\
+ 	 })
  
--	kvm_set_way_flush(vcpu);
-+	/*
-+	 * Only track S/W ops if we don't have FWB. It still indicates
-+	 * that the guest is a bit broken (S/W operations should only
-+	 * be done by firmware, knowing that there is only a single
-+	 * CPU left in the system, and certainly not from non-secure
-+	 * software).
-+	 */
-+	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
-+		kvm_set_way_flush(vcpu);
+-#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
+-#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
++#define PAGE_S2_XN							\
++	({								\
++		u64 __val;						\
++		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))		\
++			__val = 0;					\
++		else							\
++			__val = PTE_S2_XN;				\
++		__val;							\
++	})
 +
- 	return true;
- }
++#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
++#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
  
+ #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+ #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
 -- 
 2.17.1
