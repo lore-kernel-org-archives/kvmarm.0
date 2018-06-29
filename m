@@ -1,120 +1,95 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool test PATCH 23/24] kvmtool: arm64: Switch memory layout
-Date: Fri, 29 Jun 2018 12:15:43 +0100
-Message-ID: <1530270944-11351-24-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 01/20] virtio: mmio-v1: Validate queue PFN
+Date: Fri, 29 Jun 2018 12:15:21 +0100
+Message-ID: <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8424A11F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jun 2018 07:04:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bK7bzE3VLMwB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jun 2018 07:04:01 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 302484A0E9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jun 2018 07:04:01 -0400 (EDT)
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, Jason Wang <jasowang@redhat.com>, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If the guest wants to use a larger physical address space place
-the RAM at upper half of the address space. Otherwise, it uses the
-default layout.
+virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
+If the queue pfn is too large to fit in 32bits, which
+we could hit on arm64 systems with 52bit physical addresses
+(even with 64K page size), we simply miss out a proper link
+to the other side of the queue.
 
+Add a check to validate the PFN, rather than silently breaking
+the devices.
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>
+Cc: Peter Maydel <peter.maydell@linaro.org>
+Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/aarch32/include/kvm/kvm-arch.h |  6 ++++--
- arm/aarch64/include/kvm/kvm-arch.h | 15 ++++++++++++---
- arm/include/arm-common/kvm-arch.h  | 11 ++++++-----
- arm/kvm.c                          |  2 +-
- 4 files changed, 23 insertions(+), 11 deletions(-)
+Changes since v2:
+ - Change errno to -E2BIG
+---
+ drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
-index cd31e72..bcd382b 100644
---- a/arm/aarch32/include/kvm/kvm-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-arch.h
-@@ -3,8 +3,10 @@
- 
- #define ARM_KERN_OFFSET(...)	0x8000
- 
--#define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
--
- #include "arm-common/kvm-arch.h"
- 
-+#define ARM_MAX_MEMORY(...)	ARM32_MAX_MEMORY
-+#define ARM_MEMORY_AREA(...)	ARM32_MEMORY_AREA
+diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+index 67763d3..82cedc8 100644
+--- a/drivers/virtio/virtio_mmio.c
++++ b/drivers/virtio/virtio_mmio.c
+@@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+ 	/* Activate the queue */
+ 	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+ 	if (vm_dev->version == 1) {
++		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
 +
++		/*
++		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
++		 * that doesn't fit in 32bit, fail the setup rather than
++		 * pretending to be successful.
++		 */
++		if (q_pfn >> 32) {
++			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
++			err = -E2BIG;
++			goto error_bad_pfn;
++		}
 +
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 9de623a..bad35b9 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -1,14 +1,23 @@
- #ifndef KVM__KVM_ARCH_H
- #define KVM__KVM_ARCH_H
+ 		writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);
+-		writel(virtqueue_get_desc_addr(vq) >> PAGE_SHIFT,
+-				vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
++		writel(q_pfn, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+ 	} else {
+ 		u64 addr;
  
-+#include "arm-common/kvm-arch.h"
-+
-+#define ARM64_MEMORY_AREA(phys_shift)	(1UL << (phys_shift - 1))
-+#define ARM64_MAX_MEMORY(phys_shift)	\
-+	((1ULL << (phys_shift)) - ARM64_MEMORY_AREA(phys_shift))
-+
-+#define ARM_MEMORY_AREA(kvm)	((kvm)->cfg.arch.aarch32_guest ?	\
-+				 ARM32_MEMORY_AREA		:	\
-+				 ARM64_MEMORY_AREA(kvm->cfg.arch.phys_shift))
-+
- #define ARM_KERN_OFFSET(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
- 				0x8000				:	\
- 				0x80000)
+@@ -430,6 +442,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
  
- #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
--				ARM_LOMAP_MAX_MEMORY		:	\
--				ARM_HIMAP_MAX_MEMORY)
-+				ARM32_MAX_MEMORY		:	\
-+				ARM64_MAX_MEMORY(kvm->cfg.arch.phys_shift))
+ 	return vq;
  
--#include "arm-common/kvm-arch.h"
- 
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index b9d486d..b29b4b1 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -6,14 +6,15 @@
- #include <linux/types.h>
- 
- #include "arm-common/gic.h"
--
- #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
- #define ARM_MMIO_AREA		_AC(0x0000000000010000, UL)
- #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
--#define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
- 
--#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
--#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-+#define ARM32_MEMORY_AREA	_AC(0x0000000080000000, UL)
-+#define ARM32_MAX_MEMORY	((1ULL << 32) - ARM32_MEMORY_AREA)
-+
-+#define ARM_IOMEM_AREA_END	ARM32_MEMORY_AREA
-+
- 
- #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
- #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
-@@ -24,7 +25,7 @@
- #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
- #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
- #define ARM_PCI_CFG_SIZE	(1ULL << 24)
--#define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
-+#define ARM_PCI_MMIO_SIZE	(ARM_IOMEM_AREA_END - \
- 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
- 
- #define KVM_IOPORT_AREA		ARM_IOPORT_AREA
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 2ab436e..5701d41 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -30,7 +30,7 @@ void kvm__init_ram(struct kvm *kvm)
- 	u64 phys_start, phys_size;
- 	void *host_mem;
- 
--	phys_start	= ARM_MEMORY_AREA;
-+	phys_start	= ARM_MEMORY_AREA(kvm);
- 	phys_size	= kvm->ram_size;
- 	host_mem	= kvm->ram_start;
- 
++error_bad_pfn:
++	vring_del_virtqueue(vq);
+ error_new_virtqueue:
+ 	if (vm_dev->version == 1) {
+ 		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
 -- 
 2.7.4
