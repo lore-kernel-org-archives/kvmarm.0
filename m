@@ -1,69 +1,155 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 18/20] kvm: arm64: Add support for handling 52bit IPA
-Date: Fri, 29 Jun 2018 12:15:38 +0100
-Message-ID: <1530270944-11351-19-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 20/20] kvm: arm64: Fall back to normal stage2 entry level
+Date: Fri, 29 Jun 2018 12:15:40 +0100
+Message-ID: <1530270944-11351-21-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add support for handling the 52bit IPA. 52bit IPA
-support needs changes to the following :
-
- 1) Page-table entries - We use kernel page table helpers for setting
- up the stage2. Hence we don't explicit changes here
-
- 2) VTTBR:BADDR - This is already supported with :
-   commit 529c4b05a3cb2f324aa ("arm64: handle 52-bit addresses in TTBR")
-
- 3) VGIC support for 52bit: Supported with a patch in this series.
-
-That leaves us with the handling for PAR and HPAR. This patch adds
-support for handling the 52bit addresses in PAR and HPFAR,
-which are used while handling the permission faults in stage1.
+We use concatenated entry level page tables (upto 16tables) for
+stage2. If we don't have sufficient contiguous pages (e.g, 16 * 64K),
+fallback to the normal page table format, by going one level
+deeper if permitted.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Kristina Martsenko <kristina.martsenko@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 7 +++++++
- arch/arm64/kvm/hyp/switch.c      | 2 +-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+New in v3
+---
+ arch/arm64/include/asm/kvm_arm.h |  7 +++++++
+ arch/arm64/include/asm/kvm_mmu.h | 18 +----------------
+ arch/arm64/kvm/guest.c           | 42 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 2e90942..cb6a2ee 100644
+index cb6a2ee..42eb528 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -301,6 +301,13 @@
+@@ -137,6 +137,8 @@
+  *
+  * VTCR_EL2.SL0 and T0SZ are configured per VM at runtime before switching to
+  * the VM.
++ *
++ * With 16k/64k, the maximum number of levels supported at Stage2 is 3.
+  */
  
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-+/*
-+ * We have
-+ *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
-+ *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
-+ */
-+#define PAR_TO_HPFAR(par)		\
-+	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
+ #define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
+@@ -150,6 +152,7 @@
+  */
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_64K
+ #define VTCR_EL2_TGRAN_SL0_BASE		3UL
++#define ARM64_TGRAN_STAGE2_MAX_LEVELS	3
  
- #define kvm_arm_exception_type	\
- 	{0, "IRQ" }, 		\
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 355fb25..fb66320 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -260,7 +260,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 		return false; /* Translation failed, back to guest */
+ #elif defined(CONFIG_ARM64_16K_PAGES)
+ /*
+@@ -158,6 +161,8 @@
+  */
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_16K
+ #define VTCR_EL2_TGRAN_SL0_BASE		3UL
++#define ARM64_TGRAN_STAGE2_MAX_LEVELS	3
++
+ #else	/* 4K */
+ /*
+  * Stage2 translation configuration:
+@@ -165,6 +170,8 @@
+  */
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_4K
+ #define VTCR_EL2_TGRAN_SL0_BASE		2UL
++#define ARM64_TGRAN_STAGE2_MAX_LEVELS	4
++
+ #endif
  
- 	/* Convert PAR to HPFAR format */
--	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
-+	*hpfar = PAR_TO_HPFAR(tmp);
- 	return true;
+ #define VTCR_EL2_FLAGS		(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index d38f395..50f632e 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -527,23 +527,7 @@ static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
+ 	return vttbr_baddr_mask(kvm_phys_shift(kvm), kvm_stage2_levels(kvm));
  }
  
+-static inline void *stage2_alloc_pgd(struct kvm *kvm)
+-{
+-	u32 ipa, lvls;
+-
+-	/*
+-	 * Stage2 page table can support concatenation of (upto 16) tables
+-	 * at the entry level, thereby reducing the number of levels.
+-	 */
+-	ipa = kvm_phys_shift(kvm);
+-	lvls = stage2_pt_levels(ipa);
+-
+-	kvm->arch.s2_levels = lvls;
+-	kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
+-
+-	return alloc_pages_exact(stage2_pgd_size(kvm),
+-				 GFP_KERNEL | __GFP_ZERO);
+-}
++extern void *stage2_alloc_pgd(struct kvm *kvm);
+ 
+ static inline u32 kvm_get_ipa_limit(void)
+ {
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 56a0260..5a3a687 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -31,6 +31,8 @@
+ #include <asm/kvm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
++#include <asm/kvm_mmu.h>
++#include <asm/pgtable-hwdef.h>
+ 
+ #include "trace.h"
+ 
+@@ -458,3 +460,43 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 
+ 	return ret;
+ }
++
++void *stage2_alloc_pgd(struct kvm *kvm)
++{
++	u32 ipa, s2_lvls, lvls;
++	u64 pgd_size;
++	void *pgd;
++
++	/*
++	 * Stage2 page table can support concatenation of (upto 16) tables
++	 * at the entry level, thereby reducing the number of levels. We try
++	 * to use concatenation wherever possible. If we fail, fallback to
++	 * normal levels if possible.
++	 */
++	ipa = kvm_phys_shift(kvm);
++	lvls = s2_lvls = stage2_pt_levels(ipa);
++
++retry:
++	pgd_size = __s2_pgd_size(ipa, lvls);
++	pgd = alloc_pages_exact(pgd_size, GFP_KERNEL | __GFP_ZERO);
++
++	/* Check if the PGD meets the alignment requirements */
++	if (pgd && (virt_to_phys(pgd) & ~vttbr_baddr_mask(ipa, lvls))) {
++		free_pages_exact(pgd, pgd_size);
++		pgd = NULL;
++	}
++
++	if (pgd) {
++		kvm->arch.s2_levels = lvls;
++		kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
++	} else {
++		/* Check if we can use an entry level without concatenation */
++		lvls = ARM64_HW_PGTABLE_LEVELS(ipa);
++		if ((lvls > s2_lvls) &&
++		    (lvls <= CONFIG_PGTABLE_LEVELS) &&
++		    (lvls <= ARM64_TGRAN_STAGE2_MAX_LEVELS))
++			goto retry;
++	}
++
++	return pgd;
++}
 -- 
 2.7.4
