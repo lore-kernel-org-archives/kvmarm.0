@@ -1,19 +1,20 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 0/4] KVM: arm/arm64: vgic: Virtual interrupt grouping
- support
-Date: Fri, 29 Jun 2018 11:28:16 +0200
-Message-ID: <20180629092816.GE8441@e113682-lin.lund.arm.com>
-References: <20180624221103.15055-1-christoffer.dall@arm.com>
- <CAFEAcA_C6Voh_6Ljj9--cbo14X_uWTOekM30dU=Rp9CtZK-6ow@mail.gmail.com>
- <20180625101347.GF8004@C02W217FHV2R.local>
- <20180625115603.GG8004@C02W217FHV2R.local>
- <86h8lmyn28.wl-marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 1/6] arm64: KVM: Add support for Stage-2 control of
+ memory types and cacheability
+Date: Fri, 29 Jun 2018 11:28:31 +0200
+Message-ID: <20180629092831.GF8441@e113682-lin.lund.arm.com>
+References: <20180627122058.8210-1-marc.zyngier@arm.com>
+ <20180627122058.8210-2-marc.zyngier@arm.com>
+ <20180628205638.GC8441@e113682-lin.lund.arm.com>
+ <86po0aypx0.wl-marc.zyngier@arm.com>
+ <20180629090750.GD8441@e113682-lin.lund.arm.com>
+ <86efgqymlk.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <86h8lmyn28.wl-marc.zyngier@arm.com>
+In-Reply-To: <86efgqymlk.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,69 +25,143 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 29, 2018 at 10:11:27AM +0100, Marc Zyngier wrote:
-> On Mon, 25 Jun 2018 12:56:03 +0100,
+On Fri, Jun 29, 2018 at 10:21:27AM +0100, Marc Zyngier wrote:
+> On Fri, 29 Jun 2018 10:07:50 +0100,
 > Christoffer Dall <christoffer.dall@arm.com> wrote:
 > >
-> > On Mon, Jun 25, 2018 at 12:13:47PM +0200, Christoffer Dall wrote:
-> > > On Mon, Jun 25, 2018 at 10:52:41AM +0100, Peter Maydell wrote:
-> > > > On 24 June 2018 at 23:10, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> > > > > This small series addresses a peculiarity of the current VGIC
-> > > > > implementation, namely that we don't support interrupt grouping.
-> > > > >
-> > > > > KVM either implements a GICv2 without support for the security
-> > > > > extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
-> > > > > security extensions, group 0 interrupts can be configured to be either
-> > > > > signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
-> > > > > always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
-> > > > > and group 0 interrupts are always FIQs, and there is no concept of
-> > > > > secure vs. non-secure group 1 interrupts when DS=1.
-> > > > >
-> > > > > We were treating all interrupts on GICv2 as group 0, but yet telling the
-> > > > > geust that they were group 1.  The first patch changes this behavior,
-> > > > > which seems to have no effect on no known guests, but still.
-> > > > >
-> > > > > The remaining patches introduce proper interrupt grouping support, along
-> > > > > with MMIO accessors for the VM and userspace to retrieve and set the
-> > > > > which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
-> > > > > interrupts as per the architecture, and there is no way to modify this
-> > > > > configuration (no IGROUPR registers for LPIs or equivalent ITS
-> > > > > commands).
+> > On Fri, Jun 29, 2018 at 09:09:47AM +0100, Marc Zyngier wrote:
+> > > On Thu, 28 Jun 2018 21:56:38 +0100,
+> > > Christoffer Dall <christoffer.dall@arm.com> wrote:
 > > > >
-> > > > How do we handle migration compatibility here? For instance if
-> > > > we have a guest running on an old kernel with GICv2, presumably
-> > > > it reports the GICD_IGROUPRn to userspace as being all-1 (but
-> > > > they behave as group 0); then when we load on the new kernel
-> > > > the new kernel will honour the IGROUPRn values and the interrupts
-> > > > will start behaving like group 1 ? Maybe this works because the
-> > > > guest is expecting them to be signalled as IRQ either way...
+> > > > On Wed, Jun 27, 2018 at 01:20:53PM +0100, Marc Zyngier wrote:
+> > > > > Up to ARMv8.3, the combinaison of Stage-1 and Stage-2 attributes
+> > > > > results in the strongest attribute of the two stages.  This means
+> > > > > that the hypervisor has to perform quite a lot of cache maintenance
+> > > > > just in case the guest has some non-cacheable mappings around.
+> > > > >
+> > > > > ARMv8.4 solves this problem by offering a different mode (FWB) where
+> > > > > Stage-2 has total control over the memory attribute (this is limited
+> > > > > to systems where both I/O and instruction fetches are coherent with
+> > > > > the dcache). This is achieved by having a different set of memory
+> > > > > attributes in the page tables, and a new bit set in HCR_EL2.
+> > > > >
+> > > > > On such a system, we can then safely sidestep any form of dcache
+> > > > > management.
+> > > > >
+> > > > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > > > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > > ---
+> > > > >  arch/arm64/include/asm/cpucaps.h      |  3 ++-
+> > > > >  arch/arm64/include/asm/kvm_arm.h      |  1 +
+> > > > >  arch/arm64/include/asm/kvm_emulate.h  |  2 ++
+> > > > >  arch/arm64/include/asm/kvm_mmu.h      | 26 ++++++++++++++++++++------
+> > > > >  arch/arm64/include/asm/memory.h       |  7 +++++++
+> > > > >  arch/arm64/include/asm/pgtable-prot.h | 14 ++++++++++++--
+> > > > >  arch/arm64/include/asm/sysreg.h       |  1 +
+> > > > >  arch/arm64/kernel/cpufeature.c        | 20 ++++++++++++++++++++
+> > > > >  virt/kvm/arm/mmu.c                    |  4 ++++
+> > > > >  9 files changed, 69 insertions(+), 9 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> > > > > index 8a699c708fc9..ed84d6536830 100644
+> > > > > --- a/arch/arm64/include/asm/cpucaps.h
+> > > > > +++ b/arch/arm64/include/asm/cpucaps.h
+> > > > > @@ -49,7 +49,8 @@
+> > > > >  #define ARM64_HAS_CACHE_DIC                  28
+> > > > >  #define ARM64_HW_DBM                         29
+> > > > >  #define ARM64_SSBD                           30
+> > > > > +#define ARM64_HAS_STAGE2_FWB                 31
+> > > > >
+> > > > > -#define ARM64_NCAPS                          31
+> > > > > +#define ARM64_NCAPS                          32
+> > > > >
+> > > > >  #endif /* __ASM_CPUCAPS_H */
+> > > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > > > > index 6dd285e979c9..aa45df752a16 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_arm.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > > > > @@ -23,6 +23,7 @@
+> > > > >  #include <asm/types.h>
+> > > > >
+> > > > >  /* Hyp Configuration Register (HCR) bits */
+> > > > > +#define HCR_FWB              (UL(1) << 46)
+> > > > >  #define HCR_TEA              (UL(1) << 37)
+> > > > >  #define HCR_TERR     (UL(1) << 36)
+> > > > >  #define HCR_TLOR     (UL(1) << 35)
+> > > > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > > > index 1dab3a984608..dd98fdf33d99 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > > > @@ -63,6 +63,8 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+> > > > >               /* trap error record accesses */
+> > > > >               vcpu->arch.hcr_el2 |= HCR_TERR;
+> > > > >       }
+> > > > > +     if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> > > > > +             vcpu->arch.hcr_el2 |= HCR_FWB;
+> > > > >
+> > > > >       if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+> > > > >               vcpu->arch.hcr_el2 &= ~HCR_RW;
+> > > > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > > > > index fb9a7127bb75..620eb9e06bd8 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > > > > @@ -257,6 +257,7 @@ static inline bool kvm_page_empty(void *ptr)
+> > > > >  struct kvm;
+> > > > >
+> > > > >  #define kvm_flush_dcache_to_poc(a,l) __flush_dcache_area((a), (l))
+> > > > > +#define kvm_flush_dcache_to_pou(a,l) __clean_dcache_area_pou((a), (l))
+> > > > >
+> > > > >  static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+> > > > >  {
+> > > > > @@ -267,6 +268,13 @@ static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> > > > >  {
+> > > > >       void *va = page_address(pfn_to_page(pfn));
+> > > > >
+> > > > > +     /*
+> > > > > +      * FWB implies IDC, so cache clean to PoC is not required in
+> > > > > +      * this case.
+> > > > > +      */
 > > > >
+> > > > I don't understand this comment.  __clean_dcache_guest_page is called
+> > > > when faulting in pages for translation faults (fault_status != FSC_PERM)
+> > > > and PoC is about coherency between ram and caches, not instruction and
+> > > > data caches, so how is this related to IDC?
 > > >
-> > > Interesting.  For GICv2, I think this will actually break, and the
-> > > migrated Linux guest won't see any interrupts anymore (Linux only sets
-> > > bit 0 in GICD_CTLR).  For GICv3, everything stays group 1 unless the
-> > > guest is specifically trying to configure group 0 for something.
+> > > There's a shortcut in this comment, so let me develop a tiny bit:
 > > >
-> > > I suppose this means we need to let userspace request
-> > > ARCH_COMPLIANT_GICV2 and otherwise ignore userspace writes to IGROUPR?
+> > > - FWB makes memory the memory cacheable from the PoV of the guest, so
+> > >   we don't need to clean to the PoC for the guest to access it even
+> > >   when running with the stage-1 MMU off or non-cacheable mappings.
 > > >
-> > Alternatively, we could deny (fail) migration where the
-> > GICD_IIDR.Revision does not match the source, and just let userspace fix
-> > things up.  Thoughts?
+> > > - FWB implies IDC so there is no need to clean to the PoU for
+> > >   instruction fetches to get the right thing either.
+> > >
+> > > The combination of these two statements implies that we don't need to
+> > > clean anything at all.
+> > >
+> > > Does it make more sense?
+> >
+> > Yes, this makes sense, but the comment is weird, because it's not
+> > because FWB implies IDC that you don't have to clean to PoC, so I would
+> > suggest either removing the comment, or rewording it to something like:
+> >
+> > /*
+> >  * With FWB we ensure that the guest always accesses memory cacheable
+> >  * and we don't have to clean to PoC when faulting in pages.
+> >  * Furthermore, FWB implies IDC, so cleaning to PoU is also not required
+> >  * in this case.
+> >  */
+> >
+> > I think the comment as it stands now, only makes sense in the context of
+> > the conversation we've had on this patch on the list.
 >
-> That's exactly the kind of thing I had in mind when I suggested to
-> bump up the IIDR. It allows us to push the knowledge of the quirks to
-> both the guest and userspace, instead of adding more esoteric API
-> features.
+> Fair enough. I'll update the comment to reflect the above.
 >
 
-The problem with that is that upgrading the kernel (but not QEMU) on
-your destination machine now breaks migration.  Is that acceptable?
+Thanks, with that:
 
-
-Thanks,
--Christoffer
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
