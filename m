@@ -1,75 +1,37 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 02/20] virtio: pci-legacy: Validate queue pfn
-Date: Fri, 29 Jun 2018 12:15:22 +0100
-Message-ID: <1530270944-11351-3-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 06/20] kvm: arm/arm64: Remove spurious WARN_ON
+Date: Fri, 29 Jun 2018 12:15:26 +0100
+Message-ID: <1530270944-11351-7-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Legacy PCI over virtio uses a 32bit PFN for the queue. If the
-queue pfn is too large to fit in 32bits, which we could hit on
-arm64 systems with 52bit physical addresses (even with 64K page
-size), we simply miss out a proper link to the other side of
-the queue.
+On a 4-level page table pgd entry can be empty, unlike a 3-level
+page table. Remove the spurious WARN_ON() in stage_get_pud().
 
-Add a check to validate the PFN, rather than silently breaking
-the devices.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>
-Cc: Peter Maydel <peter.maydell@linaro.org>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Acked-by: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v2:
- - Change errno to -E2BIG
----
- drivers/virtio/virtio_pci_legacy.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ virt/kvm/arm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
-index 2780886..c0d6987a 100644
---- a/drivers/virtio/virtio_pci_legacy.c
-+++ b/drivers/virtio/virtio_pci_legacy.c
-@@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
- 	struct virtqueue *vq;
- 	u16 num;
- 	int err;
-+	u64 q_pfn;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 061e6b3..308171c 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -976,7 +976,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	pud_t *pud;
  
- 	/* Select the queue we're interested in */
- 	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
-@@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
- 	if (!vq)
- 		return ERR_PTR(-ENOMEM);
- 
-+	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
-+	if (q_pfn >> 32) {
-+		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
-+		err = -E2BIG;
-+		goto out_del_vq;
-+	}
-+
- 	/* activate the queue */
--	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
--		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
-+	iowrite32(q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
- 
- 	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
- 
-@@ -160,6 +167,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
- 
- out_deactivate:
- 	iowrite32(0, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
-+out_del_vq:
- 	vring_del_virtqueue(vq);
- 	return ERR_PTR(err);
- }
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+-	if (WARN_ON(stage2_pgd_none(*pgd))) {
++	if (stage2_pgd_none(*pgd)) {
+ 		if (!cache)
+ 			return NULL;
+ 		pud = mmu_memory_cache_alloc(cache);
 -- 
 2.7.4
