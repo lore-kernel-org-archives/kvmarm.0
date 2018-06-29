@@ -1,49 +1,84 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 06/20] kvm: arm/arm64: Remove spurious WARN_ON
-Date: Fri, 29 Jun 2018 16:51:21 +0200
-Message-ID: <57ac04d3-0bbf-a3a4-f9a4-140dac8fa021@redhat.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v3 01/20] virtio: mmio-v1: Validate queue PFN
+Date: Fri, 29 Jun 2018 20:42:02 +0300
+Message-ID: <20180629200816-mutt-send-email-mst@kernel.org>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-7-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1530270944-11351-7-git-send-email-suzuki.poulose@arm.com>
+Content-Disposition: inline
+In-Reply-To: <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
-
-On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
-> On a 4-level page table pgd entry can be empty, unlike a 3-level
-> page table. Remove the spurious WARN_ON() in stage_get_pud().
+On Fri, Jun 29, 2018 at 12:15:21PM +0100, Suzuki K Poulose wrote:
+> virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
+> If the queue pfn is too large to fit in 32bits, which
+> we could hit on arm64 systems with 52bit physical addresses
+> (even with 64K page size), we simply miss out a proper link
+> to the other side of the queue.
 > 
+> Add a check to validate the PFN, rather than silently breaking
+> the devices.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Acked-by: Christoffer Dall <cdall@kernel.org>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Peter Maydel <peter.maydell@linaro.org>
+> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  virt/kvm/arm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Changes since v2:
+>  - Change errno to -E2BIG
+> ---
+>  drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 061e6b3..308171c 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -976,7 +976,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->  	pud_t *pud;
+> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> index 67763d3..82cedc8 100644
+> --- a/drivers/virtio/virtio_mmio.c
+> +++ b/drivers/virtio/virtio_mmio.c
+> @@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+>  	/* Activate the queue */
+>  	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+>  	if (vm_dev->version == 1) {
+> +		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
+> +
+> +		/*
+> +		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
+> +		 * that doesn't fit in 32bit, fail the setup rather than
+> +		 * pretending to be successful.
+> +		 */
+> +		if (q_pfn >> 32) {
+> +			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
+
+How about:
+	"hypervisor bug: legacy virtio-mmio must not be used with more than 0x%llx Gigabytes of memory",
+	0x1ULL << (32 - 30) << PAGE_SHIFT
+
+> +			err = -E2BIG;
+> +			goto error_bad_pfn;
+> +		}
+> +
+>  		writel(PAGE_SIZE, vm_dev->base + VIRTIO_MMIO_QUEUE_ALIGN);
+> -		writel(virtqueue_get_desc_addr(vq) >> PAGE_SHIFT,
+> -				vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+> +		writel(q_pfn, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+>  	} else {
+>  		u64 addr;
 >  
->  	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-> -	if (WARN_ON(stage2_pgd_none(*pgd))) {
-> +	if (stage2_pgd_none(*pgd)) {
->  		if (!cache)
->  			return NULL;
->  		pud = mmu_memory_cache_alloc(cache);
-> 
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+> @@ -430,6 +442,8 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+>  
+>  	return vq;
+>  
+> +error_bad_pfn:
+> +	vring_del_virtqueue(vq);
+>  error_new_virtqueue:
+>  	if (vm_dev->version == 1) {
+>  		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
+> -- 
+> 2.7.4
