@@ -1,118 +1,60 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 19/20] kvm: arm64: Allow IPA size supported by the system
-Date: Fri, 29 Jun 2018 12:15:39 +0100
-Message-ID: <1530270944-11351-20-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 05/20] kvm: arm/arm64: Fix stage2_flush_memslot for 4 level
+ page table
+Date: Fri, 29 Jun 2018 12:15:25 +0100
+Message-ID: <1530270944-11351-6-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D3B4A140
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jun 2018 07:04:44 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3doN0Y8Z2-Gl for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jun 2018 07:04:21 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EBA04A117
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jun 2018 07:04:12 -0400 (EDT)
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far we have restricted the IPA size of the VM to the default
-value (40bits). Now that we can manage the IPA size per VM and
-support dynamic stage2 page tables, allow VMs to have larger IPA.
-This is done by setting the IPA limit to the one supported by
-the hardware and kernel. This patch also moves the check for
-the default IPA size support to kvm_get_ipa_limit().
+So far we have only supported 3 level page table with fixed IPA of 40bits.
+Fix stage2_flush_memslot() to accommodate for 4 level tables.
 
-Since the stage2 page table code is dependent on the stage1
-page table, we always ensure that :
-
-  Number of Levels at Stage1 >= Number of Levels at Stage2
-
-So we limit the IPA to make sure that the above condition
-is satisfied. This will affect the following combinations
-of VA_BITS and IPA for different page sizes.
-
-  39bit VA, 4K  - IPA > 43 (Upto 48)
-  36bit VA, 16K - IPA > 40 (Upto 48)
-  42bit VA, 64K - IPA > 46 (Upto 52)
-
-Supporting the above combinations need independent stage2
-page table manipulation code, which would need substantial
-changes. We could purse the solution independently and
-switch the page table code once we have it ready.
-
-Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>
+Acked-by: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since V2:
- - Restrict the IPA size to limit the number of page table
-   levels in stage2 to that of stage1 or less.
----
- arch/arm64/include/asm/kvm_host.h |  6 ------
- arch/arm64/include/asm/kvm_mmu.h  | 37 ++++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 7 deletions(-)
+ virt/kvm/arm/mmu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9a15860..e858e49 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -452,13 +452,7 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- static inline void __cpu_init_stage2(void)
- {
--	u32 ps;
--
- 	kvm_call_hyp(__init_stage2_translation);
--	/* Sanity check for minimum IPA size support */
--	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1) & 0x7);
--	WARN_ONCE(ps < 40,
--		  "PARange is %d bits, unsupported configuration!", ps);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 1d90d79..061e6b3 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -379,7 +379,8 @@ static void stage2_flush_memslot(struct kvm *kvm,
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+ 		next = stage2_pgd_addr_end(addr, end);
+-		stage2_flush_puds(kvm, pgd, addr, next);
++		if (!stage2_pgd_none(*pgd))
++			stage2_flush_puds(kvm, pgd, addr, next);
+ 	} while (pgd++, addr = next, addr != end);
  }
  
- /* Guest/host FPSIMD coordination helpers */
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index a291cdc..d38f395 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -547,7 +547,42 @@ static inline void *stage2_alloc_pgd(struct kvm *kvm)
- 
- static inline u32 kvm_get_ipa_limit(void)
- {
--	return KVM_PHYS_SHIFT;
-+	unsigned int ipa_max, va_max, parange;
-+
-+	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
-+	ipa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
-+
-+	/* Raise the limit to the default size for backward compatibility */
-+	if (ipa_max < KVM_PHYS_SHIFT) {
-+		WARN_ONCE(1,
-+			  "PARange is %d bits, unsupported configuration!",
-+			  ipa_max);
-+		ipa_max = KVM_PHYS_SHIFT;
-+	}
-+
-+	/* Clamp it to the PA size supported by the kernel */
-+	ipa_max = (ipa_max > PHYS_MASK_SHIFT) ? PHYS_MASK_SHIFT : ipa_max;
-+	/*
-+	 * Since our stage2 table is dependent on the stage1 page table code,
-+	 * we must always honor the following condition:
-+	 *
-+	 *  Number of levels in Stage1 >= Number of levels in Stage2.
-+	 *
-+	 * So clamp the ipa limit further down to limit the number of levels.
-+	 * Since we can concatenate upto 16 tables at entry level, we could
-+	 * go upto 4bits above the maximum VA addressible with the current
-+	 * number of levels.
-+	 */
-+	va_max = PGDIR_SHIFT + PAGE_SHIFT - 3;
-+	va_max += 4;
-+
-+	if (va_max < ipa_max) {
-+		kvm_info("Limiting IPA limit to %dbytes due to host VA bits limitation\n",
-+			 va_max);
-+		ipa_max = va_max;
-+	}
-+
-+	return ipa_max;
- }
- 
- static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift)
 -- 
 2.7.4
