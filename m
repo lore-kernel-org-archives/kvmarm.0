@@ -1,71 +1,77 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 03/20] arm64: Add a helper for PARange to physical shift
- conversion
-Date: Fri, 29 Jun 2018 12:15:23 +0100
-Message-ID: <1530270944-11351-4-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 08/20] kvm: arm/arm64: Abstract stage2 pgd table allocation
+Date: Fri, 29 Jun 2018 12:15:28 +0100
+Message-ID: <1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, eric.auger@redhat.com, julien.grall@arm.com, james.morse@arm.com, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On arm64, ID_AA64MMFR0_EL1.PARange encodes the maximum Physical
-Address range supported by the CPU. Add a helper to decode this
-to actual physical shift. If we hit an unallocated value, return
-the maximum range supported by the kernel.
-This is will be used by the KVM to set the VTCR_EL2.T0SZ, as it
-is about to move its place. Having this helper keeps the code
-movement cleaner.
+Abstract the allocation of stage2 entry level tables for
+given VM, so that later we can choose to fall back to the
+normal page table levels (i.e, avoid entry level table
+concatenation) on arm64.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: James Morse <james.morse@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
 Changes since V2:
- - Split the patch
- - Limit the physical shift only for values unrecognized.
+ - New patch
 ---
- arch/arm64/include/asm/cpufeature.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm/include/asm/kvm_mmu.h   | 6 ++++++
+ arch/arm64/include/asm/kvm_mmu.h | 6 ++++++
+ virt/kvm/arm/mmu.c               | 2 +-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 1717ba1..855cf0e 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -530,6 +530,19 @@ void arm64_set_ssbd_mitigation(bool state);
- static inline void arm64_set_ssbd_mitigation(bool state) {}
- #endif
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index f36eb20..b2da5a4 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -372,6 +372,12 @@ static inline int hyp_map_aux_data(void)
+ 	return 0;
+ }
  
-+static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
++static inline void *stage2_alloc_pgd(struct kvm *kvm)
 +{
-+	switch (parange) {
-+	case 0: return 32;
-+	case 1: return 36;
-+	case 2: return 40;
-+	case 3: return 42;
-+	case 4: return 44;
-+	case 5: return 48;
-+	case 6: return 52;
-+	default: return CONFIG_ARM64_PA_BITS;
-+	}
++	return alloc_pages_exact(stage2_pgd_size(kvm),
++				 GFP_KERNEL | __GFP_ZERO);
 +}
- #endif /* __ASSEMBLY__ */
++
+ #define kvm_phys_to_vttbr(addr)		(addr)
  
- #endif
+ #endif	/* !__ASSEMBLY__ */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 5da8f52..dbaf513 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -501,5 +501,11 @@ static inline int hyp_map_aux_data(void)
+ 
+ #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
+ 
++static inline void *stage2_alloc_pgd(struct kvm *kvm)
++{
++	return alloc_pages_exact(stage2_pgd_size(kvm),
++				 GFP_KERNEL | __GFP_ZERO);
++}
++
+ #endif /* __ASSEMBLY__ */
+ #endif /* __ARM64_KVM_MMU_H__ */
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 82dd571..a339e00 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -868,7 +868,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 	}
+ 
+ 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+-	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
++	pgd = stage2_alloc_pgd(kvm);
+ 	if (!pgd)
+ 		return -ENOMEM;
+ 
 -- 
 2.7.4
