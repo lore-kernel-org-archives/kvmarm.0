@@ -1,197 +1,149 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3 17/20] vgic: Add support for 52bit guest physical address
-Date: Fri, 29 Jun 2018 12:15:37 +0100
-Message-ID: <1530270944-11351-18-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v3 16/20] kvm: arm64: Switch to per VM IPA limit
+Date: Fri, 29 Jun 2018 12:15:36 +0100
+Message-ID: <1530270944-11351-17-git-send-email-suzuki.poulose@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Kristina Martsenko <kristina.martsenko@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-
-Add support for handling 52bit guest physical address to the
-VGIC layer. So far we have limited the guest physical address
-to 48bits, by explicitly masking the upper bits. This patch
-removes the restriction. We do not have to check if the host
-supports 52bit as the gpa is always validated during an access.
-(e.g, kvm_{read/write}_guest, kvm_is_visible_gfn()).
-Also, the ITS table save-restore is also not affected with
-the enhancement. The DTE entries already store the bits[51:8]
-of the ITT_addr (with a 256byte alignment).
+Now that we can manage the stage2 page table per VM, switch the
+configuration details to per VM instance. We keep track of the
+IPA bits, number of page table levels and the VTCR bits (which
+depends on the IPA and the number of levels). While at it, remove
+unused pgd_lock field from kvm_arch for arm64.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-[ Macro clean ups, fix PROPBASER and PENDBASER accesses ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  5 +++++
- virt/kvm/arm/vgic/vgic-its.c       | 36 ++++++++++--------------------------
- virt/kvm/arm/vgic/vgic-mmio-v3.c   |  2 --
- 3 files changed, 15 insertions(+), 28 deletions(-)
+ arch/arm64/include/asm/kvm_host.h       | 14 ++++++++++++--
+ arch/arm64/include/asm/kvm_hyp.h        |  3 +--
+ arch/arm64/include/asm/kvm_mmu.h        | 20 ++++++++++++++++++--
+ arch/arm64/include/asm/stage2_pgtable.h |  1 -
+ virt/kvm/arm/mmu.c                      |  4 ++++
+ 5 files changed, 35 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index cbb872c..bc4b95b 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -346,6 +346,8 @@
- #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
- #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 328f472..9a15860 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -61,13 +61,23 @@ struct kvm_arch {
+ 	u64    vmid_gen;
+ 	u32    vmid;
  
-+#define GITS_CBASER_ADDRESS(cbaser)	((cbaser) & GENMASK_ULL(52, 12))
+-	/* 1-level 2nd stage table and lock */
+-	spinlock_t pgd_lock;
++	/* stage-2 page table */
+ 	pgd_t *pgd;
+ 
+ 	/* VTTBR value associated with above pgd and vmid */
+ 	u64    vttbr;
+ 
++	/* Private bits of VTCR_EL2 for this VM */
++	u64    vtcr_private;
++	/* Size of the PA size for this guest */
++	u8     phys_shift;
++	/*
++	 * Number of levels in page table. We could always calculate
++	 * it from phys_shift above. We cache it for faster switches
++	 * in stage2 page table helpers.
++	 */
++	u8     s2_levels;
 +
- #define GITS_BASER_NR_REGS		8
+ 	/* The last vcpu id that ran on each physical CPU */
+ 	int __percpu *last_vcpu_ran;
  
- #define GITS_BASER_VALID			(1ULL << 63)
-@@ -377,6 +379,9 @@
- #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
- #define GITS_BASER_PHYS_52_to_48(phys)					\
- 	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
-+#define GITS_BASER_ADDR_48_to_52(baser)					\
-+	(((baser) & GENMASK_ULL(47, 16)) | (((baser) >> 12) & 0xf) << 48)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 3e8052d1..699f678 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -166,8 +166,7 @@ static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
+ 	u64 vtcr = read_sysreg(vtcr_el2);
+ 
+ 	vtcr &= ~VTCR_EL2_PRIVATE_MASK;
+-	vtcr |= VTCR_EL2_SL0(kvm_stage2_levels(kvm)) |
+-		VTCR_EL2_T0SZ(kvm_phys_shift(kvm));
++	vtcr |= kvm->arch.vtcr_private;
+ 	write_sysreg(vtcr, vtcr_el2);
+ 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+ }
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index f3fb05a3..a291cdc 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -143,9 +143,10 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+  */
+ #define KVM_PHYS_SHIFT	(40)
+ 
+-#define kvm_phys_shift(kvm)		KVM_PHYS_SHIFT
++#define kvm_phys_shift(kvm)		(kvm->arch.phys_shift)
+ #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
+ #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
++#define kvm_stage2_levels(kvm)		(kvm->arch.s2_levels)
+ 
+ static inline bool kvm_page_empty(void *ptr)
+ {
+@@ -528,6 +529,18 @@ static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
+ 
+ static inline void *stage2_alloc_pgd(struct kvm *kvm)
+ {
++	u32 ipa, lvls;
 +
- #define GITS_BASER_SHAREABILITY_SHIFT	(10)
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4ed79c9..c6eb390 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -234,13 +234,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- 	list_for_each_entry(dev, &(its)->device_list, dev_list) \
- 		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
- 
--/*
-- * We only implement 48 bits of PA at the moment, although the ITS
-- * supports more. Let's be restrictive here.
-- */
--#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
--#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
--
- #define GIC_LPI_OFFSET 8192
- 
- #define VITS_TYPER_IDBITS 16
-@@ -752,6 +745,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-+	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 	int index;
- 	gfn_t gfn;
-@@ -776,7 +770,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 		if (id >= (l1_tbl_size / esz))
- 			return false;
- 
--		addr = BASER_ADDRESS(baser) + id * esz;
-+		addr = base + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
- 
- 		if (eaddr)
-@@ -791,7 +785,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	/* Each 1st level entry is represented by a 64-bit value. */
- 	if (kvm_read_guest_lock(its->dev->kvm,
--			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
-+			   base + index * sizeof(indirect_ptr),
- 			   &indirect_ptr, sizeof(indirect_ptr)))
- 		return false;
- 
-@@ -801,11 +795,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	if (!(indirect_ptr & BIT_ULL(63)))
- 		return false;
- 
--	/*
--	 * Mask the guest physical address and calculate the frame number.
--	 * Any address beyond our supported 48 bits of PA will be caught
--	 * by the actual check in the final step.
--	 */
-+	/* Mask the guest physical address and calculate the frame number. */
- 	indirect_ptr &= GENMASK_ULL(51, 16);
- 
- 	/* Find the address of the actual entry */
-@@ -1297,9 +1287,6 @@ static u64 vgic_sanitise_its_baser(u64 reg)
- 				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/* Bits 15:12 contain bits 51:48 of the PA, which we don't support. */
--	reg &= ~GENMASK_ULL(15, 12);
--
- 	/* We support only one (ITS) page size: 64K */
- 	reg = (reg & ~GITS_BASER_PAGE_SIZE_MASK) | GITS_BASER_PAGE_SIZE_64K;
- 
-@@ -1318,11 +1305,8 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
- 				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/*
--	 * Sanitise the physical address to be 64k aligned.
--	 * Also limit the physical addresses to 48 bits.
--	 */
--	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
-+	/* Sanitise the physical address to be 64k aligned. */
-+	reg &= ~GENMASK_ULL(15, 12);
- 
- 	return reg;
++	/*
++	 * Stage2 page table can support concatenation of (upto 16) tables
++	 * at the entry level, thereby reducing the number of levels.
++	 */
++	ipa = kvm_phys_shift(kvm);
++	lvls = stage2_pt_levels(ipa);
++
++	kvm->arch.s2_levels = lvls;
++	kvm->arch.vtcr_private = VTCR_EL2_SL0(lvls) | TCR_T0SZ(ipa);
++
+ 	return alloc_pages_exact(stage2_pgd_size(kvm),
+ 				 GFP_KERNEL | __GFP_ZERO);
  }
-@@ -1368,7 +1352,7 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
- 	if (!its->enabled)
- 		return;
- 
--	cbaser = CBASER_ADDRESS(its->cbaser);
-+	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
- 
- 	while (its->cwriter != its->creadr) {
- 		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
-@@ -2226,7 +2210,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	l1_gpa = BASER_ADDRESS(baser);
-+	l1_gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	if (baser & GITS_BASER_INDIRECT) {
- 		l1_esz = GITS_LVL1_ENTRY_SIZE;
-@@ -2298,7 +2282,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
- 	u64 baser = its->baser_coll_table;
--	gpa_t gpa = BASER_ADDRESS(baser);
-+	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
- 	struct its_collection *collection;
- 	u64 val;
- 	size_t max_size, filled = 0;
-@@ -2347,7 +2331,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	gpa = BASER_ADDRESS(baser);
-+	gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 2877840..64647be 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -338,7 +338,6 @@ static u64 vgic_sanitise_pendbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
- 
- 	reg &= ~PENDBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 
- 	return reg;
- }
-@@ -356,7 +355,6 @@ static u64 vgic_sanitise_propbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
- 
- 	reg &= ~PROPBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 	return reg;
+@@ -537,7 +550,10 @@ static inline u32 kvm_get_ipa_limit(void)
+ 	return KVM_PHYS_SHIFT;
  }
  
+-static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift) {}
++static inline void kvm_config_stage2(struct kvm *kvm, u32 ipa_shift)
++{
++	kvm->arch.phys_shift = ipa_shift;
++}
+ 
+ #endif /* __ASSEMBLY__ */
+ #endif /* __ARM64_KVM_MMU_H__ */
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index ffc37cc..91d7936 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -65,7 +65,6 @@
+ #define __s2_pgd_ptrs(pa, lvls)	(1 << ((pa) - pt_levels_pgdir_shift((lvls))))
+ #define __s2_pgd_size(pa, lvls)	(__s2_pgd_ptrs((pa), (lvls)) * sizeof(pgd_t))
+ 
+-#define kvm_stage2_levels(kvm)		stage2_pt_levels(kvm_phys_shift(kvm))
+ #define stage2_pgdir_shift(kvm)	\
+ 		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
+ #define stage2_pgdir_size(kvm)		(_AC(1, UL) << stage2_pgdir_shift((kvm)))
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index a339e00..d7822e1 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -867,6 +867,10 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Make sure we have the stage2 configured for this VM */
++	if (WARN_ON(!kvm_phys_shift(kvm)))
++		return -EINVAL;
++
+ 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+ 	pgd = stage2_alloc_pgd(kvm);
+ 	if (!pgd)
 -- 
 2.7.4
