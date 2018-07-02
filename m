@@ -1,93 +1,59 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 18/20] kvm: arm64: Add support for handling 52bit IPA
-Date: Mon, 2 Jul 2018 14:43:14 +0100
-Message-ID: <ea593baa-a7d8-6328-456c-1ca0476f7d75@arm.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-19-git-send-email-suzuki.poulose@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH RESEND v6 0/2] support exception state migration and set
+ VSESR_EL2 by user space
+Date: Mon, 2 Jul 2018 21:43:04 +0800
+Message-ID: <1530538986-4024-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1530270944-11351-19-git-send-email-suzuki.poulose@arm.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Kristina Martsenko <kristina.martsenko@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE2449FAC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 09:30:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oVO0Whmb5x7U for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Jul 2018 09:30:59 -0400 (EDT)
+Received: from huawei.com (unknown [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0466E4070F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 09:30:59 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: rkrcmar@redhat.com, corbet@lwn.net, james.morse@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linuxarm@huawei.com, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29/06/18 12:15, Suzuki K Poulose wrote:
-> Add support for handling the 52bit IPA. 52bit IPA
-> support needs changes to the following :
-> 
->  1) Page-table entries - We use kernel page table helpers for setting
->  up the stage2. Hence we don't explicit changes here
-> 
->  2) VTTBR:BADDR - This is already supported with :
->    commit 529c4b05a3cb2f324aa ("arm64: handle 52-bit addresses in TTBR")
-> 
->  3) VGIC support for 52bit: Supported with a patch in this series.
-> 
-> That leaves us with the handling for PAR and HPAR. This patch adds
+This series patch is separated from https://www.spinics.net/lists/kvm/msg168917.html
 
-HPFAR?
+1. Detect whether KVM can set set guest SError syndrome
+2. Support to Set VSESR_EL2 and inject SError by user space.
+3. Support live migration to keep SError pending state and VSESR_EL2 value
 
-> support for handling the 52bit addresses in PAR and HPFAR,
-> which are used while handling the permission faults in stage1.
+The user space patch is here: https://www.mail-archive.com/qemu-devel@nongnu.org/msg539534.html
+BTW: The user space patch is needed to rebase
 
-Overall, this is a pretty confusing commit message. Can you just call it:
 
-KVM/arm64: Add 52bit support for PAR to HPFAR conversion
+Dongjiu Geng (2):
+  arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+  arm64: KVM: export the capability to set guest SError syndrome
 
-and just describe that it now uses PHYS_MASK_SHIFT instead of a
-hardcoded constant?
+ Documentation/virtual/kvm/api.txt    | 44 ++++++++++++++++++++++++++++++----
+ arch/arm64/include/asm/kvm_emulate.h |  5 ++++
+ arch/arm64/include/asm/kvm_host.h    |  7 ++++++
+ arch/arm64/include/uapi/asm/kvm.h    | 13 ++++++++++
+ arch/arm64/kvm/guest.c               | 46 ++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/inject_fault.c        |  6 ++---
+ arch/arm64/kvm/reset.c               |  4 ++++
+ include/uapi/linux/kvm.h             |  1 +
+ virt/kvm/arm/arm.c                   | 21 ++++++++++++++++
+ 9 files changed, 140 insertions(+), 7 deletions(-)
 
-> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Kristina Martsenko <kristina.martsenko@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 7 +++++++
->  arch/arm64/kvm/hyp/switch.c      | 2 +-
->  2 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 2e90942..cb6a2ee 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -301,6 +301,13 @@
->  
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
-> +/*
-> + * We have
-> + *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
-> + *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
-> + */
-> +#define PAR_TO_HPFAR(par)		\
-> +	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
->  
->  #define kvm_arm_exception_type	\
->  	{0, "IRQ" }, 		\
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 355fb25..fb66320 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -260,7 +260,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
->  		return false; /* Translation failed, back to guest */
->  
->  	/* Convert PAR to HPFAR format */
-> -	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
-> +	*hpfar = PAR_TO_HPFAR(tmp);
->  	return true;
->  }
->  
-> 
-
-Otherwise:
-
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
