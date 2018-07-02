@@ -1,109 +1,88 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 11/20] kvm: arm64: Helper for computing VTCR_EL2.SL0
-Date: Mon, 2 Jul 2018 16:59:43 +0200
-Message-ID: <8faab60c-3025-d37f-6dd2-4f26bc32447c@redhat.com>
+Subject: Re: [PATCH v3 08/20] kvm: arm/arm64: Abstract stage2 pgd table
+ allocation
+Date: Mon, 2 Jul 2018 17:01:31 +0200
+Message-ID: <ac15d082-22eb-54d1-d695-6a0a3ac2d1eb@redhat.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1530270944-11351-9-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, Christoffer Dall <cdall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+Hi Suzuki
 
 On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
-> VTCR_EL2 holds the following key stage2 translation table
-> parameters:
->   SL0  - Entry level in the page table lookup.
->   T0SZ - Denotes the size of the memory addressed by the table.
-> 
-> We have been using fixed values for the SL0 depending on the
-> page size as we have a fixed IPA size. But since we are about
-> to make it dynamic, we need to calculate the SL0 at runtime
-> per VM. This patch adds a helper to comput the value of SL0 for
-compute
-> a given IPA.
+> Abstract the allocation of stage2 entry level tables for
+> given VM, so that later we can choose to fall back to the
+> normal page table levels (i.e, avoid entry level table
+> concatenation) on arm64.
+
+the justification is not crystal clear to me but it does no harm I think.
 > 
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> Changes since v2:
->  - Part 2 of split from VTCR & VTTBR dynamic configuration
+> Changes since V2:
+>  - New patch
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
+>  arch/arm/include/asm/kvm_mmu.h   | 6 ++++++
+>  arch/arm64/include/asm/kvm_mmu.h | 6 ++++++
+>  virt/kvm/arm/mmu.c               | 2 +-
+>  3 files changed, 13 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index c557f45..11a7db0 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -153,7 +153,8 @@
->   * 2 level page tables (SL = 1)
->   */
->  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
-> -#define VTTBR_X_TGRAN_MAGIC		38
-> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
-> +
->  #elif defined(CONFIG_ARM64_16K_PAGES)
->  /*
->   * Stage2 translation configuration:
-> @@ -161,7 +162,7 @@
->   * 2 level page tables (SL = 1)
->   */
->  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
-> -#define VTTBR_X_TGRAN_MAGIC		42
-> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
->  #else	/* 4K */
->  /*
->   * Stage2 translation configuration:
-> @@ -169,11 +170,39 @@
->   * 3 level page tables (SL = 1)
->   */
->  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
-> -#define VTTBR_X_TGRAN_MAGIC		37
-> +#define VTCR_EL2_TGRAN_SL0_BASE		2UL
->  #endif
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index f36eb20..b2da5a4 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -372,6 +372,12 @@ static inline int hyp_map_aux_data(void)
+>  	return 0;
+>  }
 >  
->  #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
->  /*
-> + * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
-> + * Interestingly, it depends on the page size.
-> + * See D.10.2.110, VTCR_EL2, in ARM DDI 0487B.b
-update ref to the last one?
-> + *
-> + *	-----------------------------------------
-> + *	| Entry level		|  4K  | 16K/64K |
-> + *	------------------------------------------
-> + *	| Level: 0		|  2   |   -     |
-> + *	------------------------------------------
-> + *	| Level: 1		|  1   |   2     |
-> + *	------------------------------------------
-> + *	| Level: 2		|  0   |   1     |
-> + *	------------------------------------------
-> + *	| Level: 3		|  -   |   0     |
-> + *	------------------------------------------
-> + *
-> + * That table roughly translates to :
-> + *
-> + *	SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
-> + *
-> + * Where SL0_BASE(4K) = 2 and SL0_BASE(16K) = 3, SL0_BASE(64K) = 3, provided
-> + * we take care of ruling out the unsupported cases and
-> + * Entry_Level = 4 - Number_of_levels.
-> + *
-> + */
-> +#define VTCR_EL2_SL0(levels) \
-> +	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
-> +/*
->   * ARM VMSAv8-64 defines an algorithm for finding the translation table
->   * descriptors in section D4.2.8 in ARM DDI 0487B.b.
->   *
+> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
+> +{
+> +	return alloc_pages_exact(stage2_pgd_size(kvm),
+> +				 GFP_KERNEL | __GFP_ZERO);
+> +}
+> +
+>  #define kvm_phys_to_vttbr(addr)		(addr)
+>  
+>  #endif	/* !__ASSEMBLY__ */
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 5da8f52..dbaf513 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -501,5 +501,11 @@ static inline int hyp_map_aux_data(void)
+>  
+>  #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
+>  
+> +static inline void *stage2_alloc_pgd(struct kvm *kvm)
+> +{
+> +	return alloc_pages_exact(stage2_pgd_size(kvm),
+> +				 GFP_KERNEL | __GFP_ZERO);
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 82dd571..a339e00 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -868,7 +868,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>  	}
+>  
+>  	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+> -	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
+> +	pgd = stage2_alloc_pgd(kvm);
+>  	if (!pgd)
+>  		return -ENOMEM;
+>  
 > 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
