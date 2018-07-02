@@ -1,121 +1,96 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable adaptative WFE trapping
-Date: Mon, 2 Jul 2018 20:39:54 +0200
-Message-ID: <20180702183954.GB10663@C02W217FHV2R.local>
-References: <20180702164621.9899-1-marc.zyngier@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 12/20] kvm: arm64: Add helper for loading the stage2
+ setting for a VM
+Date: Mon, 2 Jul 2018 21:13:54 +0200
+Message-ID: <c8091c05-b7ea-92fa-6d04-917619691381@redhat.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-13-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180702164621.9899-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1530270944-11351-13-git-send-email-suzuki.poulose@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 02, 2018 at 05:46:21PM +0100, Marc Zyngier wrote:
-> Trapping blocking WFE is extremely beneficial in situations where
-> the system is oversubscribed, as it allows another thread to run
-> while being blocked. In a non-oversubscribed environment, this is
-> the complete opposite, and trapping WFE is just unnecessary overhead.
-> 
-> Let's only enable WFE trapping if the CPU has more than a single task
-> to run (that is, more than just the vcpu thread).
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Hi Suzuki,
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
+> We load the stage2 context of a guest for different operations,
+> including running the guest and tlb maintenance on behalf of the
+> guest. As of now only the vttbr is private to the guest, but this
+> is about to change with IPA per VM. Add a helper to load the stage2
+> configuration for a VM, which could do the right thing with the
+> future changes.
+> 
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+Thanks
+
+Eric
 > ---
-> This small patchlet seem to have some interesting effects in my limited
-> testing. Installing 100 concurrent Debian VMs results results in about
-> 90 million WFE exits without this patch, and only 7.6 millions with it
-> (TX1, 96 cores, 2 vcpu guests). I haven't measured any significant
-> performance variation in that process.
+> Changes since v2:
+>  - New patch
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h | 6 ++++++
+>  arch/arm64/kvm/hyp/switch.c      | 2 +-
+>  arch/arm64/kvm/hyp/tlb.c         | 4 ++--
+>  3 files changed, 9 insertions(+), 3 deletions(-)
 > 
-> I'd welcome any benchmarking result from people with more interesting
-> workloads than mine so that I could make my mind about it.
-> 
->  arch/arm/include/asm/kvm_emulate.h   | 10 ++++++++++
->  arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
->  virt/kvm/arm/arm.c                   |  6 ++++++
->  3 files changed, 26 insertions(+)
-> 
-> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> index 6493bd479ddc..b50fe8380868 100644
-> --- a/arch/arm/include/asm/kvm_emulate.h
-> +++ b/arch/arm/include/asm/kvm_emulate.h
-> @@ -107,6 +107,16 @@ static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
->  	return (unsigned long *)&vcpu->arch.hcr;
->  }
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 384c343..82f9994 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -155,5 +155,11 @@ void deactivate_traps_vhe_put(void);
+>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>  void __noreturn __hyp_do_panic(unsigned long, ...);
 >  
-> +static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
+> +/* Must be called from hyp code running at EL2 */
+> +static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
 > +{
-> +	vcpu->arch.hcr &= ~HCR_TWE;
+> +	write_sysreg(kvm->arch.vttbr, vttbr_el2);
 > +}
 > +
-> +static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.hcr |= HCR_TWE;
-> +}
-> +
->  static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+>  #endif /* __ARM64_KVM_HYP_H__ */
+>  
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index d496ef5..355fb25 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -195,7 +195,7 @@ void deactivate_traps_vhe_put(void)
+>  
+>  static void __hyp_text __activate_vm(struct kvm *kvm)
 >  {
->  	return 1;
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 1dab3a984608..a71e5af816a9 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -81,6 +81,16 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
->  	return (unsigned long *)&vcpu->arch.hcr_el2;
+> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> +	__load_guest_stage2(kvm);
 >  }
 >  
-> +static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.hcr_el2 &= ~HCR_TWE;
-> +}
-> +
-> +static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.hcr_el2 |= HCR_TWE;
-> +}
-> +
->  static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+>  static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+> index 131c777..4dbd9c6 100644
+> --- a/arch/arm64/kvm/hyp/tlb.c
+> +++ b/arch/arm64/kvm/hyp/tlb.c
+> @@ -30,7 +30,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+>  	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
+>  	 * let's flip TGE before executing the TLB operation.
+>  	 */
+> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> +	__load_guest_stage2(kvm);
+>  	val = read_sysreg(hcr_el2);
+>  	val &= ~HCR_TGE;
+>  	write_sysreg(val, hcr_el2);
+> @@ -39,7 +39,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+>  
+>  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
 >  {
->  	vcpu->arch.vsesr_el2 = vsesr;
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 04e554cae3a2..8e66b89a3db2 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -30,6 +30,7 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_irqfd.h>
->  #include <linux/irqbypass.h>
-> +#include <linux/sched/stat.h>
->  #include <trace/events/kvm.h>
->  #include <kvm/arm_pmu.h>
->  #include <kvm/arm_psci.h>
-> @@ -380,6 +381,11 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_timer_vcpu_load(vcpu);
->  	kvm_vcpu_load_sysregs(vcpu);
->  	kvm_arch_vcpu_load_fp(vcpu);
-> +
-> +	if (single_task_running())
-> +		vcpu_clear_wfe_traps(vcpu);
-> +	else
-> +		vcpu_set_wfe_traps(vcpu);
+> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> +	__load_guest_stage2(kvm);
+>  	isb();
 >  }
 >  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> -- 
-> 2.17.1
 > 
