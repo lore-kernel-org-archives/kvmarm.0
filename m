@@ -1,78 +1,76 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 3/6] arm64: KVM: Avoid marking pages as XN in Stage-2 if
- CTR_EL0.DIC is set
-Date: Mon,  2 Jul 2018 16:02:47 +0100
-Message-ID: <20180702150250.16550-4-marc.zyngier@arm.com>
+Subject: [PATCH v4 6/6] KVM: arm/arm64: Remove unnecessary CMOs when creating
+ HYP page tables
+Date: Mon,  2 Jul 2018 16:02:50 +0100
+Message-ID: <20180702150250.16550-7-marc.zyngier@arm.com>
 References: <20180702150250.16550-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4885C49F87
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 10:51:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VyUuOKtC0tBK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Jul 2018 10:50:43 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B19774A0CC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 10:50:43 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180702150250.16550-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On systems where CTR_EL0.DIC is set, we don't need to perform
-icache invalidation to guarantee that we'll fetch the right
-instruction stream.
+There is no need to perform cache maintenance operations when
+creating the HYP page tables if we have the multiprocessing
+extensions. ARMv7 mandates them with the virtualization support,
+and ARMv8 just mandates them unconditionally.
 
-This also means that taking a permission fault to invalidate the
-icache is an unnecessary overhead.
+Let's remove these operations.
 
-On such systems, we can safely leave the page as being executable.
-
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Acked-by: Mark Rutland <mark.rutland@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/pgtable-prot.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ virt/kvm/arm/mmu.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index c66c3047400e..78b942c1bea4 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -77,8 +77,18 @@
- 		__val;							\
- 	 })
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index eade30caaa3c..97d27cd9c654 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -609,7 +609,6 @@ static void create_hyp_pte_mappings(pmd_t *pmd, unsigned long start,
+ 		pte = pte_offset_kernel(pmd, addr);
+ 		kvm_set_pte(pte, pfn_pte(pfn, prot));
+ 		get_page(virt_to_page(pte));
+-		kvm_flush_dcache_to_poc(pte, sizeof(*pte));
+ 		pfn++;
+ 	} while (addr += PAGE_SIZE, addr != end);
+ }
+@@ -636,7 +635,6 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
+ 			}
+ 			kvm_pmd_populate(pmd, pte);
+ 			get_page(virt_to_page(pmd));
+-			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
+ 		}
  
--#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PTE_S2_XN)
--#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
-+#define PAGE_S2_XN							\
-+	({								\
-+		u64 __val;						\
-+		if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))		\
-+			__val = 0;					\
-+		else							\
-+			__val = PTE_S2_XN;				\
-+		__val;							\
-+	})
-+
-+#define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
-+#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
+ 		next = pmd_addr_end(addr, end);
+@@ -669,7 +667,6 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
+ 			}
+ 			kvm_pud_populate(pud, pmd);
+ 			get_page(virt_to_page(pud));
+-			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
+ 		}
  
- #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
- #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
+ 		next = pud_addr_end(addr, end);
+@@ -706,7 +703,6 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
+ 			}
+ 			kvm_pgd_populate(pgd, pud);
+ 			get_page(virt_to_page(pgd));
+-			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
+ 		}
+ 
+ 		next = pgd_addr_end(addr, end);
 -- 
 2.17.1
