@@ -1,119 +1,121 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Remove VLA usage
-Date: Mon, 2 Jul 2018 10:15:27 -0700
-Message-ID: <CAGXu5jJcqMX7HjvgqcR37jnuN48PtyHd+VVmfcQH6YfXXSpO_g@mail.gmail.com>
-References: <20180629184618.GA37364@beast> <19f9ddb1-6009-850c-1949-3a8cdacdd2fc@redhat.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable adaptative WFE trapping
+Date: Mon, 2 Jul 2018 20:39:54 +0200
+Message-ID: <20180702183954.GB10663@C02W217FHV2R.local>
+References: <20180702164621.9899-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <19f9ddb1-6009-850c-1949-3a8cdacdd2fc@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, LKML <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180702164621.9899-1-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 2, 2018 at 12:36 AM, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Kees,
->
-> On 06/29/2018 08:46 PM, Kees Cook wrote:
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> switches to using a maximum size and adds sanity checks. Additionally
->> cleans up some of the int-vs-u32 usage and adds additional bounds checking.
->> As it currently stands, this will always be 8 bytes until the ABI changes.
->>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Eric Auger <eric.auger@redhat.com>
->> Cc: Andre Przywara <andre.przywara@arm.com>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: kvmarm@lists.cs.columbia.edu
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 19 +++++++++++++++----
->>  1 file changed, 15 insertions(+), 4 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 4ed79c939fb4..3143fc047fcf 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -168,8 +168,14 @@ struct vgic_its_abi {
->>       int (*commit)(struct vgic_its *its);
->>  };
->>
->> +#define ABI_0_ESZ    8
->> +#define ESZ_MAX              ABI_0_ESZ
->> +
->>  static const struct vgic_its_abi its_table_abi_versions[] = {
->> -     [0] = {.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
->> +     [0] = {
->> +      .cte_esz = ABI_0_ESZ,
->> +      .dte_esz = ABI_0_ESZ,
->> +      .ite_esz = ABI_0_ESZ,
->>        .save_tables = vgic_its_save_tables_v0,
->>        .restore_tables = vgic_its_restore_tables_v0,
->>        .commit = vgic_its_commit_v0,
->> @@ -180,10 +186,12 @@ static const struct vgic_its_abi its_table_abi_versions[] = {
->>
->>  inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
->>  {
->> +     if (WARN_ON(its->abi_rev >= NR_ITS_ABIS))
->> +             return NULL;
->>       return &its_table_abi_versions[its->abi_rev];
->>  }
->>
->> -int vgic_its_set_abi(struct vgic_its *its, int rev)
->> +static int vgic_its_set_abi(struct vgic_its *its, u32 rev)
->>  {
-> if vgic_its_get_abi is likely to return NULL, don't we need to check abi
-> != NULL in all call sites.
+On Mon, Jul 02, 2018 at 05:46:21PM +0100, Marc Zyngier wrote:
+> Trapping blocking WFE is extremely beneficial in situations where
+> the system is oversubscribed, as it allows another thread to run
+> while being blocked. In a non-oversubscribed environment, this is
+> the complete opposite, and trapping WFE is just unnecessary overhead.
+> 
+> Let's only enable WFE trapping if the CPU has more than a single task
+> to run (that is, more than just the vcpu thread).
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-My thinking was that since it should never happen, a WARN_ON would be
-sufficient. But I can drop all these changes if you want. I just
-wanted to see the VLA removed. :)
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 
--Kees
-
->
-> abi_rev is actually set by vgic_its_set_abi() which is actually called
-> by vgic_mmio_uaccess_write_its_iidr() and vgic_its_create().
->
-> Only vgic_mmio_uaccess_write_its_iidr allows the userspace to overwrite
-> the default abi_rev. At this point a check against NR_ITS_ABIS is
-> already done. So to me the check is done at the source?
->
-> Thanks
->
-> Eric
->>       const struct vgic_its_abi *abi;
->>
->> @@ -1881,16 +1889,19 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
->>   * Return: < 0 on error, 0 if last element was identified, 1 otherwise
->>   * (the last element may not be found on second level tables)
->>   */
->> -static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
->> +static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
->>                         int start_id, entry_fn_t fn, void *opaque)
->>  {
->>       struct kvm *kvm = its->dev->kvm;
->>       unsigned long len = size;
->>       int id = start_id;
->>       gpa_t gpa = base;
->> -     char entry[esz];
->> +     char entry[ESZ_MAX];
->>       int ret;
->>
->> +     if (WARN_ON(esz > ESZ_MAX))
->> +             return -EINVAL;
->> +
->>       memset(entry, 0, esz);
->>
->>       while (len > 0) {
->>
-
-
-
--- 
-Kees Cook
-Pixel Security
+> ---
+> This small patchlet seem to have some interesting effects in my limited
+> testing. Installing 100 concurrent Debian VMs results results in about
+> 90 million WFE exits without this patch, and only 7.6 millions with it
+> (TX1, 96 cores, 2 vcpu guests). I haven't measured any significant
+> performance variation in that process.
+> 
+> I'd welcome any benchmarking result from people with more interesting
+> workloads than mine so that I could make my mind about it.
+> 
+>  arch/arm/include/asm/kvm_emulate.h   | 10 ++++++++++
+>  arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
+>  virt/kvm/arm/arm.c                   |  6 ++++++
+>  3 files changed, 26 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 6493bd479ddc..b50fe8380868 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -107,6 +107,16 @@ static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
+>  	return (unsigned long *)&vcpu->arch.hcr;
+>  }
+>  
+> +static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr &= ~HCR_TWE;
+> +}
+> +
+> +static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr |= HCR_TWE;
+> +}
+> +
+>  static inline bool vcpu_mode_is_32bit(const struct kvm_vcpu *vcpu)
+>  {
+>  	return 1;
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 1dab3a984608..a71e5af816a9 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -81,6 +81,16 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+>  	return (unsigned long *)&vcpu->arch.hcr_el2;
+>  }
+>  
+> +static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 &= ~HCR_TWE;
+> +}
+> +
+> +static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcr_el2 |= HCR_TWE;
+> +}
+> +
+>  static inline void vcpu_set_vsesr(struct kvm_vcpu *vcpu, u64 vsesr)
+>  {
+>  	vcpu->arch.vsesr_el2 = vsesr;
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 04e554cae3a2..8e66b89a3db2 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -30,6 +30,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_irqfd.h>
+>  #include <linux/irqbypass.h>
+> +#include <linux/sched/stat.h>
+>  #include <trace/events/kvm.h>
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_psci.h>
+> @@ -380,6 +381,11 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	kvm_timer_vcpu_load(vcpu);
+>  	kvm_vcpu_load_sysregs(vcpu);
+>  	kvm_arch_vcpu_load_fp(vcpu);
+> +
+> +	if (single_task_running())
+> +		vcpu_clear_wfe_traps(vcpu);
+> +	else
+> +		vcpu_set_wfe_traps(vcpu);
+>  }
+>  
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> -- 
+> 2.17.1
+> 
