@@ -1,11 +1,13 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 0/6] KVM/arm64: Cache maintenance relaxations
-Date: Mon,  2 Jul 2018 16:02:44 +0100
-Message-ID: <20180702150250.16550-1-marc.zyngier@arm.com>
+Subject: [PATCH v4 4/6] KVM: arm/arm64: Consolidate page-table accessors
+Date: Mon,  2 Jul 2018 16:02:48 +0100
+Message-ID: <20180702150250.16550-5-marc.zyngier@arm.com>
+References: <20180702150250.16550-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180702150250.16550-1-marc.zyngier@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,71 +21,80 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This small series makes use of features recently introduced in the
-ARMv8 architecture to relax the cache maintenance operations on CPUs
-that implement these features.
+The arm and arm64 KVM page tables accessors are pointlessly different
+between the two architectures, and likely both wrong one way or another:
+arm64 lacks a dsb(), and arm doesn't use WRITE_ONCE.
 
-FWB is the most important one. It allows stage-2 to enforce the
-cacheability of memory, no matter what the guest says. It also
-mandates that the whole machine is cache coherent (no non-coherent
-I/O), meaning we can drop a whole class of cache maintenance
-operations.
+Let's unify them.
 
-FWB also has the same effect as CTR_EL0.IDC being set, and when
-combined with CTR_EL0.DIC allows the removal of all cache maintenance
-and tracking of pages being executed.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_mmu.h   | 12 ------------
+ arch/arm64/include/asm/kvm_mmu.h |  3 ---
+ virt/kvm/arm/mmu.c               | 12 ++++++++++++
+ 3 files changed, 12 insertions(+), 15 deletions(-)
 
-We also take the opportunity to drop a few useless CMOs that were
-applied to the HYP page tables, but that were never necessary. This
-ended up requiring quite a few changes in out page table accessors so
-that they get consistent barriers. These barriers are a bit on the
-heavy side, and could be further optimized, although that's probably
-for a different patch series
-
-Unless someone screams now, I plan to apply this to kvmarm/next
-shortly.
-
-* From v1:
-  - Reordered the series in a slightly more consistent order
-  - Added patches refactoring the PT accessors before dropping
-    the CMOs
-  - Removed final dsb(ishst) from the last patch, as all PT accessors
-    now have their own barriers
-  - Collected Acks from Catalin
-
-* From v2:
-  - Dropped the clean to PoU when FWB, as it always implies IDC
-  - Added comments about the pertinence of Set/Way CMOs in guests
-  - Collected Acks and RBs
-
-* From v3:
-  - Fixed P[MU]D_TYPE_TABLE position in entry constructors
-  - Clarified comment about FWB vs cleaning to PoU/PoC
-  - Resplit patches 4 and 5
-  - Dropped obsolete prototyped for a vanished function
-  - Collected RBs
-
-Marc Zyngier (6):
-  arm64: KVM: Add support for Stage-2 control of memory types and
-    cacheability
-  arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is present
-  arm64: KVM: Avoid marking pages as XN in Stage-2 if CTR_EL0.DIC is set
-  KVM: arm/arm64: Consolidate page-table accessors
-  KVM: arm/arm64: Stop using the kernel's {pmd,pud,pgd}_populate helpers
-  KVM: arm/arm64: Remove unnecessary CMOs when creating HYP page tables
-
- arch/arm/include/asm/kvm_mmu.h        | 14 ++-------
- arch/arm64/include/asm/cpucaps.h      |  3 +-
- arch/arm64/include/asm/kvm_arm.h      |  1 +
- arch/arm64/include/asm/kvm_emulate.h  |  2 ++
- arch/arm64/include/asm/kvm_mmu.h      | 35 ++++++++++++++++-----
- arch/arm64/include/asm/memory.h       |  7 +++++
- arch/arm64/include/asm/pgtable-prot.h | 24 ++++++++++++--
- arch/arm64/include/asm/sysreg.h       |  1 +
- arch/arm64/kernel/cpufeature.c        | 20 ++++++++++++
- arch/arm64/kvm/sys_regs.c             | 11 ++++++-
- virt/kvm/arm/mmu.c                    | 45 ++++++++++++++++++++++-----
- 11 files changed, 132 insertions(+), 31 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 8553d68b7c8a..b2feaea1434c 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -75,18 +75,6 @@ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
+ 
+-static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
+-{
+-	*pmd = new_pmd;
+-	dsb(ishst);
+-}
+-
+-static inline void kvm_set_pte(pte_t *pte, pte_t new_pte)
+-{
+-	*pte = new_pte;
+-	dsb(ishst);
+-}
+-
+ static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+ {
+ 	pte_val(pte) |= L_PTE_S2_RDWR;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index bac9f016736b..ea000fb47ec0 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -169,9 +169,6 @@ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(void);
+ void kvm_clear_hyp_idmap(void);
+ 
+-#define	kvm_set_pte(ptep, pte)		set_pte(ptep, pte)
+-#define	kvm_set_pmd(pmdp, pmd)		set_pmd(pmdp, pmd)
+-
+ static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+ {
+ 	pte_val(pte) |= PTE_S2_RDWR;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ea7314296ad1..a6bdbed1903a 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -177,6 +177,18 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
+ 	put_page(virt_to_page(pmd));
+ }
+ 
++static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
++{
++	WRITE_ONCE(*ptep, new_pte);
++	dsb(ishst);
++}
++
++static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
++{
++	WRITE_ONCE(*pmdp, new_pmd);
++	dsb(ishst);
++}
++
+ /*
+  * Unmapping vs dcache management:
+  *
 -- 
 2.17.1
