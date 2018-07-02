@@ -1,76 +1,75 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 6/6] KVM: arm/arm64: Remove unnecessary CMOs when creating
- HYP page tables
-Date: Mon,  2 Jul 2018 16:02:50 +0100
-Message-ID: <20180702150250.16550-7-marc.zyngier@arm.com>
+Subject: [PATCH v4 2/6] arm64: KVM: Handle Set/Way CMOs as NOPs if FWB is
+ present
+Date: Mon,  2 Jul 2018 16:02:46 +0100
+Message-ID: <20180702150250.16550-3-marc.zyngier@arm.com>
 References: <20180702150250.16550-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B44D34A0C8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 10:51:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UnfJ1doWfDVR for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Jul 2018 10:50:42 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5494A054
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Jul 2018 10:50:42 -0400 (EDT)
 In-Reply-To: <20180702150250.16550-1-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no need to perform cache maintenance operations when
-creating the HYP page tables if we have the multiprocessing
-extensions. ARMv7 mandates them with the virtualization support,
-and ARMv8 just mandates them unconditionally.
+Set/Way handling is one of the ugliest corners of KVM. We shouldn't
+have to handle that, but better safe than sorry.
 
-Let's remove these operations.
+Thankfully, FWB fixes this for us by not requiering any maintenance
+(the guest is forced to use cacheable memory, no matter what it says,
+and the whole system is garanteed to be cache coherent), which means
+we don't have to emulate S/W CMOs, and don't have to track VM ops either.
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+We still have to trap S/W though, if only to prevent the guest from
+doing something bad.
+
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/mmu.c | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index eade30caaa3c..97d27cd9c654 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -609,7 +609,6 @@ static void create_hyp_pte_mappings(pmd_t *pmd, unsigned long start,
- 		pte = pte_offset_kernel(pmd, addr);
- 		kvm_set_pte(pte, pfn_pte(pfn, prot));
- 		get_page(virt_to_page(pte));
--		kvm_flush_dcache_to_poc(pte, sizeof(*pte));
- 		pfn++;
- 	} while (addr += PAGE_SIZE, addr != end);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a4363735d3f8..774d72155904 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -194,7 +194,16 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	if (!p->is_write)
+ 		return read_from_write_only(vcpu, p, r);
+ 
+-	kvm_set_way_flush(vcpu);
++	/*
++	 * Only track S/W ops if we don't have FWB. It still indicates
++	 * that the guest is a bit broken (S/W operations should only
++	 * be done by firmware, knowing that there is only a single
++	 * CPU left in the system, and certainly not from non-secure
++	 * software).
++	 */
++	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
++		kvm_set_way_flush(vcpu);
++
+ 	return true;
  }
-@@ -636,7 +635,6 @@ static int create_hyp_pmd_mappings(pud_t *pud, unsigned long start,
- 			}
- 			kvm_pmd_populate(pmd, pte);
- 			get_page(virt_to_page(pmd));
--			kvm_flush_dcache_to_poc(pmd, sizeof(*pmd));
- 		}
  
- 		next = pmd_addr_end(addr, end);
-@@ -669,7 +667,6 @@ static int create_hyp_pud_mappings(pgd_t *pgd, unsigned long start,
- 			}
- 			kvm_pud_populate(pud, pmd);
- 			get_page(virt_to_page(pud));
--			kvm_flush_dcache_to_poc(pud, sizeof(*pud));
- 		}
- 
- 		next = pud_addr_end(addr, end);
-@@ -706,7 +703,6 @@ static int __create_hyp_mappings(pgd_t *pgdp, unsigned long ptrs_per_pgd,
- 			}
- 			kvm_pgd_populate(pgd, pud);
- 			get_page(virt_to_page(pgd));
--			kvm_flush_dcache_to_poc(pgd, sizeof(*pgd));
- 		}
- 
- 		next = pgd_addr_end(addr, end);
 -- 
 2.17.1
