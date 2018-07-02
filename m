@@ -1,124 +1,112 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 09/20] kvm: arm64: Make stage2 page table
- layout dynamic
-Date: Mon, 2 Jul 2018 16:46:21 +0200
-Message-ID: <f39d12b9-c715-3980-acfd-108255ff97c5@redhat.com>
+Subject: Re: [PATCH v3 11/20] kvm: arm64: Helper for computing VTCR_EL2.SL0
+Date: Mon, 2 Jul 2018 16:59:43 +0200
+Message-ID: <8faab60c-3025-d37f-6dd2-4f26bc32447c@redhat.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-10-git-send-email-suzuki.poulose@arm.com>
- <65475ac0-d156-c16e-bd91-438377326143@redhat.com>
- <22c070c4-aede-d699-774f-6212d05f7a59@arm.com>
+ <1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <22c070c4-aede-d699-774f-6212d05f7a59@arm.com>
+In-Reply-To: <1530270944-11351-12-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, kvmarm@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, Christoffer Dall <cdall@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Suzuki,
 
-On 07/02/2018 03:24 PM, Suzuki K Poulose wrote:
-> Hi Eric,
+On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
+> VTCR_EL2 holds the following key stage2 translation table
+> parameters:
+>   SL0  - Entry level in the page table lookup.
+>   T0SZ - Denotes the size of the memory addressed by the table.
 > 
+> We have been using fixed values for the SL0 depending on the
+> page size as we have a fixed IPA size. But since we are about
+> to make it dynamic, we need to calculate the SL0 at runtime
+> per VM. This patch adds a helper to comput the value of SL0 for
+compute
+> a given IPA.
 > 
-> On 02/07/18 13:14, Auger Eric wrote:
->> Hi Suzuki,
->>
->> On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
->>> So far we had a static stage2 page table handling code, based on a
->>> fixed IPA of 40bits. As we prepare for a configurable IPA size per
->>> VM, make our stage2 page table code dynamic, to do the right thing
->>> for a given VM. We ensure the existing condition is always true even
->>> when we lift the limit on the IPA. i.e,
->>>
->>>     page table levels in stage1 >= page table levels in stage2
->>>
->>> Support for the IPA size configuration needs other changes in the way
->>> we configure the EL2 registers (VTTBR and VTCR). So, the IPA is still
->>> fixed to 40bits. The patch also moves the kvm_page_empty() in
->>> asm/kvm_mmu.h
->>> to the top, before including the asm/stage2_pgtable.h to avoid a forward
->>> declaration.
->>>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Christoffer Dall <cdall@kernel.org>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>> Changes since V2
->>>   - Restrict the stage2 page table to allow reusing the host page table
->>>     helpers for now, until we get stage1 independent page table helpers.
->> I would move this up in the commit msg to motivate the fact we enforce
->> the able condition.
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v2:
+>  - Part 2 of split from VTCR & VTTBR dynamic configuration
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 35 ++++++++++++++++++++++++++++++++---
+>  1 file changed, 32 insertions(+), 3 deletions(-)
 > 
-> This is mentioned in the commit message for the patch which lifts the
-> limitation
-> on the IPA. This patch only deals with the dynamic page table level
-> handling,
-> with the restriction on the levels. Nevertheless, I could add it to the
-> description.
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index c557f45..11a7db0 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -153,7 +153,8 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		38
+> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
+> +
+>  #elif defined(CONFIG_ARM64_16K_PAGES)
+>  /*
+>   * Stage2 translation configuration:
+> @@ -161,7 +162,7 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		42
+> +#define VTCR_EL2_TGRAN_SL0_BASE		3UL
+>  #else	/* 4K */
+>  /*
+>   * Stage2 translation configuration:
+> @@ -169,11 +170,39 @@
+>   * 3 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		37
+> +#define VTCR_EL2_TGRAN_SL0_BASE		2UL
+>  #endif
+>  
+>  #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
+>  /*
+> + * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
+> + * Interestingly, it depends on the page size.
+> + * See D.10.2.110, VTCR_EL2, in ARM DDI 0487B.b
+update ref to the last one?
+> + *
+> + *	-----------------------------------------
+> + *	| Entry level		|  4K  | 16K/64K |
+> + *	------------------------------------------
+> + *	| Level: 0		|  2   |   -     |
+> + *	------------------------------------------
+> + *	| Level: 1		|  1   |   2     |
+> + *	------------------------------------------
+> + *	| Level: 2		|  0   |   1     |
+> + *	------------------------------------------
+> + *	| Level: 3		|  -   |   0     |
+> + *	------------------------------------------
+> + *
+> + * That table roughly translates to :
+> + *
+> + *	SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
+> + *
+> + * Where SL0_BASE(4K) = 2 and SL0_BASE(16K) = 3, SL0_BASE(64K) = 3, provided
+> + * we take care of ruling out the unsupported cases and
+> + * Entry_Level = 4 - Number_of_levels.
+> + *
+> + */
+> +#define VTCR_EL2_SL0(levels) \
+> +	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
+> +/*
+>   * ARM VMSAv8-64 defines an algorithm for finding the translation table
+>   * descriptors in section D4.2.8 in ARM DDI 0487B.b.
+>   *
 > 
->>> ---
->>>   arch/arm64/include/asm/kvm_mmu.h              |  14 +-
->>>   arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 ------
->>>   arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 -----
->>>   arch/arm64/include/asm/stage2_pgtable.h       | 207
->>> +++++++++++++++++++-------
->>>   4 files changed, 159 insertions(+), 143 deletions(-)
->>>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
->>>   delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
->>
->> with my very limited knowledge of S2 page table walkers I fail to
->> understand why we now can get rid of stage2_pgtable-nopmd.h and
->> stage2_pgtable-nopud.h and associated FOLDED config. Please could you
->> explain it in the commit message?
-> 
-> As mentioned above, we have static page table helpers, which are decided
-> at compile time (just like the stage1). So these files hold the definitions
-> for the cases where PUD/PMD is folded and included for a given stage1 VA.
-> But since we are now doing this check per VM, we make the decision
-> by checking the kvm_stage2_levels(), instead of hard coding it.
-> 
-> Does that help ? A short version of that is already there. May be I could
-> elaborate that a bit.
-
-not totally to be honest. But that's not your fault. I need to spend
-more time studying the code to get what the FOLDED case does ;-)
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-> 
->>> -
->>> -#define stage2_pgd_index(kvm, addr) \
->>> -    (((addr) >> S2_PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
->>> +static inline unsigned long stage2_pgd_index(struct kvm *kvm,
->>> phys_addr_t addr)
->>> +{
->>> +    return (addr >> stage2_pgdir_shift(kvm)) & (stage2_pgd_ptrs(kvm)
->>> - 1);
->>> +}
->>>     static inline phys_addr_t
->>>   stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t
->>> end)
->>>   {
->>> -    phys_addr_t boundary = (addr + S2_PGDIR_SIZE) & S2_PGDIR_MASK;
->>> +    phys_addr_t boundary;
->>>   +    boundary = (addr + stage2_pgdir_size(kvm)) &
->>> stage2_pgdir_mask(kvm);
->>>       return (boundary - 1 < end - 1) ? boundary : end;
->>>   }
->>>  
->>
->> Globally this patch is pretty hard to review. I don't know if it is
->> possible to split into 2. 1) Addition of some helper macros. 2) removal
->> of nopud and nopmd and implementation of the corresponding macros?
-> 
-> I acknowledge that. The patch redefines the "existing" macros to make the
-> decision at runtime based on the VM's setting. I will see if there is a
-> better way to do it.
-> 
-> Cheers
-> Suzuki
-> 
