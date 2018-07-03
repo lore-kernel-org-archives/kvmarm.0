@@ -1,130 +1,53 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v3 10/20] kvm: arm64: Dynamic configuration of VTTBR mask
-Date: Tue, 3 Jul 2018 12:54:26 +0100
-Message-ID: <a6fa912a-b2ff-ac1e-0120-b2f7eabb6f7f@arm.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-11-git-send-email-suzuki.poulose@arm.com>
- <e0c8dc62-42e8-ee24-5519-e19b2739160b@redhat.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Fix vgic init race
+Date: Tue,  3 Jul 2018 23:26:15 +0200
+Message-ID: <1530653175-11999-1-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <e0c8dc62-42e8-ee24-5519-e19b2739160b@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, julien.grall@arm.com, james.morse@arm.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+The vgic_init function can race with kvm_arch_vcpu_create() which does
+not hold kvm_lock() and we therefore have no synchronization primitives
+to ensure we're doing the right thing.
 
-On 02/07/18 15:41, Auger Eric wrote:
-> Hi Suzuki,
-> 
-> On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
->> On arm64 VTTBR_EL2:BADDR holds the base address for the stage2
->> translation table. The Arm ARM mandates that the bits BADDR[x-1:0]
->> should be 0, where 'x' is defined for a given IPA Size and the
->> number of levels for a translation granule size. It is defined
->> using some magical constants. This patch is a reverse engineered
->> implementation to calculate the 'x' at runtime for a given ipa and
->> number of page table levels. See patch for more details.
->>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <cdall@kernel.org>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since V2:
->>   - Part 1 of spilt from VTCR & VTTBR dynamic configuration
->> ---
->>   arch/arm64/include/asm/kvm_arm.h | 60 +++++++++++++++++++++++++++++++++++++---
->>   arch/arm64/include/asm/kvm_mmu.h | 25 ++++++++++++++++-
->>   2 files changed, 80 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
->> index 3dffd38..c557f45 100644
->> --- a/arch/arm64/include/asm/kvm_arm.h
->> +++ b/arch/arm64/include/asm/kvm_arm.h
->> @@ -140,8 +140,6 @@
->>    * Note that when using 4K pages, we concatenate two first level page tables
->>    * together. With 16K pages, we concatenate 16 first level page tables.
->>    *
->> - * The magic numbers used for VTTBR_X in this patch can be found in Tables
->> - * D4-23 and D4-25 in ARM DDI 0487A.b.
-> Isn't it a pretty old reference? Could you refer to C.a?
+As the user is trying to initialize or run the VM while at the same time
+creating more VCPUs, we just have to refuse to initialize the VGIC in
+this case rather than silently failing with a broken VCPU.
 
-Sure, I will update the references everywhere.
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
->> + *
->> + * The algorithm defines the expectations on the BaseAddress (for the page
->> + * table) bits resolved at each level based on the page size, entry level
->> + * and T0SZ. The variable "x" in the algorithm also affects the VTTBR:BADDR
->> + * for stage2 page table.
->> + *
->> + * The value of "x" is calculated as :
->> + *	x = Magic_N - T0SZ
->> + *
->> + * where Magic_N is an integer depending on the page size and the entry
->> + * level of the page table as below:
->> + *
->> + *	--------------------------------------------
->> + *	| Entry level		|  4K    16K   64K |
->> + *	--------------------------------------------
->> + *	| Level: 0 (4 levels)	| 28   |  -  |  -  |
->> + *	--------------------------------------------
->> + *	| Level: 1 (3 levels)	| 37   | 31  | 25  |
->> + *	--------------------------------------------
->> + *	| Level: 2 (2 levels)	| 46   | 42  | 38  |
->> + *	--------------------------------------------
->> + *	| Level: 3 (1 level)	| -    | 53  | 51  |
->> + *	--------------------------------------------
-> I understand entry level = Lookup level in the table.
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 9406eaf..c0c0b88 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -286,6 +286,10 @@ int vgic_init(struct kvm *kvm)
+        if (vgic_initialized(kvm))
+                return 0;
 
-Entry level => The level at which we start the page table walk for
-a given address (This is in line with the ARM ARM). So,
++       /* Are we also in the middle of creating a VCPU? */
++       if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus))
++               return -EBUSY;
++
+        /* freeze the number of spis */
+        if (!dist->nr_spis)
+                dist->nr_spis = VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
+--
+2.7.4
 
-Entry_level = (4 - Number_of_Page_table_levels)
-
-> But you may want to compute x for BaseAddress matching lookup level 2
-> with number of levels = 4.
-
-No, the BaseAddress is only calcualted for the "Entry_level". So the
-above case doesn't exist at all.
-
-> So shouldn't you s/Number of levels/4 - entry_level?
-
-Ok, I now understood what you are referring to [0]
-> for BADDR we want the BaseAddr of the initial lookup level so
-> effectively the entry level we are interested in is 4 - number of levels
-> and we don't care or d) condition. At least this is my understanding ;-)
-> If correct you may slightly reword the explanation?
-
-
->> + *
->> + * We have a magic formula for the Magic_N below.
->> + *
->> + *  Magic_N(PAGE_SIZE, Entry_Level) = 64 - ((PAGE_SHIFT - 3) * Number of levels)
-
-[0] ^^^
-
-
-
->> + *
->> + * where number of levels = (4 - Entry_Level).
-
-^^^ Doesn't this help make it clear ? Using the expansion makes it a bit more
-unreadable below.
-
->>   
->> +/*
->> + * Get the magic number 'x' for VTTBR:BADDR of this KVM instance.
->> + * With v8.2 LVA extensions, 'x' should be a minimum of 6 with
->> + * 52bit IPS.
-> Link to the spec?
-
-Sure, will add it.
-
-Thanks for the patience to review :-)
-
-Cheers
-Suzuki
+IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
