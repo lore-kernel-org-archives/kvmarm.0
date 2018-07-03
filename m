@@ -1,96 +1,71 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v3 12/20] kvm: arm64: Add helper for loading the stage2
- setting for a VM
-Date: Mon, 2 Jul 2018 21:13:54 +0200
-Message-ID: <c8091c05-b7ea-92fa-6d04-917619691381@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v3 01/20] virtio: mmio-v1: Validate queue PFN
+Date: Tue, 3 Jul 2018 09:04:01 +0100
+Message-ID: <5124334c-b3c8-4c59-b652-d26ea1101807@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-13-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
+ <20180629200816-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1530270944-11351-13-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <20180629200816-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+Hi Michael,
 
-On 06/29/2018 01:15 PM, Suzuki K Poulose wrote:
-> We load the stage2 context of a guest for different operations,
-> including running the guest and tlb maintenance on behalf of the
-> guest. As of now only the vttbr is private to the guest, but this
-> is about to change with IPA per VM. Add a helper to load the stage2
-> configuration for a VM, which could do the right thing with the
-> future changes.
+On 06/29/2018 06:42 PM, Michael S. Tsirkin wrote:
+> On Fri, Jun 29, 2018 at 12:15:21PM +0100, Suzuki K Poulose wrote:
+>> virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
+>> If the queue pfn is too large to fit in 32bits, which
+>> we could hit on arm64 systems with 52bit physical addresses
+>> (even with 64K page size), we simply miss out a proper link
+>> to the other side of the queue.
+>>
+>> Add a check to validate the PFN, rather than silently breaking
+>> the devices.
+>>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <cdall@kernel.org>
+>> Cc: Peter Maydel <peter.maydell@linaro.org>
+>> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>> Changes since v2:
+>>   - Change errno to -E2BIG
+>> ---
+>>   drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
+>>   1 file changed, 16 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+>> index 67763d3..82cedc8 100644
+>> --- a/drivers/virtio/virtio_mmio.c
+>> +++ b/drivers/virtio/virtio_mmio.c
+>> @@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+>>   	/* Activate the queue */
+>>   	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+>>   	if (vm_dev->version == 1) {
+>> +		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
+>> +
+>> +		/*
+>> +		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
+>> +		 * that doesn't fit in 32bit, fail the setup rather than
+>> +		 * pretending to be successful.
+>> +		 */
+>> +		if (q_pfn >> 32) {
+>> +			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
 > 
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> How about:
+> 	"hypervisor bug: legacy virtio-mmio must not be used with more than 0x%llx Gigabytes of memory",
+> 	0x1ULL << (32 - 30) << PAGE_SHIFT
 
-Thanks
+nit : Do we need change "hypervisor" => "platform" ? Virtio is used by 
+other tools (e.g, emulators) and not just virtual machines.
 
-Eric
-> ---
-> Changes since v2:
->  - New patch
-> ---
->  arch/arm64/include/asm/kvm_hyp.h | 6 ++++++
->  arch/arm64/kvm/hyp/switch.c      | 2 +-
->  arch/arm64/kvm/hyp/tlb.c         | 4 ++--
->  3 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 384c343..82f9994 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -155,5 +155,11 @@ void deactivate_traps_vhe_put(void);
->  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
->  void __noreturn __hyp_do_panic(unsigned long, ...);
->  
-> +/* Must be called from hyp code running at EL2 */
-> +static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
-> +{
-> +	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +}
-> +
->  #endif /* __ARM64_KVM_HYP_H__ */
->  
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index d496ef5..355fb25 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -195,7 +195,7 @@ void deactivate_traps_vhe_put(void)
->  
->  static void __hyp_text __activate_vm(struct kvm *kvm)
->  {
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  }
->  
->  static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 131c777..4dbd9c6 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -30,7 +30,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
->  	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
->  	 * let's flip TGE before executing the TLB operation.
->  	 */
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  	val = read_sysreg(hcr_el2);
->  	val &= ~HCR_TGE;
->  	write_sysreg(val, hcr_el2);
-> @@ -39,7 +39,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
->  
->  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
->  {
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  	isb();
->  }
->  
-> 
+Suzuki
