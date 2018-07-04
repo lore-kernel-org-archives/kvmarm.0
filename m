@@ -1,67 +1,83 @@
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
- address size for VM
-Date: Wed, 4 Jul 2018 16:51:04 +0100
-Message-ID: <20180704155104.GN4828@arm.com>
+Subject: Re: [kvmtool test PATCH 24/24] kvmtool: arm: Add support for
+ creating VM with PA size
+Date: Wed, 4 Jul 2018 16:51:24 +0100
+Message-ID: <20180704155123.GO4828@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-25-git-send-email-suzuki.poulose@arm.com>
+ <20180704142241.GG4828@arm.com>
+ <8636wzysfl.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <8636wzysfl.wl-marc.zyngier@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Peter Maydel <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
-
-On Fri, Jun 29, 2018 at 12:15:35PM +0100, Suzuki K Poulose wrote:
-> Allow specifying the physical address size for a new VM via
-> the kvm_type argument for KVM_CREATE_VM ioctl. This allows
-> us to finalise the stage2 page table format as early as possible
-> and hence perform the right checks on the memory slots without
-> complication. The size is encoded as Log2(PA_Size) in the bits[7:0]
-> of the type field and can encode more information in the future if
-> required. The IPA size is still capped at 40bits.
+On Wed, Jul 04, 2018 at 03:41:18PM +0100, Marc Zyngier wrote:
+> On Wed, 04 Jul 2018 15:22:42 +0100,
+> Will Deacon <will.deacon@arm.com> wrote:
+> > 
+> > On Fri, Jun 29, 2018 at 12:15:44PM +0100, Suzuki K Poulose wrote:
+> > > diff --git a/arm/kvm.c b/arm/kvm.c
+> > > index 5701d41..b1969be 100644
+> > > --- a/arm/kvm.c
+> > > +++ b/arm/kvm.c
+> > > @@ -11,6 +11,8 @@
+> > >  #include <linux/kvm.h>
+> > >  #include <linux/sizes.h>
+> > >  
+> > > +unsigned long kvm_arm_type;
+> > > +
+> > >  struct kvm_ext kvm_req_ext[] = {
+> > >  	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+> > >  	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+> > > @@ -18,6 +20,26 @@ struct kvm_ext kvm_req_ext[] = {
+> > >  	{ 0, 0 },
+> > >  };
+> > >  
+> > > +#ifndef KVM_ARM_GET_MAX_VM_PHYS_SHIFT
+> > > +#define KVM_ARM_GET_MAX_VM_PHYS_SHIFT		_IO(KVMIO, 0x0b)
+> > > +#endif
+> > > +
+> > > +void kvm__arch_init_hyp(struct kvm *kvm)
+> > > +{
+> > > +	int max_ipa;
+> > > +
+> > > +	max_ipa = ioctl(kvm->sys_fd, KVM_ARM_GET_MAX_VM_PHYS_SHIFT);
+> > > +	if (max_ipa < 0)
+> > > +		max_ipa = 40;
+> > > +	if (!kvm->cfg.arch.phys_shift)
+> > > +		kvm->cfg.arch.phys_shift = 40;
+> > > +	if (kvm->cfg.arch.phys_shift > max_ipa)
+> > > +		die("Requested PA size (%u) is not supported by the host (%ubits)\n",
+> > > +		    kvm->cfg.arch.phys_shift, max_ipa);
+> > > +	if (kvm->cfg.arch.phys_shift != 40)
+> > > +		kvm_arm_type = kvm->cfg.arch.phys_shift;
+> > > +}
+> > 
+> > Seems a bit weird that the "machine type identifier" to KVM_CREATE_VM is
+> > dedicated entirely to holding the physical address shift verbatim. Is this
+> > really the ABI?
+> > 
+> > Also, couldn't KVM figure it out automatically if you add memslots at high
+> > addresses, making this a niche tunable outside of testing?
 > 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Cc: Peter Maydel <peter.maydell@linaro.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h   |  2 ++
->  arch/arm64/include/asm/kvm_arm.h | 10 +++-------
->  arch/arm64/include/asm/kvm_mmu.h |  2 ++
->  include/uapi/linux/kvm.h         | 10 ++++++++++
->  virt/kvm/arm/arm.c               | 24 ++++++++++++++++++++++--
->  5 files changed, 39 insertions(+), 9 deletions(-)
+> Not really. Let's say I want my IPA space split in two: memory covers
+> the low 47 bit, and I want MMIO spanning the top 47 bit. With your
+> scheme, you'd end-up with a 47bit IPA space, while you really want 48
+> bits (MMIO space implemented by userspace isn't registered to the
+> kernel).
 
-[...]
+That still sounds quite niche for a VM. Does QEMU do that? In any case,
+having KVM automatically increase the IPA bits to cover the memslots it
+knows about would make sense to me, and also be sufficient for kvmtool
+without us having to add an extra command-line argument.
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4df9bb6..fa4cab0 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -751,6 +751,16 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_S390_SIE_PAGE_OFFSET 1
->  
->  /*
-> + * On arm/arm64, machine type can be used to request the physical
-> + * address size for the VM. Bits [7-0] have been reserved for the
-> + * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-> + * value 0 implies the default IPA size, which is 40bits.
-> + */
-> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK	0xff
-> +#define KVM_VM_TYPE_ARM_PHYS_SHIFT(x)		\
-> +	((x) & KVM_VM_TYPE_ARM_PHYS_SHIFT_MASK)
-
-This seems like you're allocating quite a lot of bits in a non-extensible
-interface to a fairly esoteric parameter. Would it be better to add another
-ioctl, or condense the number of sizes you support instead?
+The MMIO case might be better dealt with by having a way to register MMIO
+regions rather than having the PA bits exposed directly.
 
 Will
