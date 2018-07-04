@@ -1,53 +1,74 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH] KVM: arm/arm64: Fix vgic init race
-Date: Tue,  3 Jul 2018 23:26:15 +0200
-Message-ID: <1530653175-11999-1-git-send-email-christoffer.dall@arm.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v3 01/20] virtio: mmio-v1: Validate queue PFN
+Date: Wed, 4 Jul 2018 08:37:42 +0300
+Message-ID: <20180704083618-mutt-send-email-mst@kernel.org>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-2-git-send-email-suzuki.poulose@arm.com>
+ <20180629200816-mutt-send-email-mst@kernel.org>
+ <5124334c-b3c8-4c59-b652-d26ea1101807@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Christoffer Dall <christoffer.dall@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5124334c-b3c8-4c59-b652-d26ea1101807@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Peter Maydel <peter.maydell@linaro.org>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The vgic_init function can race with kvm_arch_vcpu_create() which does
-not hold kvm_lock() and we therefore have no synchronization primitives
-to ensure we're doing the right thing.
+On Tue, Jul 03, 2018 at 09:04:01AM +0100, Suzuki K Poulose wrote:
+> Hi Michael,
+> 
+> On 06/29/2018 06:42 PM, Michael S. Tsirkin wrote:
+> > On Fri, Jun 29, 2018 at 12:15:21PM +0100, Suzuki K Poulose wrote:
+> > > virtio-mmio with virtio-v1 uses a 32bit PFN for the queue.
+> > > If the queue pfn is too large to fit in 32bits, which
+> > > we could hit on arm64 systems with 52bit physical addresses
+> > > (even with 64K page size), we simply miss out a proper link
+> > > to the other side of the queue.
+> > > 
+> > > Add a check to validate the PFN, rather than silently breaking
+> > > the devices.
+> > > 
+> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > > Cc: Jason Wang <jasowang@redhat.com>
+> > > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > > Cc: Christoffer Dall <cdall@kernel.org>
+> > > Cc: Peter Maydel <peter.maydell@linaro.org>
+> > > Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > ---
+> > > Changes since v2:
+> > >   - Change errno to -E2BIG
+> > > ---
+> > >   drivers/virtio/virtio_mmio.c | 18 ++++++++++++++++--
+> > >   1 file changed, 16 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> > > index 67763d3..82cedc8 100644
+> > > --- a/drivers/virtio/virtio_mmio.c
+> > > +++ b/drivers/virtio/virtio_mmio.c
+> > > @@ -397,9 +397,21 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned index,
+> > >   	/* Activate the queue */
+> > >   	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
+> > >   	if (vm_dev->version == 1) {
+> > > +		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
+> > > +
+> > > +		/*
+> > > +		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
+> > > +		 * that doesn't fit in 32bit, fail the setup rather than
+> > > +		 * pretending to be successful.
+> > > +		 */
+> > > +		if (q_pfn >> 32) {
+> > > +			dev_err(&vdev->dev, "virtio-mmio: queue address too large\n");
+> > 
+> > How about:
+> > 	"hypervisor bug: legacy virtio-mmio must not be used with more than 0x%llx Gigabytes of memory",
+> > 	0x1ULL << (32 - 30) << PAGE_SHIFT
+> 
+> nit : Do we need change "hypervisor" => "platform" ? Virtio is used by other
+> tools (e.g, emulators) and not just virtual machines.
+> 
+> Suzuki
 
-As the user is trying to initialize or run the VM while at the same time
-creating more VCPUs, we just have to refuse to initialize the VGIC in
-this case rather than silently failing with a broken VCPU.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- virt/kvm/arm/vgic/vgic-init.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 9406eaf..c0c0b88 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -286,6 +286,10 @@ int vgic_init(struct kvm *kvm)
-        if (vgic_initialized(kvm))
-                return 0;
-
-+       /* Are we also in the middle of creating a VCPU? */
-+       if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus))
-+               return -EBUSY;
-+
-        /* freeze the number of spis */
-        if (!dist->nr_spis)
-                dist->nr_spis = VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
---
-2.7.4
-
-IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+OK.
