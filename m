@@ -1,82 +1,51 @@
-From: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v2 1/5] dt-bindings: virtio: Specify #iommu-cells value
-	for a virtio-iommu
-Date: Wed, 4 Jul 2018 12:45:20 +0100
-Message-ID: <0d701fb2-aea5-12a2-e07e-ba128e2e36e7@arm.com>
-References: <20180621190655.56391-1-jean-philippe.brucker@arm.com>
-	<20180621190655.56391-2-jean-philippe.brucker@arm.com>
-	<20180625192753.GA22351@rob-hp-laptop>
-	<89d31865-ee35-ef8c-f7b3-f3acf2bbd30e@arm.com>
-	<CAL_JsqLdahF+2VsH9h658z9guO0XmqHM75QLaHApZLNP8twUNA@mail.gmail.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [kvmtool test PATCH 22/24] kvmtool: arm64: Add support for guest
+ physical address size
+Date: Wed, 4 Jul 2018 15:09:43 +0100
+Message-ID: <20180704140943.GF4828@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <CAL_JsqLdahF+2VsH9h658z9guO0XmqHM75QLaHApZLNP8twUNA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jayachandran.nair-YGCgFSpz5w/QT0dZR+AlfA@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, Linux IOMMU <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, julien.grall@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/06/18 18:46, Rob Herring wrote:
-> On Tue, Jun 26, 2018 at 11:59 AM Jean-Philippe Brucker
-> <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org> wrote:
->>
->> On 25/06/18 20:27, Rob Herring wrote:
->>> On Thu, Jun 21, 2018 at 08:06:51PM +0100, Jean-Philippe Brucker wrote:
->>>> A virtio-mmio node may represent a virtio-iommu device. This is discovered
->>>> by the virtio driver at probe time, but the DMA topology isn't
->>>> discoverable and must be described by firmware. For DT the standard IOMMU
->>>> description is used, as specified in bindings/iommu/iommu.txt and
->>>> bindings/pci/pci-iommu.txt. Like many other IOMMUs, virtio-iommu
->>>> distinguishes masters by their endpoint IDs, which requires one IOMMU cell
->>>> in the "iommus" property.
->>>>
->>>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
->>>> ---
->>>>   Documentation/devicetree/bindings/virtio/mmio.txt | 8 ++++++++
->>>>   1 file changed, 8 insertions(+)
->>>>
->>>> diff --git a/Documentation/devicetree/bindings/virtio/mmio.txt b/Documentation/devicetree/bindings/virtio/mmio.txt
->>>> index 5069c1b8e193..337da0e3a87f 100644
->>>> --- a/Documentation/devicetree/bindings/virtio/mmio.txt
->>>> +++ b/Documentation/devicetree/bindings/virtio/mmio.txt
->>>> @@ -8,6 +8,14 @@ Required properties:
->>>>   - reg:              control registers base address and size including configuration space
->>>>   - interrupts:       interrupt generated by the device
->>>>
->>>> +Required properties for virtio-iommu:
->>>> +
->>>> +- #iommu-cells:     When the node describes a virtio-iommu device, it is
->>>> +            linked to DMA masters using the "iommus" property as
->>>> +            described in devicetree/bindings/iommu/iommu.txt. For
->>>> +            virtio-iommu #iommu-cells must be 1, each cell describing
->>>> +            a single endpoint ID.
->>>
->>> The iommus property should also be documented for the client side.
->>
->> Isn't section "IOMMU master node" of iommu.txt sufficient? Since the
->> iommus property applies to any DMA master, not only virtio-mmio devices,
->> the canonical description in iommu.txt seems the best place for it, and
->> I'm not sure what to add in this file. Maybe a short example below the
->> virtio_block one?
+On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
+> Add an option to specify the physical address size used by this
+> VM.
 > 
-> No, because somewhere we have to capture if 'iommus' is valid for
-> 'virtio-mmio' or not. Hopefully soon we'll actually be able to
-> validate that.
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
+>  arm/include/arm-common/kvm-config-arch.h  | 1 +
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+> index 04be43d..dabd22c 100644
+> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+> @@ -8,7 +8,10 @@
+>  			"Create PMUv3 device"),				\
+>  	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>  			"Specify random seed for Kernel Address Space "	\
+> -			"Layout Randomization (KASLR)"),
+> +			"Layout Randomization (KASLR)"),		\
+> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
+> +			"Specify maximum physical address size (not "	\
+> +			"the amount of memory)"),
 
-Indeed, it's rather unusual to have a single compatible which may either 
-be an IOMMU or an IOMMU client (but not both at once, I hope!), so 
-nailing down the exact semantics as clearly as possible would definitely 
-be desirable.
+Given that this is a shift value, I think the help message could be more
+informative. Something like:
 
-Robin.
+	"Specify maximum number of bits in a guest physical address"
+
+I think I'd actually leave out any mention of memory, because this does
+actually have an effect on the amount of addressable memory in a way that I
+don't think we want to describe in half of a usage message line :)
+
+Will
