@@ -1,30 +1,71 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCHv4 00/10] ARMv8.3 pointer authentication userspace support
-Date: Wed, 4 Jul 2018 17:12:12 +0100
-Message-ID: <20180704161212.GS4828@arm.com>
-References: <20180503132031.25705-1-mark.rutland@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
+ address size for VM
+Date: Wed, 4 Jul 2018 23:03:10 +0100
+Message-ID: <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+ <20180704155104.GN4828@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180503132031.25705-1-mark.rutland@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, christoffer.dall@arm.com, drjones@redhat.com, marc.zyngier@arm.com, ramana.radhakrishnan@arm.com, suzuki.poulose@arm.com, awallis@codeaurora.org
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180704155104.GN4828@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Peter Maydel <peter.maydell@linaro.org>, cdall@kernel.org, kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, eric.auger@redhat.com, julien.grall@arm.com, james.morse@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-HI Mark,
-
-On Thu, May 03, 2018 at 02:20:21PM +0100, Mark Rutland wrote:
-> This series adds support for the ARMv8.3 pointer authentication extension,
-> enabling userspace return address protection with recent versions of GCC.
-
-As discussed off-list, I'd really like to get a feel for how we might use
-this to protect the kernel before we commit to a userspace ABI, especially
-given that there is some level of resource sharing with the keys.
-
-So ideally, we'd merge this along with the support for the kernel side.
-In the meantime, is it worth taking any of the ID register sanity checks
-now?
-
-Will
+T24gMDcvMDQvMjAxOCAwNDo1MSBQTSwgV2lsbCBEZWFjb24gd3JvdGU6Cj4gSGkgU3V6dWtpLAo+
+IAo+IE9uIEZyaSwgSnVuIDI5LCAyMDE4IGF0IDEyOjE1OjM1UE0gKzAxMDAsIFN1enVraSBLIFBv
+dWxvc2Ugd3JvdGU6Cj4+IEFsbG93IHNwZWNpZnlpbmcgdGhlIHBoeXNpY2FsIGFkZHJlc3Mgc2l6
+ZSBmb3IgYSBuZXcgVk0gdmlhCj4+IHRoZSBrdm1fdHlwZSBhcmd1bWVudCBmb3IgS1ZNX0NSRUFU
+RV9WTSBpb2N0bC4gVGhpcyBhbGxvd3MKPj4gdXMgdG8gZmluYWxpc2UgdGhlIHN0YWdlMiBwYWdl
+IHRhYmxlIGZvcm1hdCBhcyBlYXJseSBhcyBwb3NzaWJsZQo+PiBhbmQgaGVuY2UgcGVyZm9ybSB0
+aGUgcmlnaHQgY2hlY2tzIG9uIHRoZSBtZW1vcnkgc2xvdHMgd2l0aG91dAo+PiBjb21wbGljYXRp
+b24uIFRoZSBzaXplIGlzIGVuY29kZWQgYXMgTG9nMihQQV9TaXplKSBpbiB0aGUgYml0c1s3OjBd
+Cj4+IG9mIHRoZSB0eXBlIGZpZWxkIGFuZCBjYW4gZW5jb2RlIG1vcmUgaW5mb3JtYXRpb24gaW4g
+dGhlIGZ1dHVyZSBpZgo+PiByZXF1aXJlZC4gVGhlIElQQSBzaXplIGlzIHN0aWxsIGNhcHBlZCBh
+dCA0MGJpdHMuCj4+Cj4+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+
+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxAa2VybmVsLm9yZz4KPj4gQ2M6IFBldGVyIE1h
+eWRlbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPgo+PiBDYzogUGFvbG8gQm9uemluaSA8cGJv
+bnppbmlAcmVkaGF0LmNvbT4KPj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21hckByZWRoYXQu
+Y29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBh
+cm0uY29tPgo+PiAtLS0KPj4gICBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1fbW11LmggICB8ICAy
+ICsrCj4+ICAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fYXJtLmggfCAxMCArKystLS0tLS0t
+Cj4+ICAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW11LmggfCAgMiArKwo+PiAgIGluY2x1
+ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAgIHwgMTAgKysrKysrKysrKwo+PiAgIHZpcnQva3Zt
+L2FybS9hcm0uYyAgICAgICAgICAgICAgIHwgMjQgKysrKysrKysrKysrKysrKysrKysrKy0tCj4+
+ICAgNSBmaWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQo+IAo+
+IFsuLi5dCj4gCj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNs
+dWRlL3VhcGkvbGludXgva3ZtLmgKPj4gaW5kZXggNGRmOWJiNi4uZmE0Y2FiMCAxMDA2NDQKPj4g
+LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCj4+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51
+eC9rdm0uaAo+PiBAQCAtNzUxLDYgKzc1MSwxNiBAQCBzdHJ1Y3Qga3ZtX3BwY19yZXNpemVfaHB0
+IHsKPj4gICAjZGVmaW5lIEtWTV9TMzkwX1NJRV9QQUdFX09GRlNFVCAxCj4+ICAgCj4+ICAgLyoK
+Pj4gKyAqIE9uIGFybS9hcm02NCwgbWFjaGluZSB0eXBlIGNhbiBiZSB1c2VkIHRvIHJlcXVlc3Qg
+dGhlIHBoeXNpY2FsCj4+ICsgKiBhZGRyZXNzIHNpemUgZm9yIHRoZSBWTS4gQml0cyBbNy0wXSBo
+YXZlIGJlZW4gcmVzZXJ2ZWQgZm9yIHRoZQo+PiArICogUEEgc2l6ZSBzaGlmdCAoaS5lLCBsb2cy
+KFBBX1NpemUpKS4gRm9yIGJhY2t3YXJkIGNvbXBhdGliaWxpdHksCj4+ICsgKiB2YWx1ZSAwIGlt
+cGxpZXMgdGhlIGRlZmF1bHQgSVBBIHNpemUsIHdoaWNoIGlzIDQwYml0cy4KPj4gKyAqLwo+PiAr
+I2RlZmluZSBLVk1fVk1fVFlQRV9BUk1fUEhZU19TSElGVF9NQVNLCTB4ZmYKPj4gKyNkZWZpbmUg
+S1ZNX1ZNX1RZUEVfQVJNX1BIWVNfU0hJRlQoeCkJCVwKPj4gKwkoKHgpICYgS1ZNX1ZNX1RZUEVf
+QVJNX1BIWVNfU0hJRlRfTUFTSykKPiAKPiBUaGlzIHNlZW1zIGxpa2UgeW91J3JlIGFsbG9jYXRp
+bmcgcXVpdGUgYSBsb3Qgb2YgYml0cyBpbiBhIG5vbi1leHRlbnNpYmxlCj4gaW50ZXJmYWNlIHRv
+IGEgZmFpcmx5IGVzb3RlcmljIHBhcmFtZXRlci4gV291bGQgaXQgYmUgYmV0dGVyIHRvIGFkZCBh
+bm90aGVyCj4gaW9jdGwsIG9yIGNvbmRlbnNlIHRoZSBudW1iZXIgb2Ygc2l6ZXMgeW91IHN1cHBv
+cnQgaW5zdGVhZD8KCkFzIEkgZXhwbGFpbmVkIGluIHRoZSBvdGhlciB0aHJlYWQsIHdlIG5lZWQg
+dGhlIHNpemUgYXMgc29vbiBhcyB0aGUgVk0KaXMgY3JlYXRlZC4gVGhlIG1ham9yIGNoYWxsZW5n
+ZSBpcyBrZWVwaW5nIHRoZSBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGJ5Cm1hcHBpbmcgMCB0byA0
+MGJpdHMuIEkgd2lsbCBnaXZlIGl0IGEgdGhvdWdodC4KClN1enVraQoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5n
+IGxpc3QKbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5p
+bmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
