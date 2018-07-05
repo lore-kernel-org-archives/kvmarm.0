@@ -1,19 +1,33 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v4 6/7] KVM: arm64: Update age handlers to support PUD hugepages
-Date: Thu,  5 Jul 2018 15:08:49 +0100
-Message-ID: <20180705140850.5801-7-punit.agrawal@arm.com>
+Subject: [PATCH v4 4/7] KVM: arm64: Support PUD hugepage in stage2_is_exec()
+Date: Thu,  5 Jul 2018 15:08:47 +0100
+Message-ID: <20180705140850.5801-5-punit.agrawal@arm.com>
 References: <20180705140850.5801-1-punit.agrawal@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180705140850.5801-1-punit.agrawal@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: kvmarm@lists.cs.columbia.edu
-Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for creating larger hugepages at Stage 2, add support
-to the age handling notifiers for PUD hugepages when encountered.
+In preparation for creating PUD hugepages at stage 2, add support for
+detecting execute permissions on PUD page table entries. Faults due to
+lack of execute permissions on page table entries is used to perform
+i-cache invalidation on first execute.
 
-Provide trivial helpers for arm32 to allow sharing code.
+Provide trivial implementations of arm32 helpers to allow sharing of
+code.
 
 Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
 Cc: Christoffer Dall <christoffer.dall@arm.com>
@@ -22,21 +36,21 @@ Cc: Russell King <linux@armlinux.org.uk>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |  6 ++++++
- arch/arm64/include/asm/kvm_mmu.h |  5 +++++
- arch/arm64/include/asm/pgtable.h |  1 +
- virt/kvm/arm/mmu.c               | 29 +++++++++++++++++++++++++----
- 4 files changed, 37 insertions(+), 4 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h         |  6 ++++++
+ arch/arm64/include/asm/kvm_mmu.h       |  5 +++++
+ arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
+ virt/kvm/arm/mmu.c                     | 10 +++++++++-
+ 4 files changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index a4298d429efc..8e1e8aee229e 100644
+index c23722f75d5c..d05c8986e495 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -110,6 +110,12 @@ static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
- 	return pud;
+@@ -96,6 +96,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
  }
  
-+static inline bool kvm_s2pud_young(pud_t pud)
+ 
++static inline bool kvm_s2pud_exec(pud_t *pud)
 +{
 +	BUG();
 +	return false;
@@ -46,92 +60,57 @@ index a4298d429efc..8e1e8aee229e 100644
  {
  	*pmd = new_pmd;
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 4d2780c588b0..c542052fb199 100644
+index 84051930ddfe..15bc1be8f82f 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -261,6 +261,11 @@ static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
- 	return pud_mkyoung(pud);
+@@ -249,6 +249,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+ 	return kvm_s2pte_readonly((pte_t *)pudp);
  }
  
-+static inline bool kvm_s2pud_young(pud_t pud)
++static inline bool kvm_s2pud_exec(pud_t *pudp)
 +{
-+	return pud_young(pud);
++	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
 +}
 +
  static inline bool kvm_page_empty(void *ptr)
  {
  	struct page *ptr_page = virt_to_page(ptr);
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index a64a5c35beb1..4d9476e420d9 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -385,6 +385,7 @@ static inline int pmd_protnone(pmd_t pmd)
- #define pfn_pmd(pfn,prot)	__pmd(__phys_to_pmd_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
- #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index fd208eac9f2a..10ae592b78b8 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -193,6 +193,8 @@
+ #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+ #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
  
-+#define pud_young(pud)		pte_young(pud_pte(pud))
- #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
- #define pud_write(pud)		pte_write(pud_pte(pud))
- 
++#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
++
+ /*
+  * Memory Attribute override for Stage-2 (MemAttr[3:0])
+  */
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 94a91bcdd152..0c04c64e858c 100644
+index db04b18218c1..ccdea0edabb3 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1141,6 +1141,11 @@ static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
- 	return stage2_ptep_test_and_clear_young((pte_t *)pmd);
- }
+@@ -1040,10 +1040,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
  
-+static int stage2_pudp_test_and_clear_young(pud_t *pud)
-+{
-+	return stage2_ptep_test_and_clear_young((pte_t *)pud);
-+}
-+
- /**
-  * kvm_phys_addr_ioremap - map a device range to guest IPA
-  *
-@@ -1860,11 +1865,19 @@ void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- 
- static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+ static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
  {
-+	pud_t *pud;
- 	pmd_t *pmd;
- 	pte_t *pte;
++	pud_t *pudp;
+ 	pmd_t *pmdp;
+ 	pte_t *ptep;
  
--	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
--	pmd = stage2_get_pmd(kvm, NULL, gpa);
-+	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
-+	pud = stage2_get_pud(kvm, NULL, gpa);
-+	if (!pud || pud_none(*pud))	/* Nothing there */
-+		return 0;
+-	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	pudp = stage2_get_pud(kvm, NULL, addr);
++	if (!pudp || pud_none(*pudp) || !pud_present(*pudp))
++		return false;
 +
-+	if (pud_huge(*pud))		/* HugeTLB */
-+		return stage2_pudp_test_and_clear_young(pud);
++	if (pud_huge(*pudp))
++		return kvm_s2pud_exec(pudp);
 +
-+	pmd = stage2_pmd_offset(pud, gpa);
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
- 
-@@ -1880,11 +1893,19 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- 
- static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- {
-+	pud_t *pud;
- 	pmd_t *pmd;
- 	pte_t *pte;
- 
--	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
--	pmd = stage2_get_pmd(kvm, NULL, gpa);
-+	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
-+	pud = stage2_get_pud(kvm, NULL, gpa);
-+	if (!pud || pud_none(*pud))	/* Nothing there */
-+		return 0;
-+
-+	if (pud_huge(*pud))		/* HugeTLB */
-+		return kvm_s2pud_young(*pud);
-+
-+	pmd = stage2_pmd_offset(pud, gpa);
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
++	pmdp = stage2_pmd_offset(pudp, addr);
+ 	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
+ 		return false;
  
 -- 
 2.17.1
