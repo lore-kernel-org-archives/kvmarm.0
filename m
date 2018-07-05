@@ -1,138 +1,79 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvmtool test PATCH 22/24] kvmtool: arm64: Add support for guest
- physical address size
-Date: Thu, 5 Jul 2018 16:37:43 +0200
-Message-ID: <52eb61a0-e114-14ac-8f5e-fa99f566d1cb@redhat.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
- <20180704140943.GF4828@arm.com>
- <8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
- <20180704155231.GP4828@arm.com>
- <ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
- <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
- <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
- <29208b59-0224-00d2-0e2a-6f53a0cbc963@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v5 00/20] APEI in_nmi() rework and arm64 SDEI wire-up
+Date: Thu, 5 Jul 2018 16:42:51 +0100
+Message-ID: <1246af75-eaf4-e306-2276-65859be053e6@arm.com>
+References: <20180626170116.25825-1-james.morse@arm.com>
+ <4409985.sv3PbRGN0l@aspire.rjw.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <29208b59-0224-00d2-0e2a-6f53a0cbc963@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: cdall@kernel.org, kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <4409985.sv3PbRGN0l@aspire.rjw.lan>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>
+Cc: jonathan.zhang@cavium.com, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki, Marc,
+Hi guys,
 
-On 07/05/2018 04:15 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 05/07/18 14:46, Auger Eric wrote:
->> Hi Marc,
+On 05/07/18 10:50, Rafael J. Wysocki wrote:
+> On Tuesday, June 26, 2018 7:00:56 PM CEST James Morse wrote:
+>> The aim of this series is to wire arm64's SDEI into APEI.
 >>
->> On 07/05/2018 03:20 PM, Marc Zyngier wrote:
->>> On 05/07/18 13:47, Julien Grall wrote:
->>>> Hi Will,
->>>>
->>>> On 04/07/18 16:52, Will Deacon wrote:
->>>>> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
->>>>>> On 04/07/18 15:09, Will Deacon wrote:
->>>>>>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
->>>>>>>> Add an option to specify the physical address size used by this
->>>>>>>> VM.
->>>>>>>>
->>>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>>>> ---
->>>>>>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>>>>>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
->>>>>>>>   2 files changed, 5 insertions(+), 1 deletion(-)
->>>>>>>>
->>>>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>>> index 04be43d..dabd22c 100644
->>>>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>>>> @@ -8,7 +8,10 @@
->>>>>>>>   			"Create PMUv3 device"),				\
->>>>>>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>>>>>>>   			"Specify random seed for Kernel Address Space "	\
->>>>>>>> -			"Layout Randomization (KASLR)"),
->>>>>>>> +			"Layout Randomization (KASLR)"),		\
->>>>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
->>>>>>>> +			"Specify maximum physical address size (not "	\
->>>>>>>> +			"the amount of memory)"),
->>>>>>>
->>>>>>> Given that this is a shift value, I think the help message could be more
->>>>>>> informative. Something like:
->>>>>>>
->>>>>>> 	"Specify maximum number of bits in a guest physical address"
->>>>>>>
->>>>>>> I think I'd actually leave out any mention of memory, because this does
->>>>>>> actually have an effect on the amount of addressable memory in a way that I
->>>>>>> don't think we want to describe in half of a usage message line :)
->>>>>> Is there any particular reasons to expose this option to the user?
->>>>>>
->>>>>> I have recently sent a series to allow the user to specify the position
->>>>>> of the RAM [1]. With that series in mind, I think the user would not really
->>>>>> need to specify the maximum physical shift. Instead we could automatically
->>>>>> find it.
->>>>>
->>>>> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
->>>>> to understand whether we can do something differently there and avoid
->>>>> sacrificing the type parameter.
->>>>
->>>> I am not sure to understand this. kvmtools knows the memory layout 
->>>> (including MMIOs) of the guest, so couldn't it guess the maximum 
->>>> physical shift for that?
->>>
->>> That's exactly what Will was trying to avoid, by having KVM to compute
->>> the size of the IPA space based on the registered memslots. We've now
->>> established that it doesn't work, so what we need to define is:
->>>
->>> - whether we need another ioctl(), or do we carry on piggy-backing on
->>> the CPU type,
->> kvm type I guess
-> 
-> I really meant target here. Whatever you pass as a "-cpu" on your QEMU
-> command line.
-Oh OK. It was not a slip then ;-)
-> 
->>> - assuming the latter, whether we can reduce the number of bits used in
->>> the ioctl parameter by subtly encoding the IPA size.
->> Getting benefit from your Freudian slip, how should guest CPU PARange
->> and maximum number of bits in a guest physical address relate?
-> 
-> Freudian? I'm not on the sofa yet... ;-)
-> 
->> My understanding is they are not correlated at the moment and our guest
->> PARange is fixed at the moment. But shouldn't they?
+>> On arm64 we have three APEI notifications that are NMI-like, and
+>> in the unlikely event that all three are supported by a platform,
+>> they can interrupt each other.
+>> The GHES driver shouldn't have to deal with this, so this series aims
+>> to make it re-entrant.
 >>
->> On Intel there is
->>    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
->> or
->>    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
+>> To do that, we refactor the estatus queue to allow multiple notifications
+>> to use it, then convert NOTIFY_SEA to always be described as NMI-like,
+>> and to use the estatus queue.
 >>
->> where phys-bits, as far as I understand has a a similar semantics as the
->> PARange.
-> 
-> I think there is value in having it global, just like on x86. We don't
-> really support heterogeneous guests anyway.
+>> From here we push the locking and fixmap choices out to the notification
+>> functions, and remove the use of per-ghes estatus and flags. This removes
+>> the in_nmi() 'timebomb' in ghes_copy_tofrom_phys().
+>>
+>> Things get sticky when an NMI notification needs to know how big the
+>> CPER records might be, before reading it. This series splits
+>> ghes_estatus_read() to let us peek at the buffer. A side effect of this
+>> is the 20byte header will get read twice. (how does it work today? it
+>> reads the records into a per-ghes worst-case sized buffer, allocates
+>> the correct size and copies the records. in_nmi() use of this per-ghes
+>> buffer needs eliminating).
+>>
+>> One alternative was to trust firmware's 'max raw data length' and use
+>> that to allocate 'enough' memory. We don't use this value today, so its
+>> probably wrong on some sytem somewhere.
+>>
+>> Since v4 patches 5,8-15 are new, otherwise changes are noted in the patch.
 
-Assuming we would use such a ",phys-bits=n" cpu option, is my
-understanding correct that it would set both
-- guest CPU PARange an
-- maximum number of bits in a guest physical address
-to n?
+> Tony, I need your help with reviewing the APEI-related material here.
+> Can you please have a look at this series and let me know if there are
+> any concerns regarding it?
 
-Thanks
+Thanks.
 
-Eric
-> 
-> Independently, we should also repaint/satinize PARange so that the guest
-> observes the same thing, no matter what CPU it runs on (an A53/A57
-> system could be confusing in that respect).
+I think the only context from earlier versions is where Borislav spotted some
+issues with the ghes_proc() call at probe time and NMI-like notifications.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+>From https://www.spinics.net/lists/arm-kernel/msg653332.html :
+| Which means, that this code is not really reentrant and if should be
+| fixed to be callable from different contexts, then it should use private
+| buffers and be careful about locking.
+
+... the patches for which have bloated this series.
+
+
+Thanks,
+
+James
