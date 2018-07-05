@@ -1,60 +1,156 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvmtool test PATCH 24/24] kvmtool: arm: Add support for creating
- VM with PA size
-Date: Thu, 5 Jul 2018 09:58:50 +0200
-Message-ID: <c04ac446-ec16-6ec9-383a-e93f0e2d7275@redhat.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-25-git-send-email-suzuki.poulose@arm.com>
- <20180704142241.GG4828@arm.com> <8636wzysfl.wl-marc.zyngier@arm.com>
- <20180704155123.GO4828@arm.com>
- <CAFEAcA9wgnbK8PHMvksezHqgN1BQZd_+sxXCe85AW+E+cfrcXg@mail.gmail.com>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [PATCH v5 00/20] APEI in_nmi() rework and arm64 SDEI wire-up
+Date: Thu, 05 Jul 2018 11:50:33 +0200
+Message-ID: <4409985.sv3PbRGN0l@aspire.rjw.lan>
+References: <20180626170116.25825-1-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA9wgnbK8PHMvksezHqgN1BQZd_+sxXCe85AW+E+cfrcXg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>, Will Deacon <will.deacon@arm.com>
-Cc: Christoffer Dall <cdall@kernel.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180626170116.25825-1-james.morse@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>, Tony Luck <tony.luck@intel.com>
+Cc: jonathan.zhang@cavium.com, Punit Agrawal <punit.agrawal@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 07/05/2018 09:51 AM, Peter Maydell wrote:
-> On 4 July 2018 at 16:51, Will Deacon <will.deacon@arm.com> wrote:
->> On Wed, Jul 04, 2018 at 03:41:18PM +0100, Marc Zyngier wrote:
->>> Not really. Let's say I want my IPA space split in two: memory covers
->>> the low 47 bit, and I want MMIO spanning the top 47 bit. With your
->>> scheme, you'd end-up with a 47bit IPA space, while you really want 48
->>> bits (MMIO space implemented by userspace isn't registered to the
->>> kernel).
->>
->> That still sounds quite niche for a VM. Does QEMU do that?
+On Tuesday, June 26, 2018 7:00:56 PM CEST James Morse wrote:
+> The aim of this series is to wire arm64's SDEI into APEI.
 > 
-> Not at 47 bits, but we have RAM up to the 256GB mark, and
-> MMIO above that (including a large PCI window), so the general
-> arrangement of having the top end of the IPA space not
-> necessarily be things we've told the kernel about definitely
-> exists.
-
-Is this document (2012) still a reference document?
-http://infocenter.arm.com/help/topic/com.arm.doc.den0001c/DEN0001C_principles_of_arm_memory_maps.pdf
-(especially Fig 5?)
-
-Peter, comments in QEMU hw/arm/virt.c suggested next RAM chunk should be
-added at 2TB. This doc suggests to put it at 8TB. I understand the PA
-memory map only is suggested but shouldn't we align?
-
-Thanks
-
-Eric
-
-
+> On arm64 we have three APEI notifications that are NMI-like, and
+> in the unlikely event that all three are supported by a platform,
+> they can interrupt each other.
+> The GHES driver shouldn't have to deal with this, so this series aims
+> to make it re-entrant.
 > 
-> thanks
-> -- PMM
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> To do that, we refactor the estatus queue to allow multiple notifications
+> to use it, then convert NOTIFY_SEA to always be described as NMI-like,
+> and to use the estatus queue.
 > 
+> From here we push the locking and fixmap choices out to the notification
+> functions, and remove the use of per-ghes estatus and flags. This removes
+> the in_nmi() 'timebomb' in ghes_copy_tofrom_phys().
+> 
+> Things get sticky when an NMI notification needs to know how big the
+> CPER records might be, before reading it. This series splits
+> ghes_estatus_read() to let us peek at the buffer. A side effect of this
+> is the 20byte header will get read twice. (how does it work today? it
+> reads the records into a per-ghes worst-case sized buffer, allocates
+> the correct size and copies the records. in_nmi() use of this per-ghes
+> buffer needs eliminating).
+> 
+> One alternative was to trust firmware's 'max raw data length' and use
+> that to allocate 'enough' memory. We don't use this value today, so its
+> probably wrong on some sytem somewhere.
+> 
+> Since v4 patches 5,8-15 are new, otherwise changes are noted in the patch.
+> 
+> 
+> The earlier boiler-plate:
+> 
+> What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
+> used by firmware to tell the OS about firmware-first RAS events.
+> 
+> These Software exceptions can interrupt anything, so I describe them as
+> NMI-like. They aren't the only NMI-like way to notify the OS about
+> firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
+> 'NOTIFY_SEI'.
+> 
+> (Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
+> but the owner of that memory said no. These are always synchronous with the
+> instruction that caused them. SEI, System-Error Interrupt, commonly called
+> SError. This is an asynchronous external abort, the memory-owner didn't say no
+> at the right point. Collectively these things are called external-aborts
+> How is firmware involved? It traps these and re-injects them into the kernel
+> once its written the CPER records).
+> 
+> APEI's GHES code only expects one source of NMI. If a platform implements
+> more than one of these mechanisms, APEI needs to handle the interaction.
+> 'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
+> with itself: its exceptions can be 'normal' or 'critical', and firmware
+> could use both types for RAS. (errors using normal, 'panic-now' using
+> critical).
+> 
+> 
+> ghes.c became clearer to me when I worked out that it has three sets of
+> functions with 'estatus' in the name. One is a pool of memory that can be
+> allocated-from atomically. This is grown/shrunk when new NMI users are
+> allocated.
+> The second is the estatus-cache, which holds recent notifications so it
+> can suppress notifications we've already handled.
+> The last it the estatus-queue, which holds data from NMI-like notifications
+> (in pool memory) to be processed from irq_work.
+> 
+> 
+> Testing?
+> Tested with the SDEI FVP based software model and a mocked up NOTFIY_SEA using
+> KVM. I've added a case where 'corrected errors' are discovered at probe time
+> to exercise ghes_probe() during boot. I've only build tested this on x86.
+> 
+> This series based on v4.18-rc2 can be retrieved from:
+> git://linux-arm.org/linux-jm.git -b apei_sdei/v5
+> 
+> 
+> Thanks,
+> 
+> James
+> 
+> [0] http://infocenter.arm.com/help/topic/com.arm.doc.den0054a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+> 
+> James Morse (20):
+>   ACPI / APEI: Move the estatus queue code up, and under its own ifdef
+>   ACPI / APEI: Generalise the estatus queue's add/remove and notify code
+>   ACPI / APEI: don't wait to serialise with oops messages when
+>     panic()ing
+>   ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+>   ACPI / APEI: Make estatus queue a Kconfig symbol
+>   KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+>   arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+>   ACPI / APEI: Move locking to the notification helper
+>   ACPI / APEI: Let the notification helper specify the fixmap slot
+>   ACPI / APEI: preparatory split of ghes->estatus
+>   ACPI / APEI: Remove silent flag from ghes_read_estatus()
+>   ACPI / APEI: Don't store CPER records physical address in struct ghes
+>   ACPI / APEI: Don't update struct ghes' flags in read/clear estatus
+>   ACPI / APEI: Split ghes_read_estatus() to read CPER length
+>   ACPI / APEI: Only use queued estatus entry during _in_nmi_notify_one()
+>   ACPI / APEI: Split fixmap pages for arm64 NMI-like notifications
+>   firmware: arm_sdei: Add ACPI GHES registration helper
+>   ACPI / APEI: Add support for the SDEI GHES Notification type
+>   mm/memory-failure: increase queued recovery work's priority
+>   arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+> 
+>  arch/arm/include/asm/kvm_ras.h       |  14 +
+>  arch/arm/include/asm/system_misc.h   |   5 -
+>  arch/arm64/include/asm/acpi.h        |   4 +
+>  arch/arm64/include/asm/daifflags.h   |   1 +
+>  arch/arm64/include/asm/fixmap.h      |   8 +-
+>  arch/arm64/include/asm/kvm_ras.h     |  25 ++
+>  arch/arm64/include/asm/system_misc.h |   2 -
+>  arch/arm64/kernel/acpi.c             |  49 ++
+>  arch/arm64/mm/fault.c                |  30 +-
+>  drivers/acpi/apei/Kconfig            |  11 +
+>  drivers/acpi/apei/ghes.c             | 649 ++++++++++++++++-----------
+>  drivers/firmware/Kconfig             |   1 +
+>  drivers/firmware/arm_sdei.c          |  66 +++
+>  include/acpi/ghes.h                  |   2 -
+>  include/linux/arm_sdei.h             |   9 +
+>  mm/memory-failure.c                  |  11 +-
+>  virt/kvm/arm/mmu.c                   |   4 +-
+>  17 files changed, 591 insertions(+), 300 deletions(-)
+>  create mode 100644 arch/arm/include/asm/kvm_ras.h
+>  create mode 100644 arch/arm64/include/asm/kvm_ras.h
+
+Tony, I need your help with reviewing the APEI-related material here.
+Can you please have a look at this series and let me know if there are
+any concerns regarding it?
+
+Thanks,
+Rafael
