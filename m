@@ -1,8 +1,8 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [kvmtool test PATCH 22/24] kvmtool: arm64: Add support for guest
  physical address size
-Date: Thu, 5 Jul 2018 15:12:48 +0100
-Message-ID: <5790744f-a8bd-3a44-8e8d-bc3e05b74ce5@arm.com>
+Date: Thu, 5 Jul 2018 15:15:46 +0100
+Message-ID: <29208b59-0224-00d2-0e2a-6f53a0cbc963@arm.com>
 References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
  <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
  <20180704140943.GF4828@arm.com>
@@ -12,15 +12,17 @@ References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
  <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
  <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
-Content-Language: en-US
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
+
+Hi Eric,
 
 On 05/07/18 14:46, Auger Eric wrote:
 > Hi Marc,
@@ -38,18 +40,18 @@ On 05/07/18 14:46, Auger Eric wrote:
 >>>>>>>
 >>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>>>>>> ---
->>>>>>>    arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>>>>>>    arm/include/arm-common/kvm-config-arch.h  | 1 +
->>>>>>>    2 files changed, 5 insertions(+), 1 deletion(-)
+>>>>>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
+>>>>>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
+>>>>>>>   2 files changed, 5 insertions(+), 1 deletion(-)
 >>>>>>>
 >>>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
 >>>>>>> index 04be43d..dabd22c 100644
 >>>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
 >>>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
 >>>>>>> @@ -8,7 +8,10 @@
->>>>>>>    			"Create PMUv3 device"),				\
->>>>>>>    	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>>>>>>    			"Specify random seed for Kernel Address Space "	\
+>>>>>>>   			"Create PMUv3 device"),				\
+>>>>>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>>>>>>>   			"Specify random seed for Kernel Address Space "	\
 >>>>>>> -			"Layout Randomization (KASLR)"),
 >>>>>>> +			"Layout Randomization (KASLR)"),		\
 >>>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
@@ -75,8 +77,8 @@ On 05/07/18 14:46, Auger Eric wrote:
 >>>> to understand whether we can do something differently there and avoid
 >>>> sacrificing the type parameter.
 >>>
->>> I am not sure to understand this. kvmtools knows the memory layout
->>> (including MMIOs) of the guest, so couldn't it guess the maximum
+>>> I am not sure to understand this. kvmtools knows the memory layout 
+>>> (including MMIOs) of the guest, so couldn't it guess the maximum 
 >>> physical shift for that?
 >>
 >> That's exactly what Will was trying to avoid, by having KVM to compute
@@ -87,50 +89,36 @@ On 05/07/18 14:46, Auger Eric wrote:
 >> the CPU type,
 > kvm type I guess
 
-machine type is more appropriate, going by the existing users.
+I really meant target here. Whatever you pass as a "-cpu" on your QEMU
+command line.
 
 >> - assuming the latter, whether we can reduce the number of bits used in
 >> the ioctl parameter by subtly encoding the IPA size.
 > Getting benefit from your Freudian slip, how should guest CPU PARange
 > and maximum number of bits in a guest physical address relate?
-> 
+
+Freudian? I'm not on the sofa yet... ;-)
+
 > My understanding is they are not correlated at the moment and our guest
 > PARange is fixed at the moment. But shouldn't they?
 > 
 > On Intel there is
->     qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
+>    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
 > or
->     qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
+>    qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
 > 
 > where phys-bits, as far as I understand has a a similar semantics as the
 > PARange.
 
+I think there is value in having it global, just like on x86. We don't
+really support heterogeneous guests anyway.
 
-AFAIT, PARange tells you the maximum (I)Physcial Address that can be handled
-by the CPU. But your IPA limit tells you where the guest RAM is placed.
-So they need not be the same. e.g, on Juno, A57's have a PARange of 42 if I am
-not wrong (but definitely > 40), while A53's have it at 40 and the system RAM
-is at 40bits.
+Independently, we should also repaint/satinize PARange so that the guest
+observes the same thing, no matter what CPU it runs on (an A53/A57
+system could be confusing in that respect).
 
-So, if we were to only use the A57s on Juno, we could run a KVM instance with 42
-bits IPA or anything lower. So, PARange can be inferred as the maximum limit
-of the CPU's capability while the IPA is where the RAM is placed for a given
-system.
-One could keep them in sync for a VM by emulating, but then nobody
-uses the PARange, except the KVM. The other problem with capping PARange in the VM
-to IPA is restricting the IPA size of a nested VM. So, I don't think this is
-really beneficial.
+Thanks,
 
-Cheers
-Suzuki
-
-
-> 
-> Thanks
-> 
-> Eric
->>
->> Thanks,
->>
->> 	M.
->>
+	M.
+-- 
+Jazz is not dead. It just smells funny...
