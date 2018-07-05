@@ -1,116 +1,136 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v4 4/7] KVM: arm64: Support PUD hugepage in stage2_is_exec()
-Date: Thu,  5 Jul 2018 15:08:47 +0100
-Message-ID: <20180705140850.5801-5-punit.agrawal@arm.com>
-References: <20180705140850.5801-1-punit.agrawal@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [kvmtool test PATCH 22/24] kvmtool: arm64: Add support for guest
+ physical address size
+Date: Thu, 5 Jul 2018 15:12:48 +0100
+Message-ID: <5790744f-a8bd-3a44-8e8d-bc3e05b74ce5@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
+ <20180704140943.GF4828@arm.com>
+ <8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
+ <20180704155231.GP4828@arm.com>
+ <ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
+ <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
+ <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180705140850.5801-1-punit.agrawal@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Will Deacon <will.deacon@arm.com>, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for creating PUD hugepages at stage 2, add support for
-detecting execute permissions on PUD page table entries. Faults due to
-lack of execute permissions on page table entries is used to perform
-i-cache invalidation on first execute.
+On 05/07/18 14:46, Auger Eric wrote:
+> Hi Marc,
+> 
+> On 07/05/2018 03:20 PM, Marc Zyngier wrote:
+>> On 05/07/18 13:47, Julien Grall wrote:
+>>> Hi Will,
+>>>
+>>> On 04/07/18 16:52, Will Deacon wrote:
+>>>> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
+>>>>> On 04/07/18 15:09, Will Deacon wrote:
+>>>>>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
+>>>>>>> Add an option to specify the physical address size used by this
+>>>>>>> VM.
+>>>>>>>
+>>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>>>> ---
+>>>>>>>    arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
+>>>>>>>    arm/include/arm-common/kvm-config-arch.h  | 1 +
+>>>>>>>    2 files changed, 5 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>>>> index 04be43d..dabd22c 100644
+>>>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>>>>> @@ -8,7 +8,10 @@
+>>>>>>>    			"Create PMUv3 device"),				\
+>>>>>>>    	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>>>>>>>    			"Specify random seed for Kernel Address Space "	\
+>>>>>>> -			"Layout Randomization (KASLR)"),
+>>>>>>> +			"Layout Randomization (KASLR)"),		\
+>>>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
+>>>>>>> +			"Specify maximum physical address size (not "	\
+>>>>>>> +			"the amount of memory)"),
+>>>>>>
+>>>>>> Given that this is a shift value, I think the help message could be more
+>>>>>> informative. Something like:
+>>>>>>
+>>>>>> 	"Specify maximum number of bits in a guest physical address"
+>>>>>>
+>>>>>> I think I'd actually leave out any mention of memory, because this does
+>>>>>> actually have an effect on the amount of addressable memory in a way that I
+>>>>>> don't think we want to describe in half of a usage message line :)
+>>>>> Is there any particular reasons to expose this option to the user?
+>>>>>
+>>>>> I have recently sent a series to allow the user to specify the position
+>>>>> of the RAM [1]. With that series in mind, I think the user would not really
+>>>>> need to specify the maximum physical shift. Instead we could automatically
+>>>>> find it.
+>>>>
+>>>> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
+>>>> to understand whether we can do something differently there and avoid
+>>>> sacrificing the type parameter.
+>>>
+>>> I am not sure to understand this. kvmtools knows the memory layout
+>>> (including MMIOs) of the guest, so couldn't it guess the maximum
+>>> physical shift for that?
+>>
+>> That's exactly what Will was trying to avoid, by having KVM to compute
+>> the size of the IPA space based on the registered memslots. We've now
+>> established that it doesn't work, so what we need to define is:
+>>
+>> - whether we need another ioctl(), or do we carry on piggy-backing on
+>> the CPU type,
+> kvm type I guess
 
-Provide trivial implementations of arm32 helpers to allow sharing of
-code.
+machine type is more appropriate, going by the existing users.
 
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
----
- arch/arm/include/asm/kvm_mmu.h         |  6 ++++++
- arch/arm64/include/asm/kvm_mmu.h       |  5 +++++
- arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
- virt/kvm/arm/mmu.c                     | 10 +++++++++-
- 4 files changed, 22 insertions(+), 1 deletion(-)
+>> - assuming the latter, whether we can reduce the number of bits used in
+>> the ioctl parameter by subtly encoding the IPA size.
+> Getting benefit from your Freudian slip, how should guest CPU PARange
+> and maximum number of bits in a guest physical address relate?
+> 
+> My understanding is they are not correlated at the moment and our guest
+> PARange is fixed at the moment. But shouldn't they?
+> 
+> On Intel there is
+>     qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
+> or
+>     qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
+> 
+> where phys-bits, as far as I understand has a a similar semantics as the
+> PARange.
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index c23722f75d5c..d05c8986e495 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -96,6 +96,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
- }
- 
- 
-+static inline bool kvm_s2pud_exec(pud_t *pud)
-+{
-+	BUG();
-+	return false;
-+}
-+
- static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
- {
- 	*pmd = new_pmd;
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 84051930ddfe..15bc1be8f82f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -249,6 +249,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
- 	return kvm_s2pte_readonly((pte_t *)pudp);
- }
- 
-+static inline bool kvm_s2pud_exec(pud_t *pudp)
-+{
-+	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
-+}
-+
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index fd208eac9f2a..10ae592b78b8 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -193,6 +193,8 @@
- #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
- #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
- 
-+#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
-+
- /*
-  * Memory Attribute override for Stage-2 (MemAttr[3:0])
-  */
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index db04b18218c1..ccdea0edabb3 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1040,10 +1040,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- 
- static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
- {
-+	pud_t *pudp;
- 	pmd_t *pmdp;
- 	pte_t *ptep;
- 
--	pmdp = stage2_get_pmd(kvm, NULL, addr);
-+	pudp = stage2_get_pud(kvm, NULL, addr);
-+	if (!pudp || pud_none(*pudp) || !pud_present(*pudp))
-+		return false;
-+
-+	if (pud_huge(*pudp))
-+		return kvm_s2pud_exec(pudp);
-+
-+	pmdp = stage2_pmd_offset(pudp, addr);
- 	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
- 		return false;
- 
--- 
-2.17.1
+
+AFAIT, PARange tells you the maximum (I)Physcial Address that can be handled
+by the CPU. But your IPA limit tells you where the guest RAM is placed.
+So they need not be the same. e.g, on Juno, A57's have a PARange of 42 if I am
+not wrong (but definitely > 40), while A53's have it at 40 and the system RAM
+is at 40bits.
+
+So, if we were to only use the A57s on Juno, we could run a KVM instance with 42
+bits IPA or anything lower. So, PARange can be inferred as the maximum limit
+of the CPU's capability while the IPA is where the RAM is placed for a given
+system.
+One could keep them in sync for a VM by emulating, but then nobody
+uses the PARange, except the KVM. The other problem with capping PARange in the VM
+to IPA is restricting the IPA size of a nested VM. So, I don't think this is
+really beneficial.
+
+Cheers
+Suzuki
+
+
+> 
+> Thanks
+> 
+> Eric
+>>
+>> Thanks,
+>>
+>> 	M.
+>>
