@@ -1,109 +1,75 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvmtool test PATCH 22/24] kvmtool: arm64: Add support for guest
- physical address size
-Date: Thu, 5 Jul 2018 15:46:50 +0200
-Message-ID: <bd5186ce-66ab-e2fa-3531-46a4a87b84d8@redhat.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-23-git-send-email-suzuki.poulose@arm.com>
- <20180704140943.GF4828@arm.com>
- <8c9bb3cd-f673-17f3-656f-66b7e14fc73c@arm.com>
- <20180704155231.GP4828@arm.com>
- <ca05f552-d0d7-b5b8-954b-7254e8c1e529@arm.com>
- <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH v4 0/7] KVM: Support PUD hugepages at stage 2
+Date: Thu,  5 Jul 2018 15:08:43 +0100
+Message-ID: <20180705140850.5801-1-punit.agrawal@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <d0c005f8-eae4-3784-1ebc-d279df4ee608@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Julien Grall <julien.grall@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, cdall@kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, qemu-devel@nongnu.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+This series is an update to the PUD hugepage support previously posted
+at [0][1][2][3]. This patchset adds support for PUD hugepages at stage
+2. This feature is useful on cores that have support for large sized
+TLB mappings (e.g., 1GB for 4K granule).
 
-On 07/05/2018 03:20 PM, Marc Zyngier wrote:
-> On 05/07/18 13:47, Julien Grall wrote:
->> Hi Will,
->>
->> On 04/07/18 16:52, Will Deacon wrote:
->>> On Wed, Jul 04, 2018 at 04:00:11PM +0100, Julien Grall wrote:
->>>> On 04/07/18 15:09, Will Deacon wrote:
->>>>> On Fri, Jun 29, 2018 at 12:15:42PM +0100, Suzuki K Poulose wrote:
->>>>>> Add an option to specify the physical address size used by this
->>>>>> VM.
->>>>>>
->>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>>> ---
->>>>>>   arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
->>>>>>   arm/include/arm-common/kvm-config-arch.h  | 1 +
->>>>>>   2 files changed, 5 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>> index 04be43d..dabd22c 100644
->>>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
->>>>>> @@ -8,7 +8,10 @@
->>>>>>   			"Create PMUv3 device"),				\
->>>>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
->>>>>>   			"Specify random seed for Kernel Address Space "	\
->>>>>> -			"Layout Randomization (KASLR)"),
->>>>>> +			"Layout Randomization (KASLR)"),		\
->>>>>> +	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
->>>>>> +			"Specify maximum physical address size (not "	\
->>>>>> +			"the amount of memory)"),
->>>>>
->>>>> Given that this is a shift value, I think the help message could be more
->>>>> informative. Something like:
->>>>>
->>>>> 	"Specify maximum number of bits in a guest physical address"
->>>>>
->>>>> I think I'd actually leave out any mention of memory, because this does
->>>>> actually have an effect on the amount of addressable memory in a way that I
->>>>> don't think we want to describe in half of a usage message line :)
->>>> Is there any particular reasons to expose this option to the user?
->>>>
->>>> I have recently sent a series to allow the user to specify the position
->>>> of the RAM [1]. With that series in mind, I think the user would not really
->>>> need to specify the maximum physical shift. Instead we could automatically
->>>> find it.
->>>
->>> Marc makes a good point that it doesn't help for MMIO regions, so I'm trying
->>> to understand whether we can do something differently there and avoid
->>> sacrificing the type parameter.
->>
->> I am not sure to understand this. kvmtools knows the memory layout 
->> (including MMIOs) of the guest, so couldn't it guess the maximum 
->> physical shift for that?
-> 
-> That's exactly what Will was trying to avoid, by having KVM to compute
-> the size of the IPA space based on the registered memslots. We've now
-> established that it doesn't work, so what we need to define is:
-> 
-> - whether we need another ioctl(), or do we carry on piggy-backing on
-> the CPU type,
-kvm type I guess
-> - assuming the latter, whether we can reduce the number of bits used in
-> the ioctl parameter by subtly encoding the IPA size.
-Getting benefit from your Freudian slip, how should guest CPU PARange
-and maximum number of bits in a guest physical address relate?
+There are a three new patches to support PUD hugepages for execute
+permission faults, access faults and handling aging of PUD page table
+entries (patches 4-6). This addresses Suzuki's feedback on the
+previous version.
 
-My understanding is they are not correlated at the moment and our guest
-PARange is fixed at the moment. But shouldn't they?
+Also, live migration didn't work with earlier versions. This has now
+been addressed by updating patch 1 & 7 to ensure that hugepages are
+dissolved correctly when dirty logging is enabled.
 
-On Intel there is
-   qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,phys-bits=36
-or
-   qemu-system-x86_64 -M pc,accel=kvm -cpu SandyBridge,host-phys-bits=true
+Support is added to code that is shared between arm and arm64. Dummy
+helpers for arm are provided as the port does not support PUD hugepage
+sizes.
 
-where phys-bits, as far as I understand has a a similar semantics as the
-PARange.
+The patches have been tested on an A57 based system. The patchset is
+based on v4.18-rc3. The are a few conflicts with the support for 52
+bit IPA[4] due to change in number of parameters for
+stage2_pmd_offset().
 
-Thanks
+Thanks,
+Punit
 
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
+v3 -> v4:
+* Patch 1 and 7 - Don't put down hugepages pte if logging is enabled
+* Patch 4-5 - Add PUD hugepage support for exec and access faults
+* Patch 6 - PUD hugepage support for aging page table entries
+
+v2 -> v3:
+* Update vma_pagesize directly if THP [1/4]. Previsouly this was done
+  indirectly via hugetlb
+* Added review tag [4/4]
+
+v1 -> v2:
+* Create helper to check if the page should have exec permission [1/4]
+* Fix broken condition to detect THP hugepage [1/4]
+* Fix in-correct hunk resulting from a rebase [4/4]
+
+[0] https://lkml.org/lkml/2018/5/14/907
+[1] https://www.spinics.net/lists/arm-kernel/msg628053.html
+[2] https://lkml.org/lkml/2018/4/20/566
+[3] https://lkml.org/lkml/2018/5/1/133
+[4] https://www.spinics.net/lists/kvm/msg171065.html
+
+Punit Agrawal (7):
+  KVM: arm/arm64: Share common code in user_mem_abort()
+  KVM: arm/arm64: Introduce helpers to manupulate page table entries
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm64: Support PUD hugepage in stage2_is_exec()
+  KVM: arm64: Support handling access faults for PUD hugepages
+  KVM: arm64: Update age handlers to support PUD hugepages
+  KVM: arm64: Add support for creating PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         |  60 +++++++
+ arch/arm64/include/asm/kvm_mmu.h       |  47 ++++++
+ arch/arm64/include/asm/pgtable-hwdef.h |   4 +
+ arch/arm64/include/asm/pgtable.h       |   9 ++
+ virt/kvm/arm/mmu.c                     | 214 ++++++++++++++++++++-----
+ 5 files changed, 291 insertions(+), 43 deletions(-)
+
+-- 
+2.17.1
