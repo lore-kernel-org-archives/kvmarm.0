@@ -1,173 +1,112 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v4 7/7] KVM: arm64: Add support for creating PUD hugepages at stage 2
-Date: Fri, 06 Jul 2018 15:12:28 +0100
-Message-ID: <87k1q8qwqb.fsf@e105922-lin.cambridge.arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v4 7/7] KVM: arm64: Add support for creating PUD hugepages
+ at stage 2
+Date: Fri, 6 Jul 2018 15:23:03 +0100
+Message-ID: <12486745-ffb7-751e-9b2b-ff4722c5fd80@arm.com>
 References: <20180705140850.5801-1-punit.agrawal@arm.com>
-        <20180705140850.5801-8-punit.agrawal@arm.com>
-        <51265e49-8b8f-cabb-d2c9-d776a8a4ace8@arm.com>
+ <20180705140850.5801-8-punit.agrawal@arm.com>
+ <51265e49-8b8f-cabb-d2c9-d776a8a4ace8@arm.com>
+ <87k1q8qwqb.fsf@e105922-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <51265e49-8b8f-cabb-d2c9-d776a8a4ace8@arm.com> (Suzuki
-        K. Poulose's message of "Thu, 5 Jul 2018 18:11:34 +0100")
+In-Reply-To: <87k1q8qwqb.fsf@e105922-lin.cambridge.arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+To: Punit Agrawal <punit.agrawal@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
+Hi Punit,
 
-> Hi Punit,
->
-> On 05/07/18 15:08, Punit Agrawal wrote:
->> KVM only supports PMD hugepages at stage 2. Now that the various page
->> handling routines are updated, extend the stage 2 fault handling to
->> map in PUD hugepages.
+
+On 06/07/18 15:12, Punit Agrawal wrote:
+> Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
+> 
+>> Hi Punit,
 >>
->> Addition of PUD hugepage support enables additional page sizes (e.g.,
->> 1G with 4K granule) which can be useful on cores that support mapping
->> larger block sizes in the TLB entries.
+>> On 05/07/18 15:08, Punit Agrawal wrote:
+>>> KVM only supports PMD hugepages at stage 2. Now that the various page
+>>> handling routines are updated, extend the stage 2 fault handling to
+>>> map in PUD hugepages.
+>>>
+>>> Addition of PUD hugepage support enables additional page sizes (e.g.,
+>>> 1G with 4K granule) which can be useful on cores that support mapping
+>>> larger block sizes in the TLB entries.
+>>>
+>>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>> Cc: Russell King <linux@armlinux.org.uk>
+>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>> Cc: Will Deacon <will.deacon@arm.com>
 >>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 0c04c64e858c..5912210e94d9 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -116,6 +116,25 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
->>   	put_page(virt_to_page(pmd));
->>   }
->>   +/**
->> + * stage2_dissolve_pud() - clear and flush huge PUD entry
->> + * @kvm:	pointer to kvm structure.
->> + * @addr:	IPA
->> + * @pud:	pud pointer for IPA
->> + *
->> + * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs. Marks all
->> + * pages in the range dirty.
->> + */
->> +static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pud)
->> +{
->> +	if (!pud_huge(*pud))
->> +		return;
->> +
->> +	pud_clear(pud);
->
-> You need to use the stage2_ accessors here. The stage2_dissolve_pmd() uses
-> "pmd_" helpers as the PTE entries (level 3) are always guaranteed to exist.
+>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>> index 0c04c64e858c..5912210e94d9 100644
+>>> --- a/virt/kvm/arm/mmu.c
+>>> +++ b/virt/kvm/arm/mmu.c
+>>> @@ -116,6 +116,25 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+>>>    	put_page(virt_to_page(pmd));
+>>>    }
+>>>    +/**
+>>> + * stage2_dissolve_pud() - clear and flush huge PUD entry
+>>> + * @kvm:	pointer to kvm structure.
+>>> + * @addr:	IPA
+>>> + * @pud:	pud pointer for IPA
+>>> + *
+>>> + * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs. Marks all
+>>> + * pages in the range dirty.
+>>> + */
+>>> +static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pud)
+>>> +{
+>>> +	if (!pud_huge(*pud))
+>>> +		return;
+>>> +
+>>> +	pud_clear(pud);
+>>
+>> You need to use the stage2_ accessors here. The stage2_dissolve_pmd() uses
+>> "pmd_" helpers as the PTE entries (level 3) are always guaranteed to exist.
+> 
+> I've fixed this and other uses of the PUD helpers to go via the stage2_
+> accessors.
+> 
+> I've still not quite come to terms with the lack of certain levels at
+> stage 2 vis-a-vis stage 1. I'll be more careful about this going
+> forward.
 
-I've fixed this and other uses of the PUD helpers to go via the stage2_
-accessors.
+I accept that it can be quite confusing. Once we get level independent types
+and table accessors this might be easier. For now, the general rule is stick
+to stage2_ accessors whenever you deal with the stage2 table. Rest should be
+left to the stage2 code to deal with it.
 
-I've still not quite come to terms with the lack of certain levels at
-stage 2 vis-a-vis stage 1. I'll be more careful about this going
-forward.
+> 
+>>> @@ -1572,7 +1631,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>    	if (exec_fault)
+>>>    		invalidate_icache_guest_page(pfn, vma_pagesize);
+>>>    -	if (hugetlb && vma_pagesize == PMD_SIZE) {
+>>> +	if (hugetlb && vma_pagesize == PUD_SIZE) {
+>>
+>> I think we may need to check if the stage2 indeed has 3 levels of
+>> tables to use stage2 PUD. Otherwise, fall back to PTE level mapping
+>> or even PMD huge pages. Also, this cannot be triggered right now,
+>> as we only get PUD hugepages with 4K and we are guaranteed to have
+>> at least 3 levels with 40bit IPA. May be I can take care of it in
+>> the Dynamic IPA series, when we run a guest with say 32bit IPA.
+>> So for now, it is worth adding a comment here.
+> 
+> Good point. I've added the following comment.
+> 
+>      /*
+>       * PUD level may not exist if the guest boots with two
+>       * levels at Stage 2. This configuration is currently
+>       * not supported due to IPA size supported by KVM.
+>       *
+>       * Revisit the assumptions about PUD levels when
+>       * additional IPA sizes are supported by KVM.
+>       */
+> 
 
->
->> +	kvm_tlb_flush_vmid_ipa(kvm, addr);
->> +	put_page(virt_to_page(pud));
->> +}
->> +
->>   static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
->>   				  int min, int max)
->>   {
->> @@ -993,7 +1012,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->>   	pmd_t *pmd;
->>     	pud = stage2_get_pud(kvm, cache, addr);
->> -	if (!pud)
->> +	if (!pud || pud_huge(*pud))
->>   		return NULL;
->
-> Same here.
->
->>     	if (stage2_pud_none(*pud)) {
->
-> Like this ^
->
->> @@ -1038,6 +1057,26 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->>   	return 0;
->>   }
->>   +static int stage2_set_pud_huge(struct kvm *kvm, struct
->> kvm_mmu_memory_cache *cache,
->> +			       phys_addr_t addr, const pud_t *new_pud)
->> +{
->> +	pud_t *pud, old_pud;
->> +
->> +	pud = stage2_get_pud(kvm, cache, addr);
->> +	VM_BUG_ON(!pud);
->> +
->> +	old_pud = *pud;
->> +	if (pud_present(old_pud)) {
->> +		pud_clear(pud);
->> +		kvm_tlb_flush_vmid_ipa(kvm, addr);
->
-> Same here.
->
->> +	} else {
->> +		get_page(virt_to_page(pud));
->> +	}
->> +
->> +	kvm_set_pud(pud, *new_pud);
->> +	return 0;
->> +}
->> +
->>   static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
->>   {
->>   	pud_t *pudp;
+Yep, that looks fine to me.
 
-[...]
-
->> @@ -1572,7 +1631,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	if (exec_fault)
->>   		invalidate_icache_guest_page(pfn, vma_pagesize);
->>   -	if (hugetlb && vma_pagesize == PMD_SIZE) {
->> +	if (hugetlb && vma_pagesize == PUD_SIZE) {
->
-> I think we may need to check if the stage2 indeed has 3 levels of
-> tables to use stage2 PUD. Otherwise, fall back to PTE level mapping
-> or even PMD huge pages. Also, this cannot be triggered right now,
-> as we only get PUD hugepages with 4K and we are guaranteed to have
-> at least 3 levels with 40bit IPA. May be I can take care of it in
-> the Dynamic IPA series, when we run a guest with say 32bit IPA.
-> So for now, it is worth adding a comment here.
-
-Good point. I've added the following comment.
-
-    /*
-     * PUD level may not exist if the guest boots with two
-     * levels at Stage 2. This configuration is currently
-     * not supported due to IPA size supported by KVM.
-     *
-     * Revisit the assumptions about PUD levels when
-     * additional IPA sizes are supported by KVM.
-     */
-
-Let me know if looks OK to you.
-
-Thanks a lot for reviewing the patches.
-
-Punit
-
->
->> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->> +
->> +		new_pud = kvm_pud_mkhuge(new_pud);
->> +		if (writable)
->> +			new_pud = kvm_s2pud_mkwrite(new_pud);
->> +
->> +		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
->> +			new_pud = kvm_s2pud_mkexec(new_pud);
->> +
->> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
->> +	} else if (hugetlb && vma_pagesize == PMD_SIZE) {
->
-> Suzuki
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Suzuki
