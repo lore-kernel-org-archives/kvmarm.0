@@ -1,25 +1,25 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [RFC PATCH 00/16] KVM: arm64: Initial support for SVE guests
-Date: Fri, 06 Jul 2018 09:22:47 +0100
-Message-ID: <87h8lc93jc.fsf@linaro.org>
+Date: Fri, 6 Jul 2018 10:05:36 +0100
+Message-ID: <20180706090534.GD26019@e103592.cambridge.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <87h8lc93jc.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB3E49F8C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:10:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B63D449F8C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:53:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id khcO9seXek-V for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jul 2018 04:10:16 -0400 (EDT)
-Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1441408B1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:10:16 -0400 (EDT)
-Received: by mail-wm0-f67.google.com with SMTP id b188-v6so14026990wme.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Jul 2018 01:22:49 -0700 (PDT)
-In-reply-to: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id ijn7e0-ZjoP2 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jul 2018 04:53:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86AAE408B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:53:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <87h8lc93jc.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,57 +29,34 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo8c25pcD4KPgo+IFRo
-aXMgc2VyaWVzIGlzIHNvbWV3aGF0IHRlc3RlZCBvbiBBcm0gSnVubyByMCBhbmQgdGhlIEFybSBG
-YXN0IE1vZGVsCj4gKHdpdGgvd2l0aG91dCBTVkUgc3VwcG9ydCkuICBhcmNoL2FybSBidWlsZHMs
-IGJ1dCBJJ3ZlIG5vdCBib290ZWQKPiBpdCAtLSBvbmx5IHNvbWUgdHJpdmlhbCByZWZhY3Rvcmlu
-ZyBpbiB0aGlzIHNlcmllcyBhZmZlY3RzIGFyY2gvYXJtLgoKTm93IHRoYXQgUUVNVSBsaW51eC11
-c2VyIFNWRSBzdXBwb3J0IGlzIHByZXR0eSBtdWNoIGNvbXBsZXRlIHdlJ3ZlIGFsc28KZ290IHBy
-ZWxpbWluYXJ5IHBhdGNoZXMgZm9yIHN5c3RlbSBlbXVsYXRpb24gbW9kZS4gSG93ZXZlciB3ZSBj
-dXJyZW50bHkKZG9uJ3QgaGF2ZSBWSEUgaW1wbGVtZW50ZWQgc28gSSBndWVzcyB3ZSBuZWVkIHRv
-IGRvIHRoYXQgZmlyc3QgYmVmb3JlIHdlCmNhbiB0ZXN0IHVuZGVyIFFFTVUuCgo+Cj4gQ2hlZXJz
-Cj4gLS0tRGF2ZQo+Cj4KPiBbMV0gW1BBVENIIHYyIDAvNF0gS1ZNOiBhcm02NDogRlBTSU1EL1NW
-RSBmaXhlcyBmb3IgNC4xNyBbc2ljXQo+IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVy
-bWFpbC9saW51eC1hcm0ta2VybmVsLzIwMTgtSnVuZS81ODQyODEuaHRtbAo+Cj4gRGF2ZSBNYXJ0
-aW4gKDE2KToKPiAgIGFybTY0OiBmcHNpbWQ6IEFsd2F5cyBzZXQgVElGX0ZPUkVJR05fRlBTVEFU
-RSBvbiB0YXNrIHN0YXRlIGZsdXNoCj4gICBLVk06IGFybTY0OiBEZWxldGUgb3JwaGFuZWQgZGVj
-bGFyYXRpb24gZm9yIF9fZnBzaW1kX2VuYWJsZWQoKQo+ICAgS1ZNOiBhcm02NDogUmVmYWN0b3Ig
-a3ZtX2FybV9udW1fcmVncygpIGZvciBlYXNpZXIgbWFpbnRlbmFuY2UKPiAgIEtWTTogYXJtNjQ6
-IEFkZCBtaXNzaW5nICNpbmNsdWRlIG9mIDxsaW51eC9iaXRtYXAuaD4gdG8ga3ZtX2hvc3QuaAo+
-ICAgS1ZNOiBhcm06IEFkZCBhcmNoIGluaXQvdW5pbml0IGhvb2tzCj4gICBhcm02NC9zdmU6IERl
-dGVybWluZSB2aXJ0dWFsaXNhdGlvbi1mcmllbmRseSB2ZWN0b3IgbGVuZ3Rocwo+ICAgYXJtNjQv
-c3ZlOiBFbmFibGUgU1ZFIHN0YXRlIHRyYWNraW5nIGZvciBub24tdGFzayBjb250ZXh0cwo+ICAg
-S1ZNOiBhcm02NDogU3VwcG9ydCBkeW5hbWljYWxseSBoaWRlYWJsZSBzeXN0ZW0gcmVnaXN0ZXJz
-Cj4gICBLVk06IGFybTY0OiBBbGxvdyBJRCByZWdpc3RlcnMgdG8gYnkgZHluYW1pY2FsbHkgcmVh
-ZC1hcy16ZXJvCj4gICBLVk06IGFybTY0OiBBZGQgYSB2Y3B1IGZsYWcgdG8gY29udHJvbCBTVkUg
-dmlzaWJpbGl0eSBmb3IgdGhlIGd1ZXN0Cj4gICBLVk06IGFybTY0L3N2ZTogU3lzdGVtIHJlZ2lz
-dGVyIGNvbnRleHQgc3dpdGNoIGFuZCBhY2Nlc3Mgc3VwcG9ydAo+ICAgS1ZNOiBhcm02NC9zdmU6
-IENvbnRleHQgc3dpdGNoIHRoZSBTVkUgcmVnaXN0ZXJzCj4gICBLVk06IEFsbG93IDIwNDgtYml0
-IHJlZ2lzdGVyIGFjY2VzcyB2aWEgS1ZNX3tHRVQsU0VUfV9PTkVfUkVHCj4gICBLVk06IGFybTY0
-L3N2ZTogQWRkIFNWRSBzdXBwb3J0IHRvIHJlZ2lzdGVyIGFjY2VzcyBpb2N0bCBpbnRlcmZhY2UK
-PiAgIEtWTTogYXJtNjQ6IEVudW1lcmF0ZSBTVkUgcmVnaXN0ZXIgaW5kaWNlcyBmb3IgS1ZNX0dF
-VF9SRUdfTElTVAo+ICAgS1ZNOiBhcm02NC9zdmU6IFJlcG9ydCBhbmQgZW5hYmxlIFNWRSBBUEkg
-ZXh0ZW5zaW9ucyBmb3IgdXNlcnNwYWNlCj4KPiAgYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hv
-c3QuaCAgIHwgICA0ICstCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggICB8ICAg
-NCArLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMTggKystCj4gIGFy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oICB8ICAgMSAtCj4gIGFyY2gvYXJtNjQvaW5j
-bHVkZS9hc20vc3lzcmVnLmggICB8ICAgMyArCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2Fz
-bS9rdm0uaCB8ICAxMSArKwo+ICBhcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgICAgfCAg
-IDIgKy0KPiAgYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICAgIHwgMTMxICsrKysrKysr
-KysrKystLS0KPiAgYXJjaC9hcm02NC9rZXJuZWwvc2lnbmFsLmMgICAgICAgIHwgICA1IC0KPiAg
-YXJjaC9hcm02NC9rdm0vZnBzaW1kLmMgICAgICAgICAgIHwgICA3ICstCj4gIGFyY2gvYXJtNjQv
-a3ZtL2d1ZXN0LmMgICAgICAgICAgICB8IDMyMSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKy0tLQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgICAgICAgfCAgNDMgKysr
-LS0KPiAgYXJjaC9hcm02NC9rdm0vaHlwL3N5c3JlZy1zci5jICAgIHwgICA1ICsKPiAgYXJjaC9h
-cm02NC9rdm0vcmVzZXQuYyAgICAgICAgICAgIHwgIDE0ICsrCj4gIGFyY2gvYXJtNjQva3ZtL3N5
-c19yZWdzLmMgICAgICAgICB8ICA3MyArKysrKystLS0KPiAgYXJjaC9hcm02NC9rdm0vc3lzX3Jl
-Z3MuaCAgICAgICAgIHwgIDIyICsrKwo+ICBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAg
-ICAgfCAgIDEgKwo+ICB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgMTMgKy0K
-PiAgMTggZmlsZXMgY2hhbmdlZCwgNTg3IGluc2VydGlvbnMoKyksIDkxIGRlbGV0aW9ucygtKQoK
-Ci0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Fri, Jul 06, 2018 at 09:22:47AM +0100, Alex Benn=E9e wrote:
+> =
+
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
+
+> <snip>
+> >
+> > This series is somewhat tested on Arm Juno r0 and the Arm Fast Model
+> > (with/without SVE support).  arch/arm builds, but I've not booted
+> > it -- only some trivial refactoring in this series affects arch/arm.
+> =
+
+> Now that QEMU linux-user SVE support is pretty much complete we've also
+> got preliminary patches for system emulation mode. However we currently
+> don't have VHE implemented so I guess we need to do that first before we
+> can test under QEMU.
+
+Qemu can use this as a KVM client without invasive changes, right?
+
+For kvmtool, it's just a question of checking/setting a feature flag
+in KVM_ARM_PREFERRED_TARGET and KVM_ARM_VCPU_INIT, and (eventually)
+doing at ioctl() to set the set of permitted vector lengths (not yet,
+this will come in a follow-up series).
+
+Cheers
+---Dave
