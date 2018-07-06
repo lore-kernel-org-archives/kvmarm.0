@@ -1,26 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 06/16] arm64/sve: Determine virtualisation-friendly
- vector lengths
-Date: Fri, 6 Jul 2018 14:20:38 +0100
-Message-ID: <c37dbbd8-8ed5-3114-ba9d-248baa59a659@arm.com>
-References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-7-git-send-email-Dave.Martin@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
+ address size for VM
+Date: Fri, 6 Jul 2018 14:49:30 +0100
+Message-ID: <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+ <20180704155104.GN4828@arm.com>
+ <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17C6549E3E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 09:08:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6046849F7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 09:37:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U6pQk7bostdM for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jul 2018 09:08:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82C16408B1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 09:08:09 -0400 (EDT)
-In-Reply-To: <1529593060-542-7-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-GB
+ with ESMTP id AaWxoKUegZwe for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jul 2018 09:37:02 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E71F549E3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 09:37:01 -0400 (EDT)
+In-Reply-To: <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,70 +32,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
-
-On 21/06/18 15:57, Dave Martin wrote:
-> Software at EL1 is permitted to assume that when programming
-> ZCR_EL1.LEN, the effective vector length is nonetheless a vector
-> length supported by the CPU.  Thus, software may rely on the
-> effective vector length being different from that programmed via
-> ZCR_EL1.LEN in some situations.
-> 
-> However, KVM does not tightly bind vcpus to individual underlying
-> physical CPUs.  As a result, vcpus can migrate from one CPU to
-> another.  This means that in order to preserve the guarantee
-> described in the previous paragraph, the set of supported vector
-> lengths must appear to be the same for the vcpu at all times,
-> irrespective of which physical CPU the vcpu is currently running
-> on.
-> 
-> The Arm SVE architecture allows the maximum vector length visible
-> to EL1 to be restricted by programming ZCR_EL2.LEN.  This provides
-> a means to hide from guests any vector lengths that are not
-> supported by every physical CPU in the system.  However, there is
-> no way to hide a particular vector length while some greater vector
-> length is exposed to EL1.
-> 
-> This patch determines the maximum vector length
-> (sve_max_virtualisable_vl) for which the set of supported vector
-> lengths not exceeding it is identical for all CPUs.  When KVM is
-> available, the set of vector lengths supported by each late
-> secondary CPU is verified to be consistent with those of the early
-> CPUs, in order to ensure that the value chosen for
-> sve_max_virtualisable_vl remains globally valid, and ensure that
-> all created vcpus continue to behave correctly.
-> 
-> sve_secondary_vq_map is used as scratch space for these
-> computations, rendering its name misleading.  This patch renames
-> this bitmap to sve_tmp_vq_map in order to make its purpose clearer.
-
-I'm slightly put off by this patch.
-
-While it does a great job making sure we're always in a situation where
-we can offer SVE to a guest, no matter how utterly broken the system is,
-I wonder if there is a real value in jumping through all these hoops the
-first place.
-
-It is (sort of) reasonable to support a system that has different max
-VLs (big-little) and cap it at the minimum of the max VLs (just like we
-do for userspace). But I don't think it is reasonable to consider
-systems that have different supported VLs in that range, and I don't
-think any system exhibit that behaviour.
-
-To put it another way, if a "small" CPU's supported VLs are not a strict
-prefix of the "big" ones', we just disable SVE support in KVM. I'd be
-tempted to do the same thing for userspace too, but that's a separate
-discussion.
-
-Can we turn this patch into one that checks the above condition instead
-of trying to cope with an unacceptable level of braindeadness?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+T24gMDQvMDcvMTggMjM6MDMsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gT24gMDcvMDQvMjAx
+OCAwNDo1MSBQTSwgV2lsbCBEZWFjb24gd3JvdGU6Cj4+IEhpIFN1enVraSwKPj4KPj4gT24gRnJp
+LCBKdW4gMjksIDIwMTggYXQgMTI6MTU6MzVQTSArMDEwMCwgU3V6dWtpIEsgUG91bG9zZSB3cm90
+ZToKPj4+IEFsbG93IHNwZWNpZnlpbmcgdGhlIHBoeXNpY2FsIGFkZHJlc3Mgc2l6ZSBmb3IgYSBu
+ZXcgVk0gdmlhCj4+PiB0aGUga3ZtX3R5cGUgYXJndW1lbnQgZm9yIEtWTV9DUkVBVEVfVk0gaW9j
+dGwuIFRoaXMgYWxsb3dzCj4+PiB1cyB0byBmaW5hbGlzZSB0aGUgc3RhZ2UyIHBhZ2UgdGFibGUg
+Zm9ybWF0IGFzIGVhcmx5IGFzIHBvc3NpYmxlCj4+PiBhbmQgaGVuY2UgcGVyZm9ybSB0aGUgcmln
+aHQgY2hlY2tzIG9uIHRoZSBtZW1vcnkgc2xvdHMgd2l0aG91dAo+Pj4gY29tcGxpY2F0aW9uLiBU
+aGUgc2l6ZSBpcyBlbmNvZGVkIGFzIExvZzIoUEFfU2l6ZSkgaW4gdGhlIGJpdHNbNzowXQo+Pj4g
+b2YgdGhlIHR5cGUgZmllbGQgYW5kIGNhbiBlbmNvZGUgbW9yZSBpbmZvcm1hdGlvbiBpbiB0aGUg
+ZnV0dXJlIGlmCj4+PiByZXF1aXJlZC4gVGhlIElQQSBzaXplIGlzIHN0aWxsIGNhcHBlZCBhdCA0
+MGJpdHMuCj4+Pgo+Pj4gQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4+
+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxAa2VybmVsLm9yZz4KPj4+IENjOiBQZXRlciBN
+YXlkZWwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPj4+IENjOiBQYW9sbyBCb256aW5pIDxw
+Ym9uemluaUByZWRoYXQuY29tPgo+Pj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8cmtyY21hckByZWRo
+YXQuY29tPgo+Pj4gU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxv
+c2VAYXJtLmNvbT4KPj4+IC0tLQo+Pj4gwqAgYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX21tdS5o
+wqDCoCB8wqAgMiArKwo+Pj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fYXJtLmggfCAx
+MCArKystLS0tLS0tCj4+PiDCoCBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9tbXUuaCB8wqAg
+MiArKwo+Pj4gwqAgaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5owqDCoMKgwqDCoMKgwqDCoCB8IDEw
+ICsrKysrKysrKysKPj4+IMKgIHZpcnQva3ZtL2FybS9hcm0uY8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgfCAyNCArKysrKysrKysrKysrKysrKysrKysrLS0KPj4+IMKgIDUgZmlsZXMgY2hh
+bmdlZCwgMzkgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkKPj4KPj4gWy4uLl0KPj4KPj4+
+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGlu
+dXgva3ZtLmgKPj4+IGluZGV4IDRkZjliYjYuLmZhNGNhYjAgMTAwNjQ0Cj4+PiAtLS0gYS9pbmNs
+dWRlL3VhcGkvbGludXgva3ZtLmgKPj4+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+
+Pj4gQEAgLTc1MSw2ICs3NTEsMTYgQEAgc3RydWN0IGt2bV9wcGNfcmVzaXplX2hwdCB7Cj4+PiDC
+oCAjZGVmaW5lIEtWTV9TMzkwX1NJRV9QQUdFX09GRlNFVCAxCj4+PiDCoCAvKgo+Pj4gKyAqIE9u
+IGFybS9hcm02NCwgbWFjaGluZSB0eXBlIGNhbiBiZSB1c2VkIHRvIHJlcXVlc3QgdGhlIHBoeXNp
+Y2FsCj4+PiArICogYWRkcmVzcyBzaXplIGZvciB0aGUgVk0uIEJpdHMgWzctMF0gaGF2ZSBiZWVu
+IHJlc2VydmVkIGZvciB0aGUKPj4+ICsgKiBQQSBzaXplIHNoaWZ0IChpLmUsIGxvZzIoUEFfU2l6
+ZSkpLiBGb3IgYmFja3dhcmQgY29tcGF0aWJpbGl0eSwKPj4+ICsgKiB2YWx1ZSAwIGltcGxpZXMg
+dGhlIGRlZmF1bHQgSVBBIHNpemUsIHdoaWNoIGlzIDQwYml0cy4KPj4+ICsgKi8KPj4+ICsjZGVm
+aW5lIEtWTV9WTV9UWVBFX0FSTV9QSFlTX1NISUZUX01BU0vCoMKgwqAgMHhmZgo+Pj4gKyNkZWZp
+bmUgS1ZNX1ZNX1RZUEVfQVJNX1BIWVNfU0hJRlQoeCnCoMKgwqDCoMKgwqDCoCBcCj4+PiArwqDC
+oMKgICgoeCkgJiBLVk1fVk1fVFlQRV9BUk1fUEhZU19TSElGVF9NQVNLKQo+Pgo+PiBUaGlzIHNl
+ZW1zIGxpa2UgeW91J3JlIGFsbG9jYXRpbmcgcXVpdGUgYSBsb3Qgb2YgYml0cyBpbiBhIG5vbi1l
+eHRlbnNpYmxlCj4+IGludGVyZmFjZSB0byBhIGZhaXJseSBlc290ZXJpYyBwYXJhbWV0ZXIuIFdv
+dWxkIGl0IGJlIGJldHRlciB0byBhZGQgYW5vdGhlcgo+PiBpb2N0bCwgb3IgY29uZGVuc2UgdGhl
+IG51bWJlciBvZiBzaXplcyB5b3Ugc3VwcG9ydCBpbnN0ZWFkPwo+IAo+IEFzIEkgZXhwbGFpbmVk
+IGluIHRoZSBvdGhlciB0aHJlYWQsIHdlIG5lZWQgdGhlIHNpemUgYXMgc29vbiBhcyB0aGUgVk0K
+PiBpcyBjcmVhdGVkLiBUaGUgbWFqb3IgY2hhbGxlbmdlIGlzIGtlZXBpbmcgdGhlIGJhY2t3YXJk
+IGNvbXBhdGliaWxpdHkgYnkKPiBtYXBwaW5nIDAgdG8gNDBiaXRzLiBJIHdpbGwgZ2l2ZSBpdCBh
+IHRob3VnaHQuCgpIZXJlIGlzIG9uZSBvcHRpb24uIFdlIGNvdWxkIHJlLXVzZSB0aGUge1Z9VENS
+X0VMeC57SX1QUyBmaWVsZCBmb3JtYXQsIHdoaWNoCm9jY3VwaWVzIDMgYml0cyBhbmQgaGFzIHRo
+ZSBmb2xsb3dpbmcgZGVmaW5pdGlvbnMuIChJRF9BQTY0TU1GUjBfRUwxOlBBUmFuZ2UKYWxzbyBo
+YXMgdGhlIGZpZWxkIGRlZmluaXRpb25zLCBleGNlcHQgdGhhdCB0aGUgZmllbGQgaXMgNGJpdHMg
+d2lkZSwgYnV0Cm9ubHkgM2JpdHMgYXJlIHVzZWQpCgowMDAgMzIgYml0cywgNEdCLgowMDEgMzYg
+Yml0cywgNjRHQi4KMDEwIDQwIGJpdHMsIDFUQi4KMDExIDQyIGJpdHMsIDRUQi4KMTAwIDQ0IGJp
+dHMsIDE2VEIuCjEwMSA0OCBiaXRzLCAyNTZUQi4KMTEwIDUyIGJpdHMsIDRQQgoKQnV0IHdlIG5l
+ZWQgdG8gbWFwIDAgPT4gNDBiaXRzIElQQSB0byBtYWtlIG91ciBBQkkgYmFja3dhcmQgY29tcGF0
+aWJsZS4gU28Kd2UgY291bGQgdXNlIHRoZSBhZGRpdGlvbmFsIG9uZSBiaXQgdG8gaW5kaWNhdGUg
+dGhhdCBJUEEgc2l6ZSBpcyByZXF1ZXN0ZWQKaW4gdGhlIDMgYml0cy4KCmkuZSwKCm1hY2hpbmVf
+dHlwZToKCkJpdCBbMjowXQktIFJlcXVlc3RlZCBJUEEgc2l6ZS4gVmFsdWVzIGZvbGxvdyBWVENS
+X0VMMi5QUyBmb3JtYXQuCgpCaXQgWzNdCQktIDEgPT4gSVBBIFNpemUgYml0cyAoQml0c1syOjBd
+KSByZXF1ZXN0ZWQuCgkJMCA9PiBOb3QgcmVxdWVzdGVkCgpUaGUgb25seSBtaW5vciBkb3duIHNp
+ZGUgaXMgcmVzdHJpY3RpbmcgdG8gdGhlIHByZWRlZmluZWQgdmFsdWVzIGFib3ZlLAp3aGljaCBp
+cyBub3QgYSByZWFsIGlzc3VlIGZvciBhIFZNLgoKVGhvdWdodHMgPwoKU3V6dWtpCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
+c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
+LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
