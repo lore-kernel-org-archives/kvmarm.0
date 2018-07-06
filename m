@@ -1,190 +1,85 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v4 7/7] KVM: arm64: Add support for creating PUD hugepages
- at stage 2
-Date: Thu, 5 Jul 2018 18:11:34 +0100
-Message-ID: <51265e49-8b8f-cabb-d2c9-d776a8a4ace8@arm.com>
-References: <20180705140850.5801-1-punit.agrawal@arm.com>
- <20180705140850.5801-8-punit.agrawal@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH 00/16] KVM: arm64: Initial support for SVE guests
+Date: Fri, 06 Jul 2018 09:22:47 +0100
+Message-ID: <87h8lc93jc.fsf@linaro.org>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180705140850.5801-8-punit.agrawal@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB3E49F8C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:10:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id khcO9seXek-V for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jul 2018 04:10:16 -0400 (EDT)
+Received: from mail-wm0-f67.google.com (mail-wm0-f67.google.com [74.125.82.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1441408B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 04:10:16 -0400 (EDT)
+Received: by mail-wm0-f67.google.com with SMTP id b188-v6so14026990wme.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Jul 2018 01:22:49 -0700 (PDT)
+In-reply-to: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Punit,
-
-On 05/07/18 15:08, Punit Agrawal wrote:
-> KVM only supports PMD hugepages at stage 2. Now that the various page
-> handling routines are updated, extend the stage 2 fault handling to
-> map in PUD hugepages.
-> 
-> Addition of PUD hugepage support enables additional page sizes (e.g.,
-> 1G with 4K granule) which can be useful on cores that support mapping
-> larger block sizes in the TLB entries.
-> 
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 0c04c64e858c..5912210e94d9 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -116,6 +116,25 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
->   	put_page(virt_to_page(pmd));
->   }
->   
-> +/**
-> + * stage2_dissolve_pud() - clear and flush huge PUD entry
-> + * @kvm:	pointer to kvm structure.
-> + * @addr:	IPA
-> + * @pud:	pud pointer for IPA
-> + *
-> + * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs. Marks all
-> + * pages in the range dirty.
-> + */
-> +static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pud)
-> +{
-> +	if (!pud_huge(*pud))
-> +		return;
-> +
-> +	pud_clear(pud);
-
-You need to use the stage2_ accessors here. The stage2_dissolve_pmd() uses
-"pmd_" helpers as the PTE entries (level 3) are always guaranteed to exist.
-
-
-> +	kvm_tlb_flush_vmid_ipa(kvm, addr);
-> +	put_page(virt_to_page(pud));
-> +}
-> +
->   static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
->   				  int min, int max)
->   {
-> @@ -993,7 +1012,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->   	pmd_t *pmd;
->   
->   	pud = stage2_get_pud(kvm, cache, addr);
-> -	if (!pud)
-> +	if (!pud || pud_huge(*pud))
->   		return NULL;
-
-Same here.
-
->   
->   	if (stage2_pud_none(*pud)) {
-
-Like this ^
-
-> @@ -1038,6 +1057,26 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->   	return 0;
->   }
->   
-> +static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-> +			       phys_addr_t addr, const pud_t *new_pud)
-> +{
-> +	pud_t *pud, old_pud;
-> +
-> +	pud = stage2_get_pud(kvm, cache, addr);
-> +	VM_BUG_ON(!pud);
-> +
-> +	old_pud = *pud;
-> +	if (pud_present(old_pud)) {
-> +		pud_clear(pud);
-> +		kvm_tlb_flush_vmid_ipa(kvm, addr);
-
-Same here.
-
-> +	} else {
-> +		get_page(virt_to_page(pud));
-> +	}
-> +
-> +	kvm_set_pud(pud, *new_pud);
-> +	return 0;
-> +}
-> +
->   static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
->   {
->   	pud_t *pudp;
-> @@ -1069,6 +1108,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->   			  phys_addr_t addr, const pte_t *new_pte,
->   			  unsigned long flags)
->   {
-> +	pud_t *pud;
->   	pmd_t *pmd;
->   	pte_t *pte, old_pte;
->   	bool iomap = flags & KVM_S2PTE_FLAG_IS_IOMAP;
-> @@ -1077,6 +1117,22 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->   	VM_BUG_ON(logging_active && !cache);
->   
->   	/* Create stage-2 page table mapping - Levels 0 and 1 */
-> +	pud = stage2_get_pud(kvm, cache, addr);
-> +	if (!pud) {
-> +		/*
-> +		 * Ignore calls from kvm_set_spte_hva for unallocated
-> +		 * address ranges.
-> +		 */
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * While dirty page logging - dissolve huge PUD, then continue
-> +	 * on to allocate page.
-> +	 */
-> +	if (logging_active)
-> +		stage2_dissolve_pud(kvm, addr, pud);
-> +
->   	pmd = stage2_get_pmd(kvm, cache, addr);
->   	if (!pmd) {
->   		/*
-> @@ -1483,9 +1539,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	}
->   
->   	vma_pagesize = vma_kernel_pagesize(vma);
-> -	if (vma_pagesize == PMD_SIZE && !logging_active) {
-> +	if ((vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE) &&
-> +	    !logging_active) {
-> +		struct hstate *h = hstate_vma(vma);
-> +
->   		hugetlb = true;
-> -		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
-> +		gfn = (fault_ipa & huge_page_mask(h)) >> PAGE_SHIFT;
->   	} else {
->   		/*
->   		 * Pages belonging to memslots that don't have the same
-> @@ -1572,7 +1631,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (exec_fault)
->   		invalidate_icache_guest_page(pfn, vma_pagesize);
->   
-> -	if (hugetlb && vma_pagesize == PMD_SIZE) {
-> +	if (hugetlb && vma_pagesize == PUD_SIZE) {
-
-I think we may need to check if the stage2 indeed has 3 levels of
-tables to use stage2 PUD. Otherwise, fall back to PTE level mapping
-or even PMD huge pages. Also, this cannot be triggered right now,
-as we only get PUD hugepages with 4K and we are guaranteed to have
-at least 3 levels with 40bit IPA. May be I can take care of it in
-the Dynamic IPA series, when we run a guest with say 32bit IPA.
-So for now, it is worth adding a comment here.
-
-> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
-> +
-> +		new_pud = kvm_pud_mkhuge(new_pud);
-> +		if (writable)
-> +			new_pud = kvm_s2pud_mkwrite(new_pud);
-> +
-> +		if (stage2_should_exec(kvm, fault_ipa, exec_fault, fault_status))
-> +			new_pud = kvm_s2pud_mkexec(new_pud);
-> +
-> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
-> +	} else if (hugetlb && vma_pagesize == PMD_SIZE) {
-
-Suzuki
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo8c25pcD4KPgo+IFRo
+aXMgc2VyaWVzIGlzIHNvbWV3aGF0IHRlc3RlZCBvbiBBcm0gSnVubyByMCBhbmQgdGhlIEFybSBG
+YXN0IE1vZGVsCj4gKHdpdGgvd2l0aG91dCBTVkUgc3VwcG9ydCkuICBhcmNoL2FybSBidWlsZHMs
+IGJ1dCBJJ3ZlIG5vdCBib290ZWQKPiBpdCAtLSBvbmx5IHNvbWUgdHJpdmlhbCByZWZhY3Rvcmlu
+ZyBpbiB0aGlzIHNlcmllcyBhZmZlY3RzIGFyY2gvYXJtLgoKTm93IHRoYXQgUUVNVSBsaW51eC11
+c2VyIFNWRSBzdXBwb3J0IGlzIHByZXR0eSBtdWNoIGNvbXBsZXRlIHdlJ3ZlIGFsc28KZ290IHBy
+ZWxpbWluYXJ5IHBhdGNoZXMgZm9yIHN5c3RlbSBlbXVsYXRpb24gbW9kZS4gSG93ZXZlciB3ZSBj
+dXJyZW50bHkKZG9uJ3QgaGF2ZSBWSEUgaW1wbGVtZW50ZWQgc28gSSBndWVzcyB3ZSBuZWVkIHRv
+IGRvIHRoYXQgZmlyc3QgYmVmb3JlIHdlCmNhbiB0ZXN0IHVuZGVyIFFFTVUuCgo+Cj4gQ2hlZXJz
+Cj4gLS0tRGF2ZQo+Cj4KPiBbMV0gW1BBVENIIHYyIDAvNF0gS1ZNOiBhcm02NDogRlBTSU1EL1NW
+RSBmaXhlcyBmb3IgNC4xNyBbc2ljXQo+IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVy
+bWFpbC9saW51eC1hcm0ta2VybmVsLzIwMTgtSnVuZS81ODQyODEuaHRtbAo+Cj4gRGF2ZSBNYXJ0
+aW4gKDE2KToKPiAgIGFybTY0OiBmcHNpbWQ6IEFsd2F5cyBzZXQgVElGX0ZPUkVJR05fRlBTVEFU
+RSBvbiB0YXNrIHN0YXRlIGZsdXNoCj4gICBLVk06IGFybTY0OiBEZWxldGUgb3JwaGFuZWQgZGVj
+bGFyYXRpb24gZm9yIF9fZnBzaW1kX2VuYWJsZWQoKQo+ICAgS1ZNOiBhcm02NDogUmVmYWN0b3Ig
+a3ZtX2FybV9udW1fcmVncygpIGZvciBlYXNpZXIgbWFpbnRlbmFuY2UKPiAgIEtWTTogYXJtNjQ6
+IEFkZCBtaXNzaW5nICNpbmNsdWRlIG9mIDxsaW51eC9iaXRtYXAuaD4gdG8ga3ZtX2hvc3QuaAo+
+ICAgS1ZNOiBhcm06IEFkZCBhcmNoIGluaXQvdW5pbml0IGhvb2tzCj4gICBhcm02NC9zdmU6IERl
+dGVybWluZSB2aXJ0dWFsaXNhdGlvbi1mcmllbmRseSB2ZWN0b3IgbGVuZ3Rocwo+ICAgYXJtNjQv
+c3ZlOiBFbmFibGUgU1ZFIHN0YXRlIHRyYWNraW5nIGZvciBub24tdGFzayBjb250ZXh0cwo+ICAg
+S1ZNOiBhcm02NDogU3VwcG9ydCBkeW5hbWljYWxseSBoaWRlYWJsZSBzeXN0ZW0gcmVnaXN0ZXJz
+Cj4gICBLVk06IGFybTY0OiBBbGxvdyBJRCByZWdpc3RlcnMgdG8gYnkgZHluYW1pY2FsbHkgcmVh
+ZC1hcy16ZXJvCj4gICBLVk06IGFybTY0OiBBZGQgYSB2Y3B1IGZsYWcgdG8gY29udHJvbCBTVkUg
+dmlzaWJpbGl0eSBmb3IgdGhlIGd1ZXN0Cj4gICBLVk06IGFybTY0L3N2ZTogU3lzdGVtIHJlZ2lz
+dGVyIGNvbnRleHQgc3dpdGNoIGFuZCBhY2Nlc3Mgc3VwcG9ydAo+ICAgS1ZNOiBhcm02NC9zdmU6
+IENvbnRleHQgc3dpdGNoIHRoZSBTVkUgcmVnaXN0ZXJzCj4gICBLVk06IEFsbG93IDIwNDgtYml0
+IHJlZ2lzdGVyIGFjY2VzcyB2aWEgS1ZNX3tHRVQsU0VUfV9PTkVfUkVHCj4gICBLVk06IGFybTY0
+L3N2ZTogQWRkIFNWRSBzdXBwb3J0IHRvIHJlZ2lzdGVyIGFjY2VzcyBpb2N0bCBpbnRlcmZhY2UK
+PiAgIEtWTTogYXJtNjQ6IEVudW1lcmF0ZSBTVkUgcmVnaXN0ZXIgaW5kaWNlcyBmb3IgS1ZNX0dF
+VF9SRUdfTElTVAo+ICAgS1ZNOiBhcm02NC9zdmU6IFJlcG9ydCBhbmQgZW5hYmxlIFNWRSBBUEkg
+ZXh0ZW5zaW9ucyBmb3IgdXNlcnNwYWNlCj4KPiAgYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hv
+c3QuaCAgIHwgICA0ICstCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggICB8ICAg
+NCArLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgMTggKystCj4gIGFy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oICB8ICAgMSAtCj4gIGFyY2gvYXJtNjQvaW5j
+bHVkZS9hc20vc3lzcmVnLmggICB8ICAgMyArCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2Fz
+bS9rdm0uaCB8ICAxMSArKwo+ICBhcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmMgICAgfCAg
+IDIgKy0KPiAgYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICAgIHwgMTMxICsrKysrKysr
+KysrKystLS0KPiAgYXJjaC9hcm02NC9rZXJuZWwvc2lnbmFsLmMgICAgICAgIHwgICA1IC0KPiAg
+YXJjaC9hcm02NC9rdm0vZnBzaW1kLmMgICAgICAgICAgIHwgICA3ICstCj4gIGFyY2gvYXJtNjQv
+a3ZtL2d1ZXN0LmMgICAgICAgICAgICB8IDMyMSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKy0tLQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMgICAgICAgfCAgNDMgKysr
+LS0KPiAgYXJjaC9hcm02NC9rdm0vaHlwL3N5c3JlZy1zci5jICAgIHwgICA1ICsKPiAgYXJjaC9h
+cm02NC9rdm0vcmVzZXQuYyAgICAgICAgICAgIHwgIDE0ICsrCj4gIGFyY2gvYXJtNjQva3ZtL3N5
+c19yZWdzLmMgICAgICAgICB8ICA3MyArKysrKystLS0KPiAgYXJjaC9hcm02NC9rdm0vc3lzX3Jl
+Z3MuaCAgICAgICAgIHwgIDIyICsrKwo+ICBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAg
+ICAgfCAgIDEgKwo+ICB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgMTMgKy0K
+PiAgMTggZmlsZXMgY2hhbmdlZCwgNTg3IGluc2VydGlvbnMoKyksIDkxIGRlbGV0aW9ucygtKQoK
+Ci0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
