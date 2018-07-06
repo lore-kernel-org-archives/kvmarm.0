@@ -1,27 +1,29 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v4 4/7] KVM: arm64: Support PUD hugepage in
- stage2_is_exec()
-Date: Fri, 06 Jul 2018 15:36:04 +0100
-Message-ID: <87fu0wqvmz.fsf@e105922-lin.cambridge.arm.com>
-References: <20180705140850.5801-1-punit.agrawal@arm.com>
- <20180705140850.5801-5-punit.agrawal@arm.com>
- <442d0f4b-cb23-9788-1ebd-b14c89c52c45@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
+ address size for VM
+Date: Fri, 6 Jul 2018 16:09:35 +0100
+Message-ID: <9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
+References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
+ <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+ <20180704155104.GN4828@arm.com>
+ <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
+ <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 575DE49FAC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 10:23:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBA7349FAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 10:57:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 00WcdVEkonfc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jul 2018 10:23:33 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3479408AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 10:23:33 -0400 (EDT)
-In-Reply-To: <442d0f4b-cb23-9788-1ebd-b14c89c52c45@arm.com> (Suzuki
- K. Poulose's message of "Thu, 5 Jul 2018 17:48:37 +0100")
+ with ESMTP id g6eknOARszSq for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Jul 2018 10:57:07 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7486D408AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 10:57:07 -0400 (EDT)
+In-Reply-To: <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,316 +33,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
-
-> Hi Punit,
->
-> On 05/07/18 15:08, Punit Agrawal wrote:
->> In preparation for creating PUD hugepages at stage 2, add support for
->> detecting execute permissions on PUD page table entries. Faults due to
->> lack of execute permissions on page table entries is used to perform
->> i-cache invalidation on first execute.
->>
->> Provide trivial implementations of arm32 helpers to allow sharing of
->> code.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_mmu.h         |  6 ++++++
->>   arch/arm64/include/asm/kvm_mmu.h       |  5 +++++
->>   arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
->>   virt/kvm/arm/mmu.c                     | 10 +++++++++-
->>   4 files changed, 22 insertions(+), 1 deletion(-)
->>
-
-[...]
-
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index db04b18218c1..ccdea0edabb3 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1040,10 +1040,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->>     static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
->>   {
->> +	pud_t *pudp;
->>   	pmd_t *pmdp;
->>   	pte_t *ptep;
->>   -	pmdp = stage2_get_pmd(kvm, NULL, addr);
->> +	pudp = stage2_get_pud(kvm, NULL, addr);
->> +	if (!pudp || pud_none(*pudp) || !pud_present(*pudp))
->> +		return false;
->> +
->> +	if (pud_huge(*pudp))
->> +		return kvm_s2pud_exec(pudp);
->> +
->> +	pmdp = stage2_pmd_offset(pudp, addr);
->>   	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
->>   		return false;
->
-> I am wondering if we need a slightly better way to deal with this
-> kind of operation. We seem to duplicate the above operation (here and
-> in the following patches), i.e, finding the "leaf entry" for a given
-> address and follow the checks one level up at a time.
-
-We definitely need a better way to walk the page tables - for stage 2
-but also stage 1 and hugetlbfs. As things stands, there is a lot of
-repetitive pattern with small differences at some levels (hugepage
-and/or THP, p*d_none(), p*d_present(), ...)
-
-> So instead of doing, stage2_get_pud() and walking down everywhere this
-> is needed, how about adding :
->
-> /* Returns true if the leaf entry is found and updates the relevant pointer */
-> found = stage2_get_leaf_entry(kvm, NULL, addr, &pudp, &pmdp, &ptep)
->
-> which could set the appropriate entry and we could check the result
-> here.
-
-I prototyped with the above approach but found that it could not be used
-in all places due to the specific semantics of the walk. Also, then we
-end up with the following pattern.
-
-    if (pudp) {
-            ...
-    } else if (pmdp) {
-            ...
-    } else {
-            ...
-    }
-
-At the end of the conversion, the resulting code is the same size as
-well (see diff below for changes).
-
-Another idea might be to build a page table walker passing in callbacks
-- but this makes more sense if we have unified modifiers for the
-levels. I think this is something we should explore but would like to do
-outside the context of this series.
-
-Hope thats ok.
-
-Thanks for having a look,
-Punit
-
--- >8 --
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index eddb74a7fac3..ea5c99f6dfab 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1077,31 +1077,56 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
- 	return 0;
- }
- 
--static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-+static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr, pud_t **pudp,
-+				  pmd_t **pmdp, pte_t **ptep)
- {
--	pud_t *pudp;
--	pmd_t *pmdp;
--	pte_t *ptep;
-+	pud_t *lpudp;
-+	pmd_t *lpmdp;
-+	pte_t *lptep;
- 
--	pudp = stage2_get_pud(kvm, NULL, addr);
--	if (!pudp || pud_none(*pudp) || !pud_present(*pudp))
-+	lpudp = stage2_get_pud(kvm, NULL, addr);
-+	if (!lpudp || pud_none(*lpudp) || !pud_present(*lpudp))
- 		return false;
- 
--	if (pud_huge(*pudp))
--		return kvm_s2pud_exec(pudp);
-+	if (pud_huge(*lpudp)) {
-+		*pudp = lpudp;
-+		return true;
-+	}
- 
--	pmdp = stage2_pmd_offset(pudp, addr);
--	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
-+	lpmdp = stage2_pmd_offset(lpudp, addr);
-+	if (!lpmdp || pmd_none(*lpmdp) || !pmd_present(*lpmdp))
- 		return false;
- 
--	if (pmd_thp_or_huge(*pmdp))
--		return kvm_s2pmd_exec(pmdp);
-+	if (pmd_thp_or_huge(*lpmdp)) {
-+		*pmdp = lpmdp;
-+		return true;
-+	}
- 
--	ptep = pte_offset_kernel(pmdp, addr);
--	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
-+	lptep = pte_offset_kernel(lpmdp, addr);
-+	if (!lptep || pte_none(*lptep) || !pte_present(*lptep))
- 		return false;
- 
--	return kvm_s2pte_exec(ptep);
-+	*ptep = lptep;
-+	return true;
-+}
-+
-+static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-+{
-+	pud_t *pudp = NULL;
-+	pmd_t *pmdp = NULL;
-+	pte_t *ptep = NULL;
-+	bool found;
-+
-+	found = stage2_get_leaf_entry(kvm, addr, &pudp, &pmdp, &ptep);
-+	if (!found)
-+		return false;
-+
-+	if (pudp)
-+		return kvm_s2pud_exec(pudp);
-+	else if (pmdp)
-+		return kvm_s2pmd_exec(pmdp);
-+	else
-+		return kvm_s2pte_exec(ptep);
- }
- 
- static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -1681,45 +1706,36 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-  */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
--	pud_t *pud;
--	pmd_t *pmd;
--	pte_t *pte;
-+	pud_t *pud = NULL;
-+	pmd_t *pmd = NULL;
-+	pte_t *pte = NULL;
- 	kvm_pfn_t pfn;
--	bool pfn_valid = false;
-+	bool found, pfn_valid = false;
- 
- 	trace_kvm_access_fault(fault_ipa);
- 
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
--	pud = stage2_get_pud(vcpu->kvm, NULL, fault_ipa);
--	if (!pud || pud_none(*pud))
--		goto out;		/* Nothing there */
-+	found = stage2_get_leaf_entry(kvm, fault_ipa, &pud, &pmd, &pte);
-+	if (!found)
-+		goto out;
- 
--	if (pud_huge(*pud)) {		/* HugeTLB */
-+	if (pud) {		/* HugeTLB */
- 		*pud = kvm_s2pud_mkyoung(*pud);
- 		pfn = kvm_pud_pfn(*pud);
- 		pfn_valid = true;
- 		goto out;
--	}
--
--	pmd = stage2_pmd_offset(pud, fault_ipa);
--	if (!pmd || pmd_none(*pmd))	/* Nothing there */
--		goto out;
--
--	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
-+	} else 	if (pmd) {	/* THP, HugeTLB */
- 		*pmd = pmd_mkyoung(*pmd);
- 		pfn = pmd_pfn(*pmd);
- 		pfn_valid = true;
- 		goto out;
-+	} else {
-+		*pte = pte_mkyoung(*pte);	/* Just a page... */
-+		pfn = pte_pfn(*pte);
-+		pfn_valid = true;
- 	}
- 
--	pte = pte_offset_kernel(pmd, fault_ipa);
--	if (pte_none(*pte))		/* Nothing there either */
--		goto out;
--
--	*pte = pte_mkyoung(*pte);	/* Just a page... */
--	pfn = pte_pfn(*pte);
--	pfn_valid = true;
- out:
- 	spin_unlock(&vcpu->kvm->mmu_lock);
- 	if (pfn_valid)
-@@ -1932,58 +1948,42 @@ void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- 
- static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- {
--	pud_t *pud;
--	pmd_t *pmd;
--	pte_t *pte;
-+	pud_t *pud = NULL;
-+	pmd_t *pmd = NULL;
-+	pte_t *pte = NULL;
-+	bool found;
- 
- 	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
--	pud = stage2_get_pud(kvm, NULL, gpa);
--	if (!pud || pud_none(*pud))	/* Nothing there */
-+	found = stage2_get_leaf_entry(kvm, gpa, &pud, &pmd, &pte);
-+	if (!found)
- 		return 0;
- 
--	if (pud_huge(*pud))		/* HugeTLB */
-+	if (pud)
- 		return stage2_pudp_test_and_clear_young(pud);
--
--	pmd = stage2_pmd_offset(pud, gpa);
--	if (!pmd || pmd_none(*pmd))	/* Nothing there */
--		return 0;
--
--	if (pmd_thp_or_huge(*pmd))	/* THP, HugeTLB */
-+	else if (pmd)
- 		return stage2_pmdp_test_and_clear_young(pmd);
--
--	pte = pte_offset_kernel(pmd, gpa);
--	if (pte_none(*pte))
--		return 0;
--
--	return stage2_ptep_test_and_clear_young(pte);
-+	else
-+		return stage2_ptep_test_and_clear_young(pte);
- }
- 
- static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- {
--	pud_t *pud;
--	pmd_t *pmd;
--	pte_t *pte;
-+	pud_t *pud = NULL;
-+	pmd_t *pmd = NULL;
-+	pte_t *pte = NULL;
-+	bool found;
- 
- 	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
--	pud = stage2_get_pud(kvm, NULL, gpa);
--	if (!pud || pud_none(*pud))	/* Nothing there */
-+	found = stage2_get_leaf_entry(kvm, gpa, &pud, &pmd, &pte);
-+	if (!found)
- 		return 0;
- 
--	if (pud_huge(*pud))		/* HugeTLB */
-+	if (pud)
- 		return kvm_s2pud_young(*pud);
--
--	pmd = stage2_pmd_offset(pud, gpa);
--	if (!pmd || pmd_none(*pmd))	/* Nothing there */
--		return 0;
--
--	if (pmd_thp_or_huge(*pmd))		/* THP, HugeTLB */
-+	else if (pmd)
- 		return pmd_young(*pmd);
--
--	pte = pte_offset_kernel(pmd, gpa);
--	if (!pte_none(*pte))		/* Just a page... */
-+	else
- 		return pte_young(*pte);
--
--	return 0;
- }
- 
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+T24gMDYvMDcvMTggMTQ6NDksIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gT24gMDQvMDcvMTgg
+MjM6MDMsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+IE9uIDA3LzA0LzIwMTggMDQ6NTEgUE0s
+IFdpbGwgRGVhY29uIHdyb3RlOgo+Pj4gSGkgU3V6dWtpLAo+Pj4KPj4+IE9uIEZyaSwgSnVuIDI5
+LCAyMDE4IGF0IDEyOjE1OjM1UE0gKzAxMDAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+Pj4g
+QWxsb3cgc3BlY2lmeWluZyB0aGUgcGh5c2ljYWwgYWRkcmVzcyBzaXplIGZvciBhIG5ldyBWTSB2
+aWEKPj4+PiB0aGUga3ZtX3R5cGUgYXJndW1lbnQgZm9yIEtWTV9DUkVBVEVfVk0gaW9jdGwuIFRo
+aXMgYWxsb3dzCj4+Pj4gdXMgdG8gZmluYWxpc2UgdGhlIHN0YWdlMiBwYWdlIHRhYmxlIGZvcm1h
+dCBhcyBlYXJseSBhcyBwb3NzaWJsZQo+Pj4+IGFuZCBoZW5jZSBwZXJmb3JtIHRoZSByaWdodCBj
+aGVja3Mgb24gdGhlIG1lbW9yeSBzbG90cyB3aXRob3V0Cj4+Pj4gY29tcGxpY2F0aW9uLiBUaGUg
+c2l6ZSBpcyBlbmNvZGVkIGFzIExvZzIoUEFfU2l6ZSkgaW4gdGhlIGJpdHNbNzowXQo+Pj4+IG9m
+IHRoZSB0eXBlIGZpZWxkIGFuZCBjYW4gZW5jb2RlIG1vcmUgaW5mb3JtYXRpb24gaW4gdGhlIGZ1
+dHVyZSBpZgo+Pj4+IHJlcXVpcmVkLiBUaGUgSVBBIHNpemUgaXMgc3RpbGwgY2FwcGVkIGF0IDQw
+Yml0cy4KPj4+Pgo+Pj4+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+
+Pj4+IENjOiBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBrZXJuZWwub3JnPgo+Pj4+IENjOiBQZXRl
+ciBNYXlkZWwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPj4+PiBDYzogUGFvbG8gQm9uemlu
+aSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPj4+PiBDYzogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFy
+QHJlZGhhdC5jb20+Cj4+Pj4gU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtp
+LnBvdWxvc2VAYXJtLmNvbT4KPj4+PiAtLS0KPj4+PiDCoCBhcmNoL2FybS9pbmNsdWRlL2FzbS9r
+dm1fbW11LmjCoMKgIHzCoCAyICsrCj4+Pj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
+YXJtLmggfCAxMCArKystLS0tLS0tCj4+Pj4gwqAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
+bW11LmggfMKgIDIgKysKPj4+PiDCoCBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmjCoMKgwqDCoMKg
+wqDCoMKgIHwgMTAgKysrKysrKysrKwo+Pj4+IMKgIHZpcnQva3ZtL2FybS9hcm0uY8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAyNCArKysrKysrKysrKysrKysrKysrKysrLS0KPj4+PiDC
+oCA1IGZpbGVzIGNoYW5nZWQsIDM5IGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pCj4+Pgo+
+Pj4gWy4uLl0KPj4+Cj4+Pj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaCBi
+L2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+Pj4+IGluZGV4IDRkZjliYjYuLmZhNGNhYjAgMTAw
+NjQ0Cj4+Pj4gLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCj4+Pj4gKysrIGIvaW5jbHVk
+ZS91YXBpL2xpbnV4L2t2bS5oCj4+Pj4gQEAgLTc1MSw2ICs3NTEsMTYgQEAgc3RydWN0IGt2bV9w
+cGNfcmVzaXplX2hwdCB7Cj4+Pj4gwqAgI2RlZmluZSBLVk1fUzM5MF9TSUVfUEFHRV9PRkZTRVQg
+MQo+Pj4+IMKgIC8qCj4+Pj4gKyAqIE9uIGFybS9hcm02NCwgbWFjaGluZSB0eXBlIGNhbiBiZSB1
+c2VkIHRvIHJlcXVlc3QgdGhlIHBoeXNpY2FsCj4+Pj4gKyAqIGFkZHJlc3Mgc2l6ZSBmb3IgdGhl
+IFZNLiBCaXRzIFs3LTBdIGhhdmUgYmVlbiByZXNlcnZlZCBmb3IgdGhlCj4+Pj4gKyAqIFBBIHNp
+emUgc2hpZnQgKGkuZSwgbG9nMihQQV9TaXplKSkuIEZvciBiYWNrd2FyZCBjb21wYXRpYmlsaXR5
+LAo+Pj4+ICsgKiB2YWx1ZSAwIGltcGxpZXMgdGhlIGRlZmF1bHQgSVBBIHNpemUsIHdoaWNoIGlz
+IDQwYml0cy4KPj4+PiArICovCj4+Pj4gKyNkZWZpbmUgS1ZNX1ZNX1RZUEVfQVJNX1BIWVNfU0hJ
+RlRfTUFTS8KgwqDCoCAweGZmCj4+Pj4gKyNkZWZpbmUgS1ZNX1ZNX1RZUEVfQVJNX1BIWVNfU0hJ
+RlQoeCnCoMKgwqDCoMKgwqDCoCBcCj4+Pj4gK8KgwqDCoCAoKHgpICYgS1ZNX1ZNX1RZUEVfQVJN
+X1BIWVNfU0hJRlRfTUFTSykKPj4+Cj4+PiBUaGlzIHNlZW1zIGxpa2UgeW91J3JlIGFsbG9jYXRp
+bmcgcXVpdGUgYSBsb3Qgb2YgYml0cyBpbiBhIG5vbi1leHRlbnNpYmxlCj4+PiBpbnRlcmZhY2Ug
+dG8gYSBmYWlybHkgZXNvdGVyaWMgcGFyYW1ldGVyLiBXb3VsZCBpdCBiZSBiZXR0ZXIgdG8gYWRk
+IGFub3RoZXIKPj4+IGlvY3RsLCBvciBjb25kZW5zZSB0aGUgbnVtYmVyIG9mIHNpemVzIHlvdSBz
+dXBwb3J0IGluc3RlYWQ/Cj4+Cj4+IEFzIEkgZXhwbGFpbmVkIGluIHRoZSBvdGhlciB0aHJlYWQs
+IHdlIG5lZWQgdGhlIHNpemUgYXMgc29vbiBhcyB0aGUgVk0KPj4gaXMgY3JlYXRlZC4gVGhlIG1h
+am9yIGNoYWxsZW5nZSBpcyBrZWVwaW5nIHRoZSBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGJ5Cj4+
+IG1hcHBpbmcgMCB0byA0MGJpdHMuIEkgd2lsbCBnaXZlIGl0IGEgdGhvdWdodC4KPiAKPiBIZXJl
+IGlzIG9uZSBvcHRpb24uIFdlIGNvdWxkIHJlLXVzZSB0aGUge1Z9VENSX0VMeC57SX1QUyBmaWVs
+ZCBmb3JtYXQsIHdoaWNoCj4gb2NjdXBpZXMgMyBiaXRzIGFuZCBoYXMgdGhlIGZvbGxvd2luZyBk
+ZWZpbml0aW9ucy4gKElEX0FBNjRNTUZSMF9FTDE6UEFSYW5nZQo+IGFsc28gaGFzIHRoZSBmaWVs
+ZCBkZWZpbml0aW9ucywgZXhjZXB0IHRoYXQgdGhlIGZpZWxkIGlzIDRiaXRzIHdpZGUsIGJ1dAo+
+IG9ubHkgM2JpdHMgYXJlIHVzZWQpCj4gCj4gMDAwIDMyIGJpdHMsIDRHQi4KPiAwMDEgMzYgYml0
+cywgNjRHQi4KPiAwMTAgNDAgYml0cywgMVRCLgo+IDAxMSA0MiBiaXRzLCA0VEIuCj4gMTAwIDQ0
+IGJpdHMsIDE2VEIuCj4gMTAxIDQ4IGJpdHMsIDI1NlRCLgo+IDExMCA1MiBiaXRzLCA0UEIKPiAK
+PiBCdXQgd2UgbmVlZCB0byBtYXAgMCA9PiA0MGJpdHMgSVBBIHRvIG1ha2Ugb3VyIEFCSSBiYWNr
+d2FyZCBjb21wYXRpYmxlLiBTbwo+IHdlIGNvdWxkIHVzZSB0aGUgYWRkaXRpb25hbCBvbmUgYml0
+IHRvIGluZGljYXRlIHRoYXQgSVBBIHNpemUgaXMgcmVxdWVzdGVkCj4gaW4gdGhlIDMgYml0cy4K
+PiAKPiBpLmUsCj4gCj4gbWFjaGluZV90eXBlOgo+IAo+IEJpdCBbMjowXQktIFJlcXVlc3RlZCBJ
+UEEgc2l6ZS4gVmFsdWVzIGZvbGxvdyBWVENSX0VMMi5QUyBmb3JtYXQuCj4gCj4gQml0IFszXQkJ
+LSAxID0+IElQQSBTaXplIGJpdHMgKEJpdHNbMjowXSkgcmVxdWVzdGVkLgo+IAkJMCA9PiBOb3Qg
+cmVxdWVzdGVkCj4gCj4gVGhlIG9ubHkgbWlub3IgZG93biBzaWRlIGlzIHJlc3RyaWN0aW5nIHRv
+IHRoZSBwcmVkZWZpbmVkIHZhbHVlcyBhYm92ZSwKPiB3aGljaCBpcyBub3QgYSByZWFsIGlzc3Vl
+IGZvciBhIFZNLgo+IAo+IFRob3VnaHRzID8KCkknZCBiZSB2ZXJ5IHdhcnkgb2YgdXNpbmcgdGhh
+dCA0dGggYml0IHRvIGRvIHNvbWV0aGluZyB0aGF0IGlzIG5vdCBpbgp0aGUgYXJjaGl0ZWN0dXJl
+LiBXZSBoYXZlIG9ubHkgYSBzaW5nbGUgdmFsdWUgbGVmdCB0byBiZSB1c2VkICgwYjExMSksCmFu
+ZCB0aGVuIHlvdXIgc2NoZW1lIGNsYXNoZXMgd2l0aCB0aGUgYXJjaGl0ZWN0dXJlIGRlZmluaXRp
+b24uCgpJJ2QgcmF0aGVyIGVuY29kZSB0aGluZ3MgaW4gYSB3YXkgdGhhdCBpcyBpbmRlcGVuZGVu
+dCBmcm9tIHRoZQphcmNoaXRlY3R1cmUsIGFuZCBiZSBkb25lIHdpdGggaXQuIFlvdSBjYW4gbWFw
+IDAgdG8gNDBiaXRzLCBhbmQgd2UgaGF2ZQp0aGUgYWJpbGl0eSB0byBleHByZXNzIGFsbCB2YWx1
+ZXMgdGhlIGFyY2hpdGVjdHVyZSBoYXMgKGp1c3QgaW4gYQpkaWZmZXJlbnQgb3JkZXIpLgoKVGhh
+bmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4uLgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
+bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
+b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
