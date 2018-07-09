@@ -1,29 +1,27 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] KVM: arm64: vgic-its: Remove VLA usage
-Date: Mon, 9 Jul 2018 08:53:40 -0700
-Message-ID: <CAGXu5jLXQ2ZQ8mCfcKC6F7DMzbvP7MvArcacouVaX=WS9=7LPQ@mail.gmail.com>
-References: <20180629184618.GA37364@beast>
- <19f9ddb1-6009-850c-1949-3a8cdacdd2fc@redhat.com>
- <CAGXu5jJcqMX7HjvgqcR37jnuN48PtyHd+VVmfcQH6YfXXSpO_g@mail.gmail.com>
- <f213e03a-66a6-0c07-7bb8-2061b9c24731@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v2 6/6] KVM: arm/arm64: vgic: Allow configuration of
+ interrupt groups
+Date: Mon, 9 Jul 2018 15:48:36 -0700
+Message-ID: <20180709224836.GA26579@u002843.usa.arm.com>
+References: <1530697100-22419-1-git-send-email-christoffer.dall@arm.com>
+ <1530697100-22419-7-git-send-email-christoffer.dall@arm.com>
+ <7f875ead-d3cb-1fec-bc84-56e64526e6a7@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0504A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 11:41:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AACB34A0C8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 18:35:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tKn8gFegjhWj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jul 2018 11:41:00 -0400 (EDT)
-Received: from mail-yb0-f196.google.com (mail-yb0-f196.google.com
- [209.85.213.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53FB540192
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 11:41:00 -0400 (EDT)
-Received: by mail-yb0-f196.google.com with SMTP id i9-v6so7367010ybo.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Jul 2018 08:53:41 -0700 (PDT)
-In-Reply-To: <f213e03a-66a6-0c07-7bb8-2061b9c24731@arm.com>
+ with ESMTP id jfLXktJr8XwP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jul 2018 18:35:56 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FE4940192
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 18:35:56 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <7f875ead-d3cb-1fec-bc84-56e64526e6a7@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,84 +32,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, LKML <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 9, 2018 at 3:47 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> Hi kees,
->
-> On 02/07/18 18:15, Kees Cook wrote:
->> On Mon, Jul 2, 2018 at 12:36 AM, Auger Eric <eric.auger@redhat.com> wrote:
->>> Hi Kees,
->>>
->>> On 06/29/2018 08:46 PM, Kees Cook wrote:
->>>> In the quest to remove all stack VLA usage from the kernel[1], this
->>>> switches to using a maximum size and adds sanity checks. Additionally
->>>> cleans up some of the int-vs-u32 usage and adds additional bounds checking.
->>>> As it currently stands, this will always be 8 bytes until the ABI changes.
->>>>
->>>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>>>
->>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
->>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>>> Cc: Eric Auger <eric.auger@redhat.com>
->>>> Cc: Andre Przywara <andre.przywara@arm.com>
->>>> Cc: linux-arm-kernel@lists.infradead.org
->>>> Cc: kvmarm@lists.cs.columbia.edu
->>>> Signed-off-by: Kees Cook <keescook@chromium.org>
->>>> ---
->>>>  virt/kvm/arm/vgic/vgic-its.c | 19 +++++++++++++++----
->>>>  1 file changed, 15 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 4ed79c939fb4..3143fc047fcf 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -168,8 +168,14 @@ struct vgic_its_abi {
->>>>       int (*commit)(struct vgic_its *its);
->>>>  };
->>>>
->>>> +#define ABI_0_ESZ    8
->>>> +#define ESZ_MAX              ABI_0_ESZ
->>>> +
->>>>  static const struct vgic_its_abi its_table_abi_versions[] = {
->>>> -     [0] = {.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
->>>> +     [0] = {
->>>> +      .cte_esz = ABI_0_ESZ,
->>>> +      .dte_esz = ABI_0_ESZ,
->>>> +      .ite_esz = ABI_0_ESZ,
->>>>        .save_tables = vgic_its_save_tables_v0,
->>>>        .restore_tables = vgic_its_restore_tables_v0,
->>>>        .commit = vgic_its_commit_v0,
->>>> @@ -180,10 +186,12 @@ static const struct vgic_its_abi its_table_abi_versions[] = {
->>>>
->>>>  inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
->>>>  {
->>>> +     if (WARN_ON(its->abi_rev >= NR_ITS_ABIS))
->>>> +             return NULL;
->>>>       return &its_table_abi_versions[its->abi_rev];
->>>>  }
->>>>
->>>> -int vgic_its_set_abi(struct vgic_its *its, int rev)
->>>> +static int vgic_its_set_abi(struct vgic_its *its, u32 rev)
->>>>  {
->>> if vgic_its_get_abi is likely to return NULL, don't we need to check abi
->>> != NULL in all call sites.
->>
->> My thinking was that since it should never happen, a WARN_ON would be
->> sufficient. But I can drop all these changes if you want. I just
->> wanted to see the VLA removed. :)
->
-> Are you going to respin this patch limiting it to just the VLA changes?
-> I'm actively queuing stuff for the next merge window, and it'd be good
-> to get that one in.
->
-> Alternatively, I can drop the WARN_ONs myself. Just let me know.
+On Mon, Jul 09, 2018 at 09:42:40AM +0100, Marc Zyngier wrote:
+> On 04/07/18 10:38, Christoffer Dall wrote:
+> > Implement the required MMIO accessors for GICv2 and GICv3 for the
+> > IGROUPR distributor and redistributor registers.
+> > 
+> > This can allow guests to change behavior compared to running on previous
+> > versions of KVM, but only to align with the architecture and hardware
+> > implementations.
+> > 
+> > This also allows userspace to configure the groups for interrupts.  Note
+> > that this potentially results in GICv2 guests not receiving interrupts
+> > after migration if migrating from an older kernel that exposes GICv2
+> > interrupts as group 1.
+> > 
+> > Cc: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > ---
+> > I implemented (but stashed) a version of this which predicated the
+> > behavior based on the value of GICD_IIDR revision field, falling back to
+> > ignoring writes and resetting GICv2 groups to 0 if the guest wrote a
+> > revision less than 2.  However, current QEMU implementations simply
+> > don't write the GICD_IIDR, so this doesn't help at all without changing
+> > QEMU anyhow.
+> > 
+> > The only actual fix I can see here to work around the problem in the
+> > kernel is to require an opt-in to allow restoring groups from userspace,
+> > but that's a lot of logic to support cross-kernel version migration.
+> > 
+> > Question: Do we expect that cross-kernel version migration is a critical
+> > feature that people really expect to work, and do we actually have
+> > examples of catering to this in the kernel elsewhere?  (Also, how would
+> > then that relate to the whole 'adding a new sysreg breaks migration'
+> > situation?)
+> 
+> I don't really get why QEMU doesn't try to restore GICD_IIDR, while it
+> is definitely trying to restore RO sysregs (and that's how we detect
+> incompatibilities).
+> 
+> I think we should at least give userspace a chance to do the right
+> thing. If it doesn't, well, too bad.
 
-If you can just drop them that would be best, thanks!
+This series should give userspace an option to adjust its behavior.
 
--Kees
+My main concern is that this version of the series results in the worst
+kind of migration failures, where the guest simply doesn't run on the
+destination side with no warnings or error messages returned to the
+user..
 
--- 
-Kees Cook
-Pixel Security
+We could add logic to return an error code if trying to write a
+different revision than what the kernel has (similar to the invariant
+sysregs), so that a simple fix to QEMU to save restore the GICD_IIDR
+register at least results in an error being returned to userspace.
+
+However, as QEMU doesn't do anything useful here today (not blaming
+anyone, I wrote the apparently broken GIC save/restore code for QEMU
+myself), we could also argue that QEMU might as well just fix things up
+if it detects a different IIDR.
+
+> 
+> How bad is that "writable GICD_IIDR" patch? Because at this stage, and
+> in the absence of any comment, I'm close to just pick that series and
+> merge it for 4.19.
+> 
+
+My guess is that a patch to "save/restore GICD_IIDR" is simple enough,
+but requires additional logic in the kernel that returns an error if the
+GICD_IIDR don't match on write.
+
+A patch which changes the groups and bumps the IIDR in userspace is
+probably more complex.
+
+Sounds like I should add the GICD_IIDR checking patch.  Thoughts?
+
+What I would really like to know is whether this is really an issue or
+not.  Do people who run products based on KVM, such as RHEV, have any
+expectations about cross-kernel version migration?
+
+
+Thanks,
+-Christoffer
