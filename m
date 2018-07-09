@@ -1,30 +1,26 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
- address size for VM
-Date: Fri, 6 Jul 2018 17:39:00 +0100
-Message-ID: <f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
-References: <1530270944-11351-1-git-send-email-suzuki.poulose@arm.com>
- <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
- <20180704155104.GN4828@arm.com>
- <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
- <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
- <9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 6/6] KVM: arm/arm64: vgic: Allow configuration of
+ interrupt groups
+Date: Mon, 9 Jul 2018 09:42:40 +0100
+Message-ID: <7f875ead-d3cb-1fec-bc84-56e64526e6a7@arm.com>
+References: <1530697100-22419-1-git-send-email-christoffer.dall@arm.com>
+ <1530697100-22419-7-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8333949F8C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 12:26:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5938C49EA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 04:30:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M+oVHbDfYW2O for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Jul 2018 12:26:07 -0400 (EDT)
+ with ESMTP id k6rKcAbv-7eT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jul 2018 04:30:04 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E738C408AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Jul 2018 12:26:06 -0400 (EDT)
-In-Reply-To: <9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
-Content-Language: en-US
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26F8A40192
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 04:30:04 -0400 (EDT)
+In-Reply-To: <1530697100-22419-7-git-send-email-christoffer.dall@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,89 +30,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDcvMDYvMjAxOCAwNDowOSBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IE9uIDA2LzA3LzE4
-IDE0OjQ5LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+PiBPbiAwNC8wNy8xOCAyMzowMywgU3V6
-dWtpIEsgUG91bG9zZSB3cm90ZToKPj4+IE9uIDA3LzA0LzIwMTggMDQ6NTEgUE0sIFdpbGwgRGVh
-Y29uIHdyb3RlOgo+Pj4+IEhpIFN1enVraSwKPj4+Pgo+Pj4+IE9uIEZyaSwgSnVuIDI5LCAyMDE4
-IGF0IDEyOjE1OjM1UE0gKzAxMDAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+Pj4+IEFsbG93
-IHNwZWNpZnlpbmcgdGhlIHBoeXNpY2FsIGFkZHJlc3Mgc2l6ZSBmb3IgYSBuZXcgVk0gdmlhCj4+
-Pj4+IHRoZSBrdm1fdHlwZSBhcmd1bWVudCBmb3IgS1ZNX0NSRUFURV9WTSBpb2N0bC4gVGhpcyBh
-bGxvd3MKPj4+Pj4gdXMgdG8gZmluYWxpc2UgdGhlIHN0YWdlMiBwYWdlIHRhYmxlIGZvcm1hdCBh
-cyBlYXJseSBhcyBwb3NzaWJsZQo+Pj4+PiBhbmQgaGVuY2UgcGVyZm9ybSB0aGUgcmlnaHQgY2hl
-Y2tzIG9uIHRoZSBtZW1vcnkgc2xvdHMgd2l0aG91dAo+Pj4+PiBjb21wbGljYXRpb24uIFRoZSBz
-aXplIGlzIGVuY29kZWQgYXMgTG9nMihQQV9TaXplKSBpbiB0aGUgYml0c1s3OjBdCj4+Pj4+IG9m
-IHRoZSB0eXBlIGZpZWxkIGFuZCBjYW4gZW5jb2RlIG1vcmUgaW5mb3JtYXRpb24gaW4gdGhlIGZ1
-dHVyZSBpZgo+Pj4+PiByZXF1aXJlZC4gVGhlIElQQSBzaXplIGlzIHN0aWxsIGNhcHBlZCBhdCA0
-MGJpdHMuCj4+Pj4+Cj4+Pj4+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29t
-Pgo+Pj4+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxAa2VybmVsLm9yZz4KPj4+Pj4gQ2M6
-IFBldGVyIE1heWRlbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPgo+Pj4+PiBDYzogUGFvbG8g
-Qm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPj4+Pj4gQ2M6IFJhZGltIEtyxI1tw6HFmSA8
-cmtyY21hckByZWRoYXQuY29tPgo+Pj4+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3Nl
-IDxzdXp1a2kucG91bG9zZUBhcm0uY29tPgo+Pj4+PiAtLS0KPj4+Pj4gIMKgIGFyY2gvYXJtL2lu
-Y2x1ZGUvYXNtL2t2bV9tbXUuaMKgwqAgfMKgIDIgKysKPj4+Pj4gIMKgIGFyY2gvYXJtNjQvaW5j
-bHVkZS9hc20va3ZtX2FybS5oIHwgMTAgKysrLS0tLS0tLQo+Pj4+PiAgwqAgYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1fbW11LmggfMKgIDIgKysKPj4+Pj4gIMKgIGluY2x1ZGUvdWFwaS9saW51
-eC9rdm0uaMKgwqDCoMKgwqDCoMKgwqAgfCAxMCArKysrKysrKysrCj4+Pj4+ICDCoCB2aXJ0L2t2
-bS9hcm0vYXJtLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjQgKysrKysrKysrKysr
-KysrKysrKysrKy0tCj4+Pj4+ICDCoCA1IGZpbGVzIGNoYW5nZWQsIDM5IGluc2VydGlvbnMoKyks
-IDkgZGVsZXRpb25zKC0pCj4+Pj4KPj4+PiBbLi4uXQo+Pj4+Cj4+Pj4+IGRpZmYgLS1naXQgYS9p
-bmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPj4+Pj4g
-aW5kZXggNGRmOWJiNi4uZmE0Y2FiMCAxMDA2NDQKPj4+Pj4gLS0tIGEvaW5jbHVkZS91YXBpL2xp
-bnV4L2t2bS5oCj4+Pj4+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+Pj4+PiBAQCAt
-NzUxLDYgKzc1MSwxNiBAQCBzdHJ1Y3Qga3ZtX3BwY19yZXNpemVfaHB0IHsKPj4+Pj4gIMKgICNk
-ZWZpbmUgS1ZNX1MzOTBfU0lFX1BBR0VfT0ZGU0VUIDEKPj4+Pj4gIMKgIC8qCj4+Pj4+ICsgKiBP
-biBhcm0vYXJtNjQsIG1hY2hpbmUgdHlwZSBjYW4gYmUgdXNlZCB0byByZXF1ZXN0IHRoZSBwaHlz
-aWNhbAo+Pj4+PiArICogYWRkcmVzcyBzaXplIGZvciB0aGUgVk0uIEJpdHMgWzctMF0gaGF2ZSBi
-ZWVuIHJlc2VydmVkIGZvciB0aGUKPj4+Pj4gKyAqIFBBIHNpemUgc2hpZnQgKGkuZSwgbG9nMihQ
-QV9TaXplKSkuIEZvciBiYWNrd2FyZCBjb21wYXRpYmlsaXR5LAo+Pj4+PiArICogdmFsdWUgMCBp
-bXBsaWVzIHRoZSBkZWZhdWx0IElQQSBzaXplLCB3aGljaCBpcyA0MGJpdHMuCj4+Pj4+ICsgKi8K
-Pj4+Pj4gKyNkZWZpbmUgS1ZNX1ZNX1RZUEVfQVJNX1BIWVNfU0hJRlRfTUFTS8KgwqDCoCAweGZm
-Cj4+Pj4+ICsjZGVmaW5lIEtWTV9WTV9UWVBFX0FSTV9QSFlTX1NISUZUKHgpwqDCoMKgwqDCoMKg
-wqAgXAo+Pj4+PiArwqDCoMKgICgoeCkgJiBLVk1fVk1fVFlQRV9BUk1fUEhZU19TSElGVF9NQVNL
-KQo+Pj4+Cj4+Pj4gVGhpcyBzZWVtcyBsaWtlIHlvdSdyZSBhbGxvY2F0aW5nIHF1aXRlIGEgbG90
-IG9mIGJpdHMgaW4gYSBub24tZXh0ZW5zaWJsZQo+Pj4+IGludGVyZmFjZSB0byBhIGZhaXJseSBl
-c290ZXJpYyBwYXJhbWV0ZXIuIFdvdWxkIGl0IGJlIGJldHRlciB0byBhZGQgYW5vdGhlcgo+Pj4+
-IGlvY3RsLCBvciBjb25kZW5zZSB0aGUgbnVtYmVyIG9mIHNpemVzIHlvdSBzdXBwb3J0IGluc3Rl
-YWQ/Cj4+Pgo+Pj4gQXMgSSBleHBsYWluZWQgaW4gdGhlIG90aGVyIHRocmVhZCwgd2UgbmVlZCB0
-aGUgc2l6ZSBhcyBzb29uIGFzIHRoZSBWTQo+Pj4gaXMgY3JlYXRlZC4gVGhlIG1ham9yIGNoYWxs
-ZW5nZSBpcyBrZWVwaW5nIHRoZSBiYWNrd2FyZCBjb21wYXRpYmlsaXR5IGJ5Cj4+PiBtYXBwaW5n
-IDAgdG8gNDBiaXRzLiBJIHdpbGwgZ2l2ZSBpdCBhIHRob3VnaHQuCj4+Cj4+IEhlcmUgaXMgb25l
-IG9wdGlvbi4gV2UgY291bGQgcmUtdXNlIHRoZSB7Vn1UQ1JfRUx4LntJfVBTIGZpZWxkIGZvcm1h
-dCwgd2hpY2gKPj4gb2NjdXBpZXMgMyBiaXRzIGFuZCBoYXMgdGhlIGZvbGxvd2luZyBkZWZpbml0
-aW9ucy4gKElEX0FBNjRNTUZSMF9FTDE6UEFSYW5nZQo+PiBhbHNvIGhhcyB0aGUgZmllbGQgZGVm
-aW5pdGlvbnMsIGV4Y2VwdCB0aGF0IHRoZSBmaWVsZCBpcyA0Yml0cyB3aWRlLCBidXQKPj4gb25s
-eSAzYml0cyBhcmUgdXNlZCkKPj4KPj4gMDAwIDMyIGJpdHMsIDRHQi4KPj4gMDAxIDM2IGJpdHMs
-IDY0R0IuCj4+IDAxMCA0MCBiaXRzLCAxVEIuCj4+IDAxMSA0MiBiaXRzLCA0VEIuCj4+IDEwMCA0
-NCBiaXRzLCAxNlRCLgo+PiAxMDEgNDggYml0cywgMjU2VEIuCj4+IDExMCA1MiBiaXRzLCA0UEIK
-Pj4KPj4gQnV0IHdlIG5lZWQgdG8gbWFwIDAgPT4gNDBiaXRzIElQQSB0byBtYWtlIG91ciBBQkkg
-YmFja3dhcmQgY29tcGF0aWJsZS4gU28KPj4gd2UgY291bGQgdXNlIHRoZSBhZGRpdGlvbmFsIG9u
-ZSBiaXQgdG8gaW5kaWNhdGUgdGhhdCBJUEEgc2l6ZSBpcyByZXF1ZXN0ZWQKPj4gaW4gdGhlIDMg
-Yml0cy4KPj4KPj4gaS5lLAo+Pgo+PiBtYWNoaW5lX3R5cGU6Cj4+Cj4+IEJpdCBbMjowXQktIFJl
-cXVlc3RlZCBJUEEgc2l6ZS4gVmFsdWVzIGZvbGxvdyBWVENSX0VMMi5QUyBmb3JtYXQuCj4+Cj4+
-IEJpdCBbM10JCS0gMSA9PiBJUEEgU2l6ZSBiaXRzIChCaXRzWzI6MF0pIHJlcXVlc3RlZC4KPj4g
-CQkwID0+IE5vdCByZXF1ZXN0ZWQKPj4KPj4gVGhlIG9ubHkgbWlub3IgZG93biBzaWRlIGlzIHJl
-c3RyaWN0aW5nIHRvIHRoZSBwcmVkZWZpbmVkIHZhbHVlcyBhYm92ZSwKPj4gd2hpY2ggaXMgbm90
-IGEgcmVhbCBpc3N1ZSBmb3IgYSBWTS4KPj4KPj4gVGhvdWdodHMgPwo+IAo+IEknZCBiZSB2ZXJ5
-IHdhcnkgb2YgdXNpbmcgdGhhdCA0dGggYml0IHRvIGRvIHNvbWV0aGluZyB0aGF0IGlzIG5vdCBp
-bgo+IHRoZSBhcmNoaXRlY3R1cmUuIFdlIGhhdmUgb25seSBhIHNpbmdsZSB2YWx1ZSBsZWZ0IHRv
-IGJlIHVzZWQgKDBiMTExKSwKPiBhbmQgdGhlbiB5b3VyIHNjaGVtZSBjbGFzaGVzIHdpdGggdGhl
-IGFyY2hpdGVjdHVyZSBkZWZpbml0aW9uLgoKSSBhZ3JlZS4gSG93ZXZlciwgaWYgd2UgZXZlciBn
-byBiZXlvbmQgdGhlIDNiaXRzIGluIFBBUmFuZ2UsIHdlIGhhdmUgYW4KaXNzdWUgd2l0aCB7Vn1U
-Q1IgY291bnRlciBwYXJ0LiBCdXQgbGV0cyBub3QgdGFrZSB0aGF0IGNoYW5jZS4KCj4gCj4gSSdk
-IHJhdGhlciBlbmNvZGUgdGhpbmdzIGluIGEgd2F5IHRoYXQgaXMgaW5kZXBlbmRlbnQgZnJvbSB0
-aGUKPiBhcmNoaXRlY3R1cmUsIGFuZCBiZSBkb25lIHdpdGggaXQuIFlvdSBjYW4gbWFwIDAgdG8g
-NDBiaXRzLCBhbmQgd2UgaGF2ZQo+IHRoZSBhYmlsaXR5IHRvIGV4cHJlc3MgYWxsIHZhbHVlcyB0
-aGUgYXJjaGl0ZWN0dXJlIGhhcyAoanVzdCBpbiBhCj4gZGlmZmVyZW50IG9yZGVyKS4KClRoZSBv
-dGhlciBvcHRpb24gSSBjYW4gdGhpbmsgb2YgaXMgZW5jb2RpbmcgYSBzaWduZWQgbnVtYmVyIHdo
-aWNoIGlzIHRoZSAKZGlmZmVyZW5jZSBvZiB0aGUgSVBBIGZyb20gNDAuIEJ1dCB0aGF0IHdvdWxk
-IG5lZWQgNSBiaXRzIGlmIHdlIHdlcmUgdG8KZW5jb2RlIGl0IGFzIGl0IGlzLiBBbmQgaWYgd2Ug
-d2FudCB0byBzcXVlZXplIGl0IGluIDRiaXQsIHdlIGNvdWxkIHN0b3JlIApoYWxmIHRoZSBkaWZm
-ZXJlbmNlIChsaW1pdGluZyB0aGUgSVBBIGxpbWl0IHRvIGV2ZW4gbnVtYmVycykuCgppLmUgSVBB
-ID0gNDAgKyAyICogc2lnbl9leHRlbmQoYml0c1szOjApOwoKClN1enVraQpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 04/07/18 10:38, Christoffer Dall wrote:
+> Implement the required MMIO accessors for GICv2 and GICv3 for the
+> IGROUPR distributor and redistributor registers.
+> 
+> This can allow guests to change behavior compared to running on previous
+> versions of KVM, but only to align with the architecture and hardware
+> implementations.
+> 
+> This also allows userspace to configure the groups for interrupts.  Note
+> that this potentially results in GICv2 guests not receiving interrupts
+> after migration if migrating from an older kernel that exposes GICv2
+> interrupts as group 1.
+> 
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+> I implemented (but stashed) a version of this which predicated the
+> behavior based on the value of GICD_IIDR revision field, falling back to
+> ignoring writes and resetting GICv2 groups to 0 if the guest wrote a
+> revision less than 2.  However, current QEMU implementations simply
+> don't write the GICD_IIDR, so this doesn't help at all without changing
+> QEMU anyhow.
+> 
+> The only actual fix I can see here to work around the problem in the
+> kernel is to require an opt-in to allow restoring groups from userspace,
+> but that's a lot of logic to support cross-kernel version migration.
+> 
+> Question: Do we expect that cross-kernel version migration is a critical
+> feature that people really expect to work, and do we actually have
+> examples of catering to this in the kernel elsewhere?  (Also, how would
+> then that relate to the whole 'adding a new sysreg breaks migration'
+> situation?)
+
+I don't really get why QEMU doesn't try to restore GICD_IIDR, while it
+is definitely trying to restore RO sysregs (and that's how we detect
+incompatibilities).
+
+I think we should at least give userspace a chance to do the right
+thing. If it doesn't, well, too bad.
+
+How bad is that "writable GICD_IIDR" patch? Because at this stage, and
+in the absence of any comment, I'm close to just pick that series and
+merge it for 4.19.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
