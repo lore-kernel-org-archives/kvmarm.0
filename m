@@ -1,21 +1,23 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
 Subject: [PATCH v5 0/7] KVM: Support PUD hugepages at stage 2
-Date: Mon,  9 Jul 2018 15:38:27 +0100
-Message-ID: <20180709143835.28971-1-punit.agrawal@arm.com>
+Date: Mon,  9 Jul 2018 15:38:28 +0100
+Message-ID: <20180709143835.28971-2-punit.agrawal@arm.com>
+References: <20180709143835.28971-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 19D514A054
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:26:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FDC849F87
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:26:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UondoXxRRKvw for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Jul 2018 10:26:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AED6A40196
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:26:00 -0400 (EDT)
+ with ESMTP id CQTuUiea7dfI for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jul 2018 10:26:08 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC87140196
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:26:08 -0400 (EDT)
+In-Reply-To: <20180709143835.28971-1-punit.agrawal@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -53,6 +55,7 @@ Thanks,
 Punit
 
 v4 -> v5:
+
 * Patch 1 - Drop helper stage2_should_exec() and refactor the
   condition to decide if a page table entry should be marked
   executable
@@ -62,6 +65,7 @@ v4 -> v5:
   helpers directly
 * Patch 7 - Add a note to update the PUD hugepage support when number
   of levels of stage 2 tables differs from stage 1
+
 
 v3 -> v4:
 * Patch 1 and 7 - Don't put down hugepages pte if logging is enabled
@@ -80,6 +84,7 @@ v1 -> v2:
 
 [0] https://www.spinics.net/lists/arm-kernel/msg663562.html
 [1] https://www.spinics.net/lists/kvm/msg171065.html
+
 
 Punit Agrawal (7):
   KVM: arm/arm64: Share common code in user_mem_abort()
