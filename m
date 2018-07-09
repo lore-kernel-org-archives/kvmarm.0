@@ -1,112 +1,175 @@
 From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v5 3/7] KVM: arm64: Support dirty page tracking for PUD hugepages
-Date: Mon,  9 Jul 2018 15:41:20 +0100
-Message-ID: <20180709144124.29164-3-punit.agrawal@arm.com>
+Subject: [PATCH v5 4/7] KVM: arm64: Support PUD hugepage in stage2_is_exec()
+Date: Mon,  9 Jul 2018 15:41:21 +0100
+Message-ID: <20180709144124.29164-4-punit.agrawal@arm.com>
 References: <20180709143835.28971-1-punit.agrawal@arm.com>
  <20180709144124.29164-1-punit.agrawal@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39F2B4A054
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:29:22 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nRlN+TKxI2YO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Jul 2018 10:29:21 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEC6C40196
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Jul 2018 10:29:20 -0400 (EDT)
 In-Reply-To: <20180709144124.29164-1-punit.agrawal@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, will.deacon@arm.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+Cc: marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 In preparation for creating PUD hugepages at stage 2, add support for
-write protecting PUD hugepages when they are encountered. Write
-protecting guest tables is used to track dirty pages when migrating
-VMs.
+detecting execute permissions on PUD page table entries. Faults due to
+lack of execute permissions on page table entries is used to perform
+i-cache invalidation on first execute.
 
-Also, provide trivial implementations of required kvm_s2pud_* helpers
-to allow sharing of code with arm32.
+Provide trivial implementations of arm32 helpers to allow sharing of
+code.
 
 Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Russell King <linux@armlinux.org.uk>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   | 16 ++++++++++++++++
- arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
- virt/kvm/arm/mmu.c               | 11 +++++++----
- 3 files changed, 33 insertions(+), 4 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h         |  6 ++++
+ arch/arm64/include/asm/kvm_mmu.h       |  5 +++
+ arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
+ virt/kvm/arm/mmu.c                     | 49 +++++++++++++++++++++++---
+ 4 files changed, 57 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index d095c2d0b284..c23722f75d5c 100644
+index c23722f75d5c..d05c8986e495 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -80,6 +80,22 @@ void kvm_clear_hyp_idmap(void);
+@@ -96,6 +96,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+ }
  
- #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
  
-+/*
-+ * The following kvm_*pud*() functionas are provided strictly to allow
-+ * sharing code with arm64. They should never be called in practice.
-+ */
-+static inline void kvm_set_s2pud_readonly(pud_t *pud)
-+{
-+	BUG();
-+}
-+
-+static inline bool kvm_s2pud_readonly(pud_t *pud)
++static inline bool kvm_s2pud_exec(pud_t *pud)
 +{
 +	BUG();
 +	return false;
 +}
 +
-+
  static inline void kvm_set_pmd(pmd_t *pmd, pmd_t new_pmd)
  {
  	*pmd = new_pmd;
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 689def9bb9d5..84051930ddfe 100644
+index 84051930ddfe..15bc1be8f82f 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -239,6 +239,16 @@ static inline bool kvm_s2pmd_exec(pmd_t *pmdp)
- 	return !(READ_ONCE(pmd_val(*pmdp)) & PMD_S2_XN);
+@@ -249,6 +249,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+ 	return kvm_s2pte_readonly((pte_t *)pudp);
  }
  
-+static inline void kvm_set_s2pud_readonly(pud_t *pudp)
++static inline bool kvm_s2pud_exec(pud_t *pudp)
 +{
-+	kvm_set_s2pte_readonly((pte_t *)pudp);
-+}
-+
-+static inline bool kvm_s2pud_readonly(pud_t *pudp)
-+{
-+	return kvm_s2pte_readonly((pte_t *)pudp);
++	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
 +}
 +
  static inline bool kvm_page_empty(void *ptr)
  {
  	struct page *ptr_page = virt_to_page(ptr);
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index fd208eac9f2a..10ae592b78b8 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -193,6 +193,8 @@
+ #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+ #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+ 
++#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
++
+ /*
+  * Memory Attribute override for Stage-2 (MemAttr[3:0])
+  */
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e131b7f9b7d7..ed8f8271c389 100644
+index ed8f8271c389..e73909a31e02 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1288,9 +1288,12 @@ static void  stage2_wp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
- 	do {
- 		next = stage2_pud_addr_end(addr, end);
- 		if (!stage2_pud_none(*pud)) {
--			/* TODO:PUD not supported, revisit later if supported */
--			BUG_ON(stage2_pud_huge(*pud));
--			stage2_wp_pmds(pud, addr, next);
-+			if (stage2_pud_huge(*pud)) {
-+				if (!kvm_s2pud_readonly(pud))
-+					kvm_set_s2pud_readonly(pud);
-+			} else {
-+				stage2_wp_pmds(pud, addr, next);
-+			}
- 		}
- 	} while (pud++, addr = next, addr != end);
+@@ -1038,23 +1038,62 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	return 0;
  }
-@@ -1333,7 +1336,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
-  *
-  * Called to start logging dirty pages after memory region
-  * KVM_MEM_LOG_DIRTY_PAGES operation is called. After this function returns
-- * all present PMD and PTEs are write protected in the memory region.
-+ * all present PUD, PMD and PTEs are write protected in the memory region.
-  * Afterwards read of dirty page log can be called.
-  *
-  * Acquires kvm_mmu_lock. Called with kvm->slots_lock mutex acquired,
+ 
+-static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++/*
++ * stage2_get_leaf_entry - walk the stage2 VM page tables and return
++ * true if a valid and present leaf-entry is found. A pointer to the
++ * leaf-entry is returned in the appropriate level variable - pudpp,
++ * pmdpp, ptepp.
++ */
++static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
++				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
+ {
++	pud_t *pudp;
+ 	pmd_t *pmdp;
+ 	pte_t *ptep;
+ 
+-	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	pudp = stage2_get_pud(kvm, NULL, addr);
++	if (!pudp || pud_none(*pudp) || !pud_present(*pudp))
++		return false;
++
++	if (pud_huge(*pudp)) {
++		*pudpp = pudp;
++		return true;
++	}
++
++	pmdp = stage2_pmd_offset(pudp, addr);
+ 	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
+ 		return false;
+ 
+-	if (pmd_thp_or_huge(*pmdp))
+-		return kvm_s2pmd_exec(pmdp);
++	if (pmd_thp_or_huge(*pmdp)) {
++		*pmdpp = pmdp;
++		return true;
++	}
+ 
+ 	ptep = pte_offset_kernel(pmdp, addr);
+ 	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
+ 		return false;
+ 
+-	return kvm_s2pte_exec(ptep);
++	*ptepp = ptep;
++	return true;
++}
++
++static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++{
++	pud_t *pudp = NULL;
++	pmd_t *pmdp = NULL;
++	pte_t *ptep = NULL;
++	bool found;
++
++	found = stage2_get_leaf_entry(kvm, addr, &pudp, &pmdp, &ptep);
++	if (!found)
++		return false;
++
++	if (pudp)
++		return kvm_s2pud_exec(pudp);
++	else if (pmdp)
++		return kvm_s2pmd_exec(pmdp);
++	else
++		return kvm_s2pte_exec(ptep);
+ }
+ 
+ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
 -- 
 2.17.1
