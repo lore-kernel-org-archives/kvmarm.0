@@ -1,63 +1,135 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7 1/4] arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
-Date: Wed, 11 Jul 2018 08:45:11 +0100
-Message-ID: <1cbb0f3f-1bc4-5205-d28c-1843d09a702e@arm.com>
-References: <20180710164952.23736-1-james.morse@arm.com>
- <20180710164952.23736-2-james.morse@arm.com>
- <b0eb95f3-7905-8aab-f816-529c17f07e04@huawei.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH v3 15/20] kvm: arm/arm64: Allow tuning the physical
+ address size for VM
+Date: Wed, 11 Jul 2018 10:05:50 +0100
+Message-ID: <0d9d48fc-f913-9f05-afbe-83299c470611@arm.com>
+References: <1530270944-11351-16-git-send-email-suzuki.poulose@arm.com>
+ <20180704155104.GN4828@arm.com>
+ <12d1832a-1a13-7dd4-662b-addf58400789@arm.com>
+ <fe9f5aa5-b283-07e0-5f0e-e97d96b780e7@arm.com>
+ <9f1af26e-2913-2b0b-1352-63160096f78f@arm.com>
+ <f3463d0a-c6a3-c34d-acb3-13c99fc61c5a@arm.com>
+ <20180709112326.GD9486@e103592.cambridge.arm.com>
+ <17f8d585-3489-ab6f-6ee1-4d8d337dcf9c@arm.com>
+ <20180709133750.GE9486@e103592.cambridge.arm.com>
+ <377420ce-97a8-4359-6224-273d91f37247@arm.com>
+ <20180710170330.GJ9486@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2FCB4A0C9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jul 2018 03:32:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8y16Pbvh9GVu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Jul 2018 03:32:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A43CF49E14
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Jul 2018 03:32:28 -0400 (EDT)
-In-Reply-To: <b0eb95f3-7905-8aab-f816-529c17f07e04@huawei.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>, James Morse <james.morse@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: linuxarm@huawei.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180710170330.GJ9486@e103592.cambridge.arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, cdall@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, punit.agrawal@arm.com, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/07/18 07:48, gengdongjiu wrote:
-> Hi, James,
+On 10/07/18 18:03, Dave Martin wrote:
+> On Tue, Jul 10, 2018 at 05:38:39PM +0100, Suzuki K Poulose wrote:
+>> On 09/07/18 14:37, Dave Martin wrote:
+>>> On Mon, Jul 09, 2018 at 01:29:42PM +0100, Marc Zyngier wrote:
+>>>> On 09/07/18 12:23, Dave Martin wrote:
 > 
 > [...]
->> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
->> index d10944e619d3..e3940f8715a5 100644
->> --- a/Documentation/virtual/kvm/api.txt
->> +++ b/Documentation/virtual/kvm/api.txt
->> @@ -835,11 +835,13 @@ struct kvm_clock_data {
->>  
->>  Capability: KVM_CAP_VCPU_EVENTS
->>  Extended by: KVM_CAP_INTR_SHADOW
->> -Architectures: x86
->> -Type: vm ioctl
->> +Architectures: x86, arm64
 > 
->    In my previous patch, I only add the arm64 support, now you add patches to support arm32 platform,
->    so you can add "ARM" to the Architectures, for example: "Architectures: x86, ARM, arm64"
+>>>>> Wedging arguments into a few bits in the type argument feels awkward,
+>>>>> and may be regretted later if we run out of bits, or something can't be
+>>>>> represented in the chosen encoding.
+>>>>
+>>>> I think that's a pretty convincing argument for a "better" CREATE_VM,
+>>>> one that would have a clearly defined, structured (and potentially
+>>>> extensible) argument.
+>>>>
+>>>> I've quickly hacked the following:
+>>>>
+>>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>>> index b6270a3b38e9..3e76214034c2 100644
+>>>> --- a/include/uapi/linux/kvm.h
+>>>> +++ b/include/uapi/linux/kvm.h
+>>>> @@ -735,6 +735,20 @@ struct kvm_ppc_resize_hpt {
+>>>>   	__u32 pad;
+>>>>   };
+>>>>
+>>>> +struct kvm_create_vm2 {
+>>>> +	__u64	version;	/* Or maybe not */
+>>>> +	union {
+>>>> +		struct {
+>>>> +#define KVM_ARM_SVE_CAPABLE	(1 << 0)
+>>>> +#define KVM_ARM_SELECT_IPA	{1 << 1)
+>>>> +			__u64	capabilities;
+>>>> +			__u16	sve_vlen;
+>>>> +			__u8	ipa_size;
+>>>> +		} arm64;
+>>>> +		__u64	dummy[15];
+>>>> +	};
+>>>> +};
+>>>> +
+>>>>   #define KVMIO 0xAE
+>>>>
+>>>>   /* machine type bits, to be used as argument to KVM_CREATE_VM */
+>>>>
+>>>> Other architectures could fill in their own bits if they need to.
+>>>>
+>>>> Thoughts?
+>>>
+>>> This kind of thing should work, but it may still get messy when we
+>>> add additional fields.
+>>
+>>
+>> Marc, Dave,
+>>
+>> I like Dave's approach. Some comments below.
+>>
+>>>
+>>> It we want this to work cross-arch, would it make sense to go
+>>> for a more generic approach, say
+>>>
+>>> struct kvm_create_vm_attr_any {
+>>>          __u32   type;
+>>> };
+>>>
+>>> #define KVM_CREATE_VM_ATTR_ARCH_CAPABILITIES 1
+>>> struct kvm_create_vm_attr_arch_capabilities {
+>>>          __u32   type;
+>>>          __u16   size; /* support future expansion of capabilities[] */
+>>>          __u16   reserved;
+>>>          __u64   capabilities[1];
+>>> };
+>>
+>> We also need to advertise which attributes are supported by the host,
+>> so that the user can tune the available ones. That would make a bit mask
+>> like the above trickier, unless we return the supported values back
+>> in the argument ptr for the "probe" call. And this scheme in general
+>> can be useful for passing back a non-boolean result specific to the
+>> attribute, without having a per-attribute ioctl. (e.g, maximum limit
+>> for IPA).
+> 
+> Maybe, but this could quickly become bloated.  (My approach already
+> feels a bit bloated...)
+> 
+> I'm not sure that arbitrarily complex negotiation will really be
+> needed, but userspace might want to change its mind if setting a
+> particular propertiy fails.
+> 
+> An alternative might be to have a bunch of per-VM ioctls to configure
+> different things, like x86 has.  There's at least precedent for that.
+> For arm, we currently only have a few.  That allows for easy extension,
+> at the cost of adding ioctls.
 
-That should be the job of the last patch, shouldn't it? At this point in
-the series, there is no 32bit support whatsoever.
+As you know, one of the major problems with the per-VM ioctls is
+the ordering of different operations and tracking to make sure that
+the userspace follows the expected order. e.g, the first approach for
+IPA series was based on this and it made things complex enough to drop
+it.
 
-Thanks,
+> 
+> There may be some ioctls we can reuse, like KVM_ENABLE_CAP for per-
+> vm capability flags.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+May be we could switch to KVM_VM_CAPS and pass a list of capabilities
+to be enabled at creation time ? The kvm_enable_cap can pass in additional
+arguments for each cap. That way we don't have to rely on a new set of
+attributes and probing becomes straight forward.
+
+Suzuki
