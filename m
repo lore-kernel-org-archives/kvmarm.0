@@ -1,27 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v7 3/4] KVM: arm64: Share the parts of get/set events
- useful to 32bit
-Date: Fri, 13 Jul 2018 16:27:37 +0100
-Message-ID: <77fa3cb5-ef9c-962a-0d0c-b7cac19c1ce7@arm.com>
-References: <20180710164952.23736-1-james.morse@arm.com>
- <20180710164952.23736-4-james.morse@arm.com>
- <b392c9e1-d0e4-9674-a223-351b381db76c@huawei.com>
+Subject: [PATCH v8 0/4] support exception state migration and set VSESR_EL2 by
+ user space
+Date: Fri, 13 Jul 2018 16:47:47 +0100
+Message-ID: <20180713154751.18131-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0E74A0DD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:14:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 538D64A110
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:35:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vQg7e14i51LI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Jul 2018 11:14:50 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5853E4A0D9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:14:50 -0400 (EDT)
-In-Reply-To: <b392c9e1-d0e4-9674-a223-351b381db76c@huawei.com>
-Content-Language: en-US
+ with ESMTP id eWsheXq5Uv3e for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Jul 2018 11:35:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E0B54A0DF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:35:12 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,46 +26,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linuxarm@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linuxarm@huawei.com, gengdongjiu@huawei.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi gengdongjiu,
+Hi guys,
 
-On 11/07/18 08:16, gengdongjiu wrote:
-> On 2018/7/11 0:49, James Morse wrote:
->> The get/set events helpers to do some work to check reserved
->> and padding fields are zero. This is useful on 32bit too.
->>
->> Move this code into virt/kvm/arm/arm.c, and give the arch
->> code some underscores.
->>
->> This is temporarily hidden behind __KVM_HAVE_VCPU_EVENTS until
->> 32bit is wired up.
+This is GengDongjiu's get/set events series[0], with additional plumbing for
+32bit.
 
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index a94eab71e5c7..f70d24e1751d 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -1044,6 +1044,34 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+Changes since v7: removed the temporary #ifdefs and updated the documentation
+in patch 4.
 
->> +#ifdef __KVM_HAVE_VCPU_EVENTS	/* temporary: until 32bit is wired up */
+This series adds the get/set events API to KVM for arm/arm64 so that
+user-space can migrate pending SError, (which KVM may have made pending
+as part of its device emulation), and for RAS make a new SError with a
+specific ESR value pending. (Only systems with the v8.2 RAS Extensions
+can specify an ESR, KVM advertises this capability with a new cap:
+KVM_CAP_ARM_INJECT_SERROR_ESR)
 
-[..]
-
->> +#endif /* __KVM_HAVE_VCPU_EVENTS */
-
-> In [PATCH v7 4/4] KVM: arm: Add 32bit get/set events support, I see you> remove "__KVM_HAVE_VCPU_EVENTS" in kvm_arch_vcpu_ioctl()
-> but here it adds, it looks like strange.
-> so maybe it is better keep it in both place, or remove them both.
-> 
-> From the comments /* temporary: until 32bit is wired up */, do you forget
-> to remove the __KVM_HAVE_VCPU_EVENTS	after wiring up the 32bit?
-
-Indeed I did, the 'temporary' note was meant to remind me!
-(and I forgot about the documentation too)
+User-space can use this for emulation of the v8.2 CPU RAS features
+(using error nodes backed by mmio) or as part of NOTIFY_SEI which
+extends a v8.2 RAS SError to also have firmware-first CPER records.
 
 
-Thanks!
+Thanks,
 
 James
+
+
+Dongjiu Geng (2):
+  arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+  arm64: KVM: export the capability to set guest SError syndrome
+
+James Morse (2):
+  KVM: arm64: Share the parts of get/set events useful to 32bit
+  KVM: arm: Add 32bit get/set events support
+
+ Documentation/virtual/kvm/api.txt    | 44 ++++++++++++++++++++++++---
+ arch/arm/include/asm/kvm_host.h      |  5 ++++
+ arch/arm/include/uapi/asm/kvm.h      | 13 ++++++++
+ arch/arm/kvm/guest.c                 | 23 ++++++++++++++
+ arch/arm64/include/asm/kvm_emulate.h |  5 ++++
+ arch/arm64/include/asm/kvm_host.h    |  7 +++++
+ arch/arm64/include/uapi/asm/kvm.h    | 13 ++++++++
+ arch/arm64/kvm/guest.c               | 33 ++++++++++++++++++++
+ arch/arm64/kvm/inject_fault.c        |  6 ++--
+ arch/arm64/kvm/reset.c               |  4 +++
+ include/uapi/linux/kvm.h             |  1 +
+ virt/kvm/arm/arm.c                   | 45 ++++++++++++++++++++++++++++
+ 12 files changed, 192 insertions(+), 7 deletions(-)
+
+-- 
+2.18.0
