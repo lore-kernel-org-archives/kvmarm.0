@@ -1,101 +1,76 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 02/17] virtio: pci-legacy: Validate queue pfn
-Date: Fri, 13 Jul 2018 09:54:56 +0100
-Message-ID: <0e475b0c-5c38-ef37-3c87-486f418c609e@arm.com>
-References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
- <1522156531-28348-3-git-send-email-suzuki.poulose@arm.com>
- <20180327170823-mutt-send-email-mst@kernel.org>
- <20180713004545-mutt-send-email-mst@kernel.org>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v7 3/4] KVM: arm64: Share the parts of get/set events
+ useful to 32bit
+Date: Fri, 13 Jul 2018 16:27:37 +0100
+Message-ID: <77fa3cb5-ef9c-962a-0d0c-b7cac19c1ce7@arm.com>
+References: <20180710164952.23736-1-james.morse@arm.com>
+ <20180710164952.23736-4-james.morse@arm.com>
+ <b392c9e1-d0e4-9674-a223-351b381db76c@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180713004545-mutt-send-email-mst@kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0E74A0DD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:14:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vQg7e14i51LI for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Jul 2018 11:14:50 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5853E4A0D9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Jul 2018 11:14:50 -0400 (EDT)
+In-Reply-To: <b392c9e1-d0e4-9674-a223-351b381db76c@huawei.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, kristina.martsenko@arm.com, mark.rutland@arm.com, Jason Wang <jasowang@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linuxarm@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/07/18 01:36, Michael S. Tsirkin wrote:
-> On Tue, Mar 27, 2018 at 05:11:04PM +0300, Michael S. Tsirkin wrote:
->> On Tue, Mar 27, 2018 at 02:15:12PM +0100, Suzuki K Poulose wrote:
->>> Legacy PCI over virtio uses a 32bit PFN for the queue. If the
->>> queue pfn is too large to fit in 32bits, which we could hit on
->>> arm64 systems with 52bit physical addresses (even with 64K page
->>> size), we simply miss out a proper link to the other side of
->>> the queue.
->>>
->>> Add a check to validate the PFN, rather than silently breaking
->>> the devices.
->>>
->>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>> Cc: Jason Wang <jasowang@redhat.com>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Christoffer Dall <cdall@kernel.org>
->>> Cc: Peter Maydel <peter.maydell@linaro.org>
->>> Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>>   drivers/virtio/virtio_pci_legacy.c | 12 ++++++++++--
->>>   1 file changed, 10 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
->>> index 2780886..4b84a75 100644
->>> --- a/drivers/virtio/virtio_pci_legacy.c
->>> +++ b/drivers/virtio/virtio_pci_legacy.c
->>> @@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->>>   	struct virtqueue *vq;
->>>   	u16 num;
->>>   	int err;
->>> +	u64 q_pfn;
->>>   
->>>   	/* Select the queue we're interested in */
->>>   	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
->>> @@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->>>   	if (!vq)
->>>   		return ERR_PTR(-ENOMEM);
->>>   
->>> +	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
->>> +	if (q_pfn >> 32) {
->>> +		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
->>> +		err = -ENOMEM;
->>
->> ENOMEM seems wrong here. E2BIG?
->>
->>> +		goto out_del_vq;
->>> +	}
->>> +
->>>   	/* activate the queue */
->>> -	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
->>> -		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
->>> +	iowrite32((u32)q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
->>
->> Is the cast really necessary here?
->>
->>>   
->>>   	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
->>>   
->>> @@ -160,6 +167,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
->>>   
->>>   out_deactivate:
->>>   	iowrite32(0, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
->>> +out_del_vq:
->>>   	vring_del_virtqueue(vq);
->>>   	return ERR_PTR(err);
->>>   }
->>> -- 
->>> 2.7.4
+Hi gengdongjiu,
 
-Michael,
+On 11/07/18 08:16, gengdongjiu wrote:
+> On 2018/7/11 0:49, James Morse wrote:
+>> The get/set events helpers to do some work to check reserved
+>> and padding fields are zero. This is useful on 32bit too.
+>>
+>> Move this code into virt/kvm/arm/arm.c, and give the arch
+>> code some underscores.
+>>
+>> This is temporarily hidden behind __KVM_HAVE_VCPU_EVENTS until
+>> 32bit is wired up.
 
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index a94eab71e5c7..f70d24e1751d 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -1044,6 +1044,34 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+
+>> +#ifdef __KVM_HAVE_VCPU_EVENTS	/* temporary: until 32bit is wired up */
+
+[..]
+
+>> +#endif /* __KVM_HAVE_VCPU_EVENTS */
+
+> In [PATCH v7 4/4] KVM: arm: Add 32bit get/set events support, I see you> remove "__KVM_HAVE_VCPU_EVENTS" in kvm_arch_vcpu_ioctl()
+> but here it adds, it looks like strange.
+> so maybe it is better keep it in both place, or remove them both.
 > 
-> Ping are you going to address and repost, or should I drop this?
+> From the comments /* temporary: until 32bit is wired up */, do you forget
+> to remove the __KVM_HAVE_VCPU_EVENTS	after wiring up the 32bit?
 
-This was addressed and reposted as v3, which needs a minor update to the
-error message as mentioned here [0]. I will post the fixed version today.
+Indeed I did, the 'temporary' note was meant to remind me!
+(and I forgot about the documentation too)
 
-[0] http://lists.infradead.org/pipermail/linux-arm-kernel/2018-July/588398.html
 
-Thanks
-Suzuki
+Thanks!
+
+James
