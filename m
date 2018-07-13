@@ -1,125 +1,90 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v5 7/7] KVM: arm64: Add support for creating PUD hugepages at stage 2
-Date: Wed, 11 Jul 2018 17:19:06 +0100
-Message-ID: <87lgahoidh.fsf@e105922-lin.cambridge.arm.com>
-References: <20180709143835.28971-1-punit.agrawal@arm.com>
-        <20180709144124.29164-1-punit.agrawal@arm.com>
-        <20180709144124.29164-7-punit.agrawal@arm.com>
-        <bbc3f286-be5b-d0dc-2037-54d5b995a0a5@arm.com>
-        <87zhyxoize.fsf@e105922-lin.cambridge.arm.com>
-        <fe8b92a1-2584-61ab-39e2-4d3247f92c7c@arm.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 02/17] virtio: pci-legacy: Validate queue pfn
+Date: Fri, 13 Jul 2018 03:36:12 +0300
+Message-ID: <20180713004545-mutt-send-email-mst@kernel.org>
+References: <1522156531-28348-1-git-send-email-suzuki.poulose@arm.com>
+ <1522156531-28348-3-git-send-email-suzuki.poulose@arm.com>
+ <20180327170823-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <fe8b92a1-2584-61ab-39e2-4d3247f92c7c@arm.com> (Suzuki
-        K. Poulose's message of "Wed, 11 Jul 2018 17:13:54 +0100")
+Content-Disposition: inline
+In-Reply-To: <20180327170823-mutt-send-email-mst@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, marc.zyngier@arm.com, punit.agrawal@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, ard.biesheuvel@linaro.org, peter.maydell@linaro.org, kristina.martsenko@arm.com, mark.rutland@arm.com, Jason Wang <jasowang@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
+On Tue, Mar 27, 2018 at 05:11:04PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Mar 27, 2018 at 02:15:12PM +0100, Suzuki K Poulose wrote:
+> > Legacy PCI over virtio uses a 32bit PFN for the queue. If the
+> > queue pfn is too large to fit in 32bits, which we could hit on
+> > arm64 systems with 52bit physical addresses (even with 64K page
+> > size), we simply miss out a proper link to the other side of
+> > the queue.
+> > 
+> > Add a check to validate the PFN, rather than silently breaking
+> > the devices.
+> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > Cc: Christoffer Dall <cdall@kernel.org>
+> > Cc: Peter Maydel <peter.maydell@linaro.org>
+> > Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > ---
+> >  drivers/virtio/virtio_pci_legacy.c | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> > index 2780886..4b84a75 100644
+> > --- a/drivers/virtio/virtio_pci_legacy.c
+> > +++ b/drivers/virtio/virtio_pci_legacy.c
+> > @@ -122,6 +122,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >  	struct virtqueue *vq;
+> >  	u16 num;
+> >  	int err;
+> > +	u64 q_pfn;
+> >  
+> >  	/* Select the queue we're interested in */
+> >  	iowrite16(index, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_SEL);
+> > @@ -141,9 +142,15 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >  	if (!vq)
+> >  		return ERR_PTR(-ENOMEM);
+> >  
+> > +	q_pfn = virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT;
+> > +	if (q_pfn >> 32) {
+> > +		dev_err(&vp_dev->pci_dev->dev, "virtio-pci queue PFN too large\n");
+> > +		err = -ENOMEM;
+> 
+> ENOMEM seems wrong here. E2BIG?
+> 
+> > +		goto out_del_vq;
+> > +	}
+> > +
+> >  	/* activate the queue */
+> > -	iowrite32(virtqueue_get_desc_addr(vq) >> VIRTIO_PCI_QUEUE_ADDR_SHIFT,
+> > -		  vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+> > +	iowrite32((u32)q_pfn, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+> 
+> Is the cast really necessary here?
+> 
+> >  
+> >  	vq->priv = (void __force *)vp_dev->ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
+> >  
+> > @@ -160,6 +167,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
+> >  
+> >  out_deactivate:
+> >  	iowrite32(0, vp_dev->ioaddr + VIRTIO_PCI_QUEUE_PFN);
+> > +out_del_vq:
+> >  	vring_del_virtqueue(vq);
+> >  	return ERR_PTR(err);
+> >  }
+> > -- 
+> > 2.7.4
 
-> On 11/07/18 17:05, Punit Agrawal wrote:
->> Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
->>
->>> On 09/07/18 15:41, Punit Agrawal wrote:
->>>> KVM only supports PMD hugepages at stage 2. Now that the various page
->>>> handling routines are updated, extend the stage 2 fault handling to
->>>> map in PUD hugepages.
->>>>
->>>> Addition of PUD hugepage support enables additional page sizes (e.g.,
->>>> 1G with 4K granule) which can be useful on cores that support mapping
->>>> larger block sizes in the TLB entries.
->>>>
->>>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
->>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>>> Cc: Russell King <linux@armlinux.org.uk>
->>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
->>>> Cc: Will Deacon <will.deacon@arm.com>
->>>> ---
->>>>    arch/arm/include/asm/kvm_mmu.h         | 19 +++++++
->>>>    arch/arm64/include/asm/kvm_mmu.h       | 15 +++++
->>>>    arch/arm64/include/asm/pgtable-hwdef.h |  2 +
->>>>    arch/arm64/include/asm/pgtable.h       |  2 +
->>>>    virt/kvm/arm/mmu.c                     | 78 ++++++++++++++++++++++++--
->>>>    5 files changed, 112 insertions(+), 4 deletions(-)
->>>>
->>
->> [...]
->>
->>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>>> index a6d3ac9d7c7a..d8e2497e5353 100644
->>>> --- a/virt/kvm/arm/mmu.c
->>>> +++ b/virt/kvm/arm/mmu.c
->>
->> [...]
->>
->>>> @@ -1100,6 +1139,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->>>>    			  phys_addr_t addr, const pte_t *new_pte,
->>>>    			  unsigned long flags)
->>>>    {
->>>> +	pud_t *pud;
->>>>    	pmd_t *pmd;
->>>>    	pte_t *pte, old_pte;
->>>>    	bool iomap = flags & KVM_S2PTE_FLAG_IS_IOMAP;
->>>> @@ -1108,6 +1148,22 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->>>>    	VM_BUG_ON(logging_active && !cache);
->>>>      	/* Create stage-2 page table mapping - Levels 0 and 1 */
->>>> +	pud = stage2_get_pud(kvm, cache, addr);
->>>> +	if (!pud) {
->>>> +		/*
->>>> +		 * Ignore calls from kvm_set_spte_hva for unallocated
->>>> +		 * address ranges.
->>>> +		 */
->>>> +		return 0;
->>>> +	}
->>>> +
->>>> +	/*
->>>> +	 * While dirty page logging - dissolve huge PUD, then continue
->>>> +	 * on to allocate page.
->>>
->>> Punit,
->>>
->>> We don't seem to allocate a page here for the PUD entry, in case if it is dissolved
->>> or empty (i.e, stage2_pud_none(*pud) is true.).
->>
->> I was trying to avoid duplicating the PUD allocation by reusing the
->> functionality in stage2_get_pmd().
->>
->> Does the below updated comment help?
->>
->> 	/*
->> 	 * While dirty page logging - dissolve huge PUD, it'll be
->> 	 * allocated in stage2_get_pmd().
->> 	 */
->>
->> The other option is to duplicate the stage2_pud_none() case from
->> stage2_get_pmd() here.
->
-> I think the explicit check for stage2_pud_none() suits better here.
-> That would make it explicit that we are tearing down the entries
-> from top to bottom. Also, we may be able to short cut for case
-> where we know we just allocated a PUD page and hence we need another
-> PMD level page.
+Ping are you going to address and repost, or should I drop this?
 
-Ok, I'll add the PUD allocation code here.
-
->
-> Also, you are missing the comment about the assumption that stage2 PUD
-> level always exist with 4k fixed IPA.
-
-Hmm... I'm quite sure I wrote a comment to that effect but can't find it
-now. I'll include it in the next version.
-
-Thanks,
-Punit
-
->
-> Cheers
-> Suzuki
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+-- 
+MST
