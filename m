@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v3 5/9] KVM: arm/arm64: vgic: Signal IRQs using their
- configured group
-Date: Sat, 14 Jul 2018 19:05:36 +0200
-Message-ID: <1531587940-2490-6-git-send-email-christoffer.dall@arm.com>
+Subject: [PATCH v3 6/9] KVM: arm/arm64: vgic: Allow configuration of interrupt
+ groups
+Date: Sat, 14 Jul 2018 19:05:37 +0200
+Message-ID: <1531587940-2490-7-git-send-email-christoffer.dall@arm.com>
 References: <1531587940-2490-1-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 504214A135
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Jul 2018 12:53:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 262204A12E
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Jul 2018 12:53:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ArbH9im84nq6 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 14 Jul 2018 12:53:21 -0400 (EDT)
-Received: from EUR02-AM5-obe.outbound.protection.outlook.com
- (mail-am5eur02hn0215.outbound.protection.outlook.com [104.47.4.215])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 151804A14F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Jul 2018 12:53:21 -0400 (EDT)
+ with ESMTP id 2ftcSksyAXdj for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 14 Jul 2018 12:53:24 -0400 (EDT)
+Received: from EUR02-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur02hn0207.outbound.protection.outlook.com [104.47.6.207])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F31424A144
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 14 Jul 2018 12:53:23 -0400 (EDT)
 In-Reply-To: <1531587940-2490-1-git-send-email-christoffer.dall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,62 +33,179 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now when we have a group configuration on the struct IRQ, use this state
-when populating the LR and signaling interrupts as either group 0 or
-group 1 to the VM.  Depending on the model of the emulated GIC, and the
-guest's configuration of the VMCR, interrupts may be signaled as IRQs or
-FIQs to the VM.
+Implement the required MMIO accessors for GICv2 and GICv3 for the
+IGROUPR distributor and redistributor registers.
+
+This can allow guests to change behavior compared to running on previous
+versions of KVM, but only to align with the architecture and hardware
+implementations.
+
+This also allows userspace to configure the interrupts groups for GICv3.
+We don't allow userspace to write the groups on GICv2 just yet, because
+that would result in GICv2 guests not receiving interrupts after
+migrating from an older kernel that exposes GICv2 interrupts as group 1.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- include/linux/irqchip/arm-gic.h | 1 +
- virt/kvm/arm/vgic/vgic-v2.c     | 3 +++
- virt/kvm/arm/vgic/vgic-v3.c     | 6 +-----
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c    |  2 +-
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 12 +++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 11 +++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.c    | 38 ++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  6 ++++++
+ 5 files changed, 65 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-index 484f5bf..6c4aaf0 100644
---- a/include/linux/irqchip/arm-gic.h
-+++ b/include/linux/irqchip/arm-gic.h
-@@ -104,6 +104,7 @@
- #define GICH_LR_PENDING_BIT            (1 << 28)
- #define GICH_LR_ACTIVE_BIT             (1 << 29)
- #define GICH_LR_EOI                    (1 << 19)
-+#define GICH_LR_GROUP1                 (1 << 30)
- #define GICH_LR_HW                     (1 << 31)
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index a7c19cd..c0c0b88 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -313,7 +313,7 @@ int vgic_init(struct kvm *kvm)
 
- #define GICH_VMCR_ENABLE_GRP0_SHIFT    0
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index a5f2e44..df5e6a6 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -159,6 +159,9 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
-                }
+        vgic_debug_init(kvm);
+
+-       dist->implementation_rev = 1;
++       dist->implementation_rev = 2;
+        dist->initialized = true;
+
+ out:
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index db646f1..34e36fc 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -26,6 +26,8 @@
+  * The Revision field in the IIDR have the following meanings:
+  *
+  * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
++ * Revision 2: Interrupt groups are guest-configurable and signaled using
++ *            their configured groups.
+  */
+
+ static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+@@ -75,6 +77,13 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
         }
+ }
 
-+       if (irq->group)
-+               val |= GICH_LR_GROUP1;
++static void vgic_mmio_uaccess_write_v2_group(struct kvm_vcpu *vcpu,
++                                            gpa_t addr, unsigned int len,
++                                            unsigned long val)
++{
++       /* Ignore writes from userspace */
++}
 +
-        if (irq->hw) {
-                val |= GICH_LR_HW;
-                val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index cdce653..530b849 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -197,11 +197,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
-        if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
-                irq->line_level = false;
+ static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
+                                 gpa_t addr, unsigned int len,
+                                 unsigned long val)
+@@ -371,7 +380,8 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+                vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+                VGIC_ACCESS_32bit),
+        REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
+-               vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
++               vgic_mmio_read_group, vgic_mmio_write_group,
++               NULL, vgic_mmio_uaccess_write_v2_group, 1,
+                VGIC_ACCESS_32bit),
+        REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
+                vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index ebe10a0..49df2a1 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -59,6 +59,13 @@ bool vgic_supports_direct_msis(struct kvm *kvm)
+        return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
+ }
 
--       /*
--        * We currently only support Group1 interrupts, which is a
--        * known defect. This needs to be addressed at some point.
--        */
--       if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+       if (irq->group)
-                val |= ICH_LR_GROUP;
++/*
++ * The Revision field in the IIDR have the following meanings:
++ *
++ * Revision 2: Interrupt groups are guest-configurable and signaled using
++ *            their configured groups.
++ */
++
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+                                            gpa_t addr, unsigned int len)
+ {
+@@ -454,7 +461,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+                vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
+                VGIC_ACCESS_32bit),
+        REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
+-               vgic_mmio_read_rao, vgic_mmio_write_wi, NULL, NULL, 1,
++               vgic_mmio_read_group, vgic_mmio_write_group, NULL, NULL, 1,
+                VGIC_ACCESS_32bit),
+        REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
+                vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
+@@ -527,7 +534,7 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
 
-        val |= (u64)irq->priority << ICH_LR_PRIORITY_SHIFT;
+ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
+        REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
+-               vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
++               vgic_mmio_read_group, vgic_mmio_write_group, 4,
+                VGIC_ACCESS_32bit),
+        REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
+                vgic_mmio_read_enable, vgic_mmio_write_senable, 4,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index ff9655c..ae31bd0 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -40,6 +40,44 @@ void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
+        /* Ignore */
+ }
+
++unsigned long vgic_mmio_read_group(struct kvm_vcpu *vcpu,
++                                  gpa_t addr, unsigned int len)
++{
++       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++       u32 value = 0;
++       int i;
++
++       /* Loop over all IRQs affected by this read */
++       for (i = 0; i < len * 8; i++) {
++               struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++               if (irq->group)
++                       value |= BIT(i);
++
++               vgic_put_irq(vcpu->kvm, irq);
++       }
++
++       return value;
++}
++
++void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
++                          unsigned int len, unsigned long val)
++{
++       u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
++       int i;
++       unsigned long flags;
++
++       for (i = 0; i < len * 8; i++) {
++               struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++               spin_lock_irqsave(&irq->irq_lock, flags);
++               irq->group = !!(val & BIT(i));
++               vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++
++               vgic_put_irq(vcpu->kvm, irq);
++       }
++}
++
+ /*
+  * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
+  * of the enabled bit, so there is only one function for both here.
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 5693f6df..1079862 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -134,6 +134,12 @@ unsigned long vgic_mmio_read_rao(struct kvm_vcpu *vcpu,
+ void vgic_mmio_write_wi(struct kvm_vcpu *vcpu, gpa_t addr,
+                        unsigned int len, unsigned long val);
+
++unsigned long vgic_mmio_read_group(struct kvm_vcpu *vcpu, gpa_t addr,
++                                  unsigned int len);
++
++void vgic_mmio_write_group(struct kvm_vcpu *vcpu, gpa_t addr,
++                          unsigned int len, unsigned long val);
++
+ unsigned long vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
+                                    gpa_t addr, unsigned int len);
+
 --
 2.7.4
 
