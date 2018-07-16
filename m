@@ -1,26 +1,26 @@
 From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Subject: RE: [PATCH v4 07/10] KVM: arm/arm64: vgic: Return error on
- incompatible uaccess GICD_IIDR writes
-Date: Mon, 16 Jul 2018 15:43:28 +0000
-Message-ID: <AM5PR0401MB25455D849AB57AF98A3C91F49A5D0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+Subject: RE: [PATCH v4 10/10] KVM: arm/arm64: vgic: Update documentation of
+ the GIC devices wrt IIDR
+Date: Mon, 16 Jul 2018 15:59:42 +0000
+Message-ID: <AM5PR0401MB25454B501D430C2EB6BF1C069A5D0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
 References: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
- <1531746387-7033-8-git-send-email-christoffer.dall@arm.com>
+ <1531746387-7033-11-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBE384A124
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:30:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1C74A13E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:46:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uLoqHtqe5hcT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 11:30:31 -0400 (EDT)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com
- (mail-eopbgr60065.outbound.protection.outlook.com [40.107.6.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 974C64A15A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:30:31 -0400 (EDT)
-In-Reply-To: <1531746387-7033-8-git-send-email-christoffer.dall@arm.com>
+ with ESMTP id DzjF-czJCYsF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 11:46:52 -0400 (EDT)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com
+ (mail-he1eur01on0075.outbound.protection.outlook.com [104.47.0.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B29B04A111
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:46:51 -0400 (EDT)
+In-Reply-To: <1531746387-7033-11-git-send-email-christoffer.dall@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -44,111 +44,95 @@ Hi Christoffer,
 > To: kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org
 > Cc: kvm@vger.kernel.org; Marc Zyngier <marc.zyngier@arm.com>; Andre
 > Przywara <andre.przywara@arm.com>
-> Subject: [PATCH v4 07/10] KVM: arm/arm64: vgic: Return error on
-> incompatible uaccess GICD_IIDR writes
+> Subject: [PATCH v4 10/10] KVM: arm/arm64: vgic: Update documentation of
+> the GIC devices wrt IIDR
 > 
-> If userspace attempts to write a GICD_IIDR that does not match the
-> kernel version, return an error to userspace.  The intention is to allow
-> implementation changes inside KVM while avoiding silently breaking
-> migration resulting in guests not running without any clear indication
-> of what went wrong.
+> Update the documentation to reflect the ordering requirements of
+> restoring the GICD_IIDR register before any other registers and the
+> effects this has on restoring the interrupt groups for an emulated GICv2
+> insttance.
+> 
+> Also remove some outdated limitations in the documentation while we're
+> at it.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > ---
->  virt/kvm/arm/vgic/vgic-mmio-v2.c | 21 ++++++++++++++++++---
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 21 ++++++++++++++++++---
->  2 files changed, 36 insertions(+), 6 deletions(-)
+>  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  8 ++++++++
+>  Documentation/virtual/kvm/devices/arm-vgic.txt    | 15 +++++++++------
+>  2 files changed, 17 insertions(+), 6 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-
-> mmio-v2.c
-> index db646f1..4f0f2c4 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -75,6 +75,20 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu
-> *vcpu,
->  	}
->  }
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> index 2408ab7..eba20ae 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> @@ -100,6 +100,14 @@ Groups:
+>      Note that distributor fields are not banked, but return the same value
+>      regardless of the mpidr used to access the register.
 > 
-> +static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
-> +					   gpa_t addr, unsigned int len,
-> +					   unsigned long val)
-> +{
-> +	switch (addr & 0x0c) {
+> +    GICD_IIDR.Revision is updated when the KVM implementation is changed
+> in a
+> +    way directly observable by the guest or userspace.  Userspace should
+> read
+> +    GICD_IIDR from KVM and write back the read value to confirm its
+> expected
+> +    behavior is aligned with the KVM implementation.  Userspace should set
+> +    GICD_IIDR before setting any other registers.  to ensure the expected
+> +    behavior.
+> +
+> +
+>      The GICD_STATUSR and GICR_STATUSR registers are architecturally
+> defined such
+>      that a write of a clear bit has no effect, whereas a write with a set bit
+>      clears that value.  To allow userspace to freely set the values of these two
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> index b3ce126..4ff7635 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> @@ -49,9 +49,15 @@ Groups:
+>      index is specified with the vcpu_index field.  Note that most distributor
+>      fields are not banked, but return the same value regardless of the
+>      vcpu_index used to access the register.
+> -  Limitations:
+> -    - Priorities are not implemented, and registers are RAZ/WI
+> -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+> +
+> +    GICD_IIDR.Revision is updated when the KVM implementation of an
+> emulated
+> +    GICv2 is changed in a way directly observable by the guest or userspace.
+> +    Userspace should read GICD_IIDR from KVM and write back the read
+> value to
+> +    confirm its expected behavior is aligned with the KVM implementation.
+> +    Userspace should set GICD_IIDR before setting any other registers (both
+> +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS and
+> KVM_DEV_ARM_VGIC_GRP_CPU_REGS) to ensure
+> +    the expected behavior.  Unless GICD_IIDR has been set from userspace,
+> writes
+> +    to the interrupt group registers (GICD_IGROUPR) are ignored.
 
-I am just understanding the code, not sure if it make sense to replace hardcoded "0x0c".
+Newer user-space will write to GICD_IIDR, that mean interrupt-groups are supported otherwise not.
+And when interrupt-groups are not supported then writes to GICD_IGROUPR are ignored (backward compatibility)
+
+Is this understanding correct?
 
 Thanks
 -Bharat
 
-> +	case GIC_DIST_IIDR:
-> +		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
-> +			return -EINVAL;
-> +	}
-> +
-> +	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
-> +	return 0;
-> +}
-> +
->  static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
->  				 gpa_t addr, unsigned int len,
->  				 unsigned long val)
-> @@ -367,9 +381,10 @@ static void vgic_mmio_write_apr(struct kvm_vcpu
-> *vcpu,
->  }
+>    Errors:
+>      -ENXIO: Getting or setting this register is not yet supported
+>      -EBUSY: One or more VCPUs are running
+> @@ -94,9 +100,6 @@ Groups:
+>      use the lower 5 bits to communicate with the KVM device and must shift
+> the
+>      value left by 3 places to obtain the actual priority mask level.
 > 
->  static const struct vgic_register_region vgic_v2_dist_registers[] = {
-> -	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
-> -		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-> -		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GIC_DIST_CTRL,
-> +		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc,
-> +		NULL, vgic_mmio_uaccess_write_v2_misc,
-> +		12, VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
->  		vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
->  		VGIC_ACCESS_32bit),
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-
-> mmio-v3.c
-> index ef57a1a..abdb0ec 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -113,6 +113,20 @@ static void vgic_mmio_write_v3_misc(struct
-> kvm_vcpu *vcpu,
->  	}
->  }
-> 
-> +static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
-> +					   gpa_t addr, unsigned int len,
-> +					   unsigned long val)
-> +{
-> +	switch (addr & 0x0c) {
-> +	case GICD_IIDR:
-> +		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
-> +			return -EINVAL;
-> +	}
-> +
-> +	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
-> +	return 0;
-> +}
-> +
->  static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
->  					    gpa_t addr, unsigned int len)
->  {
-> @@ -449,9 +463,10 @@ static void vgic_mmio_write_pendbase(struct
-> kvm_vcpu *vcpu,
->  	}
-> 
->  static const struct vgic_register_region vgic_v3_dist_registers[] = {
-> -	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
-> -		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
-> -		VGIC_ACCESS_32bit),
-> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICD_CTLR,
-> +		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc,
-> +		NULL, vgic_mmio_uaccess_write_v3_misc,
-> +		16, VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICD_STATUSR,
->  		vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
->  		VGIC_ACCESS_32bit),
+> -  Limitations:
+> -    - Priorities are not implemented, and registers are RAZ/WI
+> -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+>    Errors:
+>      -ENXIO: Getting or setting this register is not yet supported
+>      -EBUSY: One or more VCPUs are running
 > --
 > 2.7.4
 > 
@@ -157,7 +141,7 @@ Thanks
 > kvmarm@lists.cs.columbia.edu
 > https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flist
 > s.cs.columbia.edu%2Fmailman%2Flistinfo%2Fkvmarm&amp;data=02%7C01%
-> 7Cbharat.bhushan%40nxp.com%7Cf2d3e98a8d1a48166ce108d5eb1d06f4%7C
-> 686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C636673432268886197&am
-> p;sdata=DitjaxtCqfVUge823Qw9IpT%2Fg9EoN2xI%2FIlj6mCdZ9k%3D&amp;r
-> eserved=0
+> 7Cbharat.bhushan%40nxp.com%7C55b2ec9f9b7b4d6e530c08d5eb1d0faf%7C
+> 686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C636673432404483929&am
+> p;sdata=RSQwNKkEYC02igGgPVIQmp40VsC9hU%2FFeiMcQBvYJOA%3D&am
+> p;reserved=0
