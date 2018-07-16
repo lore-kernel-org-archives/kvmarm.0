@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvm-unit-tests PATCH 1/2] arm64: timer: add TVAL accessors
-Date: Mon, 16 Jul 2018 16:14:37 +0100
-Message-ID: <20180716151438.9877-2-andre.przywara@arm.com>
+Subject: [kvm-unit-tests PATCH 2/2] arm64: timer: Add TVAL timeout IRQ trigger
+ test
+Date: Mon, 16 Jul 2018 16:14:38 +0100
+Message-ID: <20180716151438.9877-3-andre.przywara@arm.com>
 References: <20180716151438.9877-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8664A129
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE5D94A149
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7ZWjz7ojxKkS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 11:01:44 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2134A128
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:44 -0400 (EDT)
+ with ESMTP id jhMedmhM3bnM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 11:01:46 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC8184A168
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:45 -0400 (EDT)
 In-Reply-To: <20180716151438.9877-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,83 +32,44 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM arch timer features the CVAL register, which holds an absolute
-value that is compared against the counter value.
-But there is also the TVAL register, which is defined as (CVAL - counter),
-and can be used to program or read relative timeouts.
-
-Add accessors for the TVAL register, to be able to read and write them
-easily later.
+So far we were only testing the CVAL register. Add a test which programs
+a (relative) TVAL value to check this functionality as well.
+Also we go into WFI and wait for the interrupt to release us from it.
+The timer tests are run with a 2 second timeout on the host side, so
+that any failure in coming back would be covered.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/timer.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arm/timer.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/arm/timer.c b/arm/timer.c
-index 5f3135f..1c9ef44 100644
+index 1c9ef44..275d049 100644
 --- a/arm/timer.c
 +++ b/arm/timer.c
-@@ -40,6 +40,16 @@ static void write_vtimer_cval(u64 val)
- 	write_sysreg(val, cntv_cval_el0);
+@@ -211,6 +211,7 @@ static void test_timer(struct timer_info *info)
+ 	u64 now = info->read_counter();
+ 	u64 time_10s = read_sysreg(cntfrq_el0) * 10;
+ 	u64 later = now + time_10s;
++	s32 left;
+ 
+ 	/* We don't want the irq handler to fire because that will change the
+ 	 * timer state and we want to test the timer output signal.  We can
+@@ -236,6 +237,15 @@ static void test_timer(struct timer_info *info)
+ 
+ 	/* Disable the timer again */
+ 	info->write_ctl(0);
++
++	/* Test TVAL and IRQ trigger */
++	info->irq_received = false;
++	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
++	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
++	wfi();
++	left = info->read_tval();
++	report("interrupt received after TVAL/WFI", info->irq_received);
++	report("timer has expired (%d)", left < 0, left);
  }
  
-+static s32 read_vtimer_tval(void)
-+{
-+	return read_sysreg(cntv_tval_el0);
-+}
-+
-+static void write_vtimer_tval(s32 val)
-+{
-+	write_sysreg(val, cntv_tval_el0);
-+}
-+
- static u64 read_vtimer_ctl(void)
- {
- 	return read_sysreg(cntv_ctl_el0);
-@@ -65,6 +75,16 @@ static void write_ptimer_cval(u64 val)
- 	write_sysreg(val, cntp_cval_el0);
- }
- 
-+static s32 read_ptimer_tval(void)
-+{
-+	return read_sysreg(cntp_tval_el0);
-+}
-+
-+static void write_ptimer_tval(s32 val)
-+{
-+	write_sysreg(val, cntp_tval_el0);
-+}
-+
- static u64 read_ptimer_ctl(void)
- {
- 	return read_sysreg(cntp_ctl_el0);
-@@ -82,6 +102,8 @@ struct timer_info {
- 	u64 (*read_counter)(void);
- 	u64 (*read_cval)(void);
- 	void (*write_cval)(u64);
-+	s32 (*read_tval)(void);
-+	void (*write_tval)(s32);
- 	u64 (*read_ctl)(void);
- 	void (*write_ctl)(u64);
- };
-@@ -91,6 +113,8 @@ static struct timer_info vtimer_info = {
- 	.read_counter = read_vtimer_counter,
- 	.read_cval = read_vtimer_cval,
- 	.write_cval = write_vtimer_cval,
-+	.read_tval = read_vtimer_tval,
-+	.write_tval = write_vtimer_tval,
- 	.read_ctl = read_vtimer_ctl,
- 	.write_ctl = write_vtimer_ctl,
- };
-@@ -100,6 +124,8 @@ static struct timer_info ptimer_info = {
- 	.read_counter = read_ptimer_counter,
- 	.read_cval = read_ptimer_cval,
- 	.write_cval = write_ptimer_cval,
-+	.read_tval = read_ptimer_tval,
-+	.write_tval = write_ptimer_tval,
- 	.read_ctl = read_ptimer_ctl,
- 	.write_ctl = write_ptimer_ctl,
- };
+ static void test_vtimer(void)
 -- 
 2.14.4
