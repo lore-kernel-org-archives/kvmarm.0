@@ -1,24 +1,27 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [kvm-unit-tests PATCH 2/2] arm64: timer: Add TVAL timeout IRQ trigger
- test
-Date: Mon, 16 Jul 2018 16:14:38 +0100
-Message-ID: <20180716151438.9877-3-andre.przywara@arm.com>
-References: <20180716151438.9877-1-andre.przywara@arm.com>
+From: Bharat Bhushan <bharat.bhushan@nxp.com>
+Subject: RE: [PATCH v4 07/10] KVM: arm/arm64: vgic: Return error on
+ incompatible uaccess GICD_IIDR writes
+Date: Mon, 16 Jul 2018 15:43:28 +0000
+Message-ID: <AM5PR0401MB25455D849AB57AF98A3C91F49A5D0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
+References: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
+ <1531746387-7033-8-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE5D94A149
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBE384A124
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:30:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jhMedmhM3bnM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 11:01:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC8184A168
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:45 -0400 (EDT)
-In-Reply-To: <20180716151438.9877-1-andre.przywara@arm.com>
+ with ESMTP id uLoqHtqe5hcT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 11:30:31 -0400 (EDT)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+ (mail-eopbgr60065.outbound.protection.outlook.com [40.107.6.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 974C64A15A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:30:31 -0400 (EDT)
+In-Reply-To: <1531746387-7033-8-git-send-email-christoffer.dall@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,48 +31,133 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far we were only testing the CVAL register. Add a test which programs
-a (relative) TVAL value to check this functionality as well.
-Also we go into WFI and wait for the interrupt to release us from it.
-The timer tests are run with a 2 second timeout on the host side, so
-that any failure in coming back would be covered.
+Hi Christoffer,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/timer.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> -----Original Message-----
+> From: kvmarm-bounces@lists.cs.columbia.edu [mailto:kvmarm-
+> bounces@lists.cs.columbia.edu] On Behalf Of Christoffer Dall
+> Sent: Monday, July 16, 2018 6:36 PM
+> To: kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org
+> Cc: kvm@vger.kernel.org; Marc Zyngier <marc.zyngier@arm.com>; Andre
+> Przywara <andre.przywara@arm.com>
+> Subject: [PATCH v4 07/10] KVM: arm/arm64: vgic: Return error on
+> incompatible uaccess GICD_IIDR writes
+> 
+> If userspace attempts to write a GICD_IIDR that does not match the
+> kernel version, return an error to userspace.  The intention is to allow
+> implementation changes inside KVM while avoiding silently breaking
+> migration resulting in guests not running without any clear indication
+> of what went wrong.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 21 ++++++++++++++++++---
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 21 ++++++++++++++++++---
+>  2 files changed, 36 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-
+> mmio-v2.c
+> index db646f1..4f0f2c4 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+> @@ -75,6 +75,20 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu
+> *vcpu,
+>  	}
+>  }
+> 
+> +static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+> +					   gpa_t addr, unsigned int len,
+> +					   unsigned long val)
+> +{
+> +	switch (addr & 0x0c) {
 
-diff --git a/arm/timer.c b/arm/timer.c
-index 1c9ef44..275d049 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -211,6 +211,7 @@ static void test_timer(struct timer_info *info)
- 	u64 now = info->read_counter();
- 	u64 time_10s = read_sysreg(cntfrq_el0) * 10;
- 	u64 later = now + time_10s;
-+	s32 left;
- 
- 	/* We don't want the irq handler to fire because that will change the
- 	 * timer state and we want to test the timer output signal.  We can
-@@ -236,6 +237,15 @@ static void test_timer(struct timer_info *info)
- 
- 	/* Disable the timer again */
- 	info->write_ctl(0);
-+
-+	/* Test TVAL and IRQ trigger */
-+	info->irq_received = false;
-+	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
-+	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
-+	wfi();
-+	left = info->read_tval();
-+	report("interrupt received after TVAL/WFI", info->irq_received);
-+	report("timer has expired (%d)", left < 0, left);
- }
- 
- static void test_vtimer(void)
--- 
-2.14.4
+I am just understanding the code, not sure if it make sense to replace hardcoded "0x0c".
+
+Thanks
+-Bharat
+
+> +	case GIC_DIST_IIDR:
+> +		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
+> +			return -EINVAL;
+> +	}
+> +
+> +	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
+> +	return 0;
+> +}
+> +
+>  static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
+>  				 gpa_t addr, unsigned int len,
+>  				 unsigned long val)
+> @@ -367,9 +381,10 @@ static void vgic_mmio_write_apr(struct kvm_vcpu
+> *vcpu,
+>  }
+> 
+>  static const struct vgic_register_region vgic_v2_dist_registers[] = {
+> -	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+> -		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
+> -		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GIC_DIST_CTRL,
+> +		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc,
+> +		NULL, vgic_mmio_uaccess_write_v2_misc,
+> +		12, VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
+>  		vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
+>  		VGIC_ACCESS_32bit),
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-
+> mmio-v3.c
+> index ef57a1a..abdb0ec 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -113,6 +113,20 @@ static void vgic_mmio_write_v3_misc(struct
+> kvm_vcpu *vcpu,
+>  	}
+>  }
+> 
+> +static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
+> +					   gpa_t addr, unsigned int len,
+> +					   unsigned long val)
+> +{
+> +	switch (addr & 0x0c) {
+> +	case GICD_IIDR:
+> +		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
+> +			return -EINVAL;
+> +	}
+> +
+> +	vgic_mmio_write_v3_misc(vcpu, addr, len, val);
+> +	return 0;
+> +}
+> +
+>  static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
+>  					    gpa_t addr, unsigned int len)
+>  {
+> @@ -449,9 +463,10 @@ static void vgic_mmio_write_pendbase(struct
+> kvm_vcpu *vcpu,
+>  	}
+> 
+>  static const struct vgic_register_region vgic_v3_dist_registers[] = {
+> -	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
+> -		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16,
+> -		VGIC_ACCESS_32bit),
+> +	REGISTER_DESC_WITH_LENGTH_UACCESS(GICD_CTLR,
+> +		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc,
+> +		NULL, vgic_mmio_uaccess_write_v3_misc,
+> +		16, VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH(GICD_STATUSR,
+>  		vgic_mmio_read_rao, vgic_mmio_write_wi, 4,
+>  		VGIC_ACCESS_32bit),
+> --
+> 2.7.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flist
+> s.cs.columbia.edu%2Fmailman%2Flistinfo%2Fkvmarm&amp;data=02%7C01%
+> 7Cbharat.bhushan%40nxp.com%7Cf2d3e98a8d1a48166ce108d5eb1d06f4%7C
+> 686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C636673432268886197&am
+> p;sdata=DitjaxtCqfVUge823Qw9IpT%2Fg9EoN2xI%2FIlj6mCdZ9k%3D&amp;r
+> eserved=0
