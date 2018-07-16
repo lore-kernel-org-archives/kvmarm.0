@@ -1,24 +1,22 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v4 02/10] KVM: arm/arm64: vgic: Keep track of implementation
- revision
-Date: Mon, 16 Jul 2018 15:06:19 +0200
-Message-ID: <1531746387-7033-3-git-send-email-christoffer.dall@arm.com>
-References: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
+Subject: [PATCH v4 00/10] KVM: arm/arm64: vgic: Virtual interrupt grouping
+ support
+Date: Mon, 16 Jul 2018 15:06:17 +0200
+Message-ID: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86D164A172
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 08:53:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D454A120
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 08:53:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NZ1pMzUGmihO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 08:53:41 -0400 (EDT)
+ with ESMTP id dD8lo6zhgTmF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 08:53:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A084A11E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 08:53:41 -0400 (EDT)
-In-Reply-To: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBB7A4A11E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 08:53:35 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,104 +30,88 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we are about to tweak implementation aspects of the VGIC emulation,
-while still preserving some level of backwards compatibility support,
-add a field to keep track of the implementation revision field which is
-reported to the VM and to userspace.
+This series addresses a peculiarity of the current VGIC
+implementation, namely that we don't support interrupt grouping.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- include/kvm/arm_vgic.h           | 3 +++
- virt/kvm/arm/vgic/vgic-init.c    | 1 +
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 6 ++++--
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 6 ++++--
- 4 files changed, 12 insertions(+), 4 deletions(-)
+KVM either implements a GICv2 without support for the security
+extensions, or a GICv3 with DS=1.  For GICv2, on systems without the
+security extensions, group 0 interrupts can be configured to be either
+signalled as FIQs or as IRQs by the VM, whereas group 1 interrupts are
+always IRQs.  For GICv3, with DS=1, group 1 interrupts are always IRQs
+and group 0 interrupts are always FIQs, and there is no concept of
+secure vs. non-secure group 1 interrupts when DS=1.
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index cfdd248..7e64c46 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -217,6 +217,9 @@ struct vgic_dist {
- 	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
- 	u32			vgic_model;
- 
-+	/* Implementation revision as reported in the GICD_IIDR */
-+	u32			implementation_rev;
-+
- 	/* Do injected MSIs require an additional device ID? */
- 	bool			msis_require_devid;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index b714179..8b6fc45 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -298,6 +298,7 @@ int vgic_init(struct kvm *kvm)
- 
- 	vgic_debug_init(kvm);
- 
-+	dist->implementation_rev = 0;
- 	dist->initialized = true;
- 
- out:
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index af44e569..f0c5351 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -25,19 +25,21 @@
- static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
- {
-+	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
- 	u32 value;
- 
- 	switch (addr & 0x0c) {
- 	case GIC_DIST_CTRL:
--		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
-+		value = vgic->enabled ? GICD_ENABLE : 0;
- 		break;
- 	case GIC_DIST_CTR:
--		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
- 		value = (value >> 5) - 1;
- 		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
- 		break;
- 	case GIC_DIST_IIDR:
- 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
-+			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
- 			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
- 		break;
- 	default:
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index c03f424..ebe10a0 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -62,16 +62,17 @@ bool vgic_supports_direct_msis(struct kvm *kvm)
- static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
- {
-+	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
- 	u32 value = 0;
- 
- 	switch (addr & 0x0c) {
- 	case GICD_CTLR:
--		if (vcpu->kvm->arch.vgic.enabled)
-+		if (vgic->enabled)
- 			value |= GICD_CTLR_ENABLE_SS_G1;
- 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
- 		break;
- 	case GICD_TYPER:
--		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
- 		value = (value >> 5) - 1;
- 		if (vgic_has_its(vcpu->kvm)) {
- 			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
-@@ -82,6 +83,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 		break;
- 	case GICD_IIDR:
- 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
-+			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
- 			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
- 		break;
- 	default:
+We were treating all interrupts on GICv2 as group 0, but yet telling the
+guest that they were group 1.  The first patch changes this behavior,
+which seems to have no effect on no known guests, but still.
+
+The remaining patches introduce proper interrupt grouping support, along
+with MMIO accessors for the VM and userspace to retrieve and set the
+which group SGIs, PPIs, and SPIs belong to.  LPIs are always group 1
+interrupts as per the architecture, and there is no way to modify this
+configuration (no IGROUPR registers for LPIs or equivalent ITS
+commands).
+
+Tested on Seattle, TX1, and the foundation model.  I've run a
+GICv2 guest on a GICv3 host on the foundation model.  I've tested
+migration on Seattle, and migration from an old kernel to a newer kernel
+with an unmodified QEMU binary continues to work.  I also tested a
+modified userspace that sets some interrupts to group 1, and that is
+reflected in the vgic debug output.
+
+Applies to v4.18-rc5.
+
+Changes since v3:
+ - Rebased to v4.18-rc5
+ - Reworked documentation to clarify order of register restore and
+   include GICv3
+ - Re-ordered patches to add infrastructure for returning uaccess write
+   errors first, and factored out GIC_IIDR write checking to a separate
+   patch.
+ - Added a return 0; in the GICv2 GICD_IIDR uaccess write handler and
+   fixed a typo in the comment.
+
+Changes since v2:
+ - Patch 6 doesn't allow configuraiton of groups from userspace for
+   GICv2.
+ - Patches 7 through 9 are new in v3 of this series, and prevents
+   userspace from restoring an incompatible IIDR without seeing an error
+   in the future, and supports legacy userspace migration from old to
+   new kernels.
+
+Changes since v1:
+ - Bumped implementation revision field in GICD_IIDR along with changes
+ - Changed logic in init code to correctly detect vgic emulation type
+ - Rebased to v4.18-rc3
+
+Christoffer Dall (10):
+  KVM: arm/arm64: vgic: Define GICD_IIDR fields for GICv2 and GIv3
+  KVM: arm/arm64: vgic: Keep track of implementation revision
+  KVM: arm/arm64: vgic: GICv2 IGROUPR should read as zero
+  KVM: arm/arm64: vgic: Add group field to struct irq
+  KVM: arm/arm64: vgic: Signal IRQs using their configured group
+  KVM: arm/arm64: vgic: Permit uaccess writes to return errors
+  KVM: arm/arm64: vgic: Return error on incompatible uaccess GICD_IIDR
+    writes
+  KVM: arm/arm64: vgic: Allow configuration of interrupt groups
+  KVM: arm/arm64: vgic: Let userspace opt-in to writable v2 IGROUPR
+  KVM: arm/arm64: vgic: Update documentation of the GIC devices wrt IIDR
+
+ Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  8 +++
+ Documentation/virtual/kvm/devices/arm-vgic.txt    | 15 +++---
+ include/kvm/arm_vgic.h                            |  7 +++
+ include/linux/irqchip/arm-gic-v3.h                | 10 ++++
+ include/linux/irqchip/arm-gic.h                   | 11 ++++
+ virt/kvm/arm/vgic/vgic-debug.c                    |  8 +--
+ virt/kvm/arm/vgic/vgic-init.c                     | 20 ++++++-
+ virt/kvm/arm/vgic/vgic-its.c                      |  1 +
+ virt/kvm/arm/vgic/vgic-mmio-v2.c                  | 63 ++++++++++++++++++++---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  | 53 ++++++++++++++-----
+ virt/kvm/arm/vgic/vgic-mmio.c                     | 56 ++++++++++++++++++--
+ virt/kvm/arm/vgic/vgic-mmio.h                     | 25 ++++++---
+ virt/kvm/arm/vgic/vgic-v2.c                       |  3 ++
+ virt/kvm/arm/vgic/vgic-v3.c                       |  6 +--
+ 14 files changed, 237 insertions(+), 49 deletions(-)
+
 -- 
 2.7.4
