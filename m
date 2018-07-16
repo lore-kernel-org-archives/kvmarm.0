@@ -1,25 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 7/9] KVM: arm/arm64: vgic: Permit uaccess writes to
- return errors
-Date: Mon, 16 Jul 2018 09:28:00 +0100
-Message-ID: <08e71965-e39e-430f-3db5-765283ba3a0f@arm.com>
+Subject: Re: [PATCH v3 8/9] KVM: arm/arm64: vgic: Let userspace opt-in to
+ writable v2 IGROUPR
+Date: Mon, 16 Jul 2018 09:38:36 +0100
+Message-ID: <16b6ec62-4548-3980-073c-2b593d7d4dcb@arm.com>
 References: <1531587940-2490-1-git-send-email-christoffer.dall@arm.com>
- <1531587940-2490-8-git-send-email-christoffer.dall@arm.com>
+ <1531587940-2490-9-git-send-email-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB80D4A11C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 04:15:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A707C4A11D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 04:25:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3l6d0tyMIu2Z for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 04:15:06 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 837E04A0FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 04:15:06 -0400 (EDT)
-In-Reply-To: <1531587940-2490-8-git-send-email-christoffer.dall@arm.com>
+ with ESMTP id 2hI9V4JRyByg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 04:25:41 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 608FC4A11C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 04:25:41 -0400 (EDT)
+In-Reply-To: <1531587940-2490-9-git-send-email-christoffer.dall@arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,61 +35,88 @@ Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 14/07/18 18:05, Christoffer Dall wrote:
-> Currently we do not allow any vgic mmio write operations to fail, which
-> makes sense from mmio traps from the guest.  However, we should be able
-> to report failures to userspace, if userspace writes incompatible values
-> to read-only registers.  Rework the internal interface to allow errors
-> to be returned on the write side for userspace writes.
+> Simply letting IGROUPR be writable from userspace would break
+> migration from old kernels to newer kernels, because old kernels
+> incorrectly report interrupt groups as group 1.  This would not be a big
+> problem if userspace wrote GICD_IIDR as read from the kernel, because we
+> could detect the incompatibility and return an error to userspace.
+> Unfortunately, this is not the case with current userspace
+> implementations and simply letting IGROUPR be writable from userspace for
+> an emulated GICv2 silently breaks migration and causes the destination
+> VM to no longer run after migration.
+> 
+> We now encourage userspace to write the read and expected value of
+> GICD_IIDR as the first part of a GIC register restore, and if we observe
+> a write to GICD_IIDR we know that userspace has been updated and has had
+> a chance to cope with older kernels (VGICv2 IIDR.Revision == 0)
+> incorrectly reporting interrupts as group 1, and therefore we now allow
+> groups to be user writable.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > ---
->  virt/kvm/arm/vgic/vgic-mmio-v2.c | 26 +++++++++++++++++++++-----
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 31 ++++++++++++++++++++++++-------
->  virt/kvm/arm/vgic/vgic-mmio.c    | 18 +++++++++++++-----
->  virt/kvm/arm/vgic/vgic-mmio.h    | 19 +++++++++++--------
->  4 files changed, 69 insertions(+), 25 deletions(-)
+>  include/kvm/arm_vgic.h           |  3 +++
+>  virt/kvm/arm/vgic/vgic-mmio-v2.c | 15 ++++++++++++++-
+>  2 files changed, 17 insertions(+), 1 deletion(-)
 > 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index c661d0e..c134790 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -221,6 +221,9 @@ struct vgic_dist {
+>  	/* Implementation revision as reported in the GICD_IIDR */
+>  	u32			implementation_rev;
+>  
+> +	/* Userspace can write to GICv2 IGROUPR */
+> +	bool			v2_groups_user_writable;
+> +
+>  	/* Do injected MSIs require an additional device ID? */
+>  	bool			msis_require_devid;
+>  
 > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> index 34e36fc..b79de42 100644
+> index b79de42..9b6b758 100644
 > --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 > +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> @@ -77,11 +77,26 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
+> @@ -85,6 +85,17 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+>  	case GIC_DIST_IIDR:
+>  		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
+>  			return -EINVAL;
+> +
+> +		/*
+> +		 * If we observe a write to GICD_IIDR we know that userspace
+> +		 * has been updated and has had a chance to cope with older
+> +		 * kernels (VGICv2 IIDR.Revision == 0) incorrectly reporting
+> +		 * interrupts as group 1, and therefore we now allow gruops to
+
+groups
+
+> +		 * be user writable.  Doing this by default would break
+> +		 * migration from old kernels to new kernels with legacy
+> +		 * userspace.
+> +		 */
+> +		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
+
+		return 0; ?
+
+I think it'd be safer, just in case we decide to do something bizarre in
+vgic_mmio_write_v2_misc...
+
 >  	}
+>  
+>  	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
+> @@ -95,7 +106,9 @@ static int vgic_mmio_uaccess_write_v2_group(struct kvm_vcpu *vcpu,
+>  					    gpa_t addr, unsigned int len,
+>  					    unsigned long val)
+>  {
+> -	/* Ignore writes from userspace */
+> +	if (vcpu->kvm->arch.vgic.v2_groups_user_writable)
+> +		vgic_mmio_write_group(vcpu, addr, len, val);
+> +
+>  	return 0;
 >  }
 >  
-> -static void vgic_mmio_uaccess_write_v2_group(struct kvm_vcpu *vcpu,
-> -					     gpa_t addr, unsigned int len,
-> -					     unsigned long val)
-> +static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
-> +					   gpa_t addr, unsigned int len,
-> +					   unsigned long val)
-> +{
-> +	switch (addr & 0x0c) {
-> +	case GIC_DIST_IIDR:
-> +		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
-> +			return -EINVAL;
-> +	}
-> +
-> +	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
-> +	return 0;
-> +}
-> +
-> +static int vgic_mmio_uaccess_write_v2_group(struct kvm_vcpu *vcpu,
-> +					    gpa_t addr, unsigned int len,
-> +					    unsigned long val)
->  {
->  	/* Ignore writes from userspace */
-> +	return 0;
->  }
+> 
 
-I think it'd make more sense if this patch came before the previous one
-(change the prototype of the userspace accessor, and only then add a new
-accessor that can return an error). It would avoid churn in the above
-function, and you could move vgic_mmio_uaccess_write_v2_misc into patch 6.
-
-Not a big deal though, as the code is otherwise perfectly fine.
-
-Thanks,
+Otherwise looks good..
 
 	M.
 -- 
