@@ -1,147 +1,87 @@
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Subject: RE: [PATCH v4 10/10] KVM: arm/arm64: vgic: Update documentation of
- the GIC devices wrt IIDR
-Date: Mon, 16 Jul 2018 15:59:42 +0000
-Message-ID: <AM5PR0401MB25454B501D430C2EB6BF1C069A5D0@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
- <1531746387-7033-11-git-send-email-christoffer.dall@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1C74A13E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:46:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DzjF-czJCYsF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 11:46:52 -0400 (EDT)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur01on0075.outbound.protection.outlook.com [104.47.0.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B29B04A111
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:46:51 -0400 (EDT)
-In-Reply-To: <1531746387-7033-11-git-send-email-christoffer.dall@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH] kvm: arm/arm64: Fix emulated physical timer IRQ injection
+Date: Mon, 16 Jul 2018 18:23:57 +0100
+Message-ID: <20180716172357.6121-1-andre.przywara@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Stable <stable@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+When KVM emulates a physical timer, we keep track of the interrupt
+condition and try to inject an IRQ to the guest when needed.
+This works if the timer expires when either the guest is running or KVM
+does work on behalf of it, since it calls kvm_timer_update_state().
+However when the guest's VCPU is not scheduled (for instance because
+the guest issued a WFI instruction before), we miss injecting the interrupt
+when the VCPU's state gets restored back in kvm_timer_vcpu_load().
 
-> -----Original Message-----
-> From: kvmarm-bounces@lists.cs.columbia.edu [mailto:kvmarm-
-> bounces@lists.cs.columbia.edu] On Behalf Of Christoffer Dall
-> Sent: Monday, July 16, 2018 6:36 PM
-> To: kvmarm@lists.cs.columbia.edu; linux-arm-kernel@lists.infradead.org
-> Cc: kvm@vger.kernel.org; Marc Zyngier <marc.zyngier@arm.com>; Andre
-> Przywara <andre.przywara@arm.com>
-> Subject: [PATCH v4 10/10] KVM: arm/arm64: vgic: Update documentation of
-> the GIC devices wrt IIDR
-> 
-> Update the documentation to reflect the ordering requirements of
-> restoring the GICD_IIDR register before any other registers and the
-> effects this has on restoring the interrupt groups for an emulated GICv2
-> insttance.
-> 
-> Also remove some outdated limitations in the documentation while we're
-> at it.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  8 ++++++++
->  Documentation/virtual/kvm/devices/arm-vgic.txt    | 15 +++++++++------
->  2 files changed, 17 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> index 2408ab7..eba20ae 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-> @@ -100,6 +100,14 @@ Groups:
->      Note that distributor fields are not banked, but return the same value
->      regardless of the mpidr used to access the register.
-> 
-> +    GICD_IIDR.Revision is updated when the KVM implementation is changed
-> in a
-> +    way directly observable by the guest or userspace.  Userspace should
-> read
-> +    GICD_IIDR from KVM and write back the read value to confirm its
-> expected
-> +    behavior is aligned with the KVM implementation.  Userspace should set
-> +    GICD_IIDR before setting any other registers.  to ensure the expected
-> +    behavior.
-> +
-> +
->      The GICD_STATUSR and GICR_STATUSR registers are architecturally
-> defined such
->      that a write of a clear bit has no effect, whereas a write with a set bit
->      clears that value.  To allow userspace to freely set the values of these two
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> index b3ce126..4ff7635 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> @@ -49,9 +49,15 @@ Groups:
->      index is specified with the vcpu_index field.  Note that most distributor
->      fields are not banked, but return the same value regardless of the
->      vcpu_index used to access the register.
-> -  Limitations:
-> -    - Priorities are not implemented, and registers are RAZ/WI
-> -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
-> +
-> +    GICD_IIDR.Revision is updated when the KVM implementation of an
-> emulated
-> +    GICv2 is changed in a way directly observable by the guest or userspace.
-> +    Userspace should read GICD_IIDR from KVM and write back the read
-> value to
-> +    confirm its expected behavior is aligned with the KVM implementation.
-> +    Userspace should set GICD_IIDR before setting any other registers (both
-> +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS and
-> KVM_DEV_ARM_VGIC_GRP_CPU_REGS) to ensure
-> +    the expected behavior.  Unless GICD_IIDR has been set from userspace,
-> writes
-> +    to the interrupt group registers (GICD_IGROUPR) are ignored.
+Fix this by moving the interrupt injection check into the
+phys_timer_emulate() function, so that all possible paths of execution
+are covered.
 
-Newer user-space will write to GICD_IIDR, that mean interrupt-groups are supported otherwise not.
-And when interrupt-groups are not supported then writes to GICD_IGROUPR are ignored (backward compatibility)
+This fixes the physical timer emulation, which broke when it got changed
+in the 4.15 merge window.
+The respective kvm-unit-test check has been posted already.
 
-Is this understanding correct?
+Cc: Stable <stable@vger.kernel.org> # 4.15+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ virt/kvm/arm/arch_timer.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-Thanks
--Bharat
-
->    Errors:
->      -ENXIO: Getting or setting this register is not yet supported
->      -EBUSY: One or more VCPUs are running
-> @@ -94,9 +100,6 @@ Groups:
->      use the lower 5 bits to communicate with the KVM device and must shift
-> the
->      value left by 3 places to obtain the actual priority mask level.
-> 
-> -  Limitations:
-> -    - Priorities are not implemented, and registers are RAZ/WI
-> -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
->    Errors:
->      -ENXIO: Getting or setting this register is not yet supported
->      -EBUSY: One or more VCPUs are running
-> --
-> 2.7.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flist
-> s.cs.columbia.edu%2Fmailman%2Flistinfo%2Fkvmarm&amp;data=02%7C01%
-> 7Cbharat.bhushan%40nxp.com%7C55b2ec9f9b7b4d6e530c08d5eb1d0faf%7C
-> 686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C636673432404483929&am
-> p;sdata=RSQwNKkEYC02igGgPVIQmp40VsC9hU%2FFeiMcQBvYJOA%3D&am
-> p;reserved=0
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index bd3d57f40f1b..1949fb0b80a4 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -294,17 +294,26 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
++	/* If the timer cannot fire at all, then we don't need a soft timer. */
++	if (!kvm_timer_irq_can_fire(ptimer)) {
++		soft_timer_cancel(&timer->phys_timer, NULL);
++		kvm_timer_update_irq(vcpu, false, ptimer);
++		return;
++	}
++
+ 	/*
+-	 * If the timer can fire now we have just raised the IRQ line and we
+-	 * don't need to have a soft timer scheduled for the future.  If the
+-	 * timer cannot fire at all, then we also don't need a soft timer.
++	 * If the timer can fire now, we don't need to have a soft timer
++	 * scheduled for the future, as we also raise the IRQ line.
+ 	 */
+-	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
++	if (kvm_timer_should_fire(ptimer)) {
+ 		soft_timer_cancel(&timer->phys_timer, NULL);
++		kvm_timer_update_irq(vcpu, true, ptimer);
++
+ 		return;
+ 	}
+ 
+ 	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
++	kvm_timer_update_irq(vcpu, false, ptimer);
+ }
+ 
+ /*
+@@ -316,7 +325,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+-	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 	bool level;
+ 
+ 	if (unlikely(!timer->enabled))
+@@ -332,9 +340,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	level = kvm_timer_should_fire(vtimer);
+ 	kvm_timer_update_irq(vcpu, level, vtimer);
+ 
+-	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+-		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+-
+ 	phys_timer_emulate(vcpu);
+ }
+ 
+-- 
+2.14.4
