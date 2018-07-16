@@ -1,45 +1,50 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v6 1/8] KVM: arm/arm64: Share common code in user_mem_abort()
-Date: Mon, 16 Jul 2018 14:28:24 +0100
-Message-ID: <87r2k3mhs7.fsf@e105922-lin.cambridge.arm.com>
-References: <20180716110857.19310-1-punit.agrawal@arm.com>
-        <20180716110857.19310-2-punit.agrawal@arm.com>
-        <c28e1aa4-c0f1-8010-6a11-005e7f1db01c@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [kvm-unit-tests PATCH 0/2] arm64: extend arch timer tests
+Date: Mon, 16 Jul 2018 16:14:36 +0100
+Message-ID: <20180716151438.9877-1-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c28e1aa4-c0f1-8010-6a11-005e7f1db01c@arm.com> (Suzuki
-        K. Poulose's message of "Mon, 16 Jul 2018 13:45:05 +0100")
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 425874A127
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:44 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id stKEoekjkRY1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Jul 2018 11:01:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24FC54A129
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 11:01:43 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+While debugging some timer emulation IRQ problem, I realised that the
+failure pattern I was looking at is not covered by kvm-unit-tests.
 
-Suzuki K Poulose <Suzuki.Poulose@arm.com> writes:
+Add a test for the TVAL register, also check that KVM correctly injects
+the timer interrupt for the emulated physical timer when the guest is in
+WFI (hint: it does not, starting with 4.15-rc, I am on it).
 
-> On 16/07/18 12:08, Punit Agrawal wrote:
->> The code for operations such as marking the pfn as dirty, and
->> dcache/icache maintenance during stage 2 fault handling is duplicated
->> between normal pages and PMD hugepages.
->>
->> Instead of creating another copy of the operations when we introduce
->> PUD hugepages, let's share them across the different pagesizes.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->
-> Thanks for splitting the patch. It looks much simpler this way.
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cheers,
+Andre.
 
-Thanks for reviewing the patches.
+Andre Przywara (2):
+  arm64: timer: add TVAL accessors
+  arm64: timer: Add TVAL timeout test and test IRQ trigger
 
-Punit
+ arm/timer.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+-- 
+2.14.4
