@@ -1,93 +1,86 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 9/9] KVM: arm/arm64: vgic: Update documentation of the
- GICv2 device
-Date: Mon, 16 Jul 2018 12:07:04 +0100
-Message-ID: <5c91b926-58d6-5830-87b9-2170bb700ef6@arm.com>
-References: <1531587940-2490-1-git-send-email-christoffer.dall@arm.com>
- <1531587940-2490-10-git-send-email-christoffer.dall@arm.com>
- <a5324e35-53b4-b5b4-84a2-1e0a89b244e7@arm.com>
- <20180716103442.GD30822@e113682-lin.lund.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F1C24A128
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 06:54:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LViji3GfqAjI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Jul 2018 06:54:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 062BC4A114
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Jul 2018 06:54:09 -0400 (EDT)
-In-Reply-To: <20180716103442.GD30822@e113682-lin.lund.arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH v6 0/8] KVM: Support PUD hugepages at stage 2
+Date: Mon, 16 Jul 2018 12:08:49 +0100
+Message-ID: <20180716110857.19310-1-punit.agrawal@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/07/18 11:34, Christoffer Dall wrote:
-> On Mon, Jul 16, 2018 at 09:52:04AM +0100, Marc Zyngier wrote:
->> On 14/07/18 18:05, Christoffer Dall wrote:
->>> Update the documentation to reflect the ordering requirements of
->>> restoring GICv2 distributor registers and remove outdated limitations in
->>> the documentation while we're at it.
->>>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->>> ---
->>>  Documentation/virtual/kvm/devices/arm-vgic.txt | 12 ++++++------
->>>  1 file changed, 6 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> index b3ce126..c9a6393 100644
->>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>> @@ -49,9 +49,12 @@ Groups:
->>>      index is specified with the vcpu_index field.  Note that most distributor
->>>      fields are not banked, but return the same value regardless of the
->>>      vcpu_index used to access the register.
->>> -  Limitations:
->>> -    - Priorities are not implemented, and registers are RAZ/WI
->>> -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
->>> +
->>> +    GICD_IIDR.Revision is updated when the KVM implementation of an emulated
->>> +    GICv2 is changed.  Userspace should read GICD_IIDR from KVM and write back
->>> +    the read value to confirm its expected behavior is aligned with the KVM
->>> +    implementation.  To properly restore the interrupt group configuration,
->>> +    GICD_IIDR should be written before any other registers.
->>
->> I'd like to make it crystal clear that writing to IIDR doesn't allow to
->> select a behaviour, and is merely a confirmation that host and guest do
->> agree on either revision 0 (no write) or revision n (n being read and
->> written back).
->>
-> 
-> But that's not really true though, because userspace can read rev 0, and
-> still have "no write", or read and write n for n >= 1 and have "write".
-> 
-> I guess I'm not completely sure which wording you'd like me to add?
-I'm not sure either, because I find the behaviour of this register a bit
-odd. We always default to rev 0, and allow the behaviour to be switched
-to rev 2 if we write 2 to it. But we can't select rev 1.
+This series is an update to the PUD hugepage support previously posted
+at [0]. This patchset adds support for PUD hugepages at stage 2 a
+feature that is useful on cores that have support for large sized TLB
+mappings (e.g., 1GB for 4K granule).
 
-So in a way, it is not a revision selection API (like we have with the
-ITS), but a "I don't want rev 0" API. It works for what we have now, but
-I'm not sure how future proof it is (I guess we can cross that bridge
-when we get there).
+This version adds tags and addresses feedback received on
+v5. Additionally, Patch 1 (1 & 2 in this version) has been split to
+help make it easy to review.
 
-Another thing is that the guest will always see rev 2, even when it runs
-with the rev 0 behaviour, which is quite bizarre.
+Support is added to code that is shared between arm and arm64. Dummy
+helpers for arm are provided as the port does not support PUD hugepage
+sizes.
 
-	M.
+The patches have been tested on an A57 based system. The patchset is
+based on v4.18-rc5. The are a few conflicts with the support for 52
+bit IPA[1] - I'll work with Suzuki to resolve this once the code is in
+the right shape.
+
+Thanks,
+Punit
+
+v5 -> v6
+
+* Split Patch 1 to move out the refactoring of exec permissions on
+  page table entries.
+* Patch 4 - Initialise p*dpp pointers in stage2_get_leaf_entry()
+* Patch 5 - Trigger a BUG() in kvm_pud_pfn() on arm
+
+v4 -> v5:
+* Patch 1 - Drop helper stage2_should_exec() and refactor the
+  condition to decide if a page table entry should be marked
+  executable
+* Patch 4-6 - Introduce stage2_get_leaf_entry() and use it in this and
+  latter patches
+* Patch 7 - Use stage 2 accessors instead of using the page table
+  helpers directly
+* Patch 7 - Add a note to update the PUD hugepage support when number
+  of levels of stage 2 tables differs from stage 1
+
+v3 -> v4:
+* Patch 1 and 7 - Don't put down hugepages pte if logging is enabled
+* Patch 4-5 - Add PUD hugepage support for exec and access faults
+* Patch 6 - PUD hugepage support for aging page table entries
+
+v2 -> v3:
+* Update vma_pagesize directly if THP [1/4]. Previsouly this was done
+  indirectly via hugetlb
+* Added review tag [4/4]
+
+v1 -> v2:
+* Create helper to check if the page should have exec permission [1/4]
+* Fix broken condition to detect THP hugepage [1/4]
+* Fix in-correct hunk resulting from a rebase [4/4]
+
+[0] https://www.spinics.net/lists/arm-kernel/msg664276.html
+[1] https://www.spinics.net/lists/kvm/msg171065.html
+
+Punit Agrawal (8):
+  KVM: arm/arm64: Share common code in user_mem_abort()
+  KVM: arm/arm64: Re-factor setting the Stage 2 entry to exec on fault
+  KVM: arm/arm64: Introduce helpers to manipulate page table entries
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm64: Support PUD hugepage in stage2_is_exec()
+  KVM: arm64: Support handling access faults for PUD hugepages
+  KVM: arm64: Update age handlers to support PUD hugepages
+  KVM: arm64: Add support for creating PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         |  61 +++++
+ arch/arm64/include/asm/kvm_mmu.h       |  47 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h |   4 +
+ arch/arm64/include/asm/pgtable.h       |   9 +
+ virt/kvm/arm/mmu.c                     | 294 ++++++++++++++++++-------
+ 5 files changed, 341 insertions(+), 74 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.17.1
