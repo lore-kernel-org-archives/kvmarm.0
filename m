@@ -1,138 +1,110 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2] kvm: arm/arm64: Fix emulated physical timer IRQ
- injection
-Date: Tue, 17 Jul 2018 14:46:29 +0200
-Message-ID: <20180717124629.GB30790@e113682-lin.lund.arm.com>
-References: <20180717095137.9620-1-andre.przywara@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v8 1/4] arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+Date: Tue, 17 Jul 2018 17:33:01 +0100
+Message-ID: <CAFEAcA-t8U-GmkCtAcAN8tj4UAaynCZhgTi1Cg1RhaarGUOJfg@mail.gmail.com>
+References: <20180713154751.18131-1-james.morse@arm.com>
+ <20180713154751.18131-2-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180717095137.9620-1-andre.przywara@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B6154A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jul 2018 12:20:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Z1Ey3hC3jFxH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Jul 2018 12:20:20 -0400 (EDT)
+Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
+ [209.85.218.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 396644A054
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jul 2018 12:20:20 -0400 (EDT)
+Received: by mail-oi0-f68.google.com with SMTP id s198-v6so3179142oih.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Jul 2018 09:33:22 -0700 (PDT)
+In-Reply-To: <20180713154751.18131-2-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Linuxarm <linuxarm@huawei.com>, gengdongjiu <gengdongjiu@huawei.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 17, 2018 at 10:51:37AM +0100, Andre Przywara wrote:
-> When KVM emulates a physical timer, we keep track of the interrupt
-> condition and try to inject an IRQ to the guest when needed.
-> This works if the timer expires when either the guest is running or KVM
-> does work on behalf of it (like handling a trap).
-> However when the guest's VCPU is not scheduled (for instance because
-> the guest issued a WFI instruction before), we miss injecting the interrupt
-> when the VCPU's state gets restored back in kvm_timer_vcpu_load().
-> 
-> Fix this by moving the interrupt injection check into the
-> phys_timer_emulate() function, so that all possible paths of execution
-> are covered.
-> 
-> Cc: Stable <stable@vger.kernel.org> # 4.15+
-> Fixes: bbdd52cfcba29 ("KVM: arm/arm64: Avoid phys timer emulation in vcpu entry/exit")
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+On 13 July 2018 at 16:47, James Morse <james.morse@arm.com> wrote:
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> For the migrating VMs, user space may need to know the exception
+> state. For example, in the machine A, KVM make an SError pending,
+> when migrate to B, KVM also needs to pend an SError.
+>
+> This new IOCTL exports user-invisible states related to SError.
+> Together with appropriate user space changes, user space can get/set
+> the SError exception state to do migrate/snapshot/suspend.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Reviewed-by: James Morse <james.morse@arm.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
 > ---
-> Changelog v1...v2:
-> - clear IRQ line *before* starting the soft timer
-> 
->  virt/kvm/arm/arch_timer.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index bd3d57f40f1b..03a4ea776b85 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -294,16 +294,25 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
-
-Please update the comment on this function as well.
-
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
->  
-> +	/* If the timer cannot fire at all, then we don't need a soft timer. */
-> +	if (!kvm_timer_irq_can_fire(ptimer)) {
-> +		soft_timer_cancel(&timer->phys_timer, NULL);
-> +		kvm_timer_update_irq(vcpu, false, ptimer);
-> +		return;
-> +	}
+>  Documentation/virtual/kvm/api.txt    | 33 +++++++++++++++++---
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++
+>  arch/arm64/include/asm/kvm_host.h    |  7 +++++
+>  arch/arm64/include/uapi/asm/kvm.h    | 13 ++++++++
+>  arch/arm64/kvm/guest.c               | 46 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/inject_fault.c        |  6 ++--
+>  arch/arm64/kvm/reset.c               |  1 +
+>  virt/kvm/arm/arm.c                   | 21 +++++++++++++
+>  8 files changed, 125 insertions(+), 7 deletions(-)
+>
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index d10944e619d3..e3940f8715a5 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -835,11 +835,13 @@ struct kvm_clock_data {
+>
+>  Capability: KVM_CAP_VCPU_EVENTS
+>  Extended by: KVM_CAP_INTR_SHADOW
+> -Architectures: x86
+> -Type: vm ioctl
+> +Architectures: x86, arm64
+> +Type: vcpu ioctl
+>  Parameters: struct kvm_vcpu_event (out)
+>  Returns: 0 on success, -1 on error
+>
+> +X86:
 > +
->  	/*
-> -	 * If the timer can fire now we have just raised the IRQ line and we
-> -	 * don't need to have a soft timer scheduled for the future.  If the
-> -	 * timer cannot fire at all, then we also don't need a soft timer.
-> +	 * If the timer can fire now, we don't need to have a soft timer
-> +	 * scheduled for the future, as we also raise the IRQ line.
->  	 */
-> -	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
-> +	if (kvm_timer_should_fire(ptimer)) {
->  		soft_timer_cancel(&timer->phys_timer, NULL);
-> +		kvm_timer_update_irq(vcpu, true, ptimer);
+>  Gets currently pending exceptions, interrupts, and NMIs as well as related
+>  states of the vcpu.
+>
+> @@ -881,15 +883,32 @@ Only two fields are defined in the flags field:
+>  - KVM_VCPUEVENT_VALID_SMM may be set in the flags field to signal that
+>    smi contains a valid state.
+>
+> +ARM64:
 > +
->  		return;
->  	}
->  
-> +	kvm_timer_update_irq(vcpu, false, ptimer);
->  	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
+> +Gets currently pending SError exceptions as well as related states of the vcpu.
 
-I find this overly complex.
+Any chance of expanding this to explain what this state actually is?
+(ie something you could use to implement or review the userspace
+code which has to manipulate it).
 
-How about:
+> +
+> +struct kvm_vcpu_events {
+> +       struct {
+> +               __u8 serror_pending;
+> +               __u8 serror_has_esr;
+> +               /* Align it to 8 bytes */
+> +               __u8 pad[6];
+> +               __u64 serror_esr;
+> +       } exception;
+> +       __u32 reserved[12];
+> +};
+> +
+>  4.32 KVM_SET_VCPU_EVENTS
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index bd3d57f..b5dcfca 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -288,7 +288,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 	}
- }
- 
--/* Schedule the background timer for the emulated timer. */
-+/* Emulate the physical timer in software and update IRQ signal if needed */
- static void phys_timer_emulate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-@@ -299,12 +299,13 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
- 	 * don't need to have a soft timer scheduled for the future.  If the
- 	 * timer cannot fire at all, then we also don't need a soft timer.
- 	 */
--	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
-+	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer))
- 		soft_timer_cancel(&timer->phys_timer, NULL);
--		return;
--	}
-+	else
-+		soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
- 
--	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
-+	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-+		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
- }
- 
- /*
- 
-
->  }
->  
-> @@ -316,7 +325,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
->  {
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-> -	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
->  	bool level;
->  
->  	if (unlikely(!timer->enabled))
-> @@ -332,9 +340,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
->  	level = kvm_timer_should_fire(vtimer);
->  	kvm_timer_update_irq(vcpu, level, vtimer);
->  
-> -	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-> -		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
-> -
->  	phys_timer_emulate(vcpu);
->  }
->  
-Please also remove the comment in kvm_timer_vcpu_load() which indicates
-that the call to the function will only ever schedule a background
-timer.
-
-Thanks,
--Christoffer
+thanks
+-- PMM
