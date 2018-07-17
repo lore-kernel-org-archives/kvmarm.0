@@ -1,95 +1,138 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] kvm: arm/arm64: Fix emulated physical timer IRQ injection
-Date: Tue, 17 Jul 2018 14:29:35 +0200
-Message-ID: <20180717122935.GA30790@e113682-lin.lund.arm.com>
-References: <20180716172357.6121-1-andre.przywara@arm.com>
- <20180717101040.GE30570@e113682-lin.lund.arm.com>
- <0acb919d-04d2-66f9-5281-ddcae5342578@arm.com>
+Subject: Re: [PATCH v2] kvm: arm/arm64: Fix emulated physical timer IRQ
+ injection
+Date: Tue, 17 Jul 2018 14:46:29 +0200
+Message-ID: <20180717124629.GB30790@e113682-lin.lund.arm.com>
+References: <20180717095137.9620-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <0acb919d-04d2-66f9-5281-ddcae5342578@arm.com>
+In-Reply-To: <20180717095137.9620-1-andre.przywara@arm.com>
 Sender: stable-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Stable <stable@vger.kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Stable <stable@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 17, 2018 at 12:34:58PM +0100, Andre Przywara wrote:
-> Hi,
+On Tue, Jul 17, 2018 at 10:51:37AM +0100, Andre Przywara wrote:
+> When KVM emulates a physical timer, we keep track of the interrupt
+> condition and try to inject an IRQ to the guest when needed.
+> This works if the timer expires when either the guest is running or KVM
+> does work on behalf of it (like handling a trap).
+> However when the guest's VCPU is not scheduled (for instance because
+> the guest issued a WFI instruction before), we miss injecting the interrupt
+> when the VCPU's state gets restored back in kvm_timer_vcpu_load().
 > 
-> On 17/07/18 11:10, Christoffer Dall wrote:
-> > On Mon, Jul 16, 2018 at 06:23:57PM +0100, Andre Przywara wrote:
-> >> When KVM emulates a physical timer, we keep track of the interrupt
-> >> condition and try to inject an IRQ to the guest when needed.
-> >> This works if the timer expires when either the guest is running or KVM
-> >> does work on behalf of it, since it calls kvm_timer_update_state().
-> >> However when the guest's VCPU is not scheduled (for instance because
-> >> the guest issued a WFI instruction before), we miss injecting the interrupt
-> >> when the VCPU's state gets restored back in kvm_timer_vcpu_load().
-> >>
-> >> Fix this by moving the interrupt injection check into the
-> >> phys_timer_emulate() function, so that all possible paths of execution
-> >> are covered.
-> >>
-> >> This fixes the physical timer emulation, which broke when it got changed
-> >> in the 4.15 merge window.
-> >> The respective kvm-unit-test check has been posted already.
-> >>
-> >> Cc: Stable <stable@vger.kernel.org> # 4.15+
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >>  virt/kvm/arm/arch_timer.c | 21 +++++++++++++--------
-> >>  1 file changed, 13 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> >> index bd3d57f40f1b..1949fb0b80a4 100644
-> >> --- a/virt/kvm/arm/arch_timer.c
-> >> +++ b/virt/kvm/arm/arch_timer.c
-> >> @@ -294,17 +294,26 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
-> >>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-> >>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-> >>  
-> >> +	/* If the timer cannot fire at all, then we don't need a soft timer. */
-> >> +	if (!kvm_timer_irq_can_fire(ptimer)) {
-> >> +		soft_timer_cancel(&timer->phys_timer, NULL);
-> >> +		kvm_timer_update_irq(vcpu, false, ptimer);
-> >> +		return;
-> >> +	}
-> > 
-> > This stuff is breaking what the intention is with the
-> > phys_timer_emulate() function.  See the comment above the function,
-> > which says that this is about scheduling the background soft timer, and
-> > not about managing the rest of the state.
-> > 
-> > At least that function needs updating.
+> Fix this by moving the interrupt injection check into the
+> phys_timer_emulate() function, so that all possible paths of execution
+> are covered.
 > 
-> Well, my naive understanding of "phys_timer_emulate()" was that it takes
-> care of the whole task, and injecting the IRQ is an integral part of the
-> package. 
-
-I don't understand how you could come to that conclusion given that the
-comment says otherwise and the function doesn't do anything with IRQs,
-but ok...
-
-> As it stands with your patches now, the caller of
-> phys_timer_emulate() has to take care of the IRQ injection, which smells
-> a bit fragile.  So since we have this "phys_timer_emulate(); if()
-> kvm_timer_update_irq() ...;" sequence now exactly twice, I found it more
-> logical to move that into the function.
-> But I don't really care (or we wrap this once more as Marc suggested).
-> And as your version also works (tested with both kvm-unit-tests and by
-> running a hacked Linux guest which always uses the physical timer), feel
-> free to send your patches. You might want to declare ptimer in
-> kvm_timer_vcpu_load() though ;-) and also amend this comment in
-> phys_timer_emulate().
-> I think having this separate bites me a bit in the nested virt rework
-> (because it's more than one timer to emulate), but I can fix this there.
+> Cc: Stable <stable@vger.kernel.org> # 4.15+
+> Fixes: bbdd52cfcba29 ("KVM: arm/arm64: Avoid phys timer emulation in vcpu entry/exit")
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog v1...v2:
+> - clear IRQ line *before* starting the soft timer
 > 
+>  virt/kvm/arm/arch_timer.c | 21 +++++++++++++--------
+>  1 file changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index bd3d57f40f1b..03a4ea776b85 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -294,16 +294,25 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
 
-That's a resonable argument for having it embedded in a single function.
+Please update the comment on this function as well.
 
-I'll send another version of my patches then.
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> +	/* If the timer cannot fire at all, then we don't need a soft timer. */
+> +	if (!kvm_timer_irq_can_fire(ptimer)) {
+> +		soft_timer_cancel(&timer->phys_timer, NULL);
+> +		kvm_timer_update_irq(vcpu, false, ptimer);
+> +		return;
+> +	}
+> +
+>  	/*
+> -	 * If the timer can fire now we have just raised the IRQ line and we
+> -	 * don't need to have a soft timer scheduled for the future.  If the
+> -	 * timer cannot fire at all, then we also don't need a soft timer.
+> +	 * If the timer can fire now, we don't need to have a soft timer
+> +	 * scheduled for the future, as we also raise the IRQ line.
+>  	 */
+> -	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
+> +	if (kvm_timer_should_fire(ptimer)) {
+>  		soft_timer_cancel(&timer->phys_timer, NULL);
+> +		kvm_timer_update_irq(vcpu, true, ptimer);
+> +
+>  		return;
+>  	}
+>  
+> +	kvm_timer_update_irq(vcpu, false, ptimer);
+>  	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
+
+I find this overly complex.
+
+How about:
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index bd3d57f..b5dcfca 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -288,7 +288,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 	}
+ }
+ 
+-/* Schedule the background timer for the emulated timer. */
++/* Emulate the physical timer in software and update IRQ signal if needed */
+ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+@@ -299,12 +299,13 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+ 	 * don't need to have a soft timer scheduled for the future.  If the
+ 	 * timer cannot fire at all, then we also don't need a soft timer.
+ 	 */
+-	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
++	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer))
+ 		soft_timer_cancel(&timer->phys_timer, NULL);
+-		return;
+-	}
++	else
++		soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
+ 
+-	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
++	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
++		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+ }
+ 
+ /*
+ 
+
+>  }
+>  
+> @@ -316,7 +325,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> -	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  	bool level;
+>  
+>  	if (unlikely(!timer->enabled))
+> @@ -332,9 +340,6 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  	level = kvm_timer_should_fire(vtimer);
+>  	kvm_timer_update_irq(vcpu, level, vtimer);
+>  
+> -	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+> -		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+> -
+>  	phys_timer_emulate(vcpu);
+>  }
+>  
+Please also remove the comment in kvm_timer_vcpu_load() which indicates
+that the call to the function will only ever schedule a background
+timer.
 
 Thanks,
 -Christoffer
