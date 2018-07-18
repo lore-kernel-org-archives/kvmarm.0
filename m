@@ -1,23 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool PATCH v4 21/24] kvmtool: Allow backends to run checks on the
- KVM device fd
-Date: Wed, 18 Jul 2018 10:19:04 +0100
-Message-ID: <1531905547-25478-22-git-send-email-suzuki.poulose@arm.com>
+Subject: [kvmtool PATCH v4 23/24] kvmtool: arm64: Switch memory layout
+Date: Wed, 18 Jul 2018 10:19:06 +0100
+Message-ID: <1531905547-25478-24-git-send-email-suzuki.poulose@arm.com>
 References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A894A0F8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D7A4A0DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6m7wwh+MiyFe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Jul 2018 05:07:17 -0400 (EDT)
+ with ESMTP id c68o8GZ7SrjH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Jul 2018 05:07:22 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0684070F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C77FF49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:22 -0400 (EDT)
 In-Reply-To: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,42 +31,111 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allow architectures to perform initialisation based on the
-KVM device fd ioctls, even before the VM is created.
+If the guest wants to use a larger physical address space place
+the RAM at upper half of the address space. Otherwise, it uses the
+default layout.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- include/kvm/kvm.h | 4 ++++
- kvm.c             | 2 ++
- 2 files changed, 6 insertions(+)
+ arm/aarch32/include/kvm/kvm-arch.h |  6 ++++--
+ arm/aarch64/include/kvm/kvm-arch.h | 15 ++++++++++++---
+ arm/include/arm-common/kvm-arch.h  | 11 ++++++-----
+ arm/kvm.c                          |  2 +-
+ 4 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 90463b8..a036dd2 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -103,6 +103,10 @@ int kvm__get_sock_by_instance(const char *name);
- int kvm__enumerate_instances(int (*callback)(const char *name, int pid));
- void kvm__remove_socket(const char *name);
+diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+index cd31e72..bcd382b 100644
+--- a/arm/aarch32/include/kvm/kvm-arch.h
++++ b/arm/aarch32/include/kvm/kvm-arch.h
+@@ -3,8 +3,10 @@
  
-+#ifndef kvm__arch_init_hyp
-+static inline void kvm__arch_init_hyp(struct kvm *kvm) {}
-+#endif
-+
- void kvm__arch_set_cmdline(char *cmdline, bool video);
- void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size);
- void kvm__arch_delete_ram(struct kvm *kvm);
-diff --git a/kvm.c b/kvm.c
-index f8f2fdc..b992e74 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -304,6 +304,8 @@ int kvm__init(struct kvm *kvm)
- 		goto err_sys_fd;
- 	}
+ #define ARM_KERN_OFFSET(...)	0x8000
  
-+	kvm__arch_init_hyp(kvm);
+-#define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+-
+ #include "arm-common/kvm-arch.h"
+ 
++#define ARM_MAX_MEMORY(...)	ARM32_MAX_MEMORY
++#define ARM_MEMORY_AREA(...)	ARM32_MEMORY_AREA
 +
- 	kvm->vm_fd = ioctl(kvm->sys_fd, KVM_CREATE_VM, KVM_VM_TYPE);
- 	if (kvm->vm_fd < 0) {
- 		pr_err("KVM_CREATE_VM ioctl");
++
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 9de623a..bad35b9 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -1,14 +1,23 @@
+ #ifndef KVM__KVM_ARCH_H
+ #define KVM__KVM_ARCH_H
+ 
++#include "arm-common/kvm-arch.h"
++
++#define ARM64_MEMORY_AREA(phys_shift)	(1UL << (phys_shift - 1))
++#define ARM64_MAX_MEMORY(phys_shift)	\
++	((1ULL << (phys_shift)) - ARM64_MEMORY_AREA(phys_shift))
++
++#define ARM_MEMORY_AREA(kvm)	((kvm)->cfg.arch.aarch32_guest ?	\
++				 ARM32_MEMORY_AREA		:	\
++				 ARM64_MEMORY_AREA(kvm->cfg.arch.phys_shift))
++
+ #define ARM_KERN_OFFSET(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+ 				0x8000				:	\
+ 				0x80000)
+ 
+ #define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
+-				ARM_LOMAP_MAX_MEMORY		:	\
+-				ARM_HIMAP_MAX_MEMORY)
++				ARM32_MAX_MEMORY		:	\
++				ARM64_MAX_MEMORY(kvm->cfg.arch.phys_shift))
+ 
+-#include "arm-common/kvm-arch.h"
+ 
+ #endif /* KVM__KVM_ARCH_H */
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index b9d486d..b29b4b1 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -6,14 +6,15 @@
+ #include <linux/types.h>
+ 
+ #include "arm-common/gic.h"
+-
+ #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
+ #define ARM_MMIO_AREA		_AC(0x0000000000010000, UL)
+ #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
+-#define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
+ 
+-#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+-#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
++#define ARM32_MEMORY_AREA	_AC(0x0000000080000000, UL)
++#define ARM32_MAX_MEMORY	((1ULL << 32) - ARM32_MEMORY_AREA)
++
++#define ARM_IOMEM_AREA_END	ARM32_MEMORY_AREA
++
+ 
+ #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
+ #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
+@@ -24,7 +25,7 @@
+ #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
+ #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
+ #define ARM_PCI_CFG_SIZE	(1ULL << 24)
+-#define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
++#define ARM_PCI_MMIO_SIZE	(ARM_IOMEM_AREA_END - \
+ 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+ 
+ #define KVM_IOPORT_AREA		ARM_IOPORT_AREA
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 2ab436e..5701d41 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -30,7 +30,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 	u64 phys_start, phys_size;
+ 	void *host_mem;
+ 
+-	phys_start	= ARM_MEMORY_AREA;
++	phys_start	= ARM_MEMORY_AREA(kvm);
+ 	phys_size	= kvm->ram_size;
+ 	host_mem	= kvm->ram_start;
+ 
 -- 
 2.7.4
