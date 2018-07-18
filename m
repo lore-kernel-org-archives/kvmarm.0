@@ -1,23 +1,23 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool PATCH v4 22/24] kvmtool: arm64: Add support for guest
- physical address size
-Date: Wed, 18 Jul 2018 10:19:05 +0100
-Message-ID: <1531905547-25478-23-git-send-email-suzuki.poulose@arm.com>
+Subject: [kvmtool PATCH v4 24/24] kvmtool: arm: Add support for creating VM
+ with PA size
+Date: Wed, 18 Jul 2018 10:19:07 +0100
+Message-ID: <1531905547-25478-25-git-send-email-suzuki.poulose@arm.com>
 References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D6B449F87
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7D149F7F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qC2af7JKK10T for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Jul 2018 05:07:21 -0400 (EDT)
+ with ESMTP id x49CYDUZiQ2u for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Jul 2018 05:07:25 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1B44A0E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 410D74A0DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:07:25 -0400 (EDT)
 In-Reply-To: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,42 +32,70 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an option to specify the physical address size used by this
-VM.
+Specify the physical size for the VM encoded in the vm type.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/aarch64/include/kvm/kvm-config-arch.h | 5 ++++-
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ arm/include/arm-common/kvm-arch.h |  6 +++++-
+ arm/kvm.c                         | 22 ++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..dabd22c 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,7 +8,10 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_INTEGER('\0', "phys-shift", &(cfg)->phys_shift,		\
-+			"Specify maximum physical address size (not "	\
-+			"the amount of memory)"),
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index b29b4b1..d77f3ac 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -44,7 +44,11 @@
  
- #include "arm-common/kvm-config-arch.h"
+ #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
  
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 6a196f1..e0b531e 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -11,6 +11,7 @@ struct kvm_config_arch {
- 	bool		has_pmuv3;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
-+	int		phys_shift;
+-#define KVM_VM_TYPE		0
++extern unsigned long		kvm_arm_type;
++extern void kvm__arch_init_hyp(struct kvm *kvm);
++
++#define KVM_VM_TYPE		kvm_arm_type
++#define kvm__arch_init_hyp	kvm__arch_init_hyp
+ 
+ #define VIRTIO_DEFAULT_TRANS(kvm)	\
+ 	((kvm)->cfg.arch.virtio_trans_pci ? VIRTIO_PCI : VIRTIO_MMIO)
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 5701d41..b7c3382 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -11,6 +11,8 @@
+ #include <linux/kvm.h>
+ #include <linux/sizes.h>
+ 
++unsigned long kvm_arm_type;
++
+ struct kvm_ext kvm_req_ext[] = {
+ 	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+ 	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+@@ -18,6 +20,26 @@ struct kvm_ext kvm_req_ext[] = {
+ 	{ 0, 0 },
  };
  
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
++#ifndef KVM_CAP_ARM_VM_MAX_PHYS_SHIFT
++#define KVM_CAP_ARM_VM_MAX_PHYS_SHIFT	156
++#endif
++
++void kvm__arch_init_hyp(struct kvm *kvm)
++{
++	int max_ipa;
++
++	if (!kvm->cfg.arch.phys_shift || kvm->cfg.arch.phys_shift == 40)
++		return;
++	max_ipa = ioctl(kvm->sys_fd,
++			KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_MAX_PHYS_SHIFT);
++	if (!max_ipa)
++		die("Kernel doesn't support IPA size configuration\n");
++	if (kvm->cfg.arch.phys_shift > max_ipa)
++		die("Requested PA size (%u) is not supported by the host (%ubits)\n",
++		    kvm->cfg.arch.phys_shift, max_ipa);
++	kvm_arm_type = kvm->cfg.arch.phys_shift;
++}
++
+ bool kvm__arch_cpu_supports_vm(void)
+ {
+ 	/* The KVM capability check is enough. */
 -- 
 2.7.4
