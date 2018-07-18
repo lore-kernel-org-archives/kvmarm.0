@@ -1,22 +1,23 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v4 04/20] kvm: arm/arm64: Remove spurious WARN_ON
-Date: Wed, 18 Jul 2018 10:18:47 +0100
-Message-ID: <1531905547-25478-5-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v4 05/20] kvm: arm64: Add helper for loading the stage2
+ setting for a VM
+Date: Wed, 18 Jul 2018 10:18:48 +0100
+Message-ID: <1531905547-25478-6-git-send-email-suzuki.poulose@arm.com>
 References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48A364A0D1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F86C4A0D1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RIvf3UxWiTa7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Jul 2018 05:06:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FD864A0F0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:32 -0400 (EDT)
+ with ESMTP id WZwzJb2fwr2I for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Jul 2018 05:06:35 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3BA94A0F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:34 -0400 (EDT)
 In-Reply-To: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,29 +32,76 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On a 4-level page table pgd entry can be empty, unlike a 3-level
-page table. Remove the spurious WARN_ON() in stage_get_pud().
+We load the stage2 context of a guest for different operations,
+including running the guest and tlb maintenance on behalf of the
+guest. As of now only the vttbr is private to the guest, but this
+is about to change with IPA per VM. Add a helper to load the stage2
+configuration for a VM, which could do the right thing with the
+future changes.
 
-Acked-by: Christoffer Dall <cdall@kernel.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes since v2:
+ - New patch
+---
+ arch/arm64/include/asm/kvm_hyp.h | 6 ++++++
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ arch/arm64/kvm/hyp/tlb.c         | 4 ++--
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 061e6b3..308171c 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -976,7 +976,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pud_t *pud;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 384c343..82f9994 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -155,5 +155,11 @@ void deactivate_traps_vhe_put(void);
+ u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+ void __noreturn __hyp_do_panic(unsigned long, ...);
  
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
--	if (WARN_ON(stage2_pgd_none(*pgd))) {
-+	if (stage2_pgd_none(*pgd)) {
- 		if (!cache)
- 			return NULL;
- 		pud = mmu_memory_cache_alloc(cache);
++/* Must be called from hyp code running at EL2 */
++static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
++{
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++}
++
+ #endif /* __ARM64_KVM_HYP_H__ */
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d496ef5..355fb25 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -195,7 +195,7 @@ void deactivate_traps_vhe_put(void)
+ 
+ static void __hyp_text __activate_vm(struct kvm *kvm)
+ {
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	__load_guest_stage2(kvm);
+ }
+ 
+ static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 131c777..4dbd9c6 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -30,7 +30,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+ 	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
+ 	 * let's flip TGE before executing the TLB operation.
+ 	 */
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	__load_guest_stage2(kvm);
+ 	val = read_sysreg(hcr_el2);
+ 	val &= ~HCR_TGE;
+ 	write_sysreg(val, hcr_el2);
+@@ -39,7 +39,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+ 
+ static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
+ {
+-	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	__load_guest_stage2(kvm);
+ 	isb();
+ }
+ 
 -- 
 2.7.4
