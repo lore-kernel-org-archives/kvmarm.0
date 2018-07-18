@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v4 08/20] kvm: arm64: Configure VTCR_EL2 per VM
-Date: Wed, 18 Jul 2018 10:18:51 +0100
-Message-ID: <1531905547-25478-9-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v4 07/20] kvm: arm64: Clean up VTCR_EL2 initialisation
+Date: Wed, 18 Jul 2018 10:18:50 +0100
+Message-ID: <1531905547-25478-8-git-send-email-suzuki.poulose@arm.com>
 References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 981014A0E0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 705E34A0E2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LST7s7nnOFW3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Jul 2018 05:06:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B80AA49F87
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:42 -0400 (EDT)
+ with ESMTP id ika4KQQFLg9b for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Jul 2018 05:06:40 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 227F94A0E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Jul 2018 05:06:40 -0400 (EDT)
 In-Reply-To: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,290 +31,115 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add support for setting the VTCR_EL2 per VM, rather than hard
-coding a value at boot time per CPU. This would allow us to tune
-the stage2 page table parameters per VM in the later changes.
+Use the new helper for converting the parange to the physical shift.
+Also, add the missing definitions for the VTCR_EL2 register fields
+and use them instead of hard coding numbers.
 
-We compute the VTCR fields based on the system wide sanitised
-feature registers, except for the hardware management of Access
-Flags (VTCR_EL2.HA). It is fine to run a system with a mix of
-CPUs that may or may not update the page table Access Flags.
-Since the bit is RES0 on CPUs that don't support it, the bit
-should be ignored on them.
-
-Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  5 +++
- arch/arm64/include/asm/kvm_arm.h  |  3 +-
- arch/arm64/include/asm/kvm_asm.h  |  2 --
- arch/arm64/include/asm/kvm_host.h | 15 +++++---
- arch/arm64/include/asm/kvm_hyp.h  |  1 +
- arch/arm64/kvm/guest.c            | 38 ++++++++++++++++++++-
- arch/arm64/kvm/hyp/Makefile       |  1 -
- arch/arm64/kvm/hyp/s2-setup.c     | 72 ---------------------------------------
- virt/kvm/arm/arm.c                |  4 +++
- 9 files changed, 58 insertions(+), 83 deletions(-)
- delete mode 100644 arch/arm64/kvm/hyp/s2-setup.c
+Changs sinec v3
+ - Update comment about reserved bits
+ - Added Reviewed-by from Eric
+---
+ arch/arm64/include/asm/kvm_arm.h |  3 +++
+ arch/arm64/kvm/hyp/s2-setup.c    | 34 ++++++++--------------------------
+ 2 files changed, 11 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 1f1fe410..86f43ab 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -350,4 +350,9 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
- 
-+static inline int kvm_arm_config_vm(struct kvm *kvm)
-+{
-+	return 0;
-+}
-+
- #endif /* __ARM_KVM_HOST_H__ */
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 3dffd38..87d2db6 100644
+index 6dd285e..3dffd38 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -134,8 +134,7 @@
+@@ -106,6 +106,7 @@
+ #define VTCR_EL2_RES1		(1 << 31)
+ #define VTCR_EL2_HD		(1 << 22)
+ #define VTCR_EL2_HA		(1 << 21)
++#define VTCR_EL2_PS_SHIFT	TCR_EL2_PS_SHIFT
+ #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
+ #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
+ #define VTCR_EL2_TG0_4K		TCR_TG0_4K
+@@ -126,6 +127,8 @@
+ #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
+ #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
+ 
++#define VTCR_EL2_T0SZ(x)	TCR_T0SZ(x)
++
+ /*
+  * We configure the Stage-2 page tables to always restrict the IPA space to be
   * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
-  * not known to exist and will break with this configuration.
-  *
-- * VTCR_EL2.PS is extracted from ID_AA64MMFR0_EL1.PARange at boot time
-- * (see hyp-init.S).
-+ * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_config_vm().
-  *
-  * Note that when using 4K pages, we concatenate two first level page tables
-  * together. With 16K pages, we concatenate 16 first level page tables.
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 102b5a5..0b53c72 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -72,8 +72,6 @@ extern void __vgic_v3_init_lrs(void);
- 
- extern u32 __kvm_get_mdcr_el2(void);
- 
--extern u32 __init_stage2_translation(void);
--
- /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
- #define __hyp_this_cpu_ptr(sym)						\
- 	({								\
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index fe8777b..b1ffaf3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -61,12 +61,13 @@ struct kvm_arch {
- 	u64    vmid_gen;
- 	u32    vmid;
- 
--	/* 1-level 2nd stage table and lock */
--	spinlock_t pgd_lock;
-+	/* stage2 entry level table */
- 	pgd_t *pgd;
- 
- 	/* VTTBR value associated with above pgd and vmid */
- 	u64    vttbr;
-+	/* VTCR_EL2 value for this VM */
-+	u64    vtcr;
- 
- 	/* The last vcpu id that ran on each physical CPU */
- 	int __percpu *last_vcpu_ran;
-@@ -442,10 +443,12 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- static inline void __cpu_init_stage2(void)
- {
--	u32 parange = kvm_call_hyp(__init_stage2_translation);
-+	u32 ps;
- 
--	WARN_ONCE(parange < 40,
--		  "PARange is %d bits, unsupported configuration!", parange);
-+	/* Sanity check for minimum IPA size support */
-+	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1) & 0x7);
-+	WARN_ONCE(ps < 40,
-+		  "PARange is %d bits, unsupported configuration!", ps);
- }
- 
- /* Guest/host FPSIMD coordination helpers */
-@@ -513,4 +516,6 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
- 
-+int kvm_arm_config_vm(struct kvm *kvm);
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 82f9994..6f47cc7 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -158,6 +158,7 @@ void __noreturn __hyp_do_panic(unsigned long, ...);
- /* Must be called from hyp code running at EL2 */
- static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
- {
-+	write_sysreg(kvm->arch.vtcr, vtcr_el2);
- 	write_sysreg(kvm->arch.vttbr, vttbr_el2);
- }
- 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 56a0260..d24ee23 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -26,11 +26,13 @@
- #include <linux/vmalloc.h>
- #include <linux/fs.h>
- #include <kvm/arm_psci.h>
--#include <asm/cputype.h>
- #include <linux/uaccess.h>
-+#include <asm/cpufeature.h>
-+#include <asm/cputype.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_mmu.h>
- 
- #include "trace.h"
- 
-@@ -458,3 +460,37 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- 	return ret;
- }
-+
-+/*
-+ * Configure the VTCR_EL2 for this VM. The VTCR value is common
-+ * across all the physical CPUs on the system. We use system wide
-+ * sanitised values to fill in different fields, except for Hardware
-+ * Management of Access Flags. HA Flag is set unconditionally on
-+ * all CPUs, as it is safe to run with or without the feature and
-+ * the bit is RES0 on CPUs that don't support it.
-+ */
-+int kvm_arm_config_vm(struct kvm *kvm)
-+{
-+	u64 vtcr = VTCR_EL2_FLAGS;
-+	u64 parange;
-+
-+
-+	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
-+	if (parange > ID_AA64MMFR0_PARANGE_MAX)
-+		parange = ID_AA64MMFR0_PARANGE_MAX;
-+	vtcr |= parange << VTCR_EL2_PS_SHIFT;
-+
-+	/*
-+	 * Enable the Hardware Access Flag management, unconditionally
-+	 * on all CPUs. The features is RES0 on CPUs without the support
-+	 * and must be ignored by the CPUs.
-+	 */
-+	vtcr |= VTCR_EL2_HA;
-+
-+	/* Set the vmid bits */
-+	vtcr |= (kvm_get_vmid_bits() == 16) ?
-+		VTCR_EL2_VS_16BIT :
-+		VTCR_EL2_VS_8BIT;
-+	kvm->arch.vtcr = vtcr;
-+	return 0;
-+}
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 4313f74..1b80a9a 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -18,7 +18,6 @@ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
- obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
- obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
- obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
--obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
- 
- # KVM code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
 diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-deleted file mode 100644
-index e1ca672..0000000
+index 603e1ee..e1ca672 100644
 --- a/arch/arm64/kvm/hyp/s2-setup.c
-+++ /dev/null
-@@ -1,72 +0,0 @@
--/*
-- * Copyright (C) 2016 - ARM Ltd
-- * Author: Marc Zyngier <marc.zyngier@arm.com>
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as
-- * published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-- */
--
--#include <linux/types.h>
--#include <asm/kvm_arm.h>
--#include <asm/kvm_asm.h>
--#include <asm/kvm_hyp.h>
--#include <asm/cpufeature.h>
--
--u32 __hyp_text __init_stage2_translation(void)
--{
--	u64 val = VTCR_EL2_FLAGS;
--	u64 parange;
--	u32 phys_shift;
--	u64 tmp;
--
--	/*
--	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS
--	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, but the
--	 * allocated values are limited to 3bits.
--	 */
--	parange = read_sysreg(id_aa64mmfr0_el1) & 7;
--	if (parange > ID_AA64MMFR0_PARANGE_MAX)
--		parange = ID_AA64MMFR0_PARANGE_MAX;
--	val |= parange << VTCR_EL2_PS_SHIFT;
--
--	/* Compute the actual PARange... */
--	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
--
--	/*
--	 * ... and clamp it to 40 bits, unless we have some braindead
--	 * HW that implements less than that. In all cases, we'll
--	 * return that value for the rest of the kernel to decide what
--	 * to do.
--	 */
--	val |= VTCR_EL2_T0SZ(phys_shift > 40 ? 40 : phys_shift);
--
--	/*
--	 * Check the availability of Hardware Access Flag / Dirty Bit
--	 * Management in ID_AA64MMFR1_EL1 and enable the feature in VTCR_EL2.
--	 */
--	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_HADBS_SHIFT) & 0xf;
--	if (tmp)
--		val |= VTCR_EL2_HA;
--
--	/*
--	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
--	 * bit in VTCR_EL2.
--	 */
--	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_VMIDBITS_SHIFT) & 0xf;
--	val |= (tmp == ID_AA64MMFR1_VMIDBITS_16) ?
--			VTCR_EL2_VS_16BIT :
--			VTCR_EL2_VS_8BIT;
--
--	write_sysreg(val, vtcr_el2);
--
--	return phys_shift;
--}
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 04e554c..37e46e4 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -122,6 +122,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (type)
- 		return -EINVAL;
++++ b/arch/arm64/kvm/hyp/s2-setup.c
+@@ -19,45 +19,27 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/cpufeature.h>
  
-+	ret = kvm_arm_config_vm(kvm);
-+	if (ret)
-+		return ret;
-+
- 	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
- 	if (!kvm->arch.last_vcpu_ran)
- 		return -ENOMEM;
+ u32 __hyp_text __init_stage2_translation(void)
+ {
+ 	u64 val = VTCR_EL2_FLAGS;
+ 	u64 parange;
++	u32 phys_shift;
+ 	u64 tmp;
+ 
+ 	/*
+ 	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS
+-	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, while
+-	 * PS is only 3. Fortunately, bit 19 is RES0 in VTCR_EL2...
++	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, but the
++	 * allocated values are limited to 3bits.
+ 	 */
+ 	parange = read_sysreg(id_aa64mmfr0_el1) & 7;
+ 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
+ 		parange = ID_AA64MMFR0_PARANGE_MAX;
+-	val |= parange << 16;
++	val |= parange << VTCR_EL2_PS_SHIFT;
+ 
+ 	/* Compute the actual PARange... */
+-	switch (parange) {
+-	case 0:
+-		parange = 32;
+-		break;
+-	case 1:
+-		parange = 36;
+-		break;
+-	case 2:
+-		parange = 40;
+-		break;
+-	case 3:
+-		parange = 42;
+-		break;
+-	case 4:
+-		parange = 44;
+-		break;
+-	case 5:
+-	default:
+-		parange = 48;
+-		break;
+-	}
++	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
+ 
+ 	/*
+ 	 * ... and clamp it to 40 bits, unless we have some braindead
+@@ -65,7 +47,7 @@ u32 __hyp_text __init_stage2_translation(void)
+ 	 * return that value for the rest of the kernel to decide what
+ 	 * to do.
+ 	 */
+-	val |= 64 - (parange > 40 ? 40 : parange);
++	val |= VTCR_EL2_T0SZ(phys_shift > 40 ? 40 : phys_shift);
+ 
+ 	/*
+ 	 * Check the availability of Hardware Access Flag / Dirty Bit
+@@ -86,5 +68,5 @@ u32 __hyp_text __init_stage2_translation(void)
+ 
+ 	write_sysreg(val, vtcr_el2);
+ 
+-	return parange;
++	return phys_shift;
+ }
 -- 
 2.7.4
