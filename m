@@ -1,29 +1,26 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v8 2/4] arm64: KVM: export the capability to set guest
- SError syndrome
-Date: Thu, 19 Jul 2018 17:29:07 +0800
-Message-ID: <299f2265-ea03-52ef-d88e-9efab1752b60@huawei.com>
-References: <20180713154751.18131-1-james.morse@arm.com>
- <20180713154751.18131-3-james.morse@arm.com>
- <CAFEAcA9pK7W=gSZXTOTxFEFDmc6kJ8GDYO4a6r_P1FHp+KuT9A@mail.gmail.com>
- <86da7b47-5026-5ec7-96dc-4d3a14caa2f8@huawei.com>
- <CAFEAcA_Amw6Pr+DmeZXHDWKQPSYf_826hDDwna2fwQvOP1+9og@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC PATCH 10/16] KVM: arm64: Add a vcpu flag to control SVE
+ visibility for the guest
+Date: Thu, 19 Jul 2018 13:08:10 +0200
+Message-ID: <20180719110810.2edkoz53b6vrafum@kamzik.brq.redhat.com>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-11-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E69CC49F86
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 05:16:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D920A49F8C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 06:55:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CKSyWHY-61zH for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Jul 2018 05:16:29 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE11E40196
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 05:16:28 -0400 (EDT)
-In-Reply-To: <CAFEAcA_Amw6Pr+DmeZXHDWKQPSYf_826hDDwna2fwQvOP1+9og@mail.gmail.com>
-Content-Language: en-US
+ with ESMTP id KRxN7VZw1-0h for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Jul 2018 06:55:07 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C255E40196
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 06:55:07 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1529593060-542-11-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,18 +30,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Linuxarm <linuxarm@huawei.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2018/7/19 17:10, Peter Maydell wrote:
->> The user space will firstly check the  KVM_CAP_VCPU_EVENTS through kvm_has_vcpu_events() to know whether KVM can support get/set vcpu events,
->> If KVM supports get/set vcpu events, it will check KVM_CAP_ARM_SET_SERROR_ESR to know whether can set guest SError ESR, as shown the user space code in [1].
-> OK, so this capability affects the behaviour of
-> KVM_SET_VCPU_EVENTS. Can you make sure the documentation
-> of KVM_SET_VCPU_EVENTS clearly explains what happens
-> and the effect of whether this capability is present,
-> please? People trying to understand the behaviour of
-> that ioctl are not going to know that they need to
-> look here as well.
-sure, I will. Thanks peter's reminder and comments.
+On Thu, Jun 21, 2018 at 03:57:34PM +0100, Dave Martin wrote:
+> Since SVE will be enabled or disabled on a per-vcpu basis, a flag
+> is needed in order to track which vcpus have it enabled.
+> 
+> This patch adds a suitable flag and a helper for checking it.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9671ddd..609d08b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -308,6 +308,14 @@ struct kvm_vcpu_arch {
+>  #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+>  #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+>  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
+> +#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
+> +
+> +static inline bool vcpu_has_sve(struct kvm_vcpu_arch const *vcpu_arch)
+> +{
+> +	return system_supports_sve() &&
+
+system_supports_sve() checks cpus_have_const_cap(), not
+this_cpu_has_cap(), so, iiuc, the result of this check won't
+change, regardless of which cpu it's run on at the time.
+
+> +		(vcpu_arch->flags & KVM_ARM64_GUEST_HAS_SVE);
+
+Since this flag can only be set if system_supports_sve() is
+true at vcpu init time, then it isn't necessary to always check
+system_supports_sve() in this function. Or, should
+system_supports_sve() be changed to use this_cpu_has_cap()?
+
+Thanks,
+drew
+
+> +
+> +}
+>  
+>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+>  
+> -- 
+> 2.1.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
