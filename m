@@ -1,26 +1,27 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC PATCH 15/16] KVM: arm64: Enumerate SVE register indices for
- KVM_GET_REG_LIST
-Date: Thu, 19 Jul 2018 16:12:32 +0200
-Message-ID: <20180719141232.hm2vjld5ztfrtter@kamzik.brq.redhat.com>
-References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-16-git-send-email-Dave.Martin@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v8 1/4] arm/arm64: KVM: Add KVM_GET/SET_VCPU_EVENTS
+Date: Thu, 19 Jul 2018 15:15:20 +0100
+Message-ID: <a840714a-16b3-2da8-c6e2-5be85c73bda2@arm.com>
+References: <20180713154751.18131-1-james.morse@arm.com>
+ <20180713154751.18131-2-james.morse@arm.com>
+ <CAFEAcA-t8U-GmkCtAcAN8tj4UAaynCZhgTi1Cg1RhaarGUOJfg@mail.gmail.com>
+ <49bb119c-ec31-34ee-f4e5-9f3e90d7c181@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D00D408AD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 09:59:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D3BC4065F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 10:02:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7+oyVOt9lK3G for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Jul 2018 09:59:30 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25555402B8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 09:59:30 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1529593060-542-16-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id xkV3ZwP7S2n8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Jul 2018 10:02:19 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7649640192
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 10:02:19 -0400 (EDT)
+In-Reply-To: <49bb119c-ec31-34ee-f4e5-9f3e90d7c181@huawei.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,189 +31,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: gengdongjiu <gengdongjiu@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, kvm-devel <kvm@vger.kernel.org>, Linuxarm <linuxarm@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 21, 2018 at 03:57:39PM +0100, Dave Martin wrote:
-> This patch includes the SVE register IDs in the list returned by
-> KVM_GET_REG_LIST, as appropriate.
-> 
-> On a non-SVE-enabled vcpu, no extra IDs are added.
-> 
-> On an SVE-enabled vcpu, the appropriate number of slide IDs are
-> enumerated for each SVE register, depending on the maximum vector
-> length for the vcpu.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
->  arch/arm64/kvm/guest.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 73 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 005394b..5152362 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -21,6 +21,7 @@
->  
->  #include <linux/errno.h>
->  #include <linux/err.h>
-> +#include <linux/kernel.h>
->  #include <linux/kvm_host.h>
->  #include <linux/module.h>
->  #include <linux/uaccess.h>
-> @@ -253,6 +254,73 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return err;
->  }
->  
-> +static void copy_reg_index_to_user(u64 __user **uind, int *total, int *cerr,
-> +				   u64 id)
-> +{
-> +	int err;
-> +
-> +	if (*cerr)
-> +		return;
-> +
-> +	if (uind) {
-> +		err = put_user(id, *uind);
-> +		if (err) {
-> +			*cerr = err;
-> +			return;
-> +		}
-> +	}
-> +
-> +	++*total;
-> +	if (uind)
-> +		++*uind;
-> +}
-> +
-> +static int enumerate_sve_regs(const struct kvm_vcpu *vcpu, u64 __user **uind)
-> +{
-> +	unsigned int n, i;
-> +	int err = 0;
-> +	int total = 0;
-> +	unsigned int slices;
-> +
-> +	if (!vcpu_has_sve(&vcpu->arch))
-> +		return 0;
-> +
-> +	slices = DIV_ROUND_UP(vcpu->arch.sve_max_vl,
-> +			      KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
-> +
-> +	for (n = 0; n < SVE_NUM_ZREGS; ++n)
-> +		for (i = 0; i < slices; ++i)
-> +			copy_reg_index_to_user(uind, &total, &err,
-> +					       KVM_REG_ARM64_SVE_ZREG(n, i));
-> +
-> +	for (n = 0; n < SVE_NUM_PREGS; ++n)
-> +		for (i = 0; i < slices; ++i)
-> +			copy_reg_index_to_user(uind, &total, &err,
-> +					       KVM_REG_ARM64_SVE_PREG(n, i));
-> +
-> +	for (i = 0; i < slices; ++i)
-> +		copy_reg_index_to_user(uind, &total, &err,
-> +				       KVM_REG_ARM64_SVE_FFR(i));
-> +
-> +	if (err)
-> +		return -EFAULT;
-> +
-> +	return total;
-> +}
-> +
-> +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
-> +{
-> +	return enumerate_sve_regs(vcpu, NULL);
-> +}
-> +
-> +static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu, u64 __user **uind)
-> +{
-> +	int err;
-> +
-> +	err = enumerate_sve_regs(vcpu, uind);
-> +	return err < 0 ? err : 0;
-> +}
+Hi guys,
 
-I see the above functions were inspired by walk_sys_regs(), but, IMHO,
-they're a bit overcomplicated. How about this untested approach?
+On 19/07/18 08:39, gengdongjiu wrote:
+> On 2018/7/18 0:33, Peter Maydell wrote:
+>> On 13 July 2018 at 16:47, James Morse <james.morse@arm.com> wrote:
+>>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>>
+>>> For the migrating VMs, user space may need to know the exception
+>>> state. For example, in the machine A, KVM make an SError pending,
+>>> when migrate to B, KVM also needs to pend an SError.
+>>>
+>>> This new IOCTL exports user-invisible states related to SError.
+>>> Together with appropriate user space changes, user space can get/set
+>>> the SError exception state to do migrate/snapshot/suspend.
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 56a0260ceb11..0188a8b30d46 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -130,6 +130,52 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return err;
- }
- 
-+static int enumerate_sve_regs(const struct kvm_vcpu *vcpu, u64 __user *uind)
-+{
-+	unsigned int slices = DIV_ROUND_UP(vcpu->arch.sve_max_vl,
-+				KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
-+	unsigned int n, i;
-+
-+	if (!vcpu_has_sve(&vcpu->arch))
-+		return 0;
-+
-+	for (n = 0; < SVE_NUM_ZREGS; ++n) {
-+		for (i = 0; i < slices; ++i) {
-+			if (put_user(KVM_REG_ARM64_SVE_ZREG(n, i), uind++))
-+				return -EFAULT;
-+		}
-+	}
-+
-+	for (n = 0; < SVE_NUM_PREGS; ++n) {
-+		for (i = 0; i < slices; ++i) {
-+			if (put_user(KVM_REG_ARM64_SVE_PREG(n, i), uind++))
-+				return -EFAULT;
-+		}
-+	}
-+
-+	for (i = 0; i < slices; ++i) {
-+		if (put_user(KVM_REG_ARM64_SVE_FFR(i), uind++))
-+			return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
-+static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
-+{
-+	unsigned int slices = DIV_ROUND_UP(vcpu->arch.sve_max_vl,
-+				KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
-+
-+	if (vcpu_has_sve(&vcpu->arch))
-+		return (SVE_NUM_ZREGS + SVE_NUM_PREGS + 1) * slices;
-+
-+	return 0;
-+}
-+
+>>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>>> index d10944e619d3..e3940f8715a5 100644
+>>> --- a/Documentation/virtual/kvm/api.txt
+>>> +++ b/Documentation/virtual/kvm/api.txt
 
-> +
->  static int sve_reg_bounds(struct reg_bounds_struct *b,
->  			  const struct kvm_vcpu *vcpu,
->  			  const struct kvm_one_reg *reg)
-> @@ -403,6 +471,7 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
->  	unsigned long res = 0;
->  
->  	res += num_core_regs();
-> +	res += num_sve_regs(vcpu);
->  	res += kvm_arm_num_sys_reg_descs(vcpu);
->  	res += kvm_arm_get_fw_num_regs(vcpu);
->  	res += NUM_TIMER_REGS;
-> @@ -427,6 +496,10 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->  		uindices++;
->  	}
->  
-> +	ret = copy_sve_reg_indices(vcpu, &uindices);
-> +	if (ret)
-> +		return ret;
-> +
->  	ret = kvm_arm_copy_fw_reg_indices(vcpu, uindices);
->  	if (ret)
->  		return ret;
-> -- 
-> 2.1.4
+
+>>> +Gets currently pending SError exceptions as well as related states of the vcpu.
+>>
+>> Any chance of expanding this to explain what this state actually is?
+>> (ie something you could use to implement or review the userspace
+>> code which has to manipulate it)
+> sure, can expand it.
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> serror_pending means whether KVM is pending Serror for guest.
+> serror_has_esr means whether KVM or user space can set the SError syndrome for guest.
+> serror_esr means the value of SError syndrome.
+
+I've had a go at something more verbose for this section:
+------------------%<------------------
+If the guest accesses a device that is being emulated by the host kernel in such
+a way that a real device would generate a physical SError, KVM may make a
+virtual SError pending for that VCPU. This system error interrupt remains
+pending until the guest takes the exception by unmasking PSTATE.A.
+
+Running the VCPU may cause it to take a pending SError, or make an access that
+causes an SError to become pending. The event's description is only valid while
+the VPCU is not running.
+
+This API provides a way to read and write the pending 'event' state that is not
+visible to the guest. To save, restore or migrate a VCPU the struct representing
+the state can be read then written using this GET/SET API, along with the other
+guest-visible registers. It is not possible to 'cancel' an SError that has been
+made pending.
+
+A device being emulated in user-space may also wish to generate an SError. To do
+this the events structure can be populated by user-space. The current state
+should be read first, to ensure no existing SError is pending. If an existing
+SError is pending, the architectures 'Multiple SError interrupts' rules should
+be followed. (2.5.3 of DDI0587.a "ARM Reliability, Availability, and
+Serviceability (RAS) Specification").
+------------------%<------------------
+
+
+Thanks,
+
+James
