@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v4 03/10] KVM: arm/arm64: vgic: GICv2 IGROUPR should read
- as zero
-Date: Thu, 19 Jul 2018 22:56:53 +0200
-Message-ID: <20180719205653.GA6399@C02W217FHV2R.local>
+Subject: Re: [PATCH v4 10/10] KVM: arm/arm64: vgic: Update documentation of
+ the GIC devices wrt IIDR
+Date: Thu, 19 Jul 2018 22:57:39 +0200
+Message-ID: <20180719205739.GB6399@C02W217FHV2R.local>
 References: <1531746387-7033-1-git-send-email-christoffer.dall@arm.com>
- <1531746387-7033-4-git-send-email-christoffer.dall@arm.com>
- <20180719181636.mtlxhyrxtsweio2y@kamzik.brq.redhat.com>
+ <1531746387-7033-11-git-send-email-christoffer.dall@arm.com>
+ <20180719170830.cjrob66sjz522d33@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A3E949EA2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 16:43:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0F58402AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 16:44:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HKKLPJqlGjQ3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Jul 2018 16:43:50 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 952E8402AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 16:43:50 -0400 (EDT)
+ with ESMTP id cVBXVqX0ZuQj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Jul 2018 16:44:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8591840192
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Jul 2018 16:44:35 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180719181636.mtlxhyrxtsweio2y@kamzik.brq.redhat.com>
+In-Reply-To: <20180719170830.cjrob66sjz522d33@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,90 +35,89 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 19, 2018 at 08:16:36PM +0200, Andrew Jones wrote:
-> On Mon, Jul 16, 2018 at 03:06:20PM +0200, Christoffer Dall wrote:
-> > We currently don't support grouping in the emulated VGIC, which is a
-> > known defect on KVM (not hurting any currently used guests as far as
-> > we're aware). This is currently handled by treating all interrupts as
-> > group 0 interrupts for an emulated GICv2 and always signaling interrupts
-> > as group 0 to the virtual CPU interface.
+On Thu, Jul 19, 2018 at 07:08:30PM +0200, Andrew Jones wrote:
+> On Mon, Jul 16, 2018 at 03:06:27PM +0200, Christoffer Dall wrote:
+> > Update the documentation to reflect the ordering requirements of
+> > restoring the GICD_IIDR register before any other registers and the
+> > effects this has on restoring the interrupt groups for an emulated GICv2
+> > insttance.
+> 
+> instance
+> 
 > > 
-> > However, when reading which group interrupts belongs to in the guest
-> > from the emulated VGIC, the VGIC currently reports group 1 instead of
-> > group 0, which is misleading.  Fix this temporarily before introducing
-> > full group support by changing the hander to _raz instead of _rao.
+> > Also remove some outdated limitations in the documentation while we're
+> > at it.
 > > 
-> > Fixes: fb848db39661a "KVM: arm/arm64: vgic-new: Add GICv2 MMIO handling framework"
 > > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > > ---
-> >  virt/kvm/arm/vgic/vgic-init.c    | 2 +-
-> >  virt/kvm/arm/vgic/vgic-mmio-v2.c | 8 +++++++-
-> >  2 files changed, 8 insertions(+), 2 deletions(-)
+> >  Documentation/virtual/kvm/devices/arm-vgic-v3.txt |  8 ++++++++
+> >  Documentation/virtual/kvm/devices/arm-vgic.txt    | 15 +++++++++------
+> >  2 files changed, 17 insertions(+), 6 deletions(-)
 > > 
-> > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> > index 8b6fc45..230c922 100644
-> > --- a/virt/kvm/arm/vgic/vgic-init.c
-> > +++ b/virt/kvm/arm/vgic/vgic-init.c
-> > @@ -298,7 +298,7 @@ int vgic_init(struct kvm *kvm)
+> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > index 2408ab7..eba20ae 100644
+> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > @@ -100,6 +100,14 @@ Groups:
+> >      Note that distributor fields are not banked, but return the same value
+> >      regardless of the mpidr used to access the register.
 > >  
-> >  	vgic_debug_init(kvm);
-> >  
-> > -	dist->implementation_rev = 0;
-> > +	dist->implementation_rev = 1;
-> >  	dist->initialized = true;
-> >  
-> >  out:
-> > diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > index f0c5351..db646f1 100644
-> > --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> > @@ -22,6 +22,12 @@
-> >  #include "vgic.h"
-> >  #include "vgic-mmio.h"
-> >  
-> > +/*
-> > + * The Revision field in the IIDR have the following meanings:
-> > + *
-> > + * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
-> > + */
+> > +    GICD_IIDR.Revision is updated when the KVM implementation is changed in a
+> > +    way directly observable by the guest or userspace.  Userspace should read
+> > +    GICD_IIDR from KVM and write back the read value to confirm its expected
+> > +    behavior is aligned with the KVM implementation.  Userspace should set
+> > +    GICD_IIDR before setting any other registers.  to ensure the expected
+> 
+>  s/. //
+> 
+> > +    behavior.
 > > +
-> >  static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
-> >  					    gpa_t addr, unsigned int len)
-> >  {
-> > @@ -365,7 +371,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
-> >  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12,
-> >  		VGIC_ACCESS_32bit),
-> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
-> > -		vgic_mmio_read_rao, vgic_mmio_write_wi, NULL, NULL, 1,
-> > +		vgic_mmio_read_raz, vgic_mmio_write_wi, NULL, NULL, 1,
-> >  		VGIC_ACCESS_32bit),
-> >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
-> >  		vgic_mmio_read_enable, vgic_mmio_write_senable, NULL, NULL, 1,
+> > +
+> >      The GICD_STATUSR and GICR_STATUSR registers are architecturally defined such
+> >      that a write of a clear bit has no effect, whereas a write with a set bit
+> >      clears that value.  To allow userspace to freely set the values of these two
+> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > index b3ce126..4ff7635 100644
+> > --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> > @@ -49,9 +49,15 @@ Groups:
+> >      index is specified with the vcpu_index field.  Note that most distributor
+> >      fields are not banked, but return the same value regardless of the
+> >      vcpu_index used to access the register.
+> > -  Limitations:
+> > -    - Priorities are not implemented, and registers are RAZ/WI
+> > -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+> > +
+> > +    GICD_IIDR.Revision is updated when the KVM implementation of an emulated
+> > +    GICv2 is changed in a way directly observable by the guest or userspace.
+> > +    Userspace should read GICD_IIDR from KVM and write back the read value to
+> > +    confirm its expected behavior is aligned with the KVM implementation.
+> > +    Userspace should set GICD_IIDR before setting any other registers (both
+> > +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_CPU_REGS) to ensure
+> > +    the expected behavior.  Unless GICD_IIDR has been set from userspace, writes
+> > +    to the interrupt group registers (GICD_IGROUPR) are ignored.
+> >    Errors:
+> >      -ENXIO: Getting or setting this register is not yet supported
+> >      -EBUSY: One or more VCPUs are running
+> > @@ -94,9 +100,6 @@ Groups:
+> >      use the lower 5 bits to communicate with the KVM device and must shift the
+> >      value left by 3 places to obtain the actual priority mask level.
+> >  
+> > -  Limitations:
+> > -    - Priorities are not implemented, and registers are RAZ/WI
+> > -    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+> >    Errors:
+> >      -ENXIO: Getting or setting this register is not yet supported
+> >      -EBUSY: One or more VCPUs are running
 > > -- 
 > > 2.7.4
 > >
 > 
-> I realize that this is fixing the emulation, so any guest that would find
-> this change a problem is broken, but guest-visible changes without user
-> consent always seem a bit wrong.
-> 
-> We could drop this patch and only allow gicv2 guests to read ones from the
-> IGROUP registers until v2_groups_user_writable is true. Then, if a broken
-> guest needs to run on a host with an updated kernel, userspace, which must
-> have been updated too, can give the guest the broken group view it needs.
-
-That won't really help because those interrupts will no longer be
-injected as IRQs, but as FIQs, which is also a departure from what the
-guest expects.
-
-> 
-> That said, I'm not overly concerned about this guest-visible issue. So
-
-Any guests relying on this broken behavior will not run on hardwre, so
-I'm not going to change this.
-
+> Otherwise
 > 
 > Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Thanks!
+Thanks.  I'm hoping that Marc won't mind fixing this up when applying
+the patches.
+
 -Christoffer
