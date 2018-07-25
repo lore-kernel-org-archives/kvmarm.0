@@ -1,28 +1,28 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC PATCH 16/16] KVM: arm64/sve: Report and enable SVE API
- extensions for userspace
-Date: Wed, 25 Jul 2018 18:52:56 +0200
-Message-ID: <20180725165256.k2kcrazgyt7y4i4o@kamzik.brq.redhat.com>
+Subject: Re: [RFC PATCH 14/16] KVM: arm64/sve: Add SVE support to register
+ access ioctl interface
+Date: Wed, 25 Jul 2018 19:20:57 +0200
+Message-ID: <20180725172057.tvesmvfjtwe6sxla@kamzik.brq.redhat.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-17-git-send-email-Dave.Martin@arm.com>
- <20180719145921.oasa3a57at5nnwya@kamzik.brq.redhat.com>
- <20180725152749.GQ4240@e103592.cambridge.arm.com>
+ <1529593060-542-15-git-send-email-Dave.Martin@arm.com>
+ <20180719130433.mfqqnxxlmvhduqri@kamzik.brq.redhat.com>
+ <20180725140621.GK4240@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6374A0F6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 12:53:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E484A0F9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 13:21:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SPqmwWmoN7Sn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 12:53:01 -0400 (EDT)
+ with ESMTP id WwDM2N-FB+wY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 13:21:02 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C63B4045F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 12:53:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6196404D9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 13:21:02 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180725152749.GQ4240@e103592.cambridge.arm.com>
+In-Reply-To: <20180725140621.GK4240@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,90 +36,100 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 25, 2018 at 04:27:49PM +0100, Dave Martin wrote:
-> On Thu, Jul 19, 2018 at 04:59:21PM +0200, Andrew Jones wrote:
-> > On Thu, Jun 21, 2018 at 03:57:40PM +0100, Dave Martin wrote:
-> > > -	/*
-> > > -	 * For now, we don't return any features.
-> > > -	 * In future, we might use features to return target
-> > > -	 * specific features available for the preferred
-> > > -	 * target type.
-> > > -	 */
-> > > +	/* KVM_ARM_VCPU_SVE understood by KVM_VCPU_INIT */
-> > > +	init->features[0] = 1 << KVM_ARM_VCPU_SVE;
+On Wed, Jul 25, 2018 at 03:06:21PM +0100, Dave Martin wrote:
+> On Thu, Jul 19, 2018 at 03:04:33PM +0200, Andrew Jones wrote:
+> > On Thu, Jun 21, 2018 at 03:57:38PM +0100, Dave Martin wrote:
 > > > +
+> > > +	if (usize % sizeof(u32))
+> > > +		return -EINVAL;
 > > 
-> > We shouldn't need to do this. The "preferred" target type isn't defined
-> > well (that I know of), but IMO it should probably be the target that
-> > best matches the host, minus optional features. The best base target. We
-> > may use these features to convey that the preferred target should enable
-> > some optional feature if that feature is necessary to workaround a bug,
-> > i.e. using the "feature" bit as an erratum bit someday, but that'd be
-> > quite a debatable use, so maybe not even that. Most likely we'll never
-> > need to add features here.
 > 
-> init->features[] has no semantics yet so we can define it how we like,
-> but I agree that the way I use it here is not necessarily the most
-> natural.
+> Currently we don't enforce the register size to be a multiple of 32 bits,
+> but I'm trying to establish a stronger position.  Passing different
+> register sizes feels like an abuse of the API and there is no evidence
+> that qemu or kvmtool is relying on this so far.  The ability to pass
+> a misaligned register ID and/or slurp multiple vcpu registers (or parts
+> of registers) is once call really seems like it works by accident today
+> and seems not to be intentional design.  Rather, it exposes kernel
+> implementation details, which is best avoided.
 > 
-> OTOH, we cannot use features[] for "mandatory" features like erratum
-> workarounds, because current userspace just ignores these bits.
-
-It would have to learn to look here if that's how we started using it,
-but it'd be better to invent something else that wouldn't appear as
-abusive if we're going to teach userspace new stuff anyway.
-
+> It would be better to make this a global check for usize % 32 == 0
+> though, rather than burying it in fpsimd_vreg_bounds().
 > 
-> Rather, these bits would be for features that are considered beneficial
-> but must be off by default (due to incompatibility risks across nodes,
-> or due to ABI impacts).  Just blindly using the preferred target
-> already risks configuring a vcpu that won't work across all nodes in
-> your cluster.
+> Opinions?
 
-KVM usually advertises optional features through capabilities. A device
-(vcpu device, in this case) ioctl can also be used to check for feature
-availability.
+There's only one reason to not start enforcing it globally on arm/arm64,
+and that's that it's not documented that way. Changing it would be an API
+change, rather than just an API fix. It's probably a safe change, but...
 
 > 
-> So I'm not convinced that there is any useful interpretation of
-> features[] unless we interpret it as suggested in this patch.
+> > > +
+> > > +	usize /= sizeof(u32);
+> > > +
+> > > +	if ((uoffset <= start && usize <= start - uoffset) ||
+> > > +	    uoffset >= limit)
+> > > +		return -ENOENT;	/* not a vreg */
+> > > +
+> > > +	BUILD_BUG_ON(uoffset > limit);
+> > 
+> > Hmm, a build bug on uoffset can't be right, it's not a constant.
+> > 
+> > > +	if (uoffset < start || usize > limit - uoffset)
+> > > +		return -EINVAL;	/* overlaps vregs[] bounds */
 > 
-> Can you elaborate why you think it should be used with a more
-> concrete example?
+> uoffset is not compile-time constant, but (uoffset > limit) is compile-
+> time constant, because the previous if() returns from the function
+> otherwise.
+> 
+> gcc seems to do the right thing here: the code compiles as-is, but
+> if the prior if() is commented out then the BUILD_BUG_ON() fires
+> because (uoffset > limit) is no longer compile-time constant.
 
-I'm advocating that it *not* be used here. I think it should be used
-like the PMU feature uses it - and the PMU feature doesn't set a bit
-here.
-
-> 
-> > That said, I think defining the feature bit makes sense. ATM, I'm feeling
-> > like we'll want to model the user interface for SVE like PMU (using VCPU
-> > device ioctls).
-> 
-> Some people expressed concerns about the ioctls becoming order-sensitive.
-> 
-> In the SVE case we don't want people enabling/disabling/reconfiguring
-> "silicon" features like SVE after the vcpu starts executing.
-> 
-> We will need an extra ioctl() for configuring the allowed SVE vector
-> lengths though.  I don't see a way around that.  So maybe we have to
-> solve the ordering problem anyway.
-
-Yes, that's why I'm thinking that the vcpu device ioctls is probably the
-right way to go. The SVE group can have its own "finalize" request that
-allows all other SVE ioctls to be in any order prior to it.
+Oh, interesting.
 
 > 
 > 
-> By current approach (not in this series) was to have VCPU_INIT return
-> -EINPROGRESS or similar if SVE is enabled in features[]: this indicates
-> that certain setup ioctls are required before the vcpu can run.
+> This is a defensively-coded bounds check, where
 > 
-> This may be overkill / not the best approach though.  I can look at
-> vcpu device ioctls as an alternative.
+> 	if (A + B > C)
+> 
+> is transformed to
+> 
+> 	if (C >= B && A > C - B)
+> 
+> The former is susceptible to overflow in (A + B), whereas the latter is
+> not.  We might be able to hide the risk with type casts, but that trades
+> one kind of fragility for another IMHO.
+> 
+> In this patch, the C >= B part is subsumed into the previous if(), but
+> because this is non-obvious I dropped the BUILD_BUG_ON() in as a hint
+> to maintainers that we really do depend on a property of the previous
+> check, so although it may look like the checks could be swapped over
+> with no ill effects, really that is not safe.
 
-With a "finalize" attribute if SVE isn't finalized by VCPU_INIT or
-KVM_RUN time, then SVE just won't be enabled for that VCPU.
+I'm glad our maintainers can pick up on hints like that :-) Maybe you can
+add a comment for mortals like me though.
+
+> 
+> 
+> Maybe the BUILD_BUG_ON() is superfluous, but I would prefer at least
+> to keep a comment here.
+> 
+> What do you think.
+>
+
+Comment plus build-bug or just comment works for me.
+
+> 
+> OTOH, if we can show conclusively that we can avoid overflow here
+> then the code can be simplified.  But I would want to be confident
+> that this is really safe not just now but also under future maintenance.
+> 
+
+I agree with thoroughly checking user input. Maybe we can create/use
+some helper functions to do it. Those helpers can then get reused
+elsewhere, helping to keep ourselves sane the next time we need to
+do similar sanity checks.
 
 Thanks,
 drew
