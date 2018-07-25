@@ -1,59 +1,70 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 2/2] KVM: arm/arm64: Fix lost IRQs from emulated physcial timer when blocked
-Date: Wed, 25 Jul 2018 10:21:28 +0100
-Message-ID: <20180725092128.11534-3-andre.przywara@arm.com>
-References: <20180725092128.11534-1-andre.przywara@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180725092128.11534-1-andre.przywara@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Stable <stable@vger.kernel.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: VCPU hotplug on KVM/ARM
+Date: Wed, 25 Jul 2018 11:40:54 +0100
+Message-ID: <74427c65-b860-d576-04f9-766253285210@arm.com>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+ <20180227104708.GA11391@cbox>
+ <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+ <20180227124604.GA2373@cbox>
+ <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+ <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4B140A6E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 06:40:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jLDfAF2eLItO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 06:40:58 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8BE54045F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 06:40:58 -0400 (EDT)
+In-Reply-To: <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Maran Wilson <maran.wilson@oracle.com>, kvmarm@lists.cs.columbia.edu, bthakur@codeaurora.org
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, david@redhat.com, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+On 24/07/18 19:35, Maran Wilson wrote:
+> It's been a few months since this email thread died off. Has anyone 
+> started working on a potential solution that would allow VCPU hotplug on 
+> KVM/ARM ? Or is this a project that is still waiting for an owner who 
+> has the time and inclination to get started?
 
-When the VCPU is blocked (for example from WFI) we don't inject the
-physical timer interrupt if it should fire while the CPU is blocked, but
-instead we just wake up the VCPU and expect kvm_timer_vcpu_load to take
-care of injecting the interrupt.
+This is typically a project for someone who would have this particular
+itch to scratch, and who has a demonstrable need for this functionality.
 
-Unfortunately, kvm_timer_vcpu_load() doesn't actually do that, it only
-has support to schedule a soft timer if the emulated phys timer is
-expected to fire in the future.
+Work wise, it would have to include adding physical CPU hotplug support
+to the arm64 kernel as a precondition, before worrying about doing it in
+KVM.
 
-Follow the same pattern as kvm_timer_update_state() and update the irq
-state after potentially scheduling a soft timer.
+For KVM itself, particular area of interests would be:
+- Making GICv3 redistributors magically appear in the IPA space
+- Live resizing of GICv3 structures
+- Dynamic allocation of MPIDR, and mapping with vcpu_id
 
-Reported-by: Andre Przywara <andre.przywara@arm.com>
-Cc: Stable <stable@vger.kernel.org> # 4.15+
-Fixes: bbdd52cfcba29 ("KVM: arm/arm64: Avoid phys timer emulation in vcpu entry/exit")
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- virt/kvm/arm/arch_timer.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This should keep someone busy for a good couple of weeks (give or take a
+few months).
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 18ff6203079d..17cecc96f735 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -487,6 +487,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 
- 	if (unlikely(!timer->enabled))
- 		return;
-@@ -502,6 +503,10 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	/* Set the background timer for the physical timer emulation. */
- 	phys_timer_emulate(vcpu);
-+
-+	/* If the timer fired while we weren't running, inject it now */
-+	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
-+		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
- }
- 
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+That being said, I'd rather see support in QEMU first, creating all the
+vcpu/redistributors upfront, and signalling the hotplug event via the
+virtual firmware. And then post some numbers to show that creating all
+the vcpus upfront is not acceptable.
+
+Thanks,
+
+	M.
 -- 
-2.14.4
+Jazz is not dead. It just smells funny...
