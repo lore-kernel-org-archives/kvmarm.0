@@ -1,27 +1,27 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH 08/16] KVM: arm64: Support dynamically hideable system
- registers
-Date: Wed, 25 Jul 2018 15:12:15 +0100
-Message-ID: <878t5ztneo.fsf@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH 08/16] KVM: arm64: Support dynamically hideable
+ system registers
+Date: Wed, 25 Jul 2018 15:36:14 +0100
+Message-ID: <20180725143613.GM4240@e103592.cambridge.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
  <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
+ <878t5ztneo.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D9E49F86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 10:12:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 211BC4065F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 10:36:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Em6w3QT6u0gL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 10:12:18 -0400 (EDT)
-Received: from mail-wm0-f66.google.com (mail-wm0-f66.google.com [74.125.82.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9616649E4C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 10:12:18 -0400 (EDT)
-Received: by mail-wm0-f66.google.com with SMTP id y2-v6so5620726wma.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 07:12:18 -0700 (PDT)
-In-reply-to: <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id qEEHF8hWN86B for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 10:36:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5FC24045F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 10:36:18 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <878t5ztneo.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,86 +31,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFNvbWUgc3lzdGVt
-IHJlZ2lzdGVycyBtYXkgb3IgbWF5IG5vdCBsb2dpY2FsbHkgZXhpc3QgZm9yIGEgdmNwdQo+IGRl
-cGVuZGluZyBvbiB3aGV0aGVyIGNlcnRhaW4gYXJjaGl0ZWN0dXJhbCBmZWF0dXJlcyBhcmUgZW5h
-YmxlZCBmb3IKPiB0aGUgdmNwdS4KPgo+IEluIG9yZGVyIHRvIGF2b2lkIHNwdXJpb3VzbHkgZW11
-bGF0aW5nIGFjY2VzcyB0byB0aGVzZSByZWdpc3RlcnMKPiB3aGVuIHRoZXkgc2hvdWxkIG5vdCBl
-eGlzdCwgb3IgYWxsb3dpbmcgdGhlIHJlZ2lzdGVycyB0byBiZQo+IHNwdXJpb3VzbHkgZW51bWVy
-YXRlZCBvciBzYXZlZC9yZXN0b3JlZCB0aHJvdWdoIHRoZSBpb2N0bAo+IGludGVyZmFjZSwgYSBt
-ZWFucyBpcyBuZWVkZWQgdG8gYWxsb3cgcmVnaXN0ZXJzIHRvIGJlIGhpZGRlbgo+IGRlcGVuZGlu
-ZyBvbiB0aGUgdmNwdSBjb25maWd1cmF0aW9uLgo+Cj4gSW4gb3JkZXIgdG8gc3VwcG9ydCB0aGlz
-IGluIGEgZmxleGlibGUgd2F5LCB0aGlzIHBhdGNoIGFkZHMgYQo+IGNoZWNrX3ByZXNlbnQoKSBt
-ZXRob2QgdG8gc3RydWN0IHN5c19yZWdfZGVzYywgYW5kIHVwZGF0ZXMgdGhlCj4gZ2VuZXJpYyBz
-eXN0ZW0gcmVnaXN0ZXIgYWNjZXNzIGFuZCBlbnVtZXJhdGlvbiBjb2RlIHRvIGJlIGF3YXJlIG9m
-Cj4gaXQ6ICBpZiBjaGVja19wcmVzZW50KCkgcmV0dXJucyBmYWxzZSwgdGhlIGNvZGUgYmVoYXZl
-cyBhcyBpZiB0aGUKPiByZWdpc3RlciBkaWQgbm90IGV4aXN0Lgo+Cj4gRm9yIGNvbnZlbmllbmNl
-LCB0aGUgY29tcGxldGUgY2hlY2sgaXMgd3JhcHBlZCB1cCBpbiBhIG5ldyBoZWxwZXIKPiBzeXNf
-cmVnX3ByZXNlbnQoKS4KPgo+IEFuIGF0dGVtcHQgaGFzIGJlZW4gbWFkZSB0byBob29rIHRoZSBu
-ZXcgY2hlY2sgaW50byB0aGUgZ2VuZXJpYwo+IGFjY2Vzc29ycyBmb3IgdHJhcHBlZCBzeXN0ZW0g
-cmVnaXN0ZXJzLiAgVGhpcyBzaG91bGQgcmVkdWNlIHRoZQo+IHBvdGVudGlhbCBmb3IgZnV0dXJl
-IHN1cnByaXNlcywgYWx0aG91Z2ggdGhlIHJlZHVuZGFudCBjaGVjayB3aWxsCj4gYWRkIGEgc21h
-bGwgY29zdC4gIE5vIHN5c3RlbSByZWdpc3RlciBkZXBlbmRzIG9uIHRoaXMgZnVuY3Rpb25hbGl0
-eQo+IHlldCwgYW5kIHNvbWUgcGF0aHMgbmVlZGluZyB0aGUgY2hlY2sgbWF5IGFsc28gbmVlZCBh
-dHRlbnRpb24uCj4KPiBOYXR1cmFsbHksIHRoaXMgZmFjaWxpdHkgbWFrZXMgc2Vuc2Ugb25seSBm
-b3IgcmVnaXN0ZXJzIHRoYXQgYXJlCj4gdHJhcHBlZC4KPgo+IFNpZ25lZC1vZmYtYnk6IERhdmUg
-TWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9zeXNf
-cmVncy5jIHwgMjAgKysrKysrKysrKysrKysrLS0tLS0KPiAgYXJjaC9hcm02NC9rdm0vc3lzX3Jl
-Z3MuaCB8IDExICsrKysrKysrKysrCj4gIDIgZmlsZXMgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygr
-KSwgNSBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVn
-cy5jIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+IGluZGV4IGE0MzYzNzMuLjMxYTM1MWEg
-MTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+ICsrKyBiL2FyY2gvYXJt
-NjQva3ZtL3N5c19yZWdzLmMKPiBAQCAtMTg0MCw3ICsxODQwLDcgQEAgc3RhdGljIGludCBlbXVs
-YXRlX2NwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPgo+ICAJciA9IGZpbmRfcmVnKHBhcmFtcywg
-dGFibGUsIG51bSk7Cj4KPiAtCWlmIChyKSB7Cj4gKwlpZiAobGlrZWx5KHIpICYmIHN5c19yZWdf
-cHJlc2VudCh2Y3B1LCByKSkgewo+ICAJCXBlcmZvcm1fYWNjZXNzKHZjcHUsIHBhcmFtcywgcik7
-Cj4gIAkJcmV0dXJuIDA7Cj4gIAl9Cj4gQEAgLTIwMTYsNyArMjAxNiw3IEBAIHN0YXRpYyBpbnQg
-ZW11bGF0ZV9zeXNfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgCWlmICghcikKPiAgCQly
-ID0gZmluZF9yZWcocGFyYW1zLCBzeXNfcmVnX2Rlc2NzLCBBUlJBWV9TSVpFKHN5c19yZWdfZGVz
-Y3MpKTsKPgo+IC0JaWYgKGxpa2VseShyKSkgewo+ICsJaWYgKGxpa2VseShyKSAmJiBzeXNfcmVn
-X3ByZXNlbnQodmNwdSwgcikpIHsKPiAgCQlwZXJmb3JtX2FjY2Vzcyh2Y3B1LCBwYXJhbXMsIHIp
-Owo+ICAJfSBlbHNlIHsKPiAgCQlrdm1fZXJyKCJVbnN1cHBvcnRlZCBndWVzdCBzeXNfcmVnIGFj
-Y2VzcyBhdDogJWx4XG4iLAo+IEBAIC0yMzEzLDYgKzIzMTMsOSBAQCBpbnQga3ZtX2FybV9zeXNf
-cmVnX2dldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9y
-ZWcgKnJlZwo+ICAJaWYgKCFyKQo+ICAJCXJldHVybiBnZXRfaW52YXJpYW50X3N5c19yZWcocmVn
-LT5pZCwgdWFkZHIpOwo+Cj4gKwlpZiAoIXN5c19yZWdfcHJlc2VudCh2Y3B1LCByKSkKPiArCQly
-ZXR1cm4gLUVOT0VOVDsKPiArCj4gIAlpZiAoci0+Z2V0X3VzZXIpCj4gIAkJcmV0dXJuIChyLT5n
-ZXRfdXNlcikodmNwdSwgciwgcmVnLCB1YWRkcik7Cj4KPiBAQCAtMjMzNCw2ICsyMzM3LDkgQEAg
-aW50IGt2bV9hcm1fc3lzX3JlZ19zZXRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qg
-c3RydWN0IGt2bV9vbmVfcmVnICpyZWcKPiAgCWlmICghcikKPiAgCQlyZXR1cm4gc2V0X2ludmFy
-aWFudF9zeXNfcmVnKHJlZy0+aWQsIHVhZGRyKTsKPgo+ICsJaWYgKCFzeXNfcmVnX3ByZXNlbnQo
-dmNwdSwgcikpCj4gKwkJcmV0dXJuIC1FTk9FTlQ7Cj4gKwo+ICAJaWYgKHItPnNldF91c2VyKQo+
-ICAJCXJldHVybiAoci0+c2V0X3VzZXIpKHZjcHUsIHIsIHJlZywgdWFkZHIpOwo+Cj4gQEAgLTIz
-OTAsNyArMjM5Niw4IEBAIHN0YXRpYyBib29sIGNvcHlfcmVnX3RvX3VzZXIoY29uc3Qgc3RydWN0
-IHN5c19yZWdfZGVzYyAqcmVnLCB1NjQgX191c2VyICoqdWluZCkKPiAgCXJldHVybiB0cnVlOwo+
-ICB9Cj4KPiAtc3RhdGljIGludCB3YWxrX29uZV9zeXNfcmVnKGNvbnN0IHN0cnVjdCBzeXNfcmVn
-X2Rlc2MgKnJkLAo+ICtzdGF0aWMgaW50IHdhbGtfb25lX3N5c19yZWcoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LAo+ICsJCQkgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCj4gIAkJCSAg
-ICB1NjQgX191c2VyICoqdWluZCwKPiAgCQkJICAgIHVuc2lnbmVkIGludCAqdG90YWwpCj4gIHsK
-PiBAQCAtMjQwMSw2ICsyNDA4LDkgQEAgc3RhdGljIGludCB3YWxrX29uZV9zeXNfcmVnKGNvbnN0
-IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+ICAJaWYgKCEocmQtPnJlZyB8fCByZC0+Z2V0X3Vz
-ZXIpKQo+ICAJCXJldHVybiAwOwo+Cj4gKwlpZiAoIXN5c19yZWdfcHJlc2VudCh2Y3B1LCByZCkp
-Cj4gKwkJcmV0dXJuIDA7Cj4gKwo+ICAJaWYgKCFjb3B5X3JlZ190b191c2VyKHJkLCB1aW5kKSkK
-PiAgCQlyZXR1cm4gLUVGQVVMVDsKPgo+IEBAIC0yNDI5LDkgKzI0MzksOSBAQCBzdGF0aWMgaW50
-IHdhbGtfc3lzX3JlZ3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgX191c2VyICp1aW5kKQo+
-ICAJCWludCBjbXAgPSBjbXBfc3lzX3JlZyhpMSwgaTIpOwo+ICAJCS8qIHRhcmdldC1zcGVjaWZp
-YyBvdmVycmlkZXMgZ2VuZXJpYyBlbnRyeS4gKi8KPiAgCQlpZiAoY21wIDw9IDApCj4gLQkJCWVy
-ciA9IHdhbGtfb25lX3N5c19yZWcoaTEsICZ1aW5kLCAmdG90YWwpOwo+ICsJCQllcnIgPSB3YWxr
-X29uZV9zeXNfcmVnKHZjcHUsIGkxLCAmdWluZCwgJnRvdGFsKTsKPiAgCQllbHNlCj4gLQkJCWVy
-ciA9IHdhbGtfb25lX3N5c19yZWcoaTIsICZ1aW5kLCAmdG90YWwpOwo+ICsJCQllcnIgPSB3YWxr
-X29uZV9zeXNfcmVnKHZjcHUsIGkyLCAmdWluZCwgJnRvdGFsKTsKPgo+ICAJCWlmIChlcnIpCj4g
-IAkJCXJldHVybiBlcnI7Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmgg
-Yi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5oCj4gaW5kZXggY2Q3MTBmOC4uZGZiYjM0MiAxMDA2
-NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5oCj4gKysrIGIvYXJjaC9hcm02NC9r
-dm0vc3lzX3JlZ3MuaAo+IEBAIC0yMiw2ICsyMiw5IEBACj4gICNpZm5kZWYgX19BUk02NF9LVk1f
-U1lTX1JFR1NfTE9DQUxfSF9fCj4gICNkZWZpbmUgX19BUk02NF9LVk1fU1lTX1JFR1NfTE9DQUxf
-SF9fCj4KPiArI2luY2x1ZGUgPGxpbnV4L2NvbXBpbGVyLmg+Cj4gKyNpbmNsdWRlIDxsaW51eC90
-eXBlcy5oPgoKSSBjYW4gc2VlIHdoeSB5b3Ugd2FudCBjb21waWxlci5oLCBidXQgd2h5IHR5cGVz
-Lmg/CgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+On Wed, Jul 25, 2018 at 03:12:15PM +0100, Alex Benn=E9e wrote:
+> =
+
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
+
+> > Some system registers may or may not logically exist for a vcpu
+> > depending on whether certain architectural features are enabled for
+> > the vcpu.
+> >
+> > In order to avoid spuriously emulating access to these registers
+> > when they should not exist, or allowing the registers to be
+> > spuriously enumerated or saved/restored through the ioctl
+> > interface, a means is needed to allow registers to be hidden
+> > depending on the vcpu configuration.
+> >
+> > In order to support this in a flexible way, this patch adds a
+> > check_present() method to struct sys_reg_desc, and updates the
+> > generic system register access and enumeration code to be aware of
+> > it:  if check_present() returns false, the code behaves as if the
+> > register did not exist.
+> >
+> > For convenience, the complete check is wrapped up in a new helper
+> > sys_reg_present().
+> >
+> > An attempt has been made to hook the new check into the generic
+> > accessors for trapped system registers.  This should reduce the
+> > potential for future surprises, although the redundant check will
+> > add a small cost.  No system register depends on this functionality
+> > yet, and some paths needing the check may also need attention.
+> >
+> > Naturally, this facility makes sense only for registers that are
+> > trapped.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 20 +++++++++++++++-----
+> >  arch/arm64/kvm/sys_regs.h | 11 +++++++++++
+> >  2 files changed, 26 insertions(+), 5 deletions(-)
+
+[...]
+
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index cd710f8..dfbb342 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -22,6 +22,9 @@
+> >  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
+> >  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
+> >
+> > +#include <linux/compiler.h>
+> > +#include <linux/types.h>
+> =
+
+> I can see why you want compiler.h, but why types.h?
+
+For bool (though it felt a bit pedantic).
+
+Cheers
+---Dave
