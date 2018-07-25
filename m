@@ -1,57 +1,78 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 0/2] kvm: arm/arm64: Fix emulated physical timer IRQ
- injection
-Date: Wed, 25 Jul 2018 10:21:26 +0100
-Message-ID: <20180725092128.11534-1-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ECE74065F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 05:21:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gAXr9J3f9sVi for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 05:21:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 481CD40493
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 05:21:31 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v3 1/2] KVM: arm/arm64: Fix potential loss of ptimer interrupts
+Date: Wed, 25 Jul 2018 10:21:27 +0100
+Message-ID: <20180725092128.11534-2-andre.przywara@arm.com>
+References: <20180725092128.11534-1-andre.przywara@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180725092128.11534-1-andre.przywara@arm.com>
+Sender: stable-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Stable <stable@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-those two patches fix the (physical EL1) arch timer emulation in KVM,
-which missed to inject the timer IRQ if the vCPU was asleep when the
-timer expired. This can be checked by a new kvm-unit-tests test [1].
+kvm_timer_update_state() is called when changing the phys timer
+configuration registers, either via vcpu reset, as a result of a trap
+from the guest, or when userspace programs the registers.
 
-I am now taking Christoffer's approach, which keeps phys_timer_emulate()
-mostly as it is, and adds the explicit IRQ injection check in the caller.
-This turned out to fit better into the upcoming arch timer rework.
+phys_timer_emulate() is in turn called by kvm_timer_update_state() to
+either cancel an existing software timer, or program a new software
+timer, to emulate the behavior of a real phys timer, based on the change
+in configuration registers.
 
-Cheers,
-Andre.
+Unfortunately, the interaction between these two functions left a small
+race; if the conceptual emulated phys timer should actually fire, but
+the soft timer hasn't executed its callback yet, we cancel the timer in
+phys_timer_emulate without injecting an irq.  This only happens if the
+check in kvm_timer_update_state is called before the timer should fire,
+which is relatively unlikely, but possible.
 
-[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2018-July/032220.html
+The solution is to update the state of the phys timer after calling
+phys_timer_emulate, which will pick up the pending timer state and
+update the interrupt value.
 
-Christoffer Dall (2):
-  KVM: arm/arm64: Fix potential loss of ptimer interrupts
-  KVM: arm/arm64: Fix lost IRQs from emulated physcial timer when
-    blocked
+Note that this leaves the opportunity of raising the interrupt twice,
+once in the just-programmed soft timer, and once in
+kvm_timer_update_state.  Since this always happens synchronously with
+the VCPU execution, there is no harm in this, and the guest ever only
+sees a single timer interrupt.
 
- virt/kvm/arm/arch_timer.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Cc: Stable <stable@vger.kernel.org> # 4.15+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ virt/kvm/arm/arch_timer.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index bd3d57f40f1b..18ff6203079d 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -295,9 +295,9 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+ 	/*
+-	 * If the timer can fire now we have just raised the IRQ line and we
+-	 * don't need to have a soft timer scheduled for the future.  If the
+-	 * timer cannot fire at all, then we also don't need a soft timer.
++	 * If the timer can fire now, we don't need to have a soft timer
++	 * scheduled for the future.  If the timer cannot fire at all,
++	 * then we also don't need a soft timer.
+ 	 */
+ 	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
+ 		soft_timer_cancel(&timer->phys_timer, NULL);
+@@ -332,10 +332,10 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+ 	level = kvm_timer_should_fire(vtimer);
+ 	kvm_timer_update_irq(vcpu, level, vtimer);
+ 
++	phys_timer_emulate(vcpu);
++
+ 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+-
+-	phys_timer_emulate(vcpu);
+ }
+ 
+ static void vtimer_save_state(struct kvm_vcpu *vcpu)
 -- 
 2.14.4
