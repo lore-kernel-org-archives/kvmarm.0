@@ -1,31 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
-Date: Wed, 25 Jul 2018 14:07:12 +0100
-Message-ID: <202a2c63-1a3e-7f01-850c-4fb5e48f43e7@arm.com>
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
- <20180227104708.GA11391@cbox>
- <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
- <20180227124604.GA2373@cbox>
- <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
- <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
- <74427c65-b860-d576-04f9-766253285210@arm.com>
- <20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC PATCH 10/16] KVM: arm64: Add a vcpu flag to control SVE
+ visibility for the guest
+Date: Wed, 25 Jul 2018 15:43:59 +0200
+Message-ID: <20180725134359.rebcjfsigkvbs2n5@kamzik.brq.redhat.com>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-11-git-send-email-Dave.Martin@arm.com>
+ <20180719110810.2edkoz53b6vrafum@kamzik.brq.redhat.com>
+ <20180725114103.GG4240@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF37B4A0D2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 09:07:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AE834A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 09:44:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AIpJtuzAHgbk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 09:07:16 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6136140493
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 09:07:16 -0400 (EDT)
-In-Reply-To: <20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
-Content-Language: en-GB
+ with ESMTP id zQvf5y2NKvLg for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 09:44:04 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12E1549F89
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 09:44:04 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180725114103.GG4240@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,65 +32,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, david@redhat.com, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, imammedo@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/07/18 13:28, Andrew Jones wrote:
-> On Wed, Jul 25, 2018 at 11:40:54AM +0100, Marc Zyngier wrote:
->> On 24/07/18 19:35, Maran Wilson wrote:
->>> It's been a few months since this email thread died off. Has anyone 
->>> started working on a potential solution that would allow VCPU hotplug on 
->>> KVM/ARM ? Or is this a project that is still waiting for an owner who 
->>> has the time and inclination to get started?
->>
->> This is typically a project for someone who would have this particular
->> itch to scratch, and who has a demonstrable need for this functionality.
->>
->> Work wise, it would have to include adding physical CPU hotplug support
->> to the arm64 kernel as a precondition, before worrying about doing it in
->> KVM.
->>
->> For KVM itself, particular area of interests would be:
->> - Making GICv3 redistributors magically appear in the IPA space
->> - Live resizing of GICv3 structures
->> - Dynamic allocation of MPIDR, and mapping with vcpu_id
+On Wed, Jul 25, 2018 at 12:41:06PM +0100, Dave Martin wrote:
+> On Thu, Jul 19, 2018 at 01:08:10PM +0200, Andrew Jones wrote:
+> > On Thu, Jun 21, 2018 at 03:57:34PM +0100, Dave Martin wrote:
+> > > Since SVE will be enabled or disabled on a per-vcpu basis, a flag
+> > > is needed in order to track which vcpus have it enabled.
+> > > 
+> > > This patch adds a suitable flag and a helper for checking it.
+> > > 
+> > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 9671ddd..609d08b 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -308,6 +308,14 @@ struct kvm_vcpu_arch {
+> > >  #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+> > >  #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+> > >  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
+> > > +#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
+> > > +
+> > > +static inline bool vcpu_has_sve(struct kvm_vcpu_arch const *vcpu_arch)
+> > > +{
+> > > +	return system_supports_sve() &&
+> > 
+> > system_supports_sve() checks cpus_have_const_cap(), not
+> > this_cpu_has_cap(), so, iiuc, the result of this check won't
+> > change, regardless of which cpu it's run on at the time.
 > 
-> I have CPU topology description patches on the QEMU list now[*]. A next
-> step for me is to this MPIDR work. I probably won't get to it until the
-> end of August though.
+> That's correct: this is intentional.
 > 
-> [*] http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01168.html
+> If any physical cpu doesn't have SVE, we treat it is absent from the
+> whole system, and we don't permit its use.  This ensures that any task
+> or vcpu can always be migrated to any physical cpu.
+> > 
+> > > +		(vcpu_arch->flags & KVM_ARM64_GUEST_HAS_SVE);
+> > 
+> > Since this flag can only be set if system_supports_sve() is
+> > true at vcpu init time, then it isn't necessary to always check
+> > system_supports_sve() in this function. Or, should
+> > system_supports_sve() be changed to use this_cpu_has_cap()?
 > 
->>
->> This should keep someone busy for a good couple of weeks (give or take a
->> few months).
+> The main purpose of system_supports_sve() here is to shadow the check on
+> vcpu_arch->flags with a static branch.  If the system doesn't support
+> SVE, we don't pay the runtime cost of the dynamic check on
+> vcpu_arch->flags.
 > 
-> :-)
-> 
->>
->> That being said, I'd rather see support in QEMU first, creating all the
->> vcpu/redistributors upfront, and signalling the hotplug event via the
->> virtual firmware. And then post some numbers to show that creating all
->> the vcpus upfront is not acceptable.
-> 
-> I think the upfront allocation, allocating all possible cpus, but only
-> activating all present cpus, was the planned approach. What were the
-> concerns about that approach? Just vcpu memory overhead for too many
-> overly ambitious VM configs?
+> If the kernel is built with CONFIG_ARM64_SVE=n, the dynamic check should
+> be entirely optimised away by the compiler.
 
-I don't have any ARM-specific concern about that, and I think this is
-the right approach. It has the good property of not requiring much
-change in the kernel (other than actually supporting CPU hotplug).
+Ah, that makes sense. Thanks for clarifying it.
 
-vcpu memory overhead is a generic concern though, and not only for ARM.
-We currently allow up to 512 vcpus per VM, which looks like a lot, but
-really isn't. If we're to allow this to be bumped up significantly, we
-should start accounting the vcpu-related memory against the user's
-allowance...
+> 
+> I'd rather not add an explicit comment for this because the same
+> convention is followed elsewhere -- thus for consistency the comment
+> would need to be added in a lot of places.
+
+Agreed that we don't need a comment. A note in the commit message might
+have been nice though.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+drew
