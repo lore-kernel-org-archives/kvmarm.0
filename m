@@ -1,27 +1,27 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 11/16] KVM: arm64/sve: System register context switch
- and access support
-Date: Wed, 25 Jul 2018 12:45:01 +0100
-Message-ID: <20180725114501.GH4240@e103592.cambridge.arm.com>
+Subject: Re: [RFC PATCH 10/16] KVM: arm64: Add a vcpu flag to control SVE
+ visibility for the guest
+Date: Wed, 25 Jul 2018 12:48:12 +0100
+Message-ID: <20180725114812.GI4240@e103592.cambridge.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-12-git-send-email-Dave.Martin@arm.com>
- <20180719111117.qztdqqhco7klvfhz@kamzik.brq.redhat.com>
+ <1529593060-542-11-git-send-email-Dave.Martin@arm.com>
+ <20180719150244.cybuq65qc6pt7hek@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E2B540A50
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 07:45:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2870440A50
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 07:48:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2xd5pau80fTn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 07:45:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EC8A40493
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 07:45:06 -0400 (EDT)
+ with ESMTP id BBzRsL-gCNcb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 07:48:17 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1690D40493
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 07:48:17 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180719111117.qztdqqhco7klvfhz@kamzik.brq.redhat.com>
+In-Reply-To: <20180719150244.cybuq65qc6pt7hek@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,63 +35,35 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 19, 2018 at 01:11:17PM +0200, Andrew Jones wrote:
-> On Thu, Jun 21, 2018 at 03:57:35PM +0100, Dave Martin wrote:
-> > This patch adds the necessary support for context switching ZCR_EL1
-> > for each vcpu.
+On Thu, Jul 19, 2018 at 05:02:44PM +0200, Andrew Jones wrote:
+> On Thu, Jun 21, 2018 at 03:57:34PM +0100, Dave Martin wrote:
+> > Since SVE will be enabled or disabled on a per-vcpu basis, a flag
+> > is needed in order to track which vcpus have it enabled.
 > > 
-> > The ID_AA64PFR0_EL1 emulation code is updated to expose the
-> > presence of SVE to the guest if appropriate, and ioctl() access to
-> > ZCR_EL1 is also added.
-> > 
-> > In the context switch code itself, ZCR_EL1 is context switched if
-> > the host is SVE-capable, irrespectively for now of whether SVE is
-> > exposed to the guest or not.  Adding a dynamic vcpu_has_sve() check
-> > may lose as much performance as would be gained in this simple
-> > case.
+> > This patch adds a suitable flag and a helper for checking it.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-
-[...]
-
-> >  #define SCTLR_ELx_IESB	(1 << 21)
-> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > index 35bc168..0f4046a 100644
-> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> > @@ -21,6 +21,7 @@
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_hyp.h>
-> > +#include <asm/sysreg.h>
-> >  
-> >  /*
-> >   * Non-VHE: Both host and guest must save everything.
-> > @@ -57,6 +58,8 @@ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> >  	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
-> >  	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
-> >  	ctxt->sys_regs[CPACR_EL1]	= read_sysreg_el1(cpacr);
-> > +	if (system_supports_sve()) /* implies has_vhe() */
-> > +		ctxt->sys_regs[ZCR_EL1]	= read_sysreg_s(SYS_ZCR_EL12);
-> >  	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg_el1(ttbr0);
-> >  	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg_el1(ttbr1);
-> >  	ctxt->sys_regs[TCR_EL1]		= read_sysreg_el1(tcr);
-> > @@ -129,6 +132,8 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> >  	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	sctlr);
-> >  	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  	actlr_el1);
-> >  	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	cpacr);
-> > +	if (system_supports_sve()) /* implies has_vhe() */
-> > +		write_sysreg_s(ctxt->sys_regs[ZCR_EL1],	SYS_ZCR_EL12);
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 9671ddd..609d08b 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -308,6 +308,14 @@ struct kvm_vcpu_arch {
+> >  #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+> >  #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+> >  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
+> > +#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
+> > +
+> > +static inline bool vcpu_has_sve(struct kvm_vcpu_arch const *vcpu_arch)
 > 
-> I feel like the ZCR_EL12 save/restores are out of place, as these
-> functions are shared by non-VHE and VHE. Maybe they should be
-> moved to the VHE callers?
+> Shouldn't this vcpu function take a vcpu instead of a vcpu_arch?
 
-Hmmm, you're right -- it did look a bit odd at the time.
-
-I think they should move to the vhe-specific paths as you suggest.
-
-I'll change this for the next spin of the series.
+Logically it could.  There was some circular include issue that made it
+tricky to get the definition of struct kvm_vcpu here, but I may have
+another go at it.
 
 Cheers
 ---Dave
