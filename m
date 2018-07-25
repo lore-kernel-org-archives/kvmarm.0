@@ -1,28 +1,22 @@
-From: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
-Date: Wed, 25 Jul 2018 08:45:02 +0200
-Message-ID: <20180725084502.751106ed@redhat.com>
-References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
- <20180227104708.GA11391@cbox>
- <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
- <20180227124604.GA2373@cbox>
- <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
- <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v3 0/2] kvm: arm/arm64: Fix emulated physical timer IRQ
+ injection
+Date: Wed, 25 Jul 2018 10:19:57 +0100
+Message-ID: <20180725091959.11475-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67305404D9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 02:45:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D1804065F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 05:20:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5q+wGqFGTwJj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Jul 2018 02:45:06 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C74540493
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 02:45:06 -0400 (EDT)
-In-Reply-To: <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+ with ESMTP id 9s89z9JCd1rd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Jul 2018 05:20:37 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0513340493
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Jul 2018 05:20:36 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,89 +26,32 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Maran Wilson <maran.wilson@oracle.com>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, Christoffer Dall <cdall@kernel.org>, marc.zyngier@arm.com, david@redhat.com, qemu-devel@nongnu.org, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, 24 Jul 2018 11:35:31 -0700
-Maran Wilson <maran.wilson@oracle.com> wrote:
+Hi,
 
-> It's been a few months since this email thread died off. Has anyone 
-> started working on a potential solution that would allow VCPU hotplug on 
-> KVM/ARM ? Or is this a project that is still waiting for an owner who 
-> has the time and inclination to get started?
-I'm working on QEMU side of it as time allows.
+those two patches fix the (physical EL1) arch timer emulation in KVM,
+which missed to inject the timer IRQ if the vCPU was asleep when the
+timer expired. This can be checked by a new kvm-unit-tests test [1].
 
-I can guide or share task if are you interested in helping out with it?
+I am now taking Christoffer's approach, which keeps phys_timer_emulate()
+mostly as it is, and adds the explicit IRQ injection check in the caller.
+This turned out to fit better into the upcoming arch timer rework.
 
+Cheers,
+Andre.
 
-> Thanks,
-> -Maran
-> 
-> On 2/27/2018 5:21 AM, Andrew Jones wrote:
-> > On Tue, Feb 27, 2018 at 01:46:04PM +0100, Christoffer Dall wrote:  
-> >> On Tue, Feb 27, 2018 at 05:34:28PM +0530, bthakur@codeaurora.org wrote:  
-> >>> Hi Christoffer,
-> >>>
-> >>> Thanks for your reply.
-> >>>
-> >>> On 2018-02-27 16:17, Christoffer Dall wrote:  
-> >>>> Hi Bhupinder,
-> >>>>
-> >>>> On Tue, Feb 27, 2018 at 03:01:17PM +0530, bthakur@codeaurora.org wrote:  
-> >>>>> I hope it is the right forum to post my query.
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> I am currently looking at the possibility of adding a new VCPU to a
-> >>>>> running
-> >>>>> guest VM in KVM/ARM. I see that currently, it is not allowed to add a
-> >>>>> new
-> >>>>> VCPU to a guest VM, if it is already initialized. The first check in
-> >>>>> kvm_arch_vcpu_create() returns failure if it is already initialized.
-> >>>>>  
-> >>>> This would require a major rework of a lot of logic surrounding the GIC
-> >>>> and other parts of KVM initialization.
-> >>>>  
-> >>>>>
-> >>>>> There was some work done in QEMU to add support for VCPU hotplug:
-> >>>>> https://lists.gnu.org/archive/html/qemu-arm/2017-05/msg00404.html
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> But I am looking at the KVM side for enabling adding a new VCPU. If you
-> >>>>> can
-> >>>>> point me to any relevant work/resources, which I can refer to then it
-> >>>>> will
-> >>>>> help me.
-> >>>>>  
-> >>>> I don't have any specific pointers, but I was always told that the way
-> >>>> we were going to do CPU hotplug would be to instantiate a large number
-> >>>> of VCPUs, and hotplug would be equivalent to turning on a VCPU which was
-> >>>> previously powered off.
-> >>>>
-> >>>> Is this not still a feasible solution?  
-> >>> It should be a feasible solution provided the guest VM is not able to
-> >>> control the onlining/offlining of VCPUs. It should be controlled by the
-> >>> Host.
-> >>>  
-> >> KVM could simply refuse to turn on some of the CPUs unless given
-> >> permission from host userspace.
-> >>  
-> >>>> How does VCPU hotplug work on x86?  
-> >>> On x86, you can add a vcpu through libvirt setvcpu command and it shows up
-> >>> in the guest VM as a new CPU if you do lscpu.
-> >>>  
-> >> Sure, but what is the mechanism, does x86 qemu actually call
-> >> KVM_CREATE_VCPU, or is this also a question of turning on already
-> >> created vcpus ?
-> >>  
-> > CC'ing Igor and qemu-devel
-> >
-> > drew
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm  
-> 
-> 
+[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2018-July/032220.html
+
+Christoffer Dall (2):
+  KVM: arm/arm64: Fix potential loss of ptimer interrupts
+  KVM: arm/arm64: Fix lost IRQs from emulated physcial timer when
+    blocked
+
+ virt/kvm/arm/arch_timer.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+-- 
+2.14.4
