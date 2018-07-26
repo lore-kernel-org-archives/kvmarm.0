@@ -1,29 +1,27 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 08/16] KVM: arm64: Support dynamically hideable
- system registers
-Date: Thu, 26 Jul 2018 13:53:35 +0100
-Message-ID: <20180726125335.GU4240@e103592.cambridge.arm.com>
+Subject: Re: [RFC PATCH 13/16] KVM: Allow 2048-bit register access via
+ KVM_{GET, SET}_ONE_REG
+Date: Thu, 26 Jul 2018 13:58:35 +0100
+Message-ID: <20180726125834.GV4240@e103592.cambridge.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
- <878t5ztneo.fsf@linaro.org>
- <20180725143613.GM4240@e103592.cambridge.arm.com>
- <877eljtj9j.fsf@linaro.org>
+ <1529593060-542-14-git-send-email-Dave.Martin@arm.com>
+ <874lgntihl.fsf@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 247074A0C7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 08:53:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FA04A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 08:58:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s-HzlhwbhUgO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Jul 2018 08:53:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0204045F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 08:53:40 -0400 (EDT)
+ with ESMTP id aiZ1N4YXJGzf for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Jul 2018 08:58:39 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E3D4045F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 08:58:39 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <877eljtj9j.fsf@linaro.org>
+In-Reply-To: <874lgntihl.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,77 +35,78 @@ To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 25, 2018 at 04:41:44PM +0100, Alex Benn=E9e wrote:
+On Wed, Jul 25, 2018 at 04:58:30PM +0100, Alex Benn=E9e wrote:
 > =
 
 > Dave Martin <Dave.Martin@arm.com> writes:
 > =
 
-> > On Wed, Jul 25, 2018 at 03:12:15PM +0100, Alex Benn=E9e wrote:
-> >>
-> >> Dave Martin <Dave.Martin@arm.com> writes:
-> >>
-> >> > Some system registers may or may not logically exist for a vcpu
-> >> > depending on whether certain architectural features are enabled for
-> >> > the vcpu.
-> >> >
-> >> > In order to avoid spuriously emulating access to these registers
-> >> > when they should not exist, or allowing the registers to be
-> >> > spuriously enumerated or saved/restored through the ioctl
-> >> > interface, a means is needed to allow registers to be hidden
-> >> > depending on the vcpu configuration.
-> >> >
-> >> > In order to support this in a flexible way, this patch adds a
-> >> > check_present() method to struct sys_reg_desc, and updates the
-> >> > generic system register access and enumeration code to be aware of
-> >> > it:  if check_present() returns false, the code behaves as if the
-> >> > register did not exist.
-> >> >
-> >> > For convenience, the complete check is wrapped up in a new helper
-> >> > sys_reg_present().
-> >> >
-> >> > An attempt has been made to hook the new check into the generic
-> >> > accessors for trapped system registers.  This should reduce the
-> >> > potential for future surprises, although the redundant check will
-> >> > add a small cost.  No system register depends on this functionality
-> >> > yet, and some paths needing the check may also need attention.
-> >> >
-> >> > Naturally, this facility makes sense only for registers that are
-> >> > trapped.
-> >> >
-> >> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >> > ---
-> >> >  arch/arm64/kvm/sys_regs.c | 20 +++++++++++++++-----
-> >> >  arch/arm64/kvm/sys_regs.h | 11 +++++++++++
-> >> >  2 files changed, 26 insertions(+), 5 deletions(-)
+> > The Arm SVE architecture defines registers that are up to 2048 bits
+> > in size (with some possibility of further future expansion).
 > >
-> > [...]
+> > In order to avoid the need for an excessively large number of
+> > ioctls when saving and restoring a vcpu's registers, this patch
+> > adds a #define to make support for individual 2048-bit registers
+> > through the KVM_{GET,SET}_ONE_REG ioctl interface official.  This
+> > will allow each SVE register to be accessed in a single call.
 > >
-> >> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> >> > index cd710f8..dfbb342 100644
-> >> > --- a/arch/arm64/kvm/sys_regs.h
-> >> > +++ b/arch/arm64/kvm/sys_regs.h
-> >> > @@ -22,6 +22,9 @@
-> >> >  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
-> >> >  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
-> >> >
-> >> > +#include <linux/compiler.h>
-> >> > +#include <linux/types.h>
-> >>
-> >> I can see why you want compiler.h, but why types.h?
-> >
-> > For bool (though it felt a bit pedantic).
+> > There are sufficient spare bits in the register id size field for
+> > this change, so there is no ABI impact providing that
+> > KVM_GET_REG_LIST does not enumerate any 2048-bit register unless
+> > userspace explicitly opts in to the relevant architecture-specific
+> > features.
 > =
 
-> It must be picked up elsewhere because it didn't fail when I rebuilt
-> without it - and the header has been happily using bool up to that
-> point.
+> Does it? It's not in this patch and looking at the final tree:
+> =
 
-Sure, lots of headers include linux/types.h, so we get away with it all
-over the place.
+>   unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
+>   {
+>           unsigned long res =3D 0;
+> =
 
-I was adding it for completeness really: I prefer not to rely on headers
-being included by accident.
+>           res +=3D num_core_regs();
+>           res +=3D num_sve_regs(vcpu);
+>           res +=3D kvm_arm_num_sys_reg_descs(vcpu);
+>           res +=3D kvm_arm_get_fw_num_regs(vcpu);
+>           res +=3D NUM_TIMER_REGS;
+> =
+
+>           return res;
+>   }
+> =
+
+> =
+
+> which leads to:
+> =
+
+>   static int enumerate_sve_regs(const struct kvm_vcpu *vcpu, u64 __user *=
+*uind)
+>   {
+>           unsigned int n, i;
+>           int err =3D 0;
+>           int total =3D 0;
+>           unsigned int slices;
+> =
+
+>           if (!vcpu_has_sve(&vcpu->arch))
+>                   return 0;
+> =
+
+> Which enumerates the SVE regs if vcpu_has_sve() which AFAICT is true if
+> the host supports it, not if the user has requested it.
+> =
+
+> I'll have to check what but given the indirection of kvm_one_reg I
+> wonder if existing binaries might end up spamming a badly sized array
+> when run on a new SVE supporting kernel?
+
+That shouldn't be the case: vcpu_has_sve() checks for the
+KVM_ARM64_GUEST_HAS_SVE flag, which should only be set if userspace asks
+for it.
+
+Give me a shout if this doesn't seem to be the case...
 
 Cheers
 ---Dave
