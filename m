@@ -1,27 +1,29 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 16/16] KVM: arm64/sve: Report and enable SVE API
- extensions for userspace
-Date: Thu, 26 Jul 2018 14:23:07 +0100
-Message-ID: <20180726132307.GY4240@e103592.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH 13/16] KVM: Allow 2048-bit register access via
+ KVM_{GET, SET}_ONE_REG
+Date: Thu, 26 Jul 2018 14:55:44 +0100
+Message-ID: <871sbqt82n.fsf@linaro.org>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-17-git-send-email-Dave.Martin@arm.com>
- <20180719152420.mvzd5zjkm47ujdlj@kamzik.brq.redhat.com>
+ <1529593060-542-14-git-send-email-Dave.Martin@arm.com>
+ <874lgntihl.fsf@linaro.org> <20180726125834.GV4240@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81A9B4065F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 09:23:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C71254043C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 09:55:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lrifTK28nAqT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Jul 2018 09:23:12 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BFB84043C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 09:23:11 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180719152420.mvzd5zjkm47ujdlj@kamzik.brq.redhat.com>
+ with ESMTP id 2N2j08-2yKG6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Jul 2018 09:55:46 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B778740217
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 09:55:46 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id h9-v6so1825771wro.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Jul 2018 06:55:46 -0700 (PDT)
+In-reply-to: <20180726125834.GV4240@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,144 +33,57 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
+To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 19, 2018 at 05:24:20PM +0200, Andrew Jones wrote:
-> On Thu, Jun 21, 2018 at 03:57:40PM +0100, Dave Martin wrote:
-> > This patch reports the availability of KVM SVE support to userspace
-> > via a new vcpu feature flag KVM_ARM_VCPU_SVE.  This flag is
-> > reported via the KVM_ARM_PREFERRED_TARGET ioctl.
-> > 
-> > Userspace can enable the feature by setting the flag for
-> > KVM_ARM_VCPU_INIT.  Without this flag set, SVE-related ioctls and
-> > register access extensions are hidden, and SVE remains disabled
-> > unconditionally for the guest.  This ensures that non-SVE-aware KVM
-> > userspace does not receive a vcpu that it does not understand how
-> > to snapshot or restore correctly.
-> > 
-> > Storage is allocated for the SVE register state at vcpu init time,
-> > sufficient for the maximum vector length to be exposed to the vcpu.
-> > No attempt is made to allocate the storage lazily for now.  Also,
-> > no attempt is made to resize the storage dynamically, since the
-> > effective vector length of the vcpu can change at each EL0/EL1
-> > transition.  The storage is freed at the vcpu uninit hook.
-> > 
-> > No particular attempt is made to prevent userspace from creating a
-> > mix of vcpus some of which have SVE enabled and some of which have
-> > it disabled.  This may or may not be useful, but it reflects the
-> > underlying architectural behaviour.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  6 +++---
-> >  arch/arm64/include/uapi/asm/kvm.h |  1 +
-> >  arch/arm64/kvm/guest.c            | 19 +++++++++++++------
-> >  arch/arm64/kvm/reset.c            | 14 ++++++++++++++
-> >  4 files changed, 31 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index d2084ae..d956cf2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -44,7 +44,7 @@
-> >  
-> >  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
-> >  
-> > -#define KVM_VCPU_MAX_FEATURES 4
-> > +#define KVM_VCPU_MAX_FEATURES 5
-> >  
-> >  #define KVM_REQ_SLEEP \
-> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> > @@ -439,8 +439,8 @@ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> >  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> >  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-> >  
-> > -static inline int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu) { return 0; }
-> > -static inline void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
-> > +int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu);
-> > +void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu);
-> >  
-> >  void kvm_arm_init_debug(void);
-> >  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index f54a9b0..6acf276 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -101,6 +101,7 @@ struct kvm_regs {
-> >  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
-> >  #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-> >  #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-> > +#define KVM_ARM_VCPU_SVE		4 /* Allow SVE for guest */
-> >  
-> >  struct kvm_vcpu_init {
-> >  	__u32 target;
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 5152362..fb7f6aa 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -58,6 +58,16 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
-> >  	return 0;
-> >  }
-> >  
-> > +int kvm_arm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
-> > +{
-> > +	kfree(vcpu->arch.sve_state);
-> > +}
-> > +
-> >  static u64 core_reg_offset_from_id(u64 id)
-> >  {
-> >  	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
-> > @@ -600,12 +610,9 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
-> >  
-> >  	memset(init, 0, sizeof(*init));
-> >  
-> > -	/*
-> > -	 * For now, we don't return any features.
-> > -	 * In future, we might use features to return target
-> > -	 * specific features available for the preferred
-> > -	 * target type.
-> > -	 */
-> > +	/* KVM_ARM_VCPU_SVE understood by KVM_VCPU_INIT */
-> > +	init->features[0] = 1 << KVM_ARM_VCPU_SVE;
-> > +
-> >  	init->target = (__u32)target;
-> >  
-> >  	return 0;
-> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > index a74311b..f63a791 100644
-> > --- a/arch/arm64/kvm/reset.c
-> > +++ b/arch/arm64/kvm/reset.c
-> > @@ -110,6 +110,20 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >  			cpu_reset = &default_regs_reset;
-> >  		}
-> >  
-> > +		if (system_supports_sve() &&
-> > +		    test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
-> > +			vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_SVE;
-> > +
-> > +			vcpu->arch.sve_max_vl = sve_max_virtualisable_vl;
-> > +
-> 
-> The allocation below needs to be guarded by an if (!vcpu->arch.sve_state),
-> otherwise every time the guest does a PSCI-off/PSCI-on cycle of the vcpu
-> we'll have a memory leak. Or, we need to move this allocation into the new
-> kvm_arm_arch_vcpu_init() function. Why did you opt for kvm_reset_vcpu()?
-
-I think I failed to find another suitable init function that gets called
-at the right time.  I may have got confused though.
-
-Good spot on the PSCI interaction.  In light of that, I agree: the SVE
-buffer allocation should not be done here.
-
-
-I'll have a think about how to refactor this in light of the discussion.
-
-Cheers
----Dave
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFdlZCwgSnVs
+IDI1LCAyMDE4IGF0IDA0OjU4OjMwUE0gKzAxMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4KPj4g
+RGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+IHdyaXRlczoKPj4KPj4gPiBUaGUgQXJt
+IFNWRSBhcmNoaXRlY3R1cmUgZGVmaW5lcyByZWdpc3RlcnMgdGhhdCBhcmUgdXAgdG8gMjA0OCBi
+aXRzCj4+ID4gaW4gc2l6ZSAod2l0aCBzb21lIHBvc3NpYmlsaXR5IG9mIGZ1cnRoZXIgZnV0dXJl
+IGV4cGFuc2lvbikuCj4+ID4KPj4gPiBJbiBvcmRlciB0byBhdm9pZCB0aGUgbmVlZCBmb3IgYW4g
+ZXhjZXNzaXZlbHkgbGFyZ2UgbnVtYmVyIG9mCj4+ID4gaW9jdGxzIHdoZW4gc2F2aW5nIGFuZCBy
+ZXN0b3JpbmcgYSB2Y3B1J3MgcmVnaXN0ZXJzLCB0aGlzIHBhdGNoCj4+ID4gYWRkcyBhICNkZWZp
+bmUgdG8gbWFrZSBzdXBwb3J0IGZvciBpbmRpdmlkdWFsIDIwNDgtYml0IHJlZ2lzdGVycwo+PiA+
+IHRocm91Z2ggdGhlIEtWTV97R0VULFNFVH1fT05FX1JFRyBpb2N0bCBpbnRlcmZhY2Ugb2ZmaWNp
+YWwuICBUaGlzCj4+ID4gd2lsbCBhbGxvdyBlYWNoIFNWRSByZWdpc3RlciB0byBiZSBhY2Nlc3Nl
+ZCBpbiBhIHNpbmdsZSBjYWxsLgo+PiA+Cj4+ID4gVGhlcmUgYXJlIHN1ZmZpY2llbnQgc3BhcmUg
+Yml0cyBpbiB0aGUgcmVnaXN0ZXIgaWQgc2l6ZSBmaWVsZCBmb3IKPj4gPiB0aGlzIGNoYW5nZSwg
+c28gdGhlcmUgaXMgbm8gQUJJIGltcGFjdCBwcm92aWRpbmcgdGhhdAo+PiA+IEtWTV9HRVRfUkVH
+X0xJU1QgZG9lcyBub3QgZW51bWVyYXRlIGFueSAyMDQ4LWJpdCByZWdpc3RlciB1bmxlc3MKPj4g
+PiB1c2Vyc3BhY2UgZXhwbGljaXRseSBvcHRzIGluIHRvIHRoZSByZWxldmFudCBhcmNoaXRlY3R1
+cmUtc3BlY2lmaWMKPj4gPiBmZWF0dXJlcy4KPj4KPj4gRG9lcyBpdD8gSXQncyBub3QgaW4gdGhp
+cyBwYXRjaCBhbmQgbG9va2luZyBhdCB0aGUgZmluYWwgdHJlZToKPj4KPj4gICB1bnNpZ25lZCBs
+b25nIGt2bV9hcm1fbnVtX3JlZ3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAgIHsKPj4gICAg
+ICAgICAgIHVuc2lnbmVkIGxvbmcgcmVzID0gMDsKPj4KPj4gICAgICAgICAgIHJlcyArPSBudW1f
+Y29yZV9yZWdzKCk7Cj4+ICAgICAgICAgICByZXMgKz0gbnVtX3N2ZV9yZWdzKHZjcHUpOwo+PiAg
+ICAgICAgICAgcmVzICs9IGt2bV9hcm1fbnVtX3N5c19yZWdfZGVzY3ModmNwdSk7Cj4+ICAgICAg
+ICAgICByZXMgKz0ga3ZtX2FybV9nZXRfZndfbnVtX3JlZ3ModmNwdSk7Cj4+ICAgICAgICAgICBy
+ZXMgKz0gTlVNX1RJTUVSX1JFR1M7Cj4+Cj4+ICAgICAgICAgICByZXR1cm4gcmVzOwo+PiAgIH0K
+Pj4KPj4KPj4gd2hpY2ggbGVhZHMgdG86Cj4+Cj4+ICAgc3RhdGljIGludCBlbnVtZXJhdGVfc3Zl
+X3JlZ3MoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgX191c2VyICoqdWluZCkKPj4g
+ICB7Cj4+ICAgICAgICAgICB1bnNpZ25lZCBpbnQgbiwgaTsKPj4gICAgICAgICAgIGludCBlcnIg
+PSAwOwo+PiAgICAgICAgICAgaW50IHRvdGFsID0gMDsKPj4gICAgICAgICAgIHVuc2lnbmVkIGlu
+dCBzbGljZXM7Cj4+Cj4+ICAgICAgICAgICBpZiAoIXZjcHVfaGFzX3N2ZSgmdmNwdS0+YXJjaCkp
+Cj4+ICAgICAgICAgICAgICAgICAgIHJldHVybiAwOwo+Pgo+PiBXaGljaCBlbnVtZXJhdGVzIHRo
+ZSBTVkUgcmVncyBpZiB2Y3B1X2hhc19zdmUoKSB3aGljaCBBRkFJQ1QgaXMgdHJ1ZSBpZgo+PiB0
+aGUgaG9zdCBzdXBwb3J0cyBpdCwgbm90IGlmIHRoZSB1c2VyIGhhcyByZXF1ZXN0ZWQgaXQuCj4+
+Cj4+IEknbGwgaGF2ZSB0byBjaGVjayB3aGF0IGJ1dCBnaXZlbiB0aGUgaW5kaXJlY3Rpb24gb2Yg
+a3ZtX29uZV9yZWcgSQo+PiB3b25kZXIgaWYgZXhpc3RpbmcgYmluYXJpZXMgbWlnaHQgZW5kIHVw
+IHNwYW1taW5nIGEgYmFkbHkgc2l6ZWQgYXJyYXkKPj4gd2hlbiBydW4gb24gYSBuZXcgU1ZFIHN1
+cHBvcnRpbmcga2VybmVsPwo+Cj4gVGhhdCBzaG91bGRuJ3QgYmUgdGhlIGNhc2U6IHZjcHVfaGFz
+X3N2ZSgpIGNoZWNrcyBmb3IgdGhlCj4gS1ZNX0FSTTY0X0dVRVNUX0hBU19TVkUgZmxhZywgd2hp
+Y2ggc2hvdWxkIG9ubHkgYmUgc2V0IGlmIHVzZXJzcGFjZSBhc2tzCj4gZm9yIGl0Lgo+Cj4gR2l2
+ZSBtZSBhIHNob3V0IGlmIHRoaXMgZG9lc24ndCBzZWVtIHRvIGJlIHRoZSBjYXNlLi4uCgpBaGgg
+SSBtaXNzZWQgaXQgdGhlIGZpcnN0IHRpbWU6CgoJCWlmIChzeXN0ZW1fc3VwcG9ydHNfc3ZlKCkg
+JiYKCQkgICAgdGVzdF9iaXQoS1ZNX0FSTV9WQ1BVX1NWRSwgdmNwdS0+YXJjaC5mZWF0dXJlcykp
+IHsKCQkJdmNwdS0+YXJjaC5mbGFncyB8PSBLVk1fQVJNNjRfR1VFU1RfSEFTX1NWRTsKCkFuZCB2
+Y3B1LT5hcmNoLmZlYXR1cmVzIGlzIHNldCBieSB0aGUgdXNlci4gSG93ZXZlciBpdCB3aWxsIGJl
+IHNldCBhcwp1bmxlc3MgeW91IHNwZWNpZnkgb3RoZXJ3aXNlIHdlIHVzZSB0aGUgcmVzdWx0cyBv
+ZiBwcm9iZWQ6CgogIHJldCA9IGlvY3RsKHZtZmQsIEtWTV9BUk1fUFJFRkVSUkVEX1RBUkdFVCwg
+aW5pdCk7CgpzbyB0aGUgdXNlciB3aWxsIGdldCBpdCBieSBkZWZpbml0aW9uIHdoZW4gdGhleSBm
+aXJzdCBydW4gb24gU1ZFIGNhcGFibGUKaGFyZHdhcmUuCgoKPgo+IENoZWVycwo+IC0tLURhdmUK
+CgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
