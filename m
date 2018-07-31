@@ -1,29 +1,31 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 13/16] KVM: Allow 2048-bit register access via
- KVM_{GET, SET}_ONE_REG
-Date: Fri, 27 Jul 2018 10:26:59 +0100
-Message-ID: <20180727092656.GZ4240@e103592.cambridge.arm.com>
-References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-14-git-send-email-Dave.Martin@arm.com>
- <874lgntihl.fsf@linaro.org>
- <20180726125834.GV4240@e103592.cambridge.arm.com>
- <871sbqt82n.fsf@linaro.org>
+From: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [Qemu-devel] VCPU hotplug on KVM/ARM
+Date: Tue, 31 Jul 2018 12:27:10 +0200
+Message-ID: <20180731122710.142a97c4@redhat.com>
+References: <000e01d3afad$b9a13830$2ce3a890$@codeaurora.org>
+ <20180227104708.GA11391@cbox>
+ <ac329e1b1f5265a805916ab4f8708f9d@codeaurora.org>
+ <20180227124604.GA2373@cbox>
+ <20180227132131.fipafmnb56a7fj76@kamzik.brq.redhat.com>
+ <b589d714-4f12-e450-7ca5-e55fed4d1705@oracle.com>
+ <74427c65-b860-d576-04f9-766253285210@arm.com>
+ <20180725122806.g2gpvdbrbdkriprg@kamzik.brq.redhat.com>
+ <202a2c63-1a3e-7f01-850c-4fb5e48f43e7@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6727D40A67
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Jul 2018 05:27:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C99A408AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jul 2018 06:27:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PMXrArCUSjtI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Jul 2018 05:27:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E67B84065F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Jul 2018 05:27:03 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <871sbqt82n.fsf@linaro.org>
+ with ESMTP id 48msHxnckhpa for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Jul 2018 06:27:17 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6304A40217
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Jul 2018 06:27:17 -0400 (EDT)
+In-Reply-To: <202a2c63-1a3e-7f01-850c-4fb5e48f43e7@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,107 +35,72 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, cohuck@redhat.com, Christoffer Dall <cdall@kernel.org>, david@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Christoffer Dall <christofferdall@christofferdall.dk>, qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu, David Gibson <david@gibson.dropbear.id.au>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 26, 2018 at 02:55:44PM +0100, Alex Benn=E9e wrote:
-> =
+On Wed, 25 Jul 2018 14:07:12 +0100
+Marc Zyngier <marc.zyngier@arm.com> wrote:
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
+> On 25/07/18 13:28, Andrew Jones wrote:
+> > On Wed, Jul 25, 2018 at 11:40:54AM +0100, Marc Zyngier wrote:  
+> >> On 24/07/18 19:35, Maran Wilson wrote:  
+> >>> It's been a few months since this email thread died off. Has anyone 
+> >>> started working on a potential solution that would allow VCPU hotplug on 
+> >>> KVM/ARM ? Or is this a project that is still waiting for an owner who 
+> >>> has the time and inclination to get started?  
+> >>
+> >> This is typically a project for someone who would have this particular
+> >> itch to scratch, and who has a demonstrable need for this functionality.
+> >>
+> >> Work wise, it would have to include adding physical CPU hotplug support
+> >> to the arm64 kernel as a precondition, before worrying about doing it in
+> >> KVM.
+> >>
+> >> For KVM itself, particular area of interests would be:
+> >> - Making GICv3 redistributors magically appear in the IPA space
+> >> - Live resizing of GICv3 structures
+> >> - Dynamic allocation of MPIDR, and mapping with vcpu_id  
+> > 
+> > I have CPU topology description patches on the QEMU list now[*]. A next
+> > step for me is to this MPIDR work. I probably won't get to it until the
+> > end of August though.
+> > 
+> > [*] http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01168.html
+> >   
+> >>
+> >> This should keep someone busy for a good couple of weeks (give or take a
+> >> few months).  
+> > 
+> > :-)
+> >   
+> >>
+> >> That being said, I'd rather see support in QEMU first, creating all the
+> >> vcpu/redistributors upfront, and signalling the hotplug event via the
+> >> virtual firmware. And then post some numbers to show that creating all
+> >> the vcpus upfront is not acceptable.  
+> > 
+> > I think the upfront allocation, allocating all possible cpus, but only
+> > activating all present cpus, was the planned approach. What were the
+> > concerns about that approach? Just vcpu memory overhead for too many
+> > overly ambitious VM configs?  
+> 
+> I don't have any ARM-specific concern about that, and I think this is
+> the right approach. It has the good property of not requiring much
+> change in the kernel (other than actually supporting CPU hotplug).
+for x86 we allocate VCPUs dynamically (both QEMU and KVM)
+CCing ppc/s390 folks as I don't recall how it's implemented there.
 
-> > On Wed, Jul 25, 2018 at 04:58:30PM +0100, Alex Benn=E9e wrote:
-> >>
-> >> Dave Martin <Dave.Martin@arm.com> writes:
-> >>
-> >> > The Arm SVE architecture defines registers that are up to 2048 bits
-> >> > in size (with some possibility of further future expansion).
-> >> >
-> >> > In order to avoid the need for an excessively large number of
-> >> > ioctls when saving and restoring a vcpu's registers, this patch
-> >> > adds a #define to make support for individual 2048-bit registers
-> >> > through the KVM_{GET,SET}_ONE_REG ioctl interface official.  This
-> >> > will allow each SVE register to be accessed in a single call.
-> >> >
-> >> > There are sufficient spare bits in the register id size field for
-> >> > this change, so there is no ABI impact providing that
-> >> > KVM_GET_REG_LIST does not enumerate any 2048-bit register unless
-> >> > userspace explicitly opts in to the relevant architecture-specific
-> >> > features.
-> >>
-> >> Does it? It's not in this patch and looking at the final tree:
-> >>
-> >>   unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
-> >>   {
-> >>           unsigned long res =3D 0;
-> >>
-> >>           res +=3D num_core_regs();
-> >>           res +=3D num_sve_regs(vcpu);
-> >>           res +=3D kvm_arm_num_sys_reg_descs(vcpu);
-> >>           res +=3D kvm_arm_get_fw_num_regs(vcpu);
-> >>           res +=3D NUM_TIMER_REGS;
-> >>
-> >>           return res;
-> >>   }
-> >>
-> >>
-> >> which leads to:
-> >>
-> >>   static int enumerate_sve_regs(const struct kvm_vcpu *vcpu, u64 __use=
-r **uind)
-> >>   {
-> >>           unsigned int n, i;
-> >>           int err =3D 0;
-> >>           int total =3D 0;
-> >>           unsigned int slices;
-> >>
-> >>           if (!vcpu_has_sve(&vcpu->arch))
-> >>                   return 0;
-> >>
-> >> Which enumerates the SVE regs if vcpu_has_sve() which AFAICT is true if
-> >> the host supports it, not if the user has requested it.
-> >>
-> >> I'll have to check what but given the indirection of kvm_one_reg I
-> >> wonder if existing binaries might end up spamming a badly sized array
-> >> when run on a new SVE supporting kernel?
-> >
-> > That shouldn't be the case: vcpu_has_sve() checks for the
-> > KVM_ARM64_GUEST_HAS_SVE flag, which should only be set if userspace asks
-> > for it.
-> >
-> > Give me a shout if this doesn't seem to be the case...
-> =
+but we do not delete vcpus in KVM after they were created
+(as it deemed to be too complicated), we are just deleting QEMU part
+of it and keep kvm's vcpu for reuse with future hotplug.
 
-> Ahh I missed it the first time:
-> =
-
-> 		if (system_supports_sve() &&
-> 		    test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
-> 			vcpu->arch.flags |=3D KVM_ARM64_GUEST_HAS_SVE;
-> =
-
-> And vcpu->arch.features is set by the user. However it will be set as
-> unless you specify otherwise we use the results of probed:
-> =
-
->   ret =3D ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
-> =
-
-> so the user will get it by definition when they first run on SVE capable
-> hardware.
-
-AFAIK qemu and kvmtool don't currently propagate the feature flags from
-KVM_ARM_PREFERRED_TARGET to KVM_VCPU_INIT.  That would probably not be
-the right thing to do, because if you don't know what a feature flag
-means then you can't safely turn it on.
-
-But in light of Andrew's comments I will need to review how this works.
-
-The semantics of the feature bits are not well defined, so it may be
-safer not to use them for enabling SVE.  I was hoping we could choose
-a meaning for them since they weren't previously used for anything,
-but that may be optimistic.
-
-Cheers
----Dave
+> vcpu memory overhead is a generic concern though, and not only for ARM.
+> We currently allow up to 512 vcpus per VM, which looks like a lot, but
+> really isn't. If we're to allow this to be bumped up significantly, we
+> should start accounting the vcpu-related memory against the user's
+> allowance...
+> 
+> Thanks,
+> 
+> 	M.
