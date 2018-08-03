@@ -1,50 +1,55 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v2 4/4] arm/arm64: GICv2: add
- GICD_ITARGETSR testing
-Date: Fri, 3 Aug 2018 15:13:05 +0200
-Message-ID: <20180803131305.rshrvokhexqpwu5y@kamzik.brq.redhat.com>
-References: <20180720153942.26821-1-andre.przywara@arm.com>
- <20180720153942.26821-5-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA52C4A0C7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Aug 2018 09:13:09 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AUzFCntVZ91U for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Aug 2018 09:13:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16CA049FA8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Aug 2018 09:13:09 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180720153942.26821-5-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+From: Jia He <hejianet@gmail.com>
+Subject: [PATCH 1/2] KVM: arm/arm64: vgic: move DEBUG_SPINLOCK_BUG_ON to vgic.h
+Date: Fri,  3 Aug 2018 21:57:03 +0800
+Message-ID: <1533304624-43250-1-git-send-email-jia.he@hxt-semitech.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Jia He <hejianet@gmail.com>, Andre Przywara <andre.przywara@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 20, 2018 at 04:39:42PM +0100, Andre Przywara wrote:
-> Some tests for the ITARGETS registers.
-> Bits corresponding to non-existent CPUs must be RAZ/WI.
-> These registers must be byte-accessible, also check that accesses beyond
-> the implemented IRQ limit are actually read-as-zero/write-ignore.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm/gic.c         | 43 +++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h |  1 +
->  2 files changed, 44 insertions(+)
->
+This is to let DEBUG_SPINLOCK_BUG_ON be commonly used in vgic-v2 and
+vgic-v3.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Jia He <jia.he@hxt-semitech.com>
+---
+ virt/kvm/arm/vgic/vgic.c | 6 ------
+ virt/kvm/arm/vgic/vgic.h | 6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 33c8325..c22cea6 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -28,12 +28,6 @@
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
+-#ifdef CONFIG_DEBUG_SPINLOCK
+-#define DEBUG_SPINLOCK_BUG_ON(p) BUG_ON(p)
+-#else
+-#define DEBUG_SPINLOCK_BUG_ON(p)
+-#endif
+-
+ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+ 	.gicv3_cpuif = STATIC_KEY_FALSE_INIT,
+ };
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index ead00b2..ea51fcc 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -103,6 +103,12 @@
+ #define KVM_VGIC_V3_RDIST_COUNT_MASK	GENMASK_ULL(63, 52)
+ #define KVM_VGIC_V3_RDIST_COUNT_SHIFT	52
+ 
++#ifdef CONFIG_DEBUG_SPINLOCK
++#define DEBUG_SPINLOCK_BUG_ON(p) BUG_ON(p)
++#else
++#define DEBUG_SPINLOCK_BUG_ON(p)
++#endif
++
+ /* Requires the irq_lock to be held by the caller. */
+ static inline bool irq_is_pending(struct vgic_irq *irq)
+ {
+-- 
+1.8.3.1
