@@ -1,145 +1,112 @@
-From: Jia He <hejianet@gmail.com>
-Subject: [PATCH 2/2] KVM: arm/arm64: vgic: no need to call spin_lock_irqsave/restore when irq is disabled
-Date: Fri,  3 Aug 2018 21:57:04 +0800
-Message-ID: <1533304624-43250-2-git-send-email-jia.he@hxt-semitech.com>
-References: <1533304624-43250-1-git-send-email-jia.he@hxt-semitech.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1533304624-43250-1-git-send-email-jia.he@hxt-semitech.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Jia He <hejianet@gmail.com>, Andre Przywara <andre.przywara@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH 14/16] KVM: arm64/sve: Add SVE support to register
+ access ioctl interface
+Date: Fri, 3 Aug 2018 15:57:59 +0100
+Message-ID: <20180803145757.GC4240@e103592.cambridge.arm.com>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-15-git-send-email-Dave.Martin@arm.com>
+ <20180719130433.mfqqnxxlmvhduqri@kamzik.brq.redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7C1D40A52
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Aug 2018 10:58:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kxsTRZCOtoKP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Aug 2018 10:58:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62D98408B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Aug 2018 10:58:04 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180719130433.mfqqnxxlmvhduqri@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Because kvm_vgic_sync_hwstate currently is definitly in the context
-which irq is disabled (local_irq_disable/enable). There is no need to
-call spin_lock_irqsave/restore in vgic_fold_lr_state and vgic_prune_ap_list
+On Thu, Jul 19, 2018 at 03:04:33PM +0200, Andrew Jones wrote:
+> On Thu, Jun 21, 2018 at 03:57:38PM +0100, Dave Martin wrote:
+> > This patch adds the following registers for access via the
+> > KVM_{GET,SET}_ONE_REG interface:
+> > 
+> >  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
+> >  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
+> >  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
+> > 
+> > In order to adapt gracefully to future architectural extensions,
+> > the registers are divided up into slices as noted above:  the i
+> > parameter denotes the slice index.
+> > 
+> > For simplicity, bits or slices that exceed the maximum vector
+> > length supported for the vcpu are ignored for KVM_SET_ONE_REG, and
+> > read as zero for KVM_GET_ONE_REG.
+> > 
+> > For the current architecture, only slice i = 0 is significant.  The
+> > interface design allows i to increase to up to 31 in the future if
+> > required by future architectural amendments.
+> > 
+> > The registers are only visible for vcpus that have SVE enabled.
+> > They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
+> > have SVE.  In all cases, surplus slices are not enumerated by
+> > KVM_GET_REG_LIST.
+> > 
+> > Accesses to the FPSIMD registers via KVM_REG_ARM_CORE are
+> > redirected to access the underlying vcpu SVE register storage as
+> > appropriate.  In order to make this more straightforward, register
+> > accesses that straddle register boundaries are no longer guaranteed
+> > to succeed.  (Support for such use was never deliberate, and
+> > userspace does not currently seem to be relying on it.)
+> > 
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-This patch replace them with the spin_lock/unlock no irq version
+[...]
 
-Signed-off-by: Jia He <jia.he@hxt-semitech.com>
----
- virt/kvm/arm/vgic/vgic-v2.c |  7 ++++---
- virt/kvm/arm/vgic/vgic-v3.c |  7 ++++---
- virt/kvm/arm/vgic/vgic.c    | 13 +++++++------
- 3 files changed, 15 insertions(+), 12 deletions(-)
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index a5f2e44..487f5f2 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -62,7 +62,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_v2_cpu_if *cpuif = &vgic_cpu->vgic_v2;
- 	int lr;
--	unsigned long flags;
-+
-+	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
- 
- 	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
- 
-@@ -83,7 +84,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 
- 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
- 
--		spin_lock_irqsave(&irq->irq_lock, flags);
-+		spin_lock(&irq->irq_lock);
- 
- 		/* Always preserve the active bit */
- 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
-@@ -126,7 +127,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 				vgic_irq_set_phys_active(irq, false);
- 		}
- 
--		spin_unlock_irqrestore(&irq->irq_lock, flags);
-+		spin_unlock(&irq->irq_lock);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
- 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index cdce653..b66b513 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -46,7 +46,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
- 	u32 model = vcpu->kvm->arch.vgic.vgic_model;
- 	int lr;
--	unsigned long flags;
-+
-+	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
- 
- 	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
- 
-@@ -75,7 +76,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 		if (!irq)	/* An LPI could have been unmapped. */
- 			continue;
- 
--		spin_lock_irqsave(&irq->irq_lock, flags);
-+		spin_lock(&irq->irq_lock);
- 
- 		/* Always preserve the active bit */
- 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
-@@ -118,7 +119,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 				vgic_irq_set_phys_active(irq, false);
- 		}
- 
--		spin_unlock_irqrestore(&irq->irq_lock, flags);
-+		spin_unlock(&irq->irq_lock);
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index c22cea6..7cfdfbc 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -593,10 +593,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_irq *irq, *tmp;
--	unsigned long flags;
-+
-+	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
- 
- retry:
--	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
-+	spin_lock(&vgic_cpu->ap_list_lock);
- 
- 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
- 		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
-@@ -637,7 +638,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		/* This interrupt looks like it has to be migrated. */
- 
- 		spin_unlock(&irq->irq_lock);
--		spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-+		spin_unlock(&vgic_cpu->ap_list_lock);
- 
- 		/*
- 		 * Ensure locking order by always locking the smallest
-@@ -651,7 +652,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 			vcpuB = vcpu;
- 		}
- 
--		spin_lock_irqsave(&vcpuA->arch.vgic_cpu.ap_list_lock, flags);
-+		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
- 		spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
- 				 SINGLE_DEPTH_NESTING);
- 		spin_lock(&irq->irq_lock);
-@@ -676,7 +677,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 
- 		spin_unlock(&irq->irq_lock);
- 		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
--		spin_unlock_irqrestore(&vcpuA->arch.vgic_cpu.ap_list_lock, flags);
-+		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
- 
- 		if (target_vcpu_needs_kick) {
- 			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
-@@ -686,7 +687,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		goto retry;
- 	}
- 
--	spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-+	spin_unlock(&vgic_cpu->ap_list_lock);
- }
- 
- static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
--- 
-1.8.3.1
+[...]
+
+> > +static int sve_reg_bounds(struct reg_bounds_struct *b,
+> > +			  const struct kvm_vcpu *vcpu,
+> > +			  const struct kvm_one_reg *reg)
+> > +{
+
+[...]
+
+> > +	b->kptr += start;
+> > +
+> > +	if (copy_limit < start)
+> > +		copy_limit = start;
+> > +	else if (copy_limit > limit)
+> > +		copy_limit = limit;
+> 
+>  copy_limit = clamp(copy_limit, start, limit)
+
+Hmmm, having looked in detail in the definition of clamp(), I'm not sure
+I like it that much -- it can introduce type issues that are not readily
+apparent to the reader.
+
+gcc can warn about signed/unsigned comparisons, which is the only issue
+where clamp() genuinely helps AFAICT, but this requires -Wsign-compare
+(which is not enabled by default, nor with -Wall).  Great.
+
+I can use clamp() if you feel strongly about it, but otherwise I tend
+prefer my subtleties to be in plain sight rather than buried inside a
+macro, unless there is a serious verbosity impact from not using the
+macro (here, I would say there isn't, since it's just a single
+instance).
+
+[...]
+
+Cheers
+---Dave
