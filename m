@@ -1,153 +1,199 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 2/2] KVM: arm/arm64: vgic: no need to call
- spin_lock_irqsave/restore when irq is disabled
-Date: Mon, 6 Aug 2018 16:13:55 +0200
-Message-ID: <20180806141355.GF5985@e113682-lin.lund.arm.com>
-References: <1533304624-43250-1-git-send-email-jia.he@hxt-semitech.com>
- <1533304624-43250-2-git-send-email-jia.he@hxt-semitech.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
+ dynamically read-as-zero
+Date: Tue, 7 Aug 2018 12:09:58 +0100
+Message-ID: <20180807110958.GC9097@e103592.cambridge.arm.com>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
+ <20180806130324.GA5985@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBC2449F8B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:10:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5hFYfuPFx2M8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Aug 2018 07:10:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76F644005D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:10:03 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1533304624-43250-2-git-send-email-jia.he@hxt-semitech.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jia He <hejianet@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Eric Auger <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Jia He <jia.he@hxt-semitech.com>
+In-Reply-To: <20180806130324.GA5985@e113682-lin.lund.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Aug 03, 2018 at 09:57:04PM +0800, Jia He wrote:
-> Because kvm_vgic_sync_hwstate currently is definitly in the context
-> which irq is disabled (local_irq_disable/enable). There is no need to
-> call spin_lock_irqsave/restore in vgic_fold_lr_state and vgic_prune_ap_list
-> 
-> This patch replace them with the spin_lock/unlock no irq version
-> 
-> Signed-off-by: Jia He <jia.he@hxt-semitech.com>
-> ---
->  virt/kvm/arm/vgic/vgic-v2.c |  7 ++++---
->  virt/kvm/arm/vgic/vgic-v3.c |  7 ++++---
->  virt/kvm/arm/vgic/vgic.c    | 13 +++++++------
->  3 files changed, 15 insertions(+), 12 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index a5f2e44..487f5f2 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -62,7 +62,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_v2_cpu_if *cpuif = &vgic_cpu->vgic_v2;
->  	int lr;
-> -	unsigned long flags;
-> +
-> +	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
->  
->  	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
->  
-> @@ -83,7 +84,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->  
->  		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
->  
-> -		spin_lock_irqsave(&irq->irq_lock, flags);
-> +		spin_lock(&irq->irq_lock);
->  
->  		/* Always preserve the active bit */
->  		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
-> @@ -126,7 +127,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
->  				vgic_irq_set_phys_active(irq, false);
->  		}
->  
-> -		spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +		spin_unlock(&irq->irq_lock);
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index cdce653..b66b513 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -46,7 +46,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
->  	u32 model = vcpu->kvm->arch.vgic.vgic_model;
->  	int lr;
-> -	unsigned long flags;
-> +
-> +	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
->  
->  	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
->  
-> @@ -75,7 +76,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  		if (!irq)	/* An LPI could have been unmapped. */
->  			continue;
->  
-> -		spin_lock_irqsave(&irq->irq_lock, flags);
-> +		spin_lock(&irq->irq_lock);
->  
->  		/* Always preserve the active bit */
->  		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
-> @@ -118,7 +119,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
->  				vgic_irq_set_phys_active(irq, false);
->  		}
->  
-> -		spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +		spin_unlock(&irq->irq_lock);
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
->  
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index c22cea6..7cfdfbc 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -593,10 +593,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_irq *irq, *tmp;
-> -	unsigned long flags;
-> +
-> +	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
->  
->  retry:
-> -	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
-> +	spin_lock(&vgic_cpu->ap_list_lock);
->  
->  	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
->  		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
-> @@ -637,7 +638,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  		/* This interrupt looks like it has to be migrated. */
->  
->  		spin_unlock(&irq->irq_lock);
-> -		spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-> +		spin_unlock(&vgic_cpu->ap_list_lock);
->  
->  		/*
->  		 * Ensure locking order by always locking the smallest
-> @@ -651,7 +652,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  			vcpuB = vcpu;
->  		}
->  
-> -		spin_lock_irqsave(&vcpuA->arch.vgic_cpu.ap_list_lock, flags);
-> +		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
->  		spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
->  				 SINGLE_DEPTH_NESTING);
->  		spin_lock(&irq->irq_lock);
-> @@ -676,7 +677,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  
->  		spin_unlock(&irq->irq_lock);
->  		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
-> -		spin_unlock_irqrestore(&vcpuA->arch.vgic_cpu.ap_list_lock, flags);
-> +		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
->  
->  		if (target_vcpu_needs_kick) {
->  			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
-> @@ -686,7 +687,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
->  		goto retry;
->  	}
->  
-> -	spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-> +	spin_unlock(&vgic_cpu->ap_list_lock);
->  }
->  
->  static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
-> -- 
-> 1.8.3.1
-> 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+On Mon, Aug 06, 2018 at 03:03:24PM +0200, Christoffer Dall wrote:
+> Hi Dave,
+> =
+
+> I think there's a typo in the subject "to be" rather than "to by".
+> =
+
+> On Thu, Jun 21, 2018 at 03:57:33PM +0100, Dave Martin wrote:
+> > When a feature-dependent ID register is hidden from the guest, it
+> > needs to exhibit read-as-zero behaviour as defined by the Arm
+> > architecture, rather than appearing to be entirely absent.
+> > =
+
+> > This patch updates the ID register emulation logic to make use of
+> > the new check_present() method to determine whether the register
+> > should read as zero instead of yielding the host's sanitised
+> > value.  Because currently a false result from this method truncates
+> > the trap call chain before the sysreg's emulate method() is called,
+> > a flag is added to distinguish this special case, and helpers are
+> > refactored appropriately.
+> =
+
+> I don't understand this last sentence.
+> =
+
+> And I'm not really sure I understand the code either.
+> =
+
+> I can't seem to see any registers which are defined as !present && !raz,
+> which is what I thought this feature was all about.
+
+!present and !raz is the default behaviour for everything that is not
+ID-register-like.  This patch is adding the !present && raz case (though
+that may not be a helpful way to descibe it ... see below).
+
+> In other words, what is the benefit of this more generic method as
+> opposed to having a wrapper around read_id_reg() for read_sve_id_reg()
+> which sets RAZ if there is no support for SVE in this context?
+
+There may be other ways to factor this.  I can't now remember whay I
+went with this particular approach, except that I vaguely recall
+hitting some obstacles when doing things another way.
+
+Can you take a look at my attempted explanation below and then we
+can reconsider this?
+
+[...]
+
+> =
+
+> > =
+
+> > This invloves some trivial updates to pass the vcpu pointer down
+> > into the ID register emulation/access functions.
+> > =
+
+> > A new ID_SANITISED_IF() macro is defined for declaring
+> > conditionally visible ID registers.
+> > =
+
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 51 ++++++++++++++++++++++++++++++---------=
+--------
+> >  arch/arm64/kvm/sys_regs.h | 11 ++++++++++
+> >  2 files changed, 44 insertions(+), 18 deletions(-)
+> > =
+
+
+[...]
+
+> > @@ -1840,7 +1855,7 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
+> >  =
+
+> >  	r =3D find_reg(params, table, num);
+> >  =
+
+> > -	if (likely(r) && sys_reg_present(vcpu, r)) {
+> > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
+> >  		perform_access(vcpu, params, r);
+> >  		return 0;
+> >  	}
+> > @@ -2016,7 +2031,7 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+> >  	if (!r)
+> >  		r =3D find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> >  =
+
+> > -	if (likely(r) && sys_reg_present(vcpu, r)) {
+> > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
+> >  		perform_access(vcpu, params, r);
+> >  	} else {
+> >  		kvm_err("Unsupported guest sys_reg access at: %lx\n",
+> > @@ -2313,7 +2328,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu=
+, const struct kvm_one_reg *reg
+> >  	if (!r)
+> >  		return get_invariant_sys_reg(reg->id, uaddr);
+> >  =
+
+> > -	if (!sys_reg_present(vcpu, r))
+> > +	if (!sys_reg_present_or_raz(vcpu, r))
+> >  		return -ENOENT;
+> >  =
+
+> >  	if (r->get_user)
+> > @@ -2337,7 +2352,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu=
+, const struct kvm_one_reg *reg
+> >  	if (!r)
+> >  		return set_invariant_sys_reg(reg->id, uaddr);
+> >  =
+
+> > -	if (!sys_reg_present(vcpu, r))
+> > +	if (!sys_reg_present_or_raz(vcpu, r))
+> >  		return -ENOENT;
+
+On Wed, Jul 25, 2018 at 04:46:55PM +0100, Alex Benn=E9e wrote:
+> It's all very well being raz, but shouldn't you catch this further down
+> and not attempt to write the register that doesn't exist?
+
+To be clear, is this a question about factoring, or do you think there's
+a bug here?
+
+
+In response to both sets of comments, I think the way the code is
+factored is causing some confusion.
+
+The idea in my head was something like this:
+
+System register encodings fall into two classes:
+
+ a) encodings that we emulate in some way
+ b) encodings that we unconditionally reflect back to the guest as an
+    Undef.
+
+Architecturally defined system registers fall into two classes:
+
+ i) registers whose removal turns all accesses into an Undef
+ ii) registers whose removal exhibits some other behaviour.
+
+These two classifications overlap somwehat.
+
+
+>From an emulation perspective, (b), and (i) in the "register not
+present" case, look the same: we trap the register and reflect an Undef
+directly back to the guest with no further action required.
+
+>From an emulation perspective, (a) and (ii) are also somewhat the
+same: we need to emulate something, although precisely what we need
+to do depends on which register it is and on whether the register is
+deemed present or not.
+
+sys_reg_check_present_or_raz() thus means "falls under (a) or (ii)",
+i.e., some emulation is required and we need to call sysreg-specific
+methods to figure out precisely what we need to do.
+
+Conversely !sys_reg_check_present_or_raz() means that we can just
+Undef the guest with no further logic required.
+
+Does this rationale make things clearer?  The naming is perhaps
+unfortunate.
+
+Cheers,
+---Dave
