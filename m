@@ -1,27 +1,26 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
- dynamically read-as-zero
-Date: Tue, 7 Aug 2018 12:09:58 +0100
-Message-ID: <20180807110958.GC9097@e103592.cambridge.arm.com>
+Subject: Re: [RFC PATCH 12/16] KVM: arm64/sve: Context switch the SVE registers
+Date: Tue, 7 Aug 2018 12:15:26 +0100
+Message-ID: <20180807111526.GD9097@e103592.cambridge.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
- <20180806130324.GA5985@e113682-lin.lund.arm.com>
+ <1529593060-542-13-git-send-email-Dave.Martin@arm.com>
+ <20180806131910.GC5985@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBC2449F8B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:10:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DFEF49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:15:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5hFYfuPFx2M8 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Aug 2018 07:10:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76F644005D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:10:03 -0400 (EDT)
+ with ESMTP id 4CTM0oXN9oy1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Aug 2018 07:15:31 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C89D4086E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 07:15:31 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180806130324.GA5985@e113682-lin.lund.arm.com>
+In-Reply-To: <20180806131910.GC5985@e113682-lin.lund.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,165 +34,92 @@ To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Aug 06, 2018 at 03:03:24PM +0200, Christoffer Dall wrote:
-> Hi Dave,
-> =
-
-> I think there's a typo in the subject "to be" rather than "to by".
-> =
-
-> On Thu, Jun 21, 2018 at 03:57:33PM +0100, Dave Martin wrote:
-> > When a feature-dependent ID register is hidden from the guest, it
-> > needs to exhibit read-as-zero behaviour as defined by the Arm
-> > architecture, rather than appearing to be entirely absent.
-> > =
-
-> > This patch updates the ID register emulation logic to make use of
-> > the new check_present() method to determine whether the register
-> > should read as zero instead of yielding the host's sanitised
-> > value.  Because currently a false result from this method truncates
-> > the trap call chain before the sysreg's emulate method() is called,
-> > a flag is added to distinguish this special case, and helpers are
-> > refactored appropriately.
-> =
-
-> I don't understand this last sentence.
-> =
-
-> And I'm not really sure I understand the code either.
-> =
-
-> I can't seem to see any registers which are defined as !present && !raz,
-> which is what I thought this feature was all about.
-
-!present and !raz is the default behaviour for everything that is not
-ID-register-like.  This patch is adding the !present && raz case (though
-that may not be a helpful way to descibe it ... see below).
-
-> In other words, what is the benefit of this more generic method as
-> opposed to having a wrapper around read_id_reg() for read_sve_id_reg()
-> which sets RAZ if there is no support for SVE in this context?
-
-There may be other ways to factor this.  I can't now remember whay I
-went with this particular approach, except that I vaguely recall
-hitting some obstacles when doing things another way.
-
-Can you take a look at my attempted explanation below and then we
-can reconsider this?
-
-[...]
-
-> =
-
-> > =
-
-> > This invloves some trivial updates to pass the vcpu pointer down
-> > into the ID register emulation/access functions.
-> > =
-
-> > A new ID_SANITISED_IF() macro is defined for declaring
-> > conditionally visible ID registers.
-> > =
-
+On Mon, Aug 06, 2018 at 03:19:10PM +0200, Christoffer Dall wrote:
+> On Thu, Jun 21, 2018 at 03:57:36PM +0100, Dave Martin wrote:
+> > In order to give each vcpu its own view of the SVE registers, this
+> > patch adds context storage via a new sve_state pointer in struct
+> > vcpu_arch.  An additional member sve_max_vl is also added for each
+> > vcpu, to determine the maximum vector length visible to the guest
+> > and thus the value to be configured in ZCR_EL2.LEN while the is
+> > active.  This also determines the layout and size of the storage in
+> > sve_state, which is read and written by the same backend functions
+> > that are used for context-switching the SVE state for host tasks.
+> > 
+> > On SVE-enabled vcpus, SVE access traps are now handled by switching
+> > in the vcpu's SVE context and disabling the trap before returning
+> > to the guest.  On other vcpus, the trap is not handled and an exit
+> > back to the host occurs, where the handle_sve() fallback path
+> > reflects an undefined instruction exception back to the guest,
+> > consistently with the behaviour of non-SVE-capable hardware (as was
+> > done unconditionally prior to this patch).
+> > 
+> > No SVE handling is added on non-VHE-only paths, since VHE is an
+> > architectural and Kconfig prerequisite of SVE.
+> > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 51 ++++++++++++++++++++++++++++++---------=
---------
-> >  arch/arm64/kvm/sys_regs.h | 11 ++++++++++
-> >  2 files changed, 44 insertions(+), 18 deletions(-)
-> > =
-
+> >  arch/arm64/include/asm/kvm_host.h |  2 ++
+> >  arch/arm64/kvm/fpsimd.c           |  5 +++--
+> >  arch/arm64/kvm/hyp/switch.c       | 43 ++++++++++++++++++++++++++++++---------
+> >  3 files changed, 38 insertions(+), 12 deletions(-)
 
 [...]
 
-> > @@ -1840,7 +1855,7 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
-> >  =
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
 
-> >  	r =3D find_reg(params, table, num);
-> >  =
+[...]
 
-> > -	if (likely(r) && sys_reg_present(vcpu, r)) {
-> > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
-> >  		perform_access(vcpu, params, r);
-> >  		return 0;
+> > @@ -361,7 +373,13 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> >  		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
 > >  	}
-> > @@ -2016,7 +2031,7 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
-> >  	if (!r)
-> >  		r =3D find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> >  =
+> >  
+> > -	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+> > +	if (system_supports_sve() && guest_has_sve)
+> > +		sve_load_state((char *)vcpu->arch.sve_state +
+> > +					sve_ffr_offset(vcpu->arch.sve_max_vl),
+> 
+> nit: would it make sense to have a macro 'vcpu_get_sve_state_ptr(vcpu)'
+> to make this first argument more pretty?
 
-> > -	if (likely(r) && sys_reg_present(vcpu, r)) {
-> > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
-> >  		perform_access(vcpu, params, r);
-> >  	} else {
-> >  		kvm_err("Unsupported guest sys_reg access at: %lx\n",
-> > @@ -2313,7 +2328,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu=
-, const struct kvm_one_reg *reg
-> >  	if (!r)
-> >  		return get_invariant_sys_reg(reg->id, uaddr);
-> >  =
+Could do, I guess.  I'll take a look.
 
-> > -	if (!sys_reg_present(vcpu, r))
-> > +	if (!sys_reg_present_or_raz(vcpu, r))
-> >  		return -ENOENT;
-> >  =
+> 
+> > +			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
+> > +			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+> > +	else
+> > +		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+> >  
+> >  	/* Skip restoring fpexc32 for AArch64 guests */
+> >  	if (!(read_sysreg(hcr_el2) & HCR_RW))
+> > @@ -380,6 +398,8 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> >   */
+> >  static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  {
+> > +	bool guest_has_sve;
+> > +
+> >  	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+> >  		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+> >  
+> > @@ -397,10 +417,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * and restore the guest context lazily.
+> >  	 * If FP/SIMD is not implemented, handle the trap and inject an
+> >  	 * undefined instruction exception to the guest.
+> > +	 * Similarly for trapped SVE accesses.
+> >  	 */
+> > -	if (system_supports_fpsimd() &&
+> > -	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
+> > -		return __hyp_switch_fpsimd(vcpu);
+> > +	guest_has_sve = vcpu_has_sve(&vcpu->arch);
+> > +	if ((system_supports_fpsimd() &&
+> > +	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD) ||
+> > +	    (guest_has_sve && kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SVE))
+> 
+> nit: this may also be folded nicely into a static bool
+> __trap_fpsimd_sve_access() check.
 
-> >  	if (r->get_user)
-> > @@ -2337,7 +2352,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu=
-, const struct kvm_one_reg *reg
-> >  	if (!r)
-> >  		return set_invariant_sys_reg(reg->id, uaddr);
-> >  =
+It wouldn't hurt to make this look less fiddly, certainly.
 
-> > -	if (!sys_reg_present(vcpu, r))
-> > +	if (!sys_reg_present_or_raz(vcpu, r))
-> >  		return -ENOENT;
+Can you elaborate on precisely what you had in mind?
 
-On Wed, Jul 25, 2018 at 04:46:55PM +0100, Alex Benn=E9e wrote:
-> It's all very well being raz, but shouldn't you catch this further down
-> and not attempt to write the register that doesn't exist?
-
-To be clear, is this a question about factoring, or do you think there's
-a bug here?
-
-
-In response to both sets of comments, I think the way the code is
-factored is causing some confusion.
-
-The idea in my head was something like this:
-
-System register encodings fall into two classes:
-
- a) encodings that we emulate in some way
- b) encodings that we unconditionally reflect back to the guest as an
-    Undef.
-
-Architecturally defined system registers fall into two classes:
-
- i) registers whose removal turns all accesses into an Undef
- ii) registers whose removal exhibits some other behaviour.
-
-These two classifications overlap somwehat.
-
-
->From an emulation perspective, (b), and (i) in the "register not
-present" case, look the same: we trap the register and reflect an Undef
-directly back to the guest with no further action required.
-
->From an emulation perspective, (a) and (ii) are also somewhat the
-same: we need to emulate something, although precisely what we need
-to do depends on which register it is and on whether the register is
-deemed present or not.
-
-sys_reg_check_present_or_raz() thus means "falls under (a) or (ii)",
-i.e., some emulation is required and we need to call sysreg-specific
-methods to figure out precisely what we need to do.
-
-Conversely !sys_reg_check_present_or_raz() means that we can just
-Undef the guest with no further logic required.
-
-Does this rationale make things clearer?  The naming is perhaps
-unfortunate.
-
-Cheers,
+Cheers
 ---Dave
