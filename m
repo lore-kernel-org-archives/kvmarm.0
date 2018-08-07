@@ -1,28 +1,27 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
- dynamically read-as-zero
-Date: Tue, 7 Aug 2018 21:35:12 +0200
-Message-ID: <20180807193512.GH5985@e113682-lin.lund.arm.com>
+Subject: Re: [RFC PATCH 12/16] KVM: arm64/sve: Context switch the SVE registers
+Date: Tue, 7 Aug 2018 21:43:38 +0200
+Message-ID: <20180807194338.GI5985@e113682-lin.lund.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
- <20180806130324.GA5985@e113682-lin.lund.arm.com>
- <20180807110958.GC9097@e103592.cambridge.arm.com>
+ <1529593060-542-13-git-send-email-Dave.Martin@arm.com>
+ <20180806131910.GC5985@e113682-lin.lund.arm.com>
+ <20180807111526.GD9097@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAFD14A1CF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:35:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F22A4A1CF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:43:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AARQkjMPIE9K for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Aug 2018 15:35:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73432408AD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:35:15 -0400 (EDT)
+ with ESMTP id M4+BFI9cy++H for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Aug 2018 15:43:44 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00462408AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:43:43 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180807110958.GC9097@e103592.cambridge.arm.com>
+In-Reply-To: <20180807111526.GD9097@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,123 +35,122 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVHVlLCBBdWcgMDcsIDIwMTggYXQgMTI6MDk6NThQTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3Jv
-dGU6Cj4gT24gTW9uLCBBdWcgMDYsIDIwMTggYXQgMDM6MDM6MjRQTSArMDIwMCwgQ2hyaXN0b2Zm
-ZXIgRGFsbCB3cm90ZToKPiA+IEhpIERhdmUsCj4gPiAKPiA+IEkgdGhpbmsgdGhlcmUncyBhIHR5
-cG8gaW4gdGhlIHN1YmplY3QgInRvIGJlIiByYXRoZXIgdGhhbiAidG8gYnkiLgo+ID4gCj4gPiBP
-biBUaHUsIEp1biAyMSwgMjAxOCBhdCAwMzo1NzozM1BNICswMTAwLCBEYXZlIE1hcnRpbiB3cm90
-ZToKPiA+ID4gV2hlbiBhIGZlYXR1cmUtZGVwZW5kZW50IElEIHJlZ2lzdGVyIGlzIGhpZGRlbiBm
-cm9tIHRoZSBndWVzdCwgaXQKPiA+ID4gbmVlZHMgdG8gZXhoaWJpdCByZWFkLWFzLXplcm8gYmVo
-YXZpb3VyIGFzIGRlZmluZWQgYnkgdGhlIEFybQo+ID4gPiBhcmNoaXRlY3R1cmUsIHJhdGhlciB0
-aGFuIGFwcGVhcmluZyB0byBiZSBlbnRpcmVseSBhYnNlbnQuCj4gPiA+IAo+ID4gPiBUaGlzIHBh
-dGNoIHVwZGF0ZXMgdGhlIElEIHJlZ2lzdGVyIGVtdWxhdGlvbiBsb2dpYyB0byBtYWtlIHVzZSBv
-Zgo+ID4gPiB0aGUgbmV3IGNoZWNrX3ByZXNlbnQoKSBtZXRob2QgdG8gZGV0ZXJtaW5lIHdoZXRo
-ZXIgdGhlIHJlZ2lzdGVyCj4gPiA+IHNob3VsZCByZWFkIGFzIHplcm8gaW5zdGVhZCBvZiB5aWVs
-ZGluZyB0aGUgaG9zdCdzIHNhbml0aXNlZAo+ID4gPiB2YWx1ZS4gIEJlY2F1c2UgY3VycmVudGx5
-IGEgZmFsc2UgcmVzdWx0IGZyb20gdGhpcyBtZXRob2QgdHJ1bmNhdGVzCj4gPiA+IHRoZSB0cmFw
-IGNhbGwgY2hhaW4gYmVmb3JlIHRoZSBzeXNyZWcncyBlbXVsYXRlIG1ldGhvZCgpIGlzIGNhbGxl
-ZCwKPiA+ID4gYSBmbGFnIGlzIGFkZGVkIHRvIGRpc3Rpbmd1aXNoIHRoaXMgc3BlY2lhbCBjYXNl
-LCBhbmQgaGVscGVycyBhcmUKPiA+ID4gcmVmYWN0b3JlZCBhcHByb3ByaWF0ZWx5Lgo+ID4gCj4g
-PiBJIGRvbid0IHVuZGVyc3RhbmQgdGhpcyBsYXN0IHNlbnRlbmNlLgo+ID4gCj4gPiBBbmQgSSdt
-IG5vdCByZWFsbHkgc3VyZSBJIHVuZGVyc3RhbmQgdGhlIGNvZGUgZWl0aGVyLgo+ID4gCj4gPiBJ
-IGNhbid0IHNlZW0gdG8gc2VlIGFueSByZWdpc3RlcnMgd2hpY2ggYXJlIGRlZmluZWQgYXMgIXBy
-ZXNlbnQgJiYgIXJheiwKPiA+IHdoaWNoIGlzIHdoYXQgSSB0aG91Z2h0IHRoaXMgZmVhdHVyZSB3
-YXMgYWxsIGFib3V0Lgo+IAo+ICFwcmVzZW50IGFuZCAhcmF6IGlzIHRoZSBkZWZhdWx0IGJlaGF2
-aW91ciBmb3IgZXZlcnl0aGluZyB0aGF0IGlzIG5vdAo+IElELXJlZ2lzdGVyLWxpa2UuICBUaGlz
-IHBhdGNoIGlzIGFkZGluZyB0aGUgIXByZXNlbnQgJiYgcmF6IGNhc2UgKHRob3VnaAo+IHRoYXQg
-bWF5IG5vdCBiZSBhIGhlbHBmdWwgd2F5IHRvIGRlc2NpYmUgaXQgLi4uIHNlZSBiZWxvdykuCgpG
-YWlyIGVub3VnaCwgYnV0IEkgZG9uJ3QgcmVhbGx5IHNlZSB3aHkgeW91IG5lZWQgdG8gY2xhc3Np
-ZnkgYSByZWdpc3RlcgphcyAhcHJlc2VudCAmJiByYXosIGJlY2F1c2UgcmF6IGltcGxpZXMgcHJl
-c2VudCBBRkFJQ1QuCgo+IAo+ID4gSW4gb3RoZXIgd29yZHMsIHdoYXQgaXMgdGhlIGJlbmVmaXQg
-b2YgdGhpcyBtb3JlIGdlbmVyaWMgbWV0aG9kIGFzCj4gPiBvcHBvc2VkIHRvIGhhdmluZyBhIHdy
-YXBwZXIgYXJvdW5kIHJlYWRfaWRfcmVnKCkgZm9yIHJlYWRfc3ZlX2lkX3JlZygpCj4gPiB3aGlj
-aCBzZXRzIFJBWiBpZiB0aGVyZSBpcyBubyBzdXBwb3J0IGZvciBTVkUgaW4gdGhpcyBjb250ZXh0
-Pwo+IAo+IFRoZXJlIG1heSBiZSBvdGhlciB3YXlzIHRvIGZhY3RvciB0aGlzLiAgSSBjYW4ndCBu
-b3cgcmVtZW1iZXIgd2hheSBJCj4gd2VudCB3aXRoIHRoaXMgcGFydGljdWxhciBhcHByb2FjaCwg
-ZXhjZXB0IHRoYXQgSSB2YWd1ZWx5IHJlY2FsbAo+IGhpdHRpbmcgc29tZSBvYnN0YWNsZXMgd2hl
-biBkb2luZyB0aGluZ3MgYW5vdGhlciB3YXkuCgpXaGF0IEkgZG9uJ3QgbXVjaCBjYXJlIGZvciBp
-cyB0aGF0IHdlIG5vdyBzZWVtIHRvIGJlIG1peGluZyB0aGUgY29uY2VwdApvZiB3aGV0aGVyIHNv
-bWV0aGluZyBpcyBwcmVzZW50IGFuZCB0aGUgdmFsdWUgaXQgcmV0dXJucyBpZiBpdCBpcwpwcmVz
-ZW50IGluIHRoZSBvdmVyYWxsIHN5c3RlbSByZWdpc3RlciBoYW5kbGluZyBsb2dpYy4gIEFuZCBJ
-IGRvbid0CnVuZGVyc3RhbmQgd2h5IHRoaXMgaXMgYSByZXF1aXJlbWVudC4KCj4gCj4gQ2FuIHlv
-dSB0YWtlIGEgbG9vayBhdCBteSBhdHRlbXB0ZWQgZXhwbGFuYXRpb24gYmVsb3cgYW5kIHRoZW4g
-d2UKPiBjYW4gcmVjb25zaWRlciB0aGlzPwoKU3VyZSwgc2VlIG15IGNvbW1lbnRzIGJlbG93LgoK
-PiAKPiBbLi4uXQo+IAo+ID4gCj4gPiA+IAo+ID4gPiBUaGlzIGludmxvdmVzIHNvbWUgdHJpdmlh
-bCB1cGRhdGVzIHRvIHBhc3MgdGhlIHZjcHUgcG9pbnRlciBkb3duCj4gPiA+IGludG8gdGhlIElE
-IHJlZ2lzdGVyIGVtdWxhdGlvbi9hY2Nlc3MgZnVuY3Rpb25zLgo+ID4gPiAKPiA+ID4gQSBuZXcg
-SURfU0FOSVRJU0VEX0lGKCkgbWFjcm8gaXMgZGVmaW5lZCBmb3IgZGVjbGFyaW5nCj4gPiA+IGNv
-bmRpdGlvbmFsbHkgdmlzaWJsZSBJRCByZWdpc3RlcnMuCj4gPiA+IAo+ID4gPiBTaWduZWQtb2Zm
-LWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiA+ID4gLS0tCj4gPiA+ICBh
-cmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIHwgNTEgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLS0tLS0tLS0tLS0KPiA+ID4gIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmggfCAx
-MSArKysrKysrKysrCj4gPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDE4
-IGRlbGV0aW9ucygtKQo+ID4gPiAKPiAKPiBbLi4uXQo+IAo+ID4gPiBAQCAtMTg0MCw3ICsxODU1
-LDcgQEAgc3RhdGljIGludCBlbXVsYXRlX2NwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiA+ID4g
-IAo+ID4gPiAgCXIgPSBmaW5kX3JlZyhwYXJhbXMsIHRhYmxlLCBudW0pOwo+ID4gPiAgCj4gPiA+
-IC0JaWYgKGxpa2VseShyKSAmJiBzeXNfcmVnX3ByZXNlbnQodmNwdSwgcikpIHsKPiA+ID4gKwlp
-ZiAobGlrZWx5KHIpICYmIHN5c19yZWdfcHJlc2VudF9vcl9yYXoodmNwdSwgcikpIHsKPiA+ID4g
-IAkJcGVyZm9ybV9hY2Nlc3ModmNwdSwgcGFyYW1zLCByKTsKPiA+ID4gIAkJcmV0dXJuIDA7Cj4g
-PiA+ICAJfQo+ID4gPiBAQCAtMjAxNiw3ICsyMDMxLDcgQEAgc3RhdGljIGludCBlbXVsYXRlX3N5
-c19yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ID4gPiAgCWlmICghcikKPiA+ID4gIAkJciA9
-IGZpbmRfcmVnKHBhcmFtcywgc3lzX3JlZ19kZXNjcywgQVJSQVlfU0laRShzeXNfcmVnX2Rlc2Nz
-KSk7Cj4gPiA+ICAKPiA+ID4gLQlpZiAobGlrZWx5KHIpICYmIHN5c19yZWdfcHJlc2VudCh2Y3B1
-LCByKSkgewo+ID4gPiArCWlmIChsaWtlbHkocikgJiYgc3lzX3JlZ19wcmVzZW50X29yX3Jheih2
-Y3B1LCByKSkgewo+ID4gPiAgCQlwZXJmb3JtX2FjY2Vzcyh2Y3B1LCBwYXJhbXMsIHIpOwo+ID4g
-PiAgCX0gZWxzZSB7Cj4gPiA+ICAJCWt2bV9lcnIoIlVuc3VwcG9ydGVkIGd1ZXN0IHN5c19yZWcg
-YWNjZXNzIGF0OiAlbHhcbiIsCj4gPiA+IEBAIC0yMzEzLDcgKzIzMjgsNyBAQCBpbnQga3ZtX2Fy
-bV9zeXNfcmVnX2dldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3Zt
-X29uZV9yZWcgKnJlZwo+ID4gPiAgCWlmICghcikKPiA+ID4gIAkJcmV0dXJuIGdldF9pbnZhcmlh
-bnRfc3lzX3JlZyhyZWctPmlkLCB1YWRkcik7Cj4gPiA+ICAKPiA+ID4gLQlpZiAoIXN5c19yZWdf
-cHJlc2VudCh2Y3B1LCByKSkKPiA+ID4gKwlpZiAoIXN5c19yZWdfcHJlc2VudF9vcl9yYXoodmNw
-dSwgcikpCj4gPiA+ICAJCXJldHVybiAtRU5PRU5UOwo+ID4gPiAgCj4gPiA+ICAJaWYgKHItPmdl
-dF91c2VyKQo+ID4gPiBAQCAtMjMzNyw3ICsyMzUyLDcgQEAgaW50IGt2bV9hcm1fc3lzX3JlZ19z
-ZXRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpy
-ZWcKPiA+ID4gIAlpZiAoIXIpCj4gPiA+ICAJCXJldHVybiBzZXRfaW52YXJpYW50X3N5c19yZWco
-cmVnLT5pZCwgdWFkZHIpOwo+ID4gPiAgCj4gPiA+IC0JaWYgKCFzeXNfcmVnX3ByZXNlbnQodmNw
-dSwgcikpCj4gPiA+ICsJaWYgKCFzeXNfcmVnX3ByZXNlbnRfb3JfcmF6KHZjcHUsIHIpKQo+ID4g
-PiAgCQlyZXR1cm4gLUVOT0VOVDsKPiAKPiBPbiBXZWQsIEp1bCAyNSwgMjAxOCBhdCAwNDo0Njo1
-NVBNICswMTAwLCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gPiBJdCdzIGFsbCB2ZXJ5IHdlbGwgYmVp
-bmcgcmF6LCBidXQgc2hvdWxkbid0IHlvdSBjYXRjaCB0aGlzIGZ1cnRoZXIgZG93bgo+ID4gYW5k
-IG5vdCBhdHRlbXB0IHRvIHdyaXRlIHRoZSByZWdpc3RlciB0aGF0IGRvZXNuJ3QgZXhpc3Q/Cj4g
-Cj4gVG8gYmUgY2xlYXIsIGlzIHRoaXMgYSBxdWVzdGlvbiBhYm91dCBmYWN0b3JpbmcsIG9yIGRv
-IHlvdSB0aGluayB0aGVyZSdzCj4gYSBidWcgaGVyZT8KPiAKPiAKPiBJbiByZXNwb25zZSB0byBi
-b3RoIHNldHMgb2YgY29tbWVudHMsIEkgdGhpbmsgdGhlIHdheSB0aGUgY29kZSBpcwo+IGZhY3Rv
-cmVkIGlzIGNhdXNpbmcgc29tZSBjb25mdXNpb24uCj4gCj4gVGhlIGlkZWEgaW4gbXkgaGVhZCB3
-YXMgc29tZXRoaW5nIGxpa2UgdGhpczoKPiAKPiBTeXN0ZW0gcmVnaXN0ZXIgZW5jb2RpbmdzIGZh
-bGwgaW50byB0d28gY2xhc3NlczoKPiAKPiAgYSkgZW5jb2RpbmdzIHRoYXQgd2UgZW11bGF0ZSBp
-biBzb21lIHdheQoKdGhpcyBpcyBwcmVzZW50LCB0aGVuCgo+ICBiKSBlbmNvZGluZ3MgdGhhdCB3
-ZSB1bmNvbmRpdGlvbmFsbHkgcmVmbGVjdCBiYWNrIHRvIHRoZSBndWVzdCBhcyBhbgo+ICAgICBV
-bmRlZi4KCnRoaXMgaXMgIXByZXNlbnQsIHRoZW4KClRoZSBwcmV2aW91cyBjaGFuZ2UgbWFkZSB0
-aGlzIGEgY29uZmlndXJhYmxlIHRoaW5nIGFzIG9wcG9zZWQgdG8gYQpzdGF0aWMgY29tcGlsZSB0
-aW1lIHRoaW5nLCByaWdodD8KPiAKPiBBcmNoaXRlY3R1cmFsbHkgZGVmaW5lZCBzeXN0ZW0gcmVn
-aXN0ZXJzIGZhbGwgaW50byB0d28gY2xhc3NlczoKPiAKPiAgaSkgcmVnaXN0ZXJzIHdob3NlIHJl
-bW92YWwgdHVybnMgYWxsIGFjY2Vzc2VzIGludG8gYW4gVW5kZWYKPiAgaWkpIHJlZ2lzdGVycyB3
-aG9zZSByZW1vdmFsIGV4aGliaXRzIHNvbWUgb3RoZXIgYmVoYXZpb3VyLgoKSSdtIG5vdCBzdXJl
-IHdoYXQgeW91IG1lYW4gYnkgJ3JlbW92YWwnIGhlcmUsIGFuZCB3aGljaCBhcmNoaXRlY3R1cmFs
-CmNvbmNlcHQgdGhhdCByZWxhdGVzIHRvLCB3aGljaCBtYWtlcyBpdCBoYXJkIGZvciBtZSB0byBw
-YXJzZSB0aGUgcmVzdApoZXJlLi4uCgo+IAo+IFRoZXNlIHR3byBjbGFzc2lmaWNhdGlvbnMgb3Zl
-cmxhcCBzb213ZWhhdC4KPiAKPiAKPiBGcm9tIGFuIGVtdWxhdGlvbiBwZXJzcGVjdGl2ZSwgKGIp
-LCBhbmQgKGkpIGluIHRoZSAicmVnaXN0ZXIgbm90Cj4gcHJlc2VudCIgY2FzZSwgbG9vayB0aGUg
-c2FtZTogd2UgdHJhcCB0aGUgcmVnaXN0ZXIgYW5kIHJlZmxlY3QgYW4gVW5kZWYKPiBkaXJlY3Rs
-eSBiYWNrIHRvIHRoZSBndWVzdCB3aXRoIG5vIGZ1cnRoZXIgYWN0aW9uIHJlcXVpcmVkLgo+IAo+
-IEZyb20gYW4gZW11bGF0aW9uIHBlcnNwZWN0aXZlLCAoYSkgYW5kIChpaSkgYXJlIGFsc28gc29t
-ZXdoYXQgdGhlCj4gc2FtZTogd2UgbmVlZCB0byBlbXVsYXRlIHNvbWV0aGluZywgYWx0aG91Z2gg
-cHJlY2lzZWx5IHdoYXQgd2UgbmVlZAo+IHRvIGRvIGRlcGVuZHMgb24gd2hpY2ggcmVnaXN0ZXIg
-aXQgaXMgYW5kIG9uIHdoZXRoZXIgdGhlIHJlZ2lzdGVyIGlzCj4gZGVlbWVkIHByZXNlbnQgb3Ig
-bm90Lgo+IAo+IHN5c19yZWdfY2hlY2tfcHJlc2VudF9vcl9yYXooKSB0aHVzIG1lYW5zICJmYWxs
-cyB1bmRlciAoYSkgb3IgKGlpKSIsCj4gaS5lLiwgc29tZSBlbXVsYXRpb24gaXMgcmVxdWlyZWQg
-YW5kIHdlIG5lZWQgdG8gY2FsbCBzeXNyZWctc3BlY2lmaWMKPiBtZXRob2RzIHRvIGZpZ3VyZSBv
-dXQgcHJlY2lzZWx5IHdoYXQgd2UgbmVlZCB0byBkby4KCnllcywgYnV0IHdlJ3ZlIGFsd2F5cyBo
-YWQgdGhhdCB3aXRob3V0IHRoZSAib3JfcmF6IiBzdHVmZiBhdCB0aGUgbG9va3VwCmxldmVsLiAg
-V2hhdCBoYXMgY2hhbmdlZD8KCj4gCj4gQ29udmVyc2VseSAhc3lzX3JlZ19jaGVja19wcmVzZW50
-X29yX3JheigpIG1lYW5zIHRoYXQgd2UgY2FuIGp1c3QKPiBVbmRlZiB0aGUgZ3Vlc3Qgd2l0aCBu
-byBmdXJ0aGVyIGxvZ2ljIHJlcXVpcmVkLgoKWWVzLCBidXQgdGhhdCdzIHRoZSBzYW1lIGFzICFw
-cmVzZW50LCBiZWNhdXNlIHJheiB0aGVuIGltcGxpZXMgcHJlc2VudCwKc2VlIGFib3ZlLgoKPiAK
-PiBEb2VzIHRoaXMgcmF0aW9uYWxlIG1ha2UgdGhpbmdzIGNsZWFyZXI/ICBUaGUgbmFtaW5nIGlz
-IHBlcmhhcHMKPiB1bmZvcnR1bmF0ZS4KPiAKClVuZm9ydHVuYXRlbHkgbm90IHNvIG11Y2guICBJ
-IGhhdmUgYSBzdHJvbmcgZmVlbGluZyB5b3Ugd2FudCB0byBtb3ZlCmFueXRoaW5nIHJlbGF0aW5n
-IHRvIHNvbWV0aGluZyBiZWluZyBlbXVsYXRlZCBhcyBSQVovUkFPL3NvbWV0aGluZyBlbHNlCmlu
-dG8gc3lzcmVnIHNwZWNpZmljIGZ1bmN0aW9ucy4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Tue, Aug 07, 2018 at 12:15:26PM +0100, Dave Martin wrote:
+> On Mon, Aug 06, 2018 at 03:19:10PM +0200, Christoffer Dall wrote:
+> > On Thu, Jun 21, 2018 at 03:57:36PM +0100, Dave Martin wrote:
+> > > In order to give each vcpu its own view of the SVE registers, this
+> > > patch adds context storage via a new sve_state pointer in struct
+> > > vcpu_arch.  An additional member sve_max_vl is also added for each
+> > > vcpu, to determine the maximum vector length visible to the guest
+> > > and thus the value to be configured in ZCR_EL2.LEN while the is
+> > > active.  This also determines the layout and size of the storage in
+> > > sve_state, which is read and written by the same backend functions
+> > > that are used for context-switching the SVE state for host tasks.
+> > > 
+> > > On SVE-enabled vcpus, SVE access traps are now handled by switching
+> > > in the vcpu's SVE context and disabling the trap before returning
+> > > to the guest.  On other vcpus, the trap is not handled and an exit
+> > > back to the host occurs, where the handle_sve() fallback path
+> > > reflects an undefined instruction exception back to the guest,
+> > > consistently with the behaviour of non-SVE-capable hardware (as was
+> > > done unconditionally prior to this patch).
+> > > 
+> > > No SVE handling is added on non-VHE-only paths, since VHE is an
+> > > architectural and Kconfig prerequisite of SVE.
+> > > 
+> > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  2 ++
+> > >  arch/arm64/kvm/fpsimd.c           |  5 +++--
+> > >  arch/arm64/kvm/hyp/switch.c       | 43 ++++++++++++++++++++++++++++++---------
+> > >  3 files changed, 38 insertions(+), 12 deletions(-)
+> 
+> [...]
+> 
+> > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> 
+> [...]
+> 
+> > > @@ -361,7 +373,13 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> > >  		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
+> > >  	}
+> > >  
+> > > -	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+> > > +	if (system_supports_sve() && guest_has_sve)
+> > > +		sve_load_state((char *)vcpu->arch.sve_state +
+> > > +					sve_ffr_offset(vcpu->arch.sve_max_vl),
+> > 
+> > nit: would it make sense to have a macro 'vcpu_get_sve_state_ptr(vcpu)'
+> > to make this first argument more pretty?
+> 
+> Could do, I guess.  I'll take a look.
+> 
+> > 
+> > > +			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
+> > > +			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+> > > +	else
+> > > +		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+> > >  
+> > >  	/* Skip restoring fpexc32 for AArch64 guests */
+> > >  	if (!(read_sysreg(hcr_el2) & HCR_RW))
+> > > @@ -380,6 +398,8 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> > >   */
+> > >  static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > >  {
+> > > +	bool guest_has_sve;
+> > > +
+> > >  	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+> > >  		vcpu->arch.fault.esr_el2 = read_sysreg_el2(esr);
+> > >  
+> > > @@ -397,10 +417,13 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > >  	 * and restore the guest context lazily.
+> > >  	 * If FP/SIMD is not implemented, handle the trap and inject an
+> > >  	 * undefined instruction exception to the guest.
+> > > +	 * Similarly for trapped SVE accesses.
+> > >  	 */
+> > > -	if (system_supports_fpsimd() &&
+> > > -	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
+> > > -		return __hyp_switch_fpsimd(vcpu);
+> > > +	guest_has_sve = vcpu_has_sve(&vcpu->arch);
+> > > +	if ((system_supports_fpsimd() &&
+> > > +	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD) ||
+> > > +	    (guest_has_sve && kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SVE))
+> > 
+> > nit: this may also be folded nicely into a static bool
+> > __trap_fpsimd_sve_access() check.
+> 
+> It wouldn't hurt to make this look less fiddly, certainly.
+> 
+> Can you elaborate on precisely what you had in mind?
+
+sure:
+
+static bool __hyp_text __trap_is_fpsimd_sve_access(struct kvm_vcpu *vcpu)
+{
+	/*
+	 * Can we support SVE without FPSIMD? If not, this can be
+	 * simplified by reversing the condition.
+	 */
+	if (system_supports_fpsimd() &&
+	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
+		return true;
+
+	if (guest_has_sve && kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SVE)
+		return true;
+
+	return false;
+}
+
+
+static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+{
+	[...]
+	if (__trap_is_fpsimd_sve_access(vcpu))
+		return __hyp_switch_fpsimd(vcpu, guest_has_sve);
+	[...]
+}
+
+Of course not even compile-tested or anything like that.
+
+Thanks,
+-Christoffer
