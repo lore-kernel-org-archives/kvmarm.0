@@ -1,26 +1,28 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [RFC PATCH 08/16] KVM: arm64: Support dynamically hideable
- system registers
-Date: Tue, 7 Aug 2018 21:20:10 +0200
-Message-ID: <20180807192010.GG5985@e113682-lin.lund.arm.com>
+Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
+ dynamically read-as-zero
+Date: Tue, 7 Aug 2018 21:35:12 +0200
+Message-ID: <20180807193512.GH5985@e113682-lin.lund.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
+ <20180806130324.GA5985@e113682-lin.lund.arm.com>
+ <20180807110958.GC9097@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1020149F93
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:20:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAFD14A1CF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:35:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JVn1P2kpgmav for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Aug 2018 15:20:13 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65B9940217
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:20:13 -0400 (EDT)
+ with ESMTP id AARQkjMPIE9K for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Aug 2018 15:35:15 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73432408AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Aug 2018 15:35:15 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1529593060-542-9-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20180807110958.GC9097@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,159 +36,123 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 21, 2018 at 03:57:32PM +0100, Dave Martin wrote:
-> Some system registers may or may not logically exist for a vcpu
-> depending on whether certain architectural features are enabled for
-> the vcpu.
-> 
-> In order to avoid spuriously emulating access to these registers
-> when they should not exist, or allowing the registers to be
-> spuriously enumerated or saved/restored through the ioctl
-> interface, a means is needed to allow registers to be hidden
-> depending on the vcpu configuration.
-> 
-> In order to support this in a flexible way, this patch adds a
-> check_present() method to struct sys_reg_desc, and updates the
-> generic system register access and enumeration code to be aware of
-> it:  if check_present() returns false, the code behaves as if the
-> register did not exist.
-> 
-> For convenience, the complete check is wrapped up in a new helper
-> sys_reg_present().
-> 
-> An attempt has been made to hook the new check into the generic
-> accessors for trapped system registers.  This should reduce the
-> potential for future surprises, although the redundant check will
-> add a small cost.  No system register depends on this functionality
-> yet, and some paths needing the check may also need attention.
-> 
-> Naturally, this facility makes sense only for registers that are
-> trapped.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 20 +++++++++++++++-----
->  arch/arm64/kvm/sys_regs.h | 11 +++++++++++
->  2 files changed, 26 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index a436373..31a351a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1840,7 +1840,7 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
->  
->  	r = find_reg(params, table, num);
->  
-> -	if (r) {
-> +	if (likely(r) && sys_reg_present(vcpu, r)) {
->  		perform_access(vcpu, params, r);
->  		return 0;
->  	}
-> @@ -2016,7 +2016,7 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
->  	if (!r)
->  		r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->  
-> -	if (likely(r)) {
-> +	if (likely(r) && sys_reg_present(vcpu, r)) {
->  		perform_access(vcpu, params, r);
->  	} else {
->  		kvm_err("Unsupported guest sys_reg access at: %lx\n",
-
-This looks a bit fishy, because it seems that now a guest can be
-configured in such a way that it can access non-present emulated system
-registers and get the host to tell the operator that the KVM instance
-running on the system doesn't really support the hardware...
-
-Thanks,
--Christoffer
-
-> @@ -2313,6 +2313,9 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if (!r)
->  		return get_invariant_sys_reg(reg->id, uaddr);
->  
-> +	if (!sys_reg_present(vcpu, r))
-> +		return -ENOENT;
-> +
->  	if (r->get_user)
->  		return (r->get_user)(vcpu, r, reg, uaddr);
->  
-> @@ -2334,6 +2337,9 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->  	if (!r)
->  		return set_invariant_sys_reg(reg->id, uaddr);
->  
-> +	if (!sys_reg_present(vcpu, r))
-> +		return -ENOENT;
-> +
->  	if (r->set_user)
->  		return (r->set_user)(vcpu, r, reg, uaddr);
->  
-> @@ -2390,7 +2396,8 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
->  	return true;
->  }
->  
-> -static int walk_one_sys_reg(const struct sys_reg_desc *rd,
-> +static int walk_one_sys_reg(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_desc *rd,
->  			    u64 __user **uind,
->  			    unsigned int *total)
->  {
-> @@ -2401,6 +2408,9 @@ static int walk_one_sys_reg(const struct sys_reg_desc *rd,
->  	if (!(rd->reg || rd->get_user))
->  		return 0;
->  
-> +	if (!sys_reg_present(vcpu, rd))
-> +		return 0;
-> +
->  	if (!copy_reg_to_user(rd, uind))
->  		return -EFAULT;
->  
-> @@ -2429,9 +2439,9 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->  		int cmp = cmp_sys_reg(i1, i2);
->  		/* target-specific overrides generic entry. */
->  		if (cmp <= 0)
-> -			err = walk_one_sys_reg(i1, &uind, &total);
-> +			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
->  		else
-> -			err = walk_one_sys_reg(i2, &uind, &total);
-> +			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
->  
->  		if (err)
->  			return err;
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index cd710f8..dfbb342 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -22,6 +22,9 @@
->  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
->  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
->  
-> +#include <linux/compiler.h>
-> +#include <linux/types.h>
-> +
->  struct sys_reg_params {
->  	u8	Op0;
->  	u8	Op1;
-> @@ -61,8 +64,16 @@ struct sys_reg_desc {
->  			const struct kvm_one_reg *reg, void __user *uaddr);
->  	int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  			const struct kvm_one_reg *reg, void __user *uaddr);
-> +	bool (*check_present)(const struct kvm_vcpu *vpcu,
-> +			      const struct sys_reg_desc *rd);
->  };
->  
-> +static inline bool sys_reg_present(const struct kvm_vcpu *vcpu,
-> +				   const struct sys_reg_desc *rd)
-> +{
-> +	return likely(!rd->check_present) || rd->check_present(vcpu, rd);
-> +}
-> +
->  static inline void print_sys_reg_instr(const struct sys_reg_params *p)
->  {
->  	/* Look, we even formatted it for you to paste into the table! */
-> -- 
-> 2.1.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCBBdWcgMDcsIDIwMTggYXQgMTI6MDk6NThQTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3Jv
+dGU6Cj4gT24gTW9uLCBBdWcgMDYsIDIwMTggYXQgMDM6MDM6MjRQTSArMDIwMCwgQ2hyaXN0b2Zm
+ZXIgRGFsbCB3cm90ZToKPiA+IEhpIERhdmUsCj4gPiAKPiA+IEkgdGhpbmsgdGhlcmUncyBhIHR5
+cG8gaW4gdGhlIHN1YmplY3QgInRvIGJlIiByYXRoZXIgdGhhbiAidG8gYnkiLgo+ID4gCj4gPiBP
+biBUaHUsIEp1biAyMSwgMjAxOCBhdCAwMzo1NzozM1BNICswMTAwLCBEYXZlIE1hcnRpbiB3cm90
+ZToKPiA+ID4gV2hlbiBhIGZlYXR1cmUtZGVwZW5kZW50IElEIHJlZ2lzdGVyIGlzIGhpZGRlbiBm
+cm9tIHRoZSBndWVzdCwgaXQKPiA+ID4gbmVlZHMgdG8gZXhoaWJpdCByZWFkLWFzLXplcm8gYmVo
+YXZpb3VyIGFzIGRlZmluZWQgYnkgdGhlIEFybQo+ID4gPiBhcmNoaXRlY3R1cmUsIHJhdGhlciB0
+aGFuIGFwcGVhcmluZyB0byBiZSBlbnRpcmVseSBhYnNlbnQuCj4gPiA+IAo+ID4gPiBUaGlzIHBh
+dGNoIHVwZGF0ZXMgdGhlIElEIHJlZ2lzdGVyIGVtdWxhdGlvbiBsb2dpYyB0byBtYWtlIHVzZSBv
+Zgo+ID4gPiB0aGUgbmV3IGNoZWNrX3ByZXNlbnQoKSBtZXRob2QgdG8gZGV0ZXJtaW5lIHdoZXRo
+ZXIgdGhlIHJlZ2lzdGVyCj4gPiA+IHNob3VsZCByZWFkIGFzIHplcm8gaW5zdGVhZCBvZiB5aWVs
+ZGluZyB0aGUgaG9zdCdzIHNhbml0aXNlZAo+ID4gPiB2YWx1ZS4gIEJlY2F1c2UgY3VycmVudGx5
+IGEgZmFsc2UgcmVzdWx0IGZyb20gdGhpcyBtZXRob2QgdHJ1bmNhdGVzCj4gPiA+IHRoZSB0cmFw
+IGNhbGwgY2hhaW4gYmVmb3JlIHRoZSBzeXNyZWcncyBlbXVsYXRlIG1ldGhvZCgpIGlzIGNhbGxl
+ZCwKPiA+ID4gYSBmbGFnIGlzIGFkZGVkIHRvIGRpc3Rpbmd1aXNoIHRoaXMgc3BlY2lhbCBjYXNl
+LCBhbmQgaGVscGVycyBhcmUKPiA+ID4gcmVmYWN0b3JlZCBhcHByb3ByaWF0ZWx5Lgo+ID4gCj4g
+PiBJIGRvbid0IHVuZGVyc3RhbmQgdGhpcyBsYXN0IHNlbnRlbmNlLgo+ID4gCj4gPiBBbmQgSSdt
+IG5vdCByZWFsbHkgc3VyZSBJIHVuZGVyc3RhbmQgdGhlIGNvZGUgZWl0aGVyLgo+ID4gCj4gPiBJ
+IGNhbid0IHNlZW0gdG8gc2VlIGFueSByZWdpc3RlcnMgd2hpY2ggYXJlIGRlZmluZWQgYXMgIXBy
+ZXNlbnQgJiYgIXJheiwKPiA+IHdoaWNoIGlzIHdoYXQgSSB0aG91Z2h0IHRoaXMgZmVhdHVyZSB3
+YXMgYWxsIGFib3V0Lgo+IAo+ICFwcmVzZW50IGFuZCAhcmF6IGlzIHRoZSBkZWZhdWx0IGJlaGF2
+aW91ciBmb3IgZXZlcnl0aGluZyB0aGF0IGlzIG5vdAo+IElELXJlZ2lzdGVyLWxpa2UuICBUaGlz
+IHBhdGNoIGlzIGFkZGluZyB0aGUgIXByZXNlbnQgJiYgcmF6IGNhc2UgKHRob3VnaAo+IHRoYXQg
+bWF5IG5vdCBiZSBhIGhlbHBmdWwgd2F5IHRvIGRlc2NpYmUgaXQgLi4uIHNlZSBiZWxvdykuCgpG
+YWlyIGVub3VnaCwgYnV0IEkgZG9uJ3QgcmVhbGx5IHNlZSB3aHkgeW91IG5lZWQgdG8gY2xhc3Np
+ZnkgYSByZWdpc3RlcgphcyAhcHJlc2VudCAmJiByYXosIGJlY2F1c2UgcmF6IGltcGxpZXMgcHJl
+c2VudCBBRkFJQ1QuCgo+IAo+ID4gSW4gb3RoZXIgd29yZHMsIHdoYXQgaXMgdGhlIGJlbmVmaXQg
+b2YgdGhpcyBtb3JlIGdlbmVyaWMgbWV0aG9kIGFzCj4gPiBvcHBvc2VkIHRvIGhhdmluZyBhIHdy
+YXBwZXIgYXJvdW5kIHJlYWRfaWRfcmVnKCkgZm9yIHJlYWRfc3ZlX2lkX3JlZygpCj4gPiB3aGlj
+aCBzZXRzIFJBWiBpZiB0aGVyZSBpcyBubyBzdXBwb3J0IGZvciBTVkUgaW4gdGhpcyBjb250ZXh0
+Pwo+IAo+IFRoZXJlIG1heSBiZSBvdGhlciB3YXlzIHRvIGZhY3RvciB0aGlzLiAgSSBjYW4ndCBu
+b3cgcmVtZW1iZXIgd2hheSBJCj4gd2VudCB3aXRoIHRoaXMgcGFydGljdWxhciBhcHByb2FjaCwg
+ZXhjZXB0IHRoYXQgSSB2YWd1ZWx5IHJlY2FsbAo+IGhpdHRpbmcgc29tZSBvYnN0YWNsZXMgd2hl
+biBkb2luZyB0aGluZ3MgYW5vdGhlciB3YXkuCgpXaGF0IEkgZG9uJ3QgbXVjaCBjYXJlIGZvciBp
+cyB0aGF0IHdlIG5vdyBzZWVtIHRvIGJlIG1peGluZyB0aGUgY29uY2VwdApvZiB3aGV0aGVyIHNv
+bWV0aGluZyBpcyBwcmVzZW50IGFuZCB0aGUgdmFsdWUgaXQgcmV0dXJucyBpZiBpdCBpcwpwcmVz
+ZW50IGluIHRoZSBvdmVyYWxsIHN5c3RlbSByZWdpc3RlciBoYW5kbGluZyBsb2dpYy4gIEFuZCBJ
+IGRvbid0CnVuZGVyc3RhbmQgd2h5IHRoaXMgaXMgYSByZXF1aXJlbWVudC4KCj4gCj4gQ2FuIHlv
+dSB0YWtlIGEgbG9vayBhdCBteSBhdHRlbXB0ZWQgZXhwbGFuYXRpb24gYmVsb3cgYW5kIHRoZW4g
+d2UKPiBjYW4gcmVjb25zaWRlciB0aGlzPwoKU3VyZSwgc2VlIG15IGNvbW1lbnRzIGJlbG93LgoK
+PiAKPiBbLi4uXQo+IAo+ID4gCj4gPiA+IAo+ID4gPiBUaGlzIGludmxvdmVzIHNvbWUgdHJpdmlh
+bCB1cGRhdGVzIHRvIHBhc3MgdGhlIHZjcHUgcG9pbnRlciBkb3duCj4gPiA+IGludG8gdGhlIElE
+IHJlZ2lzdGVyIGVtdWxhdGlvbi9hY2Nlc3MgZnVuY3Rpb25zLgo+ID4gPiAKPiA+ID4gQSBuZXcg
+SURfU0FOSVRJU0VEX0lGKCkgbWFjcm8gaXMgZGVmaW5lZCBmb3IgZGVjbGFyaW5nCj4gPiA+IGNv
+bmRpdGlvbmFsbHkgdmlzaWJsZSBJRCByZWdpc3RlcnMuCj4gPiA+IAo+ID4gPiBTaWduZWQtb2Zm
+LWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiA+ID4gLS0tCj4gPiA+ICBh
+cmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIHwgNTEgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0tLS0tLS0tLS0tLS0tLS0KPiA+ID4gIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmggfCAx
+MSArKysrKysrKysrCj4gPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDE4
+IGRlbGV0aW9ucygtKQo+ID4gPiAKPiAKPiBbLi4uXQo+IAo+ID4gPiBAQCAtMTg0MCw3ICsxODU1
+LDcgQEAgc3RhdGljIGludCBlbXVsYXRlX2NwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiA+ID4g
+IAo+ID4gPiAgCXIgPSBmaW5kX3JlZyhwYXJhbXMsIHRhYmxlLCBudW0pOwo+ID4gPiAgCj4gPiA+
+IC0JaWYgKGxpa2VseShyKSAmJiBzeXNfcmVnX3ByZXNlbnQodmNwdSwgcikpIHsKPiA+ID4gKwlp
+ZiAobGlrZWx5KHIpICYmIHN5c19yZWdfcHJlc2VudF9vcl9yYXoodmNwdSwgcikpIHsKPiA+ID4g
+IAkJcGVyZm9ybV9hY2Nlc3ModmNwdSwgcGFyYW1zLCByKTsKPiA+ID4gIAkJcmV0dXJuIDA7Cj4g
+PiA+ICAJfQo+ID4gPiBAQCAtMjAxNiw3ICsyMDMxLDcgQEAgc3RhdGljIGludCBlbXVsYXRlX3N5
+c19yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ID4gPiAgCWlmICghcikKPiA+ID4gIAkJciA9
+IGZpbmRfcmVnKHBhcmFtcywgc3lzX3JlZ19kZXNjcywgQVJSQVlfU0laRShzeXNfcmVnX2Rlc2Nz
+KSk7Cj4gPiA+ICAKPiA+ID4gLQlpZiAobGlrZWx5KHIpICYmIHN5c19yZWdfcHJlc2VudCh2Y3B1
+LCByKSkgewo+ID4gPiArCWlmIChsaWtlbHkocikgJiYgc3lzX3JlZ19wcmVzZW50X29yX3Jheih2
+Y3B1LCByKSkgewo+ID4gPiAgCQlwZXJmb3JtX2FjY2Vzcyh2Y3B1LCBwYXJhbXMsIHIpOwo+ID4g
+PiAgCX0gZWxzZSB7Cj4gPiA+ICAJCWt2bV9lcnIoIlVuc3VwcG9ydGVkIGd1ZXN0IHN5c19yZWcg
+YWNjZXNzIGF0OiAlbHhcbiIsCj4gPiA+IEBAIC0yMzEzLDcgKzIzMjgsNyBAQCBpbnQga3ZtX2Fy
+bV9zeXNfcmVnX2dldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3Zt
+X29uZV9yZWcgKnJlZwo+ID4gPiAgCWlmICghcikKPiA+ID4gIAkJcmV0dXJuIGdldF9pbnZhcmlh
+bnRfc3lzX3JlZyhyZWctPmlkLCB1YWRkcik7Cj4gPiA+ICAKPiA+ID4gLQlpZiAoIXN5c19yZWdf
+cHJlc2VudCh2Y3B1LCByKSkKPiA+ID4gKwlpZiAoIXN5c19yZWdfcHJlc2VudF9vcl9yYXoodmNw
+dSwgcikpCj4gPiA+ICAJCXJldHVybiAtRU5PRU5UOwo+ID4gPiAgCj4gPiA+ICAJaWYgKHItPmdl
+dF91c2VyKQo+ID4gPiBAQCAtMjMzNyw3ICsyMzUyLDcgQEAgaW50IGt2bV9hcm1fc3lzX3JlZ19z
+ZXRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpy
+ZWcKPiA+ID4gIAlpZiAoIXIpCj4gPiA+ICAJCXJldHVybiBzZXRfaW52YXJpYW50X3N5c19yZWco
+cmVnLT5pZCwgdWFkZHIpOwo+ID4gPiAgCj4gPiA+IC0JaWYgKCFzeXNfcmVnX3ByZXNlbnQodmNw
+dSwgcikpCj4gPiA+ICsJaWYgKCFzeXNfcmVnX3ByZXNlbnRfb3JfcmF6KHZjcHUsIHIpKQo+ID4g
+PiAgCQlyZXR1cm4gLUVOT0VOVDsKPiAKPiBPbiBXZWQsIEp1bCAyNSwgMjAxOCBhdCAwNDo0Njo1
+NVBNICswMTAwLCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gPiBJdCdzIGFsbCB2ZXJ5IHdlbGwgYmVp
+bmcgcmF6LCBidXQgc2hvdWxkbid0IHlvdSBjYXRjaCB0aGlzIGZ1cnRoZXIgZG93bgo+ID4gYW5k
+IG5vdCBhdHRlbXB0IHRvIHdyaXRlIHRoZSByZWdpc3RlciB0aGF0IGRvZXNuJ3QgZXhpc3Q/Cj4g
+Cj4gVG8gYmUgY2xlYXIsIGlzIHRoaXMgYSBxdWVzdGlvbiBhYm91dCBmYWN0b3JpbmcsIG9yIGRv
+IHlvdSB0aGluayB0aGVyZSdzCj4gYSBidWcgaGVyZT8KPiAKPiAKPiBJbiByZXNwb25zZSB0byBi
+b3RoIHNldHMgb2YgY29tbWVudHMsIEkgdGhpbmsgdGhlIHdheSB0aGUgY29kZSBpcwo+IGZhY3Rv
+cmVkIGlzIGNhdXNpbmcgc29tZSBjb25mdXNpb24uCj4gCj4gVGhlIGlkZWEgaW4gbXkgaGVhZCB3
+YXMgc29tZXRoaW5nIGxpa2UgdGhpczoKPiAKPiBTeXN0ZW0gcmVnaXN0ZXIgZW5jb2RpbmdzIGZh
+bGwgaW50byB0d28gY2xhc3NlczoKPiAKPiAgYSkgZW5jb2RpbmdzIHRoYXQgd2UgZW11bGF0ZSBp
+biBzb21lIHdheQoKdGhpcyBpcyBwcmVzZW50LCB0aGVuCgo+ICBiKSBlbmNvZGluZ3MgdGhhdCB3
+ZSB1bmNvbmRpdGlvbmFsbHkgcmVmbGVjdCBiYWNrIHRvIHRoZSBndWVzdCBhcyBhbgo+ICAgICBV
+bmRlZi4KCnRoaXMgaXMgIXByZXNlbnQsIHRoZW4KClRoZSBwcmV2aW91cyBjaGFuZ2UgbWFkZSB0
+aGlzIGEgY29uZmlndXJhYmxlIHRoaW5nIGFzIG9wcG9zZWQgdG8gYQpzdGF0aWMgY29tcGlsZSB0
+aW1lIHRoaW5nLCByaWdodD8KPiAKPiBBcmNoaXRlY3R1cmFsbHkgZGVmaW5lZCBzeXN0ZW0gcmVn
+aXN0ZXJzIGZhbGwgaW50byB0d28gY2xhc3NlczoKPiAKPiAgaSkgcmVnaXN0ZXJzIHdob3NlIHJl
+bW92YWwgdHVybnMgYWxsIGFjY2Vzc2VzIGludG8gYW4gVW5kZWYKPiAgaWkpIHJlZ2lzdGVycyB3
+aG9zZSByZW1vdmFsIGV4aGliaXRzIHNvbWUgb3RoZXIgYmVoYXZpb3VyLgoKSSdtIG5vdCBzdXJl
+IHdoYXQgeW91IG1lYW4gYnkgJ3JlbW92YWwnIGhlcmUsIGFuZCB3aGljaCBhcmNoaXRlY3R1cmFs
+CmNvbmNlcHQgdGhhdCByZWxhdGVzIHRvLCB3aGljaCBtYWtlcyBpdCBoYXJkIGZvciBtZSB0byBw
+YXJzZSB0aGUgcmVzdApoZXJlLi4uCgo+IAo+IFRoZXNlIHR3byBjbGFzc2lmaWNhdGlvbnMgb3Zl
+cmxhcCBzb213ZWhhdC4KPiAKPiAKPiBGcm9tIGFuIGVtdWxhdGlvbiBwZXJzcGVjdGl2ZSwgKGIp
+LCBhbmQgKGkpIGluIHRoZSAicmVnaXN0ZXIgbm90Cj4gcHJlc2VudCIgY2FzZSwgbG9vayB0aGUg
+c2FtZTogd2UgdHJhcCB0aGUgcmVnaXN0ZXIgYW5kIHJlZmxlY3QgYW4gVW5kZWYKPiBkaXJlY3Rs
+eSBiYWNrIHRvIHRoZSBndWVzdCB3aXRoIG5vIGZ1cnRoZXIgYWN0aW9uIHJlcXVpcmVkLgo+IAo+
+IEZyb20gYW4gZW11bGF0aW9uIHBlcnNwZWN0aXZlLCAoYSkgYW5kIChpaSkgYXJlIGFsc28gc29t
+ZXdoYXQgdGhlCj4gc2FtZTogd2UgbmVlZCB0byBlbXVsYXRlIHNvbWV0aGluZywgYWx0aG91Z2gg
+cHJlY2lzZWx5IHdoYXQgd2UgbmVlZAo+IHRvIGRvIGRlcGVuZHMgb24gd2hpY2ggcmVnaXN0ZXIg
+aXQgaXMgYW5kIG9uIHdoZXRoZXIgdGhlIHJlZ2lzdGVyIGlzCj4gZGVlbWVkIHByZXNlbnQgb3Ig
+bm90Lgo+IAo+IHN5c19yZWdfY2hlY2tfcHJlc2VudF9vcl9yYXooKSB0aHVzIG1lYW5zICJmYWxs
+cyB1bmRlciAoYSkgb3IgKGlpKSIsCj4gaS5lLiwgc29tZSBlbXVsYXRpb24gaXMgcmVxdWlyZWQg
+YW5kIHdlIG5lZWQgdG8gY2FsbCBzeXNyZWctc3BlY2lmaWMKPiBtZXRob2RzIHRvIGZpZ3VyZSBv
+dXQgcHJlY2lzZWx5IHdoYXQgd2UgbmVlZCB0byBkby4KCnllcywgYnV0IHdlJ3ZlIGFsd2F5cyBo
+YWQgdGhhdCB3aXRob3V0IHRoZSAib3JfcmF6IiBzdHVmZiBhdCB0aGUgbG9va3VwCmxldmVsLiAg
+V2hhdCBoYXMgY2hhbmdlZD8KCj4gCj4gQ29udmVyc2VseSAhc3lzX3JlZ19jaGVja19wcmVzZW50
+X29yX3JheigpIG1lYW5zIHRoYXQgd2UgY2FuIGp1c3QKPiBVbmRlZiB0aGUgZ3Vlc3Qgd2l0aCBu
+byBmdXJ0aGVyIGxvZ2ljIHJlcXVpcmVkLgoKWWVzLCBidXQgdGhhdCdzIHRoZSBzYW1lIGFzICFw
+cmVzZW50LCBiZWNhdXNlIHJheiB0aGVuIGltcGxpZXMgcHJlc2VudCwKc2VlIGFib3ZlLgoKPiAK
+PiBEb2VzIHRoaXMgcmF0aW9uYWxlIG1ha2UgdGhpbmdzIGNsZWFyZXI/ICBUaGUgbmFtaW5nIGlz
+IHBlcmhhcHMKPiB1bmZvcnR1bmF0ZS4KPiAKClVuZm9ydHVuYXRlbHkgbm90IHNvIG11Y2guICBJ
+IGhhdmUgYSBzdHJvbmcgZmVlbGluZyB5b3Ugd2FudCB0byBtb3ZlCmFueXRoaW5nIHJlbGF0aW5n
+IHRvIHNvbWV0aGluZyBiZWluZyBlbXVsYXRlZCBhcyBSQVovUkFPL3NvbWV0aGluZyBlbHNlCmlu
+dG8gc3lzcmVnIHNwZWNpZmljIGZ1bmN0aW9ucy4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
