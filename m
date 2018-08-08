@@ -1,29 +1,30 @@
-From: Dave Martin <Dave.Martin@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
 Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
  dynamically read-as-zero
-Date: Wed, 8 Aug 2018 10:11:11 +0100
-Message-ID: <20180808091111.GL9097@e103592.cambridge.arm.com>
+Date: Wed, 8 Aug 2018 11:58:35 +0200
+Message-ID: <20180808095835.GK5985@e113682-lin.lund.arm.com>
 References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
  <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
  <20180806130324.GA5985@e113682-lin.lund.arm.com>
  <20180807110958.GC9097@e103592.cambridge.arm.com>
  <20180807193512.GH5985@e113682-lin.lund.arm.com>
+ <20180808091111.GL9097@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0F894A0C8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 05:11:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B9F4A0C9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 05:58:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f4yZIrD21aQK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Aug 2018 05:11:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3218640493
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 05:11:16 -0400 (EDT)
+ with ESMTP id uYxYVG4Y5Q4f for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Aug 2018 05:58:38 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C45B240493
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 05:58:38 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180807193512.GH5985@e113682-lin.lund.arm.com>
+In-Reply-To: <20180808091111.GL9097@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,298 +34,189 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
+To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 07, 2018 at 09:35:12PM +0200, Christoffer Dall wrote:
-> On Tue, Aug 07, 2018 at 12:09:58PM +0100, Dave Martin wrote:
-> > On Mon, Aug 06, 2018 at 03:03:24PM +0200, Christoffer Dall wrote:
-> > > Hi Dave,
-> > > =
-
-> > > I think there's a typo in the subject "to be" rather than "to by".
-> > > =
-
-> > > On Thu, Jun 21, 2018 at 03:57:33PM +0100, Dave Martin wrote:
-> > > > When a feature-dependent ID register is hidden from the guest, it
-> > > > needs to exhibit read-as-zero behaviour as defined by the Arm
-> > > > architecture, rather than appearing to be entirely absent.
-> > > > =
-
-> > > > This patch updates the ID register emulation logic to make use of
-> > > > the new check_present() method to determine whether the register
-> > > > should read as zero instead of yielding the host's sanitised
-> > > > value.  Because currently a false result from this method truncates
-> > > > the trap call chain before the sysreg's emulate method() is called,
-> > > > a flag is added to distinguish this special case, and helpers are
-> > > > refactored appropriately.
-> > > =
-
-> > > I don't understand this last sentence.
-> > > =
-
-> > > And I'm not really sure I understand the code either.
-> > > =
-
-> > > I can't seem to see any registers which are defined as !present && !r=
-az,
-> > > which is what I thought this feature was all about.
-> > =
-
-> > !present and !raz is the default behaviour for everything that is not
-> > ID-register-like.  This patch is adding the !present && raz case (though
-> > that may not be a helpful way to descibe it ... see below).
-> =
-
-> Fair enough, but I don't really see why you need to classify a register
-> as !present && raz, because raz implies present AFAICT.
-> =
-
-> > =
-
-> > > In other words, what is the benefit of this more generic method as
-> > > opposed to having a wrapper around read_id_reg() for read_sve_id_reg()
-> > > which sets RAZ if there is no support for SVE in this context?
-> > =
-
-> > There may be other ways to factor this.  I can't now remember whay I
-> > went with this particular approach, except that I vaguely recall
-> > hitting some obstacles when doing things another way.
-> =
-
-> What I don't much care for is that we now seem to be mixing the concept
-> of whether something is present and the value it returns if it is
-> present in the overall system register handling logic.  And I don't
-> understand why this is a requirement.
-> =
-
-> > =
-
-> > Can you take a look at my attempted explanation below and then we
-> > can reconsider this?
-> =
-
-> Sure, see my comments below.
-> =
-
-> > =
-
-> > [...]
-> > =
-
-> > > =
-
-> > > > =
-
-> > > > This invloves some trivial updates to pass the vcpu pointer down
-> > > > into the ID register emulation/access functions.
-> > > > =
-
-> > > > A new ID_SANITISED_IF() macro is defined for declaring
-> > > > conditionally visible ID registers.
-> > > > =
-
-> > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > > ---
-> > > >  arch/arm64/kvm/sys_regs.c | 51 ++++++++++++++++++++++++++++++-----=
-------------
-> > > >  arch/arm64/kvm/sys_regs.h | 11 ++++++++++
-> > > >  2 files changed, 44 insertions(+), 18 deletions(-)
-> > > > =
-
-> > =
-
-> > [...]
-> > =
-
-> > > > @@ -1840,7 +1855,7 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
-> > > >  =
-
-> > > >  	r =3D find_reg(params, table, num);
-> > > >  =
-
-> > > > -	if (likely(r) && sys_reg_present(vcpu, r)) {
-> > > > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
-> > > >  		perform_access(vcpu, params, r);
-> > > >  		return 0;
-> > > >  	}
-> > > > @@ -2016,7 +2031,7 @@ static int emulate_sys_reg(struct kvm_vcpu *v=
-cpu,
-> > > >  	if (!r)
-> > > >  		r =3D find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-> > > >  =
-
-> > > > -	if (likely(r) && sys_reg_present(vcpu, r)) {
-> > > > +	if (likely(r) && sys_reg_present_or_raz(vcpu, r)) {
-> > > >  		perform_access(vcpu, params, r);
-> > > >  	} else {
-> > > >  		kvm_err("Unsupported guest sys_reg access at: %lx\n",
-> > > > @@ -2313,7 +2328,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *=
-vcpu, const struct kvm_one_reg *reg
-> > > >  	if (!r)
-> > > >  		return get_invariant_sys_reg(reg->id, uaddr);
-> > > >  =
-
-> > > > -	if (!sys_reg_present(vcpu, r))
-> > > > +	if (!sys_reg_present_or_raz(vcpu, r))
-> > > >  		return -ENOENT;
-> > > >  =
-
-> > > >  	if (r->get_user)
-> > > > @@ -2337,7 +2352,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *=
-vcpu, const struct kvm_one_reg *reg
-> > > >  	if (!r)
-> > > >  		return set_invariant_sys_reg(reg->id, uaddr);
-> > > >  =
-
-> > > > -	if (!sys_reg_present(vcpu, r))
-> > > > +	if (!sys_reg_present_or_raz(vcpu, r))
-> > > >  		return -ENOENT;
-> > =
-
-> > On Wed, Jul 25, 2018 at 04:46:55PM +0100, Alex Benn=E9e wrote:
-> > > It's all very well being raz, but shouldn't you catch this further do=
-wn
-> > > and not attempt to write the register that doesn't exist?
-> > =
-
-> > To be clear, is this a question about factoring, or do you think there's
-> > a bug here?
-> > =
-
-> > =
-
-> > In response to both sets of comments, I think the way the code is
-> > factored is causing some confusion.
-> > =
-
-> > The idea in my head was something like this:
-> > =
-
-> > System register encodings fall into two classes:
-> > =
-
-> >  a) encodings that we emulate in some way
-> =
-
-> this is present, then
-> =
-
-> >  b) encodings that we unconditionally reflect back to the guest as an
-> >     Undef.
-> =
-
-> this is !present, then
-> =
-
-> The previous change made this a configurable thing as opposed to a
-> static compile time thing, right?
-> > =
-
-> > Architecturally defined system registers fall into two classes:
-> > =
-
-> >  i) registers whose removal turns all accesses into an Undef
-> >  ii) registers whose removal exhibits some other behaviour.
-> =
-
-> I'm not sure what you mean by 'removal' here, and which architectural
-> concept that relates to, which makes it hard for me to parse the rest
-> here...
-> =
-
-> > =
-
-> > These two classifications overlap somwehat.
-> > =
-
-> > =
-
-> > From an emulation perspective, (b), and (i) in the "register not
-> > present" case, look the same: we trap the register and reflect an Undef
-> > directly back to the guest with no further action required.
-> > =
-
-> > From an emulation perspective, (a) and (ii) are also somewhat the
-> > same: we need to emulate something, although precisely what we need
-> > to do depends on which register it is and on whether the register is
-> > deemed present or not.
-> > =
-
-> > sys_reg_check_present_or_raz() thus means "falls under (a) or (ii)",
-> > i.e., some emulation is required and we need to call sysreg-specific
-> > methods to figure out precisely what we need to do.
-> =
-
-> yes, but we've always had that without the "or_raz" stuff at the lookup
-> level.  What has changed?
-> =
-
-> > =
-
-> > Conversely !sys_reg_check_present_or_raz() means that we can just
-> > Undef the guest with no further logic required.
-> =
-
-> Yes, but that's the same as !present, because raz then implies present,
-> see above.
-> =
-
-> > =
-
-> > Does this rationale make things clearer?  The naming is perhaps
-> > unfortunate.
-> > =
-
-> =
-
-> Unfortunately not so much.  I have a strong feeling you want to move
-> anything relating to something being emulated as RAZ/RAO/something else
-> into sysreg specific functions.
-
-
-The way I integrated this seemed natural at the time, but your
-reaction suggests that it may not be the right approach...
-
-
-At its heart, I'm trying to abstract out the special behaviour of
-all unallocated ID registers, so that we can decide at runtime which
-ones to hide fro the guest: within the ID register block, each
-unallocated register becomes RAZ, not UNDEFINED as would be the case
-for other system registers, so we need to capture both behaviours.
-
-
-If we want a generic handler for all the ID registers in sys_regs.c,
-then we need a flag to tell us whether to pass the ID register through
-from cpufeatures or to make it appear as zero.
-
-For ZCR_EL1 on the other hand, we really want attempts to access that
-to reflect an Undef to the guest if we are pretending that SVE is not
-implemented.  Again if we want to filter out some sysregs in a runtime-
-controlled way, we need a flag to tell us whether to filter out a
-particular register.
-
-So, we have two specific ways of rolling a feature that is really
-implemented in the hardware back to the ARMv8-A behaviour (RAZ for ID
-registers and Undef for anything else).
-
-I tried to group these under a single concept of presence/absence,
-which is what check_present() is intended to check.  However, we
-don't really want ID registers to Undef when !check_present(): this
-is bodged around with the additional SR_RAZ_IF_ABSENT flag so that
-the decision about whether to make the register Undef or not can
-be made generic.
-
-
-It seems that this attempt at generalisation is creating more confusion
-than it solves, so I may abandon it and just handle ID_AA64PFR0_EL1 and
-ID_AA64ZFR0_EL1 specially.
-
-When/if we've done that a few times for different features, it may
-become clearer what any generic framework for doing it should look
-like...
-
-Thoughts?
-
----Dave
+T24gV2VkLCBBdWcgMDgsIDIwMTggYXQgMTA6MTE6MTFBTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3Jv
+dGU6Cj4gT24gVHVlLCBBdWcgMDcsIDIwMTggYXQgMDk6MzU6MTJQTSArMDIwMCwgQ2hyaXN0b2Zm
+ZXIgRGFsbCB3cm90ZToKPiA+IE9uIFR1ZSwgQXVnIDA3LCAyMDE4IGF0IDEyOjA5OjU4UE0gKzAx
+MDAsIERhdmUgTWFydGluIHdyb3RlOgo+ID4gPiBPbiBNb24sIEF1ZyAwNiwgMjAxOCBhdCAwMzow
+MzoyNFBNICswMjAwLCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+ID4gPiA+IEhpIERhdmUsCj4g
+PiA+ID4gCj4gPiA+ID4gSSB0aGluayB0aGVyZSdzIGEgdHlwbyBpbiB0aGUgc3ViamVjdCAidG8g
+YmUiIHJhdGhlciB0aGFuICJ0byBieSIuCj4gPiA+ID4gCj4gPiA+ID4gT24gVGh1LCBKdW4gMjEs
+IDIwMTggYXQgMDM6NTc6MzNQTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3JvdGU6Cj4gPiA+ID4gPiBX
+aGVuIGEgZmVhdHVyZS1kZXBlbmRlbnQgSUQgcmVnaXN0ZXIgaXMgaGlkZGVuIGZyb20gdGhlIGd1
+ZXN0LCBpdAo+ID4gPiA+ID4gbmVlZHMgdG8gZXhoaWJpdCByZWFkLWFzLXplcm8gYmVoYXZpb3Vy
+IGFzIGRlZmluZWQgYnkgdGhlIEFybQo+ID4gPiA+ID4gYXJjaGl0ZWN0dXJlLCByYXRoZXIgdGhh
+biBhcHBlYXJpbmcgdG8gYmUgZW50aXJlbHkgYWJzZW50Lgo+ID4gPiA+ID4gCj4gPiA+ID4gPiBU
+aGlzIHBhdGNoIHVwZGF0ZXMgdGhlIElEIHJlZ2lzdGVyIGVtdWxhdGlvbiBsb2dpYyB0byBtYWtl
+IHVzZSBvZgo+ID4gPiA+ID4gdGhlIG5ldyBjaGVja19wcmVzZW50KCkgbWV0aG9kIHRvIGRldGVy
+bWluZSB3aGV0aGVyIHRoZSByZWdpc3Rlcgo+ID4gPiA+ID4gc2hvdWxkIHJlYWQgYXMgemVybyBp
+bnN0ZWFkIG9mIHlpZWxkaW5nIHRoZSBob3N0J3Mgc2FuaXRpc2VkCj4gPiA+ID4gPiB2YWx1ZS4g
+IEJlY2F1c2UgY3VycmVudGx5IGEgZmFsc2UgcmVzdWx0IGZyb20gdGhpcyBtZXRob2QgdHJ1bmNh
+dGVzCj4gPiA+ID4gPiB0aGUgdHJhcCBjYWxsIGNoYWluIGJlZm9yZSB0aGUgc3lzcmVnJ3MgZW11
+bGF0ZSBtZXRob2QoKSBpcyBjYWxsZWQsCj4gPiA+ID4gPiBhIGZsYWcgaXMgYWRkZWQgdG8gZGlz
+dGluZ3Vpc2ggdGhpcyBzcGVjaWFsIGNhc2UsIGFuZCBoZWxwZXJzIGFyZQo+ID4gPiA+ID4gcmVm
+YWN0b3JlZCBhcHByb3ByaWF0ZWx5Lgo+ID4gPiA+IAo+ID4gPiA+IEkgZG9uJ3QgdW5kZXJzdGFu
+ZCB0aGlzIGxhc3Qgc2VudGVuY2UuCj4gPiA+ID4gCj4gPiA+ID4gQW5kIEknbSBub3QgcmVhbGx5
+IHN1cmUgSSB1bmRlcnN0YW5kIHRoZSBjb2RlIGVpdGhlci4KPiA+ID4gPiAKPiA+ID4gPiBJIGNh
+bid0IHNlZW0gdG8gc2VlIGFueSByZWdpc3RlcnMgd2hpY2ggYXJlIGRlZmluZWQgYXMgIXByZXNl
+bnQgJiYgIXJheiwKPiA+ID4gPiB3aGljaCBpcyB3aGF0IEkgdGhvdWdodCB0aGlzIGZlYXR1cmUg
+d2FzIGFsbCBhYm91dC4KPiA+ID4gCj4gPiA+ICFwcmVzZW50IGFuZCAhcmF6IGlzIHRoZSBkZWZh
+dWx0IGJlaGF2aW91ciBmb3IgZXZlcnl0aGluZyB0aGF0IGlzIG5vdAo+ID4gPiBJRC1yZWdpc3Rl
+ci1saWtlLiAgVGhpcyBwYXRjaCBpcyBhZGRpbmcgdGhlICFwcmVzZW50ICYmIHJheiBjYXNlICh0
+aG91Z2gKPiA+ID4gdGhhdCBtYXkgbm90IGJlIGEgaGVscGZ1bCB3YXkgdG8gZGVzY2liZSBpdCAu
+Li4gc2VlIGJlbG93KS4KPiA+IAo+ID4gRmFpciBlbm91Z2gsIGJ1dCBJIGRvbid0IHJlYWxseSBz
+ZWUgd2h5IHlvdSBuZWVkIHRvIGNsYXNzaWZ5IGEgcmVnaXN0ZXIKPiA+IGFzICFwcmVzZW50ICYm
+IHJheiwgYmVjYXVzZSByYXogaW1wbGllcyBwcmVzZW50IEFGQUlDVC4KPiA+IAo+ID4gPiAKPiA+
+ID4gPiBJbiBvdGhlciB3b3Jkcywgd2hhdCBpcyB0aGUgYmVuZWZpdCBvZiB0aGlzIG1vcmUgZ2Vu
+ZXJpYyBtZXRob2QgYXMKPiA+ID4gPiBvcHBvc2VkIHRvIGhhdmluZyBhIHdyYXBwZXIgYXJvdW5k
+IHJlYWRfaWRfcmVnKCkgZm9yIHJlYWRfc3ZlX2lkX3JlZygpCj4gPiA+ID4gd2hpY2ggc2V0cyBS
+QVogaWYgdGhlcmUgaXMgbm8gc3VwcG9ydCBmb3IgU1ZFIGluIHRoaXMgY29udGV4dD8KPiA+ID4g
+Cj4gPiA+IFRoZXJlIG1heSBiZSBvdGhlciB3YXlzIHRvIGZhY3RvciB0aGlzLiAgSSBjYW4ndCBu
+b3cgcmVtZW1iZXIgd2hheSBJCj4gPiA+IHdlbnQgd2l0aCB0aGlzIHBhcnRpY3VsYXIgYXBwcm9h
+Y2gsIGV4Y2VwdCB0aGF0IEkgdmFndWVseSByZWNhbGwKPiA+ID4gaGl0dGluZyBzb21lIG9ic3Rh
+Y2xlcyB3aGVuIGRvaW5nIHRoaW5ncyBhbm90aGVyIHdheS4KPiA+IAo+ID4gV2hhdCBJIGRvbid0
+IG11Y2ggY2FyZSBmb3IgaXMgdGhhdCB3ZSBub3cgc2VlbSB0byBiZSBtaXhpbmcgdGhlIGNvbmNl
+cHQKPiA+IG9mIHdoZXRoZXIgc29tZXRoaW5nIGlzIHByZXNlbnQgYW5kIHRoZSB2YWx1ZSBpdCBy
+ZXR1cm5zIGlmIGl0IGlzCj4gPiBwcmVzZW50IGluIHRoZSBvdmVyYWxsIHN5c3RlbSByZWdpc3Rl
+ciBoYW5kbGluZyBsb2dpYy4gIEFuZCBJIGRvbid0Cj4gPiB1bmRlcnN0YW5kIHdoeSB0aGlzIGlz
+IGEgcmVxdWlyZW1lbnQuCj4gPiAKPiA+ID4gCj4gPiA+IENhbiB5b3UgdGFrZSBhIGxvb2sgYXQg
+bXkgYXR0ZW1wdGVkIGV4cGxhbmF0aW9uIGJlbG93IGFuZCB0aGVuIHdlCj4gPiA+IGNhbiByZWNv
+bnNpZGVyIHRoaXM/Cj4gPiAKPiA+IFN1cmUsIHNlZSBteSBjb21tZW50cyBiZWxvdy4KPiA+IAo+
+ID4gPiAKPiA+ID4gWy4uLl0KPiA+ID4gCj4gPiA+ID4gCj4gPiA+ID4gPiAKPiA+ID4gPiA+IFRo
+aXMgaW52bG92ZXMgc29tZSB0cml2aWFsIHVwZGF0ZXMgdG8gcGFzcyB0aGUgdmNwdSBwb2ludGVy
+IGRvd24KPiA+ID4gPiA+IGludG8gdGhlIElEIHJlZ2lzdGVyIGVtdWxhdGlvbi9hY2Nlc3MgZnVu
+Y3Rpb25zLgo+ID4gPiA+ID4gCj4gPiA+ID4gPiBBIG5ldyBJRF9TQU5JVElTRURfSUYoKSBtYWNy
+byBpcyBkZWZpbmVkIGZvciBkZWNsYXJpbmcKPiA+ID4gPiA+IGNvbmRpdGlvbmFsbHkgdmlzaWJs
+ZSBJRCByZWdpc3RlcnMuCj4gPiA+ID4gPiAKPiA+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IERhdmUg
+TWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+ID4gPiA+ID4gLS0tCj4gPiA+ID4gPiAgYXJj
+aC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDUxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tLS0tCj4gPiA+ID4gPiAgYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuaCB8
+IDExICsrKysrKysrKysKPiA+ID4gPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMo
+KyksIDE4IGRlbGV0aW9ucygtKQo+ID4gPiA+ID4gCj4gPiA+IAo+ID4gPiBbLi4uXQo+ID4gPiAK
+PiA+ID4gPiA+IEBAIC0xODQwLDcgKzE4NTUsNyBAQCBzdGF0aWMgaW50IGVtdWxhdGVfY3Aoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1LAo+ID4gPiA+ID4gIAo+ID4gPiA+ID4gIAlyID0gZmluZF9yZWco
+cGFyYW1zLCB0YWJsZSwgbnVtKTsKPiA+ID4gPiA+ICAKPiA+ID4gPiA+IC0JaWYgKGxpa2VseShy
+KSAmJiBzeXNfcmVnX3ByZXNlbnQodmNwdSwgcikpIHsKPiA+ID4gPiA+ICsJaWYgKGxpa2VseShy
+KSAmJiBzeXNfcmVnX3ByZXNlbnRfb3JfcmF6KHZjcHUsIHIpKSB7Cj4gPiA+ID4gPiAgCQlwZXJm
+b3JtX2FjY2Vzcyh2Y3B1LCBwYXJhbXMsIHIpOwo+ID4gPiA+ID4gIAkJcmV0dXJuIDA7Cj4gPiA+
+ID4gPiAgCX0KPiA+ID4gPiA+IEBAIC0yMDE2LDcgKzIwMzEsNyBAQCBzdGF0aWMgaW50IGVtdWxh
+dGVfc3lzX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gPiA+ID4gPiAgCWlmICghcikKPiA+
+ID4gPiA+ICAJCXIgPSBmaW5kX3JlZyhwYXJhbXMsIHN5c19yZWdfZGVzY3MsIEFSUkFZX1NJWkUo
+c3lzX3JlZ19kZXNjcykpOwo+ID4gPiA+ID4gIAo+ID4gPiA+ID4gLQlpZiAobGlrZWx5KHIpICYm
+IHN5c19yZWdfcHJlc2VudCh2Y3B1LCByKSkgewo+ID4gPiA+ID4gKwlpZiAobGlrZWx5KHIpICYm
+IHN5c19yZWdfcHJlc2VudF9vcl9yYXoodmNwdSwgcikpIHsKPiA+ID4gPiA+ICAJCXBlcmZvcm1f
+YWNjZXNzKHZjcHUsIHBhcmFtcywgcik7Cj4gPiA+ID4gPiAgCX0gZWxzZSB7Cj4gPiA+ID4gPiAg
+CQlrdm1fZXJyKCJVbnN1cHBvcnRlZCBndWVzdCBzeXNfcmVnIGFjY2VzcyBhdDogJWx4XG4iLAo+
+ID4gPiA+ID4gQEAgLTIzMTMsNyArMjMyOCw3IEBAIGludCBrdm1fYXJtX3N5c19yZWdfZ2V0X3Jl
+ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnCj4g
+PiA+ID4gPiAgCWlmICghcikKPiA+ID4gPiA+ICAJCXJldHVybiBnZXRfaW52YXJpYW50X3N5c19y
+ZWcocmVnLT5pZCwgdWFkZHIpOwo+ID4gPiA+ID4gIAo+ID4gPiA+ID4gLQlpZiAoIXN5c19yZWdf
+cHJlc2VudCh2Y3B1LCByKSkKPiA+ID4gPiA+ICsJaWYgKCFzeXNfcmVnX3ByZXNlbnRfb3JfcmF6
+KHZjcHUsIHIpKQo+ID4gPiA+ID4gIAkJcmV0dXJuIC1FTk9FTlQ7Cj4gPiA+ID4gPiAgCj4gPiA+
+ID4gPiAgCWlmIChyLT5nZXRfdXNlcikKPiA+ID4gPiA+IEBAIC0yMzM3LDcgKzIzNTIsNyBAQCBp
+bnQga3ZtX2FybV9zeXNfcmVnX3NldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBz
+dHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZwo+ID4gPiA+ID4gIAlpZiAoIXIpCj4gPiA+ID4gPiAgCQly
+ZXR1cm4gc2V0X2ludmFyaWFudF9zeXNfcmVnKHJlZy0+aWQsIHVhZGRyKTsKPiA+ID4gPiA+ICAK
+PiA+ID4gPiA+IC0JaWYgKCFzeXNfcmVnX3ByZXNlbnQodmNwdSwgcikpCj4gPiA+ID4gPiArCWlm
+ICghc3lzX3JlZ19wcmVzZW50X29yX3Jheih2Y3B1LCByKSkKPiA+ID4gPiA+ICAJCXJldHVybiAt
+RU5PRU5UOwo+ID4gPiAKPiA+ID4gT24gV2VkLCBKdWwgMjUsIDIwMTggYXQgMDQ6NDY6NTVQTSAr
+MDEwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+ID4gPiA+IEl0J3MgYWxsIHZlcnkgd2VsbCBiZWlu
+ZyByYXosIGJ1dCBzaG91bGRuJ3QgeW91IGNhdGNoIHRoaXMgZnVydGhlciBkb3duCj4gPiA+ID4g
+YW5kIG5vdCBhdHRlbXB0IHRvIHdyaXRlIHRoZSByZWdpc3RlciB0aGF0IGRvZXNuJ3QgZXhpc3Q/
+Cj4gPiA+IAo+ID4gPiBUbyBiZSBjbGVhciwgaXMgdGhpcyBhIHF1ZXN0aW9uIGFib3V0IGZhY3Rv
+cmluZywgb3IgZG8geW91IHRoaW5rIHRoZXJlJ3MKPiA+ID4gYSBidWcgaGVyZT8KPiA+ID4gCj4g
+PiA+IAo+ID4gPiBJbiByZXNwb25zZSB0byBib3RoIHNldHMgb2YgY29tbWVudHMsIEkgdGhpbmsg
+dGhlIHdheSB0aGUgY29kZSBpcwo+ID4gPiBmYWN0b3JlZCBpcyBjYXVzaW5nIHNvbWUgY29uZnVz
+aW9uLgo+ID4gPiAKPiA+ID4gVGhlIGlkZWEgaW4gbXkgaGVhZCB3YXMgc29tZXRoaW5nIGxpa2Ug
+dGhpczoKPiA+ID4gCj4gPiA+IFN5c3RlbSByZWdpc3RlciBlbmNvZGluZ3MgZmFsbCBpbnRvIHR3
+byBjbGFzc2VzOgo+ID4gPiAKPiA+ID4gIGEpIGVuY29kaW5ncyB0aGF0IHdlIGVtdWxhdGUgaW4g
+c29tZSB3YXkKPiA+IAo+ID4gdGhpcyBpcyBwcmVzZW50LCB0aGVuCj4gPiAKPiA+ID4gIGIpIGVu
+Y29kaW5ncyB0aGF0IHdlIHVuY29uZGl0aW9uYWxseSByZWZsZWN0IGJhY2sgdG8gdGhlIGd1ZXN0
+IGFzIGFuCj4gPiA+ICAgICBVbmRlZi4KPiA+IAo+ID4gdGhpcyBpcyAhcHJlc2VudCwgdGhlbgo+
+ID4gCj4gPiBUaGUgcHJldmlvdXMgY2hhbmdlIG1hZGUgdGhpcyBhIGNvbmZpZ3VyYWJsZSB0aGlu
+ZyBhcyBvcHBvc2VkIHRvIGEKPiA+IHN0YXRpYyBjb21waWxlIHRpbWUgdGhpbmcsIHJpZ2h0Pwo+
+ID4gPiAKPiA+ID4gQXJjaGl0ZWN0dXJhbGx5IGRlZmluZWQgc3lzdGVtIHJlZ2lzdGVycyBmYWxs
+IGludG8gdHdvIGNsYXNzZXM6Cj4gPiA+IAo+ID4gPiAgaSkgcmVnaXN0ZXJzIHdob3NlIHJlbW92
+YWwgdHVybnMgYWxsIGFjY2Vzc2VzIGludG8gYW4gVW5kZWYKPiA+ID4gIGlpKSByZWdpc3RlcnMg
+d2hvc2UgcmVtb3ZhbCBleGhpYml0cyBzb21lIG90aGVyIGJlaGF2aW91ci4KPiA+IAo+ID4gSSdt
+IG5vdCBzdXJlIHdoYXQgeW91IG1lYW4gYnkgJ3JlbW92YWwnIGhlcmUsIGFuZCB3aGljaCBhcmNo
+aXRlY3R1cmFsCj4gPiBjb25jZXB0IHRoYXQgcmVsYXRlcyB0bywgd2hpY2ggbWFrZXMgaXQgaGFy
+ZCBmb3IgbWUgdG8gcGFyc2UgdGhlIHJlc3QKPiA+IGhlcmUuLi4KPiA+IAo+ID4gPiAKPiA+ID4g
+VGhlc2UgdHdvIGNsYXNzaWZpY2F0aW9ucyBvdmVybGFwIHNvbXdlaGF0Lgo+ID4gPiAKPiA+ID4g
+Cj4gPiA+IEZyb20gYW4gZW11bGF0aW9uIHBlcnNwZWN0aXZlLCAoYiksIGFuZCAoaSkgaW4gdGhl
+ICJyZWdpc3RlciBub3QKPiA+ID4gcHJlc2VudCIgY2FzZSwgbG9vayB0aGUgc2FtZTogd2UgdHJh
+cCB0aGUgcmVnaXN0ZXIgYW5kIHJlZmxlY3QgYW4gVW5kZWYKPiA+ID4gZGlyZWN0bHkgYmFjayB0
+byB0aGUgZ3Vlc3Qgd2l0aCBubyBmdXJ0aGVyIGFjdGlvbiByZXF1aXJlZC4KPiA+ID4gCj4gPiA+
+IEZyb20gYW4gZW11bGF0aW9uIHBlcnNwZWN0aXZlLCAoYSkgYW5kIChpaSkgYXJlIGFsc28gc29t
+ZXdoYXQgdGhlCj4gPiA+IHNhbWU6IHdlIG5lZWQgdG8gZW11bGF0ZSBzb21ldGhpbmcsIGFsdGhv
+dWdoIHByZWNpc2VseSB3aGF0IHdlIG5lZWQKPiA+ID4gdG8gZG8gZGVwZW5kcyBvbiB3aGljaCBy
+ZWdpc3RlciBpdCBpcyBhbmQgb24gd2hldGhlciB0aGUgcmVnaXN0ZXIgaXMKPiA+ID4gZGVlbWVk
+IHByZXNlbnQgb3Igbm90Lgo+ID4gPiAKPiA+ID4gc3lzX3JlZ19jaGVja19wcmVzZW50X29yX3Jh
+eigpIHRodXMgbWVhbnMgImZhbGxzIHVuZGVyIChhKSBvciAoaWkpIiwKPiA+ID4gaS5lLiwgc29t
+ZSBlbXVsYXRpb24gaXMgcmVxdWlyZWQgYW5kIHdlIG5lZWQgdG8gY2FsbCBzeXNyZWctc3BlY2lm
+aWMKPiA+ID4gbWV0aG9kcyB0byBmaWd1cmUgb3V0IHByZWNpc2VseSB3aGF0IHdlIG5lZWQgdG8g
+ZG8uCj4gPiAKPiA+IHllcywgYnV0IHdlJ3ZlIGFsd2F5cyBoYWQgdGhhdCB3aXRob3V0IHRoZSAi
+b3JfcmF6IiBzdHVmZiBhdCB0aGUgbG9va3VwCj4gPiBsZXZlbC4gIFdoYXQgaGFzIGNoYW5nZWQ/
+Cj4gPiAKPiA+ID4gCj4gPiA+IENvbnZlcnNlbHkgIXN5c19yZWdfY2hlY2tfcHJlc2VudF9vcl9y
+YXooKSBtZWFucyB0aGF0IHdlIGNhbiBqdXN0Cj4gPiA+IFVuZGVmIHRoZSBndWVzdCB3aXRoIG5v
+IGZ1cnRoZXIgbG9naWMgcmVxdWlyZWQuCj4gPiAKPiA+IFllcywgYnV0IHRoYXQncyB0aGUgc2Ft
+ZSBhcyAhcHJlc2VudCwgYmVjYXVzZSByYXogdGhlbiBpbXBsaWVzIHByZXNlbnQsCj4gPiBzZWUg
+YWJvdmUuCj4gPiAKPiA+ID4gCj4gPiA+IERvZXMgdGhpcyByYXRpb25hbGUgbWFrZSB0aGluZ3Mg
+Y2xlYXJlcj8gIFRoZSBuYW1pbmcgaXMgcGVyaGFwcwo+ID4gPiB1bmZvcnR1bmF0ZS4KPiA+ID4g
+Cj4gPiAKPiA+IFVuZm9ydHVuYXRlbHkgbm90IHNvIG11Y2guICBJIGhhdmUgYSBzdHJvbmcgZmVl
+bGluZyB5b3Ugd2FudCB0byBtb3ZlCj4gPiBhbnl0aGluZyByZWxhdGluZyB0byBzb21ldGhpbmcg
+YmVpbmcgZW11bGF0ZWQgYXMgUkFaL1JBTy9zb21ldGhpbmcgZWxzZQo+ID4gaW50byBzeXNyZWcg
+c3BlY2lmaWMgZnVuY3Rpb25zLgo+IAo+IAo+IFRoZSB3YXkgSSBpbnRlZ3JhdGVkIHRoaXMgc2Vl
+bWVkIG5hdHVyYWwgYXQgdGhlIHRpbWUsIGJ1dCB5b3VyCj4gcmVhY3Rpb24gc3VnZ2VzdHMgdGhh
+dCBpdCBtYXkgbm90IGJlIHRoZSByaWdodCBhcHByb2FjaC4uLgo+IAo+IAo+IEF0IGl0cyBoZWFy
+dCwgSSdtIHRyeWluZyB0byBhYnN0cmFjdCBvdXQgdGhlIHNwZWNpYWwgYmVoYXZpb3VyIG9mCj4g
+YWxsIHVuYWxsb2NhdGVkIElEIHJlZ2lzdGVycywgc28gdGhhdCB3ZSBjYW4gZGVjaWRlIGF0IHJ1
+bnRpbWUgd2hpY2gKPiBvbmVzIHRvIGhpZGUgZnJvIHRoZSBndWVzdDogd2l0aGluIHRoZSBJRCBy
+ZWdpc3RlciBibG9jaywgZWFjaAo+IHVuYWxsb2NhdGVkIHJlZ2lzdGVyIGJlY29tZXMgUkFaLCBu
+b3QgVU5ERUZJTkVEIGFzIHdvdWxkIGJlIHRoZSBjYXNlCj4gZm9yIG90aGVyIHN5c3RlbSByZWdp
+c3RlcnMsIHNvIHdlIG5lZWQgdG8gY2FwdHVyZSBib3RoIGJlaGF2aW91cnMuCj4gCj4gCj4gSWYg
+d2Ugd2FudCBhIGdlbmVyaWMgaGFuZGxlciBmb3IgYWxsIHRoZSBJRCByZWdpc3RlcnMgaW4gc3lz
+X3JlZ3MuYywKPiB0aGVuIHdlIG5lZWQgYSBmbGFnIHRvIHRlbGwgdXMgd2hldGhlciB0byBwYXNz
+IHRoZSBJRCByZWdpc3RlciB0aHJvdWdoCj4gZnJvbSBjcHVmZWF0dXJlcyBvciB0byBtYWtlIGl0
+IGFwcGVhciBhcyB6ZXJvLgo+IAo+IEZvciBaQ1JfRUwxIG9uIHRoZSBvdGhlciBoYW5kLCB3ZSBy
+ZWFsbHkgd2FudCBhdHRlbXB0cyB0byBhY2Nlc3MgdGhhdAo+IHRvIHJlZmxlY3QgYW4gVW5kZWYg
+dG8gdGhlIGd1ZXN0IGlmIHdlIGFyZSBwcmV0ZW5kaW5nIHRoYXQgU1ZFIGlzIG5vdAo+IGltcGxl
+bWVudGVkLiAgQWdhaW4gaWYgd2Ugd2FudCB0byBmaWx0ZXIgb3V0IHNvbWUgc3lzcmVncyBpbiBh
+IHJ1bnRpbWUtCj4gY29udHJvbGxlZCB3YXksIHdlIG5lZWQgYSBmbGFnIHRvIHRlbGwgdXMgd2hl
+dGhlciB0byBmaWx0ZXIgb3V0IGEKPiBwYXJ0aWN1bGFyIHJlZ2lzdGVyLgo+IAo+IFNvLCB3ZSBo
+YXZlIHR3byBzcGVjaWZpYyB3YXlzIG9mIHJvbGxpbmcgYSBmZWF0dXJlIHRoYXQgaXMgcmVhbGx5
+Cj4gaW1wbGVtZW50ZWQgaW4gdGhlIGhhcmR3YXJlIGJhY2sgdG8gdGhlIEFSTXY4LUEgYmVoYXZp
+b3VyIChSQVogZm9yIElECj4gcmVnaXN0ZXJzIGFuZCBVbmRlZiBmb3IgYW55dGhpbmcgZWxzZSku
+Cj4gCj4gSSB0cmllZCB0byBncm91cCB0aGVzZSB1bmRlciBhIHNpbmdsZSBjb25jZXB0IG9mIHBy
+ZXNlbmNlL2Fic2VuY2UsCj4gd2hpY2ggaXMgd2hhdCBjaGVja19wcmVzZW50KCkgaXMgaW50ZW5k
+ZWQgdG8gY2hlY2suICBIb3dldmVyLCB3ZQo+IGRvbid0IHJlYWxseSB3YW50IElEIHJlZ2lzdGVy
+cyB0byBVbmRlZiB3aGVuICFjaGVja19wcmVzZW50KCk6IHRoaXMKPiBpcyBib2RnZWQgYXJvdW5k
+IHdpdGggdGhlIGFkZGl0aW9uYWwgU1JfUkFaX0lGX0FCU0VOVCBmbGFnIHNvIHRoYXQKPiB0aGUg
+ZGVjaXNpb24gYWJvdXQgd2hldGhlciB0byBtYWtlIHRoZSByZWdpc3RlciBVbmRlZiBvciBub3Qg
+Y2FuCj4gYmUgbWFkZSBnZW5lcmljLgo+IAo+IAo+IEl0IHNlZW1zIHRoYXQgdGhpcyBhdHRlbXB0
+IGF0IGdlbmVyYWxpc2F0aW9uIGlzIGNyZWF0aW5nIG1vcmUgY29uZnVzaW9uCj4gdGhhbiBpdCBz
+b2x2ZXMsIHNvIEkgbWF5IGFiYW5kb24gaXQgYW5kIGp1c3QgaGFuZGxlIElEX0FBNjRQRlIwX0VM
+MSBhbmQKPiBJRF9BQTY0WkZSMF9FTDEgc3BlY2lhbGx5Lgo+IAo+IFdoZW4vaWYgd2UndmUgZG9u
+ZSB0aGF0IGEgZmV3IHRpbWVzIGZvciBkaWZmZXJlbnQgZmVhdHVyZXMsIGl0IG1heQo+IGJlY29t
+ZSBjbGVhcmVyIHdoYXQgYW55IGdlbmVyaWMgZnJhbWV3b3JrIGZvciBkb2luZyBpdCBzaG91bGQg
+bG9vawo+IGxpa2UuLi4KPiAKCkkgdGhpbmsgdGhlcmUncyBqdXN0IGEgcmVhc29uYWJsZSBhbW91
+bnQgb2YgY29tcGxleGl0eSBpbiBzeXNfcmVncy5jCmFscmVhZHksIGFuZCB0aGUgbmFtaW5nIGFu
+ZCBjb25jZXB0cyBhcmVuJ3QgY2xlYXIgZnJvbSB0aGUgcmVhZGluZyB0aGUKY29kZSBhcyBpdCBz
+dGFuZHMgbm93LgoKSSB0aGluayBpdCB3b3VsZCBwcm9iYWJseSBoZWxwIHRvIGZsYWcgdGhpbmdz
+IGFzIElEIHJlZ2lzdGVycyBhcyBvcHBvc2VkCnRvICdSQVonIGJlaGF2aW9yLCBiZWNjYXVzZSBp
+dCdzIGNsZWFyIHdlJ3JlIHRoZW4gdHJ5aW5nIHRvIHN1cHBvcnQgYW4KYXJjaGl0ZWN0dXJhbCBj
+b25jZXB0LgoKSG93ZXZlciwgSSB0aGluayBvZiB0aGUgZ2VuZXJpYyBpbmZyYXN0cnVjdHJlIGlu
+IHN5c19yZWdzLmMgdG8gYmUKd29ycmllZCBhYm91dCBLVk0tc3BlY2lmaWNzLCBhbmQgdGhlIGlt
+cGxlbWVudGF0aW9uIG9mIHRoZQplbXVsYXRlL2FjY2VzcyBmdW5jdGlvbnMgdG8gYmUgY29uY2Vy
+bmVkIHdpdGggYXJjaGl0ZWN0dXJhbCBjb25jZXB0cy4KVGhhdCdzIGp1c3QgaG93IEkndmUgYWx3
+YXlzIHRob3VnaHQgYWJ1b3QgdGhpcyBjb2RlLgoKVGhlcmVmb3JlLCBJIHdvdWxkIHN1Z2dlc3Qg
+d3JhcHBpbmcgYWxsIElEIHJlZ2lzdGVyIGFjY2Vzc2VzIHRocm91Z2gKY29tbW9uIElEIHJlZ2lz
+dGVyIGFjY2VzcyBmdW5jdGlvbnMgKHJlYWQvd3JpdGUpIHdoaWNoIGhhbmRsZXMgdGhlIFJBWgpj
+YXNlLgoKQXQgbGVhc3QsIEknZCBsaWtlIHRvIHNlZSBpZiB0aGF0IGJlY29tZXMgdG9vIGhvcnJp
+YmxlIGJlZm9yZSB0YWtpbmcKdGhpcyByb3V0ZS4KClRoYW5rcywKLUNocmlzdG9mZmVyCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
