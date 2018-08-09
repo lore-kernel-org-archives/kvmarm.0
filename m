@@ -1,26 +1,31 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm: vgic-v3: Add support for ICC_SGI0R and
- ICC_ASGI1R accesses
-Date: Thu, 9 Aug 2018 09:41:53 +0200
-Message-ID: <20180809074153.GF20606@e113682-lin.lund.arm.com>
-References: <20180808131501.584-1-marc.zyngier@arm.com>
- <20180808131501.584-5-marc.zyngier@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
+ dynamically read-as-zero
+Date: Thu, 9 Aug 2018 11:19:14 +0100
+Message-ID: <20180809101911.GM9097@e103592.cambridge.arm.com>
+References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
+ <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
+ <20180806130324.GA5985@e113682-lin.lund.arm.com>
+ <20180807110958.GC9097@e103592.cambridge.arm.com>
+ <20180807193512.GH5985@e113682-lin.lund.arm.com>
+ <20180808091111.GL9097@e103592.cambridge.arm.com>
+ <CAFEAcA_9JDzj3NSrJcR6fkVm=Cuy71B_te+PUDJgDvV1gkDLSQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B53C4A0CC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 03:41:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0CA4A0E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 06:19:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xJdg4IUSOVK4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Aug 2018 03:41:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 121A640672
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 03:41:56 -0400 (EDT)
+ with ESMTP id Vpbt2+QeO-Kk for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Aug 2018 06:19:19 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79CE440184
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 06:19:19 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180808131501.584-5-marc.zyngier@arm.com>
+In-Reply-To: <CAFEAcA_9JDzj3NSrJcR6fkVm=Cuy71B_te+PUDJgDvV1gkDLSQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,71 +35,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 08, 2018 at 02:15:01PM +0100, Marc Zyngier wrote:
-> In order to generate Group0 SGIs, let's add some decoding logic to
-> access_gic_sgi(), and pass the generating group accordingly.
+On Wed, Aug 08, 2018 at 03:03:31PM +0100, Peter Maydell wrote:
+> On 8 August 2018 at 10:11, Dave Martin <Dave.Martin@arm.com> wrote:
+> > At its heart, I'm trying to abstract out the special behaviour of
+> > all unallocated ID registers, so that we can decide at runtime which
+> > ones to hide fro the guest: within the ID register block, each
+> > unallocated register becomes RAZ, not UNDEFINED as would be the case
+> > for other system registers, so we need to capture both behaviours.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/kvm/coproc.c | 25 ++++++++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index ec517992c12d..0dc0ca061d78 100644
-> --- a/arch/arm/kvm/coproc.c
-> +++ b/arch/arm/kvm/coproc.c
-> @@ -246,6 +246,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
->  			   const struct coproc_reg *r)
->  {
->  	u64 reg;
-> +	int group;
->  
->  	if (!p->is_write)
->  		return read_from_write_only(vcpu, p);
-> @@ -253,7 +254,25 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
->  	reg = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
->  	reg |= *vcpu_reg(vcpu, p->Rt1) ;
->  
-> -	vgic_v3_dispatch_sgi(vcpu, reg, 1);
-> +	/*
-> +	 * In a system where GICD_CTLR.DS=1, a ICC_SGI0R access generates
-> +	 * Group0 SGIs only, while ICC_SGI1R can generate either group,
-> +	 * depending on the SGI configuration. ICC_ASGI1R is effectively
-> +	 * equivalent to ICC_SGI0R, as there is no "alternative" secure
-> +	 * group.
-> +	 */
-> +	switch (p->Op1) {
-> +	default:		/* Keep GCC quiet */
-> +	case 0:			/* ICC_SGI1R */
-> +		group = 1;
-> +		break;
-> +	case 1:			/* ICC_ASGI1R */
-> +	case 2:			/* ICC_SGI0R */
-> +		group = 0;
-> +		break;
-> +	}
-> +
-> +	vgic_v3_dispatch_sgi(vcpu, reg, group);
->  
->  	return true;
->  }
-> @@ -459,6 +478,10 @@ static const struct coproc_reg cp15_regs[] = {
->  
->  	/* ICC_SGI1R */
->  	{ CRm64(12), Op1( 0), is64, access_gic_sgi},
-> +	/* ICC_ASGI1R */
-> +	{ CRm64(12), Op1( 1), is64, access_gic_sgi},
-> +	/* ICC_SGI0R */
-> +	{ CRm64(12), Op1( 2), is64, access_gic_sgi},
->  
->  	/* VBAR: swapped by interrupt.S. */
->  	{ CRn(12), CRm( 0), Op1( 0), Op2( 0), is32,
-> -- 
-> 2.18.0
-> 
+> I think a better way to think of the ID register block is
+> that all the registers in it *are* allocated. It's just that
+> some of them are specified as RAZ/WI (because no bits in
+> them have been given meaning yet). Then you retain the
+> straightforward "unallocated == UNDEF". (In the Arm ARM
+> the gaps in the ID register block are documented as
+> "reserved, RAZ", not "unallocated".)
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Sure, I'm not arguing against that.  Your viewpoint does mean that
+"enabling"/"disabling" a system register needs to do different things
+depending on whether it's an ID register or not: in the latter case,
+disabling it makes it unallocated; in the former case it doesn't but
+makes the register read as zero.
+
+I think my attempt to conflate the two behaviours was not helpful.
+
+The way the existing code was structured was not helpful for solving
+this either, which is one reason I ended up with my approach, but I will
+take another look and see if I can some up with something a bit more
+sane.
+
+Cheers
+---Dave
