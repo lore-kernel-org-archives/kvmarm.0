@@ -1,32 +1,26 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH 09/16] KVM: arm64: Allow ID registers to by
- dynamically read-as-zero
-Date: Wed, 8 Aug 2018 15:03:31 +0100
-Message-ID: <CAFEAcA_9JDzj3NSrJcR6fkVm=Cuy71B_te+PUDJgDvV1gkDLSQ@mail.gmail.com>
-References: <1529593060-542-1-git-send-email-Dave.Martin@arm.com>
- <1529593060-542-10-git-send-email-Dave.Martin@arm.com>
- <20180806130324.GA5985@e113682-lin.lund.arm.com>
- <20180807110958.GC9097@e103592.cambridge.arm.com>
- <20180807193512.GH5985@e113682-lin.lund.arm.com>
- <20180808091111.GL9097@e103592.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 2/4] KVM: arm/arm64: vgic-v3: Add core support for Group0
+ SGIs
+Date: Thu, 9 Aug 2018 09:40:34 +0200
+Message-ID: <20180809074034.GC20606@e113682-lin.lund.arm.com>
+References: <20180808131501.584-1-marc.zyngier@arm.com>
+ <20180808131501.584-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D761408B1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 10:03:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A000F4A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 03:40:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fgvLd3X5wBeS for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Aug 2018 10:03:52 -0400 (EDT)
-Received: from mail-oi0-f68.google.com (mail-oi0-f68.google.com
- [209.85.218.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6391340672
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Aug 2018 10:03:52 -0400 (EDT)
-Received: by mail-oi0-f68.google.com with SMTP id q11-v6so3827820oic.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Aug 2018 07:03:52 -0700 (PDT)
-In-Reply-To: <20180808091111.GL9097@e103592.cambridge.arm.com>
+ with ESMTP id xB12Sd+8r9jq for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Aug 2018 03:40:38 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C55240672
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Aug 2018 03:40:38 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180808131501.584-3-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,24 +30,136 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 8 August 2018 at 10:11, Dave Martin <Dave.Martin@arm.com> wrote:
-> At its heart, I'm trying to abstract out the special behaviour of
-> all unallocated ID registers, so that we can decide at runtime which
-> ones to hide fro the guest: within the ID register block, each
-> unallocated register becomes RAZ, not UNDEFINED as would be the case
-> for other system registers, so we need to capture both behaviours.
+On Wed, Aug 08, 2018 at 02:14:59PM +0100, Marc Zyngier wrote:
+> Although vgic-v3 now supports Group0 interrupts, it still doesn't
+> deal with Group0 SGIs. As usually with the GIC, nothing is simple:
+> 
+> - ICC_SGI1R can signal SGIs of both groups, since GICD_CTLR.DS==1
+>   with KVM (as per 8.1.10, Non-secure EL1 access)
+> 
+> - ICC_SGI0R can only generate Group0 SGIs
+> 
+> - ICC_ASGI1R sees its scope refocussed to generate only Group0
+>   SGIs (as per the note at the bottom of Table 8-14)
+> 
+> One way to look at this is that an SGI can be generated if the
+> group implied by the CPU interface is lower or equal to the
+> group specified by the interrupt.
 
-I think a better way to think of the ID register block is
-that all the registers in it *are* allocated. It's just that
-some of them are specified as RAZ/WI (because no bits in
-them have been given meaning yet). Then you retain the
-straightforward "unallocated == UNDEF". (In the Arm ARM
-the gaps in the ID register block are documented as
-"reserved, RAZ", not "unallocated".)
+This sentence hurts my brain. Another way to look at it is that with
+DS=1, only SGI1R allows signaling group1 interrupts.  See below.
 
-thanks
--- PMM
+> 
+> We only support Group1 SGIs so far, so no material change.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/kvm/coproc.c            |  2 +-
+>  arch/arm64/kvm/sys_regs.c        |  2 +-
+>  include/kvm/arm_vgic.h           |  2 +-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 16 +++++++++++++---
+>  4 files changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+> index 3a02e76699a6..ec517992c12d 100644
+> --- a/arch/arm/kvm/coproc.c
+> +++ b/arch/arm/kvm/coproc.c
+> @@ -253,7 +253,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+>  	reg = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
+>  	reg |= *vcpu_reg(vcpu, p->Rt1) ;
+>  
+> -	vgic_v3_dispatch_sgi(vcpu, reg);
+> +	vgic_v3_dispatch_sgi(vcpu, reg, 1);
+>  
+>  	return true;
+>  }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e04aacb2a24c..a09139b97e81 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -255,7 +255,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+>  	if (!p->is_write)
+>  		return read_from_write_only(vcpu, p, r);
+>  
+> -	vgic_v3_dispatch_sgi(vcpu, p->regval);
+> +	vgic_v3_dispatch_sgi(vcpu, p->regval, 1);
+>  
+>  	return true;
+>  }
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index c134790be32c..06a25b11efa7 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -373,7 +373,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
+>  
+> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, int group);
+>  
+>  /**
+>   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 88e78b582139..11d321f7ad71 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -901,6 +901,7 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+>   * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
+>   * @vcpu: The VCPU requesting a SGI
+>   * @reg: The value written into the ICC_SGI1R_EL1 register by that VCPU
+> + * @group: Interrupt group requested by the sender
+>   *
+>   * With GICv3 (and ARE=1) CPUs trigger SGIs by writing to a system register.
+>   * This will trap in sys_regs.c and call this function.
+> @@ -910,7 +911,7 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+>   * check for matching ones. If this bit is set, we signal all, but not the
+>   * calling VCPU.
+>   */
+> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, int group)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_vcpu *c_vcpu;
+> @@ -959,9 +960,18 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+>  		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+>  
+>  		spin_lock_irqsave(&irq->irq_lock, flags);
+> -		irq->pending_latch = true;
+>  
+> -		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+> +		/*
+> +		 * A Group0 access can only generate a Group0 SGI,
+> +		 * while a Group1 access can generate either group.
+> +		 */
+
+nit: "Is a Group 0 access" a well-defined term?
+
+I think it may be clearer if the parameter was: bool allow_group1
+
+and the condition was:
+
+if (irq->group && allow_group1) {
+	...
+
+At least that would match the comment.
+
+> +		if (irq->group <= group) {
+> +			irq->pending_latch = true;
+> +			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+> +		} else {
+> +			spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +		}
+> +
+>  		vgic_put_irq(vcpu->kvm, irq);
+>  	}
+>  }
+> -- 
+> 2.18.0
+> 
+
+Thanks,
+-Christoffer
