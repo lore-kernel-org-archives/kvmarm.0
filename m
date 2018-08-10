@@ -1,24 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 4/4] KVM: arm: vgic-v3: Add support for ICC_SGI0R and
- ICC_ASGI1R accesses
-Date: Fri, 10 Aug 2018 11:14:22 +0100
-Message-ID: <20180810101422.3569-5-marc.zyngier@arm.com>
-References: <20180810101422.3569-1-marc.zyngier@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Skip updating page table entry if no change
+Date: Fri, 10 Aug 2018 12:13:00 +0100
+Message-ID: <20180810111300.17144-1-punit.agrawal@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0324A1F7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Aug 2018 06:14:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8986A49F89
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Aug 2018 07:13:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id etXIdSYsHR5v for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Aug 2018 06:14:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB1874A1F5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Aug 2018 06:14:42 -0400 (EDT)
-In-Reply-To: <20180810101422.3569-1-marc.zyngier@arm.com>
+ with ESMTP id G27xtr01dwch for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Aug 2018 07:13:11 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 522F44086E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Aug 2018 07:13:11 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,68 +25,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to generate Group0 SGIs, let's add some decoding logic to
-access_gic_sgi(), and pass the generating group accordingly.
+Contention on updating a page table entry by a large number of vcpus
+can lead to duplicate work when handling stage 2 page faults. As the
+page table update follows the break-before-make requirement of the
+architecture, it can lead to repeated refaults due to clearing the
+entry and flushing the tlbs.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+This problem is more likely when -
+
+* there are large number of vcpus
+* the mapping is large block mapping
+
+such as when using PMD hugepages (512MB) with 64k pages.
+
+Fix this by skipping the page table update if there is no change in
+the entry being updated.
+
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Suzuki Poulose <suzuki.poulose@arm.com>
+--
+Hi,
+
+This problem was reported by a user when testing PUD hugepages. During
+VM restore when all threads are running cpu intensive workload, the
+refauting was causing the VM to not make any forward progress.
+
+This patch fixes the problem for PMD and PTE page fault handling.
+
+Thanks,
+Punit
+
+Change-Id: I04c9aa8b9fbada47deb1a171c9959f400a0d2a21
 ---
- arch/arm/kvm/coproc.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ virt/kvm/arm/mmu.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index b17c52608a19..450c7a4fbc8a 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -246,6 +246,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
- 			   const struct coproc_reg *r)
- {
- 	u64 reg;
-+	bool g1;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 1d90d79706bd..a66a5441ca2f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1027,6 +1027,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	VM_BUG_ON(pmd_present(*pmd) && pmd_pfn(*pmd) != pmd_pfn(*new_pmd));
  
- 	if (!p->is_write)
- 		return read_from_write_only(vcpu, p);
-@@ -253,7 +254,25 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
- 	reg = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
- 	reg |= *vcpu_reg(vcpu, p->Rt1) ;
- 
--	vgic_v3_dispatch_sgi(vcpu, reg, true);
+ 	old_pmd = *pmd;
 +	/*
-+	 * In a system where GICD_CTLR.DS=1, a ICC_SGI0R access generates
-+	 * Group0 SGIs only, while ICC_SGI1R can generate either group,
-+	 * depending on the SGI configuration. ICC_ASGI1R is effectively
-+	 * equivalent to ICC_SGI0R, as there is no "alternative" secure
-+	 * group.
++	 * Multiple vcpus faulting on the same PMD entry, can lead to
++	 * them sequentially updating the PMD with the same
++	 * value. Following the break-before-make (pmd_clear()
++	 * followed by tlb_flush()) process can hinder forward
++	 * progress due to refaults generated on missing translations.
++	 *
++	 * Skip updating the page table if the entry is unchanged.
 +	 */
-+	switch (p->Op1) {
-+	default:		/* Keep GCC quiet */
-+	case 0:			/* ICC_SGI1R */
-+		g1 = true;
-+		break;
-+	case 1:			/* ICC_ASGI1R */
-+	case 2:			/* ICC_SGI0R */
-+		g1 = false;
-+		break;
-+	}
++	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
++		return 0;
 +
-+	vgic_v3_dispatch_sgi(vcpu, reg, g1);
+ 	if (pmd_present(old_pmd)) {
+ 		pmd_clear(pmd);
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
+@@ -1101,6 +1113,10 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
  
- 	return true;
- }
-@@ -459,6 +478,10 @@ static const struct coproc_reg cp15_regs[] = {
- 
- 	/* ICC_SGI1R */
- 	{ CRm64(12), Op1( 0), is64, access_gic_sgi},
-+	/* ICC_ASGI1R */
-+	{ CRm64(12), Op1( 1), is64, access_gic_sgi},
-+	/* ICC_SGI0R */
-+	{ CRm64(12), Op1( 2), is64, access_gic_sgi},
- 
- 	/* VBAR: swapped by interrupt.S. */
- 	{ CRn(12), CRm( 0), Op1( 0), Op2( 0), is32,
+ 	/* Create 2nd stage page table mapping - Level 3 */
+ 	old_pte = *pte;
++	/* Skip page table update if there is no change */
++	if (pte_val(old_pte) == pte_val(*new_pte))
++		return 0;
++
+ 	if (pte_present(old_pte)) {
+ 		kvm_set_pte(pte, __pte(0));
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
 -- 
 2.18.0
