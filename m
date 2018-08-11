@@ -1,133 +1,153 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Skip updating page table entry if no change
-Date: Fri, 10 Aug 2018 19:51:17 +0100
-Message-ID: <871sb62gyi.fsf@e105922-lin.cambridge.arm.com>
-References: <20180810111300.17144-1-punit.agrawal@arm.com>
-        <86mutup9mu.wl-marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v2 2/4] KVM: arm/arm64: vgic-v3: Add core support for
+ Group0 SGIs
+Date: Sat, 11 Aug 2018 18:22:32 +0200
+Message-ID: <20180811162232.GG20606@e113682-lin.lund.arm.com>
+References: <20180810101422.3569-1-marc.zyngier@arm.com>
+ <20180810101422.3569-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <86mutup9mu.wl-marc.zyngier@arm.com> (Marc Zyngier's message of
-        "Fri, 10 Aug 2018 15:40:57 +0100")
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5B854A1DE
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Aug 2018 12:22:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ivLatTed+xzm for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 11 Aug 2018 12:22:35 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 502574086E
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Aug 2018 12:22:35 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180810101422.3569-3-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Marc Zyngier <marc.zyngier@arm.com> writes:
+On Fri, Aug 10, 2018 at 11:14:20AM +0100, Marc Zyngier wrote:
+> Although vgic-v3 now supports Group0 interrupts, it still doesn't
+> deal with Group0 SGIs. As usually with the GIC, nothing is simple:
+> 
+> - ICC_SGI1R can signal SGIs of both groups, since GICD_CTLR.DS==1
+>   with KVM (as per 8.1.10, Non-secure EL1 access)
+> 
+> - ICC_SGI0R can only generate Group0 SGIs
+> 
+> - ICC_ASGI1R sees its scope refocussed to generate only Group0
+>   SGIs (as per the note at the bottom of Table 8-14)
+> 
+> We only support Group1 SGIs so far, so no material change.
+> 
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/kvm/coproc.c            |  2 +-
+>  arch/arm64/kvm/sys_regs.c        |  2 +-
+>  include/kvm/arm_vgic.h           |  2 +-
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 19 +++++++++++++++----
+>  4 files changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+> index 3a02e76699a6..b17c52608a19 100644
+> --- a/arch/arm/kvm/coproc.c
+> +++ b/arch/arm/kvm/coproc.c
+> @@ -253,7 +253,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+>  	reg = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
+>  	reg |= *vcpu_reg(vcpu, p->Rt1) ;
+>  
+> -	vgic_v3_dispatch_sgi(vcpu, reg);
+> +	vgic_v3_dispatch_sgi(vcpu, reg, true);
+>  
+>  	return true;
+>  }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e04aacb2a24c..aba6755c816d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -255,7 +255,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+>  	if (!p->is_write)
+>  		return read_from_write_only(vcpu, p, r);
+>  
+> -	vgic_v3_dispatch_sgi(vcpu, p->regval);
+> +	vgic_v3_dispatch_sgi(vcpu, p->regval, true);
+>  
+>  	return true;
+>  }
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index c134790be32c..4f31f96bbfab 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -373,7 +373,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
+>  
+> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1);
+>  
+>  /**
+>   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> index 88e78b582139..9482b4cbdd4f 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -900,7 +900,8 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+>  /**
+>   * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
+>   * @vcpu: The VCPU requesting a SGI
+> - * @reg: The value written into the ICC_SGI1R_EL1 register by that VCPU
+> + * @reg: The value written into ICC_{ASGI1,SGI0,SGI1}R by that VCPU
+> + * @allow_group1: Does the sysreg access access allow generation of G0 SGIs
 
-> Hi Punit,
->
-> On Fri, 10 Aug 2018 12:13:00 +0100,
-> Punit Agrawal <punit.agrawal@arm.com> wrote:
->> 
->> Contention on updating a page table entry by a large number of vcpus
->> can lead to duplicate work when handling stage 2 page faults. As the
->> page table update follows the break-before-make requirement of the
->> architecture, it can lead to repeated refaults due to clearing the
->> entry and flushing the tlbs.
->> 
->> This problem is more likely when -
->> 
->> * there are large number of vcpus
->> * the mapping is large block mapping
->>  
->> such as when using PMD hugepages (512MB) with 64k pages.
->> 
->> Fix this by skipping the page table update if there is no change in
->> the entry being updated.
->> 
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Suzuki Poulose <suzuki.poulose@arm.com>
->
-> This definitely deserves a Cc to stable, and a Fixes: tag.
+nit: access access
 
-Agreed.
+>   *
+>   * With GICv3 (and ARE=1) CPUs trigger SGIs by writing to a system register.
+>   * This will trap in sys_regs.c and call this function.
+> @@ -910,7 +911,7 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+>   * check for matching ones. If this bit is set, we signal all, but not the
+>   * calling VCPU.
+>   */
+> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+>  {
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_vcpu *c_vcpu;
+> @@ -959,9 +960,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+>  		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
+>  
+>  		spin_lock_irqsave(&irq->irq_lock, flags);
+> -		irq->pending_latch = true;
+>  
+> -		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+> +		/*
+> +		 * An access targetting Group0 SGIs can only generate
+> +		 * those, while an access targetting Group1 SGIs can
+> +		 * generate interrupts of either group.
+> +		 */
+> +		if (!irq->group || allow_group1) {
+> +			irq->pending_latch = true;
+> +			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+> +		} else {
+> +			spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +		}
+> +
+>  		vgic_put_irq(vcpu->kvm, irq);
+>  	}
+>  }
+> -- 
+> 2.18.0
+> 
 
-For PMD the issue exists since commit ad361f093c1e ("KVM: ARM: Support
-hugetlbfs backed huge pages") when the file lived in arch/arm/kvm. (v3.12+)
+Despite the nit (which you can fix locally):
 
-For PTE the issue exists since commit d5d8184d35c9 ("KVM: ARM: Memory
-virtualization setup"). (v3.8+)
-
-I'll split the fix into two patches and add a cc to stable.
-
->> --
->> Hi,
->> 
->> This problem was reported by a user when testing PUD hugepages. During
->> VM restore when all threads are running cpu intensive workload, the
->> refauting was causing the VM to not make any forward progress.
->> 
->> This patch fixes the problem for PMD and PTE page fault handling.
->> 
->> Thanks,
->> Punit
->> 
->> Change-Id: I04c9aa8b9fbada47deb1a171c9959f400a0d2a21
-
-Just noticed this. Looks like the commit hook has escaped it's worktree.
-
->> ---
->>  virt/kvm/arm/mmu.c | 16 ++++++++++++++++
->>  1 file changed, 16 insertions(+)
->> 
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 1d90d79706bd..a66a5441ca2f 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1027,6 +1027,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->>  	VM_BUG_ON(pmd_present(*pmd) && pmd_pfn(*pmd) != pmd_pfn(*new_pmd));
->>  
->>  	old_pmd = *pmd;
->> +	/*
->> +	 * Multiple vcpus faulting on the same PMD entry, can lead to
->> +	 * them sequentially updating the PMD with the same
->> +	 * value. Following the break-before-make (pmd_clear()
->> +	 * followed by tlb_flush()) process can hinder forward
->> +	 * progress due to refaults generated on missing translations.
->> +	 *
->> +	 * Skip updating the page table if the entry is unchanged.
->> +	 */
->> +	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
->> +		return 0;
->
-> Shouldn't you take this opportunity to also refactor it with the above
-> VM_BUG_ON and the below pmd_present? At the moment, we end-up testing
-> pmd_present twice, and your patch is awfully similar to the VM_BUG_ON
-> one.
-
-I went for the minimal change keeping a backport in mind.
-
-The VM_BUG_ON() is enabled only when CONFIG_DEBUG_VM is selected and
-checks for pfn ignoring the attributes, while this fix checks for the
-entire entry. Maybe I'm missing something, but I can't see an obvious
-way to combine the checks.
-
-I've eliminated the duplicate pmd_present() check and will post the
-updated patches.
-
-Thanks,
-Punit
-
->> +
->>  	if (pmd_present(old_pmd)) {
->>  		pmd_clear(pmd);
->>  		kvm_tlb_flush_vmid_ipa(kvm, addr);
->> @@ -1101,6 +1113,10 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->>  
->>  	/* Create 2nd stage page table mapping - Level 3 */
->>  	old_pte = *pte;
->> +	/* Skip page table update if there is no change */
->> +	if (pte_val(old_pte) == pte_val(*new_pte))
->> +		return 0;
->> +
->>  	if (pte_present(old_pte)) {
->>  		kvm_set_pte(pte, __pte(0));
->>  		kvm_tlb_flush_vmid_ipa(kvm, addr);
->
-> Thanks,
->
-> 	M.
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
