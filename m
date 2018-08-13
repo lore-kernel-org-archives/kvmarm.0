@@ -1,46 +1,93 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: [PATCH v3 2/2] KVM: arm/arm64: Skip updating PTE entry if no change
-Date: Mon, 13 Aug 2018 11:43:51 +0100
-Message-ID: <20180813104351.24595-3-punit.agrawal@arm.com>
-References: <20180813104351.24595-1-punit.agrawal@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Skip updating page table entry if no
+ change
+Date: Mon, 13 Aug 2018 16:27:11 +0200
+Message-ID: <20180813142711.GJ20606@e113682-lin.lund.arm.com>
+References: <20180810111300.17144-1-punit.agrawal@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180813104351.24595-1-punit.agrawal@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20180810111300.17144-1-punit.agrawal@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, marc.zyngier@arm.com, christoffer.dall@arm.com, stable@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Suzuki Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When there is contention on faulting in a particular page table entry
-at stage 2, the break-before-make requirement of the architecture can
-lead to additional refaulting due to TLB invalidation.
+On Fri, Aug 10, 2018 at 12:13:00PM +0100, Punit Agrawal wrote:
+> Contention on updating a page table entry by a large number of vcpus
+> can lead to duplicate work when handling stage 2 page faults. As the
+> page table update follows the break-before-make requirement of the
+> architecture, it can lead to repeated refaults due to clearing the
+> entry and flushing the tlbs.
+> 
+> This problem is more likely when -
+> 
+> * there are large number of vcpus
+> * the mapping is large block mapping
+> 
+> such as when using PMD hugepages (512MB) with 64k pages.
+> 
+> Fix this by skipping the page table update if there is no change in
+> the entry being updated.
+> 
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Suzuki Poulose <suzuki.poulose@arm.com>
+> --
+> Hi,
+> 
+> This problem was reported by a user when testing PUD hugepages. During
+> VM restore when all threads are running cpu intensive workload, the
+> refauting was causing the VM to not make any forward progress.
+> 
+> This patch fixes the problem for PMD and PTE page fault handling.
+> 
+> Thanks,
+> Punit
+> 
+> Change-Id: I04c9aa8b9fbada47deb1a171c9959f400a0d2a21
+> ---
+>  virt/kvm/arm/mmu.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 1d90d79706bd..a66a5441ca2f 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1027,6 +1027,18 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+>  	VM_BUG_ON(pmd_present(*pmd) && pmd_pfn(*pmd) != pmd_pfn(*new_pmd));
+>  
+>  	old_pmd = *pmd;
+> +	/*
+> +	 * Multiple vcpus faulting on the same PMD entry, can lead to
+> +	 * them sequentially updating the PMD with the same
+> +	 * value. Following the break-before-make (pmd_clear()
+> +	 * followed by tlb_flush()) process can hinder forward
+> +	 * progress due to refaults generated on missing translations.
+> +	 *
+> +	 * Skip updating the page table if the entry is unchanged.
+> +	 */
+> +	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+> +		return 0;
+> +
+>  	if (pmd_present(old_pmd)) {
+>  		pmd_clear(pmd);
+>  		kvm_tlb_flush_vmid_ipa(kvm, addr);
+> @@ -1101,6 +1113,10 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+>  
+>  	/* Create 2nd stage page table mapping - Level 3 */
+>  	old_pte = *pte;
+> +	/* Skip page table update if there is no change */
+> +	if (pte_val(old_pte) == pte_val(*new_pte))
+> +		return 0;
+> +
+>  	if (pte_present(old_pte)) {
+>  		kvm_set_pte(pte, __pte(0));
+>  		kvm_tlb_flush_vmid_ipa(kvm, addr);
+> -- 
+> 2.18.0
+> 
 
-Avoid this by skipping a page table update if the new value of the PTE
-matches the previous value.
-
-Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Reviewed-by: Suzuki Poulose <suzuki.poulose@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: stable@vger.kernel.org
----
- virt/kvm/arm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 2bb0b5dba412..c2b95a22959b 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1118,6 +1118,10 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 	/* Create 2nd stage page table mapping - Level 3 */
- 	old_pte = *pte;
- 	if (pte_present(old_pte)) {
-+		/* Skip page table update if there is no change */
-+		if (pte_val(old_pte) == pte_val(*new_pte))
-+			return 0;
-+
- 		kvm_set_pte(pte, __pte(0));
- 		kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	} else {
--- 
-2.18.0
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
