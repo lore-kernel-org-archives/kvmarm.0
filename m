@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/37] KVM: arm64: vgic-its: Remove VLA usage
-Date: Mon, 13 Aug 2018 15:57:27 +0100
-Message-ID: <20180813145755.16566-10-marc.zyngier@arm.com>
+Subject: [PATCH 10/37] KVM: arm/arm64: vgic-debug: Show LPI status
+Date: Mon, 13 Aug 2018 15:57:28 +0100
+Message-ID: <20180813145755.16566-11-marc.zyngier@arm.com>
 References: <20180813145755.16566-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F27A04A1D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8F664A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aUhd1dXcNlo1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Aug 2018 10:59:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C40CD4A21C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:18 -0400 (EDT)
+ with ESMTP id AJAgSS-A1mQ5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Aug 2018 10:59:22 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 022534A1D5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:21 -0400 (EDT)
 In-Reply-To: <20180813145755.16566-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,72 +31,202 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org, "Gustavo A . R . Silva" <gustavo@embeddedor.com>, Andre Przywara <andre.przywara@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Jia He <jia.he@hxt-semitech.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Kees Cook <keescook@chromium.org>
+The vgic debugfs file only knows about SGI/PPI/SPI interrupts, and
+completely ignores LPIs. Let's fix that.
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-switches to using a maximum size and adds sanity checks. Additionally
-cleans up some of the int-vs-u32 usage and adds additional bounds checking.
-As it currently stands, this will always be 8 bytes until the ABI changes.
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Kees Cook <keescook@chromium.org>
-[maz: dropped WARN_ONs]
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic-debug.c | 42 ++++++++++++++++++++++++++--------
+ virt/kvm/arm/vgic/vgic-its.c   | 12 +++++-----
+ virt/kvm/arm/vgic/vgic.h       |  1 +
+ 3 files changed, 39 insertions(+), 16 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 4ed79c939fb4..1d88010f6b61 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -168,8 +168,14 @@ struct vgic_its_abi {
- 	int (*commit)(struct vgic_its *its);
+diff --git a/virt/kvm/arm/vgic/vgic-debug.c b/virt/kvm/arm/vgic/vgic-debug.c
+index c589d4c2b478..9279e35fefb1 100644
+--- a/virt/kvm/arm/vgic/vgic-debug.c
++++ b/virt/kvm/arm/vgic/vgic-debug.c
+@@ -36,9 +36,12 @@
+ struct vgic_state_iter {
+ 	int nr_cpus;
+ 	int nr_spis;
++	int nr_lpis;
+ 	int dist_id;
+ 	int vcpu_id;
+ 	int intid;
++	int lpi_idx;
++	u32 *lpi_array;
  };
  
-+#define ABI_0_ESZ	8
-+#define ESZ_MAX		ABI_0_ESZ
+ static void iter_next(struct vgic_state_iter *iter)
+@@ -52,6 +55,12 @@ static void iter_next(struct vgic_state_iter *iter)
+ 	if (iter->intid == VGIC_NR_PRIVATE_IRQS &&
+ 	    ++iter->vcpu_id < iter->nr_cpus)
+ 		iter->intid = 0;
 +
- static const struct vgic_its_abi its_table_abi_versions[] = {
--	[0] = {.cte_esz = 8, .dte_esz = 8, .ite_esz = 8,
-+	[0] = {
-+	 .cte_esz = ABI_0_ESZ,
-+	 .dte_esz = ABI_0_ESZ,
-+	 .ite_esz = ABI_0_ESZ,
- 	 .save_tables = vgic_its_save_tables_v0,
- 	 .restore_tables = vgic_its_restore_tables_v0,
- 	 .commit = vgic_its_commit_v0,
-@@ -183,7 +189,7 @@ inline const struct vgic_its_abi *vgic_its_get_abi(struct vgic_its *its)
- 	return &its_table_abi_versions[its->abi_rev];
++	if (iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS)) {
++		if (iter->lpi_idx < iter->nr_lpis)
++			iter->intid = iter->lpi_array[iter->lpi_idx];
++		iter->lpi_idx++;
++	}
  }
  
--int vgic_its_set_abi(struct vgic_its *its, int rev)
-+static int vgic_its_set_abi(struct vgic_its *its, u32 rev)
- {
- 	const struct vgic_its_abi *abi;
+ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
+@@ -63,6 +72,11 @@ static void iter_init(struct kvm *kvm, struct vgic_state_iter *iter,
  
-@@ -1881,14 +1887,14 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
-  * Return: < 0 on error, 0 if last element was identified, 1 otherwise
-  * (the last element may not be found on second level tables)
+ 	iter->nr_cpus = nr_cpus;
+ 	iter->nr_spis = kvm->arch.vgic.nr_spis;
++	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		iter->nr_lpis = vgic_copy_lpi_list(kvm, NULL, &iter->lpi_array);
++		if (iter->nr_lpis < 0)
++			iter->nr_lpis = 0;
++	}
+ 
+ 	/* Fast forward to the right position if needed */
+ 	while (pos--)
+@@ -73,7 +87,8 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+ {
+ 	return iter->dist_id > 0 &&
+ 		iter->vcpu_id == iter->nr_cpus &&
+-		(iter->intid - VGIC_NR_PRIVATE_IRQS) == iter->nr_spis;
++		iter->intid >= (iter->nr_spis + VGIC_NR_PRIVATE_IRQS) &&
++		iter->lpi_idx > iter->nr_lpis;
+ }
+ 
+ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
+@@ -130,6 +145,7 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ 
+ 	mutex_lock(&kvm->lock);
+ 	iter = kvm->arch.vgic.iter;
++	kfree(iter->lpi_array);
+ 	kfree(iter);
+ 	kvm->arch.vgic.iter = NULL;
+ 	mutex_unlock(&kvm->lock);
+@@ -137,12 +153,14 @@ static void vgic_debug_stop(struct seq_file *s, void *v)
+ 
+ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
+ {
++	bool v3 = dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3;
++
+ 	seq_printf(s, "Distributor\n");
+ 	seq_printf(s, "===========\n");
+-	seq_printf(s, "vgic_model:\t%s\n",
+-		   (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) ?
+-		   "GICv3" : "GICv2");
++	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
+ 	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
++	if (v3)
++		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
+ 	seq_printf(s, "enabled:\t%d\n", dist->enabled);
+ 	seq_printf(s, "\n");
+ 
+@@ -174,8 +192,10 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 		type = "SGI";
+ 	else if (irq->intid < VGIC_NR_PRIVATE_IRQS)
+ 		type = "PPI";
+-	else
++	else if (irq->intid < VGIC_MAX_SPI)
+ 		type = "SPI";
++	else
++		type = "LPI";
+ 
+ 	if (irq->intid ==0 || irq->intid == VGIC_NR_PRIVATE_IRQS)
+ 		print_header(s, irq, vcpu);
+@@ -202,7 +222,6 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 			irq->source,
+ 			irq->priority,
+ 			(irq->vcpu) ? irq->vcpu->vcpu_id : -1);
+-
+ }
+ 
+ static int vgic_debug_show(struct seq_file *s, void *v)
+@@ -221,17 +240,20 @@ static int vgic_debug_show(struct seq_file *s, void *v)
+ 	if (!kvm->arch.vgic.initialized)
+ 		return 0;
+ 
+-	if (iter->vcpu_id < iter->nr_cpus) {
++	if (iter->vcpu_id < iter->nr_cpus)
+ 		vcpu = kvm_get_vcpu(kvm, iter->vcpu_id);
+-		irq = &vcpu->arch.vgic_cpu.private_irqs[iter->intid];
+-	} else {
+-		irq = &kvm->arch.vgic.spis[iter->intid - VGIC_NR_PRIVATE_IRQS];
++
++	irq = vgic_get_irq(kvm, vcpu, iter->intid);
++	if (!irq) {
++		seq_printf(s, "       LPI %4d freed\n", iter->intid);
++		return 0;
+ 	}
+ 
+ 	spin_lock_irqsave(&irq->irq_lock, flags);
+ 	print_irq_state(s, irq, vcpu);
+ 	spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
++	vgic_put_irq(kvm, irq);
+ 	return 0;
+ }
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 1d88010f6b61..cee2c3c5519c 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -318,9 +318,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+  * enumerate those LPIs without holding any lock.
+  * Returns their number and puts the kmalloc'ed array into intid_ptr.
   */
--static int scan_its_table(struct vgic_its *its, gpa_t base, int size, int esz,
-+static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 			  int start_id, entry_fn_t fn, void *opaque)
+-static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
++int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
  {
- 	struct kvm *kvm = its->dev->kvm;
- 	unsigned long len = size;
- 	int id = start_id;
- 	gpa_t gpa = base;
--	char entry[esz];
-+	char entry[ESZ_MAX];
- 	int ret;
+-	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq;
+ 	unsigned long flags;
+ 	u32 *intids;
+@@ -343,7 +343,7 @@ static int vgic_copy_lpi_list(struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 		if (i == irq_count)
+ 			break;
+ 		/* We don't need to "get" the IRQ, as we hold the list lock. */
+-		if (irq->target_vcpu != vcpu)
++		if (vcpu && irq->target_vcpu != vcpu)
+ 			continue;
+ 		intids[i++] = irq->intid;
+ 	}
+@@ -435,7 +435,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ 	unsigned long flags;
+ 	u8 pendmask;
  
- 	memset(entry, 0, esz);
+-	nr_irqs = vgic_copy_lpi_list(vcpu, &intids);
++	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, vcpu, &intids);
+ 	if (nr_irqs < 0)
+ 		return nr_irqs;
+ 
+@@ -1160,7 +1160,7 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ 
+ 	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+ 
+-	irq_count = vgic_copy_lpi_list(vcpu, &intids);
++	irq_count = vgic_copy_lpi_list(kvm, vcpu, &intids);
+ 	if (irq_count < 0)
+ 		return irq_count;
+ 
+@@ -1208,7 +1208,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+ 	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
+ 	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+ 
+-	irq_count = vgic_copy_lpi_list(vcpu1, &intids);
++	irq_count = vgic_copy_lpi_list(kvm, vcpu1, &intids);
+ 	if (irq_count < 0)
+ 		return irq_count;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index ead00b2072b2..ed9d9d9e2fc5 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -305,6 +305,7 @@ static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
+ 		(base < d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE);
+ }
+ 
++int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
 -- 
 2.18.0
