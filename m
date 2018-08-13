@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 23/37] arm64: KVM: export the capability to set guest SError
- syndrome
-Date: Mon, 13 Aug 2018 15:57:41 +0100
-Message-ID: <20180813145755.16566-24-marc.zyngier@arm.com>
+Subject: [PATCH 24/37] KVM: arm64: Share the parts of get/set events useful to
+ 32bit
+Date: Mon, 13 Aug 2018 15:57:42 +0100
+Message-ID: <20180813145755.16566-25-marc.zyngier@arm.com>
 References: <20180813145755.16566-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8584A22B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3E644A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hOrEVohiqfYC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Aug 2018 11:00:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CE434A1DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:03 -0400 (EDT)
+ with ESMTP id 9ywc8J80aoXi for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Aug 2018 11:00:06 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C4DF4A246
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:06 -0400 (EDT)
 In-Reply-To: <20180813145755.16566-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,92 +32,128 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org, "Gustavo A . R . Silva" <gustavo@embeddedor.com>, Andre Przywara <andre.przywara@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Jia He <jia.he@hxt-semitech.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Dongjiu Geng <gengdongjiu@huawei.com>
+From: James Morse <james.morse@arm.com>
 
-For the arm64 RAS Extension, user space can inject a virtual-SError
-with specified ESR. So user space needs to know whether KVM support
-to inject such SError, this interface adds this query for this capability.
+The get/set events helpers to do some work to check reserved
+and padding fields are zero. This is useful on 32bit too.
 
-KVM will check whether system support RAS Extension, if supported, KVM
-returns true to user space, otherwise returns false.
+Move this code into virt/kvm/arm/arm.c, and give the arch
+code some underscores.
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Reviewed-by: James Morse <james.morse@arm.com>
-[expanded documentation wording]
+This is temporarily hidden behind __KVM_HAVE_VCPU_EVENTS until
+32bit is wired up.
+
 Signed-off-by: James Morse <james.morse@arm.com>
+Reviewed-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/api.txt | 26 ++++++++++++++++++++++++++
- arch/arm64/kvm/reset.c            |  3 +++
- include/uapi/linux/kvm.h          |  1 +
- 3 files changed, 30 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  8 ++++----
+ arch/arm64/kvm/guest.c            | 21 ++++-----------------
+ virt/kvm/arm/arm.c                | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 284d36e72f28..dbbb95d5798a 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -907,6 +907,18 @@ SError is pending, the architecture's 'Multiple SError interrupts' rules should
- be followed. (2.5.3 of DDI0587.a "ARM Reliability, Availability, and
- Serviceability (RAS) Specification").
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bc244cc6e451..f26055f2306e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -350,11 +350,11 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
+ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
+ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+-int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+-			    struct kvm_vcpu_events *events);
++int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
++			      struct kvm_vcpu_events *events);
  
-+SError exceptions always have an ESR value. Some CPUs have the ability to
-+specify what the virtual SError's ESR value should be. These systems will
-+advertise KVM_CAP_ARM_SET_SERROR_ESR. In this case exception.has_esr will
-+always have a non-zero value when read, and the agent making an SError pending
-+should specify the ISS field in the lower 24 bits of exception.serror_esr. If
-+the system supports KVM_CAP_ARM_SET_SERROR_ESR, but user-space sets the events
-+with exception.has_esr as zero, KVM will choose an ESR.
-+
-+Specifying exception.has_esr on a system that does not support it will return
-+-EINVAL. Setting anything other than the lower 24bits of exception.serror_esr
-+will return -EINVAL.
-+
- struct kvm_vcpu_events {
- 	struct {
- 		__u8 serror_pending;
-@@ -4664,3 +4676,17 @@ This capability indicates that KVM supports paravirtualized Hyper-V TLB Flush
- hypercalls:
- HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
- HvFlushVirtualAddressList, HvFlushVirtualAddressListEx.
-+
-+8.19 KVM_CAP_ARM_SET_SERROR_ESR
-+
-+Architectures: arm, arm64
-+
-+This capability indicates that userspace can specify (via the
-+KVM_SET_VCPU_EVENTS ioctl) the syndrome value reported to the guest when it
-+takes a virtual SError interrupt exception.
-+If KVM advertises this capability, userspace can only specify the ISS field for
-+the ESR syndrome. Other parts of the ESR, such as the EC are generated by the
-+CPU when the exception is taken. If this virtual SError is taken to EL1 using
-+AArch64, this value will be reported in the ISS field of ESR_ELx.
-+
-+See KVM_CAP_VCPU_EVENTS for more details.
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index a3db01a28062..067c6ba969bd 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PMU_V3:
- 		r = kvm_arm_support_pmu_v3();
- 		break;
-+	case KVM_CAP_ARM_INJECT_SERROR_ESR:
-+		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
-+		break;
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_VCPU_EVENTS:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b6270a3b38e9..a7d9bc4e4068 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_GET_MSR_FEATURES 153
- #define KVM_CAP_HYPERV_EVENTFD 154
- #define KVM_CAP_HYPERV_TLBFLUSH 155
-+#define KVM_CAP_ARM_INJECT_SERROR_ESR 156
+-int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+-			    struct kvm_vcpu_events *events);
++int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
++			      struct kvm_vcpu_events *events);
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index dd05be96d981..725c7545e91a 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -289,11 +289,9 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ 	return -EINVAL;
+ }
  
+-int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+-			struct kvm_vcpu_events *events)
++int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
++			      struct kvm_vcpu_events *events)
+ {
+-	memset(events, 0, sizeof(*events));
+-
+ 	events->exception.serror_pending = !!(vcpu->arch.hcr_el2 & HCR_VSE);
+ 	events->exception.serror_has_esr = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
+ 
+@@ -303,23 +301,12 @@ int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+-			struct kvm_vcpu_events *events)
++int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
++			      struct kvm_vcpu_events *events)
+ {
+-	int i;
+ 	bool serror_pending = events->exception.serror_pending;
+ 	bool has_esr = events->exception.serror_has_esr;
+ 
+-	/* check whether the reserved field is zero */
+-	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
+-		if (events->reserved[i])
+-			return -EINVAL;
+-
+-	/* check whether the pad field is zero */
+-	for (i = 0; i < ARRAY_SIZE(events->exception.pad); i++)
+-		if (events->exception.pad[i])
+-			return -EINVAL;
+-
+ 	if (serror_pending && has_esr) {
+ 		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
+ 			return -EINVAL;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 1c72247aeb1d..14f8fad1c7ae 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1050,6 +1050,34 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++#ifdef __KVM_HAVE_VCPU_EVENTS	/* temporary: until 32bit is wired up */
++static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
++				   struct kvm_vcpu_events *events)
++{
++	memset(events, 0, sizeof(*events));
++
++	return __kvm_arm_vcpu_get_events(vcpu, events);
++}
++
++static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
++				   struct kvm_vcpu_events *events)
++{
++	int i;
++
++	/* check whether the reserved field is zero */
++	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
++		if (events->reserved[i])
++			return -EINVAL;
++
++	/* check whether the pad field is zero */
++	for (i = 0; i < ARRAY_SIZE(events->exception.pad); i++)
++		if (events->exception.pad[i])
++			return -EINVAL;
++
++	return __kvm_arm_vcpu_set_events(vcpu, events);
++}
++#endif /* __KVM_HAVE_VCPU_EVENTS */
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
 -- 
 2.18.0
