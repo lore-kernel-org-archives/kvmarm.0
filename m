@@ -1,153 +1,38 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm/arm64: vgic-v3: Add core support for
- Group0 SGIs
-Date: Sat, 11 Aug 2018 18:22:32 +0200
-Message-ID: <20180811162232.GG20606@e113682-lin.lund.arm.com>
-References: <20180810101422.3569-1-marc.zyngier@arm.com>
- <20180810101422.3569-3-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D5B854A1DE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Aug 2018 12:22:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ivLatTed+xzm for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Aug 2018 12:22:35 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 502574086E
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Aug 2018 12:22:35 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180810101422.3569-3-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH v2 0/2] KVM: Fix refaulting due to page table update
+Date: Mon, 13 Aug 2018 10:40:47 +0100
+Message-ID: <20180813094049.3726-1-punit.agrawal@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com, marc.zyngier@arm.com, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Aug 10, 2018 at 11:14:20AM +0100, Marc Zyngier wrote:
-> Although vgic-v3 now supports Group0 interrupts, it still doesn't
-> deal with Group0 SGIs. As usually with the GIC, nothing is simple:
-> 
-> - ICC_SGI1R can signal SGIs of both groups, since GICD_CTLR.DS==1
->   with KVM (as per 8.1.10, Non-secure EL1 access)
-> 
-> - ICC_SGI0R can only generate Group0 SGIs
-> 
-> - ICC_ASGI1R sees its scope refocussed to generate only Group0
->   SGIs (as per the note at the bottom of Table 8-14)
-> 
-> We only support Group1 SGIs so far, so no material change.
-> 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/kvm/coproc.c            |  2 +-
->  arch/arm64/kvm/sys_regs.c        |  2 +-
->  include/kvm/arm_vgic.h           |  2 +-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 19 +++++++++++++++----
->  4 files changed, 18 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index 3a02e76699a6..b17c52608a19 100644
-> --- a/arch/arm/kvm/coproc.c
-> +++ b/arch/arm/kvm/coproc.c
-> @@ -253,7 +253,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
->  	reg = (u64)*vcpu_reg(vcpu, p->Rt2) << 32;
->  	reg |= *vcpu_reg(vcpu, p->Rt1) ;
->  
-> -	vgic_v3_dispatch_sgi(vcpu, reg);
-> +	vgic_v3_dispatch_sgi(vcpu, reg, true);
->  
->  	return true;
->  }
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e04aacb2a24c..aba6755c816d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -255,7 +255,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
->  	if (!p->is_write)
->  		return read_from_write_only(vcpu, p, r);
->  
-> -	vgic_v3_dispatch_sgi(vcpu, p->regval);
-> +	vgic_v3_dispatch_sgi(vcpu, p->regval, true);
->  
->  	return true;
->  }
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index c134790be32c..4f31f96bbfab 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -373,7 +373,7 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
->  
-> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
-> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1);
->  
->  /**
->   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 88e78b582139..9482b4cbdd4f 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -900,7 +900,8 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
->  /**
->   * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
->   * @vcpu: The VCPU requesting a SGI
-> - * @reg: The value written into the ICC_SGI1R_EL1 register by that VCPU
-> + * @reg: The value written into ICC_{ASGI1,SGI0,SGI1}R by that VCPU
-> + * @allow_group1: Does the sysreg access access allow generation of G0 SGIs
+Hi,
 
-nit: access access
+Here's a couple of patches to fix an issue when multiple vcpus fault
+on a page table entry[0]. The issue was reported by a user when testing
+PUD hugepage support[1] but also exists for PMD and PTE updates though
+with a lower probability.
 
->   *
->   * With GICv3 (and ARE=1) CPUs trigger SGIs by writing to a system register.
->   * This will trap in sys_regs.c and call this function.
-> @@ -910,7 +911,7 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
->   * check for matching ones. If this bit is set, we signal all, but not the
->   * calling VCPU.
->   */
-> -void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
-> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
->  {
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_vcpu *c_vcpu;
-> @@ -959,9 +960,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
->  		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
->  
->  		spin_lock_irqsave(&irq->irq_lock, flags);
-> -		irq->pending_latch = true;
->  
-> -		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +		/*
-> +		 * An access targetting Group0 SGIs can only generate
-> +		 * those, while an access targetting Group1 SGIs can
-> +		 * generate interrupts of either group.
-> +		 */
-> +		if (!irq->group || allow_group1) {
-> +			irq->pending_latch = true;
-> +			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +		} else {
-> +			spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +		}
-> +
->  		vgic_put_irq(vcpu->kvm, irq);
->  	}
->  }
-> -- 
-> 2.18.0
-> 
+In this version -
 
-Despite the nit (which you can fix locally):
+* the fix has been split for PMD hugepage and PTE update
+* refactored the PMD fix
+* applied fixes tag and cc'ing to stable
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Thanks,
+Punit
+
+[0] https://lkml.org/lkml/2018/8/10/256
+[1] https://lkml.org/lkml/2018/7/16/482
+
+Punit Agrawal (2):
+  KVM: arm/arm64: Skip updating PMD entry if no change
+  KVM: arm/arm64: Skip updating PTE entry if no change
+
+ virt/kvm/arm/mmu.c | 45 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 34 insertions(+), 11 deletions(-)
+
+-- 
+2.18.0
