@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 12/37] KVM: arm/arm64: vgic: Define GICD_IIDR fields for GICv2
- and GIv3
-Date: Mon, 13 Aug 2018 15:57:30 +0100
-Message-ID: <20180813145755.16566-13-marc.zyngier@arm.com>
+Subject: [PATCH 13/37] KVM: arm/arm64: vgic: Keep track of implementation
+ revision
+Date: Mon, 13 Aug 2018 15:57:31 +0100
+Message-ID: <20180813145755.16566-14-marc.zyngier@arm.com>
 References: <20180813145755.16566-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3FF4A1D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E3074A21D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9dHKfU210+cZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Aug 2018 10:59:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67B664A1FD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:28 -0400 (EDT)
+ with ESMTP id g1iWbQXvsE7W for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Aug 2018 10:59:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F39A4A1D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 10:59:31 -0400 (EDT)
 In-Reply-To: <20180813145755.16566-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,92 +34,106 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-Instead of hardcoding the shifts and masks in the GICD_IIDR register
-emulation, let's add the definition of these fields to the GIC header
-files and use them.
-
-This will make things more obvious when we're going to bump the revision
-in the IIDR when we'll make guest-visible changes to the implementation.
+As we are about to tweak implementation aspects of the VGIC emulation,
+while still preserving some level of backwards compatibility support,
+add a field to keep track of the implementation revision field which is
+reported to the VM and to userspace.
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h | 10 ++++++++++
- include/linux/irqchip/arm-gic.h    | 10 ++++++++++
- virt/kvm/arm/vgic/vgic-mmio-v2.c   |  3 ++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c   |  3 ++-
- 4 files changed, 24 insertions(+), 2 deletions(-)
+ include/kvm/arm_vgic.h           | 3 +++
+ virt/kvm/arm/vgic/vgic-init.c    | 1 +
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 6 ++++--
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 6 ++++--
+ 4 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index cbb872c1b607..b22f9dfa61af 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -61,6 +61,16 @@
- #define GICD_CTLR_ENABLE_G1A		(1U << 1)
- #define GICD_CTLR_ENABLE_G1		(1U << 0)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index cfdd2484cc42..7e64c463ab4d 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -217,6 +217,9 @@ struct vgic_dist {
+ 	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
+ 	u32			vgic_model;
  
-+#define GICD_IIDR_IMPLEMENTER_SHIFT	0
-+#define GICD_IIDR_IMPLEMENTER_MASK	(0xfff << GICD_IIDR_IMPLEMENTER_SHIFT)
-+#define GICD_IIDR_REVISION_SHIFT	12
-+#define GICD_IIDR_REVISION_MASK		(0xf << GICD_IIDR_REVISION_SHIFT)
-+#define GICD_IIDR_VARIANT_SHIFT		16
-+#define GICD_IIDR_VARIANT_MASK		(0xf << GICD_IIDR_VARIANT_SHIFT)
-+#define GICD_IIDR_PRODUCT_ID_SHIFT	24
-+#define GICD_IIDR_PRODUCT_ID_MASK	(0xff << GICD_IIDR_PRODUCT_ID_SHIFT)
++	/* Implementation revision as reported in the GICD_IIDR */
++	u32			implementation_rev;
 +
-+
- /*
-  * In systems with a single security state (what we emulate in KVM)
-  * the meaning of the interrupt group enable bits is slightly different
-diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-index 68d8b1f73682..484f5bfa9f3d 100644
---- a/include/linux/irqchip/arm-gic.h
-+++ b/include/linux/irqchip/arm-gic.h
-@@ -71,6 +71,16 @@
- 					(GICD_INT_DEF_PRI << 8) |\
- 					GICD_INT_DEF_PRI)
+ 	/* Do injected MSIs require an additional device ID? */
+ 	bool			msis_require_devid;
  
-+#define GICD_IIDR_IMPLEMENTER_SHIFT	0
-+#define GICD_IIDR_IMPLEMENTER_MASK	(0xfff << GICD_IIDR_IMPLEMENTER_SHIFT)
-+#define GICD_IIDR_REVISION_SHIFT	12
-+#define GICD_IIDR_REVISION_MASK		(0xf << GICD_IIDR_REVISION_SHIFT)
-+#define GICD_IIDR_VARIANT_SHIFT		16
-+#define GICD_IIDR_VARIANT_MASK		(0xf << GICD_IIDR_VARIANT_SHIFT)
-+#define GICD_IIDR_PRODUCT_ID_SHIFT	24
-+#define GICD_IIDR_PRODUCT_ID_MASK	(0xff << GICD_IIDR_PRODUCT_ID_SHIFT)
-+
-+
- #define GICH_HCR			0x0
- #define GICH_VTR			0x4
- #define GICH_VMCR			0x8
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index b71417913741..8b6fc45c42fe 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -298,6 +298,7 @@ int vgic_init(struct kvm *kvm)
+ 
+ 	vgic_debug_init(kvm);
+ 
++	dist->implementation_rev = 0;
+ 	dist->initialized = true;
+ 
+ out:
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index ffc587bf4742..af44e569373a 100644
+index af44e569373a..f0c5351805b6 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -37,7 +37,8 @@ static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+@@ -25,19 +25,21 @@
+ static unsigned long vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+ {
++	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+ 	u32 value;
+ 
+ 	switch (addr & 0x0c) {
+ 	case GIC_DIST_CTRL:
+-		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
++		value = vgic->enabled ? GICD_ENABLE : 0;
+ 		break;
+ 	case GIC_DIST_CTR:
+-		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
++		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
+ 		value = (value >> 5) - 1;
  		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
  		break;
  	case GIC_DIST_IIDR:
--		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
-+			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
+ 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
++			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
+ 			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
  		break;
  	default:
- 		return 0;
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 287784095b5b..c03f42409b98 100644
+index c03f42409b98..ebe10a015bfb 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -81,7 +81,8 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 		}
+@@ -62,16 +62,17 @@ bool vgic_supports_direct_msis(struct kvm *kvm)
+ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+ 					    gpa_t addr, unsigned int len)
+ {
++	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+ 	u32 value = 0;
+ 
+ 	switch (addr & 0x0c) {
+ 	case GICD_CTLR:
+-		if (vcpu->kvm->arch.vgic.enabled)
++		if (vgic->enabled)
+ 			value |= GICD_CTLR_ENABLE_SS_G1;
+ 		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
+ 		break;
+ 	case GICD_TYPER:
+-		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
++		value = vgic->nr_spis + VGIC_NR_PRIVATE_IRQS;
+ 		value = (value >> 5) - 1;
+ 		if (vgic_has_its(vcpu->kvm)) {
+ 			value |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
+@@ -82,6 +83,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
  		break;
  	case GICD_IIDR:
--		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
-+			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
+ 		value = (PRODUCT_ID_KVM << GICD_IIDR_PRODUCT_ID_SHIFT) |
++			(vgic->implementation_rev << GICD_IIDR_REVISION_SHIFT) |
+ 			(IMPLEMENTER_ARM << GICD_IIDR_IMPLEMENTER_SHIFT);
  		break;
  	default:
- 		return 0;
 -- 
 2.18.0
