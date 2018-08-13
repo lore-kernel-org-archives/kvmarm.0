@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 27/37] KVM: arm/arm64: Fix potential loss of ptimer interrupts
-Date: Mon, 13 Aug 2018 15:57:45 +0100
-Message-ID: <20180813145755.16566-28-marc.zyngier@arm.com>
+Subject: [PATCH 26/37] KVM: arm/arm64: vgic: Fix possible spectre-v1 write in
+ vgic_mmio_write_apr()
+Date: Mon, 13 Aug 2018 15:57:44 +0100
+Message-ID: <20180813145755.16566-27-marc.zyngier@arm.com>
 References: <20180813145755.16566-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A5E84A1DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5D34A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fbaXDkEw3WgY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Aug 2018 11:00:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46BA04A216
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:16 -0400 (EDT)
+ with ESMTP id nalLBaZ3rRVO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Aug 2018 11:00:13 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CDFD4A20E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Aug 2018 11:00:13 -0400 (EDT)
 In-Reply-To: <20180813145755.16566-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +32,41 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org, "Gustavo A . R . Silva" <gustavo@embeddedor.com>, Andre Przywara <andre.przywara@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Jia He <jia.he@hxt-semitech.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
 
-kvm_timer_update_state() is called when changing the phys timer
-configuration registers, either via vcpu reset, as a result of a trap
-from the guest, or when userspace programs the registers.
+It's possible for userspace to control n. Sanitize n when using it as an
+array index, to inhibit the potential spectre-v1 write gadget.
 
-phys_timer_emulate() is in turn called by kvm_timer_update_state() to
-either cancel an existing software timer, or program a new software
-timer, to emulate the behavior of a real phys timer, based on the change
-in configuration registers.
+Note that while it appears that n must be bound to the interval [0,3]
+due to the way it is extracted from addr, we cannot guarantee that
+compiler transformations (and/or future refactoring) will ensure this is
+the case, and given this is a slow path it's better to always perform
+the masking.
 
-Unfortunately, the interaction between these two functions left a small
-race; if the conceptual emulated phys timer should actually fire, but
-the soft timer hasn't executed its callback yet, we cancel the timer in
-phys_timer_emulate without injecting an irq.  This only happens if the
-check in kvm_timer_update_state is called before the timer should fire,
-which is relatively unlikely, but possible.
+Found by smatch.
 
-The solution is to update the state of the phys timer after calling
-phys_timer_emulate, which will pick up the pending timer state and
-update the interrupt value.
-
-Note that this leaves the opportunity of raising the interrupt twice,
-once in the just-programmed soft timer, and once in
-kvm_timer_update_state.  Since this always happens synchronously with
-the VCPU execution, there is no harm in this, and the guest ever only
-sees a single timer interrupt.
-
-Cc: Stable <stable@vger.kernel.org> # 4.15+
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index bd3d57f40f1b..18ff6203079d 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -295,9 +295,9 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 26654f4140ed..738b65d2d0e7 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -399,6 +399,9 @@ static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
  
- 	/*
--	 * If the timer can fire now we have just raised the IRQ line and we
--	 * don't need to have a soft timer scheduled for the future.  If the
--	 * timer cannot fire at all, then we also don't need a soft timer.
-+	 * If the timer can fire now, we don't need to have a soft timer
-+	 * scheduled for the future.  If the timer cannot fire at all,
-+	 * then we also don't need a soft timer.
- 	 */
- 	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
- 		soft_timer_cancel(&timer->phys_timer, NULL);
-@@ -332,10 +332,10 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	level = kvm_timer_should_fire(vtimer);
- 	kvm_timer_update_irq(vcpu, level, vtimer);
- 
-+	phys_timer_emulate(vcpu);
+ 		if (n > vgic_v3_max_apr_idx(vcpu))
+ 			return;
 +
- 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
- 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
--
--	phys_timer_emulate(vcpu);
- }
- 
- static void vtimer_save_state(struct kvm_vcpu *vcpu)
++		n = array_index_nospec(n, 4);
++
+ 		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
+ 		vgicv3->vgic_ap1r[n] = val;
+ 	}
 -- 
 2.18.0
