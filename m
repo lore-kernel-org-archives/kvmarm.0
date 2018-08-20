@@ -1,76 +1,60 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: Remove pgd_lock
-Date: Wed, 15 Aug 2018 17:52:32 +0100
-Message-ID: <57835dc1-c8ab-d440-d16d-849bf1334547@arm.com>
-References: <20180813160453.38032-1-steven.price@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH] arm64: KVM: rename the capability to set guest SError syndrome
+Date: Mon, 20 Aug 2018 14:37:31 -0400
+Message-ID: <1534790251-15847-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 146A94A0CA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Aug 2018 12:51:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QE50pPnepssL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Aug 2018 12:51:50 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7BF449FA8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Aug 2018 12:51:50 -0400 (EDT)
-In-Reply-To: <20180813160453.38032-1-steven.price@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@arm.com, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Steve
+In the documentation description, this capability's name is
+KVM_CAP_ARM_SET_SERROR_ESR, but in the header file this
+capability's name is KVM_CAP_ARM_INJECT_SERROR_ESR, so it
+is better to use a same name.
 
-On 08/13/2018 05:04 PM, Steven Price wrote:
-> The lock has never been used and the page tables are protected by
-> mmu_lock in struct kvm.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> CC: Marc Zyngier <marc.zyngier@arm.com>
-> CC: Christoffer Dall <christoffer.dall@arm.com>
-> 
->   arch/arm64/include/asm/kvm_host.h | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index fe8777b12f86..8150a7f8a50f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -61,8 +61,7 @@ struct kvm_arch {
->   	u64    vmid_gen;
->   	u32    vmid;
->   
-> -	/* 1-level 2nd stage table and lock */
-> -	spinlock_t pgd_lock;
-> +	/* 1-level 2nd stage table, protected by kvm->mmu_lock */
->   	pgd_t *pgd;
->   
->   	/* VTTBR value associated with above pgd and vmid */
-> 
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+In the Documentation/virtual/kvm/api.txt:
 
-I have a patch which already does this, though not a dedicated patch [1] 
-in the dynamic IPA series. As such I am fine with this patch being
-merged if it gets there first, as we are still working out the userspace
-API for dynamic IPA.
++8.19 KVM_CAP_ARM_SET_SERROR_ESR
 
-FWIW,
+In the include/uapi/linux/kvm.h:
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 156
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+So in above two files, the capability's name is not same, it
+is better to use a same name.
+---
+ arch/arm64/kvm/reset.c   | 2 +-
+ include/uapi/linux/kvm.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-
-
-[1] 
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-July/591778.html
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index e37c78b..57dc6be 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -77,7 +77,7 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PMU_V3:
+ 		r = kvm_arm_support_pmu_v3();
+ 		break;
+-	case KVM_CAP_ARM_INJECT_SERROR_ESR:
++	case KVM_CAP_ARM_SET_SERROR_ESR:
+ 		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 07548de..fab7525 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -951,7 +951,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_TLBFLUSH 155
+ #define KVM_CAP_S390_HPAGE_1M 156
+ #define KVM_CAP_NESTED_STATE 157
+-#define KVM_CAP_ARM_INJECT_SERROR_ESR 158
++#define KVM_CAP_ARM_SET_SERROR_ESR 158
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.7.4
