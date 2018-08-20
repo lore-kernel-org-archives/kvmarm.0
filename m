@@ -1,22 +1,59 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH] arm64: KVM: rename the capability to set guest SError
- syndrome
-Date: Mon, 20 Aug 2018 20:29:22 +0800
-Message-ID: <034a3749-1a7d-44cf-a1e5-1b1fe9810929@huawei.com>
-References: <1534790251-15847-1-git-send-email-gengdongjiu@huawei.com>
- <07f6c4c9-0397-7e03-ba36-1b8086dc1ccf@arm.com>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH] KVM: Documentation: rename the capability of KVM_CAP_ARM_SET_SERROR_ESR
+Date: Mon, 20 Aug 2018 17:39:25 -0400
+Message-ID: <1534801165-41525-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <07f6c4c9-0397-7e03-ba36-1b8086dc1ccf@arm.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: christoffer.dall@arm.com, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2018/8/20 19:15, Marc Zyngier wrote:
-> I'd prefer you fix the documentation rather than the code, as this would
-> pointlessly break existing code.
+In the documentation description, this capability's name is
+KVM_CAP_ARM_SET_SERROR_ESR, but in the header file this
+capability's name is KVM_CAP_ARM_INJECT_SERROR_ESR, so change
+the documentation description to make it same.
 
-Ok, sure. I will, thanks a lot.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+In the Documentation/virtual/kvm/api.txt:
+
++8.19 KVM_CAP_ARM_SET_SERROR_ESR
+
+In the include/uapi/linux/kvm.h:
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 156
+
+So in above two files, the capability's name is not same, it
+is better to use a same name.
+---
+ Documentation/virtual/kvm/api.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 0acdbac..c664064 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -909,10 +909,10 @@ Serviceability (RAS) Specification").
+ 
+ SError exceptions always have an ESR value. Some CPUs have the ability to
+ specify what the virtual SError's ESR value should be. These systems will
+-advertise KVM_CAP_ARM_SET_SERROR_ESR. In this case exception.has_esr will
++advertise KVM_CAP_ARM_INJECT_SERROR_ESR. In this case exception.has_esr will
+ always have a non-zero value when read, and the agent making an SError pending
+ should specify the ISS field in the lower 24 bits of exception.serror_esr. If
+-the system supports KVM_CAP_ARM_SET_SERROR_ESR, but user-space sets the events
++the system supports KVM_CAP_ARM_INJECT_SERROR_ESR, but user-space sets the events
+ with exception.has_esr as zero, KVM will choose an ESR.
+ 
+ Specifying exception.has_esr on a system that does not support it will return
+@@ -4749,7 +4749,7 @@ hypercalls:
+ HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
+ HvFlushVirtualAddressList, HvFlushVirtualAddressListEx.
+ 
+-8.19 KVM_CAP_ARM_SET_SERROR_ESR
++8.19 KVM_CAP_ARM_INJECT_SERROR_ESR
+ 
+ Architectures: arm, arm64
+ 
+-- 
+2.7.4
