@@ -1,27 +1,27 @@
-From: Alexander Graf <agraf@suse.de>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v3 7/9] KVM: arm/arm64: Only clean the dcache on
  translation fault
-Date: Tue, 21 Aug 2018 15:42:30 +0200
-Message-ID: <f01ed8f5-8b73-7876-89a8-14a8ed1d9138@suse.de>
+Date: Tue, 21 Aug 2018 14:57:31 +0100
+Message-ID: <9fa7efdf-1c21-7b07-edb9-0c7d0d91eaed@arm.com>
 References: <20171023161122.15291-1-marc.zyngier@arm.com>
  <20171023161122.15291-8-marc.zyngier@arm.com>
  <bfeee11e-f8bf-78f2-ab61-27e43781e2e3@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2AB34A214
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Aug 2018 09:42:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9B1A4A210
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Aug 2018 09:57:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9tYgs1PYuNXV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Aug 2018 09:42:32 -0400 (EDT)
-Received: from mx1.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7DDE4A1E5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Aug 2018 09:42:32 -0400 (EDT)
+ with ESMTP id 8eirAMR8+gRK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Aug 2018 09:57:34 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C714A209
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Aug 2018 09:57:34 -0400 (EDT)
 In-Reply-To: <bfeee11e-f8bf-78f2-ab61-27e43781e2e3@suse.de>
-Content-Language: en-US
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,11 +31,11 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: =?UTF-8?Q?Dirk_M=c3=bcller?= <dmueller@suse.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/21/2018 03:35 PM, Alexander Graf wrote:
+On 21/08/18 14:35, Alexander Graf wrote:
 > On 10/23/2017 06:11 PM, Marc Zyngier wrote:
 >> The only case where we actually need to perform a dcache maintenance
 >> is when we map the page for the first time, and subsequent permission
@@ -44,18 +44,28 @@ On 08/21/2018 03:35 PM, Alexander Graf wrote:
 >>
 >> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->
+> 
 > This patch unfortunately breaks something on Hi1616 SoCs when running 
-> 32bit guests. With this patch applied (and thus with 4.18) I get 
-> random illegal instruction warnings from 32bit code inside VMs. I do 
-> not know at this point whether this affects other CPUs as well.
->
-> If anyone is interested in a reproducer, I have something handy. But 
-> for now I believe we should just revert this patch.
+> 32bit guests. With this patch applied (and thus with 4.18) I get random 
+> illegal instruction warnings from 32bit code inside VMs. I do not know 
+> at this point whether this affects other CPUs as well.
 
-Ok, I'm slightly confused. The patch in question is already upstream 
-since 4.16, but the regression reportedly came with the switch from 4.17 
-to 4.18. I'll try to bisect it down a bit further ...
+Can you please give a few more details?
 
+- what are the CPUs on this Hi1616? At least a /proc/cpuinfo would help
 
-Alex
+- an example of the crash? Is it within the decompressor? After? This
+things do matter, given the number of crazy things the 32bit kernel does
+
+- a host kernel configuration?
+
+> If anyone is interested in a reproducer, I have something handy. But for 
+> now I believe we should just revert this patch.
+
+Before we revert anything, I'd like to understand what is happening.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
