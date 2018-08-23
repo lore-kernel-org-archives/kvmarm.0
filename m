@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 09/13] iommu/smmuv3: Get prepared for nested stage support
-Date: Thu, 23 Aug 2018 14:17:32 +0200
-Message-ID: <1535026656-8450-10-git-send-email-eric.auger__45763.7662686922$1535038713$gmane$org@redhat.com>
+Subject: [RFC 06/13] vfio: VFIO_IOMMU_BIND_MSI
+Date: Thu, 23 Aug 2018 14:17:29 +0200
+Message-ID: <1535026656-8450-7-git-send-email-eric.auger__5700.24818084693$1535038713$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E0D94A21D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50C914A230
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X6fsTgOFyG65 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:18:14 -0400 (EDT)
+ with ESMTP id APBL60-FMFZR for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:18:05 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EDFA4A1DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 899A74A22F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:05 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,102 +35,81 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To allow nested stage support, we need to store both
-stage 1 and stage 2 configurations (and remove the former
-union).
-
-arm_smmu_write_strtab_ent() is modified to write both stage
-fields in the STE.
-
-We add a bypass field to the S1 configuration as the first
-stage can be bypassed.
-
-Only S2 stage is "finalized" as the host does not configure
-S1 CD, guest does.
+This patch adds the VFIO_IOMMU_BIND_MSI ioctl which aims at
+passing the guest MSI binding to the host.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 31 +++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       |  7 +++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 19c085d..3a33979 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -496,6 +496,7 @@ struct arm_smmu_strtab_l1_desc {
- struct arm_smmu_s1_cfg {
- 	__le64				*cdptr;
- 	dma_addr_t			cdptr_dma;
-+	bool bypass;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 973bb4d..2962cb9 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1696,6 +1696,24 @@ static int do_tlb_inv_fn(struct device *dev, void *data)
+ 	return iommu_tlb_invalidate(task->domain, dev, &ustruct->info);
+ }
  
- 	struct arm_smmu_ctx_desc {
- 		u16	asid;
-@@ -617,10 +618,8 @@ struct arm_smmu_domain {
- 	struct io_pgtable_ops		*pgtbl_ops;
++static int
++vfio_iommu_bind_guest_msi(struct vfio_iommu *iommu,
++			  struct vfio_iommu_type1_guest_msi_binding *ustruct)
++{
++	struct vfio_domain *d;
++	int ret;
++
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		ret = iommu_bind_guest_msi(d->domain, &ustruct->binding);
++		if (ret)
++			break;
++	}
++	mutex_unlock(&iommu->lock);
++	return ret;
++}
++
++
+ static int vfio_iommu_dispatch_task(struct vfio_iommu *iommu, void *data,
+ 				    int (*fn)(struct device *, void *))
+ {
+@@ -1822,6 +1840,19 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
  
- 	enum arm_smmu_domain_stage	stage;
--	union {
--		struct arm_smmu_s1_cfg	s1_cfg;
--		struct arm_smmu_s2_cfg	s2_cfg;
--	};
-+	struct arm_smmu_s1_cfg	s1_cfg;
-+	struct arm_smmu_s2_cfg	s2_cfg;
- 
- 	struct iommu_domain		domain;
- 
-@@ -1107,6 +1106,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
- 			break;
- 		case STRTAB_STE_0_CFG_S1_TRANS:
- 		case STRTAB_STE_0_CFG_S2_TRANS:
-+		case STRTAB_STE_0_CFG_S1_TRANS | STRTAB_STE_0_CFG_S2_TRANS:
- 			ste_live = true;
- 			break;
- 		case STRTAB_STE_0_CFG_ABORT:
-@@ -1141,7 +1141,6 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 		return vfio_iommu_dispatch_task(iommu, (u8 *)&ustruct,
+ 						do_tlb_inv_fn);
++	} else if (cmd == VFIO_IOMMU_BIND_MSI) {
++		struct vfio_iommu_type1_guest_msi_binding ustruct;
++
++		minsz = offsetofend(struct vfio_iommu_type1_guest_msi_binding,
++				    binding);
++
++		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (ustruct.argsz < minsz || ustruct.flags)
++			return -EINVAL;
++
++		return vfio_iommu_bind_guest_msi(iommu, &ustruct);
  	}
  
- 	if (ste->s1_cfg) {
--		BUG_ON(ste_live);
- 		dst[1] = cpu_to_le64(
- 			 FIELD_PREP(STRTAB_STE_1_S1CIR, STRTAB_STE_1_S1C_CACHE_WBRA) |
- 			 FIELD_PREP(STRTAB_STE_1_S1COR, STRTAB_STE_1_S1C_CACHE_WBRA) |
-@@ -1155,12 +1154,12 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
- 		   !(smmu->features & ARM_SMMU_FEAT_STALL_FORCE))
- 			dst[1] |= cpu_to_le64(STRTAB_STE_1_S1STALLD);
+ 	return -ENOTTY;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index b59f9fc..b7a9943 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -680,6 +680,13 @@ struct vfio_iommu_type1_tlb_invalidate {
+ };
+ #define VFIO_IOMMU_TLB_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 23)
  
--		val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
--			FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
-+		if (!ste->s1_cfg->bypass)
-+			val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
-+				FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
- 	}
++struct vfio_iommu_type1_guest_msi_binding {
++	__u32   argsz;
++	__u32   flags;
++	struct iommu_guest_msi_binding binding;
++};
++#define VFIO_IOMMU_BIND_MSI      _IO(VFIO_TYPE, VFIO_BASE + 24)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
- 	if (ste->s2_cfg) {
--		BUG_ON(ste_live);
- 		dst[2] = cpu_to_le64(
- 			 FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
- 			 FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
-@@ -1399,6 +1398,10 @@ static void arm_smmu_tlb_inv_context(void *cookie)
- 		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
- 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
- 		cmd.tlbi.vmid	= 0;
-+	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
-+		cmd.opcode      = CMDQ_OP_TLBI_NH_ASID;
-+		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
-+		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
- 	} else {
- 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
- 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
-@@ -1423,6 +1426,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
- 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
- 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
- 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
-+	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
-+		cmd.opcode      = CMDQ_OP_TLBI_NH_VA;
-+		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
-+		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
- 	} else {
- 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
- 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+ /*
 -- 
 2.5.5
