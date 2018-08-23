@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 07/13] vfio: Document nested stage control
-Date: Thu, 23 Aug 2018 14:17:30 +0200
-Message-ID: <1535026656-8450-8-git-send-email-eric.auger__28731.5827365548$1535038714$gmane$org@redhat.com>
+Subject: [RFC 10/13] iommu/smmuv3: Implement bind_guest_stage
+Date: Thu, 23 Aug 2018 14:17:33 +0200
+Message-ID: <1535026656-8450-11-git-send-email-eric.auger__49679.1281424977$1535038714$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 704F94A22B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 479A34A21D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c37vOGaKDmv8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:18:08 -0400 (EDT)
+ with ESMTP id X0ofh5DEB2DK for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:18:18 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A053F4A210
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AB024A210
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:18 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,73 +35,112 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-New iotcls were introduced to pass information about guest stage1
-to the host through VFIO. Let's document the nested stage control.
+On bind_guest_stage() we set the minimal information in s1_cfg:
+- the asid (allocated by the guest)
+- the context descriptor GPA
+
+On unbind, the STE stage 1 fields are reset.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ drivers/iommu/arm-smmu-v3.c | 78 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-fault reporting is current missing to the picture
----
- Documentation/vfio.txt | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
-
-diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
-index f1a4d3c..858a363 100644
---- a/Documentation/vfio.txt
-+++ b/Documentation/vfio.txt
-@@ -239,6 +239,51 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 3a33979..26afafa 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -2025,6 +2025,82 @@ static void arm_smmu_put_resv_regions(struct device *dev,
+ 		kfree(entry);
+ }
  
-+IOMMU Dual Stage Control
-+------------------------
++static int arm_smmu_bind_guest_stage(struct iommu_domain *domain,
++				     struct device *dev,
++				     struct iommu_guest_stage_config *cfg)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu = smmu_domain->smmu;
++	struct arm_smmu_master_data *entry;
++	unsigned long flags;
 +
-+Some IOMMUs support 2 stages of translation. This is useful when the
-+guest is exposed with a virtual IOMMU and some devices are assigned
-+to the guest through VFIO. Then the guest OS can use stage 1 (IOVA -> GPA),
-+while the hypervisor uses stage 2 for VM isolation (GPA -> HPA).
++	if (cfg->flags != SMMUV3_S1_CFG)
++		return -EINVAL;
 +
-+The guest gets ownership of the stage 1 page tables and also owns stage 1
-+configuration structures. The hypervisor owns the root configuration structure
-+(for security reason), including stage 2 configuration. This works as long
-+configuration structures and page table format are compatible between the
-+virtual IOMMU and the physical IOMMU.
++	if (!smmu)
++		return -EINVAL;
 +
-+Assuming the HW supports it, this nested mode is selected by choosing the
-+VFIO_TYPE1_NESTING_IOMMU type through:
++	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
++	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
++		dev_info(smmu_domain->smmu->dev,
++			 "does not implement two stages\n");
++		return -EINVAL;
++	}
 +
-+ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		return -EINVAL;
 +
-+This forces the hypervisor to use the stage 2, leaving stage 1 available for
-+guest usage.
++	if (cfg->smmu_s1.asid >= (1 << smmu->asid_bits))
++		return -EINVAL;
 +
-+Once groups are attached to the container, the guest stage 1 translation
-+configuration data can be passed to VFIO by using
++	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
++	list_for_each_entry(entry, &smmu_domain->devices, list) {
++		struct arm_smmu_s1_cfg *s1_cfg;
 +
-+ioctl(container, VFIO_IOMMU_BIND_GUEST_STAGE, &guest_stage_info);
++		if (dev != entry->dev)
++			continue;
 +
-+This allows to combine guest stage1 configuration structure along with hypervisor
-+stage 2 configuration structure. stage 1 configuration structures are dependent
-+on the IOMMU type.
++		s1_cfg = entry->ste.s1_cfg = &smmu_domain->s1_cfg;
++		s1_cfg->bypass = cfg->smmu_s1.disabled || cfg->smmu_s1.bypassed;
++		s1_cfg->cd.asid = cfg->smmu_s1.asid;
 +
-+When the guest invalidates stage 1 entries, IOTLB invalidations must be forwarded
-+to the host through
-+ioctl(container, VFIO_IOMMU_TLB_INVALIDATE, &inv_data);
-+Those invalidations can happen at various granularity levels, page, context, ...
++		if (!s1_cfg->bypass)
++			s1_cfg->cdptr_dma = cfg->smmu_s1.cdptr_dma;
 +
-+The ARM SMMU specification introduces another challenge: MSIs are translated by
-+both the virtual SMMU and the physical SMMU. To build a nested mapping for the
-+IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
-+doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
-+binding eventually translating into the physical MSI doorbell.
++		arm_smmu_install_ste_for_dev(dev->iommu_fwspec);
++		break;
++	}
++	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
 +
-+This is achieved by
-+ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
++	return 0;
++}
 +
- VFIO User API
- -------------------------------------------------------------------------------
++static void arm_smmu_unbind_guest_stage(struct iommu_domain *domain,
++					struct device *dev)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu = smmu_domain->smmu;
++	struct arm_smmu_master_data *entry;
++	unsigned long flags;
++
++	if (!smmu)
++		return;
++
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		return;
++
++	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
++	list_for_each_entry(entry, &smmu_domain->devices, list) {
++		if (dev != entry->dev)
++			continue;
++
++		entry->ste.s1_cfg = NULL;
++		arm_smmu_install_ste_for_dev(dev->iommu_fwspec);
++		break;
++	}
++	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
++}
++
+ static struct iommu_ops arm_smmu_ops = {
+ 	.capable		= arm_smmu_capable,
+ 	.domain_alloc		= arm_smmu_domain_alloc,
+@@ -2044,6 +2120,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.of_xlate		= arm_smmu_of_xlate,
+ 	.get_resv_regions	= arm_smmu_get_resv_regions,
+ 	.put_resv_regions	= arm_smmu_put_resv_regions,
++	.bind_guest_stage	= arm_smmu_bind_guest_stage,
++	.unbind_guest_stage	= arm_smmu_unbind_guest_stage,
+ 	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+ };
  
 -- 
 2.5.5
