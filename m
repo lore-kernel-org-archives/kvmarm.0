@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 02/13] iommu: Introduce tlb_invalidate API
-Date: Thu, 23 Aug 2018 14:17:25 +0200
-Message-ID: <1535026656-8450-3-git-send-email-eric.auger__24023.8561215394$1535038711$gmane$org@redhat.com>
+Subject: [RFC 09/13] iommu/smmuv3: Get prepared for nested stage support
+Date: Thu, 23 Aug 2018 14:17:32 +0200
+Message-ID: <1535026656-8450-10-git-send-email-eric.auger__45763.7662686922$1535038713$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE5634A1DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E0D94A21D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OmHDKgo3qAxf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:17:50 -0400 (EDT)
+ with ESMTP id X6fsTgOFyG65 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:18:14 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4AA64A210
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EDFA4A1DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:14 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,202 +35,102 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+To allow nested stage support, we need to store both
+stage 1 and stage 2 configurations (and remove the former
+union).
 
-In any virtualization use case When the fisrt translation stage
-is "owned" by the guest OS, the host IOMMU driver has no knowledge
-of caching structure updates unless the guest invalidation activities
-are trapped by the virtualizer and passed down to the host.
+arm_smmu_write_strtab_ent() is modified to write both stage
+fields in the STE.
 
-Since the invalidation data are obtained from user space and will be
-written into physical IOMMU, we must allow security check at various
-layers. Therefore, generic invalidation data format are proposed here,
-model specific IOMMU drivers need to convert them into their own format.
+We add a bypass field to the S1 configuration as the first
+stage can be bypassed.
 
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+Only S2 stage is "finalized" as the host does not configure
+S1 CD, guest does.
+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
-header. Commit message reworded.
----
- drivers/iommu/iommu.c      | 14 +++++++
- include/linux/iommu.h      | 13 +++++++
- include/uapi/linux/iommu.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 118 insertions(+)
+ drivers/iommu/arm-smmu-v3.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 5156172..0bc05a7 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1345,6 +1345,20 @@ void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
- }
- EXPORT_SYMBOL_GPL(iommu_unbind_guest_stage);
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 19c085d..3a33979 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -496,6 +496,7 @@ struct arm_smmu_strtab_l1_desc {
+ struct arm_smmu_s1_cfg {
+ 	__le64				*cdptr;
+ 	dma_addr_t			cdptr_dma;
++	bool bypass;
  
-+int iommu_tlb_invalidate(struct iommu_domain *domain, struct device *dev,
-+			 struct iommu_tlb_invalidate_info *inv_info)
-+{
-+	int ret = 0;
-+
-+	if (unlikely(!domain->ops->tlb_invalidate))
-+		return -ENODEV;
-+
-+	ret = domain->ops->tlb_invalidate(domain, dev, inv_info);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_tlb_invalidate);
-+
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
- {
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index aec853d..b13cf2b 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -190,6 +190,7 @@ struct iommu_resv_region {
-  * @pgsize_bitmap: bitmap of all possible supported page sizes
-  * @bind_guest_stage: program the guest stage configuration
-  * @unbind_guest_stage: unbind the guest stage and restore defaults
-+ * @tlb_invalidate: invalidate translation caches
-  */
- struct iommu_ops {
- 	bool (*capable)(enum iommu_cap);
-@@ -243,6 +244,9 @@ struct iommu_ops {
- 	void (*unbind_guest_stage)(struct iommu_domain *domain,
- 				   struct device *dev);
+ 	struct arm_smmu_ctx_desc {
+ 		u16	asid;
+@@ -617,10 +618,8 @@ struct arm_smmu_domain {
+ 	struct io_pgtable_ops		*pgtbl_ops;
  
-+	int (*tlb_invalidate)(struct iommu_domain *domain, struct device *dev,
-+			      struct iommu_tlb_invalidate_info *inv_info);
-+
- 	unsigned long pgsize_bitmap;
- };
+ 	enum arm_smmu_domain_stage	stage;
+-	union {
+-		struct arm_smmu_s1_cfg	s1_cfg;
+-		struct arm_smmu_s2_cfg	s2_cfg;
+-	};
++	struct arm_smmu_s1_cfg	s1_cfg;
++	struct arm_smmu_s2_cfg	s2_cfg;
  
-@@ -308,6 +312,10 @@ extern int iommu_bind_guest_stage(struct iommu_domain *domain,
- 		struct device *dev, struct iommu_guest_stage_config *cfg);
- extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
- 				     struct device *dev);
-+extern int iommu_tlb_invalidate(struct iommu_domain *domain,
-+				struct device *dev,
-+				struct iommu_tlb_invalidate_info *inv_info);
-+
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
- 		     phys_addr_t paddr, size_t size, int prot);
-@@ -718,6 +726,11 @@ static inline
- void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
- {
- }
-+static inline int iommu_tlb_invalidate(struct iommu_domain *domain,
-+		struct device *dev, struct iommu_tlb_invalidate_info *inv_info)
-+{
-+	return -ENODEV;
-+}
+ 	struct iommu_domain		domain;
  
- #endif /* CONFIG_IOMMU_API */
+@@ -1107,6 +1106,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 			break;
+ 		case STRTAB_STE_0_CFG_S1_TRANS:
+ 		case STRTAB_STE_0_CFG_S2_TRANS:
++		case STRTAB_STE_0_CFG_S1_TRANS | STRTAB_STE_0_CFG_S2_TRANS:
+ 			ste_live = true;
+ 			break;
+ 		case STRTAB_STE_0_CFG_ABORT:
+@@ -1141,7 +1141,6 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 	}
  
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 2d1593c..7c88d80 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -56,4 +56,95 @@ struct iommu_guest_stage_config {
- 	};
- };
+ 	if (ste->s1_cfg) {
+-		BUG_ON(ste_live);
+ 		dst[1] = cpu_to_le64(
+ 			 FIELD_PREP(STRTAB_STE_1_S1CIR, STRTAB_STE_1_S1C_CACHE_WBRA) |
+ 			 FIELD_PREP(STRTAB_STE_1_S1COR, STRTAB_STE_1_S1C_CACHE_WBRA) |
+@@ -1155,12 +1154,12 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 		   !(smmu->features & ARM_SMMU_FEAT_STALL_FORCE))
+ 			dst[1] |= cpu_to_le64(STRTAB_STE_1_S1STALLD);
  
-+/**
-+ * enum iommu_inv_granularity - Generic invalidation granularity
-+ * @IOMMU_INV_GRANU_DOMAIN_ALL_PASID:	TLB entries or PASID caches of all
-+ *					PASIDs associated with a domain ID
-+ * @IOMMU_INV_GRANU_PASID_SEL:		TLB entries or PASID cache associated
-+ *					with a PASID and a domain
-+ * @IOMMU_INV_GRANU_PAGE_PASID:		TLB entries of selected page range
-+ *					within a PASID
-+ *
-+ * When an invalidation request is passed down to IOMMU to flush translation
-+ * caches, it may carry different granularity levels, which can be specific
-+ * to certain types of translation caches.
-+ * This enum is a collection of granularities for all types of translation
-+ * caches. The idea is to make it easy for IOMMU model specific driver to
-+ * convert from generic to model specific value. Each IOMMU driver
-+ * can enforce check based on its own conversion table. The conversion is
-+ * based on 2D look-up with inputs as follows:
-+ * - translation cache types
-+ * - granularity
-+ *
-+ *             type |   DTLB    |    TLB    |   PASID   |
-+ *  granule         |           |           |   cache   |
-+ * -----------------+-----------+-----------+-----------+
-+ *  DN_ALL_PASID    |   Y       |   Y       |   Y       |
-+ *  PASID_SEL       |   Y       |   Y       |   Y       |
-+ *  PAGE_PASID      |   Y       |   Y       |   N/A     |
-+ *
-+ */
-+enum iommu_inv_granularity {
-+	IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
-+	IOMMU_INV_GRANU_PASID_SEL,
-+	IOMMU_INV_GRANU_PAGE_PASID,
-+	IOMMU_INV_NR_GRANU,
-+};
-+
-+/**
-+ * enum iommu_inv_type - Generic translation cache types for invalidation
-+ *
-+ * @IOMMU_INV_TYPE_DTLB:	device IOTLB
-+ * @IOMMU_INV_TYPE_TLB:		IOMMU paging structure cache
-+ * @IOMMU_INV_TYPE_PASID:	PASID cache
-+ * Invalidation requests sent to IOMMU for a given device need to indicate
-+ * which type of translation cache to be operated on. Combined with enum
-+ * iommu_inv_granularity, model specific driver can do a simple lookup to
-+ * convert from generic to model specific value.
-+ */
-+enum iommu_inv_type {
-+	IOMMU_INV_TYPE_DTLB,
-+	IOMMU_INV_TYPE_TLB,
-+	IOMMU_INV_TYPE_PASID,
-+	IOMMU_INV_NR_TYPE
-+};
-+
-+/**
-+ * Translation cache invalidation header that contains mandatory meta data.
-+ * @version:	info format version, expecting future extesions
-+ * @type:	type of translation cache to be invalidated
-+ */
-+struct iommu_tlb_invalidate_hdr {
-+	__u32 version;
-+#define TLB_INV_HDR_VERSION_1 1
-+	enum iommu_inv_type type;
-+};
-+
-+/**
-+ * Translation cache invalidation information, contains generic IOMMU
-+ * data which can be parsed based on model ID by model specific drivers.
-+ * Since the invalidation of second level page tables are included in the
-+ * unmap operation, this info is only applicable to the first level
-+ * translation caches, i.e. DMA request with PASID.
-+ *
-+ * @granularity:	requested invalidation granularity, type dependent
-+ * @size:		2^size of 4K pages, 0 for 4k, 9 for 2MB, etc.
-+ * @nr_pages:		number of pages to invalidate
-+ * @pasid:		processor address space ID value per PCI spec.
-+ * @addr:		page address to be invalidated
-+ * @flags		IOMMU_INVALIDATE_ADDR_LEAF: leaf paging entries
-+ *			IOMMU_INVALIDATE_GLOBAL_PAGE: global pages
-+ *
-+ */
-+struct iommu_tlb_invalidate_info {
-+	struct iommu_tlb_invalidate_hdr	hdr;
-+	enum iommu_inv_granularity	granularity;
-+	__u32		flags;
-+#define IOMMU_INVALIDATE_ADDR_LEAF	(1 << 0)
-+#define IOMMU_INVALIDATE_GLOBAL_PAGE	(1 << 1)
-+	__u8		size;
-+	__u64		nr_pages;
-+	__u32		pasid;
-+	__u64		addr;
-+};
- #endif /* _UAPI_IOMMU_H */
+-		val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
+-			FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
++		if (!ste->s1_cfg->bypass)
++			val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
++				FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
+ 	}
+ 
+ 	if (ste->s2_cfg) {
+-		BUG_ON(ste_live);
+ 		dst[2] = cpu_to_le64(
+ 			 FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
+ 			 FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
+@@ -1399,6 +1398,10 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+ 		cmd.tlbi.vmid	= 0;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
++		cmd.opcode      = CMDQ_OP_TLBI_NH_ASID;
++		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+ 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+@@ -1423,6 +1426,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
++		cmd.opcode      = CMDQ_OP_TLBI_NH_VA;
++		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+ 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
 -- 
 2.5.5
