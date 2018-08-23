@@ -1,171 +1,231 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 7/9] KVM: arm/arm64: Only clean the dcache on
- translation fault
-Date: Thu, 23 Aug 2018 13:43:13 +0100
-Message-ID: <1efbf386-d9c9-9a23-f2d5-3cf8cddf95e3@arm.com>
-References: <20171023161122.15291-1-marc.zyngier@arm.com>
- <20171023161122.15291-8-marc.zyngier@arm.com>
- <bfeee11e-f8bf-78f2-ab61-27e43781e2e3@suse.de>
- <9fa7efdf-1c21-7b07-edb9-0c7d0d91eaed@arm.com>
- <2686ddfc-935a-18e0-46bd-0cb608ae44e1@suse.de>
- <4d1c7d3b-4abe-fa8d-31ac-7a98ec349db1@arm.com>
- <a92a365f-3ad1-587e-4919-3814aebe85b0@suse.de>
- <1f59ea80-a88e-e09d-bb55-cd1a514bc957@arm.com>
- <51b376d9-6339-66e3-bda2-06f8bbff8888@suse.de>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC 01/13] iommu: Introduce bind_guest_stage API
+Date: Thu, 23 Aug 2018 17:25:23 +0200
+Message-ID: <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 139894A1FC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:43:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UmxnRIGRMQ-4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:43:17 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5834A1E6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:43:17 -0400 (EDT)
-In-Reply-To: <51b376d9-6339-66e3-bda2-06f8bbff8888@suse.de>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>, Christoffer Dall <christoffer.dall@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jean-philippe.brucker@arm.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjMvMDgvMTggMTM6MjQsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+IE9uIDA4LzIzLzIwMTgg
-MDE6MTYgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4gT24gMjEvMDgvMTggMTc6NTQsIEFsZXhh
-bmRlciBHcmFmIHdyb3RlOgo+Pj4gT24gMDgvMjEvMjAxOCAwNTowOCBQTSwgTWFyYyBaeW5naWVy
-IHdyb3RlOgo+Pj4+IE9uIDIxLzA4LzE4IDE1OjA4LCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPj4+
-Pj4gT24gMDgvMjEvMjAxOCAwMzo1NyBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4+Pj4gT24g
-MjEvMDgvMTggMTQ6MzUsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+Pj4+Pj4+IE9uIDEwLzIzLzIw
-MTcgMDY6MTEgUE0sIE1hcmMgWnluZ2llciB3cm90ZToKPj4+Pj4+Pj4gVGhlIG9ubHkgY2FzZSB3
-aGVyZSB3ZSBhY3R1YWxseSBuZWVkIHRvIHBlcmZvcm0gYSBkY2FjaGUgbWFpbnRlbmFuY2UKPj4+
-Pj4+Pj4gaXMgd2hlbiB3ZSBtYXAgdGhlIHBhZ2UgZm9yIHRoZSBmaXJzdCB0aW1lLCBhbmQgc3Vi
-c2VxdWVudCBwZXJtaXNzaW9uCj4+Pj4+Pj4+IGZhdWx0cyBkbyBub3QgcmVxdWlyZSBjYWNoZSBt
-YWludGVuYW5jZS4gTGV0J3MgbWFrZSBpdCBjb25kaXRpb25hbAo+Pj4+Pj4+PiBvbiBub3QgYmVp
-bmcgYSBwZXJtaXNzaW9uIGZhdWx0IChhbmQgdGh1cyBhIHRyYW5zbGF0aW9uIGZhdWx0KS4KPj4+
-Pj4+Pj4KPj4+Pj4+Pj4gUmV2aWV3ZWQtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVy
-LmRhbGxAbGluYXJvLm9yZz4KPj4+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVyIDxt
-YXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4+Pj4+PiBUaGlzIHBhdGNoIHVuZm9ydHVuYXRlbHkgYnJl
-YWtzIHNvbWV0aGluZyBvbiBIaTE2MTYgU29DcyB3aGVuIHJ1bm5pbmcKPj4+Pj4+PiAzMmJpdCBn
-dWVzdHMuIFdpdGggdGhpcyBwYXRjaCBhcHBsaWVkIChhbmQgdGh1cyB3aXRoIDQuMTgpIEkgZ2V0
-IHJhbmRvbQo+Pj4+Pj4+IGlsbGVnYWwgaW5zdHJ1Y3Rpb24gd2FybmluZ3MgZnJvbSAzMmJpdCBj
-b2RlIGluc2lkZSBWTXMuIEkgZG8gbm90IGtub3cKPj4+Pj4+PiBhdCB0aGlzIHBvaW50IHdoZXRo
-ZXIgdGhpcyBhZmZlY3RzIG90aGVyIENQVXMgYXMgd2VsbC4KPj4+Pj4+IENhbiB5b3UgcGxlYXNl
-IGdpdmUgYSBmZXcgbW9yZSBkZXRhaWxzPwo+Pj4+Pj4KPj4+Pj4+IC0gd2hhdCBhcmUgdGhlIENQ
-VXMgb24gdGhpcyBIaTE2MTY/IEF0IGxlYXN0IGEgL3Byb2MvY3B1aW5mbyB3b3VsZCBoZWxwCj4+
-Pj4+IFRoZXNlIGFyZSBBNzJzOgo+Pj4+Pgo+Pj4+PiBwcm9jZXNzb3LCoMKgwqAgOiAwCj4+Pj4+
-IEJvZ29NSVBTwqDCoMKgIDogMTAwLjAwCj4+Pj4+IEZlYXR1cmVzwqDCoMKgIDogZnAgYXNpbWQg
-ZXZ0c3RybSBhZXMgcG11bGwgc2hhMSBzaGEyIGNyYzMyIGNwdWlkCj4+Pj4+IENQVSBpbXBsZW1l
-bnRlcsKgwqDCoCA6IDB4NDEKPj4+Pj4gQ1BVIGFyY2hpdGVjdHVyZTogOAo+Pj4+PiBDUFUgdmFy
-aWFudMKgwqDCoCA6IDB4MAo+Pj4+PiBDUFUgcGFydMKgwqDCoCA6IDB4ZDA4Cj4+Pj4+IENQVSBy
-ZXZpc2lvbsKgwqDCoCA6IDIKPj4+Pj4KPj4+Pj4+IC0gYW4gZXhhbXBsZSBvZiB0aGUgY3Jhc2g/
-IElzIGl0IHdpdGhpbiB0aGUgZGVjb21wcmVzc29yPyBBZnRlcj8gVGhpcwo+Pj4+Pj4gdGhpbmdz
-IGRvIG1hdHRlciwgZ2l2ZW4gdGhlIG51bWJlciBvZiBjcmF6eSB0aGluZ3MgdGhlIDMyYml0IGtl
-cm5lbCBkb2VzCj4+Pj4+IFRoZXkgYXJlIGFsd2F5cyBpbiB1c2VyIHNwYWNlLiBNeSBjdXJyZW50
-IHJlcHJvZHVjZXIgaXMgdGhpczoKPj4+Pj4KPj4+Pj4gICAgwqAgJCB3aGlsZSBycG0gLXFhID4g
-L2Rldi9udWxsOyBkbyA6OyBkb25lCj4+Pj4+Cj4+Pj4+IElmIEkgcnVuIHRoaXMgaW4gcGFyYWxs
-ZWwgd2l0aCBzb21ldGhpbmcgdGhhdCBqdXN0IHBvcHVsYXRlcyBSQU0gKGRkCj4+Pj4+IGlmPS9k
-ZXYvbnZtZTBuMSBvZj0vZGV2L251bGwgYnM9MTBHKSBJIGdldCBhbiBpbGxlZ2FsIGluc3RydWN0
-aW9uIGZhdWx0Cj4+Pj4+IHdpdGhpbiBzZWNvbmRzOgo+Pj4+Pgo+Pj4+PiBzaC00LjQjIHdoaWxl
-IHJwbSAtcWEgPiAvZGV2L251bGw7IGRvIHRydWU7IGRvbmUKPj4+Pj4gSWxsZWdhbCBpbnN0cnVj
-dGlvbiAoY29yZSBkdW1wZWQpCj4+Pj4+Cj4+Pj4+Cj4+Pj4+PiAtIGEgaG9zdCBrZXJuZWwgY29u
-ZmlndXJhdGlvbj8KPj4+Pj4gSG9zdCBrZXJuZWwgY29uZmlndXJhdGlvbiBpcyBqdXN0IHRoZSBu
-b3JtYWwgb3BlblNVU0Ugb25lOgo+Pj4+Pgo+Pj4+PiBodHRwczovL2tlcm5lbC5vcGVuc3VzZS5v
-cmcvY2dpdC9rZXJuZWwtc291cmNlL3BsYWluL2NvbmZpZy9hcm02NC9kZWZhdWx0P2g9c3RhYmxl
-Cj4+Pj4+Cj4+Pj4+Pj4gSWYgYW55b25lIGlzIGludGVyZXN0ZWQgaW4gYSByZXByb2R1Y2VyLCBJ
-IGhhdmUgc29tZXRoaW5nIGhhbmR5LiBCdXQgZm9yCj4+Pj4+Pj4gbm93IEkgYmVsaWV2ZSB3ZSBz
-aG91bGQganVzdCByZXZlcnQgdGhpcyBwYXRjaC4KPj4+Pj4+IEJlZm9yZSB3ZSByZXZlcnQgYW55
-dGhpbmcsIEknZCBsaWtlIHRvIHVuZGVyc3RhbmQgd2hhdCBpcyBoYXBwZW5pbmcuCj4+Pj4+IFll
-YWgsIEkgZGlkbid0IHJlYWxpemUgdGhlIGNvbW1pdCBpcyBhbHJlYWR5IGluIHNpbmNlIDQuMTYs
-IHNvIEkgYWdyZWUuCj4+Pj4+IEknbGwgYmlzZWN0IGEgYml0LCBidXQgaXQgbWF5IHRha2UgYSB3
-aGlsZS4KPj4+PiBEbyB5b3UgbWluZCBnaXZpbmcgdGhpcyBhIHRyeT8KPj4+Pgo+Pj4+IGRpZmYg
-LS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiBpbmRl
-eCAxZDkwZDc5NzA2YmQuLmRmOGYzZDVlYWEyMiAxMDA2NDQKPj4+PiAtLS0gYS92aXJ0L2t2bS9h
-cm0vbW11LmMKPj4+PiArKysgYi92aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiBAQCAtMTUzMSw3ICsx
-NTM2LDcgQEAgc3RhdGljIGludCB1c2VyX21lbV9hYm9ydChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-IHBoeXNfYWRkcl90IGZhdWx0X2lwYSwKPj4+PiAgICAJCQlrdm1fc2V0X3Bmbl9kaXJ0eShwZm4p
-Owo+Pj4+ICAgIAkJfQo+Pj4+ICAgIAo+Pj4+IC0JCWlmIChmYXVsdF9zdGF0dXMgIT0gRlNDX1BF
-Uk0pCj4+Pj4gKwkJaWYgKGZhdWx0X3N0YXR1cyAhPSBGU0NfUEVSTSB8fCB3cml0ZV9mYXVsdCkK
-Pj4+PiAgICAJCQljbGVhbl9kY2FjaGVfZ3Vlc3RfcGFnZShwZm4sIFBNRF9TSVpFKTsKPj4+PiAg
-ICAKPj4+PiAgICAJCWlmIChleGVjX2ZhdWx0KSB7Cj4+Pj4gQEAgLTE1NTMsNyArMTU1OCw3IEBA
-IHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBwaHlzX2Fk
-ZHJfdCBmYXVsdF9pcGEsCj4+Pj4gICAgCQkJbWFya19wYWdlX2RpcnR5KGt2bSwgZ2ZuKTsKPj4+
-PiAgICAJCX0KPj4+PiAgICAKPj4+PiAtCQlpZiAoZmF1bHRfc3RhdHVzICE9IEZTQ19QRVJNKQo+
-Pj4+ICsJCWlmIChmYXVsdF9zdGF0dXMgIT0gRlNDX1BFUk0gfHwgd3JpdGVfZmF1bHQpCj4+Pj4g
-ICAgCQkJY2xlYW5fZGNhY2hlX2d1ZXN0X3BhZ2UocGZuLCBQQUdFX1NJWkUpOwo+Pj4+ICAgIAo+
-Pj4+ICAgIAkJaWYgKGV4ZWNfZmF1bHQpIHsKPj4+Pgo+Pj4+Cj4+Pj4gVGhlIG1pc3NpbmcgbG9n
-aWMgaXMgdGhhdCBhIHdyaXRlIGZyb20gdGhlIGd1ZXN0IGNvdWxkIGhhdmUgdHJpZ2dlcmVkCj4+
-Pj4gYSBDb1csIG1lYW5pbmcgd2UgZGVmaW5pdGVseSBuZWVkIHRvIGZsdXNoIGl0IGluIHRoYXQg
-Y2FzZSB0b28uIEl0Cj4+Pj4gZml4ZXMgYSBrdm0tdW5pdC10ZXN0IHJlZ3Jlc3Npb24gaGVyZS4K
-Pj4+IFRoaXMgcGF0Y2ggdW5mb3J0dW5hdGVseSBkb2VzIG5vdCBmaXggdGhlIGlzc3VlLiBJIHN0
-aWxsIHNlZSBpbGxlZ2FsCj4+PiBpbnN0cnVjdGlvbnMuCj4+IFsrRGF2ZV0KPj4KPj4gVGhhdCdz
-IGJlY2F1c2Ugd2hhdCB5b3UncmUgb2JzZXJ2aW5nIGhhcyBub3RoaW5nIHRvIGRvIHdpdGggY2Fj
-aGluZywgYnV0Cj4+IHdpdGggRlAvU0lNRCB0cmFwcGluZyBpbnN0ZWFkLiBUaGFua3MgdG8gdGhl
-IGd1ZXN0IGltYWdlIHlvdSd2ZSBwcm92aWRlZCwKPj4gSSd2ZSBiZWVuIGFibGUgdG8gZXh0cmFj
-dCB0aGUgZm9sbG93aW5nOgo+Pgo+PiBbICAgIDMuOTQ0MjczXSBzeXN0ZW1kLXVkZXZkICgyNjYp
-OiB1bmRlZmluZWQgaW5zdHJ1Y3Rpb246IHBjPShwdHJ2YWwpCj4+IFsgICAgMy45NDUzOTZdIENQ
-VTogMCBQSUQ6IDI2NiBDb21tOiBzeXN0ZW1kLXVkZXZkIE5vdCB0YWludGVkIDQuMTcuMTQtMi1s
-cGFlICMxIG9wZW5TVVNFIFR1bWJsZXdlZWQgKHVucmVsZWFzZWQpCj4+IFsgICAgMy45NDcxMzBd
-IEhhcmR3YXJlIG5hbWU6IEdlbmVyaWMgRFQgYmFzZWQgc3lzdGVtCj4+IFsgICAgMy45NDc5NzZd
-IFBDIGlzIGF0IDB4YjZiOTM5N2EKPj4gWyAgICAzLjk0ODU0N10gTFIgaXMgYXQgMHhiNmU5YTFi
-MAo+PiBbICAgIDMuOTU4MjkxXSBwYyA6IFs8YjZiOTM5N2E+XSAgICBsciA6IFs8YjZlOWExYjA+
-XSAgICBwc3I6IDIwMDcwMDMwCj4+IFsgICAgMy45NTk2NjRdIHNwIDogYmViZTM2YTAgIGlwIDog
-YjZmNmFkNTAgIGZwIDogMDA1ZTg3ODQKPj4gWyAgICAzLjk2MDYwMV0gcjEwOiBiZWJlMzgxNCAg
-cjkgOiBiZWJlMzZjMCAgcjggOiBiZWJlMzZiYwo+PiBbICAgIDMuOTYxNTIyXSByNyA6IGJlYmUz
-ODE0ICByNiA6IDAwMDAwMDc0ICByNSA6IDAwMDAwMDAwICByNCA6IDAwMDAwMDAwCj4+IFsgICAg
-My45NjI2NjFdIHIzIDogMDA1ZjJiNjAgIHIyIDogMDAwMDAwNzQgIHIxIDogMDAwMDAwMDAgIHIw
-IDogYmViZTM4MTQKPj4gWyAgICAzLjk2MzgwMV0gRmxhZ3M6IG56Q3YgIElSUXMgb24gIEZJUXMg
-b24gIE1vZGUgVVNFUl8zMiAgSVNBIFRodW1iICBTZWdtZW50IHVzZXIKPj4gWyAgICA0LjAwMDYw
-Nl0gQ29udHJvbDogMzBjNTM4M2QgIFRhYmxlOiA2YThlNzQwMCAgREFDOiBmZmZmZmZmZAo+PiBb
-ICAgIDQuMDAxNjU5XSBDb2RlOiBkMWY5IGYxYTAgMDAwMSA0NzcwIChlZWUwKSAxYjEwCj4+Cj4+
-IG1hekBmbGFrZXM6fi9hcm12Ny1idWlsZC1mYWlsJCAoZWNobyAudGh1bWI7IGVjaG8gLmluc3Qu
-dyAweGVlZTAxYjEwKSA+IHguUyAmJiAgYXJtLWxpbnV4LWdudWVhYmloZi1nY2MgLWMgeC5TICYm
-IGFybS1saW51eC1nbnVlYWJpaGYtb2JqZHVtcCAtZCB4Lm8KPj4KPj4geC5vOiAgICAgZmlsZSBm
-b3JtYXQgZWxmMzItbGl0dGxlYXJtCj4+Cj4+Cj4+IERpc2Fzc2VtYmx5IG9mIHNlY3Rpb24gLnRl
-eHQ6Cj4+Cj4+IDAwMDAwMDAwIDwudGV4dD46Cj4+ICAgICAwOgllZWUwIDFiMTAgCXZkdXAuOAlx
-MCwgcjEKPj4KPj4gQSBWRlAgaW5zdHJ1Y3Rpb24uIEdpdmVuIHRoYXQgeW91J3ZlIHJlcG9ydGVk
-IHRoYXQgdGhpbmdzIHdvcmtlZCBpbgo+PiA0LjE3IGFuZCBicm9rZSBpbiA0LjE4LCBJIHN0cm9u
-Z2x5IHN1c3BlY3QgdGhlIG5ldyBsYXp5IEZQU0lNRCBjb2RlLgo+PiBVcG9uIGluc3BlY3Rpb24s
-IHRoZSB3YXkgd2Ugc2V0dXAgdHJhcHBpbmcgZm9yIDMyYml0IGlzIGEgdGlueSBiaXQKPj4gc3Vz
-cGVjdC4KPj4KPj4gQ291bGQgeW91IHBsZWFzZSBnaXZlIHRoaXMgcGF0Y2ggYSBnbz8gTXkgU2Vh
-dHRsZSBoYXMgYmVlbiBydW5uaW5nCj4+IHdpdGggaXQgZm9yIDMwIG1pbnV0ZXMgbm93LCBhbmQg
-aXQgaXMgc3RpbGwgcnVubmluZyAoaW5zdGVhZCBvZgo+PiBmYWlsaW5nIHdpdGggc2Vjb25kcyku
-Cj4+Cj4+IFRoYW5rcywKPj4KPj4gCU0uCj4+Cj4+ICBGcm9tIGYyZDFkNDNlMjQyOWY5MjY5YWI2
-YzU2NTQ0MGUwOTVhYjNhOWJlODkgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCj4+IEZyb206IE1h
-cmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4+IERhdGU6IFRodSwgMjMgQXVnIDIw
-MTggMTE6NTE6NDMgKzAxMDAKPj4gU3ViamVjdDogW1BBVENIXSBhcm02NDogS1ZNOiBPbmx5IGZv
-cmNlIEZQRVhDMzJfRUwyLkVOIGlmIHRyYXBwaW5nIEZQU0lNRAo+Pgo+PiBJZiB0cmFwcGluZyBG
-UFNJTUQgaW4gdGhlIGNvbnRleHQgb2YgYW4gQUFyY2gzMiBndWVzdCwgaXQgaXMgY3JpdGljYWwK
-Pj4gdG8gc2V0IEZQRVhDMzJfRUwyLkVOIHRvIDEgc28gdGhhdCB0aGUgdHJhcHBpbmcgaXMgdGFr
-ZW4gdG8gRUwyIGFuZAo+PiBub3QgRUwxLgo+Pgo+PiBDb252ZXJzZWx5LCBpdCBpcyBqdXN0IGFz
-IGNyaXRpY2FsICpub3QqIHRvIHNldCBGUEVYQzMyX0VMMi5FTiB0byAxCj4+IGlmIHdlJ3JlIG5v
-dCBnb2luZyB0byB0cmFwIEZQU0lNRCwgYXMgd2UgdGhlbiBjb3JydXB0IHRoZSBleGlzdGluZwo+
-PiBWRlAgc3RhdGUuCj4+Cj4+IE1vdmluZyB0aGUgY2FsbCB0byBfX2FjdGl2YXRlX3RyYXBzX2Zw
-c2ltZDMyIHRvIHRoZSBwb2ludCB3aGVyZSB3ZQo+PiBrbm93IGZvciBzdXJlIHRoYXQgd2UgYXJl
-IGdvaW5nIHRvIHRyYXAgZW5zdXJlcyB0aGF0IHdlIGRvbid0IHNldCB0aGF0Cj4+IGJpdCBzcHVy
-aW91c2x5Lgo+Pgo+PiBGaXhlczogZTZiNjczYjc0MWVhICgiS1ZNOiBhcm02NDogT3B0aW1pc2Ug
-RlBTSU1EIGhhbmRsaW5nIHRvIHJlZHVjZSBndWVzdC9ob3N0IHRocmFzaGluZyIpCj4+IENjOiBE
-YXZlIE1hcnRpbiA8ZGF2ZS5tYXJ0aW5AYXJtLmNvbT4KPj4gUmVwb3J0ZWQtYnk6IEFsZXhhbmRl
-ciBHcmFmIDxhZ3JhZkBzdXNlLmRlPgo+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1h
-cmMuenluZ2llckBhcm0uY29tPgo+IAo+IFZlcnkgZ29vZCBjYXRjaC4gVGhpcyBwYXRjaCBkb2Vz
-IGluZGVlZCBmaXggaXQuIEknbSBzdGlsbCBwdXp6bGVkIHdoeSAKPiByZXZlcnRpbmcgdGhlIGRj
-YWNoZSBwYXRjaCBhY3R1YWxseSBoYWQgYW55IHBvc2l0aXZlIGVmZmVjdCwgYnV0IG9oIHdlbGwg
-Cj4gLi4uIDopCgpXZWxsLCB0aGVyZSBpcyBzdGlsbCBhIGJ1ZyBpbiB0aGF0IGRjYWNoZSBwYXRj
-aCwgd2hpY2ggSSd2ZSBmaXhlZApzZXBhcmF0ZWx5IChpbiBhIGJldHRlciB3YXkgdGhhbiB3aGF0
-IEkgc2VudCBiZWZvcmUpLCBzbyB5b3UgbWF5IGhhdmUKaGl0IHRoYXQgYXMgd2VsbCwgYnV0IHRo
-YXQncyBub3QgdGhlIG1vc3QgdmlzaWJsZSBidWcuCgo+IFRlc3RlZC1ieTogQWxleGFuZGVyIEdy
-YWYgPGFncmFmQHN1c2UuZGU+CgpUaGFua3MgZm9yIHRoYXQuCgoJTS4KLS0gCkphenogaXMgbm90
-IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+Hi,
+
+On 08/23/2018 02:17 PM, Eric Auger wrote:
+> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> 
+> In virtualization use case, when a guest is assigned
+> a PCI host device, protected by a virtual IOMMU on a guest,
+> the physical IOMMU must be programmed to be consistent with
+> the guest mappings. If the physical IOMMU supports two
+> translation stages it makes sense to program guest mappings
+> onto the first stage while to host owns the stage 2.
+> 
+> In that case, it is mandated to trap on guest configuration
+> settings and pass those to the physical iommu driver.
+> 
+> This patch adds a new API to the iommu subsystem that allows
+> to bind and unbind the guest configuration data to the host.
+> 
+> A generic iommu_guest_stage_config struct is introduced in
+> a new iommu.h uapi header. This is going to be used by the VFIO
+> user API. We foresee at least 2 specialization of this struct,
+> for PASID table passing and ARM SMMUv3.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> This patch generalizes the API introduced by Jacob & co-authors in
+> https://lwn.net/Articles/754331/
+> ---
+>  drivers/iommu/iommu.c      | 19 +++++++++++++++
+>  include/linux/iommu.h      | 23 ++++++++++++++++++
+>  include/uapi/linux/iommu.h | 59 ++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 101 insertions(+)
+>  create mode 100644 include/uapi/linux/iommu.h
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 63b3756..5156172 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1326,6 +1326,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+>  
+> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
+> +			   struct iommu_guest_stage_config *cfg)
+> +{
+> +	if (unlikely(!domain->ops->bind_guest_stage))
+> +		return -ENODEV;
+> +
+> +	return domain->ops->bind_guest_stage(domain, dev, cfg);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_bind_guest_stage);
+> +
+> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
+> +{
+> +	if (unlikely(!domain->ops->unbind_guest_stage))
+> +		return;
+> +
+> +	domain->ops->unbind_guest_stage(domain, dev);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_stage);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 19938ee..aec853d 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -25,6 +25,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+>  #include <linux/of.h>
+> +#include <uapi/linux/iommu.h>
+>  
+>  #define IOMMU_READ	(1 << 0)
+>  #define IOMMU_WRITE	(1 << 1)
+> @@ -187,6 +188,8 @@ struct iommu_resv_region {
+>   * @domain_get_windows: Return the number of windows for a domain
+>   * @of_xlate: add OF master IDs to iommu grouping
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+> + * @bind_guest_stage: program the guest stage configuration
+> + * @unbind_guest_stage: unbind the guest stage and restore defaults
+>   */
+>  struct iommu_ops {
+>  	bool (*capable)(enum iommu_cap);
+> @@ -235,6 +238,11 @@ struct iommu_ops {
+>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
+>  
+> +	int (*bind_guest_stage)(struct iommu_domain *domain, struct device *dev,
+> +				struct iommu_guest_stage_config *cfg);
+> +	void (*unbind_guest_stage)(struct iommu_domain *domain,
+> +				   struct device *dev);
+> +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -296,6 +304,10 @@ extern int iommu_attach_device(struct iommu_domain *domain,
+>  			       struct device *dev);
+>  extern void iommu_detach_device(struct iommu_domain *domain,
+>  				struct device *dev);
+> +extern int iommu_bind_guest_stage(struct iommu_domain *domain,
+> +		struct device *dev, struct iommu_guest_stage_config *cfg);
+> +extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
+> +				     struct device *dev);
+>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>  		     phys_addr_t paddr, size_t size, int prot);
+> @@ -696,6 +708,17 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
+>  	return NULL;
+>  }
+>  
+> +static inline
+> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
+> +			   struct iommu_guest_stage_config *cfg)
+> +{
+> +	return -ENODEV;
+> +}
+> +static inline
+> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
+> +{
+> +}
+> +
+>  #endif /* CONFIG_IOMMU_API */
+>  
+>  #endif /* __LINUX_IOMMU_H */
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> new file mode 100644
+> index 0000000..2d1593c
+> --- /dev/null
+> +++ b/include/uapi/linux/iommu.h
+> @@ -0,0 +1,59 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * IOMMU user API definitions
+> + *
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#ifndef _UAPI_IOMMU_H
+> +#define _UAPI_IOMMU_H
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * PASID table data used to bind guest PASID table to the host IOMMU. This will
+> + * enable guest managed first level page tables.
+> + * @version: for future extensions and identification of the data format
+> + * @bytes: size of this structure
+> + * @base_ptr:	PASID table pointer
+> + * @pasid_bits:	number of bits supported in the guest PASID table, must be less
+> + *		or equal than the host supported PASID size.
+> + */
+> +struct iommu_pasid_table_config {
+> +	__u32 version;
+> +#define PASID_TABLE_CFG_VERSION_1 1
+> +	__u32 bytes;
+> +	__u64 base_ptr;
+> +	__u8 pasid_bits;
+> +};
+> +
+> +/**
+> + * Stream Table Entry S1 info
+> + * @disabled: the smmu is disabled
+> + * @bypassed: stage 1 is bypassed
+> + * @aborted: aborted
+> + * @cdptr_dma: GPA of the Context Descriptor
+> + * @asid: address space identified associated to the CD
+> + */
+> +struct iommu_smmu_s1_config {
+> +	__u8 disabled;
+> +	__u8 bypassed;
+> +	__u8 aborted;
+> +	__u64 cdptr_dma;
+> +	__u16 asid;
+This asid field is a leftover. asid is part of the CD (owned by the
+guest) and cannot be conveyed through this API. What is relevant is to
+pass is the guest asid_bits (vSMMU IDR1 info), to be compared with the
+host one. So we end up having something similar to the base_ptr and
+pasid_bits of iommu_pasid_table_config.
+
+Otherwise, the other fields (disable, bypassed, aborted) can be packed
+as masks in a _u8 flag.
+
+Anyway this API still is at the stage of proof of concept. At least it
+shows the similarities between that use case and the PASID one and
+should encourage to discuss about the relevance to have a unified API to
+pass the guest stage info.
+
+Thanks
+
+Eric
+> +};
+> +
+> +struct iommu_guest_stage_config {
+> +#define PASID_TABLE	(1 << 0)
+> +#define SMMUV3_S1_CFG	(1 << 1)
+> +	__u32 flags;
+> +	union {
+> +		struct iommu_pasid_table_config pasidt;
+> +		struct iommu_smmu_s1_config smmu_s1;
+> +	};
+> +};
+> +
+> +#endif /* _UAPI_IOMMU_H */
+> 
