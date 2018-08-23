@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 10/13] iommu/smmuv3: Implement bind_guest_stage
-Date: Thu, 23 Aug 2018 14:17:33 +0200
-Message-ID: <1535026656-8450-11-git-send-email-eric.auger__49679.1281424977$1535038714$gmane$org@redhat.com>
+Subject: [RFC 11/13] iommu/smmuv3: Implement tlb_invalidate
+Date: Thu, 23 Aug 2018 14:17:34 +0200
+Message-ID: <1535026656-8450-12-git-send-email-eric.auger__45416.1825044595$1535038715$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 479A34A21D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F9414A210
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X0ofh5DEB2DK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:18:18 -0400 (EDT)
+ with ESMTP id OyKtSfBPBtAL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:18:24 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AB024A210
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 74ACC4A1DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:24 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,110 +35,70 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On bind_guest_stage() we set the minimal information in s1_cfg:
-- the asid (allocated by the guest)
-- the context descriptor GPA
-
-On unbind, the STE stage 1 fields are reset.
+Implement IOMMU_INV_TYPE_TLB invalidations. When
+nr_pages is null we interpret this as a context
+invalidation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
 ---
- drivers/iommu/arm-smmu-v3.c | 78 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+
+The user API needs to be refined to discriminate context
+invalidations from NH_VA invalidations. Also the leaf attribute
+is not yet properly handled.
+---
+ drivers/iommu/arm-smmu-v3.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 3a33979..26afafa 100644
+index 26afafa..e4c7ae8 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -2025,6 +2025,82 @@ static void arm_smmu_put_resv_regions(struct device *dev,
- 		kfree(entry);
+@@ -2101,6 +2101,39 @@ static void arm_smmu_unbind_guest_stage(struct iommu_domain *domain,
+ 	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
  }
  
-+static int arm_smmu_bind_guest_stage(struct iommu_domain *domain,
-+				     struct device *dev,
-+				     struct iommu_guest_stage_config *cfg)
++static int arm_smmu_tlb_invalidate(struct iommu_domain *domain,
++				   struct device *dev,
++				   struct iommu_tlb_invalidate_info *inv_info)
 +{
 +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
 +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_master_data *entry;
-+	unsigned long flags;
++	size_t granule = 1 << (inv_info->size + 12);
 +
-+	if (cfg->flags != SMMUV3_S1_CFG)
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
 +		return -EINVAL;
 +
 +	if (!smmu)
 +		return -EINVAL;
 +
-+	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
-+	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
-+		dev_info(smmu_domain->smmu->dev,
-+			 "does not implement two stages\n");
++	if (inv_info->hdr.type != IOMMU_INV_TYPE_TLB)
 +		return -EINVAL;
++
++	/*
++	 * TODO: On context invalidation, the userspace sets nr_pages to 0.
++	 * Refine the API to add a dedicated flags and also properly handle
++	 * the leaf parameter.
++	 */
++	if (!inv_info->nr_pages) {
++		arm_smmu_tlb_inv_context(smmu_domain);
++	} else {
++		arm_smmu_tlb_inv_range_nosync(inv_info->addr,
++					      inv_info->nr_pages * granule,
++					      granule, false, smmu_domain);
++		__arm_smmu_tlb_sync(smmu);
 +	}
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		return -EINVAL;
-+
-+	if (cfg->smmu_s1.asid >= (1 << smmu->asid_bits))
-+		return -EINVAL;
-+
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(entry, &smmu_domain->devices, list) {
-+		struct arm_smmu_s1_cfg *s1_cfg;
-+
-+		if (dev != entry->dev)
-+			continue;
-+
-+		s1_cfg = entry->ste.s1_cfg = &smmu_domain->s1_cfg;
-+		s1_cfg->bypass = cfg->smmu_s1.disabled || cfg->smmu_s1.bypassed;
-+		s1_cfg->cd.asid = cfg->smmu_s1.asid;
-+
-+		if (!s1_cfg->bypass)
-+			s1_cfg->cdptr_dma = cfg->smmu_s1.cdptr_dma;
-+
-+		arm_smmu_install_ste_for_dev(dev->iommu_fwspec);
-+		break;
-+	}
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+
 +	return 0;
-+}
-+
-+static void arm_smmu_unbind_guest_stage(struct iommu_domain *domain,
-+					struct device *dev)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_master_data *entry;
-+	unsigned long flags;
-+
-+	if (!smmu)
-+		return;
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		return;
-+
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(entry, &smmu_domain->devices, list) {
-+		if (dev != entry->dev)
-+			continue;
-+
-+		entry->ste.s1_cfg = NULL;
-+		arm_smmu_install_ste_for_dev(dev->iommu_fwspec);
-+		break;
-+	}
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
 +}
 +
  static struct iommu_ops arm_smmu_ops = {
  	.capable		= arm_smmu_capable,
  	.domain_alloc		= arm_smmu_domain_alloc,
-@@ -2044,6 +2120,8 @@ static struct iommu_ops arm_smmu_ops = {
- 	.of_xlate		= arm_smmu_of_xlate,
- 	.get_resv_regions	= arm_smmu_get_resv_regions,
+@@ -2122,6 +2155,7 @@ static struct iommu_ops arm_smmu_ops = {
  	.put_resv_regions	= arm_smmu_put_resv_regions,
-+	.bind_guest_stage	= arm_smmu_bind_guest_stage,
-+	.unbind_guest_stage	= arm_smmu_unbind_guest_stage,
+ 	.bind_guest_stage	= arm_smmu_bind_guest_stage,
+ 	.unbind_guest_stage	= arm_smmu_unbind_guest_stage,
++	.tlb_invalidate		= arm_smmu_tlb_invalidate,
  	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
  };
  
