@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 01/13] iommu: Introduce bind_guest_stage API
-Date: Thu, 23 Aug 2018 14:17:24 +0200
-Message-ID: <1535026656-8450-2-git-send-email-eric.auger__39376.4459797696$1535038707$gmane$org@redhat.com>
+Subject: [RFC 03/13] iommu: Introduce bind_guest_msi
+Date: Thu, 23 Aug 2018 14:17:26 +0200
+Message-ID: <1535026656-8450-4-git-send-email-eric.auger__49887.9237370149$1535038711$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 488CF4A210
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2694A210
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UefGAcyGSLSi for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:17:48 -0400 (EDT)
+ with ESMTP id ZC4p7K3UFX9R for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:17:53 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 177ED4A1DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A4CD4A1DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:17:53 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,199 +35,110 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+On ARM, MSI are translated by the SMMU. An IOVA is allocated
+for each MSI doorbell. If both the host and the guest are exposed
+with SMMUs, we end up with 2 different IOVAs allocated by each.
+guest allocates an IOVA (gIOVA) to map onto the guest MSI
+doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
+onto the physical doorbell (hDB).
 
-In virtualization use case, when a guest is assigned
-a PCI host device, protected by a virtual IOMMU on a guest,
-the physical IOMMU must be programmed to be consistent with
-the guest mappings. If the physical IOMMU supports two
-translation stages it makes sense to program guest mappings
-onto the first stage while to host owns the stage 2.
+So we end up with 2 untied mappings:
+         S1            S2
+gIOVA    ->    gDB
+              hIOVA    ->    gDB
 
-In that case, it is mandated to trap on guest configuration
-settings and pass those to the physical iommu driver.
+Currently the PCI device is programmed by the host with hIOVA
+as MSI doorbell. So this does not work.
 
-This patch adds a new API to the iommu subsystem that allows
-to bind and unbind the guest configuration data to the host.
+This patch introduces an API to pass gIOVA/gDB to the host so
+that gIOVA can be reused by the host instead of re-allocating
+a new IOVA. So the goal is to create the following nested mapping:
 
-A generic iommu_guest_stage_config struct is introduced in
-a new iommu.h uapi header. This is going to be used by the VFIO
-user API. We foresee at least 2 specialization of this struct,
-for PASID table passing and ARM SMMUv3.
+         S1            S2
+gIOVA    ->    gDB     ->    hDB
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+and program the PCI device with gIOVA MSI doorbell.
+
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-This patch generalizes the API introduced by Jacob & co-authors in
-https://lwn.net/Articles/754331/
----
- drivers/iommu/iommu.c      | 19 +++++++++++++++
- include/linux/iommu.h      | 23 ++++++++++++++++++
- include/uapi/linux/iommu.h | 59 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+)
- create mode 100644 include/uapi/linux/iommu.h
+ drivers/iommu/iommu.c      | 10 ++++++++++
+ include/linux/iommu.h      | 12 ++++++++++++
+ include/uapi/linux/iommu.h |  7 +++++++
+ 3 files changed, 29 insertions(+)
 
 diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 63b3756..5156172 100644
+index 0bc05a7..ab8968f 100644
 --- a/drivers/iommu/iommu.c
 +++ b/drivers/iommu/iommu.c
-@@ -1326,6 +1326,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+@@ -1336,6 +1336,16 @@ int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
  }
- EXPORT_SYMBOL_GPL(iommu_attach_device);
+ EXPORT_SYMBOL_GPL(iommu_bind_guest_stage);
  
-+int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
-+			   struct iommu_guest_stage_config *cfg)
++int iommu_bind_guest_msi(struct iommu_domain *domain,
++			 struct iommu_guest_msi_binding *binding)
 +{
-+	if (unlikely(!domain->ops->bind_guest_stage))
++	if (unlikely(!domain->ops->bind_guest_msi))
 +		return -ENODEV;
 +
-+	return domain->ops->bind_guest_stage(domain, dev, cfg);
++	return domain->ops->bind_guest_msi(domain, binding);
 +}
-+EXPORT_SYMBOL_GPL(iommu_bind_guest_stage);
++EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
 +
-+void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
-+{
-+	if (unlikely(!domain->ops->unbind_guest_stage))
-+		return;
-+
-+	domain->ops->unbind_guest_stage(domain, dev);
-+}
-+EXPORT_SYMBOL_GPL(iommu_unbind_guest_stage);
-+
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
+ void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
  {
+ 	if (unlikely(!domain->ops->unbind_guest_stage))
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 19938ee..aec853d 100644
+index b13cf2b..ff8ae5f0 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -25,6 +25,7 @@
- #include <linux/errno.h>
- #include <linux/err.h>
- #include <linux/of.h>
-+#include <uapi/linux/iommu.h>
+@@ -247,6 +247,9 @@ struct iommu_ops {
+ 	int (*tlb_invalidate)(struct iommu_domain *domain, struct device *dev,
+ 			      struct iommu_tlb_invalidate_info *inv_info);
  
- #define IOMMU_READ	(1 << 0)
- #define IOMMU_WRITE	(1 << 1)
-@@ -187,6 +188,8 @@ struct iommu_resv_region {
-  * @domain_get_windows: Return the number of windows for a domain
-  * @of_xlate: add OF master IDs to iommu grouping
-  * @pgsize_bitmap: bitmap of all possible supported page sizes
-+ * @bind_guest_stage: program the guest stage configuration
-+ * @unbind_guest_stage: unbind the guest stage and restore defaults
-  */
- struct iommu_ops {
- 	bool (*capable)(enum iommu_cap);
-@@ -235,6 +238,11 @@ struct iommu_ops {
- 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
- 	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
- 
-+	int (*bind_guest_stage)(struct iommu_domain *domain, struct device *dev,
-+				struct iommu_guest_stage_config *cfg);
-+	void (*unbind_guest_stage)(struct iommu_domain *domain,
-+				   struct device *dev);
++	int (*bind_guest_msi)(struct iommu_domain *domain,
++			      struct iommu_guest_msi_binding *binding);
 +
  	unsigned long pgsize_bitmap;
  };
  
-@@ -296,6 +304,10 @@ extern int iommu_attach_device(struct iommu_domain *domain,
- 			       struct device *dev);
- extern void iommu_detach_device(struct iommu_domain *domain,
- 				struct device *dev);
-+extern int iommu_bind_guest_stage(struct iommu_domain *domain,
-+		struct device *dev, struct iommu_guest_stage_config *cfg);
-+extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
-+				     struct device *dev);
+@@ -315,6 +318,8 @@ extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
+ extern int iommu_tlb_invalidate(struct iommu_domain *domain,
+ 				struct device *dev,
+ 				struct iommu_tlb_invalidate_info *inv_info);
++extern int iommu_bind_guest_msi(struct iommu_domain *domain,
++				struct iommu_guest_msi_binding *binding);
+ 
  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
- 		     phys_addr_t paddr, size_t size, int prot);
-@@ -696,6 +708,17 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
- 	return NULL;
+@@ -732,6 +737,13 @@ static inline int iommu_tlb_invalidate(struct iommu_domain *domain,
+ 	return -ENODEV;
  }
  
 +static inline
-+int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
-+			   struct iommu_guest_stage_config *cfg)
++int iommu_bind_guest_msi(struct iommu_domain *domain,
++			 struct iommu_guest_msi_binding *binding)
 +{
 +	return -ENODEV;
-+}
-+static inline
-+void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device *dev)
-+{
 +}
 +
  #endif /* CONFIG_IOMMU_API */
  
  #endif /* __LINUX_IOMMU_H */
 diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-new file mode 100644
-index 0000000..2d1593c
---- /dev/null
+index 7c88d80..7de9ab1 100644
+--- a/include/uapi/linux/iommu.h
 +++ b/include/uapi/linux/iommu.h
-@@ -0,0 +1,59 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * IOMMU user API definitions
-+ *
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
+@@ -147,4 +147,11 @@ struct iommu_tlb_invalidate_info {
+ 	__u32		pasid;
+ 	__u64		addr;
+ };
 +
-+#ifndef _UAPI_IOMMU_H
-+#define _UAPI_IOMMU_H
-+
-+#include <linux/types.h>
-+
-+/**
-+ * PASID table data used to bind guest PASID table to the host IOMMU. This will
-+ * enable guest managed first level page tables.
-+ * @version: for future extensions and identification of the data format
-+ * @bytes: size of this structure
-+ * @base_ptr:	PASID table pointer
-+ * @pasid_bits:	number of bits supported in the guest PASID table, must be less
-+ *		or equal than the host supported PASID size.
-+ */
-+struct iommu_pasid_table_config {
-+	__u32 version;
-+#define PASID_TABLE_CFG_VERSION_1 1
-+	__u32 bytes;
-+	__u64 base_ptr;
-+	__u8 pasid_bits;
++struct iommu_guest_msi_binding {
++	__u64		iova;
++	__u64		gpa;
++	__u32		granule;
 +};
+ #endif /* _UAPI_IOMMU_H */
 +
-+/**
-+ * Stream Table Entry S1 info
-+ * @disabled: the smmu is disabled
-+ * @bypassed: stage 1 is bypassed
-+ * @aborted: aborted
-+ * @cdptr_dma: GPA of the Context Descriptor
-+ * @asid: address space identified associated to the CD
-+ */
-+struct iommu_smmu_s1_config {
-+	__u8 disabled;
-+	__u8 bypassed;
-+	__u8 aborted;
-+	__u64 cdptr_dma;
-+	__u16 asid;
-+};
-+
-+struct iommu_guest_stage_config {
-+#define PASID_TABLE	(1 << 0)
-+#define SMMUV3_S1_CFG	(1 << 1)
-+	__u32 flags;
-+	union {
-+		struct iommu_pasid_table_config pasidt;
-+		struct iommu_smmu_s1_config smmu_s1;
-+	};
-+};
-+
-+#endif /* _UAPI_IOMMU_H */
 -- 
 2.5.5
