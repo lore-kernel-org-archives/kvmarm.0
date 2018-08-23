@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC 08/13] iommu/arm-smmu-v3: Link domains and devices
-Date: Thu, 23 Aug 2018 14:17:31 +0200
-Message-ID: <1535026656-8450-9-git-send-email-eric.auger__11161.1021952287$1535038714$gmane$org@redhat.com>
+Subject: [RFC 07/13] vfio: Document nested stage control
+Date: Thu, 23 Aug 2018 14:17:30 +0200
+Message-ID: <1535026656-8450-8-git-send-email-eric.auger__28731.5827365548$1535038714$gmane$org@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D7D34A210
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 704F94A22B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SUASsXuGpb8P for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 08:18:11 -0400 (EDT)
+ with ESMTP id c37vOGaKDmv8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Aug 2018 08:18:08 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B68D4A1DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A053F4A210
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 08:18:08 -0400 (EDT)
 In-Reply-To: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,106 +35,73 @@ To: "eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+New iotcls were introduced to pass information about guest stage1
+to the host through VFIO. Let's document the nested stage control.
 
-When removing a mapping from a domain, we need to send an invalidation to
-all devices that might have stored it in their Address Translation Cache
-(ATC). In addition with SVM, we'll need to invalidate context descriptors
-of all devices attached to a live domain.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Maintain a list of devices in each domain, protected by a spinlock. It is
-updated every time we attach or detach devices to and from domains.
-
-It needs to be a spinlock because we'll invalidate ATC entries from
-within hardirq-safe contexts, but it may be possible to relax the read
-side with RCU later.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 22bdabd..19c085d 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -595,6 +595,11 @@ struct arm_smmu_device {
- struct arm_smmu_master_data {
- 	struct arm_smmu_device		*smmu;
- 	struct arm_smmu_strtab_ent	ste;
+fault reporting is current missing to the picture
+---
+ Documentation/vfio.txt | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
+index f1a4d3c..858a363 100644
+--- a/Documentation/vfio.txt
++++ b/Documentation/vfio.txt
+@@ -239,6 +239,51 @@ group and can access them as follows::
+ 	/* Gratuitous device reset and go... */
+ 	ioctl(device, VFIO_DEVICE_RESET);
+ 
++IOMMU Dual Stage Control
++------------------------
 +
-+	struct arm_smmu_domain		*domain;
-+	struct list_head		list; /* domain->devices */
++Some IOMMUs support 2 stages of translation. This is useful when the
++guest is exposed with a virtual IOMMU and some devices are assigned
++to the guest through VFIO. Then the guest OS can use stage 1 (IOVA -> GPA),
++while the hypervisor uses stage 2 for VM isolation (GPA -> HPA).
 +
-+	struct device			*dev;
- };
- 
- /* SMMU private data for an IOMMU domain */
-@@ -618,6 +623,9 @@ struct arm_smmu_domain {
- 	};
- 
- 	struct iommu_domain		domain;
++The guest gets ownership of the stage 1 page tables and also owns stage 1
++configuration structures. The hypervisor owns the root configuration structure
++(for security reason), including stage 2 configuration. This works as long
++configuration structures and page table format are compatible between the
++virtual IOMMU and the physical IOMMU.
 +
-+	struct list_head		devices;
-+	spinlock_t			devices_lock;
- };
- 
- struct arm_smmu_option_prop {
-@@ -1470,6 +1478,9 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 	}
- 
- 	mutex_init(&smmu_domain->init_mutex);
-+	INIT_LIST_HEAD(&smmu_domain->devices);
-+	spin_lock_init(&smmu_domain->devices_lock);
++Assuming the HW supports it, this nested mode is selected by choosing the
++VFIO_TYPE1_NESTING_IOMMU type through:
 +
- 	return &smmu_domain->domain;
- }
- 
-@@ -1685,7 +1696,17 @@ static void arm_smmu_install_ste_for_dev(struct iommu_fwspec *fwspec)
- 
- static void arm_smmu_detach_dev(struct device *dev)
- {
-+	unsigned long flags;
- 	struct arm_smmu_master_data *master = dev->iommu_fwspec->iommu_priv;
-+	struct arm_smmu_domain *smmu_domain = master->domain;
++ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
 +
-+	if (smmu_domain) {
-+		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+		list_del(&master->list);
-+		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
++This forces the hypervisor to use the stage 2, leaving stage 1 available for
++guest usage.
 +
-+		master->domain = NULL;
-+	}
- 
- 	master->ste.assigned = false;
- 	arm_smmu_install_ste_for_dev(dev->iommu_fwspec);
-@@ -1694,6 +1715,7 @@ static void arm_smmu_detach_dev(struct device *dev)
- static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- {
- 	int ret = 0;
-+	unsigned long flags;
- 	struct arm_smmu_device *smmu;
- 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
- 	struct arm_smmu_master_data *master;
-@@ -1729,6 +1751,11 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- 	}
- 
- 	ste->assigned = true;
-+	master->domain = smmu_domain;
++Once groups are attached to the container, the guest stage 1 translation
++configuration data can be passed to VFIO by using
 +
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_add(&master->list, &smmu_domain->devices);
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
- 
- 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_BYPASS) {
- 		ste->s1_cfg = NULL;
-@@ -1847,6 +1874,7 @@ static int arm_smmu_add_device(struct device *dev)
- 			return -ENOMEM;
- 
- 		master->smmu = smmu;
-+		master->dev = dev;
- 		fwspec->iommu_priv = master;
- 	}
++ioctl(container, VFIO_IOMMU_BIND_GUEST_STAGE, &guest_stage_info);
++
++This allows to combine guest stage1 configuration structure along with hypervisor
++stage 2 configuration structure. stage 1 configuration structures are dependent
++on the IOMMU type.
++
++When the guest invalidates stage 1 entries, IOTLB invalidations must be forwarded
++to the host through
++ioctl(container, VFIO_IOMMU_TLB_INVALIDATE, &inv_data);
++Those invalidations can happen at various granularity levels, page, context, ...
++
++The ARM SMMU specification introduces another challenge: MSIs are translated by
++both the virtual SMMU and the physical SMMU. To build a nested mapping for the
++IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
++doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
++binding eventually translating into the physical MSI doorbell.
++
++This is achieved by
++ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
++
+ VFIO User API
+ -------------------------------------------------------------------------------
  
 -- 
 2.5.5
