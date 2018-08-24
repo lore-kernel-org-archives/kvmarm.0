@@ -1,188 +1,245 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: Remove obsolete kvm_unmap_hva notifier backend
-Date: Thu, 23 Aug 2018 18:27:01 +0200
-Message-ID: <694651bc-f6ab-fa7f-7d77-ecacae99b4cd@redhat.com>
-References: <20180823153805.158563-1-marc.zyngier@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC 01/13] iommu: Introduce bind_guest_stage API
+Date: Fri, 24 Aug 2018 15:20:14 +0200
+Message-ID: <04f9fcdb-abc7-dded-f3cd-8c258e66983f@redhat.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
+ <A2975661238FB949B60364EF0F2C257439CCE9EE@SHSMSX104.ccr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 820324A226
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 12:27:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rqDpIhHr0fCr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Aug 2018 12:27:06 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512344A1E1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Aug 2018 12:27:06 -0400 (EDT)
-In-Reply-To: <20180823153805.158563-1-marc.zyngier@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: James Hogan <jhogan@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439CCE9EE@SHSMSX104.ccr.corp.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "\"eric.auger.pro"@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jean-philippe.brucker@arm.com, jacob.jun.pan@linux.intel.com"yi.l.liu\"@linux.intel.com" <"\"eric.auger.pro"@gmail.co>eric.auger@redhat.comiommu@lists.linux-foundation.orglinux-kernel@vger.kernel.orgkvm@vger.kernel.orgkvmarm@lists.cs.columbia.edujoro@8bytes.orgalex.williamson@redhat.comjean-philippe.brucker@arm.comjacob.jun.pan@linux.intel.com, "yi.l.liu\""@linux.intel.com, "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>
+Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/08/2018 17:38, Marc Zyngier wrote:
-> kvm_unmap_hva is long gone, and we only have kvm_unmap_hva_range to
-> deal with. Drop the now obsolete code.
-> 
-> Fixes: fb1522e099f0 ("KVM: update to new mmu_notifier semantic v2")
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  1 -
->  arch/arm64/include/asm/kvm_host.h |  1 -
->  arch/mips/include/asm/kvm_host.h  |  1 -
->  arch/mips/kvm/mmu.c               | 10 ----------
->  arch/x86/include/asm/kvm_host.h   |  1 -
->  arch/x86/kvm/mmu.c                |  5 -----
->  virt/kvm/arm/mmu.c                | 12 ------------
->  virt/kvm/arm/trace.h              | 15 ---------------
->  8 files changed, 46 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 1f1fe4109b02..dd282cc54e45 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -218,7 +218,6 @@ unsigned long kvm_call_hyp(void *hypfn, ...);
->  void force_vm_exit(const cpumask_t *mask);
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_unmap_hva_range(struct kvm *kvm,
->  			unsigned long start, unsigned long end);
->  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index fe8777b12f86..d6c68cf4f264 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -352,7 +352,6 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
->  int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_unmap_hva_range(struct kvm *kvm,
->  			unsigned long start, unsigned long end);
->  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index a9af1d2dcd69..2c1c53d12179 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -931,7 +931,6 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
->  						   bool write);
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_unmap_hva_range(struct kvm *kvm,
->  			unsigned long start, unsigned long end);
->  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-> index ee64db032793..d8dcdb350405 100644
-> --- a/arch/mips/kvm/mmu.c
-> +++ b/arch/mips/kvm/mmu.c
-> @@ -512,16 +512,6 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
->  	return 1;
->  }
->  
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
-> -{
-> -	unsigned long end = hva + PAGE_SIZE;
-> -
-> -	handle_hva_to_gpa(kvm, hva, end, &kvm_unmap_hva_handler, NULL);
-> -
-> -	kvm_mips_callbacks->flush_shadow_all(kvm);
-> -	return 0;
-> -}
-> -
->  int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
->  {
->  	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index c13cd28d9d1b..9bf27626c167 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1401,7 +1401,6 @@ asmlinkage void kvm_spurious_fault(void);
->  	____kvm_handle_fault_on_reboot(insn, "")
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 6b8f11521c41..0182a4ee799c 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -1801,11 +1801,6 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
->  	return kvm_handle_hva_range(kvm, hva, hva + 1, data, handler);
->  }
->  
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
-> -{
-> -	return kvm_handle_hva(kvm, hva, 0, kvm_unmap_rmapp);
-> -}
-> -
->  int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
->  {
->  	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 287c8e274655..b5b9746af23c 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1768,18 +1768,6 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *dat
->  	return 0;
->  }
->  
-> -int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
-> -{
-> -	unsigned long end = hva + PAGE_SIZE;
-> -
-> -	if (!kvm->arch.pgd)
-> -		return 0;
-> -
-> -	trace_kvm_unmap_hva(hva);
-> -	handle_hva_to_gpa(kvm, hva, end, &kvm_unmap_hva_handler, NULL);
-> -	return 0;
-> -}
-> -
->  int kvm_unmap_hva_range(struct kvm *kvm,
->  			unsigned long start, unsigned long end)
->  {
-> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-> index e53b596f483b..57b3edebbb40 100644
-> --- a/virt/kvm/arm/trace.h
-> +++ b/virt/kvm/arm/trace.h
-> @@ -134,21 +134,6 @@ TRACE_EVENT(kvm_mmio_emulate,
->  		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
->  );
->  
-> -TRACE_EVENT(kvm_unmap_hva,
-> -	TP_PROTO(unsigned long hva),
-> -	TP_ARGS(hva),
-> -
-> -	TP_STRUCT__entry(
-> -		__field(	unsigned long,	hva		)
-> -	),
-> -
-> -	TP_fast_assign(
-> -		__entry->hva		= hva;
-> -	),
-> -
-> -	TP_printk("mmu notifier unmap hva: %#08lx", __entry->hva)
-> -);
-> -
->  TRACE_EVENT(kvm_unmap_hva_range,
->  	TP_PROTO(unsigned long start, unsigned long end),
->  	TP_ARGS(start, end),
-> 
+Hi Yi Liu,
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+On 08/24/2018 02:53 PM, Liu, Yi L wrote:
+> Hi Eric,
+> 
+>> From: iommu-bounces@lists.linux-foundation.org [mailto:iommu-
+>> bounces@lists.linux-foundation.org] On Behalf Of Eric Auger
+>> Sent: Thursday, August 23, 2018 8:17 PM
+>> Subject: [RFC 01/13] iommu: Introduce bind_guest_stage API
+>>
+>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>
+>> In virtualization use case, when a guest is assigned
+>> a PCI host device, protected by a virtual IOMMU on a guest,
+>> the physical IOMMU must be programmed to be consistent with
+>> the guest mappings. If the physical IOMMU supports two
+>> translation stages it makes sense to program guest mappings
+>> onto the first stage while to host owns the stage 2.
+>>
+>> In that case, it is mandated to trap on guest configuration
+>> settings and pass those to the physical iommu driver.
+>>
+>> This patch adds a new API to the iommu subsystem that allows
+>> to bind and unbind the guest configuration data to the host.
+>>
+>> A generic iommu_guest_stage_config struct is introduced in
+>> a new iommu.h uapi header. This is going to be used by the VFIO
+>> user API. We foresee at least 2 specialization of this struct,
+>> for PASID table passing and ARM SMMUv3.
+>>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> This patch generalizes the API introduced by Jacob & co-authors in
+>> https://lwn.net/Articles/754331/
+>> ---
+>>  drivers/iommu/iommu.c      | 19 +++++++++++++++
+>>  include/linux/iommu.h      | 23 ++++++++++++++++++
+>>  include/uapi/linux/iommu.h | 59
+>> ++++++++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 101 insertions(+)
+>>  create mode 100644 include/uapi/linux/iommu.h
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 63b3756..5156172 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1326,6 +1326,25 @@ int iommu_attach_device(struct iommu_domain
+>> *domain, struct device *dev)
+>>  }
+>>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+>>
+>> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
+>> +			   struct iommu_guest_stage_config *cfg)
+>> +{
+>> +	if (unlikely(!domain->ops->bind_guest_stage))
+>> +		return -ENODEV;
+>> +
+>> +	return domain->ops->bind_guest_stage(domain, dev, cfg);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_bind_guest_stage);
+>> +
+>> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device
+>> *dev)
+>> +{
+>> +	if (unlikely(!domain->ops->unbind_guest_stage))
+>> +		return;
+>> +
+>> +	domain->ops->unbind_guest_stage(domain, dev);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_stage);
+>> +
+>>  static void __iommu_detach_device(struct iommu_domain *domain,
+>>  				  struct device *dev)
+>>  {
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 19938ee..aec853d 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -25,6 +25,7 @@
+>>  #include <linux/errno.h>
+>>  #include <linux/err.h>
+>>  #include <linux/of.h>
+>> +#include <uapi/linux/iommu.h>
+>>
+>>  #define IOMMU_READ	(1 << 0)
+>>  #define IOMMU_WRITE	(1 << 1)
+>> @@ -187,6 +188,8 @@ struct iommu_resv_region {
+>>   * @domain_get_windows: Return the number of windows for a domain
+>>   * @of_xlate: add OF master IDs to iommu grouping
+>>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>> + * @bind_guest_stage: program the guest stage configuration
+>> + * @unbind_guest_stage: unbind the guest stage and restore defaults
+>>   */
+>>  struct iommu_ops {
+>>  	bool (*capable)(enum iommu_cap);
+>> @@ -235,6 +238,11 @@ struct iommu_ops {
+>>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+>>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device
+>> *dev);
+>>
+>> +	int (*bind_guest_stage)(struct iommu_domain *domain, struct device *dev,
+>> +				struct iommu_guest_stage_config *cfg);
+>> +	void (*unbind_guest_stage)(struct iommu_domain *domain,
+>> +				   struct device *dev);
+>> +
+>>  	unsigned long pgsize_bitmap;
+>>  };
+>>
+>> @@ -296,6 +304,10 @@ extern int iommu_attach_device(struct iommu_domain
+>> *domain,
+>>  			       struct device *dev);
+>>  extern void iommu_detach_device(struct iommu_domain *domain,
+>>  				struct device *dev);
+>> +extern int iommu_bind_guest_stage(struct iommu_domain *domain,
+>> +		struct device *dev, struct iommu_guest_stage_config *cfg);
+>> +extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
+>> +				     struct device *dev);
+>>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>>  		     phys_addr_t paddr, size_t size, int prot);
+>> @@ -696,6 +708,17 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct
+>> fwnode_handle *fwnode)
+>>  	return NULL;
+>>  }
+>>
+>> +static inline
+>> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
+>> +			   struct iommu_guest_stage_config *cfg)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +static inline
+>> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device
+>> *dev)
+>> +{
+>> +}
+>> +
+>>  #endif /* CONFIG_IOMMU_API */
+>>
+>>  #endif /* __LINUX_IOMMU_H */
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> new file mode 100644
+>> index 0000000..2d1593c
+>> --- /dev/null
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -0,0 +1,59 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * IOMMU user API definitions
+>> + *
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + */
+>> +
+>> +#ifndef _UAPI_IOMMU_H
+>> +#define _UAPI_IOMMU_H
+>> +
+>> +#include <linux/types.h>
+>> +
+>> +/**
+>> + * PASID table data used to bind guest PASID table to the host IOMMU. This will
+>> + * enable guest managed first level page tables.
+>> + * @version: for future extensions and identification of the data format
+>> + * @bytes: size of this structure
+>> + * @base_ptr:	PASID table pointer
+>> + * @pasid_bits:	number of bits supported in the guest PASID table, must be
+>> less
+>> + *		or equal than the host supported PASID size.
+>> + */
+>> +struct iommu_pasid_table_config {
+>> +	__u32 version;
+>> +#define PASID_TABLE_CFG_VERSION_1 1
+>> +	__u32 bytes;
+>> +	__u64 base_ptr;
+>> +	__u8 pasid_bits;
+>> +};
+>> +
+>> +/**
+>> + * Stream Table Entry S1 info
+>> + * @disabled: the smmu is disabled
+>> + * @bypassed: stage 1 is bypassed
+>> + * @aborted: aborted
+>> + * @cdptr_dma: GPA of the Context Descriptor
+>> + * @asid: address space identified associated to the CD
+>> + */
+>> +struct iommu_smmu_s1_config {
+>> +	__u8 disabled;
+>> +	__u8 bypassed;
+>> +	__u8 aborted;
+>> +	__u64 cdptr_dma;
+> 
+> If I'm getting it correctly, so with cdptr_dma configed on
+> host, hardware can access guest's CD table when nested
+> stage is setup on host. Is it? If yes, I think it is similar with
+> the base_ptr field in struct iommu_pasid_table_config.
+
+Yes you're right, this is similar to base_ptr.
+
+Thanks
+
+Eric
+> 
+>> +	__u16 asid;
+>> +};
+>> +
+>> +struct iommu_guest_stage_config {
+>> +#define PASID_TABLE	(1 << 0)
+>> +#define SMMUV3_S1_CFG	(1 << 1)
+>> +	__u32 flags;
+>> +	union {
+>> +		struct iommu_pasid_table_config pasidt;
+>> +		struct iommu_smmu_s1_config smmu_s1;
+>> +	};
+>> +};
+>> +
+>> +#endif /* _UAPI_IOMMU_H */
+> 
+> Thanks,
+> Yi Liu
+> 
