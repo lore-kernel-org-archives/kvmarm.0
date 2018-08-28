@@ -1,245 +1,104 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC 01/13] iommu: Introduce bind_guest_stage API
-Date: Fri, 24 Aug 2018 15:20:14 +0200
-Message-ID: <04f9fcdb-abc7-dded-f3cd-8c258e66983f@redhat.com>
-References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
- <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
- <A2975661238FB949B60364EF0F2C257439CCE9EE@SHSMSX104.ccr.corp.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v5 14/27] arm64: kvm: Unmask PMR before entering guest
+Date: Tue, 28 Aug 2018 16:51:24 +0100
+Message-ID: <1535471497-38854-15-git-send-email-julien.thierry@arm.com>
+References: <1535471497-38854-1-git-send-email-julien.thierry@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439CCE9EE@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <1535471497-38854-1-git-send-email-julien.thierry@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: "Liu, Yi L" <yi.l.liu@intel.com>, "\"eric.auger.pro"@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jean-philippe.brucker@arm.com, jacob.jun.pan@linux.intel.com"yi.l.liu\"@linux.intel.com" <"\"eric.auger.pro"@gmail.co>eric.auger@redhat.comiommu@lists.linux-foundation.orglinux-kernel@vger.kernel.orgkvm@vger.kernel.orgkvmarm@lists.cs.columbia.edujoro@8bytes.orgalex.williamson@redhat.comjean-philippe.brucker@arm.comjacob.jun.pan@linux.intel.com, "yi.l.liu\""@linux.intel.com, "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, daniel.thompson@linaro.org, joel@joelfernandes.org, marc.zyngier@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, james.morse@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Yi Liu,
+Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
+means that hypervisor will not receive masked interrupts while running a
+guest.
 
-On 08/24/2018 02:53 PM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> From: iommu-bounces@lists.linux-foundation.org [mailto:iommu-
->> bounces@lists.linux-foundation.org] On Behalf Of Eric Auger
->> Sent: Thursday, August 23, 2018 8:17 PM
->> Subject: [RFC 01/13] iommu: Introduce bind_guest_stage API
->>
->> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>
->> In virtualization use case, when a guest is assigned
->> a PCI host device, protected by a virtual IOMMU on a guest,
->> the physical IOMMU must be programmed to be consistent with
->> the guest mappings. If the physical IOMMU supports two
->> translation stages it makes sense to program guest mappings
->> onto the first stage while to host owns the stage 2.
->>
->> In that case, it is mandated to trap on guest configuration
->> settings and pass those to the physical iommu driver.
->>
->> This patch adds a new API to the iommu subsystem that allows
->> to bind and unbind the guest configuration data to the host.
->>
->> A generic iommu_guest_stage_config struct is introduced in
->> a new iommu.h uapi header. This is going to be used by the VFIO
->> user API. We foresee at least 2 specialization of this struct,
->> for PASID table passing and ARM SMMUv3.
->>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> This patch generalizes the API introduced by Jacob & co-authors in
->> https://lwn.net/Articles/754331/
->> ---
->>  drivers/iommu/iommu.c      | 19 +++++++++++++++
->>  include/linux/iommu.h      | 23 ++++++++++++++++++
->>  include/uapi/linux/iommu.h | 59
->> ++++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 101 insertions(+)
->>  create mode 100644 include/uapi/linux/iommu.h
->>
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index 63b3756..5156172 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -1326,6 +1326,25 @@ int iommu_attach_device(struct iommu_domain
->> *domain, struct device *dev)
->>  }
->>  EXPORT_SYMBOL_GPL(iommu_attach_device);
->>
->> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
->> +			   struct iommu_guest_stage_config *cfg)
->> +{
->> +	if (unlikely(!domain->ops->bind_guest_stage))
->> +		return -ENODEV;
->> +
->> +	return domain->ops->bind_guest_stage(domain, dev, cfg);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_bind_guest_stage);
->> +
->> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device
->> *dev)
->> +{
->> +	if (unlikely(!domain->ops->unbind_guest_stage))
->> +		return;
->> +
->> +	domain->ops->unbind_guest_stage(domain, dev);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_stage);
->> +
->>  static void __iommu_detach_device(struct iommu_domain *domain,
->>  				  struct device *dev)
->>  {
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index 19938ee..aec853d 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -25,6 +25,7 @@
->>  #include <linux/errno.h>
->>  #include <linux/err.h>
->>  #include <linux/of.h>
->> +#include <uapi/linux/iommu.h>
->>
->>  #define IOMMU_READ	(1 << 0)
->>  #define IOMMU_WRITE	(1 << 1)
->> @@ -187,6 +188,8 @@ struct iommu_resv_region {
->>   * @domain_get_windows: Return the number of windows for a domain
->>   * @of_xlate: add OF master IDs to iommu grouping
->>   * @pgsize_bitmap: bitmap of all possible supported page sizes
->> + * @bind_guest_stage: program the guest stage configuration
->> + * @unbind_guest_stage: unbind the guest stage and restore defaults
->>   */
->>  struct iommu_ops {
->>  	bool (*capable)(enum iommu_cap);
->> @@ -235,6 +238,11 @@ struct iommu_ops {
->>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
->>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device
->> *dev);
->>
->> +	int (*bind_guest_stage)(struct iommu_domain *domain, struct device *dev,
->> +				struct iommu_guest_stage_config *cfg);
->> +	void (*unbind_guest_stage)(struct iommu_domain *domain,
->> +				   struct device *dev);
->> +
->>  	unsigned long pgsize_bitmap;
->>  };
->>
->> @@ -296,6 +304,10 @@ extern int iommu_attach_device(struct iommu_domain
->> *domain,
->>  			       struct device *dev);
->>  extern void iommu_detach_device(struct iommu_domain *domain,
->>  				struct device *dev);
->> +extern int iommu_bind_guest_stage(struct iommu_domain *domain,
->> +		struct device *dev, struct iommu_guest_stage_config *cfg);
->> +extern void iommu_unbind_guest_stage(struct iommu_domain *domain,
->> +				     struct device *dev);
->>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
->>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
->>  		     phys_addr_t paddr, size_t size, int prot);
->> @@ -696,6 +708,17 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct
->> fwnode_handle *fwnode)
->>  	return NULL;
->>  }
->>
->> +static inline
->> +int iommu_bind_guest_stage(struct iommu_domain *domain, struct device *dev,
->> +			   struct iommu_guest_stage_config *cfg)
->> +{
->> +	return -ENODEV;
->> +}
->> +static inline
->> +void iommu_unbind_guest_stage(struct iommu_domain *domain, struct device
->> *dev)
->> +{
->> +}
->> +
->>  #endif /* CONFIG_IOMMU_API */
->>
->>  #endif /* __LINUX_IOMMU_H */
->> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->> new file mode 100644
->> index 0000000..2d1593c
->> --- /dev/null
->> +++ b/include/uapi/linux/iommu.h
->> @@ -0,0 +1,59 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/*
->> + * IOMMU user API definitions
->> + *
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + */
->> +
->> +#ifndef _UAPI_IOMMU_H
->> +#define _UAPI_IOMMU_H
->> +
->> +#include <linux/types.h>
->> +
->> +/**
->> + * PASID table data used to bind guest PASID table to the host IOMMU. This will
->> + * enable guest managed first level page tables.
->> + * @version: for future extensions and identification of the data format
->> + * @bytes: size of this structure
->> + * @base_ptr:	PASID table pointer
->> + * @pasid_bits:	number of bits supported in the guest PASID table, must be
->> less
->> + *		or equal than the host supported PASID size.
->> + */
->> +struct iommu_pasid_table_config {
->> +	__u32 version;
->> +#define PASID_TABLE_CFG_VERSION_1 1
->> +	__u32 bytes;
->> +	__u64 base_ptr;
->> +	__u8 pasid_bits;
->> +};
->> +
->> +/**
->> + * Stream Table Entry S1 info
->> + * @disabled: the smmu is disabled
->> + * @bypassed: stage 1 is bypassed
->> + * @aborted: aborted
->> + * @cdptr_dma: GPA of the Context Descriptor
->> + * @asid: address space identified associated to the CD
->> + */
->> +struct iommu_smmu_s1_config {
->> +	__u8 disabled;
->> +	__u8 bypassed;
->> +	__u8 aborted;
->> +	__u64 cdptr_dma;
-> 
-> If I'm getting it correctly, so with cdptr_dma configed on
-> host, hardware can access guest's CD table when nested
-> stage is setup on host. Is it? If yes, I think it is similar with
-> the base_ptr field in struct iommu_pasid_table_config.
+Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
 
-Yes you're right, this is similar to base_ptr.
+Tested-by: Daniel Thompson <daniel.thompson@linaro.org>
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
+ arch/arm64/kvm/hyp/switch.c       | 17 +++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-Thanks
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f26055f..9689592 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -24,6 +24,7 @@
 
-Eric
-> 
->> +	__u16 asid;
->> +};
->> +
->> +struct iommu_guest_stage_config {
->> +#define PASID_TABLE	(1 << 0)
->> +#define SMMUV3_S1_CFG	(1 << 1)
->> +	__u32 flags;
->> +	union {
->> +		struct iommu_pasid_table_config pasidt;
->> +		struct iommu_smmu_s1_config smmu_s1;
->> +	};
->> +};
->> +
->> +#endif /* _UAPI_IOMMU_H */
-> 
-> Thanks,
-> Yi Liu
-> 
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/daifflags.h>
+ #include <asm/fpsimd.h>
+@@ -466,6 +467,17 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ static inline void kvm_arm_vhe_guest_enter(void)
+ {
+ 	local_daif_mask();
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (gic_prio_masking_enabled()) {
++		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
++		dsb(sy);
++	}
+ }
+
+ static inline void kvm_arm_vhe_guest_exit(void)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d496ef5..074ab21 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -22,6 +22,7 @@
+
+ #include <kvm/arm_psci.h>
+
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+@@ -533,6 +534,19 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
++	u32 host_pmr = ICC_PMR_EL1_UNMASKED;
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (gic_prio_masking_enabled()) {
++		host_pmr = gic_read_pmr();
++		gic_write_pmr(ICC_PMR_EL1_UNMASKED);
++		dsb(sy);
++	}
+
+ 	vcpu = kern_hyp_va(vcpu);
+
+@@ -586,6 +600,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+
++	if (gic_prio_masking_enabled())
++		gic_write_pmr(host_pmr);
++
+ 	return exit_code;
+ }
+
+--
+1.9.1
