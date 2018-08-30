@@ -1,25 +1,26 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Clean dcache to PoC when changing PTE
- due to CoW
-Date: Thu, 30 Aug 2018 14:20:52 +0200
-Message-ID: <20180830122052.GD4029@e113682-lin.lund.arm.com>
-References: <20180823153342.158230-1-marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 20/20] kvm: arm64: Allow tuning the physical address
+ size for VM
+Date: Thu, 30 Aug 2018 14:40:54 +0200
+Message-ID: <20180830124054.GE4029@e113682-lin.lund.arm.com>
+References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
+ <1531905547-25478-21-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A9F94A209
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 08:20:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F14A24A212
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 08:41:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 947Zkv8EhHX1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Aug 2018 08:20:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BC2640A67
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 08:20:56 -0400 (EDT)
+ with ESMTP id LFodNbNs+GGT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Aug 2018 08:40:58 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 147AD4A20D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 08:40:58 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180823153342.158230-1-marc.zyngier@arm.com>
+In-Reply-To: <1531905547-25478-21-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,69 +30,121 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: punit.agrawal@arm.com, kvm@vger.kernel.org, Mike Galbraith <efault@gmx.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Adding Andrea and Steve in CC]
-
-On Thu, Aug 23, 2018 at 04:33:42PM +0100, Marc Zyngier wrote:
-> When triggering a CoW, we unmap the RO page via an MMU notifier
-> (invalidate_range_start), and then populate the new PTE using another
-> one (change_pte). In the meantime, we'll have copied the old page
-> into the new one.
-> 
-> The problem is that the data for the new page is sitting in the
-> cache, and should the guest have an uncached mapping to that page
-> (or its MMU off), following accesses will bypass the cache.
-> 
-> In a way, this is similar to what happens on a translation fault:
-> We need to clean the page to the PoC before mapping it. So let's just
-> do that.
-> 
-> This fixes a KVM unit test regression observed on a HiSilicon platform,
-> and subsequently reproduced on Seattle.
-> 
-> Fixes: a9c0e12ebee5 ("KVM: arm/arm64: Only clean the dcache on translation fault")
-> Reported-by: Mike Galbraith <efault@gmx.de>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 1d90d79706bd..287c8e274655 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1811,13 +1811,20 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data
->  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
->  {
->  	unsigned long end = hva + PAGE_SIZE;
-> +	kvm_pfn_t pfn = pte_pfn(pte);
->  	pte_t stage2_pte;
->  
->  	if (!kvm->arch.pgd)
->  		return;
->  
->  	trace_kvm_set_spte_hva(hva);
-> -	stage2_pte = pfn_pte(pte_pfn(pte), PAGE_S2);
-> +
-> +	/*
-> +	 * We've moved a page around, probably through CoW, so let's treat
-> +	 * just like a translation fault and clean the cache to the PoC.
-> +	 */
-> +	clean_dcache_guest_page(pfn, PAGE_SIZE);
-> +	stage2_pte = pfn_pte(pfn, PAGE_S2);
->  	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
->  }
-
-How does this work for pmd mappings?
-
-Are we guaranteed that a pmd mapping (hugetlbfs or THP) is split before
-a CoW happens?
-
-Steve tells me that we share THP mappings on fork and that we back THPs
-by a zero page, so CoW with THP should be possible.
-
-Thanks,
-    Christoffer
+SGkgU3V6dWtpLAoKT24gV2VkLCBKdWwgMTgsIDIwMTggYXQgMTA6MTk6MDNBTSArMDEwMCwgU3V6
+dWtpIEsgUG91bG9zZSB3cm90ZToKPiBBbGxvdyBzcGVjaWZ5aW5nIHRoZSBwaHlzaWNhbCBhZGRy
+ZXNzIHNpemUgbGltaXQgZm9yIGEgbmV3Cj4gVk0gdmlhIHRoZSBrdm1fdHlwZSBhcmd1bWVudCBm
+b3IgdGhlIEtWTV9DUkVBVEVfVk0gaW9jdGwuIFRoaXMKPiBhbGxvd3MgdXMgdG8gZmluYWxpc2Ug
+dGhlIHN0YWdlMiBwYWdlIHRhYmxlIGFzIGVhcmx5IGFzIHBvc3NpYmxlCj4gYW5kIGhlbmNlIHBl
+cmZvcm0gdGhlIHJpZ2h0IGNoZWNrcyBvbiB0aGUgbWVtb3J5IHNsb3RzCj4gd2l0aG91dCBjb21w
+bGljYXRpb24uIFRoZSBzaXplIGlzIGVjbm9kZWQgYXMgTG9nMihQQV9TaXplKSBpbgo+IGJpdHNb
+NzowXSBvZiB0aGUgdHlwZSBmaWVsZC4gRm9yIGJhY2t3YXJkIGNvbXBhdGliaWxpdHkgdGhlCj4g
+dmFsdWUgMCBpcyByZXNlcnZlZCBhbmQgaW1wbGllcyA0MGJpdHMuIEFsc28sIGxpZnQgdGhlIGxp
+bWl0Cj4gb2YgdGhlIElQQSB0byBob3N0IGxpbWl0IGFuZCBhbGxvdyBsb3dlciBJUEEgc2l6ZXMg
+KGUuZywgMzIpLgo+IAo+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+
+IENjOiBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBrZXJuZWwub3JnPgo+IENjOiBQZXRlciBNYXlk
+ZWwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnpp
+bmlAcmVkaGF0LmNvbT4KPiBDYzogUmFkaW0gS3LEjW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+
+Cj4gU2lnbmVkLW9mZi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNv
+bT4KPiAtLS0KPiBBbGwsCj4gCj4gVGhpcyBpcyBub3QgdGhlIGZpbmFsIEFQSS4gV2UgYXJlIHN0
+aWxsIGV2YWx1YXRpbmcgdGhlIHBvc3NpYmxlCj4gb3B0aW9ucyB0byBjcmVhdGUgYSBWTSBhbmQg
+dGhlbiBjb25maWd1cmUgdGhlIFZNIGJlZm9yZSBhbnkKPiByZXNvdXJjZXMgY2FuIGJlIGFsbG9j
+YXRlZCAoZS5nLCBkZXZpY2VzLCB2Q1BVcyBvciBtZW1vcnkpLgo+IFNlZSBbMF0gZm9yIGRpc2N1
+c3Npb246Cj4gCj4gWzBdIGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51
+eC1hcm0ta2VybmVsLzIwMTgtSnVseS81ODc4MzkuaHRtbAoKRldJVywgSSB0aGluayBlbmNvZGlu
+ZyB0aGUgc2l6ZSBpbiB0aGUgdHlwZSBpc24ndCB0aGF0IGJhZCwgYXMgaXQgc2VlbXMKaW4gdGhl
+IHdvcnN0IGNhc2Ugd2UnbGwgb2NjdXB5IDI0IGJpdHMgb3V0IG9mIHRoZSA2NC1iaXQgdHlwZSBh
+cmd1bWVudAphdCB0aGUgdGltZSBiZWluZyAoSVBBK1NWRSksIGFuZCB0aGF0J3Mgc2V2ZXJhbCB5
+ZWFycyBpbnRvIEtWTS9BUk0ncwpsaWZlIHRpbWUuCgpJJ20gc3VyZSB3ZSdsbCBuZWVkIGEgbW9y
+ZSBzb3BoaXN0aWNhdGVkIEFQSSBzb21lIGRheSwgd2hlbiB3ZQphYnNvbHV0ZWx5IGNhbm5vdCBl
+YXNpbHkgdXNlIHdoYXQgd2UgYWxyZWFkeSBoYXZlLCBidXQgd2UgY2FuIGFkZCB0aGF0CkFQSSBh
+dCB0aGUgdGltZS4KCj4gLS0tCj4gIERvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCAg
+ICAgICB8ICA0ICsrKysKPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFnZTJfcGd0YWJsZS5o
+IHwgMjAgLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYyAgICAg
+ICAgICAgICAgICAgIHwgIDMgLS0tCj4gIGluY2x1ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAg
+ICAgICAgICB8ICA5ICsrKysrKysrKwo+ICB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAg
+ICAgICAgICAgfCAxNiArKysrKysrKysrKystLS0tCj4gIDUgZmlsZXMgY2hhbmdlZCwgMjUgaW5z
+ZXJ0aW9ucygrKSwgMjcgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRp
+b24vdmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4
+dAo+IGluZGV4IGQxMDk0NGUuLjRlNzZlODEgMTAwNjQ0Cj4gLS0tIGEvRG9jdW1lbnRhdGlvbi92
+aXJ0dWFsL2t2bS9hcGkudHh0Cj4gKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGku
+dHh0Cj4gQEAgLTEyMiw2ICsxMjIsMTAgQEAgdGhlIGRlZmF1bHQgdHJhcCAmIGVtdWxhdGUgaW1w
+bGVtZW50YXRpb24gKHdoaWNoIGNoYW5nZXMgdGhlIHZpcnR1YWwKPiAgbWVtb3J5IGxheW91dCB0
+byBmaXQgaW4gdXNlciBtb2RlKSwgY2hlY2sgS1ZNX0NBUF9NSVBTX1ZaIGFuZCB1c2UgdGhlCj4g
+IGZsYWcgS1ZNX1ZNX01JUFNfVlouCj4gIAo+ICtPbiBhcm02NCwgYml0c1s3LTBdIG9mIHRoZSBt
+YWNoaW5lIHR5cGUgaGFzIGJlZW4gcmVzZXJ2ZWQgZm9yIHNwZWNpZnlpbmcKPiArdGhlIG1heGlt
+dW0gcGh5c2ljYWwgYWRkcmVzcyBzaXplIGZvciB0aGUgVk0uIEZvciBiYWNrd2FyZCBjb21wYXRp
+YmlsaXR5LAo+ICt2YWx1ZSAwIGltcGxpZXMgdGhlIGRlZmF1bHQgbGltaXQgb2YgNDBiaXRzLgo+
+ICsKPiAgCj4gIDQuMyBLVk1fR0VUX01TUl9JTkRFWF9MSVNULCBLVk1fR0VUX01TUl9GRUFUVVJF
+X0lOREVYX0xJU1QKPiAgCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3Rh
+Z2UyX3BndGFibGUuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3RhZ2UyX3BndGFibGUuaAo+
+IGluZGV4IDY3NDNiNzYuLmZiZGZlZDcgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9zdGFnZTJfcGd0YWJsZS5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFn
+ZTJfcGd0YWJsZS5oCj4gQEAgLTQyLDI4ICs0Miw4IEBACj4gICAqIHRoZSByYW5nZSAoSVBBX1NI
+SUZULCBJUEFfU0hJRlQgLSA0KS4KPiAgICovCj4gICNkZWZpbmUgc3RhZ2UyX3BndGFibGVfbGV2
+ZWxzKGlwYSkJQVJNNjRfSFdfUEdUQUJMRV9MRVZFTFMoKGlwYSkgLSA0KQo+IC0jZGVmaW5lIFNU
+QUdFMl9QR1RBQkxFX0xFVkVMUwkJc3RhZ2UyX3BndGFibGVfbGV2ZWxzKEtWTV9QSFlTX1NISUZU
+KQo+ICAjZGVmaW5lIGt2bV9zdGFnZTJfbGV2ZWxzKGt2bSkJCVZUQ1JfRUwyX0xWTFMoa3ZtLT5h
+cmNoLnZ0Y3IpCj4gIAo+IC0vKgo+IC0gKiBXaXRoIGFsbCB0aGUgc3VwcG9ydGVkIFZBX0JJVHMg
+YW5kIDQwYml0IGd1ZXN0IElQQSwgdGhlIGZvbGxvd2luZyBjb25kaXRpb24KPiAtICogaXMgYWx3
+YXlzIHRydWU6Cj4gLSAqCj4gLSAqICAgICAgIFNUQUdFMl9QR1RBQkxFX0xFVkVMUyA8PSBDT05G
+SUdfUEdUQUJMRV9MRVZFTFMKPiAtICoKPiAtICogV2UgYmFzZSBvdXIgc3RhZ2UtMiBwYWdlIHRh
+YmxlIHdhbGtlciBoZWxwZXJzIG9uIHRoaXMgYXNzdW1wdGlvbiBhbmQKPiAtICogZmFsbCBiYWNr
+IHRvIHVzaW5nIHRoZSBob3N0IHZlcnNpb24gb2YgdGhlIGhlbHBlciB3aGVyZXZlciBwb3NzaWJs
+ZS4KPiAtICogaS5lLCBpZiBhIHBhcnRpY3VsYXIgbGV2ZWwgaXMgbm90IGZvbGRlZCAoZS5nLCBQ
+VUQpIGF0IHN0YWdlMiwgd2UgZmFsbCBiYWNrCj4gLSAqIHRvIHVzaW5nIHRoZSBob3N0IHZlcnNp
+b24sIHNpbmNlIGl0IGlzIGd1YXJhbnRlZWQgaXQgaXMgbm90IGZvbGRlZCBhdCBob3N0Lgo+IC0g
+Kgo+IC0gKiBJZiB0aGUgY29uZGl0aW9uIGJyZWFrcyBpbiB0aGUgZnV0dXJlLCB3ZSBjYW4gcmVh
+cnJhbmdlIHRoZSBob3N0IGxldmVsCj4gLSAqIGRlZmluaXRpb25zIGFuZCByZXVzZSB0aGVtIGZv
+ciBzdGFnZTIuIFRpbGwgdGhlbi4uLgo+IC0gKi8KPiAtI2lmIFNUQUdFMl9QR1RBQkxFX0xFVkVM
+UyA+IENPTkZJR19QR1RBQkxFX0xFVkVMUwo+IC0jZXJyb3IgIlVuc3VwcG9ydGVkIGNvbWJpbmF0
+aW9uIG9mIGd1ZXN0IElQQSBhbmQgaG9zdCBWQV9CSVRTLiIKPiAtI2VuZGlmCj4gLQo+IC0KPiAg
+Lyogc3RhZ2UyX3BnZGlyX3NoaWZ0KCkgaXMgdGhlIHNpemUgbWFwcGVkIGJ5IHRvcC1sZXZlbCBz
+dGFnZTIgZW50cnkgZm9yIHRoZSBWTSAqLwo+ICAjZGVmaW5lIHN0YWdlMl9wZ2Rpcl9zaGlmdChr
+dm0pCQlwdF9sZXZlbHNfcGdkaXJfc2hpZnQoa3ZtX3N0YWdlMl9sZXZlbHMoa3ZtKSkKPiAgI2Rl
+ZmluZSBzdGFnZTJfcGdkaXJfc2l6ZShrdm0pCQkoMVVMTCA8PCBzdGFnZTJfcGdkaXJfc2hpZnQo
+a3ZtKSkKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYyBiL2FyY2gvYXJtNjQv
+a3ZtL2d1ZXN0LmMKPiBpbmRleCAxNDJlNjEwLi42NmZiMjBjIDEwMDY0NAo+IC0tLSBhL2FyY2gv
+YXJtNjQva3ZtL2d1ZXN0LmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCj4gQEAgLTQ3
+NSw5ICs0NzUsNiBAQCBpbnQga3ZtX2FybV9jb25maWdfdm0oc3RydWN0IGt2bSAqa3ZtLCB1MzIg
+aXBhX3NoaWZ0KQo+ICAJdTY0IHBhcmFuZ2U7Cj4gIAl1OCBsdmxzID0gc3RhZ2UyX3BndGFibGVf
+bGV2ZWxzKGlwYV9zaGlmdCk7Cj4gIAo+IC0JaWYgKGlwYV9zaGlmdCAhPSBLVk1fUEhZU19TSElG
+VCkKPiAtCQlyZXR1cm4gLUVJTlZBTDsKPiAtCj4gIAkvKgo+ICAJICogVXNlIGEgbWluaW11bSAy
+IGxldmVsIHBhZ2UgdGFibGUgdG8gcHJldmVudCBzcGxpdHRpbmcKPiAgCSAqIGhvc3QgUE1EIGh1
+Z2UgcGFnZXMgYXQgc3RhZ2UyLgo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3Zt
+LmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPiBpbmRleCA5YTQwZDgyLi42MjVhMTFlIDEw
+MDY0NAo+IC0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+ICsrKyBiL2luY2x1ZGUvdWFw
+aS9saW51eC9rdm0uaAo+IEBAIC03NTEsNiArNzUxLDE1IEBAIHN0cnVjdCBrdm1fcHBjX3Jlc2l6
+ZV9ocHQgewo+ICAjZGVmaW5lIEtWTV9TMzkwX1NJRV9QQUdFX09GRlNFVCAxCj4gIAo+ICAvKgo+
+ICsgKiBPbiBhcm0vYXJtNjQsIG1hY2hpbmUgdHlwZSBjYW5lIGJlIHVzZWQgdG8gcmVxdWVzdCB0
+aGUgcGh5c2ljYWwKCm5pdDogcy9jYW5lL2Nhbi8KCj4gKyAqIGFkZHJlc3Mgc2l6ZSBmb3IgdGhl
+IFZNLiBCaXRzWzctMF0gaGFzIGJlZW4gcmVzZXJ2ZWQgZm9yIHRoZSBQQQo+ICsgKiBzaXplIHNo
+aWZ0IChpLmUsIGxvZzIoUEFfU2l6ZSkpLiBGb3IgYmFja3dhcmQgY29tcGF0aWJpbGl0eSwKPiAr
+ICogdmFsdWUgMCBpbXBsaWVzIHRoZSBkZWZhdWx0IElQQSBzaXplLCA0MGJpdHMuCj4gKyAqLwo+
+ICsjZGVmaW5lIEtWTV9WTV9UWVBFX0FSTV9QSFlTX1NISUZUX01BU0sJMHhmZgo+ICsjZGVmaW5l
+IEtWTV9WTV9UWVBFX0FSTV9QSFlTX1NISUZUKHgpCQlcCj4gKwkoKHgpICYgS1ZNX1ZNX1RZUEVf
+QVJNX1BIWVNfU0hJRlRfTUFTSykKPiArLyoKPiAgICogaW9jdGxzIGZvciAvZGV2L2t2bSBmZHM6
+Cj4gICAqLwo+ICAjZGVmaW5lIEtWTV9HRVRfQVBJX1ZFUlNJT04gICAgICAgX0lPKEtWTUlPLCAg
+IDB4MDApCj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9hcm0uYyBiL3ZpcnQva3ZtL2FybS9h
+cm0uYwo+IGluZGV4IDIyMGQ4ODYuLmE5NjIwNWUgMTAwNjQ0Cj4gLS0tIGEvdmlydC9rdm0vYXJt
+L2FybS5jCj4gKysrIGIvdmlydC9rdm0vYXJtL2FybS5jCj4gQEAgLTExMSw2ICsxMTEsMTcgQEAg
+dm9pZCBrdm1fYXJjaF9jaGVja19wcm9jZXNzb3JfY29tcGF0KHZvaWQgKnJ0bikKPiAgCSooaW50
+ICopcnRuID0gMDsKPiAgfQo+ICAKPiArc3RhdGljIGludCBrdm1fYXJjaF9jb25maWdfdm0oc3Ry
+dWN0IGt2bSAqa3ZtLCB1bnNpZ25lZCBsb25nIHR5cGUpCj4gK3sKPiArCXUzMiBpcGFfc2hpZnQg
+PSBLVk1fVk1fVFlQRV9BUk1fUEhZU19TSElGVCh0eXBlKTsKPiArCj4gKwlpZiAoIWlwYV9zaGlm
+dCkKPiArCQlpcGFfc2hpZnQgPSBLVk1fUEhZU19TSElGVDsKPiArCWlmIChpcGFfc2hpZnQgPiBr
+dm1faXBhX2xpbWl0KQo+ICsJCXJldHVybiAtRTJCSUc7Cj4gKwlyZXR1cm4ga3ZtX2FybV9jb25m
+aWdfdm0oa3ZtLCBpcGFfc2hpZnQpOwo+ICt9Cj4gKwo+ICAvKioKPiAgICoga3ZtX2FyY2hfaW5p
+dF92bSAtIGluaXRpYWxpemVzIGEgVk0gZGF0YSBzdHJ1Y3R1cmUKPiAgICogQGt2bToJcG9pbnRl
+ciB0byB0aGUgS1ZNIHN0cnVjdAo+IEBAIC0xMTksMTAgKzEzMCw3IEBAIGludCBrdm1fYXJjaF9p
+bml0X3ZtKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgbG9uZyB0eXBlKQo+ICB7Cj4gIAlpbnQg
+cmV0LCBjcHU7Cj4gIAo+IC0JaWYgKHR5cGUpCj4gLQkJcmV0dXJuIC1FSU5WQUw7Cj4gLQo+IC0J
+cmV0ID0ga3ZtX2FybV9jb25maWdfdm0oa3ZtLCBLVk1fUEhZU19TSElGVCk7Cj4gKwlyZXQgPSBr
+dm1fYXJjaF9jb25maWdfdm0oa3ZtLCB0eXBlKTsKPiAgCWlmIChyZXQpCj4gIAkJcmV0dXJuIHJl
+dDsKPiAgCj4gLS0gCj4gMi43LjQKPiAKClRoYW5rcywKCiAgICBDaHJpc3RvZmZlcgpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
+aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
+YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
