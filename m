@@ -1,26 +1,26 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v4 05/20] kvm: arm64: Add helper for loading the stage2
- setting for a VM
-Date: Thu, 30 Aug 2018 11:39:53 +0200
-Message-ID: <20180830093953.GA4029@e113682-lin.lund.arm.com>
+Subject: Re: [PATCH v4 06/20] arm64: Add a helper for PARange to physical
+ shift conversion
+Date: Thu, 30 Aug 2018 11:42:27 +0200
+Message-ID: <20180830094227.GB4029@e113682-lin.lund.arm.com>
 References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
- <1531905547-25478-6-git-send-email-suzuki.poulose@arm.com>
+ <1531905547-25478-7-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 169F14A21A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 05:39:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1C1A4A225
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 05:42:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kMyfMIa4UJlf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Aug 2018 05:39:56 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AED8C4A1FE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 05:39:56 -0400 (EDT)
+ with ESMTP id Mrz40WQUW6XU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Aug 2018 05:42:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 557E04A21A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Aug 2018 05:42:30 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1531905547-25478-6-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1531905547-25478-7-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,86 +34,64 @@ To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 18, 2018 at 10:18:48AM +0100, Suzuki K Poulose wrote:
-> We load the stage2 context of a guest for different operations,
-> including running the guest and tlb maintenance on behalf of the
-> guest. As of now only the vttbr is private to the guest, but this
-> is about to change with IPA per VM. Add a helper to load the stage2
-> configuration for a VM, which could do the right thing with the
-> future changes.
+On Wed, Jul 18, 2018 at 10:18:49AM +0100, Suzuki K Poulose wrote:
+> On arm64, ID_AA64MMFR0_EL1.PARange encodes the maximum Physical
+> Address range supported by the CPU. Add a helper to decode this
+> to actual physical shift. If we hit an unallocated value, return
+> the maximum range supported by the kernel.
+> This will be used by KVM to set the VTCR_EL2.T0SZ, as it
+> is about to move its place. Having this helper keeps the code
+> movement cleaner.
 > 
-> Cc: Christoffer Dall <cdall@kernel.org>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
 > Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> Changes since v2:
->  - New patch
+> Changes since V2:
+>  - Split the patch
+>  - Limit the physical shift only for values unrecognized.
 > ---
->  arch/arm64/include/asm/kvm_hyp.h | 6 ++++++
->  arch/arm64/kvm/hyp/switch.c      | 2 +-
->  arch/arm64/kvm/hyp/tlb.c         | 4 ++--
->  3 files changed, 9 insertions(+), 3 deletions(-)
+>  arch/arm64/include/asm/cpufeature.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 384c343..82f9994 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -155,5 +155,11 @@ void deactivate_traps_vhe_put(void);
->  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
->  void __noreturn __hyp_do_panic(unsigned long, ...);
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 1717ba1..855cf0e 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -530,6 +530,19 @@ void arm64_set_ssbd_mitigation(bool state);
+>  static inline void arm64_set_ssbd_mitigation(bool state) {}
+>  #endif
 >  
-> +/* Must be called from hyp code running at EL2 */
-
-more importantly than having to run this at EL2, is that it must have
-gone through the proper sequence of update_vttbr() and disabling
-interrupts to avoid using a stale VMID.
-
-> +static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
+> +static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
 > +{
-> +	write_sysreg(kvm->arch.vttbr, vttbr_el2);
+> +	switch (parange) {
+> +	case 0: return 32;
+> +	case 1: return 36;
+> +	case 2: return 40;
+> +	case 3: return 42;
+> +	case 4: return 44;
+> +	case 5: return 48;
+> +	case 6: return 52;
+> +	default: return CONFIG_ARM64_PA_BITS;
+
+I don't understand this case?  Shouldn't this include at least a WARN()
+?
+
+Thanks,
+    Christoffer
+
+> +	}
 > +}
-> +
->  #endif /* __ARM64_KVM_HYP_H__ */
+>  #endif /* __ASSEMBLY__ */
 >  
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index d496ef5..355fb25 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -195,7 +195,7 @@ void deactivate_traps_vhe_put(void)
->  
->  static void __hyp_text __activate_vm(struct kvm *kvm)
->  {
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  }
->  
->  static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 131c777..4dbd9c6 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -30,7 +30,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
->  	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
->  	 * let's flip TGE before executing the TLB operation.
->  	 */
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  	val = read_sysreg(hcr_el2);
->  	val &= ~HCR_TGE;
->  	write_sysreg(val, hcr_el2);
-> @@ -39,7 +39,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
->  
->  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
->  {
-> -	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-> +	__load_guest_stage2(kvm);
->  	isb();
->  }
->  
+>  #endif
 > -- 
 > 2.7.4
 > 
-
-Thanks,
--Christoffer
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
