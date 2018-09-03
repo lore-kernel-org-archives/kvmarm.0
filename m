@@ -1,81 +1,63 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests] scripts: Speedup MAX_SMP check
-Date: Mon, 3 Sep 2018 14:25:50 +0200
-Message-ID: <20180903122550.7js3albkzcmej6i4@kamzik.brq.redhat.com>
-References: <20180903105845.13942-1-christoffer.dall@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [RFC 02/13] iommu: Introduce tlb_invalidate API
+Date: Mon, 3 Sep 2018 13:28:03 +0100
+Message-ID: <8a3b8fcd-48c4-7d9e-7672-e73431bcde5b@arm.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-3-git-send-email-eric.auger@redhat.com>
+ <11279859-08f8-6d9d-7aa7-7a5de4cfd3fb@arm.com>
+ <95e423a6-3f67-d101-a391-369a1493dff9@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7771C4A1D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:25:54 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VGfURXAoYTjH for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 08:25:53 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D52E04A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:25:53 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180903105845.13942-1-christoffer.dall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <95e423a6-3f67-d101-a391-369a1493dff9@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, "yi.l.liu\""@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 12:58:45PM +0200, Christoffer Dall wrote:
-> The current MAX_SMP check launches QEMU for every value of the SMP
-> parameter to check if the SMP parameter based on the native is higher
-> than the QEMU maximum supported configuration.
+On 31/08/2018 15:07, Auger Eric wrote:
+>> Since the ioctl will be used to combine invalidations (invalidate both
+>> ATC and TLB with a single call), we need an additional ASID field for
+>> the SMMU - ATC is invalidated by PASID, TLB by ASID. I used to call it
+>> "tag", but I'm leaning towards "arch_id" now
+>> (http://www.linux-arm.org/git?p=linux-jpb.git;a=commitdiff;h=40fdef74816dd8d8d113100b9e0162fab4cec28d)
 > 
-> On something like a TX2, which has 224 threads, this takes a very long
-> time where the test script just sits there with no output.
-> 
-> Reduce the wait time by taking the log2 of MAX_SMP in each iteration of
-> the loop instead.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  scripts/runtime.bash | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index a31ae91..1e2c288 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -140,5 +140,5 @@ function run()
->  # just remove it...
->  while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
->  		|& grep -qi 'exceeds max CPUs'; do
-> -	((--MAX_SMP))
-> +	MAX_SMP=$((MAX_SMP >> 1))
->  done
-> -- 
-> 2.7.4
->
+> I aknowledge I am not crystal clear about that. for a given iommu_domain
+> don't you have a single asid. Can't you retrieve the asid from the
+> iommu_domain/arm_smmu_domain/arm_smmu_s1_cfg/arm_smmu_ctx_desc.asid?
+> Here again I am confused bout the dual iommu_domain/struct device
+> parameters.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+In nested mode, ASIDs are allocated by the guest and written into the CD
+table. Even if there is a single CD it will still be private to the
+guest. When receiving the invalidation, the host could walk the CD
+tables to retrieve the ASID, but it's not guaranteed to be here anymore:
+the guest could well clear a CD before sending the invalidate command.
 
+> I have another trouble while doing the QEMU integration.
+> When the guests does an NH_ALL, this propagates an invalidation on the
+> whole IPA range and we must discriminate that from regular NH_VA calls.
+> How would you encode the NH_ALL with this API?
 
-Someday I should move this into arch-specific code and replace
-it with something like:
+I think that translates to an invalidate-all for the domain:
 
-if gic-v3
-  MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 255)
-else
-  MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 8)
+struct tlb_iommu_invalidate_info info = {
+	.hdr.type = IOMMU_INV_TYPE_TLB,
+	.granularity = IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
+};
 
-If other archs ever care about it (they currently don't), then
-they can implement their own thing.
+Reading the spec again, I though the API was missing a way to encode
+TLBI_NH_VAA, invalidate a range for all ASIDs. Although it feels
+contrived, we could represent it with the following:
+
+struct tlb_iommu_invalidate_info info = {
+	.hdr.type = IOMMU_INV_TYPE_TLB,
+	.granularity = IOMMU_INV_GRANU_PAGE_PASID,
+	.flags = IOMMU_INVALIDATE_GLOBAL_PAGE,
+	.addr = ...
+};
 
 Thanks,
-drew
+Jean
