@@ -1,25 +1,27 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH kvm-unit-tests] scripts: Speedup MAX_SMP check
-Date: Mon, 3 Sep 2018 15:13:02 +0200
-Message-ID: <20180903131302.GK4029@e113682-lin.lund.arm.com>
-References: <20180903105845.13942-1-christoffer.dall@arm.com>
- <20180903122550.7js3albkzcmej6i4@kamzik.brq.redhat.com>
+Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
+Date: Mon, 3 Sep 2018 15:14:31 +0200
+Message-ID: <20180903131431.GL4029@e113682-lin.lund.arm.com>
+References: <20180830141733.21725-1-drjones@redhat.com>
+ <20180830141733.21725-3-drjones@redhat.com>
+ <20180903111236.GH4029@e113682-lin.lund.arm.com>
+ <20180903121130.uhkkz2avwknhxobs@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23E184A1E6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:13:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F8F24A1D2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:14:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A6t8MVbvgwg5 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 09:13:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9C804A0CC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:13:05 -0400 (EDT)
+ with ESMTP id LqhkdttYOvQy for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 09:14:34 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B7394A0CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:14:34 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180903122550.7js3albkzcmej6i4@kamzik.brq.redhat.com>
+In-Reply-To: <20180903121130.uhkkz2avwknhxobs@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,63 +32,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andrew Jones <drjones@redhat.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 02:25:50PM +0200, Andrew Jones wrote:
-> On Mon, Sep 03, 2018 at 12:58:45PM +0200, Christoffer Dall wrote:
-> > The current MAX_SMP check launches QEMU for every value of the SMP
-> > parameter to check if the SMP parameter based on the native is higher
-> > than the QEMU maximum supported configuration.
+On Mon, Sep 03, 2018 at 02:11:30PM +0200, Andrew Jones wrote:
+> On Mon, Sep 03, 2018 at 01:12:36PM +0200, Christoffer Dall wrote:
+> > On Thu, Aug 30, 2018 at 04:17:33PM +0200, Andrew Jones wrote:
+> > > From: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > > 
+> > > Here we provide the support for measuring various micro level
+> > > operations on arm64. Measurements are currently obtained using
+> > > timer counters. Further modifications in KVM will be required
+> > > to support timestamping using cycle counters, as KVM now disables
+> > > accesses to the PMU counters from the VM.
+> > > 
+> > > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > 
-> > On something like a TX2, which has 224 threads, this takes a very long
-> > time where the test script just sits there with no output.
-> > 
-> > Reduce the wait time by taking the log2 of MAX_SMP in each iteration of
-> > the loop instead.
-> > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  scripts/runtime.bash | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> > index a31ae91..1e2c288 100644
-> > --- a/scripts/runtime.bash
-> > +++ b/scripts/runtime.bash
-> > @@ -140,5 +140,5 @@ function run()
-> >  # just remove it...
-> >  while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> >  		|& grep -qi 'exceeds max CPUs'; do
-> > -	((--MAX_SMP))
-> > +	MAX_SMP=$((MAX_SMP >> 1))
-> >  done
-> > -- 
-> > 2.7.4
-> >
+> > Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 > 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Thanks Christoffer! While running this I just noticed a bug though.
+> It seemed my hardware was super-duper fast, because I was missing...
 > 
+> > > +#define PS_PER_SEC (1000 * 1000 * 1000 * 1000U)
+>                                     ...an 'L' here ^
 > 
-> Someday I should move this into arch-specific code and replace
-> it with something like:
+> I'll send a v2 with that fix now and also add your acked-by.
 > 
-> if gic-v3
->   MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 255)
 
-Not quite, becasue QEMU can't seem to support more than 123 CPUs with it
-current default set of parameters used by kvmtool at least.  But perhaps
-that's being fixed with some changes to QEMU/KVM (I lost track).
+I didn't verify the numeric aspects of the test this time around, but
+looked at what the tests do and ran this on a couple of platforms.
 
-Thanks for the reviews.
+I figured we should merge this and we can fix small issues later if they
+appear.
+
+Thanks,
 
     Christoffer
-
-
-
-> else
->   MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 8)
-> 
-> If other archs ever care about it (they currently don't), then
-> they can implement their own thing.
-> 
