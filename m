@@ -1,22 +1,22 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PULL 4/4] arm64: KVM: Remove pgd_lock
-Date: Mon,  3 Sep 2018 15:45:16 +0200
-Message-ID: <20180903134516.17796-5-christoffer.dall@arm.com>
+Subject: [PULL 2/4] arm64: KVM: Only force FPEXC32_EL2.EN if trapping FPSIMD
+Date: Mon,  3 Sep 2018 15:45:14 +0200
+Message-ID: <20180903134516.17796-3-christoffer.dall@arm.com>
 References: <20180903134516.17796-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85B584A215
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:45:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45EE84A213
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:45:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hOBs6UEeswxx for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 09:45:33 -0400 (EDT)
+ with ESMTP id qxEBzJak+LIM for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 09:45:26 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8100B4A220
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:45:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E514A215
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:45:26 -0400 (EDT)
 In-Reply-To: <20180903134516.17796-1-christoffer.dall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,35 +28,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Steven Price <steven.price@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-The lock has never been used and the page tables are protected by
-mmu_lock in struct kvm.
+If trapping FPSIMD in the context of an AArch32 guest, it is critical
+to set FPEXC32_EL2.EN to 1 so that the trapping is taken to EL2 and
+not EL1.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
+Conversely, it is just as critical *not* to set FPEXC32_EL2.EN to 1
+if we're not going to trap FPSIMD, as we then corrupt the existing
+VFP state.
+
+Moving the call to __activate_traps_fpsimd32 to the point where we
+know for sure that we are going to trap ensures that we don't set that
+bit spuriously.
+
+Fixes: e6b673b741ea ("KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing")
+Cc: Dave Martin <dave.martin@arm.com>
+Reported-by: Alexander Graf <agraf@suse.de>
+Tested-by: Alexander Graf <agraf@suse.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8e6d46df38aa..3d6d7336f871 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -61,8 +61,7 @@ struct kvm_arch {
- 	u64    vmid_gen;
- 	u32    vmid;
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d496ef579859..ca46153d7915 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -98,8 +98,10 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	val &= ~CPACR_EL1_ZEN;
+-	if (!update_fp_enabled(vcpu))
++	if (!update_fp_enabled(vcpu)) {
+ 		val &= ~CPACR_EL1_FPEN;
++		__activate_traps_fpsimd32(vcpu);
++	}
  
--	/* 1-level 2nd stage table and lock */
--	spinlock_t pgd_lock;
-+	/* 1-level 2nd stage table, protected by kvm->mmu_lock */
- 	pgd_t *pgd;
+ 	write_sysreg(val, cpacr_el1);
  
- 	/* VTTBR value associated with above pgd and vmid */
+@@ -114,8 +116,10 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+-	if (!update_fp_enabled(vcpu))
++	if (!update_fp_enabled(vcpu)) {
+ 		val |= CPTR_EL2_TFP;
++		__activate_traps_fpsimd32(vcpu);
++	}
+ 
+ 	write_sysreg(val, cptr_el2);
+ }
+@@ -129,7 +133,6 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
+ 		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
+ 
+-	__activate_traps_fpsimd32(vcpu);
+ 	if (has_vhe())
+ 		activate_traps_vhe(vcpu);
+ 	else
 -- 
 2.18.0
