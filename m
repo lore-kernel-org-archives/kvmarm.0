@@ -1,27 +1,28 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: GICv3 stride issue with many VCPUs
-Date: Mon, 3 Sep 2018 16:54:55 +0200
-Message-ID: <20180903145455.vxf7iyqfeirfzpse@kamzik.brq.redhat.com>
-References: <20180903111130.GG4029@e113682-lin.lund.arm.com>
- <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
- <20180903123119.2z5tko3kaqcezfai@kamzik.brq.redhat.com>
- <20180903131507.GM4029@e113682-lin.lund.arm.com>
+Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
+Date: Mon, 3 Sep 2018 16:59:40 +0200
+Message-ID: <20180903145940.7dbpbooniudx3zpg@kamzik.brq.redhat.com>
+References: <20180830141733.21725-1-drjones@redhat.com>
+ <20180830141733.21725-3-drjones@redhat.com>
+ <20180903111236.GH4029@e113682-lin.lund.arm.com>
+ <20180903121130.uhkkz2avwknhxobs@kamzik.brq.redhat.com>
+ <20180903131431.GL4029@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C1E34A1D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 10:55:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6C34A1D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 10:59:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sjmBMclkzhXX for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 10:55:00 -0400 (EDT)
+ with ESMTP id Vi4FKj4w0mYq for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 10:59:45 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C175C4A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 10:55:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 229A64A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 10:59:45 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180903131507.GM4029@e113682-lin.lund.arm.com>
+In-Reply-To: <20180903131431.GL4029@e113682-lin.lund.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,43 +33,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 03:15:07PM +0200, Christoffer Dall wrote:
-> On Mon, Sep 03, 2018 at 02:31:19PM +0200, Andrew Jones wrote:
-> > On Mon, Sep 03, 2018 at 01:39:12PM +0200, Auger Eric wrote:
-> > > Hi Christoffer,
-> > > 
-> > > On 09/03/2018 01:11 PM, Christoffer Dall wrote:
-> > > > Hi,
+On Mon, Sep 03, 2018 at 03:14:31PM +0200, Christoffer Dall wrote:
+> On Mon, Sep 03, 2018 at 02:11:30PM +0200, Andrew Jones wrote:
+> > On Mon, Sep 03, 2018 at 01:12:36PM +0200, Christoffer Dall wrote:
+> > > On Thu, Aug 30, 2018 at 04:17:33PM +0200, Andrew Jones wrote:
+> > > > From: Shih-Wei Li <shihwei@cs.columbia.edu>
 > > > > 
-> > > > I recently ran kvm-unit-tests on TX2, and I got an error from gicv3-ipi,
-> > > > with this in the log:
+> > > > Here we provide the support for measuring various micro level
+> > > > operations on arm64. Measurements are currently obtained using
+> > > > timer counters. Further modifications in KVM will be required
+> > > > to support timestamping using cycle counters, as KVM now disables
+> > > > accesses to the PMU counters from the VM.
 > > > > 
-> > > >   % cat logs/gicv3-ipi.log
-> > > >   timeout -k 1s --foreground 90s ../src/qemu/build/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 224 -machine gic-version=3 -append ipi # -initrd /tmp/tmp.Xy3T5zjn9n
-> > > >   lib/arm/gic-v3.c:25: assert failed: 0
-> > > >           STACK:
+> > > > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > > > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
 > > > 
-> > > Quickly looking at gicv3_set_redist_base(), I noted a single contiguous
-> > > redistributor region seems to be used: void *ptr =
-> > > gicv3_data.redist_base[0];
-> > > 
-> > > Supporting more than 123 vcpus requires to use the 2 separate
-> > > redistributor regions exposed by lastest QEMU mach-virt. I suspect the
-> > > kvm-unit-test is not using both redist regions yet.
+> > > Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 > > 
-> > Nope. I didn't have any hardware to test that on yet :-) I can write a
-> > patch, though, and send it to Christoffer to test. Or, if Christoffer
-> > doesn't mind hacking kvm-unit-tests, I'd be happy to review his patch :-)
+> > Thanks Christoffer! While running this I just noticed a bug though.
+> > It seemed my hardware was super-duper fast, because I was missing...
+> > 
+> > > > +#define PS_PER_SEC (1000 * 1000 * 1000 * 1000U)
+> >                                     ...an 'L' here ^
+> > 
+> > I'll send a v2 with that fix now and also add your acked-by.
 > > 
 > 
-> I'm quite caugt up at the moment, so if you could write a patch, I'll be
-> happy to test.
->
+> I didn't verify the numeric aspects of the test this time around, but
+> looked at what the tests do and ran this on a couple of platforms.
+> 
+> I figured we should merge this and we can fix small issues later if they
+> appear.
 
-No problem. I'll try to pull it together soon.
+Yeah, I agree. We should get it merged and then as people use it, we'll
+be able to better see what's wrong or how it can be improved. I think
+v2 is in decent shape now. Hopefully those that run these types of
+benchmarks will try it out and suggest/post improvements.
 
 Thanks,
-drew 
+drew
