@@ -1,22 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests] arm/arm64: gicv3: support two redistributor
- regions
-Date: Mon,  3 Sep 2018 18:45:07 +0200
-Message-ID: <20180903164507.24544-1-drjones@redhat.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Clean dcache to PoC when changing PTE due
+ to CoW
+Date: Mon, 03 Sep 2018 18:29:30 +0100
+Message-ID: <87a7oy7amd.fsf@e105922-lin.cambridge.arm.com>
+References: <20180823153342.158230-1-marc.zyngier@arm.com>
+ <20180830122052.GD4029@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A02424A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 12:45:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 616CE4A200
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 13:29:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f-p0tj-asvGu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 12:45:11 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE1DE49F94
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 12:45:11 -0400 (EDT)
+ with ESMTP id Pu2nRx1q8-L2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 13:29:33 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEEAB4A1FF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 13:29:32 -0400 (EDT)
+In-Reply-To: <20180830122052.GD4029@e113682-lin.lund.arm.com> (Christoffer
+ Dall's message of "Thu, 30 Aug 2018 14:20:52 +0200")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,175 +30,90 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Mike Galbraith <efault@gmx.de>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We need to support two redistributor regions in order to support
-more than 123 vcpus. Also bump NR_CPUS to 512, since that's what
-KVM currently supports.
+Christoffer Dall <christoffer.dall@arm.com> writes:
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
+> [Adding Andrea and Steve in CC]
+>
+> On Thu, Aug 23, 2018 at 04:33:42PM +0100, Marc Zyngier wrote:
+>> When triggering a CoW, we unmap the RO page via an MMU notifier
+>> (invalidate_range_start), and then populate the new PTE using another
+>> one (change_pte). In the meantime, we'll have copied the old page
+>> into the new one.
+>> 
+>> The problem is that the data for the new page is sitting in the
+>> cache, and should the guest have an uncached mapping to that page
+>> (or its MMU off), following accesses will bypass the cache.
+>> 
+>> In a way, this is similar to what happens on a translation fault:
+>> We need to clean the page to the PoC before mapping it. So let's just
+>> do that.
+>> 
+>> This fixes a KVM unit test regression observed on a HiSilicon platform,
+>> and subsequently reproduced on Seattle.
+>> 
+>> Fixes: a9c0e12ebee5 ("KVM: arm/arm64: Only clean the dcache on translation fault")
+>> Reported-by: Mike Galbraith <efault@gmx.de>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  virt/kvm/arm/mmu.c | 9 ++++++++-
+>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 1d90d79706bd..287c8e274655 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1811,13 +1811,20 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data
+>>  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+>>  {
+>>  	unsigned long end = hva + PAGE_SIZE;
+>> +	kvm_pfn_t pfn = pte_pfn(pte);
+>>  	pte_t stage2_pte;
+>>  
+>>  	if (!kvm->arch.pgd)
+>>  		return;
+>>  
+>>  	trace_kvm_set_spte_hva(hva);
+>> -	stage2_pte = pfn_pte(pte_pfn(pte), PAGE_S2);
+>> +
+>> +	/*
+>> +	 * We've moved a page around, probably through CoW, so let's treat
+>> +	 * just like a translation fault and clean the cache to the PoC.
+>> +	 */
+>> +	clean_dcache_guest_page(pfn, PAGE_SIZE);
+>> +	stage2_pte = pfn_pte(pfn, PAGE_S2);
+>>  	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
+>>  }
+>
+> How does this work for pmd mappings?
 
-So far only regression tested on TCG.
+kvm_set_spte_hva() isn't called for PMD mappings. But...
 
+>
+> Are we guaranteed that a pmd mapping (hugetlbfs or THP) is split before
+> a CoW happens?
+>
+> Steve tells me that we share THP mappings on fork and that we back THPs
+> by a zero page, so CoW with THP should be possible.
+>
 
- lib/arm/asm/gic-v3.h | 20 +++++++++++++++++---
- lib/arm/asm/setup.h  |  2 +-
- lib/arm/gic-v3.c     | 39 +++++++++++++++++++++++++++++----------
- lib/arm/gic.c        | 16 +++++++++++++---
- 4 files changed, 60 insertions(+), 17 deletions(-)
+...the problem seems to affect handling write permission faults for CoW
+or zero pages.
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 1dceb9541f62..a04e58bd438b 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -49,16 +49,30 @@
- #include <asm/smp.h>
- #include <asm/io.h>
- 
-+#define GICV3_REDIST0_NR_CPUS 123
-+
- struct gicv3_data {
- 	void *dist_base;
--	void *redist_base[NR_CPUS];
-+	void *redist_base[GICV3_REDIST0_NR_CPUS];
-+	void *redist2_base[NR_CPUS - GICV3_REDIST0_NR_CPUS];
- 	unsigned int irq_nr;
- };
- extern struct gicv3_data gicv3_data;
- 
-+#define gicv3_redist_base()								\
-+({											\
-+	int __cpu = smp_processor_id();							\
-+	void *__base;									\
-+											\
-+	if (__cpu < GICV3_REDIST0_NR_CPUS)						\
-+		__base = gicv3_data.redist_base[__cpu];					\
-+	else										\
-+		__base = gicv3_data.redist2_base[__cpu - GICV3_REDIST0_NR_CPUS];	\
-+											\
-+	__base;										\
-+})
- #define gicv3_dist_base()		(gicv3_data.dist_base)
--#define gicv3_redist_base()		(gicv3_data.redist_base[smp_processor_id()])
--#define gicv3_sgi_base()		(gicv3_data.redist_base[smp_processor_id()] + SZ_64K)
-+#define gicv3_sgi_base()		(gicv3_redist_base() + SZ_64K)
- 
- extern int gicv3_init(void);
- extern void gicv3_enable_defaults(void);
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index b57ea13b9dd2..3215814603e4 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -9,7 +9,7 @@
- #include <asm/page.h>
- #include <asm/pgtable-hwdef.h>
- 
--#define NR_CPUS			255
-+#define NR_CPUS			512
- extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
- extern int nr_cpus;
- 
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index 9b3fa5730478..e7a48c988cab 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -6,20 +6,39 @@
- #include <asm/gic.h>
- #include <asm/io.h>
- 
-+static void __gicv3_set_redist_base(void *ptr)
-+{
-+	int cpu = smp_processor_id();
-+
-+	if (cpu < GICV3_REDIST0_NR_CPUS)
-+		gicv3_data.redist_base[cpu] = ptr;
-+	else
-+		gicv3_data.redist2_base[cpu - GICV3_REDIST0_NR_CPUS] = ptr;
-+}
-+
- void gicv3_set_redist_base(size_t stride)
- {
- 	u32 aff = mpidr_compress(get_mpidr());
--	void *ptr = gicv3_data.redist_base[0];
-+	void *redist_base[] =  {
-+		gicv3_data.redist_base[0],
-+		gicv3_data.redist2_base[0],
-+	};
-+	void *ptr;
- 	u64 typer;
--
--	do {
--		typer = gicv3_read_typer(ptr + GICR_TYPER);
--		if ((typer >> 32) == aff) {
--			gicv3_redist_base() = ptr;
--			return;
--		}
--		ptr += stride; /* skip RD_base, SGI_base, etc. */
--	} while (!(typer & GICR_TYPER_LAST));
-+	int i = 0;
-+
-+	while (redist_base[i]) {
-+		ptr = redist_base[i];
-+		do {
-+			typer = gicv3_read_typer(ptr + GICR_TYPER);
-+			if ((typer >> 32) == aff) {
-+				__gicv3_set_redist_base(ptr);
-+				return;
-+			}
-+			ptr += stride; /* skip RD_base, SGI_base, etc. */
-+		} while (!(typer & GICR_TYPER_LAST));
-+		++i;
-+	}
- 
- 	/* should never reach here */
- 	assert(0);
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 59273b1716d6..81973c47d487 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -44,7 +44,7 @@ static const struct gic_common_ops gicv3_common_ops = {
-  * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
-  */
- static bool
--gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-+gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
- {
- 	struct dt_pbus_reg reg;
- 	struct dt_device gic;
-@@ -70,19 +70,29 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
- 	assert(ret == 0);
- 	*base2 = ioremap(reg.addr, reg.size);
- 
-+	if (base3) {
-+		ret = dt_pbus_translate(&gic, 2, &reg);
-+		if (ret != -FDT_ERR_NOTFOUND) {
-+			assert(ret == 0);
-+			*base3 = ioremap(reg.addr, reg.size);
-+		} else {
-+			*base3 = NULL;
-+		}
-+	}
-+
- 	return true;
- }
- 
- int gicv2_init(void)
- {
- 	return gic_get_dt_bases("arm,cortex-a15-gic",
--			&gicv2_data.dist_base, &gicv2_data.cpu_base);
-+			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
- }
- 
- int gicv3_init(void)
- {
- 	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
--			&gicv3_data.redist_base[0]);
-+			&gicv3_data.redist_base[0], &gicv3_data.redist2_base[0]);
- }
- 
- int gic_version(void)
--- 
-2.17.1
+The memory gets unmapped at stage 2 due to the invalidate notifier (in
+hugetlb_cow() for hugetlbfs and do_huge_pmd_wp_page() for THP) while the
+cache maintenance for the newly allocated page will be skipped due to
+the !FSC_PERM. 
+
+Hmm... smells like there might be a problem here. I'll try and put
+together a fix.
+
+> Thanks,
+>     Christoffer
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
