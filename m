@@ -1,28 +1,24 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v4 06/20] arm64: Add a helper for PARange to physical
- shift conversion
-Date: Mon, 3 Sep 2018 13:13:41 +0200
-Message-ID: <20180903111341.GI4029@e113682-lin.lund.arm.com>
-References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
- <1531905547-25478-7-git-send-email-suzuki.poulose@arm.com>
- <20180830094227.GB4029@e113682-lin.lund.arm.com>
- <30b9aa82-7600-8094-dca3-44a5e79caf5a@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: GICv3 stride issue with many VCPUs
+Date: Mon, 3 Sep 2018 13:39:12 +0200
+Message-ID: <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
+References: <20180903111130.GG4029@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1DE4A1DA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:13:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3EFC4A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:39:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hzRlSN8QnA46 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 07:13:44 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E284A0C9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:13:44 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <30b9aa82-7600-8094-dca3-44a5e79caf5a@arm.com>
+ with ESMTP id lFSf3FjCToPQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 07:39:14 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D664E4A1D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:39:14 -0400 (EDT)
+In-Reply-To: <20180903111130.GG4029@e113682-lin.lund.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,66 +28,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 11:06:44AM +0100, Suzuki K Poulose wrote:
-> On 30/08/18 10:42, Christoffer Dall wrote:
-> >On Wed, Jul 18, 2018 at 10:18:49AM +0100, Suzuki K Poulose wrote:
-> >>On arm64, ID_AA64MMFR0_EL1.PARange encodes the maximum Physical
-> >>Address range supported by the CPU. Add a helper to decode this
-> >>to actual physical shift. If we hit an unallocated value, return
-> >>the maximum range supported by the kernel.
-> >>This will be used by KVM to set the VTCR_EL2.T0SZ, as it
-> >>is about to move its place. Having this helper keeps the code
-> >>movement cleaner.
-> >>
-> >>Cc: Catalin Marinas <catalin.marinas@arm.com>
-> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>Cc: James Morse <james.morse@arm.com>
-> >>Cc: Christoffer Dall <cdall@kernel.org>
-> >>Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>---
-> >>Changes since V2:
-> >>  - Split the patch
-> >>  - Limit the physical shift only for values unrecognized.
-> >>---
-> >>  arch/arm64/include/asm/cpufeature.h | 13 +++++++++++++
-> >>  1 file changed, 13 insertions(+)
-> >>
-> >>diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> >>index 1717ba1..855cf0e 100644
-> >>--- a/arch/arm64/include/asm/cpufeature.h
-> >>+++ b/arch/arm64/include/asm/cpufeature.h
-> >>@@ -530,6 +530,19 @@ void arm64_set_ssbd_mitigation(bool state);
-> >>  static inline void arm64_set_ssbd_mitigation(bool state) {}
-> >>  #endif
-> >>+static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
-> >>+{
-> >>+	switch (parange) {
-> >>+	case 0: return 32;
-> >>+	case 1: return 36;
-> >>+	case 2: return 40;
-> >>+	case 3: return 42;
-> >>+	case 4: return 44;
-> >>+	case 5: return 48;
-> >>+	case 6: return 52;
-> >>+	default: return CONFIG_ARM64_PA_BITS;
-> >
-> >I don't understand this case?  Shouldn't this include at least a WARN()
-> >?
+Hi Christoffer,
+
+On 09/03/2018 01:11 PM, Christoffer Dall wrote:
+> Hi,
 > 
-> If a new value gets assigned in the future, an older kernel might not
-> be aware of it. As per the Arm ARM ID feature value rules, we are
-> guaranteed that the next higher value must indicate higher value.
-> So, WARN() may not be the right choice. Hence, we restrict it to
-> the value supported by the kernel.
+> I recently ran kvm-unit-tests on TX2, and I got an error from gicv3-ipi,
+> with this in the log:
 > 
+>   % cat logs/gicv3-ipi.log
+>   timeout -k 1s --foreground 90s ../src/qemu/build/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 224 -machine gic-version=3 -append ipi # -initrd /tmp/tmp.Xy3T5zjn9n
+>   lib/arm/gic-v3.c:25: assert failed: 0
+>           STACK:
 
-ok, fair enough.
+Quickly looking at gicv3_set_redist_base(), I noted a single contiguous
+redistributor region seems to be used: void *ptr =
+gicv3_data.redist_base[0];
 
-Thanks,
+Supporting more than 123 vcpus requires to use the 2 separate
+redistributor regions exposed by lastest QEMU mach-virt. I suspect the
+kvm-unit-test is not using both redist regions yet.
 
-    Christoffer
+Thanks
+
+Eric
+
+
+> 
+> 
+> Which is an assert in gicv3_set_redist_base().
+> 
+> I suspect this is related to the number of vcpus (112) and our GICv3 configuration.
+> 
+> Reporting it here in case anyone else is seeing this and wondering what's going on.
+> 
+> 
+> Thanks,
+> 
+>     Christoffer
+> 
