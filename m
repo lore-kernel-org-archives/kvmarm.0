@@ -1,24 +1,26 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: GICv3 stride issue with many VCPUs
-Date: Mon, 3 Sep 2018 13:39:12 +0200
-Message-ID: <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
-References: <20180903111130.GG4029@e113682-lin.lund.arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
+Date: Mon, 3 Sep 2018 14:11:30 +0200
+Message-ID: <20180903121130.uhkkz2avwknhxobs@kamzik.brq.redhat.com>
+References: <20180830141733.21725-1-drjones@redhat.com>
+ <20180830141733.21725-3-drjones@redhat.com>
+ <20180903111236.GH4029@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3EFC4A1DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:39:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA294A1D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:11:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lFSf3FjCToPQ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 07:39:14 -0400 (EDT)
+ with ESMTP id 9hzgSZCuYo3B for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 08:11:34 -0400 (EDT)
 Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D664E4A1D1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:39:14 -0400 (EDT)
-In-Reply-To: <20180903111130.GG4029@e113682-lin.lund.arm.com>
-Content-Language: en-US
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2D494A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:11:34 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180903111236.GH4029@e113682-lin.lund.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,46 +30,33 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On Mon, Sep 03, 2018 at 01:12:36PM +0200, Christoffer Dall wrote:
+> On Thu, Aug 30, 2018 at 04:17:33PM +0200, Andrew Jones wrote:
+> > From: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > 
+> > Here we provide the support for measuring various micro level
+> > operations on arm64. Measurements are currently obtained using
+> > timer counters. Further modifications in KVM will be required
+> > to support timestamping using cycle counters, as KVM now disables
+> > accesses to the PMU counters from the VM.
+> > 
+> > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
+> > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> 
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 
-On 09/03/2018 01:11 PM, Christoffer Dall wrote:
-> Hi,
-> 
-> I recently ran kvm-unit-tests on TX2, and I got an error from gicv3-ipi,
-> with this in the log:
-> 
->   % cat logs/gicv3-ipi.log
->   timeout -k 1s --foreground 90s ../src/qemu/build/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 224 -machine gic-version=3 -append ipi # -initrd /tmp/tmp.Xy3T5zjn9n
->   lib/arm/gic-v3.c:25: assert failed: 0
->           STACK:
+Thanks Christoffer! While running this I just noticed a bug though.
+It seemed my hardware was super-duper fast, because I was missing...
 
-Quickly looking at gicv3_set_redist_base(), I noted a single contiguous
-redistributor region seems to be used: void *ptr =
-gicv3_data.redist_base[0];
+> > +#define PS_PER_SEC (1000 * 1000 * 1000 * 1000U)
+                                    ...an 'L' here ^
 
-Supporting more than 123 vcpus requires to use the 2 separate
-redistributor regions exposed by lastest QEMU mach-virt. I suspect the
-kvm-unit-test is not using both redist regions yet.
+I'll send a v2 with that fix now and also add your acked-by.
 
-Thanks
-
-Eric
-
-
-> 
-> 
-> Which is an assert in gicv3_set_redist_base().
-> 
-> I suspect this is related to the number of vcpus (112) and our GICv3 configuration.
-> 
-> Reporting it here in case anyone else is seeing this and wondering what's going on.
-> 
-> 
-> Thanks,
-> 
->     Christoffer
-> 
+Thanks,
+drew
