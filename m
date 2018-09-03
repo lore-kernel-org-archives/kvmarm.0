@@ -1,83 +1,81 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: GICv3 stride issue with many VCPUs
-Date: Mon, 3 Sep 2018 14:31:19 +0200
-Message-ID: <20180903123119.2z5tko3kaqcezfai@kamzik.brq.redhat.com>
-References: <20180903111130.GG4029@e113682-lin.lund.arm.com>
- <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC 02/13] iommu: Introduce tlb_invalidate API
+Date: Mon, 3 Sep 2018 14:41:46 +0200
+Message-ID: <8c06530b-afad-1c13-4c42-f97b650f8e5b@redhat.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-3-git-send-email-eric.auger@redhat.com>
+ <11279859-08f8-6d9d-7aa7-7a5de4cfd3fb@arm.com>
+ <95e423a6-3f67-d101-a391-369a1493dff9@redhat.com>
+ <8a3b8fcd-48c4-7d9e-7672-e73431bcde5b@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E9004A1D5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:31:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rRnL4V+zBPpO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 08:31:24 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF2FC4A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:31:24 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <8a3b8fcd-48c4-7d9e-7672-e73431bcde5b@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, "yi.l.liu\""@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 01:39:12PM +0200, Auger Eric wrote:
-> Hi Christoffer,
+Hi Jean-Philippe,
+On 09/03/2018 02:28 PM, Jean-Philippe Brucker wrote:
+> On 31/08/2018 15:07, Auger Eric wrote:
+>>> Since the ioctl will be used to combine invalidations (invalidate both
+>>> ATC and TLB with a single call), we need an additional ASID field for
+>>> the SMMU - ATC is invalidated by PASID, TLB by ASID. I used to call it
+>>> "tag", but I'm leaning towards "arch_id" now
+>>> (http://www.linux-arm.org/git?p=linux-jpb.git;a=commitdiff;h=40fdef74816dd8d8d113100b9e0162fab4cec28d)
+>>
+>> I aknowledge I am not crystal clear about that. for a given iommu_domain
+>> don't you have a single asid. Can't you retrieve the asid from the
+>> iommu_domain/arm_smmu_domain/arm_smmu_s1_cfg/arm_smmu_ctx_desc.asid?
+>> Here again I am confused bout the dual iommu_domain/struct device
+>> parameters.
 > 
-> On 09/03/2018 01:11 PM, Christoffer Dall wrote:
-> > Hi,
-> > 
-> > I recently ran kvm-unit-tests on TX2, and I got an error from gicv3-ipi,
-> > with this in the log:
-> > 
-> >   % cat logs/gicv3-ipi.log
-> >   timeout -k 1s --foreground 90s ../src/qemu/build/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 224 -machine gic-version=3 -append ipi # -initrd /tmp/tmp.Xy3T5zjn9n
-> >   lib/arm/gic-v3.c:25: assert failed: 0
-> >           STACK:
-> 
-> Quickly looking at gicv3_set_redist_base(), I noted a single contiguous
-> redistributor region seems to be used: void *ptr =
-> gicv3_data.redist_base[0];
-> 
-> Supporting more than 123 vcpus requires to use the 2 separate
-> redistributor regions exposed by lastest QEMU mach-virt. I suspect the
-> kvm-unit-test is not using both redist regions yet.
+> In nested mode, ASIDs are allocated by the guest and written into the CD
+> table. Even if there is a single CD it will still be private to the
+> guest. When receiving the invalidation, the host could walk the CD
+> tables to retrieve the ASID, but it's not guaranteed to be here anymore:
+> the guest could well clear a CD before sending the invalidate command.
 
-Nope. I didn't have any hardware to test that on yet :-) I can write a
-patch, though, and send it to Christoffer to test. Or, if Christoffer
-doesn't mind hacking kvm-unit-tests, I'd be happy to review his patch :-)
-
-Thanks,
-drew
+That's fully correct. I messed up at the beginning with this asid and
+that's perfectly true the asid needs to be passed. I will respin
+accordingly.
 
 > 
-> Thanks
+>> I have another trouble while doing the QEMU integration.
+>> When the guests does an NH_ALL, this propagates an invalidation on the
+>> whole IPA range and we must discriminate that from regular NH_VA calls.
+>> How would you encode the NH_ALL with this API?
 > 
-> Eric
+> I think that translates to an invalidate-all for the domain:
 > 
+> struct tlb_iommu_invalidate_info info = {
+> 	.hdr.type = IOMMU_INV_TYPE_TLB,
+> 	.granularity = IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
+OK
+> };
 > 
-> > 
-> > 
-> > Which is an assert in gicv3_set_redist_base().
-> > 
-> > I suspect this is related to the number of vcpus (112) and our GICv3 configuration.
-> > 
-> > Reporting it here in case anyone else is seeing this and wondering what's going on.
-> > 
-> > 
-> > Thanks,
-> > 
-> >     Christoffer
-> > 
+> Reading the spec again, I though the API was missing a way to encode
+> TLBI_NH_VAA, invalidate a range for all ASIDs. Although it feels
+> contrived, we could represent it with the following:
+> 
+> struct tlb_iommu_invalidate_info info = {
+> 	.hdr.type = IOMMU_INV_TYPE_TLB,
+> 	.granularity = IOMMU_INV_GRANU_PAGE_PASID,
+> 	.flags = IOMMU_INVALIDATE_GLOBAL_PAGE,
+> 	.addr = ...
+OK
+
+Also what about CMD_CFI_CD(_ALL) propagation. Is it an
+IOMMU_INV_TYPE_PASID invalidation?
+
+Thanks
+
+Eric
+> };
+> 
+> Thanks,
+> Jean
+> 
