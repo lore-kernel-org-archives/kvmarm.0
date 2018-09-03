@@ -1,27 +1,21 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v4 20/20] kvm: arm64: Allow tuning the physical address
- size for VM
-Date: Mon, 3 Sep 2018 11:14:13 +0100
-Message-ID: <849af220-8be2-9d4c-fb82-778348717f90@arm.com>
-References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
- <1531905547-25478-21-git-send-email-suzuki.poulose@arm.com>
- <20180830124054.GE4029@e113682-lin.lund.arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH kvm-unit-tests] scripts: Speedup MAX_SMP check
+Date: Mon,  3 Sep 2018 12:58:45 +0200
+Message-ID: <20180903105845.13942-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3E44A1FF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 06:14:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B95D14A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 06:58:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mvLKXr6GJPId for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 06:14:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6CAF4A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 06:14:19 -0400 (EDT)
-In-Reply-To: <20180830124054.GE4029@e113682-lin.lund.arm.com>
-Content-Language: en-US
+ with ESMTP id 04HuDe4+Zgad for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 06:58:50 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 826054A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 06:58:50 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,85 +25,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
+To: kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQ2hyaXN0b2ZmZXIsCgpPbiAzMC8wOC8xOCAxMzo0MCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90
-ZToKPiBIaSBTdXp1a2ksCj4gCj4gT24gV2VkLCBKdWwgMTgsIDIwMTggYXQgMTA6MTk6MDNBTSAr
-MDEwMCwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKPj4gQWxsb3cgc3BlY2lmeWluZyB0aGUgcGh5
-c2ljYWwgYWRkcmVzcyBzaXplIGxpbWl0IGZvciBhIG5ldwo+PiBWTSB2aWEgdGhlIGt2bV90eXBl
-IGFyZ3VtZW50IGZvciB0aGUgS1ZNX0NSRUFURV9WTSBpb2N0bC4gVGhpcwo+PiBhbGxvd3MgdXMg
-dG8gZmluYWxpc2UgdGhlIHN0YWdlMiBwYWdlIHRhYmxlIGFzIGVhcmx5IGFzIHBvc3NpYmxlCj4+
-IGFuZCBoZW5jZSBwZXJmb3JtIHRoZSByaWdodCBjaGVja3Mgb24gdGhlIG1lbW9yeSBzbG90cwo+
-PiB3aXRob3V0IGNvbXBsaWNhdGlvbi4gVGhlIHNpemUgaXMgZWNub2RlZCBhcyBMb2cyKFBBX1Np
-emUpIGluCj4+IGJpdHNbNzowXSBvZiB0aGUgdHlwZSBmaWVsZC4gRm9yIGJhY2t3YXJkIGNvbXBh
-dGliaWxpdHkgdGhlCj4+IHZhbHVlIDAgaXMgcmVzZXJ2ZWQgYW5kIGltcGxpZXMgNDBiaXRzLiBB
-bHNvLCBsaWZ0IHRoZSBsaW1pdAo+PiBvZiB0aGUgSVBBIHRvIGhvc3QgbGltaXQgYW5kIGFsbG93
-IGxvd2VyIElQQSBzaXplcyAoZS5nLCAzMikuCj4+Cj4+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMu
-enluZ2llckBhcm0uY29tPgo+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2RhbGxAa2VybmVsLm9y
-Zz4KPj4gQ2M6IFBldGVyIE1heWRlbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPgo+PiBDYzog
-UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPj4gQ2M6IFJhZGltIEtyxI1tw6HF
-mSA8cmtyY21hckByZWRoYXQuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kgSyBQb3Vsb3Nl
-IDxzdXp1a2kucG91bG9zZUBhcm0uY29tPgo+PiAtLS0KPj4gQWxsLAo+Pgo+PiBUaGlzIGlzIG5v
-dCB0aGUgZmluYWwgQVBJLiBXZSBhcmUgc3RpbGwgZXZhbHVhdGluZyB0aGUgcG9zc2libGUKPj4g
-b3B0aW9ucyB0byBjcmVhdGUgYSBWTSBhbmQgdGhlbiBjb25maWd1cmUgdGhlIFZNIGJlZm9yZSBh
-bnkKPj4gcmVzb3VyY2VzIGNhbiBiZSBhbGxvY2F0ZWQgKGUuZywgZGV2aWNlcywgdkNQVXMgb3Ig
-bWVtb3J5KS4KPj4gU2VlIFswXSBmb3IgZGlzY3Vzc2lvbjoKPj4KPj4gWzBdIGh0dHA6Ly9saXN0
-cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1hcm0ta2VybmVsLzIwMTgtSnVseS81ODc4
-MzkuaHRtbAo+IAo+IEZXSVcsIEkgdGhpbmsgZW5jb2RpbmcgdGhlIHNpemUgaW4gdGhlIHR5cGUg
-aXNuJ3QgdGhhdCBiYWQsIGFzIGl0IHNlZW1zCj4gaW4gdGhlIHdvcnN0IGNhc2Ugd2UnbGwgb2Nj
-dXB5IDI0IGJpdHMgb3V0IG9mIHRoZSA2NC1iaXQgdHlwZSBhcmd1bWVudAo+IGF0IHRoZSB0aW1l
-IGJlaW5nIChJUEErU1ZFKSwgYW5kIHRoYXQncyBzZXZlcmFsIHllYXJzIGludG8gS1ZNL0FSTSdz
-Cj4gbGlmZSB0aW1lLgoKSSBoYWQgYSBkaXNjdXNzaW9uIHdpdGggRGF2ZSBhbmQgaXQgbG9va3Mg
-bGlrZSB3ZSBkb24ndCBuZWVkIHNwZWNpYWwgYml0cwppbiB0aGUgVk0gdHlwZSBmb3IgU1ZFLiBX
-ZSBzaG91bGQgYmUgYWJsZSB0byBtYW5hZ2UgaXQgcGVyIFZDUFUuIFNvIGl0IGlzCmp1c3QgdGhl
-IElQQSB0aGF0IG5lZWRzIGl0IGZvciBub3cuIEFsc28sIHdlIGNvdWxkIHNxdWVlemUgdGhlIElQ
-QSBjb25maWcKdG8gNmJpdHMgaWYgbmVlZGVkLgoKPiAKPiBJJ20gc3VyZSB3ZSdsbCBuZWVkIGEg
-bW9yZSBzb3BoaXN0aWNhdGVkIEFQSSBzb21lIGRheSwgd2hlbiB3ZQo+IGFic29sdXRlbHkgY2Fu
-bm90IGVhc2lseSB1c2Ugd2hhdCB3ZSBhbHJlYWR5IGhhdmUsIGJ1dCB3ZSBjYW4gYWRkIHRoYXQK
-PiBBUEkgYXQgdGhlIHRpbWUuCgpUcnVlLgoKPiAKPj4gLS0tCj4+ICAgRG9jdW1lbnRhdGlvbi92
-aXJ0dWFsL2t2bS9hcGkudHh0ICAgICAgIHwgIDQgKysrKwo+PiAgIGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20vc3RhZ2UyX3BndGFibGUuaCB8IDIwIC0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+ICAgYXJj
-aC9hcm02NC9rdm0vZ3Vlc3QuYyAgICAgICAgICAgICAgICAgIHwgIDMgLS0tCj4+ICAgaW5jbHVk
-ZS91YXBpL2xpbnV4L2t2bS5oICAgICAgICAgICAgICAgIHwgIDkgKysrKysrKysrCj4+ICAgdmly
-dC9rdm0vYXJtL2FybS5jICAgICAgICAgICAgICAgICAgICAgIHwgMTYgKysrKysrKysrKysrLS0t
-LQo+PiAgIDUgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgMjcgZGVsZXRpb25zKC0p
-Cj4+Cgo+PiAtLyoKPj4gLSAqIFdpdGggYWxsIHRoZSBzdXBwb3J0ZWQgVkFfQklUcyBhbmQgNDBi
-aXQgZ3Vlc3QgSVBBLCB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbgo+PiAtICogaXMgYWx3YXlzIHRy
-dWU6Cj4+IC0gKgo+PiAtICogICAgICAgU1RBR0UyX1BHVEFCTEVfTEVWRUxTIDw9IENPTkZJR19Q
-R1RBQkxFX0xFVkVMUwo+PiAtICoKPj4gLSAqIFdlIGJhc2Ugb3VyIHN0YWdlLTIgcGFnZSB0YWJs
-ZSB3YWxrZXIgaGVscGVycyBvbiB0aGlzIGFzc3VtcHRpb24gYW5kCj4+IC0gKiBmYWxsIGJhY2sg
-dG8gdXNpbmcgdGhlIGhvc3QgdmVyc2lvbiBvZiB0aGUgaGVscGVyIHdoZXJldmVyIHBvc3NpYmxl
-Lgo+PiAtICogaS5lLCBpZiBhIHBhcnRpY3VsYXIgbGV2ZWwgaXMgbm90IGZvbGRlZCAoZS5nLCBQ
-VUQpIGF0IHN0YWdlMiwgd2UgZmFsbCBiYWNrCj4+IC0gKiB0byB1c2luZyB0aGUgaG9zdCB2ZXJz
-aW9uLCBzaW5jZSBpdCBpcyBndWFyYW50ZWVkIGl0IGlzIG5vdCBmb2xkZWQgYXQgaG9zdC4KPj4g
-LSAqCj4+IC0gKiBJZiB0aGUgY29uZGl0aW9uIGJyZWFrcyBpbiB0aGUgZnV0dXJlLCB3ZSBjYW4g
-cmVhcnJhbmdlIHRoZSBob3N0IGxldmVsCj4+IC0gKiBkZWZpbml0aW9ucyBhbmQgcmV1c2UgdGhl
-bSBmb3Igc3RhZ2UyLiBUaWxsIHRoZW4uLi4KPj4gLSAqLwo+PiAtI2lmIFNUQUdFMl9QR1RBQkxF
-X0xFVkVMUyA+IENPTkZJR19QR1RBQkxFX0xFVkVMUwo+PiAtI2Vycm9yICJVbnN1cHBvcnRlZCBj
-b21iaW5hdGlvbiBvZiBndWVzdCBJUEEgYW5kIGhvc3QgVkFfQklUUy4iCj4+IC0jZW5kaWYKPj4g
-LQo+PiAtCj4+ICAgLyogc3RhZ2UyX3BnZGlyX3NoaWZ0KCkgaXMgdGhlIHNpemUgbWFwcGVkIGJ5
-IHRvcC1sZXZlbCBzdGFnZTIgZW50cnkgZm9yIHRoZSBWTSAqLwo+PiAgICNkZWZpbmUgc3RhZ2Uy
-X3BnZGlyX3NoaWZ0KGt2bSkJCXB0X2xldmVsc19wZ2Rpcl9zaGlmdChrdm1fc3RhZ2UyX2xldmVs
-cyhrdm0pKQo+PiAgICNkZWZpbmUgc3RhZ2UyX3BnZGlyX3NpemUoa3ZtKQkJKDFVTEwgPDwgc3Rh
-Z2UyX3BnZGlyX3NoaWZ0KGt2bSkpCj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9ndWVz
-dC5jIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+PiBpbmRleCAxNDJlNjEwLi42NmZiMjBjIDEw
-MDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCj4+ICsrKyBiL2FyY2gvYXJtNjQv
-a3ZtL2d1ZXN0LmMKPj4gQEAgLTQ3NSw5ICs0NzUsNiBAQCBpbnQga3ZtX2FybV9jb25maWdfdm0o
-c3RydWN0IGt2bSAqa3ZtLCB1MzIgaXBhX3NoaWZ0KQo+PiAgIAl1NjQgcGFyYW5nZTsKPj4gICAJ
-dTggbHZscyA9IHN0YWdlMl9wZ3RhYmxlX2xldmVscyhpcGFfc2hpZnQpOwo+PiAgIAo+PiAtCWlm
-IChpcGFfc2hpZnQgIT0gS1ZNX1BIWVNfU0hJRlQpCj4+IC0JCXJldHVybiAtRUlOVkFMOwo+PiAt
-Cj4+ICAgCS8qCj4+ICAgCSAqIFVzZSBhIG1pbmltdW0gMiBsZXZlbCBwYWdlIHRhYmxlIHRvIHBy
-ZXZlbnQgc3BsaXR0aW5nCj4+ICAgCSAqIGhvc3QgUE1EIGh1Z2UgcGFnZXMgYXQgc3RhZ2UyLgo+
-PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oIGIvaW5jbHVkZS91YXBpL2xp
-bnV4L2t2bS5oCj4+IGluZGV4IDlhNDBkODIuLjYyNWExMWUgMTAwNjQ0Cj4+IC0tLSBhL2luY2x1
-ZGUvdWFwaS9saW51eC9rdm0uaAo+PiArKysgYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPj4g
-QEAgLTc1MSw2ICs3NTEsMTUgQEAgc3RydWN0IGt2bV9wcGNfcmVzaXplX2hwdCB7Cj4+ICAgI2Rl
-ZmluZSBLVk1fUzM5MF9TSUVfUEFHRV9PRkZTRVQgMQo+PiAgIAo+PiAgIC8qCj4+ICsgKiBPbiBh
-cm0vYXJtNjQsIG1hY2hpbmUgdHlwZSBjYW5lIGJlIHVzZWQgdG8gcmVxdWVzdCB0aGUgcGh5c2lj
-YWwKPiAKPiBuaXQ6IHMvY2FuZS9jYW4vCgpUaGFua3MgZm9yIHNwb3R0aW5nLCB3aWxsIGZpeCBp
-dC4KCgpUaGFua3MgZm9yIHRoZSByZXZpZXcuCgpTdXp1a2kKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+The current MAX_SMP check launches QEMU for every value of the SMP
+parameter to check if the SMP parameter based on the native is higher
+than the QEMU maximum supported configuration.
+
+On something like a TX2, which has 224 threads, this takes a very long
+time where the test script just sits there with no output.
+
+Reduce the wait time by taking the log2 of MAX_SMP in each iteration of
+the loop instead.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ scripts/runtime.bash | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index a31ae91..1e2c288 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -140,5 +140,5 @@ function run()
+ # just remove it...
+ while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+ 		|& grep -qi 'exceeds max CPUs'; do
+-	((--MAX_SMP))
++	MAX_SMP=$((MAX_SMP >> 1))
+ done
+-- 
+2.7.4
