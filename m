@@ -1,62 +1,30 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
-Date: Mon, 3 Sep 2018 14:11:30 +0200
-Message-ID: <20180903121130.uhkkz2avwknhxobs@kamzik.brq.redhat.com>
-References: <20180830141733.21725-1-drjones@redhat.com>
- <20180830141733.21725-3-drjones@redhat.com>
- <20180903111236.GH4029@e113682-lin.lund.arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [RFC 01/13] iommu: Introduce bind_guest_stage API
+Date: Mon, 3 Sep 2018 13:19:31 +0100
+Message-ID: <58418b7b-44f4-9659-98df-b5f24bed3e15@arm.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
+ <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
+ <b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
+ <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA294A1D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:11:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9hzgSZCuYo3B for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 08:11:34 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2D494A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:11:34 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180903111236.GH4029@e113682-lin.lund.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 03, 2018 at 01:12:36PM +0200, Christoffer Dall wrote:
-> On Thu, Aug 30, 2018 at 04:17:33PM +0200, Andrew Jones wrote:
-> > From: Shih-Wei Li <shihwei@cs.columbia.edu>
-> > 
-> > Here we provide the support for measuring various micro level
-> > operations on arm64. Measurements are currently obtained using
-> > timer counters. Further modifications in KVM will be required
-> > to support timestamping using cycle counters, as KVM now disables
-> > accesses to the PMU counters from the VM.
-> > 
-> > Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-> > Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> 
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+On 31/08/2018 14:52, Auger Eric wrote:
+> Do we agree here we can get rid of the struct device * parameter?
 
-Thanks Christoffer! While running this I just noticed a bug though.
-It seemed my hardware was super-duper fast, because I was missing...
-
-> > +#define PS_PER_SEC (1000 * 1000 * 1000 * 1000U)
-                                    ...an 'L' here ^
-
-I'll send a v2 with that fix now and also add your acked-by.
+That's fine by me, in my opinion the bind operation should only be on
+the domain, like map/unmap. For the invalidation however, I think we
+need to keep the device as an optional parameter, because the guest may
+want to invalidate the ATC (DTLB) of a single device.
 
 Thanks,
-drew
+Jean
