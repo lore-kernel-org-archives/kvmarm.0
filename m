@@ -1,39 +1,83 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [RFC 09/13] iommu/smmuv3: Get prepared for nested stage support
-Date: Mon, 3 Sep 2018 13:29:34 +0100
-Message-ID: <e6de91f7-2410-b0dd-b118-674c32bae5e8@arm.com>
-References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
-	<1535026656-8450-10-git-send-email-eric.auger@redhat.com>
-	<538a2b88-dec5-a6fa-d918-486284eb56a9@arm.com>
-	<012d4950-7a06-2d59-85a0-44d511ad893b@redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: GICv3 stride issue with many VCPUs
+Date: Mon, 3 Sep 2018 14:31:19 +0200
+Message-ID: <20180903123119.2z5tko3kaqcezfai@kamzik.brq.redhat.com>
+References: <20180903111130.GG4029@e113682-lin.lund.arm.com>
+ <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <012d4950-7a06-2d59-85a0-44d511ad893b-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "\"eric.auger.pro"@gmail.com, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, "yi.l.liu\""@linux.intel.com, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
-Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E9004A1D5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:31:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rRnL4V+zBPpO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 08:31:24 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF2FC4A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:31:24 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <b6988290-7dec-cc86-d84c-d4eb36f1f97f@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 31/08/2018 15:11, Auger Eric wrote:
-> Yep this works with my setup but I was waiting for such kind of comments
-> to turn this prototype into something more "production level" ;-) Did
-> you send anything upstream, related to this branch?
+On Mon, Sep 03, 2018 at 01:39:12PM +0200, Auger Eric wrote:
+> Hi Christoffer,
+> 
+> On 09/03/2018 01:11 PM, Christoffer Dall wrote:
+> > Hi,
+> > 
+> > I recently ran kvm-unit-tests on TX2, and I got an error from gicv3-ipi,
+> > with this in the log:
+> > 
+> >   % cat logs/gicv3-ipi.log
+> >   timeout -k 1s --foreground 90s ../src/qemu/build/aarch64-softmmu/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/gic.flat -smp 224 -machine gic-version=3 -append ipi # -initrd /tmp/tmp.Xy3T5zjn9n
+> >   lib/arm/gic-v3.c:25: assert failed: 0
+> >           STACK:
+> 
+> Quickly looking at gicv3_set_redist_base(), I noted a single contiguous
+> redistributor region seems to be used: void *ptr =
+> gicv3_data.redist_base[0];
+> 
+> Supporting more than 123 vcpus requires to use the 2 separate
+> redistributor regions exposed by lastest QEMU mach-virt. I suspect the
+> kvm-unit-test is not using both redist regions yet.
 
-No I didn't have time to clean it up yet, and don't know when I'll be
-able to send it out. With host SVA and virtio-iommu, I have enough
-patches in flight to keep me busy for a while :) But you can obviously
-pick patches from that branch if they help.
+Nope. I didn't have any hardware to test that on yet :-) I can write a
+patch, though, and send it to Christoffer to test. Or, if Christoffer
+doesn't mind hacking kvm-unit-tests, I'd be happy to review his patch :-)
 
 Thanks,
-Jean
+drew
+
+> 
+> Thanks
+> 
+> Eric
+> 
+> 
+> > 
+> > 
+> > Which is an assert in gicv3_set_redist_base().
+> > 
+> > I suspect this is related to the number of vcpus (112) and our GICv3 configuration.
+> > 
+> > Reporting it here in case anyone else is seeing this and wondering what's going on.
+> > 
+> > 
+> > Thanks,
+> > 
+> >     Christoffer
+> > 
