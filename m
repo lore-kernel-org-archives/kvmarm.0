@@ -1,25 +1,28 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
-Date: Mon, 3 Sep 2018 13:12:36 +0200
-Message-ID: <20180903111236.GH4029@e113682-lin.lund.arm.com>
-References: <20180830141733.21725-1-drjones@redhat.com>
- <20180830141733.21725-3-drjones@redhat.com>
+Subject: Re: [PATCH v4 06/20] arm64: Add a helper for PARange to physical
+ shift conversion
+Date: Mon, 3 Sep 2018 13:13:41 +0200
+Message-ID: <20180903111341.GI4029@e113682-lin.lund.arm.com>
+References: <1531905547-25478-1-git-send-email-suzuki.poulose@arm.com>
+ <1531905547-25478-7-git-send-email-suzuki.poulose@arm.com>
+ <20180830094227.GB4029@e113682-lin.lund.arm.com>
+ <30b9aa82-7600-8094-dca3-44a5e79caf5a@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47F414A1DA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:12:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A1DE4A1DA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:13:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kygT-+ZEVHbC for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 07:12:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C9B4A0C9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:12:39 -0400 (EDT)
+ with ESMTP id hzRlSN8QnA46 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 07:13:44 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E284A0C9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 07:13:44 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180830141733.21725-3-drjones@redhat.com>
+In-Reply-To: <30b9aa82-7600-8094-dca3-44a5e79caf5a@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,279 +32,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, dave.martin@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Aug 30, 2018 at 04:17:33PM +0200, Andrew Jones wrote:
-> From: Shih-Wei Li <shihwei@cs.columbia.edu>
+On Mon, Sep 03, 2018 at 11:06:44AM +0100, Suzuki K Poulose wrote:
+> On 30/08/18 10:42, Christoffer Dall wrote:
+> >On Wed, Jul 18, 2018 at 10:18:49AM +0100, Suzuki K Poulose wrote:
+> >>On arm64, ID_AA64MMFR0_EL1.PARange encodes the maximum Physical
+> >>Address range supported by the CPU. Add a helper to decode this
+> >>to actual physical shift. If we hit an unallocated value, return
+> >>the maximum range supported by the kernel.
+> >>This will be used by KVM to set the VTCR_EL2.T0SZ, as it
+> >>is about to move its place. Having this helper keeps the code
+> >>movement cleaner.
+> >>
+> >>Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>Cc: James Morse <james.morse@arm.com>
+> >>Cc: Christoffer Dall <cdall@kernel.org>
+> >>Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>---
+> >>Changes since V2:
+> >>  - Split the patch
+> >>  - Limit the physical shift only for values unrecognized.
+> >>---
+> >>  arch/arm64/include/asm/cpufeature.h | 13 +++++++++++++
+> >>  1 file changed, 13 insertions(+)
+> >>
+> >>diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> >>index 1717ba1..855cf0e 100644
+> >>--- a/arch/arm64/include/asm/cpufeature.h
+> >>+++ b/arch/arm64/include/asm/cpufeature.h
+> >>@@ -530,6 +530,19 @@ void arm64_set_ssbd_mitigation(bool state);
+> >>  static inline void arm64_set_ssbd_mitigation(bool state) {}
+> >>  #endif
+> >>+static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
+> >>+{
+> >>+	switch (parange) {
+> >>+	case 0: return 32;
+> >>+	case 1: return 36;
+> >>+	case 2: return 40;
+> >>+	case 3: return 42;
+> >>+	case 4: return 44;
+> >>+	case 5: return 48;
+> >>+	case 6: return 52;
+> >>+	default: return CONFIG_ARM64_PA_BITS;
+> >
+> >I don't understand this case?  Shouldn't this include at least a WARN()
+> >?
 > 
-> Here we provide the support for measuring various micro level
-> operations on arm64. Measurements are currently obtained using
-> timer counters. Further modifications in KVM will be required
-> to support timestamping using cycle counters, as KVM now disables
-> accesses to the PMU counters from the VM.
+> If a new value gets assigned in the future, an older kernel might not
+> be aware of it. As per the Arm ARM ID feature value rules, we are
+> guaranteed that the next higher value must indicate higher value.
+> So, WARN() may not be the right choice. Hence, we restrict it to
+> the value supported by the kernel.
 > 
-> Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-> Signed-off-by: Christoffer Dall <cdall@cs.columbia.edu>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+ok, fair enough.
 
-> ---
->  arm/Makefile.arm64 |   1 +
->  arm/micro-bench.c  | 213 +++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg  |   8 ++
->  3 files changed, 222 insertions(+)
->  create mode 100644 arm/micro-bench.c
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index f04bbf476763..637435c523da 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -15,6 +15,7 @@ OBJDIRS += lib/arm64
->  
->  # arm64 specific tests
->  tests = $(TEST_DIR)/timer.flat
-> +tests += $(TEST_DIR)/micro-bench.flat
->  
->  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> new file mode 100644
-> index 000000000000..76650d647f6a
-> --- /dev/null
-> +++ b/arm/micro-bench.c
-> @@ -0,0 +1,213 @@
-> +/*
-> + * Measure the cost of micro level operations.
-> + *
-> + * This test provides support for quantifying the cost of micro level
-> + * operations. To improve precision in the measurements, one should
-> + * consider pinning each VCPU to a specific physical CPU (PCPU) and to
-> + * ensure no other task could run on that PCPU to skew the results.
-> + * This can be achieved by enabling QMP server in the QEMU command in
-> + * unittest.cfg for micro-bench, allowing a client program to get the
-> + * thread_id for each VCPU thread from the QMP server. Based on that
-> + * information, the client program can then pin the corresponding VCPUs to
-> + * dedicated PCPUs and isolate interrupts and tasks from those PCPUs.
-> + *
-> + * Copyright Columbia University
-> + * Author: Shih-Wei Li <shihwei@cs.columbia.edu>
-> + * Author: Christoffer Dall <cdall@cs.columbia.edu>
-> + * Author: Andrew Jones <drjones@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <asm/gic.h>
-> +
-> +#define NTIMES (1U << 16)
-> +
-> +static u32 cntfrq;
-> +
-> +static volatile bool ipi_ready, ipi_received;
-> +static void *vgic_dist_base;
-> +static void (*write_eoir)(u32 irqstat);
-> +
-> +static void ipi_irq_handler(struct pt_regs *regs)
-> +{
-> +	ipi_ready = false;
-> +	ipi_received = true;
-> +	gic_write_eoir(gic_read_iar());
-> +	ipi_ready = true;
-> +}
-> +
-> +static void ipi_secondary_entry(void *data)
-> +{
-> +	install_irq_handler(EL1H_IRQ, ipi_irq_handler);
-> +	gic_enable_defaults();
-> +	local_irq_enable();
-> +	ipi_ready = true;
-> +	while (true)
-> +		cpu_relax();
-> +}
-> +
-> +static bool test_init(void)
-> +{
-> +	int v = gic_init();
-> +
-> +	if (!v) {
-> +		printf("No supported gic present, skipping tests...\n");
-> +		return false;
-> +	}
-> +
-> +	if (nr_cpus < 2) {
-> +		printf("At least two cpus required, skipping tests...\n");
-> +		return false;
-> +	}
-> +
-> +	switch (v) {
-> +	case 2:
-> +		vgic_dist_base = gicv2_dist_base();
-> +		write_eoir = gicv2_write_eoir;
-> +	case 3:
-> +		vgic_dist_base = gicv3_dist_base();
-> +		write_eoir = gicv3_write_eoir;
-> +	}
-> +
-> +	ipi_ready = false;
-> +	gic_enable_defaults();
-> +	on_cpu_async(1, ipi_secondary_entry, NULL);
-> +
-> +	cntfrq = get_cntfrq();
-> +	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
-> +
-> +	return true;
-> +}
-> +
-> +static void ipi_prep(void)
-> +{
-> +	unsigned tries = 1 << 28;
-> +
-> +	while (!ipi_ready && tries--)
-> +		cpu_relax();
-> +	assert(ipi_ready);
-> +}
-> +
-> +static void ipi_exec(void)
-> +{
-> +	unsigned tries = 1 << 28;
-> +	static int received = 0;
-> +
-> +	ipi_received = false;
-> +
-> +	gic_ipi_send_single(1, 1);
-> +
-> +	while (!ipi_received && tries--)
-> +		cpu_relax();
-> +
-> +	++received;
-> +	assert_msg(ipi_received, "failed to receive IPI in time, but received %d successfully\n", received);
-> +}
-> +
-> +static void hvc_exec(void)
-> +{
-> +	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-> +}
-> +
-> +static void mmio_read_user_exec(void)
-> +{
-> +	/*
-> +	 * FIXME: Read device-id in virtio mmio here in order to
-> +	 * force an exit to userspace. This address needs to be
-> +	 * updated in the future if any relevant changes in QEMU
-> +	 * test-dev are made.
-> +	 */
-> +	void *userspace_emulated_addr = (void*)0x0a000008;
-> +
-> +	readl(userspace_emulated_addr);
-> +}
-> +
-> +static void mmio_read_vgic_exec(void)
-> +{
-> +	readl(vgic_dist_base + GICD_IIDR);
-> +}
-> +
-> +static void eoi_exec(void)
-> +{
-> +	int spurious_id = 1023; /* writes to EOI are ignored */
-> +
-> +	/* Avoid measuring assert(..) in gic_write_eoir */
-> +	write_eoir(spurious_id);
-> +}
-> +
-> +struct exit_test {
-> +	const char *name;
-> +	void (*prep)(void);
-> +	void (*exec)(void);
-> +	bool run;
-> +};
-> +
-> +static struct exit_test tests[] = {
-> +	{"hvc",			NULL,		hvc_exec,		true},
-> +	{"mmio_read_user",	NULL,		mmio_read_user_exec,	true},
-> +	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
-> +	{"eoi",			NULL,		eoi_exec,		true},
-> +	{"ipi",			ipi_prep,	ipi_exec,		true},
-> +};
-> +
-> +struct ns_time {
-> +	uint64_t ns;
-> +	uint64_t ns_frac;
-> +};
-> +
-> +#define PS_PER_SEC (1000 * 1000 * 1000 * 1000U)
-> +static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
-> +{
-> +	uint64_t ps_per_tick = PS_PER_SEC / cntfrq + !!(PS_PER_SEC % cntfrq);
-> +	uint64_t ps;
-> +
-> +	ps = ticks * ps_per_tick;
-> +	ns_time->ns = ps / 1000;
-> +	ns_time->ns_frac = (ps % 1000) / 100;
-> +}
-> +
-> +static void loop_test(struct exit_test *test)
-> +{
-> +	uint64_t start, end, total_ticks, ntimes = NTIMES;
-> +	struct ns_time total_ns, avg_ns;
-> +
-> +	if (test->prep)
-> +		test->prep();
-> +
-> +	isb();
-> +	start = read_sysreg(cntpct_el0);
-> +	while (ntimes--)
-> +		test->exec();
-> +	isb();
-> +	end = read_sysreg(cntpct_el0);
-> +
-> +	total_ticks = end - start;
-> +	ticks_to_ns_time(total_ticks, &total_ns);
-> +	avg_ns.ns = total_ns.ns / NTIMES;
-> +	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
-> +
-> +	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
-> +		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	int i;
-> +
-> +	if (!test_init())
-> +		return 1;
-> +
-> +	printf("\n%-30s%18s%13s%18s%13s\n", "name", "total ns", "", "avg ns", "");
-> +	for (i = 0 ; i < 92; ++i)
-> +		printf("%c", '-');
-> +	printf("\n");
-> +	for (i = 0; i < ARRAY_SIZE(tests); i++) {
-> +		if (!tests[i].run)
-> +			continue;
-> +		assert(tests[i].name && tests[i].exec);
-> +		loop_test(&tests[i]);
-> +	}
-> +
-> +	return 0;
-> +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 44b98cfc7afd..5c8a332da004 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -116,3 +116,11 @@ file = timer.flat
->  groups = timer
->  timeout = 2s
->  arch = arm64
-> +
-> +# Exit tests
-> +[micro-bench]
-> +file = micro-bench.flat
-> +smp = 2
-> +groups = nodefault,micro-bench
-> +accel = kvm
-> +arch = arm64
-> -- 
-> 2.17.1
-> 
+Thanks,
+
+    Christoffer
