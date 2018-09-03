@@ -1,28 +1,25 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC 09/13] iommu/smmuv3: Get prepared for nested stage support
-Date: Mon, 3 Sep 2018 14:48:58 +0200
-Message-ID: <a1c79d41-ad83-1883-dd80-c1153ccfd777@redhat.com>
-References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
- <1535026656-8450-10-git-send-email-eric.auger@redhat.com>
- <538a2b88-dec5-a6fa-d918-486284eb56a9@arm.com>
- <012d4950-7a06-2d59-85a0-44d511ad893b@redhat.com>
- <e6de91f7-2410-b0dd-b118-674c32bae5e8@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH kvm-unit-tests] scripts: Speedup MAX_SMP check
+Date: Mon, 3 Sep 2018 15:13:02 +0200
+Message-ID: <20180903131302.GK4029@e113682-lin.lund.arm.com>
+References: <20180903105845.13942-1-christoffer.dall@arm.com>
+ <20180903122550.7js3albkzcmej6i4@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 054134A1F2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:49:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23E184A1E6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:13:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ScK0cHrf5z-A for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Sep 2018 08:49:04 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56B304A0CA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 08:49:04 -0400 (EDT)
-In-Reply-To: <e6de91f7-2410-b0dd-b118-674c32bae5e8@arm.com>
-Content-Language: en-US
+ with ESMTP id A6t8MVbvgwg5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Sep 2018 09:13:05 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9C804A0CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Sep 2018 09:13:05 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180903122550.7js3albkzcmej6i4@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,31 +29,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, "yi.l.liu\""@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean-Philippe,
-
-On 09/03/2018 02:29 PM, Jean-Philippe Brucker wrote:
-> On 31/08/2018 15:11, Auger Eric wrote:
->> Yep this works with my setup but I was waiting for such kind of comments
->> to turn this prototype into something more "production level" ;-) Did
->> you send anything upstream, related to this branch?
+On Mon, Sep 03, 2018 at 02:25:50PM +0200, Andrew Jones wrote:
+> On Mon, Sep 03, 2018 at 12:58:45PM +0200, Christoffer Dall wrote:
+> > The current MAX_SMP check launches QEMU for every value of the SMP
+> > parameter to check if the SMP parameter based on the native is higher
+> > than the QEMU maximum supported configuration.
+> > 
+> > On something like a TX2, which has 224 threads, this takes a very long
+> > time where the test script just sits there with no output.
+> > 
+> > Reduce the wait time by taking the log2 of MAX_SMP in each iteration of
+> > the loop instead.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > ---
+> >  scripts/runtime.bash | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> > index a31ae91..1e2c288 100644
+> > --- a/scripts/runtime.bash
+> > +++ b/scripts/runtime.bash
+> > @@ -140,5 +140,5 @@ function run()
+> >  # just remove it...
+> >  while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> >  		|& grep -qi 'exceeds max CPUs'; do
+> > -	((--MAX_SMP))
+> > +	MAX_SMP=$((MAX_SMP >> 1))
+> >  done
+> > -- 
+> > 2.7.4
+> >
 > 
-> No I didn't have time to clean it up yet, and don't know when I'll be
-> able to send it out. With host SVA and virtio-iommu, I have enough
-> patches in flight to keep me busy for a while :) But you can obviously
-> pick patches from that branch if they help.
-
-I understand ;-) I will update the uapi according to our last
-discussions and I will look at your patches, especially smmu-v3 changes,
-adding your Sob when relevant.
-
-Thanks
-
-Eric
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 > 
-> Thanks,
-> Jean
+> 
+> Someday I should move this into arch-specific code and replace
+> it with something like:
+> 
+> if gic-v3
+>   MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 255)
+
+Not quite, becasue QEMU can't seem to support more than 123 CPUs with it
+current default set of parameters used by kvmtool at least.  But perhaps
+that's being fixed with some changes to QEMU/KVM (I lost track).
+
+Thanks for the reviews.
+
+    Christoffer
+
+
+
+> else
+>   MAX_SMP = MIN(_SC_NPROCESSORS_ONLN, 8)
+> 
+> If other archs ever care about it (they currently don't), then
+> they can implement their own thing.
 > 
