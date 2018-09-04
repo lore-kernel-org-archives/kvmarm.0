@@ -1,114 +1,137 @@
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RFC 01/13] iommu: Introduce bind_guest_stage API
-Date: Tue, 4 Sep 2018 08:43:42 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1912EFDAB@SHSMSX101.ccr.corp.intel.com>
-References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
-        <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
-        <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
-        <b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
-        <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D1912EFB76@SHSMSX101.ccr.corp.intel.com>
-        <220e4c2a-d31c-d8fb-2d77-d902d2f13bb2@redhat.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
- <8da25040-42fe-5ce8-2647-ee6b8d795bc9@redhat.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Clean dcache to PoC when changing PTE
+ due to CoW
+Date: Tue, 4 Sep 2018 11:03:43 +0200
+Message-ID: <20180904090343.GN4029@e113682-lin.lund.arm.com>
+References: <20180823153342.158230-1-marc.zyngier@arm.com>
+ <20180830122052.GD4029@e113682-lin.lund.arm.com>
+ <87a7oy7amd.fsf@e105922-lin.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <8da25040-42fe-5ce8-2647-ee6b8d795bc9@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5BF740A6E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 05:03:52 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lJV2W2D0Taja for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Sep 2018 05:03:46 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 952B740A50
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 05:03:46 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <87a7oy7amd.fsf@e105922-lin.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Punit Agrawal <punit.agrawal@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Mike Galbraith <efault@gmx.de>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> From: Auger Eric
-> Sent: Tuesday, September 4, 2018 4:41 PM
+On Mon, Sep 03, 2018 at 06:29:30PM +0100, Punit Agrawal wrote:
+> Christoffer Dall <christoffer.dall@arm.com> writes:
 > 
-> Hi Kevin,
-> 
-> On 09/04/2018 10:34 AM, Tian, Kevin wrote:
-> >> From: Auger Eric
-> >> Sent: Tuesday, September 4, 2018 4:11 PM
-> >>
-> >> Hi Kevin,
-> >> On 09/04/2018 09:57 AM, Tian, Kevin wrote:
-> >>>> From: Auger Eric
-> >>>> Sent: Friday, August 31, 2018 9:52 PM
-> >>>>
-> >>>> Hi Jean-Philippe,
-> >>>>
-> >>>> On 08/31/2018 03:11 PM, Jean-Philippe Brucker wrote:
-> >>>>> Hi Eric,
-> >>>>>
-> >>>>> On 23/08/18 16:25, Auger Eric wrote:
-> >>>>>>> +int iommu_bind_guest_stage(struct iommu_domain *domain,
-> >> struct
-> >>>> device *dev,
-> >>>>>>> +			   struct iommu_guest_stage_config *cfg)
-> >>>>>
-> >>>>> About the name change from iommu_bind_pasid_table: is the intent
-> to
-> >>>>> reuse this API for SMMUv2, which supports nested but not PASID?
-> >> Seems
-> >>>>> like a good idea but "iommu_bind_table" may be better since "stage"
-> is
-> >>>>> only used by Arm.
-> >>>>
-> >>>> At the moment I don't target SMUv2 but just SMMUv3. My focus was
-> on
-> >>>> nested stage enablement without enabling the multi-CD feature
-> (PASID),
-> >>>> whish is not supported by the QEMU vSMMUv3. Afterwards I realized
-> >> that
-> >>>> basically we are pointing to a CD or PASID table and that's about the
-> >>>> same. I don't have a strong opinion on the name,
-> >> iommu_bind_guest_table
-> >>>> or iommu_bind_pasid_table would be fine with me. Indeed "stage" is
-> >> ARM
-> >>>> vocable (level for Intel?)
-> >>>
-> >>> Intel uses first level/second level.
-> >>>
-> >>> iommu_bind_table is a bit confusing. what should people take table as?
-> >>> there is PASID table. there is also page table linked in each stage/level.
-> >> and
-> >>> maybe other tables in vendor-specific definition.
-> >>>
-> >>> to me iommu_bind_pasid_table is still clearer. anyway in other places
-> >>> we've used pasid explicitly in vfio/iommu APIs, then it should be
-> general
-> >>> enough to represent various implementations.
-> >>
-> >> Fine for me.
-> >>
-> >> However I I would suggest to rename the original iommu_sva_invalidate
-> >> into something that is SVA unrelated. iommu_tlb_invalidate is not OK as
-> >> this API also is used to invalidate context caches - which are not
-> >> iotlbs -. What about iommu_cache_invalidate?
-> >>
-> >> At least we must clarify that this API can be used for something else
-> >> than SVA enablement.
-> >>
+> > [Adding Andrea and Steve in CC]
 > >
-> > Agree. using SVA is limiting.
+> > On Thu, Aug 23, 2018 at 04:33:42PM +0100, Marc Zyngier wrote:
+> >> When triggering a CoW, we unmap the RO page via an MMU notifier
+> >> (invalidate_range_start), and then populate the new PTE using another
+> >> one (change_pte). In the meantime, we'll have copied the old page
+> >> into the new one.
+> >> 
+> >> The problem is that the data for the new page is sitting in the
+> >> cache, and should the guest have an uncached mapping to that page
+> >> (or its MMU off), following accesses will bypass the cache.
+> >> 
+> >> In a way, this is similar to what happens on a translation fault:
+> >> We need to clean the page to the PoC before mapping it. So let's just
+> >> do that.
+> >> 
+> >> This fixes a KVM unit test regression observed on a HiSilicon platform,
+> >> and subsequently reproduced on Seattle.
+> >> 
+> >> Fixes: a9c0e12ebee5 ("KVM: arm/arm64: Only clean the dcache on translation fault")
+> >> Reported-by: Mike Galbraith <efault@gmx.de>
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> ---
+> >>  virt/kvm/arm/mmu.c | 9 ++++++++-
+> >>  1 file changed, 8 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> >> index 1d90d79706bd..287c8e274655 100644
+> >> --- a/virt/kvm/arm/mmu.c
+> >> +++ b/virt/kvm/arm/mmu.c
+> >> @@ -1811,13 +1811,20 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data
+> >>  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+> >>  {
+> >>  	unsigned long end = hva + PAGE_SIZE;
+> >> +	kvm_pfn_t pfn = pte_pfn(pte);
+> >>  	pte_t stage2_pte;
+> >>  
+> >>  	if (!kvm->arch.pgd)
+> >>  		return;
+> >>  
+> >>  	trace_kvm_set_spte_hva(hva);
+> >> -	stage2_pte = pfn_pte(pte_pfn(pte), PAGE_S2);
+> >> +
+> >> +	/*
+> >> +	 * We've moved a page around, probably through CoW, so let's treat
+> >> +	 * just like a translation fault and clean the cache to the PoC.
+> >> +	 */
+> >> +	clean_dcache_guest_page(pfn, PAGE_SIZE);
+> >> +	stage2_pte = pfn_pte(pfn, PAGE_S2);
+> >>  	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
+> >>  }
 > >
-> > I also agree that iommu_cache_invalidate is better, though I don't think
-> > you want to pass guest context cache invalidation to host. that
-> information
-> > is fully under host control. :-)
+> > How does this work for pmd mappings?
 > 
-> I think the confusion comes from the different terminology used in VTD
-> and ARM SMMU spec.
+> kvm_set_spte_hva() isn't called for PMD mappings. But...
 > 
-> Your PASID table ~ ARM SMMU Context Descriptor (CD) table
-> Your Root Entry/Context Entry ~ ARM SMMU Stream Table Entry (STE)
+> >
+> > Are we guaranteed that a pmd mapping (hugetlbfs or THP) is split before
+> > a CoW happens?
+> >
+> > Steve tells me that we share THP mappings on fork and that we back THPs
+> > by a zero page, so CoW with THP should be possible.
+> >
 > 
-> So I meant guesr invalidates its Context Descriptor cache. He "owns"
-> those. Host owns the STE.
+> ...the problem seems to affect handling write permission faults for CoW
+> or zero pages.
+> 
+> The memory gets unmapped at stage 2 due to the invalidate notifier (in
+> hugetlb_cow() for hugetlbfs and do_huge_pmd_wp_page() for THP) 
+
+So just to make sure I get this right.  For a pte CoW, Linux calls the
+set_spte function to simply change the pte mapping, without doing any
+unmapping at stage 2, but with pmd, we unmap and wait to take another
+fault as an alternative method?
+
+Why the two different approaches depending on the mapping size?
+
+> while the
+> cache maintenance for the newly allocated page will be skipped due to
+> the !FSC_PERM. 
+
+If the above holds, then the subsequent fault would be similar to any
+other fault which should work via the normal mechanism (dcache clean +
+XN on fault, icache invalidation on permission fault).
+
+> 
+> Hmm... smells like there might be a problem here. I'll try and put
+> together a fix.
 > 
 
-yes, then it makes sense.
+It's not clear to me if we have a problem, or just different ways of
+handling the PMD vs. PTE CoW case?
 
-Thanks
-Kevin
+
+Thanks,
+
+    Christoffer
