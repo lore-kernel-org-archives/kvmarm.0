@@ -1,55 +1,70 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests v3 1/2] arm/arm64: add GICD_IIDR definition
-Date: Tue,  4 Sep 2018 17:34:56 +0200
-Message-ID: <20180904153457.23519-2-drjones@redhat.com>
-References: <20180904153457.23519-1-drjones@redhat.com>
+From: Lukas Braun <koomi@moshbit.net>
+Subject: [PATCH] KVM: arm/arm64: Check memslot bounds before mapping hugepages
+Date: Tue,  4 Sep 2018 18:39:36 +0200
+Message-ID: <20180904163937.12759-1-koomi@moshbit.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 175D94A206
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:35:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2Oey-Zl+Az25 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Sep 2018 11:35:02 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F6F549FA8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:35:02 -0400 (EDT)
-In-Reply-To: <20180904153457.23519-1-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu, shihwei@cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Cc: Ralph Palutke <ralph.palutke@fau.de>, Lukas Braun <koomi@moshbit.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Userspace can create a memslot with memory backed by (transparent)
+hugepages, but with bounds that do not align with hugepages.
+In that case, we cannot map the entire region in the guest as hugepages
+without exposing additional host memory to the guest and potentially
+interfering with other memslots.
+Consequently, this patch adds a bounds check when populating guest page
+tables and forces the creation of regular PTEs if mapping an entire
+hugepage would violate the memslots bounds.
 
-Signed-off-by: Shih-Wei Li <shihwei@cs.columbia.edu>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Lukas Braun <koomi@moshbit.net>
 ---
- lib/arm/asm/gic.h | 1 +
- 1 file changed, 1 insertion(+)
+ virt/kvm/arm/mmu.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 2eb4af8d6c81..3b9982b0e7b5 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -10,6 +10,7 @@
- /* Distributor registers */
- #define GICD_CTLR			0x0000
- #define GICD_TYPER			0x0004
-+#define GICD_IIDR			0x0008
- #define GICD_IGROUPR			0x0080
- #define GICD_ISENABLER			0x0100
- #define GICD_ISPENDR			0x0200
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index ed162a6c57c5..bdbec1d136a1 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1504,6 +1504,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		hugetlb = true;
+ 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+ 	} else {
++		unsigned long pmd_fn_mask = PTRS_PER_PMD - 1;
++
+ 		/*
+ 		 * Pages belonging to memslots that don't have the same
+ 		 * alignment for userspace and IPA cannot be mapped using
+@@ -1513,8 +1515,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		 * unmapping, updates, and splits of the THP or other pages
+ 		 * in the stage-2 block range.
+ 		 */
+-		if ((memslot->userspace_addr & ~PMD_MASK) !=
+-		    ((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK))
++		int aligned = ((memslot->userspace_addr & ~PMD_MASK) ==
++			((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK));
++
++		/*
++		 * We also can't map a huge page if it would violate the bounds
++		 * of the containing memslot.
++		 */
++		int in_bounds = ((memslot->base_gfn <= (gfn & ~pmd_fn_mask)) &&
++			((memslot->base_gfn + memslot->npages) > (gfn | pmd_fn_mask)));
++
++		if (!aligned || !in_bounds)
+ 			force_pte = true;
+ 	}
+ 	up_read(&current->mm->mmap_sem);
 -- 
-2.17.1
+2.11.0
