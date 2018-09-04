@@ -1,27 +1,25 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PULL 2/4] arm64: KVM: Only force FPEXC32_EL2.EN if trapping
- FPSIMD
-Date: Tue, 4 Sep 2018 14:51:21 +0200
-Message-ID: <20180904125121.GO4029@e113682-lin.lund.arm.com>
-References: <20180903134516.17796-1-christoffer.dall@arm.com>
- <20180903134516.17796-3-christoffer.dall@arm.com>
- <20180904113952.GB17801@e103592.cambridge.arm.com>
+Subject: Re: [PATCH kvm-unit-tests v2] arm/arm64: gicv3: support up to 8
+ redistributor regions regions
+Date: Tue, 4 Sep 2018 15:29:26 +0200
+Message-ID: <20180904132926.GP4029@e113682-lin.lund.arm.com>
+References: <20180904081336.9625-1-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F066F49F89
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 08:51:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E61449F89
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 09:29:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2vE7V6jDoG6P for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Sep 2018 08:51:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C97C49EA2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 08:51:24 -0400 (EDT)
+ with ESMTP id opKHPGOHr0mB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Sep 2018 09:29:29 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9056C40A6E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 09:29:29 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180904113952.GB17801@e103592.cambridge.arm.com>
+In-Reply-To: <20180904081336.9625-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,138 +29,146 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 04, 2018 at 12:39:54PM +0100, Dave Martin wrote:
-> On Mon, Sep 03, 2018 at 03:45:14PM +0200, Christoffer Dall wrote:
-> > From: Marc Zyngier <marc.zyngier@arm.com>
-> > 
-> > If trapping FPSIMD in the context of an AArch32 guest, it is critical
-> > to set FPEXC32_EL2.EN to 1 so that the trapping is taken to EL2 and
-> > not EL1.
-> > 
-> > Conversely, it is just as critical *not* to set FPEXC32_EL2.EN to 1
-> > if we're not going to trap FPSIMD, as we then corrupt the existing
-> > VFP state.
-> > 
-> > Moving the call to __activate_traps_fpsimd32 to the point where we
-> > know for sure that we are going to trap ensures that we don't set that
-> > bit spuriously.
+On Tue, Sep 04, 2018 at 10:13:36AM +0200, Andrew Jones wrote:
+> We need to support at least two redistributor regions in order to
+> support more than 123 vcpus (we select 8 because that should be
+> plenty). Also bump NR_CPUS to 512, since that's what KVM currently
+> supports.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+> v2:
+>  - Peter asked if it would be neater to be more general. At first
+>    I interpreted that as better, i.e. more general, but immediately
+>    after starting the approach I saw how much _neater_ the code is.
+>    So this version is indeed neater code and better (more general).
+>    Thanks Peter!
 > 
 > 
-> Hmmm, this looks like a viable fix but actually the way the code is
-> structured is a bit confusing here.
+>  lib/arm/asm/gic-v3.h |  3 +++
+>  lib/arm/asm/setup.h  |  2 +-
+>  lib/arm/gic-v3.c     | 23 +++++++++++++----------
+>  lib/arm/gic.c        | 14 +++++++++-----
+>  4 files changed, 26 insertions(+), 16 deletions(-)
 > 
-> It looks like some unnecessary functionality has been inherited from
-> arch/arm here: for a 32-bit host, FPEXC controls FPSIMD trapping even
-> at Hyp, so we need to handle it specially in order for the Hyp FPSIMD
-> context switching code to run without generating additional traps.
-> 
-> For a 64-bit host, this doesn't apply: FPEXC32_EL2 is just guest
-> context and doesn't affect EL2 execution.
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index 1dceb9541f62..347be2f9da17 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -49,8 +49,11 @@
+>  #include <asm/smp.h>
+>  #include <asm/io.h>
+>  
+> +#define GICV3_NR_REDISTS 8
+> +
+>  struct gicv3_data {
+>  	void *dist_base;
+> +	void *redist_bases[GICV3_NR_REDISTS];
+>  	void *redist_base[NR_CPUS];
+>  	unsigned int irq_nr;
+>  };
+> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+> index b57ea13b9dd2..3215814603e4 100644
+> --- a/lib/arm/asm/setup.h
+> +++ b/lib/arm/asm/setup.h
+> @@ -9,7 +9,7 @@
+>  #include <asm/page.h>
+>  #include <asm/pgtable-hwdef.h>
+>  
+> -#define NR_CPUS			255
+> +#define NR_CPUS			512
+>  extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
+>  extern int nr_cpus;
+>  
+> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> index 9b3fa5730478..7f41e0a1da01 100644
+> --- a/lib/arm/gic-v3.c
+> +++ b/lib/arm/gic-v3.c
+> @@ -9,17 +9,20 @@
+>  void gicv3_set_redist_base(size_t stride)
+>  {
+>  	u32 aff = mpidr_compress(get_mpidr());
+> -	void *ptr = gicv3_data.redist_base[0];
+>  	u64 typer;
+> -
+> -	do {
+> -		typer = gicv3_read_typer(ptr + GICR_TYPER);
+> -		if ((typer >> 32) == aff) {
+> -			gicv3_redist_base() = ptr;
+> -			return;
+> -		}
+> -		ptr += stride; /* skip RD_base, SGI_base, etc. */
+> -	} while (!(typer & GICR_TYPER_LAST));
+> +	int i = 0;
+> +
+> +	while (gicv3_data.redist_bases[i]) {
 
-Hmm, is that really true?  Earlier versions of the Armv8 Arm ARM, for
-the description of CPTR_EL2.TFP:
+I don't get this.  We never change I?
 
-  This causes instructions that access the registers associated with
-  Floating Point and Advanced SIMD execution to trap to EL2 when
-  executed from EL0, EL1, or EL2, unless trapped to EL1.
+(conincidentally, my test of gicv3-ipi never completes, I wonder if
+these concepts are related...)
 
-In the current version I think you can arrive at the same conclusion by
-looking at the FPEXC_EL2.EN description which tells you that if EN==0,
-then the instruction is UNDEFINED, and the Synchronous exception
-prioritization rules specify that undefined instructions are taken
-before trapped intructions because of CPTR_EL2.
 
-But there does seem to be some inconsistency with the description of
-generally trapping floating point access to EL2.
-
-> 
-> The wrinkle this patch fixes is that implicit reads of FPEXC by
-
-what do you mean by implicit reads here?
-
-> the guest are in effect not trappable, so if this register is wrongly
-> configured for the guest, spurious traps to EL1 may occur that are
-> not architecturally expected by the guest, which is precisely the
-> problem that Alexander hit.  I missed this issue in my previous
-> refactoring...
+> +		void *ptr = gicv3_data.redist_bases[i];
+> +		do {
+> +			typer = gicv3_read_typer(ptr + GICR_TYPER);
+> +			if ((typer >> 32) == aff) {
+> +				gicv3_redist_base() = ptr;
+> +				return;
+> +			}
+> +			ptr += stride; /* skip RD_base, SGI_base, etc. */
+> +		} while (!(typer & GICR_TYPER_LAST));
+> +	}
+>  
+>  	/* should never reach here */
+>  	assert(0);
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 59273b1716d6..94301169215c 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -49,7 +49,7 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>  	struct dt_pbus_reg reg;
+>  	struct dt_device gic;
+>  	struct dt_bus bus;
+> -	int node, ret;
+> +	int node, ret, i;
+>  
+>  	dt_bus_init_defaults(&bus);
+>  	dt_device_init(&gic, &bus, NULL);
+> @@ -66,9 +66,13 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>  	assert(ret == 0);
+>  	*base1 = ioremap(reg.addr, reg.size);
+>  
+> -	ret = dt_pbus_translate(&gic, 1, &reg);
+> -	assert(ret == 0);
+> -	*base2 = ioremap(reg.addr, reg.size);
+> +	for (i = 0; i < GICV3_NR_REDISTS; ++i) {
+> +		ret = dt_pbus_translate(&gic, i + 1, &reg);
+> +		if (ret == -FDT_ERR_NOTFOUND)
+> +			break;
+> +		assert(ret == 0);
+> +		base2[i] = ioremap(reg.addr, reg.size);
+> +	}
+>  
+>  	return true;
+>  }
+> @@ -82,7 +86,7 @@ int gicv2_init(void)
+>  int gicv3_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_base[0]);
+> +			&gicv3_data.redist_bases[0]);
+>  }
+>  
+>  int gic_version(void)
+> -- 
+> 2.17.1
 > 
 
 Thanks,
 
     Christoffer
-
-> 
-> So, maybe FPEXC32_EL2 should just be treated as another guest system
-> register that must be eagerly switched.
-> 
-> This would also avoid the double write of FPEXC32_EL2 that we currently
-> do (once when enabling traps, then again when writing the correct guest
-> value after a trap is taken), and the isb() can be removed too since
-> host FPSIMD accesses won't trap on arm64 irrespective of FPEXC32_EL2.
-> 
-> 
-> I'll try to cook up a cleanup patch to apply on top, but it can be
-> treated as non-urgent.
-> 
-> Cheers
-> ---Dave
-> 
-> > 
-> > Fixes: e6b673b741ea ("KVM: arm64: Optimise FPSIMD handling to reduce guest/host thrashing")
-> > Cc: Dave Martin <dave.martin@arm.com>
-> > Reported-by: Alexander Graf <agraf@suse.de>
-> > Tested-by: Alexander Graf <agraf@suse.de>
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  arch/arm64/kvm/hyp/switch.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index d496ef579859..ca46153d7915 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -98,8 +98,10 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
-> >  	val = read_sysreg(cpacr_el1);
-> >  	val |= CPACR_EL1_TTA;
-> >  	val &= ~CPACR_EL1_ZEN;
-> > -	if (!update_fp_enabled(vcpu))
-> > +	if (!update_fp_enabled(vcpu)) {
-> >  		val &= ~CPACR_EL1_FPEN;
-> > +		__activate_traps_fpsimd32(vcpu);
-> > +	}
-> >  
-> >  	write_sysreg(val, cpacr_el1);
-> >  
-> > @@ -114,8 +116,10 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
-> >  
-> >  	val = CPTR_EL2_DEFAULT;
-> >  	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
-> > -	if (!update_fp_enabled(vcpu))
-> > +	if (!update_fp_enabled(vcpu)) {
-> >  		val |= CPTR_EL2_TFP;
-> > +		__activate_traps_fpsimd32(vcpu);
-> > +	}
-> >  
-> >  	write_sysreg(val, cptr_el2);
-> >  }
-> > @@ -129,7 +133,6 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >  	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
-> >  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> >  
-> > -	__activate_traps_fpsimd32(vcpu);
-> >  	if (has_vhe())
-> >  		activate_traps_vhe(vcpu);
-> >  	else
-> > -- 
-> > 2.18.0
-> > 
-> > 
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
