@@ -1,26 +1,44 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests v2] arm/arm64: gicv3: support up to 8
- redistributor regions regions
-Date: Tue, 4 Sep 2018 16:30:12 +0200
-Message-ID: <20180904143012.lwllebwrvtzhwygd@kamzik.brq.redhat.com>
-References: <20180904081336.9625-1-drjones@redhat.com>
- <20180904132926.GP4029@e113682-lin.lund.arm.com>
+From: Shih-Wei Li <shihwei@cs.columbia.edu>
+Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: add micro-bench
+Date: Tue, 4 Sep 2018 11:02:43 -0400
+Message-ID: <CAO+sbHG5yUR4oA6YPksKeLM6+mpAKuj47BjvMbeU=LZFMTOuEQ@mail.gmail.com>
+References: <20180830141733.21725-1-drjones@redhat.com>
+ <20180830141733.21725-3-drjones@redhat.com>
+ <CAO+sbHHswsoUqhnwwzB5bGoc7G_cbkw24t6Br1=7bULVxoctaw@mail.gmail.com>
+ <20180903163139.arpf6vpg4d2z7mju@kamzik.brq.redhat.com>
+ <CAO+sbHET=Bgx2aUuhB0OoK7NJb==W7pxNhsFLs68x0XMQRvwdA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A61584A1D2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 10:30:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9972F40A50
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:03:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fG7BYyh4+msF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Sep 2018 10:30:17 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1A4A49F86
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 10:30:17 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180904132926.GP4029@e113682-lin.lund.arm.com>
+ with ESMTP id YJrfutk+uU6Y for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Sep 2018 11:03:17 -0400 (EDT)
+Received: from outprodmail01.cc.columbia.edu (outprodmail01.cc.columbia.edu
+ [128.59.72.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA05D4A1DC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:03:17 -0400 (EDT)
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+ by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w84F133S036802
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 4 Sep 2018 11:03:17 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+ by hazelnut (Postfix) with ESMTP id 9034A82
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:03:17 -0400 (EDT)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+ [128.59.72.14]) by hazelnut (Postfix) with ESMTP id EECD183
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 11:03:15 -0400 (EDT)
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200])
+ by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id w84F3Ehb032666
+ (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 4 Sep 2018 11:03:15 -0400
+Received: by mail-lj1-f200.google.com with SMTP id x86-v6so941956ljb.19
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Sep 2018 08:03:15 -0700 (PDT)
+In-Reply-To: <CAO+sbHET=Bgx2aUuhB0OoK7NJb==W7pxNhsFLs68x0XMQRvwdA@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,97 +48,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <cdall@cs.columbia.edu>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Yury Norov <ynorov@caviumnetworks.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 04, 2018 at 03:29:26PM +0200, Christoffer Dall wrote:
-> On Tue, Sep 04, 2018 at 10:13:36AM +0200, Andrew Jones wrote:
-> > We need to support at least two redistributor regions in order to
-> > support more than 123 vcpus (we select 8 because that should be
-> > plenty). Also bump NR_CPUS to 512, since that's what KVM currently
-> > supports.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> > v2:
-> >  - Peter asked if it would be neater to be more general. At first
-> >    I interpreted that as better, i.e. more general, but immediately
-> >    after starting the approach I saw how much _neater_ the code is.
-> >    So this version is indeed neater code and better (more general).
-> >    Thanks Peter!
-> > 
-> > 
-> >  lib/arm/asm/gic-v3.h |  3 +++
-> >  lib/arm/asm/setup.h  |  2 +-
-> >  lib/arm/gic-v3.c     | 23 +++++++++++++----------
-> >  lib/arm/gic.c        | 14 +++++++++-----
-> >  4 files changed, 26 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-> > index 1dceb9541f62..347be2f9da17 100644
-> > --- a/lib/arm/asm/gic-v3.h
-> > +++ b/lib/arm/asm/gic-v3.h
-> > @@ -49,8 +49,11 @@
-> >  #include <asm/smp.h>
-> >  #include <asm/io.h>
-> >  
-> > +#define GICV3_NR_REDISTS 8
-> > +
-> >  struct gicv3_data {
-> >  	void *dist_base;
-> > +	void *redist_bases[GICV3_NR_REDISTS];
-> >  	void *redist_base[NR_CPUS];
-> >  	unsigned int irq_nr;
-> >  };
-> > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> > index b57ea13b9dd2..3215814603e4 100644
-> > --- a/lib/arm/asm/setup.h
-> > +++ b/lib/arm/asm/setup.h
-> > @@ -9,7 +9,7 @@
-> >  #include <asm/page.h>
-> >  #include <asm/pgtable-hwdef.h>
-> >  
-> > -#define NR_CPUS			255
-> > +#define NR_CPUS			512
-> >  extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
-> >  extern int nr_cpus;
-> >  
-> > diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-> > index 9b3fa5730478..7f41e0a1da01 100644
-> > --- a/lib/arm/gic-v3.c
-> > +++ b/lib/arm/gic-v3.c
-> > @@ -9,17 +9,20 @@
-> >  void gicv3_set_redist_base(size_t stride)
-> >  {
-> >  	u32 aff = mpidr_compress(get_mpidr());
-> > -	void *ptr = gicv3_data.redist_base[0];
-> >  	u64 typer;
-> > -
-> > -	do {
-> > -		typer = gicv3_read_typer(ptr + GICR_TYPER);
-> > -		if ((typer >> 32) == aff) {
-> > -			gicv3_redist_base() = ptr;
-> > -			return;
-> > -		}
-> > -		ptr += stride; /* skip RD_base, SGI_base, etc. */
-> > -	} while (!(typer & GICR_TYPER_LAST));
-> > +	int i = 0;
-> > +
-> > +	while (gicv3_data.redist_bases[i]) {
-> 
-> I don't get this.  We never change I?
-> 
-> (conincidentally, my test of gicv3-ipi never completes, I wonder if
-> these concepts are related...)
+I've tested patch v2 along with the fix in the switch case. The
+performance numbers look sane on my seattle server.
 
-Darn it. I dropped the '++i' I had in v1. My regression testing naturally
-only needs i=0 (I don't have anything with > 123 cpus to test on), so the
-problem didn't show up for me.
-
-Maybe you can add a ++i in and see if it works for you before I send v3?
-If it's still busted I'll have to stop shotgunning code, and maybe even
-find a way to test it myself.
+Tested-by: Shih-Wei Li <shihwei@cs.columbia.edu>
 
 Thanks,
-drew
+Shih-Wei
+
+On Mon, Sep 3, 2018 at 11:38 PM, Shih-Wei Li <shihwei@cs.columbia.edu> wrote:
+> On Mon, Sep 3, 2018 at 12:31 PM, Andrew Jones <drjones@redhat.com> wrote:
+>> On Mon, Sep 03, 2018 at 11:06:51AM -0400, Shih-Wei Li wrote:
+>>> On Thu, Aug 30, 2018 at 10:17 AM, Andrew Jones <drjones@redhat.com> wrote:
+>>> > +static bool test_init(void)
+>>> > +{
+>>> > +       int v = gic_init();
+>>> > +
+>>> > +       if (!v) {
+>>> > +               printf("No supported gic present, skipping tests...\n");
+>>> > +               return false;
+>>> > +       }
+>>> > +
+>>> > +       if (nr_cpus < 2) {
+>>> > +               printf("At least two cpus required, skipping tests...\n");
+>>> > +               return false;
+>>> > +       }
+>>> > +
+>>> > +       switch (v) {
+>>> > +       case 2:
+>>> > +               vgic_dist_base = gicv2_dist_base();
+>>> > +               write_eoir = gicv2_write_eoir;
+>>> > +       case 3:
+>>> > +               vgic_dist_base = gicv3_dist_base();
+>>> > +               write_eoir = gicv3_write_eoir;
+>>> > +       }
+>>>
+>>> I think we'll need a "break" in the switch case body for gicv2 here
+>>> otherwise it'll fall into the case body below and refer to the wrong
+>>> symbols for gicv3.
+>>>
+>>> As I've tested on my seattle server hardware (with gicv2), this results
+>>> to incorrect execution in mmio_read_vgic_exec and a crash in
+>>> eoi_exec().
+>>>
+>>
+>> Argh... Obviously my testing of this was pretty poor. You are certainly
+>> right that I'm missing breaks in this switch. If you don't mind, please
+>> add them, along with the fix in v2, to your local repo and test again.
+>> I'll hold off on sending v3 until you've had a chance to test and review
+>> more.
+>>
+>> Thanks,
+>> drew
+>
+> I've added the break to the switch and it resolved the problems I
+> mentioned earlier. I'll do more testing and reviewing, and will get
+> back to you as soon as I can.
+>
+> Thanks for formalizing the new patch set for micro-test!
+>
+> Shih-Wei
