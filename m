@@ -1,96 +1,125 @@
-From: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: RE: [RFC 01/13] iommu: Introduce bind_guest_stage API
-Date: Tue, 4 Sep 2018 08:34:11 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC 01/13] iommu: Introduce bind_guest_stage API
+Date: Tue, 4 Sep 2018 10:41:28 +0200
+Message-ID: <8da25040-42fe-5ce8-2647-ee6b8d795bc9@redhat.com>
 References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
-	<1535026656-8450-2-git-send-email-eric.auger@redhat.com>
-	<22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
-	<b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
-	<4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D1912EFB76@SHSMSX101.ccr.corp.intel.com>
-	<220e4c2a-d31c-d8fb-2d77-d902d2f13bb2@redhat.com>
+ <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
+ <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
+ <b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
+ <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D1912EFB76@SHSMSX101.ccr.corp.intel.com>
+ <220e4c2a-d31c-d8fb-2d77-d902d2f13bb2@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <220e4c2a-d31c-d8fb-2d77-d902d2f13bb2-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A93649F89
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 04:41:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XlGjtoiftJYv for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Sep 2018 04:41:35 -0400 (EDT)
+Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5864C49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 04:41:35 -0400 (EDT)
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, "eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org" <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>, "alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org" <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>, "yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org" <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>, "will.deacon-5wv7dgnIgG8@public.gmane.org" <will.deacon-5wv7dgnIgG8@public.gmane.org>, "robin.murphy-5wv7dgnIgG8@public.gmane.org" <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-Cc: "marc.zyngier-5wv7dgnIgG8@public.gmane.org" <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "christoffer.dall-5wv7dgnIgG8@public.gmane.org" <christoffer.dall-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "Tian, Kevin" <kevin.tian@intel.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>
+Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> From: Auger Eric
-> Sent: Tuesday, September 4, 2018 4:11 PM
-> 
-> Hi Kevin,
-> On 09/04/2018 09:57 AM, Tian, Kevin wrote:
-> >> From: Auger Eric
-> >> Sent: Friday, August 31, 2018 9:52 PM
-> >>
-> >> Hi Jean-Philippe,
-> >>
-> >> On 08/31/2018 03:11 PM, Jean-Philippe Brucker wrote:
-> >>> Hi Eric,
-> >>>
-> >>> On 23/08/18 16:25, Auger Eric wrote:
-> >>>>> +int iommu_bind_guest_stage(struct iommu_domain *domain,
-> struct
-> >> device *dev,
-> >>>>> +			   struct iommu_guest_stage_config *cfg)
-> >>>
-> >>> About the name change from iommu_bind_pasid_table: is the intent to
-> >>> reuse this API for SMMUv2, which supports nested but not PASID?
-> Seems
-> >>> like a good idea but "iommu_bind_table" may be better since "stage" is
-> >>> only used by Arm.
-> >>
-> >> At the moment I don't target SMUv2 but just SMMUv3. My focus was on
-> >> nested stage enablement without enabling the multi-CD feature (PASID),
-> >> whish is not supported by the QEMU vSMMUv3. Afterwards I realized
-> that
-> >> basically we are pointing to a CD or PASID table and that's about the
-> >> same. I don't have a strong opinion on the name,
-> iommu_bind_guest_table
-> >> or iommu_bind_pasid_table would be fine with me. Indeed "stage" is
-> ARM
-> >> vocable (level for Intel?)
-> >
-> > Intel uses first level/second level.
-> >
-> > iommu_bind_table is a bit confusing. what should people take table as?
-> > there is PASID table. there is also page table linked in each stage/level.
-> and
-> > maybe other tables in vendor-specific definition.
-> >
-> > to me iommu_bind_pasid_table is still clearer. anyway in other places
-> > we've used pasid explicitly in vfio/iommu APIs, then it should be general
-> > enough to represent various implementations.
-> 
-> Fine for me.
-> 
-> However I I would suggest to rename the original iommu_sva_invalidate
-> into something that is SVA unrelated. iommu_tlb_invalidate is not OK as
-> this API also is used to invalidate context caches - which are not
-> iotlbs -. What about iommu_cache_invalidate?
-> 
-> At least we must clarify that this API can be used for something else
-> than SVA enablement.
-> 
+Hi Kevin,
 
-Agree. using SVA is limiting.
+On 09/04/2018 10:34 AM, Tian, Kevin wrote:
+>> From: Auger Eric
+>> Sent: Tuesday, September 4, 2018 4:11 PM
+>>
+>> Hi Kevin,
+>> On 09/04/2018 09:57 AM, Tian, Kevin wrote:
+>>>> From: Auger Eric
+>>>> Sent: Friday, August 31, 2018 9:52 PM
+>>>>
+>>>> Hi Jean-Philippe,
+>>>>
+>>>> On 08/31/2018 03:11 PM, Jean-Philippe Brucker wrote:
+>>>>> Hi Eric,
+>>>>>
+>>>>> On 23/08/18 16:25, Auger Eric wrote:
+>>>>>>> +int iommu_bind_guest_stage(struct iommu_domain *domain,
+>> struct
+>>>> device *dev,
+>>>>>>> +			   struct iommu_guest_stage_config *cfg)
+>>>>>
+>>>>> About the name change from iommu_bind_pasid_table: is the intent to
+>>>>> reuse this API for SMMUv2, which supports nested but not PASID?
+>> Seems
+>>>>> like a good idea but "iommu_bind_table" may be better since "stage" is
+>>>>> only used by Arm.
+>>>>
+>>>> At the moment I don't target SMUv2 but just SMMUv3. My focus was on
+>>>> nested stage enablement without enabling the multi-CD feature (PASID),
+>>>> whish is not supported by the QEMU vSMMUv3. Afterwards I realized
+>> that
+>>>> basically we are pointing to a CD or PASID table and that's about the
+>>>> same. I don't have a strong opinion on the name,
+>> iommu_bind_guest_table
+>>>> or iommu_bind_pasid_table would be fine with me. Indeed "stage" is
+>> ARM
+>>>> vocable (level for Intel?)
+>>>
+>>> Intel uses first level/second level.
+>>>
+>>> iommu_bind_table is a bit confusing. what should people take table as?
+>>> there is PASID table. there is also page table linked in each stage/level.
+>> and
+>>> maybe other tables in vendor-specific definition.
+>>>
+>>> to me iommu_bind_pasid_table is still clearer. anyway in other places
+>>> we've used pasid explicitly in vfio/iommu APIs, then it should be general
+>>> enough to represent various implementations.
+>>
+>> Fine for me.
+>>
+>> However I I would suggest to rename the original iommu_sva_invalidate
+>> into something that is SVA unrelated. iommu_tlb_invalidate is not OK as
+>> this API also is used to invalidate context caches - which are not
+>> iotlbs -. What about iommu_cache_invalidate?
+>>
+>> At least we must clarify that this API can be used for something else
+>> than SVA enablement.
+>>
+> 
+> Agree. using SVA is limiting.
+> 
+> I also agree that iommu_cache_invalidate is better, though I don't think
+> you want to pass guest context cache invalidation to host. that information
+> is fully under host control. :-)
 
-I also agree that iommu_cache_invalidate is better, though I don't think
-you want to pass guest context cache invalidation to host. that information
-is fully under host control. :-)
+I think the confusion comes from the different terminology used in VTD
+and ARM SMMU spec.
+
+Your PASID table ~ ARM SMMU Context Descriptor (CD) table
+Your Root Entry/Context Entry ~ ARM SMMU Stream Table Entry (STE)
+
+So I meant guesr invalidates its Context Descriptor cache. He "owns"
+those. Host owns the STE.
 
 Thanks
-Kevin
+
+Eric
+
+> 
+> Thanks
+> Kevin
+> 
