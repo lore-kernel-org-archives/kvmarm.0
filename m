@@ -1,22 +1,22 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH kvm-unit-tests v3] arm/arm64: gicv3: support up to 8
- redistributor regions
-Date: Wed,  5 Sep 2018 13:37:04 +0200
-Message-ID: <20180905113704.26412-1-drjones@redhat.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [RFC PATCH] KVM: arm64: Treat FPEXC32_EL2 as a regular guest system
+ register
+Date: Wed,  5 Sep 2018 14:19:13 +0100
+Message-ID: <1536153553-28767-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 549824A1FE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 07:37:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E4BEA4A1D1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 09:19:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YYyF50eqUhY9 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Sep 2018 07:37:10 -0400 (EDT)
-Received: from mx1.redhat.com (mx3-rdu2.redhat.com [66.187.233.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43EE249FA8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 07:37:10 -0400 (EDT)
+ with ESMTP id UIRmR1rM8vMk for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Sep 2018 09:19:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D63C349FA8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 09:19:22 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,134 +26,163 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We need to support at least two redistributor regions in order to
-support more than 123 vcpus (we select 8 because that should be
-plenty). Also bump NR_CPUS to 512, since that's what KVM currently
-supports.
+Currently FPEXC32_EL2 is handled specially when context-switching.
+This made sense for arm, where FPEXC affects host execution
+(including VFP/SIMD register save/restore at Hyp).
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Tested-by: Christoffer Dall <christoffer.dall@arm.com>
+However, FPEXC has no architectural effect when running in AArch64.
+The only case where an arm64 host may execute in AArch32 is when
+running compat user code at EL0: the architecture explicitly
+documents FPEXC as having no effect in this case either when the
+kernel (EL2 in the VHE case; otherwise EL1) is AArch64.
+
+So, we can just handle FPEXC32_EL2 (which is the AArch64 alias for
+this register) as a regular AArch32-only system register and switch
+it without any special handling or synchronisation.
+
+This allows some gnarly special-case code to be eliminated from
+hyp.  The extra isb() in __activate_traps_fpsimd32() is dropped
+too: for the reasons explained above arm64 never required this
+anyway.
+
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Alexander Graf <agraf@suse.de>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
-v3:
- - add missing '++i' to the main loop in gicv3_set_redist_base
-   [Christoffer]
-v2:
- - neater implementation by handling the number of redist regions
-   more generally [Peter]
 
- lib/arm/asm/gic-v3.h |  3 +++
- lib/arm/asm/setup.h  |  2 +-
- lib/arm/gic-v3.c     | 24 ++++++++++++++----------
- lib/arm/gic.c        | 14 +++++++++-----
- 4 files changed, 27 insertions(+), 16 deletions(-)
+I could do with some confirmation from someone that my interpretation of
+the architecture is in fact correct here.  The CheckFPAdvSIMDEnabled64()
+and CheckAdvSIMDEnabled() pseudocode functions may be a reasonable
+starting point (this was my reference where the wordy text is unclear).
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 1dceb9541f62..347be2f9da17 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -49,8 +49,11 @@
- #include <asm/smp.h>
- #include <asm/io.h>
+If Alexander could try this out, that would be good.
+
+This cleanup applies on top of the following previously pubished fix:
+[PULL 2/4] arm64: KVM: Only force FPEXC32_EL2.EN if trapping FPSIMD
+http://lists.infradead.org/pipermail/linux-arm-kernel/2018-September/599537.html
+
+
+ arch/arm64/kvm/hyp/switch.c    | 45 ++----------------------------------------
+ arch/arm64/kvm/hyp/sysreg-sr.c |  2 ++
+ 2 files changed, 4 insertions(+), 43 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index ca46153..0450b85 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -43,32 +43,6 @@ static bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
+ 	return !!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED);
+ }
  
-+#define GICV3_NR_REDISTS 8
-+
- struct gicv3_data {
- 	void *dist_base;
-+	void *redist_bases[GICV3_NR_REDISTS];
- 	void *redist_base[NR_CPUS];
- 	unsigned int irq_nr;
- };
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index b57ea13b9dd2..3215814603e4 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -9,7 +9,7 @@
- #include <asm/page.h>
- #include <asm/pgtable-hwdef.h>
- 
--#define NR_CPUS			255
-+#define NR_CPUS			512
- extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
- extern int nr_cpus;
- 
-diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-index 9b3fa5730478..feecb5e67caf 100644
---- a/lib/arm/gic-v3.c
-+++ b/lib/arm/gic-v3.c
-@@ -9,17 +9,21 @@
- void gicv3_set_redist_base(size_t stride)
- {
- 	u32 aff = mpidr_compress(get_mpidr());
--	void *ptr = gicv3_data.redist_base[0];
- 	u64 typer;
+-/* Save the 32-bit only FPSIMD system register state */
+-static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+-{
+-	if (!vcpu_el1_is_32bit(vcpu))
+-		return;
 -
--	do {
--		typer = gicv3_read_typer(ptr + GICR_TYPER);
--		if ((typer >> 32) == aff) {
--			gicv3_redist_base() = ptr;
--			return;
--		}
--		ptr += stride; /* skip RD_base, SGI_base, etc. */
--	} while (!(typer & GICR_TYPER_LAST));
-+	int i = 0;
-+
-+	while (gicv3_data.redist_bases[i]) {
-+		void *ptr = gicv3_data.redist_bases[i];
-+		do {
-+			typer = gicv3_read_typer(ptr + GICR_TYPER);
-+			if ((typer >> 32) == aff) {
-+				gicv3_redist_base() = ptr;
-+				return;
-+			}
-+			ptr += stride; /* skip RD_base, SGI_base, etc. */
-+		} while (!(typer & GICR_TYPER_LAST));
-+		++i;
-+	}
+-	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+-}
+-
+-static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+-{
+-	/*
+-	 * We are about to set CPTR_EL2.TFP to trap all floating point
+-	 * register accesses to EL2, however, the ARM ARM clearly states that
+-	 * traps are only taken to EL2 if the operation would not otherwise
+-	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+-	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+-	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+-	 * it will cause an exception.
+-	 */
+-	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+-		write_sysreg(1 << 30, fpexc32_el2);
+-		isb();
+-	}
+-}
+-
+ static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
+ {
+ 	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+@@ -98,10 +72,8 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	val &= ~CPACR_EL1_ZEN;
+-	if (!update_fp_enabled(vcpu)) {
++	if (!update_fp_enabled(vcpu))
+ 		val &= ~CPACR_EL1_FPEN;
+-		__activate_traps_fpsimd32(vcpu);
+-	}
  
- 	/* should never reach here */
- 	assert(0);
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 59273b1716d6..94301169215c 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -49,7 +49,7 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
- 	struct dt_pbus_reg reg;
- 	struct dt_device gic;
- 	struct dt_bus bus;
--	int node, ret;
-+	int node, ret, i;
+ 	write_sysreg(val, cpacr_el1);
  
- 	dt_bus_init_defaults(&bus);
- 	dt_device_init(&gic, &bus, NULL);
-@@ -66,9 +66,13 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
- 	assert(ret == 0);
- 	*base1 = ioremap(reg.addr, reg.size);
+@@ -116,10 +88,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
  
--	ret = dt_pbus_translate(&gic, 1, &reg);
--	assert(ret == 0);
--	*base2 = ioremap(reg.addr, reg.size);
-+	for (i = 0; i < GICV3_NR_REDISTS; ++i) {
-+		ret = dt_pbus_translate(&gic, i + 1, &reg);
-+		if (ret == -FDT_ERR_NOTFOUND)
-+			break;
-+		assert(ret == 0);
-+		base2[i] = ioremap(reg.addr, reg.size);
-+	}
+ 	val = CPTR_EL2_DEFAULT;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+-	if (!update_fp_enabled(vcpu)) {
++	if (!update_fp_enabled(vcpu))
+ 		val |= CPTR_EL2_TFP;
+-		__activate_traps_fpsimd32(vcpu);
+-	}
+ 
+ 	write_sysreg(val, cptr_el2);
+ }
+@@ -366,11 +336,6 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+ 
+ 	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+ 
+-	/* Skip restoring fpexc32 for AArch64 guests */
+-	if (!(read_sysreg(hcr_el2) & HCR_RW))
+-		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
+-			     fpexc32_el2);
+-
+ 	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
  
  	return true;
- }
-@@ -82,7 +86,7 @@ int gicv2_init(void)
- int gicv3_init(void)
- {
- 	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
--			&gicv3_data.redist_base[0]);
-+			&gicv3_data.redist_bases[0]);
- }
+@@ -522,9 +487,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
  
- int gic_version(void)
+ 	sysreg_restore_host_state_vhe(host_ctxt);
+ 
+-	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+-		__fpsimd_save_fpexc32(vcpu);
+-
+ 	__debug_switch_to_host(vcpu);
+ 
+ 	return exit_code;
+@@ -580,9 +542,6 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 
+ 	__sysreg_restore_state_nvhe(host_ctxt);
+ 
+-	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+-		__fpsimd_save_fpexc32(vcpu);
+-
+ 	/*
+ 	 * This must come after restoring the host sysregs, since a non-VHE
+ 	 * system may enable SPE here and make use of the TTBRs.
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 9ce2239..12994a9 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -195,6 +195,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ 
+ 	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+ 	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
++	sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+ 		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
+@@ -217,6 +218,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+ 
+ 	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
+ 	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
++	write_sysreg(sysreg[FPEXC32_EL2], fpexc32_el2);
+ 
+ 	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+ 		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
 -- 
-2.17.1
+2.1.4
