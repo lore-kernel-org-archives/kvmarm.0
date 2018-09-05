@@ -1,33 +1,27 @@
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RFC 01/13] iommu: Introduce bind_guest_stage API
-Date: Wed, 5 Sep 2018 00:36:23 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1912F0BC2@SHSMSX101.ccr.corp.intel.com>
-References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
- <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
- <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
- <b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
- <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D1912EFB76@SHSMSX101.ccr.corp.intel.com>
- <220e4c2a-d31c-d8fb-2d77-d902d2f13bb2@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
- <8da25040-42fe-5ce8-2647-ee6b8d795bc9@redhat.com>
- <c05ac969-2921-3166-e715-af3595291666@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH kvm-unit-tests v2] arm/arm64: gicv3: support up to 8
+ redistributor regions regions
+Date: Wed, 5 Sep 2018 12:13:36 +0200
+Message-ID: <20180905101336.GS4029@e113682-lin.lund.arm.com>
+References: <20180904081336.9625-1-drjones@redhat.com>
+ <20180904132926.GP4029@e113682-lin.lund.arm.com>
+ <20180904143012.lwllebwrvtzhwygd@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC9C4A1FE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 20:36:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 254AF4A204
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 06:13:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7RJM2CP3bBDl for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Sep 2018 20:36:38 -0400 (EDT)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 353354A1D2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 20:36:38 -0400 (EDT)
-In-Reply-To: <c05ac969-2921-3166-e715-af3595291666@arm.com>
-Content-Language: en-US
+ with ESMTP id QEM5Ynv3JfEl for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Sep 2018 06:13:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F63249FA8
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Sep 2018 06:13:39 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180904143012.lwllebwrvtzhwygd@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,27 +31,105 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> From: Jean-Philippe Brucker [mailto:jean-philippe.brucker@arm.com]
-> Sent: Tuesday, September 4, 2018 5:53 PM
+On Tue, Sep 04, 2018 at 04:30:12PM +0200, Andrew Jones wrote:
+> On Tue, Sep 04, 2018 at 03:29:26PM +0200, Christoffer Dall wrote:
+> > On Tue, Sep 04, 2018 at 10:13:36AM +0200, Andrew Jones wrote:
+> > > We need to support at least two redistributor regions in order to
+> > > support more than 123 vcpus (we select 8 because that should be
+> > > plenty). Also bump NR_CPUS to 512, since that's what KVM currently
+> > > supports.
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > > v2:
+> > >  - Peter asked if it would be neater to be more general. At first
+> > >    I interpreted that as better, i.e. more general, but immediately
+> > >    after starting the approach I saw how much _neater_ the code is.
+> > >    So this version is indeed neater code and better (more general).
+> > >    Thanks Peter!
+> > > 
+> > > 
+> > >  lib/arm/asm/gic-v3.h |  3 +++
+> > >  lib/arm/asm/setup.h  |  2 +-
+> > >  lib/arm/gic-v3.c     | 23 +++++++++++++----------
+> > >  lib/arm/gic.c        | 14 +++++++++-----
+> > >  4 files changed, 26 insertions(+), 16 deletions(-)
+> > > 
+> > > diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> > > index 1dceb9541f62..347be2f9da17 100644
+> > > --- a/lib/arm/asm/gic-v3.h
+> > > +++ b/lib/arm/asm/gic-v3.h
+> > > @@ -49,8 +49,11 @@
+> > >  #include <asm/smp.h>
+> > >  #include <asm/io.h>
+> > >  
+> > > +#define GICV3_NR_REDISTS 8
+> > > +
+> > >  struct gicv3_data {
+> > >  	void *dist_base;
+> > > +	void *redist_bases[GICV3_NR_REDISTS];
+> > >  	void *redist_base[NR_CPUS];
+> > >  	unsigned int irq_nr;
+> > >  };
+> > > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+> > > index b57ea13b9dd2..3215814603e4 100644
+> > > --- a/lib/arm/asm/setup.h
+> > > +++ b/lib/arm/asm/setup.h
+> > > @@ -9,7 +9,7 @@
+> > >  #include <asm/page.h>
+> > >  #include <asm/pgtable-hwdef.h>
+> > >  
+> > > -#define NR_CPUS			255
+> > > +#define NR_CPUS			512
+> > >  extern u64 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
+> > >  extern int nr_cpus;
+> > >  
+> > > diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+> > > index 9b3fa5730478..7f41e0a1da01 100644
+> > > --- a/lib/arm/gic-v3.c
+> > > +++ b/lib/arm/gic-v3.c
+> > > @@ -9,17 +9,20 @@
+> > >  void gicv3_set_redist_base(size_t stride)
+> > >  {
+> > >  	u32 aff = mpidr_compress(get_mpidr());
+> > > -	void *ptr = gicv3_data.redist_base[0];
+> > >  	u64 typer;
+> > > -
+> > > -	do {
+> > > -		typer = gicv3_read_typer(ptr + GICR_TYPER);
+> > > -		if ((typer >> 32) == aff) {
+> > > -			gicv3_redist_base() = ptr;
+> > > -			return;
+> > > -		}
+> > > -		ptr += stride; /* skip RD_base, SGI_base, etc. */
+> > > -	} while (!(typer & GICR_TYPER_LAST));
+> > > +	int i = 0;
+> > > +
+> > > +	while (gicv3_data.redist_bases[i]) {
+> > 
+> > I don't get this.  We never change I?
+> > 
+> > (conincidentally, my test of gicv3-ipi never completes, I wonder if
+> > these concepts are related...)
 > 
-> On 04/09/2018 09:41, Auger Eric wrote:
-> > I think the confusion comes from the different terminology used in VTD
-> > and ARM SMMU spec.
-> >
-> > Your PASID table ~ ARM SMMU Context Descriptor (CD) table
-> > Your Root Entry/Context Entry ~ ARM SMMU Stream Table Entry (STE)
+> Darn it. I dropped the '++i' I had in v1. My regression testing naturally
+> only needs i=0 (I don't have anything with > 123 cpus to test on), so the
+> problem didn't show up for me.
 > 
-> In past discussions we used "PASID table (entry)" and "device context"
-> respectively. For clarity we should probably stick to those names unless
-> we discuss arch-specific patches
+> Maybe you can add a ++i in and see if it works for you before I send v3?
+> If it's still busted I'll have to stop shotgunning code, and maybe even
+> find a way to test it myself.
 > 
 
-yes, that is a good abstraction. let's try to use them in related discussions
-and patch series.
+Indeed, works perfectly.  With an added i++:
 
-Thanks
-Kevin
+Tested-by: Christoffer Dall <christoffer.dall@arm.com>
+
+
+Thanks,
+
+    Christoffer
