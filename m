@@ -1,70 +1,63 @@
-From: Lukas Braun <koomi@moshbit.net>
-Subject: [PATCH] KVM: arm/arm64: Check memslot bounds before mapping hugepages
-Date: Tue,  4 Sep 2018 18:39:36 +0200
-Message-ID: <20180904163937.12759-1-koomi@moshbit.net>
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Subject: RE: [RFC 01/13] iommu: Introduce bind_guest_stage API
+Date: Wed, 5 Sep 2018 00:36:23 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1912F0BC2@SHSMSX101.ccr.corp.intel.com>
+References: <1535026656-8450-1-git-send-email-eric.auger@redhat.com>
+ <1535026656-8450-2-git-send-email-eric.auger@redhat.com>
+ <22c01a4d-c74a-7279-d4ae-39e29a3bc942@redhat.com>
+ <b7909f1b-57ce-f4db-d916-140a63283232@arm.com>
+ <4309832b-27ed-597a-b5a1-f439fbea9843@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D1912EFB76@SHSMSX101.ccr.corp.intel.com>
+ <220e4c2a-d31c-d8fb-2d77-d902d2f13bb2@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D1912EFCD8@SHSMSX101.ccr.corp.intel.com>
+ <8da25040-42fe-5ce8-2647-ee6b8d795bc9@redhat.com>
+ <c05ac969-2921-3166-e715-af3595291666@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: Ralph Palutke <ralph.palutke@fau.de>, Lukas Braun <koomi@moshbit.net>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC9C4A1FE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 20:36:39 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7RJM2CP3bBDl for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Sep 2018 20:36:38 -0400 (EDT)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 353354A1D2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Sep 2018 20:36:38 -0400 (EDT)
+In-Reply-To: <c05ac969-2921-3166-e715-af3595291666@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Userspace can create a memslot with memory backed by (transparent)
-hugepages, but with bounds that do not align with hugepages.
-In that case, we cannot map the entire region in the guest as hugepages
-without exposing additional host memory to the guest and potentially
-interfering with other memslots.
-Consequently, this patch adds a bounds check when populating guest page
-tables and forces the creation of regular PTEs if mapping an entire
-hugepage would violate the memslots bounds.
+> From: Jean-Philippe Brucker [mailto:jean-philippe.brucker@arm.com]
+> Sent: Tuesday, September 4, 2018 5:53 PM
+> 
+> On 04/09/2018 09:41, Auger Eric wrote:
+> > I think the confusion comes from the different terminology used in VTD
+> > and ARM SMMU spec.
+> >
+> > Your PASID table ~ ARM SMMU Context Descriptor (CD) table
+> > Your Root Entry/Context Entry ~ ARM SMMU Stream Table Entry (STE)
+> 
+> In past discussions we used "PASID table (entry)" and "device context"
+> respectively. For clarity we should probably stick to those names unless
+> we discuss arch-specific patches
+> 
 
-Signed-off-by: Lukas Braun <koomi@moshbit.net>
----
- virt/kvm/arm/mmu.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+yes, that is a good abstraction. let's try to use them in related discussions
+and patch series.
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index ed162a6c57c5..bdbec1d136a1 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1504,6 +1504,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		hugetlb = true;
- 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
- 	} else {
-+		unsigned long pmd_fn_mask = PTRS_PER_PMD - 1;
-+
- 		/*
- 		 * Pages belonging to memslots that don't have the same
- 		 * alignment for userspace and IPA cannot be mapped using
-@@ -1513,8 +1515,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 * unmapping, updates, and splits of the THP or other pages
- 		 * in the stage-2 block range.
- 		 */
--		if ((memslot->userspace_addr & ~PMD_MASK) !=
--		    ((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK))
-+		int aligned = ((memslot->userspace_addr & ~PMD_MASK) ==
-+			((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK));
-+
-+		/*
-+		 * We also can't map a huge page if it would violate the bounds
-+		 * of the containing memslot.
-+		 */
-+		int in_bounds = ((memslot->base_gfn <= (gfn & ~pmd_fn_mask)) &&
-+			((memslot->base_gfn + memslot->npages) > (gfn | pmd_fn_mask)));
-+
-+		if (!aligned || !in_bounds)
- 			force_pte = true;
- 	}
- 	up_read(&current->mm->mmap_sem);
--- 
-2.11.0
+Thanks
+Kevin
