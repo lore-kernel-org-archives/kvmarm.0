@@ -1,95 +1,59 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Treat FPEXC32_EL2 as a regular guest
- system register
-Date: Thu, 6 Sep 2018 13:11:17 +0100
-Message-ID: <20180906121115.GD17801@e103592.cambridge.arm.com>
-References: <1536153553-28767-1-git-send-email-Dave.Martin@arm.com>
- <20180905150838.GU4029@e113682-lin.lund.arm.com>
+From: Sasha Levin <Alexander.Levin@microsoft.com>
+Subject: [PATCH AUTOSEL 4.18 54/88] KVM: arm/arm64: vgic: Fix possible
+ spectre-v1 write in vgic_mmio_write_apr()
+Date: Fri, 7 Sep 2018 00:36:31 +0000
+Message-ID: <20180907003547.57567-54-alexander.levin@microsoft.com>
+References: <20180907003547.57567-1-alexander.levin@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 268F44A1D8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Sep 2018 08:11:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sSxTmq1GC8Iu for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Sep 2018 08:11:21 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C18664A1D5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Sep 2018 08:11:21 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180905150838.GU4029@e113682-lin.lund.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180907003547.57567-1-alexander.levin@microsoft.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Sasha Levin <Alexander.Levin@microsoft.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 05, 2018 at 05:08:38PM +0200, Christoffer Dall wrote:
-> On Wed, Sep 05, 2018 at 02:19:13PM +0100, Dave Martin wrote:
-> > Currently FPEXC32_EL2 is handled specially when context-switching.
-> > This made sense for arm, where FPEXC affects host execution
-> > (including VFP/SIMD register save/restore at Hyp).
-> > 
-> > However, FPEXC has no architectural effect when running in AArch64.
-> > The only case where an arm64 host may execute in AArch32 is when
-> > running compat user code at EL0: the architecture explicitly
-> > documents FPEXC as having no effect in this case either when the
-> > kernel (EL2 in the VHE case; otherwise EL1) is AArch64.
-> > 
-> > So, we can just handle FPEXC32_EL2 (which is the AArch64 alias for
-> > this register) as a regular AArch32-only system register and switch
-> > it without any special handling or synchronisation.
-> > 
-> > This allows some gnarly special-case code to be eliminated from
-> > hyp.  The extra isb() in __activate_traps_fpsimd32() is dropped
-> > too: for the reasons explained above arm64 never required this
-> > anyway.
-> 
-> This looks like a reasonable cleanup, but I don't understand how this
-> works.  The reason we had the special casing of FPXEC_EL2 was to ensure
-> that we trap to EL2 when VFP should be trapped for a 32-bit guest
-> instead of going to EL1.  How does that work with this patch if we set
+From: Mark Rutland <mark.rutland@arm.com>
 
-Actually, I think the problem was to ensure that the guest never sees
-a spurious trap to EL1 when from its point of view FPEXC.EN is set.
-Such a trap shouldn't architecturally happen, but if we execute the
-guest with FPEXC.EN=0 when the guest thinks it should be 1 then a trap
-to EL1 can occur irrespective of CPTR_EL2, because CPTR_EL2 only traps
-things that wouldn't otherwise trap to EL1.
+[ Upstream commit 6b8b9a48545e08345b8ff77c9fd51b1aebdbefb3 ]
 
-> CPTR_EL2.TFP and the guest has set FPXEX32_EL2.EN ?
+It's possible for userspace to control n. Sanitize n when using it as an
+array index, to inhibit the potential spectre-v1 write gadget.
 
-I'm not sure whether that's the question you intended to ask:
-with EN set and TFP set, everything gets trapped to EL2, giving
-us a chance to switch in the FP regs, which sounds like the
-intended behaviour.
+Note that while it appears that n must be bound to the interval [0,3]
+due to the way it is extracted from addr, we cannot guarantee that
+compiler transformations (and/or future refactoring) will ensure this is
+the case, and given this is a slow path it's better to always perform
+the masking.
 
-I think the full set of relevant possibilities looks like this:
+Found by smatch.
 
-	TFP	EN	FPEXC	fpregs
-	0	0	 -	EL1
-	0	1	 -	 -
-	1	0	EL2	EL1
-	1	1	EL2	EL2
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Here, "TFP" is CPTR_EL2.TFP (or VHE equivalent) and EN is FPEXC (or
-FPEXC32_EL2 depending on your point of view) . EN.
-
-The FPEXC and fpregs columns show what happens when attempting to access
-the FPEXC or other fp regs respectively from the guest.  - indicates no
-trap taken, otherwise I list the destination EL for the trap.
-
-(assuming I've interpreted the rules correctly of course).
-
-Cheers
----Dave
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio=
+-v2.c
+index ffc587bf4742..64e571cc02df 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -352,6 +352,9 @@ static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
+=20
+ 		if (n > vgic_v3_max_apr_idx(vcpu))
+ 			return;
++
++		n =3D array_index_nospec(n, 4);
++
+ 		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
+ 		vgicv3->vgic_ap1r[n] =3D val;
+ 	}
+--=20
+2.17.1
