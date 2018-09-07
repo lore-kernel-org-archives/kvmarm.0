@@ -1,14 +1,14 @@
 From: Sasha Levin <Alexander.Levin@microsoft.com>
-Subject: [PATCH AUTOSEL 4.18 54/88] KVM: arm/arm64: vgic: Fix possible
+Subject: [PATCH AUTOSEL 4.14 41/67] KVM: arm/arm64: vgic: Fix possible
  spectre-v1 write in vgic_mmio_write_apr()
-Date: Fri, 7 Sep 2018 00:36:31 +0000
-Message-ID: <20180907003547.57567-54-alexander.levin@microsoft.com>
-References: <20180907003547.57567-1-alexander.levin@microsoft.com>
+Date: Fri, 7 Sep 2018 00:37:52 +0000
+Message-ID: <20180907003716.57737-41-alexander.levin@microsoft.com>
+References: <20180907003716.57737-1-alexander.levin@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180907003547.57567-1-alexander.levin@microsoft.com>
+In-Reply-To: <20180907003716.57737-1-alexander.levin@microsoft.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: "stable@vger.kernel.org" <stable@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
@@ -42,10 +42,10 @@ Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio=
 -v2.c
-index ffc587bf4742..64e571cc02df 100644
+index af003268bf3e..7ea5928244fa 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -352,6 +352,9 @@ static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
+@@ -348,6 +348,9 @@ static void vgic_mmio_write_apr(struct kvm_vcpu *vcpu,
 =20
  		if (n > vgic_v3_max_apr_idx(vcpu))
  			return;
