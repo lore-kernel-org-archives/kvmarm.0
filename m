@@ -1,106 +1,205 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Check memslot bounds before mapping
- hugepages
-Date: Mon, 10 Sep 2018 10:56:36 +0100
-Message-ID: <1e88db29-9bfd-7a47-ba36-c025c121c223@arm.com>
-References: <20180904163937.12759-1-koomi@moshbit.net>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm64: Treat FPEXC32_EL2 as a regular guest
+ system register
+Date: Wed, 12 Sep 2018 12:17:04 +0200
+Message-ID: <20180912101704.GA23874@e113682-lin.lund.arm.com>
+References: <1536153553-28767-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180904163937.12759-1-koomi@moshbit.net>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Lukas Braun <koomi@moshbit.net>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: Ralph Palutke <ralph.palutke@fau.de>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E2D49FA8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Sep 2018 06:17:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OvkYp1mWzHiC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Sep 2018 06:17:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FD0C49F94
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Sep 2018 06:17:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1536153553-28767-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Lukas,
+On Wed, Sep 05, 2018 at 02:19:13PM +0100, Dave Martin wrote:
+> Currently FPEXC32_EL2 is handled specially when context-switching.
+> This made sense for arm, where FPEXC affects host execution
+> (including VFP/SIMD register save/restore at Hyp).
 
-On 04/09/18 17:39, Lukas Braun wrote:
-> Userspace can create a memslot with memory backed by (transparent)
-> hugepages, but with bounds that do not align with hugepages.
-> In that case, we cannot map the entire region in the guest as hugepages
-> without exposing additional host memory to the guest and potentially
-> interfering with other memslots.
-> Consequently, this patch adds a bounds check when populating guest page
-> tables and forces the creation of regular PTEs if mapping an entire
-> hugepage would violate the memslots bounds.
+I think the point was actually to avoid saving/restoring FPEXC32_EL2
+when VFP was being trapped to EL2
+
 > 
-> Signed-off-by: Lukas Braun <koomi@moshbit.net>
+> However, FPEXC has no architectural effect when running in AArch64.
+> The only case where an arm64 host may execute in AArch32 is when
+> running compat user code at EL0: the architecture explicitly
+> documents FPEXC as having no effect in this case either when the
+> kernel (EL2 in the VHE case; otherwise EL1) is AArch64.
+> 
+> So, we can just handle FPEXC32_EL2 (which is the AArch64 alias for
+> this register) as a regular AArch32-only system register and switch
+> it without any special handling or synchronisation.
+> 
+> This allows some gnarly special-case code to be eliminated from
+> hyp.  The extra isb() in __activate_traps_fpsimd32() is dropped
+> too: for the reasons explained above arm64 never required this
+> anyway.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > ---
->  virt/kvm/arm/mmu.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index ed162a6c57c5..bdbec1d136a1 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1504,6 +1504,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		hugetlb = true;
->  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
->  	} else {
-> +		unsigned long pmd_fn_mask = PTRS_PER_PMD - 1;
-> +
->  		/*
->  		 * Pages belonging to memslots that don't have the same
->  		 * alignment for userspace and IPA cannot be mapped using
-> @@ -1513,8 +1515,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		 * unmapping, updates, and splits of the THP or other pages
->  		 * in the stage-2 block range.
->  		 */
-> -		if ((memslot->userspace_addr & ~PMD_MASK) !=
-> -		    ((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK))
-> +		int aligned = ((memslot->userspace_addr & ~PMD_MASK) ==
-> +			((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK));
+> I could do with some confirmation from someone that my interpretation of
+> the architecture is in fact correct here.  The CheckFPAdvSIMDEnabled64()
+> and CheckAdvSIMDEnabled() pseudocode functions may be a reasonable
+> starting point (this was my reference where the wordy text is unclear).
 
-This should most probably be a bool, together with the in_bounds variable.
+Which aspect do you want confirmed here?
 
-> +
-> +		/*
-> +		 * We also can't map a huge page if it would violate the bounds
-> +		 * of the containing memslot.
-> +		 */
-> +		int in_bounds = ((memslot->base_gfn <= (gfn & ~pmd_fn_mask)) &&
-> +			((memslot->base_gfn + memslot->npages) > (gfn | pmd_fn_mask)));
-
-It's the morning, and I haven't had much coffee, but this looks 
-confusing as hell. Most of the reasoning here is done in terms of 
-addresses, and you're now mixing it with a different unit, making the 
-result more unreadable.
-
-I find it easier to read it as:
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index b3c9cc73b0f1..3729ca414fc3 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1516,6 +1516,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		if ((memslot->userspace_addr & ~PMD_MASK) !=
- 		    ((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK))
- 			force_pte = true;
-+
-+		/*
-+		 * Force PTE mapping if a THP would lead to map
-+		 * something outside of the memslot.
-+		 */
-+		if ((fault_ipa & S2_PMD_MASK) < (memslot->base_gfn << PAGE_SHIFT) ||
-+		    ALIGN(fault_ipa, S2_PMD_SIZE) >= ((memslot->base_gfn + memslot->npages) << PAGE_SHIFT))
-+			force_pte = true;
- 	}
- 	up_read(&current->mm->mmap_sem);
- 
-which is of course completely untested.
-
-> +
-> +		if (!aligned || !in_bounds)
->  			force_pte = true;
->  	}
->  	up_read(&current->mm->mmap_sem);
+> 
+> If Alexander could try this out, that would be good.
+> 
+> This cleanup applies on top of the following previously pubished fix:
+> [PULL 2/4] arm64: KVM: Only force FPEXC32_EL2.EN if trapping FPSIMD
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2018-September/599537.html
 > 
 
-Thanks,
+We can queue this for the next merge window.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+
+> 
+>  arch/arm64/kvm/hyp/switch.c    | 45 ++----------------------------------------
+>  arch/arm64/kvm/hyp/sysreg-sr.c |  2 ++
+>  2 files changed, 4 insertions(+), 43 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index ca46153..0450b85 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -43,32 +43,6 @@ static bool __hyp_text update_fp_enabled(struct kvm_vcpu *vcpu)
+>  	return !!(vcpu->arch.flags & KVM_ARM64_FP_ENABLED);
+>  }
+>  
+> -/* Save the 32-bit only FPSIMD system register state */
+> -static void __hyp_text __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+> -{
+> -	if (!vcpu_el1_is_32bit(vcpu))
+> -		return;
+> -
+> -	vcpu->arch.ctxt.sys_regs[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+> -}
+> -
+> -static void __hyp_text __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+> -{
+> -	/*
+> -	 * We are about to set CPTR_EL2.TFP to trap all floating point
+> -	 * register accesses to EL2, however, the ARM ARM clearly states that
+> -	 * traps are only taken to EL2 if the operation would not otherwise
+> -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
+> -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+> -	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
+> -	 * it will cause an exception.
+> -	 */
+> -	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
+> -		write_sysreg(1 << 30, fpexc32_el2);
+> -		isb();
+> -	}
+> -}
+> -
+>  static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
+>  {
+>  	/* Trap on AArch32 cp15 c15 (impdef sysregs) accesses (EL1 or EL0) */
+> @@ -98,10 +72,8 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+>  	val = read_sysreg(cpacr_el1);
+>  	val |= CPACR_EL1_TTA;
+>  	val &= ~CPACR_EL1_ZEN;
+> -	if (!update_fp_enabled(vcpu)) {
+> +	if (!update_fp_enabled(vcpu))
+>  		val &= ~CPACR_EL1_FPEN;
+> -		__activate_traps_fpsimd32(vcpu);
+> -	}
+>  
+>  	write_sysreg(val, cpacr_el1);
+>  
+> @@ -116,10 +88,8 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+>  
+>  	val = CPTR_EL2_DEFAULT;
+>  	val |= CPTR_EL2_TTA | CPTR_EL2_TZ;
+> -	if (!update_fp_enabled(vcpu)) {
+> +	if (!update_fp_enabled(vcpu))
+>  		val |= CPTR_EL2_TFP;
+> -		__activate_traps_fpsimd32(vcpu);
+> -	}
+>  
+>  	write_sysreg(val, cptr_el2);
+>  }
+> @@ -366,11 +336,6 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+>  
+>  	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+>  
+> -	/* Skip restoring fpexc32 for AArch64 guests */
+> -	if (!(read_sysreg(hcr_el2) & HCR_RW))
+> -		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
+> -			     fpexc32_el2);
+> -
+>  	vcpu->arch.flags |= KVM_ARM64_FP_ENABLED;
+>  
+>  	return true;
+> @@ -522,9 +487,6 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  
+>  	sysreg_restore_host_state_vhe(host_ctxt);
+>  
+> -	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+> -		__fpsimd_save_fpexc32(vcpu);
+> -
+>  	__debug_switch_to_host(vcpu);
+>  
+>  	return exit_code;
+> @@ -580,9 +542,6 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+>  
+>  	__sysreg_restore_state_nvhe(host_ctxt);
+>  
+> -	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+> -		__fpsimd_save_fpexc32(vcpu);
+> -
+>  	/*
+>  	 * This must come after restoring the host sysregs, since a non-VHE
+>  	 * system may enable SPE here and make use of the TTBRs.
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 9ce2239..12994a9 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -195,6 +195,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+>  
+>  	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
+>  	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
+> +	sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
+>  
+>  	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+>  		sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
+> @@ -217,6 +218,7 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+>  
+>  	write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
+>  	write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
+> +	write_sysreg(sysreg[FPEXC32_EL2], fpexc32_el2);
+>  
+>  	if (has_vhe() || vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY)
+>  		write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
+> -- 
+> 2.1.4
+> 
