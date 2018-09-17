@@ -1,79 +1,83 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v5 15/18] kvm: arm64: Add 52bit support for PAR to HPFAR
- conversoin
-Date: Mon, 17 Sep 2018 11:41:37 +0100
-Message-ID: <20180917104144.19188-16-suzuki.poulose@arm.com>
+Subject: [PATCH v5 17/18] kvm: arm64: Limit the minimum number of page table levels
+Date: Mon, 17 Sep 2018 11:41:39 +0100
+Message-ID: <20180917104144.19188-18-suzuki.poulose@arm.com>
 References: <20180917104144.19188-1-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7A554A1D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Sep 2018 06:43:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cXcK+B80If+l for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Sep 2018 06:43:04 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B88224A1D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Sep 2018 06:43:04 -0400 (EDT)
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180917104144.19188-1-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, dave.martin@arm.com, julien.grall@arm.com, linux-kernel@vger.kernel.org, suzuki.poulose@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add support for handling 52bit addresses in PAR to HPFAR
-conversion. Instead of hardcoding the address limits, we
-now use PHYS_MASK_SHIFT.
+Since we are about to remove the lower limit on the IPA size,
+make sure that we do not go to 1 level page table (e.g, with
+32bit IPA on 64K host with concatenation) to avoid splitting
+the host PMD huge pages at stage2.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 7 +++++++
- arch/arm64/kvm/hyp/switch.c      | 2 +-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/stage2_pgtable.h |  8 +++++++-
+ arch/arm64/kvm/reset.c                  | 12 +++++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 0a37c0513ede..241d1622fa19 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -308,6 +308,13 @@
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index 352ec4158fdf..6a56fdff0823 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -72,8 +72,14 @@
+ /*
+  * The number of PTRS across all concatenated stage2 tables given by the
+  * number of bits resolved at the initial level.
++ * If we force more number of levels than necessary, we may have
++ * stage2_pgdir_shift > IPA, in which case, stage2_pgd_ptrs will have
++ * one entry.
+  */
+-#define __s2_pgd_ptrs(ipa, lvls)	(1 << ((ipa) - pt_levels_pgdir_shift((lvls))))
++#define pgd_ptrs_shift(ipa, pgdir_shift)	\
++	((ipa) > (pgdir_shift) ? ((ipa) - (pgdir_shift)) : 0)
++#define __s2_pgd_ptrs(ipa, lvls)		\
++	(1 << (pgd_ptrs_shift((ipa), pt_levels_pgdir_shift(lvls))))
+ #define __s2_pgd_size(ipa, lvls)	(__s2_pgd_ptrs((ipa), (lvls)) * sizeof(pgd_t))
  
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-+/*
-+ * We have
-+ *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
-+ *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
-+ */
-+#define PAR_TO_HPFAR(par)		\
-+	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
+ #define stage2_pgd_ptrs(kvm)		__s2_pgd_ptrs(kvm_phys_shift(kvm), kvm_stage2_levels(kvm))
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 76972b19bdd7..0393bb974b23 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -190,10 +190,19 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	u64 vtcr = VTCR_EL2_FLAGS;
+ 	u64 parange;
++	u8 lvls;
  
- #define kvm_arm_exception_type	\
- 	{0, "IRQ" }, 		\
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 9d5ce1a3039a..7cc175c88a37 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -263,7 +263,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 		return false; /* Translation failed, back to guest */
+ 	if (type)
+ 		return -EINVAL;
  
- 	/* Convert PAR to HPFAR format */
--	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
-+	*hpfar = PAR_TO_HPFAR(tmp);
- 	return true;
- }
++	/*
++	 * Use a minimum 2 level page table to prevent splitting
++	 * host PMD huge pages at stage2.
++	 */
++	lvls = stage2_pgtable_levels(KVM_PHYS_SHIFT);
++	if (lvls < 2)
++		lvls = 2;
++
+ 	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
+ 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
+ 		parange = ID_AA64MMFR0_PARANGE_MAX;
+@@ -210,7 +219,8 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
+ 	vtcr |= (kvm_get_vmid_bits() == 16) ?
+ 		VTCR_EL2_VS_16BIT :
+ 		VTCR_EL2_VS_8BIT;
+-	vtcr |= VTCR_EL2_LVLS_TO_SL0(stage2_pgtable_levels(KVM_PHYS_SHIFT));
++
++	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
+ 	vtcr |= VTCR_EL2_T0SZ(KVM_PHYS_SHIFT);
  
+ 	kvm->arch.vtcr = vtcr;
 -- 
 2.19.0
