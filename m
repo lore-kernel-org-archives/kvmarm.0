@@ -1,22 +1,22 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 09/13] kvm: selftests: port dirty_log_test to aarch64
-Date: Tue, 18 Sep 2018 19:54:32 +0200
-Message-ID: <20180918175436.19742-10-drjones@redhat.com>
+Subject: [PATCH 10/13] kvm: selftests: introduce new VM mode for 64K pages
+Date: Tue, 18 Sep 2018 19:54:33 +0200
+Message-ID: <20180918175436.19742-11-drjones@redhat.com>
 References: <20180918175436.19742-1-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 751724A252
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B00574A252
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sIp43rh-SkG7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Sep 2018 13:55:08 -0400 (EDT)
+ with ESMTP id scafx8nLaj-2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Sep 2018 13:55:11 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FCF04A20B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B7494A26B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:10 -0400 (EDT)
 In-Reply-To: <20180918175436.19742-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,351 +31,226 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-While we're messing with the code for the port and to support guest
-page sizes that are less than the host page size, we also make some
-code formatting cleanups and apply sync_global_to_guest().
+Rename VM_MODE_FLAT48PG to be more descriptive of its config and add a
+new config that has the same parameters, except with 64K pages.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |   2 +-
- tools/testing/selftests/kvm/Makefile          |   5 +-
- .../kvm/{x86_64 => }/dirty_log_test.c         | 163 +++++++++---------
- 3 files changed, 90 insertions(+), 80 deletions(-)
- rename tools/testing/selftests/kvm/{x86_64 => }/dirty_log_test.c (65%)
+ .../testing/selftests/kvm/include/kvm_util.h  |  7 ++-
+ .../selftests/kvm/lib/aarch64/processor.c     |  8 +++-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 47 ++++++++++++-------
+ .../selftests/kvm/lib/kvm_util_internal.h     |  1 +
+ .../selftests/kvm/lib/x86_64/processor.c      | 10 ++--
+ 5 files changed, 48 insertions(+), 25 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 9b3933fb5043..c228400cba07 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -3,4 +3,4 @@
- /x86_64/sync_regs_test
- /x86_64/vmx_tsc_adjust_test
- /x86_64/state_test
--/x86_64/dirty_log_test
-+/dirty_log_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index d603d7865cd1..3875639025fe 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -5,13 +5,16 @@ UNAME_M := $(shell uname -m)
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 752715a78a9b..6e3dff9d9d94 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -34,9 +34,14 @@ typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address */
+ #define DEFAULT_STACK_PGS		5
  
- LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebit.c
- LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
-+LIBKVM_aarch64 = lib/aarch64/processor.c
+ enum vm_guest_mode {
+-	VM_MODE_FLAT48PG,
++	VM_MODE_P52V48_4K,
++	VM_MODE_P52V48_64K,
++	NUM_VM_MODES,
+ };
  
- TEST_GEN_PROGS_x86_64 = x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
--TEST_GEN_PROGS_x86_64 += x86_64/dirty_log_test
-+TEST_GEN_PROGS_x86_64 += dirty_log_test
++#define vm_guest_mode_string(m) vm_guest_mode_string[m]
++extern const char * const vm_guest_mode_string[];
 +
-+TEST_GEN_PROGS_aarch64 += dirty_log_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-similarity index 65%
-rename from tools/testing/selftests/kvm/x86_64/dirty_log_test.c
-rename to tools/testing/selftests/kvm/dirty_log_test.c
-index 395a6e07d37c..d90f1091f687 100644
---- a/tools/testing/selftests/kvm/x86_64/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -17,75 +17,75 @@
- #include "kvm_util.h"
- #include "processor.h"
- 
--#define  DEBUG                 printf
-+#define DEBUG printf
-+
-+#define VCPU_ID				1
- 
--#define  VCPU_ID                        1
- /* The memory slot index to track dirty pages */
--#define  TEST_MEM_SLOT_INDEX            1
-+#define TEST_MEM_SLOT_INDEX		1
-+
- /*
-  * GPA offset of the testing memory slot. Must be bigger than the
-  * default vm mem slot, which is DEFAULT_GUEST_PHY_PAGES.
-  */
--#define  TEST_MEM_OFFSET                (1ULL << 30) /* 1G */
-+#define TEST_MEM_OFFSET			(1ul << 30) /* 1G */
-+
- /* Size of the testing memory slot */
--#define  TEST_MEM_PAGES                 (1ULL << 18) /* 1G for 4K pages */
-+#define TEST_MEM_PAGES			(1ul << 18) /* 1G for 4K pages */
-+
- /* How many pages to dirty for each guest loop */
--#define  TEST_PAGES_PER_LOOP            1024
-+#define TEST_PAGES_PER_LOOP		1024
-+
- /* How many host loops to run (one KVM_GET_DIRTY_LOG for each loop) */
--#define  TEST_HOST_LOOP_N               32
-+#define TEST_HOST_LOOP_N		32
-+
- /* Interval for each host loop (ms) */
--#define  TEST_HOST_LOOP_INTERVAL        10
-+#define TEST_HOST_LOOP_INTERVAL		10
- 
- /*
-- * Guest variables.  We use these variables to share data between host
-- * and guest.  There are two copies of the variables, one in host memory
-- * (which is unused) and one in guest memory.  When the host wants to
-- * access these variables, it needs to call addr_gva2hva() to access the
-- * guest copy.
-+ * Guest/Host shared variables. Ensure addr_gva2hva() and/or
-+ * sync_global_to/from_guest() are used when accessing from
-+ * the host. READ/WRITE_ONCE() should also be used with anything
-+ * that may change.
-  */
--uint64_t guest_random_array[TEST_PAGES_PER_LOOP];
--uint64_t guest_iteration;
--uint64_t guest_page_size;
-+static uint64_t host_page_size;
-+static uint64_t guest_page_size;
-+static uint64_t random_array[TEST_PAGES_PER_LOOP];
-+static uint64_t iteration;
- 
- /*
-- * Writes to the first byte of a random page within the testing memory
-- * region continuously.
-+ * Continuously write to the first 8 bytes of a random pages within
-+ * the testing memory region.
-  */
--void guest_code(void)
-+static void guest_code(void)
- {
--	int i = 0;
--	uint64_t volatile *array = guest_random_array;
--	uint64_t volatile *guest_addr;
-+	int i;
- 
- 	while (true) {
- 		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
--			/*
--			 * Write to the first 8 bytes of a random page
--			 * on the testing memory region.
--			 */
--			guest_addr = (uint64_t *)
--			    (TEST_MEM_OFFSET +
--			     (array[i] % TEST_MEM_PAGES) * guest_page_size);
--			*guest_addr = guest_iteration;
-+			uint64_t addr = TEST_MEM_OFFSET;
-+			addr += (READ_ONCE(random_array[i]) % TEST_MEM_PAGES)
-+				* guest_page_size;
-+			addr &= ~(host_page_size - 1);
-+			*(uint64_t *)addr = READ_ONCE(iteration);
- 		}
-+
- 		/* Tell the host that we need more random numbers */
- 		GUEST_SYNC(1);
- 	}
- }
- 
--/*
-- * Host variables.  These variables should only be used by the host
-- * rather than the guest.
-- */
--bool host_quit;
-+/* Host variables */
-+static bool host_quit;
- 
- /* Points to the test VM memory region on which we track dirty logs */
--void *host_test_mem;
-+static void *host_test_mem;
-+static uint64_t host_num_pages;
- 
- /* For statistics only */
--uint64_t host_dirty_count;
--uint64_t host_clear_count;
--uint64_t host_track_next_count;
-+static uint64_t host_dirty_count;
-+static uint64_t host_clear_count;
-+static uint64_t host_track_next_count;
- 
- /*
-  * We use this bitmap to track some pages that should have its dirty
-@@ -94,39 +94,34 @@ uint64_t host_track_next_count;
-  * page bit is cleared in the latest bitmap, then the system must
-  * report that write in the next get dirty log call.
-  */
--unsigned long *host_bmap_track;
-+static unsigned long *host_bmap_track;
- 
--void generate_random_array(uint64_t *guest_array, uint64_t size)
-+static void generate_random_array(uint64_t *guest_array, uint64_t size)
- {
- 	uint64_t i;
- 
--	for (i = 0; i < size; i++) {
-+	for (i = 0; i < size; i++)
- 		guest_array[i] = random();
--	}
- }
- 
--void *vcpu_worker(void *data)
-+static void *vcpu_worker(void *data)
- {
- 	int ret;
--	uint64_t loops, *guest_array, pages_count = 0;
- 	struct kvm_vm *vm = data;
-+	uint64_t *guest_array;
-+	uint64_t pages_count = 0;
- 	struct kvm_run *run;
- 	struct ucall uc;
- 
- 	run = vcpu_state(vm, VCPU_ID);
- 
--	/* Retrieve the guest random array pointer and cache it */
--	guest_array = addr_gva2hva(vm, (vm_vaddr_t)guest_random_array);
--
--	DEBUG("VCPU starts\n");
--
-+	guest_array = addr_gva2hva(vm, (vm_vaddr_t)random_array);
- 	generate_random_array(guest_array, TEST_PAGES_PER_LOOP);
- 
- 	while (!READ_ONCE(host_quit)) {
--		/* Let the guest to dirty these random pages */
-+		/* Let the guest dirty the random pages */
- 		ret = _vcpu_run(vm, VCPU_ID);
--		if (run->exit_reason == KVM_EXIT_IO &&
--		    get_ucall(vm, VCPU_ID, &uc) == UCALL_SYNC) {
-+		if (get_ucall(vm, VCPU_ID, &uc) == UCALL_SYNC) {
- 			pages_count += TEST_PAGES_PER_LOOP;
- 			generate_random_array(guest_array, TEST_PAGES_PER_LOOP);
- 		} else {
-@@ -137,18 +132,18 @@ void *vcpu_worker(void *data)
- 		}
- 	}
- 
--	DEBUG("VCPU exits, dirtied %"PRIu64" pages\n", pages_count);
-+	DEBUG("Dirtied %"PRIu64" pages\n", pages_count);
- 
- 	return NULL;
- }
- 
--void vm_dirty_log_verify(unsigned long *bmap, uint64_t iteration)
-+static void vm_dirty_log_verify(unsigned long *bmap)
- {
- 	uint64_t page;
--	uint64_t volatile *value_ptr;
-+	uint64_t *value_ptr;
- 
--	for (page = 0; page < TEST_MEM_PAGES; page++) {
--		value_ptr = host_test_mem + page * getpagesize();
-+	for (page = 0; page < host_num_pages; page++) {
-+		value_ptr = host_test_mem + page * host_page_size;
- 
- 		/* If this is a special page that we were tracking... */
- 		if (test_and_clear_bit(page, host_bmap_track)) {
-@@ -208,7 +203,7 @@ void vm_dirty_log_verify(unsigned long *bmap, uint64_t iteration)
- 	}
- }
- 
--void help(char *name)
-+static void help(char *name)
- {
- 	puts("");
- 	printf("usage: %s [-i iterations] [-I interval] [-h]\n", name);
-@@ -225,9 +220,9 @@ int main(int argc, char *argv[])
- {
- 	pthread_t vcpu_thread;
+ enum vm_mem_backing_src_type {
+ 	VM_MEM_SRC_ANONYMOUS,
+ 	VM_MEM_SRC_ANONYMOUS_THP,
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 871fe2173679..b1dfc0d4b68e 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -226,7 +226,7 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+ 	uint64_t extra_pg_pages = (extra_mem_pages / ptrs_per_4k_pte) * 2;
  	struct kvm_vm *vm;
--	uint64_t volatile *psize, *iteration;
--	unsigned long *bmap, iterations = TEST_HOST_LOOP_N,
--	    interval = TEST_HOST_LOOP_INTERVAL;
-+	unsigned long iterations = TEST_HOST_LOOP_N;
-+	unsigned long interval = TEST_HOST_LOOP_INTERVAL;
-+	unsigned long *bmap;
- 	int opt;
  
- 	while ((opt = getopt(argc, argv, "hi:I:")) != -1) {
-@@ -245,16 +240,21 @@ int main(int argc, char *argv[])
- 		}
+-	vm = vm_create(VM_MODE_FLAT48PG, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
++	vm = vm_create(VM_MODE_P52V48_4K, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
+ 
+ 	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
+ 	vm_vcpu_add_default(vm, vcpuid, guest_code);
+@@ -267,10 +267,14 @@ void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_memslot)
+ 	get_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), &tcr_el1);
+ 
+ 	switch (vm->mode) {
+-	case VM_MODE_FLAT48PG:
++	case VM_MODE_P52V48_4K:
+ 		tcr_el1 |= 0ul << 14; /* TG0 = 4KB */
+ 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
+ 		break;
++	case VM_MODE_P52V48_64K:
++		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
++		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
++		break;
+ 	default:
+ 		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", vm->mode);
+ 	}
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index b5e9eb7360a2..4d3bb515de17 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -17,7 +17,7 @@
+ #include <linux/kernel.h>
+ 
+ #define KVM_UTIL_PGS_PER_HUGEPG 512
+-#define KVM_UTIL_MIN_PADDR      0x2000
++#define KVM_UTIL_MIN_PFN	2
+ 
+ /* Aligns x up to the next multiple of size. Size must be a power of 2. */
+ static void *align(void *x, size_t size)
+@@ -73,11 +73,16 @@ static void vm_open(struct kvm_vm *vm, int perm)
+ 		"rc: %i errno: %i", vm->fd, errno);
+ }
+ 
++const char * const vm_guest_mode_string[] = {
++	"PA-bits:52, VA-bits:48, 4K pages",
++	"PA-bits:52, VA-bits:48, 64K pages",
++};
++
+ /*
+  * VM Create
+  *
+  * Input Args:
+- *   mode - VM Mode (e.g. VM_MODE_FLAT48PG)
++ *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
+  *   phy_pages - Physical memory pages
+  *   perm - permission
+  *
+@@ -86,7 +91,7 @@ static void vm_open(struct kvm_vm *vm, int perm)
+  * Return:
+  *   Pointer to opaque structure that describes the created VM.
+  *
+- * Creates a VM with the mode specified by mode (e.g. VM_MODE_FLAT48PG).
++ * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
+  * When phy_pages is non-zero, a memory region of phy_pages physical pages
+  * is created and mapped starting at guest physical address 0.  The file
+  * descriptor to control the created VM is created with the permissions
+@@ -105,28 +110,35 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 
+ 	/* Setup mode specific traits. */
+ 	switch (vm->mode) {
+-	case VM_MODE_FLAT48PG:
++	case VM_MODE_P52V48_4K:
+ 		vm->pgtable_levels = 4;
++		vm->pa_bits = 52;
+ 		vm->va_bits = 48;
+ 		vm->page_size = 0x1000;
+ 		vm->page_shift = 12;
+-
+-		/* Limit to 48-bit canonical virtual addresses. */
+-		vm->vpages_valid = sparsebit_alloc();
+-		sparsebit_set_num(vm->vpages_valid,
+-			0, (1ULL << (48 - 1)) >> vm->page_shift);
+-		sparsebit_set_num(vm->vpages_valid,
+-			(~((1ULL << (48 - 1)) - 1)) >> vm->page_shift,
+-			(1ULL << (48 - 1)) >> vm->page_shift);
+-
+-		/* Limit physical addresses to 52-bits. */
+-		vm->max_gfn = ((1ULL << 52) >> vm->page_shift) - 1;
+ 		break;
+-
++	case VM_MODE_P52V48_64K:
++		vm->pgtable_levels = 3;
++		vm->pa_bits = 52;
++		vm->va_bits = 48;
++		vm->page_size = 0x10000;
++		vm->page_shift = 16;
++		break;
+ 	default:
+ 		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", mode);
  	}
  
--	TEST_ASSERT(iterations > 2, "Iteration must be bigger than zero\n");
--	TEST_ASSERT(interval > 0, "Interval must be bigger than zero");
-+	TEST_ASSERT(iterations > 2, "Iterations must be greater than two");
-+	TEST_ASSERT(interval > 0, "Interval must be greater than zero");
- 
- 	DEBUG("Test iterations: %"PRIu64", interval: %"PRIu64" (ms)\n",
- 	      iterations, interval);
- 
- 	srandom(time(0));
- 
--	bmap = bitmap_alloc(TEST_MEM_PAGES);
--	host_bmap_track = bitmap_alloc(TEST_MEM_PAGES);
-+	guest_page_size = 4096;
-+	host_page_size = getpagesize();
-+	host_num_pages = (TEST_MEM_PAGES * guest_page_size) / host_page_size +
-+			 !!((TEST_MEM_PAGES * guest_page_size) % host_page_size);
++	/* Limit to VA-bit canonical virtual addresses. */
++	vm->vpages_valid = sparsebit_alloc();
++	sparsebit_set_num(vm->vpages_valid,
++		0, (1ULL << (vm->va_bits - 1)) >> vm->page_shift);
++	sparsebit_set_num(vm->vpages_valid,
++		(~((1ULL << (vm->va_bits - 1)) - 1)) >> vm->page_shift,
++		(1ULL << (vm->va_bits - 1)) >> vm->page_shift);
 +
-+	bmap = bitmap_alloc(host_num_pages);
-+	host_bmap_track = bitmap_alloc(host_num_pages);
- 
- 	vm = vm_create_default(VCPU_ID, TEST_MEM_PAGES, guest_code);
- 
-@@ -264,32 +264,38 @@ int main(int argc, char *argv[])
- 				    TEST_MEM_SLOT_INDEX,
- 				    TEST_MEM_PAGES,
- 				    KVM_MEM_LOG_DIRTY_PAGES);
--	/* Cache the HVA pointer of the region */
--	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)TEST_MEM_OFFSET);
- 
- 	/* Do 1:1 mapping for the dirty track memory slot */
- 	virt_map(vm, TEST_MEM_OFFSET, TEST_MEM_OFFSET,
--		 TEST_MEM_PAGES * getpagesize(), 0);
-+		 TEST_MEM_PAGES * guest_page_size, 0);
++	/* Limit physical addresses to PA-bits. */
++	vm->max_gfn = ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
 +
-+	/* Cache the HVA pointer of the region */
-+	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)TEST_MEM_OFFSET);
+ 	/* Allocate and setup memory for guest. */
+ 	vm->vpages_mapped = sparsebit_alloc();
+ 	if (phy_pages != 0)
+@@ -845,7 +857,8 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
+ 		pages--, vaddr += vm->page_size) {
+ 		vm_paddr_t paddr;
  
-+#ifdef __x86_64__
- 	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+#endif
-+#ifdef __aarch64__
-+	ucall_init(vm, UCALL_MMIO, NULL);
-+#endif
+-		paddr = vm_phy_page_alloc(vm, KVM_UTIL_MIN_PADDR, data_memslot);
++		paddr = vm_phy_page_alloc(vm,
++				KVM_UTIL_MIN_PFN * vm->page_size, data_memslot);
  
--	/* Tell the guest about the page size on the system */
--	psize = addr_gva2hva(vm, (vm_vaddr_t)&guest_page_size);
--	*psize = getpagesize();
-+	/* Tell the guest about the page sizes */
-+	sync_global_to_guest(vm, host_page_size);
-+	sync_global_to_guest(vm, guest_page_size);
+ 		virt_pg_map(vm, vaddr, paddr, pgd_memslot);
  
- 	/* Start the iterations */
--	iteration = addr_gva2hva(vm, (vm_vaddr_t)&guest_iteration);
--	*iteration = 1;
-+	iteration = 1;
-+	sync_global_to_guest(vm, iteration);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+index 813145f3e4b9..5e05fb98dc62 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
++++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+@@ -47,6 +47,7 @@ struct kvm_vm {
+ 	int kvm_fd;
+ 	int fd;
+ 	unsigned int pgtable_levels;
++	unsigned int pa_bits;
+ 	unsigned int va_bits;
+ 	unsigned int page_size;
+ 	unsigned int page_shift;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index d96b5f9cc344..7092d1389dda 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -231,7 +231,7 @@ void virt_pgd_alloc(struct kvm_vm *vm, uint32_t pgd_memslot)
+ {
+ 	int rc;
  
--	/* Start dirtying pages */
- 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vm);
+-	TEST_ASSERT(vm->mode == VM_MODE_FLAT48PG, "Attempt to use "
++	TEST_ASSERT(vm->mode == VM_MODE_P52V48_4K, "Attempt to use "
+ 		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
  
--	while (*iteration < iterations) {
-+	while (iteration < iterations) {
- 		/* Give the vcpu thread some time to dirty some pages */
- 		usleep(interval * 1000);
- 		kvm_vm_get_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap);
--		vm_dirty_log_verify(bmap, *iteration);
--		(*iteration)++;
-+		vm_dirty_log_verify(bmap);
-+		iteration++;
-+		sync_global_to_guest(vm, iteration);
- 	}
+ 	/* If needed, create page map l4 table. */
+@@ -264,7 +264,7 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+ 	uint16_t index[4];
+ 	struct pageMapL4Entry *pml4e;
  
- 	/* Tell the vcpu thread to quit */
-@@ -302,6 +308,7 @@ int main(int argc, char *argv[])
+-	TEST_ASSERT(vm->mode == VM_MODE_FLAT48PG, "Attempt to use "
++	TEST_ASSERT(vm->mode == VM_MODE_P52V48_4K, "Attempt to use "
+ 		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
  
- 	free(bmap);
- 	free(host_bmap_track);
-+	ucall_uninit(vm);
- 	kvm_vm_free(vm);
+ 	TEST_ASSERT((vaddr % vm->page_size) == 0,
+@@ -551,7 +551,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	struct pageTableEntry *pte;
+ 	void *hva;
  
- 	return 0;
+-	TEST_ASSERT(vm->mode == VM_MODE_FLAT48PG, "Attempt to use "
++	TEST_ASSERT(vm->mode == VM_MODE_P52V48_4K, "Attempt to use "
+ 		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
+ 
+ 	index[0] = (gva >> 12) & 0x1ffu;
+@@ -624,7 +624,7 @@ void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_memslot)
+ 	kvm_setup_gdt(vm, &sregs.gdt, gdt_memslot, pgd_memslot);
+ 
+ 	switch (vm->mode) {
+-	case VM_MODE_FLAT48PG:
++	case VM_MODE_P52V48_4K:
+ 		sregs.cr0 = X86_CR0_PE | X86_CR0_NE | X86_CR0_PG;
+ 		sregs.cr4 |= X86_CR4_PAE | X86_CR4_OSFXSR;
+ 		sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
+@@ -873,7 +873,7 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+ 	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
+ 
+ 	/* Create VM */
+-	vm = vm_create(VM_MODE_FLAT48PG,
++	vm = vm_create(VM_MODE_P52V48_4K,
+ 		       DEFAULT_GUEST_PHY_PAGES + extra_pg_pages,
+ 		       O_RDWR);
+ 
 -- 
 2.17.1
