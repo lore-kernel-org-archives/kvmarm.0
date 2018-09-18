@@ -1,22 +1,23 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 08/13] kvm: selftests: add vcpu support for aarch64
-Date: Tue, 18 Sep 2018 19:54:31 +0200
-Message-ID: <20180918175436.19742-9-drjones@redhat.com>
+Subject: [PATCH 11/13] kvm: selftests: dirty_log_test: also test 64K pages on
+ aarch64
+Date: Tue, 18 Sep 2018 19:54:34 +0200
+Message-ID: <20180918175436.19742-12-drjones@redhat.com>
 References: <20180918175436.19742-1-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B0AF14A1FE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FE64A27C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a6W9Edc3vXbW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Sep 2018 13:55:06 -0400 (EDT)
+ with ESMTP id 8JVw3VSE2OZe for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Sep 2018 13:55:13 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F9BA4A257
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77E2C4A20B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:55:12 -0400 (EDT)
 In-Reply-To: <20180918175436.19742-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,182 +32,285 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This code adds VM and VCPU setup code for the VM_MODE_FLAT48PG mode.
-The VM_MODE_FLAT48PG isn't yet fully supportable, as it defines the
-guest physical address limit as 52-bits, and KVM currently only
-supports guests with up to 40-bit physical addresses (see
-KVM_PHYS_SHIFT). VM_MODE_FLAT48PG will work fine, though, as long as
-no >= 40-bit physical addresses are used.
-
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h | 55 ++++++++++++
- .../selftests/kvm/lib/aarch64/processor.c     | 83 +++++++++++++++++++
- 2 files changed, 138 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/processor.h
+ tools/testing/selftests/kvm/dirty_log_test.c | 183 ++++++++++++++-----
+ 1 file changed, 137 insertions(+), 46 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-new file mode 100644
-index 000000000000..9ef2ab1a0c08
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * AArch64 processor specific defines
-+ *
-+ * Copyright (C) 2018, Red Hat, Inc.
-+ */
-+#ifndef SELFTEST_KVM_PROCESSOR_H
-+#define SELFTEST_KVM_PROCESSOR_H
-+
-+#include "kvm_util.h"
-+
-+
-+#define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-+			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
-+
-+#define CPACR_EL1	3, 0,  1, 0, 2
-+#define TCR_EL1		3, 0,  2, 0, 2
-+#define MAIR_EL1	3, 0, 10, 2, 0
-+#define TTBR0_EL1	3, 0,  2, 0, 0
-+#define SCTLR_EL1	3, 0,  1, 0, 0
-+
-+/*
-+ * Default MAIR
-+ *                  index   attribute
-+ * DEVICE_nGnRnE      0     0000:0000
-+ * DEVICE_nGnRE       1     0000:0100
-+ * DEVICE_GRE         2     0000:1100
-+ * NORMAL_NC          3     0100:0100
-+ * NORMAL             4     1111:1111
-+ * NORMAL_WT          5     1011:1011
-+ */
-+#define DEFAULT_MAIR_EL1 ((0x00ul << (0 * 8)) | \
-+			  (0x04ul << (1 * 8)) | \
-+			  (0x0cul << (2 * 8)) | \
-+			  (0x44ul << (3 * 8)) | \
-+			  (0xfful << (4 * 8)) | \
-+			  (0xbbul << (5 * 8)))
-+
-+static inline void get_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint64_t *addr)
-+{
-+	struct kvm_one_reg reg;
-+	reg.id = id;
-+	reg.addr = (uint64_t)addr;
-+	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, &reg);
-+}
-+
-+static inline void set_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint64_t val)
-+{
-+	struct kvm_one_reg reg;
-+	reg.id = id;
-+	reg.addr = (uint64_t)&val;
-+	vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, &reg);
-+}
-+
-+#endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 464d4d074249..871fe2173679 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -5,10 +5,14 @@
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index d90f1091f687..3afc7d607a2e 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -5,6 +5,8 @@
   * Copyright (C) 2018, Red Hat, Inc.
   */
  
 +#define _GNU_SOURCE /* for program_invocation_name */
 +
- #include "kvm_util.h"
- #include "../kvm_util_internal.h"
-+#include "processor.h"
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+@@ -30,9 +32,6 @@
+  */
+ #define TEST_MEM_OFFSET			(1ul << 30) /* 1G */
  
- #define KVM_GUEST_PAGE_TABLE_MIN_PADDR		0x180000
-+#define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
+-/* Size of the testing memory slot */
+-#define TEST_MEM_PAGES			(1ul << 18) /* 1G for 4K pages */
+-
+ /* How many pages to dirty for each guest loop */
+ #define TEST_PAGES_PER_LOOP		1024
  
- static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+@@ -50,6 +49,7 @@
+  */
+ static uint64_t host_page_size;
+ static uint64_t guest_page_size;
++static uint64_t guest_num_pages;
+ static uint64_t random_array[TEST_PAGES_PER_LOOP];
+ static uint64_t iteration;
+ 
+@@ -64,7 +64,7 @@ static void guest_code(void)
+ 	while (true) {
+ 		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
+ 			uint64_t addr = TEST_MEM_OFFSET;
+-			addr += (READ_ONCE(random_array[i]) % TEST_MEM_PAGES)
++			addr += (READ_ONCE(random_array[i]) % guest_num_pages)
+ 				* guest_page_size;
+ 			addr &= ~(host_page_size - 1);
+ 			*(uint64_t *)addr = READ_ONCE(iteration);
+@@ -141,8 +141,10 @@ static void vm_dirty_log_verify(unsigned long *bmap)
  {
-@@ -214,3 +218,82 @@ void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- 		pte_dump(stream, vm, indent + 1, pte_addr(vm, *ptep), level);
+ 	uint64_t page;
+ 	uint64_t *value_ptr;
++	uint64_t step = host_page_size >= guest_page_size ? 1 :
++				guest_page_size / host_page_size;
+ 
+-	for (page = 0; page < host_num_pages; page++) {
++	for (page = 0; page < host_num_pages; page += step) {
+ 		value_ptr = host_test_mem + page * host_page_size;
+ 
+ 		/* If this is a special page that we were tracking... */
+@@ -203,71 +205,64 @@ static void vm_dirty_log_verify(unsigned long *bmap)
  	}
  }
-+
-+struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
-+				 void *guest_code)
-+{
-+	uint64_t ptrs_per_4k_pte = 512;
-+	uint64_t extra_pg_pages = (extra_mem_pages / ptrs_per_4k_pte) * 2;
+ 
+-static void help(char *name)
++static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
++				uint64_t extra_mem_pages, void *guest_code)
+ {
+-	puts("");
+-	printf("usage: %s [-i iterations] [-I interval] [-h]\n", name);
+-	puts("");
+-	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+-	       TEST_HOST_LOOP_N);
+-	printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
+-	       TEST_HOST_LOOP_INTERVAL);
+-	puts("");
+-	exit(0);
 +	struct kvm_vm *vm;
++	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
 +
-+	vm = vm_create(VM_MODE_FLAT48PG, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
-+
++	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
 +	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
++#ifdef __x86_64__
++	vm_create_irqchip(vm);
++#endif
 +	vm_vcpu_add_default(vm, vcpuid, guest_code);
-+
 +	return vm;
-+}
-+
-+void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+{
-+	size_t stack_size = vm->page_size == 4096 ?
-+					DEFAULT_STACK_PGS * vm->page_size :
-+					vm->page_size;
-+	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
-+					DEFAULT_ARM64_GUEST_STACK_VADDR_MIN, 0, 0);
-+
-+	vm_vcpu_add(vm, vcpuid, 0, 0);
-+
-+	set_reg(vm, vcpuid, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
-+	set_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-+}
-+
-+void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_memslot)
-+{
-+	struct kvm_vcpu_init init;
-+	uint64_t sctlr_el1, tcr_el1;
-+
-+	memset(&init, 0, sizeof(init));
-+	init.target = KVM_ARM_TARGET_GENERIC_V8;
-+	vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_INIT, &init);
-+
-+	/*
-+	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
-+	 * registers, which the variable argument list macros do.
-+	 */
-+	set_reg(vm, vcpuid, ARM64_SYS_REG(CPACR_EL1), 3 << 20);
-+
-+	get_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), &sctlr_el1);
-+	get_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), &tcr_el1);
-+
-+	switch (vm->mode) {
-+	case VM_MODE_FLAT48PG:
-+		tcr_el1 |= 0ul << 14; /* TG0 = 4KB */
-+		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
+ }
+ 
+-int main(int argc, char *argv[])
++static void run_test(enum vm_guest_mode mode, unsigned long iterations,
++		     unsigned long interval)
+ {
++	unsigned int guest_page_shift;
+ 	pthread_t vcpu_thread;
+ 	struct kvm_vm *vm;
+-	unsigned long iterations = TEST_HOST_LOOP_N;
+-	unsigned long interval = TEST_HOST_LOOP_INTERVAL;
+ 	unsigned long *bmap;
+-	int opt;
+ 
+-	while ((opt = getopt(argc, argv, "hi:I:")) != -1) {
+-		switch (opt) {
+-		case 'i':
+-			iterations = strtol(optarg, NULL, 10);
+-			break;
+-		case 'I':
+-			interval = strtol(optarg, NULL, 10);
+-			break;
+-		case 'h':
+-		default:
+-			help(argv[0]);
+-			break;
+-		}
++	switch (mode) {
++	case VM_MODE_P52V48_4K:
++		guest_page_shift = 12;
++		break;
++	case VM_MODE_P52V48_64K:
++		guest_page_shift = 16;
 +		break;
 +	default:
-+		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", vm->mode);
++		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", mode);
+ 	}
+ 
+-	TEST_ASSERT(iterations > 2, "Iterations must be greater than two");
+-	TEST_ASSERT(interval > 0, "Interval must be greater than zero");
+-
+-	DEBUG("Test iterations: %"PRIu64", interval: %"PRIu64" (ms)\n",
+-	      iterations, interval);
+-
+-	srandom(time(0));
++	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+ 
+-	guest_page_size = 4096;
++	guest_page_size = (1ul << guest_page_shift);
++	/* 1G of guest page sized pages */
++	guest_num_pages = (1ul << (30 - guest_page_shift));
+ 	host_page_size = getpagesize();
+-	host_num_pages = (TEST_MEM_PAGES * guest_page_size) / host_page_size +
+-			 !!((TEST_MEM_PAGES * guest_page_size) % host_page_size);
++	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
++			 !!((guest_num_pages * guest_page_size) % host_page_size);
+ 
+ 	bmap = bitmap_alloc(host_num_pages);
+ 	host_bmap_track = bitmap_alloc(host_num_pages);
+ 
+-	vm = vm_create_default(VCPU_ID, TEST_MEM_PAGES, guest_code);
++	vm = create_vm(mode, VCPU_ID, guest_num_pages, guest_code);
+ 
+ 	/* Add an extra memory slot for testing dirty logging */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+ 				    TEST_MEM_OFFSET,
+ 				    TEST_MEM_SLOT_INDEX,
+-				    TEST_MEM_PAGES,
++				    guest_num_pages,
+ 				    KVM_MEM_LOG_DIRTY_PAGES);
+ 
+ 	/* Do 1:1 mapping for the dirty track memory slot */
+ 	virt_map(vm, TEST_MEM_OFFSET, TEST_MEM_OFFSET,
+-		 TEST_MEM_PAGES * guest_page_size, 0);
++		 guest_num_pages * guest_page_size, 0);
+ 
+ 	/* Cache the HVA pointer of the region */
+ 	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)TEST_MEM_OFFSET);
+@@ -279,13 +274,18 @@ int main(int argc, char *argv[])
+ 	ucall_init(vm, UCALL_MMIO, NULL);
+ #endif
+ 
+-	/* Tell the guest about the page sizes */
++	/* Export the shared variables to the guest */
+ 	sync_global_to_guest(vm, host_page_size);
+ 	sync_global_to_guest(vm, guest_page_size);
++	sync_global_to_guest(vm, guest_num_pages);
+ 
+ 	/* Start the iterations */
+ 	iteration = 1;
+ 	sync_global_to_guest(vm, iteration);
++	host_quit = false;
++	host_dirty_count = 0;
++	host_clear_count = 0;
++	host_track_next_count = 0;
+ 
+ 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vm);
+ 
+@@ -310,6 +310,97 @@ int main(int argc, char *argv[])
+ 	free(host_bmap_track);
+ 	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
++}
++
++static struct vm_guest_modes {
++	enum vm_guest_mode mode;
++	bool supported;
++	bool enabled;
++} vm_guest_modes[NUM_VM_MODES] = {
++	{ VM_MODE_P52V48_4K,	1, 1, },
++#ifdef __aarch64__
++	{ VM_MODE_P52V48_64K,	1, 1, },
++#else
++	{ VM_MODE_P52V48_64K,	0, 0, },
++#endif
++};
++
++static void help(char *name)
++{
++	int i;
++
++	puts("");
++	printf("usage: %s [-h] [-i iterations] [-I interval] [-m mode]\n", name);
++	puts("");
++	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
++	       TEST_HOST_LOOP_N);
++	printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
++	       TEST_HOST_LOOP_INTERVAL);
++	printf(" -m: specify the guest mode ID to test "
++	       "(default: test all supported modes)\n"
++	       "     This option may be used multiple times.\n"
++	       "     Guest mode IDs:\n");
++	for (i = 0; i < NUM_VM_MODES; ++i) {
++		printf("         %d:    %s%s\n",
++		       vm_guest_modes[i].mode,
++		       vm_guest_mode_string(vm_guest_modes[i].mode),
++		       vm_guest_modes[i].supported ? " (supported)" : "");
++	}
++	puts("");
++	exit(0);
++}
++
++int main(int argc, char *argv[])
++{
++	unsigned long iterations = TEST_HOST_LOOP_N;
++	unsigned long interval = TEST_HOST_LOOP_INTERVAL;
++	bool mode_selected = false;
++	unsigned int mode;
++	int opt, i;
++
++	while ((opt = getopt(argc, argv, "hi:I:m:")) != -1) {
++		switch (opt) {
++		case 'i':
++			iterations = strtol(optarg, NULL, 10);
++			break;
++		case 'I':
++			interval = strtol(optarg, NULL, 10);
++			break;
++		case 'm':
++			if (!mode_selected) {
++				for (i = 0; i < NUM_VM_MODES; ++i)
++					vm_guest_modes[i].enabled = 0;
++				mode_selected = true;
++			}
++			mode = strtoul(optarg, NULL, 10);
++			TEST_ASSERT(mode < NUM_VM_MODES,
++				    "Guest mode ID %d too big", mode);
++			vm_guest_modes[mode].enabled = 1;
++			break;
++		case 'h':
++		default:
++			help(argv[0]);
++			break;
++		}
 +	}
 +
-+	sctlr_el1 |= (1 << 0) | (1 << 2) | (1 << 12) /* M | C | I */;
-+	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
-+	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
-+	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
++	TEST_ASSERT(iterations > 2, "Iterations must be greater than two");
++	TEST_ASSERT(interval > 0, "Interval must be greater than zero");
 +
-+	set_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), sctlr_el1);
-+	set_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), tcr_el1);
-+	set_reg(vm, vcpuid, ARM64_SYS_REG(MAIR_EL1), DEFAULT_MAIR_EL1);
-+	set_reg(vm, vcpuid, ARM64_SYS_REG(TTBR0_EL1), vm->pgd);
-+}
++	DEBUG("Test iterations: %"PRIu64", interval: %"PRIu64" (ms)\n",
++	      iterations, interval);
 +
-+void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-+{
-+	uint64_t pstate, pc;
++	srandom(time(0));
 +
-+	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pstate), &pstate);
-+	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &pc);
-+
-+        fprintf(stream, "%*spstate: 0x%.16llx pc: 0x%.16llx\n",
-+                indent, "", pstate, pc);
-+
-+}
++	for (i = 0; i < NUM_VM_MODES; ++i) {
++		if (!vm_guest_modes[i].enabled)
++			continue;
++		TEST_ASSERT(vm_guest_modes[i].supported,
++			    "Guest mode ID %d (%s) not supported.",
++			    vm_guest_modes[i].mode,
++			    vm_guest_mode_string(vm_guest_modes[i].mode));
++		run_test(vm_guest_modes[i].mode, iterations, interval);
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.17.1
