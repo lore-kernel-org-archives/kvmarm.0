@@ -1,58 +1,107 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 18/18] kvm: arm64: Allow tuning the physical address
- size for VM
-Date: Tue, 18 Sep 2018 18:15:04 +0100
-Message-ID: <CAFEAcA_tphfZ_BKfAYuefStTipta0notyAR=NCnWFJ6nRfERpg@mail.gmail.com>
-References: <20180917104144.19188-1-suzuki.poulose@arm.com>
- <20180917104144.19188-19-suzuki.poulose@arm.com> <CAFEAcA8eWYkzwFYHyP49dasK-NDVbbm=6DbEFNNPq9ZAdUM7JQ@mail.gmail.com>
- <218b64d5-741d-97ef-8aae-bc0a2ac3e56c@arm.com> <CAFEAcA8qjJJ0FkQj4yBMKFrwNFiJj3Q4FBi4GbnK2PN3B3J-mg@mail.gmail.com>
- <fec1a2e0-a45a-eb51-6ffe-2ac9b35acc45@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH 00/13] kvm: selftests: add aarch64 framework and dirty
+Date: Tue, 18 Sep 2018 19:54:23 +0200
+Message-ID: <20180918175436.19742-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <fec1a2e0-a45a-eb51-6ffe-2ac9b35acc45@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <cdall@kernel.org>, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, James Morse <james.morse@arm.com>, Dave P Martin <dave.martin@arm.com>, julien.grall@arm.com, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20B364A1FD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:54:45 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZhnYpQnblxRN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Sep 2018 13:54:43 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 839DD4A20B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Sep 2018 13:54:43 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18 September 2018 at 17:27, Suzuki K Poulose <Suzuki.Poulose@arm.com> wrote:
-> ---
->
-> "On arm64, the physical address size for a VM (IPA Size limit) is limited
-> to 40bits by default. The limit can be configured if the host supports the
-> extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> identifier, where IPA_Bits is the maximum width of any physical
-> address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
-> machine type identifier.
->
-> e.g, to configure a guest to use 48bit physical address size :
->
->         vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
->
-> The requested size (IPA_Bits) must be :
->   0 - Implies default 40bits (for backward compatibility)
->
->   or
->
->   N - Implies N bits, where N is a positive integer such that 32 <= N <=
-> Host_IPA_Limit
->
-> Host_IPA_Limit is the maximum possible value for IPA_Bits on the host and
-> is dependent on the CPU capability and the kernel configuration. The limit
-> can
-> be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
-> ioctl() at run-time.
->
-> Please note that configuring the IPA size does not affect the capability
-> exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
-> the guest to host physical address (stage2) translations setup by the host.
-> "
+This series provides KVM selftests that test dirty log tracking on
+AArch64 for both 4K and 64K guest page sizes. Additionally the
+framework provides an easy way to test dirty log tracking with the
+recently posted dynamic IPA and 52bit IPA series[1].
 
-Thanks, this is much clearer. The only bit I'm not sure about is that
-last paragraph -- if I ask for a VM with a 48 bit address space why
-don't we tell the guest that that's what it has ?
+The series breaks down into parts as follows:
 
-thanks
--- PMM
+ 01-02: generalize guest code to host userspace exit support by
+        introducing "ucalls" - hypercalls to userspace
+ 03-05: prepare common code for a new architecture
+ 06-07: add virtual memory setup support for AArch64
+    08: add vcpu setup support for AArch64
+    09: port the dirty log test to AArch64
+ 10-11: add 64K guest page size support for the dirty log test
+ 12-13: prepare the dirty log test to also test > 40-bit guest
+        physical address setups by allowing the test memory
+        region to be placed at the top of physical memory
+
+[1] https://www.spinics.net/lists/arm-kernel/msg676819.html
+
+Thanks,
+drew
+
+
+Andrew Jones (13):
+  kvm: selftests: vcpu_setup: set cr4.osfxsr
+  kvm: selftests: introduce ucall
+  kvm: selftests: move arch-specific files to arch-specific locations
+  kvm: selftests: add cscope make target
+  kvm: selftests: tidy up kvm_util
+  kvm: selftests: add vm_phy_pages_alloc
+  kvm: selftests: add virt mem support for aarch64
+  kvm: selftests: add vcpu support for aarch64
+  kvm: selftests: port dirty_log_test to aarch64
+  kvm: selftests: introduce new VM mode for 64K pages
+  kvm: selftests: dirty_log_test: also test 64K pages on aarch64
+  kvm: selftests: stop lying to aarch64 tests about PA-bits
+  kvm: selftests: support high GPAs in dirty_log_test
+
+ tools/testing/selftests/kvm/.gitignore        |  11 +-
+ tools/testing/selftests/kvm/Makefile          |  36 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  | 374 +++++++++----
+ .../selftests/kvm/include/aarch64/processor.h |  55 ++
+ .../testing/selftests/kvm/include/kvm_util.h  | 166 +++---
+ .../testing/selftests/kvm/include/sparsebit.h |   6 +-
+ .../testing/selftests/kvm/include/test_util.h |   6 +-
+ .../kvm/include/{x86.h => x86_64/processor.h} |  24 +-
+ .../selftests/kvm/include/{ => x86_64}/vmx.h  |   6 +-
+ .../selftests/kvm/lib/aarch64/processor.c     | 311 +++++++++++
+ tools/testing/selftests/kvm/lib/assert.c      |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 499 +++++++-----------
+ .../selftests/kvm/lib/kvm_util_internal.h     |  33 +-
+ tools/testing/selftests/kvm/lib/ucall.c       | 144 +++++
+ .../kvm/lib/{x86.c => x86_64/processor.c}     | 197 ++++++-
+ .../selftests/kvm/lib/{ => x86_64}/vmx.c      |   4 +-
+ .../kvm/{ => x86_64}/cr4_cpuid_sync_test.c    |  14 +-
+ .../kvm/{ => x86_64}/set_sregs_test.c         |   2 +-
+ .../selftests/kvm/{ => x86_64}/state_test.c   |  25 +-
+ .../kvm/{ => x86_64}/sync_regs_test.c         |   2 +-
+ .../kvm/{ => x86_64}/vmx_tsc_adjust_test.c    |  23 +-
+ 21 files changed, 1329 insertions(+), 611 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/processor.h
+ rename tools/testing/selftests/kvm/include/{x86.h => x86_64/processor.h} (98%)
+ rename tools/testing/selftests/kvm/include/{ => x86_64}/vmx.h (99%)
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall.c
+ rename tools/testing/selftests/kvm/lib/{x86.c => x86_64/processor.c} (85%)
+ rename tools/testing/selftests/kvm/lib/{ => x86_64}/vmx.c (99%)
+ rename tools/testing/selftests/kvm/{ => x86_64}/cr4_cpuid_sync_test.c (91%)
+ rename tools/testing/selftests/kvm/{ => x86_64}/set_sregs_test.c (98%)
+ rename tools/testing/selftests/kvm/{ => x86_64}/state_test.c (90%)
+ rename tools/testing/selftests/kvm/{ => x86_64}/sync_regs_test.c (99%)
+ rename tools/testing/selftests/kvm/{ => x86_64}/vmx_tsc_adjust_test.c (91%)
+
+-- 
+2.17.1
