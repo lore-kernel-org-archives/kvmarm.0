@@ -1,31 +1,24 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 18/18] kvm: arm64: Allow tuning the physical address
- size for VM
-Date: Wed, 19 Sep 2018 11:03:11 +0100
-Message-ID: <e818aa74-a34e-91fa-ad5a-344816105840@arm.com>
-References: <20180917104144.19188-1-suzuki.poulose@arm.com>
- <20180917104144.19188-19-suzuki.poulose@arm.com>
- <CAFEAcA8eWYkzwFYHyP49dasK-NDVbbm=6DbEFNNPq9ZAdUM7JQ@mail.gmail.com>
- <218b64d5-741d-97ef-8aae-bc0a2ac3e56c@arm.com>
- <CAFEAcA8qjJJ0FkQj4yBMKFrwNFiJj3Q4FBi4GbnK2PN3B3J-mg@mail.gmail.com>
- <fec1a2e0-a45a-eb51-6ffe-2ac9b35acc45@arm.com>
- <CAFEAcA_tphfZ_BKfAYuefStTipta0notyAR=NCnWFJ6nRfERpg@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 00/13] kvm: selftests: add aarch64 framework and dirty
+Date: Wed, 19 Sep 2018 14:37:38 +0200
+Message-ID: <20180919123738.yp6bncgwlpzhob2u@kamzik.brq.redhat.com>
+References: <20180918175436.19742-1-drjones@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16CE340A6E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Sep 2018 06:02:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8296D4A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Sep 2018 08:37:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s0RvjgoPEeBa for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Sep 2018 06:02:17 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87CF649F89
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Sep 2018 06:02:17 -0400 (EDT)
-In-Reply-To: <CAFEAcA_tphfZ_BKfAYuefStTipta0notyAR=NCnWFJ6nRfERpg@mail.gmail.com>
-Content-Language: en-US
+ with ESMTP id MCsRL1mctmoa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Sep 2018 08:37:46 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CA7049F87
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Sep 2018 08:37:46 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180918175436.19742-1-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,55 +28,217 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christoffer Dall <cdall@kernel.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, Dave P Martin <dave.martin@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/18/2018 06:15 PM, Peter Maydell wrote:
-> On 18 September 2018 at 17:27, Suzuki K Poulose <Suzuki.Poulose@arm.com> wrote:
->> ---
->>
->> "On arm64, the physical address size for a VM (IPA Size limit) is limited
->> to 40bits by default. The limit can be configured if the host supports the
->> extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
->> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
->> identifier, where IPA_Bits is the maximum width of any physical
->> address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
->> machine type identifier.
->>
->> e.g, to configure a guest to use 48bit physical address size :
->>
->>          vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
->>
->> The requested size (IPA_Bits) must be :
->>    0 - Implies default 40bits (for backward compatibility)
->>
->>    or
->>
->>    N - Implies N bits, where N is a positive integer such that 32 <= N <=
->> Host_IPA_Limit
->>
->> Host_IPA_Limit is the maximum possible value for IPA_Bits on the host and
->> is dependent on the CPU capability and the kernel configuration. The limit
->> can
->> be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
->> ioctl() at run-time.
->>
->> Please note that configuring the IPA size does not affect the capability
->> exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
->> the guest to host physical address (stage2) translations setup by the host.
->> "
+On Tue, Sep 18, 2018 at 07:54:23PM +0200, Andrew Jones wrote:
+> This series provides KVM selftests that test dirty log tracking on
+> AArch64 for both 4K and 64K guest page sizes. Additionally the
+> framework provides an easy way to test dirty log tracking with the
+> recently posted dynamic IPA and 52bit IPA series[1].
 > 
-> Thanks, this is much clearer. The only bit I'm not sure about is that
-> last paragraph -- if I ask for a VM with a 48 bit address space why
-> don't we tell the guest that that's what it has ?
+> The series breaks down into parts as follows:
+> 
+>  01-02: generalize guest code to host userspace exit support by
+>         introducing "ucalls" - hypercalls to userspace
+>  03-05: prepare common code for a new architecture
+>  06-07: add virtual memory setup support for AArch64
+>     08: add vcpu setup support for AArch64
+>     09: port the dirty log test to AArch64
+>  10-11: add 64K guest page size support for the dirty log test
+>  12-13: prepare the dirty log test to also test > 40-bit guest
+>         physical address setups by allowing the test memory
+>         region to be placed at the top of physical memory
+> 
+> [1] https://www.spinics.net/lists/arm-kernel/msg676819.html
+> 
 
-The point is the IPA Size is not a limit on the CPU's PA size. e.g, if
-this guest was a nested hypervisor with 48bit IPA, it could still
-support a 52bit IPA nested guest within by simply looking up the CPU
-PARange. The IPA size configuration here is simply a hint to the
-hypervisor on where the memory banks would be kept. And this certainly
-true on real platforms (e.g, my Juno has 42bit PARange on A57, while
-A53 reports 40bit, with PA max at 40bits).
+Hi Suzuki,
 
-Suzuki
+Here's an [untested] add-on patch that should provide the means to
+test dirty logging with a 52-bit guest physical address space.
+Hopefully it'll be as easy as compiling and then running with
+
+ $ ./dirty_log_test -t
+
+Thanks,
+drew
+
+>From 09ea1d724551a95ef9962d357049ef21ea8c77e8 Mon Sep 17 00:00:00 2001
+From: Andrew Jones <drjones@redhat.com>
+Date: Wed, 19 Sep 2018 14:23:30 +0200
+Subject: [PATCH] kvm: selftests: aarch64: dirty_log_test: test with 52 PA-bits
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ tools/testing/selftests/kvm/dirty_log_test.c  | 24 ++++++++++++++++---
+ .../testing/selftests/kvm/include/kvm_util.h  |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 17 +++++++++----
+ .../selftests/kvm/lib/kvm_util_internal.h     |  1 +
+ 4 files changed, 36 insertions(+), 8 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index d59820cc2d39..c11c76e09766 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -82,6 +82,7 @@ static void guest_code(void)
+ static bool host_quit;
+ 
+ /* Points to the test VM memory region on which we track dirty logs */
++static uint8_t host_ipa_limit;
+ static void *host_test_mem;
+ static uint64_t host_num_pages;
+ 
+@@ -209,12 +210,14 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+ }
+ 
+ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+-				uint64_t extra_mem_pages, void *guest_code)
++				uint64_t extra_mem_pages, void *guest_code,
++				unsigned long type)
+ {
+ 	struct kvm_vm *vm;
+ 	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
+ 
+-	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
++	vm = _vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages,
++			O_RDWR, type);
+ 	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
+ #ifdef __x86_64__
+ 	vm_create_irqchip(vm);
+@@ -231,15 +234,22 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	struct kvm_vm *vm;
+ 	uint64_t max_gfn;
+ 	unsigned long *bmap;
++	unsigned long type = 0;
+ 
+ 	switch (mode) {
+ 	case VM_MODE_P52V48_4K:
+ 		guest_pa_bits = 52;
+ 		guest_page_shift = 12;
++#ifdef __aarch64__
++		type = KVM_VM_TYPE_ARM_IPA_SIZE(52);
++#endif
+ 		break;
+ 	case VM_MODE_P52V48_64K:
+ 		guest_pa_bits = 52;
+ 		guest_page_shift = 16;
++#ifdef __aarch64__
++		type = KVM_VM_TYPE_ARM_IPA_SIZE(52);
++#endif
+ 		break;
+ 	case VM_MODE_P40V48_4K:
+ 		guest_pa_bits = 40;
+@@ -273,7 +283,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	bmap = bitmap_alloc(host_num_pages);
+ 	host_bmap_track = bitmap_alloc(host_num_pages);
+ 
+-	vm = create_vm(mode, VCPU_ID, guest_num_pages, guest_code);
++	vm = create_vm(mode, VCPU_ID, guest_num_pages, guest_code, type);
+ 
+ 	/* Add an extra memory slot for testing dirty logging */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+@@ -392,6 +402,14 @@ int main(int argc, char *argv[])
+ 	unsigned int mode;
+ 	int opt, i;
+ 
++#ifdef __aarch64__
++	host_ipa_limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
++	if (host_ipa_limit == 52) {
++		vm_guest_modes[VM_MODE_P52V48_4K].supported = 1;
++		vm_guest_modes[VM_MODE_P52V48_64K].supported = 1;
++	}
++#endif
++
+ 	while ((opt = getopt(argc, argv, "hi:I:o:tm:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index d76431322a30..5202fce337e3 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -53,6 +53,8 @@ enum vm_mem_backing_src_type {
+ int kvm_check_cap(long cap);
+ 
+ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
++struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
++			  int perm, unsigned long type);
+ void kvm_vm_free(struct kvm_vm *vmp);
+ void kvm_vm_restart(struct kvm_vm *vmp, int perm);
+ void kvm_vm_release(struct kvm_vm *vmp);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 542336db7b4f..e1805c9e0f39 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -62,13 +62,13 @@ int kvm_check_cap(long cap)
+ 	return ret;
+ }
+ 
+-static void vm_open(struct kvm_vm *vm, int perm)
++static void vm_open(struct kvm_vm *vm, int perm, unsigned long type)
+ {
+ 	vm->kvm_fd = open(KVM_DEV_PATH, perm);
+ 	if (vm->kvm_fd < 0)
+ 		exit(KSFT_SKIP);
+ 
+-	vm->fd = ioctl(vm->kvm_fd, KVM_CREATE_VM, NULL);
++	vm->fd = ioctl(vm->kvm_fd, KVM_CREATE_VM, type);
+ 	TEST_ASSERT(vm->fd >= 0, "KVM_CREATE_VM ioctl failed, "
+ 		"rc: %i errno: %i", vm->fd, errno);
+ }
+@@ -101,7 +101,8 @@ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
+  * descriptor to control the created VM is created with the permissions
+  * given by perm (e.g. O_RDWR).
+  */
+-struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
++struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
++			  int perm, unsigned long type)
+ {
+ 	struct kvm_vm *vm;
+ 	int kvm_fd;
+@@ -110,7 +111,8 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	TEST_ASSERT(vm != NULL, "Insufficent Memory");
+ 
+ 	vm->mode = mode;
+-	vm_open(vm, perm);
++	vm->type = type;
++	vm_open(vm, perm, type);
+ 
+ 	/* Setup mode specific traits. */
+ 	switch (vm->mode) {
+@@ -166,6 +168,11 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	return vm;
+ }
+ 
++struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
++{
++	return _vm_create(mode, phy_pages, perm, 0);
++}
++
+ /*
+  * VM Restart
+  *
+@@ -183,7 +190,7 @@ void kvm_vm_restart(struct kvm_vm *vmp, int perm)
+ {
+ 	struct userspace_mem_region *region;
+ 
+-	vm_open(vmp, perm);
++	vm_open(vmp, perm, vmp->type);
+ 	if (vmp->has_irqchip)
+ 		vm_create_irqchip(vmp);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+index 5e05fb98dc62..51a56102a5c9 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
++++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
+@@ -44,6 +44,7 @@ struct vcpu {
+ 
+ struct kvm_vm {
+ 	int mode;
++	unsigned long type;
+ 	int kvm_fd;
+ 	int fd;
+ 	unsigned int pgtable_levels;
+-- 
+2.17.1
