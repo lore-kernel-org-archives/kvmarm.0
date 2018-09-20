@@ -1,105 +1,240 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 12/18] kvm: arm64: Configure VTCR_EL2.SL0 per VM
-Date: Thu, 20 Sep 2018 16:25:52 +0100
-Message-ID: <d6314798-d81c-e65a-3e56-f8bc4d6f977b@arm.com>
-References: <20180917104144.19188-1-suzuki.poulose@arm.com>
- <20180917104144.19188-13-suzuki.poulose@arm.com>
- <dcc855e4-eb78-ea1b-9456-8efa36deda4e@redhat.com>
+From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [RFC v2 01/20] iommu: Introduce bind_pasid_table API
+Date: Thu, 20 Sep 2018 10:21:14 -0700
+Message-ID: <20180920102114.23e15767@jacob-builder>
+References: <20180918142457.3325-1-eric.auger@redhat.com>
+	<20180918142457.3325-2-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0BE4A216
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Sep 2018 11:26:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H8G7Fy+PQocJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Sep 2018 11:26:01 -0400 (EDT)
-Received: from EUR03-VE1-obe.outbound.protection.outlook.com
- (mail-eopbgr50070.outbound.protection.outlook.com [40.107.5.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3826A4A0C7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Sep 2018 11:26:01 -0400 (EDT)
-In-Reply-To: <dcc855e4-eb78-ea1b-9456-8efa36deda4e@redhat.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180918142457.3325-2-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: tianyu.lan-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+On Tue, 18 Sep 2018 16:24:38 +0200
+Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-On 20/09/18 15:25, Auger Eric wrote:
-> Hi Suzuki,
-> On 9/17/18 12:41 PM, Suzuki K Poulose wrote:
->> VTCR_EL2 holds the following key stage2 translation table
->> parameters:
->>    SL0  - Entry level in the page table lookup.
->>    T0SZ - Denotes the size of the memory addressed by the table.
->>
->> We have been using fixed values for the SL0 depending on the
->> page size as we have a fixed IPA size. But since we are about
->> to make it dynamic, we need to calculate the SL0 at runtime
->> per VM. This patch adds a helper to compute the value of SL0
->> for a VM based on the IPA size.
->>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <cdall@kernel.org>
->> Cc: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since v3:
->>   - Update reference to latest ARM ARM.
->>   - Update per-vm VTCR value of SL0.
->>   - Add helpers to decode levels from SL0.
->>   - Didn't pick up Reviewed-by tag from Eric, as there
->>     are some new changes in this version
+> From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> 
+> In virtualization use case, when a guest is assigned
+> a PCI host device, protected by a virtual IOMMU on a guest,
+> the physical IOMMU must be programmed to be consistent with
+> the guest mappings. If the physical IOMMU supports two
+> translation stages it makes sense to program guest mappings
+> onto the first stage/level (ARM/VTD terminology) while to host
+> owns the stage/level 2.
+> 
+> In that case, it is mandated to trap on guest configuration
+> settings and pass those to the physical iommu driver.
+> 
+> This patch adds a new API to the iommu subsystem that allows
+> to bind and unbind the guest configuration data to the host.
+> 
+> A generic iommu_pasid_table_config struct is introduced in
+> a new iommu.h uapi header. This is going to be used by the VFIO
+> user API. We foresee at least two specializations of this struct,
+> for PASID table passing and ARM SMMUv3.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> Signed-off-by: Liu, Yi L <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> Signed-off-by: Ashok Raj <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> 
+> ---
+> 
+> In practice, I think it would be simpler to have a single
+> set_pasid_table function instead of bind/unbind. The "bypass" field
+> tells the stage 1 is bypassed (equivalent to the unbind actually).
+> On userspace we have notifications that the device context has
+> changed. Calling either bind or unbind requires to have an understand
+> of what was the previous state and call different notifiers. So to me
+> the bind/unbind complexifies the user integration while not bring much
+> benefits.
+> 
+I don't have strong preference and I think having a single function
+makes sense. In VT-d2, the bind/unbind operation is a result of PASID
+cache invalidation from the guest. So there is no symmetrical
+bind/unbin user calls.
+
+> This patch generalizes the API introduced by Jacob & co-authors in
+> https://lwn.net/Articles/754331/
+> 
+> v1 -> v2:
+> - restore the original pasid table name
+> - remove the struct device * parameter in the API
+> - reworked iommu_pasid_smmuv3
+> ---
+>  drivers/iommu/iommu.c      | 19 ++++++++++++++
+>  include/linux/iommu.h      | 21 +++++++++++++++
+>  include/uapi/linux/iommu.h | 52
+> ++++++++++++++++++++++++++++++++++++++ 3 files changed, 92
+> insertions(+) create mode 100644 include/uapi/linux/iommu.h
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 8c15c5980299..db2c7c9502ae 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1362,6 +1362,25 @@ int iommu_attach_device(struct iommu_domain
+> *domain, struct device *dev) }
+>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+>  
+> +int iommu_bind_pasid_table(struct iommu_domain *domain,
+> +			   struct iommu_pasid_table_config *cfg)
+> +{
+> +	if (unlikely(!domain->ops->bind_pasid_table))
+> +		return -ENODEV;
+> +
+> +	return domain->ops->bind_pasid_table(domain, cfg);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_bind_pasid_table);
+> +
+> +void iommu_unbind_pasid_table(struct iommu_domain *domain)
+> +{
+> +	if (unlikely(!domain->ops->unbind_pasid_table))
+> +		return;
+> +
+> +	domain->ops->unbind_pasid_table(domain);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_unbind_pasid_table);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 87994c265bf5..e56cad4863f7 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -25,6 +25,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+>  #include <linux/of.h>
+> +#include <uapi/linux/iommu.h>
+>  
+>  #define IOMMU_READ	(1 << 0)
+>  #define IOMMU_WRITE	(1 << 1)
+> @@ -185,6 +186,8 @@ struct iommu_resv_region {
+>   * @domain_get_windows: Return the number of windows for a domain
+>   * @of_xlate: add OF master IDs to iommu grouping
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+> + * @bind_pasid_table: bind pasid table
+> + * @unbind_pasid_table: unbind pasid table and restore defaults
+>   */
+>  struct iommu_ops {
+>  	bool (*capable)(enum iommu_cap);
+> @@ -231,6 +234,10 @@ struct iommu_ops {
+>  	int (*of_xlate)(struct device *dev, struct of_phandle_args
+> *args); bool (*is_attach_deferred)(struct iommu_domain *domain,
+> struct device *dev); 
+> +	int (*bind_pasid_table)(struct iommu_domain *domain,
+> +				struct iommu_pasid_table_config
+> *cfg);
+> +	void (*unbind_pasid_table)(struct iommu_domain *domain);
+> +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -292,6 +299,9 @@ extern int iommu_attach_device(struct
+> iommu_domain *domain, struct device *dev);
+>  extern void iommu_detach_device(struct iommu_domain *domain,
+>  				struct device *dev);
+> +extern int iommu_bind_pasid_table(struct iommu_domain *domain,
+> +				  struct iommu_pasid_table_config
+> *cfg); +extern void iommu_unbind_pasid_table(struct iommu_domain
+> *domain); extern struct iommu_domain *iommu_get_domain_for_dev(struct
+> device *dev); extern int iommu_map(struct iommu_domain *domain,
+> unsigned long iova, phys_addr_t paddr, size_t size, int prot);
+> @@ -684,6 +694,17 @@ const struct iommu_ops
+> *iommu_ops_from_fwnode(struct fwnode_handle *fwnode) return NULL;
+>  }
+>  
+> +static inline
+> +int iommu_bind_pasid_table(struct iommu_domain *domain,
+> +			   struct iommu_pasid_table_config *cfg)
+> +{
+> +	return -ENODEV;
+> +}
+> +static inline
+> +void iommu_unbind_pasid_table(struct iommu_domain *domain)
+> +{
+> +}
+> +
+>  #endif /* CONFIG_IOMMU_API */
+>  
+>  #ifdef CONFIG_IOMMU_DEBUGFS
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> new file mode 100644
+> index 000000000000..babec91ae7e1
+> --- /dev/null
+> +++ b/include/uapi/linux/iommu.h
+> @@ -0,0 +1,52 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * IOMMU user API definitions
+> + *
+> + *
+> + * This program is free software; you can redistribute it and/or
+> modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +#ifndef _UAPI_IOMMU_H
+> +#define _UAPI_IOMMU_H
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * SMMUv3 Stream Table Entry stage 1 related information
+> + * @s1contextptr: Context Descriptor Table GPA
+> + * @abort: shall the STE lead to abort
+> + * @s1fmt: STE s1fmt field as set by the guest
+> + * @s1cdmax: STE s1cdmax as set by the guest
+> + * @s1dss: STE s1dss as set by the guest
+> + * All field names match the smmu 3.0/3.1 spec (ARM IHI 0070A)
+> + */
+> +struct iommu_pasid_smmuv3 {
+> +	__u64 s1contextptr;
+> +	__u8 bypass;
+> +	__u8 abort;
+> +	__u8 s1fmt;
+> +	__u8 s1cdmax;
+> +	__u8 s1dss;
+> +};
+> +
+> +/**
+> + * PASID table data used to bind guest PASID table to the host IOMMU
+> + * Note PASID table corresponds to the Context Table on ARM SMMUv3.
+> + *
+> + * @version: API version to prepare for future extensions
+> + * @format: format of the PASID table
+> + *
+> + */
+> +struct iommu_pasid_table_config {
+don;t you need some vendor neutral data such as 
+ * @base_ptr:	PASID table pointer
+ * @pasid_bits:	number of bits supported in the guest PASID table, must be less
+ *		or equal than the host supported PASID size.
 
 
-(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
->> index 3fb1d440be6e..5c1487dc5dca 100644
->> --- a/arch/arm64/include/asm/kvm_arm.h
->> +++ b/arch/arm64/include/asm/kvm_arm.h
->> @@ -121,7 +121,6 @@
->>   #define VTCR_EL2_IRGN0_WBWA        TCR_IRGN0_WBWA
->>   #define VTCR_EL2_SL0_SHIFT 6
->>   #define VTCR_EL2_SL0_MASK  (3 << VTCR_EL2_SL0_SHIFT)
->> -#define VTCR_EL2_SL0_LVL1   (1 << VTCR_EL2_SL0_SHIFT)
->>   #define VTCR_EL2_T0SZ_MASK 0x3f
->>   #define VTCR_EL2_VS_SHIFT  19
->>   #define VTCR_EL2_VS_8BIT   (0 << VTCR_EL2_VS_SHIFT)
->> @@ -148,29 +147,59 @@
->>   /*
->>    * Stage2 translation configuration:
->>    * 64kB pages (TG0 = 1)
->> - * 2 level page tables (SL = 1)
->>    */
->> -#define VTCR_EL2_TGRAN_FLAGS                (VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
->> -#define VTTBR_X_TGRAN_MAGIC         38
->> +#define VTCR_EL2_TGRAN                      VTCR_EL2_TG0_64K
->> +#define VTCR_EL2_TGRAN_SL0_BASE             3UL
-> the name if not obvious. I understand this is yet another magic number
-> used in the formulae below:
-> SL0(PAGE_SIZE, Entry_level) = SL0_BASE(PAGE_SIZE) - Entry_Level
-> I first tried to map this onto some spec fields. May be worth a comment?
-
-Sure, I will make that clear.
-
-
->
-> Besides
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-Suzuki
-IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+> +#define PASID_TABLE_CFG_VERSION_1 1
+> +	__u32 version;
+> +#define IOMMU_PASID_FORMAT_SMMUV3	(1 << 0)
+> +	__u32 format;
+> +	union {
+> +		struct iommu_pasid_smmuv3 smmuv3;
+> +	};
+> +};
+> +
+> +#endif /* _UAPI_IOMMU_H */
