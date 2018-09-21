@@ -1,212 +1,334 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 14/18] vgic: Add support for 52bit guest physical
- address
-Date: Fri, 21 Sep 2018 16:57:01 +0200
-Message-ID: <e308a66d-c426-81c0-0c79-ce97773fa090@redhat.com>
-References: <20180917104144.19188-1-suzuki.poulose@arm.com>
- <20180917104144.19188-15-suzuki.poulose@arm.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [RFC v2 14/20] iommu: introduce device fault data
+Date: Fri, 21 Sep 2018 09:18:37 -0700
+Message-ID: <20180921091837.1edd4e82@jacob-builder>
+References: <20180918142457.3325-1-eric.auger@redhat.com>
+        <20180918142457.3325-15-eric.auger@redhat.com>
+        <20180920150653.567287c5@jacob-builder>
+        <a1801e0f-b3f2-16cb-a5fe-48fef411fc02@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180917104144.19188-15-suzuki.poulose@arm.com>
-Content-Language: en-US
+In-Reply-To: <a1801e0f-b3f2-16cb-a5fe-48fef411fc02@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, dave.martin@arm.com, julien.grall@arm.com, linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, tianyu.lan@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, jacob.jun.pan@linux.intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+On Fri, 21 Sep 2018 11:54:56 +0200
+Auger Eric <eric.auger@redhat.com> wrote:
 
-On 9/17/18 12:41 PM, Suzuki K Poulose wrote:
-> From: Kristina Martsenko <kristina.martsenko@arm.com>
+> Hi Jacob,
 > 
-> Add support for handling 52bit guest physical address to the
-> VGIC layer. So far we have limited the guest physical address
-> to 48bits, by explicitly masking the upper bits. This patch
-> removes the restriction. We do not have to check if the host
-> supports 52bit as the gpa is always validated during an access.
-> (e.g, kvm_{read/write}_guest, kvm_is_visible_gfn()).
-> Also, the ITS table save-restore is also not affected with
-> the enhancement. The DTE entries already store the bits[51:8]
-> of the ITT_addr (with a 256byte alignment).
+> On 9/21/18 12:06 AM, Jacob Pan wrote:
+> > On Tue, 18 Sep 2018 16:24:51 +0200
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> >>
+> >> Device faults detected by IOMMU can be reported outside IOMMU
+> >> subsystem for further processing. This patch intends to provide
+> >> a generic device fault data such that device drivers can be
+> >> communicated with IOMMU faults without model specific knowledge.
+> >>
+> >> The proposed format is the result of discussion at:
+> >> https://lkml.org/lkml/2017/11/10/291
+> >> Part of the code is based on Jean-Philippe Brucker's patchset
+> >> (https://patchwork.kernel.org/patch/9989315/).
+> >>
+> >> The assumption is that model specific IOMMU driver can filter and
+> >> handle most of the internal faults if the cause is within IOMMU
+> >> driver control. Therefore, the fault reasons can be reported are
+> >> grouped and generalized based common specifications such as PCI
+> >> ATS.
+> >>
+> >> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> >> Signed-off-by: Jean-Philippe Brucker
+> >> <jean-philippe.brucker@arm.com> Signed-off-by: Liu, Yi L
+> >> <yi.l.liu@linux.intel.com> Signed-off-by: Ashok Raj
+> >> <ashok.raj@intel.com> Signed-off-by: Eric Auger
+> >> <eric.auger@redhat.com> [moved part of the iommu_fault_event
+> >> struct in the uapi, enriched the fault reasons to be able to map
+> >> unrecoverable SMMUv3 errors]  
+> > Sounds good to me.
+> > There are also other "enrichment" we need to do to support mdev or
+> > finer granularity fault reporting below physical device. e.g. PASID
+> > level.  
 > 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-> [ Macro clean ups, fix PROPBASER and PENDBASER accesses ]
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  include/linux/irqchip/arm-gic-v3.h |  5 +++++
->  virt/kvm/arm/vgic/vgic-its.c       | 36 +++++++++---------------------
->  virt/kvm/arm/vgic/vgic-mmio-v3.c   |  2 --
->  3 files changed, 15 insertions(+), 28 deletions(-)
+> Actually I intended to send you an email about those
+> iommu_fault_reason enum value changes. To attach this discussion to
+> your original series, I will send a separate email in the "[PATCH v5
+> 00/23] IOMMU and VT-d driver support for Shared Virtual Address
+> (SVA)" thread.
+> > 
+> > The current scheme works for PCIe physical device level, where each
+> > device registers a single handler only once. When device fault is
+> > detected by the IOMMU, it will find the matching handler and private
+> > data to report back. However, for devices partitioned by PASID and
+> > represented by mdev this may not work. Since IOMMU is not mdev aware
+> > and only works at physical device level.
+> > So I am thinking we should allow multiple registration of fault
+> > handler with different data and ID. i.e.
+> > 
+> > int iommu_register_device_fault_handler(struct device *dev,
+> > 					iommu_dev_fault_handler_t
+> > handler, int id,
+> > 					void *data)
+> > 
+> > where the new "id field" is
+> >  * @id: Identification of the handler private data, will be used by
+> > fault
+> >  *      reporting code to match the handler data to be returned.
+> > For page
+> >  *      request, this can be the PASID. ID must be unique per
+> > device, i.e.
+> >  *      each ID can only be registered once per device.
+> >  *      - IOMMU_DEV_FAULT_ID_UNRECOVERY (~0U) is reserved for fault
+> > reporting
+> >  *      w/o ID. e.g. unrecoverable faults.  
+> I don't get this last sentence. Don't you need the feature also for
+> unrecoverable faults, ie. isn't it requested to report an
+> unrecoverable fault on a specific id?
 > 
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index 8bdbb5f29494..e961f40992d7 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -357,6 +357,8 @@
->  #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
->  #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
->  
-> +#define GITS_CBASER_ADDRESS(cbaser)	((cbaser) & GENMASK_ULL(52, 12))
-nit GENMASK_ULL(51, 12), bit 52 is RES0
-> +
->  #define GITS_BASER_NR_REGS		8
->  
->  #define GITS_BASER_VALID			(1ULL << 63)
-> @@ -388,6 +390,9 @@
->  #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
->  #define GITS_BASER_PHYS_52_to_48(phys)					\
->  	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
-> +#define GITS_BASER_ADDR_48_to_52(baser)					\
-> +	(((baser) & GENMASK_ULL(47, 16)) | (((baser) >> 12) & 0xf) << 48)
-> +
->  #define GITS_BASER_SHAREABILITY_SHIFT	(10)
->  #define GITS_BASER_InnerShareable					\
->  	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 12502251727e..eb2a390a6c86 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -241,13 +241,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
->  	list_for_each_entry(dev, &(its)->device_list, dev_list) \
->  		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
->  
-> -/*
-> - * We only implement 48 bits of PA at the moment, although the ITS
-> - * supports more. Let's be restrictive here.
-> - */
-> -#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
-> -#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
-> -
->  #define GIC_LPI_OFFSET 8192
->  
->  #define VITS_TYPER_IDBITS 16
-> @@ -759,6 +752,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
->  {
->  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
->  	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-> +	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
->  	int esz = GITS_BASER_ENTRY_SIZE(baser);
->  	int index;
->  	gfn_t gfn;
-> @@ -783,7 +777,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
->  		if (id >= (l1_tbl_size / esz))
->  			return false;
->  
-> -		addr = BASER_ADDRESS(baser) + id * esz;
-> +		addr = base + id * esz;
->  		gfn = addr >> PAGE_SHIFT;
->  
->  		if (eaddr)
-> @@ -798,7 +792,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
->  
->  	/* Each 1st level entry is represented by a 64-bit value. */
->  	if (kvm_read_guest_lock(its->dev->kvm,
-> -			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
-> +			   base + index * sizeof(indirect_ptr),
->  			   &indirect_ptr, sizeof(indirect_ptr)))
->  		return false;
->  
-> @@ -808,11 +802,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
->  	if (!(indirect_ptr & BIT_ULL(63)))
->  		return false;
->  
-> -	/*
-> -	 * Mask the guest physical address and calculate the frame number.
-> -	 * Any address beyond our supported 48 bits of PA will be caught
-> -	 * by the actual check in the final step.
-> -	 */
-> +	/* Mask the guest physical address and calculate the frame number. */
->  	indirect_ptr &= GENMASK_ULL(51, 16);
->  
->  	/* Find the address of the actual entry */
-> @@ -1304,9 +1294,6 @@ static u64 vgic_sanitise_its_baser(u64 reg)
->  				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
->  				  vgic_sanitise_outer_cacheability);
->  
-> -	/* Bits 15:12 contain bits 51:48 of the PA, which we don't support. */
-> -	reg &= ~GENMASK_ULL(15, 12);
-> -
->  	/* We support only one (ITS) page size: 64K */
->  	reg = (reg & ~GITS_BASER_PAGE_SIZE_MASK) | GITS_BASER_PAGE_SIZE_64K;
->  
-> @@ -1325,11 +1312,8 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
->  				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
->  				  vgic_sanitise_outer_cacheability);
->  
-> -	/*
-> -	 * Sanitise the physical address to be 64k aligned.
-> -	 * Also limit the physical addresses to 48 bits.
-> -	 */
-> -	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
-> +	/* Sanitise the physical address to be 64k aligned. */
-> +	reg &= ~GENMASK_ULL(15, 12);
->  
->  	return reg;
->  }
-> @@ -1375,7 +1359,7 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
->  	if (!its->enabled)
->  		return;
->  
-> -	cbaser = CBASER_ADDRESS(its->cbaser);
-> +	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
->  
->  	while (its->cwriter != its->creadr) {
->  		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
-> @@ -2233,7 +2217,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
->  	if (!(baser & GITS_BASER_VALID))
->  		return 0;
->  
-> -	l1_gpa = BASER_ADDRESS(baser);
-> +	l1_gpa = GITS_BASER_ADDR_48_to_52(baser);
->  
->  	if (baser & GITS_BASER_INDIRECT) {
->  		l1_esz = GITS_LVL1_ENTRY_SIZE;
-> @@ -2305,7 +2289,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
->  {
->  	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
->  	u64 baser = its->baser_coll_table;
-> -	gpa_t gpa = BASER_ADDRESS(baser);
-> +	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
->  	struct its_collection *collection;
->  	u64 val;
->  	size_t max_size, filled = 0;
-> @@ -2354,7 +2338,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
->  	if (!(baser & GITS_BASER_VALID))
->  		return 0;
->  
-> -	gpa = BASER_ADDRESS(baser);
-> +	gpa = GITS_BASER_ADDR_48_to_52(baser);
->  
->  	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
->  
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index a2a175b08b17..b3d1f0985117 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -364,7 +364,6 @@ static u64 vgic_sanitise_pendbaser(u64 reg)
->  				  vgic_sanitise_outer_cacheability);
->  
->  	reg &= ~PENDBASER_RES0_MASK;
-> -	reg &= ~GENMASK_ULL(51, 48);
->  
->  	return reg;
->  }
-> @@ -382,7 +381,6 @@ static u64 vgic_sanitise_propbaser(u64 reg)
->  				  vgic_sanitise_outer_cacheability);
->  
->  	reg &= ~PROPBASER_RES0_MASK;
-> -	reg &= ~GENMASK_ULL(51, 48);
->  	return reg;
->  }
->  
-> 
-Besides looks good to me.
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+For unrecoverable faults which are not associated with a specific PASID,
+we reserve a range of special IDs for them. Let me rewrite the
+comments.
+The usage would be:
+For Handler registration by vfio or device driver
+1.  PRQ of PASID1
+iommu_register_device_fault_handler(pdev, handler, pasid1, data1);
+2.  PRQ of PASID2
+iommu_register_device_fault_handler(pdev, handler, pasid2, data2);
+3. unrecoverable fault
+iommu_register_device_fault_handler(pdev, handler,
+IOMMU_DEV_FAULT_ID_UNRECOVERY, NULL);
 
-Thanks
+For IOMMU driver reporting fault back to vfio or kernel driver:
+1. PRQ of PASID1
+iommu_report_device_fault(dev, evt1)
+where evt1->data = data1, evt1->pasid = pasid1
+2. PRQ of PASID2
+iommu_report_device_fault(dev, evt2)
+where evt2->data = data2, evt2->pasid = pasid2
+3. unrecoverable fault
+iommu_report_device_fault(dev, evt)
+where evt2->data = NULL, evt->pasid = IOMMU_DEV_FAULT_ID_UNRECOVERY
 
-Eric
+where evt is of struct iommu_fault_event.
+
+> Otherwise looks OK; but I still need to carefully review "[RFC PATCH
+> v2 00/10] vfio/mdev: IOMMU aware mediated device".
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > I am still testing, but just wanted to have feedback on this idea.
+> > 
+> > Thanks,
+> > 
+> > Jacob
+> > 
+> >   
+> >> ---
+> >>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
+> >>  include/uapi/linux/iommu.h | 83
+> >> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
+> >> insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> >> index 9bd3e63d562b..7529c14ff506 100644
+> >> --- a/include/linux/iommu.h
+> >> +++ b/include/linux/iommu.h
+> >> @@ -49,13 +49,17 @@ struct bus_type;
+> >>  struct device;
+> >>  struct iommu_domain;
+> >>  struct notifier_block;
+> >> +struct iommu_fault_event;
+> >>  
+> >>  /* iommu fault flags */
+> >> -#define IOMMU_FAULT_READ	0x0
+> >> -#define IOMMU_FAULT_WRITE	0x1
+> >> +#define IOMMU_FAULT_READ		(1 << 0)
+> >> +#define IOMMU_FAULT_WRITE		(1 << 1)
+> >> +#define IOMMU_FAULT_EXEC		(1 << 2)
+> >> +#define IOMMU_FAULT_PRIV		(1 << 3)
+> >>  
+> >>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+> >>  			struct device *, unsigned long, int, void
+> >> *); +typedef int (*iommu_dev_fault_handler_t)(struct
+> >> iommu_fault_event *, void *); 
+> >>  struct iommu_domain_geometry {
+> >>  	dma_addr_t aperture_start; /* First address that can be
+> >> mapped    */ @@ -262,6 +266,52 @@ struct iommu_device {
+> >>  	struct device *dev;
+> >>  };
+> >>  
+> >> +/**
+> >> + * struct iommu_fault_event - Generic per device fault data
+> >> + *
+> >> + * - PCI and non-PCI devices
+> >> + * - Recoverable faults (e.g. page request), information based on
+> >> PCI ATS
+> >> + * and PASID spec.
+> >> + * - Un-recoverable faults of device interest
+> >> + * - DMA remapping and IRQ remapping faults
+> >> + *
+> >> + * @fault: fault descriptor
+> >> + * @device_private: if present, uniquely identify device-specific
+> >> + *                  private data for an individual page request.
+> >> + * @iommu_private: used by the IOMMU driver for storing
+> >> fault-specific
+> >> + *                 data. Users should not modify this field before
+> >> + *                 sending the fault response.
+> >> + */
+> >> +struct iommu_fault_event {
+> >> +	struct iommu_fault fault;
+> >> +	u64 device_private;
+> >> +	u64 iommu_private;
+> >> +};
+> >> +
+> >> +/**
+> >> + * struct iommu_fault_param - per-device IOMMU fault data
+> >> + * @dev_fault_handler: Callback function to handle IOMMU faults at
+> >> device level
+> >> + * @data: handler private data
+> >> + *
+> >> + */
+> >> +struct iommu_fault_param {
+> >> +	iommu_dev_fault_handler_t handler;
+> >> +	void *data;
+> >> +};
+> >> +
+> >> +/**
+> >> + * struct iommu_param - collection of per-device IOMMU data
+> >> + *
+> >> + * @fault_param: IOMMU detected device fault reporting data
+> >> + *
+> >> + * TODO: migrate other per device data pointers under
+> >> iommu_dev_data, e.g.
+> >> + *	struct iommu_group	*iommu_group;
+> >> + *	struct iommu_fwspec	*iommu_fwspec;
+> >> + */
+> >> +struct iommu_param {
+> >> +	struct iommu_fault_param *fault_param;
+> >> +};
+> >> +
+> >>  int  iommu_device_register(struct iommu_device *iommu);
+> >>  void iommu_device_unregister(struct iommu_device *iommu);
+> >>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
+> >> @@ -429,6 +479,7 @@ struct iommu_ops {};
+> >>  struct iommu_group {};
+> >>  struct iommu_fwspec {};
+> >>  struct iommu_device {};
+> >> +struct iommu_fault_param {};
+> >>  
+> >>  static inline bool iommu_present(struct bus_type *bus)
+> >>  {
+> >> diff --git a/include/uapi/linux/iommu.h
+> >> b/include/uapi/linux/iommu.h index 21adb2a964e5..a0fe5c2fb236
+> >> 100644 --- a/include/uapi/linux/iommu.h
+> >> +++ b/include/uapi/linux/iommu.h
+> >> @@ -150,5 +150,88 @@ struct iommu_guest_msi_binding {
+> >>  	__u64		gpa;
+> >>  	__u32		granule;
+> >>  };
+> >> +
+> >> +/*  Generic fault types, can be expanded IRQ remapping fault */
+> >> +enum iommu_fault_type {
+> >> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable
+> >> fault */
+> >> +	IOMMU_FAULT_PAGE_REQ,		/* page request
+> >> fault */ +};
+> >> +
+> >> +enum iommu_fault_reason {
+> >> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
+> >> +
+> >> +	/* IOMMU internal error, no specific reason to report out
+> >> */
+> >> +	IOMMU_FAULT_REASON_INTERNAL,
+> >> +
+> >> +	/* Could not access the PASID table (fetch caused external
+> >> abort) */
+> >> +	IOMMU_FAULT_REASON_PASID_FETCH,
+> >> +
+> >> +	/* could not access the device context (fetch caused
+> >> external abort) */
+> >> +	IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH,
+> >> +
+> >> +	/* pasid entry is invalid or has configuration errors */
+> >> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
+> >> +
+> >> +	/* device context entry is invalid or has configuration
+> >> errors */
+> >> +	IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY,
+> >> +	/*
+> >> +	 * PASID is out of range (e.g. exceeds the maximum PASID
+> >> +	 * supported by the IOMMU) or disabled.
+> >> +	 */
+> >> +	IOMMU_FAULT_REASON_PASID_INVALID,
+> >> +
+> >> +	/* source id is out of range */
+> >> +	IOMMU_FAULT_REASON_SOURCEID_INVALID,
+> >> +
+> >> +	/*
+> >> +	 * An external abort occurred fetching (or updating) a
+> >> translation
+> >> +	 * table descriptor
+> >> +	 */
+> >> +	IOMMU_FAULT_REASON_WALK_EABT,
+> >> +
+> >> +	/*
+> >> +	 * Could not access the page table entry (Bad address),
+> >> +	 * actual translation fault
+> >> +	 */
+> >> +	IOMMU_FAULT_REASON_PTE_FETCH,
+> >> +
+> >> +	/* Protection flag check failed */
+> >> +	IOMMU_FAULT_REASON_PERMISSION,
+> >> +
+> >> +	/* access flag check failed */
+> >> +	IOMMU_FAULT_REASON_ACCESS,
+> >> +
+> >> +	/* Output address of a translation stage caused Address
+> >> Size fault */
+> >> +	IOMMU_FAULT_REASON_OOR_ADDRESS
+> >> +};
+> >> +
+> >> +/**
+> >> + * struct iommu_fault - Generic fault data
+> >> + *
+> >> + * @type contains fault type
+> >> + * @reason fault reasons if relevant outside IOMMU driver.
+> >> + * IOMMU driver internal faults are not reported.
+> >> + * @addr: tells the offending page address
+> >> + * @fetch_addr: tells the address that caused an abort, if any
+> >> + * @pasid: contains process address space ID, used in shared
+> >> virtual memory
+> >> + * @page_req_group_id: page request group index
+> >> + * @last_req: last request in a page request group
+> >> + * @pasid_valid: indicates if the PRQ has a valid PASID
+> >> + * @prot: page access protection flag:
+> >> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+> >> + */
+> >> +
+> >> +struct iommu_fault {
+> >> +	__u32	type;   /* enum iommu_fault_type */
+> >> +	__u32	reason; /* enum iommu_fault_reason */
+> >> +	__u64	addr;
+> >> +	__u64	fetch_addr;
+> >> +	__u32	pasid;
+> >> +	__u32	page_req_group_id;
+> >> +	__u32	last_req;
+> >> +	__u32	pasid_valid;
+> >> +	__u32	prot;
+> >> +	__u32	access;
+> >> +};
+> >>  #endif /* _UAPI_IOMMU_H */
+> >>    
+> > 
+> > [Jacob Pan]
+> >   
+
+[Jacob Pan]
