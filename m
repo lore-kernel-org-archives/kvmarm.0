@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v6 15/18] ACPI / APEI: Only use queued estatus entry during
- _in_nmi_notify_one()
-Date: Fri, 21 Sep 2018 23:17:02 +0100
-Message-ID: <20180921221705.6478-16-james.morse@arm.com>
+Subject: [PATCH v6 16/18] ACPI / APEI: Split fixmap pages for arm64 NMI-like
+ notifications
+Date: Fri, 21 Sep 2018 23:17:03 +0100
+Message-ID: <20180921221705.6478-17-james.morse@arm.com>
 References: <20180921221705.6478-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE7554A214
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Sep 2018 18:18:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E84E4A20B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Sep 2018 18:19:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ST9DcmprAdpC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Sep 2018 18:18:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 843384A1D8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Sep 2018 18:18:55 -0400 (EDT)
+ with ESMTP id S3Zob+a8bLtm for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Sep 2018 18:19:00 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38DB64A1D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Sep 2018 18:19:00 -0400 (EDT)
 In-Reply-To: <20180921221705.6478-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,104 +32,67 @@ To: linux-acpi@vger.kernel.org
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Punit Agrawal <punit.agrawal@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Each struct ghes has an worst-case sized buffer for storing the
-estatus. If an error is being processed by ghes_proc() in process
-context this buffer will be in use. If the error source then triggers
-an NMI-like notification, the same buffer will be used by
-_in_nmi_notify_one() to stage the estatus data, before
-__process_error() copys it into a queued estatus entry.
+Now that ghes notification helpers provide the fixmap slots and
+take the lock themselves we can support multiple NMI-like
+notifications on arm64.
 
-Merge __process_error()s work into _in_nmi_notify_one() so that
-the queued estatus entry is used from the beginning. Use the
-ghes_peek_estatus() so we know how much memory to allocate from
-the ghes_estatus_pool before we read the records.
+These should be named after their notification method. x86's
+NOTIFY_NMI already is, move it to live with the ghes_nmi list.
+Change the SEA fixmap entry to be called FIX_APEI_GHES_SEA.
 
-Reported-by: Borislav Petkov <bp@suse.de>
+Future patches can add support for FIX_APEI_GHES_SEI and
+FIX_APEI_GHES_SDEI_{NORMAL,CRITICAL}.
+
 Signed-off-by: James Morse <james.morse@arm.com>
----
- drivers/acpi/apei/ghes.c | 45 ++++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 23 deletions(-)
 
+---
+Changes since v3:
+ * idx/lock are now in a separate struct.
+ * Add to the comment above ghes_fixmap_lock_irq so that it makes more
+   sense in isolation.
+---
+ arch/arm64/include/asm/fixmap.h | 4 +++-
+ drivers/acpi/apei/ghes.c        | 6 +++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
+index ec1e6d6fa14c..c3974517c2cb 100644
+--- a/arch/arm64/include/asm/fixmap.h
++++ b/arch/arm64/include/asm/fixmap.h
+@@ -55,7 +55,9 @@ enum fixed_addresses {
+ #ifdef CONFIG_ACPI_APEI_GHES
+ 	/* Used for GHES mapping from assorted contexts */
+ 	FIX_APEI_GHES_IRQ,
+-	FIX_APEI_GHES_NMI,
++#ifdef CONFIG_ACPI_APEI_SEA
++	FIX_APEI_GHES_SEA,
++#endif
+ #endif /* CONFIG_ACPI_APEI_GHES */
+ 
+ #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 055176ed68ac..a0c10b60ad44 100644
+index a0c10b60ad44..463c8e6d1bb5 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -722,40 +722,32 @@ static void ghes_print_queued_estatus(void)
- 	}
- }
+@@ -994,7 +994,7 @@ int ghes_notify_sea(void)
+ 	int rv;
  
--/* Save estatus for further processing in IRQ context */
--static void __process_error(struct ghes *ghes,
--			    struct acpi_hest_generic_status *ghes_estatus)
-+static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
- {
-+	u64 buf_paddr;
-+	int sev, rc = 0;
- 	u32 len, node_len;
- 	struct ghes_estatus_node *estatus_node;
- 	struct acpi_hest_generic_status *estatus;
+ 	raw_spin_lock(&ghes_notify_lock_sea);
+-	rv = ghes_estatus_queue_notified(&ghes_sea, FIX_APEI_GHES_NMI);
++	rv = ghes_estatus_queue_notified(&ghes_sea, FIX_APEI_GHES_SEA);
+ 	raw_spin_unlock(&ghes_notify_lock_sea);
  
--	if (ghes_estatus_cached(ghes_estatus))
--		return;
-+	rc = ghes_peek_estatus(ghes, fixmap_idx, &buf_paddr, &len);
-+	if (rc)
-+		return rc;
+ 	return rv;
+@@ -1025,8 +1025,8 @@ static inline void ghes_sea_remove(struct ghes *ghes) { }
  
--	len = cper_estatus_len(ghes_estatus);
- 	node_len = GHES_ESTATUS_NODE_LEN(len);
+ #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+ /*
+- * NMI may be triggered on any CPU, so ghes_in_nmi is used for
+- * having only one concurrent reader.
++ * NOTIFY_NMI may be triggered on any CPU, so ghes_in_nmi is
++ * used for having only one concurrent reader.
+  */
+ static atomic_t ghes_in_nmi = ATOMIC_INIT(0);
  
- 	estatus_node = (void *)gen_pool_alloc(ghes_estatus_pool, node_len);
- 	if (!estatus_node)
--		return;
-+		return -ENOMEM;
- 
- 	estatus_node->ghes = ghes;
- 	estatus_node->generic = ghes->generic;
- 	estatus = GHES_ESTATUS_FROM_NODE(estatus_node);
--	memcpy(estatus, ghes_estatus, len);
--	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
--}
--
--static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
--{
--	int sev;
--	u64 buf_paddr;
--	struct acpi_hest_generic_status *estatus = ghes->estatus;
- 
--	if (ghes_read_estatus(ghes, estatus, &buf_paddr, fixmap_idx)) {
-+	if (__ghes_read_estatus(estatus, buf_paddr, len, fixmap_idx)) {
- 		ghes_clear_estatus(estatus, buf_paddr, fixmap_idx);
--		return -ENOENT;
-+		rc = -ENOENT;
-+		goto no_work;
- 	}
- 
- 	sev = ghes_severity(estatus->error_severity);
-@@ -764,13 +756,20 @@ static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
- 		__ghes_panic(ghes, estatus);
- 	}
- 
--	if (!buf_paddr)
--		return 0;
--
--	__process_error(ghes, estatus);
- 	ghes_clear_estatus(estatus, buf_paddr, fixmap_idx);
- 
--	return 0;
-+	if (!buf_paddr || ghes_estatus_cached(estatus))
-+		goto no_work;
-+
-+	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
-+
-+	return rc;
-+
-+no_work:
-+	gen_pool_free(ghes_estatus_pool, (unsigned long)estatus_node,
-+			      node_len);
-+
-+	return rc;
- }
- 
- static int ghes_estatus_queue_notified(struct list_head *rcu_list,
 -- 
 2.19.0
