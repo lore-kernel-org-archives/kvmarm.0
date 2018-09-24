@@ -1,57 +1,30 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.18 063/235] KVM: arm/arm64: vgic: Fix possible spectre-v1 write in vgic_mmio_write_apr()
-Date: Mon, 24 Sep 2018 13:50:49 +0200
-Message-ID: <20180924113111.438626086@linuxfoundation.org>
-References: <20180924113103.999624566@linuxfoundation.org>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: [PATCH 0/2] rename function name and enable 32bit vcpu events
+Date: Mon, 24 Sep 2018 21:29:58 +0800
+Message-ID: <20180924133000.10244-1-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180924113103.999624566@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Sasha Levin <alexander.levin@microsoft.com>
+To: christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, drjones@redhat.com, peter.maydell@linaro.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Cc: gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.18-stable review patch.  If anyone has any objections, please let me know.
+Rename the kvm_arch_dev_ioctl_check_extension() to 
+kvm_arch_vm_ioctl_check_extension, because the name
+is not reasonable; 
 
-------------------
+Enable the 32 bit vcpu events support.
 
-From: Mark Rutland <mark.rutland@arm.com>
+Dongjiu Geng (2):
+  arm/arm64: KVM: rename function kvm_arch_dev_ioctl_check_extension()
+  arm/arm64: KVM: share the check for vcpu events capability
 
-[ Upstream commit 6b8b9a48545e08345b8ff77c9fd51b1aebdbefb3 ]
+ arch/arm/include/asm/kvm_host.h   | 2 +-
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/reset.c            | 5 ++---
+ virt/kvm/arm/arm.c                | 3 ++-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-It's possible for userspace to control n. Sanitize n when using it as an
-array index, to inhibit the potential spectre-v1 write gadget.
-
-Note that while it appears that n must be bound to the interval [0,3]
-due to the way it is extracted from addr, we cannot guarantee that
-compiler transformations (and/or future refactoring) will ensure this is
-the case, and given this is a slow path it's better to always perform
-the masking.
-
-Found by smatch.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- virt/kvm/arm/vgic/vgic-mmio-v2.c |    3 +++
- 1 file changed, 3 insertions(+)
-
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -352,6 +352,9 @@ static void vgic_mmio_write_apr(struct k
- 
- 		if (n > vgic_v3_max_apr_idx(vcpu))
- 			return;
-+
-+		n = array_index_nospec(n, 4);
-+
- 		/* GICv3 only uses ICH_AP1Rn for memory mapped (GICv2) guests */
- 		vgicv3->vgic_ap1r[n] = val;
- 	}
+-- 
+1.9.1
