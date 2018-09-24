@@ -1,110 +1,98 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH 1/2] arm/arm64: KVM: rename function
- kvm_arch_dev_ioctl_check_extension()
-Date: Mon, 24 Sep 2018 21:29:59 +0800
-Message-ID: <20180924133000.10244-2-gengdongjiu@huawei.com>
-References: <20180924133000.10244-1-gengdongjiu@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 814CA4A205
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Sep 2018 09:31:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Eq9kIqlOeELi for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Sep 2018 09:31:09 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E01D4A230
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Sep 2018 09:31:09 -0400 (EDT)
-In-Reply-To: <20180924133000.10244-1-gengdongjiu@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, drjones@redhat.com, peter.maydell@linaro.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: gengdongjiu@huawei.com
+From: Punit Agrawal <punit.agrawal@arm.com>
+Subject: [PATCH v7 0/9] KVM: Support PUD hugepages at stage 2
+Date: Mon, 24 Sep 2018 18:45:43 +0100
+Message-ID: <20180924174552.8387-1-punit.agrawal@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Punit Agrawal <punit.agrawal@arm.com>, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Rename kvm_arch_dev_ioctl_check_extension() to
-kvm_arch_vm_ioctl_check_extension(), because it does
-not have any relationship with device.
+This series is an update to the PUD hugepage support previously posted
+at [0]. This patchset adds support for PUD hugepages at stage 2 a
+feature that is useful on cores that have support for large sized TLB
+mappings (e.g., 1GB for 4K granule).
 
-Cc: James Morse <james.morse@arm.com> 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-I remeber James also mentioned that rename this function.
+This version fixes two bugs -
 
----
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 4 ++--
- virt/kvm/arm/arm.c                | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+* Corrects stage 2 fault handling for unsupported hugepage sizes (new
+  patch 1/9). This is a long standing bug and needs backporting to
+  earlier kernels
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 3ad482d..3ee29db 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -273,7 +273,7 @@ static inline void __cpu_init_stage2(void)
- 	kvm_call_hyp(__init_stage2_translation);
- }
- 
--static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-+static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	return 0;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d6d733..c20537f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -53,7 +53,7 @@
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
--int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
-+int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
- struct kvm_arch {
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index e37c78b..fd37c53 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -55,12 +55,12 @@ static bool cpu_has_32bit_el1(void)
- }
- 
- /**
-- * kvm_arch_dev_ioctl_check_extension
-+ * kvm_arch_vm_ioctl_check_extension
-  *
-  * We currently assume that the number of HW registers is uniform
-  * across all CPUs (see cpuinfo_sanity_check).
-  */
--int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-+int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index c92053b..40e79ea 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -240,7 +240,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = 1;
- 		break;
- 	default:
--		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
-+		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
- 	}
- 	return r;
+* Ensures that multiple vcpus faulting on the same hugepage doesn't
+  hamper forward progress (patch 9)
+
+The patches are based on dynamic IPA support which could lead to a
+situation where the guest doesn't have PUD level. In this case, the
+patches have been updated to fallback to the PTE level mappings at
+stage 2.
+
+The patches have been tested on AMD Seattle system with the following
+hugepage sizes - 64K, 32M, 1G.
+
+Thanks,
+Punit
+
+v6 -> v7
+
+* Restrict thp check to exclude hugetlbfs pages - Patch 1
+* Don't update PUD entry if there's no change - Patch 9
+* Add check for PUD level in stage 2 - Patch 9
+
+v5 -> v6
+
+* Split Patch 1 to move out the refactoring of exec permissions on
+  page table entries.
+* Patch 4 - Initialise p*dpp pointers in stage2_get_leaf_entry()
+* Patch 5 - Trigger a BUG() in kvm_pud_pfn() on arm
+
+v4 -> v5:
+* Patch 1 - Drop helper stage2_should_exec() and refactor the
+  condition to decide if a page table entry should be marked
+  executable
+* Patch 4-6 - Introduce stage2_get_leaf_entry() and use it in this and
+  latter patches
+* Patch 7 - Use stage 2 accessors instead of using the page table
+  helpers directly
+* Patch 7 - Add a note to update the PUD hugepage support when number
+  of levels of stage 2 tables differs from stage 1
+
+v3 -> v4:
+* Patch 1 and 7 - Don't put down hugepages pte if logging is enabled
+* Patch 4-5 - Add PUD hugepage support for exec and access faults
+* Patch 6 - PUD hugepage support for aging page table entries
+
+v2 -> v3:
+* Update vma_pagesize directly if THP [1/4]. Previsouly this was done
+  indirectly via hugetlb
+* Added review tag [4/4]
+
+v1 -> v2:
+* Create helper to check if the page should have exec permission [1/4]
+* Fix broken condition to detect THP hugepage [1/4]
+* Fix in-correct hunk resulting from a rebase [4/4]
+
+[0] https://www.spinics.net/lists/kvm-arm/msg32241.html
+[1] https://www.spinics.net/lists/kvm-arm/msg32641.html
+
+
+Punit Agrawal (9):
+  KVM: arm/arm64: Ensure only THP is candidate for adjustment
+  KVM: arm/arm64: Share common code in user_mem_abort()
+  KVM: arm/arm64: Re-factor setting the Stage 2 entry to exec on fault
+  KVM: arm/arm64: Introduce helpers to manipulate page table entries
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm64: Support PUD hugepage in stage2_is_exec()
+  KVM: arm64: Support handling access faults for PUD hugepages
+  KVM: arm64: Update age handlers to support PUD hugepages
+  KVM: arm64: Add support for creating PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         |  61 +++++
+ arch/arm64/include/asm/kvm_mmu.h       |  48 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h |   4 +
+ arch/arm64/include/asm/pgtable.h       |   9 +
+ virt/kvm/arm/mmu.c                     | 324 +++++++++++++++++++------
+ 5 files changed, 368 insertions(+), 78 deletions(-)
+
 -- 
-1.9.1
+2.18.0
