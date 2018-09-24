@@ -1,19 +1,19 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.14 047/173] KVM: arm/arm64: vgic: Fix possible spectre-v1 write in vgic_mmio_write_apr()
-Date: Mon, 24 Sep 2018 13:51:21 +0200
-Message-ID: <20180924113119.440587089@linuxfoundation.org>
-References: <20180924113114.334025954@linuxfoundation.org>
+Subject: [PATCH 4.18 063/235] KVM: arm/arm64: vgic: Fix possible spectre-v1 write in vgic_mmio_write_apr()
+Date: Mon, 24 Sep 2018 13:50:49 +0200
+Message-ID: <20180924113111.438626086@linuxfoundation.org>
+References: <20180924113103.999624566@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180924113114.334025954@linuxfoundation.org>
+In-Reply-To: <20180924113103.999624566@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Sasha Levin <alexander.levin@microsoft.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+4.18-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -45,7 +45,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -348,6 +348,9 @@ static void vgic_mmio_write_apr(struct k
+@@ -352,6 +352,9 @@ static void vgic_mmio_write_apr(struct k
  
  		if (n > vgic_v3_max_apr_idx(vcpu))
  			return;
