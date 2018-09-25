@@ -1,95 +1,84 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 17/18] kvm: arm64: Limit the minimum number of page
- table levels
-Date: Tue, 25 Sep 2018 12:00:48 +0200
-Message-ID: <59231541-311f-e04b-3e6b-e073a8392316@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 18/18] kvm: arm64: Allow tuning the physical address
+ size for VM
+Date: Tue, 25 Sep 2018 11:24:13 +0100
+Message-ID: <75c3abc2-6518-9a4b-ea1e-01619489d535@arm.com>
 References: <20180917104144.19188-1-suzuki.poulose@arm.com>
- <20180917104144.19188-18-suzuki.poulose@arm.com>
+ <20180917104144.19188-19-suzuki.poulose@arm.com>
+ <552680a6-23e6-001c-416e-214d1e8276c6@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180917104144.19188-18-suzuki.poulose@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBD644A20B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Sep 2018 06:23:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id cVMVqVp7jg3I for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Sep 2018 06:23:17 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0D7D4A0C9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Sep 2018 06:23:17 -0400 (EDT)
+In-Reply-To: <552680a6-23e6-001c-416e-214d1e8276c6@redhat.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, dave.martin@arm.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org
+Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+On 09/25/2018 11:00 AM, Auger Eric wrote:
+> Hi Suzuki,
+> On 9/17/18 12:41 PM, Suzuki K Poulose wrote:
+>> Allow specifying the physical address size limit for a new
+>> VM via the kvm_type argument for the KVM_CREATE_VM ioctl. This
+>> allows us to finalise the stage2 page table as early as possible
+>> and hence perform the right checks on the memory slots
+>> without complication. The size is ecnoded as Log2(PA_Size) in
+> encoded
 
-On 9/17/18 12:41 PM, Suzuki K Poulose wrote:
-> Since we are about to remove the lower limit on the IPA size,
-> make sure that we do not go to 1 level page table (e.g, with
-> 32bit IPA on 64K host with concatenation) to avoid splitting
-> the host PMD huge pages at stage2.
-> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/stage2_pgtable.h |  8 +++++++-
->  arch/arm64/kvm/reset.c                  | 12 +++++++++++-
->  2 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> index 352ec4158fdf..6a56fdff0823 100644
-> --- a/arch/arm64/include/asm/stage2_pgtable.h
-> +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> @@ -72,8 +72,14 @@
->  /*
->   * The number of PTRS across all concatenated stage2 tables given by the
->   * number of bits resolved at the initial level.
-> + * If we force more number of levels than necessary, we may have
-more levels?
-> + * stage2_pgdir_shift > IPA, in which case, stage2_pgd_ptrs will have
-> + * one entry.
->   */
-> -#define __s2_pgd_ptrs(ipa, lvls)	(1 << ((ipa) - pt_levels_pgdir_shift((lvls))))
-> +#define pgd_ptrs_shift(ipa, pgdir_shift)	\
-> +	((ipa) > (pgdir_shift) ? ((ipa) - (pgdir_shift)) : 0)
-> +#define __s2_pgd_ptrs(ipa, lvls)		\
-> +	(1 << (pgd_ptrs_shift((ipa), pt_levels_pgdir_shift(lvls))))
->  #define __s2_pgd_size(ipa, lvls)	(__s2_pgd_ptrs((ipa), (lvls)) * sizeof(pgd_t))
->  
->  #define stage2_pgd_ptrs(kvm)		__s2_pgd_ptrs(kvm_phys_shift(kvm), kvm_stage2_levels(kvm))
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 76972b19bdd7..0393bb974b23 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -190,10 +190,19 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
->  {
->  	u64 vtcr = VTCR_EL2_FLAGS;
->  	u64 parange;
-> +	u8 lvls;
->  
->  	if (type)
->  		return -EINVAL;
->  
-> +	/*
-> +	 * Use a minimum 2 level page table to prevent splitting
-> +	 * host PMD huge pages at stage2.
-> +	 */
-> +	lvls = stage2_pgtable_levels(KVM_PHYS_SHIFT);
-> +	if (lvls < 2)
-> +		lvls = 2;
-> +
->  	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
->  	if (parange > ID_AA64MMFR0_PARANGE_MAX)
->  		parange = ID_AA64MMFR0_PARANGE_MAX;
-> @@ -210,7 +219,8 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
->  	vtcr |= (kvm_get_vmid_bits() == 16) ?
->  		VTCR_EL2_VS_16BIT :
->  		VTCR_EL2_VS_8BIT;
-> -	vtcr |= VTCR_EL2_LVLS_TO_SL0(stage2_pgtable_levels(KVM_PHYS_SHIFT));
-> +
-nit: new line not requested
+...
 
-Thanks
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index c664064f76fb..f860251ff27c 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -122,6 +122,14 @@ the default trap & emulate implementation (which changes the virtual
+>>   memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
+>>   flag KVM_VM_MIPS_VZ.
+>>   
+>> +To configure the physical address space size for a VM (IPA size) on arm64,
+>> +check KVM_CAP_ARM_VM_PHYS_SHIFT (which returns the maximum limit for the
+>> +IPA shift) and use KVM_VM_TYPE_ARM_PHYS_SHIFT(PHYS_SHIFT). Bits[7-0] of the
+>> +machine type has been reserved for specifying the PHYS_SHIFT.
+> are reserved to pass the PHYS_SHIFT?
+>> +The supported range is [32...IPA_LIMIT], where IPA_LIMIT could be
+> s/could be/is
 
-Eric
-> +	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
->  	vtcr |= VTCR_EL2_T0SZ(KVM_PHYS_SHIFT);
->  
->  	kvm->arch.vtcr = vtcr;
-> 
+
+
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 07548de5c988..2a6b29c446db 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -750,6 +750,15 @@ struct kvm_ppc_resize_hpt {
+>>   
+>>   #define KVM_S390_SIE_PAGE_OFFSET 1
+>>   
+>> +/*
+>> + * On arm64, machine type can be used to request the physical
+>> + * address size for the VM. Bits[7-0] has been reserved for the PA
+> s/has been reserved/are?
+
+Thanks for spotting, fixed all the above.
+
+Suzuki
