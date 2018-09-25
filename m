@@ -1,135 +1,71 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v7 9/9] KVM: arm64: Add support for creating PUD hugepages at stage 2
-Date: Tue, 25 Sep 2018 10:21:17 +0100
-Message-ID: <875zyurkz6.fsf@e105922-lin.cambridge.arm.com>
-References: <20180924174552.8387-1-punit.agrawal@arm.com>
-        <20180924174552.8387-10-punit.agrawal@arm.com>
-        <4df146fc-f9b0-882e-becb-056111a444d4@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 15/18] kvm: arm64: Add 52bit support for PAR to HPFAR
+ conversoin
+Date: Tue, 25 Sep 2018 11:59:36 +0200
+Message-ID: <b6929b5d-e797-6922-a5d2-3a1ded517e1a@redhat.com>
+References: <20180917104144.19188-1-suzuki.poulose@arm.com>
+ <20180917104144.19188-16-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4df146fc-f9b0-882e-becb-056111a444d4@arm.com> (Suzuki
-        K. Poulose's message of "Mon, 24 Sep 2018 22:21:43 +0100")
+In-Reply-To: <20180917104144.19188-16-suzuki.poulose@arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, dave.martin@arm.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+Hi Suzuki,
 
-> Hi Punit,
->
->
-> On 09/24/2018 06:45 PM, Punit Agrawal wrote:
->> KVM only supports PMD hugepages at stage 2. Now that the various page
->> handling routines are updated, extend the stage 2 fault handling to
->> map in PUD hugepages.
->>
->> Addition of PUD hugepage support enables additional page sizes (e.g.,
->> 1G with 4K granule) which can be useful on cores that support mapping
->> larger block sizes in the TLB entries.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->
->
->>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index a42b9505c9a7..a8e86b926ee0 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -84,11 +84,14 @@ void kvm_clear_hyp_idmap(void);
->>     #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
->>   #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
->> +#define kvm_pfn_pud(pfn, prot)	(__pud(0))
->>     #define kvm_pud_pfn(pud)	({ BUG(); 0; })
->>       #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
->> +/* No support for pud hugepages */
->> +#define kvm_pud_mkhuge(pud)	(pud)
->>   
->
-> shouldn't this be BUG() like other PUD huge helpers for arm32 ?
->
->>   /*
->>    * The following kvm_*pud*() functions are provided strictly to allow
->> @@ -105,6 +108,23 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
->>   	return false;
->>   }
->>   +static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
->> +{
->> +	BUG();
->> +}
->> +
->> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
->> +{
->> +	BUG();
->> +	return pud;
->> +}
->> +
->> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
->> +{
->> +	BUG();
->> +	return pud;
->> +}
->> +
->
->
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 3ff7ebb262d2..5b8163537bc2 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->
-> ...
->
->
->> @@ -1669,7 +1746,28 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	needs_exec = exec_fault ||
->>   		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
->>   -	if (hugetlb && vma_pagesize == PMD_SIZE) {
->> +	if (hugetlb && vma_pagesize == PUD_SIZE) {
->> +		/*
->> +		 * Assuming that PUD level always exists at Stage 2 -
->> +		 * this is true for 4k pages with 40 bits IPA
->> +		 * currently supported.
->> +		 *
->> +		 * When using 64k pages, 40bits of IPA results in
->> +		 * using only 2-levels at Stage 2. Overlooking this
->> +		 * problem for now as a PUD hugepage with 64k pages is
->> +		 * too big (4TB) to be practical.
->> +		 */
->> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->
-> Is this based on the Dynamic IPA series ? The cover letter seems
-> to suggest that it is. But I don't see the check to make sure we have
-> stage2 PUD level here before we go ahead and try PUD huge page at
-> stage2. Also the comment above seems outdated in that case.
+On 9/17/18 12:41 PM, Suzuki K Poulose wrote:
+> Add support for handling 52bit addresses in PAR to HPFAR
+> conversion. Instead of hardcoding the address limits, we
+> now use PHYS_MASK_SHIFT.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-It is indeed based on the Dynamic IPA series but I seem to have lost the
-actual changes introducing the checks for PUD level. Let me fix that up
-and post an update.
+Thanks
 
-Sorry for the noise.
+Eric
 
-Punit
-
->
->> +
->> +		new_pud = kvm_pud_mkhuge(new_pud);
->> +		if (writable)
->> +			new_pud = kvm_s2pud_mkwrite(new_pud);
->> +
->> +		if (needs_exec)
->> +			new_pud = kvm_s2pud_mkexec(new_pud);
->> +
->> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
->> +	} else if (hugetlb && vma_pagesize == PMD_SIZE) {
->>   		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
->>     		new_pmd = kvm_pmd_mkhuge(new_pmd);
->>
->
->
-> Suzuki
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 7 +++++++
+>  arch/arm64/kvm/hyp/switch.c      | 2 +-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 0a37c0513ede..241d1622fa19 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -308,6 +308,13 @@
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+> +/*
+> + * We have
+> + *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
+> + *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
+> + */
+> +#define PAR_TO_HPFAR(par)		\
+> +	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
+>  
+>  #define kvm_arm_exception_type	\
+>  	{0, "IRQ" }, 		\
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 9d5ce1a3039a..7cc175c88a37 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -263,7 +263,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+>  		return false; /* Translation failed, back to guest */
+>  
+>  	/* Convert PAR to HPFAR format */
+> -	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
+> +	*hpfar = PAR_TO_HPFAR(tmp);
+>  	return true;
+>  }
+>  
+> 
