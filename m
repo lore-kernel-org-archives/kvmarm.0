@@ -1,7 +1,7 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v6 01/18] kvm: arm/arm64: Fix stage2_flush_memslot for 4 level page table
-Date: Wed, 26 Sep 2018 17:32:37 +0100
-Message-ID: <20180926163258.20218-2-suzuki.poulose@arm.com>
+Subject: [PATCH v6 02/18] kvm: arm/arm64: Remove spurious WARN_ON
+Date: Wed, 26 Sep 2018 17:32:38 +0100
+Message-ID: <20180926163258.20218-3-suzuki.poulose@arm.com>
 References: <20180926163258.20218-1-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -12,32 +12,29 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, eric.auger@redhat.com, suzuki.poulose@arm.com, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far we have only supported 3 level page table with fixed IPA of
-40bits, where PUD is folded. With 4 level page tables, we need
-to check if the PUD entry is valid or not. Fix stage2_flush_memslot()
-to do this check, before walking down the table.
+On a 4-level page table pgd entry can be empty, unlike a 3-level
+page table. Remove the spurious WARN_ON() in stage_get_pud().
 
 Acked-by: Christoffer Dall <cdall@kernel.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index ed162a6c57c5..ee7ce8fa4a12 100644
+index ee7ce8fa4a12..4a285d760ce0 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -412,7 +412,8 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		next = stage2_pgd_addr_end(addr, end);
--		stage2_flush_puds(kvm, pgd, addr, next);
-+		if (!stage2_pgd_none(*pgd))
-+			stage2_flush_puds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
+@@ -1005,7 +1005,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	pud_t *pud;
  
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+-	if (WARN_ON(stage2_pgd_none(*pgd))) {
++	if (stage2_pgd_none(*pgd)) {
+ 		if (!cache)
+ 			return NULL;
+ 		pud = mmu_memory_cache_alloc(cache);
 -- 
 2.19.0
