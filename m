@@ -1,111 +1,60 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool PATCH v6 22/18] kvmtool: arm: Add support for creating VM
- with PA size
-Date: Wed, 26 Sep 2018 17:32:58 +0100
-Message-ID: <20180926163258.20218-23-suzuki.poulose@arm.com>
-References: <20180926163258.20218-1-suzuki.poulose@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH 2/2] arm/arm64: KVM: share the check for vcpu events
+ capability
+Date: Thu, 27 Sep 2018 15:01:35 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201E9CD77@dggema523-mbx.china.huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 115694A2B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Sep 2018 12:34:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M9cm+Wil875w for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Sep 2018 12:34:29 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4CFB4A0C7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Sep 2018 12:34:28 -0400 (EDT)
-In-Reply-To: <20180926163258.20218-1-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Transfer-Encoding: 8BIT
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: zh-CN
+Sender: linux-kernel-owner@vger.kernel.org
+To: "christoffer.dall@arm.com" <christoffer.dall@arm.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Specify the physical size for the VM encoded in the vm type.
+Hi christoffer/marc,
+   Could you review this simple patch to enable the 32 bit KVM vcpu event supports?  Because below user space patch depended on it. thanks
+   https://patchwork.kernel.org/patch/10617601/
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arm/include/arm-common/kvm-arch.h |  6 +++++-
- arm/kvm.c                         | 32 +++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index b29b4b1..d77f3ac 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -44,7 +44,11 @@
- 
- #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
- 
--#define KVM_VM_TYPE		0
-+extern unsigned long		kvm_arm_type;
-+extern void kvm__arch_init_hyp(struct kvm *kvm);
-+
-+#define KVM_VM_TYPE		kvm_arm_type
-+#define kvm__arch_init_hyp	kvm__arch_init_hyp
- 
- #define VIRTIO_DEFAULT_TRANS(kvm)	\
- 	((kvm)->cfg.arch.virtio_trans_pci ? VIRTIO_PCI : VIRTIO_MMIO)
-diff --git a/arm/kvm.c b/arm/kvm.c
-index eac2ad2..c8db6b3 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -11,6 +11,8 @@
- #include <linux/kvm.h>
- #include <linux/sizes.h>
- 
-+unsigned long kvm_arm_type;
-+
- struct kvm_ext kvm_req_ext[] = {
- 	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
- 	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
-@@ -18,6 +20,36 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 },
- };
- 
-+#ifndef KVM_CAP_ARM_VM_IPA_SIZE
-+#define KVM_CAP_ARM_VM_IPA_SIZE	159
-+#endif
-+
-+#ifndef KVM_VM_TYPE_ARM_IPA_SIZE
-+#define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
-+#define KVM_VM_TYPE_ARM_IPA_SIZE(x)	\
-+	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-+#endif
-+
-+void kvm__arch_init_hyp(struct kvm *kvm)
-+{
-+	int max_ipa;
-+
-+	if (!kvm->cfg.arch.phys_shift)
-+		kvm->cfg.arch.phys_shift = 40;
-+	if (kvm->cfg.arch.phys_shift == 40)
-+		return;
-+	max_ipa = ioctl(kvm->sys_fd,
-+			KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
-+	if (!max_ipa)
-+		die("Kernel doesn't support IPA size configuration\n");
-+	if ((kvm->cfg.arch.phys_shift > max_ipa) ||
-+	    (kvm->cfg.arch.phys_shift < 32))
-+		die("Requested PA size (%u) is not supported by the host"
-+		    " [32 - %u]bit\n",
-+		    kvm->cfg.arch.phys_shift, max_ipa);
-+	kvm_arm_type = KVM_VM_TYPE_ARM_IPA_SIZE(kvm->cfg.arch.phys_shift);
-+}
-+
- bool kvm__arch_cpu_supports_vm(void)
- {
- 	/* The KVM capability check is enough. */
--- 
-2.19.0
+> subject: [PATCH 2/2] arm/arm64: KVM: share the check for vcpu events capability
+> 
+> The commit 539aee0edb9f ("KVM: arm64: Share the parts of get/set events useful to 32bit") shares the get/set events helper for arm64
+> and arm32, it is better also share the check for vcpu events capability.
+> 
+> User space will check whether KVM supports vcpu events through KVM_CAP_VCPU_EVENTS IOCTL.
+> 
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+> For the 32 bit guest migration, it needs to enable the vcpu events
+> 
+> ---
+>  arch/arm64/kvm/reset.c | 1 -
+>  virt/kvm/arm/arm.c     | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c index fd37c53..e50245e 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -82,7 +82,6 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+> -	case KVM_CAP_VCPU_EVENTS:
+>  		r = 1;
+>  		break;
+>  	default:
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c index 40e79ea..64e5d97 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -212,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_READONLY_MEM:
+>  	case KVM_CAP_MP_STATE:
+>  	case KVM_CAP_IMMEDIATE_EXIT:
+> +	case KVM_CAP_VCPU_EVENTS:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+> --
+> 1.9.1
+> 
