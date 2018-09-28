@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v2 21/23] KVM: arm64/sve: allow KVM_ARM_SVE_CONFIG_QUERY
- on vm fd
-Date: Fri, 28 Sep 2018 14:39:25 +0100
-Message-ID: <1538141967-15375-22-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v2 22/23] KVM: Documentation: Document arm64 core
+ registers in detail
+Date: Fri, 28 Sep 2018 14:39:26 +0100
+Message-ID: <1538141967-15375-23-git-send-email-Dave.Martin@arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64B604A26A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46FA34A230
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:41:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vm6IGqelXo1h for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Sep 2018 09:40:57 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 488734A0C9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:57 -0400 (EDT)
+ with ESMTP id EOJNxgh5okSR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Sep 2018 09:41:02 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43EC14A2C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:59 -0400 (EDT)
 In-Reply-To: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,69 +32,55 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since userspace may need to decide on the set of vector lengths for
-the guest before setting up a vm, it is onerous to require a vcpu
-fd to be available first.  KVM_ARM_SVE_CONFIG_QUERY is not
-vcpu-dependent anyway, so this patch wires up KVM_ARM_SVE_CONFIG to
-be usable on a vm fd where appropriate.
+Since the the sizes of members the core arm64 registers vary, the
+list of register encodings that make sense is not a simple linear
+sequence.
 
-Subcommands that are vcpu-dependent (currently
-KVM_ARM_SVE_CONFIG_SET, KVM_ARM_SVE_CONFIG_GET) will return -EINVAL
-if invoked on a vm fd.
+To clarify which encodings to use, this patch adds a brief list
+to the documentation.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/kvm/guest.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index f066b17..2313c22 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -574,6 +574,9 @@ static int kvm_vcpu_set_sve_vls(struct kvm_vcpu *vcpu, struct kvm_sve_vls *vls,
- 	unsigned int vq, max_vq;
- 	int ret;
+Draft only -- encodings not checked yet.
+---
+ Documentation/virtual/kvm/api.txt | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 647f941..a58067b 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2037,6 +2037,30 @@ contains elements ranging from 32 to 128 bits. The index is a 32bit
+ value in the kvm_regs structure seen as a 32bit array.
+   0x60x0 0000 0010 <index into the kvm_regs struct:16>
  
-+	if (!vcpu)
-+		return -EINVAL; /* per-vcpu operation on vm fd */
++Specifically:
++    Encoding            Register  Bits  kvm_regs member
++----------------------------------------------------------------
++  0x6030 0000 0010 0000 X0          64  regs.regs[0]
++  0x6030 0000 0010 0002 X1          64  regs.regs[1]
++    ...
++  0x6030 0000 0010 003c X30         64  regs.regs[30]
++  0x6030 0000 0010 003e SP          64  regs.sp
++  0x6030 0000 0010 0040 PC          64  regs.pc
++  0x6030 0000 0010 0042 PSTATE      64  regs.pstate
++  0x6030 0000 0010 0044 SP_EL1      64  sp_el1
++  0x6030 0000 0010 0046 ELR_EL1     64  elr_el1
++  0x6030 0000 0010 0048 SPSR_EL1    64  spsr[KVM_SPSR_EL1] (alias SPSR_SVC)
++  0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
++  0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
++  0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
++  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
++  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]
++  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]
++    ...
++  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]
++  0x6020 0000 0010 00d4 FPSR        32  fp_regs.fpsr
++  0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
 +
- 	if (vcpu->arch.has_run_once || vcpu_has_sve(vcpu))
- 		return -EBADFD; /* too late, or already configured */
+ arm64 CCSIDR registers are demultiplexed by CSSELR value:
+   0x6020 0000 0011 00 <csselr:8>
  
-@@ -659,6 +662,9 @@ static int kvm_vcpu_query_sve_vls(struct kvm_vcpu *vcpu, struct kvm_sve_vls *vls
- static int kvm_vcpu_get_sve_vls(struct kvm_vcpu *vcpu, struct kvm_sve_vls *vls,
- 		struct kvm_sve_vls __user *userp)
- {
-+	if (!vcpu)
-+		return -EINVAL; /* per-vcpu operation on vm fd */
-+
- 	if (!vcpu_has_sve(vcpu))
- 		return -EBADFD; /* not configured yet */
- 
-@@ -668,6 +674,7 @@ static int kvm_vcpu_get_sve_vls(struct kvm_vcpu *vcpu, struct kvm_sve_vls *vls,
- 			sve_vq_from_vl(vcpu->arch.sve_max_vl), userp);
- }
- 
-+/* vcpu may be NULL if this is called via a vm fd */
- static int kvm_vcpu_sve_config(struct kvm_vcpu *vcpu,
- 			       struct kvm_sve_vls __user *userp)
- {
-@@ -717,7 +724,15 @@ int kvm_arm_arch_vcpu_ioctl(struct kvm_vcpu *vcpu,
- int kvm_arm_arch_vm_ioctl(struct kvm *kvm,
- 			  unsigned int ioctl, unsigned long arg)
- {
--	return -EINVAL;
-+	void __user *userp = (void __user *)arg;
-+
-+	switch (ioctl) {
-+	case KVM_ARM_SVE_CONFIG:
-+		return kvm_vcpu_sve_config(NULL, userp);
-+
-+	default:
-+		return -EINVAL;
-+	}
- }
- 
- int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
 -- 
 2.1.4
