@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v2 18/23] KVM: arm64: Add arch vcpu ioctl hook
-Date: Fri, 28 Sep 2018 14:39:22 +0100
-Message-ID: <1538141967-15375-19-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v2 16/23] KVM: arm64: Enumerate SVE register indices for
+ KVM_GET_REG_LIST
+Date: Fri, 28 Sep 2018 14:39:20 +0100
+Message-ID: <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 355B64A2BF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FC04A0C9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZqEPwArx13PU for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id qJvGLKLdc7Tv for <kvmarm@lists.cs.columbia.edu>;
  Fri, 28 Sep 2018 09:40:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 551714A205
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 788E54A2D2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:47 -0400 (EDT)
 In-Reply-To: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,89 +32,103 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To enable arm64-specific vcpu ioctls to be added cleanly, this
-patch adds a kvm_arm_arch_vcpu_ioctl() hook so that these don't
-pollute the common code.
+This patch includes the SVE register IDs in the list returned by
+KVM_GET_REG_LIST, as appropriate.
 
-No functional change: the -EINVAL return for unknown ioctls is
-retained, though it may or may not be intentional (KVM returns
--ENXIO in various other similar contexts).
+On a non-SVE-enabled vcpu, no extra IDs are added.
+
+On an SVE-enabled vcpu, the appropriate number of slice IDs are
+enumerated for each SVE register, depending on the maximum vector
+length for the vcpu.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 7 +++++++
- arch/arm64/include/asm/kvm_host.h | 2 ++
- arch/arm64/kvm/guest.c            | 6 ++++++
- virt/kvm/arm/arm.c                | 2 +-
- 4 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index c36760b..df2659d 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -19,6 +19,7 @@
- #ifndef __ARM_KVM_HOST_H__
- #define __ARM_KVM_HOST_H__
- 
-+#include <linux/errno.h>
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/cputype.h>
-@@ -278,6 +279,12 @@ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- 	return 0;
- }
- 
-+static inline int kvm_arm_arch_vcpu_ioctl(struct vcpu *vcpu,
-+	unsigned int ioctl, unsigned long arg)
-+{
-+	return -EINVAL;
-+}
-+
- int kvm_perf_init(void);
- int kvm_perf_teardown(void);
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8e9cd43..bbde597 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -55,6 +55,8 @@ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
- int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
-+int kvm_arm_arch_vcpu_ioctl(struct kvm_vcpu *vcpu,
-+			    unsigned int ioctl, unsigned long arg);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
- struct kvm_arch {
+Changes since RFCv1:
+
+ * Simplify enumerate_sve_regs() based on Andrew Jones' approach.
+
+ * Reg copying loops are inverted for brevity, since the order we
+   spit out the regs in doesn't really matter.
+
+(I tried to keep part of my approach to avoid the duplicate logic
+between num_sve_regs() and copy_sve_reg_indices(), but although
+it works in principle, gcc fails to fully collapse the num_regs()
+case... so I gave up.  The two functions need to be manually kept
+consistent, but hopefully that's fairly straightforward.)
+---
+ arch/arm64/kvm/guest.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 89eab68..331b85e 100644
+index 320db0f..89eab68 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -546,6 +546,12 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
- 	return 0;
+@@ -323,6 +323,46 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	return copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)) ? -EFAULT : 0;
  }
  
-+int kvm_arm_arch_vcpu_ioctl(struct kvm_vcpu *vcpu,
-+			    unsigned int ioctl, unsigned long arg)
++static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
 +{
-+	return -EINVAL;
++	const unsigned int slices = DIV_ROUND_UP(
++		vcpu->arch.sve_max_vl,
++		KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
++
++	if (!vcpu_has_sve(vcpu))
++		return 0;
++
++	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */);
 +}
 +
- int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
- {
- 	return -EINVAL;
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 1418af9..6e894a8 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1181,7 +1181,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		return kvm_arm_vcpu_set_events(vcpu, &events);
- 	}
- 	default:
--		r = -EINVAL;
-+		r = kvm_arm_arch_vcpu_ioctl(vcpu, ioctl, arg);
++static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu, u64 __user **uind)
++{
++	const unsigned int slices = DIV_ROUND_UP(
++		vcpu->arch.sve_max_vl,
++		KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
++	unsigned int i, n;
++
++	if (!vcpu_has_sve(vcpu))
++		return 0;
++
++	for (i = 0; i < slices; i++) {
++		for (n = 0; n < SVE_NUM_ZREGS; n++) {
++			if (put_user(KVM_REG_ARM64_SVE_ZREG(n, i), (*uind)++))
++				return -EFAULT;
++		}
++
++		for (n = 0; n < SVE_NUM_PREGS; n++) {
++			if (put_user(KVM_REG_ARM64_SVE_PREG(n, i), (*uind)++))
++				return -EFAULT;
++		}
++
++		if (put_user(KVM_REG_ARM64_SVE_FFR(i), (*uind)++))
++			return -EFAULT;
++	}
++
++	return 0;
++}
++
+ /**
+  * kvm_arm_num_regs - how many registers do we present via KVM_GET_ONE_REG
+  *
+@@ -333,6 +373,7 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
+ 	unsigned long res = 0;
+ 
+ 	res += num_core_regs();
++	res += num_sve_regs(vcpu);
+ 	res += kvm_arm_num_sys_reg_descs(vcpu);
+ 	res += kvm_arm_get_fw_num_regs(vcpu);
+ 	res += NUM_TIMER_REGS;
+@@ -357,6 +398,10 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 		uindices++;
  	}
  
- 	return r;
++	ret = copy_sve_reg_indices(vcpu, &uindices);
++	if (ret)
++		return ret;
++
+ 	ret = kvm_arm_copy_fw_reg_indices(vcpu, uindices);
+ 	if (ret)
+ 		return ret;
 -- 
 2.1.4
