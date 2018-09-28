@@ -1,23 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v2 14/23] KVM: Allow 2048-bit register access via ioctl
- interface
-Date: Fri, 28 Sep 2018 14:39:18 +0100
-Message-ID: <1538141967-15375-15-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v2 18/23] KVM: arm64: Add arch vcpu ioctl hook
+Date: Fri, 28 Sep 2018 14:39:22 +0100
+Message-ID: <1538141967-15375-19-git-send-email-Dave.Martin@arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE2164A210
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 355B64A2BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DvqJEBcxLGWn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Sep 2018 09:40:43 -0400 (EDT)
+ with ESMTP id ZqEPwArx13PU for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Sep 2018 09:40:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63AB34A1E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 551714A205
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:51 -0400 (EDT)
 In-Reply-To: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,37 +31,89 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The Arm SVE architecture defines registers that are up to 2048 bits
-in size (with some possibility of further future expansion).
+To enable arm64-specific vcpu ioctls to be added cleanly, this
+patch adds a kvm_arm_arch_vcpu_ioctl() hook so that these don't
+pollute the common code.
 
-In order to avoid the need for an excessively large number of
-ioctls when saving and restoring a vcpu's registers, this patch
-adds a #define to make support for individual 2048-bit registers
-through the KVM_{GET,SET}_ONE_REG ioctl interface official.  This
-will allow each SVE register to be accessed in a single call.
-
-There are sufficient spare bits in the register id size field for
-this change, so there is no ABI impact providing that
-KVM_GET_REG_LIST does not enumerate any 2048-bit register unless
-userspace explicitly opts in to the relevant architecture-specific
-features.
+No functional change: the -EINVAL return for unknown ioctls is
+retained, though it may or may not be intentional (KVM returns
+-ENXIO in various other similar contexts).
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- include/uapi/linux/kvm.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm/include/asm/kvm_host.h   | 7 +++++++
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/guest.c            | 6 ++++++
+ virt/kvm/arm/arm.c                | 2 +-
+ 4 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 251be35..7c3c5cc 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1110,6 +1110,7 @@ struct kvm_dirty_tlb {
- #define KVM_REG_SIZE_U256	0x0050000000000000ULL
- #define KVM_REG_SIZE_U512	0x0060000000000000ULL
- #define KVM_REG_SIZE_U1024	0x0070000000000000ULL
-+#define KVM_REG_SIZE_U2048	0x0080000000000000ULL
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index c36760b..df2659d 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -19,6 +19,7 @@
+ #ifndef __ARM_KVM_HOST_H__
+ #define __ARM_KVM_HOST_H__
  
- struct kvm_reg_list {
- 	__u64 n; /* number of regs */
++#include <linux/errno.h>
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
+ #include <asm/cputype.h>
+@@ -278,6 +279,12 @@ static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	return 0;
+ }
+ 
++static inline int kvm_arm_arch_vcpu_ioctl(struct vcpu *vcpu,
++	unsigned int ioctl, unsigned long arg)
++{
++	return -EINVAL;
++}
++
+ int kvm_perf_init(void);
+ int kvm_perf_teardown(void);
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8e9cd43..bbde597 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -55,6 +55,8 @@ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
++int kvm_arm_arch_vcpu_ioctl(struct kvm_vcpu *vcpu,
++			    unsigned int ioctl, unsigned long arg);
+ void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
+ 
+ struct kvm_arch {
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 89eab68..331b85e 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -546,6 +546,12 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+ 	return 0;
+ }
+ 
++int kvm_arm_arch_vcpu_ioctl(struct kvm_vcpu *vcpu,
++			    unsigned int ioctl, unsigned long arg)
++{
++	return -EINVAL;
++}
++
+ int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+ {
+ 	return -EINVAL;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 1418af9..6e894a8 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1181,7 +1181,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		return kvm_arm_vcpu_set_events(vcpu, &events);
+ 	}
+ 	default:
+-		r = -EINVAL;
++		r = kvm_arm_arch_vcpu_ioctl(vcpu, ioctl, arg);
+ 	}
+ 
+ 	return r;
 -- 
 2.1.4
