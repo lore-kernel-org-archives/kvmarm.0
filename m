@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v2 07/23] arm64/sve: Enable SVE state tracking for
- non-task contexts
-Date: Fri, 28 Sep 2018 14:39:11 +0100
-Message-ID: <1538141967-15375-8-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v2 08/23] KVM: arm64: Add a vcpu flag to control SVE
+ visibility for the guest
+Date: Fri, 28 Sep 2018 14:39:12 +0100
+Message-ID: <1538141967-15375-9-git-send-email-Dave.Martin@arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D98B4A1F2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 500064A217
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kC4HS9WGqX97 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Sep 2018 09:40:29 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BE34A20F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:29 -0400 (EDT)
+ with ESMTP id 5yVbY8fJ-jmd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Sep 2018 09:40:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29E1C49F94
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 09:40:31 -0400 (EDT)
 In-Reply-To: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,87 +32,39 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGN1cnJlbnQgRlBTSU1EL1NWRSBjb250ZXh0IGhhbmRsaW5nIHN1cHBvcnQgZm9yIG5vbi10
-YXNrIChpLmUuLApLVk0gdmNwdSkgY29udGV4dHMgZG9lcyBub3QgdGFrZSBTVkUgaW50byBhY2Nv
-dW50LiAgVGhpcyBtZWFucyB0aGF0Cm9ubHkgdGFzayBjb250ZXh0cyBjYW4gc2FmZWx5IHVzZSBT
-VkUgYXQgcHJlc2VudC4KCkluIHByZXBhcmF0aW9uIGZvciBlbmFibGluZyBLVk0gZ3Vlc3RzIHRv
-IHVzZSBTVkUsIGl0IGlzIG5lY2Vzc2FyeQp0byBrZWVwIHRyYWNrIG9mIFNWRSBzdGF0ZSBmb3Ig
-bm9uLXRhc2sgY29udGV4dHMgdG9vLgoKVGhpcyBwYXRjaCBhZGRzIHRoZSBuZWNlc3Nhcnkgc3Vw
-cG9ydCwgcmVtb3ZpbmcgYXNzdW1wdGlvbnMgZnJvbQp0aGUgY29udGV4dCBzd2l0Y2ggY29kZSBh
-Ym91dCB0aGUgbG9jYXRpb24gb2YgdGhlIFNWRSBjb250ZXh0CnN0b3JhZ2UuCgpXaGVuIGJpbmRp
-bmcgYSB2Y3B1IGNvbnRleHQsIGl0cyB2ZWN0b3IgbGVuZ3RoIGlzIGFyYml0cmFyaWx5CnNwZWNp
-ZmllZCBhcyBzdmVfbWF4X3ZsIGZvciBub3cuICBJbiBhbnkgY2FzZSwgYmVjYXVzZSBUSUZfU1ZF
-IGlzCnByZXNlbnRseSBjbGVhcmVkIGF0IHZjcHUgY29udGV4dCBiaW5kIHRpbWUsIHRoZSBzcGVj
-aWZpZWQgdmVjdG9yCmxlbmd0aCB3aWxsIG5vdCBiZSB1c2VkIGZvciBhbnl0aGluZyB5ZXQuICBJ
-biBsYXRlciBwYXRjaGVzIFRJRl9TVkUKd2lsbCBiZSBzZXQgaGVyZSBhcyBhcHByb3ByaWF0ZSwg
-YW5kIHRoZSBhcHByb3ByaWF0ZSBtYXhpbXVtIHZlY3RvcgpsZW5ndGggZm9yIHRoZSB2Y3B1IHdp
-bGwgYmUgcGFzc2VkIHdoZW4gYmluZGluZy4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxE
-YXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5l
-ZUBsaW5hcm8ub3JnPgotLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggfCAgMyAr
-Ky0KIGFyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jICAgICAgfCAyMCArKysrKysrKysrKysrKyst
-LS0tLQogYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMgICAgICAgICB8ICA0ICsrKy0KIDMgZmlsZXMg
-Y2hhbmdlZCwgMjAgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9m
-cHNpbWQuaAppbmRleCA5NjRhZGM5Li5kZjdhMTQzIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2Zwc2ltZC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgK
-QEAgLTU2LDcgKzU2LDggQEAgZXh0ZXJuIHZvaWQgZnBzaW1kX3Jlc3RvcmVfY3VycmVudF9zdGF0
-ZSh2b2lkKTsKIGV4dGVybiB2b2lkIGZwc2ltZF91cGRhdGVfY3VycmVudF9zdGF0ZShzdHJ1Y3Qg
-dXNlcl9mcHNpbWRfc3RhdGUgY29uc3QgKnN0YXRlKTsKIAogZXh0ZXJuIHZvaWQgZnBzaW1kX2Jp
-bmRfdGFza190b19jcHUodm9pZCk7Ci1leHRlcm4gdm9pZCBmcHNpbWRfYmluZF9zdGF0ZV90b19j
-cHUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpzdGF0ZSk7CitleHRlcm4gdm9pZCBmcHNpbWRf
-YmluZF9zdGF0ZV90b19jcHUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpzdGF0ZSwKKwkJCQkg
-ICAgIHZvaWQgKnN2ZV9zdGF0ZSwgdW5zaWduZWQgaW50IHN2ZV92bCk7CiAKIGV4dGVybiB2b2lk
-IGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFyZ2V0KTsKIGV4
-dGVybiB2b2lkIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUodm9pZCk7CmRpZmYgLS1naXQgYS9hcmNo
-L2FybTY0L2tlcm5lbC9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCmluZGV4
-IGQyODA0MmIuLjYwYzVlMjggMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5j
-CisrKyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCkBAIC0xMjEsNiArMTIxLDggQEAKICAq
-Lwogc3RydWN0IGZwc2ltZF9sYXN0X3N0YXRlX3N0cnVjdCB7CiAJc3RydWN0IHVzZXJfZnBzaW1k
-X3N0YXRlICpzdDsKKwl2b2lkICpzdmVfc3RhdGU7CisJdW5zaWduZWQgaW50IHN2ZV92bDsKIH07
-CiAKIHN0YXRpYyBERUZJTkVfUEVSX0NQVShzdHJ1Y3QgZnBzaW1kX2xhc3Rfc3RhdGVfc3RydWN0
-LCBmcHNpbWRfbGFzdF9zdGF0ZSk7CkBAIC0yNDEsMTQgKzI0MywxNSBAQCBzdGF0aWMgdm9pZCB0
-YXNrX2Zwc2ltZF9sb2FkKHZvaWQpCiAgKi8KIHZvaWQgZnBzaW1kX3NhdmUodm9pZCkKIHsKLQlz
-dHJ1Y3QgdXNlcl9mcHNpbWRfc3RhdGUgKnN0ID0gX190aGlzX2NwdV9yZWFkKGZwc2ltZF9sYXN0
-X3N0YXRlLnN0KTsKKwlzdHJ1Y3QgZnBzaW1kX2xhc3Rfc3RhdGVfc3RydWN0IGNvbnN0ICpsYXN0
-ID0KKwkJdGhpc19jcHVfcHRyKCZmcHNpbWRfbGFzdF9zdGF0ZSk7CiAJLyogc2V0IGJ5IGZwc2lt
-ZF9iaW5kX3Rhc2tfdG9fY3B1KCkgb3IgZnBzaW1kX2JpbmRfc3RhdGVfdG9fY3B1KCkgKi8KIAog
-CVdBUk5fT04oIWluX3NvZnRpcnEoKSAmJiAhaXJxc19kaXNhYmxlZCgpKTsKIAogCWlmICghdGVz
-dF90aHJlYWRfZmxhZyhUSUZfRk9SRUlHTl9GUFNUQVRFKSkgewogCQlpZiAoc3lzdGVtX3N1cHBv
-cnRzX3N2ZSgpICYmIHRlc3RfdGhyZWFkX2ZsYWcoVElGX1NWRSkpIHsKLQkJCWlmIChXQVJOX09O
-KHN2ZV9nZXRfdmwoKSAhPSBjdXJyZW50LT50aHJlYWQuc3ZlX3ZsKSkgeworCQkJaWYgKFdBUk5f
-T04oc3ZlX2dldF92bCgpICE9IGxhc3QtPnN2ZV92bCkpIHsKIAkJCQkvKgogCQkJCSAqIENhbid0
-IHNhdmUgdGhlIHVzZXIgcmVncywgc28gY3VycmVudCB3b3VsZAogCQkJCSAqIHJlLWVudGVyIHVz
-ZXIgd2l0aCBjb3JydXB0IHN0YXRlLgpAQCAtMjU4LDkgKzI2MSwxMSBAQCB2b2lkIGZwc2ltZF9z
-YXZlKHZvaWQpCiAJCQkJcmV0dXJuOwogCQkJfQogCi0JCQlzdmVfc2F2ZV9zdGF0ZShzdmVfcGZm
-cigmY3VycmVudC0+dGhyZWFkKSwgJnN0LT5mcHNyKTsKKwkJCXN2ZV9zYXZlX3N0YXRlKChjaGFy
-ICopbGFzdC0+c3ZlX3N0YXRlICsKKwkJCQkJCXN2ZV9mZnJfb2Zmc2V0KGxhc3QtPnN2ZV92bCks
-CisJCQkJICAgICAgICZsYXN0LT5zdC0+ZnBzcik7CiAJCX0gZWxzZQotCQkJZnBzaW1kX3NhdmVf
-c3RhdGUoc3QpOworCQkJZnBzaW1kX3NhdmVfc3RhdGUobGFzdC0+c3QpOwogCX0KIH0KIApAQCAt
-MTAzNSw2ICsxMDQwLDggQEAgdm9pZCBmcHNpbWRfYmluZF90YXNrX3RvX2NwdSh2b2lkKQogCQl0
-aGlzX2NwdV9wdHIoJmZwc2ltZF9sYXN0X3N0YXRlKTsKIAogCWxhc3QtPnN0ID0gJmN1cnJlbnQt
-PnRocmVhZC51dy5mcHNpbWRfc3RhdGU7CisJbGFzdC0+c3ZlX3N0YXRlID0gY3VycmVudC0+dGhy
-ZWFkLnN2ZV9zdGF0ZTsKKwlsYXN0LT5zdmVfdmwgPSBjdXJyZW50LT50aHJlYWQuc3ZlX3ZsOwog
-CWN1cnJlbnQtPnRocmVhZC5mcHNpbWRfY3B1ID0gc21wX3Byb2Nlc3Nvcl9pZCgpOwogCiAJaWYg
-KHN5c3RlbV9zdXBwb3J0c19zdmUoKSkgewpAQCAtMTA0OCw3ICsxMDU1LDggQEAgdm9pZCBmcHNp
-bWRfYmluZF90YXNrX3RvX2NwdSh2b2lkKQogCX0KIH0KIAotdm9pZCBmcHNpbWRfYmluZF9zdGF0
-ZV90b19jcHUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpzdCkKK3ZvaWQgZnBzaW1kX2JpbmRf
-c3RhdGVfdG9fY3B1KHN0cnVjdCB1c2VyX2Zwc2ltZF9zdGF0ZSAqc3QsIHZvaWQgKnN2ZV9zdGF0
-ZSwKKwkJCSAgICAgIHVuc2lnbmVkIGludCBzdmVfdmwpCiB7CiAJc3RydWN0IGZwc2ltZF9sYXN0
-X3N0YXRlX3N0cnVjdCAqbGFzdCA9CiAJCXRoaXNfY3B1X3B0cigmZnBzaW1kX2xhc3Rfc3RhdGUp
-OwpAQCAtMTA1Niw2ICsxMDY0LDggQEAgdm9pZCBmcHNpbWRfYmluZF9zdGF0ZV90b19jcHUoc3Ry
-dWN0IHVzZXJfZnBzaW1kX3N0YXRlICpzdCkKIAlXQVJOX09OKCFpbl9zb2Z0aXJxKCkgJiYgIWly
-cXNfZGlzYWJsZWQoKSk7CiAKIAlsYXN0LT5zdCA9IHN0OworCWxhc3QtPnN2ZV9zdGF0ZSA9IHN2
-ZV9zdGF0ZTsKKwlsYXN0LT5zdmVfdmwgPSBzdmVfdmw7CiB9CiAKIC8qCmRpZmYgLS1naXQgYS9h
-cmNoL2FybTY0L2t2bS9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jCmluZGV4IGFh
-Yzc4MDguLjU1NjU0Y2IgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jCisrKyBi
-L2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jCkBAIC04NSw3ICs4NSw5IEBAIHZvaWQga3ZtX2FyY2hf
-dmNwdV9jdHhzeW5jX2ZwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAlXQVJOX09OX09OQ0UoIWly
-cXNfZGlzYWJsZWQoKSk7CiAKIAlpZiAodmNwdS0+YXJjaC5mbGFncyAmIEtWTV9BUk02NF9GUF9F
-TkFCTEVEKSB7Ci0JCWZwc2ltZF9iaW5kX3N0YXRlX3RvX2NwdSgmdmNwdS0+YXJjaC5jdHh0Lmdw
-X3JlZ3MuZnBfcmVncyk7CisJCWZwc2ltZF9iaW5kX3N0YXRlX3RvX2NwdSgmdmNwdS0+YXJjaC5j
-dHh0LmdwX3JlZ3MuZnBfcmVncywKKwkJCQkJIE5VTEwsIHN2ZV9tYXhfdmwpOworCiAJCWNsZWFy
-X3RocmVhZF9mbGFnKFRJRl9GT1JFSUdOX0ZQU1RBVEUpOwogCQljbGVhcl90aHJlYWRfZmxhZyhU
-SUZfU1ZFKTsKIAl9Ci0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+Since SVE will be enabled or disabled on a per-vcpu basis, a flag
+is needed in order to track which vcpus have it enabled.
+
+This patch adds a suitable flag and a helper for checking it.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+
+Changes since RFCv1:
+
+ * Convert vcpu_has_sve() to a macro so that it can operate on a vcpu
+   without circular header dependency problems.
+
+   This avoids the helper requiring a vcpu_arch argument, which was
+   a little ugly.
+---
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d4b65414..20baf4a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -307,6 +307,10 @@ struct kvm_vcpu_arch {
+ #define KVM_ARM64_FP_HOST		(1 << 2) /* host FP regs loaded */
+ #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
+ #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
++#define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
++
++#define vcpu_has_sve(vcpu) (system_supports_sve() && \
++			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
+ 
+ #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+ 
+-- 
+2.1.4
