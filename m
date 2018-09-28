@@ -1,74 +1,61 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v6 04/18] ACPI / APEI: Switch NOTIFY_SEA to use the
- estatus queue
-Date: Fri, 28 Sep 2018 19:04:46 +0200
-Message-ID: <20180928170446.GE20768@zn.tnic>
-References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-5-james.morse@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 06/18] kvm: arm/arm64: Allow arch specific
+ configurations for VM
+Date: Fri, 28 Sep 2018 18:27:37 +0100
+Message-ID: <fbca190b-473b-5dee-67be-c724392fd297@arm.com>
+References: <20180926163258.20218-1-suzuki.poulose@arm.com>
+ <20180926163258.20218-7-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8F34A0CC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 13:04:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hEplBTSkBHNn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Sep 2018 13:04:46 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B76C49F86
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Sep 2018 13:04:46 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180921221705.6478-5-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180926163258.20218-7-suzuki.poulose@arm.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, eric.auger@redhat.com, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 21, 2018 at 11:16:51PM +0100, James Morse wrote:
-> Now that the estatus queue can be used by more than one notification
-> method, we can move notifications that have NMI-like behaviour over to
-> it, and start abstracting GHES's single in_nmi() path.
+Hi Suzuki,
+
+On 26/09/18 17:32, Suzuki K Poulose wrote:
+> Allow the arch backends to perform VM specific initialisation.
+> This will be later used to handle IPA size configuration and per-VM
+> VTCR configuration on arm64.
 > 
-> Switch NOTIFY_SEA over to use the estatus queue. This makes it behave
-> in the same way as x86's NOTIFY_NMI.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  drivers/acpi/apei/ghes.c | 23 +++++++++++------------
->  1 file changed, 11 insertions(+), 12 deletions(-)
+>   arch/arm/include/asm/kvm_host.h   | 7 +++++++
+>   arch/arm64/include/asm/kvm_host.h | 2 ++
+>   arch/arm64/kvm/reset.c            | 7 +++++++
+>   virt/kvm/arm/arm.c                | 5 +++--
+>   4 files changed, 19 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index d7c46236b353..150fb184c7cb 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -58,6 +58,10 @@
->  
->  #define GHES_PFX	"GHES: "
->  
-> +#if defined(CONFIG_HAVE_ACPI_APEI_NMI) || defined(CONFIG_ACPI_APEI_SEA)
-> +#define WANT_NMI_ESTATUS_QUEUE	1
-> +#endif
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 3ad482d2f1eb..72d46418e1ef 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -354,4 +354,11 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
+>   struct kvm *kvm_arch_alloc_vm(void);
+>   void kvm_arch_free_vm(struct kvm *kvm);
+>   
+> +static inline int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
 
-Is that just so that you have shorter ifdeffery lines? Because if so, an
-additional level of indirection is silly. Or maybe there's more coming -
-I'll see when I continue going through this set. :)
+This is a bit of a nit, but VM is a bit of an overloaded term in this 
+context. Given what we do in the following patch (moving the global 
+stage-2 init to be on a per VM -- virtual machine), I'd like to rename 
+this to something less ambiguous.
 
-Otherwise looks good - trying to reuse the facilities and all. Better. :)
+How about kvm_arm_config_stage2? Or something along those lines?
 
+No need to respin the series on this account, we can address it in a 
+separate patch. But I think it would help understanding what is done where.
+
+Thanks,
+
+	M.
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Jazz is not dead. It just smells funny...
