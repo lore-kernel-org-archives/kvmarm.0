@@ -1,75 +1,107 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v7.1 9/9] KVM: arm64: Add support for creating PUD hugepages at stage 2
-Date: Mon, 01 Oct 2018 15:00:38 +0100
-Message-ID: <87bm8dn4vt.fsf@e105922-lin.cambridge.arm.com>
-References: <20180924174552.8387-10-punit.agrawal@arm.com>
-        <20180925143731.27475-1-punit.agrawal@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [kvmtool PATCH v6 22/18] kvmtool: arm: Add support for creating
+ VM with PA size
+Date: Mon, 1 Oct 2018 15:13:15 +0100
+Message-ID: <0efe3696-e6fd-531d-c473-9dedf6b9d057@arm.com>
+References: <20180926163258.20218-1-suzuki.poulose@arm.com>
+ <20180926163258.20218-23-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180925143731.27475-1-punit.agrawal@arm.com> (Punit Agrawal's
-        message of "Tue, 25 Sep 2018 15:37:31 +0100")
+In-Reply-To: <20180926163258.20218-23-suzuki.poulose@arm.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, cdall@kernel.org, eric.auger@redhat.com, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Punit Agrawal <punit.agrawal@arm.com> writes:
-
-> KVM only supports PMD hugepages at stage 2. Now that the various page
-> handling routines are updated, extend the stage 2 fault handling to
-> map in PUD hugepages.
->
-> Addition of PUD hugepage support enables additional page sizes (e.g.,
-> 1G with 4K granule) which can be useful on cores that support mapping
-> larger block sizes in the TLB entries.
->
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
+On 26/09/18 17:32, Suzuki K Poulose wrote:
+> Specify the physical size for the VM encoded in the vm type.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->
-> v7 -> v7.1
->
-> * Added arm helper kvm_stage2_has_pud()
-> * Added check for PUD level present at stage 2
-> * Dropped redundant comment
-> * Fixed up kvm_pud_mkhuge() to complain on arm
->
->  arch/arm/include/asm/kvm_mmu.h         |  20 +++++
->  arch/arm/include/asm/stage2_pgtable.h  |   5 ++
->  arch/arm64/include/asm/kvm_mmu.h       |  16 ++++
->  arch/arm64/include/asm/pgtable-hwdef.h |   2 +
->  arch/arm64/include/asm/pgtable.h       |   2 +
->  virt/kvm/arm/mmu.c                     | 106 +++++++++++++++++++++++--
->  6 files changed, 145 insertions(+), 6 deletions(-)
->
-
-[...]
-
-> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-> index f6a7ea805232..ec1567d9eb4b 100644
-> --- a/arch/arm/include/asm/stage2_pgtable.h
-> +++ b/arch/arm/include/asm/stage2_pgtable.h
-> @@ -68,4 +68,9 @@ stage2_pmd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
->  #define stage2_pmd_table_empty(kvm, pmdp)	kvm_page_empty(pmdp)
->  #define stage2_pud_table_empty(kvm, pudp)	false
->  
-> +static inline bool kvm_stage2_has_pud(struct kvm *kvm)
-> +{
-> +	return KVM_VTCR_SL0 == VTCR_SL_L1;
-> +}
+>   arm/include/arm-common/kvm-arch.h |  6 +++++-
+>   arm/kvm.c                         | 32 +++++++++++++++++++++++++++++++
+>   2 files changed, 37 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index b29b4b1..d77f3ac 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -44,7 +44,11 @@
+>   
+>   #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
+>   
+> -#define KVM_VM_TYPE		0
+> +extern unsigned long		kvm_arm_type;
+> +extern void kvm__arch_init_hyp(struct kvm *kvm);
 > +
+> +#define KVM_VM_TYPE		kvm_arm_type
+> +#define kvm__arch_init_hyp	kvm__arch_init_hyp
+>   
+>   #define VIRTIO_DEFAULT_TRANS(kvm)	\
+>   	((kvm)->cfg.arch.virtio_trans_pci ? VIRTIO_PCI : VIRTIO_MMIO)
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index eac2ad2..c8db6b3 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -11,6 +11,8 @@
+>   #include <linux/kvm.h>
+>   #include <linux/sizes.h>
+>   
+> +unsigned long kvm_arm_type;
+> +
+>   struct kvm_ext kvm_req_ext[] = {
+>   	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+>   	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+> @@ -18,6 +20,36 @@ struct kvm_ext kvm_req_ext[] = {
+>   	{ 0, 0 },
+>   };
+>   
+> +#ifndef KVM_CAP_ARM_VM_IPA_SIZE
+> +#define KVM_CAP_ARM_VM_IPA_SIZE	159
+> +#endif
 
-Turns out this isn't quite the right check. On arm32, the maximum number
-of supported levels is 3 with LPAE - effectively the helper should
-always return false.
-
-I've updated the check locally to key off of CONFIG_PGTABLE_LEVELS. I'll
-post these patches later today.
+Note that when merged on top of 4.19-rc5, this is already 160. I assume 
+this will be even different once this lands in mainline.
 
 Thanks,
-Punit
+
+	M.
+
+> +
+> +#ifndef KVM_VM_TYPE_ARM_IPA_SIZE
+> +#define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
+> +#define KVM_VM_TYPE_ARM_IPA_SIZE(x)	\
+> +	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+> +#endif
+> +
+> +void kvm__arch_init_hyp(struct kvm *kvm)
+> +{
+> +	int max_ipa;
+> +
+> +	if (!kvm->cfg.arch.phys_shift)
+> +		kvm->cfg.arch.phys_shift = 40;
+> +	if (kvm->cfg.arch.phys_shift == 40)
+> +		return;
+> +	max_ipa = ioctl(kvm->sys_fd,
+> +			KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
+> +	if (!max_ipa)
+> +		die("Kernel doesn't support IPA size configuration\n");
+> +	if ((kvm->cfg.arch.phys_shift > max_ipa) ||
+> +	    (kvm->cfg.arch.phys_shift < 32))
+> +		die("Requested PA size (%u) is not supported by the host"
+> +		    " [32 - %u]bit\n",
+> +		    kvm->cfg.arch.phys_shift, max_ipa);
+> +	kvm_arm_type = KVM_VM_TYPE_ARM_IPA_SIZE(kvm->cfg.arch.phys_shift);
+> +}
+> +
+>   bool kvm__arch_cpu_supports_vm(void)
+>   {
+>   	/* The KVM capability check is enough. */
+> 
+
+
+-- 
+Jazz is not dead. It just smells funny...
