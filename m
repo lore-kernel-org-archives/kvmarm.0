@@ -1,14 +1,14 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 07/18] kvm: arm64: Configure VTCR_EL2 per VM
-Date: Tue, 2 Oct 2018 09:48:22 +0200
-Message-ID: <04eac5b3-b7b1-1f29-954d-1401f7e41caa@redhat.com>
+Subject: Re: [PATCH v6 11/18] kvm: arm64: Dynamic configuration of VTTBR mask
+Date: Tue, 2 Oct 2018 09:54:18 +0200
+Message-ID: <ec1a9aa3-e164-a353-609e-e9aabbd33d2b@redhat.com>
 References: <20180926163258.20218-1-suzuki.poulose@arm.com>
- <20180926163258.20218-8-suzuki.poulose@arm.com>
+ <20180926163258.20218-12-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180926163258.20218-8-suzuki.poulose@arm.com>
+In-Reply-To: <20180926163258.20218-12-suzuki.poulose@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
@@ -18,19 +18,16 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Suzuki,
 
 On 9/26/18 6:32 PM, Suzuki K Poulose wrote:
-> Add support for setting the VTCR_EL2 per VM, rather than hard
-> coding a value at boot time per CPU. This would allow us to tune
-> the stage2 page table parameters per VM in the later changes.
+> On arm64 VTTBR_EL2:BADDR holds the base address for the stage2
+> translation table. The Arm ARM mandates that the bits BADDR[x-1:0]
+> should be 0, where 'x' is defined for a given IPA Size and the
+> number of levels for a translation granule size. It is defined
+> using some magical constants. This patch is a reverse engineered
+> implementation to calculate the 'x' at runtime for a given ipa and
+> number of page table levels. See patch for more details.
 > 
-> We compute the VTCR fields based on the system wide sanitised
-> feature registers, except for the hardware management of Access
-> Flags (VTCR_EL2.HA). It is fine to run a system with a mix of
-> CPUs that may or may not update the page table Access Flags.
-> Since the bit is RES0 on CPUs that don't support it, the bit
-> should be ignored on them.
-> 
-> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
-> Acked-by: Christoffer Dall <cdall@kernel.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
@@ -39,238 +36,173 @@ Thanks
 Eric
 > ---
 > Changes since v5:
->  - Set the missing TCR_T0SZ initialisation (Eric Auger)
->    and limit the T0SZ to the real CPU limit or KVM_PHYS_SHIFT
->    whichever is lower.
+>  - Update comment about the Magic_N for VTTBR_X calculation
+>  - Remove the obsolete VTTBR_TGRAN_MAGIC value defintions
+> Changes since V3:
+>  - Update reference to latest ARM ARM and improve commentary
 > ---
->  arch/arm64/include/asm/kvm_arm.h  |  3 +-
->  arch/arm64/include/asm/kvm_asm.h  |  2 -
->  arch/arm64/include/asm/kvm_host.h | 12 ++++--
->  arch/arm64/include/asm/kvm_hyp.h  |  1 +
->  arch/arm64/kvm/hyp/Makefile       |  1 -
->  arch/arm64/kvm/hyp/s2-setup.c     | 72 -------------------------------
->  arch/arm64/kvm/reset.c            | 35 +++++++++++++++
->  7 files changed, 45 insertions(+), 81 deletions(-)
->  delete mode 100644 arch/arm64/kvm/hyp/s2-setup.c
+>  arch/arm64/include/asm/kvm_arm.h | 73 ++++++++++++++++++++++++++++----
+>  arch/arm64/include/asm/kvm_mmu.h | 25 ++++++++++-
+>  2 files changed, 88 insertions(+), 10 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 5f807b680a5f..14317b3a1820 100644
+> index 14317b3a1820..b236d90ca056 100644
 > --- a/arch/arm64/include/asm/kvm_arm.h
 > +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -135,8 +135,7 @@
->   * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
->   * not known to exist and will break with this configuration.
->   *
-> - * VTCR_EL2.PS is extracted from ID_AA64MMFR0_EL1.PARange at boot time
-> - * (see hyp-init.S).
-> + * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_config_vm().
->   *
+> @@ -123,7 +123,6 @@
+>  #define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
+>  #define VTCR_EL2_SL0_LVL1	(1 << VTCR_EL2_SL0_SHIFT)
+>  #define VTCR_EL2_T0SZ_MASK	0x3f
+> -#define VTCR_EL2_T0SZ_40B	24
+>  #define VTCR_EL2_VS_SHIFT	19
+>  #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
+>  #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
+> @@ -140,11 +139,8 @@
 >   * Note that when using 4K pages, we concatenate two first level page tables
 >   * together. With 16K pages, we concatenate 16 first level page tables.
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 102b5a5c47b6..0b53c72e7591 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -72,8 +72,6 @@ extern void __vgic_v3_init_lrs(void);
->  
->  extern u32 __kvm_get_mdcr_el2(void);
->  
-> -extern u32 __init_stage2_translation(void);
-> -
->  /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
->  #define __hyp_this_cpu_ptr(sym)						\
->  	({								\
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index b04280ae1be0..5ecd457bce7d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -61,11 +61,13 @@ struct kvm_arch {
->  	u64    vmid_gen;
->  	u32    vmid;
->  
-> -	/* 1-level 2nd stage table, protected by kvm->mmu_lock */
-> +	/* stage2 entry level table */
->  	pgd_t *pgd;
->  
->  	/* VTTBR value associated with above pgd and vmid */
->  	u64    vttbr;
-> +	/* VTCR_EL2 value for this VM */
-> +	u64    vtcr;
->  
->  	/* The last vcpu id that ran on each physical CPU */
->  	int __percpu *last_vcpu_ran;
-> @@ -442,10 +444,12 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  
->  static inline void __cpu_init_stage2(void)
->  {
-> -	u32 parange = kvm_call_hyp(__init_stage2_translation);
-> +	u32 ps;
->  
-> -	WARN_ONCE(parange < 40,
-> -		  "PARange is %d bits, unsupported configuration!", parange);
-> +	/* Sanity check for minimum IPA size support */
-> +	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1) & 0x7);
-> +	WARN_ONCE(ps < 40,
-> +		  "PARange is %d bits, unsupported configuration!", ps);
->  }
->  
->  /* Guest/host FPSIMD coordination helpers */
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index d1bd1e0f14d7..23aca66767f9 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -161,6 +161,7 @@ void __noreturn __hyp_do_panic(unsigned long, ...);
+>   *
+> - * The magic numbers used for VTTBR_X in this patch can be found in Tables
+> - * D4-23 and D4-25 in ARM DDI 0487A.b.
 >   */
->  static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
+>  
+> -#define VTCR_EL2_T0SZ_IPA	VTCR_EL2_T0SZ_40B
+>  #define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
+>  				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
+>  
+> @@ -155,7 +151,6 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		38
+>  #elif defined(CONFIG_ARM64_16K_PAGES)
+>  /*
+>   * Stage2 translation configuration:
+> @@ -163,7 +158,6 @@
+>   * 2 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		42
+>  #else	/* 4K */
+>  /*
+>   * Stage2 translation configuration:
+> @@ -171,13 +165,74 @@
+>   * 3 level page tables (SL = 1)
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1)
+> -#define VTTBR_X_TGRAN_MAGIC		37
+>  #endif
+>  
+>  #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN_FLAGS)
+> -#define VTTBR_X				(VTTBR_X_TGRAN_MAGIC - VTCR_EL2_T0SZ_IPA)
+> +/*
+> + * ARM VMSAv8-64 defines an algorithm for finding the translation table
+> + * descriptors in section D4.2.8 in ARM DDI 0487C.a.
+> + *
+> + * The algorithm defines the expectations on the translation table
+> + * addresses for each level, based on PAGE_SIZE, entry level
+> + * and the translation table size (T0SZ). The variable "x" in the
+> + * algorithm determines the alignment of a table base address at a given
+> + * level and thus determines the alignment of VTTBR:BADDR for stage2
+> + * page table entry level.
+> + * Since the number of bits resolved at the entry level could vary
+> + * depending on the T0SZ, the value of "x" is defined based on a
+> + * Magic constant for a given PAGE_SIZE and Entry Level. The
+> + * intermediate levels must be always aligned to the PAGE_SIZE (i.e,
+> + * x = PAGE_SHIFT).
+> + *
+> + * The value of "x" for entry level is calculated as :
+> + *    x = Magic_N - T0SZ
+> + *
+> + * where Magic_N is an integer depending on the page size and the entry
+> + * level of the page table as below:
+> + *
+> + *	--------------------------------------------
+> + *	| Entry level		|  4K    16K   64K |
+> + *	--------------------------------------------
+> + *	| Level: 0 (4 levels)	| 28   |  -  |  -  |
+> + *	--------------------------------------------
+> + *	| Level: 1 (3 levels)	| 37   | 31  | 25  |
+> + *	--------------------------------------------
+> + *	| Level: 2 (2 levels)	| 46   | 42  | 38  |
+> + *	--------------------------------------------
+> + *	| Level: 3 (1 level)	| -    | 53  | 51  |
+> + *	--------------------------------------------
+> + *
+> + * We have a magic formula for the Magic_N below:
+> + *
+> + *  Magic_N(PAGE_SIZE, Level) = 64 - ((PAGE_SHIFT - 3) * Number_of_levels)
+> + *
+> + * where Number_of_levels = (4 - Level). We are only interested in the
+> + * value for Entry_Level for the stage2 page table.
+> + *
+> + * So, given that T0SZ = (64 - IPA_SHIFT), we can compute 'x' as follows:
+> + *
+> + *	x = (64 - ((PAGE_SHIFT - 3) * Number_of_levels)) - (64 - IPA_SHIFT)
+> + *	  = IPA_SHIFT - ((PAGE_SHIFT - 3) * Number of levels)
+> + *
+> + * Here is one way to explain the Magic Formula:
+> + *
+> + *  x = log2(Size_of_Entry_Level_Table)
+> + *
+> + * Since, we can resolve (PAGE_SHIFT - 3) bits at each level, and another
+> + * PAGE_SHIFT bits in the PTE, we have :
+> + *
+> + *  Bits_Entry_level = IPA_SHIFT - ((PAGE_SHIFT - 3) * (n - 1) + PAGE_SHIFT)
+> + *		     = IPA_SHIFT - (PAGE_SHIFT - 3) * n - 3
+> + *  where n = number of levels, and since each pointer is 8bytes, we have:
+> + *
+> + *  x = Bits_Entry_Level + 3
+> + *    = IPA_SHIFT - (PAGE_SHIFT - 3) * n
+> + *
+> + * The only constraint here is that, we have to find the number of page table
+> + * levels for a given IPA size (which we do, see stage2_pt_levels())
+> + */
+> +#define ARM64_VTTBR_X(ipa, levels)	((ipa) - ((levels) * (PAGE_SHIFT - 3)))
+>  
+> -#define VTTBR_BADDR_MASK  (((UL(1) << (PHYS_MASK_SHIFT - VTTBR_X)) - 1) << VTTBR_X)
+>  #define VTTBR_VMID_SHIFT  (UL(48))
+>  #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
+>  
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 7342d2c51773..ac3ca9690bad 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -145,7 +145,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+>  #define kvm_phys_shift(kvm)		KVM_PHYS_SHIFT
+>  #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
+>  #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
+> -#define kvm_vttbr_baddr_mask(kvm)	VTTBR_BADDR_MASK
+>  
+>  static inline bool kvm_page_empty(void *ptr)
 >  {
-> +	write_sysreg(kvm->arch.vtcr, vtcr_el2);
->  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
->  }
+> @@ -520,5 +519,29 @@ static inline int hyp_map_aux_data(void)
 >  
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 2fabc2dc1966..82d1904328ad 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -19,7 +19,6 @@ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
->  obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
->  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
->  obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
-> -obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
->  
->  # KVM code is run at a different exception code with a different map, so
->  # compiler instrumentation that inserts callbacks or checks into the code may
-> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-> deleted file mode 100644
-> index e1ca672e937a..000000000000
-> --- a/arch/arm64/kvm/hyp/s2-setup.c
-> +++ /dev/null
-> @@ -1,72 +0,0 @@
-> -/*
-> - * Copyright (C) 2016 - ARM Ltd
-> - * Author: Marc Zyngier <marc.zyngier@arm.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> - */
-> -
-> -#include <linux/types.h>
-> -#include <asm/kvm_arm.h>
-> -#include <asm/kvm_asm.h>
-> -#include <asm/kvm_hyp.h>
-> -#include <asm/cpufeature.h>
-> -
-> -u32 __hyp_text __init_stage2_translation(void)
-> -{
-> -	u64 val = VTCR_EL2_FLAGS;
-> -	u64 parange;
-> -	u32 phys_shift;
-> -	u64 tmp;
-> -
-> -	/*
-> -	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS
-> -	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, but the
-> -	 * allocated values are limited to 3bits.
-> -	 */
-> -	parange = read_sysreg(id_aa64mmfr0_el1) & 7;
-> -	if (parange > ID_AA64MMFR0_PARANGE_MAX)
-> -		parange = ID_AA64MMFR0_PARANGE_MAX;
-> -	val |= parange << VTCR_EL2_PS_SHIFT;
-> -
-> -	/* Compute the actual PARange... */
-> -	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
-> -
-> -	/*
-> -	 * ... and clamp it to 40 bits, unless we have some braindead
-> -	 * HW that implements less than that. In all cases, we'll
-> -	 * return that value for the rest of the kernel to decide what
-> -	 * to do.
-> -	 */
-> -	val |= VTCR_EL2_T0SZ(phys_shift > 40 ? 40 : phys_shift);
-> -
-> -	/*
-> -	 * Check the availability of Hardware Access Flag / Dirty Bit
-> -	 * Management in ID_AA64MMFR1_EL1 and enable the feature in VTCR_EL2.
-> -	 */
-> -	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_HADBS_SHIFT) & 0xf;
-> -	if (tmp)
-> -		val |= VTCR_EL2_HA;
-> -
-> -	/*
-> -	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
-> -	 * bit in VTCR_EL2.
-> -	 */
-> -	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_VMIDBITS_SHIFT) & 0xf;
-> -	val |= (tmp == ID_AA64MMFR1_VMIDBITS_16) ?
-> -			VTCR_EL2_VS_16BIT :
-> -			VTCR_EL2_VS_8BIT;
-> -
-> -	write_sysreg(val, vtcr_el2);
-> -
-> -	return phys_shift;
-> -}
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index b0c07dab5cb3..616120c4176b 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -26,6 +26,7 @@
->  
->  #include <kvm/arm_arch_timer.h>
->  
-> +#include <asm/cpufeature.h>
->  #include <asm/cputype.h>
->  #include <asm/ptrace.h>
->  #include <asm/kvm_arm.h>
-> @@ -134,9 +135,43 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	return kvm_timer_vcpu_reset(vcpu);
->  }
+>  #define kvm_phys_to_vttbr(addr)		phys_to_ttbr(addr)
 >  
 > +/*
-> + * Configure the VTCR_EL2 for this VM. The VTCR value is common
-> + * across all the physical CPUs on the system. We use system wide
-> + * sanitised values to fill in different fields, except for Hardware
-> + * Management of Access Flags. HA Flag is set unconditionally on
-> + * all CPUs, as it is safe to run with or without the feature and
-> + * the bit is RES0 on CPUs that don't support it.
+> + * Get the magic number 'x' for VTTBR:BADDR of this KVM instance.
+> + * With v8.2 LVA extensions, 'x' should be a minimum of 6 with
+> + * 52bit IPS.
 > + */
->  int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
->  {
-> +	u64 vtcr = VTCR_EL2_FLAGS;
-> +	u32 parange, phys_shift;
+> +static inline int arm64_vttbr_x(u32 ipa_shift, u32 levels)
+> +{
+> +	int x = ARM64_VTTBR_X(ipa_shift, levels);
 > +
->  	if (type)
->  		return -EINVAL;
+> +	return (IS_ENABLED(CONFIG_ARM64_PA_BITS_52) && x < 6) ? 6 : x;
+> +}
 > +
-> +	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 7;
-> +	if (parange > ID_AA64MMFR0_PARANGE_MAX)
-> +		parange = ID_AA64MMFR0_PARANGE_MAX;
-> +	vtcr |= parange << VTCR_EL2_PS_SHIFT;
+> +static inline u64 vttbr_baddr_mask(u32 ipa_shift, u32 levels)
+> +{
+> +	unsigned int x = arm64_vttbr_x(ipa_shift, levels);
 > +
-> +	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
-> +	if (phys_shift > KVM_PHYS_SHIFT)
-> +		phys_shift = KVM_PHYS_SHIFT;
-> +	vtcr |= VTCR_EL2_T0SZ(phys_shift);
+> +	return GENMASK_ULL(PHYS_MASK_SHIFT - 1, x);
+> +}
 > +
-> +	/*
-> +	 * Enable the Hardware Access Flag management, unconditionally
-> +	 * on all CPUs. The features is RES0 on CPUs without the support
-> +	 * and must be ignored by the CPUs.
-> +	 */
-> +	vtcr |= VTCR_EL2_HA;
+> +static inline u64 kvm_vttbr_baddr_mask(struct kvm *kvm)
+> +{
+> +	return vttbr_baddr_mask(kvm_phys_shift(kvm), kvm_stage2_levels(kvm));
+> +}
 > +
-> +	/* Set the vmid bits */
-> +	vtcr |= (kvm_get_vmid_bits() == 16) ?
-> +		VTCR_EL2_VS_16BIT :
-> +		VTCR_EL2_VS_8BIT;
-> +	kvm->arch.vtcr = vtcr;
->  	return 0;
->  }
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
 > 
