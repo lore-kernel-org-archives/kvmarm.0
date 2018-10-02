@@ -1,95 +1,201 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 13/18] kvm: arm64: Switch to per VM IPA limit
-Date: Tue, 2 Oct 2018 09:58:27 +0200
-Message-ID: <ecaafbc4-ea70-d0e6-ced0-8ab90f445e4b@redhat.com>
+Subject: Re: [PATCH v6 16/18] kvm: arm64: Set a limit on the IPA size
+Date: Tue, 2 Oct 2018 10:20:21 +0200
+Message-ID: <b8c4ee4e-b9f2-c1ac-cea3-f11106c2aafd@redhat.com>
 References: <20180926163258.20218-1-suzuki.poulose@arm.com>
- <20180926163258.20218-14-suzuki.poulose@arm.com>
+ <20180926163258.20218-17-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180926163258.20218-14-suzuki.poulose@arm.com>
+In-Reply-To: <20180926163258.20218-17-suzuki.poulose@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
-On 9/26/18 6:32 PM, Suzuki K Poulose wrote:
-> Now that we can manage the stage2 page table per VM, switch the
-> configuration details to per VM instance. The VTCR is updated
-> with the values specific to the VM based on the configuration.
-> We store the IPA size and the number of stage2 page table levels
-> for the guest already in VTCR. Decode it back from the vtcr
-> field wherever we need it.
-> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <cdall@kernel.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi,
 
+On 9/26/18 6:32 PM, Suzuki K Poulose wrote:
+> So far we have restricted the IPA size of the VM to the default
+> value (40bits). Now that we can manage the IPA size per VM and
+> support dynamic stage2 page tables, we can allow VMs to have
+> larger IPA. This patch introduces a the maximum IPA size
+> supported on the host.
+nit: a the -> computes the max IPA size that can be supported for any VM ?
+
+Besides
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-> ---
->  arch/arm64/include/asm/kvm_arm.h        | 2 ++
->  arch/arm64/include/asm/kvm_mmu.h        | 2 +-
->  arch/arm64/include/asm/stage2_pgtable.h | 2 +-
->  arch/arm64/kvm/reset.c                  | 2 +-
->  4 files changed, 5 insertions(+), 3 deletions(-)
+
+ This is decided by the following factors :
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index f913adb44f93..e4240568cc18 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -197,6 +197,8 @@
->  	VTCR_EL2_SL0_TO_LVLS(((vtcr) & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT)
+>  1) Maximum PARange supported by the CPUs - This can be inferred
+>     from the system wide safe value.
+>  2) Maximum PA size supported by the host kernel (48 vs 52)
+>  3) Number of levels in the host page table (as we base our
+>     stage2 tables on the host table helpers).
+> 
+> Since the stage2 page table code is dependent on the stage1
+> page table, we always ensure that :
+> 
+>   Number of Levels at Stage1 >= Number of Levels at Stage2
+> 
+> So we limit the IPA to make sure that the above condition
+> is satisfied. This will affect the following combinations
+> of VA_BITS and IPA for different page sizes.
+> 
+>   Host configuration | Unsupported IPA ranges
+>   39bit VA, 4K       | [44, 48]
+>   36bit VA, 16K      | [41, 48]
+>   42bit VA, 64K      | [47, 52]
+> 
+> Supporting the above combinations need independent stage2
+> page table manipulation code, which would need substantial
+> changes. We could purse the solution independently and
+> switch the page table code once we have it ready.
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <cdall@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v5:
+>  - Don't raise the IPA limit to 40bits
+>  - Print the KVM IPA limit, WARN if the limit is less than the
+>    default size. Drop the per-CPU PARange check
+>  - If the limit was reduced due to kernel configuration,
+>    report the limiting factor. i.e, kernel virtual vs physical
+>    address limit.
+> Changes since V2:
+>  - Restrict the IPA size to limit the number of page table
+>    levels in stage2 to that of stage1 or less.
+> ---
+>  arch/arm/include/asm/kvm_mmu.h    |  2 ++
+>  arch/arm64/include/asm/kvm_host.h | 12 +++------
+>  arch/arm64/kvm/reset.c            | 43 +++++++++++++++++++++++++++++++
+>  virt/kvm/arm/arm.c                |  2 ++
+>  4 files changed, 50 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 12ae5fbbcf01..5ad1a54f98dc 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -358,6 +358,8 @@ static inline int hyp_map_aux_data(void)
 >  
->  #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-> +#define VTCR_EL2_IPA(vtcr)		(64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
+>  #define kvm_phys_to_vttbr(addr)		(addr)
+>  
+> +static inline void kvm_set_ipa_limit(void) {}
 > +
->  /*
->   * ARM VMSAv8-64 defines an algorithm for finding the translation table
->   * descriptors in section D4.2.8 in ARM DDI 0487C.a.
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index ac3ca9690bad..77b1af9e64db 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -142,7 +142,7 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
->   */
->  #define KVM_PHYS_SHIFT	(40)
+>  #endif	/* !__ASSEMBLY__ */
 >  
-> -#define kvm_phys_shift(kvm)		KVM_PHYS_SHIFT
-> +#define kvm_phys_shift(kvm)		VTCR_EL2_IPA(kvm->arch.vtcr)
->  #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
->  #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
+>  #endif /* __ARM_KVM_MMU_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 5ecd457bce7d..f008f8866b2a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -442,15 +442,7 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  			       struct kvm_device_attr *attr);
 >  
-> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> index 36a0a1165003..c62fe118a898 100644
-> --- a/arch/arm64/include/asm/stage2_pgtable.h
-> +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> @@ -43,7 +43,7 @@
->   */
->  #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
->  #define STAGE2_PGTABLE_LEVELS		stage2_pgtable_levels(KVM_PHYS_SHIFT)
-> -#define kvm_stage2_levels(kvm)		stage2_pgtable_levels(kvm_phys_shift(kvm))
-> +#define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
+> -static inline void __cpu_init_stage2(void)
+> -{
+> -	u32 ps;
+> -
+> -	/* Sanity check for minimum IPA size support */
+> -	ps = id_aa64mmfr0_parange_to_phys_shift(read_sysreg(id_aa64mmfr0_el1) & 0x7);
+> -	WARN_ONCE(ps < 40,
+> -		  "PARange is %d bits, unsupported configuration!", ps);
+> -}
+> +static inline void __cpu_init_stage2(void) {}
 >  
->  /*
->   * With all the supported VA_BITs and 40bit guest IPA, the following condition
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> @@ -513,6 +505,8 @@ static inline int kvm_arm_have_ssbd(void)
+>  void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+>  
+> +void kvm_set_ipa_limit(void);
+> +
+>  #define __KVM_HAVE_ARCH_VM_ALLOC
+>  struct kvm *kvm_arch_alloc_vm(void);
+>  void kvm_arch_free_vm(struct kvm *kvm);
 > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 1ced1e37374e..2bf41e007390 100644
+> index 2bf41e007390..96b3f50101bc 100644
 > --- a/arch/arm64/kvm/reset.c
 > +++ b/arch/arm64/kvm/reset.c
-> @@ -160,7 +160,7 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
->  	if (phys_shift > KVM_PHYS_SHIFT)
->  		phys_shift = KVM_PHYS_SHIFT;
->  	vtcr |= VTCR_EL2_T0SZ(phys_shift);
-> -	vtcr |= VTCR_EL2_LVLS_TO_SL0(kvm_stage2_levels(kvm));
-> +	vtcr |= VTCR_EL2_LVLS_TO_SL0(stage2_pgtable_levels(phys_shift));
+> @@ -34,6 +34,9 @@
+>  #include <asm/kvm_coproc.h>
+>  #include <asm/kvm_mmu.h>
 >  
->  	/*
->  	 * Enable the Hardware Access Flag management, unconditionally
+> +/* Maximum phys_shift supported for any VM on this host */
+> +static u32 kvm_ipa_limit;
+> +
+>  /*
+>   * ARMv8 Reset Values
+>   */
+> @@ -135,6 +138,46 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	return kvm_timer_vcpu_reset(vcpu);
+>  }
+>  
+> +void kvm_set_ipa_limit(void)
+> +{
+> +	unsigned int ipa_max, pa_max, va_max, parange;
+> +
+> +	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
+> +	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
+> +
+> +	/* Clamp the IPA limit to the PA size supported by the kernel */
+> +	ipa_max = (pa_max > PHYS_MASK_SHIFT) ? PHYS_MASK_SHIFT : pa_max;
+> +	/*
+> +	 * Since our stage2 table is dependent on the stage1 page table code,
+> +	 * we must always honor the following condition:
+> +	 *
+> +	 *  Number of levels in Stage1 >= Number of levels in Stage2.
+> +	 *
+> +	 * So clamp the ipa limit further down to limit the number of levels.
+> +	 * Since we can concatenate upto 16 tables at entry level, we could
+> +	 * go upto 4bits above the maximum VA addressible with the current
+> +	 * number of levels.
+> +	 */
+> +	va_max = PGDIR_SHIFT + PAGE_SHIFT - 3;
+> +	va_max += 4;
+> +
+> +	if (va_max < ipa_max)
+> +		ipa_max = va_max;
+> +
+> +	/*
+> +	 * If the final limit is lower than the real physical address
+> +	 * limit of the CPUs, report the reason.
+> +	 */
+> +	if (ipa_max < pa_max)
+> +		pr_info("kvm: Limiting the IPA size due to kernel %s Address limit\n",
+> +			(va_max < pa_max) ? "Virtual" : "Physical");
+> +
+> +	WARN(ipa_max < KVM_PHYS_SHIFT,
+> +	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
+> +	kvm_ipa_limit = ipa_max;
+> +	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
+> +}
+> +
+>  /*
+>   * Configure the VTCR_EL2 for this VM. The VTCR value is common
+>   * across all the physical CPUs on the system. We use system wide
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 43e716bc3f08..631f9a3ad99a 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1413,6 +1413,8 @@ static int init_common_resources(void)
+>  	kvm_vmid_bits = kvm_get_vmid_bits();
+>  	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
+>  
+> +	kvm_set_ipa_limit();
+> +
+>  	return 0;
+>  }
+>  
 > 
