@@ -1,100 +1,89 @@
-From: Punit Agrawal <punit.agrawal@arm.com>
-Subject: Re: [PATCH v8 9/9] KVM: arm64: Add support for creating PUD hugepages at stage 2
-Date: Tue, 02 Oct 2018 09:52:43 +0100
-Message-ID: <87y3bgk9wk.fsf@e105922-lin.cambridge.arm.com>
-References: <20181001155443.23032-1-punit.agrawal@arm.com>
-        <20181001155443.23032-10-punit.agrawal@arm.com>
-        <3bd022cd-e470-479a-d7a5-680810db6a42@arm.com>
+From: Lance Roy <ldr709@gmail.com>
+Subject: [PATCH 16/16] KVM: arm/arm64: vgic: Replace spin_is_locked() with lockdep
+Date: Tue,  2 Oct 2018 22:39:02 -0700
+Message-ID: <20181003053902.6910-17-ldr709@gmail.com>
+References: <20181003053902.6910-1-ldr709@gmail.com>
+Reply-To: Lance Roy <ldr709@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3bd022cd-e470-479a-d7a5-680810db6a42@arm.com> (Suzuki
-        K. Poulose's message of "Mon, 1 Oct 2018 22:30:00 +0100")
+In-Reply-To: <20181003053902.6910-1-ldr709@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+To: linux-kernel@vger.kernel.org
+Cc: "Paul E. McKenney" <paulmck@linux.ibm.com>, Lance Roy <ldr709@gmail.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+lockdep_assert_held() is better suited to checking locking requirements,
+since it won't get confused when someone else holds the lock. This is
+also a step towards possibly removing spin_is_locked().
 
-> On 10/01/2018 04:54 PM, Punit Agrawal wrote:
->> KVM only supports PMD hugepages at stage 2. Now that the various page
->> handling routines are updated, extend the stage 2 fault handling to
->> map in PUD hugepages.
->>
->> Addition of PUD hugepage support enables additional page sizes (e.g.,
->> 1G with 4K granule) which can be useful on cores that support mapping
->> larger block sizes in the TLB entries.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_mmu.h         |  20 +++++
->>   arch/arm/include/asm/stage2_pgtable.h  |   9 +++
->>   arch/arm64/include/asm/kvm_mmu.h       |  16 ++++
->>   arch/arm64/include/asm/pgtable-hwdef.h |   2 +
->>   arch/arm64/include/asm/pgtable.h       |   2 +
->>   virt/kvm/arm/mmu.c                     | 106 +++++++++++++++++++++++--
->>   6 files changed, 149 insertions(+), 6 deletions(-)
->>
->
-> ...
->
->> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
->> index f6a7ea805232..a4ec25360e50 100644
->> --- a/arch/arm/include/asm/stage2_pgtable.h
->> +++ b/arch/arm/include/asm/stage2_pgtable.h
->> @@ -68,4 +68,13 @@ stage2_pmd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
->>   #define stage2_pmd_table_empty(kvm, pmdp)	kvm_page_empty(pmdp)
->>   #define stage2_pud_table_empty(kvm, pudp)	false
->>   +static inline bool kvm_stage2_has_pud(struct kvm *kvm)
->> +{
->> +#if CONFIG_PGTABLE_LEVELS > 3
->> +	return true;
->> +#else
->> +	return false;
->> +#endif
->
-> nit: We can only have PGTABLE_LEVELS=3 on ARM with LPAE.
-> AFAIT, this can be set to false always for ARM.
+Signed-off-by: Lance Roy <ldr709@gmail.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: <kvmarm@lists.cs.columbia.edu>
+---
+ virt/kvm/arm/vgic/vgic.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-I debated this and veered towards being generic but not committed either
-ways.
-
-I've updated this locally but will wait for further comments before
-re-posting.
-
->
->> +}
->> +
->
-> ...
->
->> @@ -1669,7 +1752,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	needs_exec = exec_fault ||
->>   		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
->>   -	if (hugetlb && vma_pagesize == PMD_SIZE) {
->> +	if (hugetlb && vma_pagesize == PUD_SIZE) {
->> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
->> +
->> +		new_pud = kvm_pud_mkhuge(new_pud);
->> +		if (writable)
->> +			new_pud = kvm_s2pud_mkwrite(new_pud);
->> +
->> +		if (needs_exec)
->> +			new_pud = kvm_s2pud_mkexec(new_pud);
->> +
->> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
->> +	} else if (hugetlb && vma_pagesize == PMD_SIZE) {
->>   		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
->>     		new_pmd = kvm_pmd_mkhuge(new_pmd);
->>
->
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-Thanks a lot for going through the series.
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 7cfdfbc910e0..50e25438fb3c 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -196,7 +196,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
+  */
+ static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+ {
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
++	lockdep_assert_held(&irq->irq_lock);
+ 
+ 	/* If the interrupt is active, it must stay on the current vcpu */
+ 	if (irq->active)
+@@ -273,7 +273,7 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+ 	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
+ }
+@@ -311,7 +311,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ {
+ 	struct kvm_vcpu *vcpu;
+ 
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
++	lockdep_assert_held(&irq->irq_lock);
+ 
+ retry:
+ 	vcpu = vgic_target_oracle(irq);
+@@ -702,7 +702,7 @@ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+ static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
+ 				    struct vgic_irq *irq, int lr)
+ {
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
++	lockdep_assert_held(&irq->irq_lock);
+ 
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+ 		vgic_v2_populate_lr(vcpu, irq, lr);
+@@ -736,7 +736,7 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+ 
+ 	*multi_sgi = false;
+ 
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		int w;
+@@ -761,7 +761,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	bool multi_sgi;
+ 	u8 prio = 0xff;
+ 
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+ 
+ 	count = compute_ap_list_depth(vcpu, &multi_sgi);
+ 	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
+-- 
+2.19.0
