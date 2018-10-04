@@ -1,245 +1,80 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 00/18] kvm: arm64: Dynamic IPA and 52bit IPA
-Date: Thu, 4 Oct 2018 10:40:07 +0200
-Message-ID: <9cd03f6e-7738-0ad5-3eb6-4013ef0d3a1f@redhat.com>
-References: <20180926163258.20218-1-suzuki.poulose@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] ARM: KVM: Correctly order SGI register entries in the cp15
+ array
+Date: Thu,  4 Oct 2018 10:29:46 +0100
+Message-ID: <20181004092946.59836-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180926163258.20218-1-suzuki.poulose@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, cdall@kernel.org, will.deacon@arm.com, dave.martin@arm.com, peter.maydell@linaro.org, pbonzini@redhat.com, rkrcmar@redhat.com, julien.grall@arm.com, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 899774A1D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Oct 2018 05:30:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pYo8esUXQmhE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Oct 2018 05:30:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C8D40A6E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Oct 2018 05:30:00 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, Florian Fainelli <f.fainelli@gmail.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+The ICC_ASGI1R and ICC_SGI0R register entries in the cp15 array
+are not correctly ordered, leading to a BUG() at boot time.
 
-On 9/26/18 6:32 PM, Suzuki K Poulose wrote:
-> 
-> The physical address space size for a VM (IPA size) on arm/arm64 is
-> limited to a static limit of 40bits. This series adds support for
-> using an IPA size specific to a VM, allowing to use a size supported
-> by the host (based on the host kernel configuration and CPU support).
-> The default size is fixed to 40bits. On arm64, we can allow the limit
-> to be lowered (limiting the number of levels in stage2 to 2, to prevent
-> splitting the host PMD huge pages at stage2). We also add support for
-> handling 52bit IPA addresses (where supported) added by Arm v8.2
-> extensions.
-> 
-> We need to set the IPA limit as early as the VM creation to keep the
-> code simpler to avoid sprinkling checks everywhere to ensure that the
-> IPA is configured. We encode the IPA size in the machine_type
-> argument to KVM_CREATE_VM ioctl. Bits [7-0] of the type are reserved
-> for the IPA size. The availability of this feature is advertised by a
-> new cap KVM_CAP_ARM_VM_IPA_SIZE. When supported, this capability
-> returns the maximum IPA shift supported by the host. The supported IPA
-> size on a host could be different from the system's PARange indicated
-> by the CPUs (e.g, kernel limit on the PA size).
-> 
-> Supporting different IPA size requires modification to the stage2 page
-> table code. The arm64 page table level helpers are defined based on the
-> page table levels used by the host VA. So, the accessors may not work
-> if the guest uses more number of levels in stage2 than the stage1
-> of the host.  The previous versions (v1 & v2) of this series refactored
-> the stage1 page table accessors to reuse the low-level accessors for an
-> independent stage2 table. However, due to the level folding in the
-> generic code, the types are redefined as well. i.e, if the PUD is
-> folded, the pud_t could be defined as :
-> 
->  typedef struct { pgd_t pgd; } pud_t;
-> 
-> similarly for pmd_t.  So, without stage1 independent page table entry
-> types for stage2, we could be dealing with a different type for level
->  0-2 entries. This is practically fine on arm/arm64 as the entries
-> have similar format and size and we always use the appropriate
-> accessors to get the raw value (i.e, pud_val/pmd_val etc). But not
-> ideal for a solution upstream. So, this version caps the stage2 page
-> table levels to that of the stage1. This has the following impact on
-> the IPA support for various pagesize/host-va combinations :
-> 
-> 
-> x-----------------------------------------------------x
-> | host\ipa    | 40bit | 42bit | 44bit | 48bit | 52bit |
-> -------------------------------------------------------
-> | 39bit-4K    |  y    |   y   |  n    |   n   |  n/a  |
-> -------------------------------------------------------
-> | 48bit-4K    |  y    |   y   |  y    |   y   |  n/a  |
-> -------------------------------------------------------
-> | 36bit-16K   |  y    |   n   |  n    |   n   |  n/a  |
-> -------------------------------------------------------
-> | 47bit-16K   |  y    |   y   |  y    |   y   |  n/a  |
-> -------------------------------------------------------
-> | 48bit-4K    |  y    |   y   |  y    |   y   |  n/a  |
-> -------------------------------------------------------
-> | 42bit-64K   |  y    |   y   |  y    |   n   |  n    |
-> -------------------------------------------------------
-> | 48bit-64K   |  y    |   y   |  y    |   y   |  y    |
-> x-----------------------------------------------------x
-> 
-> Or the following list shows what cannot be supported :
-> 
->  39bit-4K host  | [44 - 48]
->  36bit-16K host | [41 - 48]
->  42bit-64K host | [47 - 52]
-> 
-> which is not really bad. We can pursue the independent stage2
-> page table support and lift the restriction once we get there.
-> Given there is a proposal for new generic page table walker [0],
-> it would make sense to make our efforts in sync with it to avoid
-> diverting from a common API.
-> 
-> 52bit support is added for VGIC (including ITS emulation) and handling
-> of PAR, HPFAR registers.
-> 
-> The series applies on 4.19-rc4. A tree is available here:
-> 
-> 	 git://linux-arm.org/linux-skp.git ipa52/v6
-> 
-> Tested with
->   - Modified kvmtool, which can only be used for (patches included in
->     the series for reference / testing):
->     * with virtio-pci upto 44bit PA (Due to 4K page size for virtio-pci
->       legacy implemented by kvmtool)
->     * Upto 48bit PA with virtio-mmio, due to 32bit PFN limitation.
->   - Hacked Qemu (boot loader support for highmem, IPA size support)
->     * with virtio-pci GIC-v3 ITS & MSI upto 52bit on Foundation model.
->     Also see [1] for Qemu support.
-> 
-> [0] https://lkml.org/lkml/2018/4/24/777
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05759.html
-> 
-> Change since v5:
->  - Don't raise the IPA Limit to 40bits on systems with lower PA size.
->    Doesn't break backward compatibility, we still allow KVM_CREATE_VM
->    to succeed with "0" as the IPA size (40bits). But prevent specifying
->    40bit explicitly, when the limit is lower.
->  - Rename CAP, KVM_CAP_ARM_VM_PHYS_SHIFT => KVM_CAP_ARM_VM_IPA_SIZE
->    and helper, KVM_VM_TYPE_ARM_VM_PHY_SHIFT => KVM_VM_TYPE_ARM_VM_IPA_SIZE
->  - Update Documentation of the API
->  - Update comments and commit description as reported by Eric
->  - Set the missing TCR_T0SZ in patch "kvm: arm64: Configure VTCR_EL2 per VM"
->  - Fix bits for CBASER_ADDRESS mask, GITS_CBASER_ADDRESS()
-> 
-> Changes since V4:
->  - Rebased on v4.19-rc3
->  - Dropped virtio patches queued already by mst.
->  - Collect Acks from Christoffer
->  - Restrict IPA configuration support to arm64 only
->  - Use KVM_CAP_ARM_VM_PHYS_SHIFT for detecting the support for
->    IPA size configuration along with the limit on the IPA for the host.
->  - Update comments on __load_guest_stage2
->  - Add comment about the default value for unknown PARange values.
->  - Update Documentation of the API
-> 
-> Changes since V3:
->  - Use per-VM VTCR instead per-VM private VTCR bits
->  - Allow IPA less than 40bits
->  - Split the patch adding support for stage2 dynamic page tables
->  - Rearrange the series to keep the userspace API at the end, which
->    needs further discussion.
->  - Collect Reviews/Acks from Eric & Marc
-> 
-> Changes since V2:
->  - Drop "refactoring of host page table helpers" and restrict the IPA size
->    to make sure stage2 doesn't use more page table levels than that of the host.
->  - Load VTCR for TLB operations on behalf of the VM (Pointed-by: James Morse)
->  - Split a couple of patches to make them easier to review.
->  - Fall back to normal (non-concatenated) entry level page table support if
->    possible.
->  - Bump the IOCTL number
-> 
-> Changes since V1:
->  - Change the userspace API for configuring VM to encode the IPA
->    size in the VM type.  (suggested by Christoffer)
->  - Expose the IPA limit on the host via ioctl on /dev/kvm
->  - Handle 52bit addresses in PAR & HPFAR
->  - Drop patch changing the life time of stage2 PGD
->  - Rename macros for 48-to-52 bit conversion for GIC ITS BASER.
->    (suggested by Christoffer)
->  - Split virtio PFN check patches and address comments.
-> 
-> 
-> Kristina Martsenko (1):
->   vgic: Add support for 52bit guest physical address
-> 
-> Suzuki K Poulose (17):
->   kvm: arm/arm64: Fix stage2_flush_memslot for 4 level page table
->   kvm: arm/arm64: Remove spurious WARN_ON
->   kvm: arm64: Add helper for loading the stage2 setting for a VM
->   arm64: Add a helper for PARange to physical shift conversion
->   kvm: arm64: Clean up VTCR_EL2 initialisation
->   kvm: arm/arm64: Allow arch specific configurations for VM
->   kvm: arm64: Configure VTCR_EL2 per VM
->   kvm: arm/arm64: Prepare for VM specific stage2 translations
->   kvm: arm64: Prepare for dynamic stage2 page table layout
->   kvm: arm64: Make stage2 page table layout dynamic
->   kvm: arm64: Dynamic configuration of VTTBR mask
->   kvm: arm64: Configure VTCR_EL2.SL0 per VM
->   kvm: arm64: Switch to per VM IPA limit
->   kvm: arm64: Add 52bit support for PAR to HPFAR conversoin
->   kvm: arm64: Set a limit on the IPA size
->   kvm: arm64: Limit the minimum number of page table levels
->   kvm: arm64: Allow tuning the physical address size for VM
-> 
->  Documentation/virtual/kvm/api.txt             |  31 +++
->  arch/arm/include/asm/kvm_arm.h                |   3 +-
->  arch/arm/include/asm/kvm_host.h               |   7 +
->  arch/arm/include/asm/kvm_mmu.h                |  15 +-
->  arch/arm/include/asm/stage2_pgtable.h         |  50 ++--
->  arch/arm64/include/asm/cpufeature.h           |  20 ++
->  arch/arm64/include/asm/kvm_arm.h              | 157 +++++++++---
->  arch/arm64/include/asm/kvm_asm.h              |   2 -
->  arch/arm64/include/asm/kvm_host.h             |  16 +-
->  arch/arm64/include/asm/kvm_hyp.h              |  10 +
->  arch/arm64/include/asm/kvm_mmu.h              |  42 +++-
->  arch/arm64/include/asm/stage2_pgtable-nopmd.h |  42 ----
->  arch/arm64/include/asm/stage2_pgtable-nopud.h |  39 ---
->  arch/arm64/include/asm/stage2_pgtable.h       | 236 +++++++++++++-----
->  arch/arm64/kvm/hyp/Makefile                   |   1 -
->  arch/arm64/kvm/hyp/s2-setup.c                 |  90 -------
->  arch/arm64/kvm/hyp/switch.c                   |   4 +-
->  arch/arm64/kvm/hyp/tlb.c                      |   4 +-
->  arch/arm64/kvm/reset.c                        | 103 ++++++++
->  include/linux/irqchip/arm-gic-v3.h            |   5 +
->  include/uapi/linux/kvm.h                      |  10 +
->  virt/kvm/arm/arm.c                            |   9 +-
->  virt/kvm/arm/mmu.c                            | 120 ++++-----
->  virt/kvm/arm/vgic/vgic-its.c                  |  36 +--
->  virt/kvm/arm/vgic/vgic-kvm-device.c           |   2 +-
->  virt/kvm/arm/vgic/vgic-mmio-v3.c              |   2 -
->  26 files changed, 648 insertions(+), 408 deletions(-)
->  delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
->  delete mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
->  delete mode 100644 arch/arm64/kvm/hyp/s2-setup.c
-> 
-> kvmtool changes:
-> 
-> Suzuki K Poulose (4):
->   kvmtool: Allow backends to run checks on the KVM device fd
->   kvmtool: arm64: Add support for guest physical address size
->   kvmtool: arm64: Switch memory layout
->   kvmtool: arm: Add support for creating VM with PA size
-> 
->  arm/aarch32/include/kvm/kvm-arch.h        |  6 ++--
->  arm/aarch64/include/kvm/kvm-arch.h        | 15 ++++++++--
->  arm/aarch64/include/kvm/kvm-config-arch.h |  5 +++-
->  arm/include/arm-common/kvm-arch.h         | 17 ++++++++----
->  arm/include/arm-common/kvm-config-arch.h  |  1 +
->  arm/kvm.c                                 | 34 ++++++++++++++++++++++-
->  include/kvm/kvm.h                         |  4 +++
->  kvm.c                                     |  2 ++
->  8 files changed, 71 insertions(+), 13 deletions(-)
-> 
+Move them to their natural location.
 
-Feel free to add
-Tested-by: Eric Auger <eric.auger@redhat.com>
+Fixes: 3e8a8a50c7ef ("KVM: arm: vgic-v3: Add support for ICC_SGI0R and ICC_ASGI1R accesses")
+Reported-by: Florian Fainelli <f.fainelli@gmail.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+Paolo, Radim,
 
-I tested this series with QEMU, using cold plugged 4GB PC-DIMM at 2TB on
-a Gigabyte machine. The VM is created with 43 IPA bits. I ran memtester
-on guest at 2TB using "memtester -p 20000000000 1G 1" and it succeeds.
+Could you please send this patch directly to Greg so that it makes it
+into 4.19? I thought I had it fixed long before the merge window, and
+obviously didn't...
 
-Thanks
+Thanks,
 
-Eric
+	M.
+
+ arch/arm/kvm/coproc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 450c7a4fbc8a..cb094e55dc5f 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -478,15 +478,15 @@ static const struct coproc_reg cp15_regs[] = {
+ 
+ 	/* ICC_SGI1R */
+ 	{ CRm64(12), Op1( 0), is64, access_gic_sgi},
+-	/* ICC_ASGI1R */
+-	{ CRm64(12), Op1( 1), is64, access_gic_sgi},
+-	/* ICC_SGI0R */
+-	{ CRm64(12), Op1( 2), is64, access_gic_sgi},
+ 
+ 	/* VBAR: swapped by interrupt.S. */
+ 	{ CRn(12), CRm( 0), Op1( 0), Op2( 0), is32,
+ 			NULL, reset_val, c12_VBAR, 0x00000000 },
+ 
++	/* ICC_ASGI1R */
++	{ CRm64(12), Op1( 1), is64, access_gic_sgi},
++	/* ICC_SGI0R */
++	{ CRm64(12), Op1( 2), is64, access_gic_sgi},
+ 	/* ICC_SRE */
+ 	{ CRn(12), CRm(12), Op1( 0), Op2(5), is32, access_gic_sre },
+ 
+-- 
+2.19.0
