@@ -1,7 +1,7 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [RFC 12/17] arm64: move ptrauth keys to thread_info
-Date: Fri,  5 Oct 2018 09:47:49 +0100
-Message-ID: <20181005084754.20950-13-kristina.martsenko@arm.com>
+Subject: [RFC 13/17] arm64: install user ptrauth keys at kernel exit time
+Date: Fri,  5 Oct 2018 09:47:50 +0100
+Message-ID: <20181005084754.20950-14-kristina.martsenko@arm.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181005084754.20950-1-kristina.martsenko@arm.com>
@@ -12,151 +12,145 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-To use pointer authentication in the kernel, we'll need to switch keys
-in the entry assembly. This patch moves the pointer auth keys into
-thread_info to make this possible.
-
-There should be no functional change as a result of this patch.
+This will mean we do more work per EL0 exception return, but is a
+stepping-stone to enable keys within the kernel.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 ---
- arch/arm64/include/asm/mmu.h          |  5 -----
- arch/arm64/include/asm/mmu_context.h  | 13 -------------
- arch/arm64/include/asm/pointer_auth.h | 13 +++++++------
- arch/arm64/include/asm/thread_info.h  |  4 ++++
- arch/arm64/kernel/process.c           |  4 ++++
- 5 files changed, 15 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/pointer_auth.h |  7 +------
+ arch/arm64/include/asm/ptrauth-asm.h  | 26 ++++++++++++++++++++++++++
+ arch/arm64/kernel/asm-offsets.c       |  7 +++++++
+ arch/arm64/kernel/entry.S             |  9 +++++++--
+ arch/arm64/kernel/process.c           |  1 -
+ 5 files changed, 41 insertions(+), 9 deletions(-)
+ create mode 100644 arch/arm64/include/asm/ptrauth-asm.h
 
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index f6480ea7b0d5..dd320df0d026 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -25,15 +25,10 @@
- 
- #ifndef __ASSEMBLY__
- 
--#include <asm/pointer_auth.h>
--
- typedef struct {
- 	atomic64_t	id;
- 	void		*vdso;
- 	unsigned long	flags;
--#ifdef CONFIG_ARM64_PTR_AUTH
--	struct ptrauth_keys	ptrauth_keys;
--#endif
- } mm_context_t;
- 
- /*
-diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-index 983f80925566..387e810063c7 100644
---- a/arch/arm64/include/asm/mmu_context.h
-+++ b/arch/arm64/include/asm/mmu_context.h
-@@ -215,8 +215,6 @@ static inline void __switch_mm(struct mm_struct *next)
- 		return;
- 	}
- 
--	mm_ctx_ptrauth_switch(&next->context);
--
- 	check_and_switch_context(next, cpu);
- }
- 
-@@ -242,17 +240,6 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
- void verify_cpu_asid_bits(void);
- void post_ttbr_update_workaround(void);
- 
--static inline void arch_bprm_mm_init(struct mm_struct *mm,
--				     struct vm_area_struct *vma)
--{
--	mm_ctx_ptrauth_init(&mm->context);
--}
--#define arch_bprm_mm_init arch_bprm_mm_init
--
--/*
-- * We need to override arch_bprm_mm_init before including the generic hooks,
-- * which are otherwise sufficient for us.
-- */
- #include <asm-generic/mm_hooks.h>
- 
- #endif /* !__ASSEMBLY__ */
 diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-index f5a4b075be65..cedb03bd175b 100644
+index cedb03bd175b..5e40533f4ea2 100644
 --- a/arch/arm64/include/asm/pointer_auth.h
 +++ b/arch/arm64/include/asm/pointer_auth.h
-@@ -63,16 +63,17 @@ static inline unsigned long ptrauth_strip_insn_pac(unsigned long ptr)
- 	return ptr & ~ptrauth_pac_mask();
+@@ -64,16 +64,11 @@ static inline unsigned long ptrauth_strip_insn_pac(unsigned long ptr)
  }
  
--#define mm_ctx_ptrauth_init(ctx) \
--	ptrauth_keys_init(&(ctx)->ptrauth_keys)
-+#define ptrauth_task_init_user(tsk)	\
-+	ptrauth_keys_init(&(tsk)->thread_info.keys_user); \
-+	ptrauth_keys_switch(&(tsk)->thread_info.keys_user)
- 
--#define mm_ctx_ptrauth_switch(ctx) \
--	ptrauth_keys_switch(&(ctx)->ptrauth_keys)
-+#define ptrauth_task_switch(tsk)	\
-+	ptrauth_keys_switch(&(tsk)->thread_info.keys_user)
+ #define ptrauth_task_init_user(tsk)	\
+-	ptrauth_keys_init(&(tsk)->thread_info.keys_user); \
+-	ptrauth_keys_switch(&(tsk)->thread_info.keys_user)
+-
+-#define ptrauth_task_switch(tsk)	\
+-	ptrauth_keys_switch(&(tsk)->thread_info.keys_user)
++	ptrauth_keys_init(&(tsk)->thread_info.keys_user)
  
  #else /* CONFIG_ARM64_PTR_AUTH */
  #define ptrauth_strip_insn_pac(lr)	(lr)
--#define mm_ctx_ptrauth_init(ctx)
--#define mm_ctx_ptrauth_switch(ctx)
-+#define ptrauth_task_init_user(tsk)
-+#define ptrauth_task_switch(tsk)
+ #define ptrauth_task_init_user(tsk)
+-#define ptrauth_task_switch(tsk)
  #endif /* CONFIG_ARM64_PTR_AUTH */
  
  #endif /* __ASM_POINTER_AUTH_H */
-diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
-index cb2c10a8f0a8..ea9272fb52d4 100644
---- a/arch/arm64/include/asm/thread_info.h
-+++ b/arch/arm64/include/asm/thread_info.h
-@@ -28,6 +28,7 @@
- struct task_struct;
- 
- #include <asm/memory.h>
-+#include <asm/pointer_auth.h>
- #include <asm/stack_pointer.h>
- #include <asm/types.h>
- 
-@@ -43,6 +44,9 @@ struct thread_info {
- 	u64			ttbr0;		/* saved TTBR0_EL1 */
- #endif
- 	int			preempt_count;	/* 0 => preemptable, <0 => bug */
+diff --git a/arch/arm64/include/asm/ptrauth-asm.h b/arch/arm64/include/asm/ptrauth-asm.h
+new file mode 100644
+index 000000000000..f50bdfc4046c
+--- /dev/null
++++ b/arch/arm64/include/asm/ptrauth-asm.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __ASM_PTRAUTH_ASM_H
++#define __ASM_PTRAUTH_ASM_H
++
++#include <asm/asm-offsets.h>
++#include <asm/sysreg.h>
++
 +#ifdef CONFIG_ARM64_PTR_AUTH
-+	struct ptrauth_keys	keys_user;
++
++	.macro ptrauth_keys_install_user tsk, tmp
++alternative_if ARM64_HAS_ADDRESS_AUTH
++	ldr	\tmp, [\tsk, #(TSK_TI_KEYS_USER + PTRAUTH_KEY_APIALO)]
++	msr_s	SYS_APIAKEYLO_EL1, \tmp
++	ldr	\tmp, [\tsk, #(TSK_TI_KEYS_USER + PTRAUTH_KEY_APIAHI)]
++	msr_s	SYS_APIAKEYHI_EL1, \tmp
++alternative_else_nop_endif
++	.endm
++
++#else /* CONFIG_ARM64_PTR_AUTH */
++
++	.macro ptrauth_keys_install_user tsk, tmp
++	.endm
++
++#endif /* CONFIG_ARM64_PTR_AUTH */
++
++#endif /* __ASM_PTRAUTH_ASM_H */
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 323aeb5f2fe6..b6be0dd037fd 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -45,6 +45,9 @@ int main(void)
+ #ifdef CONFIG_ARM64_SW_TTBR0_PAN
+   DEFINE(TSK_TI_TTBR0,		offsetof(struct task_struct, thread_info.ttbr0));
+ #endif
++#ifdef CONFIG_ARM64_PTR_AUTH
++  DEFINE(TSK_TI_KEYS_USER, 	offsetof(struct task_struct, thread_info.keys_user));
 +#endif
- };
+   DEFINE(TSK_STACK,		offsetof(struct task_struct, stack));
+   BLANK();
+   DEFINE(THREAD_CPU_CONTEXT,	offsetof(struct task_struct, thread.cpu_context));
+@@ -169,5 +172,9 @@ int main(void)
+   DEFINE(SDEI_EVENT_INTREGS,	offsetof(struct sdei_registered_event, interrupted_regs));
+   DEFINE(SDEI_EVENT_PRIORITY,	offsetof(struct sdei_registered_event, priority));
+ #endif
++#ifdef CONFIG_ARM64_PTR_AUTH
++  DEFINE(PTRAUTH_KEY_APIALO,	offsetof(struct ptrauth_keys, apia.lo));
++  DEFINE(PTRAUTH_KEY_APIAHI,	offsetof(struct ptrauth_keys, apia.hi));
++#endif
+   return 0;
+ }
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index 09dbea221a27..1e925f6d2978 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -23,8 +23,9 @@
+ #include <linux/linkage.h>
  
- #define thread_saved_pc(tsk)	\
+ #include <asm/alternative.h>
+-#include <asm/assembler.h>
+ #include <asm/asm-offsets.h>
++#include <asm/asm-uaccess.h>
++#include <asm/assembler.h>
+ #include <asm/cpufeature.h>
+ #include <asm/errno.h>
+ #include <asm/esr.h>
+@@ -33,8 +34,8 @@
+ #include <asm/mmu.h>
+ #include <asm/processor.h>
+ #include <asm/ptrace.h>
++#include <asm/ptrauth-asm.h>
+ #include <asm/thread_info.h>
+-#include <asm/asm-uaccess.h>
+ #include <asm/unistd.h>
+ 
+ /*
+@@ -325,6 +326,10 @@ alternative_else_nop_endif
+ 	apply_ssbd 0, x0, x1
+ 	.endif
+ 
++	.if	\el == 0
++	ptrauth_keys_install_user tsk, x0
++	.endif
++
+ 	msr	elr_el1, x21			// set up the return data
+ 	msr	spsr_el1, x22
+ 	ldp	x0, x1, [sp, #16 * 0]
 diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 7f1628effe6d..fae52be66c92 100644
+index fae52be66c92..857ae05cd04c 100644
 --- a/arch/arm64/kernel/process.c
 +++ b/arch/arm64/kernel/process.c
-@@ -57,6 +57,7 @@
- #include <asm/fpsimd.h>
- #include <asm/mmu_context.h>
- #include <asm/processor.h>
-+#include <asm/pointer_auth.h>
- #include <asm/stacktrace.h>
- 
- #ifdef CONFIG_STACKPROTECTOR
-@@ -425,6 +426,7 @@ __notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
+@@ -426,7 +426,6 @@ __notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
  	contextidr_thread_switch(next);
  	entry_task_switch(next);
  	uao_thread_switch(next);
-+	ptrauth_task_switch(next);
+-	ptrauth_task_switch(next);
  
  	/*
  	 * Complete any pending TLB or cache maintenance on this CPU in case
-@@ -492,6 +494,8 @@ unsigned long arch_randomize_brk(struct mm_struct *mm)
- void arch_setup_new_exec(void)
- {
- 	current->mm->context.flags = is_compat_task() ? MMCF_AARCH32 : 0;
-+
-+	ptrauth_task_init_user(current);
- }
- 
- #ifdef CONFIG_GCC_PLUGIN_STACKLEAK
 -- 
 2.11.0
