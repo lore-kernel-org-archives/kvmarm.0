@@ -1,7 +1,7 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [PATCH v5 05/17] arm64/cpufeature: detect pointer authentication
-Date: Fri,  5 Oct 2018 09:47:42 +0100
-Message-ID: <20181005084754.20950-6-kristina.martsenko@arm.com>
+Subject: [PATCH v5 06/17] asm-generic: mm_hooks: allow hooks to be overridden individually
+Date: Fri,  5 Oct 2018 09:47:43 +0100
+Message-ID: <20181005084754.20950-7-kristina.martsenko@arm.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181005084754.20950-1-kristina.martsenko@arm.com>
@@ -12,123 +12,70 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-So that we can dynamically handle the presence of pointer authentication
-functionality, wire up probing code in cpufeature.c.
+Currently, an architecture must either implement all of the mm hooks
+itself, or use all of those provided by the asm-generic implementation.
+When an architecture only needs to override a single hook, it must copy
+the stub implementations from the asm-generic version.
 
->From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
-has four fields describing the presence of pointer authentication
-functionality:
-
-* APA - address authentication present, using an architected algorithm
-* API - address authentication present, using an IMP DEF algorithm
-* GPA - generic authentication present, using an architected algorithm
-* GPI - generic authentication present, using an IMP DEF algorithm
-
-For the moment we only care about address authentication, so we only
-need to check APA and API. It is assumed that if all CPUs support an IMP
-DEF algorithm, the same algorithm is used across all CPUs.
-
-Note that when we implement KVM support, we will also need to ensure
-that CPUs have uniform support for GPA and GPI.
+To avoid this repetition, allow each hook to be overridden indiviually,
+by placing each under an #ifndef block. As architectures providing their
+own hooks can't include this file today, this shouldn't adversely affect
+any existing hooks.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-[kristina: update cpucap numbers]
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arch@vger.kernel.org
 ---
- arch/arm64/include/asm/cpucaps.h |  5 ++++-
- arch/arm64/kernel/cpufeature.c   | 47 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+), 1 deletion(-)
+ include/asm-generic/mm_hooks.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index ae1f70450fb2..276d4c95aa3c 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -51,7 +51,10 @@
- #define ARM64_SSBD				30
- #define ARM64_MISMATCHED_CACHE_TYPE		31
- #define ARM64_HAS_STAGE2_FWB			32
-+#define ARM64_HAS_ADDRESS_AUTH_ARCH		33
-+#define ARM64_HAS_ADDRESS_AUTH_IMP_DEF		34
-+#define ARM64_HAS_ADDRESS_AUTH			35
+diff --git a/include/asm-generic/mm_hooks.h b/include/asm-generic/mm_hooks.h
+index 8ac4e68a12f0..2b3ee15d3702 100644
+--- a/include/asm-generic/mm_hooks.h
++++ b/include/asm-generic/mm_hooks.h
+@@ -7,31 +7,42 @@
+ #ifndef _ASM_GENERIC_MM_HOOKS_H
+ #define _ASM_GENERIC_MM_HOOKS_H
  
--#define ARM64_NCAPS				33
-+#define ARM64_NCAPS				36
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index e238b7932096..0dd171c7d71e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -142,6 +142,10 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_API_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_APA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_DPB_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
-@@ -1035,6 +1039,22 @@ static void cpu_has_fwb(const struct arm64_cpu_capabilities *__unused)
- 	WARN_ON(val & (7 << 27 | 7 << 21));
++#ifndef arch_dup_mmap
+ static inline int arch_dup_mmap(struct mm_struct *oldmm,
+ 				struct mm_struct *mm)
+ {
+ 	return 0;
  }
++#endif
  
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+static bool has_address_auth(const struct arm64_cpu_capabilities *entry,
-+			     int __unused)
-+{
-+	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-+	bool api, apa;
-+
-+	apa = cpuid_feature_extract_unsigned_field(isar1,
-+					ID_AA64ISAR1_APA_SHIFT) > 0;
-+	api = cpuid_feature_extract_unsigned_field(isar1,
-+					ID_AA64ISAR1_API_SHIFT) > 0;
-+
-+	return apa || api;
-+}
-+#endif /* CONFIG_ARM64_PTR_AUTH */
-+
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -1222,6 +1242,33 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.cpu_enable = cpu_enable_hw_dbm,
- 	},
- #endif
-+#ifdef CONFIG_ARM64_PTR_AUTH
-+	{
-+		.desc = "Address authentication (architected algorithm)",
-+		.capability = ARM64_HAS_ADDRESS_AUTH_ARCH,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64ISAR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64ISAR1_APA_SHIFT,
-+		.min_field_value = ID_AA64ISAR1_APA_ARCHITECTED,
-+		.matches = has_cpuid_feature,
-+	},
-+	{
-+		.desc = "Address authentication (IMP DEF algorithm)",
-+		.capability = ARM64_HAS_ADDRESS_AUTH_IMP_DEF,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64ISAR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64ISAR1_API_SHIFT,
-+		.min_field_value = ID_AA64ISAR1_API_IMP_DEF,
-+		.matches = has_cpuid_feature,
-+	},
-+	{
-+		.capability = ARM64_HAS_ADDRESS_AUTH,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_address_auth,
-+	},
-+#endif /* CONFIG_ARM64_PTR_AUTH */
- 	{},
- };
++#ifndef arch_exit_mmap
+ static inline void arch_exit_mmap(struct mm_struct *mm)
+ {
+ }
++#endif
  
++#ifndef arch_unmap
+ static inline void arch_unmap(struct mm_struct *mm,
+ 			struct vm_area_struct *vma,
+ 			unsigned long start, unsigned long end)
+ {
+ }
++#endif
+ 
++#ifndef arch_bprm_mm_init
+ static inline void arch_bprm_mm_init(struct mm_struct *mm,
+ 				     struct vm_area_struct *vma)
+ {
+ }
++#endif
+ 
++#ifndef arch_vma_access_permitted
+ static inline bool arch_vma_access_permitted(struct vm_area_struct *vma,
+ 		bool write, bool execute, bool foreign)
+ {
+ 	/* by default, allow everything */
+ 	return true;
+ }
++#endif
++
+ #endif	/* _ASM_GENERIC_MM_HOOKS_H */
 -- 
 2.11.0
