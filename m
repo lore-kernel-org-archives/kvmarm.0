@@ -1,7 +1,7 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [PATCH v5 09/17] arm64: perf: strip PAC when unwinding userspace
-Date: Fri,  5 Oct 2018 09:47:46 +0100
-Message-ID: <20181005084754.20950-10-kristina.martsenko@arm.com>
+Subject: [PATCH v5 10/17] arm64: enable pointer authentication
+Date: Fri,  5 Oct 2018 09:47:47 +0100
+Message-ID: <20181005084754.20950-11-kristina.martsenko@arm.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181005084754.20950-1-kristina.martsenko@arm.com>
@@ -12,84 +12,50 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-When the kernel is unwinding userspace callchains, we can't expect that
-the userspace consumer of these callchains has the data necessary to
-strip the PAC from the stored LR.
-
-This patch has the kernel strip the PAC from user stackframes when the
-in-kernel unwinder is used. This only affects the LR value, and not the
-FP.
-
-This only affects the in-kernel unwinder. When userspace performs
-unwinding, it is up to userspace to strip PACs as necessary (which can
-be determined from DWARF information).
+Now that all the necessary bits are in place for userspace, add the
+necessary Kconfig logic to allow this to be enabled.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-[kristina: add pointer_auth.h #include]
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm64/include/asm/pointer_auth.h | 7 +++++++
- arch/arm64/kernel/perf_callchain.c    | 6 +++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ arch/arm64/Kconfig | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-index 15486079e9ec..f5a4b075be65 100644
---- a/arch/arm64/include/asm/pointer_auth.h
-+++ b/arch/arm64/include/asm/pointer_auth.h
-@@ -57,6 +57,12 @@ static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
-  */
- #define ptrauth_pac_mask() 	GENMASK(54, VA_BITS)
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 1b1a0e95c751..8a6d44160fa8 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1134,6 +1134,29 @@ config ARM64_RAS_EXTN
  
-+/* Only valid for EL0 TTBR0 instruction pointers */
-+static inline unsigned long ptrauth_strip_insn_pac(unsigned long ptr)
-+{
-+	return ptr & ~ptrauth_pac_mask();
-+}
+ endmenu
+ 
++menu "ARMv8.3 architectural features"
 +
- #define mm_ctx_ptrauth_init(ctx) \
- 	ptrauth_keys_init(&(ctx)->ptrauth_keys)
- 
-@@ -64,6 +70,7 @@ static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
- 	ptrauth_keys_switch(&(ctx)->ptrauth_keys)
- 
- #else /* CONFIG_ARM64_PTR_AUTH */
-+#define ptrauth_strip_insn_pac(lr)	(lr)
- #define mm_ctx_ptrauth_init(ctx)
- #define mm_ctx_ptrauth_switch(ctx)
- #endif /* CONFIG_ARM64_PTR_AUTH */
-diff --git a/arch/arm64/kernel/perf_callchain.c b/arch/arm64/kernel/perf_callchain.c
-index bcafd7dcfe8b..94754f07f67a 100644
---- a/arch/arm64/kernel/perf_callchain.c
-+++ b/arch/arm64/kernel/perf_callchain.c
-@@ -18,6 +18,7 @@
- #include <linux/perf_event.h>
- #include <linux/uaccess.h>
- 
-+#include <asm/pointer_auth.h>
- #include <asm/stacktrace.h>
- 
- struct frame_tail {
-@@ -35,6 +36,7 @@ user_backtrace(struct frame_tail __user *tail,
- {
- 	struct frame_tail buftail;
- 	unsigned long err;
-+	unsigned long lr;
- 
- 	/* Also check accessibility of one struct frame_tail beyond */
- 	if (!access_ok(VERIFY_READ, tail, sizeof(buftail)))
-@@ -47,7 +49,9 @@ user_backtrace(struct frame_tail __user *tail,
- 	if (err)
- 		return NULL;
- 
--	perf_callchain_store(entry, buftail.lr);
-+	lr = ptrauth_strip_insn_pac(buftail.lr);
++config ARM64_PTR_AUTH
++	bool "Enable support for pointer authentication"
++	default y
++	help
++	  Pointer authentication (part of the ARMv8.3 Extensions) provides
++	  instructions for signing and authenticating pointers against secret
++	  keys, which can be used to mitigate Return Oriented Programming (ROP)
++	  and other attacks.
 +
-+	perf_callchain_store(entry, lr);
- 
- 	/*
- 	 * Frame pointers should strictly progress back up the stack
++	  This option enables these instructions at EL0 (i.e. for userspace).
++
++	  Choosing this option will cause the kernel to initialise secret keys
++	  for each process at exec() time, with these keys being
++	  context-switched along with the process.
++
++	  The feature is detected at runtime. If the feature is not present in
++	  hardware it will not be advertised to userspace nor will it be
++	  enabled.
++
++endmenu
++
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
 -- 
 2.11.0
