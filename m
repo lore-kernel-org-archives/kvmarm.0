@@ -1,21 +1,23 @@
 From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v2 0/2] rename function name and enable 32bit vcpu events
-Date: Mon, 8 Oct 2018 08:34:46 -0400
-Message-ID: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v2 2/2] arm/arm64: KVM: enable 32 bits kvm vcpu events support
+Date: Mon, 8 Oct 2018 08:34:48 -0400
+Message-ID: <1539002088-21215-3-git-send-email-gengdongjiu@huawei.com>
+References: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFAD24A2A9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C3E24A2A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7FYPKE1jbazn for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Oct 2018 00:27:15 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B31B4A252
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:15 -0400 (EDT)
+ with ESMTP id dPTTHc3mLKkB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Oct 2018 00:27:20 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F10464A2E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:19 -0400 (EDT)
+In-Reply-To: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,25 +31,49 @@ To: christoffer.dall@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, dr
 Cc: gengdongjiu@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Rename the kvm_arch_dev_ioctl_check_extension() to 
-kvm_arch_vm_ioctl_check_extension, because the name
-is not reasonable; 
+The commit 539aee0edb9f ("KVM: arm64: Share the parts of
+get/set events useful to 32bit") shares the get/set events
+helper for arm64 and arm32, it is better also share the check
+for vcpu events capability to enable 32 bit kvm vcpu events
+support.
 
-Enable the 32 bit vcpu events support.
+User space will check whether KVM supports vcpu events through
+KVM_CAP_VCPU_EVENTS IOCTL.
 
-change since v1:
-1. Update patch commit messages.
+Cc: James Morse <james.morse@arm.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+For the 32 bits kvm migration, it needs to enable the vcpu events,
+this patch will enable it. The user space QEMU patch is here:
+https://patchwork.ozlabs.org/patch/975615/
+---
+ arch/arm64/kvm/reset.c | 1 -
+ virt/kvm/arm/arm.c     | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-
-Dongjiu Geng (2):
-  arm/arm64: KVM: rename function kvm_arch_dev_ioctl_check_extension()
-  arm/arm64: KVM: enable 32 bits kvm vcpu events support
-
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 5 ++---
- virt/kvm/arm/arm.c                | 3 ++-
- 4 files changed, 6 insertions(+), 6 deletions(-)
-
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index fd37c53..e50245e 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -82,7 +82,6 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+-	case KVM_CAP_VCPU_EVENTS:
+ 		r = 1;
+ 		break;
+ 	default:
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 40e79ea..64e5d97 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -212,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_VCPU_EVENTS:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
 -- 
 1.9.1
