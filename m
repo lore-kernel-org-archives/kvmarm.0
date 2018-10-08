@@ -1,23 +1,24 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v2 2/2] arm/arm64: KVM: enable 32 bits kvm vcpu events support
-Date: Mon, 8 Oct 2018 08:34:48 -0400
-Message-ID: <1539002088-21215-3-git-send-email-gengdongjiu@huawei.com>
-References: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: remove the unnecessary function check
+Date: Mon, 8 Oct 2018 17:18:18 +0100
+Message-ID: <afbb853e-ef22-dde4-d17d-6802264f1ce9@arm.com>
+References: <1535708579-12233-1-git-send-email-zhangshaokun@hisilicon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C3E24A2A9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F29954A1FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 12:18:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dPTTHc3mLKkB for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Oct 2018 00:27:20 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F10464A2E3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 00:27:19 -0400 (EDT)
-In-Reply-To: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
+ with ESMTP id UzHTgHqkz6Np for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Oct 2018 12:18:21 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC2544A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Oct 2018 12:18:21 -0400 (EDT)
+In-Reply-To: <1535708579-12233-1-git-send-email-zhangshaokun@hisilicon.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,53 +28,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, drjones@redhat.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: gengdongjiu@huawei.com
+To: Shaokun Zhang <zhangshaokun@hisilicon.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The commit 539aee0edb9f ("KVM: arm64: Share the parts of
-get/set events useful to 32bit") shares the get/set events
-helper for arm64 and arm32, it is better also share the check
-for vcpu events capability to enable 32 bit kvm vcpu events
-support.
+On 31/08/18 10:42, Shaokun Zhang wrote:
+> init_common_resources always return 0 and it is redundant to check the
+> return value, let's make it void to simplify the code.
+> 
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+> ---
+>   virt/kvm/arm/arm.c | 8 ++------
+>   1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index c92053b..66a29c9 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1406,13 +1406,11 @@ static inline void hyp_cpu_pm_exit(void)
+>   }
+>   #endif
+>   
+> -static int init_common_resources(void)
+> +static void init_common_resources(void)
+>   {
+>   	/* set size of VMID supported by CPU */
+>   	kvm_vmid_bits = kvm_get_vmid_bits();
+>   	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
+> -
+> -	return 0;
+>   }
+>   
+>   static int init_subsystems(void)
+> @@ -1655,9 +1653,7 @@ int kvm_arch_init(void *opaque)
+>   		}
+>   	}
+>   
+> -	err = init_common_resources();
+> -	if (err)
+> -		return err;
+> +	init_common_resources();
+>   
+>   	in_hyp_mode = is_kernel_in_hyp_mode();
+>   
+> 
 
-User space will check whether KVM supports vcpu events through
-KVM_CAP_VCPU_EVENTS IOCTL.
+Although I agree this looks pretty superfluous at the moment, I'd rather 
+keep init_common_resources as it is at the moment, as we may well end-up 
+with more stuff in it, which could fail.
 
-Cc: James Morse <james.morse@arm.com>
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-For the 32 bits kvm migration, it needs to enable the vcpu events,
-this patch will enable it. The user space QEMU patch is here:
-https://patchwork.ozlabs.org/patch/975615/
----
- arch/arm64/kvm/reset.c | 1 -
- virt/kvm/arm/arm.c     | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+Another possibility would be to merge everything in init_subsystems, but 
+that'd require careful investigation, specially with the stuff that is 
+currently pending for 4.20.
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index fd37c53..e50245e 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -82,7 +82,6 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
--	case KVM_CAP_VCPU_EVENTS:
- 		r = 1;
- 		break;
- 	default:
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 40e79ea..64e5d97 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -212,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+	case KVM_CAP_VCPU_EVENTS:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+Thanks,
+
+	M.
 -- 
-1.9.1
+Jazz is not dead. It just smells funny...
