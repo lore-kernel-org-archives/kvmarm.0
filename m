@@ -1,82 +1,79 @@
-From: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v2 2/2] arm/arm64: KVM: enable 32 bits kvm vcpu events
- support
-Date: Wed, 10 Oct 2018 12:22:40 +0800
-Message-ID: <f733b63b-b949-9082-3b23-aba47774d734@huawei.com>
-References: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
- <1539002088-21215-3-git-send-email-gengdongjiu@huawei.com>
- <3e6a7a5f-3ff9-b7db-b1f6-87a8fdf5c20c@arm.com>
+From: Miriam Zimmerman <mutexlox@google.com>
+Subject: Timekeeping on ARM guests/hosts
+Date: Tue, 9 Oct 2018 16:39:37 -0700
+Message-ID: <CAHSjozDb2_q9YgHsEerH_-2uc6S9W-cw_p2hTiafisQUTrwH6Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3e6a7a5f-3ff9-b7db-b1f6-87a8fdf5c20c@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, drjones@redhat.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: multipart/mixed; boundary="===============1689597210909701419=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4F374A257
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Oct 2018 19:39:50 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WTjO1glBFIZB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Oct 2018 19:39:49 -0400 (EDT)
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com
+ [209.85.210.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F954A213
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Oct 2018 19:39:49 -0400 (EDT)
+Received: by mail-ot1-f52.google.com with SMTP id q50so3550461otd.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Oct 2018 16:39:49 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki
+--===============1689597210909701419==
+Content-Type: multipart/alternative; boundary="000000000000dc3f1d0577d44094"
 
-On 2018/10/10 1:22, Suzuki K Poulose wrote:
-> 
-> 
-> On 08/10/18 13:34, Dongjiu Geng wrote:
->> The commit 539aee0edb9f ("KVM: arm64: Share the parts of
->> get/set events useful to 32bit") shares the get/set events
->> helper for arm64 and arm32, it is better also share the check
->> for vcpu events capability to enable 32 bit kvm vcpu events
->> support.
->>
->> User space will check whether KVM supports vcpu events through
->> KVM_CAP_VCPU_EVENTS IOCTL.
-> 
-> nit: User space will check whether KVM supports vcpu events by checking
-> the KVM_CAP_VCPU_EVENTS extension.
+--000000000000dc3f1d0577d44094
+Content-Type: text/plain; charset="UTF-8"
 
-  Thanks for the pointing out, I will update it.
+Hi,
 
-> 
->>
->> Cc: James Morse <james.morse@arm.com>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> 
-> Reviewed-by : Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
->> ---
->> For the 32 bits kvm migration, it needs to enable the vcpu events,
->> this patch will enable it. The user space QEMU patch is here:
->> https://patchwork.ozlabs.org/patch/975615/
->> ---
->>   arch/arm64/kvm/reset.c | 1 -
->>   virt/kvm/arm/arm.c     | 1 +
->>   2 files changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index fd37c53..e50245e 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -82,7 +82,6 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>           break;
->>       case KVM_CAP_SET_GUEST_DEBUG:
->>       case KVM_CAP_VCPU_ATTRIBUTES:
->> -    case KVM_CAP_VCPU_EVENTS:
->>           r = 1;
->>           break;
->>       default:
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 40e79ea..64e5d97 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -212,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>       case KVM_CAP_READONLY_MEM:
->>       case KVM_CAP_MP_STATE:
->>       case KVM_CAP_IMMEDIATE_EXIT:
->> +    case KVM_CAP_VCPU_EVENTS:
->>           r = 1;
->>           break;
->>       case KVM_CAP_ARM_SET_DEVICE_ADDR:
->>
-> 
-> .
-> 
+I'm working with an ARM device hosting an ARM guest. When the host is
+suspended, guest time stops advancing and it doesn't get adjusted on resume.
+
+For an x86 machine, the CONFIG_KVM_GUEST flag would enable paravirt for
+time and fix this problem, but CONFIG_KVM_GUEST isn't available on ARM.
+
+Is there a configuration option to enable paravirtualized timekeeping on
+ARM? If not, how can I configure ARM guests to handle timekeeping properly?
+
+Thanks,
+Miriam
+
+--000000000000dc3f1d0577d44094
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi,<div><br></div><div>I&#39;m working with an ARM device =
+hosting an ARM guest. When the host is suspended, guest time stops advancin=
+g and it doesn&#39;t get adjusted on resume.</div><div><br>For an x86 machi=
+ne, the CONFIG_KVM_GUEST flag would enable paravirt for time and fix this p=
+roblem, but CONFIG_KVM_GUEST isn&#39;t available on ARM.</div><div><br>Is t=
+here a configuration option to enable paravirtualized timekeeping on ARM? I=
+f not, how can I configure ARM guests to handle timekeeping properly?</div>=
+<div><br></div><div>Thanks,<br>Miriam</div></div>
+
+--000000000000dc3f1d0577d44094--
+
+--===============1689597210909701419==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1689597210909701419==--
