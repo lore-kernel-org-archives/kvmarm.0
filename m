@@ -1,72 +1,43 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 2/2] arm/arm64: KVM: enable 32 bits kvm vcpu events
- support
-Date: Tue, 9 Oct 2018 18:22:52 +0100
-Message-ID: <3e6a7a5f-3ff9-b7db-b1f6-87a8fdf5c20c@arm.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v2 1/2] arm/arm64: KVM: rename function
+ kvm_arch_dev_ioctl_check_extension()
+Date: Wed, 10 Oct 2018 10:29:48 +0800
+Message-ID: <aa6d8da8-7452-7d43-e50b-36388e60ca59@huawei.com>
 References: <1539002088-21215-1-git-send-email-gengdongjiu@huawei.com>
- <1539002088-21215-3-git-send-email-gengdongjiu@huawei.com>
+ <1539002088-21215-2-git-send-email-gengdongjiu@huawei.com>
+ <e5e5f84b-4664-7ba0-9462-5b69a987fd9d@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1539002088-21215-3-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <e5e5f84b-4664-7ba0-9462-5b69a987fd9d@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, drjones@redhat.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, drjones@redhat.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Suzuki,
 
-
-On 08/10/18 13:34, Dongjiu Geng wrote:
-> The commit 539aee0edb9f ("KVM: arm64: Share the parts of
-> get/set events useful to 32bit") shares the get/set events
-> helper for arm64 and arm32, it is better also share the check
-> for vcpu events capability to enable 32 bit kvm vcpu events
-> support.
+On 2018/10/10 0:34, Suzuki K Poulose wrote:
+> Hi,
 > 
-> User space will check whether KVM supports vcpu events through
-> KVM_CAP_VCPU_EVENTS IOCTL.
+> On 08/10/18 13:34, Dongjiu Geng wrote:
+>> Rename kvm_arch_dev_ioctl_check_extension() to
+>> kvm_arch_vm_ioctl_check_extension(), because it does
+>> not have any relationship with device.
+>>
+>> Renaming this function can make code readable.
+> 
+> +1. The current name is not really intuitive.
+> 
+>>
+>> Cc: James Morse <james.morse@arm.com>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-nit: User space will check whether KVM supports vcpu events by checking
-the KVM_CAP_VCPU_EVENTS extension.
+Thanks very much for the review
 
 > 
-> Cc: James Morse <james.morse@arm.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-
-Reviewed-by : Suzuki K Poulose <suzuki.poulose@arm.com>
-
-> ---
-> For the 32 bits kvm migration, it needs to enable the vcpu events,
-> this patch will enable it. The user space QEMU patch is here:
-> https://patchwork.ozlabs.org/patch/975615/
-> ---
->   arch/arm64/kvm/reset.c | 1 -
->   virt/kvm/arm/arm.c     | 1 +
->   2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index fd37c53..e50245e 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -82,7 +82,6 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_VCPU_ATTRIBUTES:
-> -	case KVM_CAP_VCPU_EVENTS:
->   		r = 1;
->   		break;
->   	default:
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 40e79ea..64e5d97 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -212,6 +212,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_READONLY_MEM:
->   	case KVM_CAP_MP_STATE:
->   	case KVM_CAP_IMMEDIATE_EXIT:
-> +	case KVM_CAP_VCPU_EVENTS:
->   		r = 1;
->   		break;
->   	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+> .
 > 
