@@ -1,92 +1,73 @@
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: [PATCH v3 1/2] arm/arm64: KVM: rename function kvm_arch_dev_ioctl_check_extension()
-Date: Thu, 11 Oct 2018 15:07:34 -0400
-Message-ID: <1539284855-4035-2-git-send-email-gengdongjiu@huawei.com>
-References: <1539284855-4035-1-git-send-email-gengdongjiu@huawei.com>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+Subject: Re: [RFC 17/17] arm64: compile the kernel with ptrauth
+ -msign-return-address
+Date: Thu, 11 Oct 2018 15:00:57 +0100
+Message-ID: <edbb3ad0-a38e-743f-f2e7-2241f2ed12ee@arm.com>
+References: <20181005084754.20950-1-kristina.martsenko@arm.com>
+ <20181005084754.20950-18-kristina.martsenko@arm.com>
+ <cd1eface-aebb-b654-c57c-91690087957f@foss.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1539284855-4035-1-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <cd1eface-aebb-b654-c57c-91690087957f@foss.arm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org, drjones@redhat.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: gengdongjiu@huawei.com
+To: Ramana Radhakrishnan <ramana.radhakrishnan@foss.arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <Amit.Kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Kees Cook <keescook@chromium.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Rename kvm_arch_dev_ioctl_check_extension() to
-kvm_arch_vm_ioctl_check_extension(), because it does
-not have any relationship with device.
+On 05/10/2018 10:01, Ramana Radhakrishnan wrote:
+> On 05/10/2018 09:47, Kristina Martsenko wrote:
+>> Compile all functions with two ptrauth instructions: paciasp in the
+>> prologue to sign the return address, and autiasp in the epilogue to
+>> authenticate the return address. This should help protect the kernel
+>> against attacks using return-oriented programming.
+>>
+>> CONFIG_ARM64_PTR_AUTH enables pointer auth for both userspace and the
+>> kernel.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+>> ---
+>>   arch/arm64/Makefile | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+>> index 106039d25e2f..dbcd43ea99d8 100644
+>> --- a/arch/arm64/Makefile
+>> +++ b/arch/arm64/Makefile
+>> @@ -56,6 +56,10 @@ KBUILD_AFLAGS    += $(lseinstr) $(brokengasinst)
+>>   KBUILD_CFLAGS    += $(call cc-option,-mabi=lp64)
+>>   KBUILD_AFLAGS    += $(call cc-option,-mabi=lp64)
+>>   +ifeq ($(CONFIG_ARM64_PTR_AUTH),y)
+>> +KBUILD_CFLAGS    += -msign-return-address=all
+> 
+> Glad to see this being done and being proposed for mainline.
+> 
+> I can see why you would prefer this though have you guys experimented at
+> all with -msign-return-address=non-leaf as well ?
 
-Renaming this function can make code readable.
+I've tried non-leaf and it works too. I'd be fine with switching to it,
+I'm not sure which would be better for the kernel.
 
-Cc: James Morse <james.morse@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
----
-I remeber James also mentioned that rename this function.
----
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 4 ++--
- virt/kvm/arm/arm.c                | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+What kind of experiments did you have in mind? If I understand
+correctly, then compared to non-leaf, "all" additionally protects leaf
+functions that write to the stack. I don't know how many of those there
+are in the kernel (or will be in the future). I also don't know the
+additional performance impact of "all", as I don't think we have any
+v8.3 hardware to test on yet. There is a minor code size impact (0.36%
+on the current kernel), but I'm not sure how much that matters.
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 3ad482d..3ee29db 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -273,7 +273,7 @@ static inline void __cpu_init_stage2(void)
- 	kvm_call_hyp(__init_stage2_translation);
- }
- 
--static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-+static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	return 0;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d6d733..c20537f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -53,7 +53,7 @@
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
--int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
-+int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
- struct kvm_arch {
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index e37c78b..fd37c53 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -55,12 +55,12 @@ static bool cpu_has_32bit_el1(void)
- }
- 
- /**
-- * kvm_arch_dev_ioctl_check_extension
-+ * kvm_arch_vm_ioctl_check_extension
-  *
-  * We currently assume that the number of HW registers is uniform
-  * across all CPUs (see cpuinfo_sanity_check).
-  */
--int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-+int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index c92053b..40e79ea 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -240,7 +240,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = 1;
- 		break;
- 	default:
--		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
-+		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
- 		break;
- 	}
- 	return r;
--- 
-1.9.1
+> Orthogonally and just fair warning - the command lines for this are also
+> being revised to provide ROP and JOP protection using BTI from v8.5-a
+> during the GCC-9 timeframe but I suspect that's a different option.
+
+Thanks. I expect it will be a separate Kconfig option to build the
+kernel with BTI and pointer auth, yes.
+
+> Reviewed-by: Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+Thanks!
+
+Kristina
