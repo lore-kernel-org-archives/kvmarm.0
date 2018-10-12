@@ -1,26 +1,26 @@
 From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v6 14/18] ACPI / APEI: Split ghes_read_estatus() to read
- CPER length
-Date: Fri, 12 Oct 2018 19:25:34 +0200
-Message-ID: <20181012172533.GG580@zn.tnic>
+Subject: Re: [PATCH v6 15/18] ACPI / APEI: Only use queued estatus entry
+ during _in_nmi_notify_one()
+Date: Fri, 12 Oct 2018 19:34:32 +0200
+Message-ID: <20181012173432.GH580@zn.tnic>
 References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-15-james.morse@arm.com>
+ <20180921221705.6478-16-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3693D4A1DC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:25:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E39F4A1DC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:34:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xb4M1ToDRdCo for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Oct 2018 13:25:42 -0400 (EDT)
+ with ESMTP id LbMHVVmAlVtx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 13:34:34 -0400 (EDT)
 Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08FA749E3E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:25:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F33A49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:34:34 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180921221705.6478-15-james.morse@arm.com>
+In-Reply-To: <20180921221705.6478-16-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,137 +34,115 @@ To: James Morse <james.morse@arm.com>
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 21, 2018 at 11:17:01PM +0100, James Morse wrote:
-> ghes_read_estatus() reads the record address, then the record's
-> header, then performs some sanity checks before reading the
-> records into the provided estatus buffer.
+On Fri, Sep 21, 2018 at 11:17:02PM +0100, James Morse wrote:
+> Each struct ghes has an worst-case sized buffer for storing the
+> estatus. If an error is being processed by ghes_proc() in process
+> context this buffer will be in use. If the error source then triggers
+> an NMI-like notification, the same buffer will be used by
+> _in_nmi_notify_one() to stage the estatus data, before
+> __process_error() copys it into a queued estatus entry.
 > 
-> We either need to know the size of the records before we call
-> ghes_read_estatus(), or always provide a worst-case sized buffer,
-> as happens today.
+> Merge __process_error()s work into _in_nmi_notify_one() so that
+> the queued estatus entry is used from the beginning. Use the
+> ghes_peek_estatus() so we know how much memory to allocate from
+> the ghes_estatus_pool before we read the records.
 > 
-> Add a function to peek at the record's header to find the size. This
-> will let the NMI path allocate the right amount of memory before reading
-> the records, instead of using the worst-case size, and having to copy
-> the records.
-> 
-> Split ghes_read_estatus() to create ghes_peek_estatus() which
-> returns the address and size of the CPER records.
-> 
+> Reported-by: Borislav Petkov <bp@suse.de>
 > Signed-off-by: James Morse <james.morse@arm.com>
 > ---
->  drivers/acpi/apei/ghes.c | 55 ++++++++++++++++++++++++++++++----------
->  1 file changed, 41 insertions(+), 14 deletions(-)
+>  drivers/acpi/apei/ghes.c | 45 ++++++++++++++++++++--------------------
+>  1 file changed, 22 insertions(+), 23 deletions(-)
 > 
 > diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 3028487d43a3..055176ed68ac 100644
+> index 055176ed68ac..a0c10b60ad44 100644
 > --- a/drivers/acpi/apei/ghes.c
 > +++ b/drivers/acpi/apei/ghes.c
-> @@ -298,11 +298,12 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+> @@ -722,40 +722,32 @@ static void ghes_print_queued_estatus(void)
 >  	}
 >  }
 >  
-> -static int ghes_read_estatus(struct ghes *ghes,
-> -			     struct acpi_hest_generic_status *estatus,
-> -			     u64 *buf_paddr, int fixmap_idx)
-> +/* read the CPER block returning its address and size */
-
-Make that comment a proper sentence:
-
-"./* ... Read the CPER ... and size. */
-
-> +static int ghes_peek_estatus(struct ghes *ghes, int fixmap_idx,
-> +			     u64 *buf_paddr, u32 *buf_len)
+> -/* Save estatus for further processing in IRQ context */
+> -static void __process_error(struct ghes *ghes,
+> -			    struct acpi_hest_generic_status *ghes_estatus)
+> +static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
 >  {
+> +	u64 buf_paddr;
+> +	int sev, rc = 0;
+>  	u32 len, node_len;
+>  	struct ghes_estatus_node *estatus_node;
+>  	struct acpi_hest_generic_status *estatus;
 
-I find the functionality split a bit strange:
+Please sort function local variables declaration in a reverse christmas
+tree order:
 
-ghes_peek_estatus() does peek *and* verify sizes. The latter belongs
-maybe better in ghes_read_estatus(). Together with the
-cper_estatus_check_header() call. Or maybe into a separate
+	<type> longest_variable_name;
+	<type> shorter_var_name;
+	<type> even_shorter;
+	<type> i;
 
-	__ghes_check_estatus()
-
-to separate it all nicely.
-
->  	struct acpi_hest_generic *g = ghes->generic;
-> +	struct acpi_hest_generic_status estatus;
->  	u32 len;
->  	int rc;
 >  
-> @@ -317,26 +318,23 @@ static int ghes_read_estatus(struct ghes *ghes,
->  	if (!*buf_paddr)
->  		return -ENOENT;
+> -	if (ghes_estatus_cached(ghes_estatus))
+> -		return;
+> +	rc = ghes_peek_estatus(ghes, fixmap_idx, &buf_paddr, &len);
+
+Oh ok, maybe not prefix it with "__" - we're using it somewhere else.
+
+> +	if (rc)
+> +		return rc;
 >  
-> -	ghes_copy_tofrom_phys(estatus, *buf_paddr,
-> -			      sizeof(*estatus), 1, fixmap_idx);
-> -	if (!estatus->block_status) {
-> +	ghes_copy_tofrom_phys(&estatus, *buf_paddr,
-> +			      sizeof(estatus), 1, fixmap_idx);
-> +	if (!estatus.block_status) {
->  		*buf_paddr = 0;
->  		return -ENOENT;
+> -	len = cper_estatus_len(ghes_estatus);
+>  	node_len = GHES_ESTATUS_NODE_LEN(len);
+>  
+>  	estatus_node = (void *)gen_pool_alloc(ghes_estatus_pool, node_len);
+>  	if (!estatus_node)
+> -		return;
+> +		return -ENOMEM;
+>  
+>  	estatus_node->ghes = ghes;
+>  	estatus_node->generic = ghes->generic;
+>  	estatus = GHES_ESTATUS_FROM_NODE(estatus_node);
+> -	memcpy(estatus, ghes_estatus, len);
+> -	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
+> -}
+> -
+> -static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
+> -{
+> -	int sev;
+> -	u64 buf_paddr;
+> -	struct acpi_hest_generic_status *estatus = ghes->estatus;
+>  
+> -	if (ghes_read_estatus(ghes, estatus, &buf_paddr, fixmap_idx)) {
+> +	if (__ghes_read_estatus(estatus, buf_paddr, len, fixmap_idx)) {
+>  		ghes_clear_estatus(estatus, buf_paddr, fixmap_idx);
+> -		return -ENOENT;
+> +		rc = -ENOENT;
+> +		goto no_work;
 >  	}
 >  
->  	rc = -EIO;
-> -	len = cper_estatus_len(estatus);
-> -	if (len < sizeof(*estatus))
-> +	len = cper_estatus_len(&estatus);
-> +	if (len < sizeof(estatus))
->  		goto err_read_block;
->  	if (len > ghes->generic->error_block_length)
->  		goto err_read_block;
-> -	if (cper_estatus_check_header(estatus))
-> -		goto err_read_block;
-> -	ghes_copy_tofrom_phys(estatus + 1,
-> -			      *buf_paddr + sizeof(*estatus),
-> -			      len - sizeof(*estatus), 1, fixmap_idx);
-> -	if (cper_estatus_check(estatus))
-> +	if (cper_estatus_check_header(&estatus))
->  		goto err_read_block;
-> +	*buf_len = len;
-> +
->  	rc = 0;
+>  	sev = ghes_severity(estatus->error_severity);
+> @@ -764,13 +756,20 @@ static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
+>  		__ghes_panic(ghes, estatus);
+>  	}
 >  
->  err_read_block:
-> @@ -346,6 +344,35 @@ static int ghes_read_estatus(struct ghes *ghes,
->  	return rc;
->  }
+> -	if (!buf_paddr)
+> -		return 0;
+> -
+> -	__process_error(ghes, estatus);
+>  	ghes_clear_estatus(estatus, buf_paddr, fixmap_idx);
 >  
-> +static int __ghes_read_estatus(struct acpi_hest_generic_status *estatus,
-> +			       u64 buf_paddr, size_t buf_len,
-> +			       int fixmap_idx)
-> +{
-> +	ghes_copy_tofrom_phys(estatus, buf_paddr, buf_len, 1, fixmap_idx);
-> +	if (cper_estatus_check(estatus)) {
-> +		if (printk_ratelimit())
-> +			pr_warning(FW_WARN GHES_PFX
-> +				   "Failed to read error status block!\n");
-
-Then you won't have to have two identical messages:
-
-	"Failed to read error status block!\n"
-
-which, when one sees them, is hard to figure out where exactly in the
-code that happened.
-
-> +		return -EIO;
-> +	}
+> -	return 0;
+> +	if (!buf_paddr || ghes_estatus_cached(estatus))
+> +		goto no_work;
 > +
-> +	return 0;
-> +}
+> +	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
 > +
-> +static int ghes_read_estatus(struct ghes *ghes,
-> +			     struct acpi_hest_generic_status *estatus,
-> +			     u64 *buf_paddr, int fixmap_idx)
-> +{
-> +	int rc;
-> +	u32 buf_len;
+> +	return rc;
 > +
-> +	rc = ghes_peek_estatus(ghes, fixmap_idx, buf_paddr, &buf_len);
+> +no_work:
+> +	gen_pool_free(ghes_estatus_pool, (unsigned long)estatus_node,
+> +			      node_len);
 
-Also, if we have a __ghes_read_estatus() helper now, maybe prefixing
-ghes_peek_estatus() with "__" would make sense too...
+Yeah, let it stick out.
 
 -- 
 Regards/Gruss,
