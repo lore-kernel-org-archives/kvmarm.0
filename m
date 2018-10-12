@@ -1,44 +1,46 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Fri, 12 Oct 2018 11:18:36 -0700 (PDT)
-Message-ID: <20181012.111836.1569129998592378186.davem@davemloft.net>
-References: <20181012013756.11285-2-joel@joelfernandes.org>
-        <20181012113056.gxhcbrqyu7k7xnyv@kshutemo-mobl1>
-        <20181012125046.GA170912@joelaf.mtv.corp.google.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: Re: [PATCH v2 1/2] treewide: remove unused address argument from
+ pte_alloc functions
+Date: Fri, 12 Oct 2018 20:51:45 +0200
+Message-ID: <03b524f3-5f3a-baa0-2254-9c588103d2d6@users.sourceforge.net>
+References: <20181012013756.11285-1-joel@joelfernandes.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181012125046.GA170912@joelaf.mtv.corp.google.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: joel@joelfernandes.org
-Cc: kirill@shutemov.name, linux-kernel@vger.kernel.org, kernel-team@android.com, minchan@kernel.org, pantin@google.com, hughd@google.com, lokeshgidra@google.com, dancol@google.com, mhocko@kernel.org, akpm@linux-foundation.org, aryabinin@virtuozzo.com, luto@kernel.org, bp@alien8.de, catalin.marinas@arm.com, chris@zankel.net, dave.hansen@linux.intel.com, elfring@users.sourceforge.net, fenghua.yu@intel.com, geert@linux-m68k.org, gxt@pku.edu.cn, deller@gmx.de, mingo@redhat.com, jejb@parisc-linux.org, jdike@addtoit.com, jonas@southpole.se, Julia.Lawall@lip6.fr, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, lftan@altera.com, linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org, linux-m68k@lists.linux-
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20181012013756.11285-1-joel@joelfernandes.org>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: Joel Fernandes <joel@joelfernandes.org>, kernel-janitors@vger.kernel.org
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, Lokesh Gidra <lokeshgidra@google.com>, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, Daniel Colascione <dancol@google.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Hugh Dickins <hughd@google.com>, "James E. J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, Ingo
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Fri, 12 Oct 2018 05:50:46 -0700
-
-> If its an issue, then how do transparent huge pages work on Sparc?  I don't
-> see the huge page code (move_huge_pages) during mremap doing anything special
-> for Sparc architecture when moving PMDs..
-
-This is because all huge pages are larger than SHMLBA.  So no cache flushing
-necessary.
-
-> Also, do we not flush the caches from any path when we munmap
-> address space?  We do call do_munmap on the old mapping from mremap
-> after moving to the new one.
-
-Sparc makes sure that shared mapping have consistent colors.  Therefore
-all that's left are private mappings and those will be initialized by
-block stores to clear the page out or similar.
-
-Also, when creating new mappings, we flush the D-cache when necessary
-in update_mmu_cache().
-
-We also maintain a bit in the page struct to track when a page which
-was potentially written to on one cpu ends up mapped into another
-address space and flush as necessary.
-
-The cache is write-through, which simplifies the preconditions we have
-to maintain.
+PiBUaGUgY2hhbmdlcyB3ZXJlIG9idGFpbmVkIGJ5IGFwcGx5aW5nIHRoZSBmb2xsb3dpbmcgQ29j
+Y2luZWxsZSBzY3JpcHQuCgpBIGJpdCBvZiBjbGFyaWZpY2F0aW9uIGhhcHBlbmVkIGZvciBpdHMg
+aW1wbGVtZW50YXRpb24gZGV0YWlscy4KaHR0cHM6Ly9zeXN0ZW1lLmxpcDYuZnIvcGlwZXJtYWls
+L2NvY2NpLzIwMTgtT2N0b2Jlci8wMDUzNzQuaHRtbAoKSSBoYXZlIHRha2VuIGFsc28gYW5vdGhl
+ciBsb29rIGF0IHRoZSBmb2xsb3dpbmcgU21QTCBjb2RlLgoKCj4gaWRlbnRpZmllciBmbiA9fgo+
+ICJeKF9fcHRlX2FsbG9jfHB0ZV9hbGxvY19vbmV8cHRlX2FsbG9jfF9fcHRlX2FsbG9jX2tlcm5l
+bHxwdGVfYWxsb2Nfb25lX2tlcm5lbCkkIjsKCkkgc3VnZ2VzdCB0byBhZGp1c3QgdGhlIHJlZ3Vs
+YXIgZXhwcmVzc2lvbiBmb3IgdGhpcyBjb25zdHJhaW50CmFuZCBpbiBzdWJzZXF1ZW50IFNtUEwg
+cnVsZXMuCgoiXig/OnB0ZV9hbGxvYyg/Ol9vbmUoPzpfa2VybmVsKT8pP3xfX3B0ZV9hbGxvYyg/
+Ol9rZXJuZWwpPykkIjsKCgo+ICgKPiAtIFQzIGZuKFQxIEUxLCBUMiBFMik7Cj4gKyBUMyBmbihU
+MSBFMSk7Cj4gfAo+IC0gVDMgZm4oVDEgRTEsIFQyIEUyLCBUNCBFNCk7Cj4gKyBUMyBmbihUMSBF
+MSwgVDIgRTIpOwo+ICkKCkkgcHJvcG9zZSB0byB0YWtlIGFuIG90aGVyIFNtUEwgZGlzanVuY3Rp
+b24gaW50byBhY2NvdW50IGhlcmUuCgogVDMgZm4oVDEgRTEsCigKLSAgICAgIFQyIEUyCnwgICAg
+ICBUMiBFMiwKLSAgICAgIFQ0IEU0CikgICAgICApOwoKCj4gKAo+IC0gI2RlZmluZSBmbihhLCBi
+LCBjKUBwIGUKPiArICNkZWZpbmUgZm4oYSwgYikgZQo+IHwKPiAtICNkZWZpbmUgZm4oYSwgYilA
+cCBlCj4gKyAjZGVmaW5lIGZuKGEpIGUKPiApCgpIb3cgZG8geW91IHRoaW5rIGFib3V0IHRvIG9t
+aXQgdGhlIG1ldGF2YXJpYWJsZSDigJxwb3NpdGlvbiBw4oCdIGhlcmU/CgpSZWdhcmRzLApNYXJr
+dXMKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4
+LXNucHMtYXJjIG1haWxpbmcgbGlzdApsaW51eC1zbnBzLWFyY0BsaXN0cy5pbmZyYWRlYWQub3Jn
+Cmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtc25wcy1h
+cmM=
