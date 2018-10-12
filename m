@@ -1,49 +1,62 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 0/7] Add virtio-iommu driver
-Date: Fri, 12 Oct 2018 19:55:40 +0100
-Message-ID: <17f1406e-a7a0-591f-749d-21cbda37dbe4@arm.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012125443-mutt-send-email-mst@kernel.org>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: ARM64 KVM crash
+Date: Fri, 12 Oct 2018 14:59:16 -0400 (EDT)
+Message-ID: <alpine.LRH.2.02.1810121453380.14664@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.1810121204120.16008@file01.intranet.prod.int.rdu2.redhat.com>
+ <b3355304-5144-b17a-c39c-866e197e3cc6@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20181012125443-mutt-send-email-mst-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <b3355304-5144-b17a-c39c-866e197e3cc6@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/2018 18:00, Michael S. Tsirkin wrote:
-> This all looks good to me. Minor nits:
-> - I think DEBUG mode is best just removed for now
-> - Slightly wrong patch splitup causing a misaligned structure
->   in uapi until all patches are applied.
 
-Thanks a lot for the review, I'll fix these up and send a new version
 
-> You should Cc Bjorn on the pci change - I'd like to see his ack on it
-> being merged through my tree.
+On Fri, 12 Oct 2018, Marc Zyngier wrote:
 
-Argh, I don't know how I missed him. However patches 1-4 are device tree
-changes, and need acks from Rob or Mark (on Cc)
-
-> And pls Cc the virtio-dev list on any virtio uapi changes.
+> Right. But how is that related to KVM? See below:
 > 
-> At a feature level I have some ideas for more features we
-> could add, but for now I think I'll put this version in -next
-> while you iron out the above wrinkles. Hope you can make the
-> merge window.
-Thanks, I also have some work lined up for hardware acceleration and
-shared address spaces.
+> > [75476.680725]  find_next_and_bit+0xc/0x70
+> > [75476.680728]  find_busiest_group+0x128/0x938
+> > [75476.680730]  load_balance+0x148/0x848
+> > [75476.680732]  pick_next_task_fair+0x1d4/0x568
+> > [75476.680734]  __schedule+0xe8/0x4b0
+> > [75476.680736]  schedule+0x38/0xa0
+> > [75476.680739]  kvm_vcpu_block+0x88/0x180
+> > [75476.680742]  kvm_handle_wfx+0x80/0xb8
+> > [75476.680744]  handle_exit+0x138/0x1b8
+> 
+> The guest is exiting because it has executed a blocking WFI, so KVM's
+> job is done and we're calling schedule(). The scheduler then starts
+> doing its job of picking the next victim.
+> 
+> At this stage, the kernel indeed blows up. But this doesn't immediately
+> seem to be KVM's fault. It is far more likely that the scheduler has
+> messed something up in its own data structure, which is even worse :-(.
+> 
+> I'd suggest you get in touch with the scheduler guys to see if they have
+> any insight. Also, trying to come up with a reproducer would be
+> extremely useful.
+> 
+> Thanks,
+> 
+> 	M.
 
-Jean
+I use this machine most of the time without KVM - and it crashed when I 
+started KVM - so I assume that KVM had something to do with it. Perhaps it 
+corrupts random memory? I may try to run some KVM stress for many days to 
+test if I reproduce it.
+
+Mikulas
