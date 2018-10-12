@@ -1,125 +1,79 @@
-From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Fri, 12 Oct 2018 10:06:58 -0700
-Message-ID: <20181012170658.GF223066@joelaf.mtv.corp.google.com>
-References: <20181012013756.11285-1-joel@joelfernandes.org>
- <20181012013756.11285-2-joel@joelfernandes.org>
- <9ed82f9e-88c4-8e4f-8c45-3ef153469603@kot-begemot.co.uk>
- <20181012143728.t42uvr6etg7gp7fh@kshutemo-mobl1>
- <4dd52e22-5b51-9b30-7178-fde603a08f88@kot-begemot.co.uk>
- <97cb3fe1-7bc1-12ff-d602-56c72a5496c5@kot-begemot.co.uk>
- <20181012165012.GD223066@joelaf.mtv.corp.google.com>
- <4f969958-913e-cb9f-48fb-e3a88e1d288c@kot-begemot.co.uk>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 05/18] ACPI / APEI: Make estatus queue a Kconfig symbol
+Date: Fri, 12 Oct 2018 18:17:48 +0100
+Message-ID: <52228145-f024-0ee1-01c7-da92023d53cc@arm.com>
+References: <20180921221705.6478-1-james.morse@arm.com>
+ <20180921221705.6478-6-james.morse@arm.com> <20181001175956.GF7269@zn.tnic>
+ <a562d7c4-2e74-3a18-7fb0-ba8f40d2dce4@arm.com>
+ <20181004173416.GC5149@zn.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <4f969958-913e-cb9f-48fb-e3a88e1d288c@kot-begemot.co.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
-List-Post: <mailto:linux-riscv@lists.infradead.org>
-List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-Errors-To: linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org
-To: Anton Ivanov <anton.ivanov@kot-begemot.co.uk>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>, Geert
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F16674A20D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:17:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id R3QaIdDpRhDa for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 13:17:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A7B49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:17:53 -0400 (EDT)
+In-Reply-To: <20181004173416.GC5149@zn.tnic>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Borislav Petkov <bp@alien8.de>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 05:58:40PM +0100, Anton Ivanov wrote:
-[...]
-> > > > > > If I read the code right, MIPS completely ignores the address
-> > > > > > argument so
-> > > > > > set_pmd_at there may not have the effect which this patch is trying to
-> > > > > > achieve.
-> > > > > Ignoring address is fine. Most architectures do that..
-> > > > > The ideas is to move page table to the new pmd slot. It's nothing to do
-> > > > > with the address passed to set_pmd_at().
-> > > > If that is it's only function, then I am going to appropriate the code
-> > > > out of the MIPS tree for further uml testing. It does exactly that -
-> > > > just move the pmd the new slot.
-> > > > 
-> > > > A.
-> > > 
-> > > A.
-> > > 
-> > >  From ac265d96897a346b05646fce91784ed4922c7f8d Mon Sep 17 00:00:00 2001
-> > > From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-> > > Date: Fri, 12 Oct 2018 17:24:10 +0100
-> > > Subject: [PATCH] Incremental fixes to the mmremap patch
-> > > 
-> > > Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-> > > ---
-> > >   arch/um/include/asm/pgalloc.h | 4 ++--
-> > >   arch/um/include/asm/pgtable.h | 3 +++
-> > >   arch/um/kernel/tlb.c          | 6 ++++++
-> > >   3 files changed, 11 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/um/include/asm/pgalloc.h b/arch/um/include/asm/pgalloc.h
-> > > index bf90b2aa2002..99eb5682792a 100644
-> > > --- a/arch/um/include/asm/pgalloc.h
-> > > +++ b/arch/um/include/asm/pgalloc.h
-> > > @@ -25,8 +25,8 @@
-> > >   extern pgd_t *pgd_alloc(struct mm_struct *);
-> > >   extern void pgd_free(struct mm_struct *mm, pgd_t *pgd);
-> > > -extern pte_t *pte_alloc_one_kernel(struct mm_struct *, unsigned long);
-> > > -extern pgtable_t pte_alloc_one(struct mm_struct *, unsigned long);
-> > > +extern pte_t *pte_alloc_one_kernel(struct mm_struct *);
-> > > +extern pgtable_t pte_alloc_one(struct mm_struct *);
-> > If its Ok, let me handle this bit since otherwise it complicates things for
-> > me.
-> > 
-> > >   static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
-> > >   {
-> > > diff --git a/arch/um/include/asm/pgtable.h b/arch/um/include/asm/pgtable.h
-> > > index 7485398d0737..1692da55e63a 100644
-> > > --- a/arch/um/include/asm/pgtable.h
-> > > +++ b/arch/um/include/asm/pgtable.h
-> > > @@ -359,4 +359,7 @@ do {						\
-> > >   	__flush_tlb_one((vaddr));		\
-> > >   } while (0)
-> > > +extern void set_pmd_at(struct mm_struct *mm, unsigned long addr,
-> > > +		pmd_t *pmdp, pmd_t pmd);
-> > > +
-> > >   #endif
-> > > diff --git a/arch/um/kernel/tlb.c b/arch/um/kernel/tlb.c
-> > > index 763d35bdda01..d17b74184ba0 100644
-> > > --- a/arch/um/kernel/tlb.c
-> > > +++ b/arch/um/kernel/tlb.c
-> > > @@ -647,3 +647,9 @@ void force_flush_all(void)
-> > >   		vma = vma->vm_next;
-> > >   	}
-> > >   }
-> > > +void set_pmd_at(struct mm_struct *mm, unsigned long addr,
-> > > +		pmd_t *pmdp, pmd_t pmd)
-> > > +{
-> > > +	*pmdp = pmd;
-> > > +}
-> > > +
-> > I believe this should be included in a separate patch since it is not related
-> > specifically to pte_alloc argument removal. If you want, I could split it
-> > into a separate patch for my series with you as author.
+Hi Boris,
+
+On 04/10/2018 18:34, Borislav Petkov wrote:
+> On Wed, Oct 03, 2018 at 06:50:36PM +0100, James Morse wrote:
+>> I'm all in favour of letting the compiler work it out, but the existing ghes
+>> code has #ifdef/#else all over the place. This is 'keeping the style'.
 > 
+> Yeah, but this "style" is not the optimal one and we should
+> simplify/clean up and fix this thing.
 > 
-> Whichever is more convenient for you.
-
-Ok.
-
-> One thing to note - tlb flush is extremely expensive on uml.
+> Swapping the order of your statements here:
 > 
-> I have lifted the definition of set_pmd_at from the mips tree and removed
-> the tlb_flush_all from it for this exact reason.
+>> The ACPI spec has four ~NMI notifications, so far the support for
+>> these in Linux has been selectable separately.
 > 
-> If I read the original patch correctly, it does its own flush control so
-> set_pmd_at does not need to do a force flush every time. It is done further
-> up the chain.
+> Yes, but: distro kernels end up enabling all those options anyway and
+> distro kernels are 90-ish% of the setups. Which means, this will get
+> enabled anyway and this additional Kconfig symbol is simply going to be
+> one automatic reply "Yes".
+> 
+> So let's build it in by default and if someone complains about it, we
+> can always carve it out. But right now I don't see the need for the
+> unnecessary separation...
 
-That is correct. It is not done during the optimization, but is done later
-after the pmds have moved.
+Ripping out the existing #ifdefs and replacing them with IS_ENABLED() would let
+the compiler work out the estatus stuff is unused, and saves us describing the
+what-uses-it logic in Kconfig.
 
-thanks,
+But this does expose the x86 nmi stuff on arm64, which doesn't build today.
+Dragging NMI_HANDLED and friends up to the 'linux' header causes a fair amount
+of noise under arch/x86 (include the new header in 22 files). Adding dummy
+declarations to arm64 fixes this, and doesn't affect the other architectures
+that have an asm/nmi.h
 
- - Joel
+Alternatively we could leave {un,}register_nmi_handler() under
+CONFIG_HAVE_ACPI_APEI_NMI. I think we need to keep the NOTIFY_NMI kconfig symbol
+around, as its one of the two I can't work out how to fix without the TLBI-IPI.
+
+
+Thanks,
+
+James
