@@ -1,96 +1,124 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: [PATCH v3 0/7] Add virtio-iommu driver
-Date: Fri, 12 Oct 2018 15:59:10 +0100
-Message-ID: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v3 2/7] dt-bindings: virtio: Add virtio-pci-iommu node
+Date: Fri, 12 Oct 2018 15:59:12 +0100
+Message-ID: <20181012145917.6840-3-jean-philippe.brucker@arm.com>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73D9B4A26A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 11:00:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id taXZSQkBDsfo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 11:00:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22C314A2AA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 11:00:52 -0400 (EDT)
+In-Reply-To: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: iommu@lists.linux-foundation.org, virtualization@lists.linux-foundation.org, devicetree@vger.kernel.org
+Cc: kevin.tian@intel.com, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, mst@redhat.com, marc.zyngier@arm.com, linux-pci@vger.kernel.org, jasowang@redhat.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, robh+dt@kernel.org, robin.murphy@arm.com, joro@8bytes.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the virtio-iommu driver, following specification v0.8 [1].
-Changes since v2 [2]:
+Some systems implement virtio-iommu as a PCI endpoint. The operating
+systems needs to discover the relationship between IOMMU and masters long
+before the PCI endpoint gets probed. Add a PCI child node to describe the
+virtio-iommu device.
 
-* Patches 2-4 allow virtio-iommu to use the PCI transport, since QEMU
-  would like to phase out the MMIO transport. This produces a complex
-  topology where the programming interface of the IOMMU could appear
-  lower than the endpoints that it translates. It's not unheard of (e.g.
-  AMD IOMMU), and the guest easily copes with this.
-  
-  The "Firmware description" section of the specification has been
-  updated with all combinations of PCI, MMIO and DT, ACPI.
+The virtio-pci-iommu is conceptually split between a PCI programming
+interface and a translation component on the parent bus. The latter
+doesn't have a node in the device tree. The virtio-pci-iommu node
+describes both, by linking the PCI endpoint to "iommus" property of DMA
+master nodes and to "iommu-map" properties of bus nodes.
 
-* Fix structures layout, they don't need the "packed" attribute anymore.
-
-* While we're at it, add domain parameter to DETACH request, and leave
-  some padding. This way the next version, that adds PASID support,
-  won't have to introduce a "DETACH2" request to stay backward
-  compatible.
-
-* Require virtio device 1.0+. Remove legacy transport notes from the
-  specification.
-
-* Request timeout is now only enabled with DEBUG.
-
-* The patch for VFIO Kconfig (previously patch 5/5) is in next.
-
-You can find Linux driver and kvmtool device on branches
-virtio-iommu/v0.8 [3] (currently based on 4.19-rc7 but rebasing onto
-next only produced a trivial conflict). Branch virtio-iommu/devel
-contains a few patches that I'd like to send once the base is upstream:
-
-* virtio-iommu as a module. It got *much* nicer after Rob's probe
-  deferral rework, but I still have a bug to fix when re-loading the
-  virtio-iommu module.
-
-* ACPI support requires a minor IORT spec update (reservation of node
-  ID). I think it should be easier to obtain once the device and drivers
-  are upstream.
-
-[1] Virtio-iommu specification v0.8, diff from v0.7, and sources
-    git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.8
-    http://jpbrucker.net/virtio-iommu/spec/v0.8/virtio-iommu-v0.8.pdf
-    http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.7-v0.8.pdf
-
-[2] [PATCH v2 0/5] Add virtio-iommu driver
-    https://www.spinics.net/lists/kvm/msg170655.html
-
-[3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.8
-    git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.8
-
-Jean-Philippe Brucker (7):
-  dt-bindings: virtio-mmio: Add IOMMU description
-  dt-bindings: virtio: Add virtio-pci-iommu node
-  PCI: OF: allow endpoints to bypass the iommu
-  PCI: OF: Initialize dev->fwnode appropriately
-  iommu: Add virtio-iommu driver
-  iommu/virtio: Add probe request
-  iommu/virtio: Add event queue
-
- .../devicetree/bindings/virtio/iommu.txt      |   66 +
- .../devicetree/bindings/virtio/mmio.txt       |   30 +
- MAINTAINERS                                   |    7 +
- drivers/iommu/Kconfig                         |   11 +
- drivers/iommu/Makefile                        |    1 +
- drivers/iommu/virtio-iommu.c                  | 1171 +++++++++++++++++
- drivers/pci/of.c                              |   14 +-
- include/uapi/linux/virtio_ids.h               |    1 +
- include/uapi/linux/virtio_iommu.h             |  159 +++
- 9 files changed, 1457 insertions(+), 3 deletions(-)
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+---
+ .../devicetree/bindings/virtio/iommu.txt      | 66 +++++++++++++++++++
+ 1 file changed, 66 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
- create mode 100644 drivers/iommu/virtio-iommu.c
- create mode 100644 include/uapi/linux/virtio_iommu.h
 
+diff --git a/Documentation/devicetree/bindings/virtio/iommu.txt b/Documentation/devicetree/bindings/virtio/iommu.txt
+new file mode 100644
+index 000000000000..2407fea0651c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/virtio/iommu.txt
+@@ -0,0 +1,66 @@
++* virtio IOMMU PCI device
++
++When virtio-iommu uses the PCI transport, its programming interface is
++discovered dynamically by the PCI probing infrastructure. However the
++device tree statically describes the relation between IOMMU and DMA
++masters. Therefore, the PCI root complex that hosts the virtio-iommu
++contains a child node representing the IOMMU device explicitly.
++
++Required properties:
++
++- compatible:	Should be "virtio,pci-iommu"
++- reg:		PCI address of the IOMMU. As defined in the PCI Bus
++		Binding reference [1], the reg property is a five-cell
++		address encoded as (phys.hi phys.mid phys.lo size.hi
++		size.lo). phys.hi should contain the device's BDF as
++		0b00000000 bbbbbbbb dddddfff 00000000. The other cells
++		should be zero.
++- #iommu-cells:	Each platform DMA master managed by the IOMMU is assigned
++		an endpoint ID, described by the "iommus" property [2].
++		For virtio-iommu, #iommu-cells must be 1.
++
++Notes:
++
++- DMA from the IOMMU device isn't managed by another IOMMU. Therefore the
++  virtio-iommu node doesn't have an "iommus" property, and is omitted from
++  the iommu-map property of the root complex.
++
++Example:
++
++pcie@10000000 {
++	compatible = "pci-host-ecam-generic";
++	...
++
++	/* The IOMMU programming interface uses slot 00:01.0 */
++	iommu0: iommu@0008 {
++		compatible = "virtio,pci-iommu";
++		reg = <0x00000800 0 0 0 0>;
++		#iommu-cells = <1>;
++	};
++
++	/*
++	 * The IOMMU manages all functions in this PCI domain except
++	 * itself. Omit BDF 00:01.0.
++	 */
++	iommu-map = <0x0 &iommu0 0x0 0x8>
++		    <0x9 &iommu0 0x9 0xfff7>;
++};
++
++pcie@20000000 {
++	compatible = "pci-host-ecam-generic";
++	...
++	/*
++	 * The IOMMU also manages all functions from this domain,
++	 * with endpoint IDs 0x10000 - 0x1ffff
++	 */
++	iommu-map = <0x0 &iommu0 0x10000 0x10000>;
++};
++
++ethernet@fe001000 {
++	...
++	/* The IOMMU manages this platform device with endpoint ID 0x20000 */
++	iommus = <&iommu0 0x20000>;
++};
++
++[1] Documentation/devicetree/bindings/pci/pci.txt
++[2] Documentation/devicetree/bindings/iommu/iommu.txt
 -- 
 2.19.1
