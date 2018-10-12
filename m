@@ -1,347 +1,249 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 6/7] iommu/virtio: Add probe request
-Date: Fri, 12 Oct 2018 12:42:04 -0400
-Message-ID: <20181012123633-mutt-send-email-mst@kernel.org>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012145917.6840-7-jean-philippe.brucker@arm.com>
+From: Anton Ivanov <anton.ivanov@kot-begemot.co.uk>
+Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
+Date: Fri, 12 Oct 2018 17:42:24 +0100
+Message-ID: <97cb3fe1-7bc1-12ff-d602-56c72a5496c5@kot-begemot.co.uk>
+References: <20181012013756.11285-1-joel@joelfernandes.org>
+ <20181012013756.11285-2-joel@joelfernandes.org>
+ <9ed82f9e-88c4-8e4f-8c45-3ef153469603@kot-begemot.co.uk>
+ <20181012143728.t42uvr6etg7gp7fh@kshutemo-mobl1>
+ <4dd52e22-5b51-9b30-7178-fde603a08f88@kot-begemot.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-Content-Disposition: inline
-In-Reply-To: <20181012145917.6840-7-jean-philippe.brucker@arm.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, linux-pci@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, virtualization@lists.linux-foundation.org, eric.auger@redhat.com, iommu@lists.linux-foundation.org, robh+dt@kernel.org, marc.zyngier@arm.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: multipart/mixed; boundary="------------A6D223F721C42CB9BAB1286E"
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+In-Reply-To: <4dd52e22-5b51-9b30-7178-fde603a08f88@kot-begemot.co.uk>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, "Joel Fernandes (Google)" <joel@joelfernandes.org>, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 03:59:16PM +0100, Jean-Philippe Brucker wrote:
-> When the device offers the probe feature, send a probe request for each
-> device managed by the IOMMU. Extract RESV_MEM information. When we
-> encounter a MSI doorbell region, set it up as a IOMMU_RESV_MSI region.
-> This will tell other subsystems that there is no need to map the MSI
-> doorbell in the virtio-iommu, because MSIs bypass it.
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> ---
->  drivers/iommu/virtio-iommu.c      | 147 ++++++++++++++++++++++++++++--
->  include/uapi/linux/virtio_iommu.h |  39 ++++++++
->  2 files changed, 180 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-> index 9fb38cd3b727..8eaf66770469 100644
-> --- a/drivers/iommu/virtio-iommu.c
-> +++ b/drivers/iommu/virtio-iommu.c
-> @@ -56,6 +56,7 @@ struct viommu_dev {
->  	struct iommu_domain_geometry	geometry;
->  	u64				pgsize_bitmap;
->  	u8				domain_bits;
-> +	u32				probe_size;
->  };
->  
->  struct viommu_mapping {
-> @@ -77,8 +78,10 @@ struct viommu_domain {
->  };
->  
->  struct viommu_endpoint {
-> +	struct device			*dev;
->  	struct viommu_dev		*viommu;
->  	struct viommu_domain		*vdomain;
-> +	struct list_head		resv_regions;
->  };
->  
->  struct viommu_request {
-> @@ -129,6 +132,9 @@ static off_t viommu_get_req_offset(struct viommu_dev *viommu,
->  {
->  	size_t tail_size = sizeof(struct virtio_iommu_req_tail);
->  
-> +	if (req->type == VIRTIO_IOMMU_T_PROBE)
-> +		return len - viommu->probe_size - tail_size;
-> +
->  	return len - tail_size;
->  }
->  
-> @@ -414,6 +420,101 @@ static int viommu_replay_mappings(struct viommu_domain *vdomain)
->  	return ret;
->  }
->  
-> +static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
-> +			       struct virtio_iommu_probe_resv_mem *mem,
-> +			       size_t len)
-> +{
-> +	struct iommu_resv_region *region = NULL;
-> +	unsigned long prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
-> +
-> +	u64 start = le64_to_cpu(mem->start);
-> +	u64 end = le64_to_cpu(mem->end);
-> +	size_t size = end - start + 1;
-> +
-> +	if (len < sizeof(*mem))
-> +		return -EINVAL;
+This is a multi-part message in MIME format.
+--------------A6D223F721C42CB9BAB1286E
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-Maybe validate that size, end and start all make sense
-and e.g. fit within phys_addr_t and size_t?
+On 10/12/18 3:48 PM, Anton Ivanov wrote:
+> On 12/10/2018 15:37, Kirill A. Shutemov wrote:
+>> On Fri, Oct 12, 2018 at 03:09:49PM +0100, Anton Ivanov wrote:
+>>> On 10/12/18 2:37 AM, Joel Fernandes (Google) wrote:
+>>>> Android needs to mremap large regions of memory during memory 
+>>>> management
+>>>> related operations. The mremap system call can be really slow if 
+>>>> THP is
+>>>> not enabled. The bottleneck is move_page_tables, which is copying each
+>>>> pte at a time, and can be really slow across a large map. Turning 
+>>>> on THP
+>>>> may not be a viable option, and is not for us. This patch speeds up 
+>>>> the
+>>>> performance for non-THP system by copying at the PMD level when 
+>>>> possible.
+>>>>
+>>>> The speed up is three orders of magnitude. On a 1GB mremap, the mremap
+>>>> completion times drops from 160-250 millesconds to 380-400 
+>>>> microseconds.
+>>>>
+>>>> Before:
+>>>> Total mremap time for 1GB data: 242321014 nanoseconds.
+>>>> Total mremap time for 1GB data: 196842467 nanoseconds.
+>>>> Total mremap time for 1GB data: 167051162 nanoseconds.
+>>>>
+>>>> After:
+>>>> Total mremap time for 1GB data: 385781 nanoseconds.
+>>>> Total mremap time for 1GB data: 388959 nanoseconds.
+>>>> Total mremap time for 1GB data: 402813 nanoseconds.
+>>>>
+>>>> Incase THP is enabled, the optimization is skipped. I also flush the
+>>>> tlb every time we do this optimization since I couldn't find a way to
+>>>> determine if the low-level PTEs are dirty. It is seen that the cost of
+>>>> doing so is not much compared the improvement, on both x86-64 and 
+>>>> arm64.
+>>>>
+>>>> Cc: minchan@kernel.org
+>>>> Cc: pantin@google.com
+>>>> Cc: hughd@google.com
+>>>> Cc: lokeshgidra@google.com
+>>>> Cc: dancol@google.com
+>>>> Cc: mhocko@kernel.org
+>>>> Cc: kirill@shutemov.name
+>>>> Cc: akpm@linux-foundation.org
+>>>> Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+>>>> ---
+>>>>    mm/mremap.c | 62 
+>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>    1 file changed, 62 insertions(+)
+>>>>
+>>>> diff --git a/mm/mremap.c b/mm/mremap.c
+>>>> index 9e68a02a52b1..d82c485822ef 100644
+>>>> --- a/mm/mremap.c
+>>>> +++ b/mm/mremap.c
+>>>> @@ -191,6 +191,54 @@ static void move_ptes(struct vm_area_struct 
+>>>> *vma, pmd_t *old_pmd,
+>>>>            drop_rmap_locks(vma);
+>>>>    }
+>>>> +static bool move_normal_pmd(struct vm_area_struct *vma, unsigned 
+>>>> long old_addr,
+>>>> +          unsigned long new_addr, unsigned long old_end,
+>>>> +          pmd_t *old_pmd, pmd_t *new_pmd, bool *need_flush)
+>>>> +{
+>>>> +    spinlock_t *old_ptl, *new_ptl;
+>>>> +    struct mm_struct *mm = vma->vm_mm;
+>>>> +
+>>>> +    if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK)
+>>>> +        || old_end - old_addr < PMD_SIZE)
+>>>> +        return false;
+>>>> +
+>>>> +    /*
+>>>> +     * The destination pmd shouldn't be established, free_pgtables()
+>>>> +     * should have release it.
+>>>> +     */
+>>>> +    if (WARN_ON(!pmd_none(*new_pmd)))
+>>>> +        return false;
+>>>> +
+>>>> +    /*
+>>>> +     * We don't have to worry about the ordering of src and dst
+>>>> +     * ptlocks because exclusive mmap_sem prevents deadlock.
+>>>> +     */
+>>>> +    old_ptl = pmd_lock(vma->vm_mm, old_pmd);
+>>>> +    if (old_ptl) {
+>>>> +        pmd_t pmd;
+>>>> +
+>>>> +        new_ptl = pmd_lockptr(mm, new_pmd);
+>>>> +        if (new_ptl != old_ptl)
+>>>> +            spin_lock_nested(new_ptl, SINGLE_DEPTH_NESTING);
+>>>> +
+>>>> +        /* Clear the pmd */
+>>>> +        pmd = *old_pmd;
+>>>> +        pmd_clear(old_pmd);
+>>>> +
+>>>> +        VM_BUG_ON(!pmd_none(*new_pmd));
+>>>> +
+>>>> +        /* Set the new pmd */
+>>>> +        set_pmd_at(mm, new_addr, new_pmd, pmd);
+>>> UML does not have set_pmd_at at all
+>> Every architecture does. :)
+>
+> I tried to build it patching vs 4.19-rc before I made this statement 
+> and ran into that.
+>
+> Presently it does not.
+>
+> https://elixir.bootlin.com/linux/v4.19-rc7/ident/set_pmd_at - UML is 
+> not on the list.
 
-> +
-> +	switch (mem->subtype) {
-> +	default:
-> +		dev_warn(vdev->dev, "unknown resv mem subtype 0x%x\n",
-> +			 mem->subtype);
-> +		/* Fall-through */
-> +	case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
-> +		region = iommu_alloc_resv_region(start, size, 0,
-> +						 IOMMU_RESV_RESERVED);
-> +		break;
-> +	case VIRTIO_IOMMU_RESV_MEM_T_MSI:
-> +		region = iommu_alloc_resv_region(start, size, prot,
-> +						 IOMMU_RESV_MSI);
-> +		break;
-> +	}
-> +
-> +	list_add(&vdev->resv_regions, &region->list);
-> +	return 0;
-> +}
-> +
-> +static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
-> +{
-> +	int ret;
-> +	u16 type, len;
-> +	size_t cur = 0;
-> +	size_t probe_len;
-> +	struct virtio_iommu_req_probe *probe;
-> +	struct virtio_iommu_probe_property *prop;
-> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
-> +	struct viommu_endpoint *vdev = fwspec->iommu_priv;
-> +
-> +	if (!fwspec->num_ids)
-> +		return -EINVAL;
-> +
-> +	probe_len = sizeof(*probe) + viommu->probe_size +
-> +		    sizeof(struct virtio_iommu_req_tail);
-> +	probe = kzalloc(probe_len, GFP_KERNEL);
-> +	if (!probe)
-> +		return -ENOMEM;
-> +
-> +	probe->head.type = VIRTIO_IOMMU_T_PROBE;
-> +	/*
-> +	 * For now, assume that properties of an endpoint that outputs multiple
-> +	 * IDs are consistent. Only probe the first one.
-> +	 */
-> +	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
-> +
-> +	ret = viommu_send_req_sync(viommu, probe, probe_len);
-> +	if (ret)
-> +		goto out_free;
-> +
-> +	prop = (void *)probe->properties;
-> +	type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
-> +
-> +	while (type != VIRTIO_IOMMU_PROBE_T_NONE &&
-> +	       cur < viommu->probe_size) {
-> +		len = le16_to_cpu(prop->length) + sizeof(*prop);
-> +
-> +		switch (type) {
-> +		case VIRTIO_IOMMU_PROBE_T_RESV_MEM:
-> +			ret = viommu_add_resv_mem(vdev, (void *)prop, len);
-> +			break;
-> +		default:
-> +			dev_err(dev, "unknown viommu prop 0x%x\n", type);
-> +		}
-> +
-> +		if (ret)
-> +			dev_err(dev, "failed to parse viommu prop 0x%x\n", type);
-> +
-> +		cur += len;
-> +		if (cur >= viommu->probe_size)
-> +			break;
-> +
-> +		prop = (void *)probe->properties + cur;
-> +		type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
-> +	}
-> +
-> +out_free:
-> +	kfree(probe);
-> +	return ret;
-> +}
-> +
->  /* IOMMU API */
->  
->  static struct iommu_domain *viommu_domain_alloc(unsigned type)
-> @@ -636,15 +737,33 @@ static void viommu_iotlb_sync(struct iommu_domain *domain)
->  
->  static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
->  {
-> -	struct iommu_resv_region *region;
-> +	struct iommu_resv_region *entry, *new_entry, *msi = NULL;
-> +	struct viommu_endpoint *vdev = dev->iommu_fwspec->iommu_priv;
->  	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
->  
-> -	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
-> -					 IOMMU_RESV_SW_MSI);
-> -	if (!region)
-> -		return;
-> +	list_for_each_entry(entry, &vdev->resv_regions, list) {
-> +		/*
-> +		 * If the device registered a bypass MSI windows, use it.
-> +		 * Otherwise add a software-mapped region
-> +		 */
-> +		if (entry->type == IOMMU_RESV_MSI)
-> +			msi = entry;
-> +
-> +		new_entry = kmemdup(entry, sizeof(*entry), GFP_KERNEL);
-> +		if (!new_entry)
-> +			return;
-> +		list_add_tail(&new_entry->list, head);
-> +	}
-> +
-> +	if (!msi) {
-> +		msi = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH,
-> +					      prot, IOMMU_RESV_SW_MSI);
-> +		if (!msi)
-> +			return;
-> +
-> +		list_add_tail(&msi->list, head);
-> +	}
->  
-> -	list_add_tail(&region->list, head);
->  	iommu_dma_get_resv_regions(dev, head);
->  }
->  
-> @@ -692,9 +811,18 @@ static int viommu_add_device(struct device *dev)
->  	if (!vdev)
->  		return -ENOMEM;
->  
-> +	vdev->dev = dev;
->  	vdev->viommu = viommu;
-> +	INIT_LIST_HEAD(&vdev->resv_regions);
->  	fwspec->iommu_priv = vdev;
->  
-> +	if (viommu->probe_size) {
-> +		/* Get additional information for this endpoint */
-> +		ret = viommu_probe_endpoint(viommu, dev);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
->  	ret = iommu_device_link(&viommu->iommu, dev);
->  	if (ret)
->  		goto err_free_dev;
-> @@ -717,6 +845,7 @@ static int viommu_add_device(struct device *dev)
->  	iommu_device_unlink(&viommu->iommu, dev);
->  
->  err_free_dev:
-> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
->  	kfree(vdev);
->  
->  	return ret;
-> @@ -734,6 +863,7 @@ static void viommu_remove_device(struct device *dev)
->  
->  	iommu_group_remove_device(dev);
->  	iommu_device_unlink(&vdev->viommu->iommu, dev);
-> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
->  	kfree(vdev);
->  }
->  
-> @@ -832,6 +962,10 @@ static int viommu_probe(struct virtio_device *vdev)
->  			     struct virtio_iommu_config, domain_bits,
->  			     &viommu->domain_bits);
->  
-> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_PROBE,
-> +			     struct virtio_iommu_config, probe_size,
-> +			     &viommu->probe_size);
-> +
->  	viommu->geometry = (struct iommu_domain_geometry) {
->  		.aperture_start	= input_start,
->  		.aperture_end	= input_end,
-> @@ -913,6 +1047,7 @@ static unsigned int features[] = {
->  	VIRTIO_IOMMU_F_MAP_UNMAP,
->  	VIRTIO_IOMMU_F_DOMAIN_BITS,
->  	VIRTIO_IOMMU_F_INPUT_RANGE,
-> +	VIRTIO_IOMMU_F_PROBE,
->  };
->  
->  static struct virtio_device_id id_table[] = {
-> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-> index e808fc7fbe82..feed74586bb0 100644
-> --- a/include/uapi/linux/virtio_iommu.h
-> +++ b/include/uapi/linux/virtio_iommu.h
-> @@ -14,6 +14,7 @@
->  #define VIRTIO_IOMMU_F_DOMAIN_BITS		1
->  #define VIRTIO_IOMMU_F_MAP_UNMAP		2
->  #define VIRTIO_IOMMU_F_BYPASS			3
-> +#define VIRTIO_IOMMU_F_PROBE			4
->  
->  struct virtio_iommu_config {
->  	/* Supported page sizes */
-> @@ -25,6 +26,9 @@ struct virtio_iommu_config {
->  	} input_range;
->  	/* Max domain ID size */
->  	__u8					domain_bits;
-> +	__u8					padding[3];
-> +	/* Probe buffer size */
+Once this problem as well as the omissions in the include changes for 
+UML in patch one have been fixed it appears to be working.
 
-Oh so you do add the padding in this patch, it's just a
-question of moving this line to the earlier patch then.
+What it needs is attached.
 
-> +	__u32					probe_size;
->  };
->  
->  /* Request types */
-> @@ -32,6 +36,7 @@ struct virtio_iommu_config {
->  #define VIRTIO_IOMMU_T_DETACH			0x02
->  #define VIRTIO_IOMMU_T_MAP			0x03
->  #define VIRTIO_IOMMU_T_UNMAP			0x04
-> +#define VIRTIO_IOMMU_T_PROBE			0x05
->  
->  /* Status types */
->  #define VIRTIO_IOMMU_S_OK			0x00
-> @@ -98,4 +103,38 @@ struct virtio_iommu_req_unmap {
->  	struct virtio_iommu_req_tail		tail;
->  };
->  
-> +#define VIRTIO_IOMMU_PROBE_T_NONE		0
-> +#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
-> +
-> +#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
-> +
-> +struct virtio_iommu_probe_property {
-> +	__le16					type;
-> +	__le16					length;
-> +};
-> +
-> +#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
-> +#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
-> +
-> +struct virtio_iommu_probe_resv_mem {
-> +	struct virtio_iommu_probe_property	head;
-> +	__u8					subtype;
-> +	__u8					reserved[3];
-> +	__le64					start;
-> +	__le64					end;
-> +};
-> +
-> +struct virtio_iommu_req_probe {
-> +	struct virtio_iommu_req_head		head;
-> +	__le32					endpoint;
-> +	__u8					reserved[64];
-> +
-> +	__u8					properties[];
-> +
-> +	/*
-> +	 * Tail follows the variable-length properties array. No padding,
-> +	 * property lengths are all aligned on 8 bytes.
-> +	 */
-> +};
-> +
->  #endif
-> -- 
-> 2.19.1
+
+>
+>>
+>> But it may come not from the arch code.
+>
+> There is no generic definition as far as I can see. All 12 defines in 
+> 4.19 are in arch specific code. Unless i am missing something...
+>
+>>
+>>> If I read the code right, MIPS completely ignores the address 
+>>> argument so
+>>> set_pmd_at there may not have the effect which this patch is trying to
+>>> achieve.
+>> Ignoring address is fine. Most architectures do that..
+>> The ideas is to move page table to the new pmd slot. It's nothing to do
+>> with the address passed to set_pmd_at().
+>
+> If that is it's only function, then I am going to appropriate the code 
+> out of the MIPS tree for further uml testing. It does exactly that - 
+> just move the pmd the new slot.
+>
+>>
+> A.
+
+
+A.
+
+
+--------------A6D223F721C42CB9BAB1286E
+Content-Type: text/x-patch;
+ name="0001-Incremental-fixes-to-the-mmremap-patch.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-Incremental-fixes-to-the-mmremap-patch.patch"
+
+>From ac265d96897a346b05646fce91784ed4922c7f8d Mon Sep 17 00:00:00 2001
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Date: Fri, 12 Oct 2018 17:24:10 +0100
+Subject: [PATCH] Incremental fixes to the mmremap patch
+
+Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+---
+ arch/um/include/asm/pgalloc.h | 4 ++--
+ arch/um/include/asm/pgtable.h | 3 +++
+ arch/um/kernel/tlb.c          | 6 ++++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/arch/um/include/asm/pgalloc.h b/arch/um/include/asm/pgalloc.h
+index bf90b2aa2002..99eb5682792a 100644
+--- a/arch/um/include/asm/pgalloc.h
++++ b/arch/um/include/asm/pgalloc.h
+@@ -25,8 +25,8 @@
+ extern pgd_t *pgd_alloc(struct mm_struct *);
+ extern void pgd_free(struct mm_struct *mm, pgd_t *pgd);
+ 
+-extern pte_t *pte_alloc_one_kernel(struct mm_struct *, unsigned long);
+-extern pgtable_t pte_alloc_one(struct mm_struct *, unsigned long);
++extern pte_t *pte_alloc_one_kernel(struct mm_struct *);
++extern pgtable_t pte_alloc_one(struct mm_struct *);
+ 
+ static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
+ {
+diff --git a/arch/um/include/asm/pgtable.h b/arch/um/include/asm/pgtable.h
+index 7485398d0737..1692da55e63a 100644
+--- a/arch/um/include/asm/pgtable.h
++++ b/arch/um/include/asm/pgtable.h
+@@ -359,4 +359,7 @@ do {						\
+ 	__flush_tlb_one((vaddr));		\
+ } while (0)
+ 
++extern void set_pmd_at(struct mm_struct *mm, unsigned long addr,
++		pmd_t *pmdp, pmd_t pmd);
++
+ #endif
+diff --git a/arch/um/kernel/tlb.c b/arch/um/kernel/tlb.c
+index 763d35bdda01..d17b74184ba0 100644
+--- a/arch/um/kernel/tlb.c
++++ b/arch/um/kernel/tlb.c
+@@ -647,3 +647,9 @@ void force_flush_all(void)
+ 		vma = vma->vm_next;
+ 	}
+ }
++void set_pmd_at(struct mm_struct *mm, unsigned long addr,
++		pmd_t *pmdp, pmd_t pmd)
++{
++	*pmdp = pmd;
++}
++
+-- 
+2.11.0
+
+
+--------------A6D223F721C42CB9BAB1286E
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+linux-snps-arc mailing list
+linux-snps-arc@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-snps-arc
+--------------A6D223F721C42CB9BAB1286E--
