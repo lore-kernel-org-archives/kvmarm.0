@@ -1,25 +1,25 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v6 06/18] KVM: arm/arm64: Add kvm_ras.h to collect kvm
- specific RAS plumbing
-Date: Fri, 12 Oct 2018 18:18:03 +0100
-Message-ID: <ac63b5c1-181e-b1a4-9ca7-7664a192be4e@arm.com>
+Subject: Re: [PATCH v6 07/18] arm64: KVM/mm: Move SEA handling behind a single
+ 'claim' interface
+Date: Fri, 12 Oct 2018 18:18:28 +0100
+Message-ID: <6cd00d26-df00-b5d9-5144-073672efe87a@arm.com>
 References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-7-james.morse@arm.com> <20181012095702.GC12328@zn.tnic>
+ <20180921221705.6478-8-james.morse@arm.com> <20181012100212.GA580@zn.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1FF49E3E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 523A44A20D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:18:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aXjZxPTexVje for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Oct 2018 13:18:08 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F5C4A20D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:18:08 -0400 (EDT)
-In-Reply-To: <20181012095702.GC12328@zn.tnic>
+ with ESMTP id wKC3zBKn-H-t for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 13:18:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D9749E3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 13:18:33 -0400 (EDT)
+In-Reply-To: <20181012100212.GA580@zn.tnic>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,48 +36,65 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Boris,
 
-On 12/10/2018 10:57, Borislav Petkov wrote:
-> On Fri, Sep 21, 2018 at 11:16:53PM +0100, James Morse wrote:
->> To split up APEIs in_nmi() path, we need any nmi-like callers to always
->> be in_nmi(). KVM shouldn't have to know about this, pull the RAS plumbing
->> out into a header file.
+On 12/10/2018 11:02, Borislav Petkov wrote:
+> On Fri, Sep 21, 2018 at 11:16:54PM +0100, James Morse wrote:
+>> To split up APEIs in_nmi() path, we need the nmi-like callers to always
+>> be in_nmi(). Add a helper to do the work and claim the notification.
 >>
->> Currently guest synchronous external aborts are claimed as RAS
->> notifications by handle_guest_sea(), which is hidden in the arch codes
->> mm/fault.c. 32bit gets a dummy declaration in system_misc.h.
+>> When KVM or the arch code takes an exception that might be a RAS
+>> notification, it asks the APEI firmware-first code whether it wants
+>> to claim the exception. We can then go on to see if (a future)
+>> kernel-first mechanism wants to claim the notification, before
+>> falling through to the existing default behaviour.
 >>
->> There is going to be more of this in the future if/when we support
->> the SError-based firmware-first notification mechanism and/or
->> kernel-first notifications for both synchronous external abort and
->> SError. Each of these will come with some Kconfig symbols and a
->> handful of header files.
+>> The NOTIFY_SEA code was merged before we had multiple, possibly
+>> interacting, NMI-like notifications and the need to consider kernel
+>> first in the future. Make the 'claiming' behaviour explicit.
 >>
->> Create a header file for all this.
+>> As we're restructuring the APEI code to allow multiple NMI-like
+>> notifications, any notification that might interrupt interrupts-masked
+>> code must always be wrapped in nmi_enter()/nmi_exit(). This allows APEI
+>> to use in_nmi() to use the right fixmap entries.
 >>
->> This patch gives handle_guest_sea() a 'kvm_' prefix, and moves the
->> declarations to kvm_ras.h as preparation for a future patch that moves
->> the ACPI-specific RAS code out of mm/fault.c.
+>> We mask SError over this window to prevent an asynchronous RAS error
+>> arriving and tripping 'nmi_enter()'s BUG_ON(in_nmi()).
 
->> diff --git a/arch/arm/include/asm/kvm_ras.h b/arch/arm/include/asm/kvm_ras.h
->> new file mode 100644
->> index 000000000000..aaff56bf338f
->> --- /dev/null
->> +++ b/arch/arm/include/asm/kvm_ras.h
->> @@ -0,0 +1,14 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +// Copyright (C) 2018 - Arm Ltd
+>> diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
+>> index ed46dc188b22..a9b8bba014b5 100644
+>> --- a/arch/arm64/kernel/acpi.c
+>> +++ b/arch/arm64/kernel/acpi.c
+>> @@ -257,3 +259,30 @@ pgprot_t __acpi_get_mem_attribute(phys_addr_t addr)
+>>  		return __pgprot(PROT_NORMAL_NC);
+>>  	return __pgprot(PROT_DEVICE_nGnRnE);
+>>  }
+>> +
+>> +/*
+>> + * Claim Synchronous External Aborts as a firmware first notification.
+>> + *
+>> + * Used by KVM and the arch do_sea handler.
+>> + * @regs may be NULL when called from process context.
+>> + */
+>> +int apei_claim_sea(struct pt_regs *regs)
+>> +{
+>> +	int err = -ENOENT;
+>> +	unsigned long current_flags = arch_local_save_flags();
+>> +
+>> +	if (!IS_ENABLED(CONFIG_ACPI_APEI_SEA))
+>> +		return err;
 > 
-> checkpatch is complaining for some reason:
-> 
-> WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
-> #66: FILE: arch/arm/include/asm/kvm_ras.h:1:
-> +// SPDX-License-Identifier: GPL-2.0
+> I don't know what side effects arch_local_save_flags() has on ARM but if
 
-Gah, I copied it from a C file, the comment-style has to be different for headers.
-
-Fixed,
+It reads the current 'masked' state for IRQs, debug exceptions and 'SError'.
 
 
-Thanks
+> we return here, it looks to me like useless work.
+
+Yes. I lazily assume the compiler will rip that out as the value is never used.
+But in this case it can't, because its wrapped in asm-volatile, so it doesn't
+know it has no side-effects.
+
+I'll move it further down.
+
+Thanks!
 
 James
