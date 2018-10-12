@@ -1,100 +1,120 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v6 11/18] ACPI / APEI: Remove silent flag from
- ghes_read_estatus()
-Date: Fri, 12 Oct 2018 18:55:53 +0200
-Message-ID: <20181012165553.GE580@zn.tnic>
-References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-12-james.morse@arm.com>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
+Date: Fri, 12 Oct 2018 09:57:19 -0700
+Message-ID: <20181012165719.GE223066@joelaf.mtv.corp.google.com>
+References: <20181012013756.11285-1-joel@joelfernandes.org>
+ <20181012013756.11285-2-joel@joelfernandes.org>
+ <20181012113056.gxhcbrqyu7k7xnyv@kshutemo-mobl1>
+ <20181012125046.GA170912@joelaf.mtv.corp.google.com>
+ <20181012131946.zoab2lpfmrycmuju@kshutemo-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 138E849E4C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 12:56:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M4p7b-la51oL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Oct 2018 12:56:00 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 371DE40A6E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 12:56:00 -0400 (EDT)
+Return-path: <linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180921221705.6478-12-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+In-Reply-To: <20181012131946.zoab2lpfmrycmuju@kshutemo-mobl1>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-riscv>,
+ <mailto:linux-riscv-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
+List-Post: <mailto:linux-riscv@lists.infradead.org>
+List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-riscv>,
+ <mailto:linux-riscv-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
+Errors-To: linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>, Geert
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 21, 2018 at 11:16:58PM +0100, James Morse wrote:
-> Subsequent patches will split up ghes_read_estatus(), at which
-> point passing around the 'silent' flag gets annoying. This is to
-> suppress prink() messages, which prior to 42a0bb3f7138 ("printk/nmi:
-> generic solution for safe printk in NMI"), were unsafe in NMI context.
-
-Put that commit onto a separate line:
-
-"... which prior to
-
-  42a0bb3f7138 ("printk/nmi: generic solution for safe printk in NMI")
-
-were unsafe ..."
-
-This way it is immediately visible.
-
-In any case, this patch looks like a cleanup so move it to the beginning
-of the queue, I'd say.
-
-> We don't need to do this anymore, remove the flag. printk() messages
-> are batched in a per-cpu buffer and printed via irq-work, or a call
-> back from panic().
+On Fri, Oct 12, 2018 at 04:19:46PM +0300, Kirill A. Shutemov wrote:
+> On Fri, Oct 12, 2018 at 05:50:46AM -0700, Joel Fernandes wrote:
+> > On Fri, Oct 12, 2018 at 02:30:56PM +0300, Kirill A. Shutemov wrote:
+> > > On Thu, Oct 11, 2018 at 06:37:56PM -0700, Joel Fernandes (Google) wrote:
+> > > > Android needs to mremap large regions of memory during memory management
+> > > > related operations. The mremap system call can be really slow if THP is
+> > > > not enabled. The bottleneck is move_page_tables, which is copying each
+> > > > pte at a time, and can be really slow across a large map. Turning on THP
+> > > > may not be a viable option, and is not for us. This patch speeds up the
+> > > > performance for non-THP system by copying at the PMD level when possible.
+> > > > 
+> > > > The speed up is three orders of magnitude. On a 1GB mremap, the mremap
+> > > > completion times drops from 160-250 millesconds to 380-400 microseconds.
+> > > > 
+> > > > Before:
+> > > > Total mremap time for 1GB data: 242321014 nanoseconds.
+> > > > Total mremap time for 1GB data: 196842467 nanoseconds.
+> > > > Total mremap time for 1GB data: 167051162 nanoseconds.
+> > > > 
+> > > > After:
+> > > > Total mremap time for 1GB data: 385781 nanoseconds.
+> > > > Total mremap time for 1GB data: 388959 nanoseconds.
+> > > > Total mremap time for 1GB data: 402813 nanoseconds.
+> > > > 
+> > > > Incase THP is enabled, the optimization is skipped. I also flush the
+> > > > tlb every time we do this optimization since I couldn't find a way to
+> > > > determine if the low-level PTEs are dirty. It is seen that the cost of
+> > > > doing so is not much compared the improvement, on both x86-64 and arm64.
+> > > 
+> > > I looked into the code more and noticed move_pte() helper called from
+> > > move_ptes(). It changes PTE entry to suite new address.
+> > > 
+> > > It is only defined in non-trivial way on Sparc. I don't know much about
+> > > Sparc and it's hard for me to say if the optimization will break anything
+> > > there.
+> > 
+> > Sparc's move_pte seems to be flushing the D-cache to prevent aliasing. It is
+> > not modifying the PTE itself AFAICS:
+> > 
+> > #ifdef DCACHE_ALIASING_POSSIBLE
+> > #define __HAVE_ARCH_MOVE_PTE
+> > #define move_pte(pte, prot, old_addr, new_addr)                         \
+> > ({                                                                      \
+> >         pte_t newpte = (pte);                                           \
+> >         if (tlb_type != hypervisor && pte_present(pte)) {               \
+> >                 unsigned long this_pfn = pte_pfn(pte);                  \
+> >                                                                         \
+> >                 if (pfn_valid(this_pfn) &&                              \
+> >                     (((old_addr) ^ (new_addr)) & (1 << 13)))            \
+> >                         flush_dcache_page_all(current->mm,              \
+> >                                               pfn_to_page(this_pfn));   \
+> >         }                                                               \
+> >         newpte;                                                         \
+> > })
+> > #endif
+> > 
+> > If its an issue, then how do transparent huge pages work on Sparc?  I don't
+> > see the huge page code (move_huge_pages) during mremap doing anything special
+> > for Sparc architecture when moving PMDs..
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/acpi/apei/ghes.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> My *guess* is that it will work fine on Sparc as it apprarently it only
+> cares about change in bit 13 of virtual address. It will never happen for
+> huge pages or when PTE page tables move.
 > 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index 586689cbc0fd..ba5344d26a39 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -300,7 +300,7 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
->  
->  static int ghes_read_estatus(struct ghes *ghes,
->  			     struct acpi_hest_generic_status *estatus,
-> -			     int silent, int fixmap_idx)
-> +			     int fixmap_idx)
->  {
->  	struct acpi_hest_generic *g = ghes->generic;
->  	u64 buf_paddr;
-> @@ -309,7 +309,7 @@ static int ghes_read_estatus(struct ghes *ghes,
->  
->  	rc = apei_read(&buf_paddr, &g->error_status_address);
->  	if (rc) {
-> -		if (!silent && printk_ratelimit())
-> +		if (printk_ratelimit())
+> But I just realized that the problem is bigger: since we pass new_addr to
+> the set_pte_at() we would need to audit all implementations that they are
+> safe with just moving PTE page table.
+> 
+> I would rather go with per-architecture enabling. It's much safer.
 
-Btw, checkpatch complains here:
+I'm Ok with the per-arch enabling, I agree its safer. So I should be adding a
+a new __HAVE_ARCH_MOVE_PMD right, or did you have a better name for that?
 
-WARNING: Prefer printk_ratelimited or pr_<level>_ratelimited to printk_ratelimit
-#57: FILE: drivers/acpi/apei/ghes.c:312:
-+               if (printk_ratelimit())
+Also, do you feel we should still need to remove the address argument from
+set_pte_alloc? Or should we leave that alone if we do per-arch?
+I figure I spent a bunch of time on that already anyway, and its a clean up
+anyway, so may as well do it. But perhaps that "pte_alloc cleanup" can then
+be a separate patch independent of this series?
 
-WARNING: Prefer printk_ratelimited or pr_<level>_ratelimited to printk_ratelimit
-#66: FILE: drivers/acpi/apei/ghes.c:345:
-+       if (rc && printk_ratelimit())
+> > Also, do we not flush the caches from any path when we munmap address space?
+> > We do call do_munmap on the old mapping from mremap after moving to the new one.
+> 
+> Are you sure about that? It can be hided deeper in architecture-specific
+> code.
 
+I am sure we do call do_munmap, I was asking if we flush the caches as well.
+If we're enabling this per architecture, then I guess it does not matter for
+the purposes of this patch.
 
--- 
-Regards/Gruss,
-    Boris.
+thanks,
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+ - Joel
