@@ -1,280 +1,121 @@
-From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Fri, 12 Oct 2018 09:50:12 -0700
-Message-ID: <20181012165012.GD223066@joelaf.mtv.corp.google.com>
-References: <20181012013756.11285-1-joel@joelfernandes.org>
- <20181012013756.11285-2-joel@joelfernandes.org>
- <9ed82f9e-88c4-8e4f-8c45-3ef153469603@kot-begemot.co.uk>
- <20181012143728.t42uvr6etg7gp7fh@kshutemo-mobl1>
- <4dd52e22-5b51-9b30-7178-fde603a08f88@kot-begemot.co.uk>
- <97cb3fe1-7bc1-12ff-d602-56c72a5496c5@kot-begemot.co.uk>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: ARM64 KVM crash
+Date: Fri, 12 Oct 2018 17:51:18 +0100
+Message-ID: <b3355304-5144-b17a-c39c-866e197e3cc6@arm.com>
+References: <alpine.LRH.2.02.1810121204120.16008@file01.intranet.prod.int.rdu2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <97cb3fe1-7bc1-12ff-d602-56c72a5496c5@kot-begemot.co.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-To: Anton Ivanov <anton.ivanov@kot-begemot.co.uk>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>, Geert
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A112A49E4C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 12:51:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Eznu2Z-gMaM8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 12:51:22 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF3740A6E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 12:51:22 -0400 (EDT)
+In-Reply-To: <alpine.LRH.2.02.1810121204120.16008@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mikulas Patocka <mpatocka@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 05:42:24PM +0100, Anton Ivanov wrote:
-> =
+Hi Mikulas,
 
-> On 10/12/18 3:48 PM, Anton Ivanov wrote:
-> > On 12/10/2018 15:37, Kirill A. Shutemov wrote:
-> > > On Fri, Oct 12, 2018 at 03:09:49PM +0100, Anton Ivanov wrote:
-> > > > On 10/12/18 2:37 AM, Joel Fernandes (Google) wrote:
-> > > > > Android needs to mremap large regions of memory during
-> > > > > memory management
-> > > > > related operations. The mremap system call can be really
-> > > > > slow if THP is
-> > > > > not enabled. The bottleneck is move_page_tables, which is copying=
- each
-> > > > > pte at a time, and can be really slow across a large map.
-> > > > > Turning on THP
-> > > > > may not be a viable option, and is not for us. This patch
-> > > > > speeds up the
-> > > > > performance for non-THP system by copying at the PMD level
-> > > > > when possible.
-> > > > > =
+On 12/10/18 17:20, Mikulas Patocka wrote:
+> Hi
+> 
+> I report this crash that happened on ARM64 in the host kernel when running 
+> a workload in a virtual machine. The crash is not reproducible. Kernel 
+> 4.18.12, board MacchiatoBin.
+> 
+> The call sequence that leads up to the crash: find_busiest_group -> 
+> update_sd_lb_stats -> update_sg_lb_stats -> for_each_cpu_and -> 
+> cpumask_next_and -> find_next_and_bit. The crash happened because the 
+> first argument to find_next_and_bit is invalid pointer 0x2.
 
-> > > > > The speed up is three orders of magnitude. On a 1GB mremap, the m=
-remap
-> > > > > completion times drops from 160-250 millesconds to 380-400
-> > > > > microseconds.
-> > > > > =
+Right. But how is that related to KVM? See below:
 
-> > > > > Before:
-> > > > > Total mremap time for 1GB data: 242321014 nanoseconds.
-> > > > > Total mremap time for 1GB data: 196842467 nanoseconds.
-> > > > > Total mremap time for 1GB data: 167051162 nanoseconds.
-> > > > > =
+> 
+> Mikulas
+> 
+> 
+> [75476.680487] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000003
+> [75476.680498] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000040
+> [75476.680521] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000002
+> [75476.680522] Mem abort info:
+> [75476.680524]   ESR = 0x96000005
+> [75476.680526]   Exception class = DABT (current EL), IL = 32 bits
+> [75476.680528]   SET = 0, FnV = 0
+> [75476.680529]   EA = 0, S1PTW = 0
+> [75476.680530] Data abort info:
+> [75476.680531]   ISV = 0, ISS = 0x00000005
+> [75476.680532]   CM = 0, WnR = 0
+> [75476.680536] user pgtable: 4k pages, 39-bit VAs, pgdp = 0000000005d2fe31
+> [75476.680537] [0000000000000002] pgd=0000000000000000, pud=0000000000000000
+> [75476.680542] Internal error: Oops: 96000005 [#1] PREEMPT SMP
+> [75476.680544] Modules linked in: vhost_net vhost tun bridge stp llc udlfb syscopyarea sysfillrect sysimgblt fb_sys_fops fb font autofs4 hid_generic usbhid hid binfmt_misc ip6t_REJECT nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 ip6table_filter ip6_tables ipt_MASQUERADE xt_nat iptable_nat nf_nat_ipv4 iptable_mangle xt_TCPMSS nf_conntrack_ipv4 nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 xt_tcpudp xt_conntrack xt_multiport iptable_filter ip_tables x_tables pppoe pppox af_packet ppp_generic slhc nls_utf8 nls_cp852 vfat fat snd_usb_audio snd_hwdep snd_usbmidi_lib snd_rawmidi snd_pcm snd_timer snd soundcore nf_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack ftdi_sio usbserial ipv6 aes_ce_blk crypto_simd cryptd aes_ce_cipher crc32_ce ghash_ce gf128mul aes_arm64 sha2_ce sha256_arm64 sha1_ce sha1_g
+ eneric efivars
+> [75476.680639]  xhci_plat_hcd xhci_hcd usbcore usb_common mvpp2 phylink unix
+> [75476.680652] CPU: 2 PID: 9993 Comm: CPU 2/KVM Not tainted 4.18.12 #1
+> [75476.680653] Hardware name: Marvell Armada 8040 MacchiatoBin/Armada 8040 MacchiatoBin, BIOS EDK II Jul 30 2018
+> [75476.680656] pstate: 20000085 (nzCv daIf -PAN -UAO)
+> [75476.680667] pc : find_next_and_bit+0xc/0x70
+> [75476.680671] lr : cpumask_next_and+0x20/0x28
+> [75476.680672] sp : ffffffc12c527690
+> [75476.680673] x29: ffffffc12c527690 x28: ffffffc12c527728 
+> [75476.680677] x27: 00000000ffffffff x26: fffffffffffffff8 
+> [75476.680681] x25: ffffffc13b02f380 x24: 0000000000000000 
+> [75476.680684] x23: ffffff80088696e4 x22: 0000000000000000 
+> [75476.680687] x21: ffffffc13b02f3a0 x20: ffffffc12c5278d8 
+> [75476.680690] x19: ffffff8008859c80 x18: 0000000000000400 
+> [75476.680693] x17: 0000000000000000 x16: 0000000000000000 
+> [75476.680696] x15: 0000000000000400 x14: 0000000000000400 
+> [75476.680699] x13: 0000000000000400 x12: 0000000000000001 
+> [75476.680702] x11: 000000000000027b x10: ffffffc13ff9ce88 
+> [75476.680705] x9 : ffffffc13b025e00 x8 : ffffffc13b025e00 
+> [75476.680708] x7 : 000044a5438be2c8 x6 : 0000000000000001 
+> [75476.680711] x5 : 0000000000000000 x4 : 0000000000000000 
+> [75476.680714] x3 : 0000000000000000 x2 : 0000000000000004 
+> [75476.680717] x1 : ffffffc13ff9ce88 x0 : 0000000000000002 
+> [75476.680721] Process CPU 2/KVM (pid: 9993, stack limit = 0x00000000f6dd03c5)
+> [75476.680722] Call trace:
+> [75476.680725]  find_next_and_bit+0xc/0x70
+> [75476.680728]  find_busiest_group+0x128/0x938
+> [75476.680730]  load_balance+0x148/0x848
+> [75476.680732]  pick_next_task_fair+0x1d4/0x568
+> [75476.680734]  __schedule+0xe8/0x4b0
+> [75476.680736]  schedule+0x38/0xa0
+> [75476.680739]  kvm_vcpu_block+0x88/0x180
+> [75476.680742]  kvm_handle_wfx+0x80/0xb8
+> [75476.680744]  handle_exit+0x138/0x1b8
 
-> > > > > After:
-> > > > > Total mremap time for 1GB data: 385781 nanoseconds.
-> > > > > Total mremap time for 1GB data: 388959 nanoseconds.
-> > > > > Total mremap time for 1GB data: 402813 nanoseconds.
-> > > > > =
+The guest is exiting because it has executed a blocking WFI, so KVM's
+job is done and we're calling schedule(). The scheduler then starts
+doing its job of picking the next victim.
 
-> > > > > Incase THP is enabled, the optimization is skipped. I also flush =
-the
-> > > > > tlb every time we do this optimization since I couldn't find a wa=
-y to
-> > > > > determine if the low-level PTEs are dirty. It is seen that the co=
-st of
-> > > > > doing so is not much compared the improvement, on both
-> > > > > x86-64 and arm64.
-> > > > > =
+At this stage, the kernel indeed blows up. But this doesn't immediately
+seem to be KVM's fault. It is far more likely that the scheduler has
+messed something up in its own data structure, which is even worse :-(.
 
-> > > > > Cc: minchan@kernel.org
-> > > > > Cc: pantin@google.com
-> > > > > Cc: hughd@google.com
-> > > > > Cc: lokeshgidra@google.com
-> > > > > Cc: dancol@google.com
-> > > > > Cc: mhocko@kernel.org
-> > > > > Cc: kirill@shutemov.name
-> > > > > Cc: akpm@linux-foundation.org
-> > > > > Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
-> > > > > ---
-> > > > > =A0=A0 mm/mremap.c | 62
-> > > > > +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > > > =A0=A0 1 file changed, 62 insertions(+)
-> > > > > =
+I'd suggest you get in touch with the scheduler guys to see if they have
+any insight. Also, trying to come up with a reproducer would be
+extremely useful.
 
-> > > > > diff --git a/mm/mremap.c b/mm/mremap.c
-> > > > > index 9e68a02a52b1..d82c485822ef 100644
-> > > > > --- a/mm/mremap.c
-> > > > > +++ b/mm/mremap.c
-> > > > > @@ -191,6 +191,54 @@ static void move_ptes(struct
-> > > > > vm_area_struct *vma, pmd_t *old_pmd,
-> > > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 drop_rmap_locks(vma);
-> > > > > =A0=A0 }
-> > > > > +static bool move_normal_pmd(struct vm_area_struct *vma,
-> > > > > unsigned long old_addr,
-> > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0 unsigned long new_addr, unsigned lon=
-g old_end,
-> > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0 pmd_t *old_pmd, pmd_t *new_pmd, bool=
- *need_flush)
-> > > > > +{
-> > > > > +=A0=A0=A0 spinlock_t *old_ptl, *new_ptl;
-> > > > > +=A0=A0=A0 struct mm_struct *mm =3D vma->vm_mm;
-> > > > > +
-> > > > > +=A0=A0=A0 if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK)
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 || old_end - old_addr < PMD_SIZE)
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 return false;
-> > > > > +
-> > > > > +=A0=A0=A0 /*
-> > > > > +=A0=A0=A0=A0 * The destination pmd shouldn't be established, fre=
-e_pgtables()
-> > > > > +=A0=A0=A0=A0 * should have release it.
-> > > > > +=A0=A0=A0=A0 */
-> > > > > +=A0=A0=A0 if (WARN_ON(!pmd_none(*new_pmd)))
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 return false;
-> > > > > +
-> > > > > +=A0=A0=A0 /*
-> > > > > +=A0=A0=A0=A0 * We don't have to worry about the ordering of src =
-and dst
-> > > > > +=A0=A0=A0=A0 * ptlocks because exclusive mmap_sem prevents deadl=
-ock.
-> > > > > +=A0=A0=A0=A0 */
-> > > > > +=A0=A0=A0 old_ptl =3D pmd_lock(vma->vm_mm, old_pmd);
-> > > > > +=A0=A0=A0 if (old_ptl) {
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 pmd_t pmd;
-> > > > > +
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 new_ptl =3D pmd_lockptr(mm, new_pmd);
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 if (new_ptl !=3D old_ptl)
-> > > > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 spin_lock_nested(new_ptl, SING=
-LE_DEPTH_NESTING);
-> > > > > +
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 /* Clear the pmd */
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 pmd =3D *old_pmd;
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 pmd_clear(old_pmd);
-> > > > > +
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 VM_BUG_ON(!pmd_none(*new_pmd));
-> > > > > +
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 /* Set the new pmd */
-> > > > > +=A0=A0=A0=A0=A0=A0=A0 set_pmd_at(mm, new_addr, new_pmd, pmd);
-> > > > UML does not have set_pmd_at at all
-> > > Every architecture does. :)
-> > =
+Thanks,
 
-> > I tried to build it patching vs 4.19-rc before I made this statement and
-> > ran into that.
-> > =
-
-> > Presently it does not.
-> > =
-
-> > https://elixir.bootlin.com/linux/v4.19-rc7/ident/set_pmd_at - UML is not
-> > on the list.
-> =
-
-> Once this problem as well as the omissions in the include changes for UML=
- in
-> patch one have been fixed it appears to be working.
-> =
-
-> What it needs is attached.
-> =
-
-> =
-
-> > =
-
-> > > =
-
-> > > But it may come not from the arch code.
-> > =
-
-> > There is no generic definition as far as I can see. All 12 defines in
-> > 4.19 are in arch specific code. Unless i am missing something...
-> > =
-
-> > > =
-
-> > > > If I read the code right, MIPS completely ignores the address
-> > > > argument so
-> > > > set_pmd_at there may not have the effect which this patch is trying=
- to
-> > > > achieve.
-> > > Ignoring address is fine. Most architectures do that..
-> > > The ideas is to move page table to the new pmd slot. It's nothing to =
-do
-> > > with the address passed to set_pmd_at().
-> > =
-
-> > If that is it's only function, then I am going to appropriate the code
-> > out of the MIPS tree for further uml testing. It does exactly that -
-> > just move the pmd the new slot.
-> > =
-
-> > > =
-
-> > A.
-> =
-
-> =
-
-> A.
-> =
-
-
-> From ac265d96897a346b05646fce91784ed4922c7f8d Mon Sep 17 00:00:00 2001
-> From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-> Date: Fri, 12 Oct 2018 17:24:10 +0100
-> Subject: [PATCH] Incremental fixes to the mmremap patch
-> =
-
-> Signed-off-by: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-> ---
->  arch/um/include/asm/pgalloc.h | 4 ++--
->  arch/um/include/asm/pgtable.h | 3 +++
->  arch/um/kernel/tlb.c          | 6 ++++++
->  3 files changed, 11 insertions(+), 2 deletions(-)
-> =
-
-> diff --git a/arch/um/include/asm/pgalloc.h b/arch/um/include/asm/pgalloc.h
-> index bf90b2aa2002..99eb5682792a 100644
-> --- a/arch/um/include/asm/pgalloc.h
-> +++ b/arch/um/include/asm/pgalloc.h
-> @@ -25,8 +25,8 @@
->  extern pgd_t *pgd_alloc(struct mm_struct *);
->  extern void pgd_free(struct mm_struct *mm, pgd_t *pgd);
->  =
-
-> -extern pte_t *pte_alloc_one_kernel(struct mm_struct *, unsigned long);
-> -extern pgtable_t pte_alloc_one(struct mm_struct *, unsigned long);
-> +extern pte_t *pte_alloc_one_kernel(struct mm_struct *);
-> +extern pgtable_t pte_alloc_one(struct mm_struct *);
-
-If its Ok, let me handle this bit since otherwise it complicates things for
-me.
-
->  static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
->  {
-> diff --git a/arch/um/include/asm/pgtable.h b/arch/um/include/asm/pgtable.h
-> index 7485398d0737..1692da55e63a 100644
-> --- a/arch/um/include/asm/pgtable.h
-> +++ b/arch/um/include/asm/pgtable.h
-> @@ -359,4 +359,7 @@ do {						\
->  	__flush_tlb_one((vaddr));		\
->  } while (0)
->  =
-
-> +extern void set_pmd_at(struct mm_struct *mm, unsigned long addr,
-> +		pmd_t *pmdp, pmd_t pmd);
-> +
->  #endif
-> diff --git a/arch/um/kernel/tlb.c b/arch/um/kernel/tlb.c
-> index 763d35bdda01..d17b74184ba0 100644
-> --- a/arch/um/kernel/tlb.c
-> +++ b/arch/um/kernel/tlb.c
-> @@ -647,3 +647,9 @@ void force_flush_all(void)
->  		vma =3D vma->vm_next;
->  	}
->  }
-> +void set_pmd_at(struct mm_struct *mm, unsigned long addr,
-> +		pmd_t *pmdp, pmd_t pmd)
-> +{
-> +	*pmdp =3D pmd;
-> +}
-> +
-
-I believe this should be included in a separate patch since it is not relat=
-ed
-specifically to pte_alloc argument removal. If you want, I could split it
-into a separate patch for my series with you as author.
-
-thanks,
-
-- Joel
+	M.
+-- 
+Jazz is not dead. It just smells funny...
