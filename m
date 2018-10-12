@@ -1,26 +1,26 @@
 From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v6 07/18] arm64: KVM/mm: Move SEA handling behind a
- single 'claim' interface
-Date: Fri, 12 Oct 2018 12:02:12 +0200
-Message-ID: <20181012100212.GA580@zn.tnic>
+Subject: Re: [PATCH v6 08/18] ACPI / APEI: Move locking to the notification
+ helper
+Date: Fri, 12 Oct 2018 13:08:19 +0200
+Message-ID: <20181012110819.GB580@zn.tnic>
 References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-8-james.morse@arm.com>
+ <20180921221705.6478-9-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9992A4A0C7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 06:02:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 814C84A1E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 07:08:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id svVFk28Y44QS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Oct 2018 06:02:14 -0400 (EDT)
+ with ESMTP id bCAHRc2fUzoJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Oct 2018 07:08:32 -0400 (EDT)
 Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9CB740A6E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 06:02:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BCC04A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Oct 2018 07:08:32 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20180921221705.6478-8-james.morse@arm.com>
+In-Reply-To: <20180921221705.6478-9-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,70 +34,27 @@ To: James Morse <james.morse@arm.com>
 Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 21, 2018 at 11:16:54PM +0100, James Morse wrote:
-> To split up APEIs in_nmi() path, we need the nmi-like callers to always
-> be in_nmi(). Add a helper to do the work and claim the notification.
+On Fri, Sep 21, 2018 at 11:16:55PM +0100, James Morse wrote:
+> ghes_copy_tofrom_phys() takes different locks depending on in_nmi().
+> This doesn't work when we have multiple NMI-like notifications, that
+> can interrupt each other.
 > 
-> When KVM or the arch code takes an exception that might be a RAS
-> notification, it asks the APEI firmware-first code whether it wants
-> to claim the exception. We can then go on to see if (a future)
-> kernel-first mechanism wants to claim the notification, before
-> falling through to the existing default behaviour.
+> Now that NOTIFY_SEA is always called as an NMI, move the lock-taking
+> to the notification helper. The helper will always know which lock
+> to take. This avoids ghes_copy_tofrom_phys() taking a guess based
+> on in_nmi().
 > 
-> The NOTIFY_SEA code was merged before we had multiple, possibly
-> interacting, NMI-like notifications and the need to consider kernel
-> first in the future. Make the 'claiming' behaviour explicit.
-> 
-> As we're restructuring the APEI code to allow multiple NMI-like
-> notifications, any notification that might interrupt interrupts-masked
-> code must always be wrapped in nmi_enter()/nmi_exit(). This allows APEI
-> to use in_nmi() to use the right fixmap entries.
-> 
-> We mask SError over this window to prevent an asynchronous RAS error
-> arriving and tripping 'nmi_enter()'s BUG_ON(in_nmi()).
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
+> This splits NOTIFY_NMI and NOTIFY_SEA to use different locks. All
+> the other notifications use ghes_proc(), and are called in process
+> or IRQ context. Move the spin_lock_irqsave() around their ghes_proc()
+> calls.
 
-...
+Right, should ghes_proc() be renamed to ghes_proc_irq() now, to be
+absolutely clear on the processing context it is operating in?
 
-> diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
-> index ed46dc188b22..a9b8bba014b5 100644
-> --- a/arch/arm64/kernel/acpi.c
-> +++ b/arch/arm64/kernel/acpi.c
-> @@ -28,8 +28,10 @@
->  #include <linux/smp.h>
->  #include <linux/serial_core.h>
->  
-> +#include <acpi/ghes.h>
->  #include <asm/cputype.h>
->  #include <asm/cpu_ops.h>
-> +#include <asm/daifflags.h>
->  #include <asm/pgtable.h>
->  #include <asm/smp_plat.h>
->  
-> @@ -257,3 +259,30 @@ pgprot_t __acpi_get_mem_attribute(phys_addr_t addr)
->  		return __pgprot(PROT_NORMAL_NC);
->  	return __pgprot(PROT_DEVICE_nGnRnE);
->  }
-> +
-> +/*
-> + * Claim Synchronous External Aborts as a firmware first notification.
-> + *
-> + * Used by KVM and the arch do_sea handler.
-> + * @regs may be NULL when called from process context.
-> + */
-> +int apei_claim_sea(struct pt_regs *regs)
-> +{
-> +	int err = -ENOENT;
-> +	unsigned long current_flags = arch_local_save_flags();
-> +
-> +	if (!IS_ENABLED(CONFIG_ACPI_APEI_SEA))
-> +		return err;
+Other than that:
 
-I don't know what side effects arch_local_save_flags() has on ARM but if
-we return here, it looks to me like useless work.
+Reviewed-by: Borislav Petkov <bp@suse.de>
 
 -- 
 Regards/Gruss,
