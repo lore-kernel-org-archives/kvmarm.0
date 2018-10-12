@@ -1,120 +1,115 @@
-From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Fri, 12 Oct 2018 09:57:19 -0700
-Message-ID: <20181012165719.GE223066@joelaf.mtv.corp.google.com>
-References: <20181012013756.11285-1-joel@joelfernandes.org>
- <20181012013756.11285-2-joel@joelfernandes.org>
- <20181012113056.gxhcbrqyu7k7xnyv@kshutemo-mobl1>
- <20181012125046.GA170912@joelaf.mtv.corp.google.com>
- <20181012131946.zoab2lpfmrycmuju@kshutemo-mobl1>
+From: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add virtio-iommu driver
+Date: Fri, 12 Oct 2018 13:00:34 -0400
+Message-ID: <20181012125443-mutt-send-email-mst@kernel.org>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20181012131946.zoab2lpfmrycmuju@kshutemo-mobl1>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
-List-Post: <mailto:linux-riscv@lists.infradead.org>
-List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-Errors-To: linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org
-To: "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>, Geert
+In-Reply-To: <20181012145917.6840-1-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 04:19:46PM +0300, Kirill A. Shutemov wrote:
-> On Fri, Oct 12, 2018 at 05:50:46AM -0700, Joel Fernandes wrote:
-> > On Fri, Oct 12, 2018 at 02:30:56PM +0300, Kirill A. Shutemov wrote:
-> > > On Thu, Oct 11, 2018 at 06:37:56PM -0700, Joel Fernandes (Google) wrote:
-> > > > Android needs to mremap large regions of memory during memory management
-> > > > related operations. The mremap system call can be really slow if THP is
-> > > > not enabled. The bottleneck is move_page_tables, which is copying each
-> > > > pte at a time, and can be really slow across a large map. Turning on THP
-> > > > may not be a viable option, and is not for us. This patch speeds up the
-> > > > performance for non-THP system by copying at the PMD level when possible.
-> > > > 
-> > > > The speed up is three orders of magnitude. On a 1GB mremap, the mremap
-> > > > completion times drops from 160-250 millesconds to 380-400 microseconds.
-> > > > 
-> > > > Before:
-> > > > Total mremap time for 1GB data: 242321014 nanoseconds.
-> > > > Total mremap time for 1GB data: 196842467 nanoseconds.
-> > > > Total mremap time for 1GB data: 167051162 nanoseconds.
-> > > > 
-> > > > After:
-> > > > Total mremap time for 1GB data: 385781 nanoseconds.
-> > > > Total mremap time for 1GB data: 388959 nanoseconds.
-> > > > Total mremap time for 1GB data: 402813 nanoseconds.
-> > > > 
-> > > > Incase THP is enabled, the optimization is skipped. I also flush the
-> > > > tlb every time we do this optimization since I couldn't find a way to
-> > > > determine if the low-level PTEs are dirty. It is seen that the cost of
-> > > > doing so is not much compared the improvement, on both x86-64 and arm64.
-> > > 
-> > > I looked into the code more and noticed move_pte() helper called from
-> > > move_ptes(). It changes PTE entry to suite new address.
-> > > 
-> > > It is only defined in non-trivial way on Sparc. I don't know much about
-> > > Sparc and it's hard for me to say if the optimization will break anything
-> > > there.
-> > 
-> > Sparc's move_pte seems to be flushing the D-cache to prevent aliasing. It is
-> > not modifying the PTE itself AFAICS:
-> > 
-> > #ifdef DCACHE_ALIASING_POSSIBLE
-> > #define __HAVE_ARCH_MOVE_PTE
-> > #define move_pte(pte, prot, old_addr, new_addr)                         \
-> > ({                                                                      \
-> >         pte_t newpte = (pte);                                           \
-> >         if (tlb_type != hypervisor && pte_present(pte)) {               \
-> >                 unsigned long this_pfn = pte_pfn(pte);                  \
-> >                                                                         \
-> >                 if (pfn_valid(this_pfn) &&                              \
-> >                     (((old_addr) ^ (new_addr)) & (1 << 13)))            \
-> >                         flush_dcache_page_all(current->mm,              \
-> >                                               pfn_to_page(this_pfn));   \
-> >         }                                                               \
-> >         newpte;                                                         \
-> > })
-> > #endif
-> > 
-> > If its an issue, then how do transparent huge pages work on Sparc?  I don't
-> > see the huge page code (move_huge_pages) during mremap doing anything special
-> > for Sparc architecture when moving PMDs..
+On Fri, Oct 12, 2018 at 03:59:10PM +0100, Jean-Philippe Brucker wrote:
+> Implement the virtio-iommu driver, following specification v0.8 [1].
+> Changes since v2 [2]:
 > 
-> My *guess* is that it will work fine on Sparc as it apprarently it only
-> cares about change in bit 13 of virtual address. It will never happen for
-> huge pages or when PTE page tables move.
+> * Patches 2-4 allow virtio-iommu to use the PCI transport, since QEMU
+>   would like to phase out the MMIO transport. This produces a complex
+>   topology where the programming interface of the IOMMU could appear
+>   lower than the endpoints that it translates. It's not unheard of (e.g.
+>   AMD IOMMU), and the guest easily copes with this.
+>   
+>   The "Firmware description" section of the specification has been
+>   updated with all combinations of PCI, MMIO and DT, ACPI.
 > 
-> But I just realized that the problem is bigger: since we pass new_addr to
-> the set_pte_at() we would need to audit all implementations that they are
-> safe with just moving PTE page table.
+> * Fix structures layout, they don't need the "packed" attribute anymore.
 > 
-> I would rather go with per-architecture enabling. It's much safer.
-
-I'm Ok with the per-arch enabling, I agree its safer. So I should be adding a
-a new __HAVE_ARCH_MOVE_PMD right, or did you have a better name for that?
-
-Also, do you feel we should still need to remove the address argument from
-set_pte_alloc? Or should we leave that alone if we do per-arch?
-I figure I spent a bunch of time on that already anyway, and its a clean up
-anyway, so may as well do it. But perhaps that "pte_alloc cleanup" can then
-be a separate patch independent of this series?
-
-> > Also, do we not flush the caches from any path when we munmap address space?
-> > We do call do_munmap on the old mapping from mremap after moving to the new one.
+> * While we're at it, add domain parameter to DETACH request, and leave
+>   some padding. This way the next version, that adds PASID support,
+>   won't have to introduce a "DETACH2" request to stay backward
+>   compatible.
 > 
-> Are you sure about that? It can be hided deeper in architecture-specific
-> code.
+> * Require virtio device 1.0+. Remove legacy transport notes from the
+>   specification.
+> 
+> * Request timeout is now only enabled with DEBUG.
+> 
+> * The patch for VFIO Kconfig (previously patch 5/5) is in next.
+> 
+> You can find Linux driver and kvmtool device on branches
+> virtio-iommu/v0.8 [3] (currently based on 4.19-rc7 but rebasing onto
+> next only produced a trivial conflict). Branch virtio-iommu/devel
+> contains a few patches that I'd like to send once the base is upstream:
+> 
+> * virtio-iommu as a module. It got *much* nicer after Rob's probe
+>   deferral rework, but I still have a bug to fix when re-loading the
+>   virtio-iommu module.
+> 
+> * ACPI support requires a minor IORT spec update (reservation of node
+>   ID). I think it should be easier to obtain once the device and drivers
+>   are upstream.
+> 
+> [1] Virtio-iommu specification v0.8, diff from v0.7, and sources
+>     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.8
+>     http://jpbrucker.net/virtio-iommu/spec/v0.8/virtio-iommu-v0.8.pdf
+>     http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.7-v0.8.pdf
+> 
+> [2] [PATCH v2 0/5] Add virtio-iommu driver
+>     https://www.spinics.net/lists/kvm/msg170655.html
+> 
+> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.8
+>     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.8
+> 
+> Jean-Philippe Brucker (7):
+>   dt-bindings: virtio-mmio: Add IOMMU description
+>   dt-bindings: virtio: Add virtio-pci-iommu node
+>   PCI: OF: allow endpoints to bypass the iommu
+>   PCI: OF: Initialize dev->fwnode appropriately
+>   iommu: Add virtio-iommu driver
+>   iommu/virtio: Add probe request
+>   iommu/virtio: Add event queue
+> 
+>  .../devicetree/bindings/virtio/iommu.txt      |   66 +
+>  .../devicetree/bindings/virtio/mmio.txt       |   30 +
+>  MAINTAINERS                                   |    7 +
+>  drivers/iommu/Kconfig                         |   11 +
+>  drivers/iommu/Makefile                        |    1 +
+>  drivers/iommu/virtio-iommu.c                  | 1171 +++++++++++++++++
+>  drivers/pci/of.c                              |   14 +-
+>  include/uapi/linux/virtio_ids.h               |    1 +
+>  include/uapi/linux/virtio_iommu.h             |  159 +++
+>  9 files changed, 1457 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+>  create mode 100644 drivers/iommu/virtio-iommu.c
+>  create mode 100644 include/uapi/linux/virtio_iommu.h
 
-I am sure we do call do_munmap, I was asking if we flush the caches as well.
-If we're enabling this per architecture, then I guess it does not matter for
-the purposes of this patch.
+This all looks good to me. Minor nits:
+- I think DEBUG mode is best just removed for now
+- Slightly wrong patch splitup causing a misaligned structure
+  in uapi until all patches are applied.
 
-thanks,
+You should Cc Bjorn on the pci change - I'd like to see his ack on it
+being merged through my tree.
 
- - Joel
+And pls Cc the virtio-dev list on any virtio uapi changes.
+
+At a feature level I have some ideas for more features we
+could add, but for now I think I'll put this version in -next
+while you iron out the above wrinkles. Hope you can make the
+merge window.
+
+> -- 
+> 2.19.1
