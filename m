@@ -1,83 +1,57 @@
-From: Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v3 3/7] PCI: OF: Allow endpoints to bypass the iommu
-Date: Fri, 12 Oct 2018 14:41:59 -0500
-Message-ID: <20181012194158.GX5906@bhelgaas-glaptop.roam.corp.google.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012145917.6840-4-jean-philippe.brucker@arm.com>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: Re: [PATCH v2 1/2] treewide: remove unused address argument from
+ pte_alloc functions
+Date: Fri, 12 Oct 2018 12:42:10 -0700
+Message-ID: <20181012194210.GA27630@joelaf.mtv.corp.google.com>
+References: <20181012013756.11285-1-joel@joelfernandes.org>
+ <03b524f3-5f3a-baa0-2254-9c588103d2d6@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20181012145917.6840-4-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+In-Reply-To: <03b524f3-5f3a-baa0-2254-9c588103d2d6@users.sourceforge.net>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-riscv>,
+ <mailto:linux-riscv-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
+List-Post: <mailto:linux-riscv@lists.infradead.org>
+List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-riscv>,
+ <mailto:linux-riscv-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
+Errors-To: linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org
+To: SF Markus Elfring <elfring@users.sourceforge.net>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, kernel-janitors@vger.kernel.org, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, Lokesh Gidra <lokeshgidra@google.com>, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, Daniel Colascione <dancol@google.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Hugh Dickins <hughd@google.com>, "James E. J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, Ingo
 List-Id: kvmarm@lists.cs.columbia.edu
 
-s/iommu/IOMMU/ in subject
-
-On Fri, Oct 12, 2018 at 03:59:13PM +0100, Jean-Philippe Brucker wrote:
-> Using the iommu-map binding, endpoints in a given PCI domain can be
-> managed by different IOMMUs. Some virtual machines may allow a subset of
-> endpoints to bypass the IOMMU. In some case the IOMMU itself is presented
-
-s/case/cases/
-
-> as a PCI endpoint (e.g. AMD IOMMU and virtio-iommu). Currently, when a
-> PCI root complex has an iommu-map property, the driver requires all
-> endpoints to be described by the property. Allow the iommu-map property to
-> have gaps.
-
-I'm not an IOMMU or virtio expert, so it's not obvious to me why it is
-safe to allow devices to bypass the IOMMU.  Does this mean a typo in
-iommu-map could inadvertently allow devices to bypass it?  Should we
-indicate something in dmesg (and/or sysfs) about devices that bypass
-it?
-
-> Relaxing of_pci_map_rid also allows the msi-map property to have gaps,
-
-s/of_pci_map_rid/of_pci_map_rid()/
-
-> which is invalid since MSIs always reach an MSI controller. Thankfully
-> Linux will error out later, when attempting to find an MSI domain for the
-> device.
-
-Not clear to me what "error out" means here.  In a userspace program,
-I would infer that the program exits with an error message, but I
-doubt you mean that Linux exits.
-
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-> ---
->  drivers/pci/of.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
-> index 1836b8ddf292..2f5015bdb256 100644
-> --- a/drivers/pci/of.c
-> +++ b/drivers/pci/of.c
-> @@ -451,9 +451,10 @@ int of_pci_map_rid(struct device_node *np, u32 rid,
->  		return 0;
->  	}
->  
-> -	pr_err("%pOF: Invalid %s translation - no match for rid 0x%x on %pOF\n",
-> -		np, map_name, rid, target && *target ? *target : NULL);
-> -	return -EFAULT;
-> +	/* Bypasses translation */
-> +	if (id_out)
-> +		*id_out = rid;
-> +	return 0;
->  }
->  
->  #if IS_ENABLED(CONFIG_OF_IRQ)
-> -- 
-> 2.19.1
-> 
+T24gRnJpLCBPY3QgMTIsIDIwMTggYXQgMDg6NTE6NDVQTSArMDIwMCwgU0YgTWFya3VzIEVsZnJp
+bmcgd3JvdGU6Cj4gPiBUaGUgY2hhbmdlcyB3ZXJlIG9idGFpbmVkIGJ5IGFwcGx5aW5nIHRoZSBm
+b2xsb3dpbmcgQ29jY2luZWxsZSBzY3JpcHQuCj4gCj4gQSBiaXQgb2YgY2xhcmlmaWNhdGlvbiBo
+YXBwZW5lZCBmb3IgaXRzIGltcGxlbWVudGF0aW9uIGRldGFpbHMuCj4gaHR0cHM6Ly9zeXN0ZW1l
+LmxpcDYuZnIvcGlwZXJtYWlsL2NvY2NpLzIwMTgtT2N0b2Jlci8wMDUzNzQuaHRtbAo+IAo+IEkg
+aGF2ZSB0YWtlbiBhbHNvIGFub3RoZXIgbG9vayBhdCB0aGUgZm9sbG93aW5nIFNtUEwgY29kZS4K
+PiAKPiAKPiA+IGlkZW50aWZpZXIgZm4gPX4KPiA+ICJeKF9fcHRlX2FsbG9jfHB0ZV9hbGxvY19v
+bmV8cHRlX2FsbG9jfF9fcHRlX2FsbG9jX2tlcm5lbHxwdGVfYWxsb2Nfb25lX2tlcm5lbCkkIjsK
+PiAKPiBJIHN1Z2dlc3QgdG8gYWRqdXN0IHRoZSByZWd1bGFyIGV4cHJlc3Npb24gZm9yIHRoaXMg
+Y29uc3RyYWludAo+IGFuZCBpbiBzdWJzZXF1ZW50IFNtUEwgcnVsZXMuCj4gIl4oPzpwdGVfYWxs
+b2MoPzpfb25lKD86X2tlcm5lbCk/KT98X19wdGVfYWxsb2MoPzpfa2VybmVsKT8pJCI7CgpTdXJl
+IGl0IGxvb2tzIG1vcmUgY2xldmVyLCBidXQgd2h5PyBVZ2ggdGhhdCdzIGhhcmRlciB0byByZWFk
+IGFuZCBjb25mdXNpbmcuCgo+ID4gKAo+ID4gLSBUMyBmbihUMSBFMSwgVDIgRTIpOwo+ID4gKyBU
+MyBmbihUMSBFMSk7Cj4gPiB8Cj4gPiAtIFQzIGZuKFQxIEUxLCBUMiBFMiwgVDQgRTQpOwo+ID4g
+KyBUMyBmbihUMSBFMSwgVDIgRTIpOwo+ID4gKQo+IAo+IEkgcHJvcG9zZSB0byB0YWtlIGFuIG90
+aGVyIFNtUEwgZGlzanVuY3Rpb24gaW50byBhY2NvdW50IGhlcmUuCj4gCj4gIFQzIGZuKFQxIEUx
+LAo+ICgKPiAtICAgICAgVDIgRTIKPiB8ICAgICAgVDIgRTIsCj4gLSAgICAgIFQ0IEU0Cj4gKSAg
+ICAgICk7CgpBZ2FpbiB0aGlzIGlzIGNvbmZ1c2luZy4gSXQgbWFrZXMgb25lIHRoaW5rIHRoYXQg
+bWF5YmUgdGhlIHNlY29uZCBhcmd1bWVudApjYW4gYWxzbyBiZSByZW1vdmVkIGFuZCByZXF1aXJl
+cyBjYXJlZnVsIG9ic2VydmF0aW9uIHRoYXQgdGhlICIpOyIgZm9sbG93cy4KCj4gPiAoCj4gPiAt
+ICNkZWZpbmUgZm4oYSwgYiwgYylAcCBlCj4gPiArICNkZWZpbmUgZm4oYSwgYikgZQo+ID4gfAo+
+ID4gLSAjZGVmaW5lIGZuKGEsIGIpQHAgZQo+ID4gKyAjZGVmaW5lIGZuKGEpIGUKPiA+ICkKPiAK
+PiBIb3cgZG8geW91IHRoaW5rIGFib3V0IHRvIG9taXQgdGhlIG1ldGF2YXJpYWJsZSDigJxwb3Np
+dGlvbiBw4oCdIGhlcmU/CgpSaWdodCwgSSBkb24ndCBuZWVkIGl0IGluIHRoaXMgY2FzZS4gQnV0
+IHRoZSBzY3JpcHQgd29ya3MgZWl0aGVyIHdheS4KCkkgbGlrZSB0byB0YWtlIG1vcmUgb2YgYSBw
+cm9ibGVtIHNvbHZpbmcgYXBwcm9hY2ggdGhhdCBtYWtlcyBzZW5zZSwgdGhhbgphaW1pbmcgZm9y
+IHBlcmZlY3Rpb24sIGFmdGVyIGFsbCB0aGlzIGlzIGEgdXNlZnVsIHNjcmlwdCB0aGF0IHdlIGRv
+IG5vdApuZWVkIHRvIGNoZWNrIGluIG9uY2Ugd2UgZmluaXNoIHdpdGggaXQuCgogLSBKb2VsCgoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgtcmlz
+Y3YgbWFpbGluZyBsaXN0CmxpbnV4LXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xp
+c3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1yaXNjdgo=
