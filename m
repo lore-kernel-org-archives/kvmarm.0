@@ -1,75 +1,101 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: Re: [PATCH v2 1/2] treewide: remove unused address argument from
- pte_alloc functions
-Date: Sat, 13 Oct 2018 11:22:49 +0200
-Message-ID: <e1be1dda-90ab-052d-496b-3de01ffc80d1@users.sourceforge.net>
-References: <20181012013756.11285-1-joel@joelfernandes.org>
- <03b524f3-5f3a-baa0-2254-9c588103d2d6@users.sourceforge.net>
- <20181012194210.GA27630@joelaf.mtv.corp.google.com>
+From: lantianyu1986@gmail.com
+Subject: [PATCH V4 00/15] x86/KVM/Hyper-v: Add HV ept tlb range flush
+ hypercall support in KVM
+Date: Sat, 13 Oct 2018 22:53:51 +0800
+Message-ID: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20181012194210.GA27630@joelaf.mtv.corp.google.com>
-Content-Language: en-GB
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, kernel-janitors@vger.kernel.org, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, Lokesh Gidra <lokeshgidra@google.com>, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, Daniel Colascione <dancol@google.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Hugh Dickins <hughd@google.com>, "James E. J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, Ingo
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, rkrcmar@redhat.com, benh@kernel.crashing.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, catalin.marinas@arm.com, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, pbonzini@redhat.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, devel@linuxdriverproject.org, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Pj4+IFRoZSBjaGFuZ2VzIHdlcmUgb2J0YWluZWQgYnkgYXBwbHlpbmcgdGhlIGZvbGxvd2luZyBD
-b2NjaW5lbGxlIHNjcmlwdC4KCkhvdyBkbyB5b3UgdGhpbmsgYWJvdXQgdG8gYWRqdXN0IHRoZSBv
-cmRlciBvZiBwcm92aWRlZCBpbmZvcm1hdGlvbgppbiB0aGUgY29tbWl0IGRlc2NyaXB0aW9uPwox
-LiBVcGRhdGUgZ29hbHMKMi4gVHJhbnNmb3JtYXRpb24gaW1wbGVtZW50YXRpb24gYXQgdGhlIGVu
-ZAoKCj4+ICJeKD86cHRlX2FsbG9jKD86X29uZSg/Ol9rZXJuZWwpPyk/fF9fcHRlX2FsbG9jKD86
-X2tlcm5lbCk/KSQiOwo+IAo+IFN1cmUgaXQgbG9va3MgbW9yZSBjbGV2ZXIsIGJ1dCB3aHk/Cgox
-LiBVc2FnZSBvZiBub24tY2FwdHVyaW5nIHBhcmVudGhlc2VzCjIuIENsZWFyZXIgc3BlY2lmaWNh
-dGlvbiB3aGljaCBwYXJ0cyBjYW4gYmUgdHJlYXRlZCBhcyBvcHRpb25hbAogICBpbiB0aGUgc2Vh
-cmNoIHBhdHRlcm4uCgoKPiBVZ2ggdGhhdCdzIGhhcmRlciB0byByZWFkIGFuZCBjb25mdXNpbmcu
-CgoqIERvIHlvdSBjYXJlIGZvciBjb2Rpbmcgc3R5bGUgYW5kIGV4ZWN1dGlvbiBzcGVlZCBvZiBy
-ZWd1bGFyIGV4cHJlc3Npb25zPwoKKiBJZiB5b3Ugd291bGQgcHJlZmVyIHRvIGxpc3QgZnVuY3Rp
-b24gbmFtZXMgd2l0aG91dCBwbGFjZWhvbGRlcnMsCiAgeW91IGNhbiBldmVudHVhbGx5IHNwZWNp
-ZnkgdGhlbSBhbHNvIHdpdGhpbiBTbVBMIGRpc2p1bmN0aW9ucyBkaXJlY3RseS4KCiogSXQgY2Fu
-IGxvb2sgc2ltcGxlciB0byB1c2UgYW4gaWRlbnRpZmllciBsaXN0IGFzIGEgY29uc3RyYWludCB2
-YXJpYW50LgogIGh0dHA6Ly9jb2NjaW5lbGxlLmxpcDYuZnIvZG9jcy9tYWluX2dyYW1tYXIwMDIu
-aHRtbAoKCj4gQWdhaW4gdGhpcyBpcyBjb25mdXNpbmcuCgpUaGUgdmlldyBwb2ludHMgY2FuIGJl
-IGRpZmZlcmVudCBmb3Igc3VjaCBTbVBMIGNvZGUuCgogVDMgZm4oVDEgRTEKKAotICAgICAgICAg
-ICAsIFQyIEUyCnwgICAgICAgICAgICwgVDIgRTIKLSAgICAgICAgICAgLCBUNCBFNAopICAgICAp
-OwoKCj4gSXQgbWFrZXMgb25lIHRoaW5rIHRoYXQgbWF5YmUgdGhlIHNlY29uZCBhcmd1bWVudCBj
-YW4gYWxzbyBiZSByZW1vdmVkCgpZb3UgZXhwcmVzc2VkIHRoaXMgYXMgdGhlIGZpcnN0IHRyYW5z
-Zm9ybWF0aW9uIHBvc3NpYmlsaXR5LCBkaWRuJ3QgeW91PwoKWW91IHdvdWxkIGxpa2UgdG8gZGVs
-ZXRlIGFuIGFyZ3VtZW50IGZyb20gdGhlIGVuZCBvZiBhIGZ1bmN0aW9uCm9yIG1hY3JvIHBhcmFt
-ZXRlciAob3IgZXhwcmVzc2lvbikgbGlzdC4KSSBzdWdnZXN0IHRoZW4gYWdhaW4gdG8gYXZvaWQg
-dGhlIFNtUEwgc3BlY2lmaWNhdGlvbiBvZiBzb3VyY2UgY29kZSBhZGRpdGlvbnMKKHBsdXMgbGlu
-ZXMgaW4gdGhlIGZpbGUgZGlmZmVyZW5jZSBmb3JtYXQpLgoKCj4gYW5kIHJlcXVpcmVzIGNhcmVm
-dWwgb2JzZXJ2YXRpb24gdGhhdCB0aGUgIik7IiBmb2xsb3dzLgoKWWVzLCBvZiBjb3Vyc2UuCgpX
-b3VsZCB5b3UgY2FyZSBtb3JlIGluIHRoZSBkaXN0aW5jdGlvbiB3aGljaCBjb2RlIHBhcnRzIHNo
-b3VsZCBiZSBrZXB0IHVuY2hhbmdlZD8KCgo+IFJpZ2h0LCBJIGRvbid0IG5lZWQgaXQgaW4gdGhp
-cyBjYXNlLgoKVGhhbmtzIGZvciB5b3VyIHVuZGVyc3RhbmRpbmcgdGhhdCB0aGUgbWV0YXZhcmlh
-YmxlIOKAnHBvc2l0aW9uIHDigJ0KY2FuIGJlIGRlbGV0ZWQgaW4gdGhlIFNtUEwgcnVsZSDigJxw
-dGVfYWxsb2NfbWFjcm/igJ0uCgoKPiBCdXQgdGhlIHNjcmlwdCB3b3JrcyBlaXRoZXIgd2F5LgoK
-SSBpbWFnaW5lIHRoYXQgeW91IGNhbiBiZWNvbWUgaW50ZXJlc3RlZCBpbiBhIGJpdCBuaWNlciBy
-dW4gdGltZSBjaGFyYWN0ZXJpc3RpY3MuCgoKPiBJIGxpa2UgdG8gdGFrZSBtb3JlIG9mIGEgcHJv
-YmxlbSBzb2x2aW5nIGFwcHJvYWNoIHRoYXQgbWFrZXMgc2Vuc2UsCgpUaGlzIGlzIHVzdWFsLgoK
-Cj4gdGhhbiBhaW1pbmcgZm9yIHBlcmZlY3Rpb24sCgpJZiB5b3Ugd2lsbCB3b3JrIG1vcmUgd2l0
-aCBzY3JpcHRzIGZvciB0aGUgc2VtYW50aWMgcGF0Y2ggbGFuZ3VhZ2UsCnlvdSBtaWdodCBiZWNv
-bWUgdXNlZCB0byBhZGRpdGlvbmFsIGNvZGluZyB2YXJpYW50cy4KCgo+IGFmdGVyIGFsbCB0aGlz
-IGlzIGEgdXNlZnVsIHNjcmlwdCB0aGF0IHdlIGRvIG5vdCBuZWVkIHRvIGNoZWNrCj4gaW4gb25j
-ZSB3ZSBmaW5pc2ggd2l0aCBpdC4KCkkgYW0gY3VyaW91cyBpZiB0aGVyZSB3aWxsIGV2b2x2ZSBh
-IG5lZWQgdG8gYWRkIHNpbWlsYXIgdHJhbnNmb3JtYXRpb24gYXBwcm9hY2hlcwp0byBhIGtub3du
-IHNjcmlwdCBjb2xsZWN0aW9uLgpodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgv
-a2VybmVsL2dpdC90b3J2YWxkcy9saW51eC5naXQvdHJlZS9zY3JpcHRzL2NvY2NpbmVsbGU/aWQ9
-NzlmYzE3MGIxZjVjMzZmNDg2ZDg4NmJmYmQ1OWViNGU2MjMyMTEyOAoKV291bGQgeW91IGV2ZW50
-dWFsbHkgbGlrZSB0byBydW4gc3VjaCBzY3JpcHRzIG9uY2UgbW9yZT8KClJlZ2FyZHMsCk1hcmt1
-cwoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KbGludXgt
-c25wcy1hcmMgbWFpbGluZyBsaXN0CmxpbnV4LXNucHMtYXJjQGxpc3RzLmluZnJhZGVhZC5vcmcK
-aHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1zbnBzLWFy
-Yw==
+From: Lan Tianyu <Tianyu.Lan@microsoft.com>
+
+For nested memory virtualization, Hyper-v doesn't set write-protect
+L1 hypervisor EPT page directory and page table node to track changes 
+while it relies on guest to tell it changes via HvFlushGuestAddressLlist
+hypercall. HvFlushGuestAddressLlist hypercall provides a way to flush
+EPT page table with ranges which are specified by L1 hypervisor.
+
+If L1 hypervisor uses INVEPT or HvFlushGuestAddressSpace hypercall to
+flush EPT tlb, Hyper-V will invalidate associated EPT shadow page table
+and sync L1's EPT table when next EPT page fault is triggered.
+HvFlushGuestAddressLlist hypercall helps to avoid such redundant EPT
+page fault and synchronization of shadow page table.
+
+
+Change since v3:
+	1) Remove code of updating "tlbs_dirty" in kvm_flush_remote_tlbs_with_range()
+	2) Remove directly tlb flush in the kvm_handle_hva_range()
+	3) Move tlb flush in kvm_set_pte_rmapp() to kvm_mmu_notifier_change_pte()
+	4) Combine Vitaly's "don't pass EPT configuration info to
+vmx_hv_remote_flush_tlb()" fix
+
+Change since v2:
+       1) Fix comment in the kvm_flush_remote_tlbs_with_range()
+       2) Move HV_MAX_FLUSH_PAGES and HV_MAX_FLUSH_REP_COUNT to
+	hyperv-tlfs.h.
+       3) Calculate HV_MAX_FLUSH_REP_COUNT in the macro definition
+       4) Use HV_MAX_FLUSH_REP_COUNT to define length of gpa_list in
+	struct hv_guest_mapping_flush_list.
+
+Change since v1:
+       1) Convert "end_gfn" of struct kvm_tlb_range to "pages" in order
+          to avoid confusion as to whether "end_gfn" is inclusive or exlusive.
+       2) Add hyperv tlb range struct and replace kvm tlb range struct
+          with new struct in order to avoid using kvm struct in the hyperv
+	  code directly.
+
+
+
+Lan Tianyu (15):
+  KVM: Add tlb_remote_flush_with_range callback in kvm_x86_ops
+  KVM/MMU: Add tlb flush with range helper function
+  KVM: Replace old tlb flush function with new one to flush a specified
+    range.
+  KVM: Make kvm_set_spte_hva() return int
+  KVM/MMU: Move tlb flush in kvm_set_pte_rmapp() to
+    kvm_mmu_notifier_change_pte()
+  KVM/MMU: Flush tlb directly in the kvm_set_pte_rmapp()
+  KVM/MMU: Flush tlb directly in the kvm_zap_gfn_range()
+  KVM/MMU: Flush tlb directly in kvm_mmu_zap_collapsible_spte()
+  KVM: Add flush_link and parent_pte in the struct kvm_mmu_page
+  KVM: Add spte's point in the struct kvm_mmu_page
+  KVM/MMU: Replace tlb flush function with range list flush function
+  x86/hyper-v: Add HvFlushGuestAddressList hypercall support
+  x86/Hyper-v: Add trace in the
+    hyperv_nested_flush_guest_mapping_range()
+  KVM/VMX: Change hv flush logic when ept tables are mismatched.
+  KVM/VMX: Add hv tlb range flush support
+
+ arch/arm/include/asm/kvm_host.h     |   2 +-
+ arch/arm64/include/asm/kvm_host.h   |   2 +-
+ arch/mips/include/asm/kvm_host.h    |   2 +-
+ arch/mips/kvm/mmu.c                 |   3 +-
+ arch/powerpc/include/asm/kvm_host.h |   2 +-
+ arch/powerpc/kvm/book3s.c           |   3 +-
+ arch/powerpc/kvm/e500_mmu_host.c    |   3 +-
+ arch/x86/hyperv/nested.c            |  85 ++++++++++++++++++++++
+ arch/x86/include/asm/hyperv-tlfs.h  |  32 +++++++++
+ arch/x86/include/asm/kvm_host.h     |  12 +++-
+ arch/x86/include/asm/mshyperv.h     |  16 +++++
+ arch/x86/include/asm/trace/hyperv.h |  14 ++++
+ arch/x86/kvm/mmu.c                  | 138 ++++++++++++++++++++++++++++++------
+ arch/x86/kvm/paging_tmpl.h          |  10 ++-
+ arch/x86/kvm/vmx.c                  |  70 +++++++++++++++---
+ virt/kvm/arm/mmu.c                  |   6 +-
+ virt/kvm/kvm_main.c                 |   5 +-
+ 17 files changed, 360 insertions(+), 45 deletions(-)
+
+-- 
+2.14.4
