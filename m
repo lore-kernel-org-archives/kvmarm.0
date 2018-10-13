@@ -1,62 +1,121 @@
-From: Daniel Colascione <dancol@google.com>
+From: Anton Ivanov <anton.ivanov@kot-begemot.co.uk>
 Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Fri, 12 Oct 2018 19:25:08 -0700
-Message-ID: <CAKOZueu2wdkeUFYLQ8qE48yJs1_uRz-9RVJRkp==CL=jp=Q8+g@mail.gmail.com>
-References: <20181012013756.11285-2-joel@joelfernandes.org>
- <20181012113056.gxhcbrqyu7k7xnyv@kshutemo-mobl1> <20181012125046.GA170912@joelaf.mtv.corp.google.com>
- <20181012.111836.1569129998592378186.davem@davemloft.net> <20181013013540.GA207108@joelaf.mtv.corp.google.com>
- <CAKOZueuNvWvn18vffJWpbpg7h-uScT8gXrrudTB2pnT4M2HJ_w@mail.gmail.com>
- <20181013014429.GB207108@joelaf.mtv.corp.google.com> <CAKOZues25aaKz3_AiyfJ=r2QBd5MghgY3ky_ptg4Z8=ST4DCgw@mail.gmail.com>
- <20181013021057.GA213522@joelaf.mtv.corp.google.com>
+Date: Sat, 13 Oct 2018 07:10:56 +0100
+Message-ID: <4e3d560b-afce-7d87-bbdb-9701d87ef44e@kot-begemot.co.uk>
+References: <20181012013756.11285-1-joel@joelfernandes.org>
+ <20181012013756.11285-2-joel@joelfernandes.org>
+ <9ed82f9e-88c4-8e4f-8c45-3ef153469603@kot-begemot.co.uk>
+ <20181012143728.t42uvr6etg7gp7fh@kshutemo-mobl1>
+ <4dd52e22-5b51-9b30-7178-fde603a08f88@kot-begemot.co.uk>
+ <97cb3fe1-7bc1-12ff-d602-56c72a5496c5@kot-begemot.co.uk>
+ <20181012214008.jj7vhh76vte7xj7i@kshutemo-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181013021057.GA213522@joelaf.mtv.corp.google.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: David Miller <davem@davemloft.net>, kirill@shutemov.name, linux-kernel <linux-kernel@vger.kernel.org>, kernel-team@android.com, Minchan Kim <minchan@kernel.org>, Ramon Pantin <pantin@google.com>, Hugh Dickins <hughd@google.com>, Lokesh Gidra <lokeshgidra@google.com>, Michal Hocko <mhocko@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, aryabinin@virtuozzo.com, luto@kernel.org, bp@alien8.de, catalin.marinas@arm.com, Chris Zankel <chris@zankel.net>, dave.hansen@linux.intel.com, elfring@users.sourceforge.net, fenghua.yu@intel.com, geert@linux-m68k.org, gxt@pku.edu.cn, deller@gmx.de, mingo@redhat.com, jejb@parisc-linux.org, jdike@addtoit.com, Jonas Bonn <jonas@southpole.se>, Julia Lawall <Julia.Lawall@lip6.fr>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20181012214008.jj7vhh76vte7xj7i@kshutemo-mobl1>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, "Joel Fernandes (Google)" <joel@joelfernandes.org>, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 7:10 PM, Joel Fernandes <joel@joelfernandes.org> wrote:
-> On Fri, Oct 12, 2018 at 06:54:33PM -0700, Daniel Colascione wrote:
->> I wonder whether it makes sense to expose to userspace somehow whether
->> mremap is "fast" for a particular architecture. If a feature relies on
->> fast mremap, it might be better for some userland component to disable
->> that feature entirely rather than blindly use mremap and end up
->> performing very poorly. If we're disabling fast mremap when THP is
->> enabled, the userland component can't just rely on an architecture
->> switch and some kind of runtime feature detection becomes even more
->> important.
->
-> I hate to point out that its forbidden to top post on LKML :-)
-> https://kernelnewbies.org/mailinglistguidelines
-> So don't that Mr. Dan! :D
-
-Guilty as charged. I really should switch back to Gnus. :-)
-
-> But anyway, I think this runtime detection thing is not needed. THP is
-> actually expected to be as fast as this anyway, so if that's available then
-> we should already be as fast.
-
-Ah, I think the commit message is confusing. (Or else I'm misreading
-the patch now.) It's not quite that we're disabling the feature when
-THP is enabled anywhere, but rather that we use the move_huge_pmd path
-for huge PMDs and use the new code only for non-huge PMDs. (Right?) If
-that's the case, the commit message shouldn't say "Incase THP is
-enabled, the optimization is skipped". Even if THP is enabled on a
-system generally, we might use the new PMD-moving code for mapping
-types that don't support THP-ization, right?
-
-> This is for non-THP where THP cannot be enabled
-> and there is still room for some improvement. Most/all architectures will be
-> just fine with this. This flag is more of a safety-net type of thing where in
-> the future if there is this one or two weird architectures that don't play
-> well, then they can turn it off at the architecture level by not selecting
-> the flag. See my latest patches for the per-architecture compile-time
-> controls. Ideally we'd like to blanket turn it on on all, but this is just
-> playing it extra safe as Kirill and me were discussing on other threads.
-
-Sure. I'm just pointing out that the 500x performance different turns
-the operation into a qualitatively different feature, so if we expect
-to actually ship a mainstream architecture without support for this
-thing, we should make it explicit. If we're not, we shouldn't.
+T24gMTIvMTAvMjAxOCAyMjo0MCwgS2lyaWxsIEEuIFNodXRlbW92IHdyb3RlOgo+IE9uIEZyaSwg
+T2N0IDEyLCAyMDE4IGF0IDA1OjQyOjI0UE0gKzAxMDAsIEFudG9uIEl2YW5vdiB3cm90ZToKPj4g
+T24gMTAvMTIvMTggMzo0OCBQTSwgQW50b24gSXZhbm92IHdyb3RlOgo+Pj4gT24gMTIvMTAvMjAx
+OCAxNTozNywgS2lyaWxsIEEuIFNodXRlbW92IHdyb3RlOgo+Pj4+IE9uIEZyaSwgT2N0IDEyLCAy
+MDE4IGF0IDAzOjA5OjQ5UE0gKzAxMDAsIEFudG9uIEl2YW5vdiB3cm90ZToKPj4+Pj4gT24gMTAv
+MTIvMTggMjozNyBBTSwgSm9lbCBGZXJuYW5kZXMgKEdvb2dsZSkgd3JvdGU6Cj4+Pj4+PiBBbmRy
+b2lkIG5lZWRzIHRvIG1yZW1hcCBsYXJnZSByZWdpb25zIG9mIG1lbW9yeSBkdXJpbmcKPj4+Pj4+
+IG1lbW9yeSBtYW5hZ2VtZW50Cj4+Pj4+PiByZWxhdGVkIG9wZXJhdGlvbnMuIFRoZSBtcmVtYXAg
+c3lzdGVtIGNhbGwgY2FuIGJlIHJlYWxseQo+Pj4+Pj4gc2xvdyBpZiBUSFAgaXMKPj4+Pj4+IG5v
+dCBlbmFibGVkLiBUaGUgYm90dGxlbmVjayBpcyBtb3ZlX3BhZ2VfdGFibGVzLCB3aGljaCBpcyBj
+b3B5aW5nIGVhY2gKPj4+Pj4+IHB0ZSBhdCBhIHRpbWUsIGFuZCBjYW4gYmUgcmVhbGx5IHNsb3cg
+YWNyb3NzIGEgbGFyZ2UgbWFwLgo+Pj4+Pj4gVHVybmluZyBvbiBUSFAKPj4+Pj4+IG1heSBub3Qg
+YmUgYSB2aWFibGUgb3B0aW9uLCBhbmQgaXMgbm90IGZvciB1cy4gVGhpcyBwYXRjaAo+Pj4+Pj4g
+c3BlZWRzIHVwIHRoZQo+Pj4+Pj4gcGVyZm9ybWFuY2UgZm9yIG5vbi1USFAgc3lzdGVtIGJ5IGNv
+cHlpbmcgYXQgdGhlIFBNRCBsZXZlbAo+Pj4+Pj4gd2hlbiBwb3NzaWJsZS4KPj4+Pj4+Cj4+Pj4+
+PiBUaGUgc3BlZWQgdXAgaXMgdGhyZWUgb3JkZXJzIG9mIG1hZ25pdHVkZS4gT24gYSAxR0IgbXJl
+bWFwLCB0aGUgbXJlbWFwCj4+Pj4+PiBjb21wbGV0aW9uIHRpbWVzIGRyb3BzIGZyb20gMTYwLTI1
+MCBtaWxsZXNjb25kcyB0byAzODAtNDAwCj4+Pj4+PiBtaWNyb3NlY29uZHMuCj4+Pj4+Pgo+Pj4+
+Pj4gQmVmb3JlOgo+Pj4+Pj4gVG90YWwgbXJlbWFwIHRpbWUgZm9yIDFHQiBkYXRhOiAyNDIzMjEw
+MTQgbmFub3NlY29uZHMuCj4+Pj4+PiBUb3RhbCBtcmVtYXAgdGltZSBmb3IgMUdCIGRhdGE6IDE5
+Njg0MjQ2NyBuYW5vc2Vjb25kcy4KPj4+Pj4+IFRvdGFsIG1yZW1hcCB0aW1lIGZvciAxR0IgZGF0
+YTogMTY3MDUxMTYyIG5hbm9zZWNvbmRzLgo+Pj4+Pj4KPj4+Pj4+IEFmdGVyOgo+Pj4+Pj4gVG90
+YWwgbXJlbWFwIHRpbWUgZm9yIDFHQiBkYXRhOiAzODU3ODEgbmFub3NlY29uZHMuCj4+Pj4+PiBU
+b3RhbCBtcmVtYXAgdGltZSBmb3IgMUdCIGRhdGE6IDM4ODk1OSBuYW5vc2Vjb25kcy4KPj4+Pj4+
+IFRvdGFsIG1yZW1hcCB0aW1lIGZvciAxR0IgZGF0YTogNDAyODEzIG5hbm9zZWNvbmRzLgo+Pj4+
+Pj4KPj4+Pj4+IEluY2FzZSBUSFAgaXMgZW5hYmxlZCwgdGhlIG9wdGltaXphdGlvbiBpcyBza2lw
+cGVkLiBJIGFsc28gZmx1c2ggdGhlCj4+Pj4+PiB0bGIgZXZlcnkgdGltZSB3ZSBkbyB0aGlzIG9w
+dGltaXphdGlvbiBzaW5jZSBJIGNvdWxkbid0IGZpbmQgYSB3YXkgdG8KPj4+Pj4+IGRldGVybWlu
+ZSBpZiB0aGUgbG93LWxldmVsIFBURXMgYXJlIGRpcnR5LiBJdCBpcyBzZWVuIHRoYXQgdGhlIGNv
+c3Qgb2YKPj4+Pj4+IGRvaW5nIHNvIGlzIG5vdCBtdWNoIGNvbXBhcmVkIHRoZSBpbXByb3ZlbWVu
+dCwgb24gYm90aAo+Pj4+Pj4geDg2LTY0IGFuZCBhcm02NC4KPj4+Pj4+Cj4+Pj4+PiBDYzogbWlu
+Y2hhbkBrZXJuZWwub3JnCj4+Pj4+PiBDYzogcGFudGluQGdvb2dsZS5jb20KPj4+Pj4+IENjOiBo
+dWdoZEBnb29nbGUuY29tCj4+Pj4+PiBDYzogbG9rZXNoZ2lkcmFAZ29vZ2xlLmNvbQo+Pj4+Pj4g
+Q2M6IGRhbmNvbEBnb29nbGUuY29tCj4+Pj4+PiBDYzogbWhvY2tvQGtlcm5lbC5vcmcKPj4+Pj4+
+IENjOiBraXJpbGxAc2h1dGVtb3YubmFtZQo+Pj4+Pj4gQ2M6IGFrcG1AbGludXgtZm91bmRhdGlv
+bi5vcmcKPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEpvZWwgRmVybmFuZGVzIChHb29nbGUpIDxqb2Vs
+QGpvZWxmZXJuYW5kZXMub3JnPgo+Pj4+Pj4gLS0tCj4+Pj4+PiAgwqDCoCBtbS9tcmVtYXAuYyB8
+IDYyCj4+Pj4+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKwo+Pj4+Pj4gIMKgwqAgMSBmaWxlIGNoYW5nZWQsIDYyIGluc2VydGlvbnMoKykKPj4+
+Pj4+Cj4+Pj4+PiBkaWZmIC0tZ2l0IGEvbW0vbXJlbWFwLmMgYi9tbS9tcmVtYXAuYwo+Pj4+Pj4g
+aW5kZXggOWU2OGEwMmE1MmIxLi5kODJjNDg1ODIyZWYgMTAwNjQ0Cj4+Pj4+PiAtLS0gYS9tbS9t
+cmVtYXAuYwo+Pj4+Pj4gKysrIGIvbW0vbXJlbWFwLmMKPj4+Pj4+IEBAIC0xOTEsNiArMTkxLDU0
+IEBAIHN0YXRpYyB2b2lkIG1vdmVfcHRlcyhzdHJ1Y3QKPj4+Pj4+IHZtX2FyZWFfc3RydWN0ICp2
+bWEsIHBtZF90ICpvbGRfcG1kLAo+Pj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRyb3Bfcm1h
+cF9sb2Nrcyh2bWEpOwo+Pj4+Pj4gIMKgwqAgfQo+Pj4+Pj4gK3N0YXRpYyBib29sIG1vdmVfbm9y
+bWFsX3BtZChzdHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZtYSwKPj4+Pj4+IHVuc2lnbmVkIGxvbmcg
+b2xkX2FkZHIsCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgIHVuc2lnbmVkIGxvbmcgbmV3X2Fk
+ZHIsIHVuc2lnbmVkIGxvbmcgb2xkX2VuZCwKPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqAgcG1k
+X3QgKm9sZF9wbWQsIHBtZF90ICpuZXdfcG1kLCBib29sICpuZWVkX2ZsdXNoKQo+Pj4+Pj4gK3sK
+Pj4+Pj4+ICvCoMKgwqAgc3BpbmxvY2tfdCAqb2xkX3B0bCwgKm5ld19wdGw7Cj4+Pj4+PiArwqDC
+oMKgIHN0cnVjdCBtbV9zdHJ1Y3QgKm1tID0gdm1hLT52bV9tbTsKPj4+Pj4+ICsKPj4+Pj4+ICvC
+oMKgwqAgaWYgKChvbGRfYWRkciAmIH5QTURfTUFTSykgfHwgKG5ld19hZGRyICYgflBNRF9NQVNL
+KQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHx8IG9sZF9lbmQgLSBvbGRfYWRkciA8IFBNRF9TSVpF
+KQo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiBmYWxzZTsKPj4+Pj4+ICsKPj4+Pj4+ICvC
+oMKgwqAgLyoKPj4+Pj4+ICvCoMKgwqDCoCAqIFRoZSBkZXN0aW5hdGlvbiBwbWQgc2hvdWxkbid0
+IGJlIGVzdGFibGlzaGVkLCBmcmVlX3BndGFibGVzKCkKPj4+Pj4+ICvCoMKgwqDCoCAqIHNob3Vs
+ZCBoYXZlIHJlbGVhc2UgaXQuCj4+Pj4+PiArwqDCoMKgwqAgKi8KPj4+Pj4+ICvCoMKgwqAgaWYg
+KFdBUk5fT04oIXBtZF9ub25lKCpuZXdfcG1kKSkpCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0
+dXJuIGZhbHNlOwo+Pj4+Pj4gKwo+Pj4+Pj4gK8KgwqDCoCAvKgo+Pj4+Pj4gK8KgwqDCoMKgICog
+V2UgZG9uJ3QgaGF2ZSB0byB3b3JyeSBhYm91dCB0aGUgb3JkZXJpbmcgb2Ygc3JjIGFuZCBkc3QK
+Pj4+Pj4+ICvCoMKgwqDCoCAqIHB0bG9ja3MgYmVjYXVzZSBleGNsdXNpdmUgbW1hcF9zZW0gcHJl
+dmVudHMgZGVhZGxvY2suCj4+Pj4+PiArwqDCoMKgwqAgKi8KPj4+Pj4+ICvCoMKgwqAgb2xkX3B0
+bCA9IHBtZF9sb2NrKHZtYS0+dm1fbW0sIG9sZF9wbWQpOwo+Pj4+Pj4gK8KgwqDCoCBpZiAob2xk
+X3B0bCkgewo+Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHBtZF90IHBtZDsKPj4+Pj4+ICsKPj4+Pj4+
+ICvCoMKgwqDCoMKgwqDCoCBuZXdfcHRsID0gcG1kX2xvY2twdHIobW0sIG5ld19wbWQpOwo+Pj4+
+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmIChuZXdfcHRsICE9IG9sZF9wdGwpCj4+Pj4+PiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBzcGluX2xvY2tfbmVzdGVkKG5ld19wdGwsIFNJTkdMRV9ERVBUSF9O
+RVNUSU5HKTsKPj4+Pj4+ICsKPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBDbGVhciB0aGUgcG1k
+ICovCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgcG1kID0gKm9sZF9wbWQ7Cj4+Pj4+PiArwqDCoMKg
+wqDCoMKgwqAgcG1kX2NsZWFyKG9sZF9wbWQpOwo+Pj4+Pj4gKwo+Pj4+Pj4gK8KgwqDCoMKgwqDC
+oMKgIFZNX0JVR19PTighcG1kX25vbmUoKm5ld19wbWQpKTsKPj4+Pj4+ICsKPj4+Pj4+ICvCoMKg
+wqDCoMKgwqDCoCAvKiBTZXQgdGhlIG5ldyBwbWQgKi8KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCBz
+ZXRfcG1kX2F0KG1tLCBuZXdfYWRkciwgbmV3X3BtZCwgcG1kKTsKPj4+Pj4gVU1MIGRvZXMgbm90
+IGhhdmUgc2V0X3BtZF9hdCBhdCBhbGwKPj4+PiBFdmVyeSBhcmNoaXRlY3R1cmUgZG9lcy4gOikK
+Pj4+IEkgdHJpZWQgdG8gYnVpbGQgaXQgcGF0Y2hpbmcgdnMgNC4xOS1yYyBiZWZvcmUgSSBtYWRl
+IHRoaXMgc3RhdGVtZW50IGFuZAo+Pj4gcmFuIGludG8gdGhhdC4KPj4+Cj4+PiBQcmVzZW50bHkg
+aXQgZG9lcyBub3QuCj4+Pgo+Pj4gaHR0cHM6Ly9lbGl4aXIuYm9vdGxpbi5jb20vbGludXgvdjQu
+MTktcmM3L2lkZW50L3NldF9wbWRfYXQgLSBVTUwgaXMgbm90Cj4+PiBvbiB0aGUgbGlzdC4KPj4g
+T25jZSB0aGlzIHByb2JsZW0gYXMgd2VsbCBhcyB0aGUgb21pc3Npb25zIGluIHRoZSBpbmNsdWRl
+IGNoYW5nZXMgZm9yIFVNTCBpbgo+PiBwYXRjaCBvbmUgaGF2ZSBiZWVuIGZpeGVkIGl0IGFwcGVh
+cnMgdG8gYmUgd29ya2luZy4KPj4KPj4gV2hhdCBpdCBuZWVkcyBpcyBhdHRhY2hlZC4KPiBXZWxs
+LCB0aGUgb3B0aXphdGlvbiBpcyBvbmx5IHN1aXRhYmxlIGZvciBhcmNoIHRoYXQgaGFzIDMgb3Ig
+bW9yZSBsZXZlbHMKPiBvZiBwYWdlIHRhYmxlcy4gT3RoZXJ3aXNlIGl0IHdpbGwgbm90IGhhdmUg
+W25vbi1mb2xkZWRdIHBtZC4KPgo+IEFuZCBpbiB0aGlzIGNhc2UgYXJjaC91bSBhbHJlYWR5IHNo
+b3VsZCBoYXZlIHNldF9wbWRfYXQoKSwgc2VlCj4gM19MRVZFTF9QR1RBQkxFUy4KPgo+IFRvIHBv
+cnQgb24gMi1sZXZlbCBwYWdpbmcsIGl0IGhhcyB0byBiZSBoYW5kbGVkIG9uIHBnZCBsZXZlbC4g
+SXQKPiBjb21wbGljYXRlcyB0aGUgY29kZSBhbmQgd2lsbCBub3QgYnJpbmcgbXVjaCB2YWx1ZS4K
+PgpVTUwgaGFzIDMgbGV2ZWwgcGFnZSB0YWJsZXMgb24gNjQgYml0LgoKQS4KCgpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1zbnBzLWFyYyBtYWls
+aW5nIGxpc3QKbGludXgtc25wcy1hcmNAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMu
+aW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LXNucHMtYXJj
