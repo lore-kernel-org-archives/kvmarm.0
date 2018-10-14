@@ -1,45 +1,70 @@
-From: Liran Alon <liran.alon@oracle.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
 Subject: Re: [PATCH V4 2/15] KVM/MMU: Add tlb flush with range helper function
-Date: Sun, 14 Oct 2018 12:20:00 +0300
-Message-ID: <1BDC7949-CFED-46C2-9D05-42864B0AD0F0@oracle.com>
+Date: Sun, 14 Oct 2018 10:27:34 +0100
+Message-ID: <20181014092734.GV30658@n2100.armlinux.org.uk>
 References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
  <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
  <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
  <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, lantianyu1986@gmail.com, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, devel@linuxdriverproject.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
+Cc: Liran Alon <liran.alon@oracle.com>, linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, lantianyu1986@gmail.com, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, devel@linuxdriverproject.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cgo+IE9uIDE0IE9jdCAyMDE4LCBhdCAxMToxNiwgVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0
-cm9uaXguZGU+IHdyb3RlOgo+IAo+IE9uIFN1biwgMTQgT2N0IDIwMTgsIExpcmFuIEFsb24gd3Jv
-dGU6Cj4+PiBPbiAxMyBPY3QgMjAxOCwgYXQgMTc6NTMsIGxhbnRpYW55dTE5ODZAZ21haWwuY29t
-IHdyb3RlOgo+Pj4gCj4+PiArCj4+PiArc3RhdGljIGlubGluZSBib29sIGt2bV9hdmFpbGFibGVf
-Zmx1c2hfdGxiX3dpdGhfcmFuZ2Uodm9pZCkKPj4+ICt7Cj4+PiArCXJldHVybiBrdm1feDg2X29w
-cy0+dGxiX3JlbW90ZV9mbHVzaF93aXRoX3JhbmdlOwo+Pj4gK30KPj4gCj4+IFNlZW1zIHRoYXQg
-a3ZtX2F2YWlsYWJsZV9mbHVzaF90bGJfd2l0aF9yYW5nZSgpIGlzIG5vdCB1c2VkIGluIHRoaXMg
-cGF0Y2jigKYKPiAKPiBXaGF0J3Mgd3Jvbmcgd2l0aCB0aGF0PyAKPiAKPiBJdCBwcm92aWRlcyB0
-aGUgaW1wbGVtZW50YXRpb24gYW5kIGxhdGVyIHBhdGNoZXMgbWFrZSB1c2Ugb2YgaXQuIEl0J3Mg
-YQo+IHNlbnNpYmxlIHdheSB0byBzcGxpdCBwYXRjaGVzIGludG8gc21hbGwsIHNlbGYgY29udGFp
-bmVkIGVudGl0aWVzLgo+IAo+IFRoYW5rcywKPiAKPiAJdGdseAo+IAkKCkkgZ3Vlc3MgaXTigJlz
-IGEgbWF0dGVyIG9mIHRhc3RlLCBidXQgSSBwcmVmZXIgdG8gbm90IGFkZCBkZWFkLWNvZGUgZm9y
-IHBhdGNoZXMKaW4gb3JkZXIgZm9yIGVhY2ggY29tbWl0IHRvIGNvbXBpbGUgbmljZWx5IHdpdGhv
-dXQgd2FybmluZ3Mgb2YgZGVjbGFyZWQgYW5kIHVudXNlZCBmdW5jdGlvbnMuCkkgd291bGQgcHJl
-ZmVyIHRvIGp1c3QgYWRkIHRoaXMgdXRpbGl0eSBmdW5jdGlvbiBvbiB0aGUgcGF0Y2ggdGhhdCBh
-Y3R1YWxseSB1c2UgaXQuCgotTGlyYW4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCmRldmVsIG1haWxpbmcgbGlzdApkZXZlbEBsaW51eGRyaXZlcnByb2pl
-Y3Qub3JnCmh0dHA6Ly9kcml2ZXJkZXYubGludXhkcml2ZXJwcm9qZWN0Lm9yZy9tYWlsbWFuL2xp
-c3RpbmZvL2RyaXZlcmRldi1kZXZlbAo=
+On Sun, Oct 14, 2018 at 10:16:56AM +0200, Thomas Gleixner wrote:
+> On Sun, 14 Oct 2018, Liran Alon wrote:
+> > > On 13 Oct 2018, at 17:53, lantianyu1986@gmail.com wrote:
+> > > 
+> > > From: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> > > 
+> > > This patch is to add wrapper functions for tlb_remote_flush_with_range
+> > > callback.
+> > > 
+> > > Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> > > ---
+> > > Change sicne V3:
+> > >       Remove code of updating "tlbs_dirty"
+> > > Change since V2:
+> > >       Fix comment in the kvm_flush_remote_tlbs_with_range()
+> > > ---
+> > > arch/x86/kvm/mmu.c | 40 ++++++++++++++++++++++++++++++++++++++++
+> > > 1 file changed, 40 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> > > index c73d9f650de7..ff656d85903a 100644
+> > > --- a/arch/x86/kvm/mmu.c
+> > > +++ b/arch/x86/kvm/mmu.c
+> > > @@ -264,6 +264,46 @@ static void mmu_spte_set(u64 *sptep, u64 spte);
+> > > static union kvm_mmu_page_role
+> > > kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
+> > > 
+> > > +
+> > > +static inline bool kvm_available_flush_tlb_with_range(void)
+> > > +{
+> > > +	return kvm_x86_ops->tlb_remote_flush_with_range;
+> > > +}
+> > 
+> > Seems that kvm_available_flush_tlb_with_range() is not used in this patch…
+> 
+> What's wrong with that? 
+> 
+> It provides the implementation and later patches make use of it. It's a
+> sensible way to split patches into small, self contained entities.
+
+>From what I can see of the patches that follow _this_ patch in the
+series, this function remains unused.  So, not only is it not used
+in this patch, it's not used in this series.
+
+I think the real question that needs asking is - what is the plan
+for this function, and when will it be used?
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 12.1Mbps down 622kbps up
+According to speedtest.net: 11.9Mbps down 500kbps up
