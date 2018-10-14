@@ -1,76 +1,36 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
 Subject: Re: [PATCH V4 2/15] KVM/MMU: Add tlb flush with range helper function
-Date: Sun, 14 Oct 2018 21:21:23 +0800
-Message-ID: <CAOLK0pzHAc1ipDbd3Trg2W_Gb_DxdEKM2ML5Fk09u0-O8y6UAg@mail.gmail.com>
+Date: Sun, 14 Oct 2018 14:33:53 +0100
+Message-ID: <20181014133352.GX30658@n2100.armlinux.org.uk>
 References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
  <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
  <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
  <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
  <20181014092734.GV30658@n2100.armlinux.org.uk>
  <20181014093541.GW30658@n2100.armlinux.org.uk>
+ <CAOLK0pzHAc1ipDbd3Trg2W_Gb_DxdEKM2ML5Fk09u0-O8y6UAg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20181014093541.GW30658@n2100.armlinux.org.uk>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-To: linux@armlinux.org.uk
-Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, benh@kernel.crashing.org, will.deacon@arm.com, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, paulus@ozlabs.org, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, the arch/x86 maintainers <x86@kernel.org>, michael.h.kelley@microsoft.com, Ingo Molnar <mingo@redhat.com>, catalin.marinas@arm.com, jhogan@kernel.org, Tianyu Lan <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, liran.alon@oracle.com, devel@linuxdriverproject.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, Paolo Bonzini <pbonzini@redhat.com>, vkuznets@redhat.com, linuxppc-dev@lists.o
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAOLK0pzHAc1ipDbd3Trg2W_Gb_DxdEKM2ML5Fk09u0-O8y6UAg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Tianyu Lan <lantianyu1986@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-mips@linux-mips.org, kvm <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, benh@kernel.crashing.org, will.deacon@arm.com, christoffer.dall@arm.com, paulus@ozlabs.org, "H. Peter Anvin" <hpa@zytor.com>, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, the arch/x86 maintainers <x86@kernel.org>, michael.h.kelley@microsoft.com, Ingo Molnar <mingo@redhat.com>, catalin.marinas@arm.com, jhogan@kernel.org, Tianyu Lan <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, liran.alon@oracle.com, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, ralf@linux-mips.
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgUnVzc2VsbDoKICAgICAgICAgICAgICBUaGFua3MgZm9yIHlvdXIgcmV2aWV3LgoKT24gU3Vu
-LCBPY3QgMTQsIDIwMTggYXQgNTozNiBQTSBSdXNzZWxsIEtpbmcgLSBBUk0gTGludXgKPGxpbnV4
-QGFybWxpbnV4Lm9yZy51az4gd3JvdGU6Cj4KPiBPbiBTdW4sIE9jdCAxNCwgMjAxOCBhdCAxMDoy
-NzozNEFNICswMTAwLCBSdXNzZWxsIEtpbmcgLSBBUk0gTGludXggd3JvdGU6Cj4gPiBPbiBTdW4s
-IE9jdCAxNCwgMjAxOCBhdCAxMDoxNjo1NkFNICswMjAwLCBUaG9tYXMgR2xlaXhuZXIgd3JvdGU6
-Cj4gPiA+IE9uIFN1biwgMTQgT2N0IDIwMTgsIExpcmFuIEFsb24gd3JvdGU6Cj4gPiA+ID4gPiBP
-biAxMyBPY3QgMjAxOCwgYXQgMTc6NTMsIGxhbnRpYW55dTE5ODZAZ21haWwuY29tIHdyb3RlOgo+
-ID4gPiA+ID4KPiA+ID4gPiA+IEZyb206IExhbiBUaWFueXUgPFRpYW55dS5MYW5AbWljcm9zb2Z0
-LmNvbT4KPiA+ID4gPiA+Cj4gPiA+ID4gPiBUaGlzIHBhdGNoIGlzIHRvIGFkZCB3cmFwcGVyIGZ1
-bmN0aW9ucyBmb3IgdGxiX3JlbW90ZV9mbHVzaF93aXRoX3JhbmdlCj4gPiA+ID4gPiBjYWxsYmFj
-ay4KPiA+ID4gPiA+Cj4gPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBMYW4gVGlhbnl1IDxUaWFueXUu
-TGFuQG1pY3Jvc29mdC5jb20+Cj4gPiA+ID4gPiAtLS0KPiA+ID4gPiA+IENoYW5nZSBzaWNuZSBW
-MzoKPiA+ID4gPiA+ICAgICAgIFJlbW92ZSBjb2RlIG9mIHVwZGF0aW5nICJ0bGJzX2RpcnR5Igo+
-ID4gPiA+ID4gQ2hhbmdlIHNpbmNlIFYyOgo+ID4gPiA+ID4gICAgICAgRml4IGNvbW1lbnQgaW4g
-dGhlIGt2bV9mbHVzaF9yZW1vdGVfdGxic193aXRoX3JhbmdlKCkKPiA+ID4gPiA+IC0tLQo+ID4g
-PiA+ID4gYXJjaC94ODYva3ZtL21tdS5jIHwgNDAgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKwo+ID4gPiA+ID4gMSBmaWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKykK
-PiA+ID4gPiA+Cj4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL21tdS5jIGIvYXJj
-aC94ODYva3ZtL21tdS5jCj4gPiA+ID4gPiBpbmRleCBjNzNkOWY2NTBkZTcuLmZmNjU2ZDg1OTAz
-YSAxMDA2NDQKPiA+ID4gPiA+IC0tLSBhL2FyY2gveDg2L2t2bS9tbXUuYwo+ID4gPiA+ID4gKysr
-IGIvYXJjaC94ODYva3ZtL21tdS5jCj4gPiA+ID4gPiBAQCAtMjY0LDYgKzI2NCw0NiBAQCBzdGF0
-aWMgdm9pZCBtbXVfc3B0ZV9zZXQodTY0ICpzcHRlcCwgdTY0IHNwdGUpOwo+ID4gPiA+ID4gc3Rh
-dGljIHVuaW9uIGt2bV9tbXVfcGFnZV9yb2xlCj4gPiA+ID4gPiBrdm1fbW11X2NhbGNfcm9vdF9w
-YWdlX3JvbGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKPiA+ID4gPiA+Cj4gPiA+ID4gPiArCj4g
-PiA+ID4gPiArc3RhdGljIGlubGluZSBib29sIGt2bV9hdmFpbGFibGVfZmx1c2hfdGxiX3dpdGhf
-cmFuZ2Uodm9pZCkKPiA+ID4gPiA+ICt7Cj4gPiA+ID4gPiArICAgICAgIHJldHVybiBrdm1feDg2
-X29wcy0+dGxiX3JlbW90ZV9mbHVzaF93aXRoX3JhbmdlOwo+ID4gPiA+ID4gK30KPiA+ID4gPgo+
-ID4gPiA+IFNlZW1zIHRoYXQga3ZtX2F2YWlsYWJsZV9mbHVzaF90bGJfd2l0aF9yYW5nZSgpIGlz
-IG5vdCB1c2VkIGluIHRoaXMgcGF0Y2jigKYKPiA+ID4KPiA+ID4gV2hhdCdzIHdyb25nIHdpdGgg
-dGhhdD8KPiA+ID4KPiA+ID4gSXQgcHJvdmlkZXMgdGhlIGltcGxlbWVudGF0aW9uIGFuZCBsYXRl
-ciBwYXRjaGVzIG1ha2UgdXNlIG9mIGl0LiBJdCdzIGEKPiA+ID4gc2Vuc2libGUgd2F5IHRvIHNw
-bGl0IHBhdGNoZXMgaW50byBzbWFsbCwgc2VsZiBjb250YWluZWQgZW50aXRpZXMuCj4gPgo+ID4g
-RnJvbSB3aGF0IEkgY2FuIHNlZSBvZiB0aGUgcGF0Y2hlcyB0aGF0IGZvbGxvdyBfdGhpc18gcGF0
-Y2ggaW4gdGhlCj4gPiBzZXJpZXMsIHRoaXMgZnVuY3Rpb24gcmVtYWlucyB1bnVzZWQuICBTbywg
-bm90IG9ubHkgaXMgaXQgbm90IHVzZWQKPiA+IGluIHRoaXMgcGF0Y2gsIGl0J3Mgbm90IHVzZWQg
-aW4gdGhpcyBzZXJpZXMuCj4KPiBOb3RlIC0gSSBzZWVtIHRvIGhhdmUgb25seSByZWNlaXZlZCBw
-YXRjaGVzIDEgdGhyb3VnaCA0LCBzbyB0aGlzIGlzCj4gYmFzZWQgb24gdGhlIHBhdGNoZXMgSSd2
-ZSByZWNlaXZlZC4KPgoKU29ycnkgdG8gY29uZnVzZSB5b3VyLiBJIGdldCBmcm9tIENDZXJzIGZy
-b20gZ2V0X21haW50YWluZXIucGwgc2NyaXB0LgpUaGUgbmV4dCBwYXRjaCAiW1BBVENIIFY0IDMv
-MTVdS1ZNOiBSZXBsYWNlIG9sZCB0bGIgZmx1c2ggZnVuY3Rpb24gd2l0aApuZXcgb25lIHRvIGZs
-dXNoIGEgc3BlY2lmaWVkIHJhbmdlIiBjYWxscyBuZXcgZnVuY3Rpb24uCmh0dHBzOi8vbGttbC5v
-cmcvbGttbC8yMDE4LzEwLzEzLzI1NAoKVGhlIHBhdGNoICJbUEFUQ0ggVjQgNC8xNV0gS1ZNOiBN
-YWtlIGt2bV9zZXRfc3B0ZV9odmEoKSByZXR1cm4gaW50IgpjaGFuZ2VzIHVuZGVyIEFSTSBkaXJl
-Y3RvcnkuIFBsZWFzZSBoYXZlIGEgbG9vay4gVGhhbmtzLgotLSAKQmVzdCByZWdhcmRzClRpYW55
-dSBMYW4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KZGV2
-ZWwgbWFpbGluZyBsaXN0CmRldmVsQGxpbnV4ZHJpdmVycHJvamVjdC5vcmcKaHR0cDovL2RyaXZl
-cmRldi5saW51eGRyaXZlcnByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vZHJpdmVyZGV2LWRl
-dmVsCg==
+On Sun, Oct 14, 2018 at 09:21:23PM +0800, Tianyu Lan wrote:
+> Sorry to confuse your. I get from CCers from get_maintainer.pl script.
+
+Unfortunately you seem to have made a mistake.  My email address is
+'linux@armlinux.org.uk' not 'linux@armlinux.org'.  There is no
+'linux@armlinux.org' in MAINTAINERS, yet your emails appear to be
+copied to this address.
+
+Consequently, if it was your intention to copy me with the entire
+series, that didn't happen.
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 12.1Mbps down 622kbps up
+According to speedtest.net: 11.9Mbps down 500kbps up
