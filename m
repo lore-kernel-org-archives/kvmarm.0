@@ -1,63 +1,96 @@
-From: Liran Alon <liran.alon@oracle.com>
+From: Thomas Gleixner <tglx@linutronix.de>
 Subject: Re: [PATCH V4 2/15] KVM/MMU: Add tlb flush with range helper function
-Date: Sun, 14 Oct 2018 10:26:41 +0300
-Message-ID: <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
+Date: Sun, 14 Oct 2018 10:16:56 +0200 (CEST)
+Message-ID: <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
 References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
  <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-To: lantianyu1986@gmail.com
-Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, devel@linuxdriverproject.org, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
+ <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="8323329-68457485-1539505017=:1438"
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 973FF4A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 14 Oct 2018 04:17:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mVWrK5i2Ldqj for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 14 Oct 2018 04:17:31 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D0BB4A0C7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 14 Oct 2018 04:17:31 -0400 (EDT)
+In-Reply-To: <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Liran Alon <liran.alon@oracle.com>
+Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, lantianyu1986@gmail.com, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, devel@linuxdriverproject.org, linux-arm-kernel@lists.infradead.org, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cgo+IE9uIDEzIE9jdCAyMDE4LCBhdCAxNzo1MywgbGFudGlhbnl1MTk4NkBnbWFpbC5jb20gd3Jv
-dGU6Cj4gCj4gRnJvbTogTGFuIFRpYW55dSA8VGlhbnl1LkxhbkBtaWNyb3NvZnQuY29tPgo+IAo+
-IFRoaXMgcGF0Y2ggaXMgdG8gYWRkIHdyYXBwZXIgZnVuY3Rpb25zIGZvciB0bGJfcmVtb3RlX2Zs
-dXNoX3dpdGhfcmFuZ2UKPiBjYWxsYmFjay4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBMYW4gVGlhbnl1
-IDxUaWFueXUuTGFuQG1pY3Jvc29mdC5jb20+Cj4gLS0tCj4gQ2hhbmdlIHNpY25lIFYzOgo+ICAg
-ICAgIFJlbW92ZSBjb2RlIG9mIHVwZGF0aW5nICJ0bGJzX2RpcnR5Igo+IENoYW5nZSBzaW5jZSBW
-MjoKPiAgICAgICBGaXggY29tbWVudCBpbiB0aGUga3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhf
-cmFuZ2UoKQo+IC0tLQo+IGFyY2gveDg2L2t2bS9tbXUuYyB8IDQwICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysKPiAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygr
-KQo+IAo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vbW11LmMgYi9hcmNoL3g4Ni9rdm0vbW11
-LmMKPiBpbmRleCBjNzNkOWY2NTBkZTcuLmZmNjU2ZDg1OTAzYSAxMDA2NDQKPiAtLS0gYS9hcmNo
-L3g4Ni9rdm0vbW11LmMKPiArKysgYi9hcmNoL3g4Ni9rdm0vbW11LmMKPiBAQCAtMjY0LDYgKzI2
-NCw0NiBAQCBzdGF0aWMgdm9pZCBtbXVfc3B0ZV9zZXQodTY0ICpzcHRlcCwgdTY0IHNwdGUpOwo+
-IHN0YXRpYyB1bmlvbiBrdm1fbW11X3BhZ2Vfcm9sZQo+IGt2bV9tbXVfY2FsY19yb290X3BhZ2Vf
-cm9sZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+IAo+ICsKPiArc3RhdGljIGlubGluZSBib29s
-IGt2bV9hdmFpbGFibGVfZmx1c2hfdGxiX3dpdGhfcmFuZ2Uodm9pZCkKPiArewo+ICsJcmV0dXJu
-IGt2bV94ODZfb3BzLT50bGJfcmVtb3RlX2ZsdXNoX3dpdGhfcmFuZ2U7Cj4gK30KClNlZW1zIHRo
-YXQga3ZtX2F2YWlsYWJsZV9mbHVzaF90bGJfd2l0aF9yYW5nZSgpIGlzIG5vdCB1c2VkIGluIHRo
-aXMgcGF0Y2jigKYKCj4gKwo+ICtzdGF0aWMgdm9pZCBrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0
-aF9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sCj4gKwkJc3RydWN0IGt2bV90bGJfcmFuZ2UgKnJhbmdl
-KQo+ICt7Cj4gKwlpbnQgcmV0ID0gLUVOT1RTVVBQOwo+ICsKPiArCWlmIChyYW5nZSAmJiBrdm1f
-eDg2X29wcy0+dGxiX3JlbW90ZV9mbHVzaF93aXRoX3JhbmdlKQo+ICsJCXJldCA9IGt2bV94ODZf
-b3BzLT50bGJfcmVtb3RlX2ZsdXNoX3dpdGhfcmFuZ2Uoa3ZtLCByYW5nZSk7Cj4gKwo+ICsJaWYg
-KHJldCkKPiArCQlrdm1fZmx1c2hfcmVtb3RlX3RsYnMoa3ZtKTsKPiArfQo+ICsKPiArc3RhdGlj
-IHZvaWQga3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhfbGlzdChzdHJ1Y3Qga3ZtICprdm0sCj4g
-KwkJc3RydWN0IGxpc3RfaGVhZCAqZmx1c2hfbGlzdCkKPiArewo+ICsJc3RydWN0IGt2bV90bGJf
-cmFuZ2UgcmFuZ2U7Cj4gKwo+ICsJcmFuZ2UuZmx1c2hfbGlzdCA9IGZsdXNoX2xpc3Q7Cj4gKwo+
-ICsJa3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhfcmFuZ2Uoa3ZtLCAmcmFuZ2UpOwo+ICt9Cj4g
-Kwo+ICtzdGF0aWMgdm9pZCBrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0aF9hZGRyZXNzKHN0cnVj
-dCBrdm0gKmt2bSwKPiArCQl1NjQgc3RhcnRfZ2ZuLCB1NjQgcGFnZXMpCj4gK3sKPiArCXN0cnVj
-dCBrdm1fdGxiX3JhbmdlIHJhbmdlOwo+ICsKPiArCXJhbmdlLnN0YXJ0X2dmbiA9IHN0YXJ0X2dm
-bjsKPiArCXJhbmdlLnBhZ2VzID0gcGFnZXM7Cj4gKwlyYW5nZS5mbHVzaF9saXN0ID0gTlVMTDsK
-PiArCj4gKwlrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0aF9yYW5nZShrdm0sICZyYW5nZSk7Cj4g
-K30KPiArCj4gdm9pZCBrdm1fbW11X3NldF9tbWlvX3NwdGVfbWFzayh1NjQgbW1pb19tYXNrLCB1
-NjQgbW1pb192YWx1ZSkKPiB7Cj4gCUJVR19PTigobW1pb19tYXNrICYgbW1pb192YWx1ZSkgIT0g
-bW1pb192YWx1ZSk7Cj4gLS0gCj4gMi4xNC40Cj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpkZXZlbCBtYWlsaW5nIGxpc3QKZGV2ZWxAbGludXhkcml2
-ZXJwcm9qZWN0Lm9yZwpodHRwOi8vZHJpdmVyZGV2LmxpbnV4ZHJpdmVycHJvamVjdC5vcmcvbWFp
-bG1hbi9saXN0aW5mby9kcml2ZXJkZXYtZGV2ZWwK
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--8323329-68457485-1539505017=:1438
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+
+On Sun, 14 Oct 2018, Liran Alon wrote:
+> > On 13 Oct 2018, at 17:53, lantianyu1986@gmail.com wrote:
+> > 
+> > From: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> > 
+> > This patch is to add wrapper functions for tlb_remote_flush_with_range
+> > callback.
+> > 
+> > Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> > ---
+> > Change sicne V3:
+> >       Remove code of updating "tlbs_dirty"
+> > Change since V2:
+> >       Fix comment in the kvm_flush_remote_tlbs_with_range()
+> > ---
+> > arch/x86/kvm/mmu.c | 40 ++++++++++++++++++++++++++++++++++++++++
+> > 1 file changed, 40 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> > index c73d9f650de7..ff656d85903a 100644
+> > --- a/arch/x86/kvm/mmu.c
+> > +++ b/arch/x86/kvm/mmu.c
+> > @@ -264,6 +264,46 @@ static void mmu_spte_set(u64 *sptep, u64 spte);
+> > static union kvm_mmu_page_role
+> > kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
+> > 
+> > +
+> > +static inline bool kvm_available_flush_tlb_with_range(void)
+> > +{
+> > +	return kvm_x86_ops->tlb_remote_flush_with_range;
+> > +}
+> 
+> Seems that kvm_available_flush_tlb_with_range() is not used in this patch…
+
+What's wrong with that? 
+
+It provides the implementation and later patches make use of it. It's a
+sensible way to split patches into small, self contained entities.
+
+Thanks,
+
+	tglx
+	
+--8323329-68457485-1539505017=:1438
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--8323329-68457485-1539505017=:1438--
