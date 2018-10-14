@@ -1,63 +1,63 @@
-From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH v2 2/2] mm: speed up mremap by 500x on large regions
-Date: Sat, 13 Oct 2018 10:50:39 -0700
-Message-ID: <20181013175039.GB213522@joelaf.mtv.corp.google.com>
-References: <20181012013756.11285-2-joel@joelfernandes.org>
- <20181012113056.gxhcbrqyu7k7xnyv@kshutemo-mobl1>
- <20181012125046.GA170912@joelaf.mtv.corp.google.com>
- <20181012.111836.1569129998592378186.davem@davemloft.net>
- <20181013013540.GA207108@joelaf.mtv.corp.google.com>
- <CAKOZueuNvWvn18vffJWpbpg7h-uScT8gXrrudTB2pnT4M2HJ_w@mail.gmail.com>
- <20181013014429.GB207108@joelaf.mtv.corp.google.com>
- <CAKOZues25aaKz3_AiyfJ=r2QBd5MghgY3ky_ptg4Z8=ST4DCgw@mail.gmail.com>
- <20181013021057.GA213522@joelaf.mtv.corp.google.com>
- <CAKOZueu2wdkeUFYLQ8qE48yJs1_uRz-9RVJRkp==CL=jp=Q8+g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKOZueu2wdkeUFYLQ8qE48yJs1_uRz-9RVJRkp==CL=jp=Q8+g@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: dancol@google.com
-Cc: David Miller <davem@davemloft.net>, kirill@shutemov.name, linux-kernel <linux-kernel@vger.kernel.org>, kernel-team@android.com, Minchan Kim <minchan@kernel.org>, Ramon Pantin <pantin@google.com>, Hugh Dickins <hughd@google.com>, Lokesh Gidra <lokeshgidra@google.com>, Michal Hocko <mhocko@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, aryabinin@virtuozzo.com, luto@kernel.org, bp@alien8.de, catalin.marinas@arm.com, Chris Zankel <chris@zankel.net>, dave.hansen@linux.intel.com, elfring@users.sourceforge.net, fenghua.yu@intel.com, geert@linux-m68k.org, gxt@pku.edu.cn, deller@gmx.de, mingo@redhat.com, jejb@parisc-linux.org, jdike@addtoit.com, Jonas Bonn <jonas@southpole.se>, Julia Lawall <Julia.Lawall@lip6.fr>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia
+From: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH V4 2/15] KVM/MMU: Add tlb flush with range helper function
+Date: Sun, 14 Oct 2018 10:26:41 +0300
+Message-ID: <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
+References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
+ <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+To: lantianyu1986@gmail.com
+Cc: linux-mips@linux-mips.org, linux@armlinux.org, kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, devel@linuxdriverproject.org, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 12, 2018 at 07:25:08PM -0700, Daniel Colascione wrote:
-[...] 
-> > But anyway, I think this runtime detection thing is not needed. THP is
-> > actually expected to be as fast as this anyway, so if that's available then
-> > we should already be as fast.
-> 
-> Ah, I think the commit message is confusing. (Or else I'm misreading
-> the patch now.) It's not quite that we're disabling the feature when
-> THP is enabled anywhere, but rather that we use the move_huge_pmd path
-> for huge PMDs and use the new code only for non-huge PMDs. (Right?) If
-> that's the case, the commit message shouldn't say "Incase THP is
-> enabled, the optimization is skipped". Even if THP is enabled on a
-> system generally, we might use the new PMD-moving code for mapping
-> types that don't support THP-ization, right?
-
-That is true. Ok, I guess I can update the commit message to be more accurate
-about that.
-
-> > This is for non-THP where THP cannot be enabled
-> > and there is still room for some improvement. Most/all architectures will be
-> > just fine with this. This flag is more of a safety-net type of thing where in
-> > the future if there is this one or two weird architectures that don't play
-> > well, then they can turn it off at the architecture level by not selecting
-> > the flag. See my latest patches for the per-architecture compile-time
-> > controls. Ideally we'd like to blanket turn it on on all, but this is just
-> > playing it extra safe as Kirill and me were discussing on other threads.
-> 
-> Sure. I'm just pointing out that the 500x performance different turns
-> the operation into a qualitatively different feature, so if we expect
-> to actually ship a mainstream architecture without support for this
-> thing, we should make it explicit. If we're not, we shouldn't.
-
-We can make it explicit by enabling it in such a mainstream architecture is
-my point. Also if the optimization is not doing what its supposed to, then
-userspace will also just know by measuring the time.
-
-thanks,
-
- - Joel
+Cgo+IE9uIDEzIE9jdCAyMDE4LCBhdCAxNzo1MywgbGFudGlhbnl1MTk4NkBnbWFpbC5jb20gd3Jv
+dGU6Cj4gCj4gRnJvbTogTGFuIFRpYW55dSA8VGlhbnl1LkxhbkBtaWNyb3NvZnQuY29tPgo+IAo+
+IFRoaXMgcGF0Y2ggaXMgdG8gYWRkIHdyYXBwZXIgZnVuY3Rpb25zIGZvciB0bGJfcmVtb3RlX2Zs
+dXNoX3dpdGhfcmFuZ2UKPiBjYWxsYmFjay4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBMYW4gVGlhbnl1
+IDxUaWFueXUuTGFuQG1pY3Jvc29mdC5jb20+Cj4gLS0tCj4gQ2hhbmdlIHNpY25lIFYzOgo+ICAg
+ICAgIFJlbW92ZSBjb2RlIG9mIHVwZGF0aW5nICJ0bGJzX2RpcnR5Igo+IENoYW5nZSBzaW5jZSBW
+MjoKPiAgICAgICBGaXggY29tbWVudCBpbiB0aGUga3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhf
+cmFuZ2UoKQo+IC0tLQo+IGFyY2gveDg2L2t2bS9tbXUuYyB8IDQwICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysKPiAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygr
+KQo+IAo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vbW11LmMgYi9hcmNoL3g4Ni9rdm0vbW11
+LmMKPiBpbmRleCBjNzNkOWY2NTBkZTcuLmZmNjU2ZDg1OTAzYSAxMDA2NDQKPiAtLS0gYS9hcmNo
+L3g4Ni9rdm0vbW11LmMKPiArKysgYi9hcmNoL3g4Ni9rdm0vbW11LmMKPiBAQCAtMjY0LDYgKzI2
+NCw0NiBAQCBzdGF0aWMgdm9pZCBtbXVfc3B0ZV9zZXQodTY0ICpzcHRlcCwgdTY0IHNwdGUpOwo+
+IHN0YXRpYyB1bmlvbiBrdm1fbW11X3BhZ2Vfcm9sZQo+IGt2bV9tbXVfY2FsY19yb290X3BhZ2Vf
+cm9sZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwo+IAo+ICsKPiArc3RhdGljIGlubGluZSBib29s
+IGt2bV9hdmFpbGFibGVfZmx1c2hfdGxiX3dpdGhfcmFuZ2Uodm9pZCkKPiArewo+ICsJcmV0dXJu
+IGt2bV94ODZfb3BzLT50bGJfcmVtb3RlX2ZsdXNoX3dpdGhfcmFuZ2U7Cj4gK30KClNlZW1zIHRo
+YXQga3ZtX2F2YWlsYWJsZV9mbHVzaF90bGJfd2l0aF9yYW5nZSgpIGlzIG5vdCB1c2VkIGluIHRo
+aXMgcGF0Y2jigKYKCj4gKwo+ICtzdGF0aWMgdm9pZCBrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0
+aF9yYW5nZShzdHJ1Y3Qga3ZtICprdm0sCj4gKwkJc3RydWN0IGt2bV90bGJfcmFuZ2UgKnJhbmdl
+KQo+ICt7Cj4gKwlpbnQgcmV0ID0gLUVOT1RTVVBQOwo+ICsKPiArCWlmIChyYW5nZSAmJiBrdm1f
+eDg2X29wcy0+dGxiX3JlbW90ZV9mbHVzaF93aXRoX3JhbmdlKQo+ICsJCXJldCA9IGt2bV94ODZf
+b3BzLT50bGJfcmVtb3RlX2ZsdXNoX3dpdGhfcmFuZ2Uoa3ZtLCByYW5nZSk7Cj4gKwo+ICsJaWYg
+KHJldCkKPiArCQlrdm1fZmx1c2hfcmVtb3RlX3RsYnMoa3ZtKTsKPiArfQo+ICsKPiArc3RhdGlj
+IHZvaWQga3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhfbGlzdChzdHJ1Y3Qga3ZtICprdm0sCj4g
+KwkJc3RydWN0IGxpc3RfaGVhZCAqZmx1c2hfbGlzdCkKPiArewo+ICsJc3RydWN0IGt2bV90bGJf
+cmFuZ2UgcmFuZ2U7Cj4gKwo+ICsJcmFuZ2UuZmx1c2hfbGlzdCA9IGZsdXNoX2xpc3Q7Cj4gKwo+
+ICsJa3ZtX2ZsdXNoX3JlbW90ZV90bGJzX3dpdGhfcmFuZ2Uoa3ZtLCAmcmFuZ2UpOwo+ICt9Cj4g
+Kwo+ICtzdGF0aWMgdm9pZCBrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0aF9hZGRyZXNzKHN0cnVj
+dCBrdm0gKmt2bSwKPiArCQl1NjQgc3RhcnRfZ2ZuLCB1NjQgcGFnZXMpCj4gK3sKPiArCXN0cnVj
+dCBrdm1fdGxiX3JhbmdlIHJhbmdlOwo+ICsKPiArCXJhbmdlLnN0YXJ0X2dmbiA9IHN0YXJ0X2dm
+bjsKPiArCXJhbmdlLnBhZ2VzID0gcGFnZXM7Cj4gKwlyYW5nZS5mbHVzaF9saXN0ID0gTlVMTDsK
+PiArCj4gKwlrdm1fZmx1c2hfcmVtb3RlX3RsYnNfd2l0aF9yYW5nZShrdm0sICZyYW5nZSk7Cj4g
+K30KPiArCj4gdm9pZCBrdm1fbW11X3NldF9tbWlvX3NwdGVfbWFzayh1NjQgbW1pb19tYXNrLCB1
+NjQgbW1pb192YWx1ZSkKPiB7Cj4gCUJVR19PTigobW1pb19tYXNrICYgbW1pb192YWx1ZSkgIT0g
+bW1pb192YWx1ZSk7Cj4gLS0gCj4gMi4xNC40Cj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpkZXZlbCBtYWlsaW5nIGxpc3QKZGV2ZWxAbGludXhkcml2
+ZXJwcm9qZWN0Lm9yZwpodHRwOi8vZHJpdmVyZGV2LmxpbnV4ZHJpdmVycHJvamVjdC5vcmcvbWFp
+bG1hbi9saXN0aW5mby9kcml2ZXJkZXYtZGV2ZWwK
