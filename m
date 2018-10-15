@@ -1,71 +1,211 @@
-From: Jean-philippe Brucker <jphilippe.brucker-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 3/7] PCI: OF: Allow endpoints to bypass the iommu
-Date: Mon, 15 Oct 2018 20:46:41 +0100
-Message-ID: <482d0eb9-8c4c-9d64-7b32-25d5d11a8b8f@gmail.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012145917.6840-4-jean-philippe.brucker@arm.com>
-	<20181012194158.GX5906@bhelgaas-glaptop.roam.corp.google.com>
-	<20181015065024-mutt-send-email-mst@kernel.org>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: Re: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v2)
+Date: Mon, 15 Oct 2018 15:33:03 -0700
+Message-ID: <20181015223303.GA164293@joelaf.mtv.corp.google.com>
+References: <20181013013200.206928-1-joel@joelfernandes.org>
+ <20181013013200.206928-3-joel@joelfernandes.org>
+ <20181015094209.GA31999@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20181015065024-mutt-send-email-mst-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20181015094209.GA31999@infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, Max Filippov <jcmvbkbc@gmail.com>, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, elfring@users.sourceforge.net, Ingo Molnar <mingo@redhat.com>, Geert
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Replying with my personal address because we're having SMTP issues]
-
-On 15/10/2018 11:52, Michael S. Tsirkin wrote:
-> On Fri, Oct 12, 2018 at 02:41:59PM -0500, Bjorn Helgaas wrote:
->> s/iommu/IOMMU/ in subject
->>
->> On Fri, Oct 12, 2018 at 03:59:13PM +0100, Jean-Philippe Brucker wrote:
->>> Using the iommu-map binding, endpoints in a given PCI domain can be
->>> managed by different IOMMUs. Some virtual machines may allow a subset of
->>> endpoints to bypass the IOMMU. In some case the IOMMU itself is presented
->>
->> s/case/cases/
->>
->>> as a PCI endpoint (e.g. AMD IOMMU and virtio-iommu). Currently, when a
->>> PCI root complex has an iommu-map property, the driver requires all
->>> endpoints to be described by the property. Allow the iommu-map property to
->>> have gaps.
->>
->> I'm not an IOMMU or virtio expert, so it's not obvious to me why it is
->> safe to allow devices to bypass the IOMMU.  Does this mean a typo in
->> iommu-map could inadvertently allow devices to bypass it?
+On Mon, Oct 15, 2018 at 02:42:09AM -0700, Christoph Hellwig wrote:
+> On Fri, Oct 12, 2018 at 06:31:58PM -0700, Joel Fernandes (Google) wrote:
+> > Android needs to mremap large regions of memory during memory management
+> > related operations.
 > 
+> Just curious: why?
+
+In Android we have a requirement of moving a large (up to a GB now, but may
+grow bigger in future) memory range from one location to another. This move
+operation has to happen when the application threads are paused for this
+operation. Therefore, an inefficient move like it is now (for example 250ms
+on arm64) will cause response time issues for applications, which is not
+acceptable. Huge pages cannot be used in such memory ranges to avoid this
+inefficiency as (when the application threads are running) our fault handlers
+are designed to process 4KB pages at a time, to keep response times low. So
+using huge pages in this context can, again, cause response time issues.
+
+Also, the mremap syscall waiting for quarter of a second for a large mremap
+is quite weird and we ought to improve it where possible.
+
+> > +	if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK)
+> > +	    || old_end - old_addr < PMD_SIZE)
 > 
-> Thinking about this comment, I would like to ask: can't the
-> virtio device indicate the ranges in a portable way?
-> This would minimize the dependency on dt bindings and ACPI,
-> enabling support for systems that have neither but do
-> have virtio e.g. through pci.
+> The || goes on the first line.
 
-I thought about adding a PROBE request for this in virtio-iommu, but it
-wouldn't be usable by a Linux guest because of a bootstrapping problem.
+Ok, fixed.
 
-Early on, Linux needs a description of device dependencies, to determine
-in which order to probe them. If the device dependency was described by
-virtio-iommu itself, the guest could for example initialize a NIC,
-allocate buffers and start DMA on the physical address space (which aborts
-if the IOMMU implementation disallows DMA by default), only to find out
-once the virtio-iommu module is loaded that it needs to cancel all DMA and
-reconfigure the NIC. With a static description such as iommu-map in DT or
-ACPI remapping tables, the guest can defer probing of the NIC until the
-IOMMU is initialized.
+> > +		} else if (extent == PMD_SIZE && IS_ENABLED(CONFIG_HAVE_MOVE_PMD)) {
+> 
+> Overly long line.
 
-Thanks,
-Jean
+Ok, fixed. Preview of updated patch is below.
+
+thanks,
+
+ - Joel
+
+------8<---
+From: "Joel Fernandes (Google)" <joel@joelfernandes.org>
+Subject: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v3)
+
+Android needs to mremap large regions of memory during memory management
+related operations. The mremap system call can be really slow if THP is
+not enabled. The bottleneck is move_page_tables, which is copying each
+pte at a time, and can be really slow across a large map. Turning on THP
+may not be a viable option, and is not for us. This patch speeds up the
+performance for non-THP system by copying at the PMD level when possible.
+
+The speed up is three orders of magnitude. On a 1GB mremap, the mremap
+completion times drops from 160-250 millesconds to 380-400 microseconds.
+
+Before:
+Total mremap time for 1GB data: 242321014 nanoseconds.
+Total mremap time for 1GB data: 196842467 nanoseconds.
+Total mremap time for 1GB data: 167051162 nanoseconds.
+
+After:
+Total mremap time for 1GB data: 385781 nanoseconds.
+Total mremap time for 1GB data: 388959 nanoseconds.
+Total mremap time for 1GB data: 402813 nanoseconds.
+
+Incase THP is enabled, the optimization is mostly skipped except in
+certain situations. I also flush the tlb every time we do this
+optimization since I couldn't find a way to determine if the low-level
+PTEs are dirty. It is seen that the cost of doing so is not much
+compared the improvement, on both x86-64 and arm64.
+
+Cc: minchan@kernel.org
+Cc: pantin@google.com
+Cc: hughd@google.com
+Cc: lokeshgidra@google.com
+Cc: dancol@google.com
+Cc: mhocko@kernel.org
+Cc: kirill@shutemov.name
+Cc: akpm@linux-foundation.org
+Cc: kernel-team@android.com
+Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+---
+ arch/Kconfig |  5 ++++
+ mm/mremap.c  | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
+
+diff --git a/arch/Kconfig b/arch/Kconfig
+index 6801123932a5..9724fe39884f 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -518,6 +518,11 @@ config HAVE_IRQ_TIME_ACCOUNTING
+ 	  Archs need to ensure they use a high enough resolution clock to
+ 	  support irq time accounting and then call enable_sched_clock_irqtime().
+ 
++config HAVE_MOVE_PMD
++	bool
++	help
++	  Archs that select this are able to move page tables at the PMD level.
++
+ config HAVE_ARCH_TRANSPARENT_HUGEPAGE
+ 	bool
+ 
+diff --git a/mm/mremap.c b/mm/mremap.c
+index 9e68a02a52b1..a8dd98a59975 100644
+--- a/mm/mremap.c
++++ b/mm/mremap.c
+@@ -191,6 +191,54 @@ static void move_ptes(struct vm_area_struct *vma, pmd_t *old_pmd,
+ 		drop_rmap_locks(vma);
+ }
+ 
++static bool move_normal_pmd(struct vm_area_struct *vma, unsigned long old_addr,
++		  unsigned long new_addr, unsigned long old_end,
++		  pmd_t *old_pmd, pmd_t *new_pmd, bool *need_flush)
++{
++	spinlock_t *old_ptl, *new_ptl;
++	struct mm_struct *mm = vma->vm_mm;
++
++	if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK) ||
++	    old_end - old_addr < PMD_SIZE)
++		return false;
++
++	/*
++	 * The destination pmd shouldn't be established, free_pgtables()
++	 * should have release it.
++	 */
++	if (WARN_ON(!pmd_none(*new_pmd)))
++		return false;
++
++	/*
++	 * We don't have to worry about the ordering of src and dst
++	 * ptlocks because exclusive mmap_sem prevents deadlock.
++	 */
++	old_ptl = pmd_lock(vma->vm_mm, old_pmd);
++	if (old_ptl) {
++		pmd_t pmd;
++
++		new_ptl = pmd_lockptr(mm, new_pmd);
++		if (new_ptl != old_ptl)
++			spin_lock_nested(new_ptl, SINGLE_DEPTH_NESTING);
++
++		/* Clear the pmd */
++		pmd = *old_pmd;
++		pmd_clear(old_pmd);
++
++		VM_BUG_ON(!pmd_none(*new_pmd));
++
++		/* Set the new pmd */
++		set_pmd_at(mm, new_addr, new_pmd, pmd);
++		if (new_ptl != old_ptl)
++			spin_unlock(new_ptl);
++		spin_unlock(old_ptl);
++
++		*need_flush = true;
++		return true;
++	}
++	return false;
++}
++
+ unsigned long move_page_tables(struct vm_area_struct *vma,
+ 		unsigned long old_addr, struct vm_area_struct *new_vma,
+ 		unsigned long new_addr, unsigned long len,
+@@ -239,7 +287,25 @@ unsigned long move_page_tables(struct vm_area_struct *vma,
+ 			split_huge_pmd(vma, old_pmd, old_addr);
+ 			if (pmd_trans_unstable(old_pmd))
+ 				continue;
++		} else if (extent == PMD_SIZE &&
++			   IS_ENABLED(CONFIG_HAVE_MOVE_PMD)) {
++			/*
++			 * If the extent is PMD-sized, try to speed the move by
++			 * moving at the PMD level if possible.
++			 */
++			bool moved;
++
++			if (need_rmap_locks)
++				take_rmap_locks(vma);
++			moved = move_normal_pmd(vma, old_addr, new_addr,
++						old_end, old_pmd, new_pmd,
++						&need_flush);
++			if (need_rmap_locks)
++				drop_rmap_locks(vma);
++			if (moved)
++				continue;
+ 		}
++
+ 		if (pte_alloc(new_vma->vm_mm, new_pmd))
+ 			break;
+ 		next = (new_addr + PMD_SIZE) & PMD_MASK;
+-- 
+2.19.1.331.ge82ca0e54c-goog
