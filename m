@@ -1,110 +1,106 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v6 17/18] mm/memory-failure: increase queued recovery
- work's priority
-Date: Mon, 15 Oct 2018 18:49:13 +0200
-Message-ID: <20181015164913.GE11434@zn.tnic>
-References: <20180921221705.6478-1-james.morse@arm.com>
- <20180921221705.6478-18-james.morse@arm.com>
+From: Jean-philippe Brucker <jphilippe.brucker-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v3 3/7] PCI: OF: Allow endpoints to bypass the iommu
+Date: Mon, 15 Oct 2018 20:45:47 +0100
+Message-ID: <6abc7321-c46a-5618-1ce7-4be85fcc38ec@gmail.com>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+	<20181012145917.6840-4-jean-philippe.brucker@arm.com>
+	<20181012194158.GX5906@bhelgaas-glaptop.roam.corp.google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1174A211
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Oct 2018 12:49:34 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QfaFKZmXtjkl for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Oct 2018 12:49:31 -0400 (EDT)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14EA140493
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Oct 2018 12:49:31 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20180921221705.6478-18-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, Peter Zijlstra <peterz@infradead.org>
-Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20181012194158.GX5906-1RhO1Y9PlrlHTL0Zs8A6p5iNqAH0jzoTYJqu5kTmcBRl57MIdRCFDg@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, "peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, Robin Murphy <Robin.Murphy-5wv7dgnIgG8@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-+ Peter.
+[Replying with my personal address because we're having SMTP issues]
 
-On Fri, Sep 21, 2018 at 11:17:04PM +0100, James Morse wrote:
-> arm64 can take an NMI-like error notification when user-space steps in
-> some corrupt memory. APEI's GHES code will call memory_failure_queue()
-> to schedule the recovery work. We then return to user-space, possibly
-> taking the fault again.
+On 12/10/2018 20:41, Bjorn Helgaas wrote:
+> s/iommu/IOMMU/ in subject
 > 
-> Currently the arch code unconditionally signals user-space from this
-> path, so we don't get stuck in this loop, but the affected process
-> never benefits from memory_failure()s recovery work. To fix this we
-> need to know the recovery work will run before we get back to user-space.
+> On Fri, Oct 12, 2018 at 03:59:13PM +0100, Jean-Philippe Brucker wrote:
+>> Using the iommu-map binding, endpoints in a given PCI domain can be
+>> managed by different IOMMUs. Some virtual machines may allow a subset of
+>> endpoints to bypass the IOMMU. In some case the IOMMU itself is presented
 > 
-> Increase the priority of the recovery work by scheduling it on the
-> system_highpri_wq, then try to bump the current task off this CPU
-> so that the recovery work starts immediately.
+> s/case/cases/
 > 
-> Reported-by: Xie XiuQi <xiexiuqi@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-> Tested-by: gengdongjiu <gengdongjiu@huawei.com>
-> CC: Xie XiuQi <xiexiuqi@huawei.com>
-> CC: gengdongjiu <gengdongjiu@huawei.com>
-> ---
->  mm/memory-failure.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>> as a PCI endpoint (e.g. AMD IOMMU and virtio-iommu). Currently, when a
+>> PCI root complex has an iommu-map property, the driver requires all
+>> endpoints to be described by the property. Allow the iommu-map property to
+>> have gaps.
 > 
-> diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-> index 0cd3de3550f0..4e7b115cea5a 100644
-> --- a/mm/memory-failure.c
-> +++ b/mm/memory-failure.c
-> @@ -56,6 +56,7 @@
->  #include <linux/memory_hotplug.h>
->  #include <linux/mm_inline.h>
->  #include <linux/memremap.h>
-> +#include <linux/preempt.h>
->  #include <linux/kfifo.h>
->  #include <linux/ratelimit.h>
->  #include <linux/page-isolation.h>
-> @@ -1454,6 +1455,7 @@ static DEFINE_PER_CPU(struct memory_failure_cpu, memory_failure_cpu);
->   */
->  void memory_failure_queue(unsigned long pfn, int flags)
->  {
-> +	int cpu = smp_processor_id();
->  	struct memory_failure_cpu *mf_cpu;
->  	unsigned long proc_flags;
->  	struct memory_failure_entry entry = {
-> @@ -1463,11 +1465,14 @@ void memory_failure_queue(unsigned long pfn, int flags)
->  
->  	mf_cpu = &get_cpu_var(memory_failure_cpu);
->  	spin_lock_irqsave(&mf_cpu->lock, proc_flags);
-> -	if (kfifo_put(&mf_cpu->fifo, entry))
-> -		schedule_work_on(smp_processor_id(), &mf_cpu->work);
-> -	else
-> +	if (kfifo_put(&mf_cpu->fifo, entry)) {
-> +		queue_work_on(cpu, system_highpri_wq, &mf_cpu->work);
-> +		set_tsk_need_resched(current);
-> +		preempt_set_need_resched();
+> I'm not an IOMMU or virtio expert, so it's not obvious to me why it is
+> safe to allow devices to bypass the IOMMU.  Does this mean a typo in
+> iommu-map could inadvertently allow devices to bypass it?
 
-What guarantees the workqueue would run before the process? I see this:
+As Robin said, a device that is absent from iommu-map will be ignored by
+the IOMMU layer, so it depends on the specific IOMMU implementation and
+driver. By default the SMMU and virtio-iommu drivers disable bypass, but
+I'm not sure about the others. I'll try to find a more accurate title for
+this patch
 
-``WQ_HIGHPRI``
-  Work items of a highpri wq are queued to the highpri
-  worker-pool of the target cpu.  Highpri worker-pools are
-  served by worker threads with elevated nice level.
+>  Should we
+> indicate something in dmesg (and/or sysfs) about devices that bypass
+> it?
 
-but is that enough?
+Good idea, I'll replace the pr_err() below with a pr_info(), instead of
+simply removing it.
 
--- 
-Regards/Gruss,
-    Boris.
+>> Relaxing of_pci_map_rid also allows the msi-map property to have gaps,
+> 
+> s/of_pci_map_rid/of_pci_map_rid()/
+> 
+>> which is invalid since MSIs always reach an MSI controller. Thankfully
+>> Linux will error out later, when attempting to find an MSI domain for the
+>> device.
+> 
+> Not clear to me what "error out" means here.  In a userspace program,
+> I would infer that the program exits with an error message, but I
+> doubt you mean that Linux exits.
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Right, I'll clarify this. It's pci_msi_setup_msi_irqs() that returns an
+error if the device is missing from msi-map, so the device driver won't be
+able to request MSIs.
+
+Thanks,
+Jean
+
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+>> ---
+>>  drivers/pci/of.c | 7 ++++---
+>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
+>> index 1836b8ddf292..2f5015bdb256 100644
+>> --- a/drivers/pci/of.c
+>> +++ b/drivers/pci/of.c
+>> @@ -451,9 +451,10 @@ int of_pci_map_rid(struct device_node *np, u32 rid,
+>>  		return 0;
+>>  	}
+>>  
+>> -	pr_err("%pOF: Invalid %s translation - no match for rid 0x%x on %pOF\n",
+>> -		np, map_name, rid, target && *target ? *target : NULL);
+>> -	return -EFAULT;
+>> +	/* Bypasses translation */
+>> +	if (id_out)
+>> +		*id_out = rid;
+>> +	return 0;
+>>  }
+>>  
+>>  #if IS_ENABLED(CONFIG_OF_IRQ)
+>> -- 
+>> 2.19.1
+>>
+> 
