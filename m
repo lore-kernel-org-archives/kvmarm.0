@@ -1,46 +1,110 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH V4 00/15] x86/KVM/Hyper-v: Add HV ept tlb range flush
- hypercall support in KVM
-Date: Mon, 15 Oct 2018 14:04:43 +0200
-Message-ID: <d9414a38-ca5c-4273-30dc-1fecd0f9268e@redhat.com>
-References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v6 17/18] mm/memory-failure: increase queued recovery
+ work's priority
+Date: Mon, 15 Oct 2018 18:49:13 +0200
+Message-ID: <20181015164913.GE11434@zn.tnic>
+References: <20180921221705.6478-1-james.morse@arm.com>
+ <20180921221705.6478-18-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: lantianyu1986@gmail.com
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, benh@kernel.crashing.org, catalin.marinas@arm.com, christoffer.dall@arm.com, devel@linuxdriverproject.org, haiyangz@microsoft.com, hpa@zytor.com, jhogan@kernel.org, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, kys@microsoft.com, linux-arm-kernel@lists.infradead.org, linux@armlinux.org, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, linuxppc-dev@lists.ozlabs.org, marc.zyngier@arm.com, mingo@redhat.com, mpe@ellerman.id.au, paul.burton@mips.com, paulus@ozlabs.org, ralf@linux-mips.org, rkrcmar@redhat.com, sthemmin@microsoft.com, tglx@linutronix.de, will.deacon@arm.com, x86@kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1174A211
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Oct 2018 12:49:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QfaFKZmXtjkl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Oct 2018 12:49:31 -0400 (EDT)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14EA140493
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Oct 2018 12:49:31 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20180921221705.6478-18-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: jonathan.zhang@cavium.com, Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Punit Agrawal <punit.agrawal@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/10/2018 16:53, lantianyu1986@gmail.com wrote:
-> From: Lan Tianyu <Tianyu.Lan@microsoft.com>
++ Peter.
+
+On Fri, Sep 21, 2018 at 11:17:04PM +0100, James Morse wrote:
+> arm64 can take an NMI-like error notification when user-space steps in
+> some corrupt memory. APEI's GHES code will call memory_failure_queue()
+> to schedule the recovery work. We then return to user-space, possibly
+> taking the fault again.
 > 
-> For nested memory virtualization, Hyper-v doesn't set write-protect
-> L1 hypervisor EPT page directory and page table node to track changes 
-> while it relies on guest to tell it changes via HvFlushGuestAddressLlist
-> hypercall. HvFlushGuestAddressLlist hypercall provides a way to flush
-> EPT page table with ranges which are specified by L1 hypervisor.
+> Currently the arch code unconditionally signals user-space from this
+> path, so we don't get stuck in this loop, but the affected process
+> never benefits from memory_failure()s recovery work. To fix this we
+> need to know the recovery work will run before we get back to user-space.
 > 
-> If L1 hypervisor uses INVEPT or HvFlushGuestAddressSpace hypercall to
-> flush EPT tlb, Hyper-V will invalidate associated EPT shadow page table
-> and sync L1's EPT table when next EPT page fault is triggered.
-> HvFlushGuestAddressLlist hypercall helps to avoid such redundant EPT
-> page fault and synchronization of shadow page table.
+> Increase the priority of the recovery work by scheduling it on the
+> system_highpri_wq, then try to bump the current task off this CPU
+> so that the recovery work starts immediately.
+> 
+> Reported-by: Xie XiuQi <xiexiuqi@huawei.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Tested-by: gengdongjiu <gengdongjiu@huawei.com>
+> CC: Xie XiuQi <xiexiuqi@huawei.com>
+> CC: gengdongjiu <gengdongjiu@huawei.com>
+> ---
+>  mm/memory-failure.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+> index 0cd3de3550f0..4e7b115cea5a 100644
+> --- a/mm/memory-failure.c
+> +++ b/mm/memory-failure.c
+> @@ -56,6 +56,7 @@
+>  #include <linux/memory_hotplug.h>
+>  #include <linux/mm_inline.h>
+>  #include <linux/memremap.h>
+> +#include <linux/preempt.h>
+>  #include <linux/kfifo.h>
+>  #include <linux/ratelimit.h>
+>  #include <linux/page-isolation.h>
+> @@ -1454,6 +1455,7 @@ static DEFINE_PER_CPU(struct memory_failure_cpu, memory_failure_cpu);
+>   */
+>  void memory_failure_queue(unsigned long pfn, int flags)
+>  {
+> +	int cpu = smp_processor_id();
+>  	struct memory_failure_cpu *mf_cpu;
+>  	unsigned long proc_flags;
+>  	struct memory_failure_entry entry = {
+> @@ -1463,11 +1465,14 @@ void memory_failure_queue(unsigned long pfn, int flags)
+>  
+>  	mf_cpu = &get_cpu_var(memory_failure_cpu);
+>  	spin_lock_irqsave(&mf_cpu->lock, proc_flags);
+> -	if (kfifo_put(&mf_cpu->fifo, entry))
+> -		schedule_work_on(smp_processor_id(), &mf_cpu->work);
+> -	else
+> +	if (kfifo_put(&mf_cpu->fifo, entry)) {
+> +		queue_work_on(cpu, system_highpri_wq, &mf_cpu->work);
+> +		set_tsk_need_resched(current);
+> +		preempt_set_need_resched();
 
-So I just told you that the first part is well understood but I must
-retract that; after carefully reviewing the whole series, I think one of
-us is actually very confused.
+What guarantees the workqueue would run before the process? I see this:
 
-I am not afraid to say it can be me, but my understanding is that you're
-passing L1 GPAs to the hypercall and instead the spec says it expects L2
-GPAs.  (Consider that, because KVM's shadow paging code is shared
-between nested EPT and !EPT cases, every time you see gpa/gfn in the
-code it is for L1, while nested EPT GPAs are really what the code calls
-gva.)
+``WQ_HIGHPRI``
+  Work items of a highpri wq are queued to the highpri
+  worker-pool of the target cpu.  Highpri worker-pools are
+  served by worker threads with elevated nice level.
 
-What's going on?
+but is that enough?
 
-Paolo
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
