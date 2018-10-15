@@ -1,109 +1,41 @@
-From: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 3/7] PCI: OF: Allow endpoints to bypass the iommu
-Date: Mon, 15 Oct 2018 12:32:51 +0100
-Message-ID: <33bd48e9-a061-e97d-ff00-daf5097b8e1f@arm.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012145917.6840-4-jean-philippe.brucker@arm.com>
-	<20181012194158.GX5906@bhelgaas-glaptop.roam.corp.google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH V4 2/15] KVM/MMU: Add tlb flush with range helper function
+Date: Mon, 15 Oct 2018 14:02:58 +0200
+Message-ID: <fc78b7f2-70aa-29fa-95ca-d599f76c8f1a@redhat.com>
+References: <20181013145406.4911-1-Tianyu.Lan@microsoft.com>
+ <20181013145406.4911-3-Tianyu.Lan@microsoft.com>
+ <4D709C3A-A91C-4CA7-922A-E77618EF21B4@oracle.com>
+ <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20181012194158.GX5906-1RhO1Y9PlrlHTL0Zs8A6p5iNqAH0jzoTYJqu5kTmcBRl57MIdRCFDg@public.gmane.org>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.orgnd-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.21.1810141014350.1438@nanos.tec.linutronix.de>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>, Liran Alon <liran.alon@oracle.com>
+Cc: lantianyu1986@gmail.com, Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, rkrcmar@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, devel@linuxdriverproject.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/10/18 20:41, Bjorn Helgaas wrote:
-> s/iommu/IOMMU/ in subject
+On 14/10/2018 10:16, Thomas Gleixner wrote:
+>>> +static inline bool kvm_available_flush_tlb_with_range(void)
+>>> +{
+>>> +	return kvm_x86_ops->tlb_remote_flush_with_range;
+>>> +}
+>> Seems that kvm_available_flush_tlb_with_range() is not used in this patch…
+> What's wrong with that? 
 > 
-> On Fri, Oct 12, 2018 at 03:59:13PM +0100, Jean-Philippe Brucker wrote:
->> Using the iommu-map binding, endpoints in a given PCI domain can be
->> managed by different IOMMUs. Some virtual machines may allow a subset of
->> endpoints to bypass the IOMMU. In some case the IOMMU itself is presented
-> 
-> s/case/cases/
-> 
->> as a PCI endpoint (e.g. AMD IOMMU and virtio-iommu). Currently, when a
->> PCI root complex has an iommu-map property, the driver requires all
->> endpoints to be described by the property. Allow the iommu-map property to
->> have gaps.
-> 
-> I'm not an IOMMU or virtio expert, so it's not obvious to me why it is
-> safe to allow devices to bypass the IOMMU.  Does this mean a typo in
-> iommu-map could inadvertently allow devices to bypass it?  Should we
-> indicate something in dmesg (and/or sysfs) about devices that bypass
-> it?
+> It provides the implementation and later patches make use of it. It's a
+> sensible way to split patches into small, self contained entities.
 
-It's not really "allow devices to bypass the IOMMU" so much as "allow DT 
-to describe devices which the IOMMU doesn't translate". It's a bit of an 
-edge case for not-really-PCI devices, but FWIW I can certainly think of 
-several ways to build real hardware like that. As for inadvertent errors 
-leaving out IDs which *should* be in the map, that really depends on the 
-IOMMU/driver implementation - e.g. SMMUv2 with arm-smmu.disable_bypass=0 
-would treat the device as untranslated, whereas SMMUv3 would always 
-generate a fault upon any transaction due to no valid stream table entry 
-being programmed (not even a bypass one).
+That's true, on the other hand I have indeed a concerns with this patch:
+this series is not bisectable at all, because all the new code is dead
+until the very last patch.  Uses of the new feature should come _after_
+the implementation.
 
-I reckon it's a sufficiently unusual case that keeping some sort of 
-message probably is worthwhile (at pr_info rather than pr_err) in case 
-someone does hit it by mistake.
+I don't have any big problem with what Liran pointed out (and I can live
+with the unused static functions that would warn with -Wunused, too),
+but the above should be fixed in v5, basically by moving patches 12-15
+at the beginning of the series.
 
->> Relaxing of_pci_map_rid also allows the msi-map property to have gaps,
-
-At worst, I suppose we could always add yet another parameter for each 
-caller to choose whether a missing entry is considered an error or not.
-
-Robin.
-
-> s/of_pci_map_rid/of_pci_map_rid()/
-> 
->> which is invalid since MSIs always reach an MSI controller. Thankfully
->> Linux will error out later, when attempting to find an MSI domain for the
->> device.
-> 
-> Not clear to me what "error out" means here.  In a userspace program,
-> I would infer that the program exits with an error message, but I
-> doubt you mean that Linux exits.
-> 
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
->> ---
->>   drivers/pci/of.c | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
->> index 1836b8ddf292..2f5015bdb256 100644
->> --- a/drivers/pci/of.c
->> +++ b/drivers/pci/of.c
->> @@ -451,9 +451,10 @@ int of_pci_map_rid(struct device_node *np, u32 rid,
->>   		return 0;
->>   	}
->>   
->> -	pr_err("%pOF: Invalid %s translation - no match for rid 0x%x on %pOF\n",
->> -		np, map_name, rid, target && *target ? *target : NULL);
->> -	return -EFAULT;
->> +	/* Bypasses translation */
->> +	if (id_out)
->> +		*id_out = rid;
->> +	return 0;
->>   }
->>   
->>   #if IS_ENABLED(CONFIG_OF_IRQ)
->> -- 
->> 2.19.1
->>
-> _______________________________________________
-> iommu mailing list
-> iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> 
+Paolo
