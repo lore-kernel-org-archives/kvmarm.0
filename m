@@ -1,252 +1,84 @@
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: Re: [PATCH v5 11/17] arm64: docs: document pointer authentication
-Date: Tue, 16 Oct 2018 17:14:39 +0100
-Message-ID: <7b0de19b-45b9-f4df-25d1-c7e80fab49dc@arm.com>
-References: <20181005084754.20950-1-kristina.martsenko@arm.com>
- <20181005084754.20950-12-kristina.martsenko@arm.com>
- <9acb0cd2-66b0-1c41-b1a8-7c70608e9a9b@foss.arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v3 0/7] Add virtio-iommu driver
+Date: Tue, 16 Oct 2018 19:44:09 +0100
+Message-ID: <b2f929c3-b0df-acdc-c5e8-0d7ddf7ed964@arm.com>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+ <7874471b-3711-ca44-d220-5e756ac7db8c@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9acb0cd2-66b0-1c41-b1a8-7c70608e9a9b@foss.arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 718B249E3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Oct 2018 14:44:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6eOxaQPBIuAM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Oct 2018 14:44:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F355E40493
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Oct 2018 14:44:26 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <7874471b-3711-ca44-d220-5e756ac7db8c@redhat.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Ramana Radhakrishnan <ramana.radhakrishnan@foss.arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <Amit.Kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Kees Cook <keescook@chromium.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "robh+dt@kernel.org" <robh+dt@kernel.org>, Robin Murphy <Robin.Murphy@arm.com>, "joro@8bytes.org" <joro@8bytes.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/10/2018 10:04, Ramana Radhakrishnan wrote:
-> On 05/10/2018 09:47, Kristina Martsenko wrote:
->> From: Mark Rutland <mark.rutland@arm.com>
->>
->> Now that we've added code to support pointer authentication, add some
->> documentation so that people can figure out if/how to use it.
->>
->> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
->> [kristina: update cpu-feature-registers.txt]
->> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
->> Cc: Andrew Jones <drjones@redhat.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   Documentation/arm64/booting.txt                |  8 +++
->>   Documentation/arm64/cpu-feature-registers.txt  |  4 ++
->>   Documentation/arm64/elf_hwcaps.txt             |  5 ++
->>   Documentation/arm64/pointer-authentication.txt | 84
->> ++++++++++++++++++++++++++
->>   4 files changed, 101 insertions(+)
->>   create mode 100644 Documentation/arm64/pointer-authentication.txt
->>
->> diff --git a/Documentation/arm64/booting.txt
->> b/Documentation/arm64/booting.txt
->> index 8d0df62c3fe0..8df9f4658d6f 100644
->> --- a/Documentation/arm64/booting.txt
->> +++ b/Documentation/arm64/booting.txt
->> @@ -205,6 +205,14 @@ Before jumping into the kernel, the following
->> conditions must be met:
->>       ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b0.
->>     - The DT or ACPI tables must describe a GICv2 interrupt controller.
->>   +  For CPUs with pointer authentication functionality:
->> +  - If EL3 is present:
->> +    SCR_EL3.APK (bit 16) must be initialised to 0b1
->> +    SCR_EL3.API (bit 17) must be initialised to 0b1
->> +  - If the kernel is entered at EL1:
->> +    HCR_EL2.APK (bit 40) must be initialised to 0b1
->> +    HCR_EL2.API (bit 41) must be initialised to 0b1
->> +
->>   The requirements described above for CPU mode, caches, MMUs,
->> architected
->>   timers, coherency and system registers apply to all CPUs.  All CPUs
->> must
->>   enter the kernel in the same exception level.
->> diff --git a/Documentation/arm64/cpu-feature-registers.txt
->> b/Documentation/arm64/cpu-feature-registers.txt
->> index 7964f03846b1..b165677ffab9 100644
->> --- a/Documentation/arm64/cpu-feature-registers.txt
->> +++ b/Documentation/arm64/cpu-feature-registers.txt
->> @@ -190,6 +190,10 @@ infrastructure:
->>        |--------------------------------------------------|
->>        | JSCVT                        | [15-12] |    y    |
->>        |--------------------------------------------------|
->> +     | API                          | [11-8]  |    y    |
->> +     |--------------------------------------------------|
->> +     | APA                          | [7-4]   |    y    |
->> +     |--------------------------------------------------|
->>        | DPB                          | [3-0]   |    y    |
->>        x--------------------------------------------------x
->>   diff --git a/Documentation/arm64/elf_hwcaps.txt
->> b/Documentation/arm64/elf_hwcaps.txt
->> index d6aff2c5e9e2..95509a7b0ffe 100644
->> --- a/Documentation/arm64/elf_hwcaps.txt
->> +++ b/Documentation/arm64/elf_hwcaps.txt
->> @@ -178,3 +178,8 @@ HWCAP_ILRCPC
->>   HWCAP_FLAGM
->>         Functionality implied by ID_AA64ISAR0_EL1.TS == 0b0001.
->> +
->> +HWCAP_APIA
->> +
->> +    EL0 AddPac and Auth functionality using APIAKey_EL1 is enabled, as
->> +    described by Documentation/arm64/pointer-authentication.txt.
->> diff --git a/Documentation/arm64/pointer-authentication.txt
->> b/Documentation/arm64/pointer-authentication.txt
->> new file mode 100644
->> index 000000000000..8a9cb5713770
->> --- /dev/null
->> +++ b/Documentation/arm64/pointer-authentication.txt
->> @@ -0,0 +1,84 @@
->> +Pointer authentication in AArch64 Linux
->> +=======================================
->> +
->> +Author: Mark Rutland <mark.rutland@arm.com>
->> +Date: 2017-07-19
->> +
->> +This document briefly describes the provision of pointer authentication
->> +functionality in AArch64 Linux.
->> +
->> +
->> +Architecture overview
->> +---------------------
->> +
->> +The ARMv8.3 Pointer Authentication extension adds primitives that can be
->> +used to mitigate certain classes of attack where an attacker can corrupt
->> +the contents of some memory (e.g. the stack).
->> +
->> +The extension uses a Pointer Authentication Code (PAC) to determine
->> +whether pointers have been modified unexpectedly. A PAC is derived from
->> +a pointer, another value (such as the stack pointer), and a secret key
->> +held in system registers.
->> +
->> +The extension adds instructions to insert a valid PAC into a pointer,
->> +and to verify/remove the PAC from a pointer. The PAC occupies a number
->> +of high-order bits of the pointer, which varies dependent on the
->> +configured virtual address size and whether pointer tagging is in use.
-> 
-> s/pointer tagging/top byte ignore unless that's the terminology in the
-> rest of the kernel documentation ?
-
-The rest of the kernel documentation calls them "tagged pointers", and
-doesn't use "top byte ignore", for example
-Documentation/arm64/tagged-pointers.txt:
-https://elixir.bootlin.com/linux/latest/source/Documentation/arm64/tagged-pointers.txt
-
-> 
->> +
->> +A subset of these instructions have been allocated from the HINT
->> +encoding space. In the absence of the extension (or when disabled),
->> +these instructions behave as NOPs. Applications and libraries using
->> +these instructions operate correctly regardless of the presence of the
->> +extension.
->> +
->> +
->> +Basic support
->> +-------------
->> +
->> +When CONFIG_ARM64_PTR_AUTH is selected, and relevant HW support is
->> +present, the kernel will assign a random APIAKey value to each process
->> +at exec*() time. This key is shared by all threads within the process,
->> +and the key is preserved across fork(). Presence of functionality using
->> +APIAKey is advertised via HWCAP_APIA.
->> +
->> +Recent versions of GCC can compile code with APIAKey-based return
->> +address protection when passed the -msign-return-address option. This
->> +uses instructions in the HINT space, and such code can run on systems
->> +without the pointer authentication extension.
-> 
-> Just a clarification.
-> 
-> This uses instructions in the hint space for architecture levels less
-> than armv8.3-a by default. If folks use -march=armv8.3-a you will start
-> seeing the combined forms of retaa appear.
-
-I'll amend this to:
-
-"This uses instructions in the HINT space (unless -march=armv8.3-a or
-higher is also passed), and such code can run on systems without the
-pointer authentication extension."
-
-> 
->> +
->> +The remaining instruction and data keys (APIBKey, APDAKey, APDBKey) are
->> +reserved for future use, and instructions using these keys must not be
->> +used by software until a purpose and scope for their use has been
->> +decided. To enable future software using these keys to function on
->> +contemporary kernels, where possible, instructions using these keys are
->> +made to behave as NOPs.
->> +
->> +The generic key (APGAKey) is currently unsupported. Instructions using
->> +the generic key must not be used by software.
->> +
->> +
->> +Debugging
->> +---------
->> +
->> +When CONFIG_ARM64_PTR_AUTH is selected, and relevant HW support is
->> +present, the kernel will expose the position of TTBR0 PAC bits in the
->> +NT_ARM_PAC_MASK regset (struct user_pac_mask), which userspace can
->> +acqure via PTRACE_GETREGSET.
->> +
->> +Separate masks are exposed for data pointers and instruction pointers,
->> +as the set of PAC bits can vary between the two. Debuggers should not
->> +expect that HWCAP_APIA implies the presence (or non-presence) of this
->> +regset -- in future the kernel may support the use of APIBKey, APDAKey,
->> +and/or APBAKey, even in the absence of APIAKey.
->> +
->> +Note that the masks apply to TTBR0 addresses, and are not valid to apply
->> +to TTBR1 addresses (e.g. kernel pointers).
->> +
->> +
->> +Virtualization
->> +--------------
->> +
->> +Pointer authentication is not currently supported in KVM guests. KVM
->> +will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
->> +the feature will result in an UNDEFINED exception being injected into
->> +the guest.
-> 
-> However applications using instructions from the hint space will
-> continue to work albeit without any protection (as they would just be
-> nops) ?
-
-Mostly, yes. If the guest leaves SCTLR_EL1.EnIA unset (and
-EnIB/EnDA/EnDB), then PAC* and AUT* instructions in the HINT space will
-execute as NOPs. If the guest sets EnIA, then PAC*/AUT* instructions
-will trap and KVM will inject an "Unknown reason" exception into the
-guest (which will cause a Linux guest to send a SIGILL to the application).
-
-In the latter case we could instead pretend the instruction was a NOP
-and not inject an exception, but trapping twice per every function would
-probably be terrible for performance. The guest shouldn't be setting
-EnIA anyway if ID_AA64ISAR1_EL1 reports that pointer authentication is
-not present (because KVM has hidden it).
-
-The other special case is the XPACLRI instruction, which is also in the
-HINT space. Currently it will trap and KVM will inject an exception into
-the guest. We should probably change this to NOP instead, as that's what
-applications will expect. Unfortunately there is no EnIA-like control to
-make it NOP.
-
-One option is for KVM to pretend the instruction was a NOP and return to
-the guest. But if XPACLRI gets executed frequently, then the constant
-trapping might hurt performance. I don't know how frequently it might
-get used, as I don't know of any applications currently using it. From
-what I understand, it may be used by userspace stack unwinders.
-
-(Also worth noting - as far as I can tell there is no easy way for KVM
-to know which pointer authentication instruction caused the trap, so we
-may have to do something unusual like use "at s12e1r" to read guest
-memory and check for XPACLRI.)
-
-The other option is to turn off trapping entirely. However then on a
-big.LITTLE system with mismatched pointer authentication support
-instructions will work intermittently on some CPUs but not others.
-
-Thoughts?
-
-> 
-> Reviewed-by: Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
-
-Thanks!
-
-Kristina
+T24gMTYvMTAvMjAxOCAxMDoyNSwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBKZWFuLAo+IAo+IE9u
+IDEwLzEyLzE4IDQ6NTkgUE0sIEplYW4tUGhpbGlwcGUgQnJ1Y2tlciB3cm90ZToKPj4gSW1wbGVt
+ZW50IHRoZSB2aXJ0aW8taW9tbXUgZHJpdmVyLCBmb2xsb3dpbmcgc3BlY2lmaWNhdGlvbiB2MC44
+IFsxXS4KPj4gQ2hhbmdlcyBzaW5jZSB2MiBbMl06Cj4+IAo+PiAqIFBhdGNoZXMgMi00IGFsbG93
+IHZpcnRpby1pb21tdSB0byB1c2UgdGhlIFBDSSB0cmFuc3BvcnQsIHNpbmNlIFFFTVUKPj7CoMKg
+IHdvdWxkIGxpa2UgdG8gcGhhc2Ugb3V0IHRoZSBNTUlPIHRyYW5zcG9ydC4gVGhpcyBwcm9kdWNl
+cyBhIGNvbXBsZXgKPj7CoMKgIHRvcG9sb2d5IHdoZXJlIHRoZSBwcm9ncmFtbWluZyBpbnRlcmZh
+Y2Ugb2YgdGhlIElPTU1VIGNvdWxkIGFwcGVhcgo+PsKgwqAgbG93ZXIgdGhhbiB0aGUgZW5kcG9p
+bnRzIHRoYXQgaXQgdHJhbnNsYXRlcy4gSXQncyBub3QgdW5oZWFyZCBvZiAoZS5nLgo+PsKgwqAg
+QU1EIElPTU1VKSwgYW5kIHRoZSBndWVzdCBlYXNpbHkgY29wZXMgd2l0aCB0aGlzLgo+PsKgwqAg
+Cj4+wqDCoCBUaGUgIkZpcm13YXJlIGRlc2NyaXB0aW9uIiBzZWN0aW9uIG9mIHRoZSBzcGVjaWZp
+Y2F0aW9uIGhhcyBiZWVuCj4+wqDCoCB1cGRhdGVkIHdpdGggYWxsIGNvbWJpbmF0aW9ucyBvZiBQ
+Q0ksIE1NSU8gYW5kIERULCBBQ1BJLgo+IAo+IEkgaGF2ZSBhIHF1ZXN0aW9uIHdydCB0aGUgRlcg
+c3BlY2lmaWNhdGlvbi4gVGhlIElPTU1VIGNvbnN1bWVzIDEgc2xvdCBpbgo+IHRoZSBQQ0kgZG9t
+YWluIGFuZCBvbmUgbmVlZHMgdG8gbGVhdmUgYSBSSUQgaG9sZSBpbiB0aGUgaW9tbXUtbWFwLsKg
+IEl0Cj4gaXMgbm90IG9idmlvdXMgdG8gbWUgdGhhdCB0aGlzIFJJRCBhbHdheXMgaXMgcHJlZGlj
+dGFibGUgZ2l2ZW4gdGhlIHBjaWUKPiBlbnVtZXJhdGlvbiBtZWNoYW5pc20uIEdlbmVyYWxseSB3
+ZSBoYXZlIGEgY29hcnNlIGdyYWluIG1hcHBpbmcgb2YgUklECj4gb250byBpb21tdSBwaGFuZGxl
+cy9TVFJFQU1JRHMuIEhlcmUsIGlmIEkgdW5kZXJzdGFuZCBjb3JyZWN0bHkgd2UgbmVlZAo+IHRv
+IHByZWNpc2VseSBpZGVudGlmeSB0aGUgUklEIGdyYW50ZWQgdG8gdGhlIGlvbW11LiBPbiBRRU1V
+IHRoaXMgbWF5Cj4gZGVwZW5kIG9uIHRoZSBpbnN0YW50aWF0aW9uIG9yZGVyIG9mIHRoZSB2aXJ0
+aW8tcGNpIGRldmljZSByaWdodD8KClllcywgYWx0aG91Z2ggaXQgc2hvdWxkIGFsbCBoYXBwZW4g
+YmVmb3JlIHlvdSBib290IHRoZSBndWVzdCwgc2luY2UKdGhlcmUgaXMgbm8gaG90cGx1Z2dpbmcg
+YW4gSU9NTVUuIENvdWxkIHlvdSByZXNlcnZlIGEgUENJIHNsb3QgdXBmcm9udAphbmQgdXNlIGl0
+IGZvciB2aXJ0aW8taW9tbXUgbGF0ZXI/IE9yIGdlbmVyYXRlIHRoZSBpb21tdS1tYXAgYXQgdGhl
+IHNhbWUKdGltZSBhcyBnZW5lcmF0aW5nIHRoZSBjaGlsZCBub2RlIG9mIHRoZSBQQ0kgUkM/Cgo+
+IFNvCj4gdGhpcyBkb2VzIG5vdCBsb29rIHRyaXZpYWwgdG8gYnVpbGQgdGhpcyBpbmZvLiBJc24n
+dCBpdCBwb3NzaWJsZSB0byBkbwo+IHRoaXMgZXhjbHVzaW9uIGF0IGtlcm5lbCBsZXZlbCBpbnN0
+ZWFkPwoKU28gaW4gdGhlb3J5IFZJUlRJT19GX0lPTU1VX1BMQVRGT1JNIGFscmVhZHkgZG9lcyB0
+aGF0OgoKVklSVElPX0ZfSU9NTVVfUExBVEZPUk0oMzMpCiAgICBUaGlzIGZlYXR1cmUgaW5kaWNh
+dGVzIHRoYXQgdGhlIGRldmljZSBpcyBiZWhpbmQgYW4gSU9NTVUgdGhhdAogICAgdHJhbnNsYXRl
+cyBidXMgYWRkcmVzc2VzIGZyb20gdGhlIGRldmljZSBpbnRvIHBoeXNpY2FsIGFkZHJlc3NlcyBp
+bgogICAgbWVtb3J5LiBJZiB0aGlzIGZlYXR1cmUgYml0IGlzIHNldCB0byAwLCB0aGVuIHRoZSBk
+ZXZpY2UgZW1pdHMKICAgIHBoeXNpY2FsIGFkZHJlc3NlcyB3aGljaCBhcmUgbm90IHRyYW5zbGF0
+ZWQgZnVydGhlciwgZXZlbiB0aG91Z2ggYW4KICAgIElPTU1VIG1heSBiZSBwcmVzZW50LgoKRm9y
+IGJldHRlciBvciBmb3Igd29yc2UsIHRoZSBndWVzdCBoYXMgdG8gaW1wbGVtZW50IGl0LiBJZiB0
+aGlzIGZlYXR1cmUKYml0IGlzIHVuc2V0IGZvciB2aXJ0aW8taW9tbXUsIGl0IGRvZXMgRE1BIG9u
+IHRoZSBwaHlzaWNhbCBhZGRyZXNzCnNwYWNlLCByZWdhcmRsZXNzIG9mIHdoYXQgdGhlIHN0YXRp
+YyB0b3BvbG9neSBkZXNjcmlwdGlvbiBzYXlzLgoKSW4gcHJhY3RpY2UgaXQgZG9lc24ndCBxdWl0
+ZSB3b3JrLiBJZiB5b3VyIGlvbW11LW1hcCBkZXNjcmliZXMgdGhlIElPTU1VCmFzIHRyYW5zbGF0
+aW5nIGl0c2VsZiwgTGludXgnIE9GIGNvZGUgd2lsbCB3YWl0IGZvciB0aGUgSU9NTVUgdG8gYmUK
+cHJvYmVkIGJlZm9yZSBwcm9iaW5nIHRoZSBJT01NVS4gV29ya2luZyBhcm91bmQgdGhpcyB3aXRo
+IGhhY2tzIGlzCnBvc3NpYmxlLCBidXQgSSBkb24ndCB3YW50IHRvIGludHJvZHVjZSBtb3JlIHF1
+ZXN0aW9uYWJsZSBjb2RlIHRvIE9GIGFuZApkZXZpY2UgdHJlZSBiaW5kaW5ncyBpZiB0aGVyZSBp
+cyBhbnkgb3RoZXIgd2F5LgoKVGhhbmtzLApKZWFuCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
