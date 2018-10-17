@@ -1,174 +1,105 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: [PATCH v3 7/7] arm/kvm: arm64: Add a vcpu feature for pointer
- authentication
-Date: Wed, 17 Oct 2018 16:18:00 +0530
-Message-ID: <1539773280-4159-8-git-send-email-amit.kachhap@arm.com>
-References: <1539773280-4159-1-git-send-email-amit.kachhap@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v3 0/7] Add virtio-iommu driver
+Date: Wed, 17 Oct 2018 12:54:28 +0100
+Message-ID: <40dddb20-6248-5bb0-e0ed-48bacd1867a1@arm.com>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+	<7874471b-3711-ca44-d220-5e756ac7db8c@redhat.com>
+	<b2f929c3-b0df-acdc-c5e8-0d7ddf7ed964@arm.com>
+	<c7167c51-d864-08f5-c128-f4b3257840ce@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C65554A1D1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 06:49:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DWO+yZlK1ymt for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Oct 2018 06:49:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66FEA4A1DC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 06:49:25 -0400 (EDT)
-In-Reply-To: <1539773280-4159-1-git-send-email-amit.kachhap@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+In-Reply-To: <c7167c51-d864-08f5-c128-f4b3257840ce@redhat.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
+To: Auger Eric <eric.auger@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Cc: Mark Rutland <Mark.Rutland@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "robh+dt@kernel.org" <robh+dt@kernel.org>, Robin Murphy <Robin.Murphy@arm.com>, "joro@8bytes.org" <joro@8bytes.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This is a runtime feature and can be enabled by --ptrauth option.
-
-Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arm/aarch32/include/kvm/kvm-cpu-arch.h    | 2 ++
- arm/aarch64/include/asm/kvm.h             | 3 +++
- arm/aarch64/include/kvm/kvm-arch.h        | 1 +
- arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    | 2 ++
- arm/aarch64/kvm-cpu.c                     | 5 +++++
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- arm/kvm-cpu.c                             | 7 +++++++
- include/linux/kvm.h                       | 1 +
- 9 files changed, 25 insertions(+), 1 deletion(-)
-
-diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index d28ea67..5779767 100644
---- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -13,4 +13,6 @@
- #define ARM_CPU_ID		0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
- 
-+unsigned int kvm__cpu_ptrauth_get_feature(void) {}
-+
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index c286035..0fd183d 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -98,6 +98,9 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
- 
-+/* CPU uses address authentication and A key */
-+#define KVM_ARM_VCPU_PTRAUTH		4
-+
- struct kvm_vcpu_init {
- 	__u32 target;
- 	__u32 features[7];
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index 9de623a..bd566cb 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -11,4 +11,5 @@
- 
- #include "arm-common/kvm-arch.h"
- 
-+
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..2074684 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,7 +8,9 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_BOOLEAN('\0', "ptrauth", &(cfg)->has_ptrauth,		\
-+			"Enable address authentication"),
- 
- #include "arm-common/kvm-config-arch.h"
- 
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563..f7b64b7 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -17,4 +17,6 @@
- #define ARM_CPU_CTRL		3, 0, 1, 0
- #define ARM_CPU_CTRL_SCTLR_EL1	0
- 
-+unsigned int kvm__cpu_ptrauth_get_feature(void);
-+
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 1b29374..10da2cb 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -123,6 +123,11 @@ void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
- 		return reset_vcpu_aarch64(vcpu);
- }
- 
-+unsigned int kvm__cpu_ptrauth_get_feature(void)
-+{
-+	return (1UL << KVM_ARM_VCPU_PTRAUTH);
-+}
-+
- int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- {
- 	struct kvm_one_reg reg;
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 6a196f1..eb872db 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -10,6 +10,7 @@ struct kvm_config_arch {
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
- 	u64		kaslr_seed;
-+	bool		has_ptrauth;
- 	enum irqchip_type irqchip;
- };
- 
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 7780251..5afd727 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -68,6 +68,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
- 	}
- 
-+	/* Set KVM_ARM_VCPU_PTRAUTH_I_A if available */
-+	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH)) {
-+		if (kvm->cfg.arch.has_ptrauth)
-+			vcpu_init.features[0] |=
-+					kvm__cpu_ptrauth_get_feature();
-+	}
-+
- 	/*
- 	 * If the preferred target ioctl is successful then
- 	 * use preferred target else try each and every target type
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index f51d508..ffd8f5c 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -883,6 +883,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_MMU_RADIX 134
- #define KVM_CAP_PPC_MMU_HASH_V3 135
- #define KVM_CAP_IMMEDIATE_EXIT 136
-+#define KVM_CAP_ARM_PTRAUTH 160
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.7.4
+T24gMTYvMTAvMjAxOCAyMTozMSwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBKZWFuLAo+IAo+IE9u
+IDEwLzE2LzE4IDg6NDQgUE0sIEplYW4tUGhpbGlwcGUgQnJ1Y2tlciB3cm90ZToKPj4gT24gMTYv
+MTAvMjAxOCAxMDoyNSwgQXVnZXIgRXJpYyB3cm90ZToKPj4+IEhpIEplYW4sCj4+Pgo+Pj4gT24g
+MTAvMTIvMTggNDo1OSBQTSwgSmVhbi1QaGlsaXBwZSBCcnVja2VyIHdyb3RlOgo+Pj4+IEltcGxl
+bWVudCB0aGUgdmlydGlvLWlvbW11IGRyaXZlciwgZm9sbG93aW5nIHNwZWNpZmljYXRpb24gdjAu
+OCBbMV0uCj4+Pj4gQ2hhbmdlcyBzaW5jZSB2MiBbMl06Cj4+Pj4KPj4+PiAqIFBhdGNoZXMgMi00
+IGFsbG93IHZpcnRpby1pb21tdSB0byB1c2UgdGhlIFBDSSB0cmFuc3BvcnQsIHNpbmNlIFFFTVUK
+Pj4+PiDCoMKgIHdvdWxkIGxpa2UgdG8gcGhhc2Ugb3V0IHRoZSBNTUlPIHRyYW5zcG9ydC4gVGhp
+cyBwcm9kdWNlcyBhIGNvbXBsZXgKPj4+PiDCoMKgIHRvcG9sb2d5IHdoZXJlIHRoZSBwcm9ncmFt
+bWluZyBpbnRlcmZhY2Ugb2YgdGhlIElPTU1VIGNvdWxkIGFwcGVhcgo+Pj4+IMKgwqAgbG93ZXIg
+dGhhbiB0aGUgZW5kcG9pbnRzIHRoYXQgaXQgdHJhbnNsYXRlcy4gSXQncyBub3QgdW5oZWFyZCBv
+ZiAoZS5nLgo+Pj4+IMKgwqAgQU1EIElPTU1VKSwgYW5kIHRoZSBndWVzdCBlYXNpbHkgY29wZXMg
+d2l0aCB0aGlzLgo+Pj4+IMKgwqAgCj4+Pj4gwqDCoCBUaGUgIkZpcm13YXJlIGRlc2NyaXB0aW9u
+IiBzZWN0aW9uIG9mIHRoZSBzcGVjaWZpY2F0aW9uIGhhcyBiZWVuCj4+Pj4gwqDCoCB1cGRhdGVk
+IHdpdGggYWxsIGNvbWJpbmF0aW9ucyBvZiBQQ0ksIE1NSU8gYW5kIERULCBBQ1BJLgo+Pj4KPj4+
+IEkgaGF2ZSBhIHF1ZXN0aW9uIHdydCB0aGUgRlcgc3BlY2lmaWNhdGlvbi4gVGhlIElPTU1VIGNv
+bnN1bWVzIDEgc2xvdCBpbgo+Pj4gdGhlIFBDSSBkb21haW4gYW5kIG9uZSBuZWVkcyB0byBsZWF2
+ZSBhIFJJRCBob2xlIGluIHRoZSBpb21tdS1tYXAuwqAgSXQKPj4+IGlzIG5vdCBvYnZpb3VzIHRv
+IG1lIHRoYXQgdGhpcyBSSUQgYWx3YXlzIGlzIHByZWRpY3RhYmxlIGdpdmVuIHRoZSBwY2llCj4+
+PiBlbnVtZXJhdGlvbiBtZWNoYW5pc20uIEdlbmVyYWxseSB3ZSBoYXZlIGEgY29hcnNlIGdyYWlu
+IG1hcHBpbmcgb2YgUklECj4+PiBvbnRvIGlvbW11IHBoYW5kbGVzL1NUUkVBTUlEcy4gSGVyZSwg
+aWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSB3ZSBuZWVkCj4+PiB0byBwcmVjaXNlbHkgaWRlbnRp
+ZnkgdGhlIFJJRCBncmFudGVkIHRvIHRoZSBpb21tdS4gT24gUUVNVSB0aGlzIG1heQo+Pj4gZGVw
+ZW5kIG9uIHRoZSBpbnN0YW50aWF0aW9uIG9yZGVyIG9mIHRoZSB2aXJ0aW8tcGNpIGRldmljZSBy
+aWdodD8KPj4gCj4+IFllcywgYWx0aG91Z2ggaXQgc2hvdWxkIGFsbCBoYXBwZW4gYmVmb3JlIHlv
+dSBib290IHRoZSBndWVzdCwgc2luY2UKPj4gdGhlcmUgaXMgbm8gaG90cGx1Z2dpbmcgYW4gSU9N
+TVUuIENvdWxkIHlvdSByZXNlcnZlIGEgUENJIHNsb3QgdXBmcm9udAo+PiBhbmQgdXNlIGl0IGZv
+ciB2aXJ0aW8taW9tbXUgbGF0ZXI/IE9yIGdlbmVyYXRlIHRoZSBpb21tdS1tYXAgYXQgdGhlIHNh
+bWUKPj4gdGltZSBhcyBnZW5lcmF0aW5nIHRoZSBjaGlsZCBub2RlIG9mIHRoZSBQQ0kgUkM/Cj4g
+Cj4gRXZlbiB3aGVuIGNvbGQtcGx1Z2dpbmcgdGhlIFBDSWUgZGV2aWNlcyB0aHJvdWdoIHFlbXUg
+Q0xJLCB0aGlzIGRlcGVuZHMKPiBvbiB0aGUgb3JkZXIgb2YgdGhlIHBjaWUgZGV2aWNlcyBpbiB0
+aGUgbGlzdCBJIGd1ZXNzLiBJIG5lZWQgdG8gZnVydGhlcgo+IGV4cGVyaW1lbnQuCgpQbGVhc2Ug
+bGV0IG1lIGtub3cgaG93IGl0IGdvZXMuIEkgZ3Vlc3MgdGhlIHByb2JsZW0gd2lsbCBiZSB0aGUg
+c2FtZSBmb3IKYnVpbGRpbmcgSU9SVCB0YWJsZXM/IFlvdSdyZSBhbHNvIGdvaW5nIHRvIG5lZWQg
+YSBob2xlIGluIHRoZSBJRAptYXBwaW5ncyBvZiB0aGUgUENJIHJvb3QgY29tcGxleCBub2RlLgoK
+Pj4+IFNvCj4+PiB0aGlzIGRvZXMgbm90IGxvb2sgdHJpdmlhbCB0byBidWlsZCB0aGlzIGluZm8u
+IElzbid0IGl0IHBvc3NpYmxlIHRvIGRvCj4+PiB0aGlzIGV4Y2x1c2lvbiBhdCBrZXJuZWwgbGV2
+ZWwgaW5zdGVhZD8KPj4gCj4+IFNvIGluIHRoZW9yeSBWSVJUSU9fRl9JT01NVV9QTEFURk9STSBh
+bHJlYWR5IGRvZXMgdGhhdDoKPj4gCj4+IFZJUlRJT19GX0lPTU1VX1BMQVRGT1JNKDMzKQo+PsKg
+wqDCoMKgIFRoaXMgZmVhdHVyZSBpbmRpY2F0ZXMgdGhhdCB0aGUgZGV2aWNlIGlzIGJlaGluZCBh
+biBJT01NVSB0aGF0Cj4+wqDCoMKgwqAgdHJhbnNsYXRlcyBidXMgYWRkcmVzc2VzIGZyb20gdGhl
+IGRldmljZSBpbnRvIHBoeXNpY2FsIGFkZHJlc3NlcyBpbgo+PsKgwqDCoMKgIG1lbW9yeS4gSWYg
+dGhpcyBmZWF0dXJlIGJpdCBpcyBzZXQgdG8gMCwgdGhlbiB0aGUgZGV2aWNlIGVtaXRzCj4+wqDC
+oMKgwqAgcGh5c2ljYWwgYWRkcmVzc2VzIHdoaWNoIGFyZSBub3QgdHJhbnNsYXRlZCBmdXJ0aGVy
+LCBldmVuIHRob3VnaCBhbgo+PsKgwqDCoMKgIElPTU1VIG1heSBiZSBwcmVzZW50Lgo+IAo+IFRo
+aXMgdGVsbHMgdGhlIGRyaXZlciB0byB1c2UgdGhlIGRtYSBhcGksIHJpZ2h0PyAKClRoYXQncyBo
+b3cgTGludXggaW1wbGVtZW50cyB0aGUgYml0LCBpbnN0YWxsIGN1c3RvbSBETUEgb3BzIHdoZW4g
+dGhlIGJpdAppcyBhYnNlbnQuIEJ1dCBpdCBkb2Vzbid0IHdvcmsgZm9yIGV2ZXJ5b25lIGFuZCBo
+YXMgY2F1c2VkIGEgbG90IG9mCmRlYmF0ZSAoaHR0cHM6Ly9wYXRjaHdvcmsub3psYWJzLm9yZy9j
+b3Zlci85NDY3MDgvKQoKPiBFZmZlY3RpdmVseSB0aGlzCj4gZXhwbGljaXRseSBzYXlzIHdoZXRo
+ZXIgdGhlIGRldmljZSBpcyBzdXBwb3NlZCB0byBiZSB1cGZyb250IGFuIElPTU1VLgoKWWVzLiBJ
+dCdzIHF1aXRlIHN0cmFuZ2UgaWYgeW91IGNvbnNpZGVyIGhvdHBsdWdnYWJsZSBoYXJkd2FyZSwg
+c2luY2UKdGhvc2UgZGV2aWNlcyBzaG91bGRuJ3QgZ2V0IHRvIGNob29zZSB3aGV0aGVyIHRoZXkg
+YXJlIG1hbmFnZWQgYnkgYW4KSU9NTVUuIEZvciB0aGUgSU9NTVUgaXRzZWxmLCBpdCBzaG91bGQg
+YmUgZmluZQoKPj4gRm9yIGJldHRlciBvciBmb3Igd29yc2UsIHRoZSBndWVzdCBoYXMgdG8gaW1w
+bGVtZW50IGl0LiBJZiB0aGlzIGZlYXR1cmUKPj4gYml0IGlzIHVuc2V0IGZvciB2aXJ0aW8taW9t
+bXUsIGl0IGRvZXMgRE1BIG9uIHRoZSBwaHlzaWNhbCBhZGRyZXNzCj4+IHNwYWNlLCByZWdhcmRs
+ZXNzIG9mIHdoYXQgdGhlIHN0YXRpYyB0b3BvbG9neSBkZXNjcmlwdGlvbiBzYXlzLgo+PiAKPj4g
+SW4gcHJhY3RpY2UgaXQgZG9lc24ndCBxdWl0ZSB3b3JrLiBJZiB5b3VyIGlvbW11LW1hcCBkZXNj
+cmliZXMgdGhlIElPTU1VCj4+IGFzIHRyYW5zbGF0aW5nIGl0c2VsZiwgTGludXgnIE9GIGNvZGUg
+d2lsbCB3YWl0IGZvciB0aGUgSU9NTVUgdG8gYmUKPj4gcHJvYmVkIGJlZm9yZSBwcm9iaW5nIHRo
+ZSBJT01NVS4gV29ya2luZyBhcm91bmQgdGhpcyB3aXRoIGhhY2tzIGlzCj4+IHBvc3NpYmxlLCBi
+dXQgSSBkb24ndCB3YW50IHRvIGludHJvZHVjZSBtb3JlIHF1ZXN0aW9uYWJsZSBjb2RlIHRvIE9G
+IGFuZAo+PiBkZXZpY2UgdHJlZSBiaW5kaW5ncyBpZiB0aGVyZSBpcyBhbnkgb3RoZXIgd2F5Lgo+
+IEh1bSBvay4gSSBjYW5ub3QgcmVhbGx5IGNvbW1lbnQgb24gdGhpcy4KPiAKPiBJIGp1c3Qgd2Fu
+dGVkIHRvIHJhaXNlIHRoaXMgY29uY2VybiBhYm91dCBSSUQgaWRlbnRmaWNhdGlvbi4KCldlIGNh
+biBhbHdheXMgdHJ5LiBSZWxheGluZyBpb21tdS1tYXAgZnVydGhlciB3b3VsZCBiZSBvbmUgYWRk
+aXRpb25hbApwYXRjaCB0byBEb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvcGNpL3Bj
+aS1pb21tdS50eHQsIGFuZCBvbmUgdG8KZHJpdmVycy9pb21tdS9vZi1pb21tdS5jLiBJJ2QgcmF0
+aGVyIG1ha2UgaXQgYSBzZXBhcmF0ZSBSRkMuCgpTaW5jZSB3ZSBuZWVkIGFja3MgZnJvbSBhbiBP
+RiBtYWludGFpbmVyIGFuZCBJJ2QgYWxzbyBsaWtlIEpvZXJnJ3MKYXBwcm92YWwgZm9yIGFkZGlu
+ZyBhIG5ldyBkcml2ZXIgdG8gdGhlIElPTU1VIHRyZWUsIEkgdGhpbmsgaXQncyB0b28KbGF0ZSBm
+b3IgdGhpcyBpdGVyYXRpb24uIEkgd2Fzbid0IGludGVuZGluZyBmb3IgdGhpcyB0byBnbyBpbnRv
+IDQuMjAsCmp1c3QgaGF2ZSBzb21ldGhpbmcgdG8gZGlzY3VzcyBhdCBLVk0gZm9ydW0gbmV4dCB3
+ZWVrLgoKVGhhbmtzLApKZWFuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fClZpcnR1YWxpemF0aW9uIG1haWxpbmcgbGlzdApWaXJ0dWFsaXphdGlvbkBsaXN0
+cy5saW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcv
+bWFpbG1hbi9saXN0aW5mby92aXJ0dWFsaXphdGlvbg==
