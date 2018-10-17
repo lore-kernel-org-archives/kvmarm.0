@@ -1,24 +1,22 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH] kvm: arm64: fix caching of host MDCR_EL2 value
-Date: Wed, 17 Oct 2018 18:13:26 +0100
-Message-ID: <a9599220-4351-181a-1150-facead06996d@arm.com>
-References: <20181017164210.16094-1-mark.rutland@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm64: Safety check PSTATE when entering guest and
+ handle IL
+Date: Wed, 17 Oct 2018 20:21:16 +0200
+Message-ID: <20181017182116.22603-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9828049F87
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 13:13:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 159884A1D8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 14:21:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lcMaHBMNyOHH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Oct 2018 13:13:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5975449F86
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 13:13:29 -0400 (EDT)
-In-Reply-To: <20181017164210.16094-1-mark.rutland@arm.com>
-Content-Language: en-GB
+ with ESMTP id LlF5ItSnE3UB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Oct 2018 14:21:22 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94B4949E3E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 14:21:22 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,61 +26,133 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: peter.maydell@arm.com, kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, dave.martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/10/18 17:42, Mark Rutland wrote:
-> At boot time, KVM stashes the host MDCR_EL2 value, but only does this
-> when the kernel is not running in hyp mode (i.e. is non-VHE). In these
-> cases, the stashed value of MDCR_EL2.HPMN happens to be zero, which can
-> lead to CONSTRAINED UNPREDICTABLE behaviour.
-> 
-> Since we use this value to derive the MDCR_EL2 value when switching
-> to/from a guest, after a guest have been run, the performance counters
-> do not behave as expected. This has been observed to result in accesses
-> via PMXEVTYPER_EL0 and PMXEVCNTR_EL0 not affecting the relevant
-> counters, resulting in events not being counted. In these cases, only
-> the fixed-purpose cycle counter appears to work as expected.
-> 
-> Fix this by always stashing the host MDCR_EL2 value, regardless of VHE.
+This commit adds a paranoid check when entering the guest to make sure
+we don't attempt running guest code in an equally or more privilged mode
+than the hypervisor.  We also catch other accidental programming of the
+SPSR_EL2 which results in an illegal exception return and report this
+safely back to the user.
 
-FWIW,
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ arch/arm64/include/asm/kvm_asm.h |  1 +
+ arch/arm64/include/asm/ptrace.h  |  3 +++
+ arch/arm64/kvm/handle_exit.c     |  7 +++++++
+ arch/arm64/kvm/hyp/hyp-entry.S   | 16 +++++++++++++++-
+ arch/arm64/kvm/hyp/sysreg-sr.c   | 19 ++++++++++++++++++-
+ 5 files changed, 44 insertions(+), 2 deletions(-)
 
-Tested-by: Robin Murphy <robin.murphy@arm.com>
-
-> Fixes: 1e947bad0b63b351 ("arm64: KVM: Skip HYP setup when already running in HYP")
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christopher Dall <christoffer.dall@arm.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->   virt/kvm/arm/arm.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index c92053bc3f96..8fb31a7cc22c 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1295,8 +1295,6 @@ static void cpu_init_hyp_mode(void *dummy)
->   
->   	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
->   	__cpu_init_stage2();
-> -
-> -	kvm_arm_init_debug();
->   }
->   
->   static void cpu_hyp_reset(void)
-> @@ -1320,6 +1318,8 @@ static void cpu_hyp_reinit(void)
->   		cpu_init_hyp_mode(NULL);
->   	}
->   
-> +	kvm_arm_init_debug();
-> +
->   	if (vgic_present)
->   		kvm_vgic_init_cpu_hardware();
->   }
-> 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 102b5a5c47b6..7738b4882d18 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -30,6 +30,7 @@
+ #define ARM_EXCEPTION_IRQ	  0
+ #define ARM_EXCEPTION_EL1_SERROR  1
+ #define ARM_EXCEPTION_TRAP	  2
++#define ARM_EXCEPTION_IL	  3
+ /* The hyp-stub will return this for any kvm_call_hyp() call */
+ #define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
+ 
+diff --git a/arch/arm64/include/asm/ptrace.h b/arch/arm64/include/asm/ptrace.h
+index 177b851ca6d9..ff35ac1258eb 100644
+--- a/arch/arm64/include/asm/ptrace.h
++++ b/arch/arm64/include/asm/ptrace.h
+@@ -25,6 +25,9 @@
+ #define CurrentEL_EL1		(1 << 2)
+ #define CurrentEL_EL2		(2 << 2)
+ 
++/* Additional SPSR bits not exposed in the UABI */
++#define PSR_IL_BIT		(1 << 20)
++
+ /* AArch32-specific ptrace requests */
+ #define COMPAT_PTRACE_GETREGS		12
+ #define COMPAT_PTRACE_SETREGS		13
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e5e741bfffe1..35a81bebd02b 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -284,6 +284,13 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 */
+ 		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+ 		return 0;
++	case ARM_EXCEPTION_IL:
++		/*
++		 * We attempted an illegal exception return.  Guest state must
++		 * have been corrupted somehow.  Give up.
++		 */
++		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
++		return -EINVAL;
+ 	default:
+ 		kvm_pr_unimpl("Unsupported exception type: %d",
+ 			      exception_index);
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 24b4fbafe3e4..b1f14f736962 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -162,6 +162,20 @@ el1_error:
+ 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
+ 	b	__guest_exit
+ 
++el2_sync:
++	/* Check for illegal exception return, otherwise panic */
++	mrs	x0, spsr_el2
++
++	/* if this was something else, then panic! */
++	tst	x0, #PSR_IL_BIT
++	b.eq	__hyp_panic
++
++	/* Let's attempt a recovery from the illegal exception return */
++	get_vcpu_ptr	x1, x0
++	mov	x0, #ARM_EXCEPTION_IL
++	b	__guest_exit
++
++
+ el2_error:
+ 	ldp	x0, x1, [sp], #16
+ 
+@@ -240,7 +254,7 @@ ENTRY(__kvm_hyp_vector)
+ 	invalid_vect	el2t_fiq_invalid	// FIQ EL2t
+ 	invalid_vect	el2t_error_invalid	// Error EL2t
+ 
+-	invalid_vect	el2h_sync_invalid	// Synchronous EL2h
++	valid_vect	el2_sync		// Synchronous EL2h
+ 	invalid_vect	el2h_irq_invalid	// IRQ EL2h
+ 	invalid_vect	el2h_fiq_invalid	// FIQ EL2h
+ 	valid_vect	el2_error		// Error EL2h
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 9ce223944983..d7ac15412c97 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -152,8 +152,25 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ static void __hyp_text
+ __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
++	u64 pstate = ctxt->gp_regs.regs.pstate;
++	u64 mode = pstate & PSR_AA32_MODE_MASK;
++
++	/*
++	 * Safety check to ensure we're setting the CPU up to enter the guest
++	 * in a less privileged mode.
++	 *
++	 * If we are attempting a return to EL2 or higher in AArch64 state,
++	 * program SPSR_EL2 with M=EL2h and the IL bit set which ensures that
++	 * we'll take an illegal exception return exception immediately after
++	 * the ERET to the guest.  Attempts to return to AArch32 Hyp will
++	 * result in an illegal exception return because EL2's execution state
++	 * is determined by SCR_EL3.RW.
++	 */
++	if (!(mode & PSR_MODE32_BIT) && mode >= PSR_MODE_EL2t)
++		pstate = PSR_MODE_EL2h | PSR_IL_BIT;
++
+ 	write_sysreg_el2(ctxt->gp_regs.regs.pc,		elr);
+-	write_sysreg_el2(ctxt->gp_regs.regs.pstate,	spsr);
++	write_sysreg_el2(pstate,			spsr);
+ 
+ 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
+ 		write_sysreg_s(ctxt->sys_regs[DISR_EL1], SYS_VDISR_EL2);
+-- 
+2.18.0
