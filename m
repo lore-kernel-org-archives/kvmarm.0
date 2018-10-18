@@ -1,58 +1,47 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v3 2/7] dt-bindings: virtio: Add virtio-pci-iommu node
-Date: Wed, 17 Oct 2018 19:35:02 -0500
-Message-ID: <20181018003502.GA28260@bogus>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
- <20181012145917.6840-3-jean-philippe.brucker@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 0/2] rename function name and enable 32bit vcpu events
+Date: Thu, 18 Oct 2018 10:14:54 +0100
+Message-ID: <c1cc827c-c1b7-1fa5-85be-54fc400febb1@arm.com>
+References: <20181012161249.9236-1-gengdongjiu@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 942A64A1D7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 20:35:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IDVZ+wQNdoWU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Oct 2018 20:35:04 -0400 (EDT)
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
- [209.85.210.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C33E849F87
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 20:35:04 -0400 (EDT)
-Received: by mail-ot1-f66.google.com with SMTP id x4so26689385otg.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 17:35:04 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20181012145917.6840-3-jean-philippe.brucker@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: kevin.tian@intel.com, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, jasowang@redhat.com, linux-pci@vger.kernel.org, joro@8bytes.org, mst@redhat.com, will.deacon@arm.com, virtualization@lists.linux-foundation.org, iommu@lists.linux-foundation.org, robh+dt@kernel.org, marc.zyngier@arm.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181012161249.9236-1-gengdongjiu@huawei.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>, christoffer.dall@arm.com, suzuki.poulose@arm.com, james.morse@arm.com, peter.maydell@linaro.org, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 12 Oct 2018 15:59:12 +0100, Jean-Philippe Brucker wrote:
-> Some systems implement virtio-iommu as a PCI endpoint. The operating
-> systems needs to discover the relationship between IOMMU and masters long
-> before the PCI endpoint gets probed. Add a PCI child node to describe the
-> virtio-iommu device.
+On 12/10/18 17:12, Dongjiu Geng wrote:
+> Rename the kvm_arch_dev_ioctl_check_extension() to 
+> kvm_arch_vm_ioctl_check_extension, because the name
+> is not readable;
 > 
-> The virtio-pci-iommu is conceptually split between a PCI programming
-> interface and a translation component on the parent bus. The latter
-> doesn't have a node in the device tree. The virtio-pci-iommu node
-> describes both, by linking the PCI endpoint to "iommus" property of DMA
-> master nodes and to "iommu-map" properties of bus nodes.
+> Enable the 32 bit vcpu events support.
 > 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> ---
->  .../devicetree/bindings/virtio/iommu.txt      | 66 +++++++++++++++++++
->  1 file changed, 66 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+> Change since v3:
+> 1. Address James's comments to update the patch commit messages
+> 
+> Change since v2:
+> 1. Address Suzuki's comments to update the patch commit messages
+> 
+> change since v1:
+> 1. Update patch commit messages.
+> 
+> Dongjiu Geng (2):
+>   arm/arm64: KVM: rename function kvm_arch_dev_ioctl_check_extension()
+>   arm/arm64: KVM: enable 32 bits kvm vcpu events support
+> 
+>  arch/arm/include/asm/kvm_host.h   | 2 +-
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  arch/arm64/kvm/reset.c            | 5 ++---
+>  virt/kvm/arm/arm.c                | 3 ++-
+>  4 files changed, 6 insertions(+), 6 deletions(-)
 > 
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Applied, thanks.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
