@@ -1,79 +1,96 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: Safety check PSTATE when entering guest and
- handle IL
-Date: Wed, 17 Oct 2018 20:02:43 +0100
-Message-ID: <CAFEAcA-b8O4tjViHGfQpJt6C=i4A2tV7vcOFPiE+i4QMFKFZKw@mail.gmail.com>
-References: <20181017182116.22603-1-christoffer.dall@arm.com>
+From: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v3 1/7] dt-bindings: virtio-mmio: Add IOMMU description
+Date: Wed, 17 Oct 2018 19:30:51 -0500
+Message-ID: <20181018003051.GA3400@bogus>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+	<20181012145917.6840-2-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 377BC4A20B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 15:03:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N5ArpRiQc2vQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Oct 2018 15:03:05 -0400 (EDT)
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com
- [209.85.167.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22D4C49E4C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 15:03:05 -0400 (EDT)
-Received: by mail-oi1-f196.google.com with SMTP id 22-v6so22001470oiz.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Oct 2018 12:03:05 -0700 (PDT)
-In-Reply-To: <20181017182116.22603-1-christoffer.dall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Peter Maydell <peter.maydell@arm.com>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Dave P Martin <dave.martin@arm.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20181012145917.6840-2-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17 October 2018 at 19:21, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> This commit adds a paranoid check when entering the guest to make sure
-> we don't attempt running guest code in an equally or more privilged mode
-> than the hypervisor.  We also catch other accidental programming of the
-> SPSR_EL2 which results in an illegal exception return and report this
-> safely back to the user.
->
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+On Fri, Oct 12, 2018 at 03:59:11PM +0100, Jean-Philippe Brucker wrote:
+> The nature of a virtio-mmio node is discovered by the virtio driver at
+> probe time. However the DMA relation between devices must be described
+> statically. When a virtio-mmio node is a virtio-iommu device, it needs an
+> "#iommu-cells" property as specified by bindings/iommu/iommu.txt.
+> 
+> Otherwise, the virtio-mmio device may perform DMA through an IOMMU, which
+> requires an "iommus" property. Describe these requirements in the
+> device-tree bindings documentation.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
 > ---
+>  .../devicetree/bindings/virtio/mmio.txt       | 30 +++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 9ce223944983..d7ac15412c97 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -152,8 +152,25 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  static void __hyp_text
->  __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
->  {
-> +       u64 pstate = ctxt->gp_regs.regs.pstate;
-> +       u64 mode = pstate & PSR_AA32_MODE_MASK;
+One nit, otherwise,
+
+Reviewed-by: Rob Herring <robh-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+
+> 
+> diff --git a/Documentation/devicetree/bindings/virtio/mmio.txt b/Documentation/devicetree/bindings/virtio/mmio.txt
+> index 5069c1b8e193..748595473b36 100644
+> --- a/Documentation/devicetree/bindings/virtio/mmio.txt
+> +++ b/Documentation/devicetree/bindings/virtio/mmio.txt
+> @@ -8,10 +8,40 @@ Required properties:
+>  - reg:		control registers base address and size including configuration space
+>  - interrupts:	interrupt generated by the device
+>  
+> +Required properties for virtio-iommu:
 > +
-> +       /*
-> +        * Safety check to ensure we're setting the CPU up to enter the guest
-> +        * in a less privileged mode.
-> +        *
-> +        * If we are attempting a return to EL2 or higher in AArch64 state,
-> +        * program SPSR_EL2 with M=EL2h and the IL bit set which ensures that
-> +        * we'll take an illegal exception return exception immediately after
+> +- #iommu-cells:	When the node corresponds to a virtio-iommu device, it is
+> +		linked to DMA masters using the "iommus" or "iommu-map"
+> +		properties [1][2]. #iommu-cells specifies the size of the
+> +		"iommus" property. For virtio-iommu #iommu-cells must be
+> +		1, each cell describing a single endpoint ID.
+> +
+> +Optional properties:
+> +
+> +- iommus:	If the device accesses memory through an IOMMU, it should
+> +		have an "iommus" property [1]. Since virtio-iommu itself
+> +		does not access memory through an IOMMU, the "virtio,mmio"
+> +		node cannot have both an "#iommu-cells" and an "iommus"
+> +		property.
+> +
+>  Example:
+>  
+>  	virtio_block@3000 {
+>  		compatible = "virtio,mmio";
+>  		reg = <0x3000 0x100>;
+>  		interrupts = <41>;
+> +
+> +		/* Device has endpoint ID 23 */
+> +		iommus = <&viommu 23>
+>  	}
+> +
+> +	viommu: virtio_iommu@3100 {
 
-This should read "illegal exception state exception", I think
-(for the 64-bit case we don't do an illegal exception return,
-we do a legal exception return that sets PSTATE.IL to 1.)
+iommu@3100
 
-> +        * the ERET to the guest.  Attempts to return to AArch32 Hyp will
-> +        * result in an illegal exception return because EL2's execution state
-> +        * is determined by SCR_EL3.RW.
-> +        */
-> +       if (!(mode & PSR_MODE32_BIT) && mode >= PSR_MODE_EL2t)
-> +               pstate = PSR_MODE_EL2h | PSR_IL_BIT;
-
-thanks
--- PMM
+> +		compatible = "virtio,mmio";
+> +		reg = <0x3100 0x100>;
+> +		interrupts = <42>;
+> +
+> +		#iommu-cells = <1>
+> +	}
+> +
+> +[1] Documentation/devicetree/bindings/iommu/iommu.txt
+> +[2] Documentation/devicetree/bindings/pci/pci-iommu.txt
+> -- 
+> 2.19.1
+> 
