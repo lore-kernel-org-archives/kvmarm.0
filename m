@@ -1,129 +1,89 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v5 11/17] arm64: docs: document pointer authentication
-Date: Fri, 19 Oct 2018 16:10:29 +0100
-Message-ID: <20181019151029.GD3985@arrakis.emea.arm.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
+Date: Fri, 19 Oct 2018 08:36:45 -0700
+Message-ID: <CAGXu5j+2axuzPJji_eCvMZDiPvrPsP3kAnG0CY_rsL5c=uFQFA@mail.gmail.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
- <20181005084754.20950-12-kristina.martsenko@arm.com>
- <9acb0cd2-66b0-1c41-b1a8-7c70608e9a9b@foss.arm.com>
- <7b0de19b-45b9-f4df-25d1-c7e80fab49dc@arm.com>
- <20181019113556.ljbdmjo5pdw7muvz@mbp>
- <e73035eb-2157-7a9c-3631-d4d2ad0b7d38@arm.com>
+ <20181005084754.20950-8-kristina.martsenko@arm.com> <20181019111542.6wrvjguirglzg7vg@mbp>
+ <20181019112404.GD14246@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <e73035eb-2157-7a9c-3631-d4d2ad0b7d38@arm.com>
+In-Reply-To: <20181019112404.GD14246@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: Mark Rutland <Mark.Rutland@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Adam Wallis <awallis@codeaurora.org>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@foss.arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lis>
+To: Will Deacon <will.deacon@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>, linux-arch <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, "Suzuki K . Poulose" <suzuki.poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, LKML <linux-kernel@vger.kernel.org>, Cyrill
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 19, 2018 at 03:42:23PM +0100, Kristina Martsenko wrote:
-> On 19/10/2018 12:35, Catalin Marinas wrote:
-> > On Tue, Oct 16, 2018 at 05:14:39PM +0100, Kristina Martsenko wrote:
-> >> On 05/10/2018 10:04, Ramana Radhakrishnan wrote:
-> >>> On 05/10/2018 09:47, Kristina Martsenko wrote:
-> >>>> +Virtualization
-> >>>> +--------------
-> >>>> +
-> >>>> +Pointer authentication is not currently supported in KVM guests. KVM
-> >>>> +will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-> >>>> +the feature will result in an UNDEFINED exception being injected into
-> >>>> +the guest.
-> >>>
-> >>> However applications using instructions from the hint space will
-> >>> continue to work albeit without any protection (as they would just be
-> >>> nops) ?
-> >>
-> >> Mostly, yes. If the guest leaves SCTLR_EL1.EnIA unset (and
-> >> EnIB/EnDA/EnDB), then PAC* and AUT* instructions in the HINT space will
-> >> execute as NOPs. If the guest sets EnIA, then PAC*/AUT* instructions
-> >> will trap and KVM will inject an "Unknown reason" exception into the
-> >> guest (which will cause a Linux guest to send a SIGILL to the application).
-> > 
-> > I think that part is fine. If KVM (a fairly recent version with CPUID
-> > sanitisation) does not enable ptr auth, the CPUID should not advertise
-> > this feature either so the guest kernel should not enable it. For the
-> > above instructions in the HINT space, they will just be NOPs. If the
-> > guest kernel enables the feature regardless of the CPUID information, it
-> > deserves to get an "Unknown reason" exception.
-> > 
-> >> In the latter case we could instead pretend the instruction was a NOP
-> >> and not inject an exception, but trapping twice per every function would
-> >> probably be terrible for performance. The guest shouldn't be setting
-> >> EnIA anyway if ID_AA64ISAR1_EL1 reports that pointer authentication is
-> >> not present (because KVM has hidden it).
-> > 
-> > I don't think we should. The SCTLR_EL1 bits are RES0 unless you know
-> > that the feature is present via CPUID.
-> > 
-> >> The other special case is the XPACLRI instruction, which is also in the
-> >> HINT space. Currently it will trap and KVM will inject an exception into
-> >> the guest. We should probably change this to NOP instead, as that's what
-> >> applications will expect. Unfortunately there is no EnIA-like control to
-> >> make it NOP.
-> > 
-> > Very good catch. Basically if EL2 doesn't know about ptr auth (older
-> > distro), EL1 may or may not know but leaves SCTLR_EL1 disabled (based on
-> > CPUID), the default HCR_EL2 is to trap (I'm ignoring EL3 as that's like
-> > to have ptr auth enabled, being built for the specific HW). So a user
-> > app considering XPACLRI a NOP (or inoffensive) will get a SIGILL
-> > (injected by the guest kernel following the injection of "Unknown
-> > reason" exception by KVM).
-> > 
-> > Ramana, is XPACLRI commonly generated by gcc and expects it to be a NOP?
-> > Could we restrict it to only being used at run-time if the corresponding
-> > HWCAP is set? This means redefining this instruction as no longer in the
-> > NOP space.
-> 
-> I think an alternative solution is to just disable trapping of pointer
-> auth instructions in KVM. This will mean that the instructions will
-> behave the same in the guest as they do in the host. HINT-space
-> instructions (including XPACLRI) will behave as NOPs (or perform their
-> function, if enabled by the guest), and will not trap.
+On Fri, Oct 19, 2018 at 4:24 AM, Will Deacon <will.deacon@arm.com> wrote:
+> [+Cyrill Gorcunov for CRIU stuff]
+>
+> On Fri, Oct 19, 2018 at 12:15:43PM +0100, Catalin Marinas wrote:
+>> On Fri, Oct 05, 2018 at 09:47:44AM +0100, Kristina Martsenko wrote:
+>> > diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+>> > new file mode 100644
+>> > index 000000000000..2aefedc31d9e
+>> > --- /dev/null
+>> > +++ b/arch/arm64/include/asm/pointer_auth.h
+>> > @@ -0,0 +1,63 @@
+>> > +// SPDX-License-Identifier: GPL-2.0
+>> > +#ifndef __ASM_POINTER_AUTH_H
+>> > +#define __ASM_POINTER_AUTH_H
+>> > +
+>> > +#include <linux/random.h>
+>> > +
+>> > +#include <asm/cpufeature.h>
+>> > +#include <asm/sysreg.h>
+>> > +
+>> > +#ifdef CONFIG_ARM64_PTR_AUTH
+>> > +/*
+>> > + * Each key is a 128-bit quantity which is split across a pair of 64-bit
+>> > + * registers (Lo and Hi).
+>> > + */
+>> > +struct ptrauth_key {
+>> > +   unsigned long lo, hi;
+>> > +};
+>> > +
+>> > +/*
+>> > + * We give each process its own instruction A key (APIAKey), which is shared by
+>> > + * all threads. This is inherited upon fork(), and reinitialised upon exec*().
+>> > + * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
+>> > + * instructions behaving as NOPs.
+>> > + */
+>>
+>> I don't remember the past discussions but I assume the tools guys are ok
+>> with a single key shared by multiple threads. Ramana, could you ack this
+>> part, FTR?
+>>
+>> (and it would help if someone from the Android and Chrome camps can
+>> confirm)
+>
+> FWIW: I think we should be entertaining a prctl() interface to use a new
+> key on a per-thread basis. Obviously, this would need to be used with care
+> (e.g. you'd fork(); use the prctl() and then you'd better not return from
+> the calling function!).
+>
+> Assuming we want this (Kees -- I was under the impression that everything in
+> Android would end up with the same key otherwise?), then the question is
+> do we want:
+>
+>   - prctl() get/set operations for the key, or
+>   - prctl() set_random_key operation, or
+>   - both of the above?
+>
+> Part of the answer to that may lie in the requirements of CRIU, where I
+> strongly suspect they need explicit get/set operations, although these
+> could be gated on CONFIG_CHECKPOINT_RESTORE=y.
 
-OK, so this means disabling the trap (during early EL2 setup) but still
-sanitizing the CPUID not to report the feature to EL1 unless fully
-supported on all CPUs.
+Oh CRIU. Yikes. I'd like the get/set to be gated by the CONFIG, yes.
+No reason to allow explicit access to the key (and selected algo) if
+we don't have to.
 
-> A side effect of disabling trapping is that keys may effectively leak
-> from one guest to another, since one guest may set a key and another
-> guest may use an instruction that uses that key. But this can be fixed
-> by zeroing the keys every time we enter a guest. We can additionally
-> trap key accesses (which is separate from instruction trapping), to have
-> guests fail more reliably and avoid restoring host keys on guest exit.
+As for per-thread or not, having a "pick a new key now" prctl() sounds
+good, but I'd like to have an eye toward having it just be "automatic"
+on clone().
 
-Actually, if the CPUID doesn't report the feature present, do we care
-that a stupid guest writes some register and expects it to be preserved
-and not leaked?
-
-> Things still won't work well on big.LITTLE systems with mismatched
-> pointer auth support between CPUs, but as Marc pointed out in the other
-> email, we can just disable KVM on such systems when we detect a pointer
-> auth mismatch.
-
-If we ever see such system, we could follow the approach above - disable
-trapping at EL2 if the feature is present but do not report it to EL1
-via CPUID. A guest should not expect it to work properly.
-
-> If we want current stable kernels to support guests that use HINT-space
-> pointer auth instructions, we'll need to backport the above changes to
-> stable kernels as well.
-
-I agree.
-
-> Even if we restricted userspace to only use XPACLRI if the HWCAP is set,
-> current stable kernels would still not be able to handle the HINT-space
-> PAC/AUT instructions that GCC generates, if the guest is pointer auth
-> aware. None of the stable kernels have the CPUID sanitisation patches,
-> so the guest would enable pointer auth, which would cause the PAC/AUT
-> instructions to trap.
-
-Ah, CPUID sanitisation would have to be backported as well. We can
-probably get away with something simpler which does not sanitise
-big.LITTLE (and I would not expect "enterprise" big.LITTLE machines) but
-simply cap/mask the CPUID to what is known to the respective kernel
-version. That shouldn't be too intrusive.
+-Kees
 
 -- 
-Catalin
+Kees Cook
+Pixel Security
