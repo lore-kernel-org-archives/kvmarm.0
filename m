@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 14/26] vgic: Add support for 52bit guest physical address
-Date: Fri, 19 Oct 2018 13:58:49 +0100
-Message-ID: <20181019125901.185478-15-marc.zyngier@arm.com>
+Subject: [PATCH 15/26] kvm: arm64: Add 52bit support for PAR to HPFAR
+ conversoin
+Date: Fri, 19 Oct 2018 13:58:50 +0100
+Message-ID: <20181019125901.185478-16-marc.zyngier@arm.com>
 References: <20181019125901.185478-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 576654A0C9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C3B04A30F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WuM-vA46---7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 09:00:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1FB44A2DF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:59 -0400 (EDT)
+ with ESMTP id dVQjQZCBlNBd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 09:00:04 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B87E14A2F3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:02 -0400 (EDT)
 In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,189 +32,51 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: zhong jiang <zhongjiang@huawei.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Kristina Martsenko <kristina.martsenko@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Add support for handling 52bit guest physical address to the
-VGIC layer. So far we have limited the guest physical address
-to 48bits, by explicitly masking the upper bits. This patch
-removes the restriction. We do not have to check if the host
-supports 52bit as the gpa is always validated during an access.
-(e.g, kvm_{read/write}_guest, kvm_is_visible_gfn()).
-Also, the ITS table save-restore is also not affected with
-the enhancement. The DTE entries already store the bits[51:8]
-of the ITT_addr (with a 256byte alignment).
+Add support for handling 52bit addresses in PAR to HPFAR
+conversion. Instead of hardcoding the address limits, we
+now use PHYS_MASK_SHIFT.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-[ Macro clean ups, fix PROPBASER and PENDBASER accesses ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/linux/irqchip/arm-gic-v3.h |  5 +++++
- virt/kvm/arm/vgic/vgic-its.c       | 36 +++++++++---------------------
- virt/kvm/arm/vgic/vgic-mmio-v3.c   |  2 --
- 3 files changed, 15 insertions(+), 28 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 7 +++++++
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 8bdbb5f29494..74b0aa9c7499 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -357,6 +357,8 @@
- #define GITS_CBASER_RaWaWt	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
- #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index e4240568cc18..f1330284720d 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -311,6 +311,13 @@
  
-+#define GITS_CBASER_ADDRESS(cbaser)	((cbaser) & GENMASK_ULL(51, 12))
-+
- #define GITS_BASER_NR_REGS		8
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
++/*
++ * We have
++ *	PAR	[PA_Shift - 1	: 12] = PA	[PA_Shift - 1 : 12]
++ *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
++ */
++#define PAR_TO_HPFAR(par)		\
++	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
  
- #define GITS_BASER_VALID			(1ULL << 63)
-@@ -388,6 +390,9 @@
- #define GITS_BASER_ENTRY_SIZE_MASK	GENMASK_ULL(52, 48)
- #define GITS_BASER_PHYS_52_to_48(phys)					\
- 	(((phys) & GENMASK_ULL(47, 16)) | (((phys) >> 48) & 0xf) << 12)
-+#define GITS_BASER_ADDR_48_to_52(baser)					\
-+	(((baser) & GENMASK_ULL(47, 16)) | (((baser) >> 12) & 0xf) << 48)
-+
- #define GITS_BASER_SHAREABILITY_SHIFT	(10)
- #define GITS_BASER_InnerShareable					\
- 	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 12502251727e..eb2a390a6c86 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -241,13 +241,6 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
- 	list_for_each_entry(dev, &(its)->device_list, dev_list) \
- 		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
+ #define kvm_arm_exception_type	\
+ 	{0, "IRQ" }, 		\
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 9d5ce1a3039a..7cc175c88a37 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -263,7 +263,7 @@ static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 		return false; /* Translation failed, back to guest */
  
--/*
-- * We only implement 48 bits of PA at the moment, although the ITS
-- * supports more. Let's be restrictive here.
-- */
--#define BASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 16))
--#define CBASER_ADDRESS(x)	((x) & GENMASK_ULL(47, 12))
--
- #define GIC_LPI_OFFSET 8192
- 
- #define VITS_TYPER_IDBITS 16
-@@ -759,6 +752,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- {
- 	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
-+	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
- 	int index;
- 	gfn_t gfn;
-@@ -783,7 +777,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 		if (id >= (l1_tbl_size / esz))
- 			return false;
- 
--		addr = BASER_ADDRESS(baser) + id * esz;
-+		addr = base + id * esz;
- 		gfn = addr >> PAGE_SHIFT;
- 
- 		if (eaddr)
-@@ -798,7 +792,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	/* Each 1st level entry is represented by a 64-bit value. */
- 	if (kvm_read_guest_lock(its->dev->kvm,
--			   BASER_ADDRESS(baser) + index * sizeof(indirect_ptr),
-+			   base + index * sizeof(indirect_ptr),
- 			   &indirect_ptr, sizeof(indirect_ptr)))
- 		return false;
- 
-@@ -808,11 +802,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	if (!(indirect_ptr & BIT_ULL(63)))
- 		return false;
- 
--	/*
--	 * Mask the guest physical address and calculate the frame number.
--	 * Any address beyond our supported 48 bits of PA will be caught
--	 * by the actual check in the final step.
--	 */
-+	/* Mask the guest physical address and calculate the frame number. */
- 	indirect_ptr &= GENMASK_ULL(51, 16);
- 
- 	/* Find the address of the actual entry */
-@@ -1304,9 +1294,6 @@ static u64 vgic_sanitise_its_baser(u64 reg)
- 				  GITS_BASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/* Bits 15:12 contain bits 51:48 of the PA, which we don't support. */
--	reg &= ~GENMASK_ULL(15, 12);
--
- 	/* We support only one (ITS) page size: 64K */
- 	reg = (reg & ~GITS_BASER_PAGE_SIZE_MASK) | GITS_BASER_PAGE_SIZE_64K;
- 
-@@ -1325,11 +1312,8 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
- 				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
- 				  vgic_sanitise_outer_cacheability);
- 
--	/*
--	 * Sanitise the physical address to be 64k aligned.
--	 * Also limit the physical addresses to 48 bits.
--	 */
--	reg &= ~(GENMASK_ULL(51, 48) | GENMASK_ULL(15, 12));
-+	/* Sanitise the physical address to be 64k aligned. */
-+	reg &= ~GENMASK_ULL(15, 12);
- 
- 	return reg;
- }
-@@ -1375,7 +1359,7 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
- 	if (!its->enabled)
- 		return;
- 
--	cbaser = CBASER_ADDRESS(its->cbaser);
-+	cbaser = GITS_CBASER_ADDRESS(its->cbaser);
- 
- 	while (its->cwriter != its->creadr) {
- 		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
-@@ -2233,7 +2217,7 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	l1_gpa = BASER_ADDRESS(baser);
-+	l1_gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	if (baser & GITS_BASER_INDIRECT) {
- 		l1_esz = GITS_LVL1_ENTRY_SIZE;
-@@ -2305,7 +2289,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
- 	u64 baser = its->baser_coll_table;
--	gpa_t gpa = BASER_ADDRESS(baser);
-+	gpa_t gpa = GITS_BASER_ADDR_48_to_52(baser);
- 	struct its_collection *collection;
- 	u64 val;
- 	size_t max_size, filled = 0;
-@@ -2354,7 +2338,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	if (!(baser & GITS_BASER_VALID))
- 		return 0;
- 
--	gpa = BASER_ADDRESS(baser);
-+	gpa = GITS_BASER_ADDR_48_to_52(baser);
- 
- 	max_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
- 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index a2a175b08b17..b3d1f0985117 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -364,7 +364,6 @@ static u64 vgic_sanitise_pendbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
- 
- 	reg &= ~PENDBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 
- 	return reg;
- }
-@@ -382,7 +381,6 @@ static u64 vgic_sanitise_propbaser(u64 reg)
- 				  vgic_sanitise_outer_cacheability);
- 
- 	reg &= ~PROPBASER_RES0_MASK;
--	reg &= ~GENMASK_ULL(51, 48);
- 	return reg;
+ 	/* Convert PAR to HPFAR format */
+-	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
++	*hpfar = PAR_TO_HPFAR(tmp);
+ 	return true;
  }
  
 -- 
