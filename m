@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 06/26] kvm: arm/arm64: Allow arch specific configurations for
- VM
-Date: Fri, 19 Oct 2018 13:58:41 +0100
-Message-ID: <20181019125901.185478-7-marc.zyngier@arm.com>
+Subject: [PATCH 04/26] arm64: Add a helper for PARange to physical shift
+ conversion
+Date: Fri, 19 Oct 2018 13:58:39 +0100
+Message-ID: <20181019125901.185478-5-marc.zyngier@arm.com>
 References: <20181019125901.185478-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 852A34A2F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 442774A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7-MHiA2nFXCt for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 08:59:36 -0400 (EDT)
+ with ESMTP id PMrUvQbNHM1Y for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 08:59:31 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D74C4A1D1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 967914A2B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:30 -0400 (EDT)
 In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,79 +34,55 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Allow the arch backends to perform VM specific initialisation.
-This will be later used to handle IPA size configuration and per-VM
-VTCR configuration on arm64.
+On arm64, ID_AA64MMFR0_EL1.PARange encodes the maximum Physical
+Address range supported by the CPU. Add a helper to decode this
+to actual physical shift. If we hit an unallocated value, return
+the maximum range supported by the kernel.
+This will be used by KVM to set the VTCR_EL2.T0SZ, as it
+is about to move its place. Having this helper keeps the code
+movement cleaner.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: James Morse <james.morse@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 7 +++++++
- arch/arm64/include/asm/kvm_host.h | 2 ++
- arch/arm64/kvm/reset.c            | 7 +++++++
- virt/kvm/arm/arm.c                | 5 +++--
- 4 files changed, 19 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/cpufeature.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 3ad482d2f1eb..72d46418e1ef 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -354,4 +354,11 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 1717ba1db35d..072cc1c970c2 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -530,6 +530,26 @@ void arm64_set_ssbd_mitigation(bool state);
+ static inline void arm64_set_ssbd_mitigation(bool state) {}
+ #endif
  
-+static inline int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
++static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
 +{
-+	if (type)
-+		return -EINVAL;
-+	return 0;
++	switch (parange) {
++	case 0: return 32;
++	case 1: return 36;
++	case 2: return 40;
++	case 3: return 42;
++	case 4: return 44;
++	case 5: return 48;
++	case 6: return 52;
++	/*
++	 * A future PE could use a value unknown to the kernel.
++	 * However, by the "D10.1.4 Principles of the ID scheme
++	 * for fields in ID registers", ARM DDI 0487C.a, any new
++	 * value is guaranteed to be higher than what we know already.
++	 * As a safe limit, we return the limit supported by the kernel.
++	 */
++	default: return CONFIG_ARM64_PA_BITS;
++	}
 +}
-+
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d6d7336f871..b04280ae1be0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -513,4 +513,6 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
+ #endif /* __ASSEMBLY__ */
  
-+int kvm_arm_config_vm(struct kvm *kvm, unsigned long type);
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index e37c78bbe1ca..b0c07dab5cb3 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -133,3 +133,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset timer */
- 	return kvm_timer_vcpu_reset(vcpu);
- }
-+
-+int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
-+{
-+	if (type)
-+		return -EINVAL;
-+	return 0;
-+}
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index c92053bc3f96..327d0fd28380 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -120,8 +120,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	int ret, cpu;
- 
--	if (type)
--		return -EINVAL;
-+	ret = kvm_arm_config_vm(kvm, type);
-+	if (ret)
-+		return ret;
- 
- 	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
- 	if (!kvm->arch.last_vcpu_ran)
+ #endif
 -- 
 2.19.1
