@@ -1,24 +1,26 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL 00/26] KVM/arm updates for 4.20
-Date: Fri, 19 Oct 2018 15:23:31 +0200
-Message-ID: <9af51d24-fe4a-32d9-3637-004ce9ed0e7d@redhat.com>
-References: <20181019125901.185478-1-marc.zyngier@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] arm64: KVM: Guests can skip __install_bp_hardening_cb()s
+ HYP work
+Date: Fri, 19 Oct 2018 15:38:03 +0100
+Message-ID: <20181019143803.GC3985@arrakis.emea.arm.com>
+References: <20180921204919.5790-1-james.morse@arm.com>
+ <de8be744-525a-2b75-ef77-e66d7fbabc40@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 392C64A2BD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:23:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B283D4A1FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 10:38:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kSTwd+hEy9pP for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 09:23:43 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33ADF4A2AC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:23:43 -0400 (EDT)
-In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
-Content-Language: en-US
+ with ESMTP id tyfumkU8jFCU for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 10:38:08 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F54D4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 10:38:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <de8be744-525a-2b75-ef77-e66d7fbabc40@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,41 +30,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: zhong jiang <zhongjiang@huawei.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19/10/2018 14:58, Marc Zyngier wrote:
-> Paolo, Radim,
+On Fri, Oct 19, 2018 at 11:17:32AM +0100, Marc Zyngier wrote:
+> On 21/09/18 21:49, James Morse wrote:
+> > enable_smccc_arch_workaround_1() passes NULL as the hyp_vecs start and
+> > end if the HVC conduit is in use, and ARM_SMCCC_ARCH_WORKAROUND_1 is
+> > detected.
+> > 
+> > If the guest kernel happened to be built with KVM_INDIRECT_VECTORS,
+> > we go on to allocate a slot, memcpy() the empty workaround in and
+> > do the appropriate cache maintenance.
+> > 
+> > This works as we always tell memcpy() the range is 0, so it never
+> > accesses the NULL src pointer, but we still do the cache maintenance.
+> > 
+> > If hyp_vecs_start is NULL we know we're a guest, just update the fn
+> > like the !KVM_INDIRECT_VECTORS version.
+> > 
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 > 
-> This is the bulk of the KVM/arm changes for 4.20. This time, the
-> biggest change by far is the support for variable addressing range in
-> guests, allowing userspace to size arm64 VMs from 32 to 52bits instead
-> of the hard-coded 40bits we've enjoyed so far. Other than that, we
-> have a random selection of small fixes and cleanups.
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 > 
-> Note that this will generate a few minor conflicts with the arm64 tree,
-> which should be resolved as per this branch[1].
+> Catalin: could you sneak this one in for 4.20? It is strictly a KVM
+> patch, but its location makes it more suitable for the arm64 tree...
 
-That's a bit annoying.  KVM parts of "Support Common Not Private
-translations" should not have gone through the arm64 tree.  Instead,
-Catalin should have placed the first patches in a topic branch for you
-to pull.
+Done.
 
-This minimizes the effort for everyone else, basically.  Conflicts need
-to be sorted out by Stephen Rothwell, myself and Linus/Greg, while topic
-branches just work.
-
-If it weren't for the include/uapi/linux/kvm.h change, where I have to
-sort the capability numbers as they are assigned by the various
-architecture maintainers(*), I would have told you to just send the pull
-request to Catalin this time through (but that would just be a band-aid,
-it should not be the norm).  Anyway, just remember this next time.
-
-Thanks,
-
-Paolo
-
-	(*) That's also a bit suboptimal, because it complicates
-	    debugging of new features after they're merged, but I have
-	    no better idea.
+-- 
+Catalin
