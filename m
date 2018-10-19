@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 01/26] kvm: arm/arm64: Fix stage2_flush_memslot for 4 level
- page table
-Date: Fri, 19 Oct 2018 13:58:36 +0100
-Message-ID: <20181019125901.185478-2-marc.zyngier@arm.com>
+Subject: [PATCH 02/26] kvm: arm/arm64: Remove spurious WARN_ON
+Date: Fri, 19 Oct 2018 13:58:37 +0100
+Message-ID: <20181019125901.185478-3-marc.zyngier@arm.com>
 References: <20181019125901.185478-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 066A54A2B4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAFB94A2CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pmo3xXfyEvuJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 08:59:23 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 353214A2B2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:22 -0400 (EDT)
+ with ESMTP id 2G4BN9ZlkYuY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 08:59:24 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C5D2A49F94
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 08:59:24 -0400 (EDT)
 In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,10 +33,8 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-So far we have only supported 3 level page table with fixed IPA of
-40bits, where PUD is folded. With 4 level page tables, we need
-to check if the PUD entry is valid or not. Fix stage2_flush_memslot()
-to do this check, before walking down the table.
+On a 4-level page table pgd entry can be empty, unlike a 3-level
+page table. Remove the spurious WARN_ON() in stage_get_pud().
 
 Acked-by: Christoffer Dall <cdall@kernel.org>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
@@ -45,22 +42,21 @@ Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index ed162a6c57c5..ee7ce8fa4a12 100644
+index ee7ce8fa4a12..4a285d760ce0 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -412,7 +412,8 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		next = stage2_pgd_addr_end(addr, end);
--		stage2_flush_puds(kvm, pgd, addr, next);
-+		if (!stage2_pgd_none(*pgd))
-+			stage2_flush_puds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
+@@ -1005,7 +1005,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	pud_t *pud;
  
+ 	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+-	if (WARN_ON(stage2_pgd_none(*pgd))) {
++	if (stage2_pgd_none(*pgd)) {
+ 		if (!cache)
+ 			return NULL;
+ 		pud = mmu_memory_cache_alloc(cache);
 -- 
 2.19.1
