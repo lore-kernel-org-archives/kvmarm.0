@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 23/26] KVM: arm64: Fix caching of host MDCR_EL2 value
-Date: Fri, 19 Oct 2018 13:58:58 +0100
-Message-ID: <20181019125901.185478-24-marc.zyngier@arm.com>
+Subject: [PATCH 22/26] KVM: arm/arm64: Ensure only THP is candidate for
+ adjustment
+Date: Fri, 19 Oct 2018 13:58:57 +0100
+Message-ID: <20181019125901.185478-23-marc.zyngier@arm.com>
 References: <20181019125901.185478-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 919884A2BB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A5B4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XkYeWR8iu9bG for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 09:00:28 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB524A202
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:26 -0400 (EDT)
+ with ESMTP id WSScts2Flc9O for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 09:00:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E4B04A211
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:23 -0400 (EDT)
 In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,55 +32,46 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: zhong jiang <zhongjiang@huawei.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
 
-At boot time, KVM stashes the host MDCR_EL2 value, but only does this
-when the kernel is not running in hyp mode (i.e. is non-VHE). In these
-cases, the stashed value of MDCR_EL2.HPMN happens to be zero, which can
-lead to CONSTRAINED UNPREDICTABLE behaviour.
+PageTransCompoundMap() returns true for hugetlbfs and THP
+hugepages. This behaviour incorrectly leads to stage 2 faults for
+unsupported hugepage sizes (e.g., 64K hugepage with 4K pages) to be
+treated as THP faults.
 
-Since we use this value to derive the MDCR_EL2 value when switching
-to/from a guest, after a guest have been run, the performance counters
-do not behave as expected. This has been observed to result in accesses
-via PMXEVTYPER_EL0 and PMXEVCNTR_EL0 not affecting the relevant
-counters, resulting in events not being counted. In these cases, only
-the fixed-purpose cycle counter appears to work as expected.
+Tighten the check to filter out hugetlbfs pages. This also leads to
+consistently mapping all unsupported hugepage sizes as PTE level
+entries at stage 2.
 
-Fix this by always stashing the host MDCR_EL2 value, regardless of VHE.
-
-Cc: Christopher Dall <christoffer.dall@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: stable@vger.kernel.org
-Fixes: 1e947bad0b63b351 ("arm64: KVM: Skip HYP setup when already running in HYP")
-Tested-by: Robin Murphy <robin.murphy@arm.com>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Reviewed-by: Suzuki Poulose <suzuki.poulose@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: stable@vger.kernel.org # v4.13+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/arm/mmu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 4ce99bb223bc..4c5ff06b18f9 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1296,8 +1296,6 @@ static void cpu_init_hyp_mode(void *dummy)
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 7e477b3cae5b..c23a1b323aad 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1231,8 +1231,14 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+ {
+ 	kvm_pfn_t pfn = *pfnp;
+ 	gfn_t gfn = *ipap >> PAGE_SHIFT;
++	struct page *page = pfn_to_page(pfn);
  
- 	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
- 	__cpu_init_stage2();
--
--	kvm_arm_init_debug();
- }
- 
- static void cpu_hyp_reset(void)
-@@ -1315,6 +1313,8 @@ static void cpu_hyp_reinit(void)
- 	else
- 		cpu_init_hyp_mode(NULL);
- 
-+	kvm_arm_init_debug();
-+
- 	if (vgic_present)
- 		kvm_vgic_init_cpu_hardware();
- }
+-	if (PageTransCompoundMap(pfn_to_page(pfn))) {
++	/*
++	 * PageTransCompoungMap() returns true for THP and
++	 * hugetlbfs. Make sure the adjustment is done only for THP
++	 * pages.
++	 */
++	if (!PageHuge(page) && PageTransCompoundMap(page)) {
+ 		unsigned long mask;
+ 		/*
+ 		 * The address we faulted on is backed by a transparent huge
 -- 
 2.19.1
