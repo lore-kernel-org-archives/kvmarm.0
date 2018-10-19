@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/26] kvm: arm64: Allow tuning the physical address size for
- VM
-Date: Fri, 19 Oct 2018 13:58:53 +0100
-Message-ID: <20181019125901.185478-19-marc.zyngier@arm.com>
+Subject: [PATCH 19/26] KVM: arm/arm64: Rename kvm_arm_config_vm to
+ kvm_arm_setup_stage2
+Date: Fri, 19 Oct 2018 13:58:54 +0100
+Message-ID: <20181019125901.185478-20-marc.zyngier@arm.com>
 References: <20181019125901.185478-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 523FE4A2BC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62AC64A202
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rC8UUb7QHHV2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 09:00:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CACF4A1E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:11 -0400 (EDT)
+ with ESMTP id abFo0VsNiX3k for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 09:00:18 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 911234A303
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 09:00:14 -0400 (EDT)
 In-Reply-To: <20181019125901.185478-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,125 +32,89 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: zhong jiang <zhongjiang@huawei.com>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KCkFsbG93IHNw
-ZWNpZnlpbmcgdGhlIHBoeXNpY2FsIGFkZHJlc3Mgc2l6ZSBsaW1pdCBmb3IgYSBuZXcKVk0gdmlh
-IHRoZSBrdm1fdHlwZSBhcmd1bWVudCBmb3IgdGhlIEtWTV9DUkVBVEVfVk0gaW9jdGwuIFRoaXMK
-YWxsb3dzIHVzIHRvIGZpbmFsaXNlIHRoZSBzdGFnZTIgcGFnZSB0YWJsZSBhcyBlYXJseSBhcyBw
-b3NzaWJsZQphbmQgaGVuY2UgcGVyZm9ybSB0aGUgcmlnaHQgY2hlY2tzIG9uIHRoZSBtZW1vcnkg
-c2xvdHMKd2l0aG91dCBjb21wbGljYXRpb24uIFRoZSBzaXplIGlzIGVuY29kZWQgYXMgTG9nMihQ
-QV9TaXplKSBpbgpiaXRzWzc6MF0gb2YgdGhlIHR5cGUgZmllbGQuIEZvciBiYWNrd2FyZCBjb21w
-YXRpYmlsaXR5IHRoZQp2YWx1ZSAwIGlzIHJlc2VydmVkIGFuZCBpbXBsaWVzIDQwYml0cy4gQWxz
-bywgbGlmdCB0aGUgbGltaXQKb2YgdGhlIElQQSB0byBob3N0IGxpbWl0IGFuZCBhbGxvdyBsb3dl
-ciBJUEEgc2l6ZXMgKGUuZywgMzIpLgoKVGhlIHVzZXJzcGFjZSBjb3VsZCBjaGVjayB0aGUgZXh0
-ZW5zaW9uIEtWTV9DQVBfQVJNX1ZNX0lQQV9TSVpFCmZvciB0aGUgYXZhaWxhYmlsaXR5IG9mIHRo
-aXMgZmVhdHVyZS4gVGhlIGNhcCBjaGVjayByZXR1cm5zIHRoZQptYXhpbXVtIGxpbWl0IGZvciB0
-aGUgcGh5c2ljYWwgYWRkcmVzcyBzaGlmdCBzdXBwb3J0ZWQgYnkgdGhlIGhvc3QuCgpDYzogTWFy
-YyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KQ2M6IENocmlzdG9mZmVyIERhbGwgPGNk
-YWxsQGtlcm5lbC5vcmc+CkNjOiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5v
-cmc+CkNjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPgpDYzogUmFkaW0gS3LE
-jW3DocWZIDxya3JjbWFyQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBFcmljIEF1Z2VyIDxlcmlj
-LmF1Z2VyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN1enVraSBLIFBvdWxvc2UgPHN1enVr
-aS5wb3Vsb3NlQGFybS5jb20+ClNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5n
-aWVyQGFybS5jb20+Ci0tLQogRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0ICAgICAg
-IHwgMzEgKysrKysrKysrKysrKysrKysrKysrKysrKwogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9z
-dGFnZTJfcGd0YWJsZS5oIHwgMjAgLS0tLS0tLS0tLS0tLS0tLQogYXJjaC9hcm02NC9rdm0vcmVz
-ZXQuYyAgICAgICAgICAgICAgICAgIHwgMTcgKysrKysrKysrKy0tLS0KIGluY2x1ZGUvdWFwaS9s
-aW51eC9rdm0uaCAgICAgICAgICAgICAgICB8IDEwICsrKysrKysrCiA0IGZpbGVzIGNoYW5nZWQs
-IDU0IGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3VtZW50
-YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBp
-LnR4dAppbmRleCA2NDdmOTQxMjhhODUuLmY2YjBhZjU1ZDAxMCAxMDA2NDQKLS0tIGEvRG9jdW1l
-bnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0CisrKyBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9r
-dm0vYXBpLnR4dApAQCAtMTIzLDYgKzEyMywzNyBAQCBtZW1vcnkgbGF5b3V0IHRvIGZpdCBpbiB1
-c2VyIG1vZGUpLCBjaGVjayBLVk1fQ0FQX01JUFNfVlogYW5kIHVzZSB0aGUKIGZsYWcgS1ZNX1ZN
-X01JUFNfVlouCiAKIAorT24gYXJtNjQsIHRoZSBwaHlzaWNhbCBhZGRyZXNzIHNpemUgZm9yIGEg
-Vk0gKElQQSBTaXplIGxpbWl0KSBpcyBsaW1pdGVkCit0byA0MGJpdHMgYnkgZGVmYXVsdC4gVGhl
-IGxpbWl0IGNhbiBiZSBjb25maWd1cmVkIGlmIHRoZSBob3N0IHN1cHBvcnRzIHRoZQorZXh0ZW5z
-aW9uIEtWTV9DQVBfQVJNX1ZNX0lQQV9TSVpFLiBXaGVuIHN1cHBvcnRlZCwgdXNlCitLVk1fVk1f
-VFlQRV9BUk1fSVBBX1NJWkUoSVBBX0JpdHMpIHRvIHNldCB0aGUgc2l6ZSBpbiB0aGUgbWFjaGlu
-ZSB0eXBlCitpZGVudGlmaWVyLCB3aGVyZSBJUEFfQml0cyBpcyB0aGUgbWF4aW11bSB3aWR0aCBv
-ZiBhbnkgcGh5c2ljYWwKK2FkZHJlc3MgdXNlZCBieSB0aGUgVk0uIFRoZSBJUEFfQml0cyBpcyBl
-bmNvZGVkIGluIGJpdHNbNy0wXSBvZiB0aGUKK21hY2hpbmUgdHlwZSBpZGVudGlmaWVyLgorCitl
-LmcsIHRvIGNvbmZpZ3VyZSBhIGd1ZXN0IHRvIHVzZSA0OGJpdCBwaHlzaWNhbCBhZGRyZXNzIHNp
-emUgOgorCisgICAgdm1fZmQgPSBpb2N0bChkZXZfZmQsIEtWTV9DUkVBVEVfVk0sIEtWTV9WTV9U
-WVBFX0FSTV9JUEFfU0laRSg0OCkpOworCitUaGUgcmVxdWVzdGVkIHNpemUgKElQQV9CaXRzKSBt
-dXN0IGJlIDoKKyAgMCAtIEltcGxpZXMgZGVmYXVsdCBzaXplLCA0MGJpdHMgKGZvciBiYWNrd2Fy
-ZCBjb21wYXRpYmlsaXR5KQorCisgIG9yCisKKyAgTiAtIEltcGxpZXMgTiBiaXRzLCB3aGVyZSBO
-IGlzIGEgcG9zaXRpdmUgaW50ZWdlciBzdWNoIHRoYXQsCisgICAgICAzMiA8PSBOIDw9IEhvc3Rf
-SVBBX0xpbWl0CisKK0hvc3RfSVBBX0xpbWl0IGlzIHRoZSBtYXhpbXVtIHBvc3NpYmxlIHZhbHVl
-IGZvciBJUEFfQml0cyBvbiB0aGUgaG9zdCBhbmQKK2lzIGRlcGVuZGVudCBvbiB0aGUgQ1BVIGNh
-cGFiaWxpdHkgYW5kIHRoZSBrZXJuZWwgY29uZmlndXJhdGlvbi4gVGhlIGxpbWl0IGNhbgorYmUg
-cmV0cmlldmVkIHVzaW5nIEtWTV9DQVBfQVJNX1ZNX0lQQV9TSVpFIG9mIHRoZSBLVk1fQ0hFQ0tf
-RVhURU5TSU9OCitpb2N0bCgpIGF0IHJ1bi10aW1lLgorCitQbGVhc2Ugbm90ZSB0aGF0IGNvbmZp
-Z3VyaW5nIHRoZSBJUEEgc2l6ZSBkb2VzIG5vdCBhZmZlY3QgdGhlIGNhcGFiaWxpdHkKK2V4cG9z
-ZWQgYnkgdGhlIGd1ZXN0IENQVXMgaW4gSURfQUE2NE1NRlIwX0VMMVtQQVJhbmdlXS4gSXQgb25s
-eSBhZmZlY3RzCitzaXplIG9mIHRoZSBhZGRyZXNzIHRyYW5zbGF0ZWQgYnkgdGhlIHN0YWdlMiBs
-ZXZlbCAoZ3Vlc3QgcGh5c2ljYWwgdG8KK2hvc3QgcGh5c2ljYWwgYWRkcmVzcyB0cmFuc2xhdGlv
-bnMpLgorCisKIDQuMyBLVk1fR0VUX01TUl9JTkRFWF9MSVNULCBLVk1fR0VUX01TUl9GRUFUVVJF
-X0lOREVYX0xJU1QKIAogQ2FwYWJpbGl0eTogYmFzaWMsIEtWTV9DQVBfR0VUX01TUl9GRUFUVVJF
-UyBmb3IgS1ZNX0dFVF9NU1JfRkVBVFVSRV9JTkRFWF9MSVNUCmRpZmYgLS1naXQgYS9hcmNoL2Fy
-bTY0L2luY2x1ZGUvYXNtL3N0YWdlMl9wZ3RhYmxlLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L3N0YWdlMl9wZ3RhYmxlLmgKaW5kZXggMmNjZTc2OWJhNGM2Li5kMzUyZjZkZjhkMmMgMTAwNjQ0
-Ci0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3RhZ2UyX3BndGFibGUuaAorKysgYi9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL3N0YWdlMl9wZ3RhYmxlLmgKQEAgLTQyLDI4ICs0Miw4IEBACiAg
-KiB0aGUgcmFuZ2UgKElQQV9TSElGVCwgSVBBX1NISUZUIC0gNCkuCiAgKi8KICNkZWZpbmUgc3Rh
-Z2UyX3BndGFibGVfbGV2ZWxzKGlwYSkJQVJNNjRfSFdfUEdUQUJMRV9MRVZFTFMoKGlwYSkgLSA0
-KQotI2RlZmluZSBTVEFHRTJfUEdUQUJMRV9MRVZFTFMJCXN0YWdlMl9wZ3RhYmxlX2xldmVscyhL
-Vk1fUEhZU19TSElGVCkKICNkZWZpbmUga3ZtX3N0YWdlMl9sZXZlbHMoa3ZtKQkJVlRDUl9FTDJf
-TFZMUyhrdm0tPmFyY2gudnRjcikKIAotLyoKLSAqIFdpdGggYWxsIHRoZSBzdXBwb3J0ZWQgVkFf
-QklUcyBhbmQgNDBiaXQgZ3Vlc3QgSVBBLCB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbgotICogaXMg
-YWx3YXlzIHRydWU6Ci0gKgotICogICAgICAgU1RBR0UyX1BHVEFCTEVfTEVWRUxTIDw9IENPTkZJ
-R19QR1RBQkxFX0xFVkVMUwotICoKLSAqIFdlIGJhc2Ugb3VyIHN0YWdlLTIgcGFnZSB0YWJsZSB3
-YWxrZXIgaGVscGVycyBvbiB0aGlzIGFzc3VtcHRpb24gYW5kCi0gKiBmYWxsIGJhY2sgdG8gdXNp
-bmcgdGhlIGhvc3QgdmVyc2lvbiBvZiB0aGUgaGVscGVyIHdoZXJldmVyIHBvc3NpYmxlLgotICog
-aS5lLCBpZiBhIHBhcnRpY3VsYXIgbGV2ZWwgaXMgbm90IGZvbGRlZCAoZS5nLCBQVUQpIGF0IHN0
-YWdlMiwgd2UgZmFsbCBiYWNrCi0gKiB0byB1c2luZyB0aGUgaG9zdCB2ZXJzaW9uLCBzaW5jZSBp
-dCBpcyBndWFyYW50ZWVkIGl0IGlzIG5vdCBmb2xkZWQgYXQgaG9zdC4KLSAqCi0gKiBJZiB0aGUg
-Y29uZGl0aW9uIGJyZWFrcyBpbiB0aGUgZnV0dXJlLCB3ZSBjYW4gcmVhcnJhbmdlIHRoZSBob3N0
-IGxldmVsCi0gKiBkZWZpbml0aW9ucyBhbmQgcmV1c2UgdGhlbSBmb3Igc3RhZ2UyLiBUaWxsIHRo
-ZW4uLi4KLSAqLwotI2lmIFNUQUdFMl9QR1RBQkxFX0xFVkVMUyA+IENPTkZJR19QR1RBQkxFX0xF
-VkVMUwotI2Vycm9yICJVbnN1cHBvcnRlZCBjb21iaW5hdGlvbiBvZiBndWVzdCBJUEEgYW5kIGhv
-c3QgVkFfQklUUy4iCi0jZW5kaWYKLQotCiAvKiBzdGFnZTJfcGdkaXJfc2hpZnQoKSBpcyB0aGUg
-c2l6ZSBtYXBwZWQgYnkgdG9wLWxldmVsIHN0YWdlMiBlbnRyeSBmb3IgdGhlIFZNICovCiAjZGVm
-aW5lIHN0YWdlMl9wZ2Rpcl9zaGlmdChrdm0pCQlwdF9sZXZlbHNfcGdkaXJfc2hpZnQoa3ZtX3N0
-YWdlMl9sZXZlbHMoa3ZtKSkKICNkZWZpbmUgc3RhZ2UyX3BnZGlyX3NpemUoa3ZtKQkJKDFVTEwg
-PDwgc3RhZ2UyX3BnZGlyX3NoaWZ0KGt2bSkpCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9y
-ZXNldC5jIGIvYXJjaC9hcm02NC9rdm0vcmVzZXQuYwppbmRleCBmMTU2ZTQ1NzYwYmMuLjk1ZjI4
-ZDU5NTBlMCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vcmVzZXQuYworKysgYi9hcmNoL2Fy
-bTY0L2t2bS9yZXNldC5jCkBAIC04OSw2ICs4OSw5IEBAIGludCBrdm1fYXJjaF9kZXZfaW9jdGxf
-Y2hlY2tfZXh0ZW5zaW9uKHN0cnVjdCBrdm0gKmt2bSwgbG9uZyBleHQpCiAJY2FzZSBLVk1fQ0FQ
-X1ZDUFVfRVZFTlRTOgogCQlyID0gMTsKIAkJYnJlYWs7CisJY2FzZSBLVk1fQ0FQX0FSTV9WTV9J
-UEFfU0laRToKKwkJciA9IGt2bV9pcGFfbGltaXQ7CisJCWJyZWFrOwogCWRlZmF1bHQ6CiAJCXIg
-PSAwOwogCX0KQEAgLTE5MiwxNyArMTk1LDIzIEBAIGludCBrdm1fYXJtX2NvbmZpZ192bShzdHJ1
-Y3Qga3ZtICprdm0sIHVuc2lnbmVkIGxvbmcgdHlwZSkKIAl1MzIgcGFyYW5nZSwgcGh5c19zaGlm
-dDsKIAl1OCBsdmxzOwogCi0JaWYgKHR5cGUpCisJaWYgKHR5cGUgJiB+S1ZNX1ZNX1RZUEVfQVJN
-X0lQQV9TSVpFX01BU0spCiAJCXJldHVybiAtRUlOVkFMOwogCisJcGh5c19zaGlmdCA9IEtWTV9W
-TV9UWVBFX0FSTV9JUEFfU0laRSh0eXBlKTsKKwlpZiAocGh5c19zaGlmdCkgeworCQlpZiAocGh5
-c19zaGlmdCA+IGt2bV9pcGFfbGltaXQgfHwKKwkJICAgIHBoeXNfc2hpZnQgPCAzMikKKwkJCXJl
-dHVybiAtRUlOVkFMOworCX0gZWxzZSB7CisJCXBoeXNfc2hpZnQgPSBLVk1fUEhZU19TSElGVDsK
-Kwl9CisKIAlwYXJhbmdlID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhTWVNfSURfQUE2NE1NRlIw
-X0VMMSkgJiA3OwogCWlmIChwYXJhbmdlID4gSURfQUE2NE1NRlIwX1BBUkFOR0VfTUFYKQogCQlw
-YXJhbmdlID0gSURfQUE2NE1NRlIwX1BBUkFOR0VfTUFYOwogCXZ0Y3IgfD0gcGFyYW5nZSA8PCBW
-VENSX0VMMl9QU19TSElGVDsKIAotCXBoeXNfc2hpZnQgPSBpZF9hYTY0bW1mcjBfcGFyYW5nZV90
-b19waHlzX3NoaWZ0KHBhcmFuZ2UpOwotCWlmIChwaHlzX3NoaWZ0ID4gS1ZNX1BIWVNfU0hJRlQp
-Ci0JCXBoeXNfc2hpZnQgPSBLVk1fUEhZU19TSElGVDsKIAl2dGNyIHw9IFZUQ1JfRUwyX1QwU1oo
-cGh5c19zaGlmdCk7CiAJLyoKIAkgKiBVc2UgYSBtaW5pbXVtIDIgbGV2ZWwgcGFnZSB0YWJsZSB0
-byBwcmV2ZW50IHNwbGl0dGluZwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5o
-IGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCmluZGV4IDI1MWJlMzUzZjk1MC4uOTVhYTczY2E2
-NWRjIDEwMDY0NAotLS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKKysrIGIvaW5jbHVkZS91
-YXBpL2xpbnV4L2t2bS5oCkBAIC03NTAsNiArNzUwLDE1IEBAIHN0cnVjdCBrdm1fcHBjX3Jlc2l6
-ZV9ocHQgewogCiAjZGVmaW5lIEtWTV9TMzkwX1NJRV9QQUdFX09GRlNFVCAxCiAKKy8qCisgKiBP
-biBhcm02NCwgbWFjaGluZSB0eXBlIGNhbiBiZSB1c2VkIHRvIHJlcXVlc3QgdGhlIHBoeXNpY2Fs
-CisgKiBhZGRyZXNzIHNpemUgZm9yIHRoZSBWTS4gQml0c1s3LTBdIGFyZSByZXNlcnZlZCBmb3Ig
-dGhlIGd1ZXN0CisgKiBQQSBzaXplIHNoaWZ0IChpLmUsIGxvZzIoUEFfU2l6ZSkpLiBGb3IgYmFj
-a3dhcmQgY29tcGF0aWJpbGl0eSwKKyAqIHZhbHVlIDAgaW1wbGllcyB0aGUgZGVmYXVsdCBJUEEg
-c2l6ZSwgNDBiaXRzLgorICovCisjZGVmaW5lIEtWTV9WTV9UWVBFX0FSTV9JUEFfU0laRV9NQVNL
-CTB4ZmZVTEwKKyNkZWZpbmUgS1ZNX1ZNX1RZUEVfQVJNX0lQQV9TSVpFKHgpCQlcCisJKCh4KSAm
-IEtWTV9WTV9UWVBFX0FSTV9JUEFfU0laRV9NQVNLKQogLyoKICAqIGlvY3RscyBmb3IgL2Rldi9r
-dm0gZmRzOgogICovCkBAIC05NTMsNiArOTYyLDcgQEAgc3RydWN0IGt2bV9wcGNfcmVzaXplX2hw
-dCB7CiAjZGVmaW5lIEtWTV9DQVBfTkVTVEVEX1NUQVRFIDE1NwogI2RlZmluZSBLVk1fQ0FQX0FS
-TV9JTkpFQ1RfU0VSUk9SX0VTUiAxNTgKICNkZWZpbmUgS1ZNX0NBUF9NU1JfUExBVEZPUk1fSU5G
-TyAxNTkKKyNkZWZpbmUgS1ZNX0NBUF9BUk1fVk1fSVBBX1NJWkUgMTYwIC8qIHJldHVybnMgbWF4
-aW11bSBJUEEgYml0cyBmb3IgYSBWTSAqLwogCiAjaWZkZWYgS1ZNX0NBUF9JUlFfUk9VVElORwog
-Ci0tIAoyLjE5LjEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
-czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+VM tends to be a very overloaded term in KVM, so let's keep it
+to describe the virtual machine. For the virtual memory setup,
+let's use the "stage2" suffix.
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_host.h   | 6 +++++-
+ arch/arm64/include/asm/kvm_arm.h  | 2 +-
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/reset.c            | 2 +-
+ virt/kvm/arm/arm.c                | 2 +-
+ 5 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 72d46418e1ef..b45af481ccf7 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -354,8 +354,12 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
+ struct kvm *kvm_arch_alloc_vm(void);
+ void kvm_arch_free_vm(struct kvm *kvm);
+ 
+-static inline int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
++static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ {
++	/*
++	 * On 32bit ARM, VMs get a static 40bit IPA stage2 setup,
++	 * so any non-zero value used as type is illegal.
++	 */
+ 	if (type)
+ 		return -EINVAL;
+ 	return 0;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index f1330284720d..6e324d1f1231 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -133,7 +133,7 @@
+  * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
+  * not known to exist and will break with this configuration.
+  *
+- * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_config_vm().
++ * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_setup_stage2().
+  *
+  * Note that when using 4K pages, we concatenate two first level page tables
+  * together. With 16K pages, we concatenate 16 first level page tables.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f008f8866b2a..376a5b695467 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -511,6 +511,6 @@ void kvm_set_ipa_limit(void);
+ struct kvm *kvm_arch_alloc_vm(void);
+ void kvm_arch_free_vm(struct kvm *kvm);
+ 
+-int kvm_arm_config_vm(struct kvm *kvm, unsigned long type);
++int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 95f28d5950e0..aa806d582552 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -189,7 +189,7 @@ void kvm_set_ipa_limit(void)
+  * all CPUs, as it is safe to run with or without the feature and
+  * the bit is RES0 on CPUs that don't support it.
+  */
+-int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
++int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ {
+ 	u64 vtcr = VTCR_EL2_FLAGS;
+ 	u32 parange, phys_shift;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 631f9a3ad99a..91c464c9cd21 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -120,7 +120,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	int ret, cpu;
+ 
+-	ret = kvm_arm_config_vm(kvm, type);
++	ret = kvm_arm_setup_stage2(kvm, type);
+ 	if (ret)
+ 		return ret;
+ 
+-- 
+2.19.1
