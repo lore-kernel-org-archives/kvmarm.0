@@ -1,7 +1,7 @@
-From: Will Deacon <will.deacon@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
 Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
-Date: Fri, 19 Oct 2018 16:49:48 +0100
-Message-ID: <20181019154948.GD16771@arm.com>
+Date: Fri, 19 Oct 2018 16:54:10 +0100
+Message-ID: <20181019155410.wsbmhluq4xqcyty2@lakrids.cambridge.arm.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
  <20181005084754.20950-8-kristina.martsenko@arm.com>
  <20181019111542.6wrvjguirglzg7vg@mbp>
@@ -14,16 +14,11 @@ Content-Disposition: inline
 In-Reply-To: <CAGXu5j+2axuzPJji_eCvMZDiPvrPsP3kAnG0CY_rsL5c=uFQFA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Kees Cook <keescook@chromium.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>, linux-arch <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, "Suzuki K . Poulose" <suzuki.poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, LKML <linux-kernel@vger.kernel.org>, Cyrill
+Cc: Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-arch <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, "Suzuki K . Poulose" <suzuki.poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, LKML <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Fri, Oct 19, 2018 at 08:36:45AM -0700, Kees Cook wrote:
 > On Fri, Oct 19, 2018 at 4:24 AM, Will Deacon <will.deacon@arm.com> wrote:
-> > FWIW: I think we should be entertaining a prctl() interface to use a new
-> > key on a per-thread basis. Obviously, this would need to be used with care
-> > (e.g. you'd fork(); use the prctl() and then you'd better not return from
-> > the calling function!).
-> >
 > > Assuming we want this (Kees -- I was under the impression that everything in
 > > Android would end up with the same key otherwise?), then the question is
 > > do we want:
@@ -40,17 +35,12 @@ On Fri, Oct 19, 2018 at 08:36:45AM -0700, Kees Cook wrote:
 > No reason to allow explicit access to the key (and selected algo) if
 > we don't have to.
 
-Makes sense.
+As a minor aside, the PAC algorithm (which can be IMPLEMENTATION
+DEFINED) is fixed in HW, and cannot be selected dynamically.
 
-> As for per-thread or not, having a "pick a new key now" prctl() sounds
-> good, but I'd like to have an eye toward having it just be "automatic"
-> on clone().
+Thus if a process is using pointer authentication, it would not be
+possible for CRIU to migrate that process to a CPU with a different PAC
+algorithm.
 
-I thought about that too, but we're out of clone() flags afaict and there's
-no arch hook in there. We could add yet another clone syscall, but yuck (and
-I reckon viro would kill us).
-
-Or are you saying that we could infer the behaviour from the existing set
-of flags?
-
-Will
+Thanks,
+Mark.
