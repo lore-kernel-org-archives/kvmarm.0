@@ -1,78 +1,77 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
+From: Will Deacon <will.deacon@arm.com>
 Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
-Date: Fri, 19 Oct 2018 12:15:43 +0100
-Message-ID: <20181019111542.6wrvjguirglzg7vg@mbp>
+Date: Fri, 19 Oct 2018 12:24:04 +0100
+Message-ID: <20181019112404.GD14246@arm.com>
 References: <20181005084754.20950-1-kristina.martsenko@arm.com>
  <20181005084754.20950-8-kristina.martsenko@arm.com>
+ <20181019111542.6wrvjguirglzg7vg@mbp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 166664A1D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 07:15:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id my74cGJEY8iP for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 07:15:50 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E884249F93
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 07:15:49 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20181005084754.20950-8-kristina.martsenko@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arch@vger.kernel.org, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Adam Wallis <awallis@codeaurora.org>, Will Deacon <will.deacon@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Kees Cook <keescook@chromium.org>
+In-Reply-To: <20181019111542.6wrvjguirglzg7vg@mbp>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, linux-arch@vger.kernel.org, Andrew Jones <drjones@redhat.com>, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, "Suzuki K . Poulose" <suzuki.poulose@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, gorcunov@openvz.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 05, 2018 at 09:47:44AM +0100, Kristina Martsenko wrote:
-> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-> new file mode 100644
-> index 000000000000..2aefedc31d9e
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/pointer_auth.h
-> @@ -0,0 +1,63 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#ifndef __ASM_POINTER_AUTH_H
-> +#define __ASM_POINTER_AUTH_H
-> +
-> +#include <linux/random.h>
-> +
-> +#include <asm/cpufeature.h>
-> +#include <asm/sysreg.h>
-> +
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +/*
-> + * Each key is a 128-bit quantity which is split across a pair of 64-bit
-> + * registers (Lo and Hi).
-> + */
-> +struct ptrauth_key {
-> +	unsigned long lo, hi;
-> +};
-> +
-> +/*
-> + * We give each process its own instruction A key (APIAKey), which is shared by
-> + * all threads. This is inherited upon fork(), and reinitialised upon exec*().
-> + * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
-> + * instructions behaving as NOPs.
-> + */
+[+Cyrill Gorcunov for CRIU stuff]
 
-I don't remember the past discussions but I assume the tools guys are ok
-with a single key shared by multiple threads. Ramana, could you ack this
-part, FTR?
+On Fri, Oct 19, 2018 at 12:15:43PM +0100, Catalin Marinas wrote:
+> On Fri, Oct 05, 2018 at 09:47:44AM +0100, Kristina Martsenko wrote:
+> > diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+> > new file mode 100644
+> > index 000000000000..2aefedc31d9e
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/pointer_auth.h
+> > @@ -0,0 +1,63 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +#ifndef __ASM_POINTER_AUTH_H
+> > +#define __ASM_POINTER_AUTH_H
+> > +
+> > +#include <linux/random.h>
+> > +
+> > +#include <asm/cpufeature.h>
+> > +#include <asm/sysreg.h>
+> > +
+> > +#ifdef CONFIG_ARM64_PTR_AUTH
+> > +/*
+> > + * Each key is a 128-bit quantity which is split across a pair of 64-bit
+> > + * registers (Lo and Hi).
+> > + */
+> > +struct ptrauth_key {
+> > +	unsigned long lo, hi;
+> > +};
+> > +
+> > +/*
+> > + * We give each process its own instruction A key (APIAKey), which is shared by
+> > + * all threads. This is inherited upon fork(), and reinitialised upon exec*().
+> > + * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
+> > + * instructions behaving as NOPs.
+> > + */
+> 
+> I don't remember the past discussions but I assume the tools guys are ok
+> with a single key shared by multiple threads. Ramana, could you ack this
+> part, FTR?
+> 
+> (and it would help if someone from the Android and Chrome camps can
+> confirm)
 
-(and it would help if someone from the Android and Chrome camps can
-confirm)
+FWIW: I think we should be entertaining a prctl() interface to use a new
+key on a per-thread basis. Obviously, this would need to be used with care
+(e.g. you'd fork(); use the prctl() and then you'd better not return from
+the calling function!).
 
-Thanks.
+Assuming we want this (Kees -- I was under the impression that everything in
+Android would end up with the same key otherwise?), then the question is
+do we want:
 
--- 
-Catalin
+  - prctl() get/set operations for the key, or
+  - prctl() set_random_key operation, or
+  - both of the above?
+
+Part of the answer to that may lie in the requirements of CRIU, where I
+strongly suspect they need explicit get/set operations, although these
+could be gated on CONFIG_CHECKPOINT_RESTORE=y.
+
+Will
