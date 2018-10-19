@@ -1,23 +1,25 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 1/2] kvm: Do not pause already paused vcpus
-Date: Fri, 19 Oct 2018 10:36:30 +0100
-Message-ID: <1539941791-40118-2-git-send-email-julien.thierry@arm.com>
-References: <1539941791-40118-1-git-send-email-julien.thierry@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: Guests can skip __install_bp_hardening_cb()s
+ HYP work
+Date: Fri, 19 Oct 2018 11:17:32 +0100
+Message-ID: <de8be744-525a-2b75-ef77-e66d7fbabc40@arm.com>
+References: <20180921204919.5790-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30EF84A2BD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 05:36:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A33F64A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 06:17:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2Iu74SNE2NCA for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Oct 2018 05:36:47 -0400 (EDT)
+ with ESMTP id 5skPujvRl-DD for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Oct 2018 06:17:36 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2819B4A2BE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 05:36:47 -0400 (EDT)
-In-Reply-To: <1539941791-40118-1-git-send-email-julien.thierry@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E14D49F94
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Oct 2018 06:17:36 -0400 (EDT)
+In-Reply-To: <20180921204919.5790-1-james.morse@arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,74 +29,35 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: will.deacon@arm.com, kvm@vger.kernel.org
+To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With the following sequence:
-	kvm__pause();
-	kvm__continue();
-	kvm__pause();
+On 21/09/18 21:49, James Morse wrote:
+> enable_smccc_arch_workaround_1() passes NULL as the hyp_vecs start and
+> end if the HVC conduit is in use, and ARM_SMCCC_ARCH_WORKAROUND_1 is
+> detected.
+> 
+> If the guest kernel happened to be built with KVM_INDIRECT_VECTORS,
+> we go on to allocate a slot, memcpy() the empty workaround in and
+> do the appropriate cache maintenance.
+> 
+> This works as we always tell memcpy() the range is 0, so it never
+> accesses the NULL src pointer, but we still do the cache maintenance.
+> 
+> If hyp_vecs_start is NULL we know we're a guest, just update the fn
+> like the !KVM_INDIRECT_VECTORS version.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-There is a chance that not all paused threads have been resumed, and the
-second kvm__pause will attempt to pause them again. Since the paused thread
-is waiting to own the pause_lock, it won't write its second pause
-notification. kvm__pause will be waiting for that notification while owning
-pause_lock, so... deadlock.
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Simple solution is not to try to pause thread that had not the chance to
-resume.
+Catalin: could you sneak this one in for 4.20? It is strictly a KVM
+patch, but its location makes it more suitable for the arm64 tree...
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
----
- kvm-cpu.c | 4 +---
- kvm.c     | 5 ++++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+Thanks,
 
-diff --git a/kvm-cpu.c b/kvm-cpu.c
-index cc8385f..4107841 100644
---- a/kvm-cpu.c
-+++ b/kvm-cpu.c
-@@ -148,10 +148,8 @@ int kvm_cpu__start(struct kvm_cpu *cpu)
- 		kvm_cpu__enable_singlestep(cpu);
- 
- 	while (cpu->is_running) {
--		if (cpu->paused) {
-+		if (cpu->paused)
- 			kvm__notify_paused();
--			cpu->paused = 0;
--		}
- 
- 		if (cpu->needs_nmi) {
- 			kvm_cpu__arch_nmi(cpu);
-diff --git a/kvm.c b/kvm.c
-index 05ad0b6..052c6e8 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -63,6 +63,8 @@ extern struct kvm_ext kvm_req_ext[];
- 
- static char kvm_dir[PATH_MAX];
- 
-+extern __thread struct kvm_cpu *current_kvm_cpu;
-+
- static int set_dir(const char *fmt, va_list args)
- {
- 	char tmp[PATH_MAX];
-@@ -521,7 +523,7 @@ void kvm__pause(struct kvm *kvm)
- 	if (pause_event < 0)
- 		die("Failed creating pause notification event");
- 	for (i = 0; i < kvm->nrcpus; i++) {
--		if (kvm->cpus[i]->is_running)
-+		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0)
- 			pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
- 		else
- 			paused_vcpus++;
-@@ -545,5 +547,6 @@ void kvm__notify_paused(void)
- 		die("Failed notifying of paused VCPU.");
- 
- 	mutex_lock(&pause_lock);
-+	current_kvm_cpu->paused = 0;
- 	mutex_unlock(&pause_lock);
- }
+	M.
 -- 
-1.9.1
+Jazz is not dead. It just smells funny...
