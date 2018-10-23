@@ -1,85 +1,68 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v3 3/7] PCI: OF: Allow endpoints to bypass the iommu
-Date: Mon, 22 Oct 2018 12:27:50 +0100
-Message-ID: <e5c44d21-7b43-32dd-4f5f-3136bacb07e0@arm.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
-	<20181012145917.6840-4-jean-philippe.brucker@arm.com>
-	<20181012194158.GX5906@bhelgaas-glaptop.roam.corp.google.com>
-	<20181015065024-mutt-send-email-mst@kernel.org>
-	<482d0eb9-8c4c-9d64-7b32-25d5d11a8b8f@gmail.com>
-	<20181017111100-mutt-send-email-mst@kernel.org>
+From: Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>
+Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
+Date: Tue, 23 Oct 2018 08:36:16 +0000
+Message-ID: <5ca5bf92-f2b7-48c9-ea41-5efeff09a799@arm.com>
+References: <20181005084754.20950-1-kristina.martsenko@arm.com>
+ <20181005084754.20950-8-kristina.martsenko@arm.com>
+ <20181019111542.6wrvjguirglzg7vg@mbp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20181017111100-mutt-send-email-mst-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181019111542.6wrvjguirglzg7vg@mbp>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Jean-philippe Brucker <jphilippe.brucker-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, Bjorn Helgaas <helgaas-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Content-ID: <AAD136982C3E6A438E34A7F2DAB94C7A@eurprd08.prod.outlook.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Catalin Marinas <Catalin.Marinas@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Mark Rutland <Mark.Rutland@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kees Cook <keescook@chromium.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/10/2018 16:14, Michael S. Tsirkin wrote:
->>> Thinking about this comment, I would like to ask: can't the
->>> virtio device indicate the ranges in a portable way?
->>> This would minimize the dependency on dt bindings and ACPI,
->>> enabling support for systems that have neither but do
->>> have virtio e.g. through pci.
->>
->> I thought about adding a PROBE request for this in virtio-iommu, but it
->> wouldn't be usable by a Linux guest because of a bootstrapping problem.
-> 
-> Hmm. At some level it seems wrong to design hardware interfaces
-> around how Linux happens to probe things. That can change at any time
-> ...
+On 19/10/2018 12:15, Catalin Marinas wrote:
+> On Fri, Oct 05, 2018 at 09:47:44AM +0100, Kristina Martsenko wrote:
+>> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/=
+asm/pointer_auth.h
+>> new file mode 100644
+>> index 000000000000..2aefedc31d9e
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/pointer_auth.h
+>> @@ -0,0 +1,63 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +#ifndef __ASM_POINTER_AUTH_H
+>> +#define __ASM_POINTER_AUTH_H
+>> +
+>> +#include <linux/random.h>
+>> +
+>> +#include <asm/cpufeature.h>
+>> +#include <asm/sysreg.h>
+>> +
+>> +#ifdef CONFIG_ARM64_PTR_AUTH
+>> +/*
+>> + * Each key is a 128-bit quantity which is split across a pair of 64-bi=
+t
+>> + * registers (Lo and Hi).
+>> + */
+>> +struct ptrauth_key {
+>> +	unsigned long lo, hi;
+>> +};
+>> +
+>> +/*
+>> + * We give each process its own instruction A key (APIAKey), which is s=
+hared by
+>> + * all threads. This is inherited upon fork(), and reinitialised upon e=
+xec*().
+>> + * All other keys are currently unused, with APIBKey, APDAKey, and APBA=
+Key
+>> + * instructions behaving as NOPs.
+>> + */
+>=20
+> I don't remember the past discussions but I assume the tools guys are ok
+> with a single key shared by multiple threads. Ramana, could you ack this
+> part, FTR?
 
-I suspect that most other OS will also solve this class of problem using
-a standard such as DT or ACPI, because they also provide dependency for
-clock, interrupts, power management, etc. We can add a self-contained
-PROBE method if someone makes a case for it, but it's unlikely to get
-used at all, and nearly impossible to implement in Linux. The host would
-still need a method to tell the guest which device to probe first, for
-example with kernel parameters.
+Sorry about the slow response, I've been traveling.
 
->> Early on, Linux needs a description of device dependencies, to determine
->> in which order to probe them. If the device dependency was described by
->> virtio-iommu itself, the guest could for example initialize a NIC,
->> allocate buffers and start DMA on the physical address space (which aborts
->> if the IOMMU implementation disallows DMA by default), only to find out
->> once the virtio-iommu module is loaded that it needs to cancel all DMA and
->> reconfigure the NIC. With a static description such as iommu-map in DT or
->> ACPI remapping tables, the guest can defer probing of the NIC until the
->> IOMMU is initialized.
->>
->> Thanks,
->> Jean
-> 
-> Could you point me at the code you refer to here?
+Ack and Will's response covers the reasons why pretty well. A prctl call=20
+would be a good enhancement.
 
-In drivers/base/dd.c, really_probe() calls dma_configure() before the
-device driver's probe(). dma_configure() ends up calling either
-of_dma_configure() or acpi_dma_configure(), which return -EPROBE_DEFER
-if the device's IOMMU isn't yet available. In that case the device is
-added to the deferred pending list.
-
-After another device is successfully bound to a driver, all devices on
-the pending list are retried (driver_deferred_probe_trigger()), and if
-the dependency has been resolved, then dma_configure() succeeds.
-
-Another method (used by Intel and AMD IOMMU drivers) is to initialize
-the IOMMU as early as possible, after discovering it in the ACPI tables
-and before probing other devices. This can't work for virtio-iommu
-because the driver might be a module, in which case early init isn't
-possible. We have to defer probe of all dependent devices until the
-virtio and virtio-iommu modules are loaded.
-
-Thanks,
-Jean
+regards
+Ramana
