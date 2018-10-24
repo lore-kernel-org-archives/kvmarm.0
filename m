@@ -1,66 +1,41 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
-Date: Tue, 23 Oct 2018 11:20:09 +0100
-Message-ID: <20181023102008.GA8989@brain-police>
-References: <20181005084754.20950-1-kristina.martsenko@arm.com>
- <20181005084754.20950-8-kristina.martsenko@arm.com>
- <20181019111542.6wrvjguirglzg7vg@mbp>
- <5ca5bf92-f2b7-48c9-ea41-5efeff09a799@arm.com>
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 1/4] treewide: remove unused address argument from
+ pte_alloc functions (v2)
+Date: Wed, 24 Oct 2018 10:37:16 +0200
+Message-ID: <20181024083716.GN3109@worktop.c.hoisthospitality.com>
+References: <20181013013200.206928-1-joel@joelfernandes.org>
+ <20181013013200.206928-2-joel@joelfernandes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <5ca5bf92-f2b7-48c9-ea41-5efeff09a799@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Mark Rutland <Mark.Rutland@arm.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Amit Kachhap <Amit.Kachhap@arm.com>, Dave P Martin <Dave.Martin@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@>
+In-Reply-To: <20181013013200.206928-2-joel@joelfernandes.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: "Joel Fernandes (Google)" <joel@joelfernandes.org>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-begemot.co.uk, Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 23, 2018 at 09:36:16AM +0100, Ramana Radhakrishnan wrote:
-> On 19/10/2018 12:15, Catalin Marinas wrote:
-> > On Fri, Oct 05, 2018 at 09:47:44AM +0100, Kristina Martsenko wrote:
-> >> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
-> >> new file mode 100644
-> >> index 000000000000..2aefedc31d9e
-> >> --- /dev/null
-> >> +++ b/arch/arm64/include/asm/pointer_auth.h
-> >> @@ -0,0 +1,63 @@
-> >> +// SPDX-License-Identifier: GPL-2.0
-> >> +#ifndef __ASM_POINTER_AUTH_H
-> >> +#define __ASM_POINTER_AUTH_H
-> >> +
-> >> +#include <linux/random.h>
-> >> +
-> >> +#include <asm/cpufeature.h>
-> >> +#include <asm/sysreg.h>
-> >> +
-> >> +#ifdef CONFIG_ARM64_PTR_AUTH
-> >> +/*
-> >> + * Each key is a 128-bit quantity which is split across a pair of 64-bit
-> >> + * registers (Lo and Hi).
-> >> + */
-> >> +struct ptrauth_key {
-> >> +	unsigned long lo, hi;
-> >> +};
-> >> +
-> >> +/*
-> >> + * We give each process its own instruction A key (APIAKey), which is shared by
-> >> + * all threads. This is inherited upon fork(), and reinitialised upon exec*().
-> >> + * All other keys are currently unused, with APIBKey, APDAKey, and APBAKey
-> >> + * instructions behaving as NOPs.
-> >> + */
-> > 
-> > I don't remember the past discussions but I assume the tools guys are ok
-> > with a single key shared by multiple threads. Ramana, could you ack this
-> > part, FTR?
-> 
-> Sorry about the slow response, I've been traveling.
-> 
-> Ack and Will's response covers the reasons why pretty well. A prctl call 
-> would be a good enhancement.
+On Fri, Oct 12, 2018 at 06:31:57PM -0700, Joel Fernandes (Google) wrote:
+> This series speeds up mremap(2) syscall by copying page tables at the
+> PMD level even for non-THP systems. There is concern that the extra
+> 'address' argument that mremap passes to pte_alloc may do something
+> subtle architecture related in the future that may make the scheme not
+> work.  Also we find that there is no point in passing the 'address' to
+> pte_alloc since its unused. So this patch therefore removes this
+> argument tree-wide resulting in a nice negative diff as well. Also
+> ensuring along the way that the enabled architectures do not do anything
+> funky with 'address' argument that goes unnoticed by the optimization.
 
-One minor "gotcha" with that is that the glibc prctl() wrapper would need to
-be annotated not to use pointer auth, or we'd have to issue the syscall
-in-line.
-
-Will
+Did you happen to look at the history of where that address argument
+came from? -- just being curious here. ISTR something vague about
+architectures having different paging structure for different memory
+ranges.
