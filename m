@@ -1,94 +1,87 @@
-From: Mikulas Patocka <mpatocka@redhat.com>
-Subject: Re: ARM64 KVM crash
-Date: Wed, 24 Oct 2018 17:40:42 -0400 (EDT)
-Message-ID: <alpine.LRH.2.02.1810241738390.871@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.1810121204120.16008@file01.intranet.prod.int.rdu2.redhat.com>
- <b3355304-5144-b17a-c39c-866e197e3cc6@arm.com>
- <alpine.LRH.2.02.1810121453380.14664@file01.intranet.prod.int.rdu2.redhat.com>
- <86h8hqtd4m.wl-marc.zyngier@arm.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie
+Date: Wed, 24 Oct 2018 23:05:55 +0100
+Message-ID: <70ff6bee-5775-cccb-b74a-db915c907bcd@arm.com>
+References: <20180918142457.3325-1-eric.auger@redhat.com>
+ <20180918142457.3325-13-eric.auger@redhat.com>
+ <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
+ <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <86h8hqtd4m.wl-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
+Cc: tianyu.lan@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On Sat, 13 Oct 2018, Marc Zyngier wrote:
-
-> On Fri, 12 Oct 2018 19:59:16 +0100,
-> Mikulas Patocka <mpatocka@redhat.com> wrote:
-> > 
-> > 
-> > 
-> > On Fri, 12 Oct 2018, Marc Zyngier wrote:
-> > 
-> > > Right. But how is that related to KVM? See below:
-> > > 
-> > > > [75476.680725]  find_next_and_bit+0xc/0x70
-> > > > [75476.680728]  find_busiest_group+0x128/0x938
-> > > > [75476.680730]  load_balance+0x148/0x848
-> > > > [75476.680732]  pick_next_task_fair+0x1d4/0x568
-> > > > [75476.680734]  __schedule+0xe8/0x4b0
-> > > > [75476.680736]  schedule+0x38/0xa0
-> > > > [75476.680739]  kvm_vcpu_block+0x88/0x180
-> > > > [75476.680742]  kvm_handle_wfx+0x80/0xb8
-> > > > [75476.680744]  handle_exit+0x138/0x1b8
-> > > 
-> > > The guest is exiting because it has executed a blocking WFI, so KVM's
-> > > job is done and we're calling schedule(). The scheduler then starts
-> > > doing its job of picking the next victim.
-> > > 
-> > > At this stage, the kernel indeed blows up. But this doesn't immediately
-> > > seem to be KVM's fault. It is far more likely that the scheduler has
-> > > messed something up in its own data structure, which is even worse :-(.
-> > > 
-> > > I'd suggest you get in touch with the scheduler guys to see if they have
-> > > any insight. Also, trying to come up with a reproducer would be
-> > > extremely useful.
-> > > 
-> > > Thanks,
-> > > 
-> > > 	M.
-> > 
-> > I use this machine most of the time without KVM - and it crashed when I 
-> > started KVM - so I assume that KVM had something to do with it. Perhaps it 
-> > corrupts random memory? I may try to run some KVM stress for many days to 
-> > test if I reproduce it.
+On 2018-10-24 7:44 pm, Auger Eric wrote:
+> Hi Robin,
 > 
-> One thing I know for sure is that if you use a tap (such as macvtap)
+> On 10/24/18 8:02 PM, Robin Murphy wrote:
+>> Hi Eric,
+>>
+>> On 2018-09-18 3:24 pm, Eric Auger wrote:
+>>> Up to now, when the type was UNMANAGED, we used to
+>>> allocate IOVA pages within a range provided by the user.
+>>> This does not work in nested mode.
+>>>
+>>> If both the host and the guest are exposed with SMMUs, each
+>>> would allocate an IOVA. The guest allocates an IOVA (gIOVA)
+>>> to map onto the guest MSI doorbell (gDB). The Host allocates
+>>> another IOVA (hIOVA) to map onto the physical doorbell (hDB).
+>>>
+>>> So we end up with 2 unrelated mappings, at S1 and S2:
+>>>            S1             S2
+>>> gIOVA    ->     gDB
+>>>                  hIOVA    ->    hDB
+>>>
+>>> The PCI device would be programmed with hIOVA.
+>>>
+>>> iommu_dma_bind_doorbell allows to pass gIOVA/gDB to the host
+>>> so that gIOVA can be used by the host instead of re-allocating
+>>> a new IOVA. That way the host can create the following nested
+>>> mapping:
+>>>
+>>>            S1           S2
+>>> gIOVA    ->    gDB    ->    hDB
+>>>
+>>> this time, the PCI device will be programmed with the gIOVA MSI
+>>> doorbell which is correctly map through the 2 stages.
+>>
+>> If I'm understanding things correctly, this plus a couple of the
+>> preceding patches all add up to a rather involved way of coercing an
+>> automatic allocator to only "allocate" predetermined addresses in an
+>> entirely known-ahead-of-time manner.
+> agreed
+>   Given that the guy calling
+>> iommu_dma_bind_doorbell() could seemingly just as easily call
+>> iommu_map() at that point and not bother with an allocator cookie and
+>> all this machinery at all, what am I missing?
+> Well iommu_dma_map_msi_msg() gets called and is part of this existing
+> MSI mapping machinery. If we do not do anything this function allocates
+> an hIOVA that is not involved in any nested setup. So either we coerce
+> the allocator in place (which is what this series does) or we unplug the
+> allocator to replace this latter with a simple S2 mapping, as you
+> suggest, ie. iommu_map(gDB, hDB). Assuming we unplug the allocator, the
+> guy who actually calls  iommu_dma_bind_doorbell() knows gDB but does not
+> know hDB. So I don't really get how we can simplify things.
 
-I don't have macvtap compiled. The board is also used as a router and the 
-virtual machine bridge uses the same routing tables and iptables rules as 
-anything else.
+OK, there's what I was missing :D
 
-> to give networking to your VMs, the Ethernet driver on the 8040 (such
-> as on your MacchiatoBin) will happily corrupt memory (you can witness
-> that without running KVM at all). Something to do with the sbk being
-> freed early.
-> 
-> I've reported this issue several times, only to hear the wind
-> blowing. At this stage, I've shelved it. There is enough decent and
-> maintained platforms around not to worry about the unmaintained stuff.
-> 
-> Now, if you can give me a reproducer, I'll happily investigate.
+But that then seems to reveal a somewhat bigger problem - if the callers 
+are simply registering IPAs, and relying on the ITS driver to grab an 
+entry and fill in a PA later, then how does either one know *which* PA 
+is supposed to belong to a given IPA in the case where you have multiple 
+devices with different ITS targets assigned to the same guest? (and if 
+it's possible to assume a guest will use per-device stage 1 mappings and 
+present it with a single vITS backed by multiple pITSes, I think things 
+start breaking even harder.)
 
-I haven't reproduced it so far :-(
+Other than allowing arbitrary disjoint IOVA pages, I'm not sure this 
+really works any differently from the existing MSI cookie now that I 
+look more closely :/
 
-> Thanks,
-> 
-> 	M.
-
-Mikulas
+Robin.
