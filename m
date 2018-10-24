@@ -1,79 +1,283 @@
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-Subject: Re: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v2)
-Date: Wed, 24 Oct 2018 15:57:24 +0300
-Message-ID: <20181024125724.yf6frdimjulf35do@kshutemo-mobl1>
-References: <20181013013200.206928-1-joel@joelfernandes.org>
- <20181013013200.206928-3-joel@joelfernandes.org>
- <20181024101255.it4lptrjogalxbey@kshutemo-mobl1>
- <20181024115733.GN8537@350D>
+From: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie
+Date: Wed, 24 Oct 2018 19:02:59 +0100
+Message-ID: <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
+References: <20180918142457.3325-1-eric.auger@redhat.com>
+	<20180918142457.3325-13-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20181024115733.GN8537@350D>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-To: Balbir Singh <bsingharora@gmail.com>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, "Joel Fernandes (Google)" <joel@joelfernandes.org>, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, sparclinux@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-b
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180918142457.3325-13-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org
+Cc: tianyu.lan-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 24, 2018 at 10:57:33PM +1100, Balbir Singh wrote:
-> On Wed, Oct 24, 2018 at 01:12:56PM +0300, Kirill A. Shutemov wrote:
-> > On Fri, Oct 12, 2018 at 06:31:58PM -0700, Joel Fernandes (Google) wrote:
-> > > diff --git a/mm/mremap.c b/mm/mremap.c
-> > > index 9e68a02a52b1..2fd163cff406 100644
-> > > --- a/mm/mremap.c
-> > > +++ b/mm/mremap.c
-> > > @@ -191,6 +191,54 @@ static void move_ptes(struct vm_area_struct *vma, pmd_t *old_pmd,
-> > >  		drop_rmap_locks(vma);
-> > >  }
-> > >  
-> > > +static bool move_normal_pmd(struct vm_area_struct *vma, unsigned long old_addr,
-> > > +		  unsigned long new_addr, unsigned long old_end,
-> > > +		  pmd_t *old_pmd, pmd_t *new_pmd, bool *need_flush)
-> > > +{
-> > > +	spinlock_t *old_ptl, *new_ptl;
-> > > +	struct mm_struct *mm = vma->vm_mm;
-> > > +
-> > > +	if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK)
-> > > +	    || old_end - old_addr < PMD_SIZE)
-> > > +		return false;
-> > > +
-> > > +	/*
-> > > +	 * The destination pmd shouldn't be established, free_pgtables()
-> > > +	 * should have release it.
-> > > +	 */
-> > > +	if (WARN_ON(!pmd_none(*new_pmd)))
-> > > +		return false;
-> > > +
-> > > +	/*
-> > > +	 * We don't have to worry about the ordering of src and dst
-> > > +	 * ptlocks because exclusive mmap_sem prevents deadlock.
-> > > +	 */
-> > > +	old_ptl = pmd_lock(vma->vm_mm, old_pmd);
-> > > +	if (old_ptl) {
-> > 
-> > How can it ever be false?
-> > 
-> > > +		pmd_t pmd;
-> > > +
-> > > +		new_ptl = pmd_lockptr(mm, new_pmd);
-> 
-> 
-> Looks like this is largely inspired by move_huge_pmd(), I guess a lot of
-> the code applies, why not just reuse as much as possible? The same comments
-> w.r.t mmap_sem helping protect against lock order issues applies as well.
+Hi Eric,
 
-pmd_lock() cannot fail, but __pmd_trans_huge_lock() can. We should not
-copy the code blindly.
+On 2018-09-18 3:24 pm, Eric Auger wrote:
+> Up to now, when the type was UNMANAGED, we used to
+> allocate IOVA pages within a range provided by the user.
+> This does not work in nested mode.
+> 
+> If both the host and the guest are exposed with SMMUs, each
+> would allocate an IOVA. The guest allocates an IOVA (gIOVA)
+> to map onto the guest MSI doorbell (gDB). The Host allocates
+> another IOVA (hIOVA) to map onto the physical doorbell (hDB).
+> 
+> So we end up with 2 unrelated mappings, at S1 and S2:
+>           S1             S2
+> gIOVA    ->     gDB
+>                 hIOVA    ->    hDB
+> 
+> The PCI device would be programmed with hIOVA.
+> 
+> iommu_dma_bind_doorbell allows to pass gIOVA/gDB to the host
+> so that gIOVA can be used by the host instead of re-allocating
+> a new IOVA. That way the host can create the following nested
+> mapping:
+> 
+>           S1           S2
+> gIOVA    ->    gDB    ->    hDB
+> 
+> this time, the PCI device will be programmed with the gIOVA MSI
+> doorbell which is correctly map through the 2 stages.
 
--- 
- Kirill A. Shutemov
+If I'm understanding things correctly, this plus a couple of the 
+preceding patches all add up to a rather involved way of coercing an 
+automatic allocator to only "allocate" predetermined addresses in an 
+entirely known-ahead-of-time manner. Given that the guy calling 
+iommu_dma_bind_doorbell() could seemingly just as easily call 
+iommu_map() at that point and not bother with an allocator cookie and 
+all this machinery at all, what am I missing?
+
+Robin.
+
+> 
+> Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> 
+> ---
+> 
+> v1 -> v2:
+> - unmap stage2 on put()
+> ---
+>   drivers/iommu/dma-iommu.c | 97 +++++++++++++++++++++++++++++++++++++--
+>   include/linux/dma-iommu.h | 11 +++++
+>   2 files changed, 105 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index 511ff9a1d6d9..53444c3e8f2f 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -37,12 +37,14 @@
+>   struct iommu_dma_msi_page {
+>   	struct list_head	list;
+>   	dma_addr_t		iova;
+> +	dma_addr_t		ipa;
+>   	phys_addr_t		phys;
+>   };
+>   
+>   enum iommu_dma_cookie_type {
+>   	IOMMU_DMA_IOVA_COOKIE,
+>   	IOMMU_DMA_MSI_COOKIE,
+> +	IOMMU_DMA_NESTED_MSI_COOKIE,
+>   };
+>   
+>   struct iommu_dma_cookie {
+> @@ -109,14 +111,17 @@ EXPORT_SYMBOL(iommu_get_dma_cookie);
+>    *
+>    * Users who manage their own IOVA allocation and do not want DMA API support,
+>    * but would still like to take advantage of automatic MSI remapping, can use
+> - * this to initialise their own domain appropriately. Users should reserve a
+> + * this to initialise their own domain appropriately. Users may reserve a
+>    * contiguous IOVA region, starting at @base, large enough to accommodate the
+>    * number of PAGE_SIZE mappings necessary to cover every MSI doorbell address
+> - * used by the devices attached to @domain.
+> + * used by the devices attached to @domain. The other way round is to provide
+> + * usable iova pages through the iommu_dma_bind_doorbell API (nested stages
+> + * use case)
+>    */
+>   int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>   {
+>   	struct iommu_dma_cookie *cookie;
+> +	int nesting, ret;
+>   
+>   	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+>   		return -EINVAL;
+> @@ -124,7 +129,12 @@ int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>   	if (domain->iova_cookie)
+>   		return -EEXIST;
+>   
+> -	cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
+> +	ret =  iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nesting);
+> +	if (!ret && nesting)
+> +		cookie = cookie_alloc(IOMMU_DMA_NESTED_MSI_COOKIE);
+> +	else
+> +		cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
+> +
+>   	if (!cookie)
+>   		return -ENOMEM;
+>   
+> @@ -145,6 +155,7 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
+>   {
+>   	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>   	struct iommu_dma_msi_page *msi, *tmp;
+> +	bool s2_unmap = false;
+>   
+>   	if (!cookie)
+>   		return;
+> @@ -152,7 +163,15 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
+>   	if (cookie->type == IOMMU_DMA_IOVA_COOKIE && cookie->iovad.granule)
+>   		put_iova_domain(&cookie->iovad);
+>   
+> +	if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE)
+> +		s2_unmap = true;
+> +
+>   	list_for_each_entry_safe(msi, tmp, &cookie->msi_page_list, list) {
+> +		if (s2_unmap && msi->phys) {
+> +			size_t size = cookie_msi_granule(cookie);
+> +
+> +			WARN_ON(iommu_unmap(domain, msi->ipa, size) != size);
+> +		}
+>   		list_del(&msi->list);
+>   		kfree(msi);
+>   	}
+> @@ -161,6 +180,50 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
+>   }
+>   EXPORT_SYMBOL(iommu_put_dma_cookie);
+>   
+> +/**
+> + * iommu_dma_bind_doorbell - Allows to provide a usable IOVA page
+> + * @domain: domain handle
+> + * @binding: IOVA/IPA binding
+> + *
+> + * In nested stage use case, the user can provide IOVA/IPA bindings
+> + * corresponding to a guest MSI stage 1 mapping. When the host needs
+> + * to map its own MSI doorbells, it can use the IPA as stage 2 input
+> + * and map it onto the physical MSI doorbell.
+> + */
+> +int iommu_dma_bind_doorbell(struct iommu_domain *domain,
+> +			    struct iommu_guest_msi_binding *binding)
+> +{
+> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> +	struct iommu_dma_msi_page *msi;
+> +	dma_addr_t ipa, iova;
+> +	size_t size;
+> +
+> +	if (!cookie)
+> +		return -EINVAL;
+> +
+> +	if (cookie->type != IOMMU_DMA_NESTED_MSI_COOKIE)
+> +		return -EINVAL;
+> +
+> +	size = 1 << binding->granule;
+> +	iova = binding->iova & ~(phys_addr_t)(size - 1);
+> +	ipa = binding->gpa & ~(phys_addr_t)(size - 1);
+> +
+> +	list_for_each_entry(msi, &cookie->msi_page_list, list) {
+> +		if (msi->iova == iova)
+> +			return 0; /* this page is already registered */
+> +	}
+> +
+> +	msi = kzalloc(sizeof(*msi), GFP_KERNEL);
+> +	if (!msi)
+> +		return -ENOMEM;
+> +
+> +	msi->iova = iova;
+> +	msi->ipa = ipa;
+> +	list_add(&msi->list, &cookie->msi_page_list);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(iommu_dma_bind_doorbell);
+> +
+>   /**
+>    * iommu_dma_get_resv_regions - Reserved region driver helper
+>    * @dev: Device from iommu_get_resv_regions()
+> @@ -846,6 +909,34 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
+>   		if (msi_page->phys == msi_addr)
+>   			return msi_page;
+>   
+> +	/*
+> +	 * In nested stage mode, we do not allocate an MSI page in
+> +	 * a range provided by the user. Instead, IOVA/IPA bindings are
+> +	 * individually provided. We reuse thise IOVAs to build the
+> +	 * IOVA -> IPA -> MSI PA nested stage mapping.
+> +	 */
+> +	if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE) {
+> +		list_for_each_entry(msi_page, &cookie->msi_page_list, list)
+> +			if (!msi_page->phys) { /* this binding is free to use */
+> +				dma_addr_t ipa = msi_page->ipa;
+> +				int ret;
+> +
+> +				msi_page->phys = msi_addr;
+> +
+> +				/* do the stage 2 mapping */
+> +				ret = iommu_map(domain, ipa, msi_addr, size,
+> +						IOMMU_MMIO | IOMMU_WRITE);
+> +				if (ret) {
+> +					pr_warn("MSI S2 mapping failed (%d)\n",
+> +						ret);
+> +					return NULL;
+> +				}
+> +				return msi_page;
+> +			}
+> +		pr_warn("%s no MSI binding found\n", __func__);
+> +		return NULL;
+> +	}
+> +
+>   	msi_page = kzalloc(sizeof(*msi_page), GFP_ATOMIC);
+>   	if (!msi_page)
+>   		return NULL;
+> diff --git a/include/linux/dma-iommu.h b/include/linux/dma-iommu.h
+> index e8ca5e654277..324745eef644 100644
+> --- a/include/linux/dma-iommu.h
+> +++ b/include/linux/dma-iommu.h
+> @@ -24,6 +24,7 @@
+>   #include <linux/dma-mapping.h>
+>   #include <linux/iommu.h>
+>   #include <linux/msi.h>
+> +#include <uapi/linux/iommu.h>
+>   
+>   int iommu_dma_init(void);
+>   
+> @@ -74,12 +75,15 @@ int iommu_dma_mapping_error(struct device *dev, dma_addr_t dma_addr);
+>   /* The DMA API isn't _quite_ the whole story, though... */
+>   void iommu_dma_map_msi_msg(int irq, struct msi_msg *msg);
+>   void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list);
+> +int iommu_dma_bind_doorbell(struct iommu_domain *domain,
+> +			    struct iommu_guest_msi_binding *binding);
+>   
+>   #else
+>   
+>   struct iommu_domain;
+>   struct msi_msg;
+>   struct device;
+> +struct iommu_guest_msi_binding;
+>   
+>   static inline int iommu_dma_init(void)
+>   {
+> @@ -104,6 +108,13 @@ static inline void iommu_dma_map_msi_msg(int irq, struct msi_msg *msg)
+>   {
+>   }
+>   
+> +static inline int
+> +iommu_dma_bind_doorbell(struct iommu_domain *domain,
+> +			struct iommu_guest_msi_binding *binding)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>   static inline void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list)
+>   {
+>   }
+> 
