@@ -1,296 +1,94 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie
-Date: Wed, 24 Oct 2018 20:44:03 +0200
-Message-ID: <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
-References: <20180918142457.3325-1-eric.auger@redhat.com>
- <20180918142457.3325-13-eric.auger@redhat.com>
- <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: Re: ARM64 KVM crash
+Date: Wed, 24 Oct 2018 17:40:42 -0400 (EDT)
+Message-ID: <alpine.LRH.2.02.1810241738390.871@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.1810121204120.16008@file01.intranet.prod.int.rdu2.redhat.com>
+ <b3355304-5144-b17a-c39c-866e197e3cc6@arm.com>
+ <alpine.LRH.2.02.1810121453380.14664@file01.intranet.prod.int.rdu2.redhat.com>
+ <86h8hqtd4m.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
-Cc: tianyu.lan@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <86h8hqtd4m.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Robin,
 
-On 10/24/18 8:02 PM, Robin Murphy wrote:
-> Hi Eric,
-> 
-> On 2018-09-18 3:24 pm, Eric Auger wrote:
->> Up to now, when the type was UNMANAGED, we used to
->> allocate IOVA pages within a range provided by the user.
->> This does not work in nested mode.
->>
->> If both the host and the guest are exposed with SMMUs, each
->> would allocate an IOVA. The guest allocates an IOVA (gIOVA)
->> to map onto the guest MSI doorbell (gDB). The Host allocates
->> another IOVA (hIOVA) to map onto the physical doorbell (hDB).
->>
->> So we end up with 2 unrelated mappings, at S1 and S2:
->>           S1             S2
->> gIOVA    ->     gDB
->>                 hIOVA    ->    hDB
->>
->> The PCI device would be programmed with hIOVA.
->>
->> iommu_dma_bind_doorbell allows to pass gIOVA/gDB to the host
->> so that gIOVA can be used by the host instead of re-allocating
->> a new IOVA. That way the host can create the following nested
->> mapping:
->>
->>           S1           S2
->> gIOVA    ->    gDB    ->    hDB
->>
->> this time, the PCI device will be programmed with the gIOVA MSI
->> doorbell which is correctly map through the 2 stages.
-> 
-> If I'm understanding things correctly, this plus a couple of the
-> preceding patches all add up to a rather involved way of coercing an
-> automatic allocator to only "allocate" predetermined addresses in an
-> entirely known-ahead-of-time manner.
-agreed
- Given that the guy calling
-> iommu_dma_bind_doorbell() could seemingly just as easily call
-> iommu_map() at that point and not bother with an allocator cookie and
-> all this machinery at all, what am I missing?
-Well iommu_dma_map_msi_msg() gets called and is part of this existing
-MSI mapping machinery. If we do not do anything this function allocates
-an hIOVA that is not involved in any nested setup. So either we coerce
-the allocator in place (which is what this series does) or we unplug the
-allocator to replace this latter with a simple S2 mapping, as you
-suggest, ie. iommu_map(gDB, hDB). Assuming we unplug the allocator, the
-guy who actually calls  iommu_dma_bind_doorbell() knows gDB but does not
-know hDB. So I don't really get how we can simplify things.
 
-Thanks
+On Sat, 13 Oct 2018, Marc Zyngier wrote:
 
-Eric
+> On Fri, 12 Oct 2018 19:59:16 +0100,
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+> > 
+> > 
+> > 
+> > On Fri, 12 Oct 2018, Marc Zyngier wrote:
+> > 
+> > > Right. But how is that related to KVM? See below:
+> > > 
+> > > > [75476.680725]  find_next_and_bit+0xc/0x70
+> > > > [75476.680728]  find_busiest_group+0x128/0x938
+> > > > [75476.680730]  load_balance+0x148/0x848
+> > > > [75476.680732]  pick_next_task_fair+0x1d4/0x568
+> > > > [75476.680734]  __schedule+0xe8/0x4b0
+> > > > [75476.680736]  schedule+0x38/0xa0
+> > > > [75476.680739]  kvm_vcpu_block+0x88/0x180
+> > > > [75476.680742]  kvm_handle_wfx+0x80/0xb8
+> > > > [75476.680744]  handle_exit+0x138/0x1b8
+> > > 
+> > > The guest is exiting because it has executed a blocking WFI, so KVM's
+> > > job is done and we're calling schedule(). The scheduler then starts
+> > > doing its job of picking the next victim.
+> > > 
+> > > At this stage, the kernel indeed blows up. But this doesn't immediately
+> > > seem to be KVM's fault. It is far more likely that the scheduler has
+> > > messed something up in its own data structure, which is even worse :-(.
+> > > 
+> > > I'd suggest you get in touch with the scheduler guys to see if they have
+> > > any insight. Also, trying to come up with a reproducer would be
+> > > extremely useful.
+> > > 
+> > > Thanks,
+> > > 
+> > > 	M.
+> > 
+> > I use this machine most of the time without KVM - and it crashed when I 
+> > started KVM - so I assume that KVM had something to do with it. Perhaps it 
+> > corrupts random memory? I may try to run some KVM stress for many days to 
+> > test if I reproduce it.
+> 
+> One thing I know for sure is that if you use a tap (such as macvtap)
 
+I don't have macvtap compiled. The board is also used as a router and the 
+virtual machine bridge uses the same routing tables and iptables rules as 
+anything else.
+
+> to give networking to your VMs, the Ethernet driver on the 8040 (such
+> as on your MacchiatoBin) will happily corrupt memory (you can witness
+> that without running KVM at all). Something to do with the sbk being
+> freed early.
 > 
-> Robin.
+> I've reported this issue several times, only to hear the wind
+> blowing. At this stage, I've shelved it. There is enough decent and
+> maintained platforms around not to worry about the unmaintained stuff.
 > 
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - unmap stage2 on put()
->> ---
->>   drivers/iommu/dma-iommu.c | 97 +++++++++++++++++++++++++++++++++++++--
->>   include/linux/dma-iommu.h | 11 +++++
->>   2 files changed, 105 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
->> index 511ff9a1d6d9..53444c3e8f2f 100644
->> --- a/drivers/iommu/dma-iommu.c
->> +++ b/drivers/iommu/dma-iommu.c
->> @@ -37,12 +37,14 @@
->>   struct iommu_dma_msi_page {
->>       struct list_head    list;
->>       dma_addr_t        iova;
->> +    dma_addr_t        ipa;
->>       phys_addr_t        phys;
->>   };
->>     enum iommu_dma_cookie_type {
->>       IOMMU_DMA_IOVA_COOKIE,
->>       IOMMU_DMA_MSI_COOKIE,
->> +    IOMMU_DMA_NESTED_MSI_COOKIE,
->>   };
->>     struct iommu_dma_cookie {
->> @@ -109,14 +111,17 @@ EXPORT_SYMBOL(iommu_get_dma_cookie);
->>    *
->>    * Users who manage their own IOVA allocation and do not want DMA
->> API support,
->>    * but would still like to take advantage of automatic MSI
->> remapping, can use
->> - * this to initialise their own domain appropriately. Users should
->> reserve a
->> + * this to initialise their own domain appropriately. Users may
->> reserve a
->>    * contiguous IOVA region, starting at @base, large enough to
->> accommodate the
->>    * number of PAGE_SIZE mappings necessary to cover every MSI
->> doorbell address
->> - * used by the devices attached to @domain.
->> + * used by the devices attached to @domain. The other way round is to
->> provide
->> + * usable iova pages through the iommu_dma_bind_doorbell API (nested
->> stages
->> + * use case)
->>    */
->>   int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
->>   {
->>       struct iommu_dma_cookie *cookie;
->> +    int nesting, ret;
->>         if (domain->type != IOMMU_DOMAIN_UNMANAGED)
->>           return -EINVAL;
->> @@ -124,7 +129,12 @@ int iommu_get_msi_cookie(struct iommu_domain
->> *domain, dma_addr_t base)
->>       if (domain->iova_cookie)
->>           return -EEXIST;
->>   -    cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
->> +    ret =  iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nesting);
->> +    if (!ret && nesting)
->> +        cookie = cookie_alloc(IOMMU_DMA_NESTED_MSI_COOKIE);
->> +    else
->> +        cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
->> +
->>       if (!cookie)
->>           return -ENOMEM;
->>   @@ -145,6 +155,7 @@ void iommu_put_dma_cookie(struct iommu_domain
->> *domain)
->>   {
->>       struct iommu_dma_cookie *cookie = domain->iova_cookie;
->>       struct iommu_dma_msi_page *msi, *tmp;
->> +    bool s2_unmap = false;
->>         if (!cookie)
->>           return;
->> @@ -152,7 +163,15 @@ void iommu_put_dma_cookie(struct iommu_domain
->> *domain)
->>       if (cookie->type == IOMMU_DMA_IOVA_COOKIE && cookie->iovad.granule)
->>           put_iova_domain(&cookie->iovad);
->>   +    if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE)
->> +        s2_unmap = true;
->> +
->>       list_for_each_entry_safe(msi, tmp, &cookie->msi_page_list, list) {
->> +        if (s2_unmap && msi->phys) {
->> +            size_t size = cookie_msi_granule(cookie);
->> +
->> +            WARN_ON(iommu_unmap(domain, msi->ipa, size) != size);
->> +        }
->>           list_del(&msi->list);
->>           kfree(msi);
->>       }
->> @@ -161,6 +180,50 @@ void iommu_put_dma_cookie(struct iommu_domain
->> *domain)
->>   }
->>   EXPORT_SYMBOL(iommu_put_dma_cookie);
->>   +/**
->> + * iommu_dma_bind_doorbell - Allows to provide a usable IOVA page
->> + * @domain: domain handle
->> + * @binding: IOVA/IPA binding
->> + *
->> + * In nested stage use case, the user can provide IOVA/IPA bindings
->> + * corresponding to a guest MSI stage 1 mapping. When the host needs
->> + * to map its own MSI doorbells, it can use the IPA as stage 2 input
->> + * and map it onto the physical MSI doorbell.
->> + */
->> +int iommu_dma_bind_doorbell(struct iommu_domain *domain,
->> +                struct iommu_guest_msi_binding *binding)
->> +{
->> +    struct iommu_dma_cookie *cookie = domain->iova_cookie;
->> +    struct iommu_dma_msi_page *msi;
->> +    dma_addr_t ipa, iova;
->> +    size_t size;
->> +
->> +    if (!cookie)
->> +        return -EINVAL;
->> +
->> +    if (cookie->type != IOMMU_DMA_NESTED_MSI_COOKIE)
->> +        return -EINVAL;
->> +
->> +    size = 1 << binding->granule;
->> +    iova = binding->iova & ~(phys_addr_t)(size - 1);
->> +    ipa = binding->gpa & ~(phys_addr_t)(size - 1);
->> +
->> +    list_for_each_entry(msi, &cookie->msi_page_list, list) {
->> +        if (msi->iova == iova)
->> +            return 0; /* this page is already registered */
->> +    }
->> +
->> +    msi = kzalloc(sizeof(*msi), GFP_KERNEL);
->> +    if (!msi)
->> +        return -ENOMEM;
->> +
->> +    msi->iova = iova;
->> +    msi->ipa = ipa;
->> +    list_add(&msi->list, &cookie->msi_page_list);
->> +    return 0;
->> +}
->> +EXPORT_SYMBOL(iommu_dma_bind_doorbell);
->> +
->>   /**
->>    * iommu_dma_get_resv_regions - Reserved region driver helper
->>    * @dev: Device from iommu_get_resv_regions()
->> @@ -846,6 +909,34 @@ static struct iommu_dma_msi_page
->> *iommu_dma_get_msi_page(struct device *dev,
->>           if (msi_page->phys == msi_addr)
->>               return msi_page;
->>   +    /*
->> +     * In nested stage mode, we do not allocate an MSI page in
->> +     * a range provided by the user. Instead, IOVA/IPA bindings are
->> +     * individually provided. We reuse thise IOVAs to build the
->> +     * IOVA -> IPA -> MSI PA nested stage mapping.
->> +     */
->> +    if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE) {
->> +        list_for_each_entry(msi_page, &cookie->msi_page_list, list)
->> +            if (!msi_page->phys) { /* this binding is free to use */
->> +                dma_addr_t ipa = msi_page->ipa;
->> +                int ret;
->> +
->> +                msi_page->phys = msi_addr;
->> +
->> +                /* do the stage 2 mapping */
->> +                ret = iommu_map(domain, ipa, msi_addr, size,
->> +                        IOMMU_MMIO | IOMMU_WRITE);
->> +                if (ret) {
->> +                    pr_warn("MSI S2 mapping failed (%d)\n",
->> +                        ret);
->> +                    return NULL;
->> +                }
->> +                return msi_page;
->> +            }
->> +        pr_warn("%s no MSI binding found\n", __func__);
->> +        return NULL;
->> +    }
->> +
->>       msi_page = kzalloc(sizeof(*msi_page), GFP_ATOMIC);
->>       if (!msi_page)
->>           return NULL;
->> diff --git a/include/linux/dma-iommu.h b/include/linux/dma-iommu.h
->> index e8ca5e654277..324745eef644 100644
->> --- a/include/linux/dma-iommu.h
->> +++ b/include/linux/dma-iommu.h
->> @@ -24,6 +24,7 @@
->>   #include <linux/dma-mapping.h>
->>   #include <linux/iommu.h>
->>   #include <linux/msi.h>
->> +#include <uapi/linux/iommu.h>
->>     int iommu_dma_init(void);
->>   @@ -74,12 +75,15 @@ int iommu_dma_mapping_error(struct device *dev,
->> dma_addr_t dma_addr);
->>   /* The DMA API isn't _quite_ the whole story, though... */
->>   void iommu_dma_map_msi_msg(int irq, struct msi_msg *msg);
->>   void iommu_dma_get_resv_regions(struct device *dev, struct list_head
->> *list);
->> +int iommu_dma_bind_doorbell(struct iommu_domain *domain,
->> +                struct iommu_guest_msi_binding *binding);
->>     #else
->>     struct iommu_domain;
->>   struct msi_msg;
->>   struct device;
->> +struct iommu_guest_msi_binding;
->>     static inline int iommu_dma_init(void)
->>   {
->> @@ -104,6 +108,13 @@ static inline void iommu_dma_map_msi_msg(int irq,
->> struct msi_msg *msg)
->>   {
->>   }
->>   +static inline int
->> +iommu_dma_bind_doorbell(struct iommu_domain *domain,
->> +            struct iommu_guest_msi_binding *binding)
->> +{
->> +    return -ENODEV;
->> +}
->> +
->>   static inline void iommu_dma_get_resv_regions(struct device *dev,
->> struct list_head *list)
->>   {
->>   }
->>
+> Now, if you can give me a reproducer, I'll happily investigate.
+
+I haven't reproduced it so far :-(
+
+> Thanks,
+> 
+> 	M.
+
+Mikulas
