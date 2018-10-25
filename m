@@ -1,17 +1,17 @@
 From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v2)
-Date: Wed, 24 Oct 2018 19:13:50 -0700
-Message-ID: <20181025021350.GB13560@joelaf.mtv.corp.google.com>
+Subject: Re: [PATCH 1/4] treewide: remove unused address argument from
+ pte_alloc functions (v2)
+Date: Wed, 24 Oct 2018 19:21:19 -0700
+Message-ID: <20181025022119.GC13560@joelaf.mtv.corp.google.com>
 References: <20181013013200.206928-1-joel@joelfernandes.org>
- <20181013013200.206928-3-joel@joelfernandes.org>
- <20181024101255.it4lptrjogalxbey@kshutemo-mobl1>
- <20181024115733.GN8537@350D>
+ <20181013013200.206928-2-joel@joelfernandes.org>
+ <20181024083716.GN3109@worktop.c.hoisthospitality.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20181024115733.GN8537@350D>
+In-Reply-To: <20181024083716.GN3109@worktop.c.hoisthospitality.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
  <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
@@ -21,22 +21,32 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
  <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
 Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-To: Balbir Singh <bsingharora@gmail.com>
-Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-begemot.co.uk, Ingo Molnar <mingo@redhat.com>, Geert
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-begemot.co.uk, Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 24, 2018 at 10:57:33PM +1100, Balbir Singh wrote:
-[...]
-> > > +		pmd_t pmd;
-> > > +
-> > > +		new_ptl = pmd_lockptr(mm, new_pmd);
+On Wed, Oct 24, 2018 at 10:37:16AM +0200, Peter Zijlstra wrote:
+> On Fri, Oct 12, 2018 at 06:31:57PM -0700, Joel Fernandes (Google) wrote:
+> > This series speeds up mremap(2) syscall by copying page tables at the
+> > PMD level even for non-THP systems. There is concern that the extra
+> > 'address' argument that mremap passes to pte_alloc may do something
+> > subtle architecture related in the future that may make the scheme not
+> > work.  Also we find that there is no point in passing the 'address' to
+> > pte_alloc since its unused. So this patch therefore removes this
+> > argument tree-wide resulting in a nice negative diff as well. Also
+> > ensuring along the way that the enabled architectures do not do anything
+> > funky with 'address' argument that goes unnoticed by the optimization.
 > 
-> 
-> Looks like this is largely inspired by move_huge_pmd(), I guess a lot of
-> the code applies, why not just reuse as much as possible? The same comments
-> w.r.t mmap_sem helping protect against lock order issues applies as well.
+> Did you happen to look at the history of where that address argument
+> came from? -- just being curious here. ISTR something vague about
+> architectures having different paging structure for different memory
+> ranges.
 
-I thought about this and when I looked into it, it seemed there are subtle
-differences that make such sharing not worth it (or not possible).
+I didn't happen to do that analysis but from code analysis, no architecutre
+is using it. Since its unused in the kernel, may be such architectures don't
+exist or were removed, so we don't need to bother? Could you share more about
+your concern with the removal of this argument?
+
+thanks,
 
  - Joel
