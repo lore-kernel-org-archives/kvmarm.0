@@ -1,87 +1,96 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie
-Date: Wed, 24 Oct 2018 23:05:55 +0100
-Message-ID: <70ff6bee-5775-cccb-b74a-db915c907bcd@arm.com>
-References: <20180918142457.3325-1-eric.auger@redhat.com>
- <20180918142457.3325-13-eric.auger@redhat.com>
- <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
- <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: Re: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v2)
+Date: Wed, 24 Oct 2018 19:09:07 -0700
+Message-ID: <20181025020907.GA13560@joelaf.mtv.corp.google.com>
+References: <20181013013200.206928-1-joel@joelfernandes.org>
+ <20181013013200.206928-3-joel@joelfernandes.org>
+ <20181024101255.it4lptrjogalxbey@kshutemo-mobl1>
+ <20181024115733.GN8537@350D>
+ <20181024125724.yf6frdimjulf35do@kshutemo-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
-Cc: tianyu.lan@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20181024125724.yf6frdimjulf35do@kshutemo-mobl1>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Balbir Singh <bsingharora@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-begemot.co.ukI
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2018-10-24 7:44 pm, Auger Eric wrote:
-> Hi Robin,
-> 
-> On 10/24/18 8:02 PM, Robin Murphy wrote:
->> Hi Eric,
->>
->> On 2018-09-18 3:24 pm, Eric Auger wrote:
->>> Up to now, when the type was UNMANAGED, we used to
->>> allocate IOVA pages within a range provided by the user.
->>> This does not work in nested mode.
->>>
->>> If both the host and the guest are exposed with SMMUs, each
->>> would allocate an IOVA. The guest allocates an IOVA (gIOVA)
->>> to map onto the guest MSI doorbell (gDB). The Host allocates
->>> another IOVA (hIOVA) to map onto the physical doorbell (hDB).
->>>
->>> So we end up with 2 unrelated mappings, at S1 and S2:
->>>            S1             S2
->>> gIOVA    ->     gDB
->>>                  hIOVA    ->    hDB
->>>
->>> The PCI device would be programmed with hIOVA.
->>>
->>> iommu_dma_bind_doorbell allows to pass gIOVA/gDB to the host
->>> so that gIOVA can be used by the host instead of re-allocating
->>> a new IOVA. That way the host can create the following nested
->>> mapping:
->>>
->>>            S1           S2
->>> gIOVA    ->    gDB    ->    hDB
->>>
->>> this time, the PCI device will be programmed with the gIOVA MSI
->>> doorbell which is correctly map through the 2 stages.
->>
->> If I'm understanding things correctly, this plus a couple of the
->> preceding patches all add up to a rather involved way of coercing an
->> automatic allocator to only "allocate" predetermined addresses in an
->> entirely known-ahead-of-time manner.
-> agreed
->   Given that the guy calling
->> iommu_dma_bind_doorbell() could seemingly just as easily call
->> iommu_map() at that point and not bother with an allocator cookie and
->> all this machinery at all, what am I missing?
-> Well iommu_dma_map_msi_msg() gets called and is part of this existing
-> MSI mapping machinery. If we do not do anything this function allocates
-> an hIOVA that is not involved in any nested setup. So either we coerce
-> the allocator in place (which is what this series does) or we unplug the
-> allocator to replace this latter with a simple S2 mapping, as you
-> suggest, ie. iommu_map(gDB, hDB). Assuming we unplug the allocator, the
-> guy who actually calls  iommu_dma_bind_doorbell() knows gDB but does not
-> know hDB. So I don't really get how we can simplify things.
+On Wed, Oct 24, 2018 at 03:57:24PM +0300, Kirill A. Shutemov wrote:
+> On Wed, Oct 24, 2018 at 10:57:33PM +1100, Balbir Singh wrote:
+> > On Wed, Oct 24, 2018 at 01:12:56PM +0300, Kirill A. Shutemov wrote:
+> > > On Fri, Oct 12, 2018 at 06:31:58PM -0700, Joel Fernandes (Google) wrote:
+> > > > diff --git a/mm/mremap.c b/mm/mremap.c
+> > > > index 9e68a02a52b1..2fd163cff406 100644
+> > > > --- a/mm/mremap.c
+> > > > +++ b/mm/mremap.c
+> > > > @@ -191,6 +191,54 @@ static void move_ptes(struct vm_area_struct *vma, pmd_t *old_pmd,
+> > > >  		drop_rmap_locks(vma);
+> > > >  }
+> > > >  
+> > > > +static bool move_normal_pmd(struct vm_area_struct *vma, unsigned long old_addr,
+> > > > +		  unsigned long new_addr, unsigned long old_end,
+> > > > +		  pmd_t *old_pmd, pmd_t *new_pmd, bool *need_flush)
+> > > > +{
+> > > > +	spinlock_t *old_ptl, *new_ptl;
+> > > > +	struct mm_struct *mm = vma->vm_mm;
+> > > > +
+> > > > +	if ((old_addr & ~PMD_MASK) || (new_addr & ~PMD_MASK)
+> > > > +	    || old_end - old_addr < PMD_SIZE)
+> > > > +		return false;
+> > > > +
+> > > > +	/*
+> > > > +	 * The destination pmd shouldn't be established, free_pgtables()
+> > > > +	 * should have release it.
+> > > > +	 */
+> > > > +	if (WARN_ON(!pmd_none(*new_pmd)))
+> > > > +		return false;
+> > > > +
+> > > > +	/*
+> > > > +	 * We don't have to worry about the ordering of src and dst
+> > > > +	 * ptlocks because exclusive mmap_sem prevents deadlock.
+> > > > +	 */
+> > > > +	old_ptl = pmd_lock(vma->vm_mm, old_pmd);
+> > > > +	if (old_ptl) {
+> > > 
+> > > How can it ever be false?
 
-OK, there's what I was missing :D
+Kirill,
+It cannot, you are right. I'll remove the test.
 
-But that then seems to reveal a somewhat bigger problem - if the callers 
-are simply registering IPAs, and relying on the ITS driver to grab an 
-entry and fill in a PA later, then how does either one know *which* PA 
-is supposed to belong to a given IPA in the case where you have multiple 
-devices with different ITS targets assigned to the same guest? (and if 
-it's possible to assume a guest will use per-device stage 1 mappings and 
-present it with a single vITS backed by multiple pITSes, I think things 
-start breaking even harder.)
+By the way, there are new changes upstream by Linus which flush the TLB
+before releasing the ptlock instead of after. I'm guessing that patch came
+about because of reviews of this patch and someone spotted an issue in the
+existing code :)
 
-Other than allowing arbitrary disjoint IOVA pages, I'm not sure this 
-really works any differently from the existing MSI cookie now that I 
-look more closely :/
+Anyway the patch in concern is:
+eb66ae030829 ("mremap: properly flush TLB before releasing the page")
 
-Robin.
+I need to rebase on top of that with appropriate modifications, but I worry
+that this patch will slow down performance since we have to flush at every
+PMD/PTE move before releasing the ptlock. Where as with my patch, the
+intention is to flush only at once in the end of move_page_tables. When I
+tried to flush TLB on every PMD move, it was quite slow on my arm64 device [2].
+
+Further observation [1] is, it seems like the move_huge_pmds and move_ptes code
+is a bit sub optimal in the sense, we are acquiring and releasing the same
+ptlock for a bunch of PMDs if the said PMDs are on the same page-table page
+right? Instead we can do better by acquiring and release the ptlock less
+often.
+
+I think this observation [1] and the frequent TLB flush issue [2] can be solved
+by acquiring the ptlock once for a bunch of PMDs, move them all, then flush
+the tlb and then release the ptlock, and then proceed to doing the same thing
+for the PMDs in the next page-table page. What do you think?
+
+- Joel
