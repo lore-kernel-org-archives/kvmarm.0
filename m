@@ -1,114 +1,48 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie
-Date: Sat, 27 Oct 2018 11:24:52 +0200
-Message-ID: <1d5181dd-86c6-ffe7-df27-0c8362342039@redhat.com>
-References: <20180918142457.3325-1-eric.auger@redhat.com>
- <20180918142457.3325-13-eric.auger@redhat.com>
- <bd90bf0e-1bf6-244b-0ed6-0018ddc25eb4@arm.com>
- <167b1683-9dfe-d471-da2e-37bf53278007@redhat.com>
- <70ff6bee-5775-cccb-b74a-db915c907bcd@arm.com>
+From: Balbir Singh <bsingharora@gmail.com>
+Subject: Re: [PATCH 2/4] mm: speed up mremap by 500x on large regions (v2)
+Date: Sat, 27 Oct 2018 21:21:02 +1100
+Message-ID: <20181027102102.GO8537@350D>
+References: <20181013013200.206928-1-joel@joelfernandes.org>
+ <20181013013200.206928-3-joel@joelfernandes.org>
+ <20181024101255.it4lptrjogalxbey@kshutemo-mobl1>
+ <20181024115733.GN8537@350D>
+ <20181025021350.GB13560@joelaf.mtv.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4BD74A2BE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Oct 2018 05:25:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KIj-C9xNNUkj for <kvmarm@lists.cs.columbia.edu>;
- Sat, 27 Oct 2018 05:25:02 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7860B4A2BD
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Oct 2018 05:25:02 -0400 (EDT)
-In-Reply-To: <70ff6bee-5775-cccb-b74a-db915c907bcd@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
-Cc: tianyu.lan@intel.com, marc.zyngier@arm.com, ashok.raj@intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20181025021350.GB13560@joelaf.mtv.corp.google.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: Joel Fernandes <joel@joelfernandes.org>
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, mhocko@kernel.org, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.ivanov@kot-begemot.co.uk, Ingo Molnar <mingo@redhat.com>, Geert
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgUm9iaW4sCgpPbiAxMC8yNS8xOCAxMjowNSBBTSwgUm9iaW4gTXVycGh5IHdyb3RlOgo+IE9u
-IDIwMTgtMTAtMjQgNzo0NCBwbSwgQXVnZXIgRXJpYyB3cm90ZToKPj4gSGkgUm9iaW4sCj4+Cj4+
-IE9uIDEwLzI0LzE4IDg6MDIgUE0sIFJvYmluIE11cnBoeSB3cm90ZToKPj4+IEhpIEVyaWMsCj4+
-Pgo+Pj4gT24gMjAxOC0wOS0xOCAzOjI0IHBtLCBFcmljIEF1Z2VyIHdyb3RlOgo+Pj4+IFVwIHRv
-IG5vdywgd2hlbiB0aGUgdHlwZSB3YXMgVU5NQU5BR0VELCB3ZSB1c2VkIHRvCj4+Pj4gYWxsb2Nh
-dGUgSU9WQSBwYWdlcyB3aXRoaW4gYSByYW5nZSBwcm92aWRlZCBieSB0aGUgdXNlci4KPj4+PiBU
-aGlzIGRvZXMgbm90IHdvcmsgaW4gbmVzdGVkIG1vZGUuCj4+Pj4KPj4+PiBJZiBib3RoIHRoZSBo
-b3N0IGFuZCB0aGUgZ3Vlc3QgYXJlIGV4cG9zZWQgd2l0aCBTTU1VcywgZWFjaAo+Pj4+IHdvdWxk
-IGFsbG9jYXRlIGFuIElPVkEuIFRoZSBndWVzdCBhbGxvY2F0ZXMgYW4gSU9WQSAoZ0lPVkEpCj4+
-Pj4gdG8gbWFwIG9udG8gdGhlIGd1ZXN0IE1TSSBkb29yYmVsbCAoZ0RCKS4gVGhlIEhvc3QgYWxs
-b2NhdGVzCj4+Pj4gYW5vdGhlciBJT1ZBIChoSU9WQSkgdG8gbWFwIG9udG8gdGhlIHBoeXNpY2Fs
-IGRvb3JiZWxsIChoREIpLgo+Pj4+Cj4+Pj4gU28gd2UgZW5kIHVwIHdpdGggMiB1bnJlbGF0ZWQg
-bWFwcGluZ3MsIGF0IFMxIGFuZCBTMjoKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTMcKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBTMgo+Pj4+IGdJT1ZBwqDCoMKgIC0+wqDCoMKgwqAgZ0RCCj4+
-Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaElPVkHCoMKgwqAgLT7CoMKgwqAg
-aERCCj4+Pj4KPj4+PiBUaGUgUENJIGRldmljZSB3b3VsZCBiZSBwcm9ncmFtbWVkIHdpdGggaElP
-VkEuCj4+Pj4KPj4+PiBpb21tdV9kbWFfYmluZF9kb29yYmVsbCBhbGxvd3MgdG8gcGFzcyBnSU9W
-QS9nREIgdG8gdGhlIGhvc3QKPj4+PiBzbyB0aGF0IGdJT1ZBIGNhbiBiZSB1c2VkIGJ5IHRoZSBo
-b3N0IGluc3RlYWQgb2YgcmUtYWxsb2NhdGluZwo+Pj4+IGEgbmV3IElPVkEuIFRoYXQgd2F5IHRo
-ZSBob3N0IGNhbiBjcmVhdGUgdGhlIGZvbGxvd2luZyBuZXN0ZWQKPj4+PiBtYXBwaW5nOgo+Pj4+
-Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgUzHCoMKgwqDCoMKgwqDCoMKgwqDCoCBTMgo+Pj4+
-IGdJT1ZBwqDCoMKgIC0+wqDCoMKgIGdEQsKgwqDCoCAtPsKgwqDCoCBoREIKPj4+Pgo+Pj4+IHRo
-aXMgdGltZSwgdGhlIFBDSSBkZXZpY2Ugd2lsbCBiZSBwcm9ncmFtbWVkIHdpdGggdGhlIGdJT1ZB
-IE1TSQo+Pj4+IGRvb3JiZWxsIHdoaWNoIGlzIGNvcnJlY3RseSBtYXAgdGhyb3VnaCB0aGUgMiBz
-dGFnZXMuCj4+Pgo+Pj4gSWYgSSdtIHVuZGVyc3RhbmRpbmcgdGhpbmdzIGNvcnJlY3RseSwgdGhp
-cyBwbHVzIGEgY291cGxlIG9mIHRoZQo+Pj4gcHJlY2VkaW5nIHBhdGNoZXMgYWxsIGFkZCB1cCB0
-byBhIHJhdGhlciBpbnZvbHZlZCB3YXkgb2YgY29lcmNpbmcgYW4KPj4+IGF1dG9tYXRpYyBhbGxv
-Y2F0b3IgdG8gb25seSAiYWxsb2NhdGUiIHByZWRldGVybWluZWQgYWRkcmVzc2VzIGluIGFuCj4+
-PiBlbnRpcmVseSBrbm93bi1haGVhZC1vZi10aW1lIG1hbm5lci4KPj4gYWdyZWVkCj4+IMKgIEdp
-dmVuIHRoYXQgdGhlIGd1eSBjYWxsaW5nCj4+PiBpb21tdV9kbWFfYmluZF9kb29yYmVsbCgpIGNv
-dWxkIHNlZW1pbmdseSBqdXN0IGFzIGVhc2lseSBjYWxsCj4+PiBpb21tdV9tYXAoKSBhdCB0aGF0
-IHBvaW50IGFuZCBub3QgYm90aGVyIHdpdGggYW4gYWxsb2NhdG9yIGNvb2tpZSBhbmQKPj4+IGFs
-bCB0aGlzIG1hY2hpbmVyeSBhdCBhbGwsIHdoYXQgYW0gSSBtaXNzaW5nPwo+PiBXZWxsIGlvbW11
-X2RtYV9tYXBfbXNpX21zZygpIGdldHMgY2FsbGVkIGFuZCBpcyBwYXJ0IG9mIHRoaXMgZXhpc3Rp
-bmcKPj4gTVNJIG1hcHBpbmcgbWFjaGluZXJ5LiBJZiB3ZSBkbyBub3QgZG8gYW55dGhpbmcgdGhp
-cyBmdW5jdGlvbiBhbGxvY2F0ZXMKPj4gYW4gaElPVkEgdGhhdCBpcyBub3QgaW52b2x2ZWQgaW4g
-YW55IG5lc3RlZCBzZXR1cC4gU28gZWl0aGVyIHdlIGNvZXJjZQo+PiB0aGUgYWxsb2NhdG9yIGlu
-IHBsYWNlICh3aGljaCBpcyB3aGF0IHRoaXMgc2VyaWVzIGRvZXMpIG9yIHdlIHVucGx1ZyB0aGUK
-Pj4gYWxsb2NhdG9yIHRvIHJlcGxhY2UgdGhpcyBsYXR0ZXIgd2l0aCBhIHNpbXBsZSBTMiBtYXBw
-aW5nLCBhcyB5b3UKPj4gc3VnZ2VzdCwgaWUuIGlvbW11X21hcChnREIsIGhEQikuIEFzc3VtaW5n
-IHdlIHVucGx1ZyB0aGUgYWxsb2NhdG9yLCB0aGUKPj4gZ3V5IHdobyBhY3R1YWxseSBjYWxsc8Kg
-IGlvbW11X2RtYV9iaW5kX2Rvb3JiZWxsKCkga25vd3MgZ0RCIGJ1dCBkb2VzIG5vdAo+PiBrbm93
-IGhEQi4gU28gSSBkb24ndCByZWFsbHkgZ2V0IGhvdyB3ZSBjYW4gc2ltcGxpZnkgdGhpbmdzLgo+
-IAo+IE9LLCB0aGVyZSdzIHdoYXQgSSB3YXMgbWlzc2luZyA6RAo+IAo+IEJ1dCB0aGF0IHRoZW4g
-c2VlbXMgdG8gcmV2ZWFsIGEgc29tZXdoYXQgYmlnZ2VyIHByb2JsZW0gLSBpZiB0aGUgY2FsbGVy
-cwo+IGFyZSBzaW1wbHkgcmVnaXN0ZXJpbmcgSVBBcywgYW5kIHJlbHlpbmcgb24gdGhlIElUUyBk
-cml2ZXIgdG8gZ3JhYiBhbgo+IGVudHJ5IGFuZCBmaWxsIGluIGEgUEEgbGF0ZXIsIHRoZW4gaG93
-IGRvZXMgZWl0aGVyIG9uZSBrbm93ICp3aGljaCogUEEKPiBpcyBzdXBwb3NlZCB0byBiZWxvbmcg
-dG8gYSBnaXZlbiBJUEEgaW4gdGhlIGNhc2Ugd2hlcmUgeW91IGhhdmUgbXVsdGlwbGUKPiBkZXZp
-Y2VzIHdpdGggZGlmZmVyZW50IElUUyB0YXJnZXRzIGFzc2lnbmVkIHRvIHRoZSBzYW1lIGd1ZXN0
-PwoKWW91J3JlIGRlZmluaXRpdmVseSByaWdodCBoZXJlLiBJIHRoaW5rIHRoaXMgY2FuIGJlIHJl
-c29sdmVkIGJ5IHBhc3NpbmcKdGhlIHN0cnVjdCBkZXZpY2UgaGFuZGxlIGFsb25nIHdpdGggdGhl
-IHN0YWdlMSBtYXBwaW5nIGFuZCBzdG9yaW5nIHRoZQppbmZvIHRvZ2V0aGVyLiBUaGVuIHdoZW4g
-dGhlIGhvc3QgTVNJIGNvbnRyb2xsZXIgbG9va3MgZm9yIGEgZnJlZQp1bm1hcHBlZCBpb3ZhLCBp
-dCBtdXN0IGFsc28gY2hlY2sgd2hldGhlciB0aGUgZGV2aWNlIGJlbG9uZ3MgdG8gaXRzIE1TSQpk
-b21haW4uCgogKGFuZCBpZgo+IGl0J3MgcG9zc2libGUgdG8gYXNzdW1lIGEgZ3Vlc3Qgd2lsbCB1
-c2UgcGVyLWRldmljZSBzdGFnZSAxIG1hcHBpbmdzIGFuZAo+IHByZXNlbnQgaXQgd2l0aCBhIHNp
-bmdsZSB2SVRTIGJhY2tlZCBieSBtdWx0aXBsZSBwSVRTZXMsIEkgdGhpbmsgdGhpbmdzCj4gc3Rh
-cnQgYnJlYWtpbmcgZXZlbiBoYXJkZXIuKQoKSSBkb24ndCByZWFsbHkgZ2V0IHlvdXIgcG9pbnQg
-aGVyZS4gQXNzaWduZWQgZGV2aWNlcyBvbiBndWVzdCBzaWRlCnNob3VsZCBiZSBpbiBzZXBhcmF0
-ZSBpb21tdSBkb21haW4gYmVjYXVzZSB3ZSB3YW50IHRoZW0gdG8gZ2V0IGlzb2xhdGVkCmZyb20g
-ZWFjaCBvdGhlci4gVGhlcmUgaXMgYSBzaW5nbGUgdklUUyBhcyBvZiBub3cgYW5kIEkgZG9uJ3Qg
-dGhpbmsgd2UKd2lsbCBjaGFuZ2UgdGhhdCBhbnl0aW1lIHNvb24uIFRoZSB2SVRTIGRyaXZlciBp
-cyBhbGxvY2F0aW5nIGEgZ0lPVkEgZm9yCmVhY2ggc2VwYXJhdGUgZG9tYWluIGFuZCBJIGN1cnJl
-bnRseSAidHJhcCIgdGhlIGdJT1ZBL2dQQSBtYXBwaW5nIG9uCmlycWZkIHJvdXRpbmcgc2V0dXAu
-IFRoaXMgbWFwcGluZyBnZXRzIGFzc29jaWF0ZWQgdG8gYSBWRklPIElPTU1VLCBvbmUKcGVyIGFz
-c2lnbmVkIGRldmljZSwgc28gd2UgaGF2ZSBkaWZmZXJlbnQgdmZpbyBjb250YWluZXJzIGZvciBl
-YWNoIG9mCnRoZW0uIElmIEkgdGhlbiBlbnVtZXJhdGUgYWxsIHRoZSBkZXZpY2VzIGF0dGFjaGVk
-IHRvIHRoZSBjb250YWluZXJzIGFuZApwYXNzIHRoaXMgc3RhZ2UxIGJpbmRpbmcgYWxvbmcgd2l0
-aCB0aGUgZGV2aWNlIHN0cnVjdCwgSSB0aGluayB3ZSBzaG91bGQKYmUgT0s/CgpUaGFua3MKCkVy
-aWMKCj4gCj4gT3RoZXIgdGhhbiBhbGxvd2luZyBhcmJpdHJhcnkgZGlzam9pbnQgSU9WQSBwYWdl
-cywgSSdtIG5vdCBzdXJlIHRoaXMKPiByZWFsbHkgd29ya3MgYW55IGRpZmZlcmVudGx5IGZyb20g
-dGhlIGV4aXN0aW5nIE1TSSBjb29raWUgbm93IHRoYXQgSQo+IGxvb2sgbW9yZSBjbG9zZWx5IDov
-Cj4gCj4gUm9iaW4uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
-czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Wed, Oct 24, 2018 at 07:13:50PM -0700, Joel Fernandes wrote:
+> On Wed, Oct 24, 2018 at 10:57:33PM +1100, Balbir Singh wrote:
+> [...]
+> > > > +		pmd_t pmd;
+> > > > +
+> > > > +		new_ptl = pmd_lockptr(mm, new_pmd);
+> > 
+> > 
+> > Looks like this is largely inspired by move_huge_pmd(), I guess a lot of
+> > the code applies, why not just reuse as much as possible? The same comments
+> > w.r.t mmap_sem helping protect against lock order issues applies as well.
+> 
+> I thought about this and when I looked into it, it seemed there are subtle
+> differences that make such sharing not worth it (or not possible).
+>
+
+Could you elaborate on them?
+
+Thanks,
+Balbir Singh. 
