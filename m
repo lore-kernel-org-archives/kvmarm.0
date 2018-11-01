@@ -1,62 +1,134 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v8 1/9] KVM: arm/arm64: Ensure only THP is candidate for
- adjustment
-Date: Thu, 1 Nov 2018 09:31:21 +0100
-Message-ID: <20181101083121.GG12057@e113682-lin.lund.arm.com>
-References: <20181001155443.23032-1-punit.agrawal@arm.com>
- <20181001155443.23032-2-punit.agrawal@arm.com>
- <20181031143646.GE12057@e113682-lin.lund.arm.com>
- <87h8h2rwwr.fsf@e105922-lin.cambridge.arm.com>
+Subject: Re: [PATCH v6 18/18] kvm: arm64: Allow tuning the physical address
+ size for VM
+Date: Thu, 1 Nov 2018 09:36:22 +0100
+Message-ID: <20181101083622.GH12057@e113682-lin.lund.arm.com>
+References: <20180926163258.20218-1-suzuki.poulose@arm.com>
+ <20180926163258.20218-19-suzuki.poulose@arm.com>
+ <20181031142216.GD12057@e113682-lin.lund.arm.com>
+ <ebfbc17a-5954-7a67-0ae4-b911ba5f8b9e@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87h8h2rwwr.fsf@e105922-lin.cambridge.arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, stable@vger.kernel.org
+In-Reply-To: <ebfbc17a-5954-7a67-0ae4-b911ba5f8b9e@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, cdall@kernel.org, kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, dave.martin@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, Punit Agrawal <punit.agrawal@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 31, 2018 at 02:52:20PM +0000, Punit Agrawal wrote:
-> Christoffer Dall <christoffer.dall@arm.com> writes:
+On Wed, Oct 31, 2018 at 05:55:13PM +0000, Suzuki K Poulose wrote:
+> Hi Christoffer,
 > 
-> > On Mon, Oct 01, 2018 at 04:54:35PM +0100, Punit Agrawal wrote:
-> >> PageTransCompoundMap() returns true for hugetlbfs and THP
-> >> hugepages. This behaviour incorrectly leads to stage 2 faults for
-> >> unsupported hugepage sizes (e.g., 64K hugepage with 4K pages) to be
-> >> treated as THP faults.
-> >> 
-> >> Tighten the check to filter out hugetlbfs pages. This also leads to
-> >> consistently mapping all unsupported hugepage sizes as PTE level
-> >> entries at stage 2.
-> >> 
-> >> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> >> Reviewed-by: Suzuki Poulose <suzuki.poulose@arm.com>
-> >> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> >> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >> Cc: stable@vger.kernel.org # v4.13+
-> >
-> >
-> > Hmm, this function is only actually called from user_mem_abort() if we
-> > have (!hugetlb), so I'm not sure the cc stable here was actually
-> > warranted, nor that this patch is strictly necessary.
-> >
-> > It doesn't hurt, and makes the code potentially more robust for the
-> > future though.
-> >
-> > Am I missing something?
+> On 31/10/18 14:22, Christoffer Dall wrote:
+> >On Wed, Sep 26, 2018 at 05:32:54PM +0100, Suzuki K Poulose wrote:
+> >>Allow specifying the physical address size limit for a new
+> >>VM via the kvm_type argument for the KVM_CREATE_VM ioctl. This
+> >>allows us to finalise the stage2 page table as early as possible
+> >>and hence perform the right checks on the memory slots
+> >>without complication. The size is encoded as Log2(PA_Size) in
+> >>bits[7:0] of the type field. For backward compatibility the
+> >>value 0 is reserved and implies 40bits. Also, lift the limit
+> >>of the IPA to host limit and allow lower IPA sizes (e.g, 32).
+> >>
+> >>The userspace could check the extension KVM_CAP_ARM_VM_IPA_SIZE
+> >>for the availability of this feature. The cap check returns the
+> >>maximum limit for the physical address shift supported by the host.
+> >>
+> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>Cc: Christoffer Dall <cdall@kernel.org>
+> >>Cc: Peter Maydell <peter.maydell@linaro.org>
+> >>Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >>Cc: Radim Krčmář <rkrcmar@redhat.com>
+> >>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>---
 > 
-> !hugetlb is only true for hugepage sizes supported at stage 2. The
-> function also got called for unsupported hugepage size at stage 2, e.g.,
-> 64k hugepage with 4k page size, which then ended up doing the wrong
-> thing.
+> >>@@ -192,17 +195,23 @@ int kvm_arm_config_vm(struct kvm *kvm, unsigned long type)
+> >>  	u32 parange, phys_shift;
+> >>  	u8 lvls;
+> >>-	if (type)
+> >>+	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+> >>  		return -EINVAL;
+> >>+	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+> >>+	if (phys_shift) {
+> >>+		if (phys_shift > kvm_ipa_limit ||
+> >>+		    phys_shift < 32)
+> >>+			return -EINVAL;
+> >
+> >I am concerned here that if we allow the user to set the phys_size to 32
+> >bits, then we end up with 2 levels of stage2 page tables, which means
+> >that the size of a stage2 pmd mapping becomes the size of a stage2 pgd
+> >mapping, yet we can still decide in user_mem_abort() that a stage2 fault
+> >is backed by PMD size mappings on the host, and attempt a huge mapping
+> >at stage2, which then becomes a PGD level block map, I think.
 > 
-> Hope that adds some context. I should've added this to the commit log.
+> Yes, you're right. We will have a pgd-level block map in that case.
+> This should work transparently as PMD at stage2 is folded into PGD and
+> we endup marking the PGD entry as huge and the stage2 accessors deal
+> with it appropriately. This is similar to having a PMD huge page with
+> 64K + 42bit VA (2 level page table) on stage1.
+> 
+> >
+> >Is this handled somehow?  If so, how?
+> 
+> We don't prevent this. We have a guaranteed minimum number of levels
+> at 2, which implies you can map a stage1 PMD huge page at stage2.
+> I acknowledge that the Linux naming convention does cause some confusion
+> for a "level" at stage1 and stage2 levels. But if you think of it
+> from the hardware level (and like the ARM ARM defines it , Level 0-3),
+> it is much simpler. i.e, you can map a huge page at level N in stage1
+> into stage2 if you have that level N. It doesn't matter if stage2 has
+> more or less number of levels than stage1, as long as stage2 table can
+> deal with it.
 > 
 
-To be fair you did say that this was for unsupported hugepage sizes.
+That is indeed a good way to reason about it.
 
-Thanks for the explanation.
+> >
+> >I can't see user_mem_abort() being modified to explicitly handle this
+> >in your code, but perhaps the stage2_set_pmd_huge() call ends up
+> >actually mapping at the stage2 pte level, but I can't tell that it does.
+> 
+> The stage2_set_pmd_huge() installs it at the PGD (level 2, which would
+> have been PMD if we had levels > 2) slot.
+> 
+> pmd = stage2_get_pmd(addr)
+>        \-> pud = stage2_get_pud(addr)
+>              \-> pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+>              \-> (we have stage2_pgd_none(x) = 0 and
+>              \-> stage2_pud_offset(pgd, addr) = pgd
+>              \->returns (kvm->arch.pgd + stage2_pgd_index(addr);
+>        \->  stage_pud_none(x) = 0 & stage2_pmd_offset(pud, addr) = pud
+>        \->  returns pud (kvm->arch.pgd + stage2_pgd_index(addr))
+> 
+> and we install the PMD huge mapping at the location.
+> 
+> >In any case, I think user_mem_abort() should give up on pmd/pud huge
+> >mappings if the size mapped by the stage2/stage1 pmd/pud levels don't
+> >line up.  What do you think?
+> 
+> Does it matter ? Personally I don't think it matters much as long as we
+> are able to map the "huge" page at stage1 in the stage2 as huge, even if
+> the stage2 has lesser levels and manage it well. Given that PMD huge
+> pages are quite common, it would be good to exploit it when we can.
 
+What I couldn't convince myself of was whether having 2 levels at stage2
+implied the entry level block mapping being of the same size as the
+stage1 block mapping, but given your explanation above, I think that's
+fine.
+
+> 
+> On the other hand, for stage2 PUD we are checking if the stage2 has a
+> PUD level (kvm_has_stage2_pud()). May be we should relax it just like
+> we do for PMD to check (kvm_stage2_levels > 2).
+> 
+
+Depends on how the code ends up looking like I suppose, but the more
+symmetry we can have between the approach for host PMD and host PUD and
+host PTE mappings, the better.
+
+
+Thanks,
 
     Christoffer
