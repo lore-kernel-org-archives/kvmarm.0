@@ -1,66 +1,31 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v3 6/7] arm64: docs: document KVM support of pointer
- authentication
-Date: Fri, 2 Nov 2018 09:39:39 +0100
-Message-ID: <20181102083939.GW12057@e113682-lin.lund.arm.com>
-References: <1539773280-4159-1-git-send-email-amit.kachhap@arm.com>
- <1539773280-4159-7-git-send-email-amit.kachhap@arm.com>
+From: Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>
+Subject: Re: [PATCH v5 11/17] arm64: docs: document pointer authentication
+Date: Fri, 2 Nov 2018 09:46:47 +0000
+Message-ID: <7f9c1bc4-2e82-e930-7d00-c26791ab9eef@arm.com>
+References: <20181005084754.20950-1-kristina.martsenko@arm.com>
+ <20181005084754.20950-12-kristina.martsenko@arm.com>
+ <CAGXu5j+73z1dPS13xrOgPpn47sfwzNd9BO-USr7V+7quJt7yjA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1539773280-4159-7-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <CAGXu5j+73z1dPS13xrOgPpn47sfwzNd9BO-USr7V+7quJt7yjA@mail.gmail.com>
+Content-Language: en-US
+Content-ID: <2DC72581046359458B7C520916056EC1@eurprd08.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
+To: Kees Cook <keescook@chromium.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <Amit.Kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arch <linux-arch@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>nd <nd@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 17, 2018 at 04:17:59PM +0530, Amit Daniel Kachhap wrote:
-> The documentation is updated to help in using pointer authentication
-> for KVM guests.
-> 
-> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  Documentation/arm64/pointer-authentication.txt | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-> index 8a9cb57..b00d735 100644
-> --- a/Documentation/arm64/pointer-authentication.txt
-> +++ b/Documentation/arm64/pointer-authentication.txt
-> @@ -78,7 +78,13 @@ to TTBR1 addresses (e.g. kernel pointers).
->  Virtualization
->  --------------
->  
-> -Pointer authentication is not currently supported in KVM guests. KVM
-> +Pointer authentication is enabled in KVM guest when virtual machine is
-> +created by passing a flag requesting this feature to be enabled. Without
-> +this flag, pointer authentication is not enabled in KVM guests and KVM
->  will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
->  the feature will result in an UNDEFINED exception being injected into
->  the guest.
-> +
-> +The flag to enable this feature is KVM_ARM_VCPU_PTRAUTH and should be
-> +used in KVM API KVM_ARM_VCPU_INIT. The pointer authentication key
-> +registers are hidden from userspace if this feature is not enabled.
-> -- 
-> 2.7.4
-> 
-
-I think this is placed in the wrong file.
-
-Any information about the KVM API should go in
-Documentation/virtual/kvm/api.txt.
-
-The only information about KVM that belongs in this file would be host
-running a VM with ptrauth can affect the host's ptrauth state (if that
-applies).
-
-
-Thanks,
-
-    Christoffer
+DQo+PiArDQo+PiArV2hlbiBDT05GSUdfQVJNNjRfUFRSX0FVVEggaXMgc2VsZWN0ZWQsIGFuZCBy
+ZWxldmFudCBIVyBzdXBwb3J0IGlzDQo+PiArcHJlc2VudCwgdGhlIGtlcm5lbCB3aWxsIGFzc2ln
+biBhIHJhbmRvbSBBUElBS2V5IHZhbHVlIHRvIGVhY2ggcHJvY2Vzcw0KPj4gK2F0IGV4ZWMqKCkg
+dGltZS4gVGhpcyBrZXkgaXMgc2hhcmVkIGJ5IGFsbCB0aHJlYWRzIHdpdGhpbiB0aGUgcHJvY2Vz
+cywNCj4+ICthbmQgdGhlIGtleSBpcyBwcmVzZXJ2ZWQgYWNyb3NzIGZvcmsoKS4gUHJlc2VuY2Ug
+b2YgZnVuY3Rpb25hbGl0eSB1c2luZw0KPj4gK0FQSUFLZXkgaXMgYWR2ZXJ0aXNlZCB2aWEgSFdD
+QVBfQVBJQS4NCj4gDQo+IEl0IG1pZ2h0IGJlIHVzZWZ1bCB0byBpbmNsdWRlIGRvY3VtZW50YXRp
+b24gaGVyZSBvbiBob3cgbWFueSBiaXRzIG9mDQo+IHRoZSBhZGRyZXNzIGFyZSBiZWluZyB1c2Vk
+IGZvciB0aGUgUEFDIGJpdHMgKEknbSBhc3N1bWluZyBpdCdzIDc/KQ0KDQoNCnRoZSBudW1iZXIg
+b2YgYml0cyBhdmFpbGFibGUgZGVwZW5kcyBvbiB0aGUgVkEgc2l6ZSwgc28geW91IGNhbid0IHJl
+YWxseSANCmRvY3VtZW50IGEgbnVtYmVyLg0KDQpSYW1hbmENCg0KPiANCj4gLUtlZXMNCj4gDQoN
+Cg==
