@@ -1,21 +1,25 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH] KVM: arm64: Clarify explanation of STAGE2_PGTABLE_LEVELS
-Date: Fri,  2 Nov 2018 08:53:52 +0100
-Message-ID: <20181102075352.20636-1-christoffer.dall@arm.com>
+Subject: Re: [RFC PATCH v2 05/23] KVM: arm: Add arch vcpu uninit hook
+Date: Fri, 2 Nov 2018 09:05:36 +0100
+Message-ID: <20181102080536.GQ12057@e113682-lin.lund.arm.com>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-6-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2362E4A2B5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 03:53:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A4294A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 04:05:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dxIwyyFTy0MI for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Nov 2018 03:53:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F2EA4A200
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 03:53:57 -0400 (EDT)
+ with ESMTP id 5kimmyHlEJWQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Nov 2018 04:05:40 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D52674A262
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 04:05:39 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1538141967-15375-6-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,67 +29,102 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In attempting to re-construct the logic for our stage 2 page table
-layout I found the reaoning in the comment explaining how we calculate
-the number of levels used for stage 2 page tables a bit backwards.
+On Fri, Sep 28, 2018 at 02:39:09PM +0100, Dave Martin wrote:
+> In preparation for adding support for SVE in guests on arm64, a
+> hook is needed for freeing additional per-vcpu memory when a vcpu
+> is freed.
 
-This commit attempts to clarify the comment, to make it slightly easier
-to read without having the Arm ARM open on the right page.
+Can this commit motivate why we can't do the work in kvm_arch_vcpu_free,
+which we use for freeing other data structures?
 
-While we're at it, fixup a typo in a comment that was recently changed.
+(Presumably, uninit is needed when you need to do something at the very
+last step after releasing the struct pid.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- arch/arm64/include/asm/stage2_pgtable.h | 17 ++++++++++-------
- virt/kvm/arm/mmu.c                      |  2 +-
- 2 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index d352f6df8d2c..9c387320b28c 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -31,15 +31,18 @@
- 
- /*
-  * The hardware supports concatenation of up to 16 tables at stage2 entry level
-- * and we use the feature whenever possible.
-+ * and we use the feature whenever possible, which means we resolve 4 bits of
-+ * address at the entry level.
-  *
-- * Now, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
-+ * This implies, the total number of page table levels required for
-+ * IPA_SHIFT at stage2 expected by the hardware can be calculated using
-+ * the same logic used for the (non-collapsable) stage1 page tables but for
-+ * (IPA_SHIFT - 4).
-+ *
-+ * Note, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
-  * On arm64, the smallest PAGE_SIZE supported is 4k, which means
-- *             (PAGE_SHIFT - 3) > 4 holds for all page sizes.
-- * This implies, the total number of page table levels at stage2 expected
-- * by the hardware is actually the number of levels required for (IPA_SHIFT - 4)
-- * in normal translations(e.g, stage1), since we cannot have another level in
-- * the range (IPA_SHIFT, IPA_SHIFT - 4).
-+ *             (PAGE_SHIFT - 3) > 4 holds for all page sizes
-+ * and therefore we will need a minimum of two levels for stage2 in all cases.
-  */
- #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
- #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 4e7572656b5c..78d8020df4a4 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1234,7 +1234,7 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
- 	struct page *page = pfn_to_page(pfn);
- 
- 	/*
--	 * PageTransCompoungMap() returns true for THP and
-+	 * PageTransCompoundMap() returns true for THP and
- 	 * hugetlbfs. Make sure the adjustment is done only for THP
- 	 * pages.
- 	 */
--- 
-2.18.0
+Thanks,
+
+    Christoffer
+
+> 
+> x86 already uses the kvm_arch_vcpu_uninit() hook for a similar
+> purpose, so this patch populates the same hook for arm.  Since SVE
+> is specific to arm64, a subsidiary hook kvm_arm_arch_vcpu_uninit()
+> is added (with trivial implementations for now) to enable separate
+> specialisation for arm and arm64.
+> 
+> No functional change.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+> 
+> Changes since RFCv1:
+> 
+>  * The vcpu _init_ hook that was added by the former version of this
+>    patch was never used for anything, so it is gone from this version.
+> ---
+>  arch/arm/include/asm/kvm_host.h   | 3 ++-
+>  arch/arm64/include/asm/kvm_host.h | 3 ++-
+>  virt/kvm/arm/arm.c                | 5 +++++
+>  3 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 3ad482d..c36760b 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -288,10 +288,11 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>  static inline bool kvm_arch_check_sve_has_vhe(void) { return true; }
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> -static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+> +static inline void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> +
+>  static inline void kvm_arm_init_debug(void) {}
+>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 6316a57..d4b65414 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -425,10 +425,11 @@ static inline bool kvm_arch_check_sve_has_vhe(void)
+>  
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> -static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+> +static inline void kvm_arm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> +
+>  void kvm_arm_init_debug(void);
+>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index c92053b..1418af9 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -358,6 +358,11 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  	return kvm_vgic_vcpu_init(vcpu);
+>  }
+>  
+> +void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_arm_arch_vcpu_uninit(vcpu);
+> +}
+> +
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	int *last_ran;
+> -- 
+> 2.1.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
