@@ -1,109 +1,135 @@
-From: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Subject: Re: [PATCH 16/16] KVM: arm/arm64: vgic: Replace spin_is_locked()
- with lockdep
-Date: Fri, 2 Nov 2018 12:42:18 -0700
-Message-ID: <20181102194218.GB4170@linux.ibm.com>
-References: <20181003053902.6910-1-ldr709@gmail.com>
- <20181003053902.6910-17-ldr709@gmail.com>
- <20181102184533.GA12057@e113682-lin.lund.arm.com>
-Reply-To: paulmck@linux.ibm.com
+From: Miriam Zimmerman <mutexlox@google.com>
+Subject: Re: Timekeeping on ARM guests/hosts
+Date: Fri, 2 Nov 2018 14:23:45 -0700
+Message-ID: <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
+References: <CAHSjozDb2_q9YgHsEerH_-2uc6S9W-cw_p2hTiafisQUTrwH6Q@mail.gmail.com>
+ <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
+ <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
+ <86lg74ude3.wl-marc.zyngier@arm.com>
+ <8088f91a-1a56-065d-1c8e-f9eccbb1b342@redhat.com>
+ <CAHSjozB1jQp4L==jx8pn222T7O991-d0H3Cd-5JPtJqQ8zQHAA@mail.gmail.com>
+ <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
+ <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
+ <20181102143431.GZ12057@e113682-lin.lund.arm.com>
+ <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181102184533.GA12057@e113682-lin.lund.arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Lance Roy <ldr709@gmail.com>, linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7FA4A2FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 17:23:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3G0DBIjPCAxO for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Nov 2018 17:23:58 -0400 (EDT)
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com
+ [209.85.167.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1D564A200
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 17:23:57 -0400 (EDT)
+Received: by mail-oi1-f170.google.com with SMTP id c25-v6so2759662oiy.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Nov 2018 14:23:57 -0700 (PDT)
+In-Reply-To: <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@arm.com
+Cc: marc.zyngier@arm.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu, steven.price@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 02, 2018 at 07:45:33PM +0100, Christoffer Dall wrote:
-> On Tue, Oct 02, 2018 at 10:39:02PM -0700, Lance Roy wrote:
-> > lockdep_assert_held() is better suited to checking locking requirements,
-> > since it won't get confused when someone else holds the lock. This is
-> > also a step towards possibly removing spin_is_locked().
-> > 
-> > Signed-off-by: Lance Roy <ldr709@gmail.com>
-> > Cc: Christoffer Dall <christoffer.dall@arm.com>
-> > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > Cc: <kvmarm@lists.cs.columbia.edu>
-> 
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-
-Applied, thank you!
-
-							Thanx, Paul
-
-> > ---
-> >  virt/kvm/arm/vgic/vgic.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index 7cfdfbc910e0..50e25438fb3c 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -196,7 +196,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
-> >   */
-> >  static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
-> >  {
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-> > +	lockdep_assert_held(&irq->irq_lock);
-> >  
-> >  	/* If the interrupt is active, it must stay on the current vcpu */
-> >  	if (irq->active)
-> > @@ -273,7 +273,7 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> >  
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-> > +	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> >  
-> >  	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
-> >  }
-> > @@ -311,7 +311,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
-> >  {
-> >  	struct kvm_vcpu *vcpu;
-> >  
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-> > +	lockdep_assert_held(&irq->irq_lock);
-> >  
-> >  retry:
-> >  	vcpu = vgic_target_oracle(irq);
-> > @@ -702,7 +702,7 @@ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
-> >  static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
-> >  				    struct vgic_irq *irq, int lr)
-> >  {
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-> > +	lockdep_assert_held(&irq->irq_lock);
-> >  
-> >  	if (kvm_vgic_global_state.type == VGIC_V2)
-> >  		vgic_v2_populate_lr(vcpu, irq, lr);
-> > @@ -736,7 +736,7 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
-> >  
-> >  	*multi_sgi = false;
-> >  
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-> > +	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> >  
-> >  	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> >  		int w;
-> > @@ -761,7 +761,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
-> >  	bool multi_sgi;
-> >  	u8 prio = 0xff;
-> >  
-> > -	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-> > +	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> >  
-> >  	count = compute_ap_list_depth(vcpu, &multi_sgi);
-> >  	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
-> > -- 
-> > 2.19.0
-> > 
-> > 
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+In researching KVM_REG_ARM_TIMER_CNT, I discovered your commit 4b7a6bf
+("target-arm: kvm: Differentiate registers based on write-back
+levels"), which seems to limit when the KVM_REG_ARM_TIMER_CNT is used
+to save time. Under what circumstances should this be saved in order
+to provide a consistent view of wall clock time (as given by `date` in
+the VM)?  The commit refers to 'machine initialization or on vmload
+operations', but I'm having difficulty figuring out what a vmload
+operation is on ARM. Does this include resume-from-sleep/suspend?
+On Fri, Nov 2, 2018 at 11:28 AM Miriam Zimmerman <mutexlox@google.com> wrote:
+>
+> On Fri, Nov 2, 2018 at 7:34 AM Christoffer Dall
+> <christoffer.dall@arm.com> wrote:
+> >
+> > On Wed, Oct 31, 2018 at 11:49:05AM -0700, Miriam Zimmerman wrote:
+> >
+> > [...]
+> >
+> > >
+> > > > CONFIG_KVM_GUEST fixes this by providing the guest with information on
+> > > > the host time and informs it when the guest is paused (see
+> > > > MSR_KVM_SYSTEM_TIME_NEW). Arm doesn't (yet) have para-virtualised time.
+> > > >
+> > > > On Arm, as far as I know, the guest's view of time is purely from the
+> > > > virtual counter. Since nothing saves/restores this during the pause, the
+> > > > counter continues to increment and the jump in time is visible to the guest.
+> > > What is this virtual counter? How can one configure or enable it?
+> >
+> > The 'virtual counter' is an architectural concept in the Arm
+> > architecture, not a virtual (in the software VM sense) counter.
+> >
+> > The Arm Generic Timer Architecture defines two counters:
+> >  - The physical counter, accessed via CNTPCT_EL0
+> >  - The virtual counter, accessed via CNTVCT_EL0
+> >
+> > And a number of timers.  All timers are associated with the physical
+> > counter, except the 'EL1 Virtual Timer' which uses the count in the
+> > virtual counter for its comparison.
+> >
+> > The virtual counter yields the value of the physical counter minus an
+> > offset.
+> >
+> > That offset is controlled by a hypervisor running at EL2 which can
+> > program the offset value in CNTVOFF_EL2.
+> >
+> > The basic idea is that a VM can use the virtual timer/counter to keep
+> > track of some notion of virtual time, and the physical timer/counter to
+> > keep track of something that always relates to wall-clock time.
+> >
+> > This all breaks quite horribly with migration where the physical counter
+> > is not meaningful across physical systems, and where the counter
+> > frequencies can vary.
+> >
+> > But we can use the offset for the virtual counter to communicate some
+> > other measure of time to VMs.
+>
+> That makes sense. Thanks for the primer! I haven't done any ARM kernel
+> work before, so this is all great to know.
+>
+> > > My understanding of what's going on now is that the guest kernel right
+> > > now has roughly no awareness that it's inside of a VM, so it just
+> > > tracks time using the assumption that it is native and is unaware that
+> > > the host ever suspends. (It just doesn't see any CPU time then.)
+> > >
+> > > >
+> > > > Whether the guest sees time progress depends on what happens to that
+> > > > counter during suspend. kvmtool pause/resume simply prevents the vCPU
+> > > > threads from continuing, but the system counter is still running.
+> > > >
+> > > > If you save the state of a VM to a file then the counter value is
+> > > > saved/restored so the guest won't see any change in time.
+> > > I don't believe that we're explicitly saving any state to a file on
+> > > suspend right now, though I could be wrong; I haven't looked into that
+> > > codepath yet.
+> >
+> > The key is whether the userspace program that controls the KVM VM
+> > (kvmtool, QEMU, crosvm) uses the KVM_REG_ARM_TIMER_CNT ioctl to save the
+> > VM view of virtual time, and to retore that at a later time.
+> >
+> > KVM adjusts the CNTVOFF_EL2 for the VM on which the ioctl is executed to
+> > represent the value written by userspace to the VM when the VM reads
+> > CNTVCT_EL0.
+> >
+>
+> Ah hah. I haven't looked yet, but I bet this is the missing piece.
+> Thanks very much, Christoffer!
+>
+> >
+> > Thanks,
+> >
+> >     Christoffer
