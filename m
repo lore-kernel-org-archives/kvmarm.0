@@ -1,31 +1,204 @@
-From: Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>
-Subject: Re: [PATCH v5 11/17] arm64: docs: document pointer authentication
-Date: Fri, 2 Nov 2018 09:46:47 +0000
-Message-ID: <7f9c1bc4-2e82-e930-7d00-c26791ab9eef@arm.com>
-References: <20181005084754.20950-1-kristina.martsenko@arm.com>
- <20181005084754.20950-12-kristina.martsenko@arm.com>
- <CAGXu5j+73z1dPS13xrOgPpn47sfwzNd9BO-USr7V+7quJt7yjA@mail.gmail.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Fix unintended stage 2 PMD mappings
+Date: Fri, 2 Nov 2018 10:26:37 +0000
+Message-ID: <9ed2e006-2233-bde9-ab2f-46cd6cddb321@arm.com>
+References: <20181102075322.20549-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAGXu5j+73z1dPS13xrOgPpn47sfwzNd9BO-USr7V+7quJt7yjA@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF2E4A2F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 06:26:42 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5PB1QRQCt95Q for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Nov 2018 06:26:41 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D7DA4A20D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 06:26:41 -0400 (EDT)
+In-Reply-To: <20181102075322.20549-1-christoffer.dall@arm.com>
 Content-Language: en-US
-Content-ID: <2DC72581046359458B7C520916056EC1@eurprd08.prod.outlook.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <Amit.Kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Jacob Bramley <Jacob.Bramley@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Mark Rutland <Mark.Rutland@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arch <linux-arch@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>nd <nd@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Ralph Palutke <ralph.palutke@fau.de>, kvm@vger.kernel.org, Lukas Braun <koomi@moshbit.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-DQo+PiArDQo+PiArV2hlbiBDT05GSUdfQVJNNjRfUFRSX0FVVEggaXMgc2VsZWN0ZWQsIGFuZCBy
-ZWxldmFudCBIVyBzdXBwb3J0IGlzDQo+PiArcHJlc2VudCwgdGhlIGtlcm5lbCB3aWxsIGFzc2ln
-biBhIHJhbmRvbSBBUElBS2V5IHZhbHVlIHRvIGVhY2ggcHJvY2Vzcw0KPj4gK2F0IGV4ZWMqKCkg
-dGltZS4gVGhpcyBrZXkgaXMgc2hhcmVkIGJ5IGFsbCB0aHJlYWRzIHdpdGhpbiB0aGUgcHJvY2Vz
-cywNCj4+ICthbmQgdGhlIGtleSBpcyBwcmVzZXJ2ZWQgYWNyb3NzIGZvcmsoKS4gUHJlc2VuY2Ug
-b2YgZnVuY3Rpb25hbGl0eSB1c2luZw0KPj4gK0FQSUFLZXkgaXMgYWR2ZXJ0aXNlZCB2aWEgSFdD
-QVBfQVBJQS4NCj4gDQo+IEl0IG1pZ2h0IGJlIHVzZWZ1bCB0byBpbmNsdWRlIGRvY3VtZW50YXRp
-b24gaGVyZSBvbiBob3cgbWFueSBiaXRzIG9mDQo+IHRoZSBhZGRyZXNzIGFyZSBiZWluZyB1c2Vk
-IGZvciB0aGUgUEFDIGJpdHMgKEknbSBhc3N1bWluZyBpdCdzIDc/KQ0KDQoNCnRoZSBudW1iZXIg
-b2YgYml0cyBhdmFpbGFibGUgZGVwZW5kcyBvbiB0aGUgVkEgc2l6ZSwgc28geW91IGNhbid0IHJl
-YWxseSANCmRvY3VtZW50IGEgbnVtYmVyLg0KDQpSYW1hbmENCg0KPiANCj4gLUtlZXMNCj4gDQoN
-Cg==
+Hi Christoffer,
+
+On 02/11/18 07:53, Christoffer Dall wrote:
+> There are two things we need to take care of when we create block
+> mappings in the stage 2 page tables:
+> 
+>    (1) The alignment within a PMD between the host address range and the
+>    guest IPA range must be the same, since otherwise we end up mapping
+>    pages with the wrong offset.
+> 
+>    (2) The head and tail of a memory slot may not cover a full block
+>    size, and we have to take care to not map those with block
+>    descriptors, since we could expose memory to the guest that the host
+>    did not intend to expose.
+> 
+> So far, we have been taking care of (1), but not (2), and our commentary
+> describing (1) was somewhat confusing.
+> 
+> This commit attempts to factor out the checks of both into a common
+> function, and if we don't pass the check, we won't attempt any PMD
+> mappings for neither hugetlbfs nor THP.
+> 
+> Note that we used to only check the alignment for THP, not for
+> hugetlbfs, but as far as I can tell the check needs to be applied to
+> both scenarios.
+> 
+> Cc: Ralph Palutke <ralph.palutke@fau.de>
+> Cc: Lukas Braun <koomi@moshbit.net>
+> Reported-by: Lukas Braun <koomi@moshbit.net>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> ---
+>   virt/kvm/arm/mmu.c | 79 +++++++++++++++++++++++++++++++++++++---------
+>   1 file changed, 64 insertions(+), 15 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 5eca48bdb1a6..4e7572656b5c 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1470,6 +1470,63 @@ static void kvm_send_hwpoison_signal(unsigned long address,
+>   	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+>   }
+>   
+> +static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+> +					       unsigned long hva)
+> +{
+> +	gpa_t gpa_start, gpa_end;
+> +	hva_t uaddr_start, uaddr_end;
+> +	size_t size;
+> +
+> +	size = memslot->npages * PAGE_SIZE;
+> +
+> +	gpa_start = memslot->base_gfn << PAGE_SHIFT;
+> +	gpa_end = gpa_start + size;
+> +
+> +	uaddr_start = memslot->userspace_addr;
+> +	uaddr_end = uaddr_start + size;
+> +
+> +	/*
+> +	 * Pages belonging to memslots that don't have the same alignment
+> +	 * within a PMD for userspace and IPA cannot be mapped with stage-2
+> +	 * PMD entries, because we'll end up mapping the wrong pages.
+> +	 *
+> +	 * Consider a layout like the following:
+> +	 *
+> +	 *    memslot->userspace_addr:
+> +	 *    +-----+--------------------+--------------------+---+
+> +	 *    |abcde|fgh  Stage-1 PMD    |    Stage-1 PMD   tv|xyz|
+> +	 *    +-----+--------------------+--------------------+---+
+> +	 *
+> +	 *    memslot->base_gfn << PAGE_SIZE:
+> +	 *      +---+--------------------+--------------------+-----+
+> +	 *      |abc|def  Stage-2 PMD    |    Stage-2 PMD     |tvxyz|
+> +	 *      +---+--------------------+--------------------+-----+
+> +	 *
+> +	 * If we create those stage-2 PMDs, we'll end up with this incorrect
+> +	 * mapping:
+> +	 *   d -> f
+> +	 *   e -> g
+> +	 *   f -> h
+> +	 */
+
+Nice ! The comment makes it so easy to understand the problem.
+
+> +	if ((gpa_start & ~S2_PMD_MASK) != (uaddr_start & ~S2_PMD_MASK))
+> +		return false;
+> +
+> +	/*
+> +	 * Next, let's make sure we're not trying to map anything not covered
+> +	 * by the memslot. This means we have to prohibit PMD size mappings
+> +	 * for the beginning and end of a non-PMD aligned and non-PMD sized
+> +	 * memory slot (illustrated by the head and tail parts of the
+> +	 * userspace view above containing pages 'abcde' and 'xyz',
+> +	 * respectively).
+> +	 *
+> +	 * Note that it doesn't matter if we do the check using the
+> +	 * userspace_addr or the base_gfn, as both are equally aligned (per
+> +	 * the check above) and equally sized.
+> +	 */
+> +	return (hva & S2_PMD_MASK) >= uaddr_start &&
+> +	       (hva & S2_PMD_MASK) + S2_PMD_SIZE <= uaddr_end;
+
+Shouldn't this be :
+
+		(hva & S2_PMD_MASK) + S2_PMD_SIZE < uaddr_end;
+
+		or
+
+		(hva & S2_PMD_MASK) + S2_PMD_SIZE <= (uaddr_end - 1);
+
+> +}
+> +
+>   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   			  struct kvm_memory_slot *memslot, unsigned long hva,
+>   			  unsigned long fault_status)
+> @@ -1495,6 +1552,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		return -EFAULT;
+>   	}
+>   
+> +	if (!fault_supports_stage2_pmd_mappings(memslot, hva))
+> +		force_pte = true;
+> +
+> +	if (logging_active)
+> +		force_pte = true;
+
+super minor nit: If we combine the checks, may be we could skip checking
+the  alignments, when logging is active.
+
+	if (logging_active ||
+	    !fault_supports_stage2_pmd_mappings(memslot, hva))
+		force_pte = true;
+
+> +
+>   	/* Let's check if we will get back a huge page backed by hugetlbfs */
+>   	down_read(&current->mm->mmap_sem);
+>   	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> @@ -1504,22 +1567,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		return -EFAULT;
+>   	}
+>   
+> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+> +	if (vma_kernel_pagesize(vma) == PMD_SIZE && !force_pte) {
+>   		hugetlb = true;
+>   		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+> -	} else {
+> -		/*
+> -		 * Pages belonging to memslots that don't have the same
+> -		 * alignment for userspace and IPA cannot be mapped using
+> -		 * block descriptors even if the pages belong to a THP for
+> -		 * the process, because the stage-2 block descriptor will
+> -		 * cover more than a single THP and we loose atomicity for
+> -		 * unmapping, updates, and splits of the THP or other pages
+> -		 * in the stage-2 block range.
+> -		 */
+> -		if ((memslot->userspace_addr & ~PMD_MASK) !=
+> -		    ((memslot->base_gfn << PAGE_SHIFT) & ~PMD_MASK))
+> -			force_pte = true;
+>   	}
+>   	up_read(&current->mm->mmap_sem);
+>   
+> @@ -1558,7 +1608,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		 * should not be mapped with huge pages (it introduces churn
+>   		 * and performance degradation), so force a pte mapping.
+>   		 */
+> -		force_pte = true;
+>   		flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
+>   
+
+Otherwise looks good to me.
+
+Suzuki
