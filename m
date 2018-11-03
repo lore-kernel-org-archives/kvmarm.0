@@ -1,7 +1,7 @@
-From: Miriam Zimmerman <mutexlox@google.com>
+From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
 Subject: Re: Timekeeping on ARM guests/hosts
-Date: Fri, 2 Nov 2018 14:23:45 -0700
-Message-ID: <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
+Date: Fri, 2 Nov 2018 17:19:20 -0700
+Message-ID: <4966eb6c-cc5f-a97b-1738-ba8a67b5948d@oracle.com>
 References: <CAHSjozDb2_q9YgHsEerH_-2uc6S9W-cw_p2hTiafisQUTrwH6Q@mail.gmail.com>
  <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
  <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
@@ -11,25 +11,22 @@ References: <CAHSjozDb2_q9YgHsEerH_-2uc6S9W-cw_p2hTiafisQUTrwH6Q@mail.gmail.com>
  <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
  <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
  <20181102143431.GZ12057@e113682-lin.lund.arm.com>
- <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7FA4A2FD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 17:23:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E26D24A262
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 20:19:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3G0DBIjPCAxO for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Nov 2018 17:23:58 -0400 (EDT)
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com
- [209.85.167.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1D564A200
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 17:23:57 -0400 (EDT)
-Received: by mail-oi1-f170.google.com with SMTP id c25-v6so2759662oiy.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Nov 2018 14:23:57 -0700 (PDT)
-In-Reply-To: <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
+ with ESMTP id U3bzkrla97qm for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Nov 2018 20:19:29 -0400 (EDT)
+Received: from userp2130.oracle.com (userp2130.oracle.com [156.151.31.86])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B17274A236
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 20:19:29 -0400 (EDT)
+In-Reply-To: <20181102143431.GZ12057@e113682-lin.lund.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -39,97 +36,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com
+To: Christoffer Dall <christoffer.dall@arm.com>, Miriam Zimmerman <mutexlox@google.com>
 Cc: marc.zyngier@arm.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu, steven.price@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In researching KVM_REG_ARM_TIMER_CNT, I discovered your commit 4b7a6bf
-("target-arm: kvm: Differentiate registers based on write-back
-levels"), which seems to limit when the KVM_REG_ARM_TIMER_CNT is used
-to save time. Under what circumstances should this be saved in order
-to provide a consistent view of wall clock time (as given by `date` in
-the VM)?  The commit refers to 'machine initialization or on vmload
-operations', but I'm having difficulty figuring out what a vmload
-operation is on ARM. Does this include resume-from-sleep/suspend?
-On Fri, Nov 2, 2018 at 11:28 AM Miriam Zimmerman <mutexlox@google.com> wrote:
->
-> On Fri, Nov 2, 2018 at 7:34 AM Christoffer Dall
-> <christoffer.dall@arm.com> wrote:
-> >
-> > On Wed, Oct 31, 2018 at 11:49:05AM -0700, Miriam Zimmerman wrote:
-> >
-> > [...]
-> >
-> > >
-> > > > CONFIG_KVM_GUEST fixes this by providing the guest with information on
-> > > > the host time and informs it when the guest is paused (see
-> > > > MSR_KVM_SYSTEM_TIME_NEW). Arm doesn't (yet) have para-virtualised time.
-> > > >
-> > > > On Arm, as far as I know, the guest's view of time is purely from the
-> > > > virtual counter. Since nothing saves/restores this during the pause, the
-> > > > counter continues to increment and the jump in time is visible to the guest.
-> > > What is this virtual counter? How can one configure or enable it?
-> >
-> > The 'virtual counter' is an architectural concept in the Arm
-> > architecture, not a virtual (in the software VM sense) counter.
-> >
-> > The Arm Generic Timer Architecture defines two counters:
-> >  - The physical counter, accessed via CNTPCT_EL0
-> >  - The virtual counter, accessed via CNTVCT_EL0
-> >
-> > And a number of timers.  All timers are associated with the physical
-> > counter, except the 'EL1 Virtual Timer' which uses the count in the
-> > virtual counter for its comparison.
-> >
-> > The virtual counter yields the value of the physical counter minus an
-> > offset.
-> >
-> > That offset is controlled by a hypervisor running at EL2 which can
-> > program the offset value in CNTVOFF_EL2.
-> >
-> > The basic idea is that a VM can use the virtual timer/counter to keep
-> > track of some notion of virtual time, and the physical timer/counter to
-> > keep track of something that always relates to wall-clock time.
-> >
-> > This all breaks quite horribly with migration where the physical counter
-> > is not meaningful across physical systems, and where the counter
-> > frequencies can vary.
-> >
-> > But we can use the offset for the virtual counter to communicate some
-> > other measure of time to VMs.
->
-> That makes sense. Thanks for the primer! I haven't done any ARM kernel
-> work before, so this is all great to know.
->
-> > > My understanding of what's going on now is that the guest kernel right
-> > > now has roughly no awareness that it's inside of a VM, so it just
-> > > tracks time using the assumption that it is native and is unaware that
-> > > the host ever suspends. (It just doesn't see any CPU time then.)
-> > >
-> > > >
-> > > > Whether the guest sees time progress depends on what happens to that
-> > > > counter during suspend. kvmtool pause/resume simply prevents the vCPU
-> > > > threads from continuing, but the system counter is still running.
-> > > >
-> > > > If you save the state of a VM to a file then the counter value is
-> > > > saved/restored so the guest won't see any change in time.
-> > > I don't believe that we're explicitly saving any state to a file on
-> > > suspend right now, though I could be wrong; I haven't looked into that
-> > > codepath yet.
-> >
-> > The key is whether the userspace program that controls the KVM VM
-> > (kvmtool, QEMU, crosvm) uses the KVM_REG_ARM_TIMER_CNT ioctl to save the
-> > VM view of virtual time, and to retore that at a later time.
-> >
-> > KVM adjusts the CNTVOFF_EL2 for the VM on which the ioctl is executed to
-> > represent the value written by userspace to the VM when the VM reads
-> > CNTVCT_EL0.
-> >
->
-> Ah hah. I haven't looked yet, but I bet this is the missing piece.
-> Thanks very much, Christoffer!
->
-> >
-> > Thanks,
-> >
-> >     Christoffer
+T24gMTEvMi8yMDE4IDc6MzQgQU0sIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gVGhlIGtleSBp
+cyB3aGV0aGVyIHRoZSB1c2Vyc3BhY2UgcHJvZ3JhbSB0aGF0IGNvbnRyb2xzIHRoZSBLVk0gVk0K
+PiAoa3ZtdG9vbCwgUUVNVSwgY3Jvc3ZtKSB1c2VzIHRoZSBLVk1fUkVHX0FSTV9USU1FUl9DTlQg
+aW9jdGwgdG8gc2F2ZSB0aGUKPiBWTSB2aWV3IG9mIHZpcnR1YWwgdGltZSwgYW5kIHRvIHJldG9y
+ZSB0aGF0IGF0IGEgbGF0ZXIgdGltZS4KPgo+IEtWTSBhZGp1c3RzIHRoZSBDTlRWT0ZGX0VMMiBm
+b3IgdGhlIFZNIG9uIHdoaWNoIHRoZSBpb2N0bCBpcyBleGVjdXRlZCB0bwo+IHJlcHJlc2VudCB0
+aGUgdmFsdWUgd3JpdHRlbiBieSB1c2Vyc3BhY2UgdG8gdGhlIFZNIHdoZW4gdGhlIFZNIHJlYWRz
+Cj4gQ05UVkNUX0VMMC4KPgo+Pj4gVGhlIEFybSBBUk0gZG9lc24ndCBzYXkgYSBncmVhdCBkZWFs
+IGFib3V0IHBvd2VyIHNhdmluZyBtb2RlcyBzbyBJCj4+PiB3b3VsZG4ndCBiZSBzdXJwcmlzZWQg
+aWYgdGhlcmUncyBkaWZmZXJpbmcgYmVoYXZpb3VyIGFzIHRvIHdoZXRoZXIgdGhlCj4+PiBzeXN0
+ZW0gY2xvY2sgaXMgc3RvcHBlZCBkdXJpbmcgc3VzcGVuZCBtb2Rlcy4gSW5kZWVkIEkgd29uZGVy
+IGlmIHRoZQo+Pj4gY2xvY2sgY2FuIGV2ZW4gZ28gYmFja3dhcmRzIGR1cmluZyBhIHN1c3BlbmQt
+dG8tZGlzay9yZXN1bWUgY3ljbGU/IEkKPj4+IGRvbid0IGhhdmUgaGFyZHdhcmUgaGFuZHkgdG8g
+dGVzdCB0aGlzLgo+PiBUaGUgc3BlY2lmaWMgaGFyZHdhcmUgSSBoYXZlIGluIGZyb250IG9mIG1l
+IGlzIGEgU2Ftc3VuZyBDaHJvbWVib29rCj4+IFBsdXMgKGJvYXJkIGNvZGVuYW1lICJrZXZpbiIp
+LCB3aGljaCBJIGJlbGlldmUgaGFzIGFuIFJLMzM5OQo+PiBwcm9jZXNzb3IuIChNb3JlIGluZm8g
+YXQKPj4gaHR0cHM6Ly93d3cuY2hyb21pdW0ub3JnL2Nocm9taXVtLW9zL2RldmVsb3Blci1pbmZv
+cm1hdGlvbi1mb3ItY2hyb21lLW9zLWRldmljZXMpCj4+Cj4gRm9yIHRoZSBwdXJwb3NlIG9mIHRp
+bWVrZWVwaW5nIGluIEtWTSwgd2UgbmVlZCBhbiBhcmNoaXRlY3R1cmFsbHkKPiBtZWFuaW5nZnVs
+IHNvbHV0aW9uLCBub3Qgc29tZXRoaW5nIHNwZWNpZmljIHRvIGFueSBkZXZpY2UuCgpJJ3ZlIGJl
+ZW4gd29ya2luZyBvbiBhIFFFTVUgcGF0Y2ggdG8gYWRkcmVzcyBhIHByb2JsZW0gb2JzZXJ2ZWQg
+d2hlbiBhbiAKYWN0aXZlIGd1ZXN0IGlzIHBhdXNlZCBhbmQgcmVzdW1lZCBhZnRlciBhIGNlcnRh
+aW4gZGVsYXkgd2l0aCB2aXJzaCBvciAKdGhlIFFFTVUgbW9uaXRvci4KCkEgc2ltcGxlIHRlc3Qg
+dG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtIGV4ZWN1dGVzIG9uZSBvciBtb3JlIGluc3RhbmNlcyBv
+ZiAKdGhlIGZvbGxvd2luZyBjb21tYW5kIGluIHRoZSBndWVzdDoKCmRkIGlmPS9kZXYvemVybyBv
+Zj0vZGV2L251bGwgJgoKYW5kIHRoZW4gcGF1c2VzIGFuZCByZXN1bWVzIHRoZSBndWVzdCBhZnRl
+ciBhIGNlcnRhaW4gZGVsYXk6Cgp2aXJzaCBzdXNwZW5kIDxndWVzdD7CoMKgwqAgwqDCoMKgICMg
+cGF1c2VzIHRoZSBndWVzdApzbGVlcCAxMjAKdmlyc2ggcmVzdW1lIDxndWVzdD4KCkFmdGVyIHRo
+ZSBndWVzdCBpcyByZXN1bWVkLCB0aGVyZSBhcmUgc29mdCBsb2NrdXAgd2FybmluZyBtZXNzYWdl
+cyAKZGlzcGxheWVkIG9uIHRoZSBjb25zb2xlLgoKQSBjb21wYXJpc29uIHdpdGggeDg2IHNob3dz
+IHRoYXQgaHdjbG9jayBhbmQgZGF0ZSB2YWx1ZXMgZGl2ZXJnZSBhZnRlciAKdGhlIGFib3ZlIHBh
+dXNlIGFuZCByZXN1bWUgc2VxdWVuY2UgZm9yIHg4NiBidXQgcmVtYWluIHRoZSBzYW1lIGZvciBB
+cm0uCgpUaGUgcGF0Y2ggYWNjdW11bGF0ZXMgdGhlIHRvdGFsIGd1ZXN0IHBhdXNlIHRpbWUgaW4g
+UUVNVSBhbmQgYWRqdXN0cyB0aGUgCnZpcnR1YWwgb2Zmc2V0IGNvdW50ZXIgYWNjb3JkaW5nbHkg
+d2l0aCB0aGUgS1ZNX1JFR19BUk1fVElNRVJfQ05UIGlvY3RsIApiZWZvcmUgdGhlIGd1ZXN0IGlz
+IHJlc3VtZWQuwqAgV2l0aCB0aGUgcGF0Y2ggdGhlIHRpbWUgYmVoYXZpb3IgaXMgdGhlIApzYW1l
+IGFzIHg4NiBhbmQgdGhlIHNvZnQgbG9ja3VwIG1lc3NhZ2VzIGdvIGF3YXkuCgpJJ3ZlIHRlc3Rl
+ZCB0aGUgcGF0Y2ggb24gYW4gQW1wZXJlIGVNYWcgc2VydmVyIGJ1dCBJJ20gbm90IHN1cmUgaG93
+IApjb21wbGV0ZSwgZ2VuZXJpYywgYW5kIGJhY2t3YXJkIGNvbXBhdGlibGUgb2YgYSBzb2x1dGlv
+biB0aGUgcGF0Y2ggaXMgaW4gCnRlcm1zIG9mIG90aGVyIEFybSBwbGF0Zm9ybXMuCgpBbHNvLCBJ
+J20gbm90IHN1cmUgaWYgYW5kIHdoZW4gdGhpcyBwYXRjaCB3b3VsZCBiZSBzdXBlcnNlZGVkIGJ5
+IHRoZSAKcHJvcG9zYWwgZnJvbSB5b3VyIEtWTSBGb3J1bSAyMDE4IHByZXNlbnRhdGlvbjoKClBh
+cmF2aXJ0dWFsaXplZCBUaW1lIGZvciBBcm0tYmFzZWQgU3lzdGVtcwpodHRwczovL2RldmVsb3Bl
+ci5hcm0uY29tL2RvY3MvZGVuMDA1Ny9hCgpXb3VsZCBpdCBtYWtlIHNlbnNlIHRvIHNlbmQgdGhl
+IHBhdGNoIGFzIGFuIFJGQyBmb3IgZXZhbHVhdGlvbiBhdCB0aGlzIApwb2ludCBvciBkbyB5b3Ug
+c3VnZ2VzdCBhbnkgb3RoZXIgY29uc2lkZXJhdGlvbnM/CgpUaGFua3MuCgotLWJpamFuCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
