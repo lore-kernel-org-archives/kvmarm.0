@@ -1,91 +1,49 @@
-From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Subject: Re: Timekeeping on ARM guests/hosts
-Date: Fri, 2 Nov 2018 17:19:20 -0700
-Message-ID: <4966eb6c-cc5f-a97b-1738-ba8a67b5948d@oracle.com>
-References: <CAHSjozDb2_q9YgHsEerH_-2uc6S9W-cw_p2hTiafisQUTrwH6Q@mail.gmail.com>
- <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
- <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
- <86lg74ude3.wl-marc.zyngier@arm.com>
- <8088f91a-1a56-065d-1c8e-f9eccbb1b342@redhat.com>
- <CAHSjozB1jQp4L==jx8pn222T7O991-d0H3Cd-5JPtJqQ8zQHAA@mail.gmail.com>
- <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
- <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
- <20181102143431.GZ12057@e113682-lin.lund.arm.com>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: [PATCH -next 3/3] mm: select HAVE_MOVE_PMD in x86 for faster mremap
+Date: Fri,  2 Nov 2018 21:00:41 -0700
+Message-ID: <20181103040041.7085-4-joelaf@google.com>
+References: <20181103040041.7085-1-joelaf@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E26D24A262
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 20:19:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U3bzkrla97qm for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Nov 2018 20:19:29 -0400 (EDT)
-Received: from userp2130.oracle.com (userp2130.oracle.com [156.151.31.86])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B17274A236
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Nov 2018 20:19:29 -0400 (EDT)
-In-Reply-To: <20181102143431.GZ12057@e113682-lin.lund.arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, Miriam Zimmerman <mutexlox@google.com>
-Cc: marc.zyngier@arm.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu, steven.price@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20181103040041.7085-1-joelaf@google.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: linux-kernel@vger.kernel.org
+Cc: linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, lokeshgidra@google.com, "Joel Fernandes (Google)" <joel@joelfernandes.org>, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, sparclinux@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, anton.i
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTEvMi8yMDE4IDc6MzQgQU0sIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gVGhlIGtleSBp
-cyB3aGV0aGVyIHRoZSB1c2Vyc3BhY2UgcHJvZ3JhbSB0aGF0IGNvbnRyb2xzIHRoZSBLVk0gVk0K
-PiAoa3ZtdG9vbCwgUUVNVSwgY3Jvc3ZtKSB1c2VzIHRoZSBLVk1fUkVHX0FSTV9USU1FUl9DTlQg
-aW9jdGwgdG8gc2F2ZSB0aGUKPiBWTSB2aWV3IG9mIHZpcnR1YWwgdGltZSwgYW5kIHRvIHJldG9y
-ZSB0aGF0IGF0IGEgbGF0ZXIgdGltZS4KPgo+IEtWTSBhZGp1c3RzIHRoZSBDTlRWT0ZGX0VMMiBm
-b3IgdGhlIFZNIG9uIHdoaWNoIHRoZSBpb2N0bCBpcyBleGVjdXRlZCB0bwo+IHJlcHJlc2VudCB0
-aGUgdmFsdWUgd3JpdHRlbiBieSB1c2Vyc3BhY2UgdG8gdGhlIFZNIHdoZW4gdGhlIFZNIHJlYWRz
-Cj4gQ05UVkNUX0VMMC4KPgo+Pj4gVGhlIEFybSBBUk0gZG9lc24ndCBzYXkgYSBncmVhdCBkZWFs
-IGFib3V0IHBvd2VyIHNhdmluZyBtb2RlcyBzbyBJCj4+PiB3b3VsZG4ndCBiZSBzdXJwcmlzZWQg
-aWYgdGhlcmUncyBkaWZmZXJpbmcgYmVoYXZpb3VyIGFzIHRvIHdoZXRoZXIgdGhlCj4+PiBzeXN0
-ZW0gY2xvY2sgaXMgc3RvcHBlZCBkdXJpbmcgc3VzcGVuZCBtb2Rlcy4gSW5kZWVkIEkgd29uZGVy
-IGlmIHRoZQo+Pj4gY2xvY2sgY2FuIGV2ZW4gZ28gYmFja3dhcmRzIGR1cmluZyBhIHN1c3BlbmQt
-dG8tZGlzay9yZXN1bWUgY3ljbGU/IEkKPj4+IGRvbid0IGhhdmUgaGFyZHdhcmUgaGFuZHkgdG8g
-dGVzdCB0aGlzLgo+PiBUaGUgc3BlY2lmaWMgaGFyZHdhcmUgSSBoYXZlIGluIGZyb250IG9mIG1l
-IGlzIGEgU2Ftc3VuZyBDaHJvbWVib29rCj4+IFBsdXMgKGJvYXJkIGNvZGVuYW1lICJrZXZpbiIp
-LCB3aGljaCBJIGJlbGlldmUgaGFzIGFuIFJLMzM5OQo+PiBwcm9jZXNzb3IuIChNb3JlIGluZm8g
-YXQKPj4gaHR0cHM6Ly93d3cuY2hyb21pdW0ub3JnL2Nocm9taXVtLW9zL2RldmVsb3Blci1pbmZv
-cm1hdGlvbi1mb3ItY2hyb21lLW9zLWRldmljZXMpCj4+Cj4gRm9yIHRoZSBwdXJwb3NlIG9mIHRp
-bWVrZWVwaW5nIGluIEtWTSwgd2UgbmVlZCBhbiBhcmNoaXRlY3R1cmFsbHkKPiBtZWFuaW5nZnVs
-IHNvbHV0aW9uLCBub3Qgc29tZXRoaW5nIHNwZWNpZmljIHRvIGFueSBkZXZpY2UuCgpJJ3ZlIGJl
-ZW4gd29ya2luZyBvbiBhIFFFTVUgcGF0Y2ggdG8gYWRkcmVzcyBhIHByb2JsZW0gb2JzZXJ2ZWQg
-d2hlbiBhbiAKYWN0aXZlIGd1ZXN0IGlzIHBhdXNlZCBhbmQgcmVzdW1lZCBhZnRlciBhIGNlcnRh
-aW4gZGVsYXkgd2l0aCB2aXJzaCBvciAKdGhlIFFFTVUgbW9uaXRvci4KCkEgc2ltcGxlIHRlc3Qg
-dG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtIGV4ZWN1dGVzIG9uZSBvciBtb3JlIGluc3RhbmNlcyBv
-ZiAKdGhlIGZvbGxvd2luZyBjb21tYW5kIGluIHRoZSBndWVzdDoKCmRkIGlmPS9kZXYvemVybyBv
-Zj0vZGV2L251bGwgJgoKYW5kIHRoZW4gcGF1c2VzIGFuZCByZXN1bWVzIHRoZSBndWVzdCBhZnRl
-ciBhIGNlcnRhaW4gZGVsYXk6Cgp2aXJzaCBzdXNwZW5kIDxndWVzdD7CoMKgwqAgwqDCoMKgICMg
-cGF1c2VzIHRoZSBndWVzdApzbGVlcCAxMjAKdmlyc2ggcmVzdW1lIDxndWVzdD4KCkFmdGVyIHRo
-ZSBndWVzdCBpcyByZXN1bWVkLCB0aGVyZSBhcmUgc29mdCBsb2NrdXAgd2FybmluZyBtZXNzYWdl
-cyAKZGlzcGxheWVkIG9uIHRoZSBjb25zb2xlLgoKQSBjb21wYXJpc29uIHdpdGggeDg2IHNob3dz
-IHRoYXQgaHdjbG9jayBhbmQgZGF0ZSB2YWx1ZXMgZGl2ZXJnZSBhZnRlciAKdGhlIGFib3ZlIHBh
-dXNlIGFuZCByZXN1bWUgc2VxdWVuY2UgZm9yIHg4NiBidXQgcmVtYWluIHRoZSBzYW1lIGZvciBB
-cm0uCgpUaGUgcGF0Y2ggYWNjdW11bGF0ZXMgdGhlIHRvdGFsIGd1ZXN0IHBhdXNlIHRpbWUgaW4g
-UUVNVSBhbmQgYWRqdXN0cyB0aGUgCnZpcnR1YWwgb2Zmc2V0IGNvdW50ZXIgYWNjb3JkaW5nbHkg
-d2l0aCB0aGUgS1ZNX1JFR19BUk1fVElNRVJfQ05UIGlvY3RsIApiZWZvcmUgdGhlIGd1ZXN0IGlz
-IHJlc3VtZWQuwqAgV2l0aCB0aGUgcGF0Y2ggdGhlIHRpbWUgYmVoYXZpb3IgaXMgdGhlIApzYW1l
-IGFzIHg4NiBhbmQgdGhlIHNvZnQgbG9ja3VwIG1lc3NhZ2VzIGdvIGF3YXkuCgpJJ3ZlIHRlc3Rl
-ZCB0aGUgcGF0Y2ggb24gYW4gQW1wZXJlIGVNYWcgc2VydmVyIGJ1dCBJJ20gbm90IHN1cmUgaG93
-IApjb21wbGV0ZSwgZ2VuZXJpYywgYW5kIGJhY2t3YXJkIGNvbXBhdGlibGUgb2YgYSBzb2x1dGlv
-biB0aGUgcGF0Y2ggaXMgaW4gCnRlcm1zIG9mIG90aGVyIEFybSBwbGF0Zm9ybXMuCgpBbHNvLCBJ
-J20gbm90IHN1cmUgaWYgYW5kIHdoZW4gdGhpcyBwYXRjaCB3b3VsZCBiZSBzdXBlcnNlZGVkIGJ5
-IHRoZSAKcHJvcG9zYWwgZnJvbSB5b3VyIEtWTSBGb3J1bSAyMDE4IHByZXNlbnRhdGlvbjoKClBh
-cmF2aXJ0dWFsaXplZCBUaW1lIGZvciBBcm0tYmFzZWQgU3lzdGVtcwpodHRwczovL2RldmVsb3Bl
-ci5hcm0uY29tL2RvY3MvZGVuMDA1Ny9hCgpXb3VsZCBpdCBtYWtlIHNlbnNlIHRvIHNlbmQgdGhl
-IHBhdGNoIGFzIGFuIFJGQyBmb3IgZXZhbHVhdGlvbiBhdCB0aGlzIApwb2ludCBvciBkbyB5b3Ug
-c3VnZ2VzdCBhbnkgb3RoZXIgY29uc2lkZXJhdGlvbnM/CgpUaGFua3MuCgotLWJpamFuCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+From: "Joel Fernandes (Google)" <joel@joelfernandes.org>
+
+Moving page-tables at the PMD-level on x86 is known to be safe. Enable
+this option so that we can do fast mremap when possible.
+
+Suggested-by: Kirill A. Shutemov <kirill@shutemov.name>
+Acked-by: Kirill A. Shutemov <kirill@shutemov.name>
+Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+---
+ arch/x86/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index ba7e3464ee92..48aef01a0bd1 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -173,6 +173,7 @@ config X86
+ 	select HAVE_MEMBLOCK_NODE_MAP
+ 	select HAVE_MIXED_BREAKPOINTS_REGS
+ 	select HAVE_MOD_ARCH_SPECIFIC
++	select HAVE_MOVE_PMD
+ 	select HAVE_NMI
+ 	select HAVE_OPROFILE
+ 	select HAVE_OPTPROBES
+-- 
+2.19.1.930.g4563a0d9d0-goog
