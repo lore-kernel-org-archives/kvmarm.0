@@ -1,26 +1,22 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Clarify explanation of STAGE2_PGTABLE_LEVELS
-Date: Mon, 5 Nov 2018 15:00:34 +0000
-Message-ID: <a2805e17-b9ac-40bd-ef9f-6867a4660f90@arm.com>
-References: <20181102075352.20636-1-christoffer.dall@arm.com>
- <404f2d39-5dc5-602f-0594-0997b409ff84@arm.com>
- <20181102142543.GY12057@e113682-lin.lund.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] arm64: KVM: Don't generate UNDEF when LORegion feature is
+ present
+Date: Mon,  5 Nov 2018 15:30:26 +0000
+Message-ID: <20181105153026.169248-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CDD94A1DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Nov 2018 10:00:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 918A14A211
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Nov 2018 10:30:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fP05ZHQOE+Z6 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Nov 2018 10:00:38 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA2894A2B2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Nov 2018 10:00:37 -0500 (EST)
-In-Reply-To: <20181102142543.GY12057@e113682-lin.lund.arm.com>
-Content-Language: en-US
+ with ESMTP id maVv3I9M0uf4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Nov 2018 10:30:37 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 325544A1DC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Nov 2018 10:30:37 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,129 +26,97 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Richard Henderson <richard.henderson@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+We currently hide the LORegion feature, and generate an UNDEF
+if the guest dares using the corresponding registers. This is
+a bit extreme, as ARMv8.1 guarantees the feature to be present.
 
+The guest should check the feature register before doing anything,
+but we could also give the guest some slack (read "allow the
+guest to be a bit stupid").
 
-On 02/11/18 14:25, Christoffer Dall wrote:
-> On Fri, Nov 02, 2018 at 11:02:38AM +0000, Suzuki K Poulose wrote:
->> Hi
->>
->> On 02/11/18 07:53, Christoffer Dall wrote:
->>> In attempting to re-construct the logic for our stage 2 page table
->>> layout I found the reaoning in the comment explaining how we calculate
->>> the number of levels used for stage 2 page tables a bit backwards.
->>>
->>> This commit attempts to clarify the comment, to make it slightly easier
->>> to read without having the Arm ARM open on the right page.
->>>
->>> While we're at it, fixup a typo in a comment that was recently changed.
->>>
->>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->>> ---
->>>   arch/arm64/include/asm/stage2_pgtable.h | 17 ++++++++++-------
->>>   virt/kvm/arm/mmu.c                      |  2 +-
->>>   2 files changed, 11 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
->>> index d352f6df8d2c..9c387320b28c 100644
->>> --- a/arch/arm64/include/asm/stage2_pgtable.h
->>> +++ b/arch/arm64/include/asm/stage2_pgtable.h
->>> @@ -31,15 +31,18 @@
->>>   /*
->>>    * The hardware supports concatenation of up to 16 tables at stage2 entry level
->>> - * and we use the feature whenever possible.
->>> + * and we use the feature whenever possible, which means we resolve 4 bits of
->>
->> s/we resolve 4 bits/we resolve 4 additional bits/ ?
->>
-> 
-> yes
-> 
->>> + * address at the entry level.
->>>    *
->>> - * Now, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
->>> + * This implies, the total number of page table levels required for
->>> + * IPA_SHIFT at stage2 expected by the hardware can be calculated using
->>> + * the same logic used for the (non-collapsable) stage1 page tables but for
->>> + * (IPA_SHIFT - 4).
->>> + *
->>> + * Note, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
->>
->> May be we could improve it further by :
->>
->> s/resolved at any level/resolved at any *non-entry* level/
->>
->> as, we could resolve as small as 1 bit at the entry level.
->>
->>
-> 
-> yes
-> 
->>>    * On arm64, the smallest PAGE_SIZE supported is 4k, which means
->>> - *             (PAGE_SHIFT - 3) > 4 holds for all page sizes.
->>> - * This implies, the total number of page table levels at stage2 expected
->>> - * by the hardware is actually the number of levels required for (IPA_SHIFT - 4)
->>> - * in normal translations(e.g, stage1), since we cannot have another level in
->>> - * the range (IPA_SHIFT, IPA_SHIFT - 4).
->>> + *             (PAGE_SHIFT - 3) > 4 holds for all page sizes
->>> + * and therefore we will need a minimum of two levels for stage2 in all cases.
->>
->> I think the above statement is misleading. The minimum number of
->> levels has nothing to do with the concatenation.
-> 
-> Architecturally surely it does?  (The point of concatenation is to
-> reduce the minimal number of levels required.)
-> 
-> Maybe you mean the minimum number of levels imposed by KVM here?
-> 
->> For e.g, we could
->> still create a stage2 with 1 level (32bit IPA on 64K, 29bit + 3bit
->> concatenated), going by the same rules above. The only reason why
->> we limit the number of levels to 2, is to prevent splitting stage1 PMD
->> huge mappings (which are quite common) at stage2.
->>
-> 
-> So I wasn't entirely clear what the comment was trying to say with the
-> "(PAGE_SHIFT - 3) > 4 holds for all page size" statement, so I though
-> that was there to show that we'll need a minimum of two levels, but
-> maybe that was written under the assumption of the limitations of
-> IPA_SHIFT (was KVM_PHYS_SIZE).
+So instead of unconditionnaly deliver an exception, let's
+only do it when the host doesn't support LORegion at all (or
+when the feature has been sanitized out), and treat the registers
+as RAZ/WI otherwise (with the exception of LORID_EL1 being RO).
 
-See below.
+Fixes: cc33c4e20185 ("arm64/kvm: Prohibit guest LOR accesses")
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c | 42 +++++++++++++++++++++++++--------------
+ 1 file changed, 27 insertions(+), 15 deletions(-)
 
-> 
-> Since you wrote the original comment, and I couldn't correctly parse
-> that, and I apparently still didn't fully understand, can you suggest an
-> alternative wording?
-
-I think trying to over explain the concept has created more confusion.
-The whole paragraph is trying to prove that we only need :
-
-	ARM64_HW_PGTABLE_LEVELS(IPA_SHIFT - 4)
-to map IPA_SHIFT bits at stage2 with maximum utilization of the
-concatenation at entry level.
-
-Right now the comment tries to establish it via the hard route, by
-proving that there cannot be an intermediate level in the range
-[IPA_SHIFT, IPA_SHIFT - 4]. Or in other words :
-
-(ARM64_HW_PGTABLE_LEVELS(IPA_SHIFT - 4) + 1) >= 	
-			ARM64_HW_PGTABLE_LEVELS(IPA_SHIFT)
-
-I don't know if it is worth the explanation and then causing further
-confusion.
-
-May be I could replace the confusing text with something like :
-
-"A normal page table with ARM64_HW_PGTABLE_LEVELS(IPA_SHIFT - 4) levels
-is guaranteed to resolve minimum of (IPA_SHIFT - 4)bits (when the entry 
-level is fully used, and more bits otherwise.). For an input address of
-size IPA_SHIFT bits, we could cover the remaining 4 bits using the same
-number of levels or using the concatenation if needed."
-
-Does it help ?
-
-Suzuki
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 22fbbdbece3c..1133b74065f1 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -314,12 +314,29 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
+ }
+ 
+-static bool trap_undef(struct kvm_vcpu *vcpu,
+-		       struct sys_reg_params *p,
+-		       const struct sys_reg_desc *r)
++/*
++ * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
++ * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
++ * system, these registers should UNDEF. LORID_EL1 being a RO register, we
++ * treat it separately.
++ */
++static bool trap_loregion(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
+ {
+-	kvm_inject_undefined(vcpu);
+-	return false;
++	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
++	u32 sr = sys_reg((u32)r->Op0, (u32)r->Op1,
++			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
++
++	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
++		kvm_inject_undefined(vcpu);
++		return false;
++	}
++
++	if (p->is_write && sr == SYS_LORID_EL1)
++		return write_to_read_only(vcpu, p, r);
++
++	return trap_raz_wi(vcpu, p, r);
+ }
+ 
+ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+@@ -1040,11 +1057,6 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ 			kvm_debug("SVE unsupported for guests, suppressing\n");
+ 
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+-	} else if (id == SYS_ID_AA64MMFR1_EL1) {
+-		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+-			kvm_debug("LORegions unsupported for guests, suppressing\n");
+-
+-		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
+ 	}
+ 
+ 	return val;
+@@ -1330,11 +1342,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+ 
+-	{ SYS_DESC(SYS_LORSA_EL1), trap_undef },
+-	{ SYS_DESC(SYS_LOREA_EL1), trap_undef },
+-	{ SYS_DESC(SYS_LORN_EL1), trap_undef },
+-	{ SYS_DESC(SYS_LORC_EL1), trap_undef },
+-	{ SYS_DESC(SYS_LORID_EL1), trap_undef },
++	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
++	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
++	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
++	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
++	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+ 
+ 	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+-- 
+2.19.1
