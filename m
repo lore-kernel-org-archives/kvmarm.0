@@ -1,25 +1,36 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2] KVM: arm64: Clarify explanation of
- STAGE2_PGTABLE_LEVELS
-Date: Tue, 6 Nov 2018 12:39:34 +0000
-Message-ID: <44340035-ed11-bbd1-cc42-5df19b6a8246@arm.com>
-References: <20181106123338.3786-1-christoffer.dall@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: Timekeeping on ARM guests/hosts
+Date: Tue, 06 Nov 2018 13:39:53 +0000
+Message-ID: <87pnvie34m.fsf@linaro.org>
+References: <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
+ <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
+ <86lg74ude3.wl-marc.zyngier@arm.com>
+ <8088f91a-1a56-065d-1c8e-f9eccbb1b342@redhat.com>
+ <CAHSjozB1jQp4L==jx8pn222T7O991-d0H3Cd-5JPtJqQ8zQHAA@mail.gmail.com>
+ <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
+ <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
+ <20181102143431.GZ12057@e113682-lin.lund.arm.com>
+ <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
+ <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
+ <20181106074523.GC12057@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C9B4A322
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 07:39:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02A014A32D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 08:39:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rRtitbJ-cuji for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Nov 2018 07:39:37 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A3784A31B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 07:39:37 -0500 (EST)
-In-Reply-To: <20181106123338.3786-1-christoffer.dall@arm.com>
-Content-Language: en-US
+ with ESMTP id QV-wLht5Usz8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Nov 2018 08:39:56 -0500 (EST)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B96204A30A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 08:39:56 -0500 (EST)
+Received: by mail-wr1-f67.google.com with SMTP id x12-v6so13536173wrw.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Nov 2018 05:39:56 -0800 (PST)
+In-reply-to: <20181106074523.GC12057@e113682-lin.lund.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,61 +40,118 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Miriam Zimmerman <mutexlox@google.com>, marc.zyngier@arm.com, steven.price@arm.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 06/11/2018 12:33, Christoffer Dall wrote:
-> In attempting to re-construct the logic for our stage 2 page table
-> layout I found the reaoning in the comment explaining how we calculate
-
-nit: reasoning
-
-> the number of levels used for stage 2 page tables a bit backwards.
-> 
-> This commit attempts to clarify the comment, to make it slightly easier
-> to read without having the Arm ARM open on the right page.
-> 
-> While we're at it, fixup a typo in a comment that was recently changed.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
-> Changes since v1:
->   - Dropped note about (PAGE_SHIFT - 3) > 4
-> 
->   arch/arm64/include/asm/stage2_pgtable.h | 14 ++++++--------
->   virt/kvm/arm/mmu.c                      |  2 +-
->   2 files changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> index d352f6df8d2c..72ecf8ac3668 100644
-> --- a/arch/arm64/include/asm/stage2_pgtable.h
-> +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> @@ -31,15 +31,13 @@
->   
->   /*
->    * The hardware supports concatenation of up to 16 tables at stage2 entry level
-> - * and we use the feature whenever possible.
-> + * and we use the feature whenever possible, which means we resolve 4 bits of
-
-4 additional bits
-
-> + * address at the entry level.
->    *
-> - * Now, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
-> - * On arm64, the smallest PAGE_SIZE supported is 4k, which means
-> - *             (PAGE_SHIFT - 3) > 4 holds for all page sizes.
-> - * This implies, the total number of page table levels at stage2 expected
-> - * by the hardware is actually the number of levels required for (IPA_SHIFT - 4)
-> - * in normal translations(e.g, stage1), since we cannot have another level in
-> - * the range (IPA_SHIFT, IPA_SHIFT - 4).
-> + * This implies, the total number of page table levels required for
-> + * IPA_SHIFT at stage2 expected by the hardware can be calculated using
-> + * the same logic used for the (non-collapsable) stage1 page tables but for
-> + * (IPA_SHIFT - 4).
-
-Thanks for cleaning up the mess. With the above changes :
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAYXJtLmNvbT4gd3JpdGVzOgoKPiBP
+biBGcmksIE5vdiAwMiwgMjAxOCBhdCAwMjoyMzo0NVBNIC0wNzAwLCBNaXJpYW0gWmltbWVybWFu
+IHdyb3RlOgo+PiBJbiByZXNlYXJjaGluZyBLVk1fUkVHX0FSTV9USU1FUl9DTlQsIEkgZGlzY292
+ZXJlZCB5b3VyIGNvbW1pdCA0YjdhNmJmCj4+ICgidGFyZ2V0LWFybToga3ZtOiBEaWZmZXJlbnRp
+YXRlIHJlZ2lzdGVycyBiYXNlZCBvbiB3cml0ZS1iYWNrCj4+IGxldmVscyIpLCB3aGljaCBzZWVt
+cyB0byBsaW1pdCB3aGVuIHRoZSBLVk1fUkVHX0FSTV9USU1FUl9DTlQgaXMgdXNlZAo+PiB0byBz
+YXZlIHRpbWUuIFVuZGVyIHdoYXQgY2lyY3Vtc3RhbmNlcyBzaG91bGQgdGhpcyBiZSBzYXZlZCBp
+biBvcmRlcgo+PiB0byBwcm92aWRlIGEgY29uc2lzdGVudCB2aWV3IG9mIHdhbGwgY2xvY2sgdGlt
+ZSAoYXMgZ2l2ZW4gYnkgYGRhdGVgIGluCj4+IHRoZSBWTSk/Cj4KPiBJbiBnZW5lcmFsLCBhbmQg
+bm90IHNwZWNpZmljIHRvIFFFTVUsIEkgdGhpbmsgdGhhdCB0aGUgdmlydHVhbAo+IGNvdW50ZXIg
+dmFsdWUgc2hvdWxkIHN0b3AgY291bnRpbmcgd2hlbiB0aGUgZW50aXJldHkgb2YgdGhlIFZNIGlz
+IG5vdAo+IHJ1bm5pbmcsIGZvciBleGFtcGxlIHdoZW4gdGhlIGhvc3QgbWFjaGluZSBpcyBzdXNw
+ZW5kZWQsIG9yIHdoZW4gdGhlCj4gZW50aXJlIFZNIGlzIHN0b3BwZWQvc3VzcGVuZGVkLCBlaXRo
+ZXIgYXMgcGFydCBvZiBhIHN1c3BlbmQvcmVzdW1lCj4gb3BlcmF0aW9uLCBkZWJ1ZyBvcGVyYXRp
+b24sIG9yIGFzIHBhcnQgb2YgbWlncmF0aW9uIG9mIHNvbWUgc29ydC4KPgo+IFN1cHBvcnRpbmcg
+dGhlc2UgdGltZWtlZXBpbmcgc2VtYW50aWNzIGlzIG5vdCBzb21ldGhpbmcgYW55b25lIGhhcyB0
+cmllZAo+IHVwIHVudGlsIG5vdyB3aXRoIEtWTS9Bcm0sIGFzIGZhciBhcyBJJ20gYXdhcmUsIGFu
+ZCBhcyBzdWNoIGlzICduZXcnCj4gd29yay4KPgo+Cj4+IFRoZSBjb21taXQgcmVmZXJzIHRvICdt
+YWNoaW5lIGluaXRpYWxpemF0aW9uIG9yIG9uIHZtbG9hZAo+PiBvcGVyYXRpb25zJywgYnV0IEkn
+bSBoYXZpbmcgZGlmZmljdWx0eSBmaWd1cmluZyBvdXQgd2hhdCBhIHZtbG9hZAo+PiBvcGVyYXRp
+b24gaXMgb24gQVJNLiBEb2VzIHRoaXMgaW5jbHVkZSByZXN1bWUtZnJvbS1zbGVlcC9zdXNwZW5k
+Pwo+Cj4gSSBiZWxpZXZlIHZtbG9hZCBpcyBxZW11LXNwZWFrIGZvciBsb2FkaW5nIGluIFZNIHN0
+YXRlIGZyb20gYSBzdG9yZWQKPiBtaWdyYXRpb24gc3RyZWFtLCBidXQgeW91J2QgaGF2ZSB0byBh
+c2sgdGhlIFFFTVUgZm9sa3Mgb3Igc3R1ZHkgdGhlIGNvZGUKPiBtb3JlIGNhcmVmdWxseSB0byBm
+aWd1cmUgb3V0IHdoZW4gYSB2bWxvYWQgcmVhbGx5IGhhcHBlbnMuCgpHZW5lcmFsbHkgUUVNVSBk
+b2Vzbid0IGNhcmUgYWJvdXQgdGhlIGludGVybmFsIHN0YXRlIG9mIHRoZSBndWVzdCB1bmxlc3MK
+aXQgaGFzIHRvLiBXaGVuIGl0IGRvZXMgaXQgY2FsbHM6CgogIGNwdV9zeW5jaHJvbml6ZV9zdGF0
+ZQoKV2hpY2ggd2lsbCB0aGVuIGl0ZXJhdGUgdGhyb3VnaCB0aGUgcmVnaXN0ZXJzIGFuZCBjb3B5
+IHRoZSBrZXJuZWwncyB2aWV3Cm9mIHJlZ2lzdGVyIHN0YXRlIGludG8gUUVNVS4gU29tZXRpbWVz
+IGZvciBLVk0gc3BlY2lmaWMgdGhpbmdzIGl0IHdpbGwKY2FsbCBrdm1fY3B1X3N5bmNocm9uaXpl
+X3N0YXRlKGNzKSB3aGljaCBpcyB3aGF0IGNwdV9zeW5jaHJvbml6ZV9zdGF0ZQpkb2VzIHdoZW4g
+S1ZNIGlzIGFjdGl2ZS4KClRoZXNlIGNhc2VzIGFyZToKCiAgLSBoYW5kbGluZyBkZWJ1ZyBldmVu
+dHMgKGdkYnNlcnZlci9LVk1fU0VUX0RFQlVHKQogIC0gc3lzdGVtIHN0YXJ0L3Jlc2V0CiAgLSBt
+aWdyYXRpb24gKGJlZm9yZSBzYXZpbmcgdGhlIHZtIHN0YXRlKQoKSWYgdGhlIFZNIHN0b3BzIHJ1
+bm5pbmcgZm9yIHdoYXRldmVyIHJlYXNvbiBRRU1VIHdpbGwganVzdCBzaXQgdGhlcmUgYW4Kd2Fp
+dCB1bnRpbCBhbiBldmVudCB3YWtlcyBpdCB1cCAoZ2VuZXJhbGx5IHNvbWV0aGluZyBJTyByZWxh
+dGVkKS4gU29tZQphcmNoaXRlY3R1cmVzIGRvIHRoaW5ncyBkaWZmZXJlbnRseSAtIGZvciBleGFt
+cGxlIHg4NiBvZnRlbiBuZWVkcyB0bwpzeW5jIHN0YXRlIHNvIGl0IGNhbiBkaXNhc3NlbWJsZSBp
+bnN0cnVjdGlvbnMgdG8gZW11bGF0ZSBtbWlvLiBIb3dldmVyCmZvciBBUk0gbW9zdCB0aGluZ3Mg
+Y2FuIGJlIGhhbmRsZWQgd2l0aG91dCBhIGZ1bGwgc3luYyBvZiB0aGUgcmVnaXN0ZXIKc3RhdGUu
+CgoKPgo+IFRoYW5rcywKPgo+ICAgICBDaHJpc3RvZmZlcgo+Cj4+IE9uIEZyaSwgTm92IDIsIDIw
+MTggYXQgMTE6MjggQU0gTWlyaWFtIFppbW1lcm1hbiA8bXV0ZXhsb3hAZ29vZ2xlLmNvbT4gd3Jv
+dGU6Cj4+ID4KPj4gPiBPbiBGcmksIE5vdiAyLCAyMDE4IGF0IDc6MzQgQU0gQ2hyaXN0b2ZmZXIg
+RGFsbAo+PiA+IDxjaHJpc3RvZmZlci5kYWxsQGFybS5jb20+IHdyb3RlOgo+PiA+ID4KPj4gPiA+
+IE9uIFdlZCwgT2N0IDMxLCAyMDE4IGF0IDExOjQ5OjA1QU0gLTA3MDAsIE1pcmlhbSBaaW1tZXJt
+YW4gd3JvdGU6Cj4+ID4gPgo+PiA+ID4gWy4uLl0KPj4gPiA+Cj4+ID4gPiA+Cj4+ID4gPiA+ID4g
+Q09ORklHX0tWTV9HVUVTVCBmaXhlcyB0aGlzIGJ5IHByb3ZpZGluZyB0aGUgZ3Vlc3Qgd2l0aCBp
+bmZvcm1hdGlvbiBvbgo+PiA+ID4gPiA+IHRoZSBob3N0IHRpbWUgYW5kIGluZm9ybXMgaXQgd2hl
+biB0aGUgZ3Vlc3QgaXMgcGF1c2VkIChzZWUKPj4gPiA+ID4gPiBNU1JfS1ZNX1NZU1RFTV9USU1F
+X05FVykuIEFybSBkb2Vzbid0ICh5ZXQpIGhhdmUgcGFyYS12aXJ0dWFsaXNlZCB0aW1lLgo+PiA+
+ID4gPiA+Cj4+ID4gPiA+ID4gT24gQXJtLCBhcyBmYXIgYXMgSSBrbm93LCB0aGUgZ3Vlc3QncyB2
+aWV3IG9mIHRpbWUgaXMgcHVyZWx5IGZyb20gdGhlCj4+ID4gPiA+ID4gdmlydHVhbCBjb3VudGVy
+LiBTaW5jZSBub3RoaW5nIHNhdmVzL3Jlc3RvcmVzIHRoaXMgZHVyaW5nIHRoZSBwYXVzZSwgdGhl
+Cj4+ID4gPiA+ID4gY291bnRlciBjb250aW51ZXMgdG8gaW5jcmVtZW50IGFuZCB0aGUganVtcCBp
+biB0aW1lIGlzIHZpc2libGUgdG8gdGhlIGd1ZXN0Lgo+PiA+ID4gPiBXaGF0IGlzIHRoaXMgdmly
+dHVhbCBjb3VudGVyPyBIb3cgY2FuIG9uZSBjb25maWd1cmUgb3IgZW5hYmxlIGl0Pwo+PiA+ID4K
+Pj4gPiA+IFRoZSAndmlydHVhbCBjb3VudGVyJyBpcyBhbiBhcmNoaXRlY3R1cmFsIGNvbmNlcHQg
+aW4gdGhlIEFybQo+PiA+ID4gYXJjaGl0ZWN0dXJlLCBub3QgYSB2aXJ0dWFsIChpbiB0aGUgc29m
+dHdhcmUgVk0gc2Vuc2UpIGNvdW50ZXIuCj4+ID4gPgo+PiA+ID4gVGhlIEFybSBHZW5lcmljIFRp
+bWVyIEFyY2hpdGVjdHVyZSBkZWZpbmVzIHR3byBjb3VudGVyczoKPj4gPiA+ICAtIFRoZSBwaHlz
+aWNhbCBjb3VudGVyLCBhY2Nlc3NlZCB2aWEgQ05UUENUX0VMMAo+PiA+ID4gIC0gVGhlIHZpcnR1
+YWwgY291bnRlciwgYWNjZXNzZWQgdmlhIENOVFZDVF9FTDAKPj4gPiA+Cj4+ID4gPiBBbmQgYSBu
+dW1iZXIgb2YgdGltZXJzLiAgQWxsIHRpbWVycyBhcmUgYXNzb2NpYXRlZCB3aXRoIHRoZSBwaHlz
+aWNhbAo+PiA+ID4gY291bnRlciwgZXhjZXB0IHRoZSAnRUwxIFZpcnR1YWwgVGltZXInIHdoaWNo
+IHVzZXMgdGhlIGNvdW50IGluIHRoZQo+PiA+ID4gdmlydHVhbCBjb3VudGVyIGZvciBpdHMgY29t
+cGFyaXNvbi4KPj4gPiA+Cj4+ID4gPiBUaGUgdmlydHVhbCBjb3VudGVyIHlpZWxkcyB0aGUgdmFs
+dWUgb2YgdGhlIHBoeXNpY2FsIGNvdW50ZXIgbWludXMgYW4KPj4gPiA+IG9mZnNldC4KPj4gPiA+
+Cj4+ID4gPiBUaGF0IG9mZnNldCBpcyBjb250cm9sbGVkIGJ5IGEgaHlwZXJ2aXNvciBydW5uaW5n
+IGF0IEVMMiB3aGljaCBjYW4KPj4gPiA+IHByb2dyYW0gdGhlIG9mZnNldCB2YWx1ZSBpbiBDTlRW
+T0ZGX0VMMi4KPj4gPiA+Cj4+ID4gPiBUaGUgYmFzaWMgaWRlYSBpcyB0aGF0IGEgVk0gY2FuIHVz
+ZSB0aGUgdmlydHVhbCB0aW1lci9jb3VudGVyIHRvIGtlZXAKPj4gPiA+IHRyYWNrIG9mIHNvbWUg
+bm90aW9uIG9mIHZpcnR1YWwgdGltZSwgYW5kIHRoZSBwaHlzaWNhbCB0aW1lci9jb3VudGVyIHRv
+Cj4+ID4gPiBrZWVwIHRyYWNrIG9mIHNvbWV0aGluZyB0aGF0IGFsd2F5cyByZWxhdGVzIHRvIHdh
+bGwtY2xvY2sgdGltZS4KPj4gPiA+Cj4+ID4gPiBUaGlzIGFsbCBicmVha3MgcXVpdGUgaG9ycmli
+bHkgd2l0aCBtaWdyYXRpb24gd2hlcmUgdGhlIHBoeXNpY2FsIGNvdW50ZXIKPj4gPiA+IGlzIG5v
+dCBtZWFuaW5nZnVsIGFjcm9zcyBwaHlzaWNhbCBzeXN0ZW1zLCBhbmQgd2hlcmUgdGhlIGNvdW50
+ZXIKPj4gPiA+IGZyZXF1ZW5jaWVzIGNhbiB2YXJ5Lgo+PiA+ID4KPj4gPiA+IEJ1dCB3ZSBjYW4g
+dXNlIHRoZSBvZmZzZXQgZm9yIHRoZSB2aXJ0dWFsIGNvdW50ZXIgdG8gY29tbXVuaWNhdGUgc29t
+ZQo+PiA+ID4gb3RoZXIgbWVhc3VyZSBvZiB0aW1lIHRvIFZNcy4KPj4gPgo+PiA+IFRoYXQgbWFr
+ZXMgc2Vuc2UuIFRoYW5rcyBmb3IgdGhlIHByaW1lciEgSSBoYXZlbid0IGRvbmUgYW55IEFSTSBr
+ZXJuZWwKPj4gPiB3b3JrIGJlZm9yZSwgc28gdGhpcyBpcyBhbGwgZ3JlYXQgdG8ga25vdy4KPj4g
+Pgo+PiA+ID4gPiBNeSB1bmRlcnN0YW5kaW5nIG9mIHdoYXQncyBnb2luZyBvbiBub3cgaXMgdGhh
+dCB0aGUgZ3Vlc3Qga2VybmVsIHJpZ2h0Cj4+ID4gPiA+IG5vdyBoYXMgcm91Z2hseSBubyBhd2Fy
+ZW5lc3MgdGhhdCBpdCdzIGluc2lkZSBvZiBhIFZNLCBzbyBpdCBqdXN0Cj4+ID4gPiA+IHRyYWNr
+cyB0aW1lIHVzaW5nIHRoZSBhc3N1bXB0aW9uIHRoYXQgaXQgaXMgbmF0aXZlIGFuZCBpcyB1bmF3
+YXJlIHRoYXQKPj4gPiA+ID4gdGhlIGhvc3QgZXZlciBzdXNwZW5kcy4gKEl0IGp1c3QgZG9lc24n
+dCBzZWUgYW55IENQVSB0aW1lIHRoZW4uKQo+PiA+ID4gPgo+PiA+ID4gPiA+Cj4+ID4gPiA+ID4g
+V2hldGhlciB0aGUgZ3Vlc3Qgc2VlcyB0aW1lIHByb2dyZXNzIGRlcGVuZHMgb24gd2hhdCBoYXBw
+ZW5zIHRvIHRoYXQKPj4gPiA+ID4gPiBjb3VudGVyIGR1cmluZyBzdXNwZW5kLiBrdm10b29sIHBh
+dXNlL3Jlc3VtZSBzaW1wbHkgcHJldmVudHMgdGhlIHZDUFUKPj4gPiA+ID4gPiB0aHJlYWRzIGZy
+b20gY29udGludWluZywgYnV0IHRoZSBzeXN0ZW0gY291bnRlciBpcyBzdGlsbCBydW5uaW5nLgo+
+PiA+ID4gPiA+Cj4+ID4gPiA+ID4gSWYgeW91IHNhdmUgdGhlIHN0YXRlIG9mIGEgVk0gdG8gYSBm
+aWxlIHRoZW4gdGhlIGNvdW50ZXIgdmFsdWUgaXMKPj4gPiA+ID4gPiBzYXZlZC9yZXN0b3JlZCBz
+byB0aGUgZ3Vlc3Qgd29uJ3Qgc2VlIGFueSBjaGFuZ2UgaW4gdGltZS4KPj4gPiA+ID4gSSBkb24n
+dCBiZWxpZXZlIHRoYXQgd2UncmUgZXhwbGljaXRseSBzYXZpbmcgYW55IHN0YXRlIHRvIGEgZmls
+ZSBvbgo+PiA+ID4gPiBzdXNwZW5kIHJpZ2h0IG5vdywgdGhvdWdoIEkgY291bGQgYmUgd3Jvbmc7
+IEkgaGF2ZW4ndCBsb29rZWQgaW50byB0aGF0Cj4+ID4gPiA+IGNvZGVwYXRoIHlldC4KPj4gPiA+
+Cj4+ID4gPiBUaGUga2V5IGlzIHdoZXRoZXIgdGhlIHVzZXJzcGFjZSBwcm9ncmFtIHRoYXQgY29u
+dHJvbHMgdGhlIEtWTSBWTQo+PiA+ID4gKGt2bXRvb2wsIFFFTVUsIGNyb3N2bSkgdXNlcyB0aGUg
+S1ZNX1JFR19BUk1fVElNRVJfQ05UIGlvY3RsIHRvIHNhdmUgdGhlCj4+ID4gPiBWTSB2aWV3IG9m
+IHZpcnR1YWwgdGltZSwgYW5kIHRvIHJldG9yZSB0aGF0IGF0IGEgbGF0ZXIgdGltZS4KPj4gPiA+
+Cj4+ID4gPiBLVk0gYWRqdXN0cyB0aGUgQ05UVk9GRl9FTDIgZm9yIHRoZSBWTSBvbiB3aGljaCB0
+aGUgaW9jdGwgaXMgZXhlY3V0ZWQgdG8KPj4gPiA+IHJlcHJlc2VudCB0aGUgdmFsdWUgd3JpdHRl
+biBieSB1c2Vyc3BhY2UgdG8gdGhlIFZNIHdoZW4gdGhlIFZNIHJlYWRzCj4+ID4gPiBDTlRWQ1Rf
+RUwwLgo+PiA+ID4KPj4gPgo+PiA+IEFoIGhhaC4gSSBoYXZlbid0IGxvb2tlZCB5ZXQsIGJ1dCBJ
+IGJldCB0aGlzIGlzIHRoZSBtaXNzaW5nIHBpZWNlLgo+PiA+IFRoYW5rcyB2ZXJ5IG11Y2gsIENo
+cmlzdG9mZmVyIQo+PiA+Cj4+ID4gPgo+PiA+ID4gVGhhbmtzLAo+PiA+ID4KPj4gPiA+ICAgICBD
+aHJpc3RvZmZlcgoKCi0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
+b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
+by9rdm1hcm0K
