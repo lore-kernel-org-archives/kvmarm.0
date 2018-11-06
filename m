@@ -1,77 +1,156 @@
-From: Joel Fernandes <joel@joelfernandes.org>
-Subject: Re: [PATCH -next 0/3] Add support for fast mremap
-Date: Mon, 5 Nov 2018 20:36:00 -0800
-Message-ID: <20181106043600.GB139199@google.com>
-References: <20181103040041.7085-1-joelaf@google.com>
- <6886607.O3ZT5bM3Cy@blindfold>
- <e1d039a5-9c83-b9b9-98b5-d39bc48f04e0@kot-begemot.co.uk>
- <20181103183208.GA56850@google.com>
- <D6FB3C15-A8C1-4694-A434-A7489F590E05@oracle.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: Timekeeping on ARM guests/hosts
+Date: Tue, 6 Nov 2018 08:45:23 +0100
+Message-ID: <20181106074523.GC12057@e113682-lin.lund.arm.com>
+References: <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
+ <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
+ <86lg74ude3.wl-marc.zyngier@arm.com>
+ <8088f91a-1a56-065d-1c8e-f9eccbb1b342@redhat.com>
+ <CAHSjozB1jQp4L==jx8pn222T7O991-d0H3Cd-5JPtJqQ8zQHAA@mail.gmail.com>
+ <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
+ <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
+ <20181102143431.GZ12057@e113682-lin.lund.arm.com>
+ <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
+ <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A15EA4A32B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 02:45:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Sg00esMkKwk3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Nov 2018 02:45:27 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 341A44A32A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 02:45:27 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <D6FB3C15-A8C1-4694-A434-A7489F590E05@oracle.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
-List-Post: <mailto:linux-snps-arc@lists.infradead.org>
-List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
- <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
-Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
-To: William Kucharski <william.kucharski@oracle.com>
-Cc: linux-mips@linux-mips.org, linux-m68k@vger.kernel.org, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-hexagon@vger.kernel.org, linux-riscv@lists.infradead.org, elfring@users.sourceforge.net, Jonas Bonn <jonas@southpole.se>, kvmarm@lists.cs.columbia.edu, dancol@google.com, linux-ia64@vge.kvack.org, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, Richard Weinberger <richard@nod.at>, Helge Deller <deller@gmx.de>, r.kernel.org@lithops.sigma-star.at, hughd@google.com, "James E.J. Bottomley" <jejb@paris>
+In-Reply-To: <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Miriam Zimmerman <mutexlox@google.com>
+Cc: marc.zyngier@arm.com, lersek@redhat.com, steven.price@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Nov 04, 2018 at 12:56:48AM -0600, William Kucharski wrote:
-> 
-> 
-> > On Nov 3, 2018, at 12:32 PM, Joel Fernandes <joel@joelfernandes.org> wrote:
-> > 
-> > Looks like more architectures don't define set_pmd_at. I am thinking the
-> > easiest way forward is to just do the following, instead of defining
-> > set_pmd_at for every architecture that doesn't care about it. Thoughts?
-> > 
-> > diff --git a/mm/mremap.c b/mm/mremap.c
-> > index 7cf6b0943090..31ad64dcdae6 100644
-> > --- a/mm/mremap.c
-> > +++ b/mm/mremap.c
-> > @@ -281,7 +281,8 @@ unsigned long move_page_tables(struct vm_area_struct *vma,
-> > 			split_huge_pmd(vma, old_pmd, old_addr);
-> > 			if (pmd_trans_unstable(old_pmd))
-> > 				continue;
-> > -		} else if (extent == PMD_SIZE && IS_ENABLED(CONFIG_HAVE_MOVE_PMD)) {
-> > +		} else if (extent == PMD_SIZE) {
-> > +#ifdef CONFIG_HAVE_MOVE_PMD
-> > 			/*
-> > 			 * If the extent is PMD-sized, try to speed the move by
-> > 			 * moving at the PMD level if possible.
-> > @@ -296,6 +297,7 @@ unsigned long move_page_tables(struct vm_area_struct *vma,
-> > 				drop_rmap_locks(vma);
-> > 			if (moved)
-> > 				continue;
-> > +#endif
-> > 		}
-> > 
-> > 		if (pte_alloc(new_vma->vm_mm, new_pmd))
-> > 
-> 
-> That seems reasonable as there are going to be a lot of architectures that never have
-> mappings at the PMD level.
+On Fri, Nov 02, 2018 at 02:23:45PM -0700, Miriam Zimmerman wrote:
+> In researching KVM_REG_ARM_TIMER_CNT, I discovered your commit 4b7a6bf
+> ("target-arm: kvm: Differentiate registers based on write-back
+> levels"), which seems to limit when the KVM_REG_ARM_TIMER_CNT is used
+> to save time. Under what circumstances should this be saved in order
+> to provide a consistent view of wall clock time (as given by `date` in
+> the VM)? 
 
-Ok, I will do it like this and resend.
+In general, and not specific to QEMU, I think that the virtual
+counter value should stop counting when the entirety of the VM is not
+running, for example when the host machine is suspended, or when the
+entire VM is stopped/suspended, either as part of a suspend/resume
+operation, debug operation, or as part of migration of some sort.
 
-> Have you thought about what might be needed to extend this paradigm to be able to
-> perform remaps at the PUD level, given many architectures already support PUD-mapped
-> pages?
-> 
+Supporting these timekeeping semantics is not something anyone has tried
+up until now with KVM/Arm, as far as I'm aware, and as such is 'new'
+work.
 
-I have thought about this. I believe it is doable in the future. Off the top
-I don't see an issue doing it, and it will also reduce the number of flushes.
 
-thanks,
+> The commit refers to 'machine initialization or on vmload
+> operations', but I'm having difficulty figuring out what a vmload
+> operation is on ARM. Does this include resume-from-sleep/suspend?
 
-- Joel
+I believe vmload is qemu-speak for loading in VM state from a stored
+migration stream, but you'd have to ask the QEMU folks or study the code
+more carefully to figure out when a vmload really happens.
+
+Thanks,
+
+    Christoffer
+
+> On Fri, Nov 2, 2018 at 11:28 AM Miriam Zimmerman <mutexlox@google.com> wrote:
+> >
+> > On Fri, Nov 2, 2018 at 7:34 AM Christoffer Dall
+> > <christoffer.dall@arm.com> wrote:
+> > >
+> > > On Wed, Oct 31, 2018 at 11:49:05AM -0700, Miriam Zimmerman wrote:
+> > >
+> > > [...]
+> > >
+> > > >
+> > > > > CONFIG_KVM_GUEST fixes this by providing the guest with information on
+> > > > > the host time and informs it when the guest is paused (see
+> > > > > MSR_KVM_SYSTEM_TIME_NEW). Arm doesn't (yet) have para-virtualised time.
+> > > > >
+> > > > > On Arm, as far as I know, the guest's view of time is purely from the
+> > > > > virtual counter. Since nothing saves/restores this during the pause, the
+> > > > > counter continues to increment and the jump in time is visible to the guest.
+> > > > What is this virtual counter? How can one configure or enable it?
+> > >
+> > > The 'virtual counter' is an architectural concept in the Arm
+> > > architecture, not a virtual (in the software VM sense) counter.
+> > >
+> > > The Arm Generic Timer Architecture defines two counters:
+> > >  - The physical counter, accessed via CNTPCT_EL0
+> > >  - The virtual counter, accessed via CNTVCT_EL0
+> > >
+> > > And a number of timers.  All timers are associated with the physical
+> > > counter, except the 'EL1 Virtual Timer' which uses the count in the
+> > > virtual counter for its comparison.
+> > >
+> > > The virtual counter yields the value of the physical counter minus an
+> > > offset.
+> > >
+> > > That offset is controlled by a hypervisor running at EL2 which can
+> > > program the offset value in CNTVOFF_EL2.
+> > >
+> > > The basic idea is that a VM can use the virtual timer/counter to keep
+> > > track of some notion of virtual time, and the physical timer/counter to
+> > > keep track of something that always relates to wall-clock time.
+> > >
+> > > This all breaks quite horribly with migration where the physical counter
+> > > is not meaningful across physical systems, and where the counter
+> > > frequencies can vary.
+> > >
+> > > But we can use the offset for the virtual counter to communicate some
+> > > other measure of time to VMs.
+> >
+> > That makes sense. Thanks for the primer! I haven't done any ARM kernel
+> > work before, so this is all great to know.
+> >
+> > > > My understanding of what's going on now is that the guest kernel right
+> > > > now has roughly no awareness that it's inside of a VM, so it just
+> > > > tracks time using the assumption that it is native and is unaware that
+> > > > the host ever suspends. (It just doesn't see any CPU time then.)
+> > > >
+> > > > >
+> > > > > Whether the guest sees time progress depends on what happens to that
+> > > > > counter during suspend. kvmtool pause/resume simply prevents the vCPU
+> > > > > threads from continuing, but the system counter is still running.
+> > > > >
+> > > > > If you save the state of a VM to a file then the counter value is
+> > > > > saved/restored so the guest won't see any change in time.
+> > > > I don't believe that we're explicitly saving any state to a file on
+> > > > suspend right now, though I could be wrong; I haven't looked into that
+> > > > codepath yet.
+> > >
+> > > The key is whether the userspace program that controls the KVM VM
+> > > (kvmtool, QEMU, crosvm) uses the KVM_REG_ARM_TIMER_CNT ioctl to save the
+> > > VM view of virtual time, and to retore that at a later time.
+> > >
+> > > KVM adjusts the CNTVOFF_EL2 for the VM on which the ioctl is executed to
+> > > represent the value written by userspace to the VM when the VM reads
+> > > CNTVCT_EL0.
+> > >
+> >
+> > Ah hah. I haven't looked yet, but I bet this is the missing piece.
+> > Thanks very much, Christoffer!
+> >
+> > >
+> > > Thanks,
+> > >
+> > >     Christoffer
