@@ -1,36 +1,38 @@
-From: Miriam Zimmerman <mutexlox@google.com>
-Subject: Re: Timekeeping on ARM guests/hosts
-Date: Tue, 6 Nov 2018 10:37:21 -0800
-Message-ID: <CAHSjozBxtK5wnYBC-Eha8hDrB5-D6dx+8yKXHOXndD6pi-ML0Q@mail.gmail.com>
-References: <cd4eeb25-50c6-329d-d6e8-26caf478a041@arm.com>
- <CAHSjozBtan6L7eWypnB_aACqHSrBAykjU8LcxfM3Pv3QMSZnJw@mail.gmail.com>
- <86lg74ude3.wl-marc.zyngier@arm.com>
- <8088f91a-1a56-065d-1c8e-f9eccbb1b342@redhat.com>
- <CAHSjozB1jQp4L==jx8pn222T7O991-d0H3Cd-5JPtJqQ8zQHAA@mail.gmail.com>
- <59a6562e-ad8d-3bf3-cde8-4ff9c8997c95@arm.com>
- <CAHSjozCGbjAfEuhKtJyCSqw5ByTgY3b9r=5smXGv_v0PBLerOQ@mail.gmail.com>
- <20181102143431.GZ12057@e113682-lin.lund.arm.com>
- <CAHSjozAJ0_W0o3865HsCVndgfr209h9uqeuUK1=Lx1+9m18eUw@mail.gmail.com>
- <CAHSjozD-5K3SgL8hxFh+hU3rUOZ9s=duFpj56jQ39VEBUdeXSQ@mail.gmail.com>
- <20181106074523.GC12057@e113682-lin.lund.arm.com>
+From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Subject: [RFC QEMU 1/2] arm/virt: Initialize generic timer scale factor
+ dynamically
+Date: Tue,  6 Nov 2018 16:32:28 -0800
+Message-ID: <1541550749-62397-2-git-send-email-bijan.mottahedeh@oracle.com>
+References: <1541550749-62397-1-git-send-email-bijan.mottahedeh@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD97B4A1DC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 13:37:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE7F54A332
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 19:32:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nossW7T4-oSp for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Nov 2018 13:37:33 -0500 (EST)
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com
- [209.85.167.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D024C40A67
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 13:37:33 -0500 (EST)
-Received: by mail-oi1-f196.google.com with SMTP id w66-v6so11618284oiw.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Nov 2018 10:37:33 -0800 (PST)
-In-Reply-To: <20181106074523.GC12057@e113682-lin.lund.arm.com>
+ with ESMTP id FheMaGwSCCoy for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Nov 2018 19:32:45 -0500 (EST)
+Received: from userp2120.oracle.com (userp2120.oracle.com [156.151.31.85])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F7034A30E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Nov 2018 19:32:45 -0500 (EST)
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wA70TRev008131
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 7 Nov 2018 00:32:44 GMT
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+ by userp2120.oracle.com with ESMTP id 2nh4aqrhdv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Nov 2018 00:32:44 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wA70WinI027013
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 7 Nov 2018 00:32:44 GMT
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wA70WhQs003335
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 7 Nov 2018 00:32:44 GMT
+In-Reply-To: <1541550749-62397-1-git-send-email-bijan.mottahedeh@oracle.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -40,55 +42,149 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com
-Cc: marc.zyngier@arm.com, lersek@redhat.com, steven.price@arm.com, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 5, 2018 at 11:45 PM Christoffer Dall
-<christoffer.dall@arm.com> wrote:
->
-> On Fri, Nov 02, 2018 at 02:23:45PM -0700, Miriam Zimmerman wrote:
-> > In researching KVM_REG_ARM_TIMER_CNT, I discovered your commit 4b7a6bf
-> > ("target-arm: kvm: Differentiate registers based on write-back
-> > levels"), which seems to limit when the KVM_REG_ARM_TIMER_CNT is used
-> > to save time. Under what circumstances should this be saved in order
-> > to provide a consistent view of wall clock time (as given by `date` in
-> > the VM)?
->
-> In general, and not specific to QEMU, I think that the virtual
-> counter value should stop counting when the entirety of the VM is not
-> running, for example when the host machine is suspended, or when the
-> entire VM is stopped/suspended, either as part of a suspend/resume
-> operation, debug operation, or as part of migration of some sort.
->
-> Supporting these timekeeping semantics is not something anyone has tried
-> up until now with KVM/Arm, as far as I'm aware, and as such is 'new'
-> work.
+Initialize the generic timer scale factor based on the counter frequency
+register cntfrq_el0, and default to the current static value if necessary.
 
-Hrm, that's perplexing to me. I thought you said that in your tests,
-going into S3 suspend on a host did *not* result in time drift on the
-guest? That would suggest to me that there is code that correctly
-handles it.
+Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+---
+ hw/arm/virt.c          | 15 +++++++++++++++
+ target/arm/helper.c    | 19 ++++++++++++++++---
+ target/arm/internals.h |  8 ++++++--
+ target/arm/kvm64.c     |  1 +
+ 4 files changed, 38 insertions(+), 5 deletions(-)
 
-Upthread, you said:
-> The key is whether the userspace program that controls the KVM VM
-> (kvmtool, QEMU, crosvm) uses the KVM_REG_ARM_TIMER_CNT ioctl to save the
-> VM view of virtual time, and to retore that at a later time.
-Is this a description of current behavior of any of these userspace
-programs, or a description of how they might opt to address the
-time-drift-on-suspend issue?
-
->
->
->
-> > The commit refers to 'machine initialization or on vmload
-> > operations', but I'm having difficulty figuring out what a vmload
-> > operation is on ARM. Does this include resume-from-sleep/suspend?
->
-> I believe vmload is qemu-speak for loading in VM state from a stored
-> migration stream, but you'd have to ask the QEMU folks or study the code
-> more carefully to figure out when a vmload really happens.
-I see, okay. I misread the patch's commit log and thought you had written it.
-
-Thanks,
-Miriam
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 281ddcd..200a601 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -59,6 +59,7 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ #include "hw/arm/smmuv3.h"
++#include "target/arm/internals.h"
+ 
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -1710,6 +1711,19 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+     return NULL;
+ }
+ 
++static void set_system_clock_scale(void)
++{
++    unsigned long cntfrq_el0;
++
++    asm volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
++
++    if (cntfrq_el0 == 0) {
++        cntfrq_el0 = GTIMER_SCALE_DEF;
++    }
++
++    system_clock_scale = NANOSECONDS_PER_SECOND / (int)cntfrq_el0;
++}
++
+ static void virt_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -1736,6 +1750,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+     hc->plug = virt_machine_device_plug_cb;
++    set_system_clock_scale();
+ }
+ 
+ static const TypeInfo virt_machine_info = {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 66afb08..6330586 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -18,6 +18,7 @@
+ #include "sysemu/kvm.h"
+ #include "fpu/softfloat.h"
+ #include "qemu/range.h"
++#include "hw/arm/arm.h"
+ 
+ #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
+ 
+@@ -1614,6 +1615,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
+     return CP_ACCESS_OK;
+ }
+ 
++static void gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    assert(GTIMER_SCALE);
++    assert(ri->fieldoffset);
++
++    if (cpreg_field_is_64bit(ri)) {
++        CPREG_FIELD64(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
++    } else {
++        CPREG_FIELD32(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
++    }
++}
++
+ static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
+                                         bool isread)
+ {
+@@ -1709,7 +1722,7 @@ static CPAccessResult gt_stimer_access(CPUARMState *env,
+     }
+ }
+ 
+-static uint64_t gt_get_countervalue(CPUARMState *env)
++uint64_t gt_get_countervalue(CPUARMState *env)
+ {
+     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / GTIMER_SCALE;
+ }
+@@ -1996,7 +2009,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
+       .access = PL1_RW | PL0_R, .accessfn = gt_cntfrq_access,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
+-      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
++      .resetfn = gt_cntfrq_reset,
+     },
+     /* overall control: mostly access permissions */
+     { .name = "CNTKCTL", .state = ARM_CP_STATE_BOTH,
+@@ -2187,7 +2200,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
+       .type = ARM_CP_CONST, .access = PL0_R /* no PL1_RW in linux-user */,
+       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
+-      .resetvalue = NANOSECONDS_PER_SECOND / GTIMER_SCALE,
++      .resetfn = gt_cntfrq_reset,
+     },
+     { .name = "CNTVCT_EL0", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 2,
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index dc93577..b66a1fa 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -52,9 +52,13 @@ static inline bool excp_is_internal(int excp)
+ }
+ 
+ /* Scale factor for generic timers, ie number of ns per tick.
+- * This gives a 62.5MHz timer.
++ * Calculated dynamically based on CNTFRQ with a default value
++ * that gives a 62.5MHZ timer.
+  */
+-#define GTIMER_SCALE 16
++#define GTIMER_SCALE        system_clock_scale
++#define GTIMER_SCALE_DEF    16
++
++uint64_t gt_get_countervalue(CPUARMState *);
+ 
+ /* Bit definitions for the v7M CONTROL register */
+ FIELD(V7M_CONTROL, NPRIV, 0, 1)
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e0b8246..5d1c394 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -485,6 +485,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+     set_feature(&features, ARM_FEATURE_NEON);
+     set_feature(&features, ARM_FEATURE_AARCH64);
+     set_feature(&features, ARM_FEATURE_PMU);
++    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
+ 
+     ahcf->features = features;
+ 
+-- 
+1.8.3.1
