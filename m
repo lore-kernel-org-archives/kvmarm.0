@@ -1,22 +1,21 @@
 From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Subject: [RFC QEMU 1/2] arm/virt: Initialize generic timer scale factor
- dynamically
-Date: Wed,  7 Nov 2018 10:48:23 -0800
-Message-ID: <1541616504-68526-2-git-send-email-bijan.mottahedeh@oracle.com>
+Subject: [RFC QEMU 2/2] arm/virt: Account for guest pause time
+Date: Wed,  7 Nov 2018 10:48:24 -0800
+Message-ID: <1541616504-68526-3-git-send-email-bijan.mottahedeh@oracle.com>
 References: <1541616504-68526-1-git-send-email-bijan.mottahedeh@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 986594A325
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE79B4A314
  for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Nov 2018 13:48:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xC3KVvxCnHJP for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id bOr2UHCJip5F for <kvmarm@lists.cs.columbia.edu>;
  Wed,  7 Nov 2018 13:48:45 -0500 (EST)
 Received: from userp2130.oracle.com (userp2130.oracle.com [156.151.31.86])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 734A14A30E
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78A5E4A310
  for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Nov 2018 13:48:45 -0500 (EST)
 In-Reply-To: <1541616504-68526-1-git-send-email-bijan.mottahedeh@oracle.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,146 +31,96 @@ To: qemu-devel@nongnu.org
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Initialize the generic timer scale factor based on the counter frequency
-register cntfrq_el0, and default to the current static value if necessary.
+Accumulate the total guest pause time and update the virtual counter
+offset register accordingly in order to account for that time before
+resuming the guest.
 
 Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
 ---
- hw/arm/virt.c          | 15 +++++++++++++++
- target/arm/helper.c    | 19 ++++++++++++++++---
- target/arm/internals.h |  8 ++++++--
- target/arm/kvm64.c     |  1 +
- 4 files changed, 38 insertions(+), 5 deletions(-)
+ hw/intc/arm_gicv3_kvm.c | 39 +++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.h        |  3 +++
+ 2 files changed, 42 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcd..200a601 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -59,6 +59,7 @@
- #include "qapi/visitor.h"
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 1e11200..aabd508 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -30,6 +30,7 @@
+ #include "gicv3_internal.h"
+ #include "vgic_common.h"
+ #include "migration/blocker.h"
 +#include "target/arm/internals.h"
  
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1710,6 +1711,19 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
-+static void set_system_clock_scale(void)
-+{
-+    unsigned long cntfrq_el0;
-+
-+    asm volatile("mrs %0, cntfrq_el0" : "=r"(cntfrq_el0));
-+
-+    if (cntfrq_el0 == 0) {
-+        cntfrq_el0 = GTIMER_SCALE_DEF;
-+    }
-+
-+    system_clock_scale = NANOSECONDS_PER_SECOND / (int)cntfrq_el0;
-+}
-+
- static void virt_machine_class_init(ObjectClass *oc, void *data)
+ #ifdef DEBUG_GICV3_KVM
+ #define DPRINTF(fmt, ...) \
+@@ -745,9 +746,38 @@ static void vm_change_state_handler(void *opaque, int running,
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1736,6 +1750,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-     hc->plug = virt_machine_device_plug_cb;
-+    set_system_clock_scale();
- }
+     GICv3State *s = (GICv3State *)opaque;
+     Error *err = NULL;
++    CPUState *cpu;
++    CPUARMState *env;
++    struct kvm_one_reg reg;
+     int ret;
++    uint64_t cnt;
  
- static const TypeInfo virt_machine_info = {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 66afb08..6330586 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -18,6 +18,7 @@
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
- #include "qemu/range.h"
-+#include "hw/arm/arm.h"
- 
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
-@@ -1614,6 +1615,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
-     return CP_ACCESS_OK;
- }
- 
-+static void gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    assert(GTIMER_SCALE);
-+    assert(ri->fieldoffset);
+     if (running) {
++        CPU_FOREACH(cpu) {
 +
-+    if (cpreg_field_is_64bit(ri)) {
-+        CPREG_FIELD64(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-+    } else {
-+        CPREG_FIELD32(env, ri) = NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-+    }
-+}
++            env = (CPUARMState *)(cpu->env_ptr);
 +
- static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
-                                         bool isread)
- {
-@@ -1709,7 +1722,7 @@ static CPAccessResult gt_stimer_access(CPUARMState *env,
++            if (!env->pause_start) {
++                continue;
++            }
++
++            /*
++             * Accumulate the total pause time and set the
++             * counter virtual offset accordingly.
++             */
++            cnt = gt_get_countervalue(env);
++            env->pause_total += (cnt - env->pause_start);
++            env->cp15.cntvoff_el2 = cnt - env->pause_total;
++
++            env->pause_start = 0;   /* clear for next pause */
++            reg.id = KVM_REG_ARM_TIMER_CNT;
++            reg.addr = (uintptr_t) &env->cp15.cntvoff_el2;
++            ret = kvm_vcpu_ioctl(cpu, KVM_SET_ONE_REG, &reg);
++            if (ret) {
++                error_report("Set virtual counter offset failed: %d", ret);
++                abort();
++            }
++        }
+         return;
      }
- }
  
--static uint64_t gt_get_countervalue(CPUARMState *env)
-+uint64_t gt_get_countervalue(CPUARMState *env)
- {
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / GTIMER_SCALE;
- }
-@@ -1996,7 +2009,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
-       .access = PL1_RW | PL0_R, .accessfn = gt_cntfrq_access,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
--      .resetvalue = (1000 * 1000 * 1000) / GTIMER_SCALE,
-+      .resetfn = gt_cntfrq_reset,
-     },
-     /* overall control: mostly access permissions */
-     { .name = "CNTKCTL", .state = ARM_CP_STATE_BOTH,
-@@ -2187,7 +2200,7 @@ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 0,
-       .type = ARM_CP_CONST, .access = PL0_R /* no PL1_RW in linux-user */,
-       .fieldoffset = offsetof(CPUARMState, cp15.c14_cntfrq),
--      .resetvalue = NANOSECONDS_PER_SECOND / GTIMER_SCALE,
-+      .resetfn = gt_cntfrq_reset,
-     },
-     { .name = "CNTVCT_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 0, .opc2 = 2,
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index dc93577..b66a1fa 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -52,9 +52,13 @@ static inline bool excp_is_internal(int excp)
- }
- 
- /* Scale factor for generic timers, ie number of ns per tick.
-- * This gives a 62.5MHz timer.
-+ * Calculated dynamically based on CNTFRQ with a default value
-+ * that gives a 62.5MHZ timer.
-  */
--#define GTIMER_SCALE 16
-+#define GTIMER_SCALE        system_clock_scale
-+#define GTIMER_SCALE_DEF    16
+@@ -760,6 +790,15 @@ static void vm_change_state_handler(void *opaque, int running,
+     if (ret < 0 && ret != -EFAULT) {
+         abort();
+     }
 +
-+uint64_t gt_get_countervalue(CPUARMState *);
++    CPU_FOREACH(cpu) {
++        /*
++         * Record the current pause start time.
++         */
++        env = (CPUARMState *)(cpu->env_ptr);
++        cnt = gt_get_countervalue(env);
++        env->pause_start = cnt;
++    }
+ }
  
- /* Bit definitions for the v7M CONTROL register */
- FIELD(V7M_CONTROL, NPRIV, 0, 1)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index e0b8246..5d1c394 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -485,6 +485,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     set_feature(&features, ARM_FEATURE_NEON);
-     set_feature(&features, ARM_FEATURE_AARCH64);
-     set_feature(&features, ARM_FEATURE_PMU);
-+    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
  
-     ahcf->features = features;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e310ffc..bd0a56e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -602,6 +602,9 @@ typedef struct CPUARMState {
+     struct CPUBreakpoint *cpu_breakpoint[16];
+     struct CPUWatchpoint *cpu_watchpoint[16];
+ 
++    uint64_t pause_start;   /* start time of last pause */
++    uint64_t pause_total;   /* total pause time */
++
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
  
 -- 
 1.8.3.1
