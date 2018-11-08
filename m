@@ -1,243 +1,108 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Implement workaround for Cortex-A76
- erratum 1165522
-Date: Thu, 8 Nov 2018 18:05:55 +0000
-Message-ID: <ec7d0e34-022f-125e-00b4-b06be23ee2a8@arm.com>
-References: <20181105143617.120602-1-marc.zyngier@arm.com>
- <20181105143617.120602-5-marc.zyngier@arm.com>
- <20181106081546.GH12057@e113682-lin.lund.arm.com>
+From: Joel Fernandes <joel@joelfernandes.org>
+Subject: [PATCH -next-akpm 0/3] Add support for fast mremap
+Date: Thu,  8 Nov 2018 10:11:58 -0800
+Message-ID: <20181108181201.88826-1-joelaf@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0235A4A339
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 13:06:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xc+1KvhB-L7i for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Nov 2018 13:05:59 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68AD64A330
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 13:05:59 -0500 (EST)
-In-Reply-To: <20181106081546.GH12057@e113682-lin.lund.arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-snps-arc/>
+List-Post: <mailto:linux-snps-arc@lists.infradead.org>
+List-Help: <mailto:linux-snps-arc-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-snps-arc>,
+ <mailto:linux-snps-arc-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-snps-arc" <linux-snps-arc-bounces@lists.infradead.org>
+Errors-To: linux-snps-arc-bounces+gla-linux-snps-arc=m.gmane.org@lists.infradead.org
+To: linux-kernel@vger.kernel.org
+Cc: Joel Fernandes <joelaf@google.com>, linux-mips@linux-mips.org, Rich Felker <dalias@libc.org>, linux-ia64@vger.kernel.org, linux-sh@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen <dave.hansen@linux.intel.com>, Will Deacon <will.deacon@arm.com>, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, lokeshgidra@google.com, sparclinux@vger.kernel.org, linux-riscv@lists.infradead.org, anton.ivanov@kot-begemot.co.uk, Jonas Bonn <jonas@southpole.se>, linux-s390@vger.kernel.org, dancol@google.com, Yoshinori Sato <ysato@users.sourceforge.jp>, linux-xtensa@linux-xtensa.org, linux-hexagon@vger.kernel.org, Helge Deller <deller@gmx.de>, "maintainer:X86 ARCHITECTURE 32-BIT AND 64-BIT" <x86@kernel.org>, hughd@google.com, "James E.J. Bottomley" <jejb@parisc-linux.org>, kasan-dev@googlegroups.com, kvmarm@lists.cs.columbia.ed
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/11/18 08:15, Christoffer Dall wrote:
-> On Mon, Nov 05, 2018 at 02:36:16PM +0000, Marc Zyngier wrote:
->> Early versions of Cortex-A76 can end-up with corrupt TLBs if they
->> speculate an AT instruction in during a guest switch while the
->> S1/S2 system registers are in an inconsistent state.
->>
->> Work around it by:
->> - Mandating VHE
->> - Make sure that S1 and S2 system registers are consistent before
->>   clearing HCR_EL2.TGE, which allows AT to target the EL1 translation
->>   regime
->>
->> These two things together ensure that we cannot hit this erratum.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  Documentation/arm64/silicon-errata.txt |  1 +
->>  arch/arm64/Kconfig                     | 12 ++++++++++++
->>  arch/arm64/include/asm/cpucaps.h       |  3 ++-
->>  arch/arm64/include/asm/kvm_host.h      |  3 +++
->>  arch/arm64/include/asm/kvm_hyp.h       |  6 ++++++
->>  arch/arm64/kernel/cpu_errata.c         |  8 ++++++++
->>  arch/arm64/kvm/hyp/switch.c            | 14 ++++++++++++++
->>  7 files changed, 46 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
->> index 76ccded8b74c..04f0bc4690c6 100644
->> --- a/Documentation/arm64/silicon-errata.txt
->> +++ b/Documentation/arm64/silicon-errata.txt
->> @@ -57,6 +57,7 @@ stable kernels.
->>  | ARM            | Cortex-A73      | #858921         | ARM64_ERRATUM_858921        |
->>  | ARM            | Cortex-A55      | #1024718        | ARM64_ERRATUM_1024718       |
->>  | ARM            | Cortex-A76      | #1188873        | ARM64_ERRATUM_1188873       |
->> +| ARM            | Cortex-A76      | #1165522        | ARM64_ERRATUM_1165522       |
->>  | ARM            | MMU-500         | #841119,#826419 | N/A                         |
->>  |                |                 |                 |                             |
->>  | Cavium         | ThunderX ITS    | #22375, #24313  | CAVIUM_ERRATUM_22375        |
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index 787d7850e064..a68bc6cc2167 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -497,6 +497,18 @@ config ARM64_ERRATUM_1188873
->>  
->>  	  If unsure, say Y.
->>  
->> +config ARM64_ERRATUM_1165522
->> +	bool "Cortex-A76: Speculative AT instruction using out-of-context translation regime could cause subsequent request to generate an incorrect translation"
->> +	default y
->> +	help
->> +	  This option adds work arounds for ARM Cortex-A76 erratum 1165522
->> +
->> +	  Affected Cortex-A76 cores (r0p0, r1p0, r2p0) could end-up with
->> +	  corrupted TLBs by speculating an AT instruction during a guest
->> +	  context switch.
->> +
->> +	  If unsure, say Y.
->> +
->>  config CAVIUM_ERRATUM_22375
->>  	bool "Cavium erratum 22375, 24313"
->>  	default y
->> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
->> index 6e2d254c09eb..62d8cd15fdf2 100644
->> --- a/arch/arm64/include/asm/cpucaps.h
->> +++ b/arch/arm64/include/asm/cpucaps.h
->> @@ -54,7 +54,8 @@
->>  #define ARM64_HAS_CRC32				33
->>  #define ARM64_SSBS				34
->>  #define ARM64_WORKAROUND_1188873		35
->> +#define ARM64_WORKAROUND_1165522		36
->>  
->> -#define ARM64_NCAPS				36
->> +#define ARM64_NCAPS				37
->>  
->>  #endif /* __ASM_CPUCAPS_H */
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 7d6e974d024a..8f486026ac87 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -435,6 +435,9 @@ static inline bool kvm_arch_sve_requires_vhe(void)
->>  static inline bool kvm_arch_impl_requires_vhe(void)
->>  {
->>  	/* Some implementations have defects that confine them to VHE */
->> +	if (cpus_have_cap(ARM64_WORKAROUND_1165522))
->> +		return true;
->> +
->>  	return false;
->>  }
->>  
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->> index 23aca66767f9..9681360d0959 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -163,6 +163,12 @@ static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
->>  {
->>  	write_sysreg(kvm->arch.vtcr, vtcr_el2);
->>  	write_sysreg(kvm->arch.vttbr, vttbr_el2);
->> +
->> +	/*
->> +	 * ARM erratum 1165522 requires the actual execution of the
->> +	 * above before we can switch to the guest translation regime.
->> +	 */
-> 
-> Is it about a guest translation 'regime' or should this just say before
-> we can enable stage 2 translation?
+Hi,
+Here is the "fast mremap" series. This just a repost with Kirill's Acked-bys
+added and William's Reviewed-by added. Also fixed a UML build error reported
+last week. I would like this to be considered for linux -next. The performance
+numbers in the series are for testing on x86. The config enablement patch for
+arm64 will be posted in the future after testing (see notes below).
 
-No, this isn't strictly about enabling stage-2 translation. This is
-about making sure that anything that impacts the guest translations is
-actually executed.
+List of patches in series:
 
-I wonder if it would be clearer to move this outside of
-__load_guest_stage2 and make it explicit in the callers of this helper...
+(1) mm: select HAVE_MOVE_PMD in x86 for faster mremap
 
-Thoughts?
+(2) mm: speed up mremap by 20x on large regions (v5)
+v1->v2: Added support for per-arch enablement (Kirill Shutemov)
+v2->v3: Updated commit message to state the optimization may also
+	run for non-thp type of systems (Daniel Col).
+v3->v4: Remove useless pmd_lock check (Kirill Shutemov)
+	Rebased ontop of Linus's master, updated perf results based
+        on x86 testing. Added Kirill's Acks.
+v4->v5: Added William's Reviewed-by. Fixed arch/um build error
+	due to set_pmd_at not defined. Rebased on linux-next/akpm.
 
-> 
->> +	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
->>  }
->>  
->>  #endif /* __ARM64_KVM_HYP_H__ */
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index a509e35132d2..476e738e6c46 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -739,6 +739,14 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->>  		.capability = ARM64_WORKAROUND_1188873,
->>  		ERRATA_MIDR_RANGE(MIDR_CORTEX_A76, 0, 0, 2, 0),
->>  	},
->> +#endif
->> +#ifdef CONFIG_ARM64_ERRATUM_1165522
->> +	{
->> +		/* Cortex-A76 r0p0 to r2p0 */
->> +		.desc = "ARM erratum 1165522",
->> +		.capability = ARM64_WORKAROUND_1165522,
->> +		ERRATA_MIDR_RANGE(MIDR_CORTEX_A76, 0, 0, 2, 0),
->> +	},
->>  #endif
->>  	{
->>  	}
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index 51d5d966d9e5..322109183853 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -143,6 +143,13 @@ static void deactivate_traps_vhe(void)
->>  {
->>  	extern char vectors[];	/* kernel exception vectors */
->>  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
->> +
->> +	/*
->> +	 * ARM erratum 1165522 requires the actual execution of the
->> +	 * above before we can switch to the host translation regime.
->> +	 */
-> 
-> same here, is it not rather about disabling stage 2 translation than
-> about the host (EL2 and EL0 stage 1) translation regimes?
-> 
->> +	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
->> +
->>  	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
->>  	write_sysreg(vectors, vbar_el1);
->>  }
->> @@ -499,6 +506,13 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->>  
->>  	sysreg_save_host_state_vhe(host_ctxt);
->>  
->> +	/*
->> +	 * ARM erratum 1165522 requires us to have all the translation
->> +	 * context in place before we clear HCR_TGE. All the offending
->> +	 * guest sysregs are loaded in kvm_vcpu_load_sysregs, and
->> +	 * __activate_vm has the stage-2 configuration. Once this is
->> +	 * done, __activate_trap clears HCR_TGE (among other things).
->> +	 */
-> 
-> I'm not this comment is needed or is helpful here.  For example, I don't
-> understand what you mean with the offending guest sysregs and how that
+(3) mm: treewide: remove unused address argument from pte_alloc functions (v2)
+v1->v2: fix arch/um/ prototype which was missed in v1 (Anton Ivanov)
+        update changelog with manual fixups for m68k and microblaze.
 
-TTBR*, TCR, SCTLR... Anything that deals with stage-1 translations.
+not included - (4) mm: select HAVE_MOVE_PMD in arm64 for faster mremap
+    This patch is dropped since last posting pending further performance
+    testing on arm64 with new TLB gather updates. See notes in patch
+    titled "mm: speed up mremap by 500x on large regions" for more
+    details.
 
-> relates to the problem of configuring stage 2 before clearing TGE.  Is
-> this about gettting the stage 1 configuration in place first?
+Joel Fernandes (Google) (3):
+mm: treewide: remove unused address argument from pte_alloc functions
+(v2)
+mm: speed up mremap by 20x on large regions (v5)
+mm: select HAVE_MOVE_PMD in x86 for faster mremap
 
-Not only stage-1. Stage-2 is involved as well, as the CPU could
-otherwise end-up with the wrong translations (bypassing stage-2 altogether).
+arch/Kconfig                                 |  5 ++
+arch/alpha/include/asm/pgalloc.h             |  6 +-
+arch/arc/include/asm/pgalloc.h               |  5 +-
+arch/arm/include/asm/pgalloc.h               |  4 +-
+arch/arm64/include/asm/pgalloc.h             |  4 +-
+arch/hexagon/include/asm/pgalloc.h           |  6 +-
+arch/ia64/include/asm/pgalloc.h              |  5 +-
+arch/m68k/include/asm/mcf_pgalloc.h          |  8 +--
+arch/m68k/include/asm/motorola_pgalloc.h     |  4 +-
+arch/m68k/include/asm/sun3_pgalloc.h         |  6 +-
+arch/microblaze/include/asm/pgalloc.h        | 19 +-----
+arch/microblaze/mm/pgtable.c                 |  3 +-
+arch/mips/include/asm/pgalloc.h              |  6 +-
+arch/nds32/include/asm/pgalloc.h             |  5 +-
+arch/nios2/include/asm/pgalloc.h             |  6 +-
+arch/openrisc/include/asm/pgalloc.h          |  5 +-
+arch/openrisc/mm/ioremap.c                   |  3 +-
+arch/parisc/include/asm/pgalloc.h            |  4 +-
+arch/powerpc/include/asm/book3s/32/pgalloc.h |  4 +-
+arch/powerpc/include/asm/book3s/64/pgalloc.h | 12 ++--
+arch/powerpc/include/asm/nohash/32/pgalloc.h |  4 +-
+arch/powerpc/include/asm/nohash/64/pgalloc.h |  6 +-
+arch/powerpc/mm/pgtable-book3s64.c           |  2 +-
+arch/powerpc/mm/pgtable_32.c                 |  4 +-
+arch/riscv/include/asm/pgalloc.h             |  6 +-
+arch/s390/include/asm/pgalloc.h              |  4 +-
+arch/sh/include/asm/pgalloc.h                |  6 +-
+arch/sparc/include/asm/pgalloc_32.h          |  5 +-
+arch/sparc/include/asm/pgalloc_64.h          |  6 +-
+arch/sparc/mm/init_64.c                      |  6 +-
+arch/sparc/mm/srmmu.c                        |  4 +-
+arch/um/include/asm/pgalloc.h                |  4 +-
+arch/um/kernel/mem.c                         |  4 +-
+arch/unicore32/include/asm/pgalloc.h         |  4 +-
+arch/x86/Kconfig                             |  1 +
+arch/x86/include/asm/pgalloc.h               |  4 +-
+arch/x86/mm/pgtable.c                        |  4 +-
+arch/xtensa/include/asm/pgalloc.h            |  8 +--
+include/linux/mm.h                           | 13 ++--
+mm/huge_memory.c                             |  8 +--
+mm/kasan/kasan_init.c                        |  2 +-
+mm/memory.c                                  | 17 +++---
+mm/migrate.c                                 |  2 +-
+mm/mremap.c                                  | 64 +++++++++++++++++++-
+mm/userfaultfd.c                             |  2 +-
+virt/kvm/arm/mmu.c                           |  2 +-
+46 files changed, 165 insertions(+), 147 deletions(-)
 
-> 
-> If so, could I suggest a reword along the lines of:
-> 
-> 	/*
-> 	 * ARM erratum 1165522 requires us to configure both stage 1 and
-> 	 * stage 2 translation for the guest context before we clear
-> 	 * HCR_EL2.TGE.
-> 	 *
-> 	 * We have already configured the guest's stage 1 translation in
-> 	 * kvm_vcpu_load_sysregs above.  We must now call __activate_vm
-> 	 * before __activate_traps, because __activate_vm configures
-> 	 * stage 2 translation, and __activate_traps clear HCR_EL2.TGE
-> 	 * (among other things).
-> 	 */
-
-Works for me (and shows that contrary to what you wrote above, you have
-perfectly understood the problem)!.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+--
+2.19.1.930.g4563a0d9d0-goog
