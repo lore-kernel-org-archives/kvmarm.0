@@ -1,26 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Implement workaround for Cortex-A76
- erratum 1165522
-Date: Thu, 8 Nov 2018 17:18:29 +0000
-Message-ID: <fd30982e-da1d-0b3f-0947-199301c8e0f3@arm.com>
+Subject: Re: [PATCH 2/4] KVM: arm64: Allow implementations to be confined to
+ using VHE
+Date: Thu, 8 Nov 2018 17:51:53 +0000
+Message-ID: <f75dfeda-63ce-73c1-4798-f47607c45cb3@arm.com>
 References: <20181105143617.120602-1-marc.zyngier@arm.com>
- <20181105143617.120602-5-marc.zyngier@arm.com>
- <a13dfb2d-df5b-7783-2e8b-8a8ffe50b436@arm.com>
+ <20181105143617.120602-3-marc.zyngier@arm.com>
+ <20181106075353.GF12057@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78AF14A349
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 12:18:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D69F94A339
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 12:51:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Im44ambhyeLr for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Nov 2018 12:18:33 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 388594A339
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 12:18:33 -0500 (EST)
-In-Reply-To: <a13dfb2d-df5b-7783-2e8b-8a8ffe50b436@arm.com>
+ with ESMTP id 4cEafB86ZaFV for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Nov 2018 12:51:57 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F68B4A330
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Nov 2018 12:51:57 -0500 (EST)
+In-Reply-To: <20181106075353.GF12057@e113682-lin.lund.arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,61 +31,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
+To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/11/18 18:34, James Morse wrote:
-> Hi Marc,
-> 
-> On 05/11/2018 14:36, Marc Zyngier wrote:
->> Early versions of Cortex-A76 can end-up with corrupt TLBs if they
->> speculate an AT instruction in during a guest switch while the
-> 
->                               (in during?)
-> 
->> S1/S2 system registers are in an inconsistent state.
+On 06/11/18 07:53, Christoffer Dall wrote:
+> On Mon, Nov 05, 2018 at 02:36:14PM +0000, Marc Zyngier wrote:
+>> Some implementations may be forced to use VHE to work around HW
+>> errata, for example. Let's introduce a helper that checks for
+>> these cases.
 >>
->> Work around it by:
->> - Mandating VHE
->> - Make sure that S1 and S2 system registers are consistent before
->>    clearing HCR_EL2.TGE, which allows AT to target the EL1 translation
->>    regime
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   | 1 +
+>>  arch/arm64/include/asm/kvm_host.h | 6 ++++++
+>>  virt/kvm/arm/arm.c                | 5 +++++
+>>  3 files changed, 12 insertions(+)
 >>
->> These two things together ensure that we cannot hit this erratum.
-> 
-> 
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index 51d5d966d9e5..322109183853 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -143,6 +143,13 @@ static void deactivate_traps_vhe(void)
->>   {
->>   	extern char vectors[];	/* kernel exception vectors */
->>   	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index c3469729f40c..0f2f782548cb 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -286,6 +286,7 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>>  
+>>  static inline bool kvm_arch_sve_requires_vhe(void) { return false; }
+>> +static inline bool kvm_arch_impl_requires_vhe(void) { return false; }
+>>  static inline void kvm_arch_hardware_unsetup(void) {}
+>>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index ca1714148400..7d6e974d024a 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -432,6 +432,12 @@ static inline bool kvm_arch_sve_requires_vhe(void)
+>>  	return system_supports_sve();
+>>  }
+>>  
+>> +static inline bool kvm_arch_impl_requires_vhe(void)
+>> +{
+>> +	/* Some implementations have defects that confine them to VHE */
+>> +	return false;
+>> +}
 >> +
->> +	/*
->> +	 * ARM erratum 1165522 requires the actual execution of the
->> +	 * above before we can switch to the host translation regime.
->> +	 */
->> +	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
+>>  static inline void kvm_arch_hardware_unsetup(void) {}
+>>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 66de2efddfca..bc90a1cdd27f 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -1647,6 +1647,11 @@ int kvm_arch_init(void *opaque)
+>>  			kvm_pr_unimpl("SVE system without VHE unsupported.  Broken cpu?");
+>>  			return -ENODEV;
+>>  		}
 >> +
+>> +		if (kvm_arch_impl_requires_vhe()) {
+>> +			kvm_pr_unimpl("CPU requiring VHE in non-VHE mode");
+>> +			return -ENODEV;
+>> +		}
 > 
-> Host regime too ... does __tlb_switch_to_host_vhe() need the same 
-> treatment? It writes vttbr_el2 and hcr_el2 back to back.
+> So as per my previous comment, I'd prefer this function to only issue a
+> single call, and have the function in kvm_host.h check for all the
+> conditions, do the printing, etc.
+> 
+> Thoughts?
 
-It turns out that our VHE TLB invalidation are a tiny bit broken, and
-that's before we work around this very erratum.
-
-You're perfectly right that we're mitting an ISB in
-__tlb_switch_to_host_vhe(). We also have the problem that we can
-perfectly take an interrupt here, and maybe schedule another process
-from there (very unlikely, but I couldn't fully convince myself that it
-couldn't happen).
-
-What I'm planning to do is to make these TLB invalidation sequence
-atomic by disabling interrupts. Yes, this is quite a hammer, but that'
-no different from !VHE, and that's a very rare event anyway.
+Indeed, this seems a sensible alternative.
 
 Thanks,
 
