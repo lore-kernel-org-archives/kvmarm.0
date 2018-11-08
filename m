@@ -1,7 +1,7 @@
 From: lantianyu1986@gmail.com
-Subject: [Resend PATCH V5 4/10] KVM/VMX: Add hv tlb range flush support
-Date: Thu,  8 Nov 2018 22:46:33 +0800
-Message-ID: <20181108144639.11206-4-Tianyu.Lan@microsoft.com>
+Subject: [Resend PATCH V5 5/10] KVM/MMU: Add tlb flush with range helper function
+Date: Thu,  8 Nov 2018 22:46:34 +0800
+Message-ID: <20181108144639.11206-5-Tianyu.Lan@microsoft.com>
 References: <20181108144639.11206-1-Tianyu.Lan@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181108144639.11206-1-Tianyu.Lan@microsoft.com>
@@ -11,131 +11,81 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to register tlb_remote_flush_with_range callback with
-hv tlb range flush interface.
+This patch is to add wrapper functions for tlb_remote_flush_with_range
+callback and flush tlb directly in kvm_mmu_zap_collapsible_spte().
+kvm_mmu_zap_collapsible_spte() returns flush request to the
+slot_handle_leaf() and the latter does flush on demand. When
+range flush is available, make kvm_mmu_zap_collapsible_spte()
+to flush tlb with range directly to avoid returning range back
+to slot_handle_leaf().
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
-Change since v4:
-	- Use new function kvm_fill_hv_flush_list_func() to fill flush
-       request.
-Change since v3:
-	- Merge Vitaly's don't pass EPT configuration info to
-vmx_hv_remote_flush_tlb() fix.
-Change since v1:
-	- Pass flush range with new hyper-v tlb flush struct rather
-       than KVM tlb flush struct.
+Change since V4:
+       Remove flush list interface and flush tlb directly in
+       kvm_mmu_zap_collapsible_spte().
+Change since V3:
+       Remove code of updating "tlbs_dirty"
+Change since V2:
+       Fix comment in the kvm_flush_remote_tlbs_with_range()
 ---
- arch/x86/kvm/vmx.c | 69 ++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 49 insertions(+), 20 deletions(-)
+ arch/x86/kvm/mmu.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index edbc96cb990a..405dfbde70b2 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -1567,7 +1567,38 @@ static void check_ept_pointer_match(struct kvm *kvm)
- 	to_kvm_vmx(kvm)->ept_pointers_match = EPT_POINTERS_MATCH;
- }
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index cf5f572f2305..c1d383532066 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -264,6 +264,35 @@ static void mmu_spte_set(u64 *sptep, u64 spte);
+ static union kvm_mmu_page_role
+ kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
  
--static int vmx_hv_remote_flush_tlb(struct kvm *kvm)
-+int kvm_fill_hv_flush_list_func(struct hv_guest_mapping_flush_list *flush,
-+		void *data)
-+{
-+	struct kvm_tlb_range *range = data;
 +
-+	return hyperv_fill_flush_guest_mapping_list(flush, range->start_gfn,
-+			range->pages);
++static inline bool kvm_available_flush_tlb_with_range(void)
++{
++	return kvm_x86_ops->tlb_remote_flush_with_range;
 +}
 +
-+static inline int __hv_remote_flush_tlb_with_range(struct kvm *kvm,
-+		struct kvm_vcpu *vcpu, struct kvm_tlb_range *range)
-+{
-+	u64 ept_pointer = to_vmx(vcpu)->ept_pointer;
-+
-+	/* If ept_pointer is invalid pointer, bypass flush request. */
-+	if (!VALID_PAGE(ept_pointer))
-+		return 0;
-+
-+	/*
-+	 * FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE hypercall needs address
-+	 * of the base of EPT PML4 table, strip off EPT configuration
-+	 * information.
-+	 */
-+	if (range)
-+		return hyperv_flush_guest_mapping_range(ept_pointer & PAGE_MASK,
-+				kvm_fill_hv_flush_list_func, (void *)range);
-+	else
-+		return hyperv_flush_guest_mapping(ept_pointer & PAGE_MASK);
-+}
-+
-+static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
++static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
 +		struct kvm_tlb_range *range)
- {
- 	struct kvm_vcpu *vcpu;
- 	int ret = -ENOTSUPP, i;
-@@ -1577,30 +1608,23 @@ static int vmx_hv_remote_flush_tlb(struct kvm *kvm)
- 	if (to_kvm_vmx(kvm)->ept_pointers_match == EPT_POINTERS_CHECK)
- 		check_ept_pointer_match(kvm);
- 
--	/*
--	 * FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE hypercall needs the address of the
--	 * base of EPT PML4 table, strip off EPT configuration information.
--	 * If ept_pointer is invalid pointer, bypass the flush request.
--	 */
- 	if (to_kvm_vmx(kvm)->ept_pointers_match != EPT_POINTERS_MATCH) {
--		kvm_for_each_vcpu(i, vcpu, kvm) {
--			if (!VALID_PAGE(to_vmx(vcpu)->ept_pointer))
--				return 0;
--
--			ret |= hyperv_flush_guest_mapping(
--				to_vmx(vcpu)->ept_pointer & PAGE_MASK);
--		}
-+		kvm_for_each_vcpu(i, vcpu, kvm)
-+			ret |= __hv_remote_flush_tlb_with_range(
-+					kvm, vcpu, range);
- 	} else {
--		if (!VALID_PAGE(to_vmx(kvm_get_vcpu(kvm, 0))->ept_pointer))
--			return 0;
--
--		ret = hyperv_flush_guest_mapping(
--			to_vmx(kvm_get_vcpu(kvm, 0))->ept_pointer & PAGE_MASK);
-+		ret = __hv_remote_flush_tlb_with_range(kvm,
-+				kvm_get_vcpu(kvm, 0), range);
- 	}
- 
- 	spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
- 	return ret;
- }
-+
-+static int hv_remote_flush_tlb(struct kvm *kvm)
 +{
-+	return hv_remote_flush_tlb_with_range(kvm, NULL);
-+}
- #else /* !IS_ENABLED(CONFIG_HYPERV) */
- static inline void evmcs_write64(unsigned long field, u64 value) {}
- static inline void evmcs_write32(unsigned long field, u32 value) {}
-@@ -7957,8 +7981,11 @@ static __init int hardware_setup(void)
- 
- #if IS_ENABLED(CONFIG_HYPERV)
- 	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
--	    && enable_ept)
--		kvm_x86_ops->tlb_remote_flush = vmx_hv_remote_flush_tlb;
-+	    && enable_ept) {
-+		kvm_x86_ops->tlb_remote_flush = hv_remote_flush_tlb;
-+		kvm_x86_ops->tlb_remote_flush_with_range =
-+				hv_remote_flush_tlb_with_range;
-+	}
- #endif
- 
- 	if (!cpu_has_vmx_ple()) {
-@@ -11567,6 +11594,8 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	vmx->nested.posted_intr_nv = -1;
- 	vmx->nested.current_vmptr = -1ull;
- 
-+	vmx->ept_pointer = INVALID_PAGE;
++	int ret = -ENOTSUPP;
 +
- 	vmx->msr_ia32_feature_control_valid_bits = FEATURE_CONTROL_LOCKED;
- 
- 	/*
++	if (range && kvm_x86_ops->tlb_remote_flush_with_range)
++		ret = kvm_x86_ops->tlb_remote_flush_with_range(kvm, range);
++
++	if (ret)
++		kvm_flush_remote_tlbs(kvm);
++}
++
++static void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
++		u64 start_gfn, u64 pages)
++{
++	struct kvm_tlb_range range;
++
++	range.start_gfn = start_gfn;
++	range.pages = pages;
++
++	kvm_flush_remote_tlbs_with_range(kvm, &range);
++}
++
+ void kvm_mmu_set_mmio_spte_mask(u64 mmio_mask, u64 mmio_value)
+ {
+ 	BUG_ON((mmio_mask & mmio_value) != mmio_value);
+@@ -5680,7 +5709,13 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+ 			!kvm_is_reserved_pfn(pfn) &&
+ 			PageTransCompoundMap(pfn_to_page(pfn))) {
+ 			pte_list_remove(rmap_head, sptep);
+-			need_tlb_flush = 1;
++
++			if (kvm_available_flush_tlb_with_range())
++				kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
++					KVM_PAGES_PER_HPAGE(sp->role.level));
++			else
++				need_tlb_flush = 1;
++
+ 			goto restart;
+ 		}
+ 	}
 -- 
 2.14.4
