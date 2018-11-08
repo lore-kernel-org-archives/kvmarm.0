@@ -1,197 +1,344 @@
-From: lantianyu1986@gmail.com
-Subject: [Resend PATCH V5 7/10] KVM: Make kvm_set_spte_hva() return int
-Date: Thu,  8 Nov 2018 22:46:36 +0800
-Message-ID: <20181108144639.11206-7-Tianyu.Lan@microsoft.com>
-References: <20181108144639.11206-1-Tianyu.Lan@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181108144639.11206-1-Tianyu.Lan@microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, kys@microsoft.com, vkuznets@redhat.com
+From: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 6/7] iommu/virtio: Add probe request
+Date: Thu, 8 Nov 2018 15:48:45 +0100
+Message-ID: <295d30bb-5aef-2727-01c0-ec10c7a8fa8c@redhat.com>
+References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
+	<20181012145917.6840-7-jean-philippe.brucker@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20181012145917.6840-7-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Lan Tianyu <Tianyu.Lan@microsoft.com>
+Hi Jean-Philippe,
 
-The patch is to make kvm_set_spte_hva() return int and caller can
-check return value to determine flush tlb or not.
+On 10/12/18 4:59 PM, Jean-Philippe Brucker wrote:
+> When the device offers the probe feature, send a probe request for each
+> device managed by the IOMMU. Extract RESV_MEM information. When we
+> encounter a MSI doorbell region, set it up as a IOMMU_RESV_MSI region.
+> This will tell other subsystems that there is no need to map the MSI
+> doorbell in the virtio-iommu, because MSIs bypass it.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> ---
+>  drivers/iommu/virtio-iommu.c      | 147 ++++++++++++++++++++++++++++--
+>  include/uapi/linux/virtio_iommu.h |  39 ++++++++
+>  2 files changed, 180 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+> index 9fb38cd3b727..8eaf66770469 100644
+> --- a/drivers/iommu/virtio-iommu.c
+> +++ b/drivers/iommu/virtio-iommu.c
+> @@ -56,6 +56,7 @@ struct viommu_dev {
+>  	struct iommu_domain_geometry	geometry;
+>  	u64				pgsize_bitmap;
+>  	u8				domain_bits;
+> +	u32				probe_size;
+>  };
+>  
+>  struct viommu_mapping {
+> @@ -77,8 +78,10 @@ struct viommu_domain {
+>  };
+>  
+>  struct viommu_endpoint {
+> +	struct device			*dev;
+>  	struct viommu_dev		*viommu;
+>  	struct viommu_domain		*vdomain;
+> +	struct list_head		resv_regions;
+>  };
+>  
+>  struct viommu_request {
+> @@ -129,6 +132,9 @@ static off_t viommu_get_req_offset(struct viommu_dev *viommu,
+>  {
+>  	size_t tail_size = sizeof(struct virtio_iommu_req_tail);
+>  
+> +	if (req->type == VIRTIO_IOMMU_T_PROBE)
+> +		return len - viommu->probe_size - tail_size;
+> +
+>  	return len - tail_size;
+>  }
+>  
+> @@ -414,6 +420,101 @@ static int viommu_replay_mappings(struct viommu_domain *vdomain)
+>  	return ret;
+>  }
+>  
+> +static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
+> +			       struct virtio_iommu_probe_resv_mem *mem,
+> +			       size_t len)
+> +{
+> +	struct iommu_resv_region *region = NULL;
+> +	unsigned long prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
+> +
+> +	u64 start = le64_to_cpu(mem->start);
+> +	u64 end = le64_to_cpu(mem->end);
+> +	size_t size = end - start + 1;
+> +
+> +	if (len < sizeof(*mem))
+> +		return -EINVAL;
+> +
+> +	switch (mem->subtype) {
+> +	default:
+> +		dev_warn(vdev->dev, "unknown resv mem subtype 0x%x\n",
+> +			 mem->subtype);
+> +		/* Fall-through */
+> +	case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
+> +		region = iommu_alloc_resv_region(start, size, 0,
+> +						 IOMMU_RESV_RESERVED);
+> +		break;
+> +	case VIRTIO_IOMMU_RESV_MEM_T_MSI:
+> +		region = iommu_alloc_resv_region(start, size, prot,
+> +						 IOMMU_RESV_MSI);
+> +		break;
+> +	}
+> +
+> +	list_add(&vdev->resv_regions, &region->list);
+> +	return 0;
+> +}
+> +
+> +static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
+> +{
+> +	int ret;
+> +	u16 type, len;
+> +	size_t cur = 0;
+> +	size_t probe_len;
+> +	struct virtio_iommu_req_probe *probe;
+> +	struct virtio_iommu_probe_property *prop;
+> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
+> +	struct viommu_endpoint *vdev = fwspec->iommu_priv;
+> +
+> +	if (!fwspec->num_ids)
+> +		return -EINVAL;
+> +
+> +	probe_len = sizeof(*probe) + viommu->probe_size +
+> +		    sizeof(struct virtio_iommu_req_tail);
+> +	probe = kzalloc(probe_len, GFP_KERNEL);
+> +	if (!probe)
+> +		return -ENOMEM;
+> +
+> +	probe->head.type = VIRTIO_IOMMU_T_PROBE;
+> +	/*
+> +	 * For now, assume that properties of an endpoint that outputs multiple
+> +	 * IDs are consistent. Only probe the first one.
+> +	 */
+> +	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
+> +
+> +	ret = viommu_send_req_sync(viommu, probe, probe_len);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	prop = (void *)probe->properties;
+> +	type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
+> +
+> +	while (type != VIRTIO_IOMMU_PROBE_T_NONE &&
+> +	       cur < viommu->probe_size) {
+> +		len = le16_to_cpu(prop->length) + sizeof(*prop);
+> +
+> +		switch (type) {
+> +		case VIRTIO_IOMMU_PROBE_T_RESV_MEM:
+> +			ret = viommu_add_resv_mem(vdev, (void *)prop, len);
+> +			break;
+> +		default:
+> +			dev_err(dev, "unknown viommu prop 0x%x\n", type);
+> +		}
+> +
+> +		if (ret)
+> +			dev_err(dev, "failed to parse viommu prop 0x%x\n", type);
+> +
+> +		cur += len;
+> +		if (cur >= viommu->probe_size)
+> +			break;
+> +
+> +		prop = (void *)probe->properties + cur;
+> +		type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
+> +	}
+> +
+> +out_free:
+> +	kfree(probe);
+> +	return ret;
+> +}
+> +
+>  /* IOMMU API */
+>  
+>  static struct iommu_domain *viommu_domain_alloc(unsigned type)
+> @@ -636,15 +737,33 @@ static void viommu_iotlb_sync(struct iommu_domain *domain)
+>  
+>  static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
+>  {
+> -	struct iommu_resv_region *region;
+> +	struct iommu_resv_region *entry, *new_entry, *msi = NULL;
+> +	struct viommu_endpoint *vdev = dev->iommu_fwspec->iommu_priv;
+>  	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
+>  
+> -	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
+> -					 IOMMU_RESV_SW_MSI);
+> -	if (!region)
+> -		return;
+> +	list_for_each_entry(entry, &vdev->resv_regions, list) {
+> +		/*
+> +		 * If the device registered a bypass MSI windows, use it.
+> +		 * Otherwise add a software-mapped region
+> +		 */
+> +		if (entry->type == IOMMU_RESV_MSI)
+> +			msi = entry;
+> +
+> +		new_entry = kmemdup(entry, sizeof(*entry), GFP_KERNEL);
+> +		if (!new_entry)
+> +			return;
+> +		list_add_tail(&new_entry->list, head);
+> +	}
+> +
+> +	if (!msi) {
+> +		msi = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH,
+> +					      prot, IOMMU_RESV_SW_MSI);
+> +		if (!msi)
+> +			return;
+> +
+> +		list_add_tail(&msi->list, head);
+> +	}
+>  
+> -	list_add_tail(&region->list, head);
+>  	iommu_dma_get_resv_regions(dev, head);
+>  }
+>  
+> @@ -692,9 +811,18 @@ static int viommu_add_device(struct device *dev)
+>  	if (!vdev)
+>  		return -ENOMEM;
+>  
+> +	vdev->dev = dev;
+>  	vdev->viommu = viommu;
+> +	INIT_LIST_HEAD(&vdev->resv_regions);
+>  	fwspec->iommu_priv = vdev;
+>  
+> +	if (viommu->probe_size) {
+> +		/* Get additional information for this endpoint */
+> +		ret = viommu_probe_endpoint(viommu, dev);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	ret = iommu_device_link(&viommu->iommu, dev);
+>  	if (ret)
+>  		goto err_free_dev;
+> @@ -717,6 +845,7 @@ static int viommu_add_device(struct device *dev)
+>  	iommu_device_unlink(&viommu->iommu, dev);
+>  
+>  err_free_dev:
+> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
+>  	kfree(vdev);
+>  
+>  	return ret;
+> @@ -734,6 +863,7 @@ static void viommu_remove_device(struct device *dev)
+>  
+>  	iommu_group_remove_device(dev);
+>  	iommu_device_unlink(&vdev->viommu->iommu, dev);
+> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
+>  	kfree(vdev);
+>  }
+>  
+> @@ -832,6 +962,10 @@ static int viommu_probe(struct virtio_device *vdev)
+>  			     struct virtio_iommu_config, domain_bits,
+>  			     &viommu->domain_bits);
+>  
+> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_PROBE,
+> +			     struct virtio_iommu_config, probe_size,
+> +			     &viommu->probe_size);
+> +
+>  	viommu->geometry = (struct iommu_domain_geometry) {
+>  		.aperture_start	= input_start,
+>  		.aperture_end	= input_end,
+> @@ -913,6 +1047,7 @@ static unsigned int features[] = {
+>  	VIRTIO_IOMMU_F_MAP_UNMAP,
+>  	VIRTIO_IOMMU_F_DOMAIN_BITS,
+>  	VIRTIO_IOMMU_F_INPUT_RANGE,
+> +	VIRTIO_IOMMU_F_PROBE,
+>  };
+>  
+>  static struct virtio_device_id id_table[] = {
+> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
+> index e808fc7fbe82..feed74586bb0 100644
+> --- a/include/uapi/linux/virtio_iommu.h
+> +++ b/include/uapi/linux/virtio_iommu.h
+> @@ -14,6 +14,7 @@
+>  #define VIRTIO_IOMMU_F_DOMAIN_BITS		1
+>  #define VIRTIO_IOMMU_F_MAP_UNMAP		2
+>  #define VIRTIO_IOMMU_F_BYPASS			3
+> +#define VIRTIO_IOMMU_F_PROBE			4
+>  
+>  struct virtio_iommu_config {
+>  	/* Supported page sizes */
+> @@ -25,6 +26,9 @@ struct virtio_iommu_config {
+>  	} input_range;
+>  	/* Max domain ID size */
+>  	__u8					domain_bits;
+> +	__u8					padding[3];
+> +	/* Probe buffer size */
+> +	__u32					probe_size;
+>  };
+>  
+>  /* Request types */
+> @@ -32,6 +36,7 @@ struct virtio_iommu_config {
+>  #define VIRTIO_IOMMU_T_DETACH			0x02
+>  #define VIRTIO_IOMMU_T_MAP			0x03
+>  #define VIRTIO_IOMMU_T_UNMAP			0x04
+> +#define VIRTIO_IOMMU_T_PROBE			0x05
+>  
+>  /* Status types */
+>  #define VIRTIO_IOMMU_S_OK			0x00
+> @@ -98,4 +103,38 @@ struct virtio_iommu_req_unmap {
+>  	struct virtio_iommu_req_tail		tail;
+>  };
+>  
+> +#define VIRTIO_IOMMU_PROBE_T_NONE		0
+> +#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
+> +
+> +#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
+> +
+> +struct virtio_iommu_probe_property {
+> +	__le16					type;
+> +	__le16					length;
+the value[] field has disappeared but still is documented in the v0.8 spec.
 
-Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
----
- arch/arm/include/asm/kvm_host.h     | 2 +-
- arch/arm64/include/asm/kvm_host.h   | 2 +-
- arch/mips/include/asm/kvm_host.h    | 2 +-
- arch/mips/kvm/mmu.c                 | 3 ++-
- arch/powerpc/include/asm/kvm_host.h | 2 +-
- arch/powerpc/kvm/book3s.c           | 3 ++-
- arch/powerpc/kvm/e500_mmu_host.c    | 3 ++-
- arch/x86/include/asm/kvm_host.h     | 2 +-
- arch/x86/kvm/mmu.c                  | 3 ++-
- virt/kvm/arm/mmu.c                  | 6 ++++--
- 10 files changed, 17 insertions(+), 11 deletions(-)
+Thanks
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 5ca5d9af0c26..fb62b500e590 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -225,7 +225,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- int kvm_unmap_hva_range(struct kvm *kvm,
- 			unsigned long start, unsigned long end);
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
- 
- unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 52fbc823ff8c..b3df7b38ba7d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -360,7 +360,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- int kvm_unmap_hva_range(struct kvm *kvm,
- 			unsigned long start, unsigned long end);
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
- 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 2c1c53d12179..71c3f21d80d5 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -933,7 +933,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- int kvm_unmap_hva_range(struct kvm *kvm,
- 			unsigned long start, unsigned long end);
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
- 
-diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-index d8dcdb350405..97e538a8c1be 100644
---- a/arch/mips/kvm/mmu.c
-+++ b/arch/mips/kvm/mmu.c
-@@ -551,7 +551,7 @@ static int kvm_set_spte_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
- 	       (pte_dirty(old_pte) && !pte_dirty(hva_pte));
- }
- 
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	unsigned long end = hva + PAGE_SIZE;
- 	int ret;
-@@ -559,6 +559,7 @@ void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- 	ret = handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pte);
- 	if (ret)
- 		kvm_mips_callbacks->flush_shadow_all(kvm);
-+	return 0;
- }
- 
- static int kvm_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index fac6f631ed29..ab23379c53a9 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -72,7 +72,7 @@ extern int kvm_unmap_hva_range(struct kvm *kvm,
- 			       unsigned long start, unsigned long end);
- extern int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
- extern int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
--extern void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-+extern int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
- 
- #define HPTEG_CACHE_NUM			(1 << 15)
- #define HPTEG_HASH_BITS_PTE		13
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index fd9893bc7aa1..437613bb609a 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -850,9 +850,10 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- 	return kvm->arch.kvm_ops->test_age_hva(kvm, hva);
- }
- 
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	kvm->arch.kvm_ops->set_spte_hva(kvm, hva, pte);
-+	return 0;
- }
- 
- void kvmppc_mmu_destroy(struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-index 8f2985e46f6f..c3f312b2bcb3 100644
---- a/arch/powerpc/kvm/e500_mmu_host.c
-+++ b/arch/powerpc/kvm/e500_mmu_host.c
-@@ -757,10 +757,11 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- 	return 0;
- }
- 
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	/* The page will get remapped properly on its next fault */
- 	kvm_unmap_hva(kvm, hva);
-+	return 0;
- }
- 
- /*****************************************/
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c8a65f0a7107..1cab3c15944f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1509,7 +1509,7 @@ asmlinkage void kvm_spurious_fault(void);
- int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
- int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
- int kvm_cpu_has_interrupt(struct kvm_vcpu *vcpu);
- int kvm_arch_interrupt_allowed(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index af3e9e466014..06bfcd327ef6 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -1913,9 +1913,10 @@ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
- 	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
- }
- 
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	kvm_handle_hva(kvm, hva, (unsigned long)&pte, kvm_set_pte_rmapp);
-+	return 0;
- }
- 
- static int kvm_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 5eca48bdb1a6..b8b20c033fcf 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1849,14 +1849,14 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data
- }
- 
- 
--void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
-+int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	unsigned long end = hva + PAGE_SIZE;
- 	kvm_pfn_t pfn = pte_pfn(pte);
- 	pte_t stage2_pte;
- 
- 	if (!kvm->arch.pgd)
--		return;
-+		return 0;
- 
- 	trace_kvm_set_spte_hva(hva);
- 
-@@ -1867,6 +1867,8 @@ void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- 	clean_dcache_guest_page(pfn, PAGE_SIZE);
- 	stage2_pte = pfn_pte(pfn, PAGE_S2);
- 	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
-+
-+	return 0;
- }
- 
- static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
--- 
-2.14.4
+Eric
+> +};
+> +
+> +#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
+> +#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
+> +
+> +struct virtio_iommu_probe_resv_mem {
+> +	struct virtio_iommu_probe_property	head;
+> +	__u8					subtype;
+> +	__u8					reserved[3];
+> +	__le64					start;
+> +	__le64					end;
+> +};
+> +
+> +struct virtio_iommu_req_probe {
+> +	struct virtio_iommu_req_head		head;
+> +	__le32					endpoint;
+> +	__u8					reserved[64];
+> +
+> +	__u8					properties[];
+> +
+> +	/*
+> +	 * Tail follows the variable-length properties array. No padding,
+> +	 * property lengths are all aligned on 8 bytes.
+> +	 */
+> +};
+> +
+>  #endif
+> 
