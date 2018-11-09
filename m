@@ -1,107 +1,67 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Implement workaround for Cortex-A76
- erratum 1165522
-Date: Fri, 9 Nov 2018 11:39:11 +0000
-Message-ID: <fc16d772-7a6c-f943-db51-9b50c39cafc3@arm.com>
-References: <20181105143617.120602-1-marc.zyngier@arm.com>
- <20181105143617.120602-5-marc.zyngier@arm.com>
- <a13dfb2d-df5b-7783-2e8b-8a8ffe50b436@arm.com>
- <fd30982e-da1d-0b3f-0947-199301c8e0f3@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm64: don't single-step for non-emulated faults
+Date: Fri, 9 Nov 2018 11:56:44 +0000
+Message-ID: <20181109115644.f4qjqnv2kogoke42@lakrids.cambridge.arm.com>
+References: <20181107171031.22573-1-alex.bennee@linaro.org>
+ <20181107180120.urnvkcrkh46ytsdb@lakrids.cambridge.arm.com>
+ <20181107180829.sex54bxhd5wyqvan@lakrids.cambridge.arm.com>
+ <87r2fv68us.fsf@linaro.org>
+ <20181108135122.llmfsel32dbe2q7o@lakrids.cambridge.arm.com>
+ <87pnvf63u2.fsf@linaro.org>
+ <CAFEAcA9v+XvAJBWpDMvEQPeJ7ALM15Yz5KY+wfGPmLG2a8yPRQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AE974A315
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Nov 2018 06:39:17 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yB01h6oLh6we for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Nov 2018 06:39:16 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B794A30D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Nov 2018 06:39:16 -0500 (EST)
-In-Reply-To: <fd30982e-da1d-0b3f-0947-199301c8e0f3@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9v+XvAJBWpDMvEQPeJ7ALM15Yz5KY+wfGPmLG2a8yPRQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 08/11/2018 17:18, Marc Zyngier wrote:
-> On 05/11/18 18:34, James Morse wrote:
->> On 05/11/2018 14:36, Marc Zyngier wrote:
->>> Early versions of Cortex-A76 can end-up with corrupt TLBs if they
->>> speculate an AT instruction in during a guest switch while the
->>
->>                                (in during?)
->>
->>> S1/S2 system registers are in an inconsistent state.
->>>
->>> Work around it by:
->>> - Mandating VHE
->>> - Make sure that S1 and S2 system registers are consistent before
->>>     clearing HCR_EL2.TGE, which allows AT to target the EL1 translation
->>>     regime
->>>
->>> These two things together ensure that we cannot hit this erratum.
->>
->>
->>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->>> index 51d5d966d9e5..322109183853 100644
->>> --- a/arch/arm64/kvm/hyp/switch.c
->>> +++ b/arch/arm64/kvm/hyp/switch.c
->>> @@ -143,6 +143,13 @@ static void deactivate_traps_vhe(void)
->>>    {
->>>    	extern char vectors[];	/* kernel exception vectors */
->>>    	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
->>> +
->>> +	/*
->>> +	 * ARM erratum 1165522 requires the actual execution of the
->>> +	 * above before we can switch to the host translation regime.
->>> +	 */
->>> +	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
->>> +
->>
->> Host regime too ... does __tlb_switch_to_host_vhe() need the same
->> treatment? It writes vttbr_el2 and hcr_el2 back to back.
+On Thu, Nov 08, 2018 at 02:38:43PM +0000, Peter Maydell wrote:
+> On 8 November 2018 at 14:28, Alex Bennée <alex.bennee@linaro.org> wrote:
+> >
+> > Mark Rutland <mark.rutland@arm.com> writes:
+> >> One problem is that I couldn't spot when we advance the PC for an MMIO
+> >> trap. I presume we do that in the kernel, *after* the MMIO trap, but I
+> >> can't see where that happens.
+> >
+> > Nope it gets done before during decode_hsr in mmio.c:
+> >
+> >         /*
+> >          * The MMIO instruction is emulated and should not be re-executed
+> >          * in the guest.
+> >          */
+> >         kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
 > 
-> It turns out that our VHE TLB invalidation are a tiny bit broken, and
-> that's before we work around this very erratum.
+> I think that this attempt to do the PC-advance early is
+> probably an underlying problem that is not helping the
+> code structure here.
 > 
-> You're perfectly right that we're mitting an ISB in
-> __tlb_switch_to_host_vhe().
+> An enhancement that's been floated previously is that the
+> MMIO emulation in userspace should be able to report back
+> to KVM "nope, that access should generate a guest synchronous
+> external abort (with ESR_EL1.EA = 0/1)".
+> If we have that, then we definitely need to not advance the
+> PC until after userspace has done the emulation and told
+> us whether the memory access succeeded or not...
 
-I thought that would only be needed for this erratum workaround, in the 
-regular case don't we rely on the isb hiding in __vhe_hyp_call()?
+Yup.
 
+I think that we absolutely want to do all the CPU state advancement (PC,
+SS bit, etc) at the point we apply the effects of the instruction. Not
+before we emulate the instruction, and not higher/lower in the call
+stack.
 
-> We also have the problem that we can
-> perfectly take an interrupt here, and maybe schedule another process
-> from there (very unlikely, but I couldn't fully convince myself that it
-> couldn't happen).
+We have a big problem in that guest-directed singlestep and
+host-directed singlestep don't compose, and given that host-directed
+singlestep doesn't work reliably today I'd be tempted to rip that out
+until we've fixed guest-directed singlestep.
 
-> What I'm planning to do is to make these TLB invalidation sequence
-> atomic by disabling interrupts. Yes, this is quite a hammer, but that'
-> no different from !VHE, and that's a very rare event anyway.
-
-Anything running on the back of an IRQ should not be allowed to see 
-HCR_EL2.TGE being clear. I think this is the right thing to do.
-One example is TGE changes PANs behaviour, which could become 
-inexplicably-trappy if we're also using the LDRT instructions in the 
-uaccess helpers from an IRQ. (who would do such a thing? perf).
-
+We should have a story for how host-directed debug is handled
+transparently from the PoV of a guest using guest-directed debug.
 
 Thanks,
-
-James
+Mark.
