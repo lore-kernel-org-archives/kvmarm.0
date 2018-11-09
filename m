@@ -1,49 +1,71 @@
 From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm64: don't single-step for non-emulated faults
-Date: Fri, 9 Nov 2018 13:29:56 +0000
-Message-ID: <20181109132955.kqfccmqrugfj5rkl@lakrids.cambridge.arm.com>
-References: <20181107180120.urnvkcrkh46ytsdb@lakrids.cambridge.arm.com>
- <20181107180829.sex54bxhd5wyqvan@lakrids.cambridge.arm.com>
- <87r2fv68us.fsf@linaro.org>
- <20181108135122.llmfsel32dbe2q7o@lakrids.cambridge.arm.com>
- <87pnvf63u2.fsf@linaro.org>
- <CAFEAcA9v+XvAJBWpDMvEQPeJ7ALM15Yz5KY+wfGPmLG2a8yPRQ@mail.gmail.com>
- <20181109115644.f4qjqnv2kogoke42@lakrids.cambridge.arm.com>
- <87lg625th2.fsf@linaro.org>
- <20181109124930.axelmyohmrcb63b4@lakrids.cambridge.arm.com>
- <CAFEAcA-xuUPukf9EPeetr_+RSU7FPDMXmyk3zbjY=FcV65CF=g@mail.gmail.com>
+Subject: [PATCH 0/2] kvm/arm: make singlestep behaviour consistent
+Date: Fri,  9 Nov 2018 15:07:09 +0000
+Message-ID: <20181109150711.45864-1-mark.rutland@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-xuUPukf9EPeetr_+RSU7FPDMXmyk3zbjY=FcV65CF=g@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F192C4A34C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Nov 2018 10:07:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8D7oo5M7g12Z for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Nov 2018 10:07:20 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC7944A34B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Nov 2018 10:07:20 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 09, 2018 at 12:56:54PM +0000, Peter Maydell wrote:
-> On 9 November 2018 at 12:49, Mark Rutland <mark.rutland@arm.com> wrote:
-> > I'm not saying anything about *decisions*. I'm saying that we can make
-> > the state consistent by advancing the singlestep state in the same way
-> > that HW does, at the instant it advances the PC.
-> >
-> > i.e. do that in kvm_skip_instr(), as I've done in my local tree.
-> >
-> > That mirrors the HW, and we don't need to special-case any handling for
-> > emulated vs non-emulated instructions.
-> 
-> You also need to do it in the "set PC because we're making the guest
-> take an exception" code path, which doesn't go through kvm_skip_instr().
+We don't consistently advance the singlestep state machine when emulating
+instructions. We attempt to bodge around this when the host is stepping a
+guest, and fake a debug exception, but we don't always get this right.
+Additionally, we don't try to fix this up at all when a guest is stepping
+itself, so guests cannot single-step emulated instructions reliably.
 
-Sure.
+In both cases we're usually reliant on the HW singlestep state machine, so
+let's have our instruction emulation consistently advance that. Thus, when we
+return to a guest after emulating an instruction, the HW will generate the step
+exception for us, routed to host or guest appropriately.
 
-> This corresponds to the two kinds of "step completed" in hardware as
-> noted in DDI0487D.a D2.12.3 fig D2-3 footnote b:
->  * executing the instruction to be stepped without taking an exception
->  * taking an exception to an exception level that debug exceptions
->    are enabled from [ie guest EL1 in our case]
+So far I have only compile-tested these patches. YMMV.
 
-Thanks for the pointer!
+These patches do not ensure that guest-stepping is reliable in the presence of
+host-stepping. We might need to say that it's userspace's responsibility to
+virtualize the guest singlestep state machine when stepping the guest.
+Otherwise, it's not clear to me if we can shadow this correctly within the
+kernel.
 
+Thanks,
 Mark.
+
+Mark Rutland (2):
+  kvm/arm: skip MMIO insn after emulation
+  kvm/arm: consistently advance singlestep when emulating instructions
+
+ arch/arm/include/asm/kvm_host.h          |  5 ----
+ arch/arm64/include/asm/kvm_emulate.h     | 35 ++++++++++++++++++++------
+ arch/arm64/include/asm/kvm_host.h        |  1 -
+ arch/arm64/kvm/debug.c                   | 21 ----------------
+ arch/arm64/kvm/handle_exit.c             | 14 +----------
+ arch/arm64/kvm/hyp/switch.c              | 43 +++-----------------------------
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 12 ++++++---
+ virt/kvm/arm/arm.c                       |  2 --
+ virt/kvm/arm/hyp/vgic-v3-sr.c            |  6 ++++-
+ virt/kvm/arm/mmio.c                      | 11 ++++----
+ 10 files changed, 52 insertions(+), 98 deletions(-)
+
+-- 
+2.11.0
