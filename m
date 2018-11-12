@@ -1,27 +1,23 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] [PATCH] kvm: arm: Introduce error code
- KVM_EINVARIANT
-Date: Mon, 12 Nov 2018 11:09:39 +0100
-Message-ID: <20181112100939.vro42goghcv7v6l2@kamzik.brq.redhat.com>
-References: <1540290099-146109-1-git-send-email-mjaggi@caviumnetworks.com>
- <4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
- <86o9avetgz.wl-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v6 09/24] arm64: kvm: Unmask PMR before entering guest
+Date: Mon, 12 Nov 2018 11:57:00 +0000
+Message-ID: <1542023835-21446-10-git-send-email-julien.thierry@arm.com>
+References: <1542023835-21446-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EA004A328
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 05:09:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95FB44A362
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 06:57:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T6MpH6JXQMPo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Nov 2018 05:09:47 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E29FE4A310
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 05:09:46 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <86o9avetgz.wl-marc.zyngier@arm.com>
+ with ESMTP id aCrUIM-DGHa5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Nov 2018 06:57:48 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 428E24A311
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 06:57:48 -0500 (EST)
+In-Reply-To: <1542023835-21446-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,88 +27,97 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Manish Jaggi <mjaggi@caviumnetworks.com>, Will Deacon <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "Nowicki,
- Tomasz" <Tomasz.Nowicki@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "dgilbert@redhat.com" <dgilbert@redhat.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: daniel.thompson@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, joel@joelfernandes.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Nov 11, 2018 at 11:36:44AM +0000, Marc Zyngier wrote:
-> On Sat, 10 Nov 2018 22:18:47 +0000,
-> Manish Jaggi <mjaggi@caviumnetworks.com> wrote:
-> > 
-> > 
-> > CCing a larger audience.
-> > Please review.
-> > 
-> > On 10/23/2018 03:51 PM, Jaggi, Manish wrote:
-> > > From: Manish Jaggi <manish.jaggi@cavium.com>
-> > >
-> > > This patch introduces an error code KVM_EINVARIANT which is returned
-> > > by KVM when userland tries to set an invariant register.
-> > >
-> > > The need for this error code is in VM Migration for arm64.
-> > > ARM64 systems use mainly -machine virt -cpu host as parameter to qemu.
-> > > Migration requires both Source and destination machines to have same
-> > > physical cpu. There are cases where the overall architecture of CPU is
-> > > same but the next version of the chip with some bug fixes which have no
-> > > effect on qemu operation. In such cases invariant registers like MIDR
-> > > have a different value.
-> > > Currently Migration fails in such cases.
-> > >
-> > > Rather than sending a EINVAL, a specifc error code will help
-> > > userland program the guest invariant register by querying the migrated
-> > > host machines invariant registers.
-> 
-> But failing migration is a good thing, right? How do you expect that
-> the guest will be happy to see a new CPU revision right in the middle
-> of its execution? Do you also propose that QEMU starts doing that for
-> big-little systems? After all, if ignoring the differences in some
-> registers is harmless for migration, surely that should be the case in
-> a single system, right?
-> 
-> > >
-> > > Qemu will have a parameter -hostinvariant along with checking of this
-> > > error code. So it can be safely assumed that the feature is opt-in
-> 
-> You're changing the ABI without any buy in from userspace, which is
-> not acceptable.
-> 
-> As it stands, this patch creates a number of issues without solving
-> any. Things to think about:
-> 
-> - How does errata management works when migrating to a different
->   system?
-> - big-little, as mentioned above
-> - Are all invariant registers equal? A different MIDR has the same
->   effect as a different MMFR0?
-> 
-> Instead of papering over architectural constants i a system, how about
-> allowing the relevant ID registers to be overloaded when not
-> incompatible?
-> 
+Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
+means that hypervisor will not receive masked interrupts while running a
+guest.
 
-In QEMU, I think we need nail down how we define '-cpu host' for kvmarm.
-IMO, '-cpu host' is what libvirt calls "host-passthrough"[*], and indeed
-migrating a guest using host-passthrough is super risky. You need to
-know what you're doing, and likely what you'll want to do is migrate to
-an _identical_ host. We should start looking at building cpu models to
-better support migration, but errata complicates that. However, for the
-sake of argument, let's assume we solved those problems and completed the
-implementation of cpu models - so we would no longer be using '-cpu host'
-for a "typical" config. So what would '-cpu host' mean? It appears the
-current semantics are "source host passthrough", similar to
-"host-model"[*]. Rather than "whatever host I'm running on host
-passthrough", which is what I think we want and what this patch and the
-QEMU counterpart changes seem to be aiming at implementing. Anyway,
-whichever of those two semantics we choose for '-cpu host', the user will
-still need to know what they're doing and to assume the risks. Without
-cpu models, I'm not even sure discussing migration safety makes sense.
+Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
 
-(Yeah, I know I ignored big-little. IMO, big-little is an upper layer
-problem, as it should just be a vcpu thread to cpu set affinity
-assignment issue.)
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
+ arch/arm64/kvm/hyp/switch.c       | 16 ++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-Thanks,
-drew
-
-[*] https://wiki.openstack.org/wiki/LibvirtXMLCPUModel
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 52fbc82..31c7e9a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -24,6 +24,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/daifflags.h>
+ #include <asm/fpsimd.h>
+@@ -471,6 +472,17 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ static inline void kvm_arm_vhe_guest_enter(void)
+ {
+ 	local_daif_mask();
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (system_supports_irq_prio_masking()) {
++		gic_write_pmr(GIC_PRIO_IRQON);
++		dsb(sy);
++	}
+ }
+ 
+ static inline void kvm_arm_vhe_guest_exit(void)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 7cc175c..e5ea193 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -22,6 +22,7 @@
+ 
+ #include <kvm/arm_psci.h>
+ 
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+@@ -537,6 +538,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
+ 
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (system_supports_irq_prio_masking()) {
++		gic_write_pmr(GIC_PRIO_IRQON);
++		dsb(sy);
++	}
++
+ 	vcpu = kern_hyp_va(vcpu);
+ 
+ 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+@@ -589,6 +601,10 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
++	/* Returning to host will clear PSR.I, remask PMR if needed */
++	if (system_supports_irq_prio_masking())
++		gic_write_pmr(GIC_PRIO_IRQOFF);
++
+ 	return exit_code;
+ }
+ 
+-- 
+1.9.1
