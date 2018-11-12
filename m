@@ -1,38 +1,25 @@
-From: "Paul E. McKenney" <paulmck@linux.ibm.com>
-Subject: [PATCH tip/core/rcu 7/7] KVM: arm/arm64: vgic: Replace
- spin_is_locked() with lockdep
-Date: Sun, 11 Nov 2018 12:04:43 -0800
-Message-ID: <20181111200443.10772-7-paulmck@linux.ibm.com>
-References: <20181111200421.GA10551@linux.ibm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [RFC] [PATCH] kvm: arm: Introduce error code KVM_EINVARIANT
+Date: Mon, 12 Nov 2018 10:06:35 +0100
+Message-ID: <20181112090635.GA11669@C02W217FHV2R.local>
+References: <1540290099-146109-1-git-send-email-mjaggi@caviumnetworks.com>
+ <4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B7A4A315
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Nov 2018 15:04:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 301134A33D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 04:06:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KLqqMEnSoP6u for <kvmarm@lists.cs.columbia.edu>;
- Sun, 11 Nov 2018 15:04:54 -0500 (EST)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
- [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A8F34A310
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Nov 2018 15:04:53 -0500 (EST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
- wABJwv8O031072
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Nov 2018 15:04:53 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2npdbgj4h9-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Nov 2018 15:04:52 -0500
-Received: from localhost
- by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <paulmck@linux.vnet.ibm.com>;
- Sun, 11 Nov 2018 20:04:51 -0000
-In-Reply-To: <20181111200421.GA10551@linux.ibm.com>
+ with ESMTP id 2gk0-CzgmtJ0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Nov 2018 04:06:38 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F3304A31B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Nov 2018 04:06:38 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <4bbb4e76-b714-eafe-f95b-aca1a258e9fe@caviumnetworks.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -42,85 +29,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu, "Paul E . McKenney" <paulmck@linux.ibm.com>, tglx@linutronix.de, peterz@infradead.org, fweisbec@gmail.com, jiangshanlai@gmail.com, josh@joshtriplett.org, rostedt@goodmis.org, oleg@redhat.com, dhowells@redhat.com, Marc Zyngier <marc.zyngier@arm.com>, edumazet@google.com, mathieu.desnoyers@efficios.com, dipankar@in.ibm.com, joel@joelfernandes.org, akpm@linux-foundation.org, Lance Roy <ldr709@gmail.com>, mingo@kernel.org, linux-arm-kernel@lists.infradead.org
+To: Manish Jaggi <mjaggi@caviumnetworks.com>
+Cc: "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "Nowicki,
+ Tomasz" <Tomasz.Nowicki@cavium.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Lance Roy <ldr709@gmail.com>
+Hi Manish,
 
-lockdep_assert_held() is better suited to checking locking requirements,
-since it only checks if the current thread holds the lock regardless of
-whether someone else does. This is also a step towards possibly removing
-spin_is_locked().
+On Sat, Nov 10, 2018 at 10:18:47PM +0000, Manish Jaggi wrote:
+> 
+> CCing a larger audience.
+> Please review.
+> 
+> On 10/23/2018 03:51 PM, Jaggi, Manish wrote:
+> > From: Manish Jaggi <manish.jaggi@cavium.com>
+> >
+> > This patch introduces an error code KVM_EINVARIANT which is returned
+> > by KVM when userland tries to set an invariant register.
+> >
+> > The need for this error code is in VM Migration for arm64.
+> > ARM64 systems use mainly -machine virt -cpu host as parameter to qemu.
+> > Migration requires both Source and destination machines to have same
+> > physical cpu. There are cases where the overall architecture of CPU is
+> > same but the next version of the chip with some bug fixes which have no
+> > effect on qemu operation. In such cases invariant registers like MIDR
+> > have a different value.
+> > Currently Migration fails in such cases.
+> >
+> > Rather than sending a EINVAL, a specifc error code will help
+> > userland program the guest invariant register by querying the migrated
+> > host machines invariant registers.
+> >
+> > Qemu will have a parameter -hostinvariant along with checking of this
+> > error code. So it can be safely assumed that the feature is opt-in
+> >
+> > Corresponding Qemu patchset can be found at :
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg05048.html
+> >
+> >
+> > Signed-off-by: Manish Jaggi <manish.jaggi@cavium.com>
+> > ---
+> >   arch/arm64/kvm/sys_regs.c     | 9 ++++-----
+> >   include/uapi/linux/kvm_para.h | 1 +
+> >   2 files changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 22fbbdb..78ffc02 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1111,7 +1111,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+> >   
+> >   	/* This is what we mean by invariant: you can't change it. */
+> >   	if (val != read_id_reg(rd, raz))
+> > -		return -EINVAL;
+> > +		return -KVM_EINVARIANT;
+> >   
+> >   	return 0;
+> >   }
+> > @@ -2254,9 +2254,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
+> >   		return err;
+> >   
+> >   	/* This is what we mean by invariant: you can't change it. */
+> > -	if (r->val != val)
+> > -		return -EINVAL;
+> > -
+> > +	if (r->val != val)	
+> > +		return -KVM_EINVARIANT;
+> >   	return 0;
+> >   }
+> >   
+> > @@ -2335,7 +2334,7 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+> >   
+> >   		/* This is also invariant: you can't change it. */
+> >   		if (newval != get_ccsidr(val))
+> > -			return -EINVAL;
+> > +			return -KVM_EINVARIANT;
+> >   		return 0;
+> >   	default:
+> >   		return -ENOENT;
+> > diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
+> > index 6c0ce49..4358669 100644
+> > --- a/include/uapi/linux/kvm_para.h
+> > +++ b/include/uapi/linux/kvm_para.h
+> > @@ -17,6 +17,7 @@
+> >   #define KVM_E2BIG		E2BIG
+> >   #define KVM_EPERM		EPERM
+> >   #define KVM_EOPNOTSUPP		95
+> > +#define KVM_EINVARIANT          96
+> >   
+> >   #define KVM_HC_VAPIC_POLL_IRQ		1
+> >   #define KVM_HC_MMU_OP			2
+> 
 
-Signed-off-by: Lance Roy <ldr709@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: <kvmarm@lists.cs.columbia.edu>
-Signed-off-by: Paul E. McKenney <paulmck@linux.ibm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
----
- virt/kvm/arm/vgic/vgic.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Eh, unless I'm severely missing something, I think you're confusing how
+these error codes are used.
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 7cfdfbc910e0..50e25438fb3c 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -196,7 +196,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
-  */
- static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
- {
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-+	lockdep_assert_held(&irq->irq_lock);
- 
- 	/* If the interrupt is active, it must stay on the current vcpu */
- 	if (irq->active)
-@@ -273,7 +273,7 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-+	lockdep_assert_held(&vgic_cpu->ap_list_lock);
- 
- 	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
- }
-@@ -311,7 +311,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- {
- 	struct kvm_vcpu *vcpu;
- 
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-+	lockdep_assert_held(&irq->irq_lock);
- 
- retry:
- 	vcpu = vgic_target_oracle(irq);
-@@ -702,7 +702,7 @@ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
- static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
- 				    struct vgic_irq *irq, int lr)
- {
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&irq->irq_lock));
-+	lockdep_assert_held(&irq->irq_lock);
- 
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_populate_lr(vcpu, irq, lr);
-@@ -736,7 +736,7 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
- 
- 	*multi_sgi = false;
- 
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-+	lockdep_assert_held(&vgic_cpu->ap_list_lock);
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		int w;
-@@ -761,7 +761,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- 	bool multi_sgi;
- 	u8 prio = 0xff;
- 
--	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
-+	lockdep_assert_held(&vgic_cpu->ap_list_lock);
- 
- 	count = compute_ap_list_depth(vcpu, &multi_sgi);
- 	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
--- 
-2.17.1
+The error codes in include/uapi/linux/kvm_para.h are for hypercalls from
+guests, not return values to userspace.  For the latter, we don't
+have a habit of inventing new constants for something subsystem
+specific, but instead we use the existing error codes which can be
+understood by userspace software.
+
+What's more, changing an error code is an ABI change and not something
+you can just do at will.  If we are overloading EINVAL with the
+KVM_SET_ONE_REG syscall (are we?), then you need to find some way to
+communicate the additional information you need to userspace without
+interfering with legacy userspace software's interaction with the
+kernel.
+
+
+Thanks,
+
+    Christoffer
