@@ -1,96 +1,73 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v3 2/7] arm64/kvm: context-switch ptrauth registers
-Date: Thu, 15 Nov 2018 20:03:49 +0530
-Message-ID: <CADGdYn7Jha7b3qx-Thow-dvHZKHdn93eJE-CzC395OBZkPvAjw@mail.gmail.com>
-References: <1539773280-4159-1-git-send-email-amit.kachhap@arm.com>
- <1539773280-4159-3-git-send-email-amit.kachhap@arm.com> <20181102083725.GV12057@e113682-lin.lund.arm.com>
- <20181112223212.5o4ipc5kt5ziuupt@localhost> <20181113134438.GH3835@e113682-lin.lund.arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH]  kvm: arm/arm64 : fix vm's hanging at startup time
+Date: Thu, 15 Nov 2018 14:39:06 +0000
+Message-ID: <20181115143906.5c2302d5@donnerap.cambridge.arm.com>
+References: <1542294848-73839-1-git-send-email-peng.hao2@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181113134438.GH3835@e113682-lin.lund.arm.com>
+In-Reply-To: <1542294848-73839-1-git-send-email-peng.hao2@zte.com.cn>
 Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@arm.com
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, drjones@redhat.com, marc.zyngier@arm.com, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, kvmarm@lists.cs.columbia.edu, ramana.radhakrishnan@arm.com, Dave Martin <Dave.Martin@arm.com>, LAK <linux-arm-kernel@lists.infradead.org>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: christoffer.dall@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 13, 2018 at 7:16 PM Christoffer Dall
-<christoffer.dall@arm.com> wrote:
->
-> On Mon, Nov 12, 2018 at 10:32:12PM +0000, Catalin Marinas wrote:
-> > On Fri, Nov 02, 2018 at 09:37:25AM +0100, Christoffer Dall wrote:
-> > > On Wed, Oct 17, 2018 at 04:17:55PM +0530, Amit Daniel Kachhap wrote:
-> > > > From: Mark Rutland <mark.rutland@arm.com>
-> > > >
-> > > > When pointer authentication is supported, a guest may wish to use it.
-> > > > This patch adds the necessary KVM infrastructure for this to work.
-> > > >
-> > > > When we schedule a vcpu, we enable guest usage of pointer
-> > > > authentication instructions and accesses to the keys. After these are
-> > > > enabled, we allow context-switching the keys.
-> > > >
-> > > > Pointer authentication consists of address authentication and generic
-> > > > authentication, and CPUs in a system might have varied support for
-> > > > either. Where support for either feature is not uniform, it is hidden
-> > > > from guests via ID register emulation, as a result of the cpufeature
-> > > > framework in the host.
-> > > >
-> > > > Unfortunately, address authentication and generic authentication cannot
-> > > > be trapped separately, as the architecture provides a single EL2 trap
-> > > > covering both. If we wish to expose one without the other, we cannot
-> > > > prevent a (badly-written) guest from intermittently using a feature
-> > > > which is not uniformly supported (when scheduled on a physical CPU which
-> > > > supports the relevant feature). When the guest is scheduled on a
-> > > > physical CPU lacking the feature, these attempts will result in an UNDEF
-> > > > being taken by the guest.
-> > > >
-> > > > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> > > > Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> > > > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> > > > Cc: Christoffer Dall <christoffer.dall@arm.com>
-> > > > Cc: kvmarm@lists.cs.columbia.edu
-> > [...]
-> > > Two questions:
-> > >
-> > >  - Can we limit all ptrauth functionality to VHE systems so that we
-> > >    don't need to touch the non-VHE path and so that we don't need any of
-> > >    the __hyp_text stuff?
-> >
-> > I would say yes. ARMv8.3 implies v8.1, so can enable ptrauth only when
-> > VHE is built into the kernel and present in the CPU implementation.
-> >
->
-> Sounds good.
->
-> > >  - Can we move all the save/restore logic to vcpu load/put as long as
-> > >    the host kernel itself isn't using ptrauth, and if the host kernel at
-> > >    some point begins to use ptrauth, can we have a hook to save/restore
-> > >    at that time (similar to what we do for FPSIMD) to avoid this
-> > >    overhead on every switch?
-> >
-> > We will probably enable ptrauth for the kernel as well fairly soon, so I
-> > don't think we should base the KVM assumption on the no ptrauth in
-> > kernel use-case.
-> >
->
-> I assume in this case ptrauth will be used for all of the kernel,
-> including most of the KVM code?
->
-> In that case, I wonder if we always need to context-switch ptrauth
-> configruation state or if we can be lazy until the guest actually uses
-> the feature?
+On Thu, 15 Nov 2018 23:14:08 +0800
+Peng Hao <peng.hao2@zte.com.cn> wrote:
 
-Sorry for the delayed reply. Lazy switching is possible and was
-present in earlier Mark's Rutland v2 version.
-However  removed it from v3 version as a mandatory user option to
-enable ptrauth is added and to make it look
-simpler. But yes both can exist together but with 1 trap cost if guest
-always uses ptrauth.
+Hi,
 
-Thanks,
-Amit
->
->
-> Thanks,
->
->     Christoffer
+> When virtual machine starts, hang up.
+
+I take it you mean the *guest* hangs? Because it doesn't get a timer
+interrupt?
+
+> The kernel version of guest
+> is 4.16. Host support vgic_v3.
+
+Your host kernel is something recent, I guess?
+
+> It was mainly due to the incorrect vgic_irq's(intid=27) group value
+> during injection interruption. when kvm_vgic_vcpu_init is called,
+> dist is not initialized at this time. Unable to get vgic V3 or V2
+> correctly, so group is not set.
+
+Mmh, that shouldn't happen with (v)GICv3. Do you use QEMU (which
+version?) or some other userland tool?
+
+> group is setted to 1 when vgic_mmio_write_group is invoked at some
+> time.
+> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
+> interrupt injection failed.
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  virt/kvm/arm/vgic/vgic-v3.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 9c0dd23..d101000 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
+> struct vgic_irq *irq, int lr) if (vgic_irq_is_mapped_level(irq) &&
+> (val & ICH_LR_PENDING_BIT)) irq->line_level = false;
+>  
+> -	if (irq->group)
+> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+
+This is not the right fix, not only because it basically reverts the
+GICv3 part of 87322099052 (KVM: arm/arm64: vgic: Signal IRQs using
+their configured group).
+
+Can you try to work out why kvm_vgic_vcpu_init() is apparently called
+before dist->vgic_model is set, also what value it has?
+If I understand the code correctly, that shouldn't happen for a GICv3.
+
+Cheers,
+Andre.
+
+>  		val |= ICH_LR_GROUP;
+>  
+>  	val |= (u64)irq->priority << ICH_LR_PRIORITY_SHIFT;
