@@ -1,26 +1,28 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v3 6/7] iommu/virtio: Add probe request
-Date: Thu, 15 Nov 2018 16:22:58 +0000
-Message-ID: <e57ac469-6731-77f6-246e-d7e9804c2e85@arm.com>
-References: <20181012145917.6840-1-jean-philippe.brucker@arm.com>
- <20181012145917.6840-7-jean-philippe.brucker@arm.com>
- <df230fb1-7290-a6b0-b5b1-7a233c849257@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH v2 12/23] KVM: arm64/sve: System register context
+ switch and access support
+Date: Thu, 15 Nov 2018 16:37:59 +0000
+Message-ID: <87efbmcn4o.fsf@linaro.org>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-13-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE80E4A320
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:23:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 528124A2BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:38:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WtGiFvuE8Ifw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Nov 2018 11:23:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EAF44A30C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:23:20 -0500 (EST)
-In-Reply-To: <df230fb1-7290-a6b0-b5b1-7a233c849257@redhat.com>
-Content-Language: en-US
+ with ESMTP id DEPWwRg4kmE7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Nov 2018 11:38:03 -0500 (EST)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D25B14A351
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:38:02 -0500 (EST)
+Received: by mail-wm1-f68.google.com with SMTP id r11-v6so19406596wmb.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 08:38:02 -0800 (PST)
+In-reply-to: <1538141967-15375-13-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,339 +32,186 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, iommu@lists.linux-foundation.org, virtualization@lists.linux-foundation.org, devicetree@vger.kernel.org
-Cc: kevin.tian@intel.com, tnowicki@caviumnetworks.com, mst@redhat.com, marc.zyngier@arm.com, linux-pci@vger.kernel.org, jasowang@redhat.com, will.deacon@arm.com, robh+dt@kernel.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Fixed all of these, thanks
-
-Jean
-
-On 15/11/2018 13:20, Auger Eric wrote:
-> Hi Jean,
-> On 10/12/18 4:59 PM, Jean-Philippe Brucker wrote:
->> When the device offers the probe feature, send a probe request for each
->> device managed by the IOMMU. Extract RESV_MEM information. When we
->> encounter a MSI doorbell region, set it up as a IOMMU_RESV_MSI region.
->> This will tell other subsystems that there is no need to map the MSI
->> doorbell in the virtio-iommu, because MSIs bypass it.
->>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> ---
->>  drivers/iommu/virtio-iommu.c      | 147 ++++++++++++++++++++++++++++--
->>  include/uapi/linux/virtio_iommu.h |  39 ++++++++
->>  2 files changed, 180 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
->> index 9fb38cd3b727..8eaf66770469 100644
->> --- a/drivers/iommu/virtio-iommu.c
->> +++ b/drivers/iommu/virtio-iommu.c
->> @@ -56,6 +56,7 @@ struct viommu_dev {
->>  	struct iommu_domain_geometry	geometry;
->>  	u64				pgsize_bitmap;
->>  	u8				domain_bits;
->> +	u32				probe_size;
->>  };
->>  
->>  struct viommu_mapping {
->> @@ -77,8 +78,10 @@ struct viommu_domain {
->>  };
->>  
->>  struct viommu_endpoint {
->> +	struct device			*dev;
->>  	struct viommu_dev		*viommu;
->>  	struct viommu_domain		*vdomain;
->> +	struct list_head		resv_regions;
->>  };
->>  
->>  struct viommu_request {
->> @@ -129,6 +132,9 @@ static off_t viommu_get_req_offset(struct viommu_dev *viommu,
->>  {
->>  	size_t tail_size = sizeof(struct virtio_iommu_req_tail);
->>  
->> +	if (req->type == VIRTIO_IOMMU_T_PROBE)
->> +		return len - viommu->probe_size - tail_size;
->> +
->>  	return len - tail_size;
->>  }
->>  
->> @@ -414,6 +420,101 @@ static int viommu_replay_mappings(struct viommu_domain *vdomain)
->>  	return ret;
->>  }
->>  
->> +static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
->> +			       struct virtio_iommu_probe_resv_mem *mem,
->> +			       size_t len)
->> +{
->> +	struct iommu_resv_region *region = NULL;
->> +	unsigned long prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
->> +
-> nit: extra void line
->> +	u64 start = le64_to_cpu(mem->start);
->> +	u64 end = le64_to_cpu(mem->end);
->> +	size_t size = end - start + 1;
->> +
->> +	if (len < sizeof(*mem))
->> +		return -EINVAL;
->> +
->> +	switch (mem->subtype) {
->> +	default:
->> +		dev_warn(vdev->dev, "unknown resv mem subtype 0x%x\n",
->> +			 mem->subtype);
->> +		/* Fall-through */
->> +	case VIRTIO_IOMMU_RESV_MEM_T_RESERVED:
->> +		region = iommu_alloc_resv_region(start, size, 0,
->> +						 IOMMU_RESV_RESERVED);
-> need to test region
->> +		break;
->> +	case VIRTIO_IOMMU_RESV_MEM_T_MSI:
->> +		region = iommu_alloc_resv_region(start, size, prot,
->> +						 IOMMU_RESV_MSI);
-> same
->> +		break;
->> +	}
->> +
->> +	list_add(&vdev->resv_regions, &region->list);
->> +	return 0;
->> +}
->> +
->> +static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
->> +{
->> +	int ret;
->> +	u16 type, len;
->> +	size_t cur = 0;
->> +	size_t probe_len;
->> +	struct virtio_iommu_req_probe *probe;
->> +	struct virtio_iommu_probe_property *prop;
->> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
->> +	struct viommu_endpoint *vdev = fwspec->iommu_priv;
->> +
->> +	if (!fwspec->num_ids)
->> +		return -EINVAL;
->> +
->> +	probe_len = sizeof(*probe) + viommu->probe_size +
->> +		    sizeof(struct virtio_iommu_req_tail);
->> +	probe = kzalloc(probe_len, GFP_KERNEL);
->> +	if (!probe)
->> +		return -ENOMEM;
->> +
->> +	probe->head.type = VIRTIO_IOMMU_T_PROBE;
->> +	/*
->> +	 * For now, assume that properties of an endpoint that outputs multiple
->> +	 * IDs are consistent. Only probe the first one.
->> +	 */
->> +	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
->> +
->> +	ret = viommu_send_req_sync(viommu, probe, probe_len);
->> +	if (ret)
->> +		goto out_free;
->> +
->> +	prop = (void *)probe->properties;
->> +	type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
->> +
->> +	while (type != VIRTIO_IOMMU_PROBE_T_NONE &&
->> +	       cur < viommu->probe_size) {
->> +		len = le16_to_cpu(prop->length) + sizeof(*prop);
->> +
->> +		switch (type) {
->> +		case VIRTIO_IOMMU_PROBE_T_RESV_MEM:
->> +			ret = viommu_add_resv_mem(vdev, (void *)prop, len);
->> +			break;
->> +		default:
->> +			dev_err(dev, "unknown viommu prop 0x%x\n", type);
->> +		}
->> +
->> +		if (ret)
->> +			dev_err(dev, "failed to parse viommu prop 0x%x\n", type);
->> +
->> +		cur += len;
->> +		if (cur >= viommu->probe_size)
->> +			break;
->> +
->> +		prop = (void *)probe->properties + cur;
->> +		type = le16_to_cpu(prop->type) & VIRTIO_IOMMU_PROBE_T_MASK;
->> +	}
->> +
->> +out_free:
->> +	kfree(probe);
->> +	return ret;
->> +}
->> +
->>  /* IOMMU API */
->>  
->>  static struct iommu_domain *viommu_domain_alloc(unsigned type)
->> @@ -636,15 +737,33 @@ static void viommu_iotlb_sync(struct iommu_domain *domain)
->>  
->>  static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
->>  {
->> -	struct iommu_resv_region *region;
->> +	struct iommu_resv_region *entry, *new_entry, *msi = NULL;
->> +	struct viommu_endpoint *vdev = dev->iommu_fwspec->iommu_priv;
->>  	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
->>  
->> -	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
->> -					 IOMMU_RESV_SW_MSI);
->> -	if (!region)
->> -		return;
->> +	list_for_each_entry(entry, &vdev->resv_regions, list) {
->> +		/*
->> +		 * If the device registered a bypass MSI windows, use it.
-> any bypass MSI windows?
->> +		 * Otherwise add a software-mapped region
->> +		 */
->> +		if (entry->type == IOMMU_RESV_MSI)
->> +			msi = entry;
->> +
->> +		new_entry = kmemdup(entry, sizeof(*entry), GFP_KERNEL);
->> +		if (!new_entry)
->> +			return;
->> +		list_add_tail(&new_entry->list, head);
->> +	}
->> +
->> +	if (!msi) {
->> +		msi = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH,
->> +					      prot, IOMMU_RESV_SW_MSI);
->> +		if (!msi)
->> +			return;
->> +
->> +		list_add_tail(&msi->list, head);
->> +	}
->>  
->> -	list_add_tail(&region->list, head);
->>  	iommu_dma_get_resv_regions(dev, head);
->>  }
->>  
->> @@ -692,9 +811,18 @@ static int viommu_add_device(struct device *dev)
->>  	if (!vdev)
->>  		return -ENOMEM;
->>  
->> +	vdev->dev = dev;
->>  	vdev->viommu = viommu;
->> +	INIT_LIST_HEAD(&vdev->resv_regions);
->>  	fwspec->iommu_priv = vdev;
->>  
->> +	if (viommu->probe_size) {
->> +		/* Get additional information for this endpoint */
->> +		ret = viommu_probe_endpoint(viommu, dev);
->> +		if (ret)
-> leaks vdev
->> +			return ret;
->> +	}
->> +
->>  	ret = iommu_device_link(&viommu->iommu, dev);
->>  	if (ret)
->>  		goto err_free_dev;
->> @@ -717,6 +845,7 @@ static int viommu_add_device(struct device *dev)
->>  	iommu_device_unlink(&viommu->iommu, dev);
->>  
->>  err_free_dev:
->> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
->>  	kfree(vdev);
->>  
->>  	return ret;
->> @@ -734,6 +863,7 @@ static void viommu_remove_device(struct device *dev)
->>  
->>  	iommu_group_remove_device(dev);
->>  	iommu_device_unlink(&vdev->viommu->iommu, dev);
->> +	viommu_put_resv_regions(dev, &vdev->resv_regions);
->>  	kfree(vdev);
->>  }
->>  
->> @@ -832,6 +962,10 @@ static int viommu_probe(struct virtio_device *vdev)
->>  			     struct virtio_iommu_config, domain_bits,
->>  			     &viommu->domain_bits);
->>  
->> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_PROBE,
->> +			     struct virtio_iommu_config, probe_size,
->> +			     &viommu->probe_size);
->> +
->>  	viommu->geometry = (struct iommu_domain_geometry) {
->>  		.aperture_start	= input_start,
->>  		.aperture_end	= input_end,
->> @@ -913,6 +1047,7 @@ static unsigned int features[] = {
->>  	VIRTIO_IOMMU_F_MAP_UNMAP,
->>  	VIRTIO_IOMMU_F_DOMAIN_BITS,
->>  	VIRTIO_IOMMU_F_INPUT_RANGE,
->> +	VIRTIO_IOMMU_F_PROBE,
->>  };
->>  
->>  static struct virtio_device_id id_table[] = {
->> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
->> index e808fc7fbe82..feed74586bb0 100644
->> --- a/include/uapi/linux/virtio_iommu.h
->> +++ b/include/uapi/linux/virtio_iommu.h
->> @@ -14,6 +14,7 @@
->>  #define VIRTIO_IOMMU_F_DOMAIN_BITS		1
->>  #define VIRTIO_IOMMU_F_MAP_UNMAP		2
->>  #define VIRTIO_IOMMU_F_BYPASS			3
->> +#define VIRTIO_IOMMU_F_PROBE			4
->>  
->>  struct virtio_iommu_config {
->>  	/* Supported page sizes */
->> @@ -25,6 +26,9 @@ struct virtio_iommu_config {
->>  	} input_range;
->>  	/* Max domain ID size */
->>  	__u8					domain_bits;
->> +	__u8					padding[3];
->> +	/* Probe buffer size */
->> +	__u32					probe_size;
->>  };
->>  
->>  /* Request types */
->> @@ -32,6 +36,7 @@ struct virtio_iommu_config {
->>  #define VIRTIO_IOMMU_T_DETACH			0x02
->>  #define VIRTIO_IOMMU_T_MAP			0x03
->>  #define VIRTIO_IOMMU_T_UNMAP			0x04
->> +#define VIRTIO_IOMMU_T_PROBE			0x05
->>  
->>  /* Status types */
->>  #define VIRTIO_IOMMU_S_OK			0x00
->> @@ -98,4 +103,38 @@ struct virtio_iommu_req_unmap {
->>  	struct virtio_iommu_req_tail		tail;
->>  };
->>  
->> +#define VIRTIO_IOMMU_PROBE_T_NONE		0
->> +#define VIRTIO_IOMMU_PROBE_T_RESV_MEM		1
->> +
->> +#define VIRTIO_IOMMU_PROBE_T_MASK		0xfff
->> +
->> +struct virtio_iommu_probe_property {
->> +	__le16					type;
->> +	__le16					length;
->> +};
->> +
->> +#define VIRTIO_IOMMU_RESV_MEM_T_RESERVED	0
->> +#define VIRTIO_IOMMU_RESV_MEM_T_MSI		1
->> +
->> +struct virtio_iommu_probe_resv_mem {
->> +	struct virtio_iommu_probe_property	head;
->> +	__u8					subtype;
->> +	__u8					reserved[3];
->> +	__le64					start;
->> +	__le64					end;
->> +};
->> +
->> +struct virtio_iommu_req_probe {
->> +	struct virtio_iommu_req_head		head;
->> +	__le32					endpoint;
->> +	__u8					reserved[64];
->> +
->> +	__u8					properties[];
->> +
->> +	/*
->> +	 * Tail follows the variable-length properties array. No padding,
->> +	 * property lengths are all aligned on 8 bytes.
->> +	 */
->> +};
->> +
->>  #endif
->>
-> 
-> Thanks
-> 
-> Eric
-> _______________________________________________
-> iommu mailing list
-> iommu@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> 
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
+YWRkcyB0aGUgbmVjZXNzYXJ5IHN1cHBvcnQgZm9yIGNvbnRleHQgc3dpdGNoaW5nIFpDUl9FTDEK
+PiBmb3IgZWFjaCB2Y3B1Lgo+Cj4gWkNSX0VMMSBpcyB0cmFwcGVkIGFsb25nc2lkZSB0aGUgRlBT
+SU1EL1NWRSByZWdpc3RlcnMsIHNvIGl0IG1ha2VzCj4gc2Vuc2UgZm9yIGl0IHRvIGJlIGhhbmRs
+ZWQgYXMgcGFydCBvZiB0aGUgZ3Vlc3QgRlBTSU1EL1NWRSBjb250ZXh0Cj4gZm9yIGNvbnRleHQg
+c3dpdGNoIHB1cnBvc2VzIGluc3RlYWQgb2YgaGFuZGxpbmcgaXQgYXMgYSBnZW5lcmFsCj4gc3lz
+dGVtIHJlZ2lzdGVyLiAgVGhpcyBtZWFucyB0aGF0IGl0IGNhbiBiZSBzd2l0Y2hlZCBpbiBsYXpp
+bHkgYXQKPiB0aGUgYXBwcm9wcmlhdGUgdGltZS4gIE5vIGVmZm9ydCBpcyBtYWRlIHRvIHRyYWNr
+IGhvc3QgY29udGV4dCBmb3IKPiB0aGlzIHJlZ2lzdGVyLCBzaW5jZSBTVkUgcmVxdWlyZXMgVkhF
+OiB0aHVzIHRoZSBob3N0cydzIHZhbHVlIGZvcgo+IHRoaXMgcmVnaXN0ZXIgbGl2ZXMgcGVybWFu
+ZW50bHkgaW4gWkNSX0VMMiBhbmQgZG9lcyBub3QgYWxpYXMgdGhlCj4gZ3Vlc3QncyB2YWx1ZSBh
+dCBhbnkgdGltZS4KPgo+IFRoZSBIeXAgc3dpdGNoIGFuZCBmcHNpbWQgY29udGV4dCBoYW5kbGlu
+ZyBjb2RlIGlzIGV4dGVuZGVkCj4gYXBwcm9wcmlhdGVseS4KPgo+IEFjY2Vzc29ycyBhcmUgYWRk
+ZWQgaW4gc3lzX3JlZ3MuYyB0byBleHBvc2UgdGhlIFNWRSBzeXN0ZW0KPiByZWdpc3RlcnMgYW5k
+IElEIHJlZ2lzdGVyIGZpZWxkcy4gIEJlY2F1c2UgdGhlc2UgbmVlZCB0byBiZQo+IGNvbmRpdGlv
+bmFsbHkgdmlzaWJsZSBiYXNlZCBvbiB0aGUgZ3Vlc3QgY29uZmlndXJhdGlvbiwgdGhleSBhcmUK
+PiBpbXBsZW1lbnRlZCBzZXBhcmF0ZWx5IGZvciBub3cgcmF0aGVyIHRoYW4gYnkgdXNlIG9mIHRo
+ZSBnZW5lcmljCj4gc3lzdGVtIHJlZ2lzdGVyIGhlbHBlcnMuICBUaGlzIG1heSBiZSBhYnN0cmFj
+dGVkIGJldHRlciBsYXRlciBvbgo+IHdoZW4vaWYgdGhlcmUgYXJlIG1vcmUgZmVhdHVyZXMgcmVx
+dWlyaW5nIHRoaXMgbW9kZWwuCj4KPiBJRF9BQTY0WkZSMF9FTDEgaXMgUk8tUkFaIGZvciBNUlMv
+TVNSIHdoZW4gU1ZFIGlzIGRpc2FibGVkIGZvciB0aGUKPiBndWVzdCwgYnV0IGZvciBjb21wYXRp
+YmlsaXR5IHdpdGggbm9uLVNWRSBhd2FyZSBLVk0gaW1wbGVtZW50YXRpb25zCj4gdGhlIHJlZ2lz
+dGVyIHNob3VsZCBub3QgYmUgZW51bWVyYXRlZCBhdCBhbGwgZm9yIEtWTV9HRVRfUkVHX0xJU1QK
+PiBpbiB0aGlzIGNhc2UuICBGb3IgY29uc2lzdGVuY3kgd2UgYWxzbyByZWplY3QgaW9jdGwgYWNj
+ZXNzIHRvIHRoZQo+IHJlZ2lzdGVyLiAgVGhpcyBlbnN1cmVzIHRoYXQgYSBub24tU1ZFLWVuYWJs
+ZWQgZ3Vlc3QgbG9va3MgdGhlIHNhbWUKPiB0byB1c2Vyc3BhY2UsIGlycmVzcGVjdGl2ZSBvZiB3
+aGV0aGVyIHRoZSBrZXJuZWwgS1ZNIGltcGxlbWVudGF0aW9uCj4gc3VwcG9ydHMgU1ZFLgo+Cj4g
+U2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+Cj4gLS0tCj4K
+PiBDaGFuZ2VzIHNpbmNlIFJGQ3YxOgo+Cj4gICogVGhlIGNvbmRpdGlvbmFsIHZpc2liaWxpdHkg
+bG9naWMgaW4gc3lzX3JlZ3MuYyBoYXMgYmVlbgo+ICAgIHNpbXBsaWZpZWQuCj4KPiAgKiBUaGUg
+Z3Vlc3QncyBaQ1JfRUwxIGlzIG5vdyB0cmVhdGVkIGFzIHBhcnQgb2YgdGhlIEZQU0lNRC9TVkUg
+c3RhdGUKPiAgICBmb3Igc3dpdGNoaW5nIHB1cnBvc2VzLiAgQW55IGFjY2VzcyB0byB0aGlzIHJl
+Z2lzdGVyIGJlZm9yZSBpdCBpcwo+ICAgIHN3aXRjaGVkIGluIGdlbmVyYXRlcyBhbiBTVkUgdHJh
+cCwgc28gd2UgaGF2ZSBhIGNoYW5nZSB0byBzd2l0Y2ggaXQKPiAgICBhbG9uZyB3aXRoIHRoZSB2
+ZWN0b3IgcmVnaXN0ZXJzLgo+Cj4gICAgQmVjYXVzZSBTVkUgaXMgb25seSBhdmFpbGFibGUgd2l0
+aCBWSEUgdGhlcmUgaXMgbm8gbmVlZCBldmVyIHRvCj4gICAgcmVzdG9yZSB0aGUgaG9zdCdzIHZl
+cnNpb24gb2YgdGhpcyByZWdpc3RlciAod2hpY2ggaW5zdGVhZCBsaXZlcwo+ICAgIHBlcm1hbmVu
+dGx5IGluIFpDUl9FTDIpLgo+IC0tLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmggfCAgIDEgKwo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5oICAgfCAgIDMgKysK
+PiAgYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMgICAgICAgICAgIHwgICA5ICsrKy0KPiAgYXJjaC9h
+cm02NC9rdm0vaHlwL3N3aXRjaC5jICAgICAgIHwgICA0ICsrCj4gIGFyY2gvYXJtNjQva3ZtL3N5
+c19yZWdzLmMgICAgICAgICB8IDExMSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KystLQo+ICA1IGZpbGVzIGNoYW5nZWQsIDEyMyBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygt
+KQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGluZGV4IDIwYmFmNGEuLjc2Y2JiOTVl
+IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+ICsrKyBi
+L2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IEBAIC0xMTAsNiArMTEwLDcgQEAg
+ZW51bSB2Y3B1X3N5c3JlZyB7Cj4gIAlTQ1RMUl9FTDEsCS8qIFN5c3RlbSBDb250cm9sIFJlZ2lz
+dGVyICovCj4gIAlBQ1RMUl9FTDEsCS8qIEF1eGlsaWFyeSBDb250cm9sIFJlZ2lzdGVyICovCj4g
+IAlDUEFDUl9FTDEsCS8qIENvcHJvY2Vzc29yIEFjY2VzcyBDb250cm9sICovCj4gKwlaQ1JfRUwx
+LAkvKiBTVkUgQ29udHJvbCAqLwo+ICAJVFRCUjBfRUwxLAkvKiBUcmFuc2xhdGlvbiBUYWJsZSBC
+YXNlIFJlZ2lzdGVyIDAgKi8KPiAgCVRUQlIxX0VMMSwJLyogVHJhbnNsYXRpb24gVGFibGUgQmFz
+ZSBSZWdpc3RlciAxICovCj4gIAlUQ1JfRUwxLAkvKiBUcmFuc2xhdGlvbiBDb250cm9sIFJlZ2lz
+dGVyICovCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3lzcmVnLmggYi9h
+cmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5oCj4gaW5kZXggYzE0NzA5My4uZGJhYzQyZiAx
+MDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N5c3JlZy5oCj4gKysrIGIvYXJj
+aC9hcm02NC9pbmNsdWRlL2FzbS9zeXNyZWcuaAo+IEBAIC00MTgsNiArNDE4LDkgQEAKPiAgI2Rl
+ZmluZSBTWVNfSUNIX0xSMTRfRUwyCQlfX1NZU19fTFI4X0VMMig2KQo+ICAjZGVmaW5lIFNZU19J
+Q0hfTFIxNV9FTDIJCV9fU1lTX19MUjhfRUwyKDcpCj4KPiArLyogVkhFIGVuY29kaW5ncyBmb3Ig
+YXJjaGl0ZWN0dXJhbCBFTDAvMSBzeXN0ZW0gcmVnaXN0ZXJzICovCj4gKyNkZWZpbmUgU1lTX1pD
+Ul9FTDEyCQkJc3lzX3JlZygzLCA1LCAxLCAyLCAwKQo+ICsKPiAgLyogQ29tbW9uIFNDVExSX0VM
+eCBmbGFncy4gKi8KPiAgI2RlZmluZSBTQ1RMUl9FTHhfRUUgICAgKDEgPDwgMjUpCj4gICNkZWZp
+bmUgU0NUTFJfRUx4X0lFU0IJKDEgPDwgMjEpCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3Zt
+L2Zwc2ltZC5jIGIvYXJjaC9hcm02NC9rdm0vZnBzaW1kLmMKPiBpbmRleCA1NTY1NGNiLi4yOWU1
+NTg1IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL2Zwc2ltZC5jCj4gKysrIGIvYXJjaC9h
+cm02NC9rdm0vZnBzaW1kLmMKPiBAQCAtMTAyLDYgKzEwMiw5IEBAIHZvaWQga3ZtX2FyY2hfdmNw
+dV9jdHhzeW5jX2ZwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgdm9pZCBrdm1fYXJjaF92Y3B1
+X3B1dF9mcChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIHsKPiAgCXVuc2lnbmVkIGxvbmcgZmxh
+Z3M7Cj4gKwlib29sIGhvc3RfaGFzX3N2ZSA9IHN5c3RlbV9zdXBwb3J0c19zdmUoKTsKPiArCWJv
+b2wgZ3Vlc3RfaGFzX3N2ZSA9Cj4gKwkJaG9zdF9oYXNfc3ZlICYmICh2Y3B1LT5hcmNoLmZsYWdz
+ICYKPiBLVk1fQVJNNjRfRlBfRU5BQkxFRCk7Cgplcm0uLi4gZGlkbid0IHlvdSBjcmVhdGUgYSBL
+Vk1fQVJNNjRfR1VFU1RfSEFTX1NWRSBhbmQgdmNwdV9oYXNfc3ZlKCkgZm9yIHRoaXM/Cgo+Cj4g
+IAlsb2NhbF9pcnFfc2F2ZShmbGFncyk7Cj4KPiBAQCAtMTA5LDcgKzExMiwxMSBAQCB2b2lkIGt2
+bV9hcmNoX3ZjcHVfcHV0X2ZwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgCQkvKiBDbGVhbiBn
+dWVzdCBGUCBzdGF0ZSB0byBtZW1vcnkgYW5kIGludmFsaWRhdGUgY3B1IHZpZXcgKi8KPiAgCQlm
+cHNpbWRfc2F2ZSgpOwo+ICAJCWZwc2ltZF9mbHVzaF9jcHVfc3RhdGUoKTsKPiAtCX0gZWxzZSBp
+ZiAoc3lzdGVtX3N1cHBvcnRzX3N2ZSgpKSB7Cj4gKwo+ICsJCWlmIChndWVzdF9oYXNfc3ZlKQo+
+ICsJCQl2Y3B1LT5hcmNoLmN0eHQuc3lzX3JlZ3NbWkNSX0VMMV0gPQo+ICsJCQkJcmVhZF9zeXNy
+ZWdfcyhTWVNfWkNSX0VMMTIpOwo+ICsJfSBlbHNlIGlmIChob3N0X2hhc19zdmUpIHsKPiAgCQkv
+Kgo+ICAJCSAqIFRoZSBGUFNJTUQvU1ZFIHN0YXRlIGluIHRoZSBDUFUgaGFzIG5vdCBiZWVuIHRv
+dWNoZWQsIGFuZCB3ZQo+ICAJCSAqIGhhdmUgU1ZFIChhbmQgVkhFKTogQ1BBQ1JfRUwxIChhbGlh
+cyBDUFRSX0VMMikgaGFzIGJlZW4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL3N3
+aXRjaC5jIGIvYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jCj4gaW5kZXggY2E0NjE1My4uMDg1
+ZWQwNiAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiArKysgYi9h
+cmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLmMKPiBAQCAtMzY2LDYgKzM2NiwxMCBAQCBzdGF0aWMg
+Ym9vbCBfX2h5cF90ZXh0IF9faHlwX3N3aXRjaF9mcHNpbWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+KQo+Cj4gIAlfX2Zwc2ltZF9yZXN0b3JlX3N0YXRlKCZ2Y3B1LT5hcmNoLmN0eHQuZ3BfcmVncy5m
+cF9yZWdzKTsKPgo+ICsJaWYgKHN5c3RlbV9zdXBwb3J0c19zdmUoKSAmJgo+ICsJICAgIHZjcHUt
+PmFyY2guZmxhZ3MgJiBLVk1fQVJNNjRfR1VFU1RfSEFTX1NWRSkKCnZjcHVfaGFzX3N2ZSh2Y3B1
+KQoKPiArCQl3cml0ZV9zeXNyZWdfcyh2Y3B1LT5hcmNoLmN0eHQuc3lzX3JlZ3NbWkNSX0VMMV0s
+IFNZU19aQ1JfRUwxMik7Cj4gKwo+ICAJLyogU2tpcCByZXN0b3JpbmcgZnBleGMzMiBmb3IgQUFy
+Y2g2NCBndWVzdHMgKi8KPiAgCWlmICghKHJlYWRfc3lzcmVnKGhjcl9lbDIpICYgSENSX1JXKSkK
+PiAgCQl3cml0ZV9zeXNyZWcodmNwdS0+YXJjaC5jdHh0LnN5c19yZWdzW0ZQRVhDMzJfRUwyXSwK
+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3Zt
+L3N5c19yZWdzLmMKPiBpbmRleCBhZGI2Y2JkLi42ZjAzMjExIDEwMDY0NAo+IC0tLSBhL2FyY2gv
+YXJtNjQva3ZtL3N5c19yZWdzLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4g
+QEAgLTEwMzYsMTAgKzEwMzYsNyBAQCBzdGF0aWMgdTY0IHJlYWRfaWRfcmVnKGNvbnN0IHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSwKPiAgCQkJICh1MzIpci0+Q1JuLCAodTMyKXItPkNSbSwgKHUzMily
+LT5PcDIpOwo+ICAJdTY0IHZhbCA9IHJheiA/IDAgOiByZWFkX3Nhbml0aXNlZF9mdHJfcmVnKGlk
+KTsKPgo+IC0JaWYgKGlkID09IFNZU19JRF9BQTY0UEZSMF9FTDEpIHsKPiAtCQlpZiAodmFsICYg
+KDB4ZlVMIDw8IElEX0FBNjRQRlIwX1NWRV9TSElGVCkpCj4gLQkJCWt2bV9kZWJ1ZygiU1ZFIHVu
+c3VwcG9ydGVkIGZvciBndWVzdHMsIHN1cHByZXNzaW5nXG4iKTsKPiAtCj4gKwlpZiAoaWQgPT0g
+U1lTX0lEX0FBNjRQRlIwX0VMMSAmJiAhdmNwdV9oYXNfc3ZlKHZjcHUpKSB7Cj4gIAkJdmFsICY9
+IH4oMHhmVUwgPDwgSURfQUE2NFBGUjBfU1ZFX1NISUZUKTsKPiAgCX0gZWxzZSBpZiAoaWQgPT0g
+U1lTX0lEX0FBNjRNTUZSMV9FTDEpIHsKPiAgCQlpZiAodmFsICYgKDB4ZlVMIDw8IElEX0FBNjRN
+TUZSMV9MT1JfU0hJRlQpKQo+IEBAIC0xMDgzLDYgKzEwODAsMTA1IEBAIHN0YXRpYyBpbnQgcmVn
+X2Zyb21fdXNlcih1NjQgKnZhbCwgY29uc3Qgdm9pZCBfX3VzZXIgKnVhZGRyLCB1NjQgaWQpOwo+
+ICBzdGF0aWMgaW50IHJlZ190b191c2VyKHZvaWQgX191c2VyICp1YWRkciwgY29uc3QgdTY0ICp2
+YWwsIHU2NCBpZCk7Cj4gIHN0YXRpYyB1NjQgc3lzX3JlZ190b19pbmRleChjb25zdCBzdHJ1Y3Qg
+c3lzX3JlZ19kZXNjICpyZWcpOwo+Cj4gKyNpZmRlZiBDT05GSUdfQVJNNjRfU1ZFCj4gK3N0YXRp
+YyBib29sIHN2ZV9jaGVja19wcmVzZW50KGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAr
+CQkJICAgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQpCj4gK3sKPiArCXJldHVybiB2
+Y3B1X2hhc19zdmUodmNwdSk7Cj4gK30KPiArCj4gK3N0YXRpYyBib29sIGFjY2Vzc196Y3JfZWwx
+KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiArCQkJICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpw
+LAo+ICsJCQkgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKPiArewo+ICsJLyoKPiAr
+CSAqIFpDUl9FTDEgYWNjZXNzIGlzIGhhbmRsZWQgZGlyZWN0bHkgaW4gSHlwIGFzIHBhcnQgb2Yg
+dGhlIEZQU0lNRC9TVkUKPiArCSAqIGNvbnRleHQsIHNvIHdlIHNob3VsZCBvbmx5IGFycml2ZSBo
+ZXJlIGZvciBub24tU1ZFIGd1ZXN0czoKPiArCSAqLwo+ICsJV0FSTl9PTih2Y3B1X2hhc19zdmUo
+dmNwdSkpOwo+ICsKPiArCWt2bV9pbmplY3RfdW5kZWZpbmVkKHZjcHUpOwo+ICsJcmV0dXJuIGZh
+bHNlOwo+ICt9Cj4gKwo+ICtzdGF0aWMgaW50IGdldF96Y3JfZWwxKHN0cnVjdCBrdm1fdmNwdSAq
+dmNwdSwKPiArCQkgICAgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCj4gKwkJICAg
+ICAgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCj4g
+K3sKPiArCWlmICghdmNwdV9oYXNfc3ZlKHZjcHUpKQo+ICsJCXJldHVybiAtRU5PRU5UOwo+ICsK
+PiArCXJldHVybiByZWdfdG9fdXNlcih1YWRkciwgJnZjcHUtPmFyY2guY3R4dC5zeXNfcmVnc1ta
+Q1JfRUwxXSwKPiArCQkJICAgcmVnLT5pZCk7Cj4gK30KPiArCj4gK3N0YXRpYyBpbnQgc2V0X3pj
+cl9lbDEoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICsJCSAgICAgICBjb25zdCBzdHJ1Y3Qgc3lz
+X3JlZ19kZXNjICpyZCwKPiArCQkgICAgICAgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcs
+IHZvaWQgX191c2VyICp1YWRkcikKPiArewo+ICsJaWYgKCF2Y3B1X2hhc19zdmUodmNwdSkpCj4g
+KwkJcmV0dXJuIC1FTk9FTlQ7Cj4gKwo+ICsJcmV0dXJuIHJlZ19mcm9tX3VzZXIoJnZjcHUtPmFy
+Y2guY3R4dC5zeXNfcmVnc1taQ1JfRUwxXSwgdWFkZHIsCj4gKwkJCSAgICAgcmVnLT5pZCk7Cj4g
+K30KPiArCj4gKy8qIEdlbmVyYXRlIHRoZSBlbXVsYXRlZCBJRF9BQTY0WkZSMF9FTDEgdmFsdWUg
+ZXhwb3NlZCB0byB0aGUgZ3Vlc3QgKi8KPiArc3RhdGljIHU2NCBndWVzdF9pZF9hYTY0emZyMF9l
+bDEoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+ICt7Cj4gKwlpZiAoIXZjcHVfaGFzX3N2
+ZSh2Y3B1KSkKPiArCQlyZXR1cm4gMDsKPiArCj4gKwlyZXR1cm4gcmVhZF9zYW5pdGlzZWRfZnRy
+X3JlZyhTWVNfSURfQUE2NFpGUjBfRUwxKTsKPiArfQo+ICsKPiArc3RhdGljIGJvb2wgYWNjZXNz
+X2lkX2FhNjR6ZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gKwkJCQkgICBzdHJ1Y3Qg
+c3lzX3JlZ19wYXJhbXMgKnAsCj4gKwkJCQkgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpy
+ZCkKPiArewo+ICsJaWYgKHAtPmlzX3dyaXRlKQo+ICsJCXJldHVybiB3cml0ZV90b19yZWFkX29u
+bHkodmNwdSwgcCwgcmQpOwo+ICsKPiArCXAtPnJlZ3ZhbCA9IGd1ZXN0X2lkX2FhNjR6ZnIwX2Vs
+MSh2Y3B1KTsKPiArCXJldHVybiB0cnVlOwo+ICt9Cj4gKwo+ICtzdGF0aWMgaW50IGdldF9pZF9h
+YTY0emZyMF9lbDEoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICsJCWNvbnN0IHN0cnVjdCBzeXNf
+cmVnX2Rlc2MgKnJkLAo+ICsJCWNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9f
+dXNlciAqdWFkZHIpCj4gK3sKPiArCXU2NCB2YWw7Cj4gKwo+ICsJaWYgKCF2Y3B1X2hhc19zdmUo
+dmNwdSkpCj4gKwkJcmV0dXJuIC1FTk9FTlQ7Cj4gKwo+ICsJdmFsID0gZ3Vlc3RfaWRfYWE2NHpm
+cjBfZWwxKHZjcHUpOwo+ICsJcmV0dXJuIHJlZ190b191c2VyKHVhZGRyLCAmdmFsLCByZWctPmlk
+KTsKPiArfQo+ICsKPiArc3RhdGljIGludCBzZXRfaWRfYWE2NHpmcjBfZWwxKHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSwKPiArCQljb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwKPiArCQljb25z
+dCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVhZGRyKQo+ICt7Cj4gKwlj
+b25zdCB1NjQgaWQgPSBzeXNfcmVnX3RvX2luZGV4KHJkKTsKPiArCWludCBlcnI7Cj4gKwl1NjQg
+dmFsOwo+ICsKPiArCWlmICghdmNwdV9oYXNfc3ZlKHZjcHUpKQo+ICsJCXJldHVybiAtRU5PRU5U
+Owo+ICsKPiArCWVyciA9IHJlZ19mcm9tX3VzZXIoJnZhbCwgdWFkZHIsIGlkKTsKPiArCWlmIChl
+cnIpCj4gKwkJcmV0dXJuIGVycjsKPiArCj4gKwkvKiBUaGlzIGlzIHdoYXQgd2UgbWVhbiBieSBp
+bnZhcmlhbnQ6IHlvdSBjYW4ndCBjaGFuZ2UgaXQuICovCj4gKwlpZiAodmFsICE9IGd1ZXN0X2lk
+X2FhNjR6ZnIwX2VsMSh2Y3B1KSkKPiArCQlyZXR1cm4gLUVJTlZBTDsKPiArCj4gKwlyZXR1cm4g
+MDsKPiArfQo+ICsjZW5kaWYgLyogQ09ORklHX0FSTTY0X1NWRSAqLwo+ICsKPiAgLyoKPiAgICog
+Y3B1ZmVhdHVyZSBJRCByZWdpc3RlciB1c2VyIGFjY2Vzc29ycwo+ICAgKgo+IEBAIC0xMjcwLDcg
+KzEzNjYsMTEgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mgc3lzX3JlZ19kZXNj
+c1tdID0gewo+ICAJSURfU0FOSVRJU0VEKElEX0FBNjRQRlIxX0VMMSksCj4gIAlJRF9VTkFMTE9D
+QVRFRCg0LDIpLAo+ICAJSURfVU5BTExPQ0FURUQoNCwzKSwKPiArI2lmZGVmIENPTkZJR19BUk02
+NF9TVkUKPiArCXsgU1lTX0RFU0MoU1lTX0lEX0FBNjRaRlIwX0VMMSksIGFjY2Vzc19pZF9hYTY0
+emZyMF9lbDEsIC5nZXRfdXNlciA9IGdldF9pZF9hYTY0emZyMF9lbDEsIC5zZXRfdXNlciA9IHNl
+dF9pZF9hYTY0emZyMF9lbDEsIC5jaGVja19wcmVzZW50ID0gc3ZlX2NoZWNrX3ByZXNlbnQgfSwK
+PiArI2Vsc2UKPiAgCUlEX1VOQUxMT0NBVEVEKDQsNCksCj4gKyNlbmRpZgo+ICAJSURfVU5BTExP
+Q0FURUQoNCw1KSwKPiAgCUlEX1VOQUxMT0NBVEVEKDQsNiksCj4gIAlJRF9VTkFMTE9DQVRFRCg0
+LDcpLAo+IEBAIC0xMzA3LDYgKzE0MDcsOSBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IHN5c19yZWdf
+ZGVzYyBzeXNfcmVnX2Rlc2NzW10gPSB7Cj4KPiAgCXsgU1lTX0RFU0MoU1lTX1NDVExSX0VMMSks
+IGFjY2Vzc192bV9yZWcsIHJlc2V0X3ZhbCwgU0NUTFJfRUwxLCAweDAwQzUwMDc4IH0sCj4gIAl7
+IFNZU19ERVNDKFNZU19DUEFDUl9FTDEpLCBOVUxMLCByZXNldF92YWwsIENQQUNSX0VMMSwgMCB9
+LAo+ICsjaWZkZWYgQ09ORklHX0FSTTY0X1NWRQo+ICsJeyBTWVNfREVTQyhTWVNfWkNSX0VMMSks
+IGFjY2Vzc196Y3JfZWwxLCByZXNldF91bmtub3duLCBaQ1JfRUwxLCB+MHhmVUwsIC5nZXRfdXNl
+ciA9IGdldF96Y3JfZWwxLCAuc2V0X3VzZXIgPSBzZXRfemNyX2VsMSwgLmNoZWNrX3ByZXNlbnQg
+PSBzdmVfY2hlY2tfcHJlc2VudCB9LAo+ICsjZW5kaWYKPiAgCXsgU1lTX0RFU0MoU1lTX1RUQlIw
+X0VMMSksIGFjY2Vzc192bV9yZWcsIHJlc2V0X3Vua25vd24sIFRUQlIwX0VMMSB9LAo+ICAJeyBT
+WVNfREVTQyhTWVNfVFRCUjFfRUwxKSwgYWNjZXNzX3ZtX3JlZywgcmVzZXRfdW5rbm93biwgVFRC
+UjFfRUwxIH0sCj4gIAl7IFNZU19ERVNDKFNZU19UQ1JfRUwxKSwgYWNjZXNzX3ZtX3JlZywgcmVz
+ZXRfdmFsLCBUQ1JfRUwxLCAwIH0sCgpPdmVybG9uZyBsaW5lcy4KCgotLQpBbGV4IEJlbm7DqWUK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
