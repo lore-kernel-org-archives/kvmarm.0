@@ -1,68 +1,116 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 07/17] arm64: add basic pointer authentication support
-Date: Thu, 15 Nov 2018 10:25:39 +0000
-Message-ID: <20181115102537.GL3505@e103592.cambridge.arm.com>
-References: <20181005084754.20950-1-kristina.martsenko@arm.com>
- <20181005084754.20950-8-kristina.martsenko@arm.com>
- <20181019111542.6wrvjguirglzg7vg@mbp>
- <20181019112404.GD14246@arm.com>
- <20181114181138.GB2580@brain-police>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
+Date: Thu, 15 Nov 2018 11:10:30 +0000
+Message-ID: <8a602e2d-54bb-6c47-fcb0-4a7f750d9fcf@arm.com>
+References: <201811151822532422079@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181114181138.GB2580@brain-police>
+In-Reply-To: <201811151822532422079@zte.com.cn>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-arch@vger.kernel.org, Jacob Bramley <jacob.bramley@arm.com>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Adam Wallis <awallis@codeaurora.org>, Kristina Martsenko <kristina.martsenko@arm.com>, gorcunov@openvz.org, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Kees Cook <keescook@chromium.org>
+To: peng.hao2@zte.com.cn
+Cc: christoffer.dall@arm.com, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 14, 2018 at 06:11:39PM +0000, Will Deacon wrote:
 
-[...]
 
-> On Fri, Oct 19, 2018 at 12:24:04PM +0100, Will Deacon wrote:
-
-[...]
-
-> > FWIW: I think we should be entertaining a prctl() interface to use a new
-> > key on a per-thread basis. Obviously, this would need to be used with care
-> > (e.g. you'd fork(); use the prctl() and then you'd better not return from
-> > the calling function!).
-> > 
-> > Assuming we want this (Kees -- I was under the impression that everything in
-> > Android would end up with the same key otherwise?), then the question is
-> > do we want:
-> > 
-> >   - prctl() get/set operations for the key, or
-> >   - prctl() set_random_key operation, or
-> >   - both of the above?
-> > 
-> > Part of the answer to that may lie in the requirements of CRIU, where I
-> > strongly suspect they need explicit get/set operations, although these
-> > could be gated on CONFIG_CHECKPOINT_RESTORE=y.
+On 15/11/18 10:22, peng.hao2@zte.com.cn wrote:
+>> Hi Peng,
+>>
+>> On 15/11/18 15:14, Peng Hao wrote:
+>>> When virtual machine starts, hang up. The kernel version of guest
+>>> is 4.16. Host support vgic_v3.
+>>
+>> I don't understand the issue here. the vgic_irq->group field does not
+>> exist in 4.16 (neither in the first nor the last version). Nor does the
+>> line you are modifying.
+> Guest's kernel version is 4.16 and Host's kernel version is mainline.
+> vgic_irq is a structure of Host's kvm.
+>>
+>> Both exist in mainline, but what you are mentioning shouldn't be an
+>> issue in mainline since vgic_irq->group gets initialized in
+>> kvm_vgic_vcpu_init for SGIs and PPIs (i.e. intid < 32) which includes
+>> your interrupt.
+> Initialization sequence of several components is like this;
+> 1.       kvm_vgic_vcpu_init ---- here, dist is not initialized at this time.
+>                                               and the value of irq->group depends on
+>                                                dist->vgic_model. but now dist->vgic_model = 0
+>                                                 and irq->group=0.
+>   2.      vgic_create         -----  assign to dist->vgic_model.
+>   3.     kvm_vgic_dist_init
 > 
-> I managed to speak to the CRIU developers at LPC. The good news is that
-> their preference is for a ptrace()-based interface for getting and setting
-> the keys, so the only prctl() operation we need is to set a random key
-> (separately for A and B).
 
-That's good if it works for them, and it seems the cleaner approach.
+I see, thanks for explaining.
 
-_If_ they run the new thread up to a checkpoint, restoring the memory
-and doing all the setup that requires in-thread syscalls, then stop it
-in ptrace to finally inject the regs, then it makes sense to set the
-keys at that stop -- i.e., you set the keys atomically* with the final
-setting of the thread's PC.
+This means the initialization in kvm_vgic_vcpu_init depends on whether 
+userland creates the GIC device first or the vcpus first...
 
-(* with respect to the target thread)
+I don't think the issue lies in vgic_v3_populate_lr, but in 
+kvm_vgic_vcpu_init which clearly expects dist->vgic_model to be 
+initialized in two places. However, the comment at the top of 
+vgic-init.c states:
 
-So long as you're confident they've understood the implications of
-ptrauth for CRIU, I guess this can work.
+  * CPU Interface: 
+ 
+ 
 
+  * 
+ 
+ 
 
-(In other news, they will also need to do some work to support SVE, but
-that's unrelated to ptrauth.)
+  * - kvm_vgic_vcpu_init(): initialization of static data that 
+ 
+ 
 
-Cheers
----Dave
+  *   doesn't depend on any sizing information or emulation type. No 
+ 
+ 
+
+  *   allocation is allowed there.
+
+So I don't think we're supposed to check for dist->vgic_model here. 
+Those two checks should probably be moved elsewhere (maybe in 
+kvm_vgic_vcpu_enable?) once the gic type has been set.
+
+Thanks,
+
+> thanks.
+>>
+>> Cheers,
+>>
+>>> It was mainly due to the incorrect vgic_irq's(intid=27) group value
+>>> during injection interruption. when kvm_vgic_vcpu_init is called,
+>>> dist is not initialized at this time. Unable to get vgic V3 or V2
+>>> correctly, so group is not set.
+>>> group is setted to 1 when vgic_mmio_write_group is invoked at some
+>>> time.
+>>> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
+>>> interrupt injection failed.
+>>>
+>>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+>>> ---
+>>>    virt/kvm/arm/vgic/vgic-v3.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>>> index 9c0dd23..d101000 100644
+>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>>> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+>>>        if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
+>>>            irq->line_level = false;
+>>>
+>>> -    if (irq->group)
+>>> +    if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+>>>            val |= ICH_LR_GROUP;
+>>>
+>>>        val |= (u64)irq->priority << ICH_LR_PRIORITY_SHIFT;
+>>>
+>>
+>> --
+>> Julien Thierry
+
+-- 
+Julien Thierry
