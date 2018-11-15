@@ -1,17 +1,17 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Thu, 15 Nov 2018 15:57:43 +0000
-Message-ID: <20181115155742.GA19420@e119886-lin.cambridge.arm.com>
+Subject: Re: [PATCH 3/4] arm64: arm_pmu: Exclude EL1,2 with :G :H perf
+ attributes
+Date: Thu, 15 Nov 2018 16:06:54 +0000
+Message-ID: <20181115160654.GB19420@e119886-lin.cambridge.arm.com>
 References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
- <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
- <79000795-971d-22fa-6264-f85f2d528477@arm.com>
+ <1542286549-4501-4-git-send-email-andrew.murray@arm.com>
+ <2b4efe9a-4f2b-961f-c841-6378dbb4bbd3@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <79000795-971d-22fa-6264-f85f2d528477@arm.com>
+In-Reply-To: <2b4efe9a-4f2b-961f-c841-6378dbb4bbd3@arm.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,83 +21,77 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Julien Thierry <julien.thierry@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 15, 2018 at 02:00:39PM +0000, Julien Thierry wrote:
+On Thu, Nov 15, 2018 at 02:57:59PM +0000, Suzuki K Poulose wrote:
 > Hi Andrew,
 > 
-> On 15/11/18 12:55, Andrew Murray wrote:
-> > Enable/disable event counters as appropriate when entering and exiting
-> > the guest to enable support for guest or host only event counting.
+> On 15/11/2018 12:55, Andrew Murray wrote:
+> > When using VHE, EL1 is unused by the host and EL2 is unused by the
+> > guest - therefore we can filter out these events with the PMU as per
+> > the 'exclude_host' and 'exclude_guest' attributes.
 > > 
-> > For both VHE and non-VHE we switch the counters between host/guest at
-> > EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+> > With both VHE and non-VHE we switch the counters between host/guest
+> > at EL2. With non-VHE when using 'exclude_host' we filter out EL2.
+> > 
+> > These changes eliminate counters counting host events on the
+> > boundaries of guest entry/exit when using :G. However when using :H
+> > unless exclude_hv is set on non-VHE then there is a small blackout
+> > window at the guest entry/exit where host events are not captured.
 > > 
 > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 > > ---
-> >   arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 38 insertions(+)
+> >   arch/arm64/kernel/perf_event.c | 6 ++++--
+> >   1 file changed, 4 insertions(+), 2 deletions(-)
 > > 
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index d496ef5..ebf0aac 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
-> >   	return true;
-> >   }
-> > +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	u32 host_only = host_ctxt->events_host_only;
-> > +	u32 guest_only = host_ctxt->events_guest_only;
-> > +
-> > +	if (host_only)
-> > +		write_sysreg(host_only, pmcntenclr_el0);
-> > +
-> > +	if (guest_only)
-> > +		write_sysreg(guest_only, pmcntenset_el0);
-> > +
-> > +	return (host_only || guest_only);
-> > +}
-> > +
-> > +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	u32 host_only = host_ctxt->events_host_only;
-> > +	u32 guest_only = host_ctxt->events_guest_only;
-> > +
-> > +	if (guest_only)
-> > +		write_sysreg(guest_only, pmcntenclr_el0);
-> > +
-> > +	if (host_only)
-> > +		write_sysreg(host_only, pmcntenset_el0);
+> > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> > index 89d444f..c079c1f 100644
+> > --- a/arch/arm64/kernel/perf_event.c
+> > +++ b/arch/arm64/kernel/perf_event.c
+> > @@ -971,12 +971,14 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+> >   	 * with other architectures (x86 and Power).
+> >   	 */
+> >   	if (is_kernel_in_hyp_mode()) {
+> > -		if (!attr->exclude_kernel)
+> > +		if (!attr->exclude_kernel && !attr->exclude_host)
+> >   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> > +		if (attr->exclude_guest)
+> > +			config_base |= ARMV8_PMU_EXCLUDE_EL1;
 > 
-> In the perf_event code, there is an ISB after enabling an event. I guess we
-> don't need it when setting the guest events since I believe the eret to the
-> guess give us the context synchronization. But don't we need one here when
-> restoring host only events?
+> Do we really need this ? exclude_guest also implies you need to
+> exclude guest EL0. We anyway disable the events when we enter the
+> guest. So the above is not necessary and could possibly create
+> confusion.
 
-It's not really clear to me why the isb is present in the existing code,
-this was only recently introduced when adding the chained events support.
+You're right, we disable the event anyway prior to entering EL1
+and visa versa so there is no gain. It felt nice to utilise the
+hardware as extra security but it does complicate this already
+complex bit of logic. I'll drop it.
 
-Ideally for chained events you'd want to start the overflow counter first
-(idx) followed by the low counter second (idx-1) as to not miss overflows
-so an isb inbetween may be helpful. Though the isb is after both enables, this
-sets a clear line of where event counting starts - but ideally this would be
-symmetrical with an isb after the disable.
+> 
+> >   	} else {
+> >   		if (attr->exclude_kernel)
+> >   			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> > -		if (!attr->exclude_hv)
+> > +		if (!attr->exclude_hv && !attr->exclude_host)
+> >   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> >   	}
+> >   	if (attr->exclude_user)
+> > 
+> 
+> 
+> I think this can be folded into the previous patch, which adds the
+> support for exclude_host/guest support. :G, :H are nothing but
+> the those exclude_ flags.
 
-At present chained counters aren't supported in the guest but in any case
-we turn them all on/off atomically rather than individually.
-
-I guess we get a trivial gain in accuracy by adding ISB's at some performance
-cost - I'm not sure I see the benefit - unless I'm missing something?
-
-Thanks,
+Thanks I'll do that.
 
 Andrew Murray
 
 > 
-> Thanks,
+> Otherwise looks good to me.
 > 
-> -- 
-> Julien Thierry
+> Cheers
+> Suzuki
