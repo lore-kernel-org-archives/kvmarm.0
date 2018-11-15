@@ -1,223 +1,202 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH v4 7/7] iommu/virtio: Add event queue
-Date: Thu, 15 Nov 2018 16:52:34 +0000
-Message-ID: <20181115165234.43990-8-jean-philippe.brucker@arm.com>
-References: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v2 06/23] arm64/sve: Check SVE virtualisability
+Date: Thu, 15 Nov 2018 17:09:04 +0000
+Message-ID: <20181115170904.GO3505@e103592.cambridge.arm.com>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-7-git-send-email-Dave.Martin@arm.com>
+ <87in0ycpuy.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <virtio-dev-return-4972-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
-To: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
-Cc: frowand.list@gmail.com, jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1DE4A342
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 12:09:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SGapsmJM9oKJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Nov 2018 12:09:10 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8C6F4A338
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 12:09:09 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <87in0ycpuy.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The event queue offers a way for the device to report access faults from
-endpoints. It is implemented on virtqueue #1. Whenever the host needs to
-signal a fault, it fills one of the buffers offered by the guest and
-interrupts it.
+On Thu, Nov 15, 2018 at 03:39:01PM +0000, Alex Benn=E9e wrote:
+> =
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
----
- drivers/iommu/virtio-iommu.c      | 116 +++++++++++++++++++++++++++---
- include/uapi/linux/virtio_iommu.h |  19 +++++
- 2 files changed, 126 insertions(+), 9 deletions(-)
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
 
-diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-index c547ebd79c43..81c6b72e9c43 100644
---- a/drivers/iommu/virtio-iommu.c
-+++ b/drivers/iommu/virtio-iommu.c
-@@ -29,7 +29,8 @@
- #define MSI_IOVA_LENGTH			0x100000
- 
- #define VIOMMU_REQUEST_VQ		0
--#define VIOMMU_NR_VQS			1
-+#define VIOMMU_EVENT_VQ			1
-+#define VIOMMU_NR_VQS			2
- 
- struct viommu_dev {
- 	struct iommu_device		iommu;
-@@ -41,6 +42,7 @@ struct viommu_dev {
- 	struct virtqueue		*vqs[VIOMMU_NR_VQS];
- 	spinlock_t			request_lock;
- 	struct list_head		requests;
-+	void				*evts;
- 
- 	/* Device configuration */
- 	struct iommu_domain_geometry	geometry;
-@@ -82,6 +84,15 @@ struct viommu_request {
- 	char				buf[];
- };
- 
-+#define VIOMMU_FAULT_RESV_MASK		0xffffff00
-+
-+struct viommu_event {
-+	union {
-+		u32			head;
-+		struct virtio_iommu_fault fault;
-+	};
-+};
-+
- #define to_viommu_domain(domain)	\
- 	container_of(domain, struct viommu_domain, domain)
- 
-@@ -504,6 +515,69 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
- 	return ret;
- }
- 
-+static int viommu_fault_handler(struct viommu_dev *viommu,
-+				struct virtio_iommu_fault *fault)
-+{
-+	char *reason_str;
-+
-+	u8 reason	= fault->reason;
-+	u32 flags	= le32_to_cpu(fault->flags);
-+	u32 endpoint	= le32_to_cpu(fault->endpoint);
-+	u64 address	= le64_to_cpu(fault->address);
-+
-+	switch (reason) {
-+	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
-+		reason_str = "domain";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_MAPPING:
-+		reason_str = "page";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
-+	default:
-+		reason_str = "unknown";
-+		break;
-+	}
-+
-+	/* TODO: find EP by ID and report_iommu_fault */
-+	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
-+				    reason_str, endpoint, address,
-+				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
-+	else
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
-+				    reason_str, endpoint);
-+	return 0;
-+}
-+
-+static void viommu_event_handler(struct virtqueue *vq)
-+{
-+	int ret;
-+	unsigned int len;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evt;
-+	struct viommu_dev *viommu = vq->vdev->priv;
-+
-+	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
-+		if (len > sizeof(*evt)) {
-+			dev_err(viommu->dev,
-+				"invalid event buffer (len %u != %zu)\n",
-+				len, sizeof(*evt));
-+		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
-+			viommu_fault_handler(viommu, &evt->fault);
-+		}
-+
-+		sg_init_one(sg, evt, sizeof(*evt));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
-+		if (ret)
-+			dev_err(viommu->dev, "could not add event buffer\n");
-+	}
-+
-+	if (!virtqueue_kick(vq))
-+		dev_err(viommu->dev, "kick failed\n");
-+}
-+
- /* IOMMU API */
- 
- static struct iommu_domain *viommu_domain_alloc(unsigned type)
-@@ -887,16 +961,35 @@ static struct iommu_ops viommu_ops = {
- static int viommu_init_vqs(struct viommu_dev *viommu)
- {
- 	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
--	const char *name = "request";
--	void *ret;
-+	const char *names[] = { "request", "event" };
-+	vq_callback_t *callbacks[] = {
-+		NULL, /* No async requests */
-+		viommu_event_handler,
-+	};
- 
--	ret = virtio_find_single_vq(vdev, NULL, name);
--	if (IS_ERR(ret)) {
--		dev_err(viommu->dev, "cannot find VQ\n");
--		return PTR_ERR(ret);
--	}
-+	return virtio_find_vqs(vdev, VIOMMU_NR_VQS, viommu->vqs, callbacks,
-+			       names, NULL);
-+}
- 
--	viommu->vqs[VIOMMU_REQUEST_VQ] = ret;
-+static int viommu_fill_evtq(struct viommu_dev *viommu)
-+{
-+	int i, ret;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evts;
-+	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
-+	size_t nr_evts = vq->num_free;
-+
-+	viommu->evts = evts = devm_kmalloc_array(viommu->dev, nr_evts,
-+						 sizeof(*evts), GFP_KERNEL);
-+	if (!evts)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < nr_evts; i++) {
-+		sg_init_one(sg, &evts[i], sizeof(*evts));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return 0;
- }
-@@ -965,6 +1058,11 @@ static int viommu_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	/* Populate the event queue with buffers */
-+	ret = viommu_fill_evtq(viommu);
-+	if (ret)
-+		goto err_free_vqs;
-+
- 	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
- 				     virtio_bus_name(vdev));
- 	if (ret)
-diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-index cde2a3409caa..fed2ba5b47ab 100644
---- a/include/uapi/linux/virtio_iommu.h
-+++ b/include/uapi/linux/virtio_iommu.h
-@@ -139,4 +139,23 @@ struct virtio_iommu_req_probe {
- 	 */
- };
- 
-+/* Fault types */
-+#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-+#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-+#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
-+
-+#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-+#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-+#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
-+
-+struct virtio_iommu_fault {
-+	__u8					reason;
-+	__u8					reserved[3];
-+	__le32					flags;
-+	__le32					endpoint;
-+	__u8					reserved2[4];
-+	__le64					address;
-+};
-+
- #endif
--- 
-2.19.1
+> > Due to the way the effective SVE vector length is controlled and
+> > trapped at different exception levels, certain mismatches in the
+> > sets of vector lengths supported by different physical CPUs in the
+> > system may prevent straightforward virtualisation of SVE at parity
+> > with the host.
+> >
+> > This patch analyses the extent to which SVE can be virtualised
+> > safely without interfering with migration of vcpus between physical
+> > CPUs, and rejects late secondary CPUs that would erode the
+> > situation further.
+> >
+> > It is left up to KVM to decide what to do with this information.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >
+> > Changes since RFCv1:
+> >
+> >  * The analysis done by this patch is the same as in the previous
+> >    version, but the commit message the printks etc. have been reworded
+> >    to avoid the suggestion that KVM is expected to work on a system with
+> >    mismatched SVE implementations.
+> > ---
+> >  arch/arm64/include/asm/fpsimd.h |  1 +
+> >  arch/arm64/kernel/cpufeature.c  |  2 +-
+> >  arch/arm64/kernel/fpsimd.c      | 87 +++++++++++++++++++++++++++++++++=
+++------
+> >  3 files changed, 76 insertions(+), 14 deletions(-)
+> >
+
+[...]
+
+> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+
+[...]
+
+> > @@ -623,11 +629,8 @@ int sve_get_current_vl(void)
+
+[...]
+
+> > +/* Bitmaps for temporary storage during manipulation of vector length =
+sets */
+> > +static DECLARE_BITMAP(sve_tmp_vq_map, SVE_VQ_MAX);
+> =
+
+> This seems odd as a local global, why not declared locally when used?
+
+Could do.
+
+My original concern was that this is "big" and therefore it's impolite
+to allocate it on the stack.
+
+But on reflection, 64 bytes of stack is no big deal for a 64-bit
+architecture.  The affected functions probably spill more than than
+already, and these functions are called on well-defined paths which
+shouldn't have super-deep stacks already.
+
+[...]
+
+> > @@ -658,24 +662,60 @@ void __init sve_init_vq_map(void)
+> >   */
+> >  void sve_update_vq_map(void)
+> >  {
+> > -	sve_probe_vqs(sve_secondary_vq_map);
+> > -	bitmap_and(sve_vq_map, sve_vq_map, sve_secondary_vq_map, SVE_VQ_MAX);
+> > +	sve_probe_vqs(sve_tmp_vq_map);
+> > +	bitmap_and(sve_vq_map, sve_vq_map, sve_tmp_vq_map,
+> > +		   SVE_VQ_MAX);
+> > +	bitmap_or(sve_vq_partial_map, sve_vq_partial_map, sve_tmp_vq_map,
+> > +		  SVE_VQ_MAX);
+> >  }
+> =
+
+> I'm not quite following what's going on here. This is tracking both the
+> vector lengths available on all CPUs and the ones available on at least
+> one CPU? This raises a some questions:
+> =
+
+>   - do such franken-machines exist or are expected to exit?
+
+no, and yes respectively (Linux does not endorse the latter for now,
+since it results in a non-SMP system: we hide the asymmetries where
+possible by clamping the set of available vector lengths, but for
+KVM it's too hard and we don't aim to support it at all).
+
+Even if we don't recommend deploying a general-purpose OS on such a
+system, people will eventually try it.  So it's better to fail safe
+rather than silently doing the wrong thing.
+
+>   - how do we ensure this is always upto date?
+
+This gets updated for each early secondary CPU that comes up.  (Early
+secondaries' boot is serialised, so we shouldn't have to worry about
+races here.)
+
+The configuration is frozen by the time we enter userspace (hence
+__ro_after_init).
+
+Once all the early secondaries have come up, we commit to the best
+possible set of vector lengths for the CPUs that we know about, and we
+don't call this path any more: instead, each late secondary goes into
+sve_verify_vq_map() instead to check that those CPUs are compatible
+with the configuration we committed to.
+
+For context, take a look at
+arch/arm64/kernel/cpufeature.c:check_local_cpu_capabilities(), which is
+the common entry point for all secondary CPUs: that splits into
+update_cpu_capabilities() and verify_local_cpu_capabilities() paths for
+the two cases described above, calling down into sve_update_vq_map()
+and sve_verify_vq_map() as appropriate.
+
+>   - what happens when we hotplug a new CPU with less available VQ?
+
+We reject the CPU and throw it back to the firmware (see
+cpufeature.c:verify_sve_features()).
+
+This follows the precedent already set in verify_local_cpu_capabilities()
+etc.
+
+> =
+
+> >
+> >  /* Check whether the current CPU supports all VQs in the committed set=
+ */
+> >  int sve_verify_vq_map(void)
+> >  {
+> > -	int ret =3D 0;
+> > +	int ret =3D -EINVAL;
+> > +	unsigned long b;
+> >
+> > -	sve_probe_vqs(sve_secondary_vq_map);
+> > -	bitmap_andnot(sve_secondary_vq_map, sve_vq_map, sve_secondary_vq_map,
+> > -		      SVE_VQ_MAX);
+> > -	if (!bitmap_empty(sve_secondary_vq_map, SVE_VQ_MAX)) {
+> > +	sve_probe_vqs(sve_tmp_vq_map);
+> > +
+> > +	bitmap_complement(sve_tmp_vq_map, sve_tmp_vq_map, SVE_VQ_MAX);
+> > +	if (bitmap_intersects(sve_tmp_vq_map, sve_vq_map, SVE_VQ_MAX)) {
+> >  		pr_warn("SVE: cpu%d: Required vector length(s) missing\n",
+> >  			smp_processor_id());
+> > -		ret =3D -EINVAL;
+> > +		goto error;
+> =
+
+> The use of goto seems a little premature considering we don't have any
+> clean-up to do.
+
+Hmm, this does look a little overengineered.  I think it may have been
+more complex during development (making the gotos less redundant), but
+to be honest I don't remember now.
+
+I'm happy to get rid of the rather pointless ret variable and replace
+all the gotos with returns if that works for you.
+
+What do you think?
+
+[...]
+
+Cheers
+---Dave
