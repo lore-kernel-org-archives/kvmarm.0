@@ -1,71 +1,81 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH v2 05/23] KVM: arm: Add arch vcpu uninit hook
-Date: Thu, 15 Nov 2018 16:40:31 +0000
-Message-ID: <20181115164031.GN3505@e103592.cambridge.arm.com>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-6-git-send-email-Dave.Martin@arm.com>
- <20181102080536.GQ12057@e113682-lin.lund.arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v4 1/7] dt-bindings: virtio-mmio: Add IOMMU description
+Date: Thu, 15 Nov 2018 16:52:28 +0000
+Message-ID: <20181115165234.43990-2-jean-philippe.brucker@arm.com>
+References: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A06E74A32F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:40:37 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gdc2o9hb3g9g for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Nov 2018 11:40:36 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A8E94A32C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 11:40:36 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181102080536.GQ12057@e113682-lin.lund.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Transfer-Encoding: 8bit
+Return-path: <virtio-dev-return-4966-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
+To: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
+Cc: frowand.list@gmail.com, jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 02, 2018 at 09:05:36AM +0100, Christoffer Dall wrote:
-> On Fri, Sep 28, 2018 at 02:39:09PM +0100, Dave Martin wrote:
-> > In preparation for adding support for SVE in guests on arm64, a
-> > hook is needed for freeing additional per-vcpu memory when a vcpu
-> > is freed.
-> 
-> Can this commit motivate why we can't do the work in kvm_arch_vcpu_free,
-> which we use for freeing other data structures?
-> 
-> (Presumably, uninit is needed when you need to do something at the very
-> last step after releasing the struct pid.
+The nature of a virtio-mmio node is discovered by the virtio driver at
+probe time. However the DMA relation between devices must be described
+statically. When a virtio-mmio node is a virtio-iommu device, it needs an
+"#iommu-cells" property as specified by bindings/iommu/iommu.txt.
 
-It wasn't to do with that.
+Otherwise, the virtio-mmio device may perform DMA through an IOMMU, which
+requires an "iommus" property. Describe these requirements in the
+device-tree bindings documentation.
 
-Rather, the division of responsibility between the vcpu_uninit and
-vcpu_free paths is not very clear.
+Reviewed-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+---
+ .../devicetree/bindings/virtio/mmio.txt       | 30 +++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-In the earlier version of the series, I think SVE state may have been
-allocated rather early and we may have needed to free it in the failure
-path of kvm_arch_vcpu_create() (which just calls kvm_vcpu_uninit()).
-(Alternatively, I may just have been wrong.)
-
-Now, the vcpu must be fully created before the KVM_ARM_SVE_CONFIG ioctl
-on it (which is what allocates sve_state) can succeed anyway.
-
-So the distinction between these two teardown phases is probably no
-longer important.
-
-I'll see whether I can get rid of this hook and free the SVE state in
-kvm_arch_vcpu_free() instead.
-
-Does that make sense?
-
-Cheers
----Dave
+diff --git a/Documentation/devicetree/bindings/virtio/mmio.txt b/Documentation/devicetree/bindings/virtio/mmio.txt
+index 5069c1b8e193..21af30fbb81f 100644
+--- a/Documentation/devicetree/bindings/virtio/mmio.txt
++++ b/Documentation/devicetree/bindings/virtio/mmio.txt
+@@ -8,10 +8,40 @@ Required properties:
+ - reg:		control registers base address and size including configuration space
+ - interrupts:	interrupt generated by the device
+ 
++Required properties for virtio-iommu:
++
++- #iommu-cells:	When the node corresponds to a virtio-iommu device, it is
++		linked to DMA masters using the "iommus" or "iommu-map"
++		properties [1][2]. #iommu-cells specifies the size of the
++		"iommus" property. For virtio-iommu #iommu-cells must be
++		1, each cell describing a single endpoint ID.
++
++Optional properties:
++
++- iommus:	If the device accesses memory through an IOMMU, it should
++		have an "iommus" property [1]. Since virtio-iommu itself
++		does not access memory through an IOMMU, the "virtio,mmio"
++		node cannot have both an "#iommu-cells" and an "iommus"
++		property.
++
+ Example:
+ 
+ 	virtio_block@3000 {
+ 		compatible = "virtio,mmio";
+ 		reg = <0x3000 0x100>;
+ 		interrupts = <41>;
++
++		/* Device has endpoint ID 23 */
++		iommus = <&viommu 23>
+ 	}
++
++	viommu: iommu@3100 {
++		compatible = "virtio,mmio";
++		reg = <0x3100 0x100>;
++		interrupts = <42>;
++
++		#iommu-cells = <1>
++	}
++
++[1] Documentation/devicetree/bindings/iommu/iommu.txt
++[2] Documentation/devicetree/bindings/pci/pci-iommu.txt
+-- 
+2.19.1
