@@ -1,64 +1,104 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
-Date: Thu, 15 Nov 2018 09:42:55 +0000
-Message-ID: <63a0ea72-e0ce-b3e4-4fda-f1a359754cc5@arm.com>
-References: <1542294848-73839-1-git-send-email-peng.hao2@zte.com.cn>
+From: <peng.hao2@zte.com.cn>
+Subject: =?UTF-8?B?UmU6UmU6IFtQQVRDSF0ga3ZtOiBhcm0vYXJtNjQgOiBmaXggdm0ncyBoYW5naW5nIGF0IHN0YXJ0dXAgdGltZQ==?=
+Date: Thu, 15 Nov 2018 18:22:53 +0800 (CST)
+Message-ID: <201811151822532422079@zte.com.cn>
+References: <63a0ea72-e0ce-b3e4-4fda-f1a359754cc5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1542294848-73839-1-git-send-email-peng.hao2@zte.com.cn>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Peng Hao <peng.hao2@zte.com.cn>, christoffer.dall@arm.com, marc.zyngier@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA2D4A33A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 05:23:13 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id coNotwrHH2NV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Nov 2018 05:23:10 -0500 (EST)
+Received: from mxct.zte.com.cn (mx7.zte.com.cn [202.103.147.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 389054A328
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 05:23:07 -0500 (EST)
+In-Reply-To: <63a0ea72-e0ce-b3e4-4fda-f1a359754cc5@arm.com>
+References: 1542294848-73839-1-git-send-email-peng.hao2@zte.com.cn,
+ 63a0ea72-e0ce-b3e4-4fda-f1a359754cc5@arm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: julien.thierry@arm.com
+Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peng,
 
-On 15/11/18 15:14, Peng Hao wrote:
-> When virtual machine starts, hang up. The kernel version of guest
-> is 4.16. Host support vgic_v3.
 
-I don't understand the issue here. the vgic_irq->group field does not 
-exist in 4.16 (neither in the first nor the last version). Nor does the 
-line you are modifying.
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-Both exist in mainline, but what you are mentioning shouldn't be an 
-issue in mainline since vgic_irq->group gets initialized in 
-kvm_vgic_vcpu_init for SGIs and PPIs (i.e. intid < 32) which includes 
-your interrupt.
 
-Cheers,
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-> It was mainly due to the incorrect vgic_irq's(intid=27) group value
-> during injection interruption. when kvm_vgic_vcpu_init is called,
-> dist is not initialized at this time. Unable to get vgic V3 or V2
-> correctly, so group is not set.
-> group is setted to 1 when vgic_mmio_write_group is invoked at some
-> time.
-> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
-> interrupt injection failed.
-> 
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> ---
->   virt/kvm/arm/vgic/vgic-v3.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 9c0dd23..d101000 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
->   	if (vgic_irq_is_mapped_level(irq) && (val & ICH_LR_PENDING_BIT))
->   		irq->line_level = false;
->   
-> -	if (irq->group)
-> +	if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
->   		val |= ICH_LR_GROUP;
->   
->   	val |= (u64)irq->priority << ICH_LR_PRIORITY_SHIFT;
-> 
+PkhpIFBlbmcsCj4KPk9uIDE1LzExLzE4IDE1OjE0LCBQZW5nIEhhbyB3cm90ZToKPj4gV2hlbiB2
+aXJ0dWFsIG1hY2hpbmUgc3RhcnRzLCBoYW5nIHVwLiBUaGUga2VybmVsIHZlcnNpb24gb2YgZ3Vl
+c3QKPj4gaXMgNC4xNi4gSG9zdCBzdXBwb3J0IHZnaWNfdjMuCj4KPkkgZG9uJ3QgdW5kZXJzdGFu
+ZCB0aGUgaXNzdWUgaGVyZS4gdGhlIHZnaWNfaXJxLT5ncm91cCBmaWVsZCBkb2VzIG5vdAo+ZXhp
+c3QgaW4gNC4xNiAobmVpdGhlciBpbiB0aGUgZmlyc3Qgbm9yIHRoZSBsYXN0IHZlcnNpb24pLiBO
+b3IgZG9lcyB0aGUKPmxpbmUgeW91IGFyZSBtb2RpZnlpbmcuCkd1ZXN0J3Mga2VybmVsIHZlcnNp
+b24gaXMgNC4xNiBhbmQgSG9zdCdzIGtlcm5lbCB2ZXJzaW9uIGlzIG1haW5saW5lLgp2Z2ljX2ly
+cSBpcyBhIHN0cnVjdHVyZSBvZiBIb3N0J3Mga3ZtLgo+Cj5Cb3RoIGV4aXN0IGluIG1haW5saW5l
+LCBidXQgd2hhdCB5b3UgYXJlIG1lbnRpb25pbmcgc2hvdWxkbid0IGJlIGFuCj5pc3N1ZSBpbiBt
+YWlubGluZSBzaW5jZSB2Z2ljX2lycS0+Z3JvdXAgZ2V0cyBpbml0aWFsaXplZCBpbgo+a3ZtX3Zn
+aWNfdmNwdV9pbml0IGZvciBTR0lzIGFuZCBQUElzIChpLmUuIGludGlkIDwgMzIpIHdoaWNoIGlu
+Y2x1ZGVzCj55b3VyIGludGVycnVwdC4KSW5pdGlhbGl6YXRpb24gc2VxdWVuY2Ugb2Ygc2V2ZXJh
+bCBjb21wb25lbnRzIGlzIGxpa2UgdGhpczsKMS4gICAgICAga3ZtX3ZnaWNfdmNwdV9pbml0IC0t
+LS0gaGVyZSwgZGlzdCBpcyBub3QgaW5pdGlhbGl6ZWQgYXQgdGhpcyB0aW1lLgogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhbmQgdGhlIHZhbHVlIG9mIGlycS0+
+Z3JvdXAgZGVwZW5kcyBvbgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgZGlzdC0+dmdpY19tb2RlbC4gYnV0IG5vdyBkaXN0LT52Z2ljX21vZGVsID0gMAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFuZCBpcnEtPmdyb3Vw
+PTAuCiAyLiAgICAgIHZnaWNfY3JlYXRlICAgICAgICAgLS0tLS0gIGFzc2lnbiB0byBkaXN0LT52
+Z2ljX21vZGVsLgogMy4gICAgIGt2bV92Z2ljX2Rpc3RfaW5pdCAKCnRoYW5rcy4KPgo+Q2hlZXJz
+LAo+Cj4+IEl0IHdhcyBtYWlubHkgZHVlIHRvIHRoZSBpbmNvcnJlY3QgdmdpY19pcnEncyhpbnRp
+ZD0yNykgZ3JvdXAgdmFsdWUKPj4gZHVyaW5nIGluamVjdGlvbiBpbnRlcnJ1cHRpb24uIHdoZW4g
+a3ZtX3ZnaWNfdmNwdV9pbml0IGlzIGNhbGxlZCwKPj4gZGlzdCBpcyBub3QgaW5pdGlhbGl6ZWQg
+YXQgdGhpcyB0aW1lLiBVbmFibGUgdG8gZ2V0IHZnaWMgVjMgb3IgVjIKPj4gY29ycmVjdGx5LCBz
+byBncm91cCBpcyBub3Qgc2V0Lgo+PiBncm91cCBpcyBzZXR0ZWQgdG8gMSB3aGVuIHZnaWNfbW1p
+b193cml0ZV9ncm91cCBpcyBpbnZva2VkIGF0IHNvbWUKPj4gdGltZS4KPj4gd2hlbiBpcnEtPmdy
+b3VwPTAgKGludGlkPTI3KSwgTm8gSUNIX0xSX0dST1VQIGZsYWcgd2FzIHNldCBhbmQKPj4gaW50
+ZXJydXB0IGluamVjdGlvbiBmYWlsZWQuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxw
+ZW5nLmhhbzJAenRlLmNvbS5jbj4KPj4gLS0tCj4+ICAgdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12
+My5jIHwgMiArLQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlv
+bigtKQo+Pgo+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jIGIvdmly
+dC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+IGluZGV4IDljMGRkMjMuLmQxMDEwMDAgMTAwNjQ0
+Cj4+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYwo+PiArKysgYi92aXJ0L2t2bS9h
+cm0vdmdpYy92Z2ljLXYzLmMKPj4gQEAgLTE5OCw3ICsxOTgsNyBAQCB2b2lkIHZnaWNfdjNfcG9w
+dWxhdGVfbHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3QgdmdpY19pcnEgKmlycSwgaW50
+IGxyKQo+PiAgICAgICBpZiAodmdpY19pcnFfaXNfbWFwcGVkX2xldmVsKGlycSkgJiYgKHZhbCAm
+IElDSF9MUl9QRU5ESU5HX0JJVCkpCj4+ICAgICAgICAgICBpcnEtPmxpbmVfbGV2ZWwgPSBmYWxz
+ZTsKPj4KPj4gLSAgICBpZiAoaXJxLT5ncm91cCkKPj4gKyAgICBpZiAobW9kZWwgPT0gS1ZNX0RF
+Vl9UWVBFX0FSTV9WR0lDX1YzKQo+PiAgICAgICAgICAgdmFsIHw9IElDSF9MUl9HUk9VUDsKPj4K
+Pj4gICAgICAgdmFsIHw9ICh1NjQpaXJxLT5wcmlvcml0eSA8PCBJQ0hfTFJfUFJJT1JJVFlfU0hJ
+RlQ7Cj4+Cj4KPi0tCj5KdWxpZW4gVGhpZXJyeQ==
 
--- 
-Julien Thierry
+
+--=====_003_next=====--
+
+--=====_001_next=====
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--=====_001_next=====--
