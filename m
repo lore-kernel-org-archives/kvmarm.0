@@ -1,7 +1,8 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event modifiers
-Date: Thu, 15 Nov 2018 12:55:49 +0000
-Message-ID: <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH 2/4] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Thu, 15 Nov 2018 12:55:47 +0000
+Message-ID: <1542286549-4501-3-git-send-email-andrew.murray@arm.com>
 References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,106 +22,94 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
+Add support for the :G and :H attributes in perf by handling the
+exclude_host/exclude_guest event attributes.
 
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+We notify KVM of counters that we wish to be enabled or disabled on
+guest entry/exit and thus defer from starting or stopping :G events
+as per the events exclude_host attribute.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ arch/arm64/kernel/perf_event.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d496ef5..ebf0aac 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
- }
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index 8e38d52..89d444f 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -26,6 +26,7 @@
  
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 host_only = host_ctxt->events_host_only;
-+	u32 guest_only = host_ctxt->events_guest_only;
-+
-+	if (host_only)
-+		write_sysreg(host_only, pmcntenclr_el0);
-+
-+	if (guest_only)
-+		write_sysreg(guest_only, pmcntenset_el0);
-+
-+	return (host_only || guest_only);
-+}
-+
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 host_only = host_ctxt->events_host_only;
-+	u32 guest_only = host_ctxt->events_guest_only;
-+
-+	if (guest_only)
-+		write_sysreg(guest_only, pmcntenclr_el0);
-+
-+	if (host_only)
-+		write_sysreg(host_only, pmcntenset_el0);
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -488,12 +514,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ #include <linux/acpi.h>
+ #include <linux/clocksource.h>
++#include <linux/kvm_host.h>
+ #include <linux/of.h>
+ #include <linux/perf/arm_pmu.h>
+ #include <linux/platform_device.h>
+@@ -647,12 +648,24 @@ static inline int armv8pmu_enable_counter(int idx)
+ 
+ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
  {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = event->hw.idx;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
  
- 	host_ctxt = vcpu->arch.host_cpu_context;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+-	armv8pmu_enable_counter(idx);
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_enable_counter(idx - 1);
+-	isb();
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
 +
- 	sysreg_save_host_state_vhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -524,6 +553,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
++	if (attr->exclude_host)
++		kvm_set_clr_guest_pmu_events(0, counter_bits);
++	if (attr->exclude_guest)
++		kvm_set_clr_host_pmu_events(0, counter_bits);
 +
- 	return exit_code;
++	if (!attr->exclude_host) {
++		armv8pmu_enable_counter(idx);
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_enable_counter(idx - 1);
++		isb();
++	}
  }
  
-@@ -532,6 +564,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ static inline int armv8pmu_disable_counter(int idx)
+@@ -665,11 +678,23 @@ static inline int armv8pmu_disable_counter(int idx)
+ static inline void armv8pmu_disable_event_counter(struct perf_event *event)
  {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
+ 	struct hw_perf_event *hwc = &event->hw;
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = hwc->idx;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
  
- 	vcpu = kern_hyp_va(vcpu);
-@@ -540,6 +573,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_disable_counter(idx - 1);
+-	armv8pmu_disable_counter(idx);
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
 +
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -586,6 +621,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
++	if (attr->exclude_host)
++		kvm_set_clr_guest_pmu_events(counter_bits, 0);
++	if (attr->exclude_guest)
++		kvm_set_clr_host_pmu_events(counter_bits, 0);
 +
- 	return exit_code;
++	if (!attr->exclude_host) {
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_disable_counter(idx - 1);
++		armv8pmu_disable_counter(idx);
++	}
  }
  
+ static inline int armv8pmu_enable_intens(int idx)
+@@ -977,6 +1002,10 @@ static void armv8pmu_reset(void *info)
+ 		armv8pmu_disable_intens(idx);
+ 	}
+ 
++	/* Clear the counters we flip at guest entry/exit */
++	kvm_set_clr_host_pmu_events(U32_MAX, 0);
++	kvm_set_clr_guest_pmu_events(U32_MAX, 0);
++
+ 	/*
+ 	 * Initialize & Reset PMNC. Request overflow interrupt for
+ 	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
 -- 
 2.7.4
