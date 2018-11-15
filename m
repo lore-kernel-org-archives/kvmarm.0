@@ -1,108 +1,103 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 09/23] KVM: arm64: Propagate vcpu into read_id_reg()
-Date: Thu, 15 Nov 2018 15:56:21 +0000
-Message-ID: <87ftw2cp22.fsf@linaro.org>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-10-git-send-email-Dave.Martin@arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event
+ modifiers
+Date: Thu, 15 Nov 2018 15:57:43 +0000
+Message-ID: <20181115155742.GA19420@e119886-lin.cambridge.arm.com>
+References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
+ <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
+ <79000795-971d-22fa-6264-f85f2d528477@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B89DB4A357
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 10:56:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NjkXL9Ph+d7F for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Nov 2018 10:56:24 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A485C4A352
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 10:56:24 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id q26so8413565wmf.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 07:56:24 -0800 (PST)
-In-reply-to: <1538141967-15375-10-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <79000795-971d-22fa-6264-f85f2d528477@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEFyY2hpdGVjdHVy
-ZSBmZWF0dXJlcyB0aGF0IGFyZSBjb25kaXRpb25hbGx5IHZpc2libGUgdG8gdGhlIGd1ZXN0Cj4g
-d2lsbCByZXF1aXJlIHJ1bi10aW1lIGNoZWNrcyBpbiB0aGUgSUQgcmVnaXN0ZXIgYWNjZXNzb3Ig
-ZnVuY3Rpb25zLgo+IEluIHBhcnRpY3VsYXIsIHJlYWRfaWRfcmVnKCkgd2lsbCBuZWVkIHRvIHBl
-cmZvcm0gY2hlY2tzIGluIG9yZGVyCj4gdG8gZ2VuZXJhdGUgdGhlIGNvcnJlY3QgZW11bGF0ZWQg
-dmFsdWUgZm9yIGNlcnRhaW4gSUQgcmVnaXN0ZXIKPiBmaWVsZHMgc3VjaCBhcyBJRF9BQTY0UEZS
-MF9FTDEuU1ZFIGZvciBleGFtcGxlLgo+Cj4gVGhpcyBwYXRjaCBwcm9wYWdhdGVzIHZjcHUgaW50
-byByZWFkX2lkX3JlZygpIHNvIHRoYXQgZnV0dXJlCj4gcGF0Y2hlcyBjYW4gYWRkIHJ1bi10aW1l
-IGNoZWNrcyBvbiB0aGUgZ3Vlc3QgY29uZmlndXJhdGlvbiBoZXJlLgo+Cj4gRm9yIG5vdywgdGhl
-cmUgaXMgbm8gZnVuY3Rpb25hbCBjaGFuZ2UuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRp
-biA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXgu
-YmVubmVlQGxpbmFyby5vcmc+Cgo+IC0tLQo+ICBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIHwg
-MjMgKysrKysrKysrKysrKy0tLS0tLS0tLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDEzIGluc2VydGlv
-bnMoKyksIDEwIGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5
-c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4gaW5kZXggMjJmYmJkYi4uMGRm
-ZDA2NCAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4gKysrIGIvYXJj
-aC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+IEBAIC0xMDI5LDcgKzEwMjksOCBAQCBzdGF0aWMgYm9v
-bCBhY2Nlc3NfY250cF9jdmFsKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgfQo+Cj4gIC8qIFJl
-YWQgYSBzYW5pdGlzZWQgY3B1ZmVhdHVyZSBJRCByZWdpc3RlciBieSBzeXNfcmVnX2Rlc2MgKi8K
-PiAtc3RhdGljIHU2NCByZWFkX2lkX3JlZyhzdHJ1Y3Qgc3lzX3JlZ19kZXNjIGNvbnN0ICpyLCBi
-b29sIHJheikKPiArc3RhdGljIHU2NCByZWFkX2lkX3JlZyhjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsCj4gKwkJc3RydWN0IHN5c19yZWdfZGVzYyBjb25zdCAqciwgYm9vbCByYXopCj4gIHsK
-PiAgCXUzMiBpZCA9IHN5c19yZWcoKHUzMilyLT5PcDAsICh1MzIpci0+T3AxLAo+ICAJCQkgKHUz
-MilyLT5DUm4sICh1MzIpci0+Q1JtLCAodTMyKXItPk9wMik7Cj4gQEAgLTEwNjAsNyArMTA2MSw3
-IEBAIHN0YXRpYyBib29sIF9fYWNjZXNzX2lkX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4g
-IAlpZiAocC0+aXNfd3JpdGUpCj4gIAkJcmV0dXJuIHdyaXRlX3RvX3JlYWRfb25seSh2Y3B1LCBw
-LCByKTsKPgo+IC0JcC0+cmVndmFsID0gcmVhZF9pZF9yZWcociwgcmF6KTsKPiArCXAtPnJlZ3Zh
-bCA9IHJlYWRfaWRfcmVnKHZjcHUsIHIsIHJheik7Cj4gIAlyZXR1cm4gdHJ1ZTsKPiAgfQo+Cj4g
-QEAgLTEwODksMTYgKzEwOTAsMTggQEAgc3RhdGljIHU2NCBzeXNfcmVnX3RvX2luZGV4KGNvbnN0
-IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJlZyk7Cj4gICAqIGFyZSBzdG9yZWQsIGFuZCBmb3Igc2V0
-X2lkX3JlZygpIHdlIGRvbid0IGFsbG93IHRoZSBlZmZlY3RpdmUgdmFsdWUKPiAgICogdG8gYmUg
-Y2hhbmdlZC4KPiAgICovCj4gLXN0YXRpYyBpbnQgX19nZXRfaWRfcmVnKGNvbnN0IHN0cnVjdCBz
-eXNfcmVnX2Rlc2MgKnJkLCB2b2lkIF9fdXNlciAqdWFkZHIsCj4gK3N0YXRpYyBpbnQgX19nZXRf
-aWRfcmVnKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiArCQkJY29uc3Qgc3RydWN0IHN5
-c19yZWdfZGVzYyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKPiAgCQkJYm9vbCByYXopCj4gIHsK
-PiAgCWNvbnN0IHU2NCBpZCA9IHN5c19yZWdfdG9faW5kZXgocmQpOwo+IC0JY29uc3QgdTY0IHZh
-bCA9IHJlYWRfaWRfcmVnKHJkLCByYXopOwo+ICsJY29uc3QgdTY0IHZhbCA9IHJlYWRfaWRfcmVn
-KHZjcHUsIHJkLCByYXopOwo+Cj4gIAlyZXR1cm4gcmVnX3RvX3VzZXIodWFkZHIsICZ2YWwsIGlk
-KTsKPiAgfQo+Cj4gLXN0YXRpYyBpbnQgX19zZXRfaWRfcmVnKGNvbnN0IHN0cnVjdCBzeXNfcmVn
-X2Rlc2MgKnJkLCB2b2lkIF9fdXNlciAqdWFkZHIsCj4gK3N0YXRpYyBpbnQgX19zZXRfaWRfcmVn
-KGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiArCQkJY29uc3Qgc3RydWN0IHN5c19yZWdf
-ZGVzYyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKPiAgCQkJYm9vbCByYXopCj4gIHsKPiAgCWNv
-bnN0IHU2NCBpZCA9IHN5c19yZWdfdG9faW5kZXgocmQpOwo+IEBAIC0xMTEwLDcgKzExMTMsNyBA
-QCBzdGF0aWMgaW50IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwg
-dm9pZCBfX3VzZXIgKnVhZGRyLAo+ICAJCXJldHVybiBlcnI7Cj4KPiAgCS8qIFRoaXMgaXMgd2hh
-dCB3ZSBtZWFuIGJ5IGludmFyaWFudDogeW91IGNhbid0IGNoYW5nZSBpdC4gKi8KPiAtCWlmICh2
-YWwgIT0gcmVhZF9pZF9yZWcocmQsIHJheikpCj4gKwlpZiAodmFsICE9IHJlYWRfaWRfcmVnKHZj
-cHUsIHJkLCByYXopKQo+ICAJCXJldHVybiAtRUlOVkFMOwo+Cj4gIAlyZXR1cm4gMDsKPiBAQCAt
-MTExOSwyNSArMTEyMiwyNSBAQCBzdGF0aWMgaW50IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qg
-c3lzX3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIgKnVhZGRyLAo+ICBzdGF0aWMgaW50IGdldF9p
-ZF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpy
-ZCwKPiAgCQkgICAgICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIg
-KnVhZGRyKQo+ICB7Cj4gLQlyZXR1cm4gX19nZXRfaWRfcmVnKHJkLCB1YWRkciwgZmFsc2UpOwo+
-ICsJcmV0dXJuIF9fZ2V0X2lkX3JlZyh2Y3B1LCByZCwgdWFkZHIsIGZhbHNlKTsKPiAgfQo+Cj4g
-IHN0YXRpYyBpbnQgc2V0X2lkX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVj
-dCBzeXNfcmVnX2Rlc2MgKnJkLAo+ICAJCSAgICAgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAq
-cmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCj4gIHsKPiAtCXJldHVybiBfX3NldF9pZF9yZWcocmQs
-IHVhZGRyLCBmYWxzZSk7Cj4gKwlyZXR1cm4gX19zZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRkciwg
-ZmFsc2UpOwo+ICB9Cj4KPiAgc3RhdGljIGludCBnZXRfcmF6X2lkX3JlZyhzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+ICAJCQkgIGNvbnN0IHN0
-cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCj4gIHsKPiAtCXJldHVy
-biBfX2dldF9pZF9yZWcocmQsIHVhZGRyLCB0cnVlKTsKPiArCXJldHVybiBfX2dldF9pZF9yZWco
-dmNwdSwgcmQsIHVhZGRyLCB0cnVlKTsKPiAgfQo+Cj4gIHN0YXRpYyBpbnQgc2V0X3Jhel9pZF9y
-ZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwK
-PiAgCQkJICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVhZGRy
-KQo+ICB7Cj4gLQlyZXR1cm4gX19zZXRfaWRfcmVnKHJkLCB1YWRkciwgdHJ1ZSk7Cj4gKwlyZXR1
-cm4gX19zZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRkciwgdHJ1ZSk7Cj4gIH0KPgo+ICAvKiBzeXNf
-cmVnX2Rlc2MgaW5pdGlhbGlzZXIgZm9yIGtub3duIGNwdWZlYXR1cmUgSUQgcmVnaXN0ZXJzICov
-CgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
-dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Thu, Nov 15, 2018 at 02:00:39PM +0000, Julien Thierry wrote:
+> Hi Andrew,
+> 
+> On 15/11/18 12:55, Andrew Murray wrote:
+> > Enable/disable event counters as appropriate when entering and exiting
+> > the guest to enable support for guest or host only event counting.
+> > 
+> > For both VHE and non-VHE we switch the counters between host/guest at
+> > EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >   arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 38 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index d496ef5..ebf0aac 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> >   	return true;
+> >   }
+> > +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	u32 host_only = host_ctxt->events_host_only;
+> > +	u32 guest_only = host_ctxt->events_guest_only;
+> > +
+> > +	if (host_only)
+> > +		write_sysreg(host_only, pmcntenclr_el0);
+> > +
+> > +	if (guest_only)
+> > +		write_sysreg(guest_only, pmcntenset_el0);
+> > +
+> > +	return (host_only || guest_only);
+> > +}
+> > +
+> > +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	u32 host_only = host_ctxt->events_host_only;
+> > +	u32 guest_only = host_ctxt->events_guest_only;
+> > +
+> > +	if (guest_only)
+> > +		write_sysreg(guest_only, pmcntenclr_el0);
+> > +
+> > +	if (host_only)
+> > +		write_sysreg(host_only, pmcntenset_el0);
+> 
+> In the perf_event code, there is an ISB after enabling an event. I guess we
+> don't need it when setting the guest events since I believe the eret to the
+> guess give us the context synchronization. But don't we need one here when
+> restoring host only events?
+
+It's not really clear to me why the isb is present in the existing code,
+this was only recently introduced when adding the chained events support.
+
+Ideally for chained events you'd want to start the overflow counter first
+(idx) followed by the low counter second (idx-1) as to not miss overflows
+so an isb inbetween may be helpful. Though the isb is after both enables, this
+sets a clear line of where event counting starts - but ideally this would be
+symmetrical with an isb after the disable.
+
+At present chained counters aren't supported in the guest but in any case
+we turn them all on/off atomically rather than individually.
+
+I guess we get a trivial gain in accuracy by adding ISB's at some performance
+cost - I'm not sure I see the benefit - unless I'm missing something?
+
+Thanks,
+
+Andrew Murray
+
+> 
+> Thanks,
+> 
+> -- 
+> Julien Thierry
