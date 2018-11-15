@@ -1,92 +1,96 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Thu, 15 Nov 2018 14:00:39 +0000
-Message-ID: <79000795-971d-22fa-6264-f85f2d528477@arm.com>
-References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
- <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v3 2/7] arm64/kvm: context-switch ptrauth registers
+Date: Thu, 15 Nov 2018 20:03:49 +0530
+Message-ID: <CADGdYn7Jha7b3qx-Thow-dvHZKHdn93eJE-CzC395OBZkPvAjw@mail.gmail.com>
+References: <1539773280-4159-1-git-send-email-amit.kachhap@arm.com>
+ <1539773280-4159-3-git-send-email-amit.kachhap@arm.com> <20181102083725.GV12057@e113682-lin.lund.arm.com>
+ <20181112223212.5o4ipc5kt5ziuupt@localhost> <20181113134438.GH3835@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E674A32F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 09:00:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id joA79S90gkrM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Nov 2018 09:00:45 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7257A4A32A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Nov 2018 09:00:45 -0500 (EST)
-In-Reply-To: <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181113134438.GH3835@e113682-lin.lund.arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@arm.com
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, drjones@redhat.com, marc.zyngier@arm.com, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kristina.martsenko@arm.com, kvmarm@lists.cs.columbia.edu, ramana.radhakrishnan@arm.com, Dave Martin <Dave.Martin@arm.com>, LAK <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
+On Tue, Nov 13, 2018 at 7:16 PM Christoffer Dall
+<christoffer.dall@arm.com> wrote:
+>
+> On Mon, Nov 12, 2018 at 10:32:12PM +0000, Catalin Marinas wrote:
+> > On Fri, Nov 02, 2018 at 09:37:25AM +0100, Christoffer Dall wrote:
+> > > On Wed, Oct 17, 2018 at 04:17:55PM +0530, Amit Daniel Kachhap wrote:
+> > > > From: Mark Rutland <mark.rutland@arm.com>
+> > > >
+> > > > When pointer authentication is supported, a guest may wish to use it.
+> > > > This patch adds the necessary KVM infrastructure for this to work.
+> > > >
+> > > > When we schedule a vcpu, we enable guest usage of pointer
+> > > > authentication instructions and accesses to the keys. After these are
+> > > > enabled, we allow context-switching the keys.
+> > > >
+> > > > Pointer authentication consists of address authentication and generic
+> > > > authentication, and CPUs in a system might have varied support for
+> > > > either. Where support for either feature is not uniform, it is hidden
+> > > > from guests via ID register emulation, as a result of the cpufeature
+> > > > framework in the host.
+> > > >
+> > > > Unfortunately, address authentication and generic authentication cannot
+> > > > be trapped separately, as the architecture provides a single EL2 trap
+> > > > covering both. If we wish to expose one without the other, we cannot
+> > > > prevent a (badly-written) guest from intermittently using a feature
+> > > > which is not uniformly supported (when scheduled on a physical CPU which
+> > > > supports the relevant feature). When the guest is scheduled on a
+> > > > physical CPU lacking the feature, these attempts will result in an UNDEF
+> > > > being taken by the guest.
+> > > >
+> > > > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> > > > Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+> > > > Cc: Marc Zyngier <marc.zyngier@arm.com>
+> > > > Cc: Christoffer Dall <christoffer.dall@arm.com>
+> > > > Cc: kvmarm@lists.cs.columbia.edu
+> > [...]
+> > > Two questions:
+> > >
+> > >  - Can we limit all ptrauth functionality to VHE systems so that we
+> > >    don't need to touch the non-VHE path and so that we don't need any of
+> > >    the __hyp_text stuff?
+> >
+> > I would say yes. ARMv8.3 implies v8.1, so can enable ptrauth only when
+> > VHE is built into the kernel and present in the CPU implementation.
+> >
+>
+> Sounds good.
+>
+> > >  - Can we move all the save/restore logic to vcpu load/put as long as
+> > >    the host kernel itself isn't using ptrauth, and if the host kernel at
+> > >    some point begins to use ptrauth, can we have a hook to save/restore
+> > >    at that time (similar to what we do for FPSIMD) to avoid this
+> > >    overhead on every switch?
+> >
+> > We will probably enable ptrauth for the kernel as well fairly soon, so I
+> > don't think we should base the KVM assumption on the no ptrauth in
+> > kernel use-case.
+> >
+>
+> I assume in this case ptrauth will be used for all of the kernel,
+> including most of the KVM code?
+>
+> In that case, I wonder if we always need to context-switch ptrauth
+> configruation state or if we can be lazy until the guest actually uses
+> the feature?
 
-On 15/11/18 12:55, Andrew Murray wrote:
-> Enable/disable event counters as appropriate when entering and exiting
-> the guest to enable support for guest or host only event counting.
-> 
-> For both VHE and non-VHE we switch the counters between host/guest at
-> EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->   arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 38 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index d496ef5..ebf0aac 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
->   	return true;
->   }
->   
-> +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	u32 host_only = host_ctxt->events_host_only;
-> +	u32 guest_only = host_ctxt->events_guest_only;
-> +
-> +	if (host_only)
-> +		write_sysreg(host_only, pmcntenclr_el0);
-> +
-> +	if (guest_only)
-> +		write_sysreg(guest_only, pmcntenset_el0);
-> +
-> +	return (host_only || guest_only);
-> +}
-> +
-> +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	u32 host_only = host_ctxt->events_host_only;
-> +	u32 guest_only = host_ctxt->events_guest_only;
-> +
-> +	if (guest_only)
-> +		write_sysreg(guest_only, pmcntenclr_el0);
-> +
-> +	if (host_only)
-> +		write_sysreg(host_only, pmcntenset_el0);
-
-In the perf_event code, there is an ISB after enabling an event. I guess 
-we don't need it when setting the guest events since I believe the eret 
-to the guess give us the context synchronization. But don't we need one 
-here when restoring host only events?
+Sorry for the delayed reply. Lazy switching is possible and was
+present in earlier Mark's Rutland v2 version.
+However  removed it from v3 version as a mandatory user option to
+enable ptrauth is added and to make it look
+simpler. But yes both can exist together but with 1 trap cost if guest
+always uses ptrauth.
 
 Thanks,
-
--- 
-Julien Thierry
+Amit
+>
+>
+> Thanks,
+>
+>     Christoffer
