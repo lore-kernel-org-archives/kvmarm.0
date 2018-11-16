@@ -1,28 +1,30 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH v2 06/23] arm64/sve: Check SVE virtualisability
-Date: Fri, 16 Nov 2018 15:09:47 +0000
-Message-ID: <20181116150947.GV3505@e103592.cambridge.arm.com>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-7-git-send-email-Dave.Martin@arm.com>
- <87in0ycpuy.fsf@linaro.org>
- <20181115170904.GO3505@e103592.cambridge.arm.com>
- <87bm6pciel.fsf@linaro.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event
+ modifiers
+Date: Fri, 16 Nov 2018 17:53:53 +0000
+Message-ID: <36b3c08c-7f5b-3f45-c0c0-062080308de8@arm.com>
+References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
+ <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
+ <79000795-971d-22fa-6264-f85f2d528477@arm.com>
+ <20181115155742.GA19420@e119886-lin.cambridge.arm.com>
+ <29cd37da-5ee9-545e-a456-b8811b0e063a@arm.com>
+ <20181116121251.GE19420@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B513A4A336
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 10:09:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D85714A343
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 12:53:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bahKgzcLRVHd for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Nov 2018 10:09:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51EC74A32A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 10:09:52 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <87bm6pciel.fsf@linaro.org>
+ with ESMTP id NnTc3QSQJlno for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Nov 2018 12:53:57 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D43A4A33A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 12:53:57 -0500 (EST)
+In-Reply-To: <20181116121251.GE19420@e119886-lin.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,175 +34,109 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 16, 2018 at 12:32:18PM +0000, Alex Benn=E9e wrote:
-> =
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
 
-> > On Thu, Nov 15, 2018 at 03:39:01PM +0000, Alex Benn=E9e wrote:
-> >>
-> >> Dave Martin <Dave.Martin@arm.com> writes:
-> >>
-> >> > Due to the way the effective SVE vector length is controlled and
-> >> > trapped at different exception levels, certain mismatches in the
-> >> > sets of vector lengths supported by different physical CPUs in the
-> >> > system may prevent straightforward virtualisation of SVE at parity
-> >> > with the host.
-> >> >
-> >> > This patch analyses the extent to which SVE can be virtualised
-> >> > safely without interfering with migration of vcpus between physical
-> >> > CPUs, and rejects late secondary CPUs that would erode the
-> >> > situation further.
-> >> >
-> >> > It is left up to KVM to decide what to do with this information.
-> >> >
-> >> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >> > ---
-> >> >
-> >> > Changes since RFCv1:
-> >> >
-> >> >  * The analysis done by this patch is the same as in the previous
-> >> >    version, but the commit message the printks etc. have been reword=
-ed
-> >> >    to avoid the suggestion that KVM is expected to work on a system =
-with
-> >> >    mismatched SVE implementations.
-> >> > ---
-> >> >  arch/arm64/include/asm/fpsimd.h |  1 +
-> >> >  arch/arm64/kernel/cpufeature.c  |  2 +-
-> >> >  arch/arm64/kernel/fpsimd.c      | 87 ++++++++++++++++++++++++++++++=
-+++++------
-> >> >  3 files changed, 76 insertions(+), 14 deletions(-)
-> >> >
-> >
-> > [...]
-> >
-> >> > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+On 16/11/2018 12:12, Andrew Murray wrote:
+> On Thu, Nov 15, 2018 at 05:40:24PM +0000, Suzuki K Poulose wrote:
+>>
+>>
+>> On 15/11/2018 15:57, Andrew Murray wrote:
+>>> On Thu, Nov 15, 2018 at 02:00:39PM +0000, Julien Thierry wrote:
+>>>> Hi Andrew,
+>>>>
+>>>> On 15/11/18 12:55, Andrew Murray wrote:
+>>>>> Enable/disable event counters as appropriate when entering and exiting
+>>>>> the guest to enable support for guest or host only event counting.
+>>>>>
+>>>>> For both VHE and non-VHE we switch the counters between host/guest at
+>>>>> EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+>>>>>
+>>>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>>>>> ---
+>>>>>     arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>>>>     1 file changed, 38 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>>>>> index d496ef5..ebf0aac 100644
+>>>>> --- a/arch/arm64/kvm/hyp/switch.c
+>>>>> +++ b/arch/arm64/kvm/hyp/switch.c
+>>>>> @@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+>>>>>     	return true;
+>>>>>     }
+>>>>> +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+>>>>> +{
+>>>>> +	u32 host_only = host_ctxt->events_host_only;
+>>>>> +	u32 guest_only = host_ctxt->events_guest_only;
+>>>>> +
+>>>>> +	if (host_only)
+>>>>> +		write_sysreg(host_only, pmcntenclr_el0);
+>>>>> +
+>>>>> +	if (guest_only)
+>>>>> +		write_sysreg(guest_only, pmcntenset_el0);
+>>>>> +
+>>>>> +	return (host_only || guest_only);
+>>>>> +}
+>>>>> +
+>>>>> +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+>>>>> +{
+>>>>> +	u32 host_only = host_ctxt->events_host_only;
+>>>>> +	u32 guest_only = host_ctxt->events_guest_only;
+>>>>> +
+>>>>> +	if (guest_only)
+>>>>> +		write_sysreg(guest_only, pmcntenclr_el0);
+>>>>> +
+>>>>> +	if (host_only)
+>>>>> +		write_sysreg(host_only, pmcntenset_el0);
+>>>>
+>>>> In the perf_event code, there is an ISB after enabling an event. I guess we
+>>>> don't need it when setting the guest events since I believe the eret to the
+>>>> guess give us the context synchronization. But don't we need one here when
+>>>> restoring host only events?
+>>>
+>>> It's not really clear to me why the isb is present in the existing code,
+>>> this was only recently introduced when adding the chained events support.
+>>>
+>>> Ideally for chained events you'd want to start the overflow counter first
+>>> (idx) followed by the low counter second (idx-1) as to not miss overflows
+>>> so an isb inbetween may be helpful. Though the isb is after both enables, this
+>>> sets a clear line of where event counting starts - but ideally this would be
+>>> symmetrical with an isb after the disable.
+>>
+>> I think the isb() in the armv8_pmu_enable_event_counter() is
+>> unnecessary, and might have been a left over from earlier versions
+>> of the series. Please feel free to remove it.
+> 
+> OK I'll do that.
+> 
+>>
+>>>
+>>> At present chained counters aren't supported in the guest but in any case
+>>> we turn them all on/off atomically rather than individually.
+>>>
+>>> I guess we get a trivial gain in accuracy by adding ISB's at some performance
+>>> cost - I'm not sure I see the benefit - unless I'm missing something?
+>>
+>> But, I think Julien has a valid point here. When we modify the
+>> pmcnten{set/clr} registers, the PMU could be enabled. (i.e, PMCR_E set).
+>>
+>> So in order to synchronize the changes to the counters, we need an isb()
+>> in the switch to host case to take immediate effect of the counter
+>> changes.
+> 
+> For VHE we already do an isb in kvm_arm_vhe_guest_exit (next line of code
+> to kvm_arm_vhe_guest_exit).
+> 
+> For !VHE as I understand we will eret from EL2 (due to kvm_call_hyp call
+> completing) and thus also implicitly isb.
+> 
+> If that's correct we don't need to add any isb's right?
 
-[...]
-
-> >> > @@ -658,24 +662,60 @@ void __init sve_init_vq_map(void)
-> >> >   */
-> >> >  void sve_update_vq_map(void)
-> >> >  {
-> >> > -	sve_probe_vqs(sve_secondary_vq_map);
-> >> > -	bitmap_and(sve_vq_map, sve_vq_map, sve_secondary_vq_map, SVE_VQ_MA=
-X);
-> >> > +	sve_probe_vqs(sve_tmp_vq_map);
-> >> > +	bitmap_and(sve_vq_map, sve_vq_map, sve_tmp_vq_map,
-> >> > +		   SVE_VQ_MAX);
-> >> > +	bitmap_or(sve_vq_partial_map, sve_vq_partial_map, sve_tmp_vq_map,
-> >> > +		  SVE_VQ_MAX);
-> >> >  }
-> >>
-> >> I'm not quite following what's going on here. This is tracking both the
-> >> vector lengths available on all CPUs and the ones available on at least
-> >> one CPU? This raises a some questions:
-> >>
-> >>   - do such franken-machines exist or are expected to exit?
-> >
-> > no, and yes respectively (Linux does not endorse the latter for now,
-> > since it results in a non-SMP system: we hide the asymmetries where
-> > possible by clamping the set of available vector lengths, but for
-> > KVM it's too hard and we don't aim to support it at all).
-> >
-> > Even if we don't recommend deploying a general-purpose OS on such a
-> > system, people will eventually try it.  So it's better to fail safe
-> > rather than silently doing the wrong thing.
-> >
-> >>   - how do we ensure this is always upto date?
-> >
-> > This gets updated for each early secondary CPU that comes up.  (Early
-> > secondaries' boot is serialised, so we shouldn't have to worry about
-> > races here.)
-> >
-> > The configuration is frozen by the time we enter userspace (hence
-> > __ro_after_init).
-> >
-> > Once all the early secondaries have come up, we commit to the best
-> > possible set of vector lengths for the CPUs that we know about, and we
-> > don't call this path any more: instead, each late secondary goes into
-> > sve_verify_vq_map() instead to check that those CPUs are compatible
-> > with the configuration we committed to.
-> >
-> > For context, take a look at
-> > arch/arm64/kernel/cpufeature.c:check_local_cpu_capabilities(), which is
-> > the common entry point for all secondary CPUs: that splits into
-> > update_cpu_capabilities() and verify_local_cpu_capabilities() paths for
-> > the two cases described above, calling down into sve_update_vq_map()
-> > and sve_verify_vq_map() as appropriate.
-> >
-> >>   - what happens when we hotplug a new CPU with less available VQ?
-> >
-> > We reject the CPU and throw it back to the firmware (see
-> > cpufeature.c:verify_sve_features()).
-> >
-> > This follows the precedent already set in verify_local_cpu_capabilities=
-()
-> > etc.
-> =
-
-> I think a few words to that effect in the function comments would be
-> helpful:
-> =
-
->   /*
->    * sve_update_vq_map only cares about CPUs at boot time and is called
->    * serially for each one. Any CPUs added later via hotplug will fail
->    * at sve_verify_vq_map if they don't match what is detected here.
->    */
-
-Ack.  I might tweak the wording, but adding brief comments explaining
-when these functions are called is a good idea.
-
-> =
-
-> >
-> >>
-> >> >
-> >> >  /* Check whether the current CPU supports all VQs in the committed =
-set */
-> >> >  int sve_verify_vq_map(void)
-> >> >  {
-> >> > -	int ret =3D 0;
-> >> > +	int ret =3D -EINVAL;
-> >> > +	unsigned long b;
-> >> >
-> >> > -	sve_probe_vqs(sve_secondary_vq_map);
-> >> > -	bitmap_andnot(sve_secondary_vq_map, sve_vq_map, sve_secondary_vq_m=
-ap,
-> >> > -		      SVE_VQ_MAX);
-> >> > -	if (!bitmap_empty(sve_secondary_vq_map, SVE_VQ_MAX)) {
-> >> > +	sve_probe_vqs(sve_tmp_vq_map);
-> >> > +
-> >> > +	bitmap_complement(sve_tmp_vq_map, sve_tmp_vq_map, SVE_VQ_MAX);
-> >> > +	if (bitmap_intersects(sve_tmp_vq_map, sve_vq_map, SVE_VQ_MAX)) {
-> >> >  		pr_warn("SVE: cpu%d: Required vector length(s) missing\n",
-> >> >  			smp_processor_id());
-> >> > -		ret =3D -EINVAL;
-> >> > +		goto error;
-> >>
-> >> The use of goto seems a little premature considering we don't have any
-> >> clean-up to do.
-> >
-> > Hmm, this does look a little overengineered.  I think it may have been
-> > more complex during development (making the gotos less redundant), but
-> > to be honest I don't remember now.
-> >
-> > I'm happy to get rid of the rather pointless ret variable and replace
-> > all the gotos with returns if that works for you.
-> >
-> > What do you think?
-> =
-
-> Yes please, that would be cleaner.
-
-OK, good.
+Yes, you're right. May be it is worth mentioning it where we switch to
+host, so that we don't have to dig this again when we look at it later.
 
 Cheers
----Dave
+Suzuki
