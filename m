@@ -1,130 +1,148 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Fri, 16 Nov 2018 12:12:52 +0000
-Message-ID: <20181116121251.GE19420@e119886-lin.cambridge.arm.com>
-References: <1542286549-4501-1-git-send-email-andrew.murray@arm.com>
- <1542286549-4501-5-git-send-email-andrew.murray@arm.com>
- <79000795-971d-22fa-6264-f85f2d528477@arm.com>
- <20181115155742.GA19420@e119886-lin.cambridge.arm.com>
- <29cd37da-5ee9-545e-a456-b8811b0e063a@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH v2 06/23] arm64/sve: Check SVE virtualisability
+Date: Fri, 16 Nov 2018 12:32:18 +0000
+Message-ID: <87bm6pciel.fsf@linaro.org>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-7-git-send-email-Dave.Martin@arm.com>
+ <87in0ycpuy.fsf@linaro.org> <20181115170904.GO3505@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <29cd37da-5ee9-545e-a456-b8811b0e063a@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57CE14A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 07:32:22 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XKFd2jUOkcxT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Nov 2018 07:32:21 -0500 (EST)
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
+ [209.85.128.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7FD74A347
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 07:32:20 -0500 (EST)
+Received: by mail-wm1-f68.google.com with SMTP id f1-v6so884384wmg.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Nov 2018 04:32:20 -0800 (PST)
+In-reply-to: <20181115170904.GO3505@e103592.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 15, 2018 at 05:40:24PM +0000, Suzuki K Poulose wrote:
-> 
-> 
-> On 15/11/2018 15:57, Andrew Murray wrote:
-> > On Thu, Nov 15, 2018 at 02:00:39PM +0000, Julien Thierry wrote:
-> > > Hi Andrew,
-> > > 
-> > > On 15/11/18 12:55, Andrew Murray wrote:
-> > > > Enable/disable event counters as appropriate when entering and exiting
-> > > > the guest to enable support for guest or host only event counting.
-> > > > 
-> > > > For both VHE and non-VHE we switch the counters between host/guest at
-> > > > EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
-> > > > 
-> > > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > > ---
-> > > >    arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
-> > > >    1 file changed, 38 insertions(+)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > > > index d496ef5..ebf0aac 100644
-> > > > --- a/arch/arm64/kvm/hyp/switch.c
-> > > > +++ b/arch/arm64/kvm/hyp/switch.c
-> > > > @@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
-> > > >    	return true;
-> > > >    }
-> > > > +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-> > > > +{
-> > > > +	u32 host_only = host_ctxt->events_host_only;
-> > > > +	u32 guest_only = host_ctxt->events_guest_only;
-> > > > +
-> > > > +	if (host_only)
-> > > > +		write_sysreg(host_only, pmcntenclr_el0);
-> > > > +
-> > > > +	if (guest_only)
-> > > > +		write_sysreg(guest_only, pmcntenset_el0);
-> > > > +
-> > > > +	return (host_only || guest_only);
-> > > > +}
-> > > > +
-> > > > +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> > > > +{
-> > > > +	u32 host_only = host_ctxt->events_host_only;
-> > > > +	u32 guest_only = host_ctxt->events_guest_only;
-> > > > +
-> > > > +	if (guest_only)
-> > > > +		write_sysreg(guest_only, pmcntenclr_el0);
-> > > > +
-> > > > +	if (host_only)
-> > > > +		write_sysreg(host_only, pmcntenset_el0);
-> > > 
-> > > In the perf_event code, there is an ISB after enabling an event. I guess we
-> > > don't need it when setting the guest events since I believe the eret to the
-> > > guess give us the context synchronization. But don't we need one here when
-> > > restoring host only events?
-> > 
-> > It's not really clear to me why the isb is present in the existing code,
-> > this was only recently introduced when adding the chained events support.
-> > 
-> > Ideally for chained events you'd want to start the overflow counter first
-> > (idx) followed by the low counter second (idx-1) as to not miss overflows
-> > so an isb inbetween may be helpful. Though the isb is after both enables, this
-> > sets a clear line of where event counting starts - but ideally this would be
-> > symmetrical with an isb after the disable.
-> 
-> I think the isb() in the armv8_pmu_enable_event_counter() is
-> unnecessary, and might have been a left over from earlier versions
-> of the series. Please feel free to remove it.
-
-OK I'll do that.
-
-> 
-> > 
-> > At present chained counters aren't supported in the guest but in any case
-> > we turn them all on/off atomically rather than individually.
-> > 
-> > I guess we get a trivial gain in accuracy by adding ISB's at some performance
-> > cost - I'm not sure I see the benefit - unless I'm missing something?
-> 
-> But, I think Julien has a valid point here. When we modify the
-> pmcnten{set/clr} registers, the PMU could be enabled. (i.e, PMCR_E set).
-> 
-> So in order to synchronize the changes to the counters, we need an isb()
-> in the switch to host case to take immediate effect of the counter
-> changes.
-
-For VHE we already do an isb in kvm_arm_vhe_guest_exit (next line of code
-to kvm_arm_vhe_guest_exit).
-
-For !VHE as I understand we will eret from EL2 (due to kvm_call_hyp call
-completing) and thus also implicitly isb.
-
-If that's correct we don't need to add any isb's right?
-
-Thanks,
-
-Andrew Murray
-
-> 
-> Cheers
-> Suzuki
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgTm92
+IDE1LCAyMDE4IGF0IDAzOjM5OjAxUE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4KPj4g
+RGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+IHdyaXRlczoKPj4KPj4gPiBEdWUgdG8g
+dGhlIHdheSB0aGUgZWZmZWN0aXZlIFNWRSB2ZWN0b3IgbGVuZ3RoIGlzIGNvbnRyb2xsZWQgYW5k
+Cj4+ID4gdHJhcHBlZCBhdCBkaWZmZXJlbnQgZXhjZXB0aW9uIGxldmVscywgY2VydGFpbiBtaXNt
+YXRjaGVzIGluIHRoZQo+PiA+IHNldHMgb2YgdmVjdG9yIGxlbmd0aHMgc3VwcG9ydGVkIGJ5IGRp
+ZmZlcmVudCBwaHlzaWNhbCBDUFVzIGluIHRoZQo+PiA+IHN5c3RlbSBtYXkgcHJldmVudCBzdHJh
+aWdodGZvcndhcmQgdmlydHVhbGlzYXRpb24gb2YgU1ZFIGF0IHBhcml0eQo+PiA+IHdpdGggdGhl
+IGhvc3QuCj4+ID4KPj4gPiBUaGlzIHBhdGNoIGFuYWx5c2VzIHRoZSBleHRlbnQgdG8gd2hpY2gg
+U1ZFIGNhbiBiZSB2aXJ0dWFsaXNlZAo+PiA+IHNhZmVseSB3aXRob3V0IGludGVyZmVyaW5nIHdp
+dGggbWlncmF0aW9uIG9mIHZjcHVzIGJldHdlZW4gcGh5c2ljYWwKPj4gPiBDUFVzLCBhbmQgcmVq
+ZWN0cyBsYXRlIHNlY29uZGFyeSBDUFVzIHRoYXQgd291bGQgZXJvZGUgdGhlCj4+ID4gc2l0dWF0
+aW9uIGZ1cnRoZXIuCj4+ID4KPj4gPiBJdCBpcyBsZWZ0IHVwIHRvIEtWTSB0byBkZWNpZGUgd2hh
+dCB0byBkbyB3aXRoIHRoaXMgaW5mb3JtYXRpb24uCj4+ID4KPj4gPiBTaWduZWQtb2ZmLWJ5OiBE
+YXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPj4gPiAtLS0KPj4gPgo+PiA+IENoYW5n
+ZXMgc2luY2UgUkZDdjE6Cj4+ID4KPj4gPiAgKiBUaGUgYW5hbHlzaXMgZG9uZSBieSB0aGlzIHBh
+dGNoIGlzIHRoZSBzYW1lIGFzIGluIHRoZSBwcmV2aW91cwo+PiA+ICAgIHZlcnNpb24sIGJ1dCB0
+aGUgY29tbWl0IG1lc3NhZ2UgdGhlIHByaW50a3MgZXRjLiBoYXZlIGJlZW4gcmV3b3JkZWQKPj4g
+PiAgICB0byBhdm9pZCB0aGUgc3VnZ2VzdGlvbiB0aGF0IEtWTSBpcyBleHBlY3RlZCB0byB3b3Jr
+IG9uIGEgc3lzdGVtIHdpdGgKPj4gPiAgICBtaXNtYXRjaGVkIFNWRSBpbXBsZW1lbnRhdGlvbnMu
+Cj4+ID4gLS0tCj4+ID4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggfCAgMSArCj4+
+ID4gIGFyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUuYyAgfCAgMiArLQo+PiA+ICBhcmNoL2Fy
+bTY0L2tlcm5lbC9mcHNpbWQuYyAgICAgIHwgODcgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKystLS0tLS0KPj4gPiAgMyBmaWxlcyBjaGFuZ2VkLCA3NiBpbnNlcnRpb25zKCspLCAx
+NCBkZWxldGlvbnMoLSkKPj4gPgo+Cj4gWy4uLl0KPgo+PiA+IGRpZmYgLS1naXQgYS9hcmNoL2Fy
+bTY0L2tlcm5lbC9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4KPiBbLi4u
+XQo+Cj4+ID4gQEAgLTYyMywxMSArNjI5LDggQEAgaW50IHN2ZV9nZXRfY3VycmVudF92bCh2b2lk
+KQo+Cj4gWy4uLl0KPgo+PiA+ICsvKiBCaXRtYXBzIGZvciB0ZW1wb3Jhcnkgc3RvcmFnZSBkdXJp
+bmcgbWFuaXB1bGF0aW9uIG9mIHZlY3RvciBsZW5ndGggc2V0cyAqLwo+PiA+ICtzdGF0aWMgREVD
+TEFSRV9CSVRNQVAoc3ZlX3RtcF92cV9tYXAsIFNWRV9WUV9NQVgpOwo+Pgo+PiBUaGlzIHNlZW1z
+IG9kZCBhcyBhIGxvY2FsIGdsb2JhbCwgd2h5IG5vdCBkZWNsYXJlZCBsb2NhbGx5IHdoZW4gdXNl
+ZD8KPgo+IENvdWxkIGRvLgo+Cj4gTXkgb3JpZ2luYWwgY29uY2VybiB3YXMgdGhhdCB0aGlzIGlz
+ICJiaWciIGFuZCB0aGVyZWZvcmUgaXQncyBpbXBvbGl0ZQo+IHRvIGFsbG9jYXRlIGl0IG9uIHRo
+ZSBzdGFjay4KPgo+IEJ1dCBvbiByZWZsZWN0aW9uLCA2NCBieXRlcyBvZiBzdGFjayBpcyBubyBi
+aWcgZGVhbCBmb3IgYSA2NC1iaXQKPiBhcmNoaXRlY3R1cmUuICBUaGUgYWZmZWN0ZWQgZnVuY3Rp
+b25zIHByb2JhYmx5IHNwaWxsIG1vcmUgdGhhbiB0aGFuCj4gYWxyZWFkeSwgYW5kIHRoZXNlIGZ1
+bmN0aW9ucyBhcmUgY2FsbGVkIG9uIHdlbGwtZGVmaW5lZCBwYXRocyB3aGljaAo+IHNob3VsZG4n
+dCBoYXZlIHN1cGVyLWRlZXAgc3RhY2tzIGFscmVhZHkuCj4KPiBbLi4uXQo+Cj4+ID4gQEAgLTY1
+OCwyNCArNjYyLDYwIEBAIHZvaWQgX19pbml0IHN2ZV9pbml0X3ZxX21hcCh2b2lkKQo+PiA+ICAg
+Ki8KPj4gPiAgdm9pZCBzdmVfdXBkYXRlX3ZxX21hcCh2b2lkKQo+PiA+ICB7Cj4+ID4gLQlzdmVf
+cHJvYmVfdnFzKHN2ZV9zZWNvbmRhcnlfdnFfbWFwKTsKPj4gPiAtCWJpdG1hcF9hbmQoc3ZlX3Zx
+X21hcCwgc3ZlX3ZxX21hcCwgc3ZlX3NlY29uZGFyeV92cV9tYXAsIFNWRV9WUV9NQVgpOwo+PiA+
+ICsJc3ZlX3Byb2JlX3ZxcyhzdmVfdG1wX3ZxX21hcCk7Cj4+ID4gKwliaXRtYXBfYW5kKHN2ZV92
+cV9tYXAsIHN2ZV92cV9tYXAsIHN2ZV90bXBfdnFfbWFwLAo+PiA+ICsJCSAgIFNWRV9WUV9NQVgp
+Owo+PiA+ICsJYml0bWFwX29yKHN2ZV92cV9wYXJ0aWFsX21hcCwgc3ZlX3ZxX3BhcnRpYWxfbWFw
+LCBzdmVfdG1wX3ZxX21hcCwKPj4gPiArCQkgIFNWRV9WUV9NQVgpOwo+PiA+ICB9Cj4+Cj4+IEkn
+bSBub3QgcXVpdGUgZm9sbG93aW5nIHdoYXQncyBnb2luZyBvbiBoZXJlLiBUaGlzIGlzIHRyYWNr
+aW5nIGJvdGggdGhlCj4+IHZlY3RvciBsZW5ndGhzIGF2YWlsYWJsZSBvbiBhbGwgQ1BVcyBhbmQg
+dGhlIG9uZXMgYXZhaWxhYmxlIG9uIGF0IGxlYXN0Cj4+IG9uZSBDUFU/IFRoaXMgcmFpc2VzIGEg
+c29tZSBxdWVzdGlvbnM6Cj4+Cj4+ICAgLSBkbyBzdWNoIGZyYW5rZW4tbWFjaGluZXMgZXhpc3Qg
+b3IgYXJlIGV4cGVjdGVkIHRvIGV4aXQ/Cj4KPiBubywgYW5kIHllcyByZXNwZWN0aXZlbHkgKExp
+bnV4IGRvZXMgbm90IGVuZG9yc2UgdGhlIGxhdHRlciBmb3Igbm93LAo+IHNpbmNlIGl0IHJlc3Vs
+dHMgaW4gYSBub24tU01QIHN5c3RlbTogd2UgaGlkZSB0aGUgYXN5bW1ldHJpZXMgd2hlcmUKPiBw
+b3NzaWJsZSBieSBjbGFtcGluZyB0aGUgc2V0IG9mIGF2YWlsYWJsZSB2ZWN0b3IgbGVuZ3Rocywg
+YnV0IGZvcgo+IEtWTSBpdCdzIHRvbyBoYXJkIGFuZCB3ZSBkb24ndCBhaW0gdG8gc3VwcG9ydCBp
+dCBhdCBhbGwpLgo+Cj4gRXZlbiBpZiB3ZSBkb24ndCByZWNvbW1lbmQgZGVwbG95aW5nIGEgZ2Vu
+ZXJhbC1wdXJwb3NlIE9TIG9uIHN1Y2ggYQo+IHN5c3RlbSwgcGVvcGxlIHdpbGwgZXZlbnR1YWxs
+eSB0cnkgaXQuICBTbyBpdCdzIGJldHRlciB0byBmYWlsIHNhZmUKPiByYXRoZXIgdGhhbiBzaWxl
+bnRseSBkb2luZyB0aGUgd3JvbmcgdGhpbmcuCj4KPj4gICAtIGhvdyBkbyB3ZSBlbnN1cmUgdGhp
+cyBpcyBhbHdheXMgdXB0byBkYXRlPwo+Cj4gVGhpcyBnZXRzIHVwZGF0ZWQgZm9yIGVhY2ggZWFy
+bHkgc2Vjb25kYXJ5IENQVSB0aGF0IGNvbWVzIHVwLiAgKEVhcmx5Cj4gc2Vjb25kYXJpZXMnIGJv
+b3QgaXMgc2VyaWFsaXNlZCwgc28gd2Ugc2hvdWxkbid0IGhhdmUgdG8gd29ycnkgYWJvdXQKPiBy
+YWNlcyBoZXJlLikKPgo+IFRoZSBjb25maWd1cmF0aW9uIGlzIGZyb3plbiBieSB0aGUgdGltZSB3
+ZSBlbnRlciB1c2Vyc3BhY2UgKGhlbmNlCj4gX19yb19hZnRlcl9pbml0KS4KPgo+IE9uY2UgYWxs
+IHRoZSBlYXJseSBzZWNvbmRhcmllcyBoYXZlIGNvbWUgdXAsIHdlIGNvbW1pdCB0byB0aGUgYmVz
+dAo+IHBvc3NpYmxlIHNldCBvZiB2ZWN0b3IgbGVuZ3RocyBmb3IgdGhlIENQVXMgdGhhdCB3ZSBr
+bm93IGFib3V0LCBhbmQgd2UKPiBkb24ndCBjYWxsIHRoaXMgcGF0aCBhbnkgbW9yZTogaW5zdGVh
+ZCwgZWFjaCBsYXRlIHNlY29uZGFyeSBnb2VzIGludG8KPiBzdmVfdmVyaWZ5X3ZxX21hcCgpIGlu
+c3RlYWQgdG8gY2hlY2sgdGhhdCB0aG9zZSBDUFVzIGFyZSBjb21wYXRpYmxlCj4gd2l0aCB0aGUg
+Y29uZmlndXJhdGlvbiB3ZSBjb21taXR0ZWQgdG8uCj4KPiBGb3IgY29udGV4dCwgdGFrZSBhIGxv
+b2sgYXQKPiBhcmNoL2FybTY0L2tlcm5lbC9jcHVmZWF0dXJlLmM6Y2hlY2tfbG9jYWxfY3B1X2Nh
+cGFiaWxpdGllcygpLCB3aGljaCBpcwo+IHRoZSBjb21tb24gZW50cnkgcG9pbnQgZm9yIGFsbCBz
+ZWNvbmRhcnkgQ1BVczogdGhhdCBzcGxpdHMgaW50bwo+IHVwZGF0ZV9jcHVfY2FwYWJpbGl0aWVz
+KCkgYW5kIHZlcmlmeV9sb2NhbF9jcHVfY2FwYWJpbGl0aWVzKCkgcGF0aHMgZm9yCj4gdGhlIHR3
+byBjYXNlcyBkZXNjcmliZWQgYWJvdmUsIGNhbGxpbmcgZG93biBpbnRvIHN2ZV91cGRhdGVfdnFf
+bWFwKCkKPiBhbmQgc3ZlX3ZlcmlmeV92cV9tYXAoKSBhcyBhcHByb3ByaWF0ZS4KPgo+PiAgIC0g
+d2hhdCBoYXBwZW5zIHdoZW4gd2UgaG90cGx1ZyBhIG5ldyBDUFUgd2l0aCBsZXNzIGF2YWlsYWJs
+ZSBWUT8KPgo+IFdlIHJlamVjdCB0aGUgQ1BVIGFuZCB0aHJvdyBpdCBiYWNrIHRvIHRoZSBmaXJt
+d2FyZSAoc2VlCj4gY3B1ZmVhdHVyZS5jOnZlcmlmeV9zdmVfZmVhdHVyZXMoKSkuCj4KPiBUaGlz
+IGZvbGxvd3MgdGhlIHByZWNlZGVudCBhbHJlYWR5IHNldCBpbiB2ZXJpZnlfbG9jYWxfY3B1X2Nh
+cGFiaWxpdGllcygpCj4gZXRjLgoKSSB0aGluayBhIGZldyB3b3JkcyB0byB0aGF0IGVmZmVjdCBp
+biB0aGUgZnVuY3Rpb24gY29tbWVudHMgd291bGQgYmUKaGVscGZ1bDoKCiAgLyoKICAgKiBzdmVf
+dXBkYXRlX3ZxX21hcCBvbmx5IGNhcmVzIGFib3V0IENQVXMgYXQgYm9vdCB0aW1lIGFuZCBpcyBj
+YWxsZWQKICAgKiBzZXJpYWxseSBmb3IgZWFjaCBvbmUuIEFueSBDUFVzIGFkZGVkIGxhdGVyIHZp
+YSBob3RwbHVnIHdpbGwgZmFpbAogICAqIGF0IHN2ZV92ZXJpZnlfdnFfbWFwIGlmIHRoZXkgZG9u
+J3QgbWF0Y2ggd2hhdCBpcyBkZXRlY3RlZCBoZXJlLgogICAqLwoKPgo+Pgo+PiA+Cj4+ID4gIC8q
+IENoZWNrIHdoZXRoZXIgdGhlIGN1cnJlbnQgQ1BVIHN1cHBvcnRzIGFsbCBWUXMgaW4gdGhlIGNv
+bW1pdHRlZCBzZXQgKi8KPj4gPiAgaW50IHN2ZV92ZXJpZnlfdnFfbWFwKHZvaWQpCj4+ID4gIHsK
+Pj4gPiAtCWludCByZXQgPSAwOwo+PiA+ICsJaW50IHJldCA9IC1FSU5WQUw7Cj4+ID4gKwl1bnNp
+Z25lZCBsb25nIGI7Cj4+ID4KPj4gPiAtCXN2ZV9wcm9iZV92cXMoc3ZlX3NlY29uZGFyeV92cV9t
+YXApOwo+PiA+IC0JYml0bWFwX2FuZG5vdChzdmVfc2Vjb25kYXJ5X3ZxX21hcCwgc3ZlX3ZxX21h
+cCwgc3ZlX3NlY29uZGFyeV92cV9tYXAsCj4+ID4gLQkJICAgICAgU1ZFX1ZRX01BWCk7Cj4+ID4g
+LQlpZiAoIWJpdG1hcF9lbXB0eShzdmVfc2Vjb25kYXJ5X3ZxX21hcCwgU1ZFX1ZRX01BWCkpIHsK
+Pj4gPiArCXN2ZV9wcm9iZV92cXMoc3ZlX3RtcF92cV9tYXApOwo+PiA+ICsKPj4gPiArCWJpdG1h
+cF9jb21wbGVtZW50KHN2ZV90bXBfdnFfbWFwLCBzdmVfdG1wX3ZxX21hcCwgU1ZFX1ZRX01BWCk7
+Cj4+ID4gKwlpZiAoYml0bWFwX2ludGVyc2VjdHMoc3ZlX3RtcF92cV9tYXAsIHN2ZV92cV9tYXAs
+IFNWRV9WUV9NQVgpKSB7Cj4+ID4gIAkJcHJfd2FybigiU1ZFOiBjcHUlZDogUmVxdWlyZWQgdmVj
+dG9yIGxlbmd0aChzKSBtaXNzaW5nXG4iLAo+PiA+ICAJCQlzbXBfcHJvY2Vzc29yX2lkKCkpOwo+
+PiA+IC0JCXJldCA9IC1FSU5WQUw7Cj4+ID4gKwkJZ290byBlcnJvcjsKPj4KPj4gVGhlIHVzZSBv
+ZiBnb3RvIHNlZW1zIGEgbGl0dGxlIHByZW1hdHVyZSBjb25zaWRlcmluZyB3ZSBkb24ndCBoYXZl
+IGFueQo+PiBjbGVhbi11cCB0byBkby4KPgo+IEhtbSwgdGhpcyBkb2VzIGxvb2sgYSBsaXR0bGUg
+b3ZlcmVuZ2luZWVyZWQuICBJIHRoaW5rIGl0IG1heSBoYXZlIGJlZW4KPiBtb3JlIGNvbXBsZXgg
+ZHVyaW5nIGRldmVsb3BtZW50IChtYWtpbmcgdGhlIGdvdG9zIGxlc3MgcmVkdW5kYW50KSwgYnV0
+Cj4gdG8gYmUgaG9uZXN0IEkgZG9uJ3QgcmVtZW1iZXIgbm93Lgo+Cj4gSSdtIGhhcHB5IHRvIGdl
+dCByaWQgb2YgdGhlIHJhdGhlciBwb2ludGxlc3MgcmV0IHZhcmlhYmxlIGFuZCByZXBsYWNlCj4g
+YWxsIHRoZSBnb3RvcyB3aXRoIHJldHVybnMgaWYgdGhhdCB3b3JrcyBmb3IgeW91Lgo+Cj4gV2hh
+dCBkbyB5b3UgdGhpbms/CgpZZXMgcGxlYXNlLCB0aGF0IHdvdWxkIGJlIGNsZWFuZXIuCgotLQpB
+bGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
+Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
