@@ -1,36 +1,18 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
-Date: Mon, 19 Nov 2018 09:26:03 +0000
-Message-ID: <c259e853-3d0c-1046-f576-fe28ead58ee8@arm.com>
+Date: Mon, 19 Nov 2018 12:49:34 +0000
+Message-ID: <01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com>
 References: <851b61b1-786b-ef64-b8c4-fe6926bdf9f9@arm.com>
  <201811171058376326562@zte.com.cn> <20181119091020.ejplmzkzo4jd72md@salmiak>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12ED34A2E7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Nov 2018 04:26:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e0yVJKE30bAf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Nov 2018 04:26:07 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 823824A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Nov 2018 04:26:07 -0500 (EST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181119091020.ejplmzkzo4jd72md@salmiak>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>, peng.hao2@zte.com.cn
-Cc: andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
+To: peng.hao2@zte.com.cn
+Cc: Mark Rutland <mark.rutland@arm.com>, julien.thierry@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, ard.bieshseuvel@linaro.org, leif.lindholm@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 19/11/2018 09:10, Mark Rutland wrote:
@@ -109,13 +91,18 @@ On 19/11/2018 09:10, Mark Rutland wrote:
 > 
 > The commit messages notes this lead to a boot-time hang.
 
-I doubt it. The EDK2 bug resulted in no interrupt being delivered due to
-the group being set to 1, and the interrupt being acknowledged through
-the Group0 accessor. Also, this was a 32bit special, and 64bit EDK2 was
-just fine.
+I managed to trigger an issue with a really old EFI implementation that
+doesn't configure its interrupts as Group1, and yet tries to ACK its
+interrupts using the Group1 accessor. Guess what? It is not going to work.
 
-What Peng describes here is the guest writing the group as 0, which
-doesn't make much sense (I certainly don't see EDK2 doing that).
+Commit c7fefb690661f2e38afcb8200bd318ecf38ab961 in the edk2 tree seems
+to be the fix (I only assume it does, I haven't actually checked). A
+recent build, as found in Debian Buster, works perfectly (tested with
+both QEMU v2.12 and tip of tree).
+
+Now, I really don't get what you're saying about Linux not getting
+interrupts. How do you get to booting Linux if EFI is not making any
+forward progress? Are you trying them independently?
 
 Thanks,
 
