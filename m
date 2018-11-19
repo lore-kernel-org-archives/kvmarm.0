@@ -1,49 +1,86 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH 0/4] KVM: arm/arm64: vgic: Use raw_spinlock for locks taken in IRQ context
-Date: Mon, 19 Nov 2018 17:07:55 +0000
-Message-ID: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock() with IRQs disabled
+Date: Mon, 19 Nov 2018 17:07:56 +0000
+Message-ID: <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
+References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, Christoffer.Dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, Julien Thierry <julien.thierry@arm.com>
+Cc: marc.zyngier@arm.com, Christoffer.Dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-While testing KVM running on PREEMPT_RT, starting guest could simply
-freeze the machine. This is because we are using spinlocks for VGIC
-locks, which is invalid in the VGIC case since the locks must be take
-with interrupts disabled.
+To change the active state of an MMIO, halt is requested for all vcpus of
+the affected guest before modifying the IRQ state. This is done by calling
+cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
+disabled at this point and running a vcpu cannot get rescheduled.
 
-The solution is to use raw_spinlock instead of spinlocks.
+Solve this by waiting for all vcpus to be halted after emmiting the halt
+request.
 
-Replacing those locks also highlighted an issue where we attempt to
-cond_resched with interrupts disabled.
+Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
+Factor out functionality to get vgic mmio requester_vcpu")
 
-Patch 1 fixes the cond_resched issue.
-Patch 2-4 replace the VGIC spinlocks with raw_spinlocks
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: stable@vger.kernel.org
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
+ 1 file changed, 11 insertions(+), 22 deletions(-)
 
-Cheers,
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index f56ff1c..eefd877 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
 
-Julien
+ 	spin_lock_irqsave(&irq->irq_lock, flags);
 
--->
+-	/*
+-	 * If this virtual IRQ was written into a list register, we
+-	 * have to make sure the CPU that runs the VCPU thread has
+-	 * synced back the LR state to the struct vgic_irq.
+-	 *
+-	 * As long as the conditions below are true, we know the VCPU thread
+-	 * may be on its way back from the guest (we kicked the VCPU thread in
+-	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
+-	 * so we release and re-acquire the spin_lock to let the other thread
+-	 * sync back the IRQ.
+-	 *
+-	 * When accessing VGIC state from user space, requester_vcpu is
+-	 * NULL, which is fine, because we guarantee that no VCPUs are running
+-	 * when accessing VGIC state from user space so irq->vcpu->cpu is
+-	 * always -1.
+-	 */
+-	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+-	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
+-	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+-		cond_resched_lock(&irq->irq_lock);
+-
+ 	if (irq->hw) {
+ 		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
+ 	} else {
+@@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+  */
+ static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ {
+-	if (intid > VGIC_NR_PRIVATE_IRQS)
++	if (intid > VGIC_NR_PRIVATE_IRQS) {
++		struct kvm_vcpu *tmp;
++		int i;
++
+ 		kvm_arm_halt_guest(vcpu->kvm);
++
++		/* Wait for each vcpu to be halted */
++		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
++			while (tmp->cpu != -1)
++				cond_resched();
++		}
++	}
+ }
 
-Julien Thierry (4):
-  KVM: arm/arm64: vgic: Do not cond_resched_lock() with IRQs disabled
-  KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock
-  KVM: arm/arm64: vgic: Make vgic_dist->lpi_list_lock a raw_spinlock
-  KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a raw_spinlock
-
- include/kvm/arm_vgic.h           |   6 +-
- virt/kvm/arm/vgic/vgic-debug.c   |   4 +-
- virt/kvm/arm/vgic/vgic-init.c    |   8 +--
- virt/kvm/arm/vgic/vgic-its.c     |  22 +++----
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  14 ++---
- virt/kvm/arm/vgic/vgic-mmio-v3.c |  12 ++--
- virt/kvm/arm/vgic/vgic-mmio.c    |  67 +++++++++-----------
- virt/kvm/arm/vgic/vgic-v2.c      |   4 +-
- virt/kvm/arm/vgic/vgic-v3.c      |   8 +--
- virt/kvm/arm/vgic/vgic.c         | 130 +++++++++++++++++++--------------------
- 10 files changed, 132 insertions(+), 143 deletions(-)
-
+ /* See vgic_change_active_prepare */
 --
 1.9.1
