@@ -1,86 +1,210 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock() with IRQs disabled
-Date: Mon, 19 Nov 2018 17:07:56 +0000
-Message-ID: <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH 4/4] KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a raw_spinlock
+Date: Mon, 19 Nov 2018 17:07:59 +0000
+Message-ID: <1542647279-46609-5-git-send-email-julien.thierry@arm.com>
 References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, Christoffer.Dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, stable@vger.kernel.org
+Cc: marc.zyngier@arm.com, Christoffer.Dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To change the active state of an MMIO, halt is requested for all vcpus of
-the affected guest before modifying the IRQ state. This is done by calling
-cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
-disabled at this point and running a vcpu cannot get rescheduled.
+vgic_cpu->ap_list_lock must always be taken with interrupts disabled as
+it is used in interrupt context.
 
-Solve this by waiting for all vcpus to be halted after emmiting the halt
-request.
-
-Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
-Factor out functionality to get vgic mmio requester_vcpu")
+For configurations such as PREEMPT_RT_FULL, this means that it should
+be a raw_spinlock since RT spinlocks are interruptible.
 
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: stable@vger.kernel.org
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
- 1 file changed, 11 insertions(+), 22 deletions(-)
+ include/kvm/arm_vgic.h        |  2 +-
+ virt/kvm/arm/vgic/vgic-init.c |  2 +-
+ virt/kvm/arm/vgic/vgic.c      | 43 ++++++++++++++++++++++---------------------
+ 3 files changed, 24 insertions(+), 23 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index f56ff1c..eefd877 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 32954e1..c36c86f 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -307,7 +307,7 @@ struct vgic_cpu {
+ 	unsigned int used_lrs;
+ 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
 
- 	spin_lock_irqsave(&irq->irq_lock, flags);
+-	spinlock_t ap_list_lock;	/* Protects the ap_list */
++	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
 
--	/*
--	 * If this virtual IRQ was written into a list register, we
--	 * have to make sure the CPU that runs the VCPU thread has
--	 * synced back the LR state to the struct vgic_irq.
--	 *
--	 * As long as the conditions below are true, we know the VCPU thread
--	 * may be on its way back from the guest (we kicked the VCPU thread in
--	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
--	 * so we release and re-acquire the spin_lock to let the other thread
--	 * sync back the IRQ.
--	 *
--	 * When accessing VGIC state from user space, requester_vcpu is
--	 * NULL, which is fine, because we guarantee that no VCPUs are running
--	 * when accessing VGIC state from user space so irq->vcpu->cpu is
--	 * always -1.
--	 */
--	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
--	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
--	       irq->vcpu->cpu != -1) /* VCPU thread is running */
--		cond_resched_lock(&irq->irq_lock);
--
- 	if (irq->hw) {
- 		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
- 	} else {
-@@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+ 	/*
+ 	 * List of IRQs that this VCPU should consider because they are either
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 330c1ad..dfbfcb1 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -206,7 +206,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
+
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+-	spin_lock_init(&vgic_cpu->ap_list_lock);
++	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
+
+ 	/*
+ 	 * Enable and configure all SGIs to be edge-triggered and
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 01bd18c..736ae59 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -54,11 +54,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * When taking more than one ap_list_lock at the same time, always take the
+  * lowest numbered VCPU's ap_list_lock first, so:
+  *   vcpuX->vcpu_id < vcpuY->vcpu_id:
+- *     spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
+- *     spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
++ *     raw_spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
++ *     raw_spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
+  *
+  * Since the VGIC must support injecting virtual interrupts from ISRs, we have
+- * to use the spin_lock_irqsave/spin_unlock_irqrestore versions of outer
++ * to use the raw_spin_lock_irqsave/raw_spin_unlock_irqrestore versions of outer
+  * spinlocks for any lock that may be taken while injecting an interrupt.
   */
- static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+
+@@ -273,7 +273,7 @@ static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
  {
--	if (intid > VGIC_NR_PRIVATE_IRQS)
-+	if (intid > VGIC_NR_PRIVATE_IRQS) {
-+		struct kvm_vcpu *tmp;
-+		int i;
-+
- 		kvm_arm_halt_guest(vcpu->kvm);
-+
-+		/* Wait for each vcpu to be halted */
-+		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-+			while (tmp->cpu != -1)
-+				cond_resched();
-+		}
-+	}
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	DEBUG_SPINLOCK_BUG_ON(!raw_spin_is_locked(&vgic_cpu->ap_list_lock));
+
+ 	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
+ }
+@@ -351,7 +351,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+
+ 	/* someone can do stuff here, which we re-check below */
+
+-	spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+ 	raw_spin_lock(&irq->irq_lock);
+
+ 	/*
+@@ -368,7 +368,8 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+
+ 	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
++					   flags);
+
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 		goto retry;
+@@ -383,7 +384,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 	irq->vcpu = vcpu;
+
+ 	raw_spin_unlock(&irq->irq_lock);
+-	spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+
+ 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+@@ -597,7 +598,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+
+ retry:
+-	spin_lock(&vgic_cpu->ap_list_lock);
++	raw_spin_lock(&vgic_cpu->ap_list_lock);
+
+ 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+ 		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
+@@ -638,7 +639,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		/* This interrupt looks like it has to be migrated. */
+
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock(&vgic_cpu->ap_list_lock);
++		raw_spin_unlock(&vgic_cpu->ap_list_lock);
+
+ 		/*
+ 		 * Ensure locking order by always locking the smallest
+@@ -652,9 +653,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 			vcpuB = vcpu;
+ 		}
+
+-		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
+-		spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
+-				 SINGLE_DEPTH_NESTING);
++		raw_spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
++		raw_spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
++				      SINGLE_DEPTH_NESTING);
+ 		raw_spin_lock(&irq->irq_lock);
+
+ 		/*
+@@ -676,8 +677,8 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		}
+
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
+-		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
++		raw_spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
++		raw_spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
+
+ 		if (target_vcpu_needs_kick) {
+ 			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
+@@ -687,7 +688,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		goto retry;
+ 	}
+
+-	spin_unlock(&vgic_cpu->ap_list_lock);
++	raw_spin_unlock(&vgic_cpu->ap_list_lock);
  }
 
- /* See vgic_change_active_prepare */
+ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+@@ -736,7 +737,7 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
+
+ 	*multi_sgi = false;
+
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	DEBUG_SPINLOCK_BUG_ON(!raw_spin_is_locked(&vgic_cpu->ap_list_lock));
+
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		int w;
+@@ -761,7 +762,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	bool multi_sgi;
+ 	u8 prio = 0xff;
+
+-	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vgic_cpu->ap_list_lock));
++	DEBUG_SPINLOCK_BUG_ON(!raw_spin_is_locked(&vgic_cpu->ap_list_lock));
+
+ 	count = compute_ap_list_depth(vcpu, &multi_sgi);
+ 	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
+@@ -872,9 +873,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+
+-	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 	vgic_flush_lr_state(vcpu);
+-	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+
+ 	if (can_access_vgic_from_kernel())
+ 		vgic_restore_state(vcpu);
+@@ -915,7 +916,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
+ 		return true;
+
+-	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
++	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		raw_spin_lock(&irq->irq_lock);
+@@ -926,7 +927,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 			break;
+ 	}
+
+-	spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
++	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
+
+ 	return pending;
+ }
 --
 1.9.1
