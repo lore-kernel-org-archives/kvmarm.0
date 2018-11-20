@@ -1,113 +1,107 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock() with
- IRQs disabled
-Date: Tue, 20 Nov 2018 17:22:39 +0000
-Message-ID: <76a488a9-893c-ffbe-16f2-23735af8126a@arm.com>
-References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
- <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
- <20181120141832.GA11162@e113682-lin.lund.arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: Re: [PATCH v4 5/7] iommu: Add virtio-iommu driver
+Date: Tue, 20 Nov 2018 17:30:45 +0000
+Message-ID: <6d003fde-9574-0ff9-0bf8-7901d1a4aa5c@arm.com>
+References: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
+ <20181115165234.43990-6-jean-philippe.brucker@arm.com>
+ <64abfb83-c555-c518-1030-cb73846517fc@redhat.com>
+ <41460260-417b-762f-f007-ccfd5ac1e8a5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20181120141832.GA11162@e113682-lin.lund.arm.com>
+Return-path: <virtio-dev-return-4979-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <41460260-417b-762f-f007-ccfd5ac1e8a5@arm.com>
 Content-Language: en-US
-Sender: stable-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, stable@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "joro@8bytes.org" <joro@8bytes.org>, "mst@redhat.com" <mst@redhat.com>
+Cc: Mark Rutland <Mark.Rutland@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, Will Deacon <Will.Deacon@arm.com>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 16/11/2018 18:46, Jean-Philippe Brucker wrote:
+>>> +/*
+>>> + * __viommu_sync_req - Complete all in-flight requests
+>>> + *
+>>> + * Wait for all added requests to complete. When this function returns, all
+>>> + * requests that were in-flight at the time of the call have completed.
+>>> + */
+>>> +static int __viommu_sync_req(struct viommu_dev *viommu)
+>>> +{
+>>> +	int ret = 0;
+>>> +	unsigned int len;
+>>> +	size_t write_len;
+>>> +	struct viommu_request *req;
+>>> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+>>> +
+>>> +	assert_spin_locked(&viommu->request_lock);
+>>> +
+>>> +	virtqueue_kick(vq);
+>>> +
+>>> +	while (!list_empty(&viommu->requests)) {
+>>> +		len = 0;
+>>> +		req = virtqueue_get_buf(vq, &len);
+>>> +		if (!req)
+>>> +			continue;
+>>> +
+>>> +		if (!len)
+>>> +			viommu_set_req_status(req->buf, req->len,
+>>> +					      VIRTIO_IOMMU_S_IOERR);
+>>> +
+>>> +		write_len = req->len - req->write_offset;
+>>> +		if (req->writeback && len >= write_len)
+>> I don't get "len >= write_len". Is it valid for the device to write more
+>> than write_len? If it writes less than write_len, the status is not set,
+>> is it?
 
+Actually, len could well be three bytes smaller than write_len. The spec
+doesn't require the device to write the three padding bytes in
+virtio_iommu_req_tail, after the status byte.
 
-On 20/11/18 14:18, Christoffer Dall wrote:
-> On Mon, Nov 19, 2018 at 05:07:56PM +0000, Julien Thierry wrote:
->> To change the active state of an MMIO, halt is requested for all vcpus of
->> the affected guest before modifying the IRQ state. This is done by calling
->> cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
->> disabled at this point and running a vcpu cannot get rescheduled.
+Here the driver just assumes that the device wrote the reserved field.
+The QEMU device seems to write uninitialized data in there...
+
+Any objection to changing the spec to require the device to initialize
+those bytes to zero? I think it makes things nicer overall and shouldn't
+have any performance impact.
+
+[...]
+>>> +static struct iommu_domain *viommu_domain_alloc(unsigned type)
+>>> +{
+>>> +	struct viommu_domain *vdomain;
+>>> +
+>>> +	if (type != IOMMU_DOMAIN_UNMANAGED && type != IOMMU_DOMAIN_DMA)
+>> smmu drivers also support the IDENTITY type. Don't we want to support it
+>> as well?
 > 
-> "running a vcpu cannot get rescheduled" ?
-
-Yes, that doesn't make much sense :\ . I guess I just meant "a vcpu 
-cannot get rescheduled on this cpu".
-
-I'll rewrite this.
-
+> Eventually yes. The IDENTITY domain is useful when an IOMMU has been
+> forced upon you and gets in the way of performance, in which case you
+> get rid of it with CONFIG_IOMMU_DEFAULT_PASSTHROUGH=y or
+> iommu.passthrough=y. For virtio-iommu though, you could simply not
+> instantiate the device.
 > 
->>
->> Solve this by waiting for all vcpus to be halted after emmiting the halt
->> request.
->>
->> Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
->> Factor out functionality to get vgic mmio requester_vcpu")
->>
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: stable@vger.kernel.org
->> ---
->>   virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
->>   1 file changed, 11 insertions(+), 22 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->> index f56ff1c..eefd877 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>
->>   	spin_lock_irqsave(&irq->irq_lock, flags);
->>
->> -	/*
->> -	 * If this virtual IRQ was written into a list register, we
->> -	 * have to make sure the CPU that runs the VCPU thread has
->> -	 * synced back the LR state to the struct vgic_irq.
->> -	 *
->> -	 * As long as the conditions below are true, we know the VCPU thread
->> -	 * may be on its way back from the guest (we kicked the VCPU thread in
->> -	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
->> -	 * so we release and re-acquire the spin_lock to let the other thread
->> -	 * sync back the IRQ.
->> -	 *
->> -	 * When accessing VGIC state from user space, requester_vcpu is
->> -	 * NULL, which is fine, because we guarantee that no VCPUs are running
->> -	 * when accessing VGIC state from user space so irq->vcpu->cpu is
->> -	 * always -1.
->> -	 */
->> -	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
->> -	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
->> -	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->> -		cond_resched_lock(&irq->irq_lock);
->> -
->>   	if (irq->hw) {
->>   		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
->>   	} else {
->> @@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>    */
->>   static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
->>   {
->> -	if (intid > VGIC_NR_PRIVATE_IRQS)
->> +	if (intid > VGIC_NR_PRIVATE_IRQS) {
->> +		struct kvm_vcpu *tmp;
->> +		int i;
->> +
->>   		kvm_arm_halt_guest(vcpu->kvm);
->> +
->> +		/* Wait for each vcpu to be halted */
->> +		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
->> +			while (tmp->cpu != -1)
->> +				cond_resched();
-> 
-> We used to have something like this which Andre then found out it could
-> deadlock the system, because the VCPU making this request wouldn't have
-> called kvm_arch_vcpu_put, and its cpu value would still have a value.
-> 
-> That's why we have the vcpu && vcpu != requester check.
-> 
+> I don't think it's difficult to add: if the device supports
+> VIRTIO_IOMMU_F_BYPASS, then we simply don't send an ATTACH request.
+> Otherwise after ATTACH we send a MAP for the whole input range. If the
+> change isn't bigger than this, I'll add it to v5.
 
-I see, thanks for pointing that out. I'll fix this in the next iteration.
+Not as straightforward as I hoped, when the device doesn't support
+VIRTIO_IOMMU_F_BYPASS:
+
+* We can't simply create an ID map for the whole input range, we need to
+carve out the resv_mem regions.
+
+* For a VFIO device, the host has no way of forwarding the identity
+mapping. For example the guest will attempt to map [0; 0xffffffffffff]
+-> [0; 0xffffffffffff], but VFIO only allows to map RAM and cannot take
+such request. One solution is to only create ID mapping for RAM, and
+register a notifier for memory hotplug, like intel-iommu does for IOMMUs
+that don't support HW pass-through.
+
+Since it's not completely trivial and - I think - not urgent, I'll leave
+this for later.
 
 Thanks,
-
--- 
-Julien Thierry
+Jean
