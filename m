@@ -1,132 +1,81 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v2 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Tue, 20 Nov 2018 14:15:22 +0000
-Message-ID: <1542723322-42536-5-git-send-email-andrew.murray@arm.com>
-References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v2 13/23] KVM: arm64/sve: Context switch the SVE
+ registers
+Date: Tue, 20 Nov 2018 17:18:37 +0000
+Message-ID: <20181120171837.GB3505@e103592.cambridge.arm.com>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-14-git-send-email-Dave.Martin@arm.com>
+ <87sgzxhvny.fsf@linaro.org>
+ <20181119170303.GX3505@e103592.cambridge.arm.com>
+ <87o9akhr6f.fsf@linaro.org>
+ <20181120141659.GZ3505@e103592.cambridge.arm.com>
+ <87muq3ix62.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E0294A2AE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 12:18:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id uksCVSs31qw7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Nov 2018 12:18:42 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4024A2AC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 12:18:42 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <87muq3ix62.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
+On Tue, Nov 20, 2018 at 03:30:29PM +0000, Alex Benn=E9e wrote:
+> =
 
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+> Dave Martin <Dave.Martin@arm.com> writes:
 
-The PMU may be on when we change which counters are enabled however
-we avoid adding an isb as we instead rely on existing context
-synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
-the eret from the hvc in kvm_call_hyp.
+[...]
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
----
- arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+> >> Put calculating guest_has_sve at the top of __hyp_switch_fpsimd make
+> >> most of that go away and just moves things around a little bit. So I
+> >> guess it could makes sense for the fast(ish) path although I'd be
+> >> interested in knowing if it made any real difference to the numbers.
+> >> After all the first read should be well cached and moving it through t=
+he
+> >> stack is just additional memory and register pressure.
+> >
+> > Hmmm, I will have a think about this when I respin.
+> >
+> > Explicitly caching guest_has_sve() does reduce the compiler's freedom to
+> > optimise.
+> >
+> > We might be able to mark it as __pure or __attribute_const__ to enable
+> > the compiler to decide whether to cache the result, but this may not be
+> > 100% safe.
+> >
+> > Part of me would prefer to leave things as they are to avoid the risk of
+> > breaking the code again...
+> =
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d496ef5..ebf0aac 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 host_only = host_ctxt->events_host_only;
-+	u32 guest_only = host_ctxt->events_guest_only;
-+
-+	if (host_only)
-+		write_sysreg(host_only, pmcntenclr_el0);
-+
-+	if (guest_only)
-+		write_sysreg(guest_only, pmcntenset_el0);
-+
-+	return (host_only || guest_only);
-+}
-+
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 host_only = host_ctxt->events_host_only;
-+	u32 guest_only = host_ctxt->events_guest_only;
-+
-+	if (guest_only)
-+		write_sysreg(guest_only, pmcntenclr_el0);
-+
-+	if (host_only)
-+		write_sysreg(host_only, pmcntenset_el0);
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -488,12 +514,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	host_ctxt = vcpu->arch.host_cpu_context;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	sysreg_save_host_state_vhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -524,6 +553,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
-@@ -532,6 +564,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
-@@ -540,6 +573,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -586,6 +621,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
--- 
-2.7.4
+> Given that the only place you call __hyp_switch_fpsimd is here you could
+> just roll in into __hyp_trap_is_fpsimd and have:
+> =
+
+> 	if (__hyp_trap_is_fpsimd(vcpu))
+> 		return true;
+
+Possibly, though the function should be renamed in this case, something
+like __hyp_handle_fpsimd_trap() I guess.
+
+Cheers
+---Dave
