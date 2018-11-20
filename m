@@ -1,267 +1,99 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH v2 13/23] KVM: arm64/sve: Context switch the SVE
- registers
-Date: Tue, 20 Nov 2018 14:17:00 +0000
-Message-ID: <20181120141659.GZ3505@e103592.cambridge.arm.com>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-14-git-send-email-Dave.Martin@arm.com>
- <87sgzxhvny.fsf@linaro.org>
- <20181119170303.GX3505@e103592.cambridge.arm.com>
- <87o9akhr6f.fsf@linaro.org>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock()
+ with IRQs disabled
+Date: Tue, 20 Nov 2018 15:18:32 +0100
+Message-ID: <20181120141832.GA11162@e113682-lin.lund.arm.com>
+References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
+ <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73C7D4A30A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 09:17:11 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZiPM8spVQsNL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Nov 2018 09:17:05 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 255B24A300
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 09:17:05 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87o9akhr6f.fsf@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
+Sender: stable-owner@vger.kernel.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 20, 2018 at 12:25:12PM +0000, Alex Benn=E9e wrote:
-> =
+On Mon, Nov 19, 2018 at 05:07:56PM +0000, Julien Thierry wrote:
+> To change the active state of an MMIO, halt is requested for all vcpus of
+> the affected guest before modifying the IRQ state. This is done by calling
+> cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
+> disabled at this point and running a vcpu cannot get rescheduled.
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
+"running a vcpu cannot get rescheduled" ?
 
-> > On Mon, Nov 19, 2018 at 04:36:01PM +0000, Alex Benn=E9e wrote:
-> >>
-> >> Dave Martin <Dave.Martin@arm.com> writes:
-> >>
-> >> > In order to give each vcpu its own view of the SVE registers, this
-> >> > patch adds context storage via a new sve_state pointer in struct
-> >> > vcpu_arch.  An additional member sve_max_vl is also added for each
-> >> > vcpu, to determine the maximum vector length visible to the guest
-> >> > and thus the value to be configured in ZCR_EL2.LEN while the is
-> >> > active.  This also determines the layout and size of the storage in
-> >> > sve_state, which is read and written by the same backend functions
-> >> > that are used for context-switching the SVE state for host tasks.
-> >> >
-> >> > On SVE-enabled vcpus, SVE access traps are now handled by switching
-> >> > in the vcpu's SVE context and disabling the trap before returning
-> >> > to the guest.  On other vcpus, the trap is not handled and an exit
-> >> > back to the host occurs, where the handle_sve() fallback path
-> >> > reflects an undefined instruction exception back to the guest,
-> >> > consistently with the behaviour of non-SVE-capable hardware (as was
-> >> > done unconditionally prior to this patch).
-> >> >
-> >> > No SVE handling is added on non-VHE-only paths, since VHE is an
-> >> > architectural and Kconfig prerequisite of SVE.
-> >> >
-> >> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> >
-> > [...]
-> >
-> >> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch=
-.c
-> >> > index 085ed06..9941349 100644
-> >> > --- a/arch/arm64/kvm/hyp/switch.c
-> >> > +++ b/arch/arm64/kvm/hyp/switch.c
-> >
-> > [...]
-> >
-> >> > @@ -380,6 +398,26 @@ static bool __hyp_text __hyp_switch_fpsimd(stru=
-ct kvm_vcpu *vcpu)
-> >> >  	return true;
-> >> >  }
-> >> >
-> >> > +static inline bool __hyp_text __hyp_trap_is_fpsimd(struct kvm_vcpu =
-*vcpu,
-> >> > +						   bool guest_has_sve)
-> >> > +{
-> >> > +
-> >> > +	u8 trap_class;
-> >> > +
-> >> > +	if (!system_supports_fpsimd())
-> >> > +		return false;
-> >> > +
-> >> > +	trap_class =3D kvm_vcpu_trap_get_class(vcpu);
-> >> > +
-> >> > +	if (trap_class =3D=3D ESR_ELx_EC_FP_ASIMD)
-> >> > +		return true;
-> >> > +
-> >> > +	if_sve (guest_has_sve && trap_class =3D=3D ESR_ELx_EC_SVE)
-> >> > +		return true;
-> >>
-> >> Do we really need to check the guest has SVE before believing what the
-> >> hardware is telling us? According to the ARM ARM:
-> >>
-> >> For ESR_ELx_EC_FP_ASIMD
-> >>
-> >>   Excludes exceptions resulting from CPACR_EL1 when the value of HCR_E=
-L2.TGE is
-> >>   1, or because SVE or Advanced SIMD and floating-point are not implem=
-ented. These
-> >>   are reported with EC value 0b000000
-> >>
-> >> But also for ESR_ELx_EC_SVE
-> >>
-> >>   Access to SVE functionality trapped as a result of CPACR_EL1.ZEN,
-> >>   CPTR_EL2.ZEN, CPTR_EL2.TZ, or CPTR_EL3.EZ, that is not reported usin=
-g EC
-> >>   0b000000. This EC is defined only if SVE is implemented
-> >>
-> >> Given I got confused maybe we need a comment for clarity?
-> >
-> > This is not about not trusting the value ESR_ELx_EC_SVE on older
-> > hardware: in effect it is retrospectively reserved for this purpose on
-> > all older arch versions, so there is no ambiguity about what it means.
-> > It should never be observed on hardware that doesn't have SVE.
-> >
-> > Rather, how we handle this trap differs depending on whether the guest
-> > is SVE-enabled or not.  If not, then this trap is handled by the generic
-> > fallback path for unhandled guest traps, so we don't check for this
-> > particular EC value explicitly in that case.
-> >
-> >>   /* Catch guests without SVE enabled running on SVE capable hardware =
-*/
-> >
-> > I might write something like:
-> >
-> > 	/*
-> > 	 * For sve-enmabled guests only, handle SVE access via FPSIMD
-> > 	 * context handling code.
-> > 	 */
-> >
-> > Does that make sense?  I may have misunderstood your concern here.
-> =
+> 
+> Solve this by waiting for all vcpus to be halted after emmiting the halt
+> request.
+> 
+> Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
+> Factor out functionality to get vgic mmio requester_vcpu")
+> 
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
+>  1 file changed, 11 insertions(+), 22 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index f56ff1c..eefd877 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+> 
+>  	spin_lock_irqsave(&irq->irq_lock, flags);
+> 
+> -	/*
+> -	 * If this virtual IRQ was written into a list register, we
+> -	 * have to make sure the CPU that runs the VCPU thread has
+> -	 * synced back the LR state to the struct vgic_irq.
+> -	 *
+> -	 * As long as the conditions below are true, we know the VCPU thread
+> -	 * may be on its way back from the guest (we kicked the VCPU thread in
+> -	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
+> -	 * so we release and re-acquire the spin_lock to let the other thread
+> -	 * sync back the IRQ.
+> -	 *
+> -	 * When accessing VGIC state from user space, requester_vcpu is
+> -	 * NULL, which is fine, because we guarantee that no VCPUs are running
+> -	 * when accessing VGIC state from user space so irq->vcpu->cpu is
+> -	 * always -1.
+> -	 */
+> -	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+> -	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
+> -	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+> -		cond_resched_lock(&irq->irq_lock);
+> -
+>  	if (irq->hw) {
+>  		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
+>  	} else {
+> @@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>   */
+>  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+>  {
+> -	if (intid > VGIC_NR_PRIVATE_IRQS)
+> +	if (intid > VGIC_NR_PRIVATE_IRQS) {
+> +		struct kvm_vcpu *tmp;
+> +		int i;
+> +
+>  		kvm_arm_halt_guest(vcpu->kvm);
+> +
+> +		/* Wait for each vcpu to be halted */
+> +		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> +			while (tmp->cpu != -1)
+> +				cond_resched();
 
-> s/enmabled/enabled/ but yeah that's fine.
+We used to have something like this which Andre then found out it could
+deadlock the system, because the VCPU making this request wouldn't have
+called kvm_arch_vcpu_put, and its cpu value would still have a value.
 
-Well spotted... I guess I was in a hurry.
+That's why we have the vcpu && vcpu != requester check.
 
-> > [...]
-> >
-> >> > @@ -387,6 +425,8 @@ static bool __hyp_text __hyp_switch_fpsimd(struc=
-t kvm_vcpu *vcpu)
-> >> >   */
-> >> >  static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 =
-*exit_code)
-> >> >  {
-> >> > +	bool guest_has_sve;
-> >> > +
-> >> >  	if (ARM_EXCEPTION_CODE(*exit_code) !=3D ARM_EXCEPTION_IRQ)
-> >> >  		vcpu->arch.fault.esr_el2 =3D read_sysreg_el2(esr);
-> >> >
-> >> > @@ -404,10 +444,11 @@ static bool __hyp_text fixup_guest_exit(struct=
- kvm_vcpu *vcpu, u64 *exit_code)
-> >> >  	 * and restore the guest context lazily.
-> >> >  	 * If FP/SIMD is not implemented, handle the trap and inject an
-> >> >  	 * undefined instruction exception to the guest.
-> >> > +	 * Similarly for trapped SVE accesses.
-> >> >  	 */
-> >> > -	if (system_supports_fpsimd() &&
-> >> > -	    kvm_vcpu_trap_get_class(vcpu) =3D=3D ESR_ELx_EC_FP_ASIMD)
-> >> > -		return __hyp_switch_fpsimd(vcpu);
-> >> > +	guest_has_sve =3D vcpu_has_sve(vcpu);
-> >>
-> >> I'm not sure if it's worth fishing this out here given you are already
-> >> passing vcpu down the chain.
-> >
-> > I wanted to discourage GCC from recomputing this.  If you're in a
-> > position to do so, can you look at the disassembly with/without this
-> > factored out and see whether it makes a difference?
-> =
 
-> Hmm it is hard to tell. There is code motion but for some reason I'm
-> seeing the static jump code unrolled, for example (original on left):
-> =
+Thanks,
 
-> __hyp_switch_fpsimd():                                                   =
-               __hyp_switch_fpsimd():
-> /home/alex/lsrc/kvm/linux.git/arch/arm64/kvm/hyp/switch.----:382         =
-             | /home/alex/lsrc/kvm/linux.git/arch/arm64/kvm/hyp/switch.----=
-:381
->                                                                          =
-             >  ----:  tst     w0, #0x400000
->                                                                          =
-             >  ----:  b.eq    22c <fixup_guest_exit+0x1a4>  // b.none
->                                                                          =
-             > arch_static_branch_jump():
->                                                                          =
-             > /home/alex/lsrc/kvm/linux.git/arch/arm64/include/asm/jump_la=
-bel.h:45
->                                                                          =
-             >  ----:  b       38c <fixup_guest_exit+0x304>
->                                                                          =
-             > arch_static_branch():
->                                                                          =
-             > /home/alex/lsrc/kvm/linux.git/arch/arm64/include/asm/jump_la=
-bel.h:31
->                                                                          =
-             >  ----:  nop
->                                                                          =
-             >  ----:  b       22c <fixup_guest_exit+0x1a4>
->                                                                          =
-             > test_bit():
->                                                                          =
-             > /home/alex/lsrc/kvm/linux.git/include/asm-generic/bitops/non=
--atomic.h:106
->                                                                          =
-             >  ----:  adrp    x0, 0 <cpu_hwcaps>
->                                                                          =
-             >  ----:  ldr     x0, [x0]
->                                                                          =
-             > __hyp_switch_fpsimd():
->                                                                          =
-             > /home/alex/lsrc/kvm/linux.git/arch/arm64/kvm/hyp/switch.----=
-:381
->  ----:  tst     w0, #0x400000                                            =
-                ----:  tst     w0, #0x400000
->  ----:  b.eq    238 <fixup_guest_exit+0x1b0>  // b.none                  =
-             |  ----:  b.eq    22c <fixup_guest_exit+0x1a4>  // b.none
->  ----:  cbz     w21, 238 <fixup_guest_exit+0x1b0>                        =
-             |  ----:  tbz     w2, #5, 22c <fixup_guest_exit+0x1a4>
-> /home/alex/lsrc/kvm/linux.git/arch/arm64/kvm/hyp/switch.----:383         =
-             | /home/alex/lsrc/kvm/linux.git/arch/arm64/kvm/hyp/switch.----=
-:382
->  ----:  ldr     w2, [x19, #2040]                                         =
-             |  ----:  ldr     w2, [x20, #2040]
->  ----:  add     x1, x19, #0x4b0                                          =
-             |  ----:  add     x1, x20, #0x4b0
->  ----:  ldr     x0, [x19, #2032]                                         =
-             |  ----:  ldr     x0, [x20, #2032]
-> sve_ffr_offset():                                                        =
-               sve_ffr_offset():
-> =
-
-> Put calculating guest_has_sve at the top of __hyp_switch_fpsimd make
-> most of that go away and just moves things around a little bit. So I
-> guess it could makes sense for the fast(ish) path although I'd be
-> interested in knowing if it made any real difference to the numbers.
-> After all the first read should be well cached and moving it through the
-> stack is just additional memory and register pressure.
-
-Hmmm, I will have a think about this when I respin.
-
-Explicitly caching guest_has_sve() does reduce the compiler's freedom to
-optimise.
-
-We might be able to mark it as __pure or __attribute_const__ to enable
-the compiler to decide whether to cache the result, but this may not be
-100% safe.
-
-Part of me would prefer to leave things as they are to avoid the risk of
-breaking the code again...
-
-Cheers
----Dave
+    Christoffer
