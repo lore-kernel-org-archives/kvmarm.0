@@ -1,138 +1,53 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 13/23] KVM: arm64/sve: Context switch the SVE
- registers
-Date: Tue, 20 Nov 2018 15:30:29 +0000
-Message-ID: <87muq3ix62.fsf@linaro.org>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-14-git-send-email-Dave.Martin@arm.com>
- <87sgzxhvny.fsf@linaro.org> <20181119170303.GX3505@e103592.cambridge.arm.com>
- <87o9akhr6f.fsf@linaro.org> <20181120141659.GZ3505@e103592.cambridge.arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: [PATCH v2 0/4] arm64: Support perf event modifiers :G and :H
+Date: Tue, 20 Nov 2018 14:15:18 +0000
+Message-ID: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BE854A314
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 10:30:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7xAzwQX9Z1l9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Nov 2018 10:30:33 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD0B84A302
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 10:30:32 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id r11-v6so2522611wmb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 07:30:32 -0800 (PST)
-In-reply-to: <20181120141659.GZ3505@e103592.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Suzuki K Poulose <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo8c25pcD4KPj4gPj4g
-PiBAQCAtNDA0LDEwICs0NDQsMTEgQEAgc3RhdGljIGJvb2wgX19oeXBfdGV4dCBmaXh1cF9ndWVz
-dF9leGl0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0ICpleGl0X2NvZGUpCj4+ID4+ID4gIAkg
-KiBhbmQgcmVzdG9yZSB0aGUgZ3Vlc3QgY29udGV4dCBsYXppbHkuCj4+ID4+ID4gIAkgKiBJZiBG
-UC9TSU1EIGlzIG5vdCBpbXBsZW1lbnRlZCwgaGFuZGxlIHRoZSB0cmFwIGFuZCBpbmplY3QgYW4K
-Pj4gPj4gPiAgCSAqIHVuZGVmaW5lZCBpbnN0cnVjdGlvbiBleGNlcHRpb24gdG8gdGhlIGd1ZXN0
-Lgo+PiA+PiA+ICsJICogU2ltaWxhcmx5IGZvciB0cmFwcGVkIFNWRSBhY2Nlc3Nlcy4KPj4gPj4g
-PiAgCSAqLwo+PiA+PiA+IC0JaWYgKHN5c3RlbV9zdXBwb3J0c19mcHNpbWQoKSAmJgo+PiA+PiA+
-IC0JICAgIGt2bV92Y3B1X3RyYXBfZ2V0X2NsYXNzKHZjcHUpID09IEVTUl9FTHhfRUNfRlBfQVNJ
-TUQpCj4+ID4+ID4gLQkJcmV0dXJuIF9faHlwX3N3aXRjaF9mcHNpbWQodmNwdSk7Cj4+ID4+ID4g
-KwlndWVzdF9oYXNfc3ZlID0gdmNwdV9oYXNfc3ZlKHZjcHUpOwo+PiA+Pgo+PiA+PiBJJ20gbm90
-IHN1cmUgaWYgaXQncyB3b3J0aCBmaXNoaW5nIHRoaXMgb3V0IGhlcmUgZ2l2ZW4geW91IGFyZSBh
-bHJlYWR5Cj4+ID4+IHBhc3NpbmcgdmNwdSBkb3duIHRoZSBjaGFpbi4KPj4gPgo+PiA+IEkgd2Fu
-dGVkIHRvIGRpc2NvdXJhZ2UgR0NDIGZyb20gcmVjb21wdXRpbmcgdGhpcy4gIElmIHlvdSdyZSBp
-biBhCj4+ID4gcG9zaXRpb24gdG8gZG8gc28sIGNhbiB5b3UgbG9vayBhdCB0aGUgZGlzYXNzZW1i
-bHkgd2l0aC93aXRob3V0IHRoaXMKPj4gPiBmYWN0b3JlZCBvdXQgYW5kIHNlZSB3aGV0aGVyIGl0
-IG1ha2VzIGEgZGlmZmVyZW5jZT8KPj4KPj4gSG1tIGl0IGlzIGhhcmQgdG8gdGVsbC4gVGhlcmUg
-aXMgY29kZSBtb3Rpb24gYnV0IGZvciBzb21lIHJlYXNvbiBJJ20KPj4gc2VlaW5nIHRoZSBzdGF0
-aWMganVtcCBjb2RlIHVucm9sbGVkLCBmb3IgZXhhbXBsZSAob3JpZ2luYWwgb24gbGVmdCk6Cj4+
-Cj4+IF9faHlwX3N3aXRjaF9mcHNpbWQoKTogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBfX2h5cF9zd2l0Y2hfZnBzaW1kKCk6
-Cj4+IC9ob21lL2FsZXgvbHNyYy9rdm0vbGludXguZ2l0L2FyY2gvYXJtNjQva3ZtL2h5cC9zd2l0
-Y2guLS0tLTozODIgICAgICAgICAgICAgICAgICAgICAgfCAvaG9tZS9hbGV4L2xzcmMva3ZtL2xp
-bnV4LmdpdC9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLi0tLS06MzgxCj4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgPiAgLS0tLTogIHRzdCAgICAgdzAsICMweDQwMDAwMAo+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgID4gIC0tLS06ICBiLmVxICAgIDIyYyA8Zml4dXBfZ3Vl
-c3RfZXhpdCsweDFhND4gIC8vIGIubm9uZQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ID4gYXJjaF9zdGF0aWNfYnJhbmNoX2p1bXAoKToKPj4gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICA+IC9ob21lL2FsZXgvbHNyYy9rdm0vbGludXguZ2l0L2FyY2gvYXJtNjQvaW5jbHVkZS9h
-c20vanVtcF9sYWJlbC5oOjQ1Cj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPiAgLS0t
-LTogIGIgICAgICAgMzhjIDxmaXh1cF9ndWVzdF9leGl0KzB4MzA0Pgo+PiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgID4gYXJjaF9zdGF0aWNfYnJhbmNoKCk6Cj4+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgPiAvaG9tZS9hbGV4L2xzcmMva3ZtL2xpbnV4LmdpdC9hcmNoL2FybTY0
-L2luY2x1ZGUvYXNtL2p1bXBfbGFiZWwuaDozMQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgID4gIC0tLS06ICBub3AKPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA+ICAtLS0t
-OiAgYiAgICAgICAyMmMgPGZpeHVwX2d1ZXN0X2V4aXQrMHgxYTQ+Cj4+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgPiB0ZXN0X2JpdCgpOgo+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgID4gL2hvbWUvYWxleC9sc3JjL2t2bS9saW51eC5naXQvaW5jbHVkZS9hc20tZ2VuZXJpYy9i
-aXRvcHMvbm9uLWF0b21pYy5oOjEwNgo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID4g
-IC0tLS06ICBhZHJwICAgIHgwLCAwIDxjcHVfaHdjYXBzPgo+PiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgID4gIC0tLS06ICBsZHIgICAgIHgwLCBbeDBdCj4+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgPiBfX2h5cF9zd2l0Y2hfZnBzaW1kKCk6Cj4+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgPiAvaG9tZS9hbGV4L2xzcmMva3ZtL2xpbnV4LmdpdC9hcmNoL2FybTY0L2t2
-bS9oeXAvc3dpdGNoLi0tLS06MzgxCj4+ICAtLS0tOiAgdHN0ICAgICB3MCwgIzB4NDAwMDAwICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-LS0tLTogIHRzdCAgICAgdzAsICMweDQwMDAwMAo+PiAgLS0tLTogIGIuZXEgICAgMjM4IDxmaXh1
-cF9ndWVzdF9leGl0KzB4MWIwPiAgLy8gYi5ub25lICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHwgIC0tLS06ICBiLmVxICAgIDIyYyA8Zml4dXBfZ3Vlc3RfZXhpdCsweDFhND4gIC8vIGIu
-bm9uZQo+PiAgLS0tLTogIGNieiAgICAgdzIxLCAyMzggPGZpeHVwX2d1ZXN0X2V4aXQrMHgxYjA+
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIC0tLS06ICB0YnogICAgIHcy
-LCAjNSwgMjJjIDxmaXh1cF9ndWVzdF9leGl0KzB4MWE0Pgo+PiAvaG9tZS9hbGV4L2xzcmMva3Zt
-L2xpbnV4LmdpdC9hcmNoL2FybTY0L2t2bS9oeXAvc3dpdGNoLi0tLS06MzgzICAgICAgICAgICAg
-ICAgICAgICAgIHwgL2hvbWUvYWxleC9sc3JjL2t2bS9saW51eC5naXQvYXJjaC9hcm02NC9rdm0v
-aHlwL3N3aXRjaC4tLS0tOjM4Mgo+PiAgLS0tLTogIGxkciAgICAgdzIsIFt4MTksICMyMDQwXSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIC0t
-LS06ICBsZHIgICAgIHcyLCBbeDIwLCAjMjA0MF0KPj4gIC0tLS06ICBhZGQgICAgIHgxLCB4MTks
-ICMweDRiMCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB8ICAtLS0tOiAgYWRkICAgICB4MSwgeDIwLCAjMHg0YjAKPj4gIC0tLS06ICBsZHIgICAg
-IHgwLCBbeDE5LCAjMjAzMl0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB8ICAtLS0tOiAgbGRyICAgICB4MCwgW3gyMCwgIzIwMzJdCj4+IHN2ZV9m
-ZnJfb2Zmc2V0KCk6ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBzdmVfZmZyX29mZnNldCgpOgo+Pgo+PiBQdXQgY2Fs
-Y3VsYXRpbmcgZ3Vlc3RfaGFzX3N2ZSBhdCB0aGUgdG9wIG9mIF9faHlwX3N3aXRjaF9mcHNpbWQg
-bWFrZQo+PiBtb3N0IG9mIHRoYXQgZ28gYXdheSBhbmQganVzdCBtb3ZlcyB0aGluZ3MgYXJvdW5k
-IGEgbGl0dGxlIGJpdC4gU28gSQo+PiBndWVzcyBpdCBjb3VsZCBtYWtlcyBzZW5zZSBmb3IgdGhl
-IGZhc3QoaXNoKSBwYXRoIGFsdGhvdWdoIEknZCBiZQo+PiBpbnRlcmVzdGVkIGluIGtub3dpbmcg
-aWYgaXQgbWFkZSBhbnkgcmVhbCBkaWZmZXJlbmNlIHRvIHRoZSBudW1iZXJzLgo+PiBBZnRlciBh
-bGwgdGhlIGZpcnN0IHJlYWQgc2hvdWxkIGJlIHdlbGwgY2FjaGVkIGFuZCBtb3ZpbmcgaXQgdGhy
-b3VnaCB0aGUKPj4gc3RhY2sgaXMganVzdCBhZGRpdGlvbmFsIG1lbW9yeSBhbmQgcmVnaXN0ZXIg
-cHJlc3N1cmUuCj4KPiBIbW1tLCBJIHdpbGwgaGF2ZSBhIHRoaW5rIGFib3V0IHRoaXMgd2hlbiBJ
-IHJlc3Bpbi4KPgo+IEV4cGxpY2l0bHkgY2FjaGluZyBndWVzdF9oYXNfc3ZlKCkgZG9lcyByZWR1
-Y2UgdGhlIGNvbXBpbGVyJ3MgZnJlZWRvbSB0bwo+IG9wdGltaXNlLgo+Cj4gV2UgbWlnaHQgYmUg
-YWJsZSB0byBtYXJrIGl0IGFzIF9fcHVyZSBvciBfX2F0dHJpYnV0ZV9jb25zdF9fIHRvIGVuYWJs
-ZQo+IHRoZSBjb21waWxlciB0byBkZWNpZGUgd2hldGhlciB0byBjYWNoZSB0aGUgcmVzdWx0LCBi
-dXQgdGhpcyBtYXkgbm90IGJlCj4gMTAwJSBzYWZlLgo+Cj4gUGFydCBvZiBtZSB3b3VsZCBwcmVm
-ZXIgdG8gbGVhdmUgdGhpbmdzIGFzIHRoZXkgYXJlIHRvIGF2b2lkIHRoZSByaXNrIG9mCj4gYnJl
-YWtpbmcgdGhlIGNvZGUgYWdhaW4uLi4KCkdpdmVuIHRoYXQgdGhlIG9ubHkgcGxhY2UgeW91IGNh
-bGwgX19oeXBfc3dpdGNoX2Zwc2ltZCBpcyBoZXJlIHlvdSBjb3VsZApqdXN0IHJvbGwgaW4gaW50
-byBfX2h5cF90cmFwX2lzX2Zwc2ltZCBhbmQgaGF2ZToKCglpZiAoX19oeXBfdHJhcF9pc19mcHNp
-bWQodmNwdSkpCgkJcmV0dXJuIHRydWU7CgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+This patchset provides support for perf event modifiers :G and :H which
+allows for filtering of PMU events between host and guests when used
+with KVM.
+
+As the underlying hardware cannot distinguish between guest and host
+context, the performance counters must be stopped and started upon
+entry/exit to the guest. This is performed at EL2 in a way that
+minimizes overhead and improves accuracy of recording events that only
+occur in the requested context.
+
+This has been tested with VHE and non-VHE kernels with a KVM guest.
+
+Changes from v1:
+
+ - Removed unnecessary exclusion of EL1 with exclude_guest on VHE
+ - Removed unnecessary isb from existing perf_event.c driver
+ - Folded perf_event.c patches together
+ - Added additional information to last patch commit message
+
+Andrew Murray (4):
+  arm64: arm_pmu: remove unnecessary isb instruction
+  arm64: KVM: add accessors to track guest/host only counters
+  arm64: arm_pmu: Add support for exclude_host/exclude_guest attributes
+  arm64: KVM: Enable support for :G/:H perf event modifiers
+
+ arch/arm64/include/asm/kvm_host.h | 20 +++++++++++++++++++
+ arch/arm64/kernel/perf_event.c    | 42 ++++++++++++++++++++++++++++++++-------
+ arch/arm64/kvm/hyp/switch.c       | 38 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 93 insertions(+), 7 deletions(-)
+
+-- 
+2.7.4
