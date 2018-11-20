@@ -1,81 +1,113 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [RFC PATCH v2 13/23] KVM: arm64/sve: Context switch the SVE
- registers
-Date: Tue, 20 Nov 2018 17:18:37 +0000
-Message-ID: <20181120171837.GB3505@e103592.cambridge.arm.com>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-14-git-send-email-Dave.Martin@arm.com>
- <87sgzxhvny.fsf@linaro.org>
- <20181119170303.GX3505@e103592.cambridge.arm.com>
- <87o9akhr6f.fsf@linaro.org>
- <20181120141659.GZ3505@e103592.cambridge.arm.com>
- <87muq3ix62.fsf@linaro.org>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock() with
+ IRQs disabled
+Date: Tue, 20 Nov 2018 17:22:39 +0000
+Message-ID: <76a488a9-893c-ffbe-16f2-23735af8126a@arm.com>
+References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
+ <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
+ <20181120141832.GA11162@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E0294A2AE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 12:18:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uksCVSs31qw7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Nov 2018 12:18:42 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4024A2AC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 12:18:42 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <87muq3ix62.fsf@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20181120141832.GA11162@e113682-lin.lund.arm.com>
+Content-Language: en-US
+Sender: stable-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 20, 2018 at 03:30:29PM +0000, Alex Benn=E9e wrote:
-> =
 
-> Dave Martin <Dave.Martin@arm.com> writes:
 
-[...]
+On 20/11/18 14:18, Christoffer Dall wrote:
+> On Mon, Nov 19, 2018 at 05:07:56PM +0000, Julien Thierry wrote:
+>> To change the active state of an MMIO, halt is requested for all vcpus of
+>> the affected guest before modifying the IRQ state. This is done by calling
+>> cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
+>> disabled at this point and running a vcpu cannot get rescheduled.
+> 
+> "running a vcpu cannot get rescheduled" ?
 
-> >> Put calculating guest_has_sve at the top of __hyp_switch_fpsimd make
-> >> most of that go away and just moves things around a little bit. So I
-> >> guess it could makes sense for the fast(ish) path although I'd be
-> >> interested in knowing if it made any real difference to the numbers.
-> >> After all the first read should be well cached and moving it through t=
-he
-> >> stack is just additional memory and register pressure.
-> >
-> > Hmmm, I will have a think about this when I respin.
-> >
-> > Explicitly caching guest_has_sve() does reduce the compiler's freedom to
-> > optimise.
-> >
-> > We might be able to mark it as __pure or __attribute_const__ to enable
-> > the compiler to decide whether to cache the result, but this may not be
-> > 100% safe.
-> >
-> > Part of me would prefer to leave things as they are to avoid the risk of
-> > breaking the code again...
-> =
+Yes, that doesn't make much sense :\ . I guess I just meant "a vcpu 
+cannot get rescheduled on this cpu".
 
-> Given that the only place you call __hyp_switch_fpsimd is here you could
-> just roll in into __hyp_trap_is_fpsimd and have:
-> =
+I'll rewrite this.
 
-> 	if (__hyp_trap_is_fpsimd(vcpu))
-> 		return true;
+> 
+>>
+>> Solve this by waiting for all vcpus to be halted after emmiting the halt
+>> request.
+>>
+>> Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
+>> Factor out functionality to get vgic mmio requester_vcpu")
+>>
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: stable@vger.kernel.org
+>> ---
+>>   virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
+>>   1 file changed, 11 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+>> index f56ff1c..eefd877 100644
+>> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+>> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+>> @@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>>
+>>   	spin_lock_irqsave(&irq->irq_lock, flags);
+>>
+>> -	/*
+>> -	 * If this virtual IRQ was written into a list register, we
+>> -	 * have to make sure the CPU that runs the VCPU thread has
+>> -	 * synced back the LR state to the struct vgic_irq.
+>> -	 *
+>> -	 * As long as the conditions below are true, we know the VCPU thread
+>> -	 * may be on its way back from the guest (we kicked the VCPU thread in
+>> -	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
+>> -	 * so we release and re-acquire the spin_lock to let the other thread
+>> -	 * sync back the IRQ.
+>> -	 *
+>> -	 * When accessing VGIC state from user space, requester_vcpu is
+>> -	 * NULL, which is fine, because we guarantee that no VCPUs are running
+>> -	 * when accessing VGIC state from user space so irq->vcpu->cpu is
+>> -	 * always -1.
+>> -	 */
+>> -	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
+>> -	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
+>> -	       irq->vcpu->cpu != -1) /* VCPU thread is running */
+>> -		cond_resched_lock(&irq->irq_lock);
+>> -
+>>   	if (irq->hw) {
+>>   		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
+>>   	} else {
+>> @@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>>    */
+>>   static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+>>   {
+>> -	if (intid > VGIC_NR_PRIVATE_IRQS)
+>> +	if (intid > VGIC_NR_PRIVATE_IRQS) {
+>> +		struct kvm_vcpu *tmp;
+>> +		int i;
+>> +
+>>   		kvm_arm_halt_guest(vcpu->kvm);
+>> +
+>> +		/* Wait for each vcpu to be halted */
+>> +		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+>> +			while (tmp->cpu != -1)
+>> +				cond_resched();
+> 
+> We used to have something like this which Andre then found out it could
+> deadlock the system, because the VCPU making this request wouldn't have
+> called kvm_arch_vcpu_put, and its cpu value would still have a value.
+> 
+> That's why we have the vcpu && vcpu != requester check.
+> 
 
-Possibly, though the function should be renamed in this case, something
-like __hyp_handle_fpsimd_trap() I guess.
+I see, thanks for pointing that out. I'll fix this in the next iteration.
 
-Cheers
----Dave
+Thanks,
+
+-- 
+Julien Thierry
