@@ -1,106 +1,189 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock() with
- IRQs disabled
-Date: Tue, 20 Nov 2018 14:37:45 +0000
-Message-ID: <0e12d8a7-2a76-e04a-ab18-ed9fc69d5d47@arm.com>
-References: <1542647279-46609-1-git-send-email-julien.thierry@arm.com>
- <1542647279-46609-2-git-send-email-julien.thierry@arm.com>
- <20181120141832.GA11162@e113682-lin.lund.arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 3/4] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Tue, 20 Nov 2018 14:49:05 +0000
+Message-ID: <2fb3eef1-c361-8ce0-a5ad-10de66517858@arm.com>
+References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
+ <1542723322-42536-4-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181120141832.GA11162@e113682-lin.lund.arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C03134A319
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 09:47:44 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id g2-+5esMXCt5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Nov 2018 09:47:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40E544A318
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Nov 2018 09:47:43 -0500 (EST)
+In-Reply-To: <1542723322-42536-4-git-send-email-andrew.murray@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Julien Thierry <julien.thierry@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, stable@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/11/2018 14:18, Christoffer Dall wrote:
-> On Mon, Nov 19, 2018 at 05:07:56PM +0000, Julien Thierry wrote:
->> To change the active state of an MMIO, halt is requested for all vcpus of
->> the affected guest before modifying the IRQ state. This is done by calling
->> cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
->> disabled at this point and running a vcpu cannot get rescheduled.
+On 11/20/2018 02:15 PM, Andrew Murray wrote:
+> Add support for the :G and :H attributes in perf by handling the
+> exclude_host/exclude_guest event attributes.
 > 
-> "running a vcpu cannot get rescheduled" ?
+> We notify KVM of counters that we wish to be enabled or disabled on
+> guest entry/exit and thus defer from starting or stopping :G events
+> as per the events exclude_host attribute.
 > 
->>
->> Solve this by waiting for all vcpus to be halted after emmiting the halt
->> request.
->>
->> Fixes commit 6c1b7521f4a07cc63bbe2dfe290efed47cdb780a ("KVM: arm/arm64:
->> Factor out functionality to get vgic mmio requester_vcpu")
->>
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: stable@vger.kernel.org
->> ---
->>  virt/kvm/arm/vgic/vgic-mmio.c | 33 +++++++++++----------------------
->>  1 file changed, 11 insertions(+), 22 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->> index f56ff1c..eefd877 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>
->>  	spin_lock_irqsave(&irq->irq_lock, flags);
->>
->> -	/*
->> -	 * If this virtual IRQ was written into a list register, we
->> -	 * have to make sure the CPU that runs the VCPU thread has
->> -	 * synced back the LR state to the struct vgic_irq.
->> -	 *
->> -	 * As long as the conditions below are true, we know the VCPU thread
->> -	 * may be on its way back from the guest (we kicked the VCPU thread in
->> -	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
->> -	 * so we release and re-acquire the spin_lock to let the other thread
->> -	 * sync back the IRQ.
->> -	 *
->> -	 * When accessing VGIC state from user space, requester_vcpu is
->> -	 * NULL, which is fine, because we guarantee that no VCPUs are running
->> -	 * when accessing VGIC state from user space so irq->vcpu->cpu is
->> -	 * always -1.
->> -	 */
->> -	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
->> -	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
->> -	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->> -		cond_resched_lock(&irq->irq_lock);
->> -
->>  	if (irq->hw) {
->>  		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
->>  	} else {
->> @@ -368,8 +347,18 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>   */
->>  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
->>  {
->> -	if (intid > VGIC_NR_PRIVATE_IRQS)
->> +	if (intid > VGIC_NR_PRIVATE_IRQS) {
->> +		struct kvm_vcpu *tmp;
->> +		int i;
->> +
->>  		kvm_arm_halt_guest(vcpu->kvm);
->> +
->> +		/* Wait for each vcpu to be halted */
->> +		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
->> +			while (tmp->cpu != -1)
->> +				cond_resched();
+> When using VHE, EL2 is unused by the guest - therefore we can filter
+> out these events with the PMU as per the 'exclude_host' attribute.
 > 
-> We used to have something like this which Andre then found out it could
-> deadlock the system, because the VCPU making this request wouldn't have
-> called kvm_arch_vcpu_put, and its cpu value would still have a value.
+> With both VHE and non-VHE we switch the counters between host/guest
+> at EL2. With non-VHE when using 'exclude_host' we filter out EL2.
 > 
-> That's why we have the vcpu && vcpu != requester check.
+> These changes eliminate counters counting host events on the
+> boundaries of guest entry/exit when using :G. However when using :H
+> unless exclude_hv is set on non-VHE then there is a small blackout
+> window at the guest entry/exit where host events are not captured.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>   arch/arm64/kernel/perf_event.c | 41 +++++++++++++++++++++++++++++++++++------
+>   1 file changed, 35 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index de564ae..412bd80 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -26,6 +26,7 @@
+>   
+>   #include <linux/acpi.h>
+>   #include <linux/clocksource.h>
+> +#include <linux/kvm_host.h>
+>   #include <linux/of.h>
+>   #include <linux/perf/arm_pmu.h>
+>   #include <linux/platform_device.h>
+> @@ -647,11 +648,23 @@ static inline int armv8pmu_enable_counter(int idx)
+>   
+>   static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+>   {
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = event->hw.idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+> -	armv8pmu_enable_counter(idx);
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_enable_counter(idx - 1);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
 
-Ah, I now remember that one. I guess it is a matter of skipping the
-requester vcpu in the kvm_for_each_vcpu loop.
+minor nit: If you rearrange the code below a bit
 
-Thanks,
+> +
+> +	if (attr->exclude_host)
+> +		kvm_set_clr_guest_pmu_events(0, counter_bits);
+> +	if (attr->exclude_guest)
+> +		kvm_set_clr_host_pmu_events(0, counter_bits);
+> +
+> +	if (!attr->exclude_host) {
+> +		armv8pmu_enable_counter(idx);
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_enable_counter(idx - 1);
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+we could have :
+
+	if (attr->exclude_guest)
+		kvm_set_clr_host_pmu_events(0, counter_bits);
+
+	if (attr->exclude_host) {
+		kvm_set_clr_guest_pmu_events(0, counter_bits);
+		return;
+	}
+
+	armv8pmu_enable_counter(idx);
+	if (armv8pmu_event_is_chained(event))
+		armv8pmu_enable_counter(idx - 1);
+
+Similarly for disable_event_counter.
+	
+> +	}
+>   }
+>   
+>   static inline int armv8pmu_disable_counter(int idx)
+> @@ -664,11 +677,23 @@ static inline int armv8pmu_disable_counter(int idx)
+>   static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+>   {
+>   	struct hw_perf_event *hwc = &event->hw;
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = hwc->idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_disable_counter(idx - 1);
+> -	armv8pmu_disable_counter(idx);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	if (attr->exclude_host)
+> +		kvm_set_clr_guest_pmu_events(counter_bits, 0);
+> +	if (attr->exclude_guest)
+> +		kvm_set_clr_host_pmu_events(counter_bits, 0);
+> +
+> +	if (!attr->exclude_host) {
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_disable_counter(idx - 1);
+> +		armv8pmu_disable_counter(idx);
+> +	}
+>   }
+>   
+>   static inline int armv8pmu_enable_intens(int idx)
+> @@ -945,12 +970,12 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>   	 * with other architectures (x86 and Power).
+>   	 */
+>   	if (is_kernel_in_hyp_mode()) {
+> -		if (!attr->exclude_kernel)
+> +		if (!attr->exclude_kernel && !attr->exclude_host)
+>   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+
+Shouldn't we handle "exclude_kernel" for a "Guest" event ?
+i.e, what if we have exclude_kernel + exclude_host set ? Doesn't
+the "exclude_kernel" apply to the event filtering after we enter
+guest and thus, we need to set the EXCLUDE_EL1 ?
+
+Also I am wondering what is the situation with Nested virtualisation
+coming in. i.e, if the host hyp wanted to profile the guest hyp, should
+we set EL2 events ? I understand this is something which should be
+solved with the nested virt changes. But it would be good to see
+if we could filter "exclude_host" and "exclude_guest" at the hypervisor
+level (i.e, in software, without PMU filtering) to allow the normal
+controls to make use of the hardware filtering ?
+
+>   	} else {
+>   		if (attr->exclude_kernel)
+>   			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> -		if (!attr->exclude_hv)
+> +		if (!attr->exclude_hv && !attr->exclude_host)
+>   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+>   	}
+
+
+>   	if (attr->exclude_user)
+> @@ -976,6 +1001,10 @@ static void armv8pmu_reset(void *info)
+>   		armv8pmu_disable_intens(idx);
+>   	}
+>   
+> +	/* Clear the counters we flip at guest entry/exit */
+> +	kvm_set_clr_host_pmu_events(U32_MAX, 0);
+> +	kvm_set_clr_guest_pmu_events(U32_MAX, 0);
+> +
+>   	/*
+>   	 * Initialize & Reset PMNC. Request overflow interrupt for
+>   	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
+> 
+
+Suzuki
