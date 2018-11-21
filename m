@@ -1,28 +1,27 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 17/23] arm64/sve: In-kernel vector length
- availability query interface
-Date: Wed, 21 Nov 2018 16:16:42 +0000
-Message-ID: <87in0qiexh.fsf@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v2 16/23] KVM: arm64: Enumerate SVE register indices
+ for KVM_GET_REG_LIST
+Date: Wed, 21 Nov 2018 16:32:03 +0000
+Message-ID: <20181121163201.GC3505@e103592.cambridge.arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-18-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
+ <87k1l6ifa8.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBCBF4A1FD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:16:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 695294A2BB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:32:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P9SFhrgKQrKk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 11:16:45 -0500 (EST)
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com
- [209.85.128.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 979FA4A20D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:16:45 -0500 (EST)
-Received: by mail-wm1-f68.google.com with SMTP id w7-v6so6094854wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 08:16:45 -0800 (PST)
-In-reply-to: <1538141967-15375-18-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id rTraANM-jqt2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Nov 2018 11:32:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D76524A1F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:32:08 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <87k1l6ifa8.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,114 +31,158 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEtWTSB3aWxsIG5l
-ZWQgdG8gaW50ZXJyb2dhdGUgdGhlIHNldCBvZiBTVkUgdmVjdG9yIGxlbmd0aHMKPiBhdmFpbGFi
-bGUgb24gdGhlIHN5c3RlbS4KPgo+IFRoaXMgcGF0Y2ggZXhwb3NlcyB0aGUgcmVsZXZhbnQgYml0
-cyB0byB0aGUga2VybmVsLCBhbG9uZyB3aXRoIGEKPiBzdmVfdnFfYXZhaWxhYmxlKCkgaGVscGVy
-IHRvIGNoZWNrIHdoZXRoZXIgYSBwYXJ0aWN1bGFyIHZlY3Rvcgo+IGxlbmd0aCBpcyBzdXBwb3J0
-ZWQuCj4KPiB2cV90b19iaXQoKSBhbmQgYml0X3RvX3ZxKCkgYXJlIG5vdCBpbnRlbmRlZCBmb3Ig
-dXNlIG91dHNpZGUgdGhlc2UKPiBmdW5jdGlvbnMsIHNvIHRoZXkgYXJlIGdpdmVuIGEgX18gcHJl
-Zml4IHRvIHdhcm4gcGVvcGxlIG5vdCB0byB1c2UKPiB0aGVtIHVubGVzcyB0aGV5IHJlYWxseSBr
-bm93IHdoYXQgdGhleSBhcmUgZG9pbmcuCgpQZXJzb25hbGx5IEkgd291bGRuJ3QgaGF2ZSBib3Ro
-ZXJlZCB3aXRoIHRoZSBfXyBidXQgd2hhdGV2ZXI6CgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6ll
-IDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKPgo+IFNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGlu
-IDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IC0tLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zw
-c2ltZC5oIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKPiAgYXJjaC9hcm02NC9r
-ZXJuZWwvZnBzaW1kLmMgICAgICB8IDM1ICsrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tCj4gIDIgZmlsZXMgY2hhbmdlZCwgMzcgaW5zZXJ0aW9ucygrKSwgMjcgZGVsZXRpb25zKC0p
-Cj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaCBiL2FyY2gv
-YXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgKPiBpbmRleCBkZjdhMTQzLi5hZDZkMmU0IDEwMDY0
-NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmgKPiArKysgYi9hcmNoL2Fy
-bTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5oCj4gQEAgLTI0LDEwICsyNCwxMyBAQAo+Cj4gICNpZm5k
-ZWYgX19BU1NFTUJMWV9fCj4KPiArI2luY2x1ZGUgPGxpbnV4L2JpdG1hcC5oPgo+ICAjaW5jbHVk
-ZSA8bGludXgvYnVpbGRfYnVnLmg+Cj4gKyNpbmNsdWRlIDxsaW51eC9idWcuaD4KPiAgI2luY2x1
-ZGUgPGxpbnV4L2NhY2hlLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9pbml0Lmg+Cj4gICNpbmNsdWRl
-IDxsaW51eC9zdGRkZWYuaD4KPiArI2luY2x1ZGUgPGxpbnV4L3R5cGVzLmg+Cj4KPiAgI2lmIGRl
-ZmluZWQoX19LRVJORUxfXykgJiYgZGVmaW5lZChDT05GSUdfQ09NUEFUKQo+ICAvKiBNYXNrcyBm
-b3IgZXh0cmFjdGluZyB0aGUgRlBTUiBhbmQgRlBDUiBmcm9tIHRoZSBGUFNDUiAqLwo+IEBAIC04
-OSw2ICs5MiwzMiBAQCBleHRlcm4gdTY0IHJlYWRfemNyX2ZlYXR1cmVzKHZvaWQpOwo+Cj4gIGV4
-dGVybiBpbnQgX19yb19hZnRlcl9pbml0IHN2ZV9tYXhfdmw7Cj4gIGV4dGVybiBpbnQgX19yb19h
-ZnRlcl9pbml0IHN2ZV9tYXhfdmlydHVhbGlzYWJsZV92bDsKPiArLyogU2V0IG9mIGF2YWlsYWJs
-ZSB2ZWN0b3IgbGVuZ3RocywgYXMgdnFfdG9fYml0KHZxKTogKi8KPiArZXh0ZXJuIF9fcm9fYWZ0
-ZXJfaW5pdCBERUNMQVJFX0JJVE1BUChzdmVfdnFfbWFwLCBTVkVfVlFfTUFYKTsKPiArCj4gKy8q
-Cj4gKyAqIEhlbHBlcnMgdG8gdHJhbnNsYXRlIGJpdCBpbmRpY2VzIGluIHN2ZV92cV9tYXAgdG8g
-VlEgdmFsdWVzIChhbmQKPiArICogdmljZSB2ZXJzYSkuICBUaGlzIGFsbG93cyBmaW5kX25leHRf
-Yml0KCkgdG8gYmUgdXNlZCB0byBmaW5kIHRoZQo+ICsgKiBfbWF4aW11bV8gVlEgbm90IGV4Y2Vl
-ZGluZyBhIGNlcnRhaW4gdmFsdWUuCj4gKyAqLwo+ICtzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGlu
-dCBfX3ZxX3RvX2JpdCh1bnNpZ25lZCBpbnQgdnEpCj4gK3sKPiArCXJldHVybiBTVkVfVlFfTUFY
-IC0gdnE7Cj4gK30KPiArCj4gK3N0YXRpYyBpbmxpbmUgdW5zaWduZWQgaW50IF9fYml0X3RvX3Zx
-KHVuc2lnbmVkIGludCBiaXQpCj4gK3sKPiArCWlmIChXQVJOX09OKGJpdCA+PSBTVkVfVlFfTUFY
-KSkKPiArCQliaXQgPSBTVkVfVlFfTUFYIC0gMTsKPiArCj4gKwlyZXR1cm4gU1ZFX1ZRX01BWCAt
-IGJpdDsKPiArfQo+ICsKPiArLyogRW5zdXJlIHZxID49IFNWRV9WUV9NSU4gJiYgdnEgPD0gU1ZF
-X1ZRX01BWCBiZWZvcmUgY2FsbGluZyB0aGlzIGZ1bmN0aW9uICovCj4gK3N0YXRpYyBpbmxpbmUg
-Ym9vbCBzdmVfdnFfYXZhaWxhYmxlKHVuc2lnbmVkIGludCB2cSkKPiArewo+ICsJcmV0dXJuIHRl
-c3RfYml0KF9fdnFfdG9fYml0KHZxKSwgc3ZlX3ZxX21hcCk7Cj4gK30KPgo+ICAjaWZkZWYgQ09O
-RklHX0FSTTY0X1NWRQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5j
-IGIvYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMKPiBpbmRleCA2MGM1ZTI4Li5jYzVhNDk1IDEw
-MDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCj4gKysrIGIvYXJjaC9hcm02
-NC9rZXJuZWwvZnBzaW1kLmMKPiBAQCAtMTM2LDcgKzEzNiw3IEBAIHN0YXRpYyBpbnQgc3ZlX2Rl
-ZmF1bHRfdmwgPSAtMTsKPiAgaW50IF9fcm9fYWZ0ZXJfaW5pdCBzdmVfbWF4X3ZsID0gU1ZFX1ZM
-X01JTjsKPiAgaW50IF9fcm9fYWZ0ZXJfaW5pdCBzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgPSBT
-VkVfVkxfTUlOOwo+ICAvKiBTZXQgb2YgYXZhaWxhYmxlIHZlY3RvciBsZW5ndGhzLCBhcyB2cV90
-b19iaXQodnEpOiAqLwo+IC1zdGF0aWMgX19yb19hZnRlcl9pbml0IERFQ0xBUkVfQklUTUFQKHN2
-ZV92cV9tYXAsIFNWRV9WUV9NQVgpOwo+ICtfX3JvX2FmdGVyX2luaXQgREVDTEFSRV9CSVRNQVAo
-c3ZlX3ZxX21hcCwgU1ZFX1ZRX01BWCk7Cj4gIC8qIFNldCBvZiB2ZWN0b3IgbGVuZ3RocyBwcmVz
-ZW50IG9uIGF0IGxlYXN0IG9uZSBjcHU6ICovCj4gIHN0YXRpYyBfX3JvX2FmdGVyX2luaXQgREVD
-TEFSRV9CSVRNQVAoc3ZlX3ZxX3BhcnRpYWxfbWFwLCBTVkVfVlFfTUFYKTsKPiAgc3RhdGljIHZv
-aWQgX19wZXJjcHUgKmVmaV9zdmVfc3RhdGU7Cj4gQEAgLTI3MCwyNSArMjcwLDYgQEAgdm9pZCBm
-cHNpbWRfc2F2ZSh2b2lkKQo+ICB9Cj4KPiAgLyoKPiAtICogSGVscGVycyB0byB0cmFuc2xhdGUg
-Yml0IGluZGljZXMgaW4gc3ZlX3ZxX21hcCB0byBWUSB2YWx1ZXMgKGFuZAo+IC0gKiB2aWNlIHZl
-cnNhKS4gIFRoaXMgYWxsb3dzIGZpbmRfbmV4dF9iaXQoKSB0byBiZSB1c2VkIHRvIGZpbmQgdGhl
-Cj4gLSAqIF9tYXhpbXVtXyBWUSBub3QgZXhjZWVkaW5nIGEgY2VydGFpbiB2YWx1ZS4KPiAtICov
-Cj4gLQo+IC1zdGF0aWMgdW5zaWduZWQgaW50IHZxX3RvX2JpdCh1bnNpZ25lZCBpbnQgdnEpCj4g
-LXsKPiAtCXJldHVybiBTVkVfVlFfTUFYIC0gdnE7Cj4gLX0KPiAtCj4gLXN0YXRpYyB1bnNpZ25l
-ZCBpbnQgYml0X3RvX3ZxKHVuc2lnbmVkIGludCBiaXQpCj4gLXsKPiAtCWlmIChXQVJOX09OKGJp
-dCA+PSBTVkVfVlFfTUFYKSkKPiAtCQliaXQgPSBTVkVfVlFfTUFYIC0gMTsKPiAtCj4gLQlyZXR1
-cm4gU1ZFX1ZRX01BWCAtIGJpdDsKPiAtfQo+IC0KPiAtLyoKPiAgICogQWxsIHZlY3RvciBsZW5n
-dGggc2VsZWN0aW9uIGZyb20gdXNlcnNwYWNlIGNvbWVzIHRocm91Z2ggaGVyZS4KPiAgICogV2Un
-cmUgb24gYSBzbG93IHBhdGgsIHNvIHNvbWUgc2FuaXR5LWNoZWNrcyBhcmUgaW5jbHVkZWQuCj4g
-ICAqIElmIHRoaW5ncyBnbyB3cm9uZyB0aGVyZSdzIGEgYnVnIHNvbWV3aGVyZSwgYnV0IHRyeSB0
-byBmYWxsIGJhY2sgdG8gYQo+IEBAIC0zMDksOCArMjkwLDggQEAgc3RhdGljIHVuc2lnbmVkIGlu
-dCBmaW5kX3N1cHBvcnRlZF92ZWN0b3JfbGVuZ3RoKHVuc2lnbmVkIGludCB2bCkKPiAgCQl2bCA9
-IG1heF92bDsKPgo+ICAJYml0ID0gZmluZF9uZXh0X2JpdChzdmVfdnFfbWFwLCBTVkVfVlFfTUFY
-LAo+IC0JCQkgICAgdnFfdG9fYml0KHN2ZV92cV9mcm9tX3ZsKHZsKSkpOwo+IC0JcmV0dXJuIHN2
-ZV92bF9mcm9tX3ZxKGJpdF90b192cShiaXQpKTsKPiArCQkJICAgIF9fdnFfdG9fYml0KHN2ZV92
-cV9mcm9tX3ZsKHZsKSkpOwo+ICsJcmV0dXJuIHN2ZV92bF9mcm9tX3ZxKF9fYml0X3RvX3ZxKGJp
-dCkpOwo+ICB9Cj4KPiAgI2lmZGVmIENPTkZJR19TWVNDVEwKPiBAQCAtNjUxLDcgKzYzMiw3IEBA
-IHN0YXRpYyB2b2lkIHN2ZV9wcm9iZV92cXMoREVDTEFSRV9CSVRNQVAobWFwLCBTVkVfVlFfTUFY
-KSkKPiAgCQl3cml0ZV9zeXNyZWdfcyh6Y3IgfCAodnEgLSAxKSwgU1lTX1pDUl9FTDEpOyAvKiBz
-ZWxmLXN5bmNpbmcgKi8KPiAgCQl2bCA9IHN2ZV9nZXRfdmwoKTsKPiAgCQl2cSA9IHN2ZV92cV9m
-cm9tX3ZsKHZsKTsgLyogc2tpcCBpbnRlcnZlbmluZyBsZW5ndGhzICovCj4gLQkJc2V0X2JpdCh2
-cV90b19iaXQodnEpLCBtYXApOwo+ICsJCXNldF9iaXQoX192cV90b19iaXQodnEpLCBtYXApOwo+
-ICAJfQo+ICB9Cj4KPiBAQCAtNzEyLDcgKzY5Myw3IEBAIGludCBzdmVfdmVyaWZ5X3ZxX21hcCh2
-b2lkKQo+ICAJICogTWlzbWF0Y2hlcyBhYm92ZSBzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgYXJl
-IGZpbmUsIHNpbmNlCj4gIAkgKiBubyBndWVzdCBpcyBhbGxvd2VkIHRvIGNvbmZpZ3VyZSBaQ1Jf
-RUwyLkxFTiB0byBleGNlZWQgdGhpczoKPiAgCSAqLwo+IC0JaWYgKHN2ZV92bF9mcm9tX3ZxKGJp
-dF90b192cShiKSkgPD0gc3ZlX21heF92aXJ0dWFsaXNhYmxlX3ZsKSB7Cj4gKwlpZiAoc3ZlX3Zs
-X2Zyb21fdnEoX19iaXRfdG9fdnEoYikpIDw9IHN2ZV9tYXhfdmlydHVhbGlzYWJsZV92bCkgewo+
-ICAJCXByX3dhcm4oIlNWRTogY3B1JWQ6IFVuc3VwcG9ydGVkIHZlY3RvciBsZW5ndGgocykgcHJl
-c2VudFxuIiwKPiAgCQkJc21wX3Byb2Nlc3Nvcl9pZCgpKTsKPiAgCQlnb3RvIGVycm9yOwo+IEBA
-IC03OTgsOCArNzc5LDggQEAgdm9pZCBfX2luaXQgc3ZlX3NldHVwKHZvaWQpCj4gIAkgKiBzbyBz
-dmVfdnFfbWFwIG11c3QgaGF2ZSBhdCBsZWFzdCBTVkVfVlFfTUlOIHNldC4KPiAgCSAqIElmIHNv
-bWV0aGluZyB3ZW50IHdyb25nLCBhdCBsZWFzdCB0cnkgdG8gcGF0Y2ggaXQgdXA6Cj4gIAkgKi8K
-PiAtCWlmIChXQVJOX09OKCF0ZXN0X2JpdCh2cV90b19iaXQoU1ZFX1ZRX01JTiksIHN2ZV92cV9t
-YXApKSkKPiAtCQlzZXRfYml0KHZxX3RvX2JpdChTVkVfVlFfTUlOKSwgc3ZlX3ZxX21hcCk7Cj4g
-KwlpZiAoV0FSTl9PTighdGVzdF9iaXQoX192cV90b19iaXQoU1ZFX1ZRX01JTiksIHN2ZV92cV9t
-YXApKSkKPiArCQlzZXRfYml0KF9fdnFfdG9fYml0KFNWRV9WUV9NSU4pLCBzdmVfdnFfbWFwKTsK
-Pgo+ICAJemNyID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhTWVNfWkNSX0VMMSk7Cj4gIAlzdmVf
-bWF4X3ZsID0gc3ZlX3ZsX2Zyb21fdnEoKHpjciAmIFpDUl9FTHhfTEVOX01BU0spICsgMSk7Cj4g
-QEAgLTgyOCw3ICs4MDksNyBAQCB2b2lkIF9faW5pdCBzdmVfc2V0dXAodm9pZCkKPiAgCQkvKiBO
-byB2aXJ0dWFsaXNhYmxlIFZMcz8gIFRoaXMgaXMgYXJjaGl0ZWN0dXJhbGx5IGZvcmJpZGRlbi4g
-Ki8KPiAgCQlzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgPSBTVkVfVlFfTUlOOwo+ICAJZWxzZSAv
-KiBiICsgMSA8IFNWRV9WUV9NQVggKi8KPiAtCQlzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgPSBz
-dmVfdmxfZnJvbV92cShiaXRfdG9fdnEoYiArIDEpKTsKPiArCQlzdmVfbWF4X3ZpcnR1YWxpc2Fi
-bGVfdmwgPSBzdmVfdmxfZnJvbV92cShfX2JpdF90b192cShiICsgMSkpOwo+Cj4gIAlpZiAoc3Zl
-X21heF92aXJ0dWFsaXNhYmxlX3ZsID4gc3ZlX21heF92bCkKPiAgCQlzdmVfbWF4X3ZpcnR1YWxp
-c2FibGVfdmwgPSBzdmVfbWF4X3ZsOwoKCi0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+On Wed, Nov 21, 2018 at 04:09:03PM +0000, Alex Benn=E9e wrote:
+> =
+
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
+
+> > This patch includes the SVE register IDs in the list returned by
+> > KVM_GET_REG_LIST, as appropriate.
+> >
+> > On a non-SVE-enabled vcpu, no extra IDs are added.
+> >
+> > On an SVE-enabled vcpu, the appropriate number of slice IDs are
+> > enumerated for each SVE register, depending on the maximum vector
+> > length for the vcpu.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >
+> > Changes since RFCv1:
+> >
+> >  * Simplify enumerate_sve_regs() based on Andrew Jones' approach.
+> >
+> >  * Reg copying loops are inverted for brevity, since the order we
+> >    spit out the regs in doesn't really matter.
+> >
+> > (I tried to keep part of my approach to avoid the duplicate logic
+> > between num_sve_regs() and copy_sve_reg_indices(), but although
+> > it works in principle, gcc fails to fully collapse the num_regs()
+> > case... so I gave up.  The two functions need to be manually kept
+> > consistent, but hopefully that's fairly straightforward.)
+> > ---
+> >  arch/arm64/kvm/guest.c | 45 ++++++++++++++++++++++++++++++++++++++++++=
++++
+> >  1 file changed, 45 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 320db0f..89eab68 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -323,6 +323,46 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, co=
+nst struct kvm_one_reg *reg)
+> >  	return copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)) ? -EFAULT : 0;
+> >  }
+> >
+> > +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+> > +{
+> > +	const unsigned int slices =3D DIV_ROUND_UP(
+> > +		vcpu->arch.sve_max_vl,
+> > +		KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
+> =
+
+> Having seen this formulation come up several times now I wonder if there
+> should be a kernel private define, KVM_SVE_ZREG/PREG_SIZE to avoid this
+> clumsiness.
+
+I agree it's a bit awkward.  Previous I spelled this "0x100", which
+was terse but more sensitive to typos and other screwups that Io
+liked.
+
+> You could still use the KVM_REG_SIZE to extract it as I guess this is to
+> make changes simpler if/when the SVE reg size gets bumped up.
+
+That might be more challenging to determine at compile time.
+
+I'm not sure how good GCC is at doing const-propagation between related
+(but different) expressions, so I preferred to go for something that
+is clearly compiletime constant rather than extracting it from the
+register ID that came from userspace.
+
+So, I'd prefer not to use KVM_REG_SIZE() for this, but I'm happy to add
+a private #define to hide this cumbersome construct.  That would
+certainly make the code more readable.
+
+(Of course, the actual runtime cost is trivial either way, but I felt
+it was easier to reason about correctness if this is really a constant.)
+
+
+Sound OK?
+
+ > =
+
+> > +
+> > +	if (!vcpu_has_sve(vcpu))
+> > +		return 0;
+> > +
+> > +	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */);
+> > +}
+> > +
+> > +static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu, u64 __use=
+r **uind)
+> > +{
+> > +	const unsigned int slices =3D DIV_ROUND_UP(
+> > +		vcpu->arch.sve_max_vl,
+> > +		KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
+> > +	unsigned int i, n;
+> > +
+> > +	if (!vcpu_has_sve(vcpu))
+> > +		return 0;
+> > +
+> > +	for (i =3D 0; i < slices; i++) {
+> > +		for (n =3D 0; n < SVE_NUM_ZREGS; n++) {
+> > +			if (put_user(KVM_REG_ARM64_SVE_ZREG(n, i), (*uind)++))
+> > +				return -EFAULT;
+> > +		}
+> > +
+> > +		for (n =3D 0; n < SVE_NUM_PREGS; n++) {
+> > +			if (put_user(KVM_REG_ARM64_SVE_PREG(n, i), (*uind)++))
+> > +				return -EFAULT;
+> > +		}
+> > +
+> > +		if (put_user(KVM_REG_ARM64_SVE_FFR(i), (*uind)++))
+> > +			return -EFAULT;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  /**
+> >   * kvm_arm_num_regs - how many registers do we present via KVM_GET_ONE=
+_REG
+> >   *
+> > @@ -333,6 +373,7 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcp=
+u)
+> >  	unsigned long res =3D 0;
+> >
+> >  	res +=3D num_core_regs();
+> > +	res +=3D num_sve_regs(vcpu);
+> >  	res +=3D kvm_arm_num_sys_reg_descs(vcpu);
+> >  	res +=3D kvm_arm_get_fw_num_regs(vcpu);
+> >  	res +=3D NUM_TIMER_REGS;
+> > @@ -357,6 +398,10 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu=
+, u64 __user *uindices)
+> >  		uindices++;
+> >  	}
+> >
+> > +	ret =3D copy_sve_reg_indices(vcpu, &uindices);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >  	ret =3D kvm_arm_copy_fw_reg_indices(vcpu, uindices);
+> >  	if (ret)
+> >  		return ret;
+> =
+
+> Otherwise:
+> =
+
+> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+
+Thanks
+---Dave
