@@ -1,177 +1,121 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
-Date: Wed, 21 Nov 2018 12:17:45 +0000
-Message-ID: <26c4ad81-f808-5a84-c725-72db8de7cd2b@arm.com>
-References: <01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com>
- <201811211656540883310@zte.com.cn>
- <20181121110620.GC18678@e113682-lin.lund.arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: Re: [PATCH v4 5/7] iommu: Add virtio-iommu driver
+Date: Wed, 21 Nov 2018 13:21:57 +0100
+Message-ID: <09b4aef3-16e8-e846-9f73-be9c5a4bd805@redhat.com>
+References: <20181115165234.43990-1-jean-philippe.brucker@arm.com>
+ <20181115165234.43990-6-jean-philippe.brucker@arm.com>
+ <64abfb83-c555-c518-1030-cb73846517fc@redhat.com>
+ <41460260-417b-762f-f007-ccfd5ac1e8a5@arm.com>
+ <6d003fde-9574-0ff9-0bf8-7901d1a4aa5c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181121110620.GC18678@e113682-lin.lund.arm.com>
+Return-path: <virtio-dev-return-5002-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <6d003fde-9574-0ff9-0bf8-7901d1a4aa5c@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, peng.hao2@zte.com.cn
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "joro@8bytes.org" <joro@8bytes.org>, "mst@redhat.com" <mst@redhat.com>
+Cc: Mark Rutland <Mark.Rutland@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, Will Deacon <Will.Deacon@arm.com>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi jean,
 
-
-On 21/11/18 11:06, Christoffer Dall wrote:
-> Hi,
+On 11/20/18 6:30 PM, Jean-Philippe Brucker wrote:
+> On 16/11/2018 18:46, Jean-Philippe Brucker wrote:
+>>>> +/*
+>>>> + * __viommu_sync_req - Complete all in-flight requests
+>>>> + *
+>>>> + * Wait for all added requests to complete. When this function returns, all
+>>>> + * requests that were in-flight at the time of the call have completed.
+>>>> + */
+>>>> +static int __viommu_sync_req(struct viommu_dev *viommu)
+>>>> +{
+>>>> +	int ret = 0;
+>>>> +	unsigned int len;
+>>>> +	size_t write_len;
+>>>> +	struct viommu_request *req;
+>>>> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+>>>> +
+>>>> +	assert_spin_locked(&viommu->request_lock);
+>>>> +
+>>>> +	virtqueue_kick(vq);
+>>>> +
+>>>> +	while (!list_empty(&viommu->requests)) {
+>>>> +		len = 0;
+>>>> +		req = virtqueue_get_buf(vq, &len);
+>>>> +		if (!req)
+>>>> +			continue;
+>>>> +
+>>>> +		if (!len)
+>>>> +			viommu_set_req_status(req->buf, req->len,
+>>>> +					      VIRTIO_IOMMU_S_IOERR);
+>>>> +
+>>>> +		write_len = req->len - req->write_offset;
+>>>> +		if (req->writeback && len >= write_len)
+>>> I don't get "len >= write_len". Is it valid for the device to write more
+>>> than write_len? If it writes less than write_len, the status is not set,
+>>> is it?
 > 
-> On Wed, Nov 21, 2018 at 04:56:54PM +0800, peng.hao2@zte.com.cn wrote:
->>> On 19/11/2018 09:10, Mark Rutland wrote:
->>>> On Sat, Nov 17, 2018 at 10:58:37AM +0800, peng.hao2@zte.com.cn wrote:
->>>>>> On 16/11/18 00:23, peng.hao2@zte.com.cn wrote:
->>>>>>>> Hi,
->>>>>>>>> When virtual machine starts, hang up.
->>>>>>>>
->>>>>>>> I take it you mean the *guest* hangs? Because it doesn't get a timer
->>>>>>>> interrupt?
->>>>>>>>
->>>>>>>>> The kernel version of guest
->>>>>>>>> is 4.16. Host support vgic_v3.
->>>>>>>>
->>>>>>>> Your host kernel is something recent, I guess?
->>>>>>>>
->>>>>>>>> It was mainly due to the incorrect vgic_irq's(intid=27) group value
->>>>>>>>> during injection interruption. when kvm_vgic_vcpu_init is called,
->>>>>>>>> dist is not initialized at this time. Unable to get vgic V3 or V2
->>>>>>>>> correctly, so group is not set.
->>>>>>>>
->>>>>>>> Mmh, that shouldn't happen with (v)GICv3. Do you use QEMU (which
->>>>>>>> version?) or some other userland tool?
->>>>>>>>
->>>>>>>
->>>>>>> QEMU emulator version 3.0.50 .
->>>>>>>
->>>>>>>>> group is setted to 1 when vgic_mmio_write_group is invoked at some
->>>>>>>>> time.
->>>>>>>>> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
->>>>>>>>> interrupt injection failed.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
->>>>>>>>> ---
->>>>>>>>>    virt/kvm/arm/vgic/vgic-v3.c | 2 +-
->>>>>>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>>>>
->>>>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
->>>>>>>>> index 9c0dd23..d101000 100644
->>>>>>>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
->>>>>>>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
->>>>>>>>> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
->>>>>>>>> struct vgic_irq *irq, int lr) if (vgic_irq_is_mapped_level(irq) &&
->>>>>>>>> (val & ICH_LR_PENDING_BIT)) irq->line_level = false;
->>>>>>>>>
->>>>>>>>> -    if (irq->group)
->>>>>>>>> +    if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
->>>>>>>>
->>>>>>>> This is not the right fix, not only because it basically reverts the
->>>>>>>> GICv3 part of 87322099052 (KVM: arm/arm64: vgic: Signal IRQs using
->>>>>>>> their configured group).
->>>>>>>>
->>>>>>>> Can you try to work out why kvm_vgic_vcpu_init() is apparently called
->>>>>>>> before dist->vgic_model is set, also what value it has?
->>>>>>>> If I understand the code correctly, that shouldn't happen for a GICv3.
->>>>>>>>
->>>>>>> Even if the value of  group is correctly assigned in kvm_vgic_vcpu_init, the group is then written 0 through vgic_mmio_write_group.
->>>>>>>    If the interrupt comes at this time, the interrupt injection fails.
->>>>>>
->>>>>> Does that mean that the guest is configuring its interrupts as Group0?
->>>>>> That sounds wrong, Linux should configure all it's interrupts as
->>>>>> non-secure group1.
->>>>>
->>>>> no, I think that uefi dose this, not linux.
->>>>> 1. kvm_vgic_vcpu_init
->>>>> 2. vgic_create
->>>>> 3. kvm_vgic_dist_init
->>>>> 4.vgic_mmio_write_group: uefi as guest, write group=0
->>>>> 5.vgic_mmio_write_group: linux as guest, write group=1
->>>>
->>>> Is this the same issue fixed by EDK2 commit:
->>>>
->>>> 66127011a544b90e ("ArmPkg/ArmGicDxe ARM: fix encoding for GICv3 interrupt acknowledge")
->>>>
->>>> ... where EDK2 would try to use IAR0 rather than IAR1?
->>>>
->>>> The commit messages notes this lead to a boot-time hang.
->>>
->>> I managed to trigger an issue with a really old EFI implementation that
->>> doesn't configure its interrupts as Group1, and yet tries to ACK its
->>> interrupts using the Group1 accessor. Guess what? It is not going to work.
->>>
->>> Commit c7fefb690661f2e38afcb8200bd318ecf38ab961 in the edk2 tree seems
->>> to be the fix (I only assume it does, I haven't actually checked). A
->>> recent build, as found in Debian Buster, works perfectly (tested with
->>> both QEMU v2.12 and tip of tree).
->>>
->>> Now, I really don't get what you're saying about Linux not getting
->>> interrupts. How do you get to booting Linux if EFI is not making any
->>> forward progress? Are you trying them independently?
->>>
->> I start linux with bypassing uefi, the print info is the same.
->> [507107.748908]  vgic_mmio_write_group:## intid/27 group=0
->> [507107.752185]  vgic_mmio_write_group:## intid/27 group=0
->> [507107.899566]  vgic_mmio_write_group:## intid/27 group=1
->> [507107.907370]  vgic_mmio_write_group:## intid/27 group=1
->> the command line is like this:
->> /home/qemu-patch/linshi/qemu/aarch64-softmmu/qemu-system-aarch64  -machine virt-3.1,accel=kvm,usb=off,dump-guest-core=off,gic-version=3  -kernel /home/kernelboot/vmlinuz-4.16.0+ -initrd /home/kernelboot/initramfs-4.16.0+.img -append root=/dev/mapper/cla-root ro crashkernel=auto rd.lvm.lv=cla/root rd.lvm.lv=cla/swap.UTF-8  -drive file=/home/centos74-ph/boot.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0 -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1  -vnc 0.0.0.0:0 -k en-us -device virtio-gpu-pci,id=video0,max_outputs=1,bus=pci.3,addr=0x0 -device pvpanic-mmio -msg timestamp=on
+> Actually, len could well be three bytes smaller than write_len. The spec
+> doesn't require the device to write the three padding bytes in
+> virtio_iommu_req_tail, after the status byte.
+> 
+> Here the driver just assumes that the device wrote the reserved field.
+> The QEMU device seems to write uninitialized data in there...
+
+Indeed that's incorrect and I should fix it. tail struct should be
+properly initialized to 0. Only probe request implementation is correct.
+> 
+> Any objection to changing the spec to require the device to initialize
+> those bytes to zero? I think it makes things nicer overall and shouldn't
+> have any performance impact.
+No objection from me.
+> 
+> [...]
+>>>> +static struct iommu_domain *viommu_domain_alloc(unsigned type)
+>>>> +{
+>>>> +	struct viommu_domain *vdomain;
+>>>> +
+>>>> +	if (type != IOMMU_DOMAIN_UNMANAGED && type != IOMMU_DOMAIN_DMA)
+>>> smmu drivers also support the IDENTITY type. Don't we want to support it
+>>> as well?
 >>
->> This is strange. That's probably the Linux 4.16  kernel setting group to 0, and I'll continue to track in guest.
+>> Eventually yes. The IDENTITY domain is useful when an IOMMU has been
+>> forced upon you and gets in the way of performance, in which case you
+>> get rid of it with CONFIG_IOMMU_DEFAULT_PASSTHROUGH=y or
+>> iommu.passthrough=y. For virtio-iommu though, you could simply not
+>> instantiate the device.
+>>
+>> I don't think it's difficult to add: if the device supports
+>> VIRTIO_IOMMU_F_BYPASS, then we simply don't send an ATTACH request.
+>> Otherwise after ATTACH we send a MAP for the whole input range. If the
+>> change isn't bigger than this, I'll add it to v5.
 > 
-> Could you try the following patch:
+> Not as straightforward as I hoped, when the device doesn't support
+> VIRTIO_IOMMU_F_BYPASS:
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index c0c0b88af1d5..6fa858c7a5a6 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->   			irq->config = VGIC_CONFIG_LEVEL;
->   		}
->   
-> -		/*
-> -		 * GICv3 can only be created via the KVM_DEVICE_CREATE API and
-> -		 * so we always know the emulation type at this point as it's
-> -		 * either explicitly configured as GICv3, or explicitly
-> -		 * configured as GICv2, or not configured yet which also
-> -		 * implies GICv2.
-> -		 */
->   		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
->   			irq->group = 1;
->   		else
-> @@ -298,6 +291,16 @@ int vgic_init(struct kvm *kvm)
->   	if (ret)
->   		goto out;
->   
-> +	/* Initialize groups on CPUs created before the VGIC type was known */
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +
-> +		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
-> +			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
-> +			irq->group = 1;
-> +		}
-> +	}
-> +
->   	if (vgic_has_its(kvm)) {
->   		ret = vgic_v4_init(kvm);
->   		if (ret)
+> * We can't simply create an ID map for the whole input range, we need to
+> carve out the resv_mem regions.
 > 
+> * For a VFIO device, the host has no way of forwarding the identity
+> mapping. For example the guest will attempt to map [0; 0xffffffffffff]
+> -> [0; 0xffffffffffff], but VFIO only allows to map RAM and cannot take
+> such request. One solution is to only create ID mapping for RAM, and
+> register a notifier for memory hotplug, like intel-iommu does for IOMMUs
+> that don't support HW pass-through.
 > 
+> Since it's not completely trivial and - I think - not urgent, I'll leave
+> this for later.
+OK makes sense to me too. It was just a head up.
 
-If the value of dist->vgic_model is not properly initialized at the time 
-we call kvm_vgic_vcpu_init is call, won't we still overwrite the 
-irq->group when we get there? (I still haven't seen why we could 
-consider dist->vgic_model is initialized at that point).
+Thanks
 
-Shouldn't we do the irq->group initialization somewhere in 
-kvm_arch_vcpu_ioctl_vcpu_init? (with some vgic_* function to encapsulate 
-it of course). At that point I believe we know that dist->vgic_model is 
-initialized.
-
-Cheers,
-
--- 
-Julien Thierry
+Eric
+> 
+> Thanks,
+> Jean
+> 
