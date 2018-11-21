@@ -1,29 +1,29 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 3/4] arm64: arm_pmu: Add support for
- exclude_host/exclude_guest attributes
-Date: Wed, 21 Nov 2018 17:01:47 +0000
-Message-ID: <d956129d-cced-2d61-c247-4521f039dfba@arm.com>
-References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
- <1542723322-42536-4-git-send-email-andrew.murray@arm.com>
- <2fb3eef1-c361-8ce0-a5ad-10de66517858@arm.com>
- <20181121105601.GB42987@e119886-lin.cambridge.arm.com>
- <20181121132337.GC42987@e119886-lin.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v2 16/23] KVM: arm64: Enumerate SVE register indices
+ for KVM_GET_REG_LIST
+Date: Wed, 21 Nov 2018 17:46:59 +0000
+Message-ID: <20181121174658.GE3505@e103592.cambridge.arm.com>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
+ <87k1l6ifa8.fsf@linaro.org>
+ <20181121163201.GC3505@e103592.cambridge.arm.com>
+ <87ftvuide0.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF2D4A236
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:01:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F224F49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:47:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HXwov8nsDto9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 12:01:51 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC7EB4A1DE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:01:50 -0500 (EST)
-In-Reply-To: <20181121132337.GC42987@e119886-lin.cambridge.arm.com>
-Content-Language: en-US
+ with ESMTP id p0zgioOOH+nB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Nov 2018 12:47:04 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F33E40A6E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:47:04 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <87ftvuide0.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,174 +33,81 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Wed, Nov 21, 2018 at 04:49:59PM +0000, Alex Benn=E9e wrote:
+> =
 
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
 
-On 21/11/2018 13:23, Andrew Murray wrote:
-> On Wed, Nov 21, 2018 at 10:56:02AM +0000, Andrew Murray wrote:
->> On Tue, Nov 20, 2018 at 02:49:05PM +0000, Suzuki K Poulose wrote:
->>> On 11/20/2018 02:15 PM, Andrew Murray wrote:
->>>> Add support for the :G and :H attributes in perf by handling the
->>>> exclude_host/exclude_guest event attributes.
->>>>
->>>> We notify KVM of counters that we wish to be enabled or disabled on
->>>> guest entry/exit and thus defer from starting or stopping :G events
->>>> as per the events exclude_host attribute.
->>>>
->>>> When using VHE, EL2 is unused by the guest - therefore we can filter
->>>> out these events with the PMU as per the 'exclude_host' attribute.
->>>>
->>>> With both VHE and non-VHE we switch the counters between host/guest
->>>> at EL2. With non-VHE when using 'exclude_host' we filter out EL2.
->>>>
->>>> These changes eliminate counters counting host events on the
->>>> boundaries of guest entry/exit when using :G. However when using :H
->>>> unless exclude_hv is set on non-VHE then there is a small blackout
->>>> window at the guest entry/exit where host events are not captured.
->>>>
->>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
->>>> ---
->>>>    arch/arm64/kernel/perf_event.c | 41 +++++++++++++++++++++++++++++++++++------
->>
-> 
-> 
->>> 	
->>>> +	}
->>>>    }
->>>>    static inline int armv8pmu_disable_counter(int idx)
->>>> @@ -664,11 +677,23 @@ static inline int armv8pmu_disable_counter(int idx)
->>>>    static inline void armv8pmu_disable_event_counter(struct perf_event *event)
->>>>    {
->>>>    	struct hw_perf_event *hwc = &event->hw;
->>>> +	struct perf_event_attr *attr = &event->attr;
->>>>    	int idx = hwc->idx;
->>>> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
->>>>    	if (armv8pmu_event_is_chained(event))
->>>> -		armv8pmu_disable_counter(idx - 1);
->>>> -	armv8pmu_disable_counter(idx);
->>>> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
->>>> +
->>>> +	if (attr->exclude_host)
->>>> +		kvm_set_clr_guest_pmu_events(counter_bits, 0);
->>>> +	if (attr->exclude_guest)
->>>> +		kvm_set_clr_host_pmu_events(counter_bits, 0);
->>>> +
->>>> +	if (!attr->exclude_host) {
->>>> +		if (armv8pmu_event_is_chained(event))
->>>> +			armv8pmu_disable_counter(idx - 1);
->>>> +		armv8pmu_disable_counter(idx);
->>>> +	}
->>>>    }
->>>>    static inline int armv8pmu_enable_intens(int idx)
->>>> @@ -945,12 +970,12 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
->>>>    	 * with other architectures (x86 and Power).
->>>>    	 */
->>>>    	if (is_kernel_in_hyp_mode()) {
->>>> -		if (!attr->exclude_kernel)
->>>> +		if (!attr->exclude_kernel && !attr->exclude_host)
->>>>    			config_base |= ARMV8_PMU_INCLUDE_EL2;
->>>
->>> Shouldn't we handle "exclude_kernel" for a "Guest" event ?
->>> i.e, what if we have exclude_kernel + exclude_host set ? Doesn't
->>> the "exclude_kernel" apply to the event filtering after we enter
->>> guest and thus, we need to set the EXCLUDE_EL1 ?
->>
->> Yes you're right. This is a problem not just for a VHE host's guest but
->> for the host as well - for example perf -e instructions:h and
->> -e instructions:G will currently give the same count.
->>
->>>
->>> Also I am wondering what is the situation with Nested virtualisation
->>> coming in. i.e, if the host hyp wanted to profile the guest hyp, should
->>> we set EL2 events ? I understand this is something which should be
->>> solved with the nested virt changes. But it would be good to see
->>> if we could filter "exclude_host" and "exclude_guest" at the hypervisor
->>> level (i.e, in software, without PMU filtering) to allow the normal
->>> controls to make use of the hardware filtering ?
->>
->> It took me a while to think this through and I think you're right in
->> that we can do more to future proof this for nested virt. In fact we
->> don't depend on the hunks in this function (i.e. addition of extra
->> '!attr->exclude_host' conditions) - we don't need them due to the
->> enable/disable of counters at guest entry/exit.
->>
->> With the assumption of the hypervisor switch enabling/disabling
->> host/guest counters I think we can now do the following:
->>
->>          /*
->>           * If we're running in hyp mode, then we *are* the hypervisor.
->>           * Therefore we ignore exclude_hv in this configuration, since
->>           * there's no hypervisor to sample anyway. This is consistent
->>           * with other architectures (x86 and Power).
->>           */
->>          if (is_kernel_in_hyp_mode())
->>                  if (!attr->exclude_kernel)
->>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
->>          else
->>                  if (!attr->exclude_hv)
->>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
->>
->>          if (attr->exclude_kernel)
->>                  config_base |= ARMV8_PMU_EXCLUDE_EL1;
->>
->>          if (attr->exclude_user)
->>                  config_base |= ARMV8_PMU_EXCLUDE_EL0;
->>
->> Also for nested virt we'd need to update
->> kvm_pmu_set_counter_event_type to ensure exclude_kernel is set when
->> the guest attempts to include EL2 to count a VHE guest kernel.
->>
->> Does this look right?
-> 
-> Actually I think this is more correct:
-> 
+> > On Wed, Nov 21, 2018 at 04:09:03PM +0000, Alex Benn=E9e wrote:
+> >>
+> >> Dave Martin <Dave.Martin@arm.com> writes:
 
+[...]
 
->          /*
->           * If we're running in hyp mode, then we *are* the hypervisor.
->           * Therefore we ignore exclude_hv in this configuration, since
->           * there's no hypervisor to sample anyway. This is consistent
->           * with other architectures (x86 and Power).
->           *
->           * To eliminate counting host events on the boundaries of
->           * guest entry/exit we ensure EL2 is not included in hyp mode
->           * with !exclude_host.
->           */
->          if (is_kernel_in_hyp_mode())
->                  if (!attr->exclude_kernel && !attr->exclude_host)
->                          config_base |= ARMV8_PMU_INCLUDE_EL2;
+> >> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> >> > index 320db0f..89eab68 100644
+> >> > --- a/arch/arm64/kvm/guest.c
+> >> > +++ b/arch/arm64/kvm/guest.c
+> >> > @@ -323,6 +323,46 @@ static int get_timer_reg(struct kvm_vcpu *vcpu,=
+ const struct kvm_one_reg *reg)
+> >> >  	return copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)) ? -EFAULT =
+: 0;
+> >> >  }
+> >> >
+> >> > +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+> >> > +{
+> >> > +	const unsigned int slices =3D DIV_ROUND_UP(
+> >> > +		vcpu->arch.sve_max_vl,
+> >> > +		KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0)));
+> >>
+> >> Having seen this formulation come up several times now I wonder if the=
+re
+> >> should be a kernel private define, KVM_SVE_ZREG/PREG_SIZE to avoid this
+> >> clumsiness.
+> >
+> > I agree it's a bit awkward.  Previous I spelled this "0x100", which
+> > was terse but more sensitive to typos and other screwups that Io
+> > liked.
+> >
+> >> You could still use the KVM_REG_SIZE to extract it as I guess this is =
+to
+> >> make changes simpler if/when the SVE reg size gets bumped up.
+> >
+> > That might be more challenging to determine at compile time.
+> >
+> > I'm not sure how good GCC is at doing const-propagation between related
+> > (but different) expressions, so I preferred to go for something that
+> > is clearly compiletime constant rather than extracting it from the
+> > register ID that came from userspace.
+> >
+> > So, I'd prefer not to use KVM_REG_SIZE() for this, but I'm happy to add
+> > a private #define to hide this cumbersome construct.  That would
+> > certainly make the code more readable.
+> >
+> > (Of course, the actual runtime cost is trivial either way, but I felt
+> > it was easier to reason about correctness if this is really a constant.)
+> >
+> >
+> > Sound OK?
+> =
 
-You beat me to it. I was thinking about it and was planning to respond
-with the same suggestion.
+> Yes.
+> =
 
->          else
->                  if (!attr->exclude_hv)
->                          config_base |= ARMV8_PMU_INCLUDE_EL2;
-> 
->          /*
->           * Filter out !VHE kernels and guest kernels
->           */
->          if (attr->exclude_kernel)
->                  config_base |= ARMV8_PMU_EXCLUDE_EL1;
-> 
->          if (attr->exclude_user)
->                  config_base |= ARMV8_PMU_EXCLUDE_EL0;
-> 
-> 
-> The reason for re-adding the !attr->exclude_host is to prevent
-> leakage of host events getting counted when using guest_only and thus
-> prevents information exposing to the guest. On VHE we flip the counters
-> from host to guest shortly before entering the guest - if we don't
-> exclude EL2 then we start counting host time between the counter flip
-> and actually entering the guest. As the guests will always be EL1/EL0
-> we really should exclude EL2. I don't think this breaks any nested
-> virt use case as EL2 is only ever emulated right?
+> I'd almost suggested by not just use KVM_REG_SIZE(KVM_REG_SIZE_U2048)
+> earlier until I realised this might be forward looking.
 
-I am not sure about the Nested virt case. But I think this looks
-fine with me.
+Having the slice size as 2048 bits is a property of the ABI and isn't
+intended to change in the future.
+
+So, I guess we could write the above, but I prefer to have the size
+determined in the fewest number of places possible.
+
 
 Cheers
-Suzuki
+---Dave
