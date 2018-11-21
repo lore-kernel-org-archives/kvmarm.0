@@ -1,29 +1,29 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 16/23] KVM: arm64: Enumerate SVE register indices
- for KVM_GET_REG_LIST
-Date: Wed, 21 Nov 2018 16:49:59 +0000
-Message-ID: <87ftvuide0.fsf@linaro.org>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
- <87k1l6ifa8.fsf@linaro.org> <20181121163201.GC3505@e103592.cambridge.arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 3/4] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Wed, 21 Nov 2018 17:01:47 +0000
+Message-ID: <d956129d-cced-2d61-c247-4521f039dfba@arm.com>
+References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
+ <1542723322-42536-4-git-send-email-andrew.murray@arm.com>
+ <2fb3eef1-c361-8ce0-a5ad-10de66517858@arm.com>
+ <20181121105601.GB42987@e119886-lin.cambridge.arm.com>
+ <20181121132337.GC42987@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 573474A236
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:50:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF2D4A236
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:01:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mLvxCeXxN+s7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 11:50:02 -0500 (EST)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 199594A0CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:50:02 -0500 (EST)
-Received: by mail-wm1-f65.google.com with SMTP id u13-v6so6465604wmc.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 08:50:02 -0800 (PST)
-In-reply-to: <20181121163201.GC3505@e103592.cambridge.arm.com>
+ with ESMTP id HXwov8nsDto9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Nov 2018 12:01:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC7EB4A1DE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 12:01:50 -0500 (EST)
+In-Reply-To: <20181121132337.GC42987@e119886-lin.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,65 +33,174 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFdlZCwgTm92
-IDIxLCAyMDE4IGF0IDA0OjA5OjAzUE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4KPj4g
-RGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+IHdyaXRlczoKPj4KPj4gPiBUaGlzIHBh
-dGNoIGluY2x1ZGVzIHRoZSBTVkUgcmVnaXN0ZXIgSURzIGluIHRoZSBsaXN0IHJldHVybmVkIGJ5
-Cj4+ID4gS1ZNX0dFVF9SRUdfTElTVCwgYXMgYXBwcm9wcmlhdGUuCj4+ID4KPj4gPiBPbiBhIG5v
-bi1TVkUtZW5hYmxlZCB2Y3B1LCBubyBleHRyYSBJRHMgYXJlIGFkZGVkLgo+PiA+Cj4+ID4gT24g
-YW4gU1ZFLWVuYWJsZWQgdmNwdSwgdGhlIGFwcHJvcHJpYXRlIG51bWJlciBvZiBzbGljZSBJRHMg
-YXJlCj4+ID4gZW51bWVyYXRlZCBmb3IgZWFjaCBTVkUgcmVnaXN0ZXIsIGRlcGVuZGluZyBvbiB0
-aGUgbWF4aW11bSB2ZWN0b3IKPj4gPiBsZW5ndGggZm9yIHRoZSB2Y3B1Lgo+PiA+Cj4+ID4gU2ln
-bmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+Cj4+ID4gLS0tCj4+
-ID4KPj4gPiBDaGFuZ2VzIHNpbmNlIFJGQ3YxOgo+PiA+Cj4+ID4gICogU2ltcGxpZnkgZW51bWVy
-YXRlX3N2ZV9yZWdzKCkgYmFzZWQgb24gQW5kcmV3IEpvbmVzJyBhcHByb2FjaC4KPj4gPgo+PiA+
-ICAqIFJlZyBjb3B5aW5nIGxvb3BzIGFyZSBpbnZlcnRlZCBmb3IgYnJldml0eSwgc2luY2UgdGhl
-IG9yZGVyIHdlCj4+ID4gICAgc3BpdCBvdXQgdGhlIHJlZ3MgaW4gZG9lc24ndCByZWFsbHkgbWF0
-dGVyLgo+PiA+Cj4+ID4gKEkgdHJpZWQgdG8ga2VlcCBwYXJ0IG9mIG15IGFwcHJvYWNoIHRvIGF2
-b2lkIHRoZSBkdXBsaWNhdGUgbG9naWMKPj4gPiBiZXR3ZWVuIG51bV9zdmVfcmVncygpIGFuZCBj
-b3B5X3N2ZV9yZWdfaW5kaWNlcygpLCBidXQgYWx0aG91Z2gKPj4gPiBpdCB3b3JrcyBpbiBwcmlu
-Y2lwbGUsIGdjYyBmYWlscyB0byBmdWxseSBjb2xsYXBzZSB0aGUgbnVtX3JlZ3MoKQo+PiA+IGNh
-c2UuLi4gc28gSSBnYXZlIHVwLiAgVGhlIHR3byBmdW5jdGlvbnMgbmVlZCB0byBiZSBtYW51YWxs
-eSBrZXB0Cj4+ID4gY29uc2lzdGVudCwgYnV0IGhvcGVmdWxseSB0aGF0J3MgZmFpcmx5IHN0cmFp
-Z2h0Zm9yd2FyZC4pCj4+ID4gLS0tCj4+ID4gIGFyY2gvYXJtNjQva3ZtL2d1ZXN0LmMgfCA0NSAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKPj4gPiAgMSBmaWxl
-IGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKykKPj4gPgo+PiA+IGRpZmYgLS1naXQgYS9hcmNoL2Fy
-bTY0L2t2bS9ndWVzdC5jIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+PiA+IGluZGV4IDMyMGRi
-MGYuLjg5ZWFiNjggMTAwNjQ0Cj4+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+PiA+
-ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMKPj4gPiBAQCAtMzIzLDYgKzMyMyw0NiBAQCBz
-dGF0aWMgaW50IGdldF90aW1lcl9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1
-Y3Qga3ZtX29uZV9yZWcgKnJlZykKPj4gPiAgCXJldHVybiBjb3B5X3RvX3VzZXIodWFkZHIsICZ2
-YWwsIEtWTV9SRUdfU0laRShyZWctPmlkKSkgPyAtRUZBVUxUIDogMDsKPj4gPiAgfQo+PiA+Cj4+
-ID4gK3N0YXRpYyB1bnNpZ25lZCBsb25nIG51bV9zdmVfcmVncyhjb25zdCBzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpCj4+ID4gK3sKPj4gPiArCWNvbnN0IHVuc2lnbmVkIGludCBzbGljZXMgPSBESVZf
-Uk9VTkRfVVAoCj4+ID4gKwkJdmNwdS0+YXJjaC5zdmVfbWF4X3ZsLAo+PiA+ICsJCUtWTV9SRUdf
-U0laRShLVk1fUkVHX0FSTTY0X1NWRV9aUkVHKDAsIDApKSk7Cj4+Cj4+IEhhdmluZyBzZWVuIHRo
-aXMgZm9ybXVsYXRpb24gY29tZSB1cCBzZXZlcmFsIHRpbWVzIG5vdyBJIHdvbmRlciBpZiB0aGVy
-ZQo+PiBzaG91bGQgYmUgYSBrZXJuZWwgcHJpdmF0ZSBkZWZpbmUsIEtWTV9TVkVfWlJFRy9QUkVH
-X1NJWkUgdG8gYXZvaWQgdGhpcwo+PiBjbHVtc2luZXNzLgo+Cj4gSSBhZ3JlZSBpdCdzIGEgYml0
-IGF3a3dhcmQuICBQcmV2aW91cyBJIHNwZWxsZWQgdGhpcyAiMHgxMDAiLCB3aGljaAo+IHdhcyB0
-ZXJzZSBidXQgbW9yZSBzZW5zaXRpdmUgdG8gdHlwb3MgYW5kIG90aGVyIHNjcmV3dXBzIHRoYXQg
-SW8KPiBsaWtlZC4KPgo+PiBZb3UgY291bGQgc3RpbGwgdXNlIHRoZSBLVk1fUkVHX1NJWkUgdG8g
-ZXh0cmFjdCBpdCBhcyBJIGd1ZXNzIHRoaXMgaXMgdG8KPj4gbWFrZSBjaGFuZ2VzIHNpbXBsZXIg
-aWYvd2hlbiB0aGUgU1ZFIHJlZyBzaXplIGdldHMgYnVtcGVkIHVwLgo+Cj4gVGhhdCBtaWdodCBi
-ZSBtb3JlIGNoYWxsZW5naW5nIHRvIGRldGVybWluZSBhdCBjb21waWxlIHRpbWUuCj4KPiBJJ20g
-bm90IHN1cmUgaG93IGdvb2QgR0NDIGlzIGF0IGRvaW5nIGNvbnN0LXByb3BhZ2F0aW9uIGJldHdl
-ZW4gcmVsYXRlZAo+IChidXQgZGlmZmVyZW50KSBleHByZXNzaW9ucywgc28gSSBwcmVmZXJyZWQg
-dG8gZ28gZm9yIHNvbWV0aGluZyB0aGF0Cj4gaXMgY2xlYXJseSBjb21waWxldGltZSBjb25zdGFu
-dCByYXRoZXIgdGhhbiBleHRyYWN0aW5nIGl0IGZyb20gdGhlCj4gcmVnaXN0ZXIgSUQgdGhhdCBj
-YW1lIGZyb20gdXNlcnNwYWNlLgo+Cj4gU28sIEknZCBwcmVmZXIgbm90IHRvIHVzZSBLVk1fUkVH
-X1NJWkUoKSBmb3IgdGhpcywgYnV0IEknbSBoYXBweSB0byBhZGQKPiBhIHByaXZhdGUgI2RlZmlu
-ZSB0byBoaWRlIHRoaXMgY3VtYmVyc29tZSBjb25zdHJ1Y3QuICBUaGF0IHdvdWxkCj4gY2VydGFp
-bmx5IG1ha2UgdGhlIGNvZGUgbW9yZSByZWFkYWJsZS4KPgo+IChPZiBjb3Vyc2UsIHRoZSBhY3R1
-YWwgcnVudGltZSBjb3N0IGlzIHRyaXZpYWwgZWl0aGVyIHdheSwgYnV0IEkgZmVsdAo+IGl0IHdh
-cyBlYXNpZXIgdG8gcmVhc29uIGFib3V0IGNvcnJlY3RuZXNzIGlmIHRoaXMgaXMgcmVhbGx5IGEg
-Y29uc3RhbnQuKQo+Cj4KPiBTb3VuZCBPSz8KClllcy4KCkknZCBhbG1vc3Qgc3VnZ2VzdGVkIGJ5
-IG5vdCBqdXN0IHVzZSBLVk1fUkVHX1NJWkUoS1ZNX1JFR19TSVpFX1UyMDQ4KQplYXJsaWVyIHVu
-dGlsIEkgcmVhbGlzZWQgdGhpcyBtaWdodCBiZSBmb3J3YXJkIGxvb2tpbmcuCgotLQpBbGV4IEJl
-bm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
-YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
-dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+
+
+On 21/11/2018 13:23, Andrew Murray wrote:
+> On Wed, Nov 21, 2018 at 10:56:02AM +0000, Andrew Murray wrote:
+>> On Tue, Nov 20, 2018 at 02:49:05PM +0000, Suzuki K Poulose wrote:
+>>> On 11/20/2018 02:15 PM, Andrew Murray wrote:
+>>>> Add support for the :G and :H attributes in perf by handling the
+>>>> exclude_host/exclude_guest event attributes.
+>>>>
+>>>> We notify KVM of counters that we wish to be enabled or disabled on
+>>>> guest entry/exit and thus defer from starting or stopping :G events
+>>>> as per the events exclude_host attribute.
+>>>>
+>>>> When using VHE, EL2 is unused by the guest - therefore we can filter
+>>>> out these events with the PMU as per the 'exclude_host' attribute.
+>>>>
+>>>> With both VHE and non-VHE we switch the counters between host/guest
+>>>> at EL2. With non-VHE when using 'exclude_host' we filter out EL2.
+>>>>
+>>>> These changes eliminate counters counting host events on the
+>>>> boundaries of guest entry/exit when using :G. However when using :H
+>>>> unless exclude_hv is set on non-VHE then there is a small blackout
+>>>> window at the guest entry/exit where host events are not captured.
+>>>>
+>>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>>>> ---
+>>>>    arch/arm64/kernel/perf_event.c | 41 +++++++++++++++++++++++++++++++++++------
+>>
+> 
+> 
+>>> 	
+>>>> +	}
+>>>>    }
+>>>>    static inline int armv8pmu_disable_counter(int idx)
+>>>> @@ -664,11 +677,23 @@ static inline int armv8pmu_disable_counter(int idx)
+>>>>    static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+>>>>    {
+>>>>    	struct hw_perf_event *hwc = &event->hw;
+>>>> +	struct perf_event_attr *attr = &event->attr;
+>>>>    	int idx = hwc->idx;
+>>>> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>>>>    	if (armv8pmu_event_is_chained(event))
+>>>> -		armv8pmu_disable_counter(idx - 1);
+>>>> -	armv8pmu_disable_counter(idx);
+>>>> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+>>>> +
+>>>> +	if (attr->exclude_host)
+>>>> +		kvm_set_clr_guest_pmu_events(counter_bits, 0);
+>>>> +	if (attr->exclude_guest)
+>>>> +		kvm_set_clr_host_pmu_events(counter_bits, 0);
+>>>> +
+>>>> +	if (!attr->exclude_host) {
+>>>> +		if (armv8pmu_event_is_chained(event))
+>>>> +			armv8pmu_disable_counter(idx - 1);
+>>>> +		armv8pmu_disable_counter(idx);
+>>>> +	}
+>>>>    }
+>>>>    static inline int armv8pmu_enable_intens(int idx)
+>>>> @@ -945,12 +970,12 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>>>>    	 * with other architectures (x86 and Power).
+>>>>    	 */
+>>>>    	if (is_kernel_in_hyp_mode()) {
+>>>> -		if (!attr->exclude_kernel)
+>>>> +		if (!attr->exclude_kernel && !attr->exclude_host)
+>>>>    			config_base |= ARMV8_PMU_INCLUDE_EL2;
+>>>
+>>> Shouldn't we handle "exclude_kernel" for a "Guest" event ?
+>>> i.e, what if we have exclude_kernel + exclude_host set ? Doesn't
+>>> the "exclude_kernel" apply to the event filtering after we enter
+>>> guest and thus, we need to set the EXCLUDE_EL1 ?
+>>
+>> Yes you're right. This is a problem not just for a VHE host's guest but
+>> for the host as well - for example perf -e instructions:h and
+>> -e instructions:G will currently give the same count.
+>>
+>>>
+>>> Also I am wondering what is the situation with Nested virtualisation
+>>> coming in. i.e, if the host hyp wanted to profile the guest hyp, should
+>>> we set EL2 events ? I understand this is something which should be
+>>> solved with the nested virt changes. But it would be good to see
+>>> if we could filter "exclude_host" and "exclude_guest" at the hypervisor
+>>> level (i.e, in software, without PMU filtering) to allow the normal
+>>> controls to make use of the hardware filtering ?
+>>
+>> It took me a while to think this through and I think you're right in
+>> that we can do more to future proof this for nested virt. In fact we
+>> don't depend on the hunks in this function (i.e. addition of extra
+>> '!attr->exclude_host' conditions) - we don't need them due to the
+>> enable/disable of counters at guest entry/exit.
+>>
+>> With the assumption of the hypervisor switch enabling/disabling
+>> host/guest counters I think we can now do the following:
+>>
+>>          /*
+>>           * If we're running in hyp mode, then we *are* the hypervisor.
+>>           * Therefore we ignore exclude_hv in this configuration, since
+>>           * there's no hypervisor to sample anyway. This is consistent
+>>           * with other architectures (x86 and Power).
+>>           */
+>>          if (is_kernel_in_hyp_mode())
+>>                  if (!attr->exclude_kernel)
+>>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
+>>          else
+>>                  if (!attr->exclude_hv)
+>>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
+>>
+>>          if (attr->exclude_kernel)
+>>                  config_base |= ARMV8_PMU_EXCLUDE_EL1;
+>>
+>>          if (attr->exclude_user)
+>>                  config_base |= ARMV8_PMU_EXCLUDE_EL0;
+>>
+>> Also for nested virt we'd need to update
+>> kvm_pmu_set_counter_event_type to ensure exclude_kernel is set when
+>> the guest attempts to include EL2 to count a VHE guest kernel.
+>>
+>> Does this look right?
+> 
+> Actually I think this is more correct:
+> 
+
+
+>          /*
+>           * If we're running in hyp mode, then we *are* the hypervisor.
+>           * Therefore we ignore exclude_hv in this configuration, since
+>           * there's no hypervisor to sample anyway. This is consistent
+>           * with other architectures (x86 and Power).
+>           *
+>           * To eliminate counting host events on the boundaries of
+>           * guest entry/exit we ensure EL2 is not included in hyp mode
+>           * with !exclude_host.
+>           */
+>          if (is_kernel_in_hyp_mode())
+>                  if (!attr->exclude_kernel && !attr->exclude_host)
+>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
+
+You beat me to it. I was thinking about it and was planning to respond
+with the same suggestion.
+
+>          else
+>                  if (!attr->exclude_hv)
+>                          config_base |= ARMV8_PMU_INCLUDE_EL2;
+> 
+>          /*
+>           * Filter out !VHE kernels and guest kernels
+>           */
+>          if (attr->exclude_kernel)
+>                  config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> 
+>          if (attr->exclude_user)
+>                  config_base |= ARMV8_PMU_EXCLUDE_EL0;
+> 
+> 
+> The reason for re-adding the !attr->exclude_host is to prevent
+> leakage of host events getting counted when using guest_only and thus
+> prevents information exposing to the guest. On VHE we flip the counters
+> from host to guest shortly before entering the guest - if we don't
+> exclude EL2 then we start counting host time between the counter flip
+> and actually entering the guest. As the guests will always be EL1/EL0
+> we really should exclude EL2. I don't think this breaks any nested
+> virt use case as EL2 is only ever emulated right?
+
+I am not sure about the Nested virt case. But I think this looks
+fine with me.
+
+Cheers
+Suzuki
