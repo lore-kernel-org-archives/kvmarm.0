@@ -1,197 +1,204 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 15/23] KVM: arm64/sve: Add SVE support to register
- access ioctl interface
-Date: Wed, 21 Nov 2018 15:20:15 +0000
-Message-ID: <87lg5mihjk.fsf@linaro.org>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-16-git-send-email-Dave.Martin@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
+Date: Wed, 21 Nov 2018 16:24:09 +0100
+Message-ID: <20181121152409.GC17441@e113682-lin.lund.arm.com>
+References: <01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com>
+ <201811211656540883310@zte.com.cn>
+ <20181121110620.GC18678@e113682-lin.lund.arm.com>
+ <26c4ad81-f808-5a84-c725-72db8de7cd2b@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E9B84A30B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 10:20:19 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t1ABLl+kohOI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 10:20:18 -0500 (EST)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FD3B4A1F2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 10:20:18 -0500 (EST)
-Received: by mail-wr1-f65.google.com with SMTP id v6so6081407wrr.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 07:20:17 -0800 (PST)
-In-reply-to: <1538141967-15375-16-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <26c4ad81-f808-5a84-c725-72db8de7cd2b@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: peng.hao2@zte.com.cn, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
-YWRkcyB0aGUgZm9sbG93aW5nIHJlZ2lzdGVycyBmb3IgYWNjZXNzIHZpYSB0aGUKPiBLVk1fe0dF
-VCxTRVR9X09ORV9SRUcgaW50ZXJmYWNlOgo+Cj4gICogS1ZNX1JFR19BUk02NF9TVkVfWlJFRyhu
-LCBpKSAobiA9IDAuLjMxKSAoaW4gMjA0OC1iaXQgc2xpY2VzKQo+ICAqIEtWTV9SRUdfQVJNNjRf
-U1ZFX1BSRUcobiwgaSkgKG4gPSAwLi4xNSkgKGluIDI1Ni1iaXQgc2xpY2VzKQo+ICAqIEtWTV9S
-RUdfQVJNNjRfU1ZFX0ZGUihpKSAoaW4gMjU2LWJpdCBzbGljZXMpCj4KPiBJbiBvcmRlciB0byBh
-ZGFwdCBncmFjZWZ1bGx5IHRvIGZ1dHVyZSBhcmNoaXRlY3R1cmFsIGV4dGVuc2lvbnMsCj4gdGhl
-IHJlZ2lzdGVycyBhcmUgZGl2aWRlZCB1cCBpbnRvIHNsaWNlcyBhcyBub3RlZCBhYm92ZTogIHRo
-ZSBpCj4gcGFyYW1ldGVyIGRlbm90ZXMgdGhlIHNsaWNlIGluZGV4Lgo+Cj4gRm9yIHNpbXBsaWNp
-dHksIGJpdHMgb3Igc2xpY2VzIHRoYXQgZXhjZWVkIHRoZSBtYXhpbXVtIHZlY3Rvcgo+IGxlbmd0
-aCBzdXBwb3J0ZWQgZm9yIHRoZSB2Y3B1IGFyZSBpZ25vcmVkIGZvciBLVk1fU0VUX09ORV9SRUcs
-IGFuZAo+IHJlYWQgYXMgemVybyBmb3IgS1ZNX0dFVF9PTkVfUkVHLgo+Cj4gRm9yIHRoZSBjdXJy
-ZW50IGFyY2hpdGVjdHVyZSwgb25seSBzbGljZSBpID0gMCBpcyBzaWduaWZpY2FudC4gIFRoZQo+
-IGludGVyZmFjZSBkZXNpZ24gYWxsb3dzIGkgdG8gaW5jcmVhc2UgdG8gdXAgdG8gMzEgaW4gdGhl
-IGZ1dHVyZSBpZgo+IHJlcXVpcmVkIGJ5IGZ1dHVyZSBhcmNoaXRlY3R1cmFsIGFtZW5kbWVudHMu
-Cj4KPiBUaGUgcmVnaXN0ZXJzIGFyZSBvbmx5IHZpc2libGUgZm9yIHZjcHVzIHRoYXQgaGF2ZSBT
-VkUgZW5hYmxlZC4KPiBUaGV5IGFyZSBub3QgZW51bWVyYXRlZCBieSBLVk1fR0VUX1JFR19MSVNU
-IG9uIHZjcHVzIHRoYXQgZG8gbm90Cj4gaGF2ZSBTVkUuICBJbiBhbGwgY2FzZXMsIHN1cnBsdXMg
-c2xpY2VzIGFyZSBub3QgZW51bWVyYXRlZCBieQo+IEtWTV9HRVRfUkVHX0xJU1QuCj4KPiBBY2Nl
-c3NlcyB0byB0aGUgRlBTSU1EIHJlZ2lzdGVycyB2aWEgS1ZNX1JFR19BUk1fQ09SRSBpcyBub3QK
-PiBhbGxvd2VkIGZvciBTVkUtZW5hYmxlZCB2Y3B1czogU1ZFLWF3YXJlIHVzZXJzcGFjZSBjYW4g
-dXNlIHRoZQo+IEtWTV9SRUdfQVJNNjRfU1ZFX1pSRUcoKSBpbnRlcmZhY2UgaW5zdGVhZCB0byBh
-Y2Nlc3MgdGhlIHNhbWUKPiByZWdpc3RlciBzdGF0ZS4gIFRoaXMgYXZvaWRzIHNvbWUgY29tcGxl
-eCBhbmQgcG9pbnRsZXNzIGVtbHVhdGlvbgo+IGluIHRoZSBrZXJuZWwuCj4KPiBTaWduZWQtb2Zm
-LWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KPiAtLS0KPgo+IENoYW5nZXMg
-c2luY2UgUkZDdjE6Cj4KPiAgKiBSZWZhY3RvcmVkIHRvIHJlbW92ZSBlbXVsYXRpb24gb2YgRlBT
-SU1EIHJlZ2lzdGVycyB3aXRoIHRoZSBTVkUKPiAgICByZWdpc3RlciB2aWV3IGFuZCB2aWNlLXZl
-cnNhLiAgVGhpcyBzaW1wbGlmaWVzIHRoZSBjb2RlIGEgZmFpciBiaXQuCj4KPiAgKiBGaXhlZCBh
-IGNvdXBsZSBvZiByYW5nZSBlcnJvcnMuCj4KPiAgKiBJbmxpbmVkIHZhcmlvdXMgdHJpdmlhbCBo
-ZWxwZXJzIHRoYXQgbm93IGhhdmUgb25seSBvbmUgY2FsbCBzaXRlLgo+Cj4gICogVXNlIEtWTV9S
-RUdfU0laRSgpIGFzIGEgc3ltYm9saWMgd2F5IG9mIGdldHRpbmcgU1ZFIHJlZ2lzdGVyIHNsaWNl
-Cj4gICAgc2l6ZXMuCj4gLS0tCj4gIGFyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCB8
-ICAxMCArKysKPiAgYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYyAgICAgICAgICAgIHwgMTQ3ICsrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tCj4gIDIgZmlsZXMgY2hhbmdlZCwgMTQ1
-IGluc2VydGlvbnMoKyksIDEyIGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJt
-NjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9r
-dm0uaAo+IGluZGV4IDk3YzM0NzguLjFmZjY4ZmEgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9p
-bmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNt
-L2t2bS5oCj4gQEAgLTIyNiw2ICsyMjYsMTYgQEAgc3RydWN0IGt2bV92Y3B1X2V2ZW50cyB7Cj4g
-IAkJCQkJIEtWTV9SRUdfQVJNX0ZXIHwgKChyKSAmIDB4ZmZmZikpCj4gICNkZWZpbmUgS1ZNX1JF
-R19BUk1fUFNDSV9WRVJTSU9OCUtWTV9SRUdfQVJNX0ZXX1JFRygwKQo+Cj4gKy8qIFNWRSByZWdp
-c3RlcnMgKi8KPiArI2RlZmluZSBLVk1fUkVHX0FSTTY0X1NWRQkJKDB4MTUgPDwgS1ZNX1JFR19B
-Uk1fQ09QUk9DX1NISUZUKQo+ICsjZGVmaW5lIEtWTV9SRUdfQVJNNjRfU1ZFX1pSRUcobiwgaSkJ
-KEtWTV9SRUdfQVJNNjQgfCBLVk1fUkVHX0FSTTY0X1NWRSB8IFwKPiArCQkJCQkgS1ZNX1JFR19T
-SVpFX1UyMDQ4IHwJCVwKPiArCQkJCQkgKChuKSA8PCA1KSB8IChpKSkKPiArI2RlZmluZSBLVk1f
-UkVHX0FSTTY0X1NWRV9QUkVHKG4sIGkpCShLVk1fUkVHX0FSTTY0IHwgS1ZNX1JFR19BUk02NF9T
-VkUgfCBcCj4gKwkJCQkJIEtWTV9SRUdfU0laRV9VMjU2IHwJCVwKPiArCQkJCQkgKChuKSA8PCA1
-KSB8IChpKSB8IDB4NDAwKQoKV2hhdCdzIHRoZSAweDQwMCBmb3I/IEFyZW4ndCBQUkVHJ3MgYWxy
-ZWFkeSB1bmlxdWUgYnkgYmVpbmcgMjU2IGJpdCB2cwp0aGUgWiByZWdzIDIwNDggYml0IHNpemU/
-Cgo+ICsjZGVmaW5lIEtWTV9SRUdfQVJNNjRfU1ZFX0ZGUihpKQlLVk1fUkVHX0FSTTY0X1NWRV9Q
-UkVHKDE2LCBpKQo+ICsKPiAgLyogRGV2aWNlIENvbnRyb2wgQVBJOiBBUk0gVkdJQyAqLwo+ICAj
-ZGVmaW5lIEtWTV9ERVZfQVJNX1ZHSUNfR1JQX0FERFIJMAo+ICAjZGVmaW5lIEtWTV9ERVZfQVJN
-X1ZHSUNfR1JQX0RJU1RfUkVHUwkxCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0
-LmMgYi9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCj4gaW5kZXggOTUzYTVjOS4uMzIwZGIwZiAxMDA2
-NDQKPHNuaXA+Cj4KPiBAQCAtMTMwLDYgKzE1NCwxMDcgQEAgc3RhdGljIGludCBzZXRfY29yZV9y
-ZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykK
-PiAgCXJldHVybiBlcnI7Cj4gIH0KPgo+ICtzdHJ1Y3Qga3JlZ19yZWdpb24gewo+ICsJY2hhciAq
-a3B0cjsKPiArCXNpemVfdCBzaXplOwo+ICsJc2l6ZV90IHplcm9wYWQ7Cj4gK307Cj4gKwo+ICsj
-ZGVmaW5lIFNWRV9SRUdfU0xJQ0VfU0hJRlQJMAo+ICsjZGVmaW5lIFNWRV9SRUdfU0xJQ0VfQklU
-Uwk1Cj4gKyNkZWZpbmUgU1ZFX1JFR19JRF9TSElGVAkoU1ZFX1JFR19TTElDRV9TSElGVCArIFNW
-RV9SRUdfU0xJQ0VfQklUUykKPiArI2RlZmluZSBTVkVfUkVHX0lEX0JJVFMJCTUKPiArCj4gKyNk
-ZWZpbmUgU1ZFX1JFR19TTElDRV9NQVNLIFwKPiArCShHRU5NQVNLKFNWRV9SRUdfU0xJQ0VfQklU
-UyAtIDEsIDApIDw8IFNWRV9SRUdfU0xJQ0VfU0hJRlQpCj4gKyNkZWZpbmUgU1ZFX1JFR19JRF9N
-QVNLCVwKPiArCShHRU5NQVNLKFNWRV9SRUdfSURfQklUUyAtIDEsIDApIDw8IFNWRV9SRUdfSURf
-U0hJRlQpCj4gKwoKSSBndWVzcyB0aGlzIGFsbCBjb21lcyBvdXQgaW4gdGhlIHdhc2ggb25jZSB0
-aGUgY29uc3RhbnRzIGFyZSBmb2xkZWQgYnV0CkdFTk1BU0sgZG9lcyBzZWVtIHRvIGJlIGRlc2ln
-bmVkIGZvciBhcmJpdHJhcnkgYml0IHBvc2l0aW9uczoKCiAgI2RlZmluZSBTVkVfUkVHX1NMSUNF
-X01BU0sgXAogICAgIEdFTl9NQVNLKFNWRV9SRUdfU0xJQ0VfQklUUyArIFNWRV9SRUdfU0xJQ0Vf
-U0hJRlQgLSAxLCBTVkVfUkVHX1NMSUNFX1NISUZUKQoKSG1tIEkgZ3Vlc3MgdGhhdCBtaWdodCBi
-ZSBldmVuIGhhcmRlciB0byBmb2xsb3cuLi4KCj4gKyNkZWZpbmUgU1ZFX05VTV9TTElDRVMgKDEg
-PDwgU1ZFX1JFR19TTElDRV9CSVRTKQo+ICsKPiArc3RhdGljIGludCBzdmVfcmVnX3JlZ2lvbihz
-dHJ1Y3Qga3JlZ19yZWdpb24gKmIsCj4gKwkJCSAgY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LAo+ICsJCQkgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnKQo+ICt7Cj4gKwljb25zdCB1
-bnNpZ25lZCBpbnQgdmwgPSB2Y3B1LT5hcmNoLnN2ZV9tYXhfdmw7Cj4gKwljb25zdCB1bnNpZ25l
-ZCBpbnQgdnEgPSBzdmVfdnFfZnJvbV92bCh2bCk7Cj4gKwo+ICsJY29uc3QgdW5zaWduZWQgaW50
-IHJlZ19udW0gPQo+ICsJCShyZWctPmlkICYgU1ZFX1JFR19JRF9NQVNLKSA+PiBTVkVfUkVHX0lE
-X1NISUZUOwo+ICsJY29uc3QgdW5zaWduZWQgaW50IHNsaWNlX251bSA9Cj4gKwkJKHJlZy0+aWQg
-JiBTVkVfUkVHX1NMSUNFX01BU0spID4+IFNWRV9SRUdfU0xJQ0VfU0hJRlQ7Cj4gKwo+ICsJdW5z
-aWduZWQgaW50IHNsaWNlX3NpemUsIG9mZnNldCwgbGltaXQ7Cj4gKwo+ICsJaWYgKHJlZy0+aWQg
-Pj0gS1ZNX1JFR19BUk02NF9TVkVfWlJFRygwLCAwKSAmJgo+ICsJICAgIHJlZy0+aWQgPD0gS1ZN
-X1JFR19BUk02NF9TVkVfWlJFRyhTVkVfTlVNX1pSRUdTIC0gMSwKPiArCQkJCQkgICAgICBTVkVf
-TlVNX1NMSUNFUyAtIDEpKSB7Cj4gKwkJc2xpY2Vfc2l6ZSA9IEtWTV9SRUdfU0laRShLVk1fUkVH
-X0FSTTY0X1NWRV9aUkVHKDAsIDApKTsKPiArCj4gKwkJLyogQ29tcHV0ZSBzdGFydCBhbmQgZW5k
-IG9mIHRoZSByZWdpc3RlcjogKi8KPiArCQlvZmZzZXQgPSBTVkVfU0lHX1pSRUdfT0ZGU0VUKHZx
-LCByZWdfbnVtKSAtIFNWRV9TSUdfUkVHU19PRkZTRVQ7Cj4gKwkJbGltaXQgPSBvZmZzZXQgKyBT
-VkVfU0lHX1pSRUdfU0laRSh2cSk7Cj4gKwo+ICsJCW9mZnNldCArPSBzbGljZV9zaXplICogc2xp
-Y2VfbnVtOyAvKiBzdGFydCBvZiByZXF1ZXN0ZWQgc2xpY2UgKi8KPiArCj4gKwl9IGVsc2UgaWYg
-KHJlZy0+aWQgPj0gS1ZNX1JFR19BUk02NF9TVkVfUFJFRygwLCAwKSAmJgo+ICsJCSAgIHJlZy0+
-aWQgPD0gS1ZNX1JFR19BUk02NF9TVkVfRkZSKFNWRV9OVU1fU0xJQ0VTIC0gMSkpIHsKPiArCQkv
-KiAoRkZSIGlzIFAxNiBmb3Igb3VyIHB1cnBvc2VzKSAqLwo+ICsKPiArCQlzbGljZV9zaXplID0g
-S1ZNX1JFR19TSVpFKEtWTV9SRUdfQVJNNjRfU1ZFX1BSRUcoMCwgMCkpOwo+ICsKPiArCQkvKiBD
-b21wdXRlIHN0YXJ0IGFuZCBlbmQgb2YgdGhlIHJlZ2lzdGVyOiAqLwo+ICsJCW9mZnNldCA9IFNW
-RV9TSUdfUFJFR19PRkZTRVQodnEsIHJlZ19udW0pIC0gU1ZFX1NJR19SRUdTX09GRlNFVDsKPiAr
-CQlsaW1pdCA9IG9mZnNldCArIFNWRV9TSUdfUFJFR19TSVpFKHZxKTsKPiArCj4gKwkJb2Zmc2V0
-ICs9IHNsaWNlX3NpemUgKiBzbGljZV9udW07IC8qIHN0YXJ0IG9mIHJlcXVlc3RlZCBzbGljZSAq
-Lwo+ICsKPiArCX0gZWxzZSB7Cj4gKwkJcmV0dXJuIC1FTk9FTlQ7Cj4gKwl9Cj4gKwo+ICsJYi0+
-a3B0ciA9IChjaGFyICopdmNwdS0+YXJjaC5zdmVfc3RhdGUgKyBvZmZzZXQ7Cj4gKwo+ICsJLyoK
-PiArCSAqIElmIHRoZSBzbGljZSBzdGFydHMgYWZ0ZXIgdGhlIGVuZCBvZiB0aGUgcmVnLCBqdXN0
-IHBhZC4KPiArCSAqIE90aGVyd2lzZSwgY29weSBhcyBtdWNoIGFzIHBvc3NpYmxlIHVwIHRvIHNs
-aWNlX3NpemUgYW5kIHBhZAo+ICsJICogdGhlIHJlbWFpbmRlcjoKPiArCSAqLwo+ICsJYi0+c2l6
-ZSA9IG9mZnNldCA+PSBsaW1pdCA/IDAgOiBtaW4obGltaXQgLSBvZmZzZXQsIHNsaWNlX3NpemUp
-Owo+ICsJYi0+emVyb3BhZCA9IHNsaWNlX3NpemUgLSBiLT5zaXplOwo+ICsKPiArCXJldHVybiAw
-Owo+ICt9Cj4gKwo+ICtzdGF0aWMgaW50IGdldF9zdmVfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSwgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcpCj4gK3sKPiArCXN0cnVjdCBrcmVnX3Jl
-Z2lvbiBrcmVnOwo+ICsJY2hhciBfX3VzZXIgKnVwdHIgPSAoY2hhciBfX3VzZXIgKilyZWctPmFk
-ZHI7Cj4gKwo+ICsJaWYgKCF2Y3B1X2hhc19zdmUodmNwdSkgfHwgc3ZlX3JlZ19yZWdpb24oJmty
-ZWcsIHZjcHUsIHJlZykpCj4gKwkJcmV0dXJuIC1FTk9FTlQ7Cj4gKwo+ICsJaWYgKGNvcHlfdG9f
-dXNlcih1cHRyLCBrcmVnLmtwdHIsIGtyZWcuc2l6ZSkgfHwKPiArCSAgICBjbGVhcl91c2VyKHVw
-dHIgKyBrcmVnLnNpemUsIGtyZWcuemVyb3BhZCkpCj4gKwkJcmV0dXJuIC1FRkFVTFQ7Cj4gKwo+
-ICsJcmV0dXJuIDA7Cj4gK30KPiArCj4gK3N0YXRpYyBpbnQgc2V0X3N2ZV9yZWcoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKPiArewo+ICsJc3Ry
-dWN0IGtyZWdfcmVnaW9uIGtyZWc7Cj4gKwljaGFyIF9fdXNlciAqdXB0ciA9IChjaGFyIF9fdXNl
-ciAqKXJlZy0+YWRkcjsKPiArCj4gKwlpZiAoIXZjcHVfaGFzX3N2ZSh2Y3B1KSB8fCBzdmVfcmVn
-X3JlZ2lvbigma3JlZywgdmNwdSwgcmVnKSkKPiArCQlyZXR1cm4gLUVOT0VOVDsKPiArCj4gKwlp
-ZiAoY29weV9mcm9tX3VzZXIoa3JlZy5rcHRyLCB1cHRyLCBrcmVnLnNpemUpKQo+ICsJCXJldHVy
-biAtRUZBVUxUOwo+ICsKPiArCXJldHVybiAwOwo+ICt9Cj4gKwo+ICBpbnQga3ZtX2FyY2hfdmNw
-dV9pb2N0bF9nZXRfcmVncyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcmVncyAq
-cmVncykKPiAgewo+ICAJcmV0dXJuIC1FSU5WQUw7Cj4gQEAgLTI1MSwxMiArMzc2LDExIEBAIGlu
-dCBrdm1fYXJtX2dldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3Zt
-X29uZV9yZWcgKnJlZykKPiAgCWlmICgocmVnLT5pZCAmIH5LVk1fUkVHX1NJWkVfTUFTSykgPj4g
-MzIgIT0gS1ZNX1JFR19BUk02NCA+PiAzMikKPiAgCQlyZXR1cm4gLUVJTlZBTDsKPgo+IC0JLyog
-UmVnaXN0ZXIgZ3JvdXAgMTYgbWVhbnMgd2Ugd2FudCBhIGNvcmUgcmVnaXN0ZXIuICovCj4gLQlp
-ZiAoKHJlZy0+aWQgJiBLVk1fUkVHX0FSTV9DT1BST0NfTUFTSykgPT0gS1ZNX1JFR19BUk1fQ09S
-RSkKPiAtCQlyZXR1cm4gZ2V0X2NvcmVfcmVnKHZjcHUsIHJlZyk7Cj4gLQo+IC0JaWYgKChyZWct
-PmlkICYgS1ZNX1JFR19BUk1fQ09QUk9DX01BU0spID09IEtWTV9SRUdfQVJNX0ZXKQo+IC0JCXJl
-dHVybiBrdm1fYXJtX2dldF9md19yZWcodmNwdSwgcmVnKTsKPiArCXN3aXRjaCAocmVnLT5pZCAm
-IEtWTV9SRUdfQVJNX0NPUFJPQ19NQVNLKSB7Cj4gKwljYXNlIEtWTV9SRUdfQVJNX0NPUkU6CXJl
-dHVybiBnZXRfY29yZV9yZWcodmNwdSwgcmVnKTsKPiArCWNhc2UgS1ZNX1JFR19BUk1fRlc6CXJl
-dHVybiBrdm1fYXJtX2dldF9md19yZWcodmNwdSwgcmVnKTsKPiArCWNhc2UgS1ZNX1JFR19BUk02
-NF9TVkU6CXJldHVybiBnZXRfc3ZlX3JlZyh2Y3B1LCByZWcpOwo+ICsJfQo+Cj4gIAlpZiAoaXNf
-dGltZXJfcmVnKHJlZy0+aWQpKQo+ICAJCXJldHVybiBnZXRfdGltZXJfcmVnKHZjcHUsIHJlZyk7
-Cj4gQEAgLTI3MCwxMiArMzk0LDExIEBAIGludCBrdm1fYXJtX3NldF9yZWcoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKPiAgCWlmICgocmVnLT5p
-ZCAmIH5LVk1fUkVHX1NJWkVfTUFTSykgPj4gMzIgIT0gS1ZNX1JFR19BUk02NCA+PiAzMikKPiAg
-CQlyZXR1cm4gLUVJTlZBTDsKPgo+IC0JLyogUmVnaXN0ZXIgZ3JvdXAgMTYgbWVhbnMgd2Ugc2V0
-IGEgY29yZSByZWdpc3Rlci4gKi8KPiAtCWlmICgocmVnLT5pZCAmIEtWTV9SRUdfQVJNX0NPUFJP
-Q19NQVNLKSA9PSBLVk1fUkVHX0FSTV9DT1JFKQo+IC0JCXJldHVybiBzZXRfY29yZV9yZWcodmNw
-dSwgcmVnKTsKPiAtCj4gLQlpZiAoKHJlZy0+aWQgJiBLVk1fUkVHX0FSTV9DT1BST0NfTUFTSykg
-PT0gS1ZNX1JFR19BUk1fRlcpCj4gLQkJcmV0dXJuIGt2bV9hcm1fc2V0X2Z3X3JlZyh2Y3B1LCBy
-ZWcpOwo+ICsJc3dpdGNoIChyZWctPmlkICYgS1ZNX1JFR19BUk1fQ09QUk9DX01BU0spIHsKPiAr
-CWNhc2UgS1ZNX1JFR19BUk1fQ09SRToJcmV0dXJuIHNldF9jb3JlX3JlZyh2Y3B1LCByZWcpOwo+
-ICsJY2FzZSBLVk1fUkVHX0FSTV9GVzoJcmV0dXJuIGt2bV9hcm1fc2V0X2Z3X3JlZyh2Y3B1LCBy
-ZWcpOwo+ICsJY2FzZSBLVk1fUkVHX0FSTTY0X1NWRToJcmV0dXJuIHNldF9zdmVfcmVnKHZjcHUs
-IHJlZyk7Cj4gKwl9Cj4KPiAgCWlmIChpc190aW1lcl9yZWcocmVnLT5pZCkpCj4gIAkJcmV0dXJu
-IHNldF90aW1lcl9yZWcodmNwdSwgcmVnKTsKClRoZSBrZXJuZWwgY29kaW5nLXN0eWxlLnJzdCBz
-ZWVtcyBtdXRlIG9uIHRoZSBzdWJqZWN0IG9mIGRlZmF1bHQKaGFuZGxpbmcgaW4gc3dpdGNoIGJ1
-dCBpdCdzIHByb2JhYmx5IHdvcnRoIGhhdmluZyBhOgoKICBkZWZhdWx0OiBicmVhazsgLyogZmFs
-bHMgdGhyb3VnaCAqLwoKdG8gYmUgZXhwbGljaXQuCgpJdCdzIG91dCBvZiBzY29wZSBmb3IgdGhp
-cyByZXZpZXcgYnV0IEkgZGlkIGdldCBhIGJpdCBjb25mdXNlZCBhcyB0aGUKS1ZNX1JFR19BUk1f
-Q09QUk9DX1NISUZUIHJlZ2lzdGVycyBzZWVtcyB0byBiZSBmYWlybHkgc3ByZWFkIG91dCBhY3Jv
-c3MKdGhlIGZpbGVzLiBXZSBoYXZlIGRlbXV4X2MxNV9nZXQvc2V0IGluIHN5c19yZWdzIGJ1dCBk
-b2Vzbid0IGxvb2sgYXMKdGhvdWdoIGl0IHRvdWNoZXMgdGhlIHJlc3Qgb2YgdGhlIGVtdWxhdGlv
-biBsb2dpYyBhbmQgd2UgaGF2ZQprdm1fYXJtX2dldC9zZXRfZndfcmVnIHdoaWNoIGFyZSAic3Bl
-Y2lhbCIgUENTSSByZWdpc3RlcnMuIEkgZ3Vlc3MgdGhpcwppcyBiZWNhdXNlIENPUFJPQ19TSElG
-VCBoYXMgYmVlbiB1c2VkIGZvciBhIGJ1bmNoIG9mIGRpc3BhcmF0ZSBjb3JlIGFuZApub24tY29y
-ZSBhbmQgc3BlY2lhbCByZWdpc3RlcnMuCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, Nov 21, 2018 at 12:17:45PM +0000, Julien Thierry wrote:
+> 
+> 
+> On 21/11/18 11:06, Christoffer Dall wrote:
+> >Hi,
+> >
+> >On Wed, Nov 21, 2018 at 04:56:54PM +0800, peng.hao2@zte.com.cn wrote:
+> >>>On 19/11/2018 09:10, Mark Rutland wrote:
+> >>>>On Sat, Nov 17, 2018 at 10:58:37AM +0800, peng.hao2@zte.com.cn wrote:
+> >>>>>>On 16/11/18 00:23, peng.hao2@zte.com.cn wrote:
+> >>>>>>>>Hi,
+> >>>>>>>>>When virtual machine starts, hang up.
+> >>>>>>>>
+> >>>>>>>>I take it you mean the *guest* hangs? Because it doesn't get a timer
+> >>>>>>>>interrupt?
+> >>>>>>>>
+> >>>>>>>>>The kernel version of guest
+> >>>>>>>>>is 4.16. Host support vgic_v3.
+> >>>>>>>>
+> >>>>>>>>Your host kernel is something recent, I guess?
+> >>>>>>>>
+> >>>>>>>>>It was mainly due to the incorrect vgic_irq's(intid=27) group value
+> >>>>>>>>>during injection interruption. when kvm_vgic_vcpu_init is called,
+> >>>>>>>>>dist is not initialized at this time. Unable to get vgic V3 or V2
+> >>>>>>>>>correctly, so group is not set.
+> >>>>>>>>
+> >>>>>>>>Mmh, that shouldn't happen with (v)GICv3. Do you use QEMU (which
+> >>>>>>>>version?) or some other userland tool?
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>>QEMU emulator version 3.0.50 .
+> >>>>>>>
+> >>>>>>>>>group is setted to 1 when vgic_mmio_write_group is invoked at some
+> >>>>>>>>>time.
+> >>>>>>>>>when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
+> >>>>>>>>>interrupt injection failed.
+> >>>>>>>>>
+> >>>>>>>>>Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> >>>>>>>>>---
+> >>>>>>>>>   virt/kvm/arm/vgic/vgic-v3.c | 2 +-
+> >>>>>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>>>>>>
+> >>>>>>>>>diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>>>>index 9c0dd23..d101000 100644
+> >>>>>>>>>--- a/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>>>>+++ b/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>>>>@@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
+> >>>>>>>>>struct vgic_irq *irq, int lr) if (vgic_irq_is_mapped_level(irq) &&
+> >>>>>>>>>(val & ICH_LR_PENDING_BIT)) irq->line_level = false;
+> >>>>>>>>>
+> >>>>>>>>>-    if (irq->group)
+> >>>>>>>>>+    if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> >>>>>>>>
+> >>>>>>>>This is not the right fix, not only because it basically reverts the
+> >>>>>>>>GICv3 part of 87322099052 (KVM: arm/arm64: vgic: Signal IRQs using
+> >>>>>>>>their configured group).
+> >>>>>>>>
+> >>>>>>>>Can you try to work out why kvm_vgic_vcpu_init() is apparently called
+> >>>>>>>>before dist->vgic_model is set, also what value it has?
+> >>>>>>>>If I understand the code correctly, that shouldn't happen for a GICv3.
+> >>>>>>>>
+> >>>>>>>Even if the value of  group is correctly assigned in kvm_vgic_vcpu_init, the group is then written 0 through vgic_mmio_write_group.
+> >>>>>>>   If the interrupt comes at this time, the interrupt injection fails.
+> >>>>>>
+> >>>>>>Does that mean that the guest is configuring its interrupts as Group0?
+> >>>>>>That sounds wrong, Linux should configure all it's interrupts as
+> >>>>>>non-secure group1.
+> >>>>>
+> >>>>>no, I think that uefi dose this, not linux.
+> >>>>>1. kvm_vgic_vcpu_init
+> >>>>>2. vgic_create
+> >>>>>3. kvm_vgic_dist_init
+> >>>>>4.vgic_mmio_write_group: uefi as guest, write group=0
+> >>>>>5.vgic_mmio_write_group: linux as guest, write group=1
+> >>>>
+> >>>>Is this the same issue fixed by EDK2 commit:
+> >>>>
+> >>>>66127011a544b90e ("ArmPkg/ArmGicDxe ARM: fix encoding for GICv3 interrupt acknowledge")
+> >>>>
+> >>>>... where EDK2 would try to use IAR0 rather than IAR1?
+> >>>>
+> >>>>The commit messages notes this lead to a boot-time hang.
+> >>>
+> >>>I managed to trigger an issue with a really old EFI implementation that
+> >>>doesn't configure its interrupts as Group1, and yet tries to ACK its
+> >>>interrupts using the Group1 accessor. Guess what? It is not going to work.
+> >>>
+> >>>Commit c7fefb690661f2e38afcb8200bd318ecf38ab961 in the edk2 tree seems
+> >>>to be the fix (I only assume it does, I haven't actually checked). A
+> >>>recent build, as found in Debian Buster, works perfectly (tested with
+> >>>both QEMU v2.12 and tip of tree).
+> >>>
+> >>>Now, I really don't get what you're saying about Linux not getting
+> >>>interrupts. How do you get to booting Linux if EFI is not making any
+> >>>forward progress? Are you trying them independently?
+> >>>
+> >>I start linux with bypassing uefi, the print info is the same.
+> >>[507107.748908]  vgic_mmio_write_group:## intid/27 group=0
+> >>[507107.752185]  vgic_mmio_write_group:## intid/27 group=0
+> >>[507107.899566]  vgic_mmio_write_group:## intid/27 group=1
+> >>[507107.907370]  vgic_mmio_write_group:## intid/27 group=1
+> >>the command line is like this:
+> >>/home/qemu-patch/linshi/qemu/aarch64-softmmu/qemu-system-aarch64  -machine virt-3.1,accel=kvm,usb=off,dump-guest-core=off,gic-version=3  -kernel /home/kernelboot/vmlinuz-4.16.0+ -initrd /home/kernelboot/initramfs-4.16.0+.img -append root=/dev/mapper/cla-root ro crashkernel=auto rd.lvm.lv=cla/root rd.lvm.lv=cla/swap.UTF-8  -drive file=/home/centos74-ph/boot.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0 -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1  -vnc 0.0.0.0:0 -k en-us -device virtio-gpu-pci,id=video0,max_outputs=1,bus=pci.3,addr=0x0 -device pvpanic-mmio -msg timestamp=on
+> >>
+> >>This is strange. That's probably the Linux 4.16  kernel setting group to 0, and I'll continue to track in guest.
+> >
+> >Could you try the following patch:
+> >
+> >diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> >index c0c0b88af1d5..6fa858c7a5a6 100644
+> >--- a/virt/kvm/arm/vgic/vgic-init.c
+> >+++ b/virt/kvm/arm/vgic/vgic-init.c
+> >@@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+> >  			irq->config = VGIC_CONFIG_LEVEL;
+> >  		}
+> >-		/*
+> >-		 * GICv3 can only be created via the KVM_DEVICE_CREATE API and
+> >-		 * so we always know the emulation type at this point as it's
+> >-		 * either explicitly configured as GICv3, or explicitly
+> >-		 * configured as GICv2, or not configured yet which also
+> >-		 * implies GICv2.
+> >-		 */
+> >  		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> >  			irq->group = 1;
+> >  		else
+> >@@ -298,6 +291,16 @@ int vgic_init(struct kvm *kvm)
+> >  	if (ret)
+> >  		goto out;
+> >+	/* Initialize groups on CPUs created before the VGIC type was known */
+> >+	kvm_for_each_vcpu(i, vcpu, kvm) {
+> >+		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >+
+> >+		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
+> >+			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+> >+			irq->group = 1;
+> >+		}
+> >+	}
+> >+
+> >  	if (vgic_has_its(kvm)) {
+> >  		ret = vgic_v4_init(kvm);
+> >  		if (ret)
+> >
+> >
+> 
+> If the value of dist->vgic_model is not properly initialized at the time we
+> call kvm_vgic_vcpu_init is call, won't we still overwrite the irq->group
+> when we get there?
+
+I don't understand this question.  When we get where?
+
+> (I still haven't seen why we could consider
+> dist->vgic_model is initialized at that point).
+
+Because there is no enforced ordering between creating VCPUs and
+creating the VGIC.
+
+> 
+> Shouldn't we do the irq->group initialization somewhere in
+> kvm_arch_vcpu_ioctl_vcpu_init? (with some vgic_* function to encapsulate it
+> of course). At that point I believe we know that dist->vgic_model is
+> initialized.
+> 
+
+See above.  AFAICT we don't have a single point at which we can do
+everything because creation of the two components can be interleaved.
+
+We could hook into kvm_vcpu_first_run_init(), but then userspace can
+observe uninitialized values if it looks at the GIC state prior to
+running the VCPUs, which is also not great.
+
+In other words, I think the problem is that you can do:
+
+  create_vcpu(0);
+  create_vgic(v3);
+  create_vcpu(2);
+
+Now you'll have vcpu0 have its private IRQs set to group 0, and you'll
+have vcpu1 have its private IRQs set to group 1 (prior to my patch).
+
+
+Am I missing something?
+
+
+Thanks,
+
+    Christoffer
