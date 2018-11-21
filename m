@@ -1,234 +1,160 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 3/4] arm64: arm_pmu: Add support for
- exclude_host/exclude_guest attributes
-Date: Wed, 21 Nov 2018 10:56:02 +0000
-Message-ID: <20181121105601.GB42987@e119886-lin.cambridge.arm.com>
-References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
- <1542723322-42536-4-git-send-email-andrew.murray@arm.com>
- <2fb3eef1-c361-8ce0-a5ad-10de66517858@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
+Date: Wed, 21 Nov 2018 12:06:20 +0100
+Message-ID: <20181121110620.GC18678@e113682-lin.lund.arm.com>
+References: <01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com>
+ <201811211656540883310@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3B184A2B2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 05:56:07 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GFwucQG58Yyc for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 05:56:05 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C318F4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 05:56:05 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2fb3eef1-c361-8ce0-a5ad-10de66517858@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <201811211656540883310@zte.com.cn>
+Sender: linux-kernel-owner@vger.kernel.org
+To: peng.hao2@zte.com.cn
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 20, 2018 at 02:49:05PM +0000, Suzuki K Poulose wrote:
-> On 11/20/2018 02:15 PM, Andrew Murray wrote:
-> > Add support for the :G and :H attributes in perf by handling the
-> > exclude_host/exclude_guest event attributes.
-> > 
-> > We notify KVM of counters that we wish to be enabled or disabled on
-> > guest entry/exit and thus defer from starting or stopping :G events
-> > as per the events exclude_host attribute.
-> > 
-> > When using VHE, EL2 is unused by the guest - therefore we can filter
-> > out these events with the PMU as per the 'exclude_host' attribute.
-> > 
-> > With both VHE and non-VHE we switch the counters between host/guest
-> > at EL2. With non-VHE when using 'exclude_host' we filter out EL2.
-> > 
-> > These changes eliminate counters counting host events on the
-> > boundaries of guest entry/exit when using :G. However when using :H
-> > unless exclude_hv is set on non-VHE then there is a small blackout
-> > window at the guest entry/exit where host events are not captured.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >   arch/arm64/kernel/perf_event.c | 41 +++++++++++++++++++++++++++++++++++------
-> >   1 file changed, 35 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> > index de564ae..412bd80 100644
-> > --- a/arch/arm64/kernel/perf_event.c
-> > +++ b/arch/arm64/kernel/perf_event.c
-> > @@ -26,6 +26,7 @@
-> >   #include <linux/acpi.h>
-> >   #include <linux/clocksource.h>
-> > +#include <linux/kvm_host.h>
-> >   #include <linux/of.h>
-> >   #include <linux/perf/arm_pmu.h>
-> >   #include <linux/platform_device.h>
-> > @@ -647,11 +648,23 @@ static inline int armv8pmu_enable_counter(int idx)
-> >   static inline void armv8pmu_enable_event_counter(struct perf_event *event)
-> >   {
-> > +	struct perf_event_attr *attr = &event->attr;
-> >   	int idx = event->hw.idx;
-> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> > -	armv8pmu_enable_counter(idx);
-> >   	if (armv8pmu_event_is_chained(event))
-> > -		armv8pmu_enable_counter(idx - 1);
-> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+Hi,
+
+On Wed, Nov 21, 2018 at 04:56:54PM +0800, peng.hao2@zte.com.cn wrote:
+> >On 19/11/2018 09:10, Mark Rutland wrote:
+> >> On Sat, Nov 17, 2018 at 10:58:37AM +0800, peng.hao2@zte.com.cn wrote:
+> >>>> On 16/11/18 00:23, peng.hao2@zte.com.cn wrote:
+> >>>>>> Hi,
+> >>>>>>> When virtual machine starts, hang up.
+> >>>>>>
+> >>>>>> I take it you mean the *guest* hangs? Because it doesn't get a timer
+> >>>>>> interrupt?
+> >>>>>>
+> >>>>>>> The kernel version of guest
+> >>>>>>> is 4.16. Host support vgic_v3.
+> >>>>>>
+> >>>>>> Your host kernel is something recent, I guess?
+> >>>>>>
+> >>>>>>> It was mainly due to the incorrect vgic_irq's(intid=27) group value
+> >>>>>>> during injection interruption. when kvm_vgic_vcpu_init is called,
+> >>>>>>> dist is not initialized at this time. Unable to get vgic V3 or V2
+> >>>>>>> correctly, so group is not set.
+> >>>>>>
+> >>>>>> Mmh, that shouldn't happen with (v)GICv3. Do you use QEMU (which
+> >>>>>> version?) or some other userland tool?
+> >>>>>>
+> >>>>>
+> >>>>> QEMU emulator version 3.0.50 .
+> >>>>>
+> >>>>>>> group is setted to 1 when vgic_mmio_write_group is invoked at some
+> >>>>>>> time.
+> >>>>>>> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
+> >>>>>>> interrupt injection failed.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> >>>>>>> ---
+> >>>>>>>   virt/kvm/arm/vgic/vgic-v3.c | 2 +-
+> >>>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>>>>
+> >>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>> index 9c0dd23..d101000 100644
+> >>>>>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> >>>>>>> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
+> >>>>>>> struct vgic_irq *irq, int lr) if (vgic_irq_is_mapped_level(irq) &&
+> >>>>>>> (val & ICH_LR_PENDING_BIT)) irq->line_level = false;
+> >>>>>>>
+> >>>>>>> -    if (irq->group)
+> >>>>>>> +    if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> >>>>>>
+> >>>>>> This is not the right fix, not only because it basically reverts the
+> >>>>>> GICv3 part of 87322099052 (KVM: arm/arm64: vgic: Signal IRQs using
+> >>>>>> their configured group).
+> >>>>>>
+> >>>>>> Can you try to work out why kvm_vgic_vcpu_init() is apparently called
+> >>>>>> before dist->vgic_model is set, also what value it has?
+> >>>>>> If I understand the code correctly, that shouldn't happen for a GICv3.
+> >>>>>>
+> >>>>> Even if the value of  group is correctly assigned in kvm_vgic_vcpu_init, the group is then written 0 through vgic_mmio_write_group.
+> >>>>>   If the interrupt comes at this time, the interrupt injection fails.
+> >>>>
+> >>>> Does that mean that the guest is configuring its interrupts as Group0?
+> >>>> That sounds wrong, Linux should configure all it's interrupts as
+> >>>> non-secure group1.
+> >>>
+> >>> no, I think that uefi dose this, not linux.
+> >>> 1. kvm_vgic_vcpu_init
+> >>> 2. vgic_create
+> >>> 3. kvm_vgic_dist_init
+> >>> 4.vgic_mmio_write_group: uefi as guest, write group=0
+> >>> 5.vgic_mmio_write_group: linux as guest, write group=1
+> >>
+> >> Is this the same issue fixed by EDK2 commit:
+> >>
+> >> 66127011a544b90e ("ArmPkg/ArmGicDxe ARM: fix encoding for GICv3 interrupt acknowledge")
+> >>
+> >> ... where EDK2 would try to use IAR0 rather than IAR1?
+> >>
+> >> The commit messages notes this lead to a boot-time hang.
+> >
+> >I managed to trigger an issue with a really old EFI implementation that
+> >doesn't configure its interrupts as Group1, and yet tries to ACK its
+> >interrupts using the Group1 accessor. Guess what? It is not going to work.
+> >
+> >Commit c7fefb690661f2e38afcb8200bd318ecf38ab961 in the edk2 tree seems
+> >to be the fix (I only assume it does, I haven't actually checked). A
+> >recent build, as found in Debian Buster, works perfectly (tested with
+> >both QEMU v2.12 and tip of tree).
+> >
+> >Now, I really don't get what you're saying about Linux not getting
+> >interrupts. How do you get to booting Linux if EFI is not making any
+> >forward progress? Are you trying them independently?
+> >
+> I start linux with bypassing uefi, the print info is the same.
+> [507107.748908]  vgic_mmio_write_group:## intid/27 group=0
+> [507107.752185]  vgic_mmio_write_group:## intid/27 group=0
+> [507107.899566]  vgic_mmio_write_group:## intid/27 group=1
+> [507107.907370]  vgic_mmio_write_group:## intid/27 group=1
+> the command line is like this:
+> /home/qemu-patch/linshi/qemu/aarch64-softmmu/qemu-system-aarch64  -machine virt-3.1,accel=kvm,usb=off,dump-guest-core=off,gic-version=3  -kernel /home/kernelboot/vmlinuz-4.16.0+ -initrd /home/kernelboot/initramfs-4.16.0+.img -append root=/dev/mapper/cla-root ro crashkernel=auto rd.lvm.lv=cla/root rd.lvm.lv=cla/swap.UTF-8  -drive file=/home/centos74-ph/boot.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0 -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1  -vnc 0.0.0.0:0 -k en-us -device virtio-gpu-pci,id=video0,max_outputs=1,bus=pci.3,addr=0x0 -device pvpanic-mmio -msg timestamp=on
 > 
-> minor nit: If you rearrange the code below a bit
-> 
-> > +
-> > +	if (attr->exclude_host)
-> > +		kvm_set_clr_guest_pmu_events(0, counter_bits);
-> > +	if (attr->exclude_guest)
-> > +		kvm_set_clr_host_pmu_events(0, counter_bits);
-> > +
-> > +	if (!attr->exclude_host) {
-> > +		armv8pmu_enable_counter(idx);
-> > +		if (armv8pmu_event_is_chained(event))
-> > +			armv8pmu_enable_counter(idx - 1);
-> 
-> we could have :
-> 
-> 	if (attr->exclude_guest)
-> 		kvm_set_clr_host_pmu_events(0, counter_bits);
-> 
-> 	if (attr->exclude_host) {
-> 		kvm_set_clr_guest_pmu_events(0, counter_bits);
-> 		return;
-> 	}
-> 
-> 	armv8pmu_enable_counter(idx);
-> 	if (armv8pmu_event_is_chained(event))
-> 		armv8pmu_enable_counter(idx - 1);
-> 
-> Similarly for disable_event_counter.
+> This is strange. That's probably the Linux 4.16  kernel setting group to 0, and I'll continue to track in guest.
 
-I'm not really sure this is more readable. It makes the symmetric
-clr_{guest|host} calls asymmetric. And moves the condition for
-enabling counters away from the code that conditionally enables
-it. Though it does get rid of one if statement...
+Could you try the following patch:
 
-> 	
-> > +	}
-> >   }
-> >   static inline int armv8pmu_disable_counter(int idx)
-> > @@ -664,11 +677,23 @@ static inline int armv8pmu_disable_counter(int idx)
-> >   static inline void armv8pmu_disable_event_counter(struct perf_event *event)
-> >   {
-> >   	struct hw_perf_event *hwc = &event->hw;
-> > +	struct perf_event_attr *attr = &event->attr;
-> >   	int idx = hwc->idx;
-> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> >   	if (armv8pmu_event_is_chained(event))
-> > -		armv8pmu_disable_counter(idx - 1);
-> > -	armv8pmu_disable_counter(idx);
-> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> > +
-> > +	if (attr->exclude_host)
-> > +		kvm_set_clr_guest_pmu_events(counter_bits, 0);
-> > +	if (attr->exclude_guest)
-> > +		kvm_set_clr_host_pmu_events(counter_bits, 0);
-> > +
-> > +	if (!attr->exclude_host) {
-> > +		if (armv8pmu_event_is_chained(event))
-> > +			armv8pmu_disable_counter(idx - 1);
-> > +		armv8pmu_disable_counter(idx);
-> > +	}
-> >   }
-> >   static inline int armv8pmu_enable_intens(int idx)
-> > @@ -945,12 +970,12 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
-> >   	 * with other architectures (x86 and Power).
-> >   	 */
-> >   	if (is_kernel_in_hyp_mode()) {
-> > -		if (!attr->exclude_kernel)
-> > +		if (!attr->exclude_kernel && !attr->exclude_host)
-> >   			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> 
-> Shouldn't we handle "exclude_kernel" for a "Guest" event ?
-> i.e, what if we have exclude_kernel + exclude_host set ? Doesn't
-> the "exclude_kernel" apply to the event filtering after we enter
-> guest and thus, we need to set the EXCLUDE_EL1 ?
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index c0c0b88af1d5..6fa858c7a5a6 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 			irq->config = VGIC_CONFIG_LEVEL;
+ 		}
+ 
+-		/*
+-		 * GICv3 can only be created via the KVM_DEVICE_CREATE API and
+-		 * so we always know the emulation type at this point as it's
+-		 * either explicitly configured as GICv3, or explicitly
+-		 * configured as GICv2, or not configured yet which also
+-		 * implies GICv2.
+-		 */
+ 		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+ 			irq->group = 1;
+ 		else
+@@ -298,6 +291,16 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
+ 
++	/* Initialize groups on CPUs created before the VGIC type was known */
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
++		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
++			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
++			irq->group = 1;
++		}
++	}
++
+ 	if (vgic_has_its(kvm)) {
+ 		ret = vgic_v4_init(kvm);
+ 		if (ret)
 
-Yes you're right. This is a problem not just for a VHE host's guest but
-for the host as well - for example perf -e instructions:h and
--e instructions:G will currently give the same count.
-
-> 
-> Also I am wondering what is the situation with Nested virtualisation
-> coming in. i.e, if the host hyp wanted to profile the guest hyp, should
-> we set EL2 events ? I understand this is something which should be
-> solved with the nested virt changes. But it would be good to see
-> if we could filter "exclude_host" and "exclude_guest" at the hypervisor
-> level (i.e, in software, without PMU filtering) to allow the normal
-> controls to make use of the hardware filtering ?
-
-It took me a while to think this through and I think you're right in
-that we can do more to future proof this for nested virt. In fact we
-don't depend on the hunks in this function (i.e. addition of extra
-'!attr->exclude_host' conditions) - we don't need them due to the
-enable/disable of counters at guest entry/exit.
-
-With the assumption of the hypervisor switch enabling/disabling
-host/guest counters I think we can now do the following:
-
-        /*
-         * If we're running in hyp mode, then we *are* the hypervisor.
-         * Therefore we ignore exclude_hv in this configuration, since
-         * there's no hypervisor to sample anyway. This is consistent
-         * with other architectures (x86 and Power).
-         */
-        if (is_kernel_in_hyp_mode())
-                if (!attr->exclude_kernel)
-                        config_base |= ARMV8_PMU_INCLUDE_EL2;
-        else
-                if (!attr->exclude_hv)
-                        config_base |= ARMV8_PMU_INCLUDE_EL2;
-
-        if (attr->exclude_kernel)
-                config_base |= ARMV8_PMU_EXCLUDE_EL1;
-
-        if (attr->exclude_user)
-                config_base |= ARMV8_PMU_EXCLUDE_EL0;
-
-Also for nested virt we'd need to update
-kvm_pmu_set_counter_event_type to ensure exclude_kernel is set when
-the guest attempts to include EL2 to count a VHE guest kernel.
-
-Does this look right?
 
 Thanks,
 
-Andrew Murray
-
-> 
-> >   	} else {
-> >   		if (attr->exclude_kernel)
-> >   			config_base |= ARMV8_PMU_EXCLUDE_EL1;
-> > -		if (!attr->exclude_hv)
-> > +		if (!attr->exclude_hv && !attr->exclude_host)
-> >   			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> >   	}
-> 
-> 
-> >   	if (attr->exclude_user)
-> > @@ -976,6 +1001,10 @@ static void armv8pmu_reset(void *info)
-> >   		armv8pmu_disable_intens(idx);
-> >   	}
-> > +	/* Clear the counters we flip at guest entry/exit */
-> > +	kvm_set_clr_host_pmu_events(U32_MAX, 0);
-> > +	kvm_set_clr_guest_pmu_events(U32_MAX, 0);
-> > +
-> >   	/*
-> >   	 * Initialize & Reset PMNC. Request overflow interrupt for
-> >   	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
-> > 
-> 
-> Suzuki
+    Christoffer
