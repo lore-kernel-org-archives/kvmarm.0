@@ -1,26 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 2/4] arm64: KVM: add accessors to track guest/host only
- counters
-Date: Wed, 21 Nov 2018 16:04:03 +0000
-Message-ID: <da549a51-9b85-f94c-07d6-91140c542ec7@arm.com>
-References: <1542723322-42536-1-git-send-email-andrew.murray@arm.com>
- <1542723322-42536-3-git-send-email-andrew.murray@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [RFC PATCH v2 16/23] KVM: arm64: Enumerate SVE register indices
+ for KVM_GET_REG_LIST
+Date: Wed, 21 Nov 2018 16:09:03 +0000
+Message-ID: <87k1l6ifa8.fsf@linaro.org>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AFC64A2AE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:04:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76AB54A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:09:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id neWgXhx4ylSN for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Nov 2018 11:04:07 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D50454A262
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:04:06 -0500 (EST)
-In-Reply-To: <1542723322-42536-3-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
+ with ESMTP id 5mueQwlN5mLu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Nov 2018 11:09:06 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5CB264A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 11:09:06 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id j10so6274428wru.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Nov 2018 08:09:06 -0800 (PST)
+In-reply-to: <1538141967-15375-17-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,44 +32,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/11/2018 14:15, Andrew Murray wrote:
-> In order to effeciently enable/disable guest/host only perf counters
-> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
-> host only events as well as accessors for updating them.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1550192..b6f998b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -203,6 +203,8 @@ struct kvm_cpu_context {
->  	};
->  
->  	struct kvm_vcpu *__hyp_running_vcpu;
-> +	u32 events_host_only;
-> +	u32 events_guest_only;
->  };
->  
->  typedef struct kvm_cpu_context kvm_cpu_context_t;
-> @@ -472,6 +474,24 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  {
->  	return kvm_arch_vcpu_run_map_fp(vcpu);
->  }
-> +static inline void kvm_set_clr_host_pmu_events(u32 clr, u32 set)
-
-nit: keep the arguments in an order that match the function name (saves
-a lot of brain power...)
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgcGF0Y2gg
+aW5jbHVkZXMgdGhlIFNWRSByZWdpc3RlciBJRHMgaW4gdGhlIGxpc3QgcmV0dXJuZWQgYnkKPiBL
+Vk1fR0VUX1JFR19MSVNULCBhcyBhcHByb3ByaWF0ZS4KPgo+IE9uIGEgbm9uLVNWRS1lbmFibGVk
+IHZjcHUsIG5vIGV4dHJhIElEcyBhcmUgYWRkZWQuCj4KPiBPbiBhbiBTVkUtZW5hYmxlZCB2Y3B1
+LCB0aGUgYXBwcm9wcmlhdGUgbnVtYmVyIG9mIHNsaWNlIElEcyBhcmUKPiBlbnVtZXJhdGVkIGZv
+ciBlYWNoIFNWRSByZWdpc3RlciwgZGVwZW5kaW5nIG9uIHRoZSBtYXhpbXVtIHZlY3Rvcgo+IGxl
+bmd0aCBmb3IgdGhlIHZjcHUuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5N
+YXJ0aW5AYXJtLmNvbT4KPiAtLS0KPgo+IENoYW5nZXMgc2luY2UgUkZDdjE6Cj4KPiAgKiBTaW1w
+bGlmeSBlbnVtZXJhdGVfc3ZlX3JlZ3MoKSBiYXNlZCBvbiBBbmRyZXcgSm9uZXMnIGFwcHJvYWNo
+Lgo+Cj4gICogUmVnIGNvcHlpbmcgbG9vcHMgYXJlIGludmVydGVkIGZvciBicmV2aXR5LCBzaW5j
+ZSB0aGUgb3JkZXIgd2UKPiAgICBzcGl0IG91dCB0aGUgcmVncyBpbiBkb2Vzbid0IHJlYWxseSBt
+YXR0ZXIuCj4KPiAoSSB0cmllZCB0byBrZWVwIHBhcnQgb2YgbXkgYXBwcm9hY2ggdG8gYXZvaWQg
+dGhlIGR1cGxpY2F0ZSBsb2dpYwo+IGJldHdlZW4gbnVtX3N2ZV9yZWdzKCkgYW5kIGNvcHlfc3Zl
+X3JlZ19pbmRpY2VzKCksIGJ1dCBhbHRob3VnaAo+IGl0IHdvcmtzIGluIHByaW5jaXBsZSwgZ2Nj
+IGZhaWxzIHRvIGZ1bGx5IGNvbGxhcHNlIHRoZSBudW1fcmVncygpCj4gY2FzZS4uLiBzbyBJIGdh
+dmUgdXAuICBUaGUgdHdvIGZ1bmN0aW9ucyBuZWVkIHRvIGJlIG1hbnVhbGx5IGtlcHQKPiBjb25z
+aXN0ZW50LCBidXQgaG9wZWZ1bGx5IHRoYXQncyBmYWlybHkgc3RyYWlnaHRmb3J3YXJkLikKPiAt
+LS0KPiAgYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYyB8IDQ1ICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKwo+ICAxIGZpbGUgY2hhbmdlZCwgNDUgaW5zZXJ0aW9ucygr
+KQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMgYi9hcmNoL2FybTY0L2t2
+bS9ndWVzdC5jCj4gaW5kZXggMzIwZGIwZi4uODllYWI2OCAxMDA2NDQKPiAtLS0gYS9hcmNoL2Fy
+bTY0L2t2bS9ndWVzdC5jCj4gKysrIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+IEBAIC0zMjMs
+NiArMzIzLDQ2IEBAIHN0YXRpYyBpbnQgZ2V0X3RpbWVyX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnKQo+ICAJcmV0dXJuIGNvcHlfdG9fdXNl
+cih1YWRkciwgJnZhbCwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSA/IC1FRkFVTFQgOiAwOwo+ICB9
+Cj4KPiArc3RhdGljIHVuc2lnbmVkIGxvbmcgbnVtX3N2ZV9yZWdzKGNvbnN0IHN0cnVjdCBrdm1f
+dmNwdSAqdmNwdSkKPiArewo+ICsJY29uc3QgdW5zaWduZWQgaW50IHNsaWNlcyA9IERJVl9ST1VO
+RF9VUCgKPiArCQl2Y3B1LT5hcmNoLnN2ZV9tYXhfdmwsCj4gKwkJS1ZNX1JFR19TSVpFKEtWTV9S
+RUdfQVJNNjRfU1ZFX1pSRUcoMCwgMCkpKTsKCkhhdmluZyBzZWVuIHRoaXMgZm9ybXVsYXRpb24g
+Y29tZSB1cCBzZXZlcmFsIHRpbWVzIG5vdyBJIHdvbmRlciBpZiB0aGVyZQpzaG91bGQgYmUgYSBr
+ZXJuZWwgcHJpdmF0ZSBkZWZpbmUsIEtWTV9TVkVfWlJFRy9QUkVHX1NJWkUgdG8gYXZvaWQgdGhp
+cwpjbHVtc2luZXNzLgoKWW91IGNvdWxkIHN0aWxsIHVzZSB0aGUgS1ZNX1JFR19TSVpFIHRvIGV4
+dHJhY3QgaXQgYXMgSSBndWVzcyB0aGlzIGlzIHRvCm1ha2UgY2hhbmdlcyBzaW1wbGVyIGlmL3do
+ZW4gdGhlIFNWRSByZWcgc2l6ZSBnZXRzIGJ1bXBlZCB1cC4KCj4gKwo+ICsJaWYgKCF2Y3B1X2hh
+c19zdmUodmNwdSkpCj4gKwkJcmV0dXJuIDA7Cj4gKwo+ICsJcmV0dXJuIHNsaWNlcyAqIChTVkVf
+TlVNX1BSRUdTICsgU1ZFX05VTV9aUkVHUyArIDEgLyogRkZSICovKTsKPiArfQo+ICsKPiArc3Rh
+dGljIGludCBjb3B5X3N2ZV9yZWdfaW5kaWNlcyhjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
+IHU2NCBfX3VzZXIgKip1aW5kKQo+ICt7Cj4gKwljb25zdCB1bnNpZ25lZCBpbnQgc2xpY2VzID0g
+RElWX1JPVU5EX1VQKAo+ICsJCXZjcHUtPmFyY2guc3ZlX21heF92bCwKPiArCQlLVk1fUkVHX1NJ
+WkUoS1ZNX1JFR19BUk02NF9TVkVfWlJFRygwLCAwKSkpOwo+ICsJdW5zaWduZWQgaW50IGksIG47
+Cj4gKwo+ICsJaWYgKCF2Y3B1X2hhc19zdmUodmNwdSkpCj4gKwkJcmV0dXJuIDA7Cj4gKwo+ICsJ
+Zm9yIChpID0gMDsgaSA8IHNsaWNlczsgaSsrKSB7Cj4gKwkJZm9yIChuID0gMDsgbiA8IFNWRV9O
+VU1fWlJFR1M7IG4rKykgewo+ICsJCQlpZiAocHV0X3VzZXIoS1ZNX1JFR19BUk02NF9TVkVfWlJF
+RyhuLCBpKSwgKCp1aW5kKSsrKSkKPiArCQkJCXJldHVybiAtRUZBVUxUOwo+ICsJCX0KPiArCj4g
+KwkJZm9yIChuID0gMDsgbiA8IFNWRV9OVU1fUFJFR1M7IG4rKykgewo+ICsJCQlpZiAocHV0X3Vz
+ZXIoS1ZNX1JFR19BUk02NF9TVkVfUFJFRyhuLCBpKSwgKCp1aW5kKSsrKSkKPiArCQkJCXJldHVy
+biAtRUZBVUxUOwo+ICsJCX0KPiArCj4gKwkJaWYgKHB1dF91c2VyKEtWTV9SRUdfQVJNNjRfU1ZF
+X0ZGUihpKSwgKCp1aW5kKSsrKSkKPiArCQkJcmV0dXJuIC1FRkFVTFQ7Cj4gKwl9Cj4gKwo+ICsJ
+cmV0dXJuIDA7Cj4gK30KPiArCj4gIC8qKgo+ICAgKiBrdm1fYXJtX251bV9yZWdzIC0gaG93IG1h
+bnkgcmVnaXN0ZXJzIGRvIHdlIHByZXNlbnQgdmlhIEtWTV9HRVRfT05FX1JFRwo+ICAgKgo+IEBA
+IC0zMzMsNiArMzczLDcgQEAgdW5zaWduZWQgbG9uZyBrdm1fYXJtX251bV9yZWdzKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkKPiAgCXVuc2lnbmVkIGxvbmcgcmVzID0gMDsKPgo+ICAJcmVzICs9IG51
+bV9jb3JlX3JlZ3MoKTsKPiArCXJlcyArPSBudW1fc3ZlX3JlZ3ModmNwdSk7Cj4gIAlyZXMgKz0g
+a3ZtX2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KTsKPiAgCXJlcyArPSBrdm1fYXJtX2dldF9m
+d19udW1fcmVncyh2Y3B1KTsKPiAgCXJlcyArPSBOVU1fVElNRVJfUkVHUzsKPiBAQCAtMzU3LDYg
+KzM5OCwxMCBAQCBpbnQga3ZtX2FybV9jb3B5X3JlZ19pbmRpY2VzKHN0cnVjdCBrdm1fdmNwdSAq
+dmNwdSwgdTY0IF9fdXNlciAqdWluZGljZXMpCj4gIAkJdWluZGljZXMrKzsKPiAgCX0KPgo+ICsJ
+cmV0ID0gY29weV9zdmVfcmVnX2luZGljZXModmNwdSwgJnVpbmRpY2VzKTsKPiArCWlmIChyZXQp
+Cj4gKwkJcmV0dXJuIHJldDsKPiArCj4gIAlyZXQgPSBrdm1fYXJtX2NvcHlfZndfcmVnX2luZGlj
+ZXModmNwdSwgdWluZGljZXMpOwo+ICAJaWYgKHJldCkKPiAgCQlyZXR1cm4gcmV0OwoKT3RoZXJ3
+aXNlOgoKUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4K
+Ci0tCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
