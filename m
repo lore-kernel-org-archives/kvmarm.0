@@ -1,150 +1,72 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/4] arm64: KVM: Implement workaround for Cortex-A76
- erratum 1165522
-Date: Thu, 22 Nov 2018 16:13:16 +0000
-Message-ID: <11733182-4e0a-5607-268e-73b8d00fbcee@arm.com>
-References: <20181105143617.120602-1-marc.zyngier@arm.com>
- <20181105143617.120602-5-marc.zyngier@arm.com>
- <20181106081546.GH12057@e113682-lin.lund.arm.com>
- <ec7d0e34-022f-125e-00b4-b06be23ee2a8@arm.com>
- <20181108201054.GG3835@e113682-lin.lund.arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v5 0/7] Add virtio-iommu driver
+Date: Thu, 22 Nov 2018 19:37:54 +0000
+Message-ID: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E184A1E5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 11:13:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R7FnrJf9EyiW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Nov 2018 11:13:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E051C4A1DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 11:13:19 -0500 (EST)
-In-Reply-To: <20181108201054.GG3835@e113682-lin.lund.arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Transfer-Encoding: 8bit
+Return-path: <virtio-dev-return-5014-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+To: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
+Cc: jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDgvMTEvMjAxOCAyMDoxMCwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90ZToKPiBPbiBUaHUsIE5v
-diAwOCwgMjAxOCBhdCAwNjowNTo1NVBNICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IE9u
-IDA2LzExLzE4IDA4OjE1LCBDaHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+Pj4gT24gTW9uLCBOb3Yg
-MDUsIDIwMTggYXQgMDI6MzY6MTZQTSArMDAwMCwgTWFyYyBaeW5naWVyIHdyb3RlOgo+Pj4+IEVh
-cmx5IHZlcnNpb25zIG9mIENvcnRleC1BNzYgY2FuIGVuZC11cCB3aXRoIGNvcnJ1cHQgVExCcyBp
-ZiB0aGV5Cj4+Pj4gc3BlY3VsYXRlIGFuIEFUIGluc3RydWN0aW9uIGluIGR1cmluZyBhIGd1ZXN0
-IHN3aXRjaCB3aGlsZSB0aGUKPj4+PiBTMS9TMiBzeXN0ZW0gcmVnaXN0ZXJzIGFyZSBpbiBhbiBp
-bmNvbnNpc3RlbnQgc3RhdGUuCj4+Pj4KPj4+PiBXb3JrIGFyb3VuZCBpdCBieToKPj4+PiAtIE1h
-bmRhdGluZyBWSEUKPj4+PiAtIE1ha2Ugc3VyZSB0aGF0IFMxIGFuZCBTMiBzeXN0ZW0gcmVnaXN0
-ZXJzIGFyZSBjb25zaXN0ZW50IGJlZm9yZQo+Pj4+ICAgY2xlYXJpbmcgSENSX0VMMi5UR0UsIHdo
-aWNoIGFsbG93cyBBVCB0byB0YXJnZXQgdGhlIEVMMSB0cmFuc2xhdGlvbgo+Pj4+ICAgcmVnaW1l
-Cj4+Pj4KPj4+PiBUaGVzZSB0d28gdGhpbmdzIHRvZ2V0aGVyIGVuc3VyZSB0aGF0IHdlIGNhbm5v
-dCBoaXQgdGhpcyBlcnJhdHVtLgo+Pj4+Cj4+Pj4gU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVy
-IDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4+PiAtLS0KPj4+PiAgRG9jdW1lbnRhdGlvbi9hcm02
-NC9zaWxpY29uLWVycmF0YS50eHQgfCAgMSArCj4+Pj4gIGFyY2gvYXJtNjQvS2NvbmZpZyAgICAg
-ICAgICAgICAgICAgICAgIHwgMTIgKysrKysrKysrKysrCj4+Pj4gIGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20vY3B1Y2Fwcy5oICAgICAgIHwgIDMgKystCj4+Pj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9h
-c20va3ZtX2hvc3QuaCAgICAgIHwgIDMgKysrCj4+Pj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20v
-a3ZtX2h5cC5oICAgICAgIHwgIDYgKysrKysrCj4+Pj4gIGFyY2gvYXJtNjQva2VybmVsL2NwdV9l
-cnJhdGEuYyAgICAgICAgIHwgIDggKysrKysrKysKPj4+PiAgYXJjaC9hcm02NC9rdm0vaHlwL3N3
-aXRjaC5jICAgICAgICAgICAgfCAxNCArKysrKysrKysrKysrKwo+Pj4+ICA3IGZpbGVzIGNoYW5n
-ZWQsIDQ2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4+Pgo+Pj4+IGRpZmYgLS1naXQg
-YS9Eb2N1bWVudGF0aW9uL2FybTY0L3NpbGljb24tZXJyYXRhLnR4dCBiL0RvY3VtZW50YXRpb24v
-YXJtNjQvc2lsaWNvbi1lcnJhdGEudHh0Cj4+Pj4gaW5kZXggNzZjY2RlZDhiNzRjLi4wNGYwYmM0
-NjkwYzYgMTAwNjQ0Cj4+Pj4gLS0tIGEvRG9jdW1lbnRhdGlvbi9hcm02NC9zaWxpY29uLWVycmF0
-YS50eHQKPj4+PiArKysgYi9Eb2N1bWVudGF0aW9uL2FybTY0L3NpbGljb24tZXJyYXRhLnR4dAo+
-Pj4+IEBAIC01Nyw2ICs1Nyw3IEBAIHN0YWJsZSBrZXJuZWxzLgo+Pj4+ICB8IEFSTSAgICAgICAg
-ICAgIHwgQ29ydGV4LUE3MyAgICAgIHwgIzg1ODkyMSAgICAgICAgIHwgQVJNNjRfRVJSQVRVTV84
-NTg5MjEgICAgICAgIHwKPj4+PiAgfCBBUk0gICAgICAgICAgICB8IENvcnRleC1BNTUgICAgICB8
-ICMxMDI0NzE4ICAgICAgICB8IEFSTTY0X0VSUkFUVU1fMTAyNDcxOCAgICAgICB8Cj4+Pj4gIHwg
-QVJNICAgICAgICAgICAgfCBDb3J0ZXgtQTc2ICAgICAgfCAjMTE4ODg3MyAgICAgICAgfCBBUk02
-NF9FUlJBVFVNXzExODg4NzMgICAgICAgfAo+Pj4+ICt8IEFSTSAgICAgICAgICAgIHwgQ29ydGV4
-LUE3NiAgICAgIHwgIzExNjU1MjIgICAgICAgIHwgQVJNNjRfRVJSQVRVTV8xMTY1NTIyICAgICAg
-IHwKPj4+PiAgfCBBUk0gICAgICAgICAgICB8IE1NVS01MDAgICAgICAgICB8ICM4NDExMTksIzgy
-NjQxOSB8IE4vQSAgICAgICAgICAgICAgICAgICAgICAgICB8Cj4+Pj4gIHwgICAgICAgICAgICAg
-ICAgfCAgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfAo+Pj4+ICB8IENhdml1bSAgICAgICAgIHwgVGh1bmRlclggSVRTICAgIHwg
-IzIyMzc1LCAjMjQzMTMgIHwgQ0FWSVVNX0VSUkFUVU1fMjIzNzUgICAgICAgIHwKPj4+PiBkaWZm
-IC0tZ2l0IGEvYXJjaC9hcm02NC9LY29uZmlnIGIvYXJjaC9hcm02NC9LY29uZmlnCj4+Pj4gaW5k
-ZXggNzg3ZDc4NTBlMDY0Li5hNjhiYzZjYzIxNjcgMTAwNjQ0Cj4+Pj4gLS0tIGEvYXJjaC9hcm02
-NC9LY29uZmlnCj4+Pj4gKysrIGIvYXJjaC9hcm02NC9LY29uZmlnCj4+Pj4gQEAgLTQ5Nyw2ICs0
-OTcsMTggQEAgY29uZmlnIEFSTTY0X0VSUkFUVU1fMTE4ODg3Mwo+Pj4+ICAKPj4+PiAgCSAgSWYg
-dW5zdXJlLCBzYXkgWS4KPj4+PiAgCj4+Pj4gK2NvbmZpZyBBUk02NF9FUlJBVFVNXzExNjU1MjIK
-Pj4+PiArCWJvb2wgIkNvcnRleC1BNzY6IFNwZWN1bGF0aXZlIEFUIGluc3RydWN0aW9uIHVzaW5n
-IG91dC1vZi1jb250ZXh0IHRyYW5zbGF0aW9uIHJlZ2ltZSBjb3VsZCBjYXVzZSBzdWJzZXF1ZW50
-IHJlcXVlc3QgdG8gZ2VuZXJhdGUgYW4gaW5jb3JyZWN0IHRyYW5zbGF0aW9uIgo+Pj4+ICsJZGVm
-YXVsdCB5Cj4+Pj4gKwloZWxwCj4+Pj4gKwkgIFRoaXMgb3B0aW9uIGFkZHMgd29yayBhcm91bmRz
-IGZvciBBUk0gQ29ydGV4LUE3NiBlcnJhdHVtIDExNjU1MjIKPj4+PiArCj4+Pj4gKwkgIEFmZmVj
-dGVkIENvcnRleC1BNzYgY29yZXMgKHIwcDAsIHIxcDAsIHIycDApIGNvdWxkIGVuZC11cCB3aXRo
-Cj4+Pj4gKwkgIGNvcnJ1cHRlZCBUTEJzIGJ5IHNwZWN1bGF0aW5nIGFuIEFUIGluc3RydWN0aW9u
-IGR1cmluZyBhIGd1ZXN0Cj4+Pj4gKwkgIGNvbnRleHQgc3dpdGNoLgo+Pj4+ICsKPj4+PiArCSAg
-SWYgdW5zdXJlLCBzYXkgWS4KPj4+PiArCj4+Pj4gIGNvbmZpZyBDQVZJVU1fRVJSQVRVTV8yMjM3
-NQo+Pj4+ICAJYm9vbCAiQ2F2aXVtIGVycmF0dW0gMjIzNzUsIDI0MzEzIgo+Pj4+ICAJZGVmYXVs
-dCB5Cj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1Y2Fwcy5oIGIv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVjYXBzLmgKPj4+PiBpbmRleCA2ZTJkMjU0YzA5ZWIu
-LjYyZDhjZDE1ZmRmMiAxMDA2NDQKPj4+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Nw
-dWNhcHMuaAo+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1Y2Fwcy5oCj4+Pj4g
-QEAgLTU0LDcgKzU0LDggQEAKPj4+PiAgI2RlZmluZSBBUk02NF9IQVNfQ1JDMzIJCQkJMzMKPj4+
-PiAgI2RlZmluZSBBUk02NF9TU0JTCQkJCTM0Cj4+Pj4gICNkZWZpbmUgQVJNNjRfV09SS0FST1VO
-RF8xMTg4ODczCQkzNQo+Pj4+ICsjZGVmaW5lIEFSTTY0X1dPUktBUk9VTkRfMTE2NTUyMgkJMzYK
-Pj4+PiAgCj4+Pj4gLSNkZWZpbmUgQVJNNjRfTkNBUFMJCQkJMzYKPj4+PiArI2RlZmluZSBBUk02
-NF9OQ0FQUwkJCQkzNwo+Pj4+ICAKPj4+PiAgI2VuZGlmIC8qIF9fQVNNX0NQVUNBUFNfSCAqLwo+
-Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+PiBpbmRleCA3ZDZlOTc0ZDAyNGEuLjhm
-NDg2MDI2YWM4NyAxMDA2NDQKPj4+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9o
-b3N0LmgKPj4+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4+PiBA
-QCAtNDM1LDYgKzQzNSw5IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJjaF9zdmVfcmVxdWly
-ZXNfdmhlKHZvaWQpCj4+Pj4gIHN0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJjaF9pbXBsX3JlcXVp
-cmVzX3ZoZSh2b2lkKQo+Pj4+ICB7Cj4+Pj4gIAkvKiBTb21lIGltcGxlbWVudGF0aW9ucyBoYXZl
-IGRlZmVjdHMgdGhhdCBjb25maW5lIHRoZW0gdG8gVkhFICovCj4+Pj4gKwlpZiAoY3B1c19oYXZl
-X2NhcChBUk02NF9XT1JLQVJPVU5EXzExNjU1MjIpKQo+Pj4+ICsJCXJldHVybiB0cnVlOwo+Pj4+
-ICsKPj4+PiAgCXJldHVybiBmYWxzZTsKPj4+PiAgfQo+Pj4+ICAKPj4+PiBkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2t2bV9oeXAuaAo+Pj4+IGluZGV4IDIzYWNhNjY3NjdmOS4uOTY4MTM2MGQwOTU5IDEwMDY0NAo+
-Pj4+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oCj4+Pj4gKysrIGIvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmgKPj4+PiBAQCAtMTYzLDYgKzE2MywxMiBAQCBz
-dGF0aWMgX19hbHdheXNfaW5saW5lIHZvaWQgX19oeXBfdGV4dCBfX2xvYWRfZ3Vlc3Rfc3RhZ2Uy
-KHN0cnVjdCBrdm0gKmt2bSkKPj4+PiAgewo+Pj4+ICAJd3JpdGVfc3lzcmVnKGt2bS0+YXJjaC52
-dGNyLCB2dGNyX2VsMik7Cj4+Pj4gIAl3cml0ZV9zeXNyZWcoa3ZtLT5hcmNoLnZ0dGJyLCB2dHRi
-cl9lbDIpOwo+Pj4+ICsKPj4+PiArCS8qCj4+Pj4gKwkgKiBBUk0gZXJyYXR1bSAxMTY1NTIyIHJl
-cXVpcmVzIHRoZSBhY3R1YWwgZXhlY3V0aW9uIG9mIHRoZQo+Pj4+ICsJICogYWJvdmUgYmVmb3Jl
-IHdlIGNhbiBzd2l0Y2ggdG8gdGhlIGd1ZXN0IHRyYW5zbGF0aW9uIHJlZ2ltZS4KPj4+PiArCSAq
-Lwo+Pj4KPj4+IElzIGl0IGFib3V0IGEgZ3Vlc3QgdHJhbnNsYXRpb24gJ3JlZ2ltZScgb3Igc2hv
-dWxkIHRoaXMganVzdCBzYXkgYmVmb3JlCj4+PiB3ZSBjYW4gZW5hYmxlIHN0YWdlIDIgdHJhbnNs
-YXRpb24/Cj4+Cj4+IE5vLCB0aGlzIGlzbid0IHN0cmljdGx5IGFib3V0IGVuYWJsaW5nIHN0YWdl
-LTIgdHJhbnNsYXRpb24uIFRoaXMgaXMKPj4gYWJvdXQgbWFraW5nIHN1cmUgdGhhdCBhbnl0aGlu
-ZyB0aGF0IGltcGFjdHMgdGhlIGd1ZXN0IHRyYW5zbGF0aW9ucyBpcwo+PiBhY3R1YWxseSBleGVj
-dXRlZC4KPj4KPj4gSSB3b25kZXIgaWYgaXQgd291bGQgYmUgY2xlYXJlciB0byBtb3ZlIHRoaXMg
-b3V0c2lkZSBvZgo+PiBfX2xvYWRfZ3Vlc3Rfc3RhZ2UyIGFuZCBtYWtlIGl0IGV4cGxpY2l0IGlu
-IHRoZSBjYWxsZXJzIG9mIHRoaXMgaGVscGVyLi4uCj4gCj4gSSB0aGluayBpdCBtYWtlcyBzZW5z
-ZSB0byBoYXZlIHRoaXMgaGVyZSB0byBleHBsYWluIHRoZSBhbHRlcm5hdGl2ZS4KPiAKPiBCdXQg
-aXQncyB0aGUgJ3N3aXRjaCB0byBndWVzdCB0cmFuc2xhdGlvbiByZWdpbWUnIHRoaW5nIHRoYXQg
-Ym90aGVycyBtZQo+IGEgYml0LiAgSXMgdGhhdCBhbiBhcmNoaXRlY3R1cmFsIGNvbmNlcHQgKEkg
-dGhvdWdodCB3ZSBvbmx5IGhhZCBFTDEgYW5kCj4gRUwyIHRyYW5zbGF0aW9uIHJlZ2ltZXMgaW4g
-c3RhZ2UgMSwgYW5kIHRoZW4gc3RhZ2UgMiB0cmFuc2xhdGlvbnMpLiAgU28KPiBXaGVuIHlvdSBz
-YXkgJ2d1ZXN0IHRyYW5zbGF0aW9uIHJlZ2ltZScgSSdtIGp1c3Qgbm90IGVudGlyZWx5IHN1cmUg
-d2hhdAo+IHRoYXQgbWVhbnMsIHVubGVzcyBJJ20gbWlzc2luZyBzb21ldGhpbmcuCgpbY29taW5n
-IGJhY2sgdG8gdGhpcyBhcyBJJ20gcHJlcGFyaW5nIHRoZSBuZXh0IHJvdW5kXQoKV2hhdCBJJ20g
-dHJ5aW5nIHRvIGNvbnZleSBieSAiZ3Vlc3QgdHJhbnNsYXRpb24gcmVnaW1lIiBpcyB0aGUgZm9s
-bG93aW5nCmZyb20gdGhlIEFSTSBBUk06CgpDNS40LjcgQVQgUzFFMVIsIEFkZHJlc3MgVHJhbnNs
-YXRlIFN0YWdlIDEgRUwxIFJlYWQKWy4uLl0KCldoZW4gRUwyIGlzIGltcGxlbWVudGVkIGFuZCBl
-bmFibGVkIGluIHRoZSBjdXJyZW50IFNlY3VyaXR5IHN0YXRlOgrigJQgSWYgSENSX0VMMi57RTJI
-LCBUR0V9IGlzIG5vdCB7MSwgMX0sIHRoZSBFTDEmMCB0cmFuc2xhdGlvbiByZWdpbWUsCmFjY2Vz
-c2VkIGZyb20gRUwxLgrigJQgSWYgSENSX0VMMi57RTJILCBUR0V9IGlzIHsxLCAxfSwgdGhlIEVM
-MiYwIHRyYW5zbGF0aW9uIHJlZ2ltZSwKYWNjZXNzZWQgZnJvbSBFTDIuCgpTbyBtYXliZSBJIHNo
-b3VsZCBqdXN0IGJpdGUgdGhlIGJ1bGxldCBhbmQgY2FsbCBvdXQgRUwxL0VMMiB0cmFuc2xhdGlv
-bgpyZWdpbWUgaW5zdGVhZCBvZiBndWVzdC9ob3N0LgoKVGhvdWdodHM/CgoJTS4KLS0gCkphenog
-aXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+Implement the virtio-iommu driver, following specification v0.9 [1].
+
+Since v4 [2] I fixed the issues reported by Eric, and added Reviewed-by
+from Eric and Rob. Thanks!
+
+I changed the specification to fix one inconsistency discussed in v4.
+That the device fills the probe buffer with zeroes is now a "SHOULD"
+instead of a "MAY", since it's the only way for the driver to know if
+the device wrote the status. Existing devices already do this. In
+addition the device now needs to fill the three padding bytes at the
+tail with zeroes.
+
+You can find Linux driver and kvmtool device on branches
+virtio-iommu/v0.9 [3]. I also lightly tested with Eric's latest QEMU
+device [4].
+
+[1] Virtio-iommu specification v0.9, sources, pdf and diff from v0.8
+    git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+    http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
+    http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.8-v0.9.pdf
+
+[2] [PATCH v4 0/7] Add virtio-iommu driver
+    https://lists.linuxfoundation.org/pipermail/iommu/2018-November/031074.html
+
+[3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9
+    git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
+
+[4] [RFC v9 00/17] VIRTIO-IOMMU device
+    https://www.mail-archive.com/qemu-devel@nongnu.org/msg575578.html
+
+Jean-Philippe Brucker (7):
+  dt-bindings: virtio-mmio: Add IOMMU description
+  dt-bindings: virtio: Add virtio-pci-iommu node
+  of: Allow the iommu-map property to omit untranslated devices
+  PCI: OF: Initialize dev->fwnode appropriately
+  iommu: Add virtio-iommu driver
+  iommu/virtio: Add probe request
+  iommu/virtio: Add event queue
+
+ .../devicetree/bindings/virtio/iommu.txt      |   66 +
+ .../devicetree/bindings/virtio/mmio.txt       |   30 +
+ MAINTAINERS                                   |    7 +
+ drivers/iommu/Kconfig                         |   11 +
+ drivers/iommu/Makefile                        |    1 +
+ drivers/iommu/virtio-iommu.c                  | 1157 +++++++++++++++++
+ drivers/of/base.c                             |   10 +-
+ drivers/pci/of.c                              |    7 +
+ include/uapi/linux/virtio_ids.h               |    1 +
+ include/uapi/linux/virtio_iommu.h             |  161 +++
+ 10 files changed, 1448 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+ create mode 100644 drivers/iommu/virtio-iommu.c
+ create mode 100644 include/uapi/linux/virtio_iommu.h
+
+-- 
+2.19.1
