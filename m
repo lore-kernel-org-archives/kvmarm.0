@@ -1,108 +1,66 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [RFC PATCH v2 11/23] KVM: arm64: Support runtime sysreg filtering
- for KVM_GET_REG_LIST
-Date: Thu, 22 Nov 2018 11:27:53 +0000
-Message-ID: <87bm6hic7a.fsf@linaro.org>
-References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
- <1538141967-15375-12-git-send-email-Dave.Martin@arm.com>
- <20181102081625.GS12057@e113682-lin.lund.arm.com>
- <20181115172711.GQ3505@e103592.cambridge.arm.com>
- <20181122105344.GF17441@e113682-lin.lund.arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Subject: [RFC] tracepoint: fix bad trace value in trace_kvm_exit()
+Date: Thu, 22 Nov 2018 12:17:30 +0000
+Message-ID: <1542889050-23144-1-git-send-email-yuzenghui@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 218334A1DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 06:27:57 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KiOFNsKZzP1Z for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Nov 2018 06:27:56 -0500 (EST)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F24D540A6E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 06:27:55 -0500 (EST)
-Received: by mail-wr1-f65.google.com with SMTP id t27so944176wra.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 03:27:55 -0800 (PST)
-In-reply-to: <20181122105344.GF17441@e113682-lin.lund.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: rostedt@goodmis.org, mingo@redhat.com, wanghaibin.wang@huawei.com, Zenghui Yu <yuzenghui@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAYXJtLmNvbT4gd3JpdGVzOgoKPiBb
-QWRkaW5nIFBldGVyIGFuZCBBbGV4IGZvciB0aGVpciB2aWV3IG9uIHRoZSBRRU1VIHNpZGVdCj4K
-PiBPbiBUaHUsIE5vdiAxNSwgMjAxOCBhdCAwNToyNzoxMVBNICswMDAwLCBEYXZlIE1hcnRpbiB3
-cm90ZToKPj4gT24gRnJpLCBOb3YgMDIsIDIwMTggYXQgMDk6MTY6MjVBTSArMDEwMCwgQ2hyaXN0
-b2ZmZXIgRGFsbCB3cm90ZToKPj4gPiBPbiBGcmksIFNlcCAyOCwgMjAxOCBhdCAwMjozOToxNVBN
-ICswMTAwLCBEYXZlIE1hcnRpbiB3cm90ZToKPj4gPiA+IEtWTV9HRVRfUkVHX0xJU1Qgc2hvdWxk
-IG9ubHkgZW51bWVyYXRlIHJlZ2lzdGVycyB0aGF0IGFyZSBhY3R1YWxseQo+PiA+ID4gYWNjZXNz
-aWJsZSwgc28gaXQgaXMgbmVjZXNzYXJ5IHRvIGZpbHRlciBvdXQgYW55IHJlZ2lzdGVyIHRoYXQg
-aXMKPj4gPiA+IG5vdCBleHBvc2VkIHRvIHRoZSBndWVzdC4gIEZvciBmZWF0dXJlcyB0aGF0IGFy
-ZSBjb25maWd1cmVkIGF0Cj4+ID4gPiBydW50aW1lLCB0aGlzIHdpbGwgcmVxdWlyZSBhIGR5bmFt
-aWMgY2hlY2suCj4+ID4gPgo+PiA+ID4gRm9yIGV4YW1wbGUsIFpDUl9FTDEgYW5kIElEX0FBNjRa
-RlIwX0VMMSB3b3VsZCBuZWVkIHRvIGJlIGhpZGRlbgo+PiA+ID4gaWYgU1ZFIGlzIG5vdCBlbmFi
-bGVkIGZvciB0aGUgZ3Vlc3QuCj4+ID4KPj4gPiBUaGlzIGltcGxpZXMgdGhhdCB1c2Vyc3BhY2Ug
-Y2FuIG5ldmVyIGFjY2VzcyB0aGlzIGludGVyZmFjZSBmb3IgYSB2Y3B1Cj4+ID4gYmVmb3JlIGhh
-dmluZyBkZWNpZGVkIHdoZXRoZXIgc3VjaCBmZWF0dXJlcyBhcmUgZW5hYmxlZCBmb3IgdGhlIGd1
-ZXN0IG9yCj4+ID4gbm90LCBzaW5jZSBvdGhlcndpc2UgdXNlcnNwYWNlIHdpbGwgc2VlIGRpZmZl
-cmVudCBzdGF0ZXMgZm9yIGEgVkNQVQo+PiA+IGRlcGVuZGluZyBvbiBzZXF1ZW5jaW5nIG9mIHRo
-ZSBBUEksIHdoaWNoIHNvdW5kcyBmcmFnaWxlIHRvIG1lLgo+PiA+Cj4+ID4gVGhhdCBzaG91bGQg
-cHJvYmFibHkgYmUgZG9jdW1lbnRlZCBzb21ld2hlcmUsIGFuZCBJIGhvcGUgdGhlCj4+ID4gZW5h
-YmxlL2Rpc2FibGUgQVBJIGZvciBTVkUgaW4gZ3Vlc3RzIGFscmVhZHkgdGFrZXMgdGhhdCBpbnRv
-IGFjY291bnQuCj4+ID4KPj4gPiBOb3Qgc3VyZSBpZiB0aGVyZSdzIGFuIGFjdGlvbiB0byB0YWtl
-IGhlcmUsIGJ1dCBpdCB3YXMgdGhlIGJlc3QgcGxhY2UgSQo+PiA+IGNvdWxkIHJhaXNlIHRoaXMg
-Y29uY2Vybi4KPj4KPj4gRmFpciBwb2ludC4gIEkgc3RydWdnbGVkIHRvIGNvbWUgdXAgd2l0aCBz
-b21ldGhpbmcgYmV0dGVyIHRoYXQgc29sdmVzCj4+IGFsbCBwcm9ibGVtcy4KPj4KPj4gTXkgZXhw
-ZWN0YXRpb24gaXMgdGhhdCBLVk1fQVJNX1NWRV9DT05GSUdfU0VUIGlzIGNvbnNpZGVyZWQgcGFy
-dCBvZgo+PiBjcmVhdGluZyB0aGUgdmNwdSwgc28gdGhhdCBpZiBpc3N1ZWQgYXQgYWxsIGZvciBh
-IHZjcHUsIGl0IGlzIGlzc3VlZAo+PiB2ZXJ5IHNvb24gYWZ0ZXIgS1ZNX1ZDUFVfSU5JVC4KPj4K
-Pj4gSSB0aGluayB0aGlzIHdvcmtlZCBPSyB3aXRoIHRoZSBjdXJyZW50IHN0cnVjdHVyZSBvZiBr
-dm10b29sIGFuZCBJCj4+IHNlZW0gdG8gcmVtZW1iZXIgZGlzY3Vzc2luZyB0aGlzIHdpdGggUGV0
-ZXIgTWF5ZGVsbCByZSBxZW11IC0tIGJ1dAo+PiBpdCBzb3VuZHMgbGlrZSBJIHNob3VsZCBkb3Vi
-bGUtY2hlY2suCj4KPiBRRU1VIGRvZXMgc29tZSB0aGluZyBhcm91bmQgZW51bWVyYXRpbmcgYWxs
-IHRoZSBzeXN0ZW0gcmVnaXN0ZXJzIGV4cG9zZWQKPiBieSBLVk0gYW5kIHNhdmluZy9yZXN0b3Jp
-bmcgdGhlbSBhcyBwYXJ0IG9mIGl0cyBzdGFydHVwLCBidXQgSSBkb24ndAo+IHJlbWVtYmVyIHRo
-ZSBleGFjdCBzZXF1ZW5jZS4KClFFTVUgZG9lcyB0aGlzIGZvciBlYWNoIHZDUFUgYXMgcGFydCBv
-ZiBpdCdzIHN0YXJ0LXVwIHNlcXVlbmNlOgoKICBrdm1faW5pdF92Y3B1CiAgICBrdm1fZ2V0X2Nw
-dSAoLT4gS1ZNX0NSRUFURV9WQ1BVKQogICAgS1ZNX0dFVF9WQ1BVX01NQVBfU0laRQogICAga3Zt
-X2FyY2hfaW5pdF92Y3B1CiAgICAgIGt2bV9hcm1fdmNwdV9pbml0ICgtPiBLVk1fQVJNX1ZDUFVf
-SU5JVCkKICAgICAga3ZtX2dldF9vbmVfcmVnKEFSTV9DUFVfSURfTVBJRFIpCiAgICAgIGt2bV9h
-cm1faW5pdF9kZWJ1ZyAoY2hrIGZvciBLVk1fQ0FQIFNFVF9HVUVTVF9ERUJVRy9HVUVTVF9ERUJV
-R19IV19XUFMvQlBTKQogICAgICBrdm1fYXJtX2luaXRfc2Vycm9yX2luamVjdGlvbiAoY2hrIEtW
-TV9DQVBfQVJNX0lOSkVDVF9TRVJST1JfRVNSKQogICAgICBrdm1fYXJtX2luaXRfY3ByZWdfbGlz
-dCAoS1ZNX0dFVF9SRUdfTElTVCkKCkF0IHRoaXMgcG9pbnQgd2UgaGF2ZSB0aGUgcmVnaXN0ZXIg
-bGlzdCB3ZSBuZWVkIGZvcgprdm1fYXJjaF9nZXRfcmVnaXN0ZXJzIHdoaWNoIGlzIHdoYXQgd2Ug
-Y2FsbCBldmVyeSB0aW1lIHdlIHdhbnQgdG8Kc3luY2hyb25pc2Ugc3RhdGUuIFdlIG9ubHkgcmVh
-bGx5IGRvIHRoaXMgZm9yIGRlYnVnIGV2ZW50cywgY3Jhc2hlcyBhbmQKYXQgc29tZSBwb2ludCB3
-aGVuIG1pZ3JhdGluZy4KCj4KPj4KPj4gRWl0aGVyIHdheSwgeW91J3JlIHJpZ2h0LCB0aGlzIG5l
-ZWRzIHRvIGJlIGNsZWFybHkgZG9jdW1lbnRlZC4KPj4KPj4KPj4gSWYgd2Ugd2FudCB0byBiZSBt
-b3JlIHJvYnVzdCwgbWF5YmUgd2Ugc2hvdWxkIGFkZCBhIGNhcGFiaWxpdHkgdG9vLAo+PiBzbyB0
-aGF0IHVzZXJzcGFjZSB0aGF0IGVuYWJsZXMgdGhpcyBjYXBhYmlsaXR5IHByb21pc2VzIHRvIGNh
-bGwKPj4gS1ZNX0FSTV9TVkVfQ09ORklHX1NFVCBmb3IgZWFjaCB2Y3B1LCBhbmQgYWZmZWN0ZWQg
-aW9jdGxzIChLVk1fUlVOLAo+PiBLVk1fR0VUX1JFR19MSVNUIGV0Yy4pIGFyZSBmb3JiaWRkZW4g
-dW50aWwgdGhhdCBpcyBkb25lPwo+Pgo+PiBUaGF0IHNob3VsZCBoZWxwIGF2b2lkIGFjY2lkZW50
-cy4KPj4KPj4gSSBjb3VsZCBhZGQgYSBzcGVjaWFsIG1lYW5pbmcgZm9yIGFuIGVtcHR5IGt2bV9z
-dmVfdmxzLCBzdWNoIHRoYXQKPj4gaXQgZG9lc24ndCBlbmFibGUgU1ZFIG9uIHRoZSBhZmZlY3Rl
-ZCB2Y3B1LiAgVGhhdCByZXRhaW5zIHRoZSBhYmlsaXR5Cj4+IHRvIGNyZWF0ZSBoZXRlcm9nZW5l
-b3VzIGd1ZXN0cyB3aGlsZSBzdGlsbCBmb2xsb3dpbmcgdGhlIGFib3ZlIGZsb3cuCj4+Cj4gSSB0
-aGluayBtYWtpbmcgc3VyZSB0aGF0IHVzZXJzcGFjZSBjYW4gZXZlciBvbmx5IHNlZSB0aGUgc2Ft
-ZSBsaXN0IG9mCj4gYXZhaWxhYmxlIHN5c3RlbSByZWdpdGVycyBpcyBnb2luZyB0byBjYXVzZSB1
-cyBsZXNzIHBhaW4gZ29pbmcgZm9yd2FyZC4KPgo+IElmIHRoZSBzZXBhcmF0ZSBpb2N0bCBhbmQg
-Y2FwYWJpbGl0eSBjaGVjayBpcyB0aGUgZWFzaWVzdCB3YXkgb2YgZG9pbmcKPiB0aGF0LCB0aGVu
-IEkgdGhpbmsgdGhhdCBzb3VuZHMgZ29vZC4gIChJIGhhZCB3aXNoZWQgd2UgY291bGQgaGF2ZSBq
-dXN0Cj4gYWRkZWQgc29tZSBkYXRhIHRvIEtWTV9DUkVBVEVfVkNQVSwgYnV0IHRoYXQgZG9lc24n
-dCBzZWVtIHRvIGJlIHRoZQo+IGNhc2UuKQo+Cj4KPiBUaGFua3MsCj4KPiAgICAgQ2hyaXN0b2Zm
-ZXIKCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+After enabling KVM event tracing, almost all of trace_kvm_exit()'s
+printk shows
+	"kvm_exit: IRQ: ..."
+even if the actual exception_type is NOT IRQ.
+
+This slight problem may have existed after commit e6753f2. There are
+two variables in trace_kvm_exit() and __DO_TRACE() which have the
+same name, *idx*. Thus the actual value of *idx* will be overwritten
+when tracing.
+
+So, what about this stupid patch?
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Wang Haibin <wanghaibin.wang@huawei.com>
+---
+ include/linux/tracepoint.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/tracepoint.h b/include/linux/tracepoint.h
+index 538ba1a..e9de8ad 100644
+--- a/include/linux/tracepoint.h
++++ b/include/linux/tracepoint.h
+@@ -166,7 +166,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 		struct tracepoint_func *it_func_ptr;			\
+ 		void *it_func;						\
+ 		void *__data;						\
+-		int __maybe_unused idx = 0;				\
++		int __maybe_unused __idx = 0;				\
+ 									\
+ 		if (!(cond))						\
+ 			return;						\
+@@ -182,7 +182,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 		 * doesn't work from the idle path.			\
+ 		 */							\
+ 		if (rcuidle) {						\
+-			idx = srcu_read_lock_notrace(&tracepoint_srcu);	\
++			__idx = srcu_read_lock_notrace(&tracepoint_srcu);\
+ 			rcu_irq_enter_irqson();				\
+ 		}							\
+ 									\
+@@ -198,7 +198,7 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 									\
+ 		if (rcuidle) {						\
+ 			rcu_irq_exit_irqson();				\
+-			srcu_read_unlock_notrace(&tracepoint_srcu, idx);\
++			srcu_read_unlock_notrace(&tracepoint_srcu, __idx);\
+ 		}							\
+ 									\
+ 		preempt_enable_notrace();				\
+-- 
+1.8.3.1
