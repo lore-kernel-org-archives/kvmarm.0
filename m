@@ -1,33 +1,31 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH v2 11/23] KVM: arm64: Support runtime sysreg filtering
- for KVM_GET_REG_LIST
-Date: Thu, 22 Nov 2018 12:59:10 +0000
-Message-ID: <CAFEAcA_G1ceUGnDX5u6bK_pX_7-tAHtP8+NkAkK-vKOhzC1hyA@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [RFC PATCH v2 11/23] KVM: arm64: Support runtime sysreg
+ filtering for KVM_GET_REG_LIST
+Date: Thu, 22 Nov 2018 14:07:18 +0100
+Message-ID: <20181122130717.GH17441@e113682-lin.lund.arm.com>
 References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
  <1538141967-15375-12-git-send-email-Dave.Martin@arm.com>
  <20181102081625.GS12057@e113682-lin.lund.arm.com>
  <20181115172711.GQ3505@e103592.cambridge.arm.com>
  <20181122105344.GF17441@e113682-lin.lund.arm.com>
- <CAFEAcA8UEqxM7KJGm81ETgPpsO6ByK7Vc9SuCKr4FZGVU8vxxg@mail.gmail.com>
- <20181122123424.GG17441@e113682-lin.lund.arm.com>
+ <87bm6hic7a.fsf@linaro.org>
+ <20181122123235.GQ4719@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7EC4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 07:59:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 755454A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 08:07:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c4TiNwU8soMt for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Nov 2018 07:59:31 -0500 (EST)
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
- [209.85.210.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9521A4A1DC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 07:59:31 -0500 (EST)
-Received: by mail-ot1-f66.google.com with SMTP id u16so7974587otk.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 04:59:31 -0800 (PST)
-In-Reply-To: <20181122123424.GG17441@e113682-lin.lund.arm.com>
+ with ESMTP id mwmbi2BEP29f for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Nov 2018 08:07:21 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06C0C4A1DC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Nov 2018 08:07:20 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20181122123235.GQ4719@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,26 +35,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Dave P Martin <Dave.Martin@arm.com>
+Cc: "tokamoto@jp.fujitsu.com" <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22 November 2018 at 12:34, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> So on migration, will you have the required information for
-> KVM_ARM_VCPU_INIT before setting the registers from the migration
-> stream?
->
-> (I assume so, because presumably this comes from a command-line switch
-> or from the machine definition, which must match the source.)
-
-Yes. QEMU always sets up the VCPU completely before doing any
-inbound migration.
-
-> Therefore, I don't think there's an issue with this patch, but from
-> bitter experience I think we should enforce ordering if possible.
-
-Yes, if there are semantic ordering constraints on the various
-calls it would be nice to have the kernel enforce them.
-
-thanks
--- PMM
+T24gVGh1LCBOb3YgMjIsIDIwMTggYXQgMDE6MzI6MzdQTSArMDEwMCwgRGF2ZSBQIE1hcnRpbiB3
+cm90ZToKPiBPbiBUaHUsIE5vdiAyMiwgMjAxOCBhdCAxMToyNzo1M0FNICswMDAwLCBBbGV4IEJl
+bm7DqWUgd3JvdGU6Cj4gPiAKPiA+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxA
+YXJtLmNvbT4gd3JpdGVzOgo+ID4gCj4gPiA+IFtBZGRpbmcgUGV0ZXIgYW5kIEFsZXggZm9yIHRo
+ZWlyIHZpZXcgb24gdGhlIFFFTVUgc2lkZV0KPiA+ID4KPiA+ID4gT24gVGh1LCBOb3YgMTUsIDIw
+MTggYXQgMDU6Mjc6MTFQTSArMDAwMCwgRGF2ZSBNYXJ0aW4gd3JvdGU6Cj4gPiA+PiBPbiBGcmks
+IE5vdiAwMiwgMjAxOCBhdCAwOToxNjoyNUFNICswMTAwLCBDaHJpc3RvZmZlciBEYWxsIHdyb3Rl
+Ogo+ID4gPj4gPiBPbiBGcmksIFNlcCAyOCwgMjAxOCBhdCAwMjozOToxNVBNICswMTAwLCBEYXZl
+IE1hcnRpbiB3cm90ZToKPiA+ID4+ID4gPiBLVk1fR0VUX1JFR19MSVNUIHNob3VsZCBvbmx5IGVu
+dW1lcmF0ZSByZWdpc3RlcnMgdGhhdCBhcmUgYWN0dWFsbHkKPiA+ID4+ID4gPiBhY2Nlc3NpYmxl
+LCBzbyBpdCBpcyBuZWNlc3NhcnkgdG8gZmlsdGVyIG91dCBhbnkgcmVnaXN0ZXIgdGhhdCBpcwo+
+ID4gPj4gPiA+IG5vdCBleHBvc2VkIHRvIHRoZSBndWVzdC4gIEZvciBmZWF0dXJlcyB0aGF0IGFy
+ZSBjb25maWd1cmVkIGF0Cj4gPiA+PiA+ID4gcnVudGltZSwgdGhpcyB3aWxsIHJlcXVpcmUgYSBk
+eW5hbWljIGNoZWNrLgo+ID4gPj4gPiA+Cj4gPiA+PiA+ID4gRm9yIGV4YW1wbGUsIFpDUl9FTDEg
+YW5kIElEX0FBNjRaRlIwX0VMMSB3b3VsZCBuZWVkIHRvIGJlIGhpZGRlbgo+ID4gPj4gPiA+IGlm
+IFNWRSBpcyBub3QgZW5hYmxlZCBmb3IgdGhlIGd1ZXN0Lgo+ID4gPj4gPgo+ID4gPj4gPiBUaGlz
+IGltcGxpZXMgdGhhdCB1c2Vyc3BhY2UgY2FuIG5ldmVyIGFjY2VzcyB0aGlzIGludGVyZmFjZSBm
+b3IgYSB2Y3B1Cj4gPiA+PiA+IGJlZm9yZSBoYXZpbmcgZGVjaWRlZCB3aGV0aGVyIHN1Y2ggZmVh
+dHVyZXMgYXJlIGVuYWJsZWQgZm9yIHRoZSBndWVzdCBvcgo+ID4gPj4gPiBub3QsIHNpbmNlIG90
+aGVyd2lzZSB1c2Vyc3BhY2Ugd2lsbCBzZWUgZGlmZmVyZW50IHN0YXRlcyBmb3IgYSBWQ1BVCj4g
+PiA+PiA+IGRlcGVuZGluZyBvbiBzZXF1ZW5jaW5nIG9mIHRoZSBBUEksIHdoaWNoIHNvdW5kcyBm
+cmFnaWxlIHRvIG1lLgo+ID4gPj4gPgo+ID4gPj4gPiBUaGF0IHNob3VsZCBwcm9iYWJseSBiZSBk
+b2N1bWVudGVkIHNvbWV3aGVyZSwgYW5kIEkgaG9wZSB0aGUKPiA+ID4+ID4gZW5hYmxlL2Rpc2Fi
+bGUgQVBJIGZvciBTVkUgaW4gZ3Vlc3RzIGFscmVhZHkgdGFrZXMgdGhhdCBpbnRvIGFjY291bnQu
+Cj4gPiA+PiA+Cj4gPiA+PiA+IE5vdCBzdXJlIGlmIHRoZXJlJ3MgYW4gYWN0aW9uIHRvIHRha2Ug
+aGVyZSwgYnV0IGl0IHdhcyB0aGUgYmVzdCBwbGFjZSBJCj4gPiA+PiA+IGNvdWxkIHJhaXNlIHRo
+aXMgY29uY2Vybi4KPiA+ID4+Cj4gPiA+PiBGYWlyIHBvaW50LiAgSSBzdHJ1Z2dsZWQgdG8gY29t
+ZSB1cCB3aXRoIHNvbWV0aGluZyBiZXR0ZXIgdGhhdCBzb2x2ZXMKPiA+ID4+IGFsbCBwcm9ibGVt
+cy4KPiA+ID4+Cj4gPiA+PiBNeSBleHBlY3RhdGlvbiBpcyB0aGF0IEtWTV9BUk1fU1ZFX0NPTkZJ
+R19TRVQgaXMgY29uc2lkZXJlZCBwYXJ0IG9mCj4gPiA+PiBjcmVhdGluZyB0aGUgdmNwdSwgc28g
+dGhhdCBpZiBpc3N1ZWQgYXQgYWxsIGZvciBhIHZjcHUsIGl0IGlzIGlzc3VlZAo+ID4gPj4gdmVy
+eSBzb29uIGFmdGVyIEtWTV9WQ1BVX0lOSVQuCj4gPiA+Pgo+ID4gPj4gSSB0aGluayB0aGlzIHdv
+cmtlZCBPSyB3aXRoIHRoZSBjdXJyZW50IHN0cnVjdHVyZSBvZiBrdm10b29sIGFuZCBJCj4gPiA+
+PiBzZWVtIHRvIHJlbWVtYmVyIGRpc2N1c3NpbmcgdGhpcyB3aXRoIFBldGVyIE1heWRlbGwgcmUg
+cWVtdSAtLSBidXQKPiA+ID4+IGl0IHNvdW5kcyBsaWtlIEkgc2hvdWxkIGRvdWJsZS1jaGVjay4K
+PiA+ID4KPiA+ID4gUUVNVSBkb2VzIHNvbWUgdGhpbmcgYXJvdW5kIGVudW1lcmF0aW5nIGFsbCB0
+aGUgc3lzdGVtIHJlZ2lzdGVycyBleHBvc2VkCj4gPiA+IGJ5IEtWTSBhbmQgc2F2aW5nL3Jlc3Rv
+cmluZyB0aGVtIGFzIHBhcnQgb2YgaXRzIHN0YXJ0dXAsIGJ1dCBJIGRvbid0Cj4gPiA+IHJlbWVt
+YmVyIHRoZSBleGFjdCBzZXF1ZW5jZS4KPiA+IAo+ID4gUUVNVSBkb2VzIHRoaXMgZm9yIGVhY2gg
+dkNQVSBhcyBwYXJ0IG9mIGl0J3Mgc3RhcnQtdXAgc2VxdWVuY2U6Cj4gPiAKPiA+ICAga3ZtX2lu
+aXRfdmNwdQo+ID4gICAgIGt2bV9nZXRfY3B1ICgtPiBLVk1fQ1JFQVRFX1ZDUFUpCj4gPiAgICAg
+S1ZNX0dFVF9WQ1BVX01NQVBfU0laRQo+ID4gICAgIGt2bV9hcmNoX2luaXRfdmNwdQo+ID4gICAg
+ICAga3ZtX2FybV92Y3B1X2luaXQgKC0+IEtWTV9BUk1fVkNQVV9JTklUKQo+ID4gICAgICAga3Zt
+X2dldF9vbmVfcmVnKEFSTV9DUFVfSURfTVBJRFIpCj4gPiAgICAgICBrdm1fYXJtX2luaXRfZGVi
+dWcgKGNoayBmb3IgS1ZNX0NBUCBTRVRfR1VFU1RfREVCVUcvR1VFU1RfREVCVUdfSFdfV1BTL0JQ
+UykKPiA+ICAgICAgIGt2bV9hcm1faW5pdF9zZXJyb3JfaW5qZWN0aW9uIChjaGsgS1ZNX0NBUF9B
+Uk1fSU5KRUNUX1NFUlJPUl9FU1IpCj4gPiAgICAgICBrdm1fYXJtX2luaXRfY3ByZWdfbGlzdCAo
+S1ZNX0dFVF9SRUdfTElTVCkKPiA+IAo+ID4gQXQgdGhpcyBwb2ludCB3ZSBoYXZlIHRoZSByZWdp
+c3RlciBsaXN0IHdlIG5lZWQgZm9yCj4gPiBrdm1fYXJjaF9nZXRfcmVnaXN0ZXJzIHdoaWNoIGlz
+IHdoYXQgd2UgY2FsbCBldmVyeSB0aW1lIHdlIHdhbnQgdG8KPiA+IHN5bmNocm9uaXNlIHN0YXRl
+LiBXZSBvbmx5IHJlYWxseSBkbyB0aGlzIGZvciBkZWJ1ZyBldmVudHMsIGNyYXNoZXMgYW5kCj4g
+PiBhdCBzb21lIHBvaW50IHdoZW4gbWlncmF0aW5nLgo+IAo+IFNvIHdlIHdvdWxkIG5lZWQgdG8g
+aW5zZXJ0IEtWTV9BUk1fU1ZFX0NPTkZJR19TRVQgaW50byB0aGlzIHNlcXVlbmNlLAo+IG1lYW5p
+bmcgdGhhdCB0aGUgbmV3IGNhcGFiaWxpdHkgaXMgbm90IHN0cmljdGx5IG5lY2Vzc2FyeS4KPiAK
+PiBJIHN5bXBhdGhpc2Ugd2l0aCBDaHJpc3RvZmZlcidzIHZpZXcgdGhvdWdoIHRoYXQgd2l0aG91
+dCB0aGUgY2FwYWJpbGl0eQo+IG1lY2hhbmlzbSBpdCBtYXkgYmUgdG9vIGVhc3kgZm9yIHNvZnR3
+YXJlIHRvIG1ha2UgbWlzdGFrZXM6IGNvZGUKPiByZWZhY3RvcmluZyBtaWdodCBzd2FwIHRoZSBL
+Vk1fR0VUX1JFR19MSVNUIGFuZCBLVk1fQVJNX1NWRV9DT05GSUcgaW9jdGxzCj4gb3ZlciBhbmQg
+dGhlbiB0aGluZ3Mgd291bGQgZ28gd3Jvbmcgd2l0aCBubyBpbW1lZGlhdGUgZXJyb3IgaW5kaWNh
+dGlvbi4KPiAKPiBJbiBlZmZlY3QsIHRoZSBTVkUgcmVncyB3b3VsZCBiZSBtaXNzaW5nIGZyb20g
+dGhlIGxpc3QgeWllbGRlZCBieQo+IEtWTV9HRVRfUkVHX0xJU1QsIHBvc3NpYmx5IGxlYWRpbmcg
+dG8gc2lsZW50IG1pZ3JhdGlvbiBmYWlsdXJlcy4KPiAKPiBJJ20gYSBiaXQgdW5lYXN5IGFib3V0
+IHRoYXQuICBBbSBJIGJlaW5nIHRvbyBwYXJhbm9pZCBub3c/Cj4gCgpObywgd2UndmUgbWFkZSBk
+ZWNpc2lvbnMgaW4gdGhlIHBhc3Qgd2hlcmUgd2UgZGlkbid0IGVuZm9yY2Ugb3JkZXJpbmcKd2hp
+Y2ggZW5kZWQgdXAgYmVpbmcgYSBodWdlIHBhaW4gKHZnaWMgbGF6eSBpbml0LCBhcyBhIGNsZWFy
+IGV4YW1wbGUgb2YKc29tZXRoaW5nIHJlYWxseSBiYWQpLiAgT2YgY291cnNlLCBpdCdzIGEgdHJh
+ZGVvZmYuICBJZiBpdCdzIGEgaHVnZSBwYWluCnRvIGltcGxlbWVudCwgbWF5YmUgdGhpbmdzIHdp
+bGwgYmUgb2ssIGJ1dCBpZiBpdCdzIGp1c3QgYSByZWFkL3dyaXRlCmNhcGFiaWxpdHkgaGFuZHNo
+YWtlLCBJIHRoaW5rIGl0J3Mgd29ydGggZG9pbmcuCgoKVGhhbmtzLAoKICAgIENocmlzdG9mZmVy
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
