@@ -1,223 +1,187 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: [PATCH v5 7/7] iommu/virtio: Add event queue
-Date: Thu, 22 Nov 2018 19:38:01 +0000
-Message-ID: <20181122193801.50510-8-jean-philippe.brucker@arm.com>
-References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
+From: <peng.hao2@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSF0ga3ZtOiBhcm0vYXJtNjQgOiBmaXggdm0ncyBoYW5naW5nIGF0IHN0YXJ0dXAgdGltZQ==?=
+Date: Fri, 23 Nov 2018 14:01:56 +0800 (CST)
+Message-ID: <201811231401560886603@zte.com.cn>
+References: <20181121110620.GC18678@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <virtio-dev-return-5021-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
-To: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
-Cc: jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C9984A2B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:02:10 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2Oqw-xKh5LKe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Nov 2018 01:02:08 -0500 (EST)
+Received: from mxct.zte.com.cn (mx7.zte.com.cn [202.103.147.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D5D54A0CC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:02:08 -0500 (EST)
+In-Reply-To: <20181121110620.GC18678@e113682-lin.lund.arm.com>
+References: 01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com,
+ 20181121110620.GC18678@e113682-lin.lund.arm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@arm.com
+Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The event queue offers a way for the device to report access faults from
-endpoints. It is implemented on virtqueue #1. Whenever the host needs to
-signal a fault, it fills one of the buffers offered by the guest and
-interrupts it.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
----
- drivers/iommu/virtio-iommu.c      | 115 +++++++++++++++++++++++++++---
- include/uapi/linux/virtio_iommu.h |  19 +++++
- 2 files changed, 125 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
-index 0c7a7fa2628d..e6ff515d41c0 100644
---- a/drivers/iommu/virtio-iommu.c
-+++ b/drivers/iommu/virtio-iommu.c
-@@ -29,7 +29,8 @@
- #define MSI_IOVA_LENGTH			0x100000
- 
- #define VIOMMU_REQUEST_VQ		0
--#define VIOMMU_NR_VQS			1
-+#define VIOMMU_EVENT_VQ			1
-+#define VIOMMU_NR_VQS			2
- 
- struct viommu_dev {
- 	struct iommu_device		iommu;
-@@ -41,6 +42,7 @@ struct viommu_dev {
- 	struct virtqueue		*vqs[VIOMMU_NR_VQS];
- 	spinlock_t			request_lock;
- 	struct list_head		requests;
-+	void				*evts;
- 
- 	/* Device configuration */
- 	struct iommu_domain_geometry	geometry;
-@@ -82,6 +84,15 @@ struct viommu_request {
- 	char				buf[];
- };
- 
-+#define VIOMMU_FAULT_RESV_MASK		0xffffff00
-+
-+struct viommu_event {
-+	union {
-+		u32			head;
-+		struct virtio_iommu_fault fault;
-+	};
-+};
-+
- #define to_viommu_domain(domain)	\
- 	container_of(domain, struct viommu_domain, domain)
- 
-@@ -503,6 +514,68 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
- 	return ret;
- }
- 
-+static int viommu_fault_handler(struct viommu_dev *viommu,
-+				struct virtio_iommu_fault *fault)
-+{
-+	char *reason_str;
-+
-+	u8 reason	= fault->reason;
-+	u32 flags	= le32_to_cpu(fault->flags);
-+	u32 endpoint	= le32_to_cpu(fault->endpoint);
-+	u64 address	= le64_to_cpu(fault->address);
-+
-+	switch (reason) {
-+	case VIRTIO_IOMMU_FAULT_R_DOMAIN:
-+		reason_str = "domain";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_MAPPING:
-+		reason_str = "page";
-+		break;
-+	case VIRTIO_IOMMU_FAULT_R_UNKNOWN:
-+	default:
-+		reason_str = "unknown";
-+		break;
-+	}
-+
-+	/* TODO: find EP by ID and report_iommu_fault */
-+	if (flags & VIRTIO_IOMMU_FAULT_F_ADDRESS)
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u at %#llx [%s%s%s]\n",
-+				    reason_str, endpoint, address,
-+				    flags & VIRTIO_IOMMU_FAULT_F_READ ? "R" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_WRITE ? "W" : "",
-+				    flags & VIRTIO_IOMMU_FAULT_F_EXEC ? "X" : "");
-+	else
-+		dev_err_ratelimited(viommu->dev, "%s fault from EP %u\n",
-+				    reason_str, endpoint);
-+	return 0;
-+}
-+
-+static void viommu_event_handler(struct virtqueue *vq)
-+{
-+	int ret;
-+	unsigned int len;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evt;
-+	struct viommu_dev *viommu = vq->vdev->priv;
-+
-+	while ((evt = virtqueue_get_buf(vq, &len)) != NULL) {
-+		if (len > sizeof(*evt)) {
-+			dev_err(viommu->dev,
-+				"invalid event buffer (len %u != %zu)\n",
-+				len, sizeof(*evt));
-+		} else if (!(evt->head & VIOMMU_FAULT_RESV_MASK)) {
-+			viommu_fault_handler(viommu, &evt->fault);
-+		}
-+
-+		sg_init_one(sg, evt, sizeof(*evt));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, evt, GFP_ATOMIC);
-+		if (ret)
-+			dev_err(viommu->dev, "could not add event buffer\n");
-+	}
-+
-+	virtqueue_kick(vq);
-+}
-+
- /* IOMMU API */
- 
- static struct iommu_domain *viommu_domain_alloc(unsigned type)
-@@ -885,16 +958,35 @@ static struct iommu_ops viommu_ops = {
- static int viommu_init_vqs(struct viommu_dev *viommu)
- {
- 	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
--	const char *name = "request";
--	void *ret;
-+	const char *names[] = { "request", "event" };
-+	vq_callback_t *callbacks[] = {
-+		NULL, /* No async requests */
-+		viommu_event_handler,
-+	};
- 
--	ret = virtio_find_single_vq(vdev, NULL, name);
--	if (IS_ERR(ret)) {
--		dev_err(viommu->dev, "cannot find VQ\n");
--		return PTR_ERR(ret);
--	}
-+	return virtio_find_vqs(vdev, VIOMMU_NR_VQS, viommu->vqs, callbacks,
-+			       names, NULL);
-+}
- 
--	viommu->vqs[VIOMMU_REQUEST_VQ] = ret;
-+static int viommu_fill_evtq(struct viommu_dev *viommu)
-+{
-+	int i, ret;
-+	struct scatterlist sg[1];
-+	struct viommu_event *evts;
-+	struct virtqueue *vq = viommu->vqs[VIOMMU_EVENT_VQ];
-+	size_t nr_evts = vq->num_free;
-+
-+	viommu->evts = evts = devm_kmalloc_array(viommu->dev, nr_evts,
-+						 sizeof(*evts), GFP_KERNEL);
-+	if (!evts)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < nr_evts; i++) {
-+		sg_init_one(sg, &evts[i], sizeof(*evts));
-+		ret = virtqueue_add_inbuf(vq, sg, 1, &evts[i], GFP_KERNEL);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return 0;
- }
-@@ -963,6 +1055,11 @@ static int viommu_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	/* Populate the event queue with buffers */
-+	ret = viommu_fill_evtq(viommu);
-+	if (ret)
-+		goto err_free_vqs;
-+
- 	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
- 				     virtio_bus_name(vdev));
- 	if (ret)
-diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
-index ae6145cf5928..ba1b460c9944 100644
---- a/include/uapi/linux/virtio_iommu.h
-+++ b/include/uapi/linux/virtio_iommu.h
-@@ -139,4 +139,23 @@ struct virtio_iommu_req_probe {
- 	 */
- };
- 
-+/* Fault types */
-+#define VIRTIO_IOMMU_FAULT_R_UNKNOWN		0
-+#define VIRTIO_IOMMU_FAULT_R_DOMAIN		1
-+#define VIRTIO_IOMMU_FAULT_R_MAPPING		2
-+
-+#define VIRTIO_IOMMU_FAULT_F_READ		(1 << 0)
-+#define VIRTIO_IOMMU_FAULT_F_WRITE		(1 << 1)
-+#define VIRTIO_IOMMU_FAULT_F_EXEC		(1 << 2)
-+#define VIRTIO_IOMMU_FAULT_F_ADDRESS		(1 << 8)
-+
-+struct virtio_iommu_fault {
-+	__u8					reason;
-+	__u8					reserved[3];
-+	__le32					flags;
-+	__le32					endpoint;
-+	__u8					reserved2[4];
-+	__le64					address;
-+};
-+
- #endif
--- 
-2.19.1
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
+
+
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PkhpLAo+Cj5PbiBXZWQsIE5vdiAyMSwgMjAxOCBhdCAwNDo1Njo1NFBNICswODAwLCBwZW5nLmhh
+bzJAenRlLmNvbS5jbiB3cm90ZToKPj4gPk9uIDE5LzExLzIwMTggMDk6MTAsIE1hcmsgUnV0bGFu
+ZCB3cm90ZToKPj4gPj4gT24gU2F0LCBOb3YgMTcsIDIwMTggYXQgMTA6NTg6MzdBTSArMDgwMCwg
+cGVuZy5oYW8yQHp0ZS5jb20uY24gd3JvdGU6Cj4+ID4+Pj4gT24gMTYvMTEvMTggMDA6MjMsIHBl
+bmcuaGFvMkB6dGUuY29tLmNuIHdyb3RlOgo+PiA+Pj4+Pj4gSGksCj4+ID4+Pj4+Pj4gV2hlbiB2
+aXJ0dWFsIG1hY2hpbmUgc3RhcnRzLCBoYW5nIHVwLgo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IEkgdGFr
+ZSBpdCB5b3UgbWVhbiB0aGUgKmd1ZXN0KiBoYW5ncz8gQmVjYXVzZSBpdCBkb2Vzbid0IGdldCBh
+IHRpbWVyCj4+ID4+Pj4+PiBpbnRlcnJ1cHQ/Cj4+ID4+Pj4+Pgo+PiA+Pj4+Pj4+IFRoZSBrZXJu
+ZWwgdmVyc2lvbiBvZiBndWVzdAo+PiA+Pj4+Pj4+IGlzIDQuMTYuIEhvc3Qgc3VwcG9ydCB2Z2lj
+X3YzLgo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IFlvdXIgaG9zdCBrZXJuZWwgaXMgc29tZXRoaW5nIHJl
+Y2VudCwgSSBndWVzcz8KPj4gPj4+Pj4+Cj4+ID4+Pj4+Pj4gSXQgd2FzIG1haW5seSBkdWUgdG8g
+dGhlIGluY29ycmVjdCB2Z2ljX2lycSdzKGludGlkPTI3KSBncm91cCB2YWx1ZQo+PiA+Pj4+Pj4+
+IGR1cmluZyBpbmplY3Rpb24gaW50ZXJydXB0aW9uLiB3aGVuIGt2bV92Z2ljX3ZjcHVfaW5pdCBp
+cyBjYWxsZWQsCj4+ID4+Pj4+Pj4gZGlzdCBpcyBub3QgaW5pdGlhbGl6ZWQgYXQgdGhpcyB0aW1l
+LiBVbmFibGUgdG8gZ2V0IHZnaWMgVjMgb3IgVjIKPj4gPj4+Pj4+PiBjb3JyZWN0bHksIHNvIGdy
+b3VwIGlzIG5vdCBzZXQuCj4+ID4+Pj4+Pgo+PiA+Pj4+Pj4gTW1oLCB0aGF0IHNob3VsZG4ndCBo
+YXBwZW4gd2l0aCAodilHSUN2My4gRG8geW91IHVzZSBRRU1VICh3aGljaAo+PiA+Pj4+Pj4gdmVy
+c2lvbj8pIG9yIHNvbWUgb3RoZXIgdXNlcmxhbmQgdG9vbD8KPj4gPj4+Pj4+Cj4+ID4+Pj4+Cj4+
+ID4+Pj4+IFFFTVUgZW11bGF0b3IgdmVyc2lvbiAzLjAuNTAgLgo+PiA+Pj4+Pgo+PiA+Pj4+Pj4+
+IGdyb3VwIGlzIHNldHRlZCB0byAxIHdoZW4gdmdpY19tbWlvX3dyaXRlX2dyb3VwIGlzIGludm9r
+ZWQgYXQgc29tZQo+PiA+Pj4+Pj4+IHRpbWUuCj4+ID4+Pj4+Pj4gd2hlbiBpcnEtPmdyb3VwPTAg
+KGludGlkPTI3KSwgTm8gSUNIX0xSX0dST1VQIGZsYWcgd2FzIHNldCBhbmQKPj4gPj4+Pj4+PiBp
+bnRlcnJ1cHQgaW5qZWN0aW9uIGZhaWxlZC4KPj4gPj4+Pj4+Pgo+PiA+Pj4+Pj4+IFNpZ25lZC1v
+ZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4KPj4gPj4+Pj4+PiAtLS0KPj4g
+Pj4+Pj4+PiAgIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyB8IDIgKy0KPj4gPj4+Pj4+PiAg
+IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQo+PiA+Pj4+Pj4+
+Cj4+ID4+Pj4+Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyBiL3Zp
+cnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYwo+PiA+Pj4+Pj4+IGluZGV4IDljMGRkMjMuLmQxMDEw
+MDAgMTAwNjQ0Cj4+ID4+Pj4+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+
+ID4+Pj4+Pj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+ID4+Pj4+Pj4gQEAg
+LTE5OCw3ICsxOTgsNyBAQCB2b2lkIHZnaWNfdjNfcG9wdWxhdGVfbHIoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1LAo+PiA+Pj4+Pj4+IHN0cnVjdCB2Z2ljX2lycSAqaXJxLCBpbnQgbHIpIGlmICh2Z2lj
+X2lycV9pc19tYXBwZWRfbGV2ZWwoaXJxKSAmJgo+PiA+Pj4+Pj4+ICh2YWwgJiBJQ0hfTFJfUEVO
+RElOR19CSVQpKSBpcnEtPmxpbmVfbGV2ZWwgPSBmYWxzZTsKPj4gPj4+Pj4+Pgo+PiA+Pj4+Pj4+
+IC0gICAgaWYgKGlycS0+Z3JvdXApCj4+ID4+Pj4+Pj4gKyAgICBpZiAobW9kZWwgPT0gS1ZNX0RF
+Vl9UWVBFX0FSTV9WR0lDX1YzKQo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IFRoaXMgaXMgbm90IHRoZSBy
+aWdodCBmaXgsIG5vdCBvbmx5IGJlY2F1c2UgaXQgYmFzaWNhbGx5IHJldmVydHMgdGhlCj4+ID4+
+Pj4+PiBHSUN2MyBwYXJ0IG9mIDg3MzIyMDk5MDUyIChLVk06IGFybS9hcm02NDogdmdpYzogU2ln
+bmFsIElSUXMgdXNpbmcKPj4gPj4+Pj4+IHRoZWlyIGNvbmZpZ3VyZWQgZ3JvdXApLgo+PiA+Pj4+
+Pj4KPj4gPj4+Pj4+IENhbiB5b3UgdHJ5IHRvIHdvcmsgb3V0IHdoeSBrdm1fdmdpY192Y3B1X2lu
+aXQoKSBpcyBhcHBhcmVudGx5IGNhbGxlZAo+PiA+Pj4+Pj4gYmVmb3JlIGRpc3QtPnZnaWNfbW9k
+ZWwgaXMgc2V0LCBhbHNvIHdoYXQgdmFsdWUgaXQgaGFzPwo+PiA+Pj4+Pj4gSWYgSSB1bmRlcnN0
+YW5kIHRoZSBjb2RlIGNvcnJlY3RseSwgdGhhdCBzaG91bGRuJ3QgaGFwcGVuIGZvciBhIEdJQ3Yz
+Lgo+PiA+Pj4+Pj4KPj4gPj4+Pj4gRXZlbiBpZiB0aGUgdmFsdWUgb2YgIGdyb3VwIGlzIGNvcnJl
+Y3RseSBhc3NpZ25lZCBpbiBrdm1fdmdpY192Y3B1X2luaXQsIHRoZSBncm91cCBpcyB0aGVuIHdy
+aXR0ZW4gMCB0aHJvdWdoID52Z2ljX21taW9fd3JpdGVfZ3JvdXAuCj4+ID4+Pj4+ICAgSWYgdGhl
+IGludGVycnVwdCBjb21lcyBhdCB0aGlzIHRpbWUsIHRoZSBpbnRlcnJ1cHQgaW5qZWN0aW9uIGZh
+aWxzLgo+PiA+Pj4+Cj4+ID4+Pj4gRG9lcyB0aGF0IG1lYW4gdGhhdCB0aGUgZ3Vlc3QgaXMgY29u
+ZmlndXJpbmcgaXRzIGludGVycnVwdHMgYXMgR3JvdXAwPwo+PiA+Pj4+IFRoYXQgc291bmRzIHdy
+b25nLCBMaW51eCBzaG91bGQgY29uZmlndXJlIGFsbCBpdCdzIGludGVycnVwdHMgYXMKPj4gPj4+
+PiBub24tc2VjdXJlIGdyb3VwMS4KPj4gPj4+Cj4+ID4+PiBubywgSSB0aGluayB0aGF0IHVlZmkg
+ZG9zZSB0aGlzLCBub3QgbGludXguCj4+ID4+PiAxLiBrdm1fdmdpY192Y3B1X2luaXQKPj4gPj4+
+IDIuIHZnaWNfY3JlYXRlCj4+ID4+PiAzLiBrdm1fdmdpY19kaXN0X2luaXQKPj4gPj4+IDQudmdp
+Y19tbWlvX3dyaXRlX2dyb3VwOiB1ZWZpIGFzIGd1ZXN0LCB3cml0ZSBncm91cD0wCj4+ID4+PiA1
+LnZnaWNfbW1pb193cml0ZV9ncm91cDogbGludXggYXMgZ3Vlc3QsIHdyaXRlIGdyb3VwPTEKPj4g
+Pj4KPj4gPj4gSXMgdGhpcyB0aGUgc2FtZSBpc3N1ZSBmaXhlZCBieSBFREsyIGNvbW1pdDoKPj4g
+Pj4KPj4gPj4gNjYxMjcwMTFhNTQ0YjkwZSAoIkFybVBrZy9Bcm1HaWNEeGUgQVJNOiBmaXggZW5j
+b2RpbmcgZm9yIEdJQ3YzIGludGVycnVwdCBhY2tub3dsZWRnZSIpCj4+ID4+Cj4+ID4+IC4uLiB3
+aGVyZSBFREsyIHdvdWxkIHRyeSB0byB1c2UgSUFSMCByYXRoZXIgdGhhbiBJQVIxPwo+PiA+Pgo+
+PiA+PiBUaGUgY29tbWl0IG1lc3NhZ2VzIG5vdGVzIHRoaXMgbGVhZCB0byBhIGJvb3QtdGltZSBo
+YW5nLgo+PiA+Cj4+ID5JIG1hbmFnZWQgdG8gdHJpZ2dlciBhbiBpc3N1ZSB3aXRoIGEgcmVhbGx5
+IG9sZCBFRkkgaW1wbGVtZW50YXRpb24gdGhhdAo+PiA+ZG9lc24ndCBjb25maWd1cmUgaXRzIGlu
+dGVycnVwdHMgYXMgR3JvdXAxLCBhbmQgeWV0IHRyaWVzIHRvIEFDSyBpdHMKPj4gPmludGVycnVw
+dHMgdXNpbmcgdGhlIEdyb3VwMSBhY2Nlc3Nvci4gR3Vlc3Mgd2hhdD8gSXQgaXMgbm90IGdvaW5n
+IHRvIHdvcmsuCj4+ID4KPj4gPkNvbW1pdCBjN2ZlZmI2OTA2NjFmMmUzOGFmY2I4MjAwYmQzMThl
+Y2YzOGFiOTYxIGluIHRoZSBlZGsyIHRyZWUgc2VlbXMKPj4gPnRvIGJlIHRoZSBmaXggKEkgb25s
+eSBhc3N1bWUgaXQgZG9lcywgSSBoYXZlbid0IGFjdHVhbGx5IGNoZWNrZWQpLiBBCj4+ID5yZWNl
+bnQgYnVpbGQsIGFzIGZvdW5kIGluIERlYmlhbiBCdXN0ZXIsIHdvcmtzIHBlcmZlY3RseSAodGVz
+dGVkIHdpdGgKPj4gPmJvdGggUUVNVSB2Mi4xMiBhbmQgdGlwIG9mIHRyZWUpLgo+PiA+Cj4+ID5O
+b3csIEkgcmVhbGx5IGRvbid0IGdldCB3aGF0IHlvdSdyZSBzYXlpbmcgYWJvdXQgTGludXggbm90
+IGdldHRpbmcKPj4gPmludGVycnVwdHMuIEhvdyBkbyB5b3UgZ2V0IHRvIGJvb3RpbmcgTGludXgg
+aWYgRUZJIGlzIG5vdCBtYWtpbmcgYW55Cj4+ID5mb3J3YXJkIHByb2dyZXNzPyBBcmUgeW91IHRy
+eWluZyB0aGVtIGluZGVwZW5kZW50bHk/Cj4+ID4KPj4gSSBzdGFydCBsaW51eCB3aXRoIGJ5cGFz
+c2luZyB1ZWZpLCB0aGUgcHJpbnQgaW5mbyBpcyB0aGUgc2FtZS4KPj4gWzUwNzEwNy43NDg5MDhd
+ICB2Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9MAo+PiBbNTA3MTA3Ljc1
+MjE4NV0gIHZnaWNfbW1pb193cml0ZV9ncm91cDojIyBpbnRpZC8yNyBncm91cD0wCj4+IFs1MDcx
+MDcuODk5NTY2XSAgdmdpY19tbWlvX3dyaXRlX2dyb3VwOiMjIGludGlkLzI3IGdyb3VwPTEKPj4g
+WzUwNzEwNy45MDczNzBdICB2Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9
+MQo+PiB0aGUgY29tbWFuZCBsaW5lIGlzIGxpa2UgdGhpczoKPj4gL2hvbWUvcWVtdS1wYXRjaC9s
+aW5zaGkvcWVtdS9hYXJjaDY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0tYWFyY2g2NCAgLW1hY2hpbmUg
+dmlydC0zLjEsYWNjZWw9a3ZtLHVzYj1vZmYsZHVtcC1ndWVzdC1jb3JlPW9mZixnaWMtdmVyc2lv
+bj0zICAta2VybmVsIC9ob21lL2tlcm5lbGJvb3Qvdm1saW51ei00LjE2LjArIC1pbml0cmQgL2hv
+bWUva2VybmVsYm9vdC9pbml0cmFtZnMtNC4xNi4wKy5pbWcgLWFwcGVuZCByb290PS9kZXYvbWFw
+cGVyL2NsYS1yb290IHJvIGNyYXNoa2VybmVsPWF1dG8gcmQubHZtLmx2PWNsYS9yb290IHJkLmx2
+bS5sdj1jbGEvc3dhcC5VVEYtOCAgLWRyaXZlIGZpbGU9L2hvbWUvY2VudG9zNzQtcGgvYm9vdC5x
+Y293Mixmb3JtYXQ9cWNvdzIsaWY9bm9uZSxpZD1kcml2ZS1zY3NpMC0wLTAtMCAtZGV2aWNlIHNj
+c2ktaGQsYnVzPXNjc2kwLjAsY2hhbm5lbD0wLHNjc2ktaWQ9MCxsdW49MCxkcml2ZT1kcml2ZS1z
+Y3NpMC0wLTAtMCxpZD1zY3NpMC0wLTAtMCxib290aW5kZXg9MSAgLXZuYyAwLjAuMC4wOjAgLWsg
+ZW4tdXMgLWRldmljZSB2aXJ0aW8tZ3B1LXBjaSxpZD12aWRlbzAsbWF4X291dHB1dHM9MSxidXM9
+cGNpLjMsYWRkcj0weDAgLWRldmljZSBwdnBhbmljLW1taW8gLW1zZyA+dGltZXN0YW1wPW9uCj4+
+Cj4+IFRoaXMgaXMgc3RyYW5nZS4gVGhhdCdzIHByb2JhYmx5IHRoZSBMaW51eCA0LjE2ICBrZXJu
+ZWwgc2V0dGluZyBncm91cCB0byAwLCBhbmQgSSdsbCBjb250aW51ZSB0byB0cmFjayBpbiBndWVz
+dC4KPgo+Q291bGQgeW91IHRyeSB0aGUgZm9sbG93aW5nIHBhdGNoOgo+Cj5kaWZmIC0tZ2l0IGEv
+dmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWlu
+aXQuYwo+aW5kZXggYzBjMGI4OGFmMWQ1Li42ZmE4NThjN2E1YTYgMTAwNjQ0Cj4tLS0gYS92aXJ0
+L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYwo+KysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1p
+bml0LmMKPkBAIC0yMzEsMTMgKzIzMSw2IEBAIGludCBrdm1fdmdpY192Y3B1X2luaXQoc3RydWN0
+IGt2bV92Y3B1ICp2Y3B1KQo+aXJxLT5jb25maWcgPSBWR0lDX0NPTkZJR19MRVZFTDsKPn0KPi0g
+ICAgICAgIC8qCj4tICAgICAgICAgKiBHSUN2MyBjYW4gb25seSBiZSBjcmVhdGVkIHZpYSB0aGUg
+S1ZNX0RFVklDRV9DUkVBVEUgQVBJIGFuZAo+LSAgICAgICAgICogc28gd2UgYWx3YXlzIGtub3cg
+dGhlIGVtdWxhdGlvbiB0eXBlIGF0IHRoaXMgcG9pbnQgYXMgaXQncwo+LSAgICAgICAgICogZWl0
+aGVyIGV4cGxpY2l0bHkgY29uZmlndXJlZCBhcyBHSUN2Mywgb3IgZXhwbGljaXRseQo+LSAgICAg
+ICAgICogY29uZmlndXJlZCBhcyBHSUN2Miwgb3Igbm90IGNvbmZpZ3VyZWQgeWV0IHdoaWNoIGFs
+c28KPi0gICAgICAgICAqIGltcGxpZXMgR0lDdjIuCj4tICAgICAgICAgKi8KPmlmIChkaXN0LT52
+Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykKPmlycS0+Z3JvdXAgPSAxOwo+
+ZWxzZQo+QEAgLTI5OCw2ICsyOTEsMTYgQEAgaW50IHZnaWNfaW5pdChzdHJ1Y3Qga3ZtICprdm0p
+Cj5pZiAocmV0KQo+Z290byBvdXQ7Cj4rICAgIC8qIEluaXRpYWxpemUgZ3JvdXBzIG9uIENQVXMg
+Y3JlYXRlZCBiZWZvcmUgdGhlIFZHSUMgdHlwZSB3YXMga25vd24gKi8KPisgICAga3ZtX2Zvcl9l
+YWNoX3ZjcHUoaSwgdmNwdSwga3ZtKSB7Cj4rICAgICAgICBzdHJ1Y3QgdmdpY19jcHUgKnZnaWNf
+Y3B1ID0gJnZjcHUtPmFyY2gudmdpY19jcHU7Cj4rCj4rICAgICAgICBmb3IgKGkgPSAwOyBpIDwg
+VkdJQ19OUl9QUklWQVRFX0lSUVM7IGkrKykgewo+KyAgICAgICAgICAgIHN0cnVjdCB2Z2ljX2ly
+cSAqaXJxID0gJnZnaWNfY3B1LT5wcml2YXRlX2lycXNbaV07Cj4rICAgICAgICAgICAgaXJxLT5n
+cm91cCA9IDE7Cj4rICAgICAgICB9Cj4rICAgIH0KPisKPmlmICh2Z2ljX2hhc19pdHMoa3ZtKSkg
+ewo+cmV0ID0gdmdpY192NF9pbml0KGt2bSk7Cj5pZiAocmV0KQo+ClNvcnJ5IGZvciB0aGUgbGF0
+ZSByZXBseS4gCkkgdGVzdCB0aGUgcGF0Y2ggYW5kIGl0IHdvcmtzLiBCdXQgSSB0aGluayB0aGVy
+ZSBpcyByYW5kb21uZXNzIGhlcmUuCjEudmdpY19pbml0OiAgc2V0IGludGlkLzI3IGdyb3VwPTEK
+Mi52Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9MAozLiEhISByZWNlaXZl
+IGEgIHZ0aW1lciBpcnEgICAtLS0tLSBpdCBtYXkgZXhpc3QuCjQudmdpY19tbWlvX3dyaXRlX2dy
+b3VwOiMjIGludGlkLzI3IGdyb3VwPTEKCkkgbWFkZSBhbiBhdHRlbXB0IGJlZm9yZToKMS4ga3Zt
+X3ZnaWNfdmNwdV9pbml0CiAgICAgYWNjb3JkaW5nIHRvIGlmICBrdm1fdmdpY19nbG9iYWxfc3Rh
+dGUudHlwZSA9PSBWR0lDX1YzLCBzZXQgZ3JvdXA9MQoyLnZnaWNfbW1pb193cml0ZV9ncm91cDoj
+IyBpbnRpZC8yNyBncm91cD0wCjMuISEhIHJlY2VpdmUgYSAgdnRpbWVyIGlycSAgIC0tLS0tSSBy
+ZWFsbHkgcmVjZWl2ZSBhIHZ0aW1lciBpcnEsIHRoZW4gdGhlIGd1ZXN0IGhhbmdzLgoKdGhhbmtz
+Lgo+Cj5UaGFua3MsCj4KPkNocmlzdG9mZmVy
+
+
+--=====_003_next=====--
+
+--=====_001_next=====
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--=====_001_next=====--
