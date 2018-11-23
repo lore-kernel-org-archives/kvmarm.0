@@ -1,198 +1,334 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] kvm: arm/arm64 : fix vm's hanging at startup time
-Date: Fri, 23 Nov 2018 11:03:02 +0100
-Message-ID: <20181123100302.GB3331@e113682-lin.lund.arm.com>
-References: <20181121110620.GC18678@e113682-lin.lund.arm.com>
- <201811231401560886603@zte.com.cn>
+From: Jan Bolke <jan.bolke@synopsys.com>
+Subject: Instruction/Cycle Counting in Guest Using the Kvm PMU
+Date: Fri, 23 Nov 2018 09:36:07 +0000
+Message-ID: <93B846538060DA46A9945E98A2E521E9A87A9C@DE02WEMBXB.internal.synopsys.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <201811231401560886603@zte.com.cn>
-Sender: linux-kernel-owner@vger.kernel.org
-To: peng.hao2@zte.com.cn
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: multipart/mixed; boundary="===============7421706474231865704=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A124A300
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 04:36:12 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id prQxjHv4cctj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Nov 2018 04:36:10 -0500 (EST)
+Received: from smtprelay.synopsys.com (smtprelay.synopsys.com [198.182.47.9])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7D234A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 04:36:10 -0500 (EST)
+Received: from mailhost.synopsys.com (mailhost1.synopsys.com [10.12.238.239])
+ by smtprelay.synopsys.com (Postfix) with ESMTP id E407F24E169C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:36:09 -0800 (PST)
+Received: from US01WEHTC3.internal.synopsys.com
+ (us01wehtc3.internal.synopsys.com [10.15.84.232])
+ by mailhost.synopsys.com (Postfix) with ESMTP id BD60450E4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:36:09 -0800 (PST)
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Nov 23, 2018 at 02:01:56PM +0800, peng.hao2@zte.com.cn wrote:
-> >Hi,
-> >
-> >On Wed, Nov 21, 2018 at 04:56:54PM +0800, peng.hao2@zte.com.cn wrote:
-> >> >On 19/11/2018 09:10, Mark Rutland wrote:
-> >> >> On Sat, Nov 17, 2018 at 10:58:37AM +0800, peng.hao2@zte.com.cn wrote:
-> >> >>>> On 16/11/18 00:23, peng.hao2@zte.com.cn wrote:
-> >> >>>>>> Hi,
-> >> >>>>>>> When virtual machine starts, hang up.
-> >> >>>>>>
-> >> >>>>>> I take it you mean the *guest* hangs? Because it doesn't get a timer
-> >> >>>>>> interrupt?
-> >> >>>>>>
-> >> >>>>>>> The kernel version of guest
-> >> >>>>>>> is 4.16. Host support vgic_v3.
-> >> >>>>>>
-> >> >>>>>> Your host kernel is something recent, I guess?
-> >> >>>>>>
-> >> >>>>>>> It was mainly due to the incorrect vgic_irq's(intid=27) group value
-> >> >>>>>>> during injection interruption. when kvm_vgic_vcpu_init is called,
-> >> >>>>>>> dist is not initialized at this time. Unable to get vgic V3 or V2
-> >> >>>>>>> correctly, so group is not set.
-> >> >>>>>>
-> >> >>>>>> Mmh, that shouldn't happen with (v)GICv3. Do you use QEMU (which
-> >> >>>>>> version?) or some other userland tool?
-> >> >>>>>>
-> >> >>>>>
-> >> >>>>> QEMU emulator version 3.0.50 .
-> >> >>>>>
-> >> >>>>>>> group is setted to 1 when vgic_mmio_write_group is invoked at some
-> >> >>>>>>> time.
-> >> >>>>>>> when irq->group=0 (intid=27), No ICH_LR_GROUP flag was set and
-> >> >>>>>>> interrupt injection failed.
-> >> >>>>>>>
-> >> >>>>>>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> >> >>>>>>> ---
-> >> >>>>>>>   virt/kvm/arm/vgic/vgic-v3.c | 2 +-
-> >> >>>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >> >>>>>>>
-> >> >>>>>>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> >> >>>>>>> index 9c0dd23..d101000 100644
-> >> >>>>>>> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> >> >>>>>>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> >> >>>>>>> @@ -198,7 +198,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
-> >> >>>>>>> struct vgic_irq *irq, int lr) if (vgic_irq_is_mapped_level(irq) &&
-> >> >>>>>>> (val & ICH_LR_PENDING_BIT)) irq->line_level = false;
-> >> >>>>>>>
-> >> >>>>>>> -    if (irq->group)
-> >> >>>>>>> +    if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> >> >>>>>>
-> >> >>>>>> This is not the right fix, not only because it basically reverts the
-> >> >>>>>> GICv3 part of 87322099052 (KVM: arm/arm64: vgic: Signal IRQs using
-> >> >>>>>> their configured group).
-> >> >>>>>>
-> >> >>>>>> Can you try to work out why kvm_vgic_vcpu_init() is apparently called
-> >> >>>>>> before dist->vgic_model is set, also what value it has?
-> >> >>>>>> If I understand the code correctly, that shouldn't happen for a GICv3.
-> >> >>>>>>
-> >> >>>>> Even if the value of  group is correctly assigned in kvm_vgic_vcpu_init, the group is then written 0 through >vgic_mmio_write_group.
-> >> >>>>>   If the interrupt comes at this time, the interrupt injection fails.
-> >> >>>>
-> >> >>>> Does that mean that the guest is configuring its interrupts as Group0?
-> >> >>>> That sounds wrong, Linux should configure all it's interrupts as
-> >> >>>> non-secure group1.
-> >> >>>
-> >> >>> no, I think that uefi dose this, not linux.
-> >> >>> 1. kvm_vgic_vcpu_init
-> >> >>> 2. vgic_create
-> >> >>> 3. kvm_vgic_dist_init
-> >> >>> 4.vgic_mmio_write_group: uefi as guest, write group=0
-> >> >>> 5.vgic_mmio_write_group: linux as guest, write group=1
-> >> >>
-> >> >> Is this the same issue fixed by EDK2 commit:
-> >> >>
-> >> >> 66127011a544b90e ("ArmPkg/ArmGicDxe ARM: fix encoding for GICv3 interrupt acknowledge")
-> >> >>
-> >> >> ... where EDK2 would try to use IAR0 rather than IAR1?
-> >> >>
-> >> >> The commit messages notes this lead to a boot-time hang.
-> >> >
-> >> >I managed to trigger an issue with a really old EFI implementation that
-> >> >doesn't configure its interrupts as Group1, and yet tries to ACK its
-> >> >interrupts using the Group1 accessor. Guess what? It is not going to work.
-> >> >
-> >> >Commit c7fefb690661f2e38afcb8200bd318ecf38ab961 in the edk2 tree seems
-> >> >to be the fix (I only assume it does, I haven't actually checked). A
-> >> >recent build, as found in Debian Buster, works perfectly (tested with
-> >> >both QEMU v2.12 and tip of tree).
-> >> >
-> >> >Now, I really don't get what you're saying about Linux not getting
-> >> >interrupts. How do you get to booting Linux if EFI is not making any
-> >> >forward progress? Are you trying them independently?
-> >> >
-> >> I start linux with bypassing uefi, the print info is the same.
-> >> [507107.748908]  vgic_mmio_write_group:## intid/27 group=0
-> >> [507107.752185]  vgic_mmio_write_group:## intid/27 group=0
-> >> [507107.899566]  vgic_mmio_write_group:## intid/27 group=1
-> >> [507107.907370]  vgic_mmio_write_group:## intid/27 group=1
-> >> the command line is like this:
-> >> /home/qemu-patch/linshi/qemu/aarch64-softmmu/qemu-system-aarch64  -machine virt-3.1,accel=kvm,usb=off,dump-guest-core=off,gic-version=3  -kernel /home/kernelboot/vmlinuz-4.16.0+ -initrd /home/kernelboot/initramfs-4.16.0+.img -append root=/dev/mapper/cla-root ro crashkernel=auto rd.lvm.lv=cla/root rd.lvm.lv=cla/swap.UTF-8  -drive file=/home/centos74-ph/boot.qcow2,format=qcow2,if=none,id=drive-scsi0-0-0-0 -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1  -vnc 0.0.0.0:0 -k en-us -device virtio-gpu-pci,id=video0,max_outputs=1,bus=pci.3,addr=0x0 -device pvpanic-mmio -msg >timestamp=on
-> >>
-> >> This is strange. That's probably the Linux 4.16  kernel setting group to 0, and I'll continue to track in guest.
-> >
-> >Could you try the following patch:
-> >
-> >diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> >index c0c0b88af1d5..6fa858c7a5a6 100644
-> >--- a/virt/kvm/arm/vgic/vgic-init.c
-> >+++ b/virt/kvm/arm/vgic/vgic-init.c
-> >@@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
-> >irq->config = VGIC_CONFIG_LEVEL;
-> >}
-> >-        /*
-> >-         * GICv3 can only be created via the KVM_DEVICE_CREATE API and
-> >-         * so we always know the emulation type at this point as it's
-> >-         * either explicitly configured as GICv3, or explicitly
-> >-         * configured as GICv2, or not configured yet which also
-> >-         * implies GICv2.
-> >-         */
-> >if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> >irq->group = 1;
-> >else
-> >@@ -298,6 +291,16 @@ int vgic_init(struct kvm *kvm)
-> >if (ret)
-> >goto out;
-> >+    /* Initialize groups on CPUs created before the VGIC type was known */
-> >+    kvm_for_each_vcpu(i, vcpu, kvm) {
-> >+        struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> >+
-> >+        for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
-> >+            struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
-> >+            irq->group = 1;
-> >+        }
-> >+    }
-> >+
-> >if (vgic_has_its(kvm)) {
-> >ret = vgic_v4_init(kvm);
-> >if (ret)
-> >
-> Sorry for the late reply. 
-> I test the patch and it works. But I think there is randomness here.
-> 1.vgic_init:  set intid/27 group=1
-> 2.vgic_mmio_write_group:## intid/27 group=0
-> 3.!!! receive a  vtimer irq   ----- it may exist.
-> 4.vgic_mmio_write_group:## intid/27 group=1
+--===============7421706474231865704==
+Content-Language: en-US
+Content-Type: multipart/alternative;
+	boundary="_000_93B846538060DA46A9945E98A2E521E9A87A9CDE02WEMBXBinterna_"
 
-Are these writes from userspace or from the guest?
-(I assume they're from the guest.)
+--_000_93B846538060DA46A9945E98A2E521E9A87A9CDE02WEMBXBinterna_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> I made an attempt before:
+Hi,
 
-Was this previous experiment using my patch or without my patch?
+I am not sure if this question is well-placed here, so sorry if it misses t=
+he purpose of this mailing list.
 
-> 1. kvm_vgic_vcpu_init
->      according to if  kvm_vgic_global_state.type == VGIC_V3, set group=1
-> 2.vgic_mmio_write_group:## intid/27 group=0
-> 3.!!! receive a  vtimer irq   -----I really receive a vtimer irq, then the guest hangs.
-> 
+My name is Jan and i am currently writing my master's thesis.
+I am using the Kvm Api and try to integrate it as an instruction set simula=
+tor in a SystemC environment.
 
-If the guest you're using is flipping the group of the interrupt and yet
-enabling the device and interrupt while flipping the group, then it's
-not expected to work and it's a guest bug.
+Anyway,
 
-My hunch here tells me that my patch is what we need for KVM, and either
+I need some mechanism to count executed instructions in the guest (or cycle=
+s).
+Currently I am trying to use the emulated PMU cycle counter in the guest to=
+ get the number of executed cycles in the guest.
 
-  (1) You no longer have a problem but are tracing some guest
-      initialization behavior which is fine, or
+I am working on Arm64 and use Linux Kernel 4.14.33.
+I create the PMU device without creating a in-kernel vgic.
 
-  (2) You still have a problem because you also have some broken guest
-      code (guest UEFI or guest Linux) that also needs fixing.
+Basically I create a vcpu and run some bare metal code.
+For convienence, I append the critical assembler snippet.
 
-If you can demonstrate that you still have a problem, with my path
-applied to KVM, and with a recent guest Linux and guest UEFI, then I'll
-be happy to have another look.  In that case, could you please provide
-the exact versions of your guest Linux and UEFI, as well as the QEMU
-version and command line.
+I configure the counter, then start the counter, execute 3 or 4 dummy instr=
+uctions and read the counter again and then exit the guest with an exit_mmi=
+o.
+I assumed the value should be a very small number, as the guest only execut=
+ed a few instructions.
 
+The thing is as I read the counter, the value is something like 2970 or 0 (=
+changes in each run).
+So to me it looks like the counter is also counting the cycles for instruct=
+ion emulation in the host, am I right?
 
-Thanks,
+Is it possible to just count the cycles in the guest from the guests's poin=
+t of view?
+I read the kvm-api.txt Documentation and the other documents a few times an=
+d tried different approaches, so this mailing list is my last resort.
 
-    Christoffer
+Thanks in advance!
+
+Regards
+Jan
+
+--------------------------------------------------
+
+APPENDIX:
+// we are in el1
+// init system registers
+LDR X1, =3D0x30C50838
+MSR SCTLR_EL1, X1
+
+// enable access to pmu counters from el0
+mov x0, 0xff
+mrs x1, currentel
+mrs x7, pmuserenr_el0
+orr x7, x7, #0b1111
+msr pmuserenr_el0, x7
+
+// set pmcr register (control register)
+//enable long counter, count every cycle and enable counters
+mrs x5, pmcr_el0
+orr x5, x5, #0b1
+orr x5, x5, #(1<<6)
+eor x5, x5, #(1<<3)
+eor x5, x5, #(1<<5)
+msr pmcr_el0, x5
+
+// read mvccfiltr register (only enable counting of el1)
+mrs x6, pmccfiltr_el0
+mov x6, #(1<<30)
+msr pmccfiltr_el0, x6
+
+// get interrupt configuration and clear overflow bit
+mrs x9, pmintenset_el1
+mov x8, #(1<<31)
+msr pmovsclr_el0, x8
+
+// write counter
+mov x0, #0x0
+msr pmccntr_el0, x0 // write counter
+
+// enable cycle counter
+mov x1, #(1<<31)
+msr pmcntenset_el0, x1
+mov x0, #0x2 */
+
+// dummy instruction and provoke mmio-exit
+mov x1, #0x3
+add x2, x0, x1
+mov x2, 0x5000
+
+//read counter
+mrs x1, pmccntr_el0
+
+// read overflow
+mrs x8, pmovsclr_el0
+
+// provoke mmio exit (0x500 is not mapped)
+ldr x3, [x2]
+
+--_000_93B846538060DA46A9945E98A2E521E9A87A9CDE02WEMBXBinterna_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Hi,<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I am not sure if this question is well-placed here, =
+so sorry if it misses the purpose of this mailing list.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">My name is Jan and i am currently writing my master&=
+#8217;s thesis.<o:p></o:p></p>
+<p class=3D"MsoNormal">I am using the Kvm Api and try to integrate it as an=
+ instruction set simulator in a SystemC environment.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Anyway,<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I need some mechanism to count executed instructions=
+ in the guest (or cycles).<o:p></o:p></p>
+<p class=3D"MsoNormal">Currently I am trying to use the emulated PMU cycle =
+counter in the guest to get the number of executed cycles in the guest.<o:p=
+></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I am working on Arm64 and use Linux Kernel 4.14.33.<=
+o:p></o:p></p>
+<p class=3D"MsoNormal">I create the PMU device without creating a in-kernel=
+ vgic.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Basically I create a vcpu and run some bare metal co=
+de.<o:p></o:p></p>
+<p class=3D"MsoNormal">For convienence, I append the critical assembler sni=
+ppet.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I configure the counter, then start the counter, exe=
+cute 3 or 4 dummy instructions and read the counter again and then exit the=
+ guest with an exit_mmio.<o:p></o:p></p>
+<p class=3D"MsoNormal">I assumed the value should be a very small number, a=
+s the guest only executed a few instructions.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">The thing is as I read the counter, the value is som=
+ething like 2970 or 0 (changes in each run).<o:p></o:p></p>
+<p class=3D"MsoNormal">So to me it looks like the counter is also counting =
+the cycles for instruction emulation in the host, am I right?<o:p></o:p></p=
+>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Is it possible to just count the cycles in the guest=
+ from the guests&#8217;s point of view?<o:p></o:p></p>
+<p class=3D"MsoNormal">I read the kvm-api.txt Documentation and the other d=
+ocuments a few times and tried different approaches, so this mailing list i=
+s my last resort.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Thanks in advance!<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Regards<o:p></o:p></p>
+<p class=3D"MsoNormal">Jan<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">--------------------------------------------------<o=
+:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">APPENDIX: <o:p></o:p></p>
+<p class=3D"MsoNormal">// we are in el1<o:p></o:p></p>
+<p class=3D"MsoNormal">// init system registers<o:p></o:p></p>
+<p class=3D"MsoNormal">LDR X1, =3D0x30C50838<o:p></o:p></p>
+<p class=3D"MsoNormal">MSR SCTLR_EL1, X1<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// enable access to pmu counters from el0<o:p></o:p>=
+</p>
+<p class=3D"MsoNormal">mov x0, 0xff<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x1, currentel<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x7, pmuserenr_el0<o:p></o:p></p>
+<p class=3D"MsoNormal">orr x7, x7, #0b1111<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmuserenr_el0, x7<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// set pmcr register (control register)<o:p></o:p></=
+p>
+<p class=3D"MsoNormal">//enable long counter, count every cycle and enable =
+counters<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x5, pmcr_el0<o:p></o:p></p>
+<p class=3D"MsoNormal">orr x5, x5, #0b1<o:p></o:p></p>
+<p class=3D"MsoNormal">orr x5, x5, #(1&lt;&lt;6)<o:p></o:p></p>
+<p class=3D"MsoNormal">eor x5, x5, #(1&lt;&lt;3)<o:p></o:p></p>
+<p class=3D"MsoNormal">eor x5, x5, #(1&lt;&lt;5)<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmcr_el0, x5<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// read mvccfiltr register (only enable counting of =
+el1)<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x6, pmccfiltr_el0<o:p></o:p></p>
+<p class=3D"MsoNormal">mov x6, #(1&lt;&lt;30)<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmccfiltr_el0, x6<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// get interrupt configuration and clear overflow bi=
+t<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x9, pmintenset_el1<o:p></o:p></p>
+<p class=3D"MsoNormal">mov x8, #(1&lt;&lt;31)<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmovsclr_el0, x8<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// write counter <o:p></o:p></p>
+<p class=3D"MsoNormal">mov x0, #0x0<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmccntr_el0, x0 // write counter<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// enable cycle counter<o:p></o:p></p>
+<p class=3D"MsoNormal">mov x1, #(1&lt;&lt;31)<o:p></o:p></p>
+<p class=3D"MsoNormal">msr pmcntenset_el0, x1<o:p></o:p></p>
+<p class=3D"MsoNormal">mov x0, #0x2 */<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// dummy instruction and provoke mmio-exit<o:p></o:p=
+></p>
+<p class=3D"MsoNormal">mov x1, #0x3<o:p></o:p></p>
+<p class=3D"MsoNormal">add x2, x0, x1<o:p></o:p></p>
+<p class=3D"MsoNormal">mov x2, 0x5000<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">//read counter<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x1, pmccntr_el0<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// read overflow<o:p></o:p></p>
+<p class=3D"MsoNormal">mrs x8, pmovsclr_el0<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">// provoke mmio exit (0x500 is not mapped)<o:p></o:p=
+></p>
+<p class=3D"MsoNormal">ldr x3, [x2]<o:p></o:p></p>
+</div>
+</body>
+</html>
+
+--_000_93B846538060DA46A9945E98A2E521E9A87A9CDE02WEMBXBinterna_--
+
+--===============7421706474231865704==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7421706474231865704==--
