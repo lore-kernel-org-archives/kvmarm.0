@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 3/8] arm64: KVM: Install stage-2 translation before
- enabling traps
-Date: Fri, 23 Nov 2018 18:41:02 +0000
-Message-ID: <20181123184107.39334-4-marc.zyngier@arm.com>
+Subject: [PATCH v2 4/8] arm64: Add TCR_EPD{0,1} definitions
+Date: Fri, 23 Nov 2018 18:41:03 +0000
+Message-ID: <20181123184107.39334-5-marc.zyngier@arm.com>
 References: <20181123184107.39334-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A86FE4A236
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA7C44A323
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VJpnCHbTWamw for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Nov 2018 13:41:22 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAD44A31D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:22 -0500 (EST)
+ with ESMTP id zsDQ4O8JwOsK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Nov 2018 13:41:24 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4334A332
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:23 -0500 (EST)
 In-Reply-To: <20181123184107.39334-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,45 +31,35 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It is a bit odd that we only install stage-2 translation after having
-cleared HCR_EL2.TGE, which means that there is a window during which
-AT requests could fail as stage-2 is not configured yet.
-
-Let's move stage-2 configuration before we clear TGE, making the
-guest entry sequence clearer: we first configure all the guest stuff,
-then only switch to the guest translation regime.
-
-While we're at it, do the same thing for !VHE. It doesn't hurt,
-and keeps things symmetric.
+We are soon going to play with TCR_EL1.EPD{0,1}, so let's add the
+relevant definitions.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable-hwdef.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 7cc175c88a37..a8fa61c68c32 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -499,8 +499,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 1d7d8da2ef9b..a7d5d6e459eb 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -224,6 +224,8 @@
+ #define TCR_TxSZ_WIDTH		6
+ #define TCR_T0SZ_MASK		(((UL(1) << TCR_TxSZ_WIDTH) - 1) << TCR_T0SZ_OFFSET)
  
- 	sysreg_save_host_state_vhe(host_ctxt);
++#define TCR_EPD0_SHIFT		7
++#define TCR_EPD0_MASK		(UL(1) << TCR_EPD0_SHIFT)
+ #define TCR_IRGN0_SHIFT		8
+ #define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
+ #define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
+@@ -231,6 +233,8 @@
+ #define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
+ #define TCR_IRGN0_WBnWA		(UL(3) << TCR_IRGN0_SHIFT)
  
--	__activate_traps(vcpu);
- 	__activate_vm(vcpu->kvm);
-+	__activate_traps(vcpu);
- 
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
-@@ -545,8 +545,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
--	__activate_traps(vcpu);
- 	__activate_vm(kern_hyp_va(vcpu->kvm));
-+	__activate_traps(vcpu);
- 
- 	__hyp_vgic_restore_state(vcpu);
- 	__timer_enable_traps(vcpu);
++#define TCR_EPD1_SHIFT		23
++#define TCR_EPD1_MASK		(UL(1) << TCR_EPD1_SHIFT)
+ #define TCR_IRGN1_SHIFT		24
+ #define TCR_IRGN1_MASK		(UL(3) << TCR_IRGN1_SHIFT)
+ #define TCR_IRGN1_NC		(UL(0) << TCR_IRGN1_SHIFT)
 -- 
 2.19.1
