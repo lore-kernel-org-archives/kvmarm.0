@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 2/8] KVM: arm64: Rework detection of SVE, !VHE systems
-Date: Fri, 23 Nov 2018 18:41:01 +0000
-Message-ID: <20181123184107.39334-3-marc.zyngier@arm.com>
+Subject: [PATCH v2 1/8] arm64: KVM: Make VHE Stage-2 TLB invalidation
+ operations non-interruptible
+Date: Fri, 23 Nov 2018 18:41:00 +0000
+Message-ID: <20181123184107.39334-2-marc.zyngier@arm.com>
 References: <20181123184107.39334-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BEAE4A2AC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FB284A318
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WsUgkzNKIwkb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Nov 2018 13:41:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F1834A300
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:20 -0500 (EST)
+ with ESMTP id LbenyDNhjnp3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Nov 2018 13:41:18 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C59C34A236
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 13:41:18 -0500 (EST)
 In-Reply-To: <20181123184107.39334-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,80 +32,142 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-An SVE system is so far the only case where we mandate VHE. As we're
-starting to grow this requirements, let's slightly rework the way we
-deal with that situation, allowing for easy extension of this check.
+Contrary to the non-VHE version of the TLB invalidation helpers, the VHE
+code  has interrupts enabled, meaning that we can take an interrupt in
+the middle of such a sequence, and start running something else with
+HCR_EL2.TGE cleared.
 
+That's really not a good idea.
+
+Take the heavy-handed option and disable interrupts in
+__tlb_switch_to_guest_vhe, restoring them in __tlb_switch_to_host_vhe.
+The latter also gain an ISB in order to make sure that TGE really has
+taken effect.
+
+Cc: stable@vger.kernel.org
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 6 +++---
- virt/kvm/arm/arm.c                | 8 ++++----
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/hyp/tlb.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 5ca5d9af0c26..2184d9ddb418 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -285,7 +285,7 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 4dbd9c69a96d..7fcc9c1a5f45 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -15,14 +15,19 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
  
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
++#include <linux/irqflags.h>
++
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/tlbflush.h>
  
--static inline bool kvm_arch_check_sve_has_vhe(void) { return true; }
-+static inline bool kvm_arch_requires_vhe(void) { return false; }
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 52fbc823ff8c..d6d9aa76a943 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -422,7 +422,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 	}
+-static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
++static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
++						 unsigned long *flags)
+ {
+ 	u64 val;
+ 
++	local_irq_save(*flags);
++
+ 	/*
+ 	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
+ 	 * most TLB operations target EL2/EL0. In order to affect the
+@@ -37,7 +42,8 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm)
+ 	isb();
  }
  
--static inline bool kvm_arch_check_sve_has_vhe(void)
-+static inline bool kvm_arch_requires_vhe(void)
+-static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm)
++static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
++						  unsigned long *flags)
+ {
+ 	__load_guest_stage2(kvm);
+ 	isb();
+@@ -48,7 +54,8 @@ static hyp_alternate_select(__tlb_switch_to_guest,
+ 			    __tlb_switch_to_guest_vhe,
+ 			    ARM64_HAS_VIRT_HOST_EXTN);
+ 
+-static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
++static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
++						unsigned long flags)
  {
  	/*
- 	 * The Arm architecture specifies that implementation of SVE
-@@ -430,9 +430,9 @@ static inline bool kvm_arch_check_sve_has_vhe(void)
- 	 * relies on this when SVE is present:
+ 	 * We're done with the TLB operation, let's restore the host's
+@@ -56,9 +63,12 @@ static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm)
  	 */
- 	if (system_supports_sve())
--		return has_vhe();
--	else
- 		return true;
-+
-+	return false;
+ 	write_sysreg(0, vttbr_el2);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
++	isb();
++	local_irq_restore(flags);
  }
  
- static inline void kvm_arch_hardware_unsetup(void) {}
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 23774970c9df..1db4c15edcdd 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1640,8 +1640,10 @@ int kvm_arch_init(void *opaque)
- 		return -ENODEV;
- 	}
+-static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm)
++static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
++						 unsigned long flags)
+ {
+ 	write_sysreg(0, vttbr_el2);
+ }
+@@ -70,11 +80,13 @@ static hyp_alternate_select(__tlb_switch_to_host,
  
--	if (!kvm_arch_check_sve_has_vhe()) {
--		kvm_pr_unimpl("SVE system without VHE unsupported.  Broken cpu?");
-+	in_hyp_mode = is_kernel_in_hyp_mode();
+ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
++	unsigned long flags;
 +
-+	if (!in_hyp_mode && kvm_arch_requires_vhe()) {
-+		kvm_pr_unimpl("CPU requiring VHE was booted in non-VHE mode");
- 		return -ENODEV;
- 	}
+ 	dsb(ishst);
  
-@@ -1657,8 +1659,6 @@ int kvm_arch_init(void *opaque)
- 	if (err)
- 		return err;
+ 	/* Switch to requested VMID */
+ 	kvm = kern_hyp_va(kvm);
+-	__tlb_switch_to_guest()(kvm);
++	__tlb_switch_to_guest()(kvm, &flags);
  
--	in_hyp_mode = is_kernel_in_hyp_mode();
--
- 	if (!in_hyp_mode) {
- 		err = init_hyp_mode();
- 		if (err)
+ 	/*
+ 	 * We could do so much better if we had the VA as well.
+@@ -117,36 +129,39 @@ void __hyp_text __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	if (!has_vhe() && icache_is_vpipt())
+ 		__flush_icache_all();
+ 
+-	__tlb_switch_to_host()(kvm);
++	__tlb_switch_to_host()(kvm, flags);
+ }
+ 
+ void __hyp_text __kvm_tlb_flush_vmid(struct kvm *kvm)
+ {
++	unsigned long flags;
++
+ 	dsb(ishst);
+ 
+ 	/* Switch to requested VMID */
+ 	kvm = kern_hyp_va(kvm);
+-	__tlb_switch_to_guest()(kvm);
++	__tlb_switch_to_guest()(kvm, &flags);
+ 
+ 	__tlbi(vmalls12e1is);
+ 	dsb(ish);
+ 	isb();
+ 
+-	__tlb_switch_to_host()(kvm);
++	__tlb_switch_to_host()(kvm, flags);
+ }
+ 
+ void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
++	unsigned long flags;
+ 
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest()(kvm);
++	__tlb_switch_to_guest()(kvm, &flags);
+ 
+ 	__tlbi(vmalle1);
+ 	dsb(nsh);
+ 	isb();
+ 
+-	__tlb_switch_to_host()(kvm);
++	__tlb_switch_to_host()(kvm, flags);
+ }
+ 
+ void __hyp_text __kvm_flush_vm_context(void)
 -- 
 2.19.1
