@@ -1,36 +1,21 @@
 From: "Michael S. Tsirkin" <mst@redhat.com>
 Subject: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
-Date: Fri, 23 Nov 2018 16:48:55 -0500
-Message-ID: <20181123164716-mutt-send-email-mst@kernel.org>
+Date: Fri, 23 Nov 2018 16:56:25 -0500
+Message-ID: <20181123165206-mutt-send-email-mst@kernel.org>
 References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
  <20181122193801.50510-6-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9201D4A300
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 16:49:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bMSEhuPDJfaT for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Nov 2018 16:49:02 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 226214A1E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 16:49:02 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <virtio-dev-return-5025-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
 Content-Disposition: inline
 In-Reply-To: <20181122193801.50510-6-jean-philippe.brucker@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: virtio-dev@lists.oasis-open.org, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, marc.zyngier@arm.com, linux-pci@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, virtualization@lists.linux-foundation.org, iommu@lists.linux-foundation.org, robh+dt@kernel.org, bhelgaas@google.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+Cc: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mark.rutland@arm.com, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, eric.auger@redhat.com, robh+dt@kernel.org, bhelgaas@google.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Thu, Nov 22, 2018 at 07:37:59PM +0000, Jean-Philippe Brucker wrote:
@@ -92,6 +77,10 @@ On Thu, Nov 22, 2018 at 07:37:59PM +0000, Jean-Philippe Brucker wrote:
 > +
 > +	  Say Y here if you intend to run this kernel as a guest.
 > +
+
+Given it is arm specific right now, shouldn't this depend on ARM?
+E.g. there's a hack for x86 right now.
+
 >  endif # IOMMU_SUPPORT
 > diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
 > index 5481e5fe1f95..bd7e55751d09 100644
@@ -881,6 +870,9 @@ On Thu, Nov 22, 2018 at 07:37:59PM +0000, Jean-Philippe Brucker wrote:
 > +
 > +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
 > +	    !virtio_has_feature(vdev, VIRTIO_IOMMU_F_MAP_UNMAP))
+
+Why bother with a feature bit for this then btw?
+
 > +		return -ENODEV;
 > +
 > +	viommu = devm_kzalloc(dev, sizeof(*viommu), GFP_KERNEL);
@@ -1071,10 +1063,6 @@ On Thu, Nov 22, 2018 at 07:37:59PM +0000, Jean-Philippe Brucker wrote:
 > +	/* Max domain ID size */
 > +	__u8					domain_bits;
 > +	__u8					padding[3];
-
-Not enough padding here it seems. Structure is 8 byte
-aligned on 64 bit systems.
-
 > +};
 > +
 > +/* Request types */
