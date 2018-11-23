@@ -1,187 +1,1145 @@
-From: <peng.hao2@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSF0ga3ZtOiBhcm0vYXJtNjQgOiBmaXggdm0ncyBoYW5naW5nIGF0IHN0YXJ0dXAgdGltZQ==?=
-Date: Fri, 23 Nov 2018 14:01:56 +0800 (CST)
-Message-ID: <201811231401560886603@zte.com.cn>
-References: <20181121110620.GC18678@e113682-lin.lund.arm.com>
+From: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
+Date: Fri, 23 Nov 2018 09:27:41 +0100
+Message-ID: <50443d27-f03d-75ac-5fae-13134917f9cd@redhat.com>
+References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
+	<20181122193801.50510-6-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C9984A2B2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:02:10 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2Oqw-xKh5LKe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Nov 2018 01:02:08 -0500 (EST)
-Received: from mxct.zte.com.cn (mx7.zte.com.cn [202.103.147.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D5D54A0CC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 01:02:08 -0500 (EST)
-In-Reply-To: <20181121110620.GC18678@e113682-lin.lund.arm.com>
-References: 01746207-c9bb-dc91-58d7-a66c0d971f88@arm.com,
- 20181121110620.GC18678@e113682-lin.lund.arm.com
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, leif.lindholm@linaro.org, ard.bieshseuvel@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20181122193801.50510-6-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Jean,
 
+On 11/22/18 8:37 PM, Jean-Philippe Brucker wrote:
+> The virtio IOMMU is a para-virtualized device, allowing to send IOMMU
+> requests such as map/unmap over virtio transport without emulating page
+> tables. This implementation handles ATTACH, DETACH, MAP and UNMAP
+> requests.
+> 
+> The bulk of the code transforms calls coming from the IOMMU API into
+> corresponding virtio requests. Mappings are kept in an interval tree
+> instead of page tables.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Reviewed-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
---=====_001_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+Thanks
 
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PkhpLAo+Cj5PbiBXZWQsIE5vdiAyMSwgMjAxOCBhdCAwNDo1Njo1NFBNICswODAwLCBwZW5nLmhh
-bzJAenRlLmNvbS5jbiB3cm90ZToKPj4gPk9uIDE5LzExLzIwMTggMDk6MTAsIE1hcmsgUnV0bGFu
-ZCB3cm90ZToKPj4gPj4gT24gU2F0LCBOb3YgMTcsIDIwMTggYXQgMTA6NTg6MzdBTSArMDgwMCwg
-cGVuZy5oYW8yQHp0ZS5jb20uY24gd3JvdGU6Cj4+ID4+Pj4gT24gMTYvMTEvMTggMDA6MjMsIHBl
-bmcuaGFvMkB6dGUuY29tLmNuIHdyb3RlOgo+PiA+Pj4+Pj4gSGksCj4+ID4+Pj4+Pj4gV2hlbiB2
-aXJ0dWFsIG1hY2hpbmUgc3RhcnRzLCBoYW5nIHVwLgo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IEkgdGFr
-ZSBpdCB5b3UgbWVhbiB0aGUgKmd1ZXN0KiBoYW5ncz8gQmVjYXVzZSBpdCBkb2Vzbid0IGdldCBh
-IHRpbWVyCj4+ID4+Pj4+PiBpbnRlcnJ1cHQ/Cj4+ID4+Pj4+Pgo+PiA+Pj4+Pj4+IFRoZSBrZXJu
-ZWwgdmVyc2lvbiBvZiBndWVzdAo+PiA+Pj4+Pj4+IGlzIDQuMTYuIEhvc3Qgc3VwcG9ydCB2Z2lj
-X3YzLgo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IFlvdXIgaG9zdCBrZXJuZWwgaXMgc29tZXRoaW5nIHJl
-Y2VudCwgSSBndWVzcz8KPj4gPj4+Pj4+Cj4+ID4+Pj4+Pj4gSXQgd2FzIG1haW5seSBkdWUgdG8g
-dGhlIGluY29ycmVjdCB2Z2ljX2lycSdzKGludGlkPTI3KSBncm91cCB2YWx1ZQo+PiA+Pj4+Pj4+
-IGR1cmluZyBpbmplY3Rpb24gaW50ZXJydXB0aW9uLiB3aGVuIGt2bV92Z2ljX3ZjcHVfaW5pdCBp
-cyBjYWxsZWQsCj4+ID4+Pj4+Pj4gZGlzdCBpcyBub3QgaW5pdGlhbGl6ZWQgYXQgdGhpcyB0aW1l
-LiBVbmFibGUgdG8gZ2V0IHZnaWMgVjMgb3IgVjIKPj4gPj4+Pj4+PiBjb3JyZWN0bHksIHNvIGdy
-b3VwIGlzIG5vdCBzZXQuCj4+ID4+Pj4+Pgo+PiA+Pj4+Pj4gTW1oLCB0aGF0IHNob3VsZG4ndCBo
-YXBwZW4gd2l0aCAodilHSUN2My4gRG8geW91IHVzZSBRRU1VICh3aGljaAo+PiA+Pj4+Pj4gdmVy
-c2lvbj8pIG9yIHNvbWUgb3RoZXIgdXNlcmxhbmQgdG9vbD8KPj4gPj4+Pj4+Cj4+ID4+Pj4+Cj4+
-ID4+Pj4+IFFFTVUgZW11bGF0b3IgdmVyc2lvbiAzLjAuNTAgLgo+PiA+Pj4+Pgo+PiA+Pj4+Pj4+
-IGdyb3VwIGlzIHNldHRlZCB0byAxIHdoZW4gdmdpY19tbWlvX3dyaXRlX2dyb3VwIGlzIGludm9r
-ZWQgYXQgc29tZQo+PiA+Pj4+Pj4+IHRpbWUuCj4+ID4+Pj4+Pj4gd2hlbiBpcnEtPmdyb3VwPTAg
-KGludGlkPTI3KSwgTm8gSUNIX0xSX0dST1VQIGZsYWcgd2FzIHNldCBhbmQKPj4gPj4+Pj4+PiBp
-bnRlcnJ1cHQgaW5qZWN0aW9uIGZhaWxlZC4KPj4gPj4+Pj4+Pgo+PiA+Pj4+Pj4+IFNpZ25lZC1v
-ZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4KPj4gPj4+Pj4+PiAtLS0KPj4g
-Pj4+Pj4+PiAgIHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyB8IDIgKy0KPj4gPj4+Pj4+PiAg
-IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQo+PiA+Pj4+Pj4+
-Cj4+ID4+Pj4+Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYyBiL3Zp
-cnQva3ZtL2FybS92Z2ljL3ZnaWMtdjMuYwo+PiA+Pj4+Pj4+IGluZGV4IDljMGRkMjMuLmQxMDEw
-MDAgMTAwNjQ0Cj4+ID4+Pj4+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+
-ID4+Pj4+Pj4gKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy12My5jCj4+ID4+Pj4+Pj4gQEAg
-LTE5OCw3ICsxOTgsNyBAQCB2b2lkIHZnaWNfdjNfcG9wdWxhdGVfbHIoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LAo+PiA+Pj4+Pj4+IHN0cnVjdCB2Z2ljX2lycSAqaXJxLCBpbnQgbHIpIGlmICh2Z2lj
-X2lycV9pc19tYXBwZWRfbGV2ZWwoaXJxKSAmJgo+PiA+Pj4+Pj4+ICh2YWwgJiBJQ0hfTFJfUEVO
-RElOR19CSVQpKSBpcnEtPmxpbmVfbGV2ZWwgPSBmYWxzZTsKPj4gPj4+Pj4+Pgo+PiA+Pj4+Pj4+
-IC0gICAgaWYgKGlycS0+Z3JvdXApCj4+ID4+Pj4+Pj4gKyAgICBpZiAobW9kZWwgPT0gS1ZNX0RF
-Vl9UWVBFX0FSTV9WR0lDX1YzKQo+PiA+Pj4+Pj4KPj4gPj4+Pj4+IFRoaXMgaXMgbm90IHRoZSBy
-aWdodCBmaXgsIG5vdCBvbmx5IGJlY2F1c2UgaXQgYmFzaWNhbGx5IHJldmVydHMgdGhlCj4+ID4+
-Pj4+PiBHSUN2MyBwYXJ0IG9mIDg3MzIyMDk5MDUyIChLVk06IGFybS9hcm02NDogdmdpYzogU2ln
-bmFsIElSUXMgdXNpbmcKPj4gPj4+Pj4+IHRoZWlyIGNvbmZpZ3VyZWQgZ3JvdXApLgo+PiA+Pj4+
-Pj4KPj4gPj4+Pj4+IENhbiB5b3UgdHJ5IHRvIHdvcmsgb3V0IHdoeSBrdm1fdmdpY192Y3B1X2lu
-aXQoKSBpcyBhcHBhcmVudGx5IGNhbGxlZAo+PiA+Pj4+Pj4gYmVmb3JlIGRpc3QtPnZnaWNfbW9k
-ZWwgaXMgc2V0LCBhbHNvIHdoYXQgdmFsdWUgaXQgaGFzPwo+PiA+Pj4+Pj4gSWYgSSB1bmRlcnN0
-YW5kIHRoZSBjb2RlIGNvcnJlY3RseSwgdGhhdCBzaG91bGRuJ3QgaGFwcGVuIGZvciBhIEdJQ3Yz
-Lgo+PiA+Pj4+Pj4KPj4gPj4+Pj4gRXZlbiBpZiB0aGUgdmFsdWUgb2YgIGdyb3VwIGlzIGNvcnJl
-Y3RseSBhc3NpZ25lZCBpbiBrdm1fdmdpY192Y3B1X2luaXQsIHRoZSBncm91cCBpcyB0aGVuIHdy
-aXR0ZW4gMCB0aHJvdWdoID52Z2ljX21taW9fd3JpdGVfZ3JvdXAuCj4+ID4+Pj4+ICAgSWYgdGhl
-IGludGVycnVwdCBjb21lcyBhdCB0aGlzIHRpbWUsIHRoZSBpbnRlcnJ1cHQgaW5qZWN0aW9uIGZh
-aWxzLgo+PiA+Pj4+Cj4+ID4+Pj4gRG9lcyB0aGF0IG1lYW4gdGhhdCB0aGUgZ3Vlc3QgaXMgY29u
-ZmlndXJpbmcgaXRzIGludGVycnVwdHMgYXMgR3JvdXAwPwo+PiA+Pj4+IFRoYXQgc291bmRzIHdy
-b25nLCBMaW51eCBzaG91bGQgY29uZmlndXJlIGFsbCBpdCdzIGludGVycnVwdHMgYXMKPj4gPj4+
-PiBub24tc2VjdXJlIGdyb3VwMS4KPj4gPj4+Cj4+ID4+PiBubywgSSB0aGluayB0aGF0IHVlZmkg
-ZG9zZSB0aGlzLCBub3QgbGludXguCj4+ID4+PiAxLiBrdm1fdmdpY192Y3B1X2luaXQKPj4gPj4+
-IDIuIHZnaWNfY3JlYXRlCj4+ID4+PiAzLiBrdm1fdmdpY19kaXN0X2luaXQKPj4gPj4+IDQudmdp
-Y19tbWlvX3dyaXRlX2dyb3VwOiB1ZWZpIGFzIGd1ZXN0LCB3cml0ZSBncm91cD0wCj4+ID4+PiA1
-LnZnaWNfbW1pb193cml0ZV9ncm91cDogbGludXggYXMgZ3Vlc3QsIHdyaXRlIGdyb3VwPTEKPj4g
-Pj4KPj4gPj4gSXMgdGhpcyB0aGUgc2FtZSBpc3N1ZSBmaXhlZCBieSBFREsyIGNvbW1pdDoKPj4g
-Pj4KPj4gPj4gNjYxMjcwMTFhNTQ0YjkwZSAoIkFybVBrZy9Bcm1HaWNEeGUgQVJNOiBmaXggZW5j
-b2RpbmcgZm9yIEdJQ3YzIGludGVycnVwdCBhY2tub3dsZWRnZSIpCj4+ID4+Cj4+ID4+IC4uLiB3
-aGVyZSBFREsyIHdvdWxkIHRyeSB0byB1c2UgSUFSMCByYXRoZXIgdGhhbiBJQVIxPwo+PiA+Pgo+
-PiA+PiBUaGUgY29tbWl0IG1lc3NhZ2VzIG5vdGVzIHRoaXMgbGVhZCB0byBhIGJvb3QtdGltZSBo
-YW5nLgo+PiA+Cj4+ID5JIG1hbmFnZWQgdG8gdHJpZ2dlciBhbiBpc3N1ZSB3aXRoIGEgcmVhbGx5
-IG9sZCBFRkkgaW1wbGVtZW50YXRpb24gdGhhdAo+PiA+ZG9lc24ndCBjb25maWd1cmUgaXRzIGlu
-dGVycnVwdHMgYXMgR3JvdXAxLCBhbmQgeWV0IHRyaWVzIHRvIEFDSyBpdHMKPj4gPmludGVycnVw
-dHMgdXNpbmcgdGhlIEdyb3VwMSBhY2Nlc3Nvci4gR3Vlc3Mgd2hhdD8gSXQgaXMgbm90IGdvaW5n
-IHRvIHdvcmsuCj4+ID4KPj4gPkNvbW1pdCBjN2ZlZmI2OTA2NjFmMmUzOGFmY2I4MjAwYmQzMThl
-Y2YzOGFiOTYxIGluIHRoZSBlZGsyIHRyZWUgc2VlbXMKPj4gPnRvIGJlIHRoZSBmaXggKEkgb25s
-eSBhc3N1bWUgaXQgZG9lcywgSSBoYXZlbid0IGFjdHVhbGx5IGNoZWNrZWQpLiBBCj4+ID5yZWNl
-bnQgYnVpbGQsIGFzIGZvdW5kIGluIERlYmlhbiBCdXN0ZXIsIHdvcmtzIHBlcmZlY3RseSAodGVz
-dGVkIHdpdGgKPj4gPmJvdGggUUVNVSB2Mi4xMiBhbmQgdGlwIG9mIHRyZWUpLgo+PiA+Cj4+ID5O
-b3csIEkgcmVhbGx5IGRvbid0IGdldCB3aGF0IHlvdSdyZSBzYXlpbmcgYWJvdXQgTGludXggbm90
-IGdldHRpbmcKPj4gPmludGVycnVwdHMuIEhvdyBkbyB5b3UgZ2V0IHRvIGJvb3RpbmcgTGludXgg
-aWYgRUZJIGlzIG5vdCBtYWtpbmcgYW55Cj4+ID5mb3J3YXJkIHByb2dyZXNzPyBBcmUgeW91IHRy
-eWluZyB0aGVtIGluZGVwZW5kZW50bHk/Cj4+ID4KPj4gSSBzdGFydCBsaW51eCB3aXRoIGJ5cGFz
-c2luZyB1ZWZpLCB0aGUgcHJpbnQgaW5mbyBpcyB0aGUgc2FtZS4KPj4gWzUwNzEwNy43NDg5MDhd
-ICB2Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9MAo+PiBbNTA3MTA3Ljc1
-MjE4NV0gIHZnaWNfbW1pb193cml0ZV9ncm91cDojIyBpbnRpZC8yNyBncm91cD0wCj4+IFs1MDcx
-MDcuODk5NTY2XSAgdmdpY19tbWlvX3dyaXRlX2dyb3VwOiMjIGludGlkLzI3IGdyb3VwPTEKPj4g
-WzUwNzEwNy45MDczNzBdICB2Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9
-MQo+PiB0aGUgY29tbWFuZCBsaW5lIGlzIGxpa2UgdGhpczoKPj4gL2hvbWUvcWVtdS1wYXRjaC9s
-aW5zaGkvcWVtdS9hYXJjaDY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0tYWFyY2g2NCAgLW1hY2hpbmUg
-dmlydC0zLjEsYWNjZWw9a3ZtLHVzYj1vZmYsZHVtcC1ndWVzdC1jb3JlPW9mZixnaWMtdmVyc2lv
-bj0zICAta2VybmVsIC9ob21lL2tlcm5lbGJvb3Qvdm1saW51ei00LjE2LjArIC1pbml0cmQgL2hv
-bWUva2VybmVsYm9vdC9pbml0cmFtZnMtNC4xNi4wKy5pbWcgLWFwcGVuZCByb290PS9kZXYvbWFw
-cGVyL2NsYS1yb290IHJvIGNyYXNoa2VybmVsPWF1dG8gcmQubHZtLmx2PWNsYS9yb290IHJkLmx2
-bS5sdj1jbGEvc3dhcC5VVEYtOCAgLWRyaXZlIGZpbGU9L2hvbWUvY2VudG9zNzQtcGgvYm9vdC5x
-Y293Mixmb3JtYXQ9cWNvdzIsaWY9bm9uZSxpZD1kcml2ZS1zY3NpMC0wLTAtMCAtZGV2aWNlIHNj
-c2ktaGQsYnVzPXNjc2kwLjAsY2hhbm5lbD0wLHNjc2ktaWQ9MCxsdW49MCxkcml2ZT1kcml2ZS1z
-Y3NpMC0wLTAtMCxpZD1zY3NpMC0wLTAtMCxib290aW5kZXg9MSAgLXZuYyAwLjAuMC4wOjAgLWsg
-ZW4tdXMgLWRldmljZSB2aXJ0aW8tZ3B1LXBjaSxpZD12aWRlbzAsbWF4X291dHB1dHM9MSxidXM9
-cGNpLjMsYWRkcj0weDAgLWRldmljZSBwdnBhbmljLW1taW8gLW1zZyA+dGltZXN0YW1wPW9uCj4+
-Cj4+IFRoaXMgaXMgc3RyYW5nZS4gVGhhdCdzIHByb2JhYmx5IHRoZSBMaW51eCA0LjE2ICBrZXJu
-ZWwgc2V0dGluZyBncm91cCB0byAwLCBhbmQgSSdsbCBjb250aW51ZSB0byB0cmFjayBpbiBndWVz
-dC4KPgo+Q291bGQgeW91IHRyeSB0aGUgZm9sbG93aW5nIHBhdGNoOgo+Cj5kaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWlu
-aXQuYwo+aW5kZXggYzBjMGI4OGFmMWQ1Li42ZmE4NThjN2E1YTYgMTAwNjQ0Cj4tLS0gYS92aXJ0
-L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYwo+KysrIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1p
-bml0LmMKPkBAIC0yMzEsMTMgKzIzMSw2IEBAIGludCBrdm1fdmdpY192Y3B1X2luaXQoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KQo+aXJxLT5jb25maWcgPSBWR0lDX0NPTkZJR19MRVZFTDsKPn0KPi0g
-ICAgICAgIC8qCj4tICAgICAgICAgKiBHSUN2MyBjYW4gb25seSBiZSBjcmVhdGVkIHZpYSB0aGUg
-S1ZNX0RFVklDRV9DUkVBVEUgQVBJIGFuZAo+LSAgICAgICAgICogc28gd2UgYWx3YXlzIGtub3cg
-dGhlIGVtdWxhdGlvbiB0eXBlIGF0IHRoaXMgcG9pbnQgYXMgaXQncwo+LSAgICAgICAgICogZWl0
-aGVyIGV4cGxpY2l0bHkgY29uZmlndXJlZCBhcyBHSUN2Mywgb3IgZXhwbGljaXRseQo+LSAgICAg
-ICAgICogY29uZmlndXJlZCBhcyBHSUN2Miwgb3Igbm90IGNvbmZpZ3VyZWQgeWV0IHdoaWNoIGFs
-c28KPi0gICAgICAgICAqIGltcGxpZXMgR0lDdjIuCj4tICAgICAgICAgKi8KPmlmIChkaXN0LT52
-Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykKPmlycS0+Z3JvdXAgPSAxOwo+
-ZWxzZQo+QEAgLTI5OCw2ICsyOTEsMTYgQEAgaW50IHZnaWNfaW5pdChzdHJ1Y3Qga3ZtICprdm0p
-Cj5pZiAocmV0KQo+Z290byBvdXQ7Cj4rICAgIC8qIEluaXRpYWxpemUgZ3JvdXBzIG9uIENQVXMg
-Y3JlYXRlZCBiZWZvcmUgdGhlIFZHSUMgdHlwZSB3YXMga25vd24gKi8KPisgICAga3ZtX2Zvcl9l
-YWNoX3ZjcHUoaSwgdmNwdSwga3ZtKSB7Cj4rICAgICAgICBzdHJ1Y3QgdmdpY19jcHUgKnZnaWNf
-Y3B1ID0gJnZjcHUtPmFyY2gudmdpY19jcHU7Cj4rCj4rICAgICAgICBmb3IgKGkgPSAwOyBpIDwg
-VkdJQ19OUl9QUklWQVRFX0lSUVM7IGkrKykgewo+KyAgICAgICAgICAgIHN0cnVjdCB2Z2ljX2ly
-cSAqaXJxID0gJnZnaWNfY3B1LT5wcml2YXRlX2lycXNbaV07Cj4rICAgICAgICAgICAgaXJxLT5n
-cm91cCA9IDE7Cj4rICAgICAgICB9Cj4rICAgIH0KPisKPmlmICh2Z2ljX2hhc19pdHMoa3ZtKSkg
-ewo+cmV0ID0gdmdpY192NF9pbml0KGt2bSk7Cj5pZiAocmV0KQo+ClNvcnJ5IGZvciB0aGUgbGF0
-ZSByZXBseS4gCkkgdGVzdCB0aGUgcGF0Y2ggYW5kIGl0IHdvcmtzLiBCdXQgSSB0aGluayB0aGVy
-ZSBpcyByYW5kb21uZXNzIGhlcmUuCjEudmdpY19pbml0OiAgc2V0IGludGlkLzI3IGdyb3VwPTEK
-Mi52Z2ljX21taW9fd3JpdGVfZ3JvdXA6IyMgaW50aWQvMjcgZ3JvdXA9MAozLiEhISByZWNlaXZl
-IGEgIHZ0aW1lciBpcnEgICAtLS0tLSBpdCBtYXkgZXhpc3QuCjQudmdpY19tbWlvX3dyaXRlX2dy
-b3VwOiMjIGludGlkLzI3IGdyb3VwPTEKCkkgbWFkZSBhbiBhdHRlbXB0IGJlZm9yZToKMS4ga3Zt
-X3ZnaWNfdmNwdV9pbml0CiAgICAgYWNjb3JkaW5nIHRvIGlmICBrdm1fdmdpY19nbG9iYWxfc3Rh
-dGUudHlwZSA9PSBWR0lDX1YzLCBzZXQgZ3JvdXA9MQoyLnZnaWNfbW1pb193cml0ZV9ncm91cDoj
-IyBpbnRpZC8yNyBncm91cD0wCjMuISEhIHJlY2VpdmUgYSAgdnRpbWVyIGlycSAgIC0tLS0tSSBy
-ZWFsbHkgcmVjZWl2ZSBhIHZ0aW1lciBpcnEsIHRoZW4gdGhlIGd1ZXN0IGhhbmdzLgoKdGhhbmtz
-Lgo+Cj5UaGFua3MsCj4KPkNocmlzdG9mZmVy
-
-
---=====_003_next=====--
-
---=====_001_next=====
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---=====_001_next=====--
+Eric
+> ---
+>  MAINTAINERS                       |   7 +
+>  drivers/iommu/Kconfig             |  11 +
+>  drivers/iommu/Makefile            |   1 +
+>  drivers/iommu/virtio-iommu.c      | 916 ++++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_ids.h   |   1 +
+>  include/uapi/linux/virtio_iommu.h | 104 ++++
+>  6 files changed, 1040 insertions(+)
+>  create mode 100644 drivers/iommu/virtio-iommu.c
+>  create mode 100644 include/uapi/linux/virtio_iommu.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1689dcfec800..3d8550c76f4a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -15946,6 +15946,13 @@ S:	Maintained
+>  F:	drivers/virtio/virtio_input.c
+>  F:	include/uapi/linux/virtio_input.h
+>  
+> +VIRTIO IOMMU DRIVER
+> +M:	Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> +L:	virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+> +S:	Maintained
+> +F:	drivers/iommu/virtio-iommu.c
+> +F:	include/uapi/linux/virtio_iommu.h
+> +
+>  VIRTUAL BOX GUEST DEVICE DRIVER
+>  M:	Hans de Goede <hdegoede-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>  M:	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+> index bf2bbfa2a399..db5f2b8c23f5 100644
+> --- a/drivers/iommu/Kconfig
+> +++ b/drivers/iommu/Kconfig
+> @@ -464,4 +464,15 @@ config QCOM_IOMMU
+>  	help
+>  	  Support for IOMMU on certain Qualcomm SoCs.
+>  
+> +config VIRTIO_IOMMU
+> +	bool "Virtio IOMMU driver"
+> +	depends on VIRTIO=y
+> +	select IOMMU_API
+> +	select INTERVAL_TREE
+> +	select ARM_DMA_USE_IOMMU if ARM
+> +	help
+> +	  Para-virtualised IOMMU driver with virtio.
+> +
+> +	  Say Y here if you intend to run this kernel as a guest.
+> +
+>  endif # IOMMU_SUPPORT
+> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
+> index 5481e5fe1f95..bd7e55751d09 100644
+> --- a/drivers/iommu/Makefile
+> +++ b/drivers/iommu/Makefile
+> @@ -36,3 +36,4 @@ obj-$(CONFIG_EXYNOS_IOMMU) += exynos-iommu.o
+>  obj-$(CONFIG_FSL_PAMU) += fsl_pamu.o fsl_pamu_domain.o
+>  obj-$(CONFIG_S390_IOMMU) += s390-iommu.o
+>  obj-$(CONFIG_QCOM_IOMMU) += qcom_iommu.o
+> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+> diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+> new file mode 100644
+> index 000000000000..7540dab9c8dc
+> --- /dev/null
+> +++ b/drivers/iommu/virtio-iommu.c
+> @@ -0,0 +1,916 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Virtio driver for the paravirtualized IOMMU
+> + *
+> + * Copyright (C) 2018 Arm Limited
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/amba/bus.h>
+> +#include <linux/delay.h>
+> +#include <linux/dma-iommu.h>
+> +#include <linux/freezer.h>
+> +#include <linux/interval_tree.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/of_iommu.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/pci.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/virtio.h>
+> +#include <linux/virtio_config.h>
+> +#include <linux/virtio_ids.h>
+> +#include <linux/wait.h>
+> +
+> +#include <uapi/linux/virtio_iommu.h>
+> +
+> +#define MSI_IOVA_BASE			0x8000000
+> +#define MSI_IOVA_LENGTH			0x100000
+> +
+> +#define VIOMMU_REQUEST_VQ		0
+> +#define VIOMMU_NR_VQS			1
+> +
+> +struct viommu_dev {
+> +	struct iommu_device		iommu;
+> +	struct device			*dev;
+> +	struct virtio_device		*vdev;
+> +
+> +	struct ida			domain_ids;
+> +
+> +	struct virtqueue		*vqs[VIOMMU_NR_VQS];
+> +	spinlock_t			request_lock;
+> +	struct list_head		requests;
+> +
+> +	/* Device configuration */
+> +	struct iommu_domain_geometry	geometry;
+> +	u64				pgsize_bitmap;
+> +	u8				domain_bits;
+> +};
+> +
+> +struct viommu_mapping {
+> +	phys_addr_t			paddr;
+> +	struct interval_tree_node	iova;
+> +	u32				flags;
+> +};
+> +
+> +struct viommu_domain {
+> +	struct iommu_domain		domain;
+> +	struct viommu_dev		*viommu;
+> +	struct mutex			mutex; /* protects viommu pointer */
+> +	unsigned int			id;
+> +
+> +	spinlock_t			mappings_lock;
+> +	struct rb_root_cached		mappings;
+> +
+> +	unsigned long			nr_endpoints;
+> +};
+> +
+> +struct viommu_endpoint {
+> +	struct viommu_dev		*viommu;
+> +	struct viommu_domain		*vdomain;
+> +};
+> +
+> +struct viommu_request {
+> +	struct list_head		list;
+> +	void				*writeback;
+> +	unsigned int			write_offset;
+> +	unsigned int			len;
+> +	char				buf[];
+> +};
+> +
+> +#define to_viommu_domain(domain)	\
+> +	container_of(domain, struct viommu_domain, domain)
+> +
+> +static int viommu_get_req_errno(void *buf, size_t len)
+> +{
+> +	struct virtio_iommu_req_tail *tail = buf + len - sizeof(*tail);
+> +
+> +	switch (tail->status) {
+> +	case VIRTIO_IOMMU_S_OK:
+> +		return 0;
+> +	case VIRTIO_IOMMU_S_UNSUPP:
+> +		return -ENOSYS;
+> +	case VIRTIO_IOMMU_S_INVAL:
+> +		return -EINVAL;
+> +	case VIRTIO_IOMMU_S_RANGE:
+> +		return -ERANGE;
+> +	case VIRTIO_IOMMU_S_NOENT:
+> +		return -ENOENT;
+> +	case VIRTIO_IOMMU_S_FAULT:
+> +		return -EFAULT;
+> +	case VIRTIO_IOMMU_S_IOERR:
+> +	case VIRTIO_IOMMU_S_DEVERR:
+> +	default:
+> +		return -EIO;
+> +	}
+> +}
+> +
+> +static void viommu_set_req_status(void *buf, size_t len, int status)
+> +{
+> +	struct virtio_iommu_req_tail *tail = buf + len - sizeof(*tail);
+> +
+> +	tail->status = status;
+> +}
+> +
+> +static off_t viommu_get_write_desc_offset(struct viommu_dev *viommu,
+> +					  struct virtio_iommu_req_head *req,
+> +					  size_t len)
+> +{
+> +	size_t tail_size = sizeof(struct virtio_iommu_req_tail);
+> +
+> +	return len - tail_size;
+> +}
+> +
+> +/*
+> + * __viommu_sync_req - Complete all in-flight requests
+> + *
+> + * Wait for all added requests to complete. When this function returns, all
+> + * requests that were in-flight at the time of the call have completed.
+> + */
+> +static int __viommu_sync_req(struct viommu_dev *viommu)
+> +{
+> +	int ret = 0;
+> +	unsigned int len;
+> +	size_t write_len;
+> +	struct viommu_request *req;
+> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+> +
+> +	assert_spin_locked(&viommu->request_lock);
+> +
+> +	virtqueue_kick(vq);
+> +
+> +	while (!list_empty(&viommu->requests)) {
+> +		len = 0;
+> +		req = virtqueue_get_buf(vq, &len);
+> +		if (!req)
+> +			continue;
+> +
+> +		if (!len)
+> +			viommu_set_req_status(req->buf, req->len,
+> +					      VIRTIO_IOMMU_S_IOERR);
+> +
+> +		write_len = req->len - req->write_offset;
+> +		if (req->writeback && len == write_len)
+> +			memcpy(req->writeback, req->buf + req->write_offset,
+> +			       write_len);
+> +
+> +		list_del(&req->list);
+> +		kfree(req);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int viommu_sync_req(struct viommu_dev *viommu)
+> +{
+> +	int ret;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&viommu->request_lock, flags);
+> +	ret = __viommu_sync_req(viommu);
+> +	if (ret)
+> +		dev_dbg(viommu->dev, "could not sync requests (%d)\n", ret);
+> +	spin_unlock_irqrestore(&viommu->request_lock, flags);
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+> + * __viommu_add_request - Add one request to the queue
+> + * @buf: pointer to the request buffer
+> + * @len: length of the request buffer
+> + * @writeback: copy data back to the buffer when the request completes.
+> + *
+> + * Add a request to the queue. Only synchronize the queue if it's already full.
+> + * Otherwise don't kick the queue nor wait for requests to complete.
+> + *
+> + * When @writeback is true, data written by the device, including the request
+> + * status, is copied into @buf after the request completes. This is unsafe if
+> + * the caller allocates @buf on stack and drops the lock between add_req() and
+> + * sync_req().
+> + *
+> + * Return 0 if the request was successfully added to the queue.
+> + */
+> +static int __viommu_add_req(struct viommu_dev *viommu, void *buf, size_t len,
+> +			    bool writeback)
+> +{
+> +	int ret;
+> +	off_t write_offset;
+> +	struct viommu_request *req;
+> +	struct scatterlist top_sg, bottom_sg;
+> +	struct scatterlist *sg[2] = { &top_sg, &bottom_sg };
+> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+> +
+> +	assert_spin_locked(&viommu->request_lock);
+> +
+> +	write_offset = viommu_get_write_desc_offset(viommu, buf, len);
+> +	if (write_offset <= 0)
+> +		return -EINVAL;
+> +
+> +	req = kzalloc(sizeof(*req) + len, GFP_ATOMIC);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	req->len = len;
+> +	if (writeback) {
+> +		req->writeback = buf + write_offset;
+> +		req->write_offset = write_offset;
+> +	}
+> +	memcpy(&req->buf, buf, write_offset);
+> +
+> +	sg_init_one(&top_sg, req->buf, write_offset);
+> +	sg_init_one(&bottom_sg, req->buf + write_offset, len - write_offset);
+> +
+> +	ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
+> +	if (ret == -ENOSPC) {
+> +		/* If the queue is full, sync and retry */
+> +		if (!__viommu_sync_req(viommu))
+> +			ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
+> +	}
+> +	if (ret)
+> +		goto err_free;
+> +
+> +	list_add_tail(&req->list, &viommu->requests);
+> +	return 0;
+> +
+> +err_free:
+> +	kfree(req);
+> +	return ret;
+> +}
+> +
+> +static int viommu_add_req(struct viommu_dev *viommu, void *buf, size_t len)
+> +{
+> +	int ret;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&viommu->request_lock, flags);
+> +	ret = __viommu_add_req(viommu, buf, len, false);
+> +	if (ret)
+> +		dev_dbg(viommu->dev, "could not add request: %d\n", ret);
+> +	spin_unlock_irqrestore(&viommu->request_lock, flags);
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Send a request and wait for it to complete. Return the request status (as an
+> + * errno)
+> + */
+> +static int viommu_send_req_sync(struct viommu_dev *viommu, void *buf,
+> +				size_t len)
+> +{
+> +	int ret;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&viommu->request_lock, flags);
+> +
+> +	ret = __viommu_add_req(viommu, buf, len, true);
+> +	if (ret) {
+> +		dev_dbg(viommu->dev, "could not add request (%d)\n", ret);
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = __viommu_sync_req(viommu);
+> +	if (ret) {
+> +		dev_dbg(viommu->dev, "could not sync requests (%d)\n", ret);
+> +		/* Fall-through (get the actual request status) */
+> +	}
+> +
+> +	ret = viommu_get_req_errno(buf, len);
+> +out_unlock:
+> +	spin_unlock_irqrestore(&viommu->request_lock, flags);
+> +	return ret;
+> +}
+> +
+> +/*
+> + * viommu_add_mapping - add a mapping to the internal tree
+> + *
+> + * On success, return the new mapping. Otherwise return NULL.
+> + */
+> +static int viommu_add_mapping(struct viommu_domain *vdomain, unsigned long iova,
+> +			      phys_addr_t paddr, size_t size, u32 flags)
+> +{
+> +	unsigned long irqflags;
+> +	struct viommu_mapping *mapping;
+> +
+> +	mapping = kzalloc(sizeof(*mapping), GFP_ATOMIC);
+> +	if (!mapping)
+> +		return -ENOMEM;
+> +
+> +	mapping->paddr		= paddr;
+> +	mapping->iova.start	= iova;
+> +	mapping->iova.last	= iova + size - 1;
+> +	mapping->flags		= flags;
+> +
+> +	spin_lock_irqsave(&vdomain->mappings_lock, irqflags);
+> +	interval_tree_insert(&mapping->iova, &vdomain->mappings);
+> +	spin_unlock_irqrestore(&vdomain->mappings_lock, irqflags);
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * viommu_del_mappings - remove mappings from the internal tree
+> + *
+> + * @vdomain: the domain
+> + * @iova: start of the range
+> + * @size: size of the range. A size of 0 corresponds to the entire address
+> + *	space.
+> + *
+> + * On success, returns the number of unmapped bytes (>= size)
+> + */
+> +static size_t viommu_del_mappings(struct viommu_domain *vdomain,
+> +				  unsigned long iova, size_t size)
+> +{
+> +	size_t unmapped = 0;
+> +	unsigned long flags;
+> +	unsigned long last = iova + size - 1;
+> +	struct viommu_mapping *mapping = NULL;
+> +	struct interval_tree_node *node, *next;
+> +
+> +	spin_lock_irqsave(&vdomain->mappings_lock, flags);
+> +	next = interval_tree_iter_first(&vdomain->mappings, iova, last);
+> +	while (next) {
+> +		node = next;
+> +		mapping = container_of(node, struct viommu_mapping, iova);
+> +		next = interval_tree_iter_next(node, iova, last);
+> +
+> +		/* Trying to split a mapping? */
+> +		if (mapping->iova.start < iova)
+> +			break;
+> +
+> +		/*
+> +		 * Virtio-iommu doesn't allow UNMAP to split a mapping created
+> +		 * with a single MAP request, so remove the full mapping.
+> +		 */
+> +		unmapped += mapping->iova.last - mapping->iova.start + 1;
+> +
+> +		interval_tree_remove(node, &vdomain->mappings);
+> +		kfree(mapping);
+> +	}
+> +	spin_unlock_irqrestore(&vdomain->mappings_lock, flags);
+> +
+> +	return unmapped;
+> +}
+> +
+> +/*
+> + * viommu_replay_mappings - re-send MAP requests
+> + *
+> + * When reattaching a domain that was previously detached from all endpoints,
+> + * mappings were deleted from the device. Re-create the mappings available in
+> + * the internal tree.
+> + */
+> +static int viommu_replay_mappings(struct viommu_domain *vdomain)
+> +{
+> +	int ret = 0;
+> +	unsigned long flags;
+> +	struct viommu_mapping *mapping;
+> +	struct interval_tree_node *node;
+> +	struct virtio_iommu_req_map map;
+> +
+> +	spin_lock_irqsave(&vdomain->mappings_lock, flags);
+> +	node = interval_tree_iter_first(&vdomain->mappings, 0, -1UL);
+> +	while (node) {
+> +		mapping = container_of(node, struct viommu_mapping, iova);
+> +		map = (struct virtio_iommu_req_map) {
+> +			.head.type	= VIRTIO_IOMMU_T_MAP,
+> +			.domain		= cpu_to_le32(vdomain->id),
+> +			.virt_start	= cpu_to_le64(mapping->iova.start),
+> +			.virt_end	= cpu_to_le64(mapping->iova.last),
+> +			.phys_start	= cpu_to_le64(mapping->paddr),
+> +			.flags		= cpu_to_le32(mapping->flags),
+> +		};
+> +
+> +		ret = viommu_send_req_sync(vdomain->viommu, &map, sizeof(map));
+> +		if (ret)
+> +			break;
+> +
+> +		node = interval_tree_iter_next(node, 0, -1UL);
+> +	}
+> +	spin_unlock_irqrestore(&vdomain->mappings_lock, flags);
+> +
+> +	return ret;
+> +}
+> +
+> +/* IOMMU API */
+> +
+> +static struct iommu_domain *viommu_domain_alloc(unsigned type)
+> +{
+> +	struct viommu_domain *vdomain;
+> +
+> +	if (type != IOMMU_DOMAIN_UNMANAGED && type != IOMMU_DOMAIN_DMA)
+> +		return NULL;
+> +
+> +	vdomain = kzalloc(sizeof(*vdomain), GFP_KERNEL);
+> +	if (!vdomain)
+> +		return NULL;
+> +
+> +	mutex_init(&vdomain->mutex);
+> +	spin_lock_init(&vdomain->mappings_lock);
+> +	vdomain->mappings = RB_ROOT_CACHED;
+> +
+> +	if (type == IOMMU_DOMAIN_DMA &&
+> +	    iommu_get_dma_cookie(&vdomain->domain)) {
+> +		kfree(vdomain);
+> +		return NULL;
+> +	}
+> +
+> +	return &vdomain->domain;
+> +}
+> +
+> +static int viommu_domain_finalise(struct viommu_dev *viommu,
+> +				  struct iommu_domain *domain)
+> +{
+> +	int ret;
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +	unsigned int max_domain = viommu->domain_bits > 31 ? ~0 :
+> +				  (1U << viommu->domain_bits) - 1;
+> +
+> +	vdomain->viommu		= viommu;
+> +
+> +	domain->pgsize_bitmap	= viommu->pgsize_bitmap;
+> +	domain->geometry	= viommu->geometry;
+> +
+> +	ret = ida_alloc_max(&viommu->domain_ids, max_domain, GFP_KERNEL);
+> +	if (ret >= 0)
+> +		vdomain->id = (unsigned int)ret;
+> +
+> +	return ret > 0 ? 0 : ret;
+> +}
+> +
+> +static void viommu_domain_free(struct iommu_domain *domain)
+> +{
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	iommu_put_dma_cookie(domain);
+> +
+> +	/* Free all remaining mappings (size 2^64) */
+> +	viommu_del_mappings(vdomain, 0, 0);
+> +
+> +	if (vdomain->viommu)
+> +		ida_free(&vdomain->viommu->domain_ids, vdomain->id);
+> +
+> +	kfree(vdomain);
+> +}
+> +
+> +static int viommu_attach_dev(struct iommu_domain *domain, struct device *dev)
+> +{
+> +	int i;
+> +	int ret = 0;
+> +	struct virtio_iommu_req_attach req;
+> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
+> +	struct viommu_endpoint *vdev = fwspec->iommu_priv;
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	mutex_lock(&vdomain->mutex);
+> +	if (!vdomain->viommu) {
+> +		/*
+> +		 * Properly initialize the domain now that we know which viommu
+> +		 * owns it.
+> +		 */
+> +		ret = viommu_domain_finalise(vdev->viommu, domain);
+> +	} else if (vdomain->viommu != vdev->viommu) {
+> +		dev_err(dev, "cannot attach to foreign vIOMMU\n");
+> +		ret = -EXDEV;
+> +	}
+> +	mutex_unlock(&vdomain->mutex);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * In the virtio-iommu device, when attaching the endpoint to a new
+> +	 * domain, it is detached from the old one and, if as as a result the
+> +	 * old domain isn't attached to any endpoint, all mappings are removed
+> +	 * from the old domain and it is freed.
+> +	 *
+> +	 * In the driver the old domain still exists, and its mappings will be
+> +	 * recreated if it gets reattached to an endpoint. Otherwise it will be
+> +	 * freed explicitly.
+> +	 *
+> +	 * vdev->vdomain is protected by group->mutex
+> +	 */
+> +	if (vdev->vdomain)
+> +		vdev->vdomain->nr_endpoints--;
+> +
+> +	req = (struct virtio_iommu_req_attach) {
+> +		.head.type	= VIRTIO_IOMMU_T_ATTACH,
+> +		.domain		= cpu_to_le32(vdomain->id),
+> +	};
+> +
+> +	for (i = 0; i < fwspec->num_ids; i++) {
+> +		req.endpoint = cpu_to_le32(fwspec->ids[i]);
+> +
+> +		ret = viommu_send_req_sync(vdomain->viommu, &req, sizeof(req));
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	if (!vdomain->nr_endpoints) {
+> +		/*
+> +		 * This endpoint is the first to be attached to the domain.
+> +		 * Replay existing mappings (e.g. SW MSI).
+> +		 */
+> +		ret = viommu_replay_mappings(vdomain);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	vdomain->nr_endpoints++;
+> +	vdev->vdomain = vdomain;
+> +
+> +	return 0;
+> +}
+> +
+> +static int viommu_map(struct iommu_domain *domain, unsigned long iova,
+> +		      phys_addr_t paddr, size_t size, int prot)
+> +{
+> +	int ret;
+> +	int flags;
+> +	struct virtio_iommu_req_map map;
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	flags = (prot & IOMMU_READ ? VIRTIO_IOMMU_MAP_F_READ : 0) |
+> +		(prot & IOMMU_WRITE ? VIRTIO_IOMMU_MAP_F_WRITE : 0) |
+> +		(prot & IOMMU_MMIO ? VIRTIO_IOMMU_MAP_F_MMIO : 0);
+> +
+> +	ret = viommu_add_mapping(vdomain, iova, paddr, size, flags);
+> +	if (ret)
+> +		return ret;
+> +
+> +	map = (struct virtio_iommu_req_map) {
+> +		.head.type	= VIRTIO_IOMMU_T_MAP,
+> +		.domain		= cpu_to_le32(vdomain->id),
+> +		.virt_start	= cpu_to_le64(iova),
+> +		.phys_start	= cpu_to_le64(paddr),
+> +		.virt_end	= cpu_to_le64(iova + size - 1),
+> +		.flags		= cpu_to_le32(flags),
+> +	};
+> +
+> +	if (!vdomain->nr_endpoints)
+> +		return 0;
+> +
+> +	ret = viommu_send_req_sync(vdomain->viommu, &map, sizeof(map));
+> +	if (ret)
+> +		viommu_del_mappings(vdomain, iova, size);
+> +
+> +	return ret;
+> +}
+> +
+> +static size_t viommu_unmap(struct iommu_domain *domain, unsigned long iova,
+> +			   size_t size)
+> +{
+> +	int ret = 0;
+> +	size_t unmapped;
+> +	struct virtio_iommu_req_unmap unmap;
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	unmapped = viommu_del_mappings(vdomain, iova, size);
+> +	if (unmapped < size)
+> +		return 0;
+> +
+> +	/* Device already removed all mappings after detach. */
+> +	if (!vdomain->nr_endpoints)
+> +		return unmapped;
+> +
+> +	unmap = (struct virtio_iommu_req_unmap) {
+> +		.head.type	= VIRTIO_IOMMU_T_UNMAP,
+> +		.domain		= cpu_to_le32(vdomain->id),
+> +		.virt_start	= cpu_to_le64(iova),
+> +		.virt_end	= cpu_to_le64(iova + unmapped - 1),
+> +	};
+> +
+> +	ret = viommu_add_req(vdomain->viommu, &unmap, sizeof(unmap));
+> +	return ret ? 0 : unmapped;
+> +}
+> +
+> +static phys_addr_t viommu_iova_to_phys(struct iommu_domain *domain,
+> +				       dma_addr_t iova)
+> +{
+> +	u64 paddr = 0;
+> +	unsigned long flags;
+> +	struct viommu_mapping *mapping;
+> +	struct interval_tree_node *node;
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	spin_lock_irqsave(&vdomain->mappings_lock, flags);
+> +	node = interval_tree_iter_first(&vdomain->mappings, iova, iova);
+> +	if (node) {
+> +		mapping = container_of(node, struct viommu_mapping, iova);
+> +		paddr = mapping->paddr + (iova - mapping->iova.start);
+> +	}
+> +	spin_unlock_irqrestore(&vdomain->mappings_lock, flags);
+> +
+> +	return paddr;
+> +}
+> +
+> +static void viommu_iotlb_sync(struct iommu_domain *domain)
+> +{
+> +	struct viommu_domain *vdomain = to_viommu_domain(domain);
+> +
+> +	viommu_sync_req(vdomain->viommu);
+> +}
+> +
+> +static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
+> +{
+> +	struct iommu_resv_region *region;
+> +	int prot = IOMMU_WRITE | IOMMU_NOEXEC | IOMMU_MMIO;
+> +
+> +	region = iommu_alloc_resv_region(MSI_IOVA_BASE, MSI_IOVA_LENGTH, prot,
+> +					 IOMMU_RESV_SW_MSI);
+> +	if (!region)
+> +		return;
+> +
+> +	list_add_tail(&region->list, head);
+> +	iommu_dma_get_resv_regions(dev, head);
+> +}
+> +
+> +static void viommu_put_resv_regions(struct device *dev, struct list_head *head)
+> +{
+> +	struct iommu_resv_region *entry, *next;
+> +
+> +	list_for_each_entry_safe(entry, next, head, list)
+> +		kfree(entry);
+> +}
+> +
+> +static struct iommu_ops viommu_ops;
+> +static struct virtio_driver virtio_iommu_drv;
+> +
+> +static int viommu_match_node(struct device *dev, void *data)
+> +{
+> +	return dev->parent->fwnode == data;
+> +}
+> +
+> +static struct viommu_dev *viommu_get_by_fwnode(struct fwnode_handle *fwnode)
+> +{
+> +	struct device *dev = driver_find_device(&virtio_iommu_drv.driver, NULL,
+> +						fwnode, viommu_match_node);
+> +	put_device(dev);
+> +
+> +	return dev ? dev_to_virtio(dev)->priv : NULL;
+> +}
+> +
+> +static int viommu_add_device(struct device *dev)
+> +{
+> +	int ret;
+> +	struct iommu_group *group;
+> +	struct viommu_endpoint *vdev;
+> +	struct viommu_dev *viommu = NULL;
+> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
+> +
+> +	if (!fwspec || fwspec->ops != &viommu_ops)
+> +		return -ENODEV;
+> +
+> +	viommu = viommu_get_by_fwnode(fwspec->iommu_fwnode);
+> +	if (!viommu)
+> +		return -ENODEV;
+> +
+> +	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
+> +	if (!vdev)
+> +		return -ENOMEM;
+> +
+> +	vdev->viommu = viommu;
+> +	fwspec->iommu_priv = vdev;
+> +
+> +	ret = iommu_device_link(&viommu->iommu, dev);
+> +	if (ret)
+> +		goto err_free_dev;
+> +
+> +	/*
+> +	 * Last step creates a default domain and attaches to it. Everything
+> +	 * must be ready.
+> +	 */
+> +	group = iommu_group_get_for_dev(dev);
+> +	if (IS_ERR(group)) {
+> +		ret = PTR_ERR(group);
+> +		goto err_unlink_dev;
+> +	}
+> +
+> +	iommu_group_put(group);
+> +
+> +	return PTR_ERR_OR_ZERO(group);
+> +
+> +err_unlink_dev:
+> +	iommu_device_unlink(&viommu->iommu, dev);
+> +err_free_dev:
+> +	kfree(vdev);
+> +
+> +	return ret;
+> +}
+> +
+> +static void viommu_remove_device(struct device *dev)
+> +{
+> +	struct viommu_endpoint *vdev;
+> +	struct iommu_fwspec *fwspec = dev->iommu_fwspec;
+> +
+> +	if (!fwspec || fwspec->ops != &viommu_ops)
+> +		return;
+> +
+> +	vdev = fwspec->iommu_priv;
+> +
+> +	iommu_group_remove_device(dev);
+> +	iommu_device_unlink(&vdev->viommu->iommu, dev);
+> +	kfree(vdev);
+> +}
+> +
+> +static struct iommu_group *viommu_device_group(struct device *dev)
+> +{
+> +	if (dev_is_pci(dev))
+> +		return pci_device_group(dev);
+> +	else
+> +		return generic_device_group(dev);
+> +}
+> +
+> +static int viommu_of_xlate(struct device *dev, struct of_phandle_args *args)
+> +{
+> +	return iommu_fwspec_add_ids(dev, args->args, 1);
+> +}
+> +
+> +static struct iommu_ops viommu_ops = {
+> +	.domain_alloc		= viommu_domain_alloc,
+> +	.domain_free		= viommu_domain_free,
+> +	.attach_dev		= viommu_attach_dev,
+> +	.map			= viommu_map,
+> +	.unmap			= viommu_unmap,
+> +	.iova_to_phys		= viommu_iova_to_phys,
+> +	.iotlb_sync		= viommu_iotlb_sync,
+> +	.add_device		= viommu_add_device,
+> +	.remove_device		= viommu_remove_device,
+> +	.device_group		= viommu_device_group,
+> +	.get_resv_regions	= viommu_get_resv_regions,
+> +	.put_resv_regions	= viommu_put_resv_regions,
+> +	.of_xlate		= viommu_of_xlate,
+> +};
+> +
+> +static int viommu_init_vqs(struct viommu_dev *viommu)
+> +{
+> +	struct virtio_device *vdev = dev_to_virtio(viommu->dev);
+> +	const char *name = "request";
+> +	void *ret;
+> +
+> +	ret = virtio_find_single_vq(vdev, NULL, name);
+> +	if (IS_ERR(ret)) {
+> +		dev_err(viommu->dev, "cannot find VQ\n");
+> +		return PTR_ERR(ret);
+> +	}
+> +
+> +	viommu->vqs[VIOMMU_REQUEST_VQ] = ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int viommu_probe(struct virtio_device *vdev)
+> +{
+> +	struct device *parent_dev = vdev->dev.parent;
+> +	struct viommu_dev *viommu = NULL;
+> +	struct device *dev = &vdev->dev;
+> +	u64 input_start = 0;
+> +	u64 input_end = -1UL;
+> +	int ret;
+> +
+> +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
+> +	    !virtio_has_feature(vdev, VIRTIO_IOMMU_F_MAP_UNMAP))
+> +		return -ENODEV;
+> +
+> +	viommu = devm_kzalloc(dev, sizeof(*viommu), GFP_KERNEL);
+> +	if (!viommu)
+> +		return -ENOMEM;
+> +
+> +	spin_lock_init(&viommu->request_lock);
+> +	ida_init(&viommu->domain_ids);
+> +	viommu->dev = dev;
+> +	viommu->vdev = vdev;
+> +	INIT_LIST_HEAD(&viommu->requests);
+> +
+> +	ret = viommu_init_vqs(viommu);
+> +	if (ret)
+> +		return ret;
+> +
+> +	virtio_cread(vdev, struct virtio_iommu_config, page_size_mask,
+> +		     &viommu->pgsize_bitmap);
+> +
+> +	if (!viommu->pgsize_bitmap) {
+> +		ret = -EINVAL;
+> +		goto err_free_vqs;
+> +	}
+> +
+> +	viommu->domain_bits = 32;
+> +
+> +	/* Optional features */
+> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_INPUT_RANGE,
+> +			     struct virtio_iommu_config, input_range.start,
+> +			     &input_start);
+> +
+> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_INPUT_RANGE,
+> +			     struct virtio_iommu_config, input_range.end,
+> +			     &input_end);
+> +
+> +	virtio_cread_feature(vdev, VIRTIO_IOMMU_F_DOMAIN_BITS,
+> +			     struct virtio_iommu_config, domain_bits,
+> +			     &viommu->domain_bits);
+> +
+> +	viommu->geometry = (struct iommu_domain_geometry) {
+> +		.aperture_start	= input_start,
+> +		.aperture_end	= input_end,
+> +		.force_aperture	= true,
+> +	};
+> +
+> +	viommu_ops.pgsize_bitmap = viommu->pgsize_bitmap;
+> +
+> +	virtio_device_ready(vdev);
+> +
+> +	ret = iommu_device_sysfs_add(&viommu->iommu, dev, NULL, "%s",
+> +				     virtio_bus_name(vdev));
+> +	if (ret)
+> +		goto err_free_vqs;
+> +
+> +	iommu_device_set_ops(&viommu->iommu, &viommu_ops);
+> +	iommu_device_set_fwnode(&viommu->iommu, parent_dev->fwnode);
+> +
+> +	iommu_device_register(&viommu->iommu);
+> +
+> +#ifdef CONFIG_PCI
+> +	if (pci_bus_type.iommu_ops != &viommu_ops) {
+> +		pci_request_acs();
+> +		ret = bus_set_iommu(&pci_bus_type, &viommu_ops);
+> +		if (ret)
+> +			goto err_unregister;
+> +	}
+> +#endif
+> +#ifdef CONFIG_ARM_AMBA
+> +	if (amba_bustype.iommu_ops != &viommu_ops) {
+> +		ret = bus_set_iommu(&amba_bustype, &viommu_ops);
+> +		if (ret)
+> +			goto err_unregister;
+> +	}
+> +#endif
+> +	if (platform_bus_type.iommu_ops != &viommu_ops) {
+> +		ret = bus_set_iommu(&platform_bus_type, &viommu_ops);
+> +		if (ret)
+> +			goto err_unregister;
+> +	}
+> +
+> +	vdev->priv = viommu;
+> +
+> +	dev_info(dev, "input address: %u bits\n",
+> +		 order_base_2(viommu->geometry.aperture_end));
+> +	dev_info(dev, "page mask: %#llx\n", viommu->pgsize_bitmap);
+> +
+> +	return 0;
+> +
+> +err_unregister:
+> +	iommu_device_sysfs_remove(&viommu->iommu);
+> +	iommu_device_unregister(&viommu->iommu);
+> +err_free_vqs:
+> +	vdev->config->del_vqs(vdev);
+> +
+> +	return ret;
+> +}
+> +
+> +static void viommu_remove(struct virtio_device *vdev)
+> +{
+> +	struct viommu_dev *viommu = vdev->priv;
+> +
+> +	iommu_device_sysfs_remove(&viommu->iommu);
+> +	iommu_device_unregister(&viommu->iommu);
+> +
+> +	/* Stop all virtqueues */
+> +	vdev->config->reset(vdev);
+> +	vdev->config->del_vqs(vdev);
+> +
+> +	dev_info(&vdev->dev, "device removed\n");
+> +}
+> +
+> +static void viommu_config_changed(struct virtio_device *vdev)
+> +{
+> +	dev_warn(&vdev->dev, "config changed\n");
+> +}
+> +
+> +static unsigned int features[] = {
+> +	VIRTIO_IOMMU_F_MAP_UNMAP,
+> +	VIRTIO_IOMMU_F_DOMAIN_BITS,
+> +	VIRTIO_IOMMU_F_INPUT_RANGE,
+> +};
+> +
+> +static struct virtio_device_id id_table[] = {
+> +	{ VIRTIO_ID_IOMMU, VIRTIO_DEV_ANY_ID },
+> +	{ 0 },
+> +};
+> +
+> +static struct virtio_driver virtio_iommu_drv = {
+> +	.driver.name		= KBUILD_MODNAME,
+> +	.driver.owner		= THIS_MODULE,
+> +	.id_table		= id_table,
+> +	.feature_table		= features,
+> +	.feature_table_size	= ARRAY_SIZE(features),
+> +	.probe			= viommu_probe,
+> +	.remove			= viommu_remove,
+> +	.config_changed		= viommu_config_changed,
+> +};
+> +
+> +module_virtio_driver(virtio_iommu_drv);
+> +
+> +MODULE_DESCRIPTION("Virtio IOMMU driver");
+> +MODULE_AUTHOR("Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>");
+> +MODULE_LICENSE("GPL v2");
+> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+> index 6d5c3b2d4f4d..cfe47c5d9a56 100644
+> --- a/include/uapi/linux/virtio_ids.h
+> +++ b/include/uapi/linux/virtio_ids.h
+> @@ -43,5 +43,6 @@
+>  #define VIRTIO_ID_INPUT        18 /* virtio input */
+>  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
+>  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
+> +#define VIRTIO_ID_IOMMU        23 /* virtio IOMMU */
+>  
+>  #endif /* _LINUX_VIRTIO_IDS_H */
+> diff --git a/include/uapi/linux/virtio_iommu.h b/include/uapi/linux/virtio_iommu.h
+> new file mode 100644
+> index 000000000000..e7c05e3afa44
+> --- /dev/null
+> +++ b/include/uapi/linux/virtio_iommu.h
+> @@ -0,0 +1,104 @@
+> +/* SPDX-License-Identifier: BSD-3-Clause */
+> +/*
+> + * Virtio-iommu definition v0.9
+> + *
+> + * Copyright (C) 2018 Arm Ltd.
+> + */
+> +#ifndef _UAPI_LINUX_VIRTIO_IOMMU_H
+> +#define _UAPI_LINUX_VIRTIO_IOMMU_H
+> +
+> +#include <linux/types.h>
+> +
+> +/* Feature bits */
+> +#define VIRTIO_IOMMU_F_INPUT_RANGE		0
+> +#define VIRTIO_IOMMU_F_DOMAIN_BITS		1
+> +#define VIRTIO_IOMMU_F_MAP_UNMAP		2
+> +#define VIRTIO_IOMMU_F_BYPASS			3
+> +
+> +struct virtio_iommu_range {
+> +	__u64					start;
+> +	__u64					end;
+> +};
+> +
+> +struct virtio_iommu_config {
+> +	/* Supported page sizes */
+> +	__u64					page_size_mask;
+> +	/* Supported IOVA range */
+> +	struct virtio_iommu_range		input_range;
+> +	/* Max domain ID size */
+> +	__u8					domain_bits;
+> +	__u8					padding[3];
+> +};
+> +
+> +/* Request types */
+> +#define VIRTIO_IOMMU_T_ATTACH			0x01
+> +#define VIRTIO_IOMMU_T_DETACH			0x02
+> +#define VIRTIO_IOMMU_T_MAP			0x03
+> +#define VIRTIO_IOMMU_T_UNMAP			0x04
+> +
+> +/* Status types */
+> +#define VIRTIO_IOMMU_S_OK			0x00
+> +#define VIRTIO_IOMMU_S_IOERR			0x01
+> +#define VIRTIO_IOMMU_S_UNSUPP			0x02
+> +#define VIRTIO_IOMMU_S_DEVERR			0x03
+> +#define VIRTIO_IOMMU_S_INVAL			0x04
+> +#define VIRTIO_IOMMU_S_RANGE			0x05
+> +#define VIRTIO_IOMMU_S_NOENT			0x06
+> +#define VIRTIO_IOMMU_S_FAULT			0x07
+> +
+> +struct virtio_iommu_req_head {
+> +	__u8					type;
+> +	__u8					reserved[3];
+> +};
+> +
+> +struct virtio_iommu_req_tail {
+> +	__u8					status;
+> +	__u8					reserved[3];
+> +};
+> +
+> +struct virtio_iommu_req_attach {
+> +	struct virtio_iommu_req_head		head;
+> +	__le32					domain;
+> +	__le32					endpoint;
+> +	__u8					reserved[8];
+> +	struct virtio_iommu_req_tail		tail;
+> +};
+> +
+> +struct virtio_iommu_req_detach {
+> +	struct virtio_iommu_req_head		head;
+> +	__le32					domain;
+> +	__le32					endpoint;
+> +	__u8					reserved[8];
+> +	struct virtio_iommu_req_tail		tail;
+> +};
+> +
+> +#define VIRTIO_IOMMU_MAP_F_READ			(1 << 0)
+> +#define VIRTIO_IOMMU_MAP_F_WRITE		(1 << 1)
+> +#define VIRTIO_IOMMU_MAP_F_EXEC			(1 << 2)
+> +#define VIRTIO_IOMMU_MAP_F_MMIO			(1 << 3)
+> +
+> +#define VIRTIO_IOMMU_MAP_F_MASK			(VIRTIO_IOMMU_MAP_F_READ |	\
+> +						 VIRTIO_IOMMU_MAP_F_WRITE |	\
+> +						 VIRTIO_IOMMU_MAP_F_EXEC |	\
+> +						 VIRTIO_IOMMU_MAP_F_MMIO)
+> +
+> +struct virtio_iommu_req_map {
+> +	struct virtio_iommu_req_head		head;
+> +	__le32					domain;
+> +	__le64					virt_start;
+> +	__le64					virt_end;
+> +	__le64					phys_start;
+> +	__le32					flags;
+> +	struct virtio_iommu_req_tail		tail;
+> +};
+> +
+> +struct virtio_iommu_req_unmap {
+> +	struct virtio_iommu_req_head		head;
+> +	__le32					domain;
+> +	__le64					virt_start;
+> +	__le64					virt_end;
+> +	__u8					reserved[4];
+> +	struct virtio_iommu_req_tail		tail;
+> +};
+> +
+> +#endif
+> 
