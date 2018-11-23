@@ -1,83 +1,160 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 0/7] Add virtio-iommu driver
-Date: Fri, 23 Nov 2018 09:28:51 +0100
-Message-ID: <250a38a9-e6b1-35ae-9261-eb8aab123f43@redhat.com>
-References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 4/4] arm64: KVM: Implement workaround for Cortex-A76
+ erratum 1165522
+Date: Fri, 23 Nov 2018 10:57:06 +0100
+Message-ID: <20181123095706.GA3331@e113682-lin.lund.arm.com>
+References: <20181105143617.120602-1-marc.zyngier@arm.com>
+ <20181105143617.120602-5-marc.zyngier@arm.com>
+ <20181106081546.GH12057@e113682-lin.lund.arm.com>
+ <ec7d0e34-022f-125e-00b4-b06be23ee2a8@arm.com>
+ <20181108201054.GG3835@e113682-lin.lund.arm.com>
+ <11733182-4e0a-5607-268e-73b8d00fbcee@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <virtio-dev-return-5023-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
-Content-Language: en-US
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
-Cc: jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 433514A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 04:57:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id T1kfU6-VyFUp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Nov 2018 04:57:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2EC14A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Nov 2018 04:57:09 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <11733182-4e0a-5607-268e-73b8d00fbcee@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
-
-On 11/22/18 8:37 PM, Jean-Philippe Brucker wrote:
-> Implement the virtio-iommu driver, following specification v0.9 [1].
-> 
-> Since v4 [2] I fixed the issues reported by Eric, and added Reviewed-by
-> from Eric and Rob. Thanks!
-> 
-> I changed the specification to fix one inconsistency discussed in v4.
-> That the device fills the probe buffer with zeroes is now a "SHOULD"
-> instead of a "MAY", since it's the only way for the driver to know if
-> the device wrote the status. Existing devices already do this. In
-> addition the device now needs to fill the three padding bytes at the
-> tail with zeroes.
-> 
-> You can find Linux driver and kvmtool device on branches
-> virtio-iommu/v0.9 [3]. I also lightly tested with Eric's latest QEMU
-> device [4].
-> 
-> [1] Virtio-iommu specification v0.9, sources, pdf and diff from v0.8
->     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
->     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
->     http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.8-v0.9.pdf
-> 
-> [2] [PATCH v4 0/7] Add virtio-iommu driver
->     https://lists.linuxfoundation.org/pipermail/iommu/2018-November/031074.html
-> 
-> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9
->     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
-> 
-> [4] [RFC v9 00/17] VIRTIO-IOMMU device
->     https://www.mail-archive.com/qemu-devel@nongnu.org/msg575578.html
-> 
-> Jean-Philippe Brucker (7):
->   dt-bindings: virtio-mmio: Add IOMMU description
->   dt-bindings: virtio: Add virtio-pci-iommu node
->   of: Allow the iommu-map property to omit untranslated devices
->   PCI: OF: Initialize dev->fwnode appropriately
->   iommu: Add virtio-iommu driver
->   iommu/virtio: Add probe request
->   iommu/virtio: Add event queue
-> 
->  .../devicetree/bindings/virtio/iommu.txt      |   66 +
->  .../devicetree/bindings/virtio/mmio.txt       |   30 +
->  MAINTAINERS                                   |    7 +
->  drivers/iommu/Kconfig                         |   11 +
->  drivers/iommu/Makefile                        |    1 +
->  drivers/iommu/virtio-iommu.c                  | 1157 +++++++++++++++++
->  drivers/of/base.c                             |   10 +-
->  drivers/pci/of.c                              |    7 +
->  include/uapi/linux/virtio_ids.h               |    1 +
->  include/uapi/linux/virtio_iommu.h             |  161 +++
->  10 files changed, 1448 insertions(+), 3 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
->  create mode 100644 drivers/iommu/virtio-iommu.c
->  create mode 100644 include/uapi/linux/virtio_iommu.h
-> 
-for the whole series
-Tested-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+T24gVGh1LCBOb3YgMjIsIDIwMTggYXQgMDQ6MTM6MTZQTSArMDAwMCwgTWFyYyBaeW5naWVyIHdy
+b3RlOgo+IE9uIDA4LzExLzIwMTggMjA6MTAsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gPiBP
+biBUaHUsIE5vdiAwOCwgMjAxOCBhdCAwNjowNTo1NVBNICswMDAwLCBNYXJjIFp5bmdpZXIgd3Jv
+dGU6Cj4gPj4gT24gMDYvMTEvMTggMDg6MTUsIENocmlzdG9mZmVyIERhbGwgd3JvdGU6Cj4gPj4+
+IE9uIE1vbiwgTm92IDA1LCAyMDE4IGF0IDAyOjM2OjE2UE0gKzAwMDAsIE1hcmMgWnluZ2llciB3
+cm90ZToKPiA+Pj4+IEVhcmx5IHZlcnNpb25zIG9mIENvcnRleC1BNzYgY2FuIGVuZC11cCB3aXRo
+IGNvcnJ1cHQgVExCcyBpZiB0aGV5Cj4gPj4+PiBzcGVjdWxhdGUgYW4gQVQgaW5zdHJ1Y3Rpb24g
+aW4gZHVyaW5nIGEgZ3Vlc3Qgc3dpdGNoIHdoaWxlIHRoZQo+ID4+Pj4gUzEvUzIgc3lzdGVtIHJl
+Z2lzdGVycyBhcmUgaW4gYW4gaW5jb25zaXN0ZW50IHN0YXRlLgo+ID4+Pj4KPiA+Pj4+IFdvcmsg
+YXJvdW5kIGl0IGJ5Ogo+ID4+Pj4gLSBNYW5kYXRpbmcgVkhFCj4gPj4+PiAtIE1ha2Ugc3VyZSB0
+aGF0IFMxIGFuZCBTMiBzeXN0ZW0gcmVnaXN0ZXJzIGFyZSBjb25zaXN0ZW50IGJlZm9yZQo+ID4+
+Pj4gICBjbGVhcmluZyBIQ1JfRUwyLlRHRSwgd2hpY2ggYWxsb3dzIEFUIHRvIHRhcmdldCB0aGUg
+RUwxIHRyYW5zbGF0aW9uCj4gPj4+PiAgIHJlZ2ltZQo+ID4+Pj4KPiA+Pj4+IFRoZXNlIHR3byB0
+aGluZ3MgdG9nZXRoZXIgZW5zdXJlIHRoYXQgd2UgY2Fubm90IGhpdCB0aGlzIGVycmF0dW0uCj4g
+Pj4+Pgo+ID4+Pj4gU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJt
+LmNvbT4KPiA+Pj4+IC0tLQo+ID4+Pj4gIERvY3VtZW50YXRpb24vYXJtNjQvc2lsaWNvbi1lcnJh
+dGEudHh0IHwgIDEgKwo+ID4+Pj4gIGFyY2gvYXJtNjQvS2NvbmZpZyAgICAgICAgICAgICAgICAg
+ICAgIHwgMTIgKysrKysrKysrKysrCj4gPj4+PiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVj
+YXBzLmggICAgICAgfCAgMyArKy0KPiA+Pj4+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9o
+b3N0LmggICAgICB8ICAzICsrKwo+ID4+Pj4gIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5
+cC5oICAgICAgIHwgIDYgKysrKysrCj4gPj4+PiAgYXJjaC9hcm02NC9rZXJuZWwvY3B1X2VycmF0
+YS5jICAgICAgICAgfCAgOCArKysrKysrKwo+ID4+Pj4gIGFyY2gvYXJtNjQva3ZtL2h5cC9zd2l0
+Y2guYyAgICAgICAgICAgIHwgMTQgKysrKysrKysrKysrKysKPiA+Pj4+ICA3IGZpbGVzIGNoYW5n
+ZWQsIDQ2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiA+Pj4+Cj4gPj4+PiBkaWZmIC0t
+Z2l0IGEvRG9jdW1lbnRhdGlvbi9hcm02NC9zaWxpY29uLWVycmF0YS50eHQgYi9Eb2N1bWVudGF0
+aW9uL2FybTY0L3NpbGljb24tZXJyYXRhLnR4dAo+ID4+Pj4gaW5kZXggNzZjY2RlZDhiNzRjLi4w
+NGYwYmM0NjkwYzYgMTAwNjQ0Cj4gPj4+PiAtLS0gYS9Eb2N1bWVudGF0aW9uL2FybTY0L3NpbGlj
+b24tZXJyYXRhLnR4dAo+ID4+Pj4gKysrIGIvRG9jdW1lbnRhdGlvbi9hcm02NC9zaWxpY29uLWVy
+cmF0YS50eHQKPiA+Pj4+IEBAIC01Nyw2ICs1Nyw3IEBAIHN0YWJsZSBrZXJuZWxzLgo+ID4+Pj4g
+IHwgQVJNICAgICAgICAgICAgfCBDb3J0ZXgtQTczICAgICAgfCAjODU4OTIxICAgICAgICAgfCBB
+Uk02NF9FUlJBVFVNXzg1ODkyMSAgICAgICAgfAo+ID4+Pj4gIHwgQVJNICAgICAgICAgICAgfCBD
+b3J0ZXgtQTU1ICAgICAgfCAjMTAyNDcxOCAgICAgICAgfCBBUk02NF9FUlJBVFVNXzEwMjQ3MTgg
+ICAgICAgfAo+ID4+Pj4gIHwgQVJNICAgICAgICAgICAgfCBDb3J0ZXgtQTc2ICAgICAgfCAjMTE4
+ODg3MyAgICAgICAgfCBBUk02NF9FUlJBVFVNXzExODg4NzMgICAgICAgfAo+ID4+Pj4gK3wgQVJN
+ICAgICAgICAgICAgfCBDb3J0ZXgtQTc2ICAgICAgfCAjMTE2NTUyMiAgICAgICAgfCBBUk02NF9F
+UlJBVFVNXzExNjU1MjIgICAgICAgfAo+ID4+Pj4gIHwgQVJNICAgICAgICAgICAgfCBNTVUtNTAw
+ICAgICAgICAgfCAjODQxMTE5LCM4MjY0MTkgfCBOL0EgICAgICAgICAgICAgICAgICAgICAgICAg
+fAo+ID4+Pj4gIHwgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAgICAgfCAgICAgICAgICAg
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfAo+ID4+Pj4gIHwgQ2F2aXVtICAg
+ICAgICAgfCBUaHVuZGVyWCBJVFMgICAgfCAjMjIzNzUsICMyNDMxMyAgfCBDQVZJVU1fRVJSQVRV
+TV8yMjM3NSAgICAgICAgfAo+ID4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvS2NvbmZpZyBi
+L2FyY2gvYXJtNjQvS2NvbmZpZwo+ID4+Pj4gaW5kZXggNzg3ZDc4NTBlMDY0Li5hNjhiYzZjYzIx
+NjcgMTAwNjQ0Cj4gPj4+PiAtLS0gYS9hcmNoL2FybTY0L0tjb25maWcKPiA+Pj4+ICsrKyBiL2Fy
+Y2gvYXJtNjQvS2NvbmZpZwo+ID4+Pj4gQEAgLTQ5Nyw2ICs0OTcsMTggQEAgY29uZmlnIEFSTTY0
+X0VSUkFUVU1fMTE4ODg3Mwo+ID4+Pj4gIAo+ID4+Pj4gIAkgIElmIHVuc3VyZSwgc2F5IFkuCj4g
+Pj4+PiAgCj4gPj4+PiArY29uZmlnIEFSTTY0X0VSUkFUVU1fMTE2NTUyMgo+ID4+Pj4gKwlib29s
+ICJDb3J0ZXgtQTc2OiBTcGVjdWxhdGl2ZSBBVCBpbnN0cnVjdGlvbiB1c2luZyBvdXQtb2YtY29u
+dGV4dCB0cmFuc2xhdGlvbiByZWdpbWUgY291bGQgY2F1c2Ugc3Vic2VxdWVudCByZXF1ZXN0IHRv
+IGdlbmVyYXRlIGFuIGluY29ycmVjdCB0cmFuc2xhdGlvbiIKPiA+Pj4+ICsJZGVmYXVsdCB5Cj4g
+Pj4+PiArCWhlbHAKPiA+Pj4+ICsJICBUaGlzIG9wdGlvbiBhZGRzIHdvcmsgYXJvdW5kcyBmb3Ig
+QVJNIENvcnRleC1BNzYgZXJyYXR1bSAxMTY1NTIyCj4gPj4+PiArCj4gPj4+PiArCSAgQWZmZWN0
+ZWQgQ29ydGV4LUE3NiBjb3JlcyAocjBwMCwgcjFwMCwgcjJwMCkgY291bGQgZW5kLXVwIHdpdGgK
+PiA+Pj4+ICsJICBjb3JydXB0ZWQgVExCcyBieSBzcGVjdWxhdGluZyBhbiBBVCBpbnN0cnVjdGlv
+biBkdXJpbmcgYSBndWVzdAo+ID4+Pj4gKwkgIGNvbnRleHQgc3dpdGNoLgo+ID4+Pj4gKwo+ID4+
+Pj4gKwkgIElmIHVuc3VyZSwgc2F5IFkuCj4gPj4+PiArCj4gPj4+PiAgY29uZmlnIENBVklVTV9F
+UlJBVFVNXzIyMzc1Cj4gPj4+PiAgCWJvb2wgIkNhdml1bSBlcnJhdHVtIDIyMzc1LCAyNDMxMyIK
+PiA+Pj4+ICAJZGVmYXVsdCB5Cj4gPj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9jcHVjYXBzLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWNhcHMuaAo+ID4+Pj4g
+aW5kZXggNmUyZDI1NGMwOWViLi42MmQ4Y2QxNWZkZjIgMTAwNjQ0Cj4gPj4+PiAtLS0gYS9hcmNo
+L2FybTY0L2luY2x1ZGUvYXNtL2NwdWNhcHMuaAo+ID4+Pj4gKysrIGIvYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9jcHVjYXBzLmgKPiA+Pj4+IEBAIC01NCw3ICs1NCw4IEBACj4gPj4+PiAgI2RlZmlu
+ZSBBUk02NF9IQVNfQ1JDMzIJCQkJMzMKPiA+Pj4+ICAjZGVmaW5lIEFSTTY0X1NTQlMJCQkJMzQK
+PiA+Pj4+ICAjZGVmaW5lIEFSTTY0X1dPUktBUk9VTkRfMTE4ODg3MwkJMzUKPiA+Pj4+ICsjZGVm
+aW5lIEFSTTY0X1dPUktBUk9VTkRfMTE2NTUyMgkJMzYKPiA+Pj4+ICAKPiA+Pj4+IC0jZGVmaW5l
+IEFSTTY0X05DQVBTCQkJCTM2Cj4gPj4+PiArI2RlZmluZSBBUk02NF9OQ0FQUwkJCQkzNwo+ID4+
+Pj4gIAo+ID4+Pj4gICNlbmRpZiAvKiBfX0FTTV9DUFVDQVBTX0ggKi8KPiA+Pj4+IGRpZmYgLS1n
+aXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybTY0L2luY2x1
+ZGUvYXNtL2t2bV9ob3N0LmgKPiA+Pj4+IGluZGV4IDdkNmU5NzRkMDI0YS4uOGY0ODYwMjZhYzg3
+IDEwMDY0NAo+ID4+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4g
+Pj4+PiArKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiA+Pj4+IEBAIC00
+MzUsNiArNDM1LDkgQEAgc3RhdGljIGlubGluZSBib29sIGt2bV9hcmNoX3N2ZV9yZXF1aXJlc192
+aGUodm9pZCkKPiA+Pj4+ICBzdGF0aWMgaW5saW5lIGJvb2wga3ZtX2FyY2hfaW1wbF9yZXF1aXJl
+c192aGUodm9pZCkKPiA+Pj4+ICB7Cj4gPj4+PiAgCS8qIFNvbWUgaW1wbGVtZW50YXRpb25zIGhh
+dmUgZGVmZWN0cyB0aGF0IGNvbmZpbmUgdGhlbSB0byBWSEUgKi8KPiA+Pj4+ICsJaWYgKGNwdXNf
+aGF2ZV9jYXAoQVJNNjRfV09SS0FST1VORF8xMTY1NTIyKSkKPiA+Pj4+ICsJCXJldHVybiB0cnVl
+Owo+ID4+Pj4gKwo+ID4+Pj4gIAlyZXR1cm4gZmFsc2U7Cj4gPj4+PiAgfQo+ID4+Pj4gIAo+ID4+
+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oIGIvYXJjaC9h
+cm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmgKPiA+Pj4+IGluZGV4IDIzYWNhNjY3NjdmOS4uOTY4
+MTM2MGQwOTU5IDEwMDY0NAo+ID4+Pj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
+aHlwLmgKPiA+Pj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2h5cC5oCj4gPj4+
+PiBAQCAtMTYzLDYgKzE2MywxMiBAQCBzdGF0aWMgX19hbHdheXNfaW5saW5lIHZvaWQgX19oeXBf
+dGV4dCBfX2xvYWRfZ3Vlc3Rfc3RhZ2UyKHN0cnVjdCBrdm0gKmt2bSkKPiA+Pj4+ICB7Cj4gPj4+
+PiAgCXdyaXRlX3N5c3JlZyhrdm0tPmFyY2gudnRjciwgdnRjcl9lbDIpOwo+ID4+Pj4gIAl3cml0
+ZV9zeXNyZWcoa3ZtLT5hcmNoLnZ0dGJyLCB2dHRicl9lbDIpOwo+ID4+Pj4gKwo+ID4+Pj4gKwkv
+Kgo+ID4+Pj4gKwkgKiBBUk0gZXJyYXR1bSAxMTY1NTIyIHJlcXVpcmVzIHRoZSBhY3R1YWwgZXhl
+Y3V0aW9uIG9mIHRoZQo+ID4+Pj4gKwkgKiBhYm92ZSBiZWZvcmUgd2UgY2FuIHN3aXRjaCB0byB0
+aGUgZ3Vlc3QgdHJhbnNsYXRpb24gcmVnaW1lLgo+ID4+Pj4gKwkgKi8KPiA+Pj4KPiA+Pj4gSXMg
+aXQgYWJvdXQgYSBndWVzdCB0cmFuc2xhdGlvbiAncmVnaW1lJyBvciBzaG91bGQgdGhpcyBqdXN0
+IHNheSBiZWZvcmUKPiA+Pj4gd2UgY2FuIGVuYWJsZSBzdGFnZSAyIHRyYW5zbGF0aW9uPwo+ID4+
+Cj4gPj4gTm8sIHRoaXMgaXNuJ3Qgc3RyaWN0bHkgYWJvdXQgZW5hYmxpbmcgc3RhZ2UtMiB0cmFu
+c2xhdGlvbi4gVGhpcyBpcwo+ID4+IGFib3V0IG1ha2luZyBzdXJlIHRoYXQgYW55dGhpbmcgdGhh
+dCBpbXBhY3RzIHRoZSBndWVzdCB0cmFuc2xhdGlvbnMgaXMKPiA+PiBhY3R1YWxseSBleGVjdXRl
+ZC4KPiA+Pgo+ID4+IEkgd29uZGVyIGlmIGl0IHdvdWxkIGJlIGNsZWFyZXIgdG8gbW92ZSB0aGlz
+IG91dHNpZGUgb2YKPiA+PiBfX2xvYWRfZ3Vlc3Rfc3RhZ2UyIGFuZCBtYWtlIGl0IGV4cGxpY2l0
+IGluIHRoZSBjYWxsZXJzIG9mIHRoaXMgaGVscGVyLi4uCj4gPiAKPiA+IEkgdGhpbmsgaXQgbWFr
+ZXMgc2Vuc2UgdG8gaGF2ZSB0aGlzIGhlcmUgdG8gZXhwbGFpbiB0aGUgYWx0ZXJuYXRpdmUuCj4g
+PiAKPiA+IEJ1dCBpdCdzIHRoZSAnc3dpdGNoIHRvIGd1ZXN0IHRyYW5zbGF0aW9uIHJlZ2ltZScg
+dGhpbmcgdGhhdCBib3RoZXJzIG1lCj4gPiBhIGJpdC4gIElzIHRoYXQgYW4gYXJjaGl0ZWN0dXJh
+bCBjb25jZXB0IChJIHRob3VnaHQgd2Ugb25seSBoYWQgRUwxIGFuZAo+ID4gRUwyIHRyYW5zbGF0
+aW9uIHJlZ2ltZXMgaW4gc3RhZ2UgMSwgYW5kIHRoZW4gc3RhZ2UgMiB0cmFuc2xhdGlvbnMpLiAg
+U28KPiA+IFdoZW4geW91IHNheSAnZ3Vlc3QgdHJhbnNsYXRpb24gcmVnaW1lJyBJJ20ganVzdCBu
+b3QgZW50aXJlbHkgc3VyZSB3aGF0Cj4gPiB0aGF0IG1lYW5zLCB1bmxlc3MgSSdtIG1pc3Npbmcg
+c29tZXRoaW5nLgo+IAo+IFtjb21pbmcgYmFjayB0byB0aGlzIGFzIEknbSBwcmVwYXJpbmcgdGhl
+IG5leHQgcm91bmRdCj4gCj4gV2hhdCBJJ20gdHJ5aW5nIHRvIGNvbnZleSBieSAiZ3Vlc3QgdHJh
+bnNsYXRpb24gcmVnaW1lIiBpcyB0aGUgZm9sbG93aW5nCj4gZnJvbSB0aGUgQVJNIEFSTToKPiAK
+PiBDNS40LjcgQVQgUzFFMVIsIEFkZHJlc3MgVHJhbnNsYXRlIFN0YWdlIDEgRUwxIFJlYWQKPiBb
+Li4uXQo+IAo+IFdoZW4gRUwyIGlzIGltcGxlbWVudGVkIGFuZCBlbmFibGVkIGluIHRoZSBjdXJy
+ZW50IFNlY3VyaXR5IHN0YXRlOgo+IOKAlCBJZiBIQ1JfRUwyLntFMkgsIFRHRX0gaXMgbm90IHsx
+LCAxfSwgdGhlIEVMMSYwIHRyYW5zbGF0aW9uIHJlZ2ltZSwKPiBhY2Nlc3NlZCBmcm9tIEVMMS4K
+PiDigJQgSWYgSENSX0VMMi57RTJILCBUR0V9IGlzIHsxLCAxfSwgdGhlIEVMMiYwIHRyYW5zbGF0
+aW9uIHJlZ2ltZSwKPiBhY2Nlc3NlZCBmcm9tIEVMMi4KPiAKPiBTbyBtYXliZSBJIHNob3VsZCBq
+dXN0IGJpdGUgdGhlIGJ1bGxldCBhbmQgY2FsbCBvdXQgRUwxL0VMMiB0cmFuc2xhdGlvbgo+IHJl
+Z2ltZSBpbnN0ZWFkIG9mIGd1ZXN0L2hvc3QuCj4gCgpIb3cgYWJvdXQgdGhlIGZvbGxvd2luZywg
+ZG9lcyB0aGF0IHdvcms/CgoJLyoKCSAqIEFSTSBlcnJhdHVtIDExNjU1MjIgcmVxdWlyZXMgdGhl
+IGFjdHVhbCBleGVjdXRpb24gb2YgdGhlCgkgKiBhYm92ZSBiZWZvcmUgd2UgY2FuIHN3aXRjaCB0
+byB0aGUgRUwxL0VMMCB0cmFuc2xhdGlvbiByZWdpbWUKCSAqIHVzZWQgYnkgdGhlIGd1ZXN0LgoJ
+ICovCgoKVGhhbmtzLAoKICAgIENocmlzdG9mZmVyCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
