@@ -1,130 +1,116 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 0/7] Add virtio-iommu driver
-Date: Tue, 27 Nov 2018 19:02:53 +0100
-Message-ID: <d3e38d89-46f8-7f82-98cc-5a3b94be26b8@redhat.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
+Date: Tue, 27 Nov 2018 13:04:08 -0500
+Message-ID: <20181127125424-mutt-send-email-mst@kernel.org>
 References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
- <20181127114402-mutt-send-email-mst@kernel.org>
- <6c061729-c404-ac25-f86f-7fe222bf5bc7@redhat.com>
- <20181127121036-mutt-send-email-mst@kernel.org>
+	<20181122193801.50510-6-jean-philippe.brucker@arm.com>
+	<20181123165742-mutt-send-email-mst@kernel.org>
+	<fd221210-7e12-1d15-0c80-52a761f6893d@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <virtio-dev-return-5054-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <20181127121036-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+Content-Disposition: inline
+In-Reply-To: <fd221210-7e12-1d15-0c80-52a761f6893d@arm.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: mark.rutland@arm.com, virtio-dev@lists.oasis-open.org, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, marc.zyngier@arm.com, linux-pci@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, virtualization@lists.linux-foundation.org, eric.auger@redhat.com, iommu@lists.linux-foundation.org, robh+dt@kernel.org, bhelgaas@google.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Michael,
-
-On 11/27/18 6:16 PM, Michael S. Tsirkin wrote:
-> On Tue, Nov 27, 2018 at 06:09:25PM +0100, Auger Eric wrote:
->> Hi Michael,
->>
->> On 11/27/18 5:53 PM, Michael S. Tsirkin wrote:
->>> On Thu, Nov 22, 2018 at 07:37:54PM +0000, Jean-Philippe Brucker wrote:
->>>> Implement the virtio-iommu driver, following specification v0.9 [1].
->>>>
->>>> Since v4 [2] I fixed the issues reported by Eric, and added Reviewed-by
->>>> from Eric and Rob. Thanks!
->>>>
->>>> I changed the specification to fix one inconsistency discussed in v4.
->>>> That the device fills the probe buffer with zeroes is now a "SHOULD"
->>>> instead of a "MAY", since it's the only way for the driver to know if
->>>> the device wrote the status. Existing devices already do this. In
->>>> addition the device now needs to fill the three padding bytes at the
->>>> tail with zeroes.
->>>>
->>>> You can find Linux driver and kvmtool device on branches
->>>> virtio-iommu/v0.9 [3]. I also lightly tested with Eric's latest QEMU
->>>> device [4].
->>>
->>> I tried to get this to work on my x86 box but without
->>> success. Any hints? Does this have to do with the IORT table?
->>> I think we really should just reserve our own table ID
->>> and avoid the pain of trying to add things to the IORT spec.
->>> I'm reluctant to merge lots of code that I can't easily test.
->>> Again, if we found a way to push more configuration into
->>> virtio config space the problem space would be smaller.
->>
->> You can at least test it with QEMU ARM virt in TCG mode.
+On Tue, Nov 27, 2018 at 05:50:50PM +0000, Jean-Philippe Brucker wrote:
+> On 23/11/2018 22:02, Michael S. Tsirkin wrote:
+> >> +/*
+> >> + * __viommu_sync_req - Complete all in-flight requests
+> >> + *
+> >> + * Wait for all added requests to complete. When this function returns, all
+> >> + * requests that were in-flight at the time of the call have completed.
+> >> + */
+> >> +static int __viommu_sync_req(struct viommu_dev *viommu)
+> >> +{
+> >> +	int ret = 0;
+> >> +	unsigned int len;
+> >> +	size_t write_len;
+> >> +	struct viommu_request *req;
+> >> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
+> >> +
+> >> +	assert_spin_locked(&viommu->request_lock);
+> >> +
+> >> +	virtqueue_kick(vq);
+> >> +
+> >> +	while (!list_empty(&viommu->requests)) {
+> >> +		len = 0;
+> >> +		req = virtqueue_get_buf(vq, &len);
+> >> +		if (!req)
+> >> +			continue;
+> >> +
+> >> +		if (!len)
+> >> +			viommu_set_req_status(req->buf, req->len,
+> >> +					      VIRTIO_IOMMU_S_IOERR);
+> >> +
+> >> +		write_len = req->len - req->write_offset;
+> >> +		if (req->writeback && len == write_len)
+> >> +			memcpy(req->writeback, req->buf + req->write_offset,
+> >> +			       write_len);
+> >> +
+> >> +		list_del(&req->list);
+> >> +		kfree(req);
+> >> +	}
+> > 
+> > I didn't notice this in the past but it seems this will spin
+> > with interrupts disabled until host handles the request.
+> > Please do not do this - host execution can be another
+> > task that needs the same host CPU. This will then disable
+> > interrupts for a very very long time.
 > 
-> It's slow enough that I generally just focus on KVM.
-fair enough
-> 
->> Then I have
->> worked on the IORT integration in PC/Q35 but this is not yet functional.
->> I need to debug what's wrong on guest ACPI probing. I plan to work on
->> this this week.
->>
->> Thanks
->>
->> Eric
-> 
-> Sounds good. Did you need to make changes to IORT?  I don't remember. If
-> yes it would be very easy to just have a virtio specific ACPI table -
-> I am assuming ARM guys will be just as hostile to virt changes
-> to IORT as they were to minor changes to ARM vIOMMU.
+> In the guest yes, but that doesn't prevent the host from running another
+> task right?
 
-Well the only difference is that on ARM we have 3 nodes in the IORT: the
-root complex node -> the VIRTIO-IOMMU node -> the ITS node. The ITS is
-the ARM MSI controller which does MSI translation. So the ARM IORT
-describes the chained ID mappings from the end point RID through the
-StreamID SMMU input to the device ID MSI controller input. On Intel we
-don't have the last node.
+Doesn't prevent it but it will delay it significantly
+until scheduler decides to kick the VCPU task out.
 
-But again my integration is not yet functional and I don't know yet if I
-have captured the whole picture.
-
-Thanks
-
-Eric
+> My tests run fine when QEMU is bound to a single CPU, even
+> though vcpu and viommu run in different threads
 > 
+> > What to do then? Queue in software and wake up task.
 > 
->>>
->>>> [1] Virtio-iommu specification v0.9, sources, pdf and diff from v0.8
->>>>     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
->>>>     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
->>>>     http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.8-v0.9.pdf
->>>>
->>>> [2] [PATCH v4 0/7] Add virtio-iommu driver
->>>>     https://lists.linuxfoundation.org/pipermail/iommu/2018-November/031074.html
->>>>
->>>> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9
->>>>     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
->>>>
->>>> [4] [RFC v9 00/17] VIRTIO-IOMMU device
->>>>     https://www.mail-archive.com/qemu-devel@nongnu.org/msg575578.html
->>>>
->>>> Jean-Philippe Brucker (7):
->>>>   dt-bindings: virtio-mmio: Add IOMMU description
->>>>   dt-bindings: virtio: Add virtio-pci-iommu node
->>>>   of: Allow the iommu-map property to omit untranslated devices
->>>>   PCI: OF: Initialize dev->fwnode appropriately
->>>>   iommu: Add virtio-iommu driver
->>>>   iommu/virtio: Add probe request
->>>>   iommu/virtio: Add event queue
->>>>
->>>>  .../devicetree/bindings/virtio/iommu.txt      |   66 +
->>>>  .../devicetree/bindings/virtio/mmio.txt       |   30 +
->>>>  MAINTAINERS                                   |    7 +
->>>>  drivers/iommu/Kconfig                         |   11 +
->>>>  drivers/iommu/Makefile                        |    1 +
->>>>  drivers/iommu/virtio-iommu.c                  | 1157 +++++++++++++++++
->>>>  drivers/of/base.c                             |   10 +-
->>>>  drivers/pci/of.c                              |    7 +
->>>>  include/uapi/linux/virtio_ids.h               |    1 +
->>>>  include/uapi/linux/virtio_iommu.h             |  161 +++
->>>>  10 files changed, 1448 insertions(+), 3 deletions(-)
->>>>  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
->>>>  create mode 100644 drivers/iommu/virtio-iommu.c
->>>>  create mode 100644 include/uapi/linux/virtio_iommu.h
->>>>
->>>> -- 
->>>> 2.19.1
+> Unfortunately I can't do anything here, because IOMMU drivers can't
+> sleep in the iommu_map() or iommu_unmap() path.
+>
+> The problem is the same
+> for all IOMMU drivers. That's because the DMA API allows drivers to call
+> some functions with interrupts disabled. For example
+> Documentation/DMA-API-HOWTO.txt allows dma_alloc_coherent() and
+> dma_unmap_single() to be called in interrupt context.
+
+In fact I don't really understand how it's supposed to
+work at all: you only sync when ring is full.
+So host may not have seen your map request if ring
+is not full.
+Why is it safe to use the address with a device then?
+
+
+> > As kick is vm exit, kick under interrupts disabled is discouraged too:
+> > better to prepare for kick enable interrupts then kick.
+> 
+> That was on my list of things to look at, because it could relax
+> things for device drivers that don't call us with interrupts disabled. I
+> just tried it and I can see some performance improvement (7% and 4% on
+> tcp_stream and tcp_maerts respectively, +/-2.5%).
+> 
+> Since it's an optimization I'll leave it for later (ACPI and module
+> support is higher on my list). The resulting change is complicated
+> because we now need to deal with threads adding new requests while
+> sync() is running. With my current prototype one thread could end up
+> staying in sync() while other threads add new async requests, so I need
+> to find a way to bound it.
+> 
+> Thanks,
+> Jean
