@@ -1,41 +1,89 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
-Subject: Re: [PATCH V5 00/10] x86/KVM/Hyper-v: Add HV ept tlb range flush
- hypercall support in KVM
-Date: Tue, 27 Nov 2018 20:34:41 +0800
-Message-ID: <CAOLK0pzL6wKbGEH_EPQ9cO8NByx4URO09=XAuYo-vEgaYjtVBQ@mail.gmail.com>
-References: <20181108144259.10817-1-Tianyu.Lan@microsoft.com>
- <CAOLK0pyvtfhoGM+D7h=gXwNpNjXGZiDJKpuVi9HOwb++4asCXw@mail.gmail.com> <20181127121129.GR3088@unbuntlaptop>
+From: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v5 0/7] Add virtio-iommu driver
+Date: Tue, 27 Nov 2018 11:53:14 -0500
+Message-ID: <20181127114402-mutt-send-email-mst@kernel.org>
+References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181127121129.GR3088@unbuntlaptop>
-Sender: linux-kernel-owner@vger.kernel.org
-To: dan.carpenter@oracle.com
-Cc: linux-mips@linux-mips.org, kvm <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, benh@kernel.crashing.org, will.deacon@arm.com, christoffer.dall@arm.com, paulus@ozlabs.org, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, the arch/x86 maintainers <x86@kernel.org>, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, Ingo Molnar <mingo@redhat.com>, catalin.marinas@arm.com, jhogan@kernel.org, Tianyu Lan <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, ralf@linux-mips.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20181122193801.50510-1-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 27, 2018 at 8:12 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> On Tue, Nov 27, 2018 at 07:59:22PM +0800, Tianyu Lan wrote:
-> > Gentile Ping...
-> >
-> > On Thu, Nov 8, 2018 at 10:43 PM <lantianyu1986@gmail.com> wrote:
-> > >
-> > > From: Lan Tianyu <Tianyu.Lan@microsoft.com>
-> > >
-> > > Sorry. Some patches was blocked and I try to resend via another account.
->
-> The patches were still blocked?  They didn't show up on driver-devel.
->
-> regards,
-> dan carpenter
->
+On Thu, Nov 22, 2018 at 07:37:54PM +0000, Jean-Philippe Brucker wrote:
+> Implement the virtio-iommu driver, following specification v0.9 [1].
+> 
+> Since v4 [2] I fixed the issues reported by Eric, and added Reviewed-by
+> from Eric and Rob. Thanks!
+> 
+> I changed the specification to fix one inconsistency discussed in v4.
+> That the device fills the probe buffer with zeroes is now a "SHOULD"
+> instead of a "MAY", since it's the only way for the driver to know if
+> the device wrote the status. Existing devices already do this. In
+> addition the device now needs to fill the three padding bytes at the
+> tail with zeroes.
+> 
+> You can find Linux driver and kvmtool device on branches
+> virtio-iommu/v0.9 [3]. I also lightly tested with Eric's latest QEMU
+> device [4].
 
-Hi Dan:
-            Thanks for reminder. I double check kvm maillist archive
-and this series is available.
-https://marc.info/?l=kvm&m=154168821118117&w=2
+I tried to get this to work on my x86 box but without
+success. Any hints? Does this have to do with the IORT table?
+I think we really should just reserve our own table ID
+and avoid the pain of trying to add things to the IORT spec.
+I'm reluctant to merge lots of code that I can't easily test.
+Again, if we found a way to push more configuration into
+virtio config space the problem space would be smaller.
 
--- 
-Best regards
-Tianyu Lan
+> [1] Virtio-iommu specification v0.9, sources, pdf and diff from v0.8
+>     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+>     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
+>     http://jpbrucker.net/virtio-iommu/spec/diffs/virtio-iommu-pdf-diff-v0.8-v0.9.pdf
+> 
+> [2] [PATCH v4 0/7] Add virtio-iommu driver
+>     https://lists.linuxfoundation.org/pipermail/iommu/2018-November/031074.html
+> 
+> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9
+>     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
+> 
+> [4] [RFC v9 00/17] VIRTIO-IOMMU device
+>     https://www.mail-archive.com/qemu-devel-qX2TKyscuCcdnm+yROfE0A@public.gmane.org/msg575578.html
+> 
+> Jean-Philippe Brucker (7):
+>   dt-bindings: virtio-mmio: Add IOMMU description
+>   dt-bindings: virtio: Add virtio-pci-iommu node
+>   of: Allow the iommu-map property to omit untranslated devices
+>   PCI: OF: Initialize dev->fwnode appropriately
+>   iommu: Add virtio-iommu driver
+>   iommu/virtio: Add probe request
+>   iommu/virtio: Add event queue
+> 
+>  .../devicetree/bindings/virtio/iommu.txt      |   66 +
+>  .../devicetree/bindings/virtio/mmio.txt       |   30 +
+>  MAINTAINERS                                   |    7 +
+>  drivers/iommu/Kconfig                         |   11 +
+>  drivers/iommu/Makefile                        |    1 +
+>  drivers/iommu/virtio-iommu.c                  | 1157 +++++++++++++++++
+>  drivers/of/base.c                             |   10 +-
+>  drivers/pci/of.c                              |    7 +
+>  include/uapi/linux/virtio_ids.h               |    1 +
+>  include/uapi/linux/virtio_iommu.h             |  161 +++
+>  10 files changed, 1448 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+>  create mode 100644 drivers/iommu/virtio-iommu.c
+>  create mode 100644 include/uapi/linux/virtio_iommu.h
+> 
+> -- 
+> 2.19.1
