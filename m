@@ -1,111 +1,126 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
-Date: Tue, 27 Nov 2018 13:53:17 -0500
-Message-ID: <20181127131455-mutt-send-email-mst@kernel.org>
-References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
- <20181122193801.50510-6-jean-philippe.brucker@arm.com>
- <20181123165742-mutt-send-email-mst@kernel.org>
- <fd221210-7e12-1d15-0c80-52a761f6893d@arm.com>
- <20181127125424-mutt-send-email-mst@kernel.org>
- <ef97313f-4795-9537-e0b8-8bf6751db6a6@arm.com>
+From: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Subject: [RFC QEMU v2 2/2] arm/virt: Account for guest pause time
+Date: Tue, 27 Nov 2018 13:07:17 -0800
+Message-ID: <1543352837-21529-3-git-send-email-bijan.mottahedeh@oracle.com>
+References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <virtio-dev-return-5060-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-Content-Disposition: inline
-In-Reply-To: <ef97313f-4795-9537-e0b8-8bf6751db6a6@arm.com>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: mark.rutland@arm.com, virtio-dev@lists.oasis-open.org, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, marc.zyngier@arm.com, linux-pci@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, virtualization@lists.linux-foundation.org, eric.auger@redhat.com, iommu@lists.linux-foundation.org, robh+dt@kernel.org, bhelgaas@google.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F044A354
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Nov 2018 16:07:27 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id frtOeOPgWcPc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Nov 2018 16:07:26 -0500 (EST)
+Received: from aserp2120.oracle.com (aserp2120.oracle.com [141.146.126.78])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 200604A34C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Nov 2018 16:07:26 -0500 (EST)
+In-Reply-To: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Nov 27, 2018 at 06:10:46PM +0000, Jean-Philippe Brucker wrote:
-> On 27/11/2018 18:04, Michael S. Tsirkin wrote:
-> > On Tue, Nov 27, 2018 at 05:50:50PM +0000, Jean-Philippe Brucker wrote:
-> >> On 23/11/2018 22:02, Michael S. Tsirkin wrote:
-> >>>> +/*
-> >>>> + * __viommu_sync_req - Complete all in-flight requests
-> >>>> + *
-> >>>> + * Wait for all added requests to complete. When this function returns, all
-> >>>> + * requests that were in-flight at the time of the call have completed.
-> >>>> + */
-> >>>> +static int __viommu_sync_req(struct viommu_dev *viommu)
-> >>>> +{
-> >>>> +	int ret = 0;
-> >>>> +	unsigned int len;
-> >>>> +	size_t write_len;
-> >>>> +	struct viommu_request *req;
-> >>>> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
-> >>>> +
-> >>>> +	assert_spin_locked(&viommu->request_lock);
-> >>>> +
-> >>>> +	virtqueue_kick(vq);
-> >>>> +
-> >>>> +	while (!list_empty(&viommu->requests)) {
-> >>>> +		len = 0;
-> >>>> +		req = virtqueue_get_buf(vq, &len);
-> >>>> +		if (!req)
-> >>>> +			continue;
-> >>>> +
-> >>>> +		if (!len)
-> >>>> +			viommu_set_req_status(req->buf, req->len,
-> >>>> +					      VIRTIO_IOMMU_S_IOERR);
-> >>>> +
-> >>>> +		write_len = req->len - req->write_offset;
-> >>>> +		if (req->writeback && len == write_len)
-> >>>> +			memcpy(req->writeback, req->buf + req->write_offset,
-> >>>> +			       write_len);
-> >>>> +
-> >>>> +		list_del(&req->list);
-> >>>> +		kfree(req);
-> >>>> +	}
-> >>>
-> >>> I didn't notice this in the past but it seems this will spin
-> >>> with interrupts disabled until host handles the request.
-> >>> Please do not do this - host execution can be another
-> >>> task that needs the same host CPU. This will then disable
-> >>> interrupts for a very very long time.
-> >>
-> >> In the guest yes, but that doesn't prevent the host from running another
-> >> task right?
-> > 
-> > Doesn't prevent it but it will delay it significantly
-> > until scheduler decides to kick the VCPU task out.
-> > 
-> >> My tests run fine when QEMU is bound to a single CPU, even
-> >> though vcpu and viommu run in different threads
-> >>
-> >>> What to do then? Queue in software and wake up task.
-> >>
-> >> Unfortunately I can't do anything here, because IOMMU drivers can't
-> >> sleep in the iommu_map() or iommu_unmap() path.
-> >>
-> >> The problem is the same
-> >> for all IOMMU drivers. That's because the DMA API allows drivers to call
-> >> some functions with interrupts disabled. For example
-> >> Documentation/DMA-API-HOWTO.txt allows dma_alloc_coherent() and
-> >> dma_unmap_single() to be called in interrupt context.
-> > 
-> > In fact I don't really understand how it's supposed to
-> > work at all: you only sync when ring is full.
-> > So host may not have seen your map request if ring
-> > is not full.
-> > Why is it safe to use the address with a device then?
-> 
-> viommu_map() calls viommu_send_req_sync(), which does the sync
-> immediately after adding the MAP request.
-> 
-> Thanks,
-> Jean
+Accumulate the total guest pause time and update the virtual counter
+offset register accordingly in order to account for that time before
+resuming the guest.
 
-I see. So it happens on every request. Maybe you should clear
-event index then. This way if exits are disabled you know that
-host is processing the ring. Event index is good for when
-you don't care when it will be processed, you just want
-to reduce number of exits as much as possible.
+Signed-off-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+---
+ hw/intc/arm_gicv3_kvm.c | 39 +++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.h        |  3 +++
+ 2 files changed, 42 insertions(+)
 
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 1e11200..aabd508 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -30,6 +30,7 @@
+ #include "gicv3_internal.h"
+ #include "vgic_common.h"
+ #include "migration/blocker.h"
++#include "target/arm/internals.h"
+ 
+ #ifdef DEBUG_GICV3_KVM
+ #define DPRINTF(fmt, ...) \
+@@ -745,9 +746,38 @@ static void vm_change_state_handler(void *opaque, int running,
+ {
+     GICv3State *s = (GICv3State *)opaque;
+     Error *err = NULL;
++    CPUState *cpu;
++    CPUARMState *env;
++    struct kvm_one_reg reg;
+     int ret;
++    uint64_t cnt;
+ 
+     if (running) {
++        CPU_FOREACH(cpu) {
++
++            env = (CPUARMState *)(cpu->env_ptr);
++
++            if (!env->pause_start) {
++                continue;
++            }
++
++            /*
++             * Accumulate the total pause time and set the
++             * counter virtual offset accordingly.
++             */
++            cnt = gt_get_countervalue(env);
++            env->pause_total += (cnt - env->pause_start);
++            env->cp15.cntvoff_el2 = cnt - env->pause_total;
++
++            env->pause_start = 0;   /* clear for next pause */
++            reg.id = KVM_REG_ARM_TIMER_CNT;
++            reg.addr = (uintptr_t) &env->cp15.cntvoff_el2;
++            ret = kvm_vcpu_ioctl(cpu, KVM_SET_ONE_REG, &reg);
++            if (ret) {
++                error_report("Set virtual counter offset failed: %d", ret);
++                abort();
++            }
++        }
+         return;
+     }
+ 
+@@ -760,6 +790,15 @@ static void vm_change_state_handler(void *opaque, int running,
+     if (ret < 0 && ret != -EFAULT) {
+         abort();
+     }
++
++    CPU_FOREACH(cpu) {
++        /*
++         * Record the current pause start time.
++         */
++        env = (CPUARMState *)(cpu->env_ptr);
++        cnt = gt_get_countervalue(env);
++        env->pause_start = cnt;
++    }
+ }
+ 
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e310ffc..bd0a56e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -602,6 +602,9 @@ typedef struct CPUARMState {
+     struct CPUBreakpoint *cpu_breakpoint[16];
+     struct CPUWatchpoint *cpu_watchpoint[16];
+ 
++    uint64_t pause_start;   /* start time of last pause */
++    uint64_t pause_total;   /* total pause time */
++
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
 -- 
-MST
+1.8.3.1
