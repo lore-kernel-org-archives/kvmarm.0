@@ -1,26 +1,26 @@
-From: Jan Bolke <jan.bolke@synopsys.com>
-Subject: RE: Instruction/Cycle Counting in Guest Using the Kvm PMU
-Date: Thu, 29 Nov 2018 11:30:55 +0000
-Message-ID: <93B846538060DA46A9945E98A2E521E9A87BEA@DE02WEMBXB.internal.synopsys.com>
-References: <93B846538060DA46A9945E98A2E521E9A87A9C@DE02WEMBXB.internal.synopsys.com>
- <0e9adc4e-20e3-5648-3ef6-64c9e16f780d@arm.com>
- <20181123132704.GN42987@e119886-lin.cambridge.arm.com>
+From: no-reply@patchew.org
+Subject: Re: [Qemu-devel] [RFC QEMU v2 0/2] arm/virt: Account for guest pause
+ time
+Date: Thu, 29 Nov 2018 06:40:53 -0800 (PST)
+Message-ID: <154350245267.24722.16191258784592311202@c26723477dc9>
+References: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+Reply-To: qemu-devel@nongnu.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E60A04A331
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 06:31:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E07C4A330
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 09:41:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ux0eUtA4ZQfj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Nov 2018 06:31:00 -0500 (EST)
-Received: from smtprelay.synopsys.com (smtprelay.synopsys.com [198.182.60.111])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 505E44A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 06:31:00 -0500 (EST)
-In-Reply-To: <20181123132704.GN42987@e119886-lin.cambridge.arm.com>
-Content-Language: en-US
+ with ESMTP id S1Sy41Pmlqdm for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Nov 2018 09:41:13 -0500 (EST)
+Received: from sender-of-o52.zoho.com (sender-of-o52.zoho.com [135.84.80.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65F6B4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 09:41:13 -0500 (EST)
+In-Reply-To: <1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com>
+Resent-Message-Id: <20181129144120.2E07C4A330@mm01.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,42 +30,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, James Morse <james.morse@arm.com>
-Cc: Jan Bolke <jan.bolke@synopsys.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: bijan.mottahedeh@oracle.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
-And thanks for the fast replies.
 
->The PMU emulation works by creating a perf event in the host, however it is pinned to the KVM process, so the the real PMU counters are stopped and started as the KVM process is >scheduled in and out. This means that it will include any CPU time associated with that process of which your guest is only a subset of.
+This series seems to have some coding style problems. See output below for
+more information:
 
-Thanks for the clarification.
-As this is the case, the counted cycles from the host should deliver a larger number than the executed instructions inside the guest.
+Type: series
+Subject: [Qemu-devel] [RFC QEMU v2 0/2] arm/virt: Account for guest pause time
+Message-id: 1543352837-21529-1-git-send-email-bijan.mottahedeh@oracle.com
 
->The patchset that James refers to will ensure that the underlying real PMU counters underlying the guest only events will only be enabled upon entering the guest (and disabled on >leaving). Thus you will need to apply this (to your host) for more accurate counting. (You could also then use the perf modifiers in the host to counter guest cycles, e.g. perf -e >instructions:G).
+=== TEST SCRIPT BEGIN ===
+#!/bin/bash
 
-So I applied your patch to a 4.19.5 kernel and also your other Patchseries for the perf events in the host [0].
-So what I do now is running :
-perf stat -e instructions:G -- ./run_loop_in_kvm.
+BASE=base
+n=1
+total=$(git log --oneline $BASE.. | wc -l)
+failed=0
 
-Run_loop_in_kvm is a small c program who starts a vm and executes a little loop in the guest and then exits.
-I get a output from perf like the following:
-	159732   instructions:Gu
-     ....
-My Problem is, I am still not sure how to interpret these values as my bare metal code runs a loop for 1048577 times 
-which executes 3 instructions in every run.
+git config --local diff.renamelimit 0
+git config --local diff.renames True
+git config --local diff.algorithm histogram
 
-My question is how comes this discrepancy of the counted values.
-The perf counting from the host delivers a value significantly smaller than the number of instructions in the guest.
+commits="$(git log --format=%H --reverse $BASE..)"
+for c in $commits; do
+    echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+    if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+        failed=1
+        echo
+    fi
+    n=$((n+1))
+done
 
-I am struggling to interpret the perf counter values as an indication how many instructions my guest performed.
-What am I missing?
+exit $failed
+=== TEST SCRIPT END ===
 
-Also I get the following output for perf stat -e cycles:G ls: 647284 cyles:Gu.
-Is this a indicator that my guest/host modifiers do not work or am I misunderstanding the whole concept here?
-Sorry for the silly question and thanks in advance!
+Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+Switched to a new branch 'test'
+bf7b6dc arm/virt: Account for guest pause time
+21423f4 arm/virt: Initialize generic timer scale factor dynamically
 
->Also you may want to refer to kvm-unit-tests are there are test cases that demonstrate bare metal code for PMU enabling.
-Thanks for the hint, these tests are very useful examples!
+=== OUTPUT BEGIN ===
+Checking PATCH 1/2: arm/virt: Initialize generic timer scale factor dynamically...
+ERROR: exactly one space required after that #ifdef
+#33: FILE: hw/arm/virt.c:1757:
++#ifdef  CONFIG_KVM
 
-[0]: http://lists.infradead.org/pipermail/linux-arm-kernel/2018-November/614985.html
+total: 1 errors, 0 warnings, 106 lines checked
+
+Your patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+
+Checking PATCH 2/2: arm/virt: Account for guest pause time...
+=== OUTPUT END ===
+
+Test command exited with code: 1
+
+
+---
+Email generated automatically by Patchew [http://patchew.org/].
+Please send your feedback to patchew-devel@redhat.com
