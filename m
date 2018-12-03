@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v7 09/25] ACPI / APEI: Generalise the estatus queue's notify
- code
-Date: Mon,  3 Dec 2018 18:05:57 +0000
-Message-ID: <20181203180613.228133-10-james.morse@arm.com>
+Subject: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Mon,  3 Dec 2018 18:05:58 +0000
+Message-ID: <20181203180613.228133-11-james.morse@arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76DE74A2BB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 521464A2F8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WMAV+CsoGVwt for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 13:07:08 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127514A377
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:08 -0500 (EST)
+ with ESMTP id E8LdPF8bk0CT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 13:07:12 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 430444A324
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:12 -0500 (EST)
 In-Reply-To: <20181203180613.228133-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,117 +32,39 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Refactor the estatus queue's pool notification routine from
-NOTIFY_NMI's handlers. This will allow another notification
-method to use the estatus queue without duplicating this code.
+ACPI has a GHESv2 which is used on hardware reduced platforms to
+explicitly acknowledge that the memory for CPER records has been
+consumed. This lets an external agent know it can re-use this
+memory for something else.
 
-This patch adds rcu_read_lock()/rcu_read_unlock() around the list
-list_for_each_entry_rcu() walker. These aren't strictly necessary as
-the whole nmi_enter/nmi_exit() window is a spooky RCU read-side
-critical section.
+Previously notify_nmi and the estatus queue didn't do this as
+they were never used on hardware reduced platforms. Once we move
+notify_sea over to use the estatus queue, it may become necessary.
 
-_in_nmi_notify_one() is separate from the rcu-list walker for a later
-caller that doesn't need to walk a list.
+Add the call. This is safe for use in NMI context as the
+read_ack_register is pre-mapped by ghes_new() before the
+ghes can be added to an RCU list, and then found by the
+notification handler.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-
 ---
-Changes since v6:
- * Removed pool grow/remove code as this is no longer necessary.
-
-Changes since v3:
- * Removed duplicate or redundant paragraphs in commit message.
- * Fixed the style of a zero check.
-Changes since v1:
-   * Tidied up _in_nmi_notify_one().
----
- drivers/acpi/apei/ghes.c | 63 ++++++++++++++++++++++++++--------------
- 1 file changed, 41 insertions(+), 22 deletions(-)
+ drivers/acpi/apei/ghes.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index d06456e60318..366dbdd41ef3 100644
+index 366dbdd41ef3..15d94373ba72 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -907,37 +907,56 @@ static void __process_error(struct ghes *ghes)
- #endif
+@@ -926,6 +926,10 @@ static int _in_nmi_notify_one(struct ghes *ghes)
+ 	__process_error(ghes);
+ 	ghes_clear_estatus(ghes, buf_paddr);
+ 
++	if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
++		pr_warn_ratelimited(FW_WARN GHES_PFX
++				    "Failed to ack error status block!\n");
++
+ 	return 0;
  }
  
--static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
-+static int _in_nmi_notify_one(struct ghes *ghes)
- {
- 	u64 buf_paddr;
--	struct ghes *ghes;
--	int sev, ret = NMI_DONE;
-+	int sev;
- 
--	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
--		return ret;
-+	if (ghes_read_estatus(ghes, &buf_paddr)) {
-+		ghes_clear_estatus(ghes, buf_paddr);
-+		return -ENOENT;
-+	}
- 
--	list_for_each_entry_rcu(ghes, &ghes_nmi, list) {
--		if (ghes_read_estatus(ghes, &buf_paddr)) {
--			ghes_clear_estatus(ghes, buf_paddr);
--			continue;
--		} else {
--			ret = NMI_HANDLED;
--		}
-+	sev = ghes_severity(ghes->estatus->error_severity);
-+	if (sev >= GHES_SEV_PANIC) {
-+		ghes_print_queued_estatus();
-+		__ghes_panic(ghes);
-+	}
- 
--		sev = ghes_severity(ghes->estatus->error_severity);
--		if (sev >= GHES_SEV_PANIC) {
--			ghes_print_queued_estatus();
--			__ghes_panic(ghes);
--		}
-+	__process_error(ghes);
-+	ghes_clear_estatus(ghes, buf_paddr);
- 
--		__process_error(ghes);
--		ghes_clear_estatus(ghes, buf_paddr);
-+	return 0;
-+}
-+
-+static int ghes_estatus_queue_notified(struct list_head *rcu_list)
-+{
-+	int ret = -ENOENT;
-+	struct ghes *ghes;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(ghes, rcu_list, list) {
-+		if (!_in_nmi_notify_one(ghes))
-+			ret = 0;
- 	}
-+	rcu_read_unlock();
- 
--#ifdef CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG
--	if (ret == NMI_HANDLED)
-+	if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) && !ret)
- 		irq_work_queue(&ghes_proc_irq_work);
--#endif
-+
-+	return ret;
-+}
-+
-+static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
-+{
-+	int ret = NMI_DONE;
-+
-+	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
-+		return ret;
-+
-+	if (!ghes_estatus_queue_notified(&ghes_nmi))
-+		ret = NMI_HANDLED;
-+
- 	atomic_dec(&ghes_in_nmi);
- 	return ret;
- }
 -- 
 2.19.2
