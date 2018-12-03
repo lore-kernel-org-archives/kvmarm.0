@@ -1,22 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v7 15/25] ACPI / APEI: Move locking to the notification helper
-Date: Mon,  3 Dec 2018 18:06:03 +0000
-Message-ID: <20181203180613.228133-16-james.morse@arm.com>
+Subject: [PATCH v7 16/25] ACPI / APEI: Let the notification helper specify the
+ fixmap slot
+Date: Mon,  3 Dec 2018 18:06:04 +0000
+Message-ID: <20181203180613.228133-17-james.morse@arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 779434A214
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35B744A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hyHVYf9oJhRN for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 13:07:31 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3264A367
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:31 -0500 (EST)
+ with ESMTP id nwQiGDB5BFve for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 13:07:34 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2FDB4A327
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:34 -0500 (EST)
 In-Reply-To: <20181203180613.228133-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,180 +32,243 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ghes_copy_tofrom_phys() takes different locks depending on in_nmi().
-This doesn't work if there are multiple NMI-like notifications, that
-can interrupt each other.
+ghes_copy_tofrom_phys() uses a different fixmap slot depending on in_nmi().
+This doesn't work when there are multiple NMI-like notifications, that
+could interrupt each other.
 
-Now that NOTIFY_SEA is always called in the same context, move the
-lock-taking to the notification helper. The helper will always know
-which lock to take. This avoids ghes_copy_tofrom_phys() taking a guess
-based on in_nmi().
+As with the locking, move the chosen fixmap_idx to the notification helper.
+This only matters for NMI-like notifications, anything calling
+ghes_proc() can use the IRQ fixmap slot as its already holding an irqsave
+spinlock.
 
-This splits NOTIFY_NMI and NOTIFY_SEA to use different locks. All
-the other notifications use ghes_proc(), and are called in process
-or IRQ context. Move the spin_lock_irqsave() around their ghes_proc()
-calls.
+This lets us collapse the ghes_ioremap_pfn_*() helpers.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Borislav Petkov <bp@suse.de>
 ---
-Changes since v6:
- * Tinkered with the commit message
- * Lock definitions have moved due to the #ifdefs
+
+The fixmap-idx and vaddr are passed back to ghes_unmap()
+to allow ioremap() to be used in process context in the
+future. This will let us send tlbi-ipi for notifications
+that don't mask irqs.
 ---
- drivers/acpi/apei/ghes.c | 34 +++++++++++++++++++++++++---------
- 1 file changed, 25 insertions(+), 9 deletions(-)
+ drivers/acpi/apei/ghes.c | 79 +++++++++++++++-------------------------
+ 1 file changed, 30 insertions(+), 49 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 4b33fa562e32..30490eff7704 100644
+index 30490eff7704..b5c31f65a1c0 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -114,11 +114,10 @@ static DEFINE_MUTEX(ghes_list_mutex);
-  * handler, but general ioremap can not be used in atomic context, so
-  * the fixmap is used instead.
-  *
-- * These 2 spinlocks are used to prevent the fixmap entries from being used
-+ * This spinlock is used to prevent the fixmap entry from being used
-  * simultaneously.
-  */
--static DEFINE_RAW_SPINLOCK(ghes_ioremap_lock_nmi);
--static DEFINE_SPINLOCK(ghes_ioremap_lock_irq);
-+static DEFINE_SPINLOCK(ghes_notify_lock_irq);
+@@ -41,6 +41,7 @@
+ #include <linux/llist.h>
+ #include <linux/genalloc.h>
+ #include <linux/pci.h>
++#include <linux/pfn.h>
+ #include <linux/aer.h>
+ #include <linux/nmi.h>
+ #include <linux/sched/clock.h>
+@@ -127,38 +128,24 @@ static atomic_t ghes_estatus_cache_alloced;
  
- static struct gen_pool *ghes_estatus_pool;
- static unsigned long ghes_estatus_pool_size_request;
-@@ -272,7 +271,6 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
- 				  int from_phys)
+ static int ghes_panic_timeout __read_mostly = 30;
+ 
+-static void __iomem *ghes_ioremap_pfn_nmi(u64 pfn)
++static void __iomem *ghes_map(u64 pfn, int fixmap_idx)
+ {
+ 	phys_addr_t paddr;
+ 	pgprot_t prot;
+ 
+-	paddr = pfn << PAGE_SHIFT;
++	paddr = PFN_PHYS(pfn);
+ 	prot = arch_apei_get_mem_attribute(paddr);
+-	__set_fixmap(FIX_APEI_GHES_NMI, paddr, prot);
++	__set_fixmap(fixmap_idx, paddr, prot);
+ 
+-	return (void __iomem *) fix_to_virt(FIX_APEI_GHES_NMI);
++	return (void __iomem *) __fix_to_virt(fixmap_idx);
+ }
+ 
+-static void __iomem *ghes_ioremap_pfn_irq(u64 pfn)
++static void ghes_unmap(int fixmap_idx, void __iomem *vaddr)
+ {
+-	phys_addr_t paddr;
+-	pgprot_t prot;
+-
+-	paddr = pfn << PAGE_SHIFT;
+-	prot = arch_apei_get_mem_attribute(paddr);
+-	__set_fixmap(FIX_APEI_GHES_IRQ, paddr, prot);
++	int _idx = virt_to_fix((unsigned long)vaddr);
+ 
+-	return (void __iomem *) fix_to_virt(FIX_APEI_GHES_IRQ);
+-}
+-
+-static void ghes_iounmap_nmi(void)
+-{
+-	clear_fixmap(FIX_APEI_GHES_NMI);
+-}
+-
+-static void ghes_iounmap_irq(void)
+-{
+-	clear_fixmap(FIX_APEI_GHES_IRQ);
++	WARN_ON_ONCE(fixmap_idx != _idx);
++	clear_fixmap(fixmap_idx);
+ }
+ 
+ int ghes_estatus_pool_init(int num_ghes)
+@@ -268,20 +255,15 @@ static inline int ghes_severity(int severity)
+ }
+ 
+ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+-				  int from_phys)
++				  int from_phys, int fixmap_idx)
  {
  	void __iomem *vaddr;
--	unsigned long flags = 0;
- 	int in_nmi = in_nmi();
+-	int in_nmi = in_nmi();
  	u64 offset;
  	u32 trunk;
-@@ -280,10 +278,8 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 
  	while (len > 0) {
  		offset = paddr - (paddr & PAGE_MASK);
- 		if (in_nmi) {
--			raw_spin_lock(&ghes_ioremap_lock_nmi);
- 			vaddr = ghes_ioremap_pfn_nmi(paddr >> PAGE_SHIFT);
- 		} else {
--			spin_lock_irqsave(&ghes_ioremap_lock_irq, flags);
- 			vaddr = ghes_ioremap_pfn_irq(paddr >> PAGE_SHIFT);
- 		}
+-		if (in_nmi) {
+-			vaddr = ghes_ioremap_pfn_nmi(paddr >> PAGE_SHIFT);
+-		} else {
+-			vaddr = ghes_ioremap_pfn_irq(paddr >> PAGE_SHIFT);
+-		}
++		vaddr = ghes_map(PHYS_PFN(paddr), fixmap_idx);
  		trunk = PAGE_SIZE - offset;
-@@ -297,10 +293,8 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 		trunk = min(trunk, len);
+ 		if (from_phys)
+@@ -291,15 +273,12 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 		len -= trunk;
+ 		paddr += trunk;
  		buffer += trunk;
- 		if (in_nmi) {
- 			ghes_iounmap_nmi();
--			raw_spin_unlock(&ghes_ioremap_lock_nmi);
- 		} else {
- 			ghes_iounmap_irq();
--			spin_unlock_irqrestore(&ghes_ioremap_lock_irq, flags);
- 		}
+-		if (in_nmi) {
+-			ghes_iounmap_nmi();
+-		} else {
+-			ghes_iounmap_irq();
+-		}
++		ghes_unmap(fixmap_idx, vaddr);
  	}
  }
-@@ -727,8 +721,11 @@ static void ghes_add_timer(struct ghes *ghes)
- static void ghes_poll_func(struct timer_list *t)
- {
- 	struct ghes *ghes = from_timer(ghes, t, timer);
-+	unsigned long flags;
  
-+	spin_lock_irqsave(&ghes_notify_lock_irq, flags);
- 	ghes_proc(ghes);
-+	spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
- 	if (!(ghes->flags & GHES_EXITING))
- 		ghes_add_timer(ghes);
- }
-@@ -736,9 +733,12 @@ static void ghes_poll_func(struct timer_list *t)
- static irqreturn_t ghes_irq_func(int irq, void *data)
+-static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
++static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr, int fixmap_idx)
++
  {
- 	struct ghes *ghes = data;
-+	unsigned long flags;
+ 	struct acpi_hest_generic *g = ghes->generic;
+ 	u32 len;
+@@ -317,7 +296,7 @@ static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
+ 		return -ENOENT;
+ 
+ 	ghes_copy_tofrom_phys(ghes->estatus, *buf_paddr,
+-			      sizeof(*ghes->estatus), 1);
++			      sizeof(*ghes->estatus), 1, fixmap_idx);
+ 	if (!ghes->estatus->block_status) {
+ 		*buf_paddr = 0;
+ 		return -ENOENT;
+@@ -333,7 +312,7 @@ static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
+ 		goto err_read_block;
+ 	ghes_copy_tofrom_phys(ghes->estatus + 1,
+ 			      *buf_paddr + sizeof(*ghes->estatus),
+-			      len - sizeof(*ghes->estatus), 1);
++			      len - sizeof(*ghes->estatus), 1, fixmap_idx);
+ 	if (cper_estatus_check(ghes->estatus))
+ 		goto err_read_block;
+ 	rc = 0;
+@@ -346,12 +325,13 @@ static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
+ 	return rc;
+ }
+ 
+-static void ghes_clear_estatus(struct ghes *ghes, u64 buf_paddr)
++static void ghes_clear_estatus(struct ghes *ghes, u64 buf_paddr, int fixmap_idx)
+ {
+ 	ghes->estatus->block_status = 0;
+ 	if (buf_paddr)
+ 		ghes_copy_tofrom_phys(ghes->estatus, buf_paddr,
+-				      sizeof(ghes->estatus->block_status), 0);
++				      sizeof(ghes->estatus->block_status), 0,
++				      fixmap_idx);
+ }
+ 
+ static void ghes_handle_memory_failure(struct acpi_hest_generic_data *gdata, int sev)
+@@ -673,7 +653,7 @@ static int ghes_proc(struct ghes *ghes)
+ 	u64 buf_paddr;
  	int rc;
  
-+	spin_lock_irqsave(&ghes_notify_lock_irq, flags);
- 	rc = ghes_proc(ghes);
-+	spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
+-	rc = ghes_read_estatus(ghes, &buf_paddr);
++	rc = ghes_read_estatus(ghes, &buf_paddr, FIX_APEI_GHES_IRQ);
  	if (rc)
- 		return IRQ_NONE;
+ 		goto out;
  
-@@ -749,14 +749,17 @@ static int ghes_notify_hed(struct notifier_block *this, unsigned long event,
- 			   void *data)
+@@ -688,7 +668,7 @@ static int ghes_proc(struct ghes *ghes)
+ 	ghes_do_proc(ghes, ghes->estatus);
+ 
+ out:
+-	ghes_clear_estatus(ghes, buf_paddr);
++	ghes_clear_estatus(ghes, buf_paddr, FIX_APEI_GHES_IRQ);
+ 
+ 	if (rc == -ENOENT)
+ 		return rc;
+@@ -864,13 +844,13 @@ static void __process_error(struct ghes *ghes)
+ #endif
+ }
+ 
+-static int _in_nmi_notify_one(struct ghes *ghes)
++static int _in_nmi_notify_one(struct ghes *ghes, int fixmap_idx)
  {
- 	struct ghes *ghes;
-+	unsigned long flags;
- 	int ret = NOTIFY_DONE;
+ 	u64 buf_paddr;
+ 	int sev;
  
-+	spin_lock_irqsave(&ghes_notify_lock_irq, flags);
+-	if (ghes_read_estatus(ghes, &buf_paddr)) {
+-		ghes_clear_estatus(ghes, buf_paddr);
++	if (ghes_read_estatus(ghes, &buf_paddr, fixmap_idx)) {
++		ghes_clear_estatus(ghes, buf_paddr, fixmap_idx);
+ 		return -ENOENT;
+ 	}
+ 
+@@ -881,7 +861,7 @@ static int _in_nmi_notify_one(struct ghes *ghes)
+ 	}
+ 
+ 	__process_error(ghes);
+-	ghes_clear_estatus(ghes, buf_paddr);
++	ghes_clear_estatus(ghes, buf_paddr, fixmap_idx);
+ 
+ 	if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
+ 		pr_warn_ratelimited(FW_WARN GHES_PFX
+@@ -890,14 +870,15 @@ static int _in_nmi_notify_one(struct ghes *ghes)
+ 	return 0;
+ }
+ 
+-static int ghes_estatus_queue_notified(struct list_head *rcu_list)
++static int ghes_estatus_queue_notified(struct list_head *rcu_list,
++				       int fixmap_idx)
+ {
+ 	int ret = -ENOENT;
+ 	struct ghes *ghes;
+ 
  	rcu_read_lock();
- 	list_for_each_entry_rcu(ghes, &ghes_hed, list) {
- 		if (!ghes_proc(ghes))
- 			ret = NOTIFY_OK;
+ 	list_for_each_entry_rcu(ghes, rcu_list, list) {
+-		if (!_in_nmi_notify_one(ghes))
++		if (!_in_nmi_notify_one(ghes, fixmap_idx))
+ 			ret = 0;
  	}
  	rcu_read_unlock();
-+	spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
+@@ -921,7 +902,7 @@ int ghes_notify_sea(void)
+ 	int rv;
  
- 	return ret;
- }
-@@ -906,6 +909,7 @@ static int ghes_estatus_queue_notified(struct list_head *rcu_list)
- }
+ 	raw_spin_lock(&ghes_notify_lock_sea);
+-	rv = ghes_estatus_queue_notified(&ghes_sea);
++	rv = ghes_estatus_queue_notified(&ghes_sea, FIX_APEI_GHES_NMI);
+ 	raw_spin_unlock(&ghes_notify_lock_sea);
  
- #ifdef CONFIG_ACPI_APEI_SEA
-+static DEFINE_RAW_SPINLOCK(ghes_notify_lock_sea);
- static LIST_HEAD(ghes_sea);
- 
- /*
-@@ -914,7 +918,13 @@ static LIST_HEAD(ghes_sea);
-  */
- int ghes_notify_sea(void)
- {
--	return ghes_estatus_queue_notified(&ghes_sea);
-+	int rv;
-+
-+	raw_spin_lock(&ghes_notify_lock_sea);
-+	rv = ghes_estatus_queue_notified(&ghes_sea);
-+	raw_spin_unlock(&ghes_notify_lock_sea);
-+
-+	return rv;
- }
- 
- static void ghes_sea_add(struct ghes *ghes)
-@@ -943,6 +953,7 @@ static inline void ghes_sea_remove(struct ghes *ghes) { }
-  */
- static atomic_t ghes_in_nmi = ATOMIC_INIT(0);
- 
-+static DEFINE_RAW_SPINLOCK(ghes_notify_lock_nmi);
- static LIST_HEAD(ghes_nmi);
- 
- static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
-@@ -952,8 +963,10 @@ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
- 	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
+ 	return rv;
+@@ -964,7 +945,7 @@ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
  		return ret;
  
-+	raw_spin_lock(&ghes_notify_lock_nmi);
- 	if (!ghes_estatus_queue_notified(&ghes_nmi))
+ 	raw_spin_lock(&ghes_notify_lock_nmi);
+-	if (!ghes_estatus_queue_notified(&ghes_nmi))
++	if (!ghes_estatus_queue_notified(&ghes_nmi, FIX_APEI_GHES_NMI))
  		ret = NMI_HANDLED;
-+	raw_spin_unlock(&ghes_notify_lock_nmi);
- 
- 	atomic_dec(&ghes_in_nmi);
- 	return ret;
-@@ -995,6 +1008,7 @@ static int ghes_probe(struct platform_device *ghes_dev)
- {
- 	struct acpi_hest_generic *generic;
- 	struct ghes *ghes = NULL;
-+	unsigned long flags;
- 
- 	int rc = -EINVAL;
- 
-@@ -1097,7 +1111,9 @@ static int ghes_probe(struct platform_device *ghes_dev)
- 	ghes_edac_register(ghes, &ghes_dev->dev);
- 
- 	/* Handle any pending errors right away */
-+	spin_lock_irqsave(&ghes_notify_lock_irq, flags);
- 	ghes_proc(ghes);
-+	spin_unlock_irqrestore(&ghes_notify_lock_irq, flags);
- 
- 	return 0;
+ 	raw_spin_unlock(&ghes_notify_lock_nmi);
  
 -- 
 2.19.2
