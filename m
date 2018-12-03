@@ -1,23 +1,22 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v7 20/25] ACPI / APEI: Use separate fixmap pages for arm64
- NMI-like notifications
-Date: Mon,  3 Dec 2018 18:06:08 +0000
-Message-ID: <20181203180613.228133-21-james.morse@arm.com>
+Subject: [PATCH v7 21/25] mm/memory-failure: Add memory_failure_queue_kick()
+Date: Mon,  3 Dec 2018 18:06:09 +0000
+Message-ID: <20181203180613.228133-22-james.morse@arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1625A4A2FD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5484A358
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SdcVRNwqfDBq for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 13:07:49 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A394A365
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:48 -0500 (EST)
+ with ESMTP id YzkUd5Whhk24 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 13:07:52 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5314A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:07:52 -0500 (EST)
 In-Reply-To: <20181203180613.228133-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,78 +31,71 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that ghes notification helpers provide the fixmap slots and
-take the lock themselves, multiple NMI-like notifications can
-be used on arm64.
+The GHES code calls memory_failure_queue() from IRQ context to schedule
+work on the current CPU so that memory_failure() can sleep.
 
-These should be named after their notification method as they can't
-all be called 'NMI'. x86's NOTIFY_NMI already is, change the SEA
-fixmap entry to be called FIX_APEI_GHES_SEA.
+For synchronous memory errors the arch code needs to know any signals
+that memory_failure() will trigger are pending before it returns to
+user-space, possibly when exiting from the IRQ.
 
-Future patches can add support for FIX_APEI_GHES_SEI and
-FIX_APEI_GHES_SDEI_{NORMAL,CRITICAL}.
+Add a helper to kick the memory failure queue, to ensure the scheduled
+work has happened. This has to be called from process context, so may
+have been migrated from the original cpu. Pass the cpu the work was
+queued on.
 
-Because all of ghes.c builds on both architectures, provide a
-constant for each fixmap entry that the architecture will never
-use.
+Change memory_failure_work_func() to permit being called on the 'wrong'
+cpu.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-
 ---
-Changes since v6:
- * Added #ifdef definitions of each missing fixmap entry.
+ include/linux/mm.h  |  1 +
+ mm/memory-failure.c | 15 ++++++++++++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
-Changes since v3:
- * idx/lock are now in a separate struct.
- * Add to the comment above ghes_fixmap_lock_irq so that it makes more
-   sense in isolation.
-
-fixup for split fixmap
----
- arch/arm64/include/asm/fixmap.h |  2 +-
- drivers/acpi/apei/ghes.c        | 10 +++++++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-index ec1e6d6fa14c..966dd4bb23f2 100644
---- a/arch/arm64/include/asm/fixmap.h
-+++ b/arch/arm64/include/asm/fixmap.h
-@@ -55,7 +55,7 @@ enum fixed_addresses {
- #ifdef CONFIG_ACPI_APEI_GHES
- 	/* Used for GHES mapping from assorted contexts */
- 	FIX_APEI_GHES_IRQ,
--	FIX_APEI_GHES_NMI,
-+	FIX_APEI_GHES_SEA,
- #endif /* CONFIG_ACPI_APEI_GHES */
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 5411de93a363..37b4884b2a1e 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2692,6 +2692,7 @@ enum mf_flags {
+ };
+ extern int memory_failure(unsigned long pfn, int flags);
+ extern void memory_failure_queue(unsigned long pfn, int flags);
++extern void memory_failure_queue_kick(int cpu);
+ extern int unpoison_memory(unsigned long pfn);
+ extern int get_hwpoison_page(struct page *page);
+ #define put_hwpoison_page(page)	put_page(page)
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index 0cd3de3550f0..ec05e1dfce37 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -1480,7 +1480,7 @@ static void memory_failure_work_func(struct work_struct *work)
+ 	unsigned long proc_flags;
+ 	int gotten;
  
- #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 849da0d43a21..6cbf9471b2a2 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -85,6 +85,14 @@
- 	((struct acpi_hest_generic_status *)				\
- 	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+-	mf_cpu = this_cpu_ptr(&memory_failure_cpu);
++	mf_cpu = container_of(work, struct memory_failure_cpu, work);
+ 	for (;;) {
+ 		spin_lock_irqsave(&mf_cpu->lock, proc_flags);
+ 		gotten = kfifo_get(&mf_cpu->fifo, &entry);
+@@ -1494,6 +1494,19 @@ static void memory_failure_work_func(struct work_struct *work)
+ 	}
+ }
  
-+/* NMI-like notifications vary by architecture. Fill in the fixmap gaps */
-+#ifndef CONFIG_HAVE_ACPI_APEI_NMI
-+#define FIX_APEI_GHES_NMI	-1
-+#endif
-+#ifndef CONFIG_ACPI_APEI_SEA
-+#define FIX_APEI_GHES_SEA	-1
-+#endif
++/*
++ * Process memory_failure work queued on the specified CPU.
++ * Used to avoid return-to-userspace racing with the memory_failure workqueue.
++ */
++void memory_failure_queue_kick(int cpu)
++{
++	struct memory_failure_cpu *mf_cpu;
 +
- static inline bool is_hest_type_generic_v2(struct ghes *ghes)
++	mf_cpu = &per_cpu(memory_failure_cpu, cpu);
++	cancel_work_sync(&mf_cpu->work);
++	memory_failure_work_func(&mf_cpu->work);
++}
++
+ static int __init memory_failure_init(void)
  {
- 	return ghes->generic->header.type == ACPI_HEST_TYPE_GENERIC_ERROR_V2;
-@@ -954,7 +962,7 @@ int ghes_notify_sea(void)
- 	int rv;
- 
- 	raw_spin_lock(&ghes_notify_lock_sea);
--	rv = ghes_estatus_queue_notified(&ghes_sea, FIX_APEI_GHES_NMI);
-+	rv = ghes_estatus_queue_notified(&ghes_sea, FIX_APEI_GHES_SEA);
- 	raw_spin_unlock(&ghes_notify_lock_sea);
- 
- 	return rv;
+ 	struct memory_failure_cpu *mf_cpu;
 -- 
 2.19.2
