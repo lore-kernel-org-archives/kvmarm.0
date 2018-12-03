@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v7 01/25] ACPI / APEI: Don't wait to serialise with oops
- messages when panic()ing
-Date: Mon,  3 Dec 2018 18:05:49 +0000
-Message-ID: <20181203180613.228133-2-james.morse@arm.com>
+Subject: [PATCH v7 02/25] ACPI / APEI: Remove silent flag from
+ ghes_read_estatus()
+Date: Mon,  3 Dec 2018 18:05:50 +0000
+Message-ID: <20181203180613.228133-3-james.morse@arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05A2B4A321
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D448A4A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hV-Msmsn09BQ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 13:06:39 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D07584A2BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:39 -0500 (EST)
+ with ESMTP id jzhVXP4vrDrU for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 13:06:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7357E4A348
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:43 -0500 (EST)
 In-Reply-To: <20181203180613.228133-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,50 +32,81 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-oops_begin() exists to group printk() messages with the oops message
-printed by die(). To reach this caller we know that platform firmware
-took this error first, then notified the OS via NMI with a 'panic'
-severity.
+Subsequent patches will split up ghes_read_estatus(), at which
+point passing around the 'silent' flag gets annoying. This is to
+suppress prink() messages, which prior to commit 42a0bb3f7138
+("printk/nmi: generic solution for safe printk in NMI"), were
+unsafe in NMI context.
 
-Don't wait for another CPU to release the die-lock before panic()ing,
-our only goal is to print this fatal error and panic().
+This is no longer necessary, remove the flag. printk() messages
+are batched in a per-cpu buffer and printed via irq-work, or a call
+back from panic().
 
-This code is always called in_nmi(), and since commit 42a0bb3f7138
-("printk/nmi: generic solution for safe printk in NMI"), it has been
-safe to call printk() from this context. Messages are batched in a
-per-cpu buffer and printed via irq-work, or a call back from panic().
-
-Link: https://patchwork.kernel.org/patch/10313555/
-Acked-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: James Morse <james.morse@arm.com>
-
 ---
 Changes since v6:
- * Capitals in patch subject
+ * Moved earlier in the series,
  * Tinkered with the commit message.
+ * switched to pr_warn_ratelimited() to shut checkpatch up
+
+shutup checkpatch
 ---
- drivers/acpi/apei/ghes.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/acpi/apei/ghes.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 02c6fd9caff7..ab2dae6fc7e4 100644
+index ab2dae6fc7e4..e8503c7d721f 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -33,7 +33,6 @@
- #include <linux/interrupt.h>
- #include <linux/timer.h>
- #include <linux/cper.h>
--#include <linux/kdebug.h>
- #include <linux/platform_device.h>
- #include <linux/mutex.h>
- #include <linux/ratelimit.h>
-@@ -947,7 +946,6 @@ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
+@@ -324,7 +324,7 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
+ 	}
+ }
  
- 		sev = ghes_severity(ghes->estatus->error_severity);
- 		if (sev >= GHES_SEV_PANIC) {
--			oops_begin();
- 			ghes_print_queued_estatus();
- 			__ghes_panic(ghes);
- 		}
+-static int ghes_read_estatus(struct ghes *ghes, int silent)
++static int ghes_read_estatus(struct ghes *ghes)
+ {
+ 	struct acpi_hest_generic *g = ghes->generic;
+ 	u64 buf_paddr;
+@@ -333,8 +333,7 @@ static int ghes_read_estatus(struct ghes *ghes, int silent)
+ 
+ 	rc = apei_read(&buf_paddr, &g->error_status_address);
+ 	if (rc) {
+-		if (!silent && printk_ratelimit())
+-			pr_warning(FW_WARN GHES_PFX
++		pr_warn_ratelimited(FW_WARN GHES_PFX
+ "Failed to read error status block address for hardware error source: %d.\n",
+ 				   g->header.source_id);
+ 		return -EIO;
+@@ -366,9 +365,9 @@ static int ghes_read_estatus(struct ghes *ghes, int silent)
+ 	rc = 0;
+ 
+ err_read_block:
+-	if (rc && !silent && printk_ratelimit())
+-		pr_warning(FW_WARN GHES_PFX
+-			   "Failed to read error status block!\n");
++	if (rc)
++		pr_warn_ratelimited(FW_WARN GHES_PFX
++				    "Failed to read error status block!\n");
+ 	return rc;
+ }
+ 
+@@ -700,7 +699,7 @@ static int ghes_proc(struct ghes *ghes)
+ {
+ 	int rc;
+ 
+-	rc = ghes_read_estatus(ghes, 0);
++	rc = ghes_read_estatus(ghes);
+ 	if (rc)
+ 		goto out;
+ 
+@@ -937,7 +936,7 @@ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
+ 		return ret;
+ 
+ 	list_for_each_entry_rcu(ghes, &ghes_nmi, list) {
+-		if (ghes_read_estatus(ghes, 1)) {
++		if (ghes_read_estatus(ghes)) {
+ 			ghes_clear_estatus(ghes);
+ 			continue;
+ 		} else {
 -- 
 2.19.2
