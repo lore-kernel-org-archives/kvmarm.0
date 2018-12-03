@@ -1,88 +1,161 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v3 2/4] arm64: KVM: add accessors to track guest/host
- only counters
-Date: Mon, 3 Dec 2018 15:05:52 +0000
-Message-ID: <20181203150551.GC16311@e119886-lin.cambridge.arm.com>
-References: <1542885950-23816-3-git-send-email-andrew.murray@arm.com>
- <20181203143114.GA26831@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v9 6/8] KVM: arm64: Support handling access faults for PUD
+ hugepages
+Date: Mon, 3 Dec 2018 20:40:45 +0530
+Message-ID: <26fcfc2c-219a-ce04-457b-cc157301c7d3@arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-7-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 249104A2AC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:05:59 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6TVGT6aAJ1Cb for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 10:05:55 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A95924A200
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:05:55 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203143114.GA26831@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181031175745.18650-7-punit.agrawal@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 02:31:14PM +0000, Will Deacon wrote:
-> On Thu, Nov 22, 2018 at 11:25:48AM +0000, Andrew Murray wrote:
-> > In order to effeciently enable/disable guest/host only perf counters
-> > at guest entry/exit we add bitfields to kvm_cpu_context for guest and
-> > host only events as well as accessors for updating them.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 1550192..4a828eb 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -203,6 +203,8 @@ struct kvm_cpu_context {
-> >  	};
-> >  
-> >  	struct kvm_vcpu *__hyp_running_vcpu;
-> > +	u32 events_host_only;
-> > +	u32 events_guest_only;
-> >  };
-> >  
-> >  typedef struct kvm_cpu_context kvm_cpu_context_t;
-> > @@ -472,6 +474,24 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-> >  {
-> >  	return kvm_arch_vcpu_run_map_fp(vcpu);
-> >  }
-> > +static inline void kvm_clr_set_host_pmu_events(u32 clr, u32 set)
-> > +{
-> > +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
-> > +
-> > +	ctx->events_host_only &= ~clr;
-> > +	ctx->events_host_only |= set;
-> > +}
+
+
+On 10/31/2018 11:27 PM, Punit Agrawal wrote:
+> In preparation for creating larger hugepages at Stage 2, extend the
+> access fault handling at Stage 2 to support PUD hugepages when
+> encountered.
 > 
-> Do you actually need this clr/set function, or can you just use the
-> facilities provided by bitfield.h at the callsites?
-
-This modifies events_{host|guest}_only which is conditionally defined
-(CONFIG_KVM) yet used by arch/arm64/kernel/perf_events which is also
-conditionally defined (CONFIG_HW_PERF_EVENTS). By moving this away
-from the callsite we avoid a load of horrible #ifdef's and allow this
-function to become a nop when KVM isn't enabled.
-
-Is there value in updating this function to use set_bit/clear_bit
-functions in bitops/atomic.h ?
-
-Andrew Murray
-
+> Provide trivial helpers for arm32 to allow sharing of code.
 > 
-> Will
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   |  9 +++++++++
+>  arch/arm64/include/asm/kvm_mmu.h |  7 +++++++
+>  arch/arm64/include/asm/pgtable.h |  6 ++++++
+>  virt/kvm/arm/mmu.c               | 22 +++++++++++-----------
+>  4 files changed, 33 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 839a619873d3..fea5e723e3ac 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -85,6 +85,9 @@ void kvm_clear_hyp_idmap(void);
+>  #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
+>  
+> +#define kvm_pud_pfn(pud)	({ BUG(); 0; })
+> +
+> +
+>  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
+>  
+>  /*
+> @@ -108,6 +111,12 @@ static inline bool kvm_s2pud_exec(pud_t *pud)
+>  	return false;
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+> +{
+> +	BUG();
+> +	return pud;
+> +}
+> +
+>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+>  {
+>  	pte_val(pte) |= L_PTE_S2_RDWR;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index c755b37b3f92..612032bbb428 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -187,6 +187,8 @@ void kvm_clear_hyp_idmap(void);
+>  #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
+>  #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
+>  
+> +#define kvm_pud_pfn(pud)		pud_pfn(pud)
+> +
+>  #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
+>  
+>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+> @@ -266,6 +268,11 @@ static inline bool kvm_s2pud_exec(pud_t *pudp)
+>  	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
+>  }
+>  
+> +static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+> +{
+> +	return pud_mkyoung(pud);
+> +}
+> +
+>  #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+>  
+>  #ifdef __PAGETABLE_PMD_FOLDED
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 50b1ef8584c0..f51e2271e6a3 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -314,6 +314,11 @@ static inline pte_t pud_pte(pud_t pud)
+>  	return __pte(pud_val(pud));
+>  }
+>  
+> +static inline pud_t pte_pud(pte_t pte)
+> +{
+> +	return __pud(pte_val(pte));
+> +}
+> +
+
+Yeah these would be required for PUD based THP when enabled.
+
+>  static inline pmd_t pud_pmd(pud_t pud)
+>  {
+>  	return __pmd(pud_val(pud));
+> @@ -381,6 +386,7 @@ static inline int pmd_protnone(pmd_t pmd)
+>  #define pfn_pmd(pfn,prot)	__pmd(__phys_to_pmd_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
+>  #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
+>  
+> +#define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
+>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>  
+>  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 8e44dccd1b47..bd749601195f 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1698,6 +1698,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   */
+>  static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  {
+> +	pud_t *pud;
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  	kvm_pfn_t pfn;
+> @@ -1707,24 +1708,23 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+>  
+> -	pmd = stage2_get_pmd(vcpu->kvm, NULL, fault_ipa);
+> -	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+> +	if (!stage2_get_leaf_entry(vcpu->kvm, fault_ipa, &pud, &pmd, &pte))
+>  		goto out;
+>  
+> -	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
+> +	if (pud) {		/* HugeTLB */
+> +		*pud = kvm_s2pud_mkyoung(*pud);
+> +		pfn = kvm_pud_pfn(*pud);
+> +		pfn_valid = true;
+> +	} else	if (pmd) {	/* THP, HugeTLB */
+>  		*pmd = pmd_mkyoung(*pmd);
+>  		pfn = pmd_pfn(*pmd);
+>  		pfn_valid = true;
+> -		goto out;
+> +	} else {
+> +		*pte = pte_mkyoung(*pte);	/* Just a page... */
+> +		pfn = pte_pfn(*pte);
+> +		pfn_valid = true;
+>  	}
+
+As mentioned before stage2_get_leaf_entry() is not required for the previous
+patch and handle_access_fault() can definitely do without it. The existing
+page table walker flow is better than this helper which takes like three
+different arguments and makes semantics more complicated than required.
