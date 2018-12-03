@@ -1,95 +1,165 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 01/12] KVM: arm64: Document PV-time interface
-Date: Mon, 3 Dec 2018 16:16:36 +0100
-Message-ID: <20181203151636.scziollrzpulbdke@kamzik.brq.redhat.com>
-References: <20181128144527.44710-1-steven.price@arm.com>
- <20181128144527.44710-2-steven.price@arm.com>
- <20181203135042.v52wawfz4nc27fna@kamzik.brq.redhat.com>
- <4ec62f53-9c3f-14cb-f1bb-c8b9aadb9bdd@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v9 7/8] KVM: arm64: Update age handlers to support PUD
+ hugepages
+Date: Mon, 3 Dec 2018 20:49:30 +0530
+Message-ID: <db1e8281-a7cb-5d2a-8ad3-6d275fc49582@arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-8-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D63094A1DE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:16:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Awysg4rpXMT9 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 10:16:41 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D54224A200
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:16:40 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <4ec62f53-9c3f-14cb-f1bb-c8b9aadb9bdd@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Steven Price <steven.price@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181031175745.18650-8-punit.agrawal@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 02:18:25PM +0000, Marc Zyngier wrote:
-> On 03/12/2018 13:50, Andrew Jones wrote:
-> > On Wed, Nov 28, 2018 at 02:45:16PM +0000, Steven Price wrote:
-> >> +The structure pointed to by the PV_TIME_LPT hypercall is as follows:
-> >> +
-> >> +  Field           | Byte Length | Byte Offset | Description
-> >> +  --------------- | ----------- | ----------- | -------------------------------
-> >> +  Revision        |      4      |      0      | Must be 0 for this revision
-> >> +  Attributes      |      4      |      4      | Must be 0
-> >> +  sequence_number |      8      |      8      | Bit 0: reserved
-> >> +                  |             |             | Bits 1:63 number of migrations
-> >> +  scale_mult      |      8      |      16     | Multiplier to scale from native
-> >> +                  |             |             | frequency to PV frequency
-> >> +  shift           |      4      |      24     | Shift applied before multiplier
-> >> +  Reserved        |      4      |      28     | Must be 0
-> >> +  Fn              |      8      |      32     | Native frequency
-> >> +  Fpv             |      8      |      40     | Paravirtualized frequency seen
-> >> +                  |             |             | by guest
-> >> +  div_by_fpv_mult |      8      |      48     | Multiplier to implement fast
-> >> +                  |             |             | divide by Fpv
-> > 
-> > Here's kvmclock's struct
-> > 
-> >  struct pvclock_vcpu_time_info {
-> >         u32   version; 
-> >         u32   pad0;
-> >         u64   tsc_timestamp;
-> >         u64   system_time;
-> >         u32   tsc_to_system_mul;
-> >         s8    tsc_shift;
-> >         u8    flags;
-> >         u8    pad[2];
-> >  }
-> > 
-> >  Revision	 =>
-> >  Attributes	 =>
-> >  sequence_number => version
-> >  scale_mult	 => tsc_to_system_mul	(this is reversed, but OK)
-> >  shift		 => tsc_shift           (also reversed)
-> >  Reserved	 =>
-> >  Fn		 => (pvclock doesn't have, but does have system_time)
-> >  Fpv		 =>
-> >  div_by_fpv_mult =>
-> > 
-> > I haven't thought about this enough yet to be sure kvmclock's fields
-> > are sufficient, but several look close - although the 'tsc' naming
-> > isn't nice. Also, the pvclock struct could be extended by adding an
-> > 'extended' flag to 'flags', and then appending more fields.
+
+
+On 10/31/2018 11:27 PM, Punit Agrawal wrote:
+> In preparation for creating larger hugepages at Stage 2, add support
+> to the age handling notifiers for PUD hugepages when encountered.
 > 
-> One important thing is that this is not a KVM PV time implementation.
-> This is something generic for the ARM architecture. Any ARM hypervisor
-> should be able to implement this.
->
+> Provide trivial helpers for arm32 to allow sharing code.
+> 
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   |  6 +++++
+>  arch/arm64/include/asm/kvm_mmu.h |  5 ++++
+>  arch/arm64/include/asm/pgtable.h |  1 +
+>  virt/kvm/arm/mmu.c               | 39 ++++++++++++++++----------------
+>  4 files changed, 32 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index fea5e723e3ac..e62f0913ce7d 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -117,6 +117,12 @@ static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+>  	return pud;
+>  }
+>  
+> +static inline bool kvm_s2pud_young(pud_t pud)
+> +{
+> +	BUG();
+> +	return false;
+> +}
+> +
+>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+>  {
+>  	pte_val(pte) |= L_PTE_S2_RDWR;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 612032bbb428..9f941f70775c 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -273,6 +273,11 @@ static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
+>  	return pud_mkyoung(pud);
+>  }
+>  
+> +static inline bool kvm_s2pud_young(pud_t pud)
+> +{
+> +	return pud_young(pud);
+> +}
+> +
+>  #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+>  
+>  #ifdef __PAGETABLE_PMD_FOLDED
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index f51e2271e6a3..bb0f3f17a7a9 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -386,6 +386,7 @@ static inline int pmd_protnone(pmd_t pmd)
+>  #define pfn_pmd(pfn,prot)	__pmd(__phys_to_pmd_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
+>  #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
+>  
+> +#define pud_young(pud)		pte_young(pud_pte(pud))
+>  #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
+>  #define pud_write(pud)		pte_write(pud_pte(pud))
+>  
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index bd749601195f..3893ea6a50bf 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1225,6 +1225,11 @@ static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
+>  	return stage2_ptep_test_and_clear_young((pte_t *)pmd);
+>  }
+>  
+> +static int stage2_pudp_test_and_clear_young(pud_t *pud)
+> +{
+> +	return stage2_ptep_test_and_clear_young((pte_t *)pud);
+> +}
+> +
+>  /**
+>   * kvm_phys_addr_ioremap - map a device range to guest IPA
+>   *
+> @@ -1932,42 +1937,38 @@ void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+>  
+>  static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+>  {
+> +	pud_t *pud;
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  
+> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
+> -	pmd = stage2_get_pmd(kvm, NULL, gpa);
+> -	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+> +	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
+> +	if (!stage2_get_leaf_entry(kvm, gpa, &pud, &pmd, &pte))
+>  		return 0;
+>  
+> -	if (pmd_thp_or_huge(*pmd))	/* THP, HugeTLB */
+> +	if (pud)
+> +		return stage2_pudp_test_and_clear_young(pud);
+> +	else if (pmd)
+>  		return stage2_pmdp_test_and_clear_young(pmd);
+> -
+> -	pte = pte_offset_kernel(pmd, gpa);
+> -	if (pte_none(*pte))
+> -		return 0;
+> -
+> -	return stage2_ptep_test_and_clear_young(pte);
+> +	else
+> +		return stage2_ptep_test_and_clear_young(pte);
+>  }
+>  
+>  static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
+>  {
+> +	pud_t *pud;
+>  	pmd_t *pmd;
+>  	pte_t *pte;
+>  
+> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE);
+> -	pmd = stage2_get_pmd(kvm, NULL, gpa);
+> -	if (!pmd || pmd_none(*pmd))	/* Nothing there */
+> +	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
+> +	if (!stage2_get_leaf_entry(kvm, gpa, &pud, &pmd, &pte))
+>  		return 0;
+>  
+> -	if (pmd_thp_or_huge(*pmd))		/* THP, HugeTLB */
+> +	if (pud)
+> +		return kvm_s2pud_young(*pud);
+> +	else if (pmd)
+>  		return pmd_young(*pmd);
+> -
+> -	pte = pte_offset_kernel(pmd, gpa);
+> -	if (!pte_none(*pte))		/* Just a page... */
+> +	else
+>  		return pte_young(*pte);
+> -
+> -	return 0;
+>  }
+>  
+>  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+> 
 
-I agree with that, but xen also uses the same pvclock structure on x86.
-
-Thanks,
-drew
+If stage2_get_leaf_entry() is avoided (which it should be) some of the previous
+patches can be folded into just a single one like defining new HW page table
+definitions, arm32 trivial functions and PUD specific additions at various
+stage 2 page table walkers etc.
