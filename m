@@ -1,163 +1,140 @@
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v9 1/8] KVM: arm/arm64: Share common code in
- user_mem_abort()
-Date: Mon, 3 Dec 2018 17:41:55 +0530
-Message-ID: <ad4b316a-054f-24d9-d32d-8fbe7972b5ad@arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-2-punit.agrawal@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 00/12] arm64: Paravirtualized time support
+Date: Mon, 3 Dec 2018 14:25:52 +0100
+Message-ID: <20181203132552.5exdbzda6dfud2d2@kamzik.brq.redhat.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181031175745.18650-2-punit.agrawal@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1977E4A333
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 08:26:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Yo8iQe8BzQCD for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 08:25:57 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE90C4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 08:25:57 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20181128144527.44710-1-steven.price@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Steven Price <steven.price@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 10/31/2018 11:27 PM, Punit Agrawal wrote:
-> The code for operations such as marking the pfn as dirty, and
-> dcache/icache maintenance during stage 2 fault handling is duplicated
-> between normal pages and PMD hugepages.
+On Wed, Nov 28, 2018 at 02:45:15PM +0000, Steven Price wrote:
+> This series add support for paravirtualized time for Arm64 guests and
+> KVM hosts following the specification in Arm's document DEN 0057A:
 > 
-> Instead of creating another copy of the operations when we introduce
-> PUD hugepages, let's share them across the different pagesizes.
+> https://developer.arm.com/docs/den0057/a
+
+Hi Steven,
+
+As that specification is still a draft, then I guess this series is an
+RFC. I just wanted to point that out, as I believe that tag should be
+used in future postings until the spec is approved.
+
+Regarding the spec, my understanding from kvm forum was that there was
+still a need to explain why kvmclock, or an extension to kvmclock, is
+insufficient.
+
+If there hasn't been anything written up about that yet, would you mind
+doing so?
+
 > 
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 49 ++++++++++++++++++++++++++++------------------
->  1 file changed, 30 insertions(+), 19 deletions(-)
+> It implements support for Live Physical Time (LPT) which provides the
+> guest with a method to derive a stable counter of time during which the
+> guest is executing even when the guest is being migrated between hosts
+> with different physical counter frequencies.
+
+Intel has TSC scaling. Is there any reason Arm is proposing a PV
+solution instead of adding a similar virt extension?
+
+Thanks,
+drew
+
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 5eca48bdb1a6..59595207c5e1 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1475,7 +1475,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  unsigned long fault_status)
->  {
->  	int ret;
-> -	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
-> +	bool write_fault, exec_fault, writable, force_pte = false;
->  	unsigned long mmu_seq;
->  	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -1484,7 +1484,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	kvm_pfn_t pfn;
->  	pgprot_t mem_type = PAGE_S2;
->  	bool logging_active = memslot_is_logging(memslot);
-> -	unsigned long flags = 0;
-> +	unsigned long vma_pagesize, flags = 0;
-
-A small nit s/vma_pagesize/pagesize. Why call it VMA ? Its implicit.
-
->  
->  	write_fault = kvm_is_write_fault(vcpu);
->  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
-> @@ -1504,10 +1504,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		return -EFAULT;
->  	}
->  
-> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
-> -		hugetlb = true;
-> +	vma_pagesize = vma_kernel_pagesize(vma);
-> +	if (vma_pagesize == PMD_SIZE && !logging_active) {
->  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
->  	} else {
-> +		/*
-> +		 * Fallback to PTE if it's not one of the Stage 2
-> +		 * supported hugepage sizes
-> +		 */
-> +		vma_pagesize = PAGE_SIZE;
-
-This seems redundant and should be dropped. vma_kernel_pagesize() here either
-calls hugetlb_vm_op_pagesize (via hugetlb_vm_ops->pagesize) or simply returns
-PAGE_SIZE. The vm_ops path is taken if the QEMU VMA covering any given HVA is
-backed either by HugeTLB pages or simply normal pages. vma_pagesize would
-either has a value of PMD_SIZE (HugeTLB hstate based) or PAGE_SIZE. Hence if
-its not PMD_SIZE it must be PAGE_SIZE which should not be assigned again.
-
-> +
->  		/*
->  		 * Pages belonging to memslots that don't have the same
->  		 * alignment for userspace and IPA cannot be mapped using
-> @@ -1573,23 +1579,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (mmu_notifier_retry(kvm, mmu_seq))
->  		goto out_unlock;
->  
-> -	if (!hugetlb && !force_pte)
-> -		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
-> +	if (vma_pagesize == PAGE_SIZE && !force_pte) {
-> +		/*
-> +		 * Only PMD_SIZE transparent hugepages(THP) are
-> +		 * currently supported. This code will need to be
-> +		 * updated to support other THP sizes.
-> +		 */
-
-This comment belongs to transparent_hugepage_adjust() but not here.
-
-> +		if (transparent_hugepage_adjust(&pfn, &fault_ipa))
-> +			vma_pagesize = PMD_SIZE;
-
-IIUC transparent_hugepage_adjust() is only getting called here. Instead of
-returning 'true' when it is able to detect a huge page backing and doing
-an adjustment there after, it should rather return THP size (PMD_SIZE) to
-accommodate probable multi size THP support in future .
-
-> +	}
-> +
-> +	if (writable)
-> +		kvm_set_pfn_dirty(pfn);
->  
-> -	if (hugetlb) {
-> +	if (fault_status != FSC_PERM)
-> +		clean_dcache_guest_page(pfn, vma_pagesize);
-> +
-> +	if (exec_fault)
-> +		invalidate_icache_guest_page(pfn, vma_pagesize);
-> +
-> +	if (vma_pagesize == PMD_SIZE) {
->  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
->  		new_pmd = pmd_mkhuge(new_pmd);
-> -		if (writable) {
-> +		if (writable)
->  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
-> -			kvm_set_pfn_dirty(pfn);
-> -		}
-> -
-> -		if (fault_status != FSC_PERM)
-> -			clean_dcache_guest_page(pfn, PMD_SIZE);
->  
->  		if (exec_fault) {
->  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-> -			invalidate_icache_guest_page(pfn, PMD_SIZE);
->  		} else if (fault_status == FSC_PERM) {
->  			/* Preserve execute if XN was already cleared */
->  			if (stage2_is_exec(kvm, fault_ipa))
-> @@ -1602,16 +1618,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  		if (writable) {
->  			new_pte = kvm_s2pte_mkwrite(new_pte);
-> -			kvm_set_pfn_dirty(pfn);
->  			mark_page_dirty(kvm, gfn);
->  		}
->  
-> -		if (fault_status != FSC_PERM)
-> -			clean_dcache_guest_page(pfn, PAGE_SIZE);
-> -
->  		if (exec_fault) {
->  			new_pte = kvm_s2pte_mkexec(new_pte);
-> -			invalidate_icache_guest_page(pfn, PAGE_SIZE);
->  		} else if (fault_status == FSC_PERM) {
->  			/* Preserve execute if XN was already cleared */
->  			if (stage2_is_exec(kvm, fault_ipa))
+> It also implements support for stolen time, allowing the guest to
+> identify time when it is forcibly not executing.
 > 
-
-kvm_set_pfn_dirty, clean_dcache_guest_page, invalidate_icache_guest_page
-can all be safely moved before setting the page table entries either as
-PMD or PTE.
+> Patch 1 provides some documentation
+> Patches 2-4, 8 and 11 provide some refactoring of existing code
+> Patch 5 implements the new PV_FEATURES discovery mechanism
+> Patches 6-7 implement live physical time
+> Patches 9-10 implement stolen time
+> Patch 12 adds the 'PV_TIME' device for user space to enable the features
+> 
+> Christoffer Dall (2):
+>   KVM: arm/arm64: Factor out hypercall handling from PSCI code
+>   KVM: Export mark_page_dirty_in_slot
+> 
+> Steven Price (10):
+>   KVM: arm64: Document PV-time interface
+>   arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+>   arm/arm64: Make use of the SMCCC 1.1 wrapper
+>   KVM: arm64: Implement PV_FEATURES call
+>   KVM: arm64: Support Live Physical Time reporting
+>   clocksource: arm_arch_timer: Use paravirtualized LPT
+>   KVM: arm64: Support stolen time reporting via shared page
+>   arm64: Retrieve stolen time as paravirtualized guest
+>   KVM: Allow kvm_device_ops to be const
+>   KVM: arm64: Provide a PV_TIME device to user space
+> 
+>  Documentation/virtual/kvm/arm/pvtime.txt | 169 ++++++++++++++
+>  arch/arm/kvm/Makefile                    |   2 +-
+>  arch/arm/kvm/handle_exit.c               |   2 +-
+>  arch/arm/mm/proc-v7-bugs.c               |  46 ++--
+>  arch/arm64/include/asm/arch_timer.h      |  32 ++-
+>  arch/arm64/include/asm/kvm_host.h        |  16 ++
+>  arch/arm64/include/asm/kvm_mmu.h         |   2 +
+>  arch/arm64/include/asm/pvclock-abi.h     |  32 +++
+>  arch/arm64/include/uapi/asm/kvm.h        |   8 +
+>  arch/arm64/kernel/Makefile               |   1 +
+>  arch/arm64/kernel/cpu_errata.c           |  47 +---
+>  arch/arm64/kernel/cpuinfo.c              |   2 +-
+>  arch/arm64/kernel/kvm.c                  | 156 +++++++++++++
+>  arch/arm64/kvm/Kconfig                   |   1 +
+>  arch/arm64/kvm/Makefile                  |   2 +
+>  arch/arm64/kvm/handle_exit.c             |   4 +-
+>  drivers/clocksource/arm_arch_timer.c     | 176 ++++++++++++++-
+>  include/kvm/arm_arch_timer.h             |   2 +
+>  include/kvm/arm_hypercalls.h             |  44 ++++
+>  include/kvm/arm_psci.h                   |   2 +-
+>  include/kvm/arm_pv.h                     |  28 +++
+>  include/linux/arm-smccc.h                |  45 ++++
+>  include/linux/cpuhotplug.h               |   1 +
+>  include/linux/kvm_host.h                 |   5 +-
+>  include/linux/kvm_types.h                |   2 +
+>  include/uapi/linux/kvm.h                 |   2 +
+>  virt/kvm/arm/arm.c                       |  25 +-
+>  virt/kvm/arm/hypercalls.c                | 276 +++++++++++++++++++++++
+>  virt/kvm/arm/mmu.c                       |  44 ++++
+>  virt/kvm/arm/psci.c                      |  76 +------
+>  virt/kvm/arm/pvtime.c                    | 243 ++++++++++++++++++++
+>  virt/kvm/kvm_main.c                      |  12 +-
+>  32 files changed, 1348 insertions(+), 157 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
+>  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+>  create mode 100644 arch/arm64/kernel/kvm.c
+>  create mode 100644 include/kvm/arm_hypercalls.h
+>  create mode 100644 include/kvm/arm_pv.h
+>  create mode 100644 virt/kvm/arm/hypercalls.c
+>  create mode 100644 virt/kvm/arm/pvtime.c
+> 
+> -- 
+> 2.19.2
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
