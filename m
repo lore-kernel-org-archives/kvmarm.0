@@ -1,27 +1,21 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v3 2/4] arm64: KVM: add accessors to track guest/host
- only counters
-Date: Mon, 3 Dec 2018 16:58:43 +0000
-Message-ID: <20181203165842.GB27796@arm.com>
-References: <1542885950-23816-3-git-send-email-andrew.murray@arm.com>
- <20181203143114.GA26831@arm.com>
- <20181203150551.GC16311@e119886-lin.cambridge.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v7 00/25] APEI in_nmi() rework and SDEI wire-up
+Date: Mon,  3 Dec 2018 18:05:48 +0000
+Message-ID: <20181203180613.228133-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD8D4A2F8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 11:58:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C427F4A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7y+3flthfW-I for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Dec 2018 11:58:24 -0500 (EST)
+ with ESMTP id yMwGWxjReNci for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 13:06:26 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F14D04A2E7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 11:58:23 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203150551.GC16311@e119886-lin.cambridge.arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17F274A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 13:06:26 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,63 +25,144 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: linux-acpi@vger.kernel.org
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 03:05:52PM +0000, Andrew Murray wrote:
-> On Mon, Dec 03, 2018 at 02:31:14PM +0000, Will Deacon wrote:
-> > On Thu, Nov 22, 2018 at 11:25:48AM +0000, Andrew Murray wrote:
-> > > In order to effeciently enable/disable guest/host only perf counters
-> > > at guest entry/exit we add bitfields to kvm_cpu_context for guest and
-> > > host only events as well as accessors for updating them.
-> > > 
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++++++++
-> > >  1 file changed, 20 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 1550192..4a828eb 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -203,6 +203,8 @@ struct kvm_cpu_context {
-> > >  	};
-> > >  
-> > >  	struct kvm_vcpu *__hyp_running_vcpu;
-> > > +	u32 events_host_only;
-> > > +	u32 events_guest_only;
-> > >  };
-> > >  
-> > >  typedef struct kvm_cpu_context kvm_cpu_context_t;
-> > > @@ -472,6 +474,24 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	return kvm_arch_vcpu_run_map_fp(vcpu);
-> > >  }
-> > > +static inline void kvm_clr_set_host_pmu_events(u32 clr, u32 set)
-> > > +{
-> > > +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
-> > > +
-> > > +	ctx->events_host_only &= ~clr;
-> > > +	ctx->events_host_only |= set;
-> > > +}
-> > 
-> > Do you actually need this clr/set function, or can you just use the
-> > facilities provided by bitfield.h at the callsites?
-> 
-> This modifies events_{host|guest}_only which is conditionally defined
-> (CONFIG_KVM) yet used by arch/arm64/kernel/perf_events which is also
-> conditionally defined (CONFIG_HW_PERF_EVENTS). By moving this away
-> from the callsite we avoid a load of horrible #ifdef's and allow this
-> function to become a nop when KVM isn't enabled.
-> 
-> Is there value in updating this function to use set_bit/clear_bit
-> functions in bitops/atomic.h ?
+Hello,
 
-You don't need the atomicity, so you'd be looking at the '__' variants
-instead. My main concern is that we're introducing a clr_set_* API which
-only ever clears or sets, so I think it's needlessly complicated. If you
-need two separate macros that are just #defined to __set_bit/__clear_bit
-or expand to nothing then that could work too.
+This series aims to wire-up arm64's fancy new software-NMI notifications
+for firmware-first RAS. These need to use the estatus-queue, which is
+also needed for notifications via emulated-SError. All of these
+things take the 'in_nmi()' path through ghes_copy_tofrom_phys(), and
+so will deadlock if they can interact, which they might.
 
-Will
+To that end, this series removes the in_nmi() stuff from ghes.c.
+Locks are pushed out to the notification helpers, and fixmap entries
+are passed in to the code that needs them. This means the estatus-queue
+users can interrupt each other however they like.
+
+While doing this there is a fair amount of cleanup, which is (now) at the
+beginning of the series. NMIlike notifications interrupting
+ghes_probe() can go wrong for three different reasons. CPER record
+blocks greater than PAGE_SIZE dont' work.
+The estatus-pool allocation is simplified and the silent-flag/oops-begin
+is removed.
+
+Nothing in this series is intended as fixes, as its all cleanup or
+never-worked.
+
+
+----------%<----------
+The earlier boiler-plate:
+
+What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
+used by firmware to tell the OS about firmware-first RAS events.
+
+These Software exceptions can interrupt anything, so I describe them as
+NMI-like. They aren't the only NMI-like way to notify the OS about
+firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
+'NOTIFY_SEI'.
+
+(Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
+but the owner of that memory said no. These are always synchronous with the
+instruction that caused them. SEI, System-Error Interrupt, commonly called
+SError. This is an asynchronous external abort, the memory-owner didn't say no
+at the right point. Collectively these things are called external-aborts
+How is firmware involved? It traps these and re-injects them into the kernel
+once its written the CPER records).
+
+APEI's GHES code only expects one source of NMI. If a platform implements
+more than one of these mechanisms, APEI needs to handle the interaction.
+'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
+with itself: its exceptions can be 'normal' or 'critical', and firmware
+could use both types for RAS. (errors using normal, 'panic-now' using
+critical).
+----------%<----------
+
+
+Known issue:
+ * ghes_copy_tofrom_phys() already takes a lock in NMI context, this
+   series moves that around, and makes sure we never try to take the
+   same lock from different NMIlike notifications. Since the switch to
+   queued spinlocks it looks like the kernel can only be 4 context's
+   deep in spinlock, which arm64 could exceed as it doesn't have a
+   single architected NMI. It either needs an additional
+   idx-bit in the qspinlock, or for ghes.c to switch to using a
+   different type of lock for NMIlike notifications.
+
+Changes since v6:
+ * Changed the order of the series.
+ * Made hest.c own the estatus pool, which is now vmalloc()d.
+ * Culled #ifdef, hopefully without generating too much noise.
+ * Added GHESv2 'ack' support to NMI-like notifications
+ * Use task-work to kick the memory_failure_queue()
+
+Specific changes are noted in each patch.
+
+[v6] https://www.spinics.net/lists/linux-acpi/msg84228.html
+[v5] https://www.spinics.net/lists/linux-acpi/msg82993.html
+[v4] https://www.spinics.net/lists/arm-kernel/msg653078.html
+[v3] https://www.spinics.net/lists/arm-kernel/msg649230.html
+
+[0] https://static.docs.arm.com/den0054/a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+
+
+Feedback welcome,
+
+Thanks
+
+James Morse (25):
+  ACPI / APEI: Don't wait to serialise with oops messages when
+    panic()ing
+  ACPI / APEI: Remove silent flag from ghes_read_estatus()
+  ACPI / APEI: Switch estatus pool to use vmalloc memory
+  ACPI / APEI: Make hest.c manage the estatus memory pool
+  ACPI / APEI: Make estatus pool allocation a static size
+  ACPI / APEI: Don't store CPER records physical address in struct ghes
+  ACPI / APEI: Remove spurious GHES_TO_CLEAR check
+  ACPI / APEI: Don't update struct ghes' flags in read/clear estatus
+  ACPI / APEI: Generalise the estatus queue's notify code
+  ACPI / APEI: Tell firmware the estatus queue consumed the records
+  ACPI / APEI: Move NOTIFY_SEA between the estatus-queue and NOTIFY_NMI
+  ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+  KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+  arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+  ACPI / APEI: Move locking to the notification helper
+  ACPI / APEI: Let the notification helper specify the fixmap slot
+  ACPI / APEI: Pass ghes and estatus separately to avoid a later copy
+  ACPI / APEI: Split ghes_read_estatus() to allow a peek at the CPER
+    length
+  ACPI / APEI: Only use queued estatus entry during _in_nmi_notify_one()
+  ACPI / APEI: Use separate fixmap pages for arm64 NMI-like
+    notifications
+  mm/memory-failure: Add memory_failure_queue_kick()
+  ACPI / APEI: Kick the memory_failure() queue for synchronous errors
+  arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+  firmware: arm_sdei: Add ACPI GHES registration helper
+  ACPI / APEI: Add support for the SDEI GHES Notification type
+
+ arch/arm/include/asm/kvm_ras.h       |  14 +
+ arch/arm/include/asm/system_misc.h   |   5 -
+ arch/arm64/include/asm/acpi.h        |   4 +-
+ arch/arm64/include/asm/daifflags.h   |   1 +
+ arch/arm64/include/asm/fixmap.h      |   6 +-
+ arch/arm64/include/asm/kvm_ras.h     |  25 +
+ arch/arm64/include/asm/system_misc.h |   2 -
+ arch/arm64/kernel/acpi.c             |  51 +++
+ arch/arm64/mm/fault.c                |  25 +-
+ drivers/acpi/apei/Kconfig            |  12 +-
+ drivers/acpi/apei/ghes.c             | 652 ++++++++++++++++-----------
+ drivers/acpi/apei/hest.c             |   5 +
+ drivers/firmware/arm_sdei.c          |  70 +++
+ include/acpi/ghes.h                  |   4 +-
+ include/linux/arm_sdei.h             |   9 +
+ include/linux/mm.h                   |   1 +
+ mm/memory-failure.c                  |  15 +-
+ virt/kvm/arm/mmu.c                   |   4 +-
+ 18 files changed, 606 insertions(+), 299 deletions(-)
+ create mode 100644 arch/arm/include/asm/kvm_ras.h
+ create mode 100644 arch/arm64/include/asm/kvm_ras.h
+
+-- 
+2.19.2
