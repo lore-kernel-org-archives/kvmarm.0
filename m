@@ -1,161 +1,95 @@
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v9 6/8] KVM: arm64: Support handling access faults for PUD
- hugepages
-Date: Mon, 3 Dec 2018 20:40:45 +0530
-Message-ID: <26fcfc2c-219a-ce04-457b-cc157301c7d3@arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-7-punit.agrawal@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 01/12] KVM: arm64: Document PV-time interface
+Date: Mon, 3 Dec 2018 16:16:36 +0100
+Message-ID: <20181203151636.scziollrzpulbdke@kamzik.brq.redhat.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181128144527.44710-2-steven.price@arm.com>
+ <20181203135042.v52wawfz4nc27fna@kamzik.brq.redhat.com>
+ <4ec62f53-9c3f-14cb-f1bb-c8b9aadb9bdd@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181031175745.18650-7-punit.agrawal@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D63094A1DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:16:41 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Awysg4rpXMT9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 10:16:41 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D54224A200
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:16:40 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <4ec62f53-9c3f-14cb-f1bb-c8b9aadb9bdd@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Steven Price <steven.price@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 10/31/2018 11:27 PM, Punit Agrawal wrote:
-> In preparation for creating larger hugepages at Stage 2, extend the
-> access fault handling at Stage 2 to support PUD hugepages when
-> encountered.
+On Mon, Dec 03, 2018 at 02:18:25PM +0000, Marc Zyngier wrote:
+> On 03/12/2018 13:50, Andrew Jones wrote:
+> > On Wed, Nov 28, 2018 at 02:45:16PM +0000, Steven Price wrote:
+> >> +The structure pointed to by the PV_TIME_LPT hypercall is as follows:
+> >> +
+> >> +  Field           | Byte Length | Byte Offset | Description
+> >> +  --------------- | ----------- | ----------- | -------------------------------
+> >> +  Revision        |      4      |      0      | Must be 0 for this revision
+> >> +  Attributes      |      4      |      4      | Must be 0
+> >> +  sequence_number |      8      |      8      | Bit 0: reserved
+> >> +                  |             |             | Bits 1:63 number of migrations
+> >> +  scale_mult      |      8      |      16     | Multiplier to scale from native
+> >> +                  |             |             | frequency to PV frequency
+> >> +  shift           |      4      |      24     | Shift applied before multiplier
+> >> +  Reserved        |      4      |      28     | Must be 0
+> >> +  Fn              |      8      |      32     | Native frequency
+> >> +  Fpv             |      8      |      40     | Paravirtualized frequency seen
+> >> +                  |             |             | by guest
+> >> +  div_by_fpv_mult |      8      |      48     | Multiplier to implement fast
+> >> +                  |             |             | divide by Fpv
+> > 
+> > Here's kvmclock's struct
+> > 
+> >  struct pvclock_vcpu_time_info {
+> >         u32   version; 
+> >         u32   pad0;
+> >         u64   tsc_timestamp;
+> >         u64   system_time;
+> >         u32   tsc_to_system_mul;
+> >         s8    tsc_shift;
+> >         u8    flags;
+> >         u8    pad[2];
+> >  }
+> > 
+> >  Revision	 =>
+> >  Attributes	 =>
+> >  sequence_number => version
+> >  scale_mult	 => tsc_to_system_mul	(this is reversed, but OK)
+> >  shift		 => tsc_shift           (also reversed)
+> >  Reserved	 =>
+> >  Fn		 => (pvclock doesn't have, but does have system_time)
+> >  Fpv		 =>
+> >  div_by_fpv_mult =>
+> > 
+> > I haven't thought about this enough yet to be sure kvmclock's fields
+> > are sufficient, but several look close - although the 'tsc' naming
+> > isn't nice. Also, the pvclock struct could be extended by adding an
+> > 'extended' flag to 'flags', and then appending more fields.
 > 
-> Provide trivial helpers for arm32 to allow sharing of code.
-> 
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h   |  9 +++++++++
->  arch/arm64/include/asm/kvm_mmu.h |  7 +++++++
->  arch/arm64/include/asm/pgtable.h |  6 ++++++
->  virt/kvm/arm/mmu.c               | 22 +++++++++++-----------
->  4 files changed, 33 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index 839a619873d3..fea5e723e3ac 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -85,6 +85,9 @@ void kvm_clear_hyp_idmap(void);
->  #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
->  #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
->  
-> +#define kvm_pud_pfn(pud)	({ BUG(); 0; })
-> +
-> +
->  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
->  
->  /*
-> @@ -108,6 +111,12 @@ static inline bool kvm_s2pud_exec(pud_t *pud)
->  	return false;
->  }
->  
-> +static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
-> +{
-> +	BUG();
-> +	return pud;
-> +}
-> +
->  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->  {
->  	pte_val(pte) |= L_PTE_S2_RDWR;
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index c755b37b3f92..612032bbb428 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -187,6 +187,8 @@ void kvm_clear_hyp_idmap(void);
->  #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
->  #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
->  
-> +#define kvm_pud_pfn(pud)		pud_pfn(pud)
-> +
->  #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
->  
->  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
-> @@ -266,6 +268,11 @@ static inline bool kvm_s2pud_exec(pud_t *pudp)
->  	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
->  }
->  
-> +static inline pud_t kvm_s2pud_mkyoung(pud_t pud)
-> +{
-> +	return pud_mkyoung(pud);
-> +}
-> +
->  #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
->  
->  #ifdef __PAGETABLE_PMD_FOLDED
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index 50b1ef8584c0..f51e2271e6a3 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -314,6 +314,11 @@ static inline pte_t pud_pte(pud_t pud)
->  	return __pte(pud_val(pud));
->  }
->  
-> +static inline pud_t pte_pud(pte_t pte)
-> +{
-> +	return __pud(pte_val(pte));
-> +}
-> +
+> One important thing is that this is not a KVM PV time implementation.
+> This is something generic for the ARM architecture. Any ARM hypervisor
+> should be able to implement this.
+>
 
-Yeah these would be required for PUD based THP when enabled.
+I agree with that, but xen also uses the same pvclock structure on x86.
 
->  static inline pmd_t pud_pmd(pud_t pud)
->  {
->  	return __pmd(pud_val(pud));
-> @@ -381,6 +386,7 @@ static inline int pmd_protnone(pmd_t pmd)
->  #define pfn_pmd(pfn,prot)	__pmd(__phys_to_pmd_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
->  #define mk_pmd(page,prot)	pfn_pmd(page_to_pfn(page),prot)
->  
-> +#define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
->  #define pud_write(pud)		pte_write(pud_pte(pud))
->  
->  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 8e44dccd1b47..bd749601195f 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1698,6 +1698,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   */
->  static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  {
-> +	pud_t *pud;
->  	pmd_t *pmd;
->  	pte_t *pte;
->  	kvm_pfn_t pfn;
-> @@ -1707,24 +1708,23 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  
->  	spin_lock(&vcpu->kvm->mmu_lock);
->  
-> -	pmd = stage2_get_pmd(vcpu->kvm, NULL, fault_ipa);
-> -	if (!pmd || pmd_none(*pmd))	/* Nothing there */
-> +	if (!stage2_get_leaf_entry(vcpu->kvm, fault_ipa, &pud, &pmd, &pte))
->  		goto out;
->  
-> -	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
-> +	if (pud) {		/* HugeTLB */
-> +		*pud = kvm_s2pud_mkyoung(*pud);
-> +		pfn = kvm_pud_pfn(*pud);
-> +		pfn_valid = true;
-> +	} else	if (pmd) {	/* THP, HugeTLB */
->  		*pmd = pmd_mkyoung(*pmd);
->  		pfn = pmd_pfn(*pmd);
->  		pfn_valid = true;
-> -		goto out;
-> +	} else {
-> +		*pte = pte_mkyoung(*pte);	/* Just a page... */
-> +		pfn = pte_pfn(*pte);
-> +		pfn_valid = true;
->  	}
-
-As mentioned before stage2_get_leaf_entry() is not required for the previous
-patch and handle_access_fault() can definitely do without it. The existing
-page table walker flow is better than this helper which takes like three
-different arguments and makes semantics more complicated than required.
+Thanks,
+drew
