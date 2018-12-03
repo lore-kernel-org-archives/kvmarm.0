@@ -1,131 +1,74 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v9 4/8] KVM: arm64: Support dirty page tracking for PUD
- hugepages
-Date: Mon, 3 Dec 2018 14:21:16 +0000
-Message-ID: <215abd97-7919-25da-7164-9f9465a8d8ba@arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-5-punit.agrawal@arm.com>
- <0d5f2d45-b09d-d43e-4320-98113d79cb18@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v3 2/4] arm64: KVM: add accessors to track guest/host
+ only counters
+Date: Mon, 3 Dec 2018 14:31:14 +0000
+Message-ID: <20181203143114.GA26831@arm.com>
+References: <1542885950-23816-3-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <0d5f2d45-b09d-d43e-4320-98113d79cb18@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E91B74A2BB
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 09:30:56 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ajRTECAgLhw4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 09:30:55 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF814A214
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 09:30:55 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1542885950-23816-3-git-send-email-andrew.murray@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 03/12/2018 14:17, Anshuman Khandual wrote:
+On Thu, Nov 22, 2018 at 11:25:48AM +0000, Andrew Murray wrote:
+> In order to effeciently enable/disable guest/host only perf counters
+> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
+> host only events as well as accessors for updating them.
 > 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> On 10/31/2018 11:27 PM, Punit Agrawal wrote:
->> In preparation for creating PUD hugepages at stage 2, add support for
->> write protecting PUD hugepages when they are encountered. Write
->> protecting guest tables is used to track dirty pages when migrating
->> VMs.
->>
->> Also, provide trivial implementations of required kvm_s2pud_* helpers
->> to allow sharing of code with arm32.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_mmu.h   | 15 +++++++++++++++
->>   arch/arm64/include/asm/kvm_mmu.h | 10 ++++++++++
->>   virt/kvm/arm/mmu.c               | 11 +++++++----
->>   3 files changed, 32 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index e6eff8bf5d7f..37bf85d39607 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -87,6 +87,21 @@ void kvm_clear_hyp_idmap(void);
->>   
->>   #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
->>   
->> +/*
->> + * The following kvm_*pud*() functions are provided strictly to allow
->> + * sharing code with arm64. They should never be called in practice.
->> + */
->> +static inline void kvm_set_s2pud_readonly(pud_t *pud)
->> +{
->> +	BUG();
->> +}
->> +
->> +static inline bool kvm_s2pud_readonly(pud_t *pud)
->> +{
->> +	BUG();
->> +	return false;
->> +}
-> 
-> As arm32 does not support direct manipulation of PUD entries.
-> 
->> +
->>   static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->>   {
->>   	pte_val(pte) |= L_PTE_S2_RDWR;
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 13d482710292..8da6d1b2a196 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -251,6 +251,16 @@ static inline bool kvm_s2pmd_exec(pmd_t *pmdp)
->>   	return !(READ_ONCE(pmd_val(*pmdp)) & PMD_S2_XN);
->>   }
->>   
->> +static inline void kvm_set_s2pud_readonly(pud_t *pudp)
->> +{
->> +	kvm_set_s2pte_readonly((pte_t *)pudp);
->> +}
->> +
->> +static inline bool kvm_s2pud_readonly(pud_t *pudp)
->> +{
->> +	return kvm_s2pte_readonly((pte_t *)pudp);
->> +}
->> +
->>   #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
->>   
->>   #ifdef __PAGETABLE_PMD_FOLDED
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index fb5325f7a1ac..1c669c3c1208 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1347,9 +1347,12 @@ static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
->>   	do {
->>   		next = stage2_pud_addr_end(kvm, addr, end);
->>   		if (!stage2_pud_none(kvm, *pud)) {
->> -			/* TODO:PUD not supported, revisit later if supported */
->> -			BUG_ON(stage2_pud_huge(kvm, *pud));
->> -			stage2_wp_pmds(kvm, pud, addr, next);
->> +			if (stage2_pud_huge(kvm, *pud)) {
->> +				if (!kvm_s2pud_readonly(pud))
->> +					kvm_set_s2pud_readonly(pud);
->> +			} else {
->> +				stage2_wp_pmds(kvm, pud, addr, next);
->> +			}
-> 
-> As this series is enabling PUD related changes in multiple places, it is
-> reasonable to enable PGD level support as well even if it might not be
-> used much at the moment. I dont see much extra code to enable PGD, then
-> why not ? Even just to make the HugeTLB support matrix complete.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1550192..4a828eb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -203,6 +203,8 @@ struct kvm_cpu_context {
+>  	};
+>  
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+> +	u32 events_host_only;
+> +	u32 events_guest_only;
+>  };
+>  
+>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+> @@ -472,6 +474,24 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_arch_vcpu_run_map_fp(vcpu);
+>  }
+> +static inline void kvm_clr_set_host_pmu_events(u32 clr, u32 set)
+> +{
+> +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
+> +
+> +	ctx->events_host_only &= ~clr;
+> +	ctx->events_host_only |= set;
+> +}
 
-Architecturally, we have hugepages at PUD/PMD (Level1 and Level2). PGD
-is a variable level which could be L0 or L1 (when PUD is folded) or L2(when
-PMD is folded). So if we enabled PUD/PMD hugepages, that would make sure
-that the PGD hugepages (i.e, when one of the levels are folded) are supported.
-We don't have L0 huge pages in arm64. Does that make sense ?
+Do you actually need this clr/set function, or can you just use the
+facilities provided by bitfield.h at the callsites?
 
-Cheers
-Suzuki
-
-
-
-> 
+Will
