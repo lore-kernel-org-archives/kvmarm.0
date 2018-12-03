@@ -1,364 +1,119 @@
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH v9 8/8] KVM: arm64: Add support for creating PUD hugepages
- at stage 2
-Date: Mon, 3 Dec 2018 21:16:54 +0530
-Message-ID: <3c37af59-6936-20fb-b3a3-eaa10f3ada53@arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-9-punit.agrawal@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 01/12] KVM: arm64: Document PV-time interface
+Date: Mon, 3 Dec 2018 16:52:16 +0100
+Message-ID: <20181203155216.ursemhjgckc4iawo@kamzik.brq.redhat.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181128144527.44710-2-steven.price@arm.com>
+ <20181203135042.v52wawfz4nc27fna@kamzik.brq.redhat.com>
+ <4ec62f53-9c3f-14cb-f1bb-c8b9aadb9bdd@arm.com>
+ <20181203151636.scziollrzpulbdke@kamzik.brq.redhat.com>
+ <389b6206-1e29-16a3-1aa1-5a79b83683c5@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181031175745.18650-9-punit.agrawal@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2C6D4A33D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:52:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iD4l9aD2amjC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Dec 2018 10:52:21 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDE154A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Dec 2018 10:52:20 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <389b6206-1e29-16a3-1aa1-5a79b83683c5@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Steven Price <steven.price@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 10/31/2018 11:27 PM, Punit Agrawal wrote:
-> KVM only supports PMD hugepages at stage 2. Now that the various page
-> handling routines are updated, extend the stage 2 fault handling to
-> map in PUD hugepages.
+On Mon, Dec 03, 2018 at 03:23:41PM +0000, Marc Zyngier wrote:
+> On 03/12/2018 15:16, Andrew Jones wrote:
+> > On Mon, Dec 03, 2018 at 02:18:25PM +0000, Marc Zyngier wrote:
+> >> On 03/12/2018 13:50, Andrew Jones wrote:
+> >>> On Wed, Nov 28, 2018 at 02:45:16PM +0000, Steven Price wrote:
+> >>>> +The structure pointed to by the PV_TIME_LPT hypercall is as follows:
+> >>>> +
+> >>>> +  Field           | Byte Length | Byte Offset | Description
+> >>>> +  --------------- | ----------- | ----------- | -------------------------------
+> >>>> +  Revision        |      4      |      0      | Must be 0 for this revision
+> >>>> +  Attributes      |      4      |      4      | Must be 0
+> >>>> +  sequence_number |      8      |      8      | Bit 0: reserved
+> >>>> +                  |             |             | Bits 1:63 number of migrations
+> >>>> +  scale_mult      |      8      |      16     | Multiplier to scale from native
+> >>>> +                  |             |             | frequency to PV frequency
+> >>>> +  shift           |      4      |      24     | Shift applied before multiplier
+> >>>> +  Reserved        |      4      |      28     | Must be 0
+> >>>> +  Fn              |      8      |      32     | Native frequency
+> >>>> +  Fpv             |      8      |      40     | Paravirtualized frequency seen
+> >>>> +                  |             |             | by guest
+> >>>> +  div_by_fpv_mult |      8      |      48     | Multiplier to implement fast
+> >>>> +                  |             |             | divide by Fpv
+> >>>
+> >>> Here's kvmclock's struct
+> >>>
+> >>>  struct pvclock_vcpu_time_info {
+> >>>         u32   version; 
+> >>>         u32   pad0;
+> >>>         u64   tsc_timestamp;
+> >>>         u64   system_time;
+> >>>         u32   tsc_to_system_mul;
+> >>>         s8    tsc_shift;
+> >>>         u8    flags;
+> >>>         u8    pad[2];
+> >>>  }
+> >>>
+> >>>  Revision	 =>
+> >>>  Attributes	 =>
+> >>>  sequence_number => version
+> >>>  scale_mult	 => tsc_to_system_mul	(this is reversed, but OK)
+> >>>  shift		 => tsc_shift           (also reversed)
+> >>>  Reserved	 =>
+> >>>  Fn		 => (pvclock doesn't have, but does have system_time)
+> >>>  Fpv		 =>
+> >>>  div_by_fpv_mult =>
+> >>>
+> >>> I haven't thought about this enough yet to be sure kvmclock's fields
+> >>> are sufficient, but several look close - although the 'tsc' naming
+> >>> isn't nice. Also, the pvclock struct could be extended by adding an
+> >>> 'extended' flag to 'flags', and then appending more fields.
+> >>
+> >> One important thing is that this is not a KVM PV time implementation.
+> >> This is something generic for the ARM architecture. Any ARM hypervisor
+> >> should be able to implement this.
+> >>
+> > 
+> > I agree with that, but xen also uses the same pvclock structure on x86.
 > 
-> Addition of PUD hugepage support enables additional page sizes (e.g.,
-> 1G with 4K granule) which can be useful on cores that support mapping
-> larger block sizes in the TLB entries.
+> Which makes sense.
 > 
-> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> Reviewed-by: Suzuki Poulose <suzuki.poulose@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h         |  20 +++++
->  arch/arm/include/asm/stage2_pgtable.h  |   5 ++
->  arch/arm64/include/asm/kvm_mmu.h       |  16 ++++
->  arch/arm64/include/asm/pgtable-hwdef.h |   2 +
->  arch/arm64/include/asm/pgtable.h       |   2 +
->  virt/kvm/arm/mmu.c                     | 104 +++++++++++++++++++++++--
->  6 files changed, 143 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index e62f0913ce7d..6336319a0d5b 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -84,11 +84,14 @@ void kvm_clear_hyp_idmap(void);
->  
->  #define kvm_pfn_pte(pfn, prot)	pfn_pte(pfn, prot)
->  #define kvm_pfn_pmd(pfn, prot)	pfn_pmd(pfn, prot)
-> +#define kvm_pfn_pud(pfn, prot)	(__pud(0))
+> Each architecture has a way to express its PV time based on its own
+> requirements, and I'd expect Xen on arm64 to use the ARM data structure
+> (/me eyes the Xen/ARM maintainer...). I thought that what you were
+> advocating was to use the x86 layout on ARM, which didn't make complete
+> sense to me.
 
-This makes sense. Was not enabled before and getting added here.
+I sort of was. I was wondering if pvclock shouldn't be improved in a
+backward compatible way by using the flags field to extend it. Field names
+could change and new fields can be appended. Then, when x86 kvm and xen
+are updated to use the extended pvclock struct, there may be more
+opportunity for code sharing across architectures - perhaps much of
+kvmclock could be shared. Of course I'm just thinking out loud, and doing
+more of the out loud part than the thinking...
 
->  
->  #define kvm_pud_pfn(pud)	({ BUG(); 0; })
->  
->  
->  #define kvm_pmd_mkhuge(pmd)	pmd_mkhuge(pmd)
-> +/* No support for pud hugepages */
-> +#define kvm_pud_mkhuge(pud)	( {BUG(); pud; })
->  
->  /*
->   * The following kvm_*pud*() functions are provided strictly to allow
-> @@ -105,6 +108,23 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
->  	return false;
->  }
->  
-> +static inline void kvm_set_pud(pud_t *pud, pud_t new_pud)
-> +{
-> +	BUG();
-> +}
-> +
-> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
-> +{
-> +	BUG();
-> +	return pud;
-> +}
-> +
-> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
-> +{
-> +	BUG();
-> +	return pud;
-> +}
-> +
+Hmm, I do see that arm-xen has already adopted the x86 layouts without
+modification and also has a TODO saying the struct definitions should put
+somewhere arch neutral.
 
-But the previous patches have been adding some of these helpers
-as well. Needs consolidation.
-
->  static inline bool kvm_s2pud_exec(pud_t *pud)
->  {
->  	BUG();
-> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-> index f6a7ea805232..f9017167a8d1 100644
-> --- a/arch/arm/include/asm/stage2_pgtable.h
-> +++ b/arch/arm/include/asm/stage2_pgtable.h
-> @@ -68,4 +68,9 @@ stage2_pmd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
->  #define stage2_pmd_table_empty(kvm, pmdp)	kvm_page_empty(pmdp)
->  #define stage2_pud_table_empty(kvm, pudp)	false
->  
-> +static inline bool kvm_stage2_has_pud(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
->
-
-Makes sense. Disabled on arm32.
-
- +
->  #endif	/* __ARM_S2_PGTABLE_H_ */
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 9f941f70775c..8af4b1befa42 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -184,12 +184,16 @@ void kvm_clear_hyp_idmap(void);
->  #define kvm_mk_pgd(pudp)					\
->  	__pgd(__phys_to_pgd_val(__pa(pudp)) | PUD_TYPE_TABLE)
->  
-> +#define kvm_set_pud(pudp, pud)		set_pud(pudp, pud)
-> +
->  #define kvm_pfn_pte(pfn, prot)		pfn_pte(pfn, prot)
->  #define kvm_pfn_pmd(pfn, prot)		pfn_pmd(pfn, prot)
-> +#define kvm_pfn_pud(pfn, prot)		pfn_pud(pfn, prot)
->  
->  #define kvm_pud_pfn(pud)		pud_pfn(pud)
->  
->  #define kvm_pmd_mkhuge(pmd)		pmd_mkhuge(pmd)
-> +#define kvm_pud_mkhuge(pud)		pud_mkhuge(pud)
->  
->  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->  {
-> @@ -203,6 +207,12 @@ static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
->  	return pmd;
->  }
->  
-> +static inline pud_t kvm_s2pud_mkwrite(pud_t pud)
-> +{
-> +	pud_val(pud) |= PUD_S2_RDWR;
-> +	return pud;
-> +}
-> +
->  static inline pte_t kvm_s2pte_mkexec(pte_t pte)
->  {
->  	pte_val(pte) &= ~PTE_S2_XN;
-> @@ -215,6 +225,12 @@ static inline pmd_t kvm_s2pmd_mkexec(pmd_t pmd)
->  	return pmd;
->  }
->  
-> +static inline pud_t kvm_s2pud_mkexec(pud_t pud)
-> +{
-> +	pud_val(pud) &= ~PUD_S2_XN;
-> +	return pud;
-> +}
-> +
-
-Should not these be consolidated in previous patches ?
-
->  static inline void kvm_set_s2pte_readonly(pte_t *ptep)
->  {
->  	pteval_t old_pteval, pteval;
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index 336e24cddc87..6f1c187f1c86 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -193,6 +193,8 @@
->  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
->  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
->  
-> +#define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
-> +#define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
->  #define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
-
-All PUD related HW page table definitions should have been added
-at once in one of the preparatory patches.
-
->  
->  /*
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index bb0f3f17a7a9..576128635f3c 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -390,6 +390,8 @@ static inline int pmd_protnone(pmd_t pmd)
->  #define pud_mkyoung(pud)	pte_pud(pte_mkyoung(pud_pte(pud)))
->  #define pud_write(pud)		pte_write(pud_pte(pud))
->  
-> +#define pud_mkhuge(pud)		(__pud(pud_val(pud) & ~PUD_TABLE_BIT))
-> +
-
-All new pud_* definitions should have come together at once as well. 
-
->  #define __pud_to_phys(pud)	__pte_to_phys(pud_pte(pud))
->  #define __phys_to_pud_val(phys)	__phys_to_pte_val(phys)
->  #define pud_pfn(pud)		((__pud_to_phys(pud) & PUD_MASK) >> PAGE_SHIFT)
-
-
-
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 3893ea6a50bf..2dcff38868d4 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -115,6 +115,25 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
->  	put_page(virt_to_page(pmd));
->  }
->  
-> +/**
-> + * stage2_dissolve_pud() - clear and flush huge PUD entry
-> + * @kvm:	pointer to kvm structure.
-> + * @addr:	IPA
-> + * @pud:	pud pointer for IPA
-> + *
-> + * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs. Marks all
-> + * pages in the range dirty.
-> + */
-> +static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
-> +{
-> +	if (!stage2_pud_huge(kvm, *pudp))
-> +		return;
-> +
-> +	stage2_pud_clear(kvm, pudp);
-> +	kvm_tlb_flush_vmid_ipa(kvm, addr);
-> +	put_page(virt_to_page(pudp));
-> +}
-> +
->  static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
->  				  int min, int max)
->  {
-> @@ -1022,7 +1041,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
->  	pmd_t *pmd;
->  
->  	pud = stage2_get_pud(kvm, cache, addr);
-> -	if (!pud)
-> +	if (!pud || stage2_pud_huge(kvm, *pud))
->  		return NULL;
->  
->  	if (stage2_pud_none(kvm, *pud)) {
-> @@ -1083,6 +1102,36 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->  	return 0;
->  }
->  
-> +static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-> +			       phys_addr_t addr, const pud_t *new_pudp)
-> +{
-> +	pud_t *pudp, old_pud;
-> +
-> +	pudp = stage2_get_pud(kvm, cache, addr);
-> +	VM_BUG_ON(!pudp);
-> +
-> +	old_pud = *pudp;
-> +
-> +	/*
-> +	 * A large number of vcpus faulting on the same stage 2 entry,
-> +	 * can lead to a refault due to the
-> +	 * stage2_pud_clear()/tlb_flush(). Skip updating the page
-> +	 * tables if there is no change.
-> +	 */
-> +	if (pud_val(old_pud) == pud_val(*new_pudp))
-> +		return 0;
-> +
-> +	if (stage2_pud_present(kvm, old_pud)) {
-> +		stage2_pud_clear(kvm, pudp);
-> +		kvm_tlb_flush_vmid_ipa(kvm, addr);
-> +	} else {
-> +		get_page(virt_to_page(pudp));
-> +	}
-> +
-> +	kvm_set_pud(pudp, *new_pudp);
-> +	return 0;
-> +}
-> +
->  /*
->   * stage2_get_leaf_entry - walk the stage2 VM page tables and return
->   * true if a valid and present leaf-entry is found. A pointer to the
-> @@ -1149,6 +1198,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->  			  phys_addr_t addr, const pte_t *new_pte,
->  			  unsigned long flags)
->  {
-> +	pud_t *pud;
->  	pmd_t *pmd;
->  	pte_t *pte, old_pte;
->  	bool iomap = flags & KVM_S2PTE_FLAG_IS_IOMAP;
-> @@ -1157,7 +1207,31 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->  	VM_BUG_ON(logging_active && !cache);
->  
->  	/* Create stage-2 page table mapping - Levels 0 and 1 */
-> -	pmd = stage2_get_pmd(kvm, cache, addr);
-> +	pud = stage2_get_pud(kvm, cache, addr);
-> +	if (!pud) {
-> +		/*
-> +		 * Ignore calls from kvm_set_spte_hva for unallocated
-> +		 * address ranges.
-> +		 */
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * While dirty page logging - dissolve huge PUD, then continue
-> +	 * on to allocate page.
-> +	 */
-> +	if (logging_active)
-> +		stage2_dissolve_pud(kvm, addr, pud);
-> +
-> +	if (stage2_pud_none(kvm, *pud)) {
-> +		if (!cache)
-> +			return 0; /* ignore calls from kvm_set_spte_hva */
-> +		pmd = mmu_memory_cache_alloc(cache);
-> +		stage2_pud_populate(kvm, pud, pmd);
-> +		get_page(virt_to_page(pud));
-> +	}
-> +
-> +	pmd = stage2_pmd_offset(kvm, pud, addr);
->  	if (!pmd) {
->  		/*
->  		 * Ignore calls from kvm_set_spte_hva for unallocated
-> @@ -1557,12 +1631,19 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	}
->  
->  	vma_pagesize = vma_kernel_pagesize(vma);
-> -	if (vma_pagesize == PMD_SIZE && !logging_active) {
-> -		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
-> +	/*
-> +	 * PUD level may not exist for a VM but PMD is guaranteed to
-> +	 * exist.
-> +	 */
-> +	if ((vma_pagesize == PMD_SIZE ||
-> +	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pud(kvm))) &&
-> +	    !logging_active) {
-
-This can be better and wrapped in a helper. Probably arm64 definition
-for the helper should check on (PUD_SIZE || PMD_SIZE) but for arm32
-it should just check on PMD_SIZE alone. But this is optional.
-
-> +		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->  	} else {
->  		/*
->  		 * Fallback to PTE if it's not one of the Stage 2
-> -		 * supported hugepage sizes
-> +		 * supported hugepage sizes or the corresponding level
-> +		 * doesn't exist
->  		 */
->  		vma_pagesize = PAGE_SIZE;
->  
-> @@ -1661,7 +1742,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	needs_exec = exec_fault ||
->  		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
->  
-> -	if (vma_pagesize == PMD_SIZE) {
-> +	if (vma_pagesize == PUD_SIZE) {
-> +		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
-> +
-> +		new_pud = kvm_pud_mkhuge(new_pud);
-> +		if (writable)
-> +			new_pud = kvm_s2pud_mkwrite(new_pud);
-> +
-> +		if (needs_exec)
-> +			new_pud = kvm_s2pud_mkexec(new_pud);
-> +
-> +		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
-> +	} else if (vma_pagesize == PMD_SIZE) {
-
-Ran some memory intensive tests on guests with these patches in place but
-will continue experimenting and looking for more details in here.
+Thanks,
+drew
