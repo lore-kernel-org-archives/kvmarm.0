@@ -1,196 +1,163 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: Instruction/Cycle Counting in Guest Using the Kvm PMU
-Date: Fri, 30 Nov 2018 00:23:30 +0000
-Message-ID: <20181130002327.GB16311@e119886-lin.cambridge.arm.com>
-References: <93B846538060DA46A9945E98A2E521E9A87A9C@DE02WEMBXB.internal.synopsys.com>
- <0e9adc4e-20e3-5648-3ef6-64c9e16f780d@arm.com>
- <20181123132704.GN42987@e119886-lin.cambridge.arm.com>
- <93B846538060DA46A9945E98A2E521E9A87BEA@DE02WEMBXB.internal.synopsys.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH v9 1/8] KVM: arm/arm64: Share common code in
+ user_mem_abort()
+Date: Mon, 3 Dec 2018 17:41:55 +0530
+Message-ID: <ad4b316a-054f-24d9-d32d-8fbe7972b5ad@arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-2-punit.agrawal@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C7B4A33F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 19:23:36 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fifv0zyv5t0d for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Nov 2018 19:23:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC7A14A33E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Nov 2018 19:23:32 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <93B846538060DA46A9945E98A2E521E9A87BEA@DE02WEMBXB.internal.synopsys.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jan Bolke <jan.bolke@synopsys.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181031175745.18650-2-punit.agrawal@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: suzuki.poulose@arm.com, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 29, 2018 at 11:30:55AM +0000, Jan Bolke wrote:
-> Hi,
-> And thanks for the fast replies.
+
+
+On 10/31/2018 11:27 PM, Punit Agrawal wrote:
+> The code for operations such as marking the pfn as dirty, and
+> dcache/icache maintenance during stage 2 fault handling is duplicated
+> between normal pages and PMD hugepages.
 > 
-> >The PMU emulation works by creating a perf event in the host, however it is pinned to the KVM process, so the the real PMU counters are stopped and started as the KVM process is >scheduled in and out. This means that it will include any CPU time associated with that process of which your guest is only a subset of.
+> Instead of creating another copy of the operations when we introduce
+> PUD hugepages, let's share them across the different pagesizes.
 > 
-> Thanks for the clarification.
-> As this is the case, the counted cycles from the host should deliver a larger number than the executed instructions inside the guest.
-
-Indeed.
-
-
+> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  virt/kvm/arm/mmu.c | 49 ++++++++++++++++++++++++++++------------------
+>  1 file changed, 30 insertions(+), 19 deletions(-)
 > 
-> >The patchset that James refers to will ensure that the underlying real PMU counters underlying the guest only events will only be enabled upon entering the guest (and disabled on >leaving). Thus you will need to apply this (to your host) for more accurate counting. (You could also then use the perf modifiers in the host to counter guest cycles, e.g. perf -e >instructions:G).
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 5eca48bdb1a6..59595207c5e1 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1475,7 +1475,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  unsigned long fault_status)
+>  {
+>  	int ret;
+> -	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
+> +	bool write_fault, exec_fault, writable, force_pte = false;
+>  	unsigned long mmu_seq;
+>  	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -1484,7 +1484,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	kvm_pfn_t pfn;
+>  	pgprot_t mem_type = PAGE_S2;
+>  	bool logging_active = memslot_is_logging(memslot);
+> -	unsigned long flags = 0;
+> +	unsigned long vma_pagesize, flags = 0;
+
+A small nit s/vma_pagesize/pagesize. Why call it VMA ? Its implicit.
+
+>  
+>  	write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+> @@ -1504,10 +1504,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+> -		hugetlb = true;
+> +	vma_pagesize = vma_kernel_pagesize(vma);
+> +	if (vma_pagesize == PMD_SIZE && !logging_active) {
+>  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+>  	} else {
+> +		/*
+> +		 * Fallback to PTE if it's not one of the Stage 2
+> +		 * supported hugepage sizes
+> +		 */
+> +		vma_pagesize = PAGE_SIZE;
+
+This seems redundant and should be dropped. vma_kernel_pagesize() here either
+calls hugetlb_vm_op_pagesize (via hugetlb_vm_ops->pagesize) or simply returns
+PAGE_SIZE. The vm_ops path is taken if the QEMU VMA covering any given HVA is
+backed either by HugeTLB pages or simply normal pages. vma_pagesize would
+either has a value of PMD_SIZE (HugeTLB hstate based) or PAGE_SIZE. Hence if
+its not PMD_SIZE it must be PAGE_SIZE which should not be assigned again.
+
+> +
+>  		/*
+>  		 * Pages belonging to memslots that don't have the same
+>  		 * alignment for userspace and IPA cannot be mapped using
+> @@ -1573,23 +1579,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (mmu_notifier_retry(kvm, mmu_seq))
+>  		goto out_unlock;
+>  
+> -	if (!hugetlb && !force_pte)
+> -		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+> +	if (vma_pagesize == PAGE_SIZE && !force_pte) {
+> +		/*
+> +		 * Only PMD_SIZE transparent hugepages(THP) are
+> +		 * currently supported. This code will need to be
+> +		 * updated to support other THP sizes.
+> +		 */
+
+This comment belongs to transparent_hugepage_adjust() but not here.
+
+> +		if (transparent_hugepage_adjust(&pfn, &fault_ipa))
+> +			vma_pagesize = PMD_SIZE;
+
+IIUC transparent_hugepage_adjust() is only getting called here. Instead of
+returning 'true' when it is able to detect a huge page backing and doing
+an adjustment there after, it should rather return THP size (PMD_SIZE) to
+accommodate probable multi size THP support in future .
+
+> +	}
+> +
+> +	if (writable)
+> +		kvm_set_pfn_dirty(pfn);
+>  
+> -	if (hugetlb) {
+> +	if (fault_status != FSC_PERM)
+> +		clean_dcache_guest_page(pfn, vma_pagesize);
+> +
+> +	if (exec_fault)
+> +		invalidate_icache_guest_page(pfn, vma_pagesize);
+> +
+> +	if (vma_pagesize == PMD_SIZE) {
+>  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+>  		new_pmd = pmd_mkhuge(new_pmd);
+> -		if (writable) {
+> +		if (writable)
+>  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+> -			kvm_set_pfn_dirty(pfn);
+> -		}
+> -
+> -		if (fault_status != FSC_PERM)
+> -			clean_dcache_guest_page(pfn, PMD_SIZE);
+>  
+>  		if (exec_fault) {
+>  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+> -			invalidate_icache_guest_page(pfn, PMD_SIZE);
+>  		} else if (fault_status == FSC_PERM) {
+>  			/* Preserve execute if XN was already cleared */
+>  			if (stage2_is_exec(kvm, fault_ipa))
+> @@ -1602,16 +1618,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  		if (writable) {
+>  			new_pte = kvm_s2pte_mkwrite(new_pte);
+> -			kvm_set_pfn_dirty(pfn);
+>  			mark_page_dirty(kvm, gfn);
+>  		}
+>  
+> -		if (fault_status != FSC_PERM)
+> -			clean_dcache_guest_page(pfn, PAGE_SIZE);
+> -
+>  		if (exec_fault) {
+>  			new_pte = kvm_s2pte_mkexec(new_pte);
+> -			invalidate_icache_guest_page(pfn, PAGE_SIZE);
+>  		} else if (fault_status == FSC_PERM) {
+>  			/* Preserve execute if XN was already cleared */
+>  			if (stage2_is_exec(kvm, fault_ipa))
 > 
-> So I applied your patch to a 4.19.5 kernel and also your other Patchseries for the perf events in the host [0].
-> So what I do now is running :
-> perf stat -e instructions:G -- ./run_loop_in_kvm.
-> 
-> Run_loop_in_kvm is a small c program who starts a vm and executes a little loop in the guest and then exits.
-> I get a output from perf like the following:
-> 	159732   instructions:Gu
->      ....
-> My Problem is, I am still not sure how to interpret these values as my bare metal code runs a loop for 1048577 times 
-> which executes 3 instructions in every run.
 
-I notice you are using :Gu. The 'u' will record only EL0, are you confident
-that your code runs at this level? Perhaps drop the 'u'.
-
-Also are you compiling with compiler optimisations turned off - or have you
-inspected an objdump of the binary to verify it is as you expect?
-
-
-> 
-> My question is how comes this discrepancy of the counted values.
-> The perf counting from the host delivers a value significantly smaller than the number of instructions in the guest.
-> 
-> I am struggling to interpret the perf counter values as an indication how many instructions my guest performed.
-> What am I missing?
-
-Your expectations are correct. For my own sanity I attempted something similar:
-
-# cat startup.s
-ENTRY(_start)
-SECTIONS
-{
-        . = 0x80080000;
-        .startup . : { startup.o(.text) }
-        .text : { *(.text) }
-        .data : { *(.data) }
-        .bss : { *(.bss COMMON) }
-        . = ALIGN(16);
-        . = . + 0x1000;
-        stack_top = .;
-}
-
-# cat test.c
-void main() {
-        int x=0;
-        for (x=0;x<20000000;x++)
-                ;
-}
-
-# cat script.ld
-
-ENTRY(_start)
-SECTIONS
-{
-        . = 0x80080000;
-        .startup . : { startup.o(.text) }
-        .text : { *(.text) }
-        .data : { *(.data) }
-        .bss : { *(.bss COMMON) }
-        . = ALIGN(16);
-        . = . + 0x1000;
-        stack_top = .;
-}
-
-And then:
-
-# aarch64-linux-gnu-gcc -c test.c -o test.o                                                             
-# aarch64-linux-gnu-as startup.s -o startup.o                                                           
-# aarch64-linux-gnu-ld -T script.ld test.o startup.o -o out                                             
-# aarch64-linux-gnu-objcopy -O binary -S out  
-
-On the host:
-
-# perf stat -e instructions:G /lkvm-static run -k /out  -m 1024 -c 1 --console serial --pmu
-
-...
-
-# KVM session ended normally.
-
- Performance counter stats for '/lkvm-static run -k /out -m 1024 -c 1 --console serial --pmu':
-
-         160000016      instructions:G                                              
-
-
-This matches exactly with what I would expect from the disassembly:
-
-Disassembly of section .startup:
-
-0000000080080000 <_start>:
-    80080000:   580000de        ldr     x30, 80080018 <_start+0x18>
-    80080004:   910003df        mov     sp, x30
-    80080008:   94000006        bl      80080020 <main>
-    8008000c:   d503207f        wfi
-    80080010:   17ffffff        b       8008000c <_start+0xc>
-    80080014:   00000000        .inst   0x00000000 ; undefined
-    80080018:   80081060        .word   0x80081060
-    8008001c:   00000000        .word   0x00000000
-
-Disassembly of section .text:
-
-0000000080080020 <main>:
-    80080020:   d10043ff        sub     sp, sp, #0x10
-    80080024:   b9000fff        str     wzr, [sp, #12]
-    80080028:   b9000fff        str     wzr, [sp, #12]
-    8008002c:   14000004        b       8008003c <main+0x1c>
-    80080030:   b9400fe0        ldr     w0, [sp, #12]
-    80080034:   11000400        add     w0, w0, #0x1
-    80080038:   b9000fe0        str     w0, [sp, #12]
-    8008003c:   b9400fe1        ldr     w1, [sp, #12]
-    80080040:   52859fe0        mov     w0, #0x2cff                     // #11519
-    80080044:   72a02620        movk    w0, #0x131, lsl #16
-    80080048:   6b00003f        cmp     w1, w0
-    8008004c:   54ffff2d        b.le    80080030 <main+0x10>
-    80080050:   d503201f        nop
-    80080054:   910043ff        add     sp, sp, #0x10
-    80080058:   d65f03c0        ret
-
-
-
-> 
-> Also I get the following output for perf stat -e cycles:G ls: 647284 cyles:Gu.
-
-> Is this a indicator that my guest/host modifiers do not work or am I misunderstanding the whole concept here?
-> Sorry for the silly question and thanks in advance!
-
-For 'perf stat -e cycles:G ls' I would expect 0. I'm not quite sure why it's
-showing data for the 'u' modifier. It smells a little like the patch hasn't
-applied or the userspace perf tool is falling back to not using exclude_guest
-and recording just EL0 (which would explain all your figures assuming your
-bare metal code actually runs at EL1).
-
-Try running 'perf stat -vv -e instructions:G ls' Make sure that the last
-'exclude_host    1' you see on the screen is set to 1.
-
-Thanks,
-
-Andrew Murray
-
-> 
-> >Also you may want to refer to kvm-unit-tests are there are test cases that demonstrate bare metal code for PMU enabling.
-> Thanks for the hint, these tests are very useful examples!
-> 
-> [0]: http://lists.infradead.org/pipermail/linux-arm-kernel/2018-November/614985.html
-> 
-> 
+kvm_set_pfn_dirty, clean_dcache_guest_page, invalidate_icache_guest_page
+can all be safely moved before setting the page table entries either as
+PMD or PTE.
