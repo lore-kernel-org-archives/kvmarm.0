@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 10/13] virtio/blk: Reset virtqueue
-Date: Tue,  4 Dec 2018 11:08:43 +0000
-Message-ID: <1543921726-54571-11-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 11/13] threadpool: Add cancel() function
+Date: Tue,  4 Dec 2018 11:08:44 +0000
+Message-ID: <1543921726-54571-12-git-send-email-julien.thierry@arm.com>
 References: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 949CE4A348
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C3E4A357
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yu+qjbFufnYc for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Dec 2018 06:09:05 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7E84A386
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:05 -0500 (EST)
+ with ESMTP id F-bdOx45WNKn for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Dec 2018 06:09:07 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D0854A37E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:06 -0500 (EST)
 In-Reply-To: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,148 +33,81 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-Move pthread creation to init_vq, and kill the thread in exit_vq.
-Initialize the virtqueue states at runtime.
+When resetting a virtqueue, it is often necessary to make sure that the
+associated threadpool job isn't running anymore. Add a function to
+cancel a job.
 
-All in-flight I/O is canceled with the virtqueue pthreads, except for AIO
-threads, but after reading the code I'm not sure if AIO has ever worked
-anyway.
+A threadpool job has three states: idle, queued and running. A job is
+queued when it is in the job list. It is running when it is out the
+list, but its signal count is greater than zero. It is idle when it is
+both out of the list and its signal count is zero. The cancel() function
+simply waits for the job to be idle. It is up to the caller to make sure
+that the job isn't queued concurrently.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- virtio/blk.c | 67 ++++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 45 insertions(+), 22 deletions(-)
+ include/kvm/threadpool.h |  2 ++
+ util/threadpool.c        | 25 ++++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/virtio/blk.c b/virtio/blk.c
-index 6a6b3b7..a57df2e 100644
---- a/virtio/blk.c
-+++ b/virtio/blk.c
-@@ -178,9 +178,29 @@ static void notify_status(struct kvm *kvm, void *dev, u32 status)
- {
- }
- 
-+static void *virtio_blk_thread(void *dev)
-+{
-+	struct blk_dev *bdev = dev;
-+	u64 data;
-+	int r;
-+
-+	kvm__set_thread_name("virtio-blk-io");
-+
-+	while (1) {
-+		r = read(bdev->io_efd, &data, sizeof(u64));
-+		if (r < 0)
-+			continue;
-+		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
-+	}
-+
-+	pthread_exit(NULL);
-+	return NULL;
-+}
-+
- static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 		   u32 pfn)
- {
-+	unsigned int i;
- 	struct blk_dev *bdev = dev;
- 	struct virt_queue *queue;
- 	void *p;
-@@ -194,26 +214,37 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 	vring_init(&queue->vring, VIRTIO_BLK_QUEUE_SIZE, p, align);
- 	virtio_init_device_vq(&bdev->vdev, queue);
- 
-+	if (vq != 0)
-+		return 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
-+		bdev->reqs[i] = (struct blk_dev_req) {
-+			.bdev = bdev,
-+			.kvm = kvm,
-+		};
-+	}
-+
-+	mutex_init(&bdev->mutex);
-+	bdev->io_efd = eventfd(0, 0);
-+	if (bdev->io_efd < 0)
-+		return -errno;
-+
-+	if (pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev))
-+		return -errno;
-+
- 	return 0;
- }
- 
--static void *virtio_blk_thread(void *dev)
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
- {
- 	struct blk_dev *bdev = dev;
--	u64 data;
--	int r;
- 
--	kvm__set_thread_name("virtio-blk-io");
-+	if (vq != 0)
-+		return;
- 
--	while (1) {
--		r = read(bdev->io_efd, &data, sizeof(u64));
--		if (r < 0)
--			continue;
--		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
--	}
--
--	pthread_exit(NULL);
--	return NULL;
-+	close(bdev->io_efd);
-+	pthread_cancel(bdev->io_thread);
-+	pthread_join(bdev->io_thread, NULL);
- }
- 
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
-@@ -259,6 +290,7 @@ static struct virtio_ops blk_dev_virtio_ops = {
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.notify_status		= notify_status,
- 	.notify_vq		= notify_vq,
- 	.get_vq			= get_vq,
-@@ -269,7 +301,6 @@ static struct virtio_ops blk_dev_virtio_ops = {
- static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- {
- 	struct blk_dev *bdev;
--	unsigned int i;
- 
- 	if (!disk)
- 		return -EINVAL;
-@@ -279,13 +310,11 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- 		return -ENOMEM;
- 
- 	*bdev = (struct blk_dev) {
--		.mutex			= MUTEX_INITIALIZER,
- 		.disk			= disk,
- 		.blk_config		= (struct virtio_blk_config) {
- 			.capacity	= disk->size / SECTOR_SIZE,
- 			.seg_max	= DISK_SEG_MAX,
- 		},
--		.io_efd			= eventfd(0, 0),
- 		.kvm			= kvm,
+diff --git a/include/kvm/threadpool.h b/include/kvm/threadpool.h
+index bacb243..880487a 100644
+--- a/include/kvm/threadpool.h
++++ b/include/kvm/threadpool.h
+@@ -28,11 +28,13 @@ static inline void thread_pool__init_job(struct thread_pool__job *job, struct kv
+ 		.data		= data,
+ 		.mutex		= MUTEX_INITIALIZER,
  	};
++	INIT_LIST_HEAD(&job->queue);
+ }
  
-@@ -295,14 +324,8 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
+ int thread_pool__init(struct kvm *kvm);
+ int thread_pool__exit(struct kvm *kvm);
  
- 	list_add_tail(&bdev->list, &bdevs);
+ void thread_pool__do_job(struct thread_pool__job *job);
++void thread_pool__cancel_job(struct thread_pool__job *job);
  
--	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
--		bdev->reqs[i].bdev = bdev;
--		bdev->reqs[i].kvm = kvm;
--	}
--
- 	disk_image__set_callback(bdev->disk, virtio_blk_complete);
+ #endif
+diff --git a/util/threadpool.c b/util/threadpool.c
+index e64aa26..1dc3bf7 100644
+--- a/util/threadpool.c
++++ b/util/threadpool.c
+@@ -25,7 +25,7 @@ static struct thread_pool__job *thread_pool__job_pop_locked(void)
+ 		return NULL;
  
--	pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev);
- 	if (compat_id == -1)
- 		compat_id = virtio_compat_add_message("virtio-blk", "CONFIG_VIRTIO_BLK");
+ 	job = list_first_entry(&head, struct thread_pool__job, queue);
+-	list_del(&job->queue);
++	list_del_init(&job->queue);
  
+ 	return job;
+ }
+@@ -173,3 +173,26 @@ void thread_pool__do_job(struct thread_pool__job *job)
+ 	pthread_cond_signal(&job_cond);
+ 	mutex_unlock(&job_mutex);
+ }
++
++void thread_pool__cancel_job(struct thread_pool__job *job)
++{
++	bool running;
++
++	/*
++	 * If the job is queued but not running, remove it. Otherwise, wait for
++	 * the signalcount to drop to 0, indicating that it has finished
++	 * running. We assume that nobody is queueing this job -
++	 * thread_pool__do_job() isn't called - while this function is running.
++	 */
++	do {
++		mutex_lock(&job_mutex);
++		if (list_empty(&job->queue)) {
++			running = job->signalcount > 0;
++		} else {
++			list_del_init(&job->queue);
++			job->signalcount = 0;
++			running = false;
++		}
++		mutex_unlock(&job_mutex);
++	} while (running);
++}
 -- 
 1.9.1
