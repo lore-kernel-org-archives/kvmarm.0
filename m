@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 05/13] virtio: Add exit_vq() callback
-Date: Tue,  4 Dec 2018 11:08:38 +0000
-Message-ID: <1543921726-54571-6-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 09/13] virtio/net: Implement device and virtqueue reset
+Date: Tue,  4 Dec 2018 11:08:42 +0000
+Message-ID: <1543921726-54571-10-git-send-email-julien.thierry@arm.com>
 References: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3002A4A36D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 985E94A372
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TmcBfMfq2mu7 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Dec 2018 06:08:59 -0500 (EST)
+ with ESMTP id OHynwfaIfQux for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Dec 2018 06:09:04 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D454C4A365
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:08:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C57314A38E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:03 -0500 (EST)
 In-Reply-To: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,158 +33,127 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-Virtio allows to reset individual virtqueues. For legacy devices, it's
-done by writing an address of 0 into the PFN register. Modern devices have
-an "enable" register. Add an exit_vq() callback to all devices. A lot more
-work is required by each device to clean up their virtqueue state, and by
-the core to reset things like MSI routes and ioeventfds.
+On exit_vq(), clean all resources allocated for the queue. When the device
+is reset, clean the backend.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/virtio.h |  5 +++++
- virtio/core.c        | 10 ++++++++++
- virtio/mmio.c        | 26 ++++++++++++++++++++------
- virtio/pci.c         | 23 +++++++++++++++++++----
- 4 files changed, 54 insertions(+), 10 deletions(-)
+ virtio/net.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
-diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index fd04d21..20399f4 100644
---- a/include/kvm/virtio.h
-+++ b/include/kvm/virtio.h
-@@ -52,6 +52,7 @@ struct virt_queue {
- 	u16		last_used_signalled;
- 	u16		endian;
- 	bool		use_event_idx;
-+	bool		enabled;
+diff --git a/virtio/net.c b/virtio/net.c
+index ef8e226..a05f4cd 100644
+--- a/virtio/net.c
++++ b/virtio/net.c
+@@ -43,6 +43,8 @@ struct net_dev_queue {
+ 	pthread_t			thread;
+ 	struct mutex			lock;
+ 	pthread_cond_t			cond;
++	int				gsi;
++	int				irqfd;
  };
  
- /*
-@@ -181,6 +182,7 @@ struct virtio_ops {
- 	int (*get_vq_count)(struct kvm *kvm, void *dev);
- 	int (*init_vq)(struct kvm *kvm, void *dev, u32 vq, u32 page_size,
- 		       u32 align, u32 pfn);
-+	void (*exit_vq)(struct kvm *kvm, void *dev, u32 vq);
- 	int (*notify_vq)(struct kvm *kvm, void *dev, u32 vq);
- 	struct virt_queue *(*get_vq)(struct kvm *kvm, void *dev, u32 vq);
- 	int (*get_size_vq)(struct kvm *kvm, void *dev, u32 vq);
-@@ -211,8 +213,11 @@ static inline void virtio_init_device_vq(struct virtio_device *vdev,
- {
- 	vq->endian = vdev->endian;
- 	vq->use_event_idx = (vdev->features & VIRTIO_RING_F_EVENT_IDX);
-+	vq->enabled = true;
- }
- 
-+void virtio_exit_vq(struct kvm *kvm, struct virtio_device *vdev, void *dev,
-+		    int num);
- void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
- 			       void *dev, u32 features);
- void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
-diff --git a/virtio/core.c b/virtio/core.c
-index 9114f27..67d4114 100644
---- a/virtio/core.c
-+++ b/virtio/core.c
-@@ -166,6 +166,16 @@ u16 virt_queue__get_inout_iov(struct kvm *kvm, struct virt_queue *queue,
- 	return head;
- }
- 
-+void virtio_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
-+			   void *dev, int num)
-+{
-+	struct virt_queue *vq = vdev->ops->get_vq(kvm, dev, num);
-+
-+	if (vq->enabled && vdev->ops->exit_vq)
-+		vdev->ops->exit_vq(kvm, dev, num);
-+	memset(vq, 0, sizeof(*vq));
-+}
-+
- int virtio__get_dev_specific_field(int offset, bool msix, u32 *config_off)
- {
- 	if (msix) {
-diff --git a/virtio/mmio.c b/virtio/mmio.c
-index 70f767e..4b8c20e 100644
---- a/virtio/mmio.c
-+++ b/virtio/mmio.c
-@@ -79,6 +79,15 @@ int virtio_mmio_signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq)
+ struct net_dev {
+@@ -361,6 +363,23 @@ fail:
  	return 0;
  }
  
-+static void virtio_mmio_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
-+				int vq)
++static void virtio_net__tap_exit(struct net_dev *ndev)
 +{
-+	struct virtio_mmio *vmmio = vdev->virtio;
++	int sock;
++	struct ifreq ifr;
 +
-+	ioeventfd__del_event(vmmio->addr + VIRTIO_MMIO_QUEUE_NOTIFY, vq);
-+	virtio_exit_vq(kvm, vdev, vmmio->dev, vq);
++	if (ndev->params->tapif)
++		return;
++
++	sock = socket(AF_INET, SOCK_STREAM, 0);
++	strncpy(ifr.ifr_name, ndev->tap_name, sizeof(ndev->tap_name));
++	ioctl(sock, SIOCGIFFLAGS, &ifr);
++	ifr.ifr_flags &= ~(IFF_UP | IFF_RUNNING);
++	if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
++		pr_warning("Count not bring tap device down");
++	close(sock);
 +}
 +
- int virtio_mmio_signal_config(struct kvm *kvm, struct virtio_device *vdev)
+ static bool virtio_net__tap_create(struct net_dev *ndev)
  {
- 	struct virtio_mmio *vmmio = vdev->virtio;
-@@ -188,12 +197,17 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
- 		break;
- 	case VIRTIO_MMIO_QUEUE_PFN:
- 		val = ioport__read32(data);
--		virtio_mmio_init_ioeventfd(vmmio->kvm, vdev, vmmio->hdr.queue_sel);
--		vdev->ops->init_vq(vmmio->kvm, vmmio->dev,
--				   vmmio->hdr.queue_sel,
--				   vmmio->hdr.guest_page_size,
--				   vmmio->hdr.queue_align,
--				   val);
-+		if (val) {
-+			virtio_mmio_init_ioeventfd(vmmio->kvm, vdev,
-+						   vmmio->hdr.queue_sel);
-+			vdev->ops->init_vq(vmmio->kvm, vmmio->dev,
-+					   vmmio->hdr.queue_sel,
-+					   vmmio->hdr.guest_page_size,
-+					   vmmio->hdr.queue_align,
-+					   val);
-+		} else {
-+			virtio_mmio_exit_vq(kvm, vdev, vmmio->hdr.queue_sel);
-+		}
- 		break;
- 	case VIRTIO_MMIO_QUEUE_NOTIFY:
- 		val = ioport__read32(data);
-diff --git a/virtio/pci.c b/virtio/pci.c
-index 8add770..2da2d3f 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -72,6 +72,16 @@ free_ioport_evt:
- 	return r;
+ 	int offload;
+@@ -533,10 +552,21 @@ static void virtio_net_start(struct net_dev *ndev)
+ 	}
  }
  
-+static void virtio_pci_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
-+			       int vq)
++static void virtio_net_stop(struct net_dev *ndev)
 +{
-+	struct virtio_pci *vpci = vdev->virtio;
-+
-+	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
-+	ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
-+	virtio_exit_vq(kvm, vdev, vpci->dev, vq);
++	/* Undo whatever start() did */
++	if (ndev->mode == NET_MODE_TAP)
++		virtio_net__tap_exit(ndev);
++	else
++		uip_exit(&ndev->info);
 +}
 +
- static inline bool virtio_pci__msix_enabled(struct virtio_pci *vpci)
+ static void notify_status(struct kvm *kvm, void *dev, u32 status)
  {
- 	return vpci->pci_hdr.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE);
-@@ -270,10 +280,15 @@ static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
- 		break;
- 	case VIRTIO_PCI_QUEUE_PFN:
- 		val = ioport__read32(data);
--		virtio_pci__init_ioeventfd(kvm, vdev, vpci->queue_selector);
--		vdev->ops->init_vq(kvm, vpci->dev, vpci->queue_selector,
--				   1 << VIRTIO_PCI_QUEUE_ADDR_SHIFT,
--				   VIRTIO_PCI_VRING_ALIGN, val);
-+		if (val) {
-+			virtio_pci__init_ioeventfd(kvm, vdev,
-+						   vpci->queue_selector);
-+			vdev->ops->init_vq(kvm, vpci->dev, vpci->queue_selector,
-+					   1 << VIRTIO_PCI_QUEUE_ADDR_SHIFT,
-+					   VIRTIO_PCI_VRING_ALIGN, val);
-+		} else {
-+			virtio_pci_exit_vq(kvm, vdev, vpci->queue_selector);
-+		}
- 		break;
- 	case VIRTIO_PCI_QUEUE_SEL:
- 		vpci->queue_selector = ioport__read16(data);
+ 	if (status & VIRTIO__STATUS_START)
+ 		virtio_net_start(dev);
++	else if (status & VIRTIO__STATUS_STOP)
++		virtio_net_stop(dev);
+ }
+ 
+ static bool is_ctrl_vq(struct net_dev *ndev, u32 vq)
+@@ -611,6 +641,35 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 	return 0;
+ }
+ 
++static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
++{
++	struct net_dev *ndev = dev;
++	struct net_dev_queue *queue = &ndev->queues[vq];
++
++	if (!is_ctrl_vq(ndev, vq) && queue->gsi) {
++		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
++		close(queue->irqfd);
++		queue->gsi = queue->irqfd = 0;
++	}
++
++	/*
++	 * TODO: vhost reset owner. It's the only way to cleanly stop vhost, but
++	 * we can't restart it at the moment.
++	 */
++	if (ndev->vhost_fd && !is_ctrl_vq(ndev, vq)) {
++		pr_warning("Cannot reset VHOST queue");
++		ioctl(ndev->vhost_fd, VHOST_RESET_OWNER);
++		return;
++	}
++
++	/*
++	 * Threads are waiting on cancellation points (readv or
++	 * pthread_cond_wait) and should stop gracefully.
++	 */
++	pthread_cancel(queue->thread);
++	pthread_join(queue->thread, NULL);
++}
++
+ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ {
+ 	struct net_dev *ndev = dev;
+@@ -630,6 +689,9 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ 	if (r < 0)
+ 		die_perror("KVM_IRQFD failed");
+ 
++	queue->irqfd = file.fd;
++	queue->gsi = gsi;
++
+ 	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
+ 	if (r < 0)
+ 		die_perror("VHOST_SET_VRING_CALL failed");
+@@ -698,6 +760,7 @@ static struct virtio_ops net_dev_virtio_ops = {
+ 	.set_guest_features	= set_guest_features,
+ 	.get_vq_count		= get_vq_count,
+ 	.init_vq		= init_vq,
++	.exit_vq		= exit_vq,
+ 	.get_vq			= get_vq,
+ 	.get_size_vq		= get_size_vq,
+ 	.set_size_vq		= set_size_vq,
 -- 
 1.9.1
