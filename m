@@ -1,21 +1,23 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 0/6] arm: Add support for firmware booting
-Date: Tue,  4 Dec 2018 11:14:27 +0000
-Message-ID: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 1/6] rtc: Initialize the Register D for MC146818 RTC
+Date: Tue,  4 Dec 2018 11:14:28 +0000
+Message-ID: <1543922073-55530-2-git-send-email-julien.thierry@arm.com>
+References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79FE24A332
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E26E54A342
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tl2tPwnIn+dV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Dec 2018 06:14:40 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4215E4A2BD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:40 -0500 (EST)
+ with ESMTP id ywNpuGCy6H77 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Dec 2018 06:14:41 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0B24A332
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:41 -0500 (EST)
+In-Reply-To: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,59 +28,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Sami.Mujawar@arm.com, will.deacon@arm.com
+Cc: Sami Mujawar <sami.mujawar@arm.com>, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+From: Sami Mujawar <sami.mujawar@arm.com>
 
-This series is based on the virtio reset series posted earlier:
-https://marc.info/?l=kvm&m=154392174625966&w=2
+Some software drivers check the VRT bit (BIT7) of Register D before
+using the MC146818 RTC. Initialized the VRT bit in rtc__init() to
+indicate that the RAM and time contents are valid.
 
-We would like to be able to load firmwares like UEFI in kvmtool.
+Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+---
+ hw/rtc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-The series contains:
-A way to load the firmware into RAM and an option to be able to create
-non-volatile memory zones and load data into them.
-
-Those non-volatile memory are presented throught the DT with a node:
-
-	<name>@<addr> {
-		compatible = "kvmtool,<name>";
-		reg = < <addr> <size> >;
-	}
-
-These are expected to be dealt with by specific kvmtool driver and not
-to be picked up by existing drivers (although technically it is just
-plain memory, mapped in the guest).
-
-Cheers,
-
-Julien
-
--->
-
-Julien Thierry (5):
-  arm: Move firmware function
-  builtin-run: Do not look for default kernel when firmware is provided
-  arm: Support firmware loading
-  kvm: Add arch specific reset
-  arm: Support non-volatile memory
-
-Sami Mujawar (1):
-  rtc: Initialize the Register D for MC146818 RTC
-
- arm/fdt.c                                |  67 ++++++++--
- arm/include/arm-common/kvm-arch.h        |   5 +-
- arm/include/arm-common/kvm-config-arch.h |  21 +++-
- arm/kvm.c                                | 204 +++++++++++++++++++++++++++++++
- builtin-run.c                            |  24 ++--
- hw/rtc.c                                 |   8 ++
- include/kvm/kvm.h                        |   1 +
- kvm.c                                    |   2 +
- mips/kvm.c                               |   4 +
- powerpc/kvm.c                            |   4 +
- x86/kvm.c                                |   4 +
- 11 files changed, 323 insertions(+), 21 deletions(-)
-
---
+diff --git a/hw/rtc.c b/hw/rtc.c
+index 0649b5d..c1fa72f 100644
+--- a/hw/rtc.c
++++ b/hw/rtc.c
+@@ -25,6 +25,11 @@
+ #define RTC_REG_C			0x0C
+ #define RTC_REG_D			0x0D
+ 
++/*
++ * Register D Bits
++ */
++#define RTC_REG_D_VRT			(1 << 7)
++
+ struct rtc_device {
+ 	u8			cmos_idx;
+ 	u8			cmos_data[128];
+@@ -140,6 +145,9 @@ int rtc__init(struct kvm *kvm)
+ 		return r;
+ 	}
+ 
++	/* Set the VRT bit in Register D to indicate valid RAM and time */
++	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
++
+ 	return r;
+ }
+ dev_init(rtc__init);
+-- 
 1.9.1
