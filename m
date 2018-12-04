@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 06/13] virtio: Add reset() callback
-Date: Tue,  4 Dec 2018 11:08:39 +0000
-Message-ID: <1543921726-54571-7-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 08/13] virtio/net: Clean virtqueue state
+Date: Tue,  4 Dec 2018 11:08:41 +0000
+Message-ID: <1543921726-54571-9-git-send-email-julien.thierry@arm.com>
 References: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BBF04A354
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C99CA4A359
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UE4rg8KVFJvh for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Dec 2018 06:09:00 -0500 (EST)
+ with ESMTP id JlfSfqx5iqTs for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Dec 2018 06:09:03 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 093734A378
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B73A4A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:02 -0500 (EST)
 In-Reply-To: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,168 +33,283 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-When the guest writes a status of 0, the device should be reset. Add a
-reset() callback for the transport layer to reset all queues and their
-ioeventfd.
+Currently the virtqueue state is mixed with the netdev state. Move it to a
+separate structure.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/virtio-mmio.h |  1 +
- include/kvm/virtio-pci.h  |  1 +
- include/kvm/virtio.h      |  1 +
- virtio/core.c             |  9 +++++++++
- virtio/mmio.c             | 16 ++++++++++++----
- virtio/pci.c              | 20 +++++++++++++-------
- 6 files changed, 37 insertions(+), 11 deletions(-)
+ virtio/net.c | 110 +++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 57 insertions(+), 53 deletions(-)
 
-diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
-index 835f421..0528947 100644
---- a/include/kvm/virtio-mmio.h
-+++ b/include/kvm/virtio-mmio.h
-@@ -54,6 +54,7 @@ struct virtio_mmio {
- int virtio_mmio_signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
- int virtio_mmio_signal_config(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev);
-+int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		      int device_id, int subsys_id, int class);
- void virtio_mmio_assign_irq(struct device_header *dev_hdr);
-diff --git a/include/kvm/virtio-pci.h b/include/kvm/virtio-pci.h
-index b70cadd..278a259 100644
---- a/include/kvm/virtio-pci.h
-+++ b/include/kvm/virtio-pci.h
-@@ -55,6 +55,7 @@ struct virtio_pci {
- int virtio_pci__signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
- int virtio_pci__signal_config(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev);
-+int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		     int device_id, int subsys_id, int class);
- 
-diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 20399f4..5678695 100644
---- a/include/kvm/virtio.h
-+++ b/include/kvm/virtio.h
-@@ -195,6 +195,7 @@ struct virtio_ops {
- 	int (*init)(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		    int device_id, int subsys_id, int class);
- 	int (*exit)(struct kvm *kvm, struct virtio_device *vdev);
-+	int (*reset)(struct kvm *kvm, struct virtio_device *vdev);
+diff --git a/virtio/net.c b/virtio/net.c
+index d65d04e..ef8e226 100644
+--- a/virtio/net.c
++++ b/virtio/net.c
+@@ -36,18 +36,23 @@ struct net_dev_operations {
+ 	int (*tx)(struct iovec *iov, u16 in, struct net_dev *ndev);
  };
  
- int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-diff --git a/virtio/core.c b/virtio/core.c
-index 67d4114..e10ec36 100644
---- a/virtio/core.c
-+++ b/virtio/core.c
-@@ -241,6 +241,13 @@ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
- 	} else if (!status && (vdev->status & VIRTIO__STATUS_START)) {
- 		vdev->status &= ~VIRTIO__STATUS_START;
- 		ext_status |= VIRTIO__STATUS_STOP;
++struct net_dev_queue {
++	int				id;
++	struct net_dev			*ndev;
++	struct virt_queue		vq;
++	pthread_t			thread;
++	struct mutex			lock;
++	pthread_cond_t			cond;
++};
 +
-+		/*
-+		 * Reset virtqueues and stop all traffic now, so that the device
-+		 * can safely reset the backend in notify_status().
-+		 */
-+		if (ext_status & VIRTIO__STATUS_STOP)
-+			vdev->ops->reset(kvm, vdev);
+ struct net_dev {
+ 	struct mutex			mutex;
+ 	struct virtio_device		vdev;
+ 	struct list_head		list;
+ 
+-	struct virt_queue		vqs[VIRTIO_NET_NUM_QUEUES * 2 + 1];
++	struct net_dev_queue		queues[VIRTIO_NET_NUM_QUEUES * 2 + 1];
+ 	struct virtio_net_config	config;
+-	u32				features, rx_vqs, tx_vqs, queue_pairs;
+-
+-	pthread_t			io_thread[VIRTIO_NET_NUM_QUEUES * 2 + 1];
+-	struct mutex			io_lock[VIRTIO_NET_NUM_QUEUES * 2 + 1];
+-	pthread_cond_t			io_cond[VIRTIO_NET_NUM_QUEUES * 2 + 1];
++	u32				features, queue_pairs;
+ 
+ 	int				vhost_fd;
+ 	int				tap_fd;
+@@ -92,28 +97,22 @@ static void virtio_net_fix_rx_hdr(struct virtio_net_hdr *hdr, struct net_dev *nd
+ static void *virtio_net_rx_thread(void *p)
+ {
+ 	struct iovec iov[VIRTIO_NET_QUEUE_SIZE];
+-	struct virt_queue *vq;
++	struct net_dev_queue *queue = p;
++	struct virt_queue *vq = &queue->vq;
++	struct net_dev *ndev = queue->ndev;
+ 	struct kvm *kvm;
+-	struct net_dev *ndev = p;
+ 	u16 out, in;
+ 	u16 head;
+ 	int len, copied;
+-	u32 id;
+-
+-	mutex_lock(&ndev->mutex);
+-	id = ndev->rx_vqs++ * 2;
+-	mutex_unlock(&ndev->mutex);
+ 
+ 	kvm__set_thread_name("virtio-net-rx");
+ 
+ 	kvm = ndev->kvm;
+-	vq = &ndev->vqs[id];
+-
+ 	while (1) {
+-		mutex_lock(&ndev->io_lock[id]);
++		mutex_lock(&queue->lock);
+ 		if (!virt_queue__available(vq))
+-			pthread_cond_wait(&ndev->io_cond[id], &ndev->io_lock[id].mutex);
+-		mutex_unlock(&ndev->io_lock[id]);
++			pthread_cond_wait(&queue->cond, &queue->lock.mutex);
++		mutex_unlock(&queue->lock);
+ 
+ 		while (virt_queue__available(vq)) {
+ 			unsigned char buffer[MAX_PACKET_SIZE + sizeof(struct virtio_net_hdr_mrg_rxbuf)];
+@@ -127,7 +126,7 @@ static void *virtio_net_rx_thread(void *p)
+ 			len = ndev->ops->rx(&dummy_iov, 1, ndev);
+ 			if (len < 0) {
+ 				pr_warning("%s: rx on vq %u failed (%d), exiting thread\n",
+-						__func__, id, len);
++						__func__, queue->id, len);
+ 				goto out_err;
+ 			}
+ 
+@@ -155,7 +154,7 @@ static void *virtio_net_rx_thread(void *p)
+ 
+ 			/* We should interrupt guest right now, otherwise latency is huge. */
+ 			if (virtio_queue__should_signal(vq))
+-				ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, id);
++				ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, queue->id);
+ 		}
  	}
  
- 	if (vdev->ops->notify_status)
-@@ -264,6 +271,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		vdev->ops->signal_config	= virtio_pci__signal_config;
- 		vdev->ops->init			= virtio_pci__init;
- 		vdev->ops->exit			= virtio_pci__exit;
-+		vdev->ops->reset		= virtio_pci__reset;
- 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
- 		break;
- 	case VIRTIO_MMIO:
-@@ -276,6 +284,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		vdev->ops->signal_config	= virtio_mmio_signal_config;
- 		vdev->ops->init			= virtio_mmio_init;
- 		vdev->ops->exit			= virtio_mmio_exit;
-+		vdev->ops->reset		= virtio_mmio_reset;
- 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
- 		break;
- 	default:
-diff --git a/virtio/mmio.c b/virtio/mmio.c
-index 4b8c20e..eff147a 100644
---- a/virtio/mmio.c
-+++ b/virtio/mmio.c
-@@ -326,15 +326,23 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	return 0;
- }
- 
-+int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev)
-+{
-+	int vq;
-+	struct virtio_mmio *vmmio = vdev->virtio;
-+
-+	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vmmio->dev); vq++)
-+		virtio_mmio_exit_vq(kvm, vdev, vq);
-+
-+	return 0;
-+}
-+
- int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev)
+@@ -168,28 +167,23 @@ out_err:
+ static void *virtio_net_tx_thread(void *p)
  {
- 	struct virtio_mmio *vmmio = vdev->virtio;
--	int i;
- 
-+	virtio_mmio_reset(kvm, vdev);
- 	kvm__deregister_mmio(kvm, vmmio->addr);
- 
--	for (i = 0; i < VIRTIO_MMIO_MAX_VQ; i++)
--		ioeventfd__del_event(vmmio->addr + VIRTIO_MMIO_QUEUE_NOTIFY, i);
+ 	struct iovec iov[VIRTIO_NET_QUEUE_SIZE];
+-	struct virt_queue *vq;
++	struct net_dev_queue *queue = p;
++	struct virt_queue *vq = &queue->vq;
++	struct net_dev *ndev = queue->ndev;
+ 	struct kvm *kvm;
+-	struct net_dev *ndev = p;
+ 	u16 out, in;
+ 	u16 head;
+ 	int len;
+-	u32 id;
 -
- 	return 0;
- }
-diff --git a/virtio/pci.c b/virtio/pci.c
-index 2da2d3f..99653ca 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -77,8 +77,8 @@ static void virtio_pci_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
+-	mutex_lock(&ndev->mutex);
+-	id = ndev->tx_vqs++ * 2 + 1;
+-	mutex_unlock(&ndev->mutex);
+ 
+ 	kvm__set_thread_name("virtio-net-tx");
+ 
+ 	kvm = ndev->kvm;
+-	vq = &ndev->vqs[id];
+ 
+ 	while (1) {
+-		mutex_lock(&ndev->io_lock[id]);
++		mutex_lock(&queue->lock);
+ 		if (!virt_queue__available(vq))
+-			pthread_cond_wait(&ndev->io_cond[id], &ndev->io_lock[id].mutex);
+-		mutex_unlock(&ndev->io_lock[id]);
++			pthread_cond_wait(&queue->cond, &queue->lock.mutex);
++		mutex_unlock(&queue->lock);
+ 
+ 		while (virt_queue__available(vq)) {
+ 			struct virtio_net_hdr *hdr;
+@@ -199,7 +193,7 @@ static void *virtio_net_tx_thread(void *p)
+ 			len = ndev->ops->tx(iov, out, ndev);
+ 			if (len < 0) {
+ 				pr_warning("%s: tx on vq %u failed (%d)\n",
+-						__func__, id, errno);
++						__func__, queue->id, errno);
+ 				goto out_err;
+ 			}
+ 
+@@ -207,7 +201,7 @@ static void *virtio_net_tx_thread(void *p)
+ 		}
+ 
+ 		if (virtio_queue__should_signal(vq))
+-			ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, id);
++			ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, queue->id);
+ 	}
+ 
+ out_err:
+@@ -224,24 +218,24 @@ static virtio_net_ctrl_ack virtio_net_handle_mq(struct kvm* kvm, struct net_dev
+ static void *virtio_net_ctrl_thread(void *p)
  {
- 	struct virtio_pci *vpci = vdev->virtio;
+ 	struct iovec iov[VIRTIO_NET_QUEUE_SIZE];
++	struct net_dev_queue *queue = p;
++	struct virt_queue *vq = &queue->vq;
++	struct net_dev *ndev = queue->ndev;
+ 	u16 out, in, head;
+-	struct net_dev *ndev = p;
+ 	struct kvm *kvm = ndev->kvm;
+-	u32 id = ndev->queue_pairs * 2;
+-	struct virt_queue *vq = &ndev->vqs[id];
+ 	struct virtio_net_ctrl_hdr *ctrl;
+ 	virtio_net_ctrl_ack *ack;
  
--	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
- 	ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
-+	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
- 	virtio_exit_vq(kvm, vdev, vpci->dev, vq);
- }
+ 	kvm__set_thread_name("virtio-net-ctrl");
  
-@@ -522,19 +522,25 @@ free_ioport:
- 	return r;
- }
+ 	while (1) {
+-		mutex_lock(&ndev->io_lock[id]);
++		mutex_lock(&queue->lock);
+ 		if (!virt_queue__available(vq))
+-			pthread_cond_wait(&ndev->io_cond[id], &ndev->io_lock[id].mutex);
+-		mutex_unlock(&ndev->io_lock[id]);
++			pthread_cond_wait(&queue->cond, &queue->lock.mutex);
++		mutex_unlock(&queue->lock);
  
-+int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
-+{
-+	int vq;
-+	struct virtio_pci *vpci = vdev->virtio;
-+
-+	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vpci->dev); vq++)
-+		virtio_pci_exit_vq(kvm, vdev, vq);
-+
-+	return 0;
-+}
-+
- int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev)
+ 		while (virt_queue__available(vq)) {
+-			head = virt_queue__get_iov(&ndev->vqs[id], iov, &out, &in, kvm);
++			head = virt_queue__get_iov(vq, iov, &out, &in, kvm);
+ 			ctrl = iov[0].iov_base;
+ 			ack = iov[out].iov_base;
+ 
+@@ -253,11 +247,11 @@ static void *virtio_net_ctrl_thread(void *p)
+ 				*ack = VIRTIO_NET_ERR;
+ 				break;
+ 			}
+-			virt_queue__set_used_elem(&ndev->vqs[id], head, iov[out].iov_len);
++			virt_queue__set_used_elem(vq, head, iov[out].iov_len);
+ 		}
+ 
+-		if (virtio_queue__should_signal(&ndev->vqs[id]))
+-			ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, id);
++		if (virtio_queue__should_signal(vq))
++			ndev->vdev.ops->signal_vq(kvm, &ndev->vdev, queue->id);
+ 	}
+ 
+ 	pthread_exit(NULL);
+@@ -267,14 +261,16 @@ static void *virtio_net_ctrl_thread(void *p)
+ 
+ static void virtio_net_handle_callback(struct kvm *kvm, struct net_dev *ndev, int queue)
  {
- 	struct virtio_pci *vpci = vdev->virtio;
--	int i;
++	struct net_dev_queue *net_queue = &ndev->queues[queue];
++
+ 	if ((u32)queue >= (ndev->queue_pairs * 2 + 1)) {
+ 		pr_warning("Unknown queue index %u", queue);
+ 		return;
+ 	}
  
-+	virtio_pci__reset(kvm, vdev);
- 	kvm__deregister_mmio(kvm, vpci->mmio_addr);
- 	kvm__deregister_mmio(kvm, vpci->msix_io_block);
- 	ioport__unregister(kvm, vpci->port_addr);
- 
--	for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++) {
--		ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
--		ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
--	}
--
- 	return 0;
+-	mutex_lock(&ndev->io_lock[queue]);
+-	pthread_cond_signal(&ndev->io_cond[queue]);
+-	mutex_unlock(&ndev->io_lock[queue]);
++	mutex_lock(&net_queue->lock);
++	pthread_cond_signal(&net_queue->cond);
++	mutex_unlock(&net_queue->lock);
  }
+ 
+ static int virtio_net_request_tap(struct net_dev *ndev, struct ifreq *ifr,
+@@ -552,6 +548,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 		   u32 pfn)
+ {
+ 	struct vhost_vring_state state = { .index = vq };
++	struct net_dev_queue *net_queue;
+ 	struct vhost_vring_addr addr;
+ 	struct net_dev *ndev = dev;
+ 	struct virt_queue *queue;
+@@ -560,24 +557,30 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 
+ 	compat__remove_message(compat_id);
+ 
+-	queue		= &ndev->vqs[vq];
++	net_queue	= &ndev->queues[vq];
++	net_queue->id	= vq;
++	net_queue->ndev	= ndev;
++	queue		= &net_queue->vq;
+ 	queue->pfn	= pfn;
+ 	p		= virtio_get_vq(kvm, queue->pfn, page_size);
+ 
+ 	vring_init(&queue->vring, VIRTIO_NET_QUEUE_SIZE, p, align);
+ 	virtio_init_device_vq(&ndev->vdev, queue);
+ 
+-	mutex_init(&ndev->io_lock[vq]);
+-	pthread_cond_init(&ndev->io_cond[vq], NULL);
++	mutex_init(&net_queue->lock);
++	pthread_cond_init(&net_queue->cond, NULL);
+ 	if (is_ctrl_vq(ndev, vq)) {
+-		pthread_create(&ndev->io_thread[vq], NULL, virtio_net_ctrl_thread, ndev);
++		pthread_create(&net_queue->thread, NULL, virtio_net_ctrl_thread,
++			       net_queue);
+ 
+ 		return 0;
+ 	} else if (ndev->vhost_fd == 0 ) {
+ 		if (vq & 1)
+-			pthread_create(&ndev->io_thread[vq], NULL, virtio_net_tx_thread, ndev);
++			pthread_create(&net_queue->thread, NULL,
++				       virtio_net_tx_thread, net_queue);
+ 		else
+-			pthread_create(&ndev->io_thread[vq], NULL, virtio_net_rx_thread, ndev);
++			pthread_create(&net_queue->thread, NULL,
++				       virtio_net_rx_thread, net_queue);
+ 
+ 		return 0;
+ 	}
+@@ -611,6 +614,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
+ {
+ 	struct net_dev *ndev = dev;
++	struct net_dev_queue *queue = &ndev->queues[vq];
+ 	struct vhost_vring_file file;
+ 	int r;
+ 
+@@ -666,7 +670,7 @@ static struct virt_queue *get_vq(struct kvm *kvm, void *dev, u32 vq)
+ {
+ 	struct net_dev *ndev = dev;
+ 
+-	return &ndev->vqs[vq];
++	return &ndev->queues[vq].vq;
+ }
+ 
+ static int get_size_vq(struct kvm *kvm, void *dev, u32 vq)
 -- 
 1.9.1
