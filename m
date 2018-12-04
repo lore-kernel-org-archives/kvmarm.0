@@ -1,23 +1,21 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 13/13] virtio/console: Implement reset
-Date: Tue,  4 Dec 2018 11:08:46 +0000
-Message-ID: <1543921726-54571-14-git-send-email-julien.thierry@arm.com>
-References: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 0/6] arm: Add support for firmware booting
+Date: Tue,  4 Dec 2018 11:14:27 +0000
+Message-ID: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54CB34A390
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79FE24A332
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S7N4w-+ZoB1b for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Dec 2018 06:09:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F90B4A357
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:09:09 -0500 (EST)
-In-Reply-To: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
+ with ESMTP id tl2tPwnIn+dV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Dec 2018 06:14:40 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4215E4A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Dec 2018 06:14:40 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,111 +26,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: will.deacon@arm.com
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Hi,
 
-The virtio-console reset cancels all running jobs.
+This series is based on the virtio reset series posted earlier:
+https://marc.info/?l=kvm&m=154392174625966&w=2
 
-Unfortunately we don't have a good way to prevent the term polling thread
-from getting in the way, read invalid data during reset and cause a
-segfault. To prevent this, move all handling of the Rx queue in the
-threadpool job.
+We would like to be able to load firmwares like UEFI in kvmtool.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
----
- virtio/console.c | 32 ++++++++++++++++++++------------
- 1 file changed, 20 insertions(+), 12 deletions(-)
+The series contains:
+A way to load the firmware into RAM and an option to be able to create
+non-volatile memory zones and load data into them.
 
-diff --git a/virtio/console.c b/virtio/console.c
-index d2b312c..f1be025 100644
---- a/virtio/console.c
-+++ b/virtio/console.c
-@@ -35,8 +35,6 @@ struct con_dev {
- 	struct virt_queue		vqs[VIRTIO_CONSOLE_NUM_QUEUES];
- 	struct virtio_console_config	config;
- 	u32				features;
--
--	pthread_cond_t			poll_cond;
- 	int				vq_ready;
- 
- 	struct thread_pool__job		jobs[VIRTIO_CONSOLE_NUM_QUEUES];
-@@ -44,7 +42,6 @@ struct con_dev {
- 
- static struct con_dev cdev = {
- 	.mutex				= MUTEX_INITIALIZER,
--	.poll_cond			= PTHREAD_COND_INITIALIZER,
- 
- 	.vq_ready			= 0,
- 
-@@ -68,16 +65,10 @@ static void virtio_console__inject_interrupt_callback(struct kvm *kvm, void *par
- 	u16 head;
- 	int len;
- 
--	if (kvm->cfg.active_console != CONSOLE_VIRTIO)
--		return;
--
- 	mutex_lock(&cdev.mutex);
- 
- 	vq = param;
- 
--	if (!cdev.vq_ready)
--		pthread_cond_wait(&cdev.poll_cond, &cdev.mutex.mutex);
--
- 	if (term_readable(0) && virt_queue__available(vq)) {
- 		head = virt_queue__get_iov(vq, iov, &out, &in, kvm);
- 		len = term_getc_iov(kvm, iov, in, 0);
-@@ -90,8 +81,13 @@ static void virtio_console__inject_interrupt_callback(struct kvm *kvm, void *par
- 
- void virtio_console__inject_interrupt(struct kvm *kvm)
- {
--	virtio_console__inject_interrupt_callback(kvm,
--					&cdev.vqs[VIRTIO_CONSOLE_RX_QUEUE]);
-+	if (kvm->cfg.active_console != CONSOLE_VIRTIO)
-+		return;
-+
-+	mutex_lock(&cdev.mutex);
-+	if (cdev.vq_ready)
-+		thread_pool__do_job(&cdev.jobs[VIRTIO_CONSOLE_RX_QUEUE]);
-+	mutex_unlock(&cdev.mutex);
- }
- 
- static void virtio_console_handle_callback(struct kvm *kvm, void *param)
-@@ -168,13 +164,24 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 		/* Tell the waiting poll thread that we're ready to go */
- 		mutex_lock(&cdev.mutex);
- 		cdev.vq_ready = 1;
--		pthread_cond_signal(&cdev.poll_cond);
- 		mutex_unlock(&cdev.mutex);
- 	}
- 
- 	return 0;
- }
- 
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+	if (vq == VIRTIO_CONSOLE_RX_QUEUE) {
-+		mutex_lock(&cdev.mutex);
-+		cdev.vq_ready = 0;
-+		mutex_unlock(&cdev.mutex);
-+		thread_pool__cancel_job(&cdev.jobs[vq]);
-+	} else if (vq == VIRTIO_CONSOLE_TX_QUEUE) {
-+		thread_pool__cancel_job(&cdev.jobs[vq]);
-+	}
-+}
-+
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
- {
- 	struct con_dev *cdev = dev;
-@@ -213,6 +220,7 @@ static struct virtio_ops con_dev_virtio_ops = {
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.notify_status		= notify_status,
- 	.notify_vq		= notify_vq,
- 	.get_vq			= get_vq,
--- 
+Those non-volatile memory are presented throught the DT with a node:
+
+	<name>@<addr> {
+		compatible = "kvmtool,<name>";
+		reg = < <addr> <size> >;
+	}
+
+These are expected to be dealt with by specific kvmtool driver and not
+to be picked up by existing drivers (although technically it is just
+plain memory, mapped in the guest).
+
+Cheers,
+
+Julien
+
+-->
+
+Julien Thierry (5):
+  arm: Move firmware function
+  builtin-run: Do not look for default kernel when firmware is provided
+  arm: Support firmware loading
+  kvm: Add arch specific reset
+  arm: Support non-volatile memory
+
+Sami Mujawar (1):
+  rtc: Initialize the Register D for MC146818 RTC
+
+ arm/fdt.c                                |  67 ++++++++--
+ arm/include/arm-common/kvm-arch.h        |   5 +-
+ arm/include/arm-common/kvm-config-arch.h |  21 +++-
+ arm/kvm.c                                | 204 +++++++++++++++++++++++++++++++
+ builtin-run.c                            |  24 ++--
+ hw/rtc.c                                 |   8 ++
+ include/kvm/kvm.h                        |   1 +
+ kvm.c                                    |   2 +
+ mips/kvm.c                               |   4 +
+ powerpc/kvm.c                            |   4 +
+ x86/kvm.c                                |   4 +
+ 11 files changed, 323 insertions(+), 21 deletions(-)
+
+--
 1.9.1
