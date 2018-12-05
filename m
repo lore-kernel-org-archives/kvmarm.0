@@ -1,23 +1,23 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v5 2/4] arm64: KVM: add accessors to track guest/host only
- counters
-Date: Wed,  5 Dec 2018 15:30:13 +0000
-Message-ID: <1544023815-16958-3-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v5 4/4] arm64: KVM: Enable support for :G/:H perf event
+ modifiers
+Date: Wed,  5 Dec 2018 15:30:15 +0000
+Message-ID: <1544023815-16958-5-git-send-email-andrew.murray@arm.com>
 References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAE6D4A348
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DBD44A347
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5neejQ+a3PIu for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 10:30:29 -0500 (EST)
+ with ESMTP id VkwJ1BMBHv1h for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Dec 2018 10:30:34 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A97A4A359
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3E7E4A36C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:33 -0500 (EST)
 In-Reply-To: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,61 +32,111 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to effeciently enable/disable guest/host only perf counters
-at guest entry/exit we add bitfields to kvm_cpu_context for guest and
-host events as well as accessors for updating them.
+Enable/disable event counters as appropriate when entering and exiting
+the guest to enable support for guest or host only event counting.
+
+For both VHE and non-VHE we switch the counters between host/guest at
+EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+
+The PMU may be on when we change which counters are enabled however
+we avoid adding an isb as we instead rely on existing context
+synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
+the eret from the hvc in kvm_call_hyp.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1550192..800c87b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -203,6 +203,8 @@ struct kvm_cpu_context {
- 	};
- 
- 	struct kvm_vcpu *__hyp_running_vcpu;
-+	u32 events_host;
-+	u32 events_guest;
- };
- 
- typedef struct kvm_cpu_context kvm_cpu_context_t;
-@@ -467,11 +469,33 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
- 
-+#define KVM_PMU_EVENTS_HOST	1
-+#define KVM_PMU_EVENTS_GUEST	2
-+
- #ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
- static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- {
- 	return kvm_arch_vcpu_run_map_fp(vcpu);
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index d496ef5..e505cad 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+ 	return true;
  }
-+static inline void kvm_set_pmu_events(u32 set, int flags)
-+{
-+	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
-+
-+	if (flags & KVM_PMU_EVENTS_HOST)
-+		ctx->events_host |= set;
-+	if (flags & KVM_PMU_EVENTS_GUEST)
-+		ctx->events_guest |= set;
-+}
-+static inline void kvm_clr_pmu_events(u32 clr)
-+{
-+	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
-+
-+	ctx->events_host &= ~clr;
-+	ctx->events_guest &= ~clr;
-+}
-+#else
-+static inline void kvm_set_pmu_events(u32 set, int flags) {}
-+static inline void kvm_clr_pmu_events(u32 clr) {}
- #endif
  
- static inline void kvm_arm_vhe_guest_enter(void)
++static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
++{
++	u32 clr = host_ctxt->events_host & ~host_ctxt->events_guest;
++	u32 set = host_ctxt->events_guest & ~host_ctxt->events_host;
++
++	if (clr)
++		write_sysreg(clr, pmcntenclr_el0);
++
++	if (set)
++		write_sysreg(set, pmcntenset_el0);
++
++	return (clr || set);
++}
++
++static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
++{
++	u32 clr = host_ctxt->events_guest & ~host_ctxt->events_host;
++	u32 set = host_ctxt->events_host & ~host_ctxt->events_guest;
++
++	if (clr)
++		write_sysreg(clr, pmcntenclr_el0);
++
++	if (set)
++		write_sysreg(set, pmcntenset_el0);
++}
++
+ /*
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
+@@ -488,12 +514,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
++	bool pmu_switch_needed;
+ 	u64 exit_code;
+ 
+ 	host_ctxt = vcpu->arch.host_cpu_context;
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
++	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++
+ 	sysreg_save_host_state_vhe(host_ctxt);
+ 
+ 	__activate_traps(vcpu);
+@@ -524,6 +553,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 
+ 	__debug_switch_to_host(vcpu);
+ 
++	if (pmu_switch_needed)
++		__pmu_switch_to_host(host_ctxt);
++
+ 	return exit_code;
+ }
+ 
+@@ -532,6 +564,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
++	bool pmu_switch_needed;
+ 	u64 exit_code;
+ 
+ 	vcpu = kern_hyp_va(vcpu);
+@@ -540,6 +573,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
++	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++
+ 	__sysreg_save_state_nvhe(host_ctxt);
+ 
+ 	__activate_traps(vcpu);
+@@ -586,6 +621,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
++	if (pmu_switch_needed)
++		__pmu_switch_to_host(host_ctxt);
++
+ 	return exit_code;
+ }
+ 
 -- 
 2.7.4
