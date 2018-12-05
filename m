@@ -1,21 +1,24 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v5 0/4] arm64: Support perf event modifiers :G and :H
-Date: Wed,  5 Dec 2018 15:30:11 +0000
-Message-ID: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v5 3/4] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Wed,  5 Dec 2018 15:30:14 +0000
+Message-ID: <1544023815-16958-4-git-send-email-andrew.murray@arm.com>
+References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23EB24A320
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3AD74A368
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MQW3iozIIRs2 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 10:30:24 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E424A1F2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:24 -0500 (EST)
+ with ESMTP id qgR8is3Dilie for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Dec 2018 10:30:31 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 645034A341
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:31 -0500 (EST)
+In-Reply-To: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,55 +32,124 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patchset provides support for perf event modifiers :G and :H which
-allows for filtering of PMU events between host and guests when used
-with KVM.
+Add support for the :G and :H attributes in perf by handling the
+exclude_host/exclude_guest event attributes.
 
-As the underlying hardware cannot distinguish between guest and host
-context, the performance counters must be stopped and started upon
-entry/exit to the guest. This is performed at EL2 in a way that
-minimizes overhead and improves accuracy of recording events that only
-occur in the requested context.
+We notify KVM of counters that we wish to be enabled or disabled on
+guest entry/exit and thus defer from starting or stopping :G events
+as per the events exclude_host attribute.
 
-This has been tested with VHE and non-VHE kernels with a KVM guest.
+With both VHE and non-VHE we switch the counters between host/guest
+at EL2. We are able to eliminate counters counting host events on
+the boundaries of guest entry/exit when using :G by filtering out
+EL2 for exclude_host. However when using :H unless exclude_hv is set
+on non-VHE then there is a small blackout window at the guest
+entry/exit where host events are not captured.
 
-Changes from v4:
+Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+---
+ arch/arm64/kernel/perf_event.c | 48 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 7 deletions(-)
 
- - Prevent unnecessary write_sysreg calls by improving
-   __pmu_switch_to_xxx logic.
-
-Changes from v3:
-
- - Remove confusing _only suffix from bitfields in kvm_cpu_context
- - Remove unnecessary condition when clearing event bits in disable
- - Simplify API of KVM accessors
- - Prevent unnecessary setting of pmcnten when guest/host events are
-   the same.
-
-Changes from v2:
-
- - Ensured that exclude_kernel works for guest
- - Removed unnecessary exclusion of EL2 with exclude_host on !VHE
- - Renamed kvm_clr_set_host_pmu_events to reflect args order
- - Added additional information to isb patch
-
-Changes from v1:
-
- - Removed unnecessary exclusion of EL1 with exclude_guest on VHE
- - Removed unnecessary isb from existing perf_event.c driver
- - Folded perf_event.c patches together
- - Added additional information to last patch commit message
-
-Andrew Murray (4):
-  arm64: arm_pmu: remove unnecessary isb instruction
-  arm64: KVM: add accessors to track guest/host only counters
-  arm64: arm_pmu: Add support for exclude_host/exclude_guest attributes
-  arm64: KVM: Enable support for :G/:H perf event modifiers
-
- arch/arm64/include/asm/kvm_host.h | 24 +++++++++++++++++++
- arch/arm64/kernel/perf_event.c    | 49 ++++++++++++++++++++++++++++++++-------
- arch/arm64/kvm/hyp/switch.c       | 38 ++++++++++++++++++++++++++++++
- 3 files changed, 103 insertions(+), 8 deletions(-)
-
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index de564ae..a5bd626 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -26,6 +26,7 @@
+ 
+ #include <linux/acpi.h>
+ #include <linux/clocksource.h>
++#include <linux/kvm_host.h>
+ #include <linux/of.h>
+ #include <linux/perf/arm_pmu.h>
+ #include <linux/platform_device.h>
+@@ -647,11 +648,23 @@ static inline int armv8pmu_enable_counter(int idx)
+ 
+ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+ {
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = event->hw.idx;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+ 
+-	armv8pmu_enable_counter(idx);
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_enable_counter(idx - 1);
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
++
++	if (!attr->exclude_host)
++		kvm_set_pmu_events(counter_bits, KVM_PMU_EVENTS_HOST);
++	if (!attr->exclude_guest)
++		kvm_set_pmu_events(counter_bits, KVM_PMU_EVENTS_GUEST);
++
++	if (!attr->exclude_host) {
++		armv8pmu_enable_counter(idx);
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_enable_counter(idx - 1);
++	}
+ }
+ 
+ static inline int armv8pmu_disable_counter(int idx)
+@@ -664,11 +677,20 @@ static inline int armv8pmu_disable_counter(int idx)
+ static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+ {
+ 	struct hw_perf_event *hwc = &event->hw;
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = hwc->idx;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+ 
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_disable_counter(idx - 1);
+-	armv8pmu_disable_counter(idx);
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
++
++	kvm_clr_pmu_events(counter_bits);
++
++	if (!attr->exclude_host) {
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_disable_counter(idx - 1);
++		armv8pmu_disable_counter(idx);
++	}
+ }
+ 
+ static inline int armv8pmu_enable_intens(int idx)
+@@ -943,16 +965,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+ 	 * Therefore we ignore exclude_hv in this configuration, since
+ 	 * there's no hypervisor to sample anyway. This is consistent
+ 	 * with other architectures (x86 and Power).
++	 *
++	 * To eliminate counting host events on the boundaries of
++	 * guest entry/exit we ensure EL2 is not included in hyp mode
++	 * with !exclude_host.
+ 	 */
+ 	if (is_kernel_in_hyp_mode()) {
+-		if (!attr->exclude_kernel)
++		if (!attr->exclude_kernel && !attr->exclude_host)
+ 			config_base |= ARMV8_PMU_INCLUDE_EL2;
+ 	} else {
+-		if (attr->exclude_kernel)
+-			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+ 		if (!attr->exclude_hv)
+ 			config_base |= ARMV8_PMU_INCLUDE_EL2;
+ 	}
++
++	/*
++	 * Filter out !VHE kernels and guest kernels
++	 */
++	if (attr->exclude_kernel)
++		config_base |= ARMV8_PMU_EXCLUDE_EL1;
++
+ 	if (attr->exclude_user)
+ 		config_base |= ARMV8_PMU_EXCLUDE_EL0;
+ 
+@@ -976,6 +1007,9 @@ static void armv8pmu_reset(void *info)
+ 		armv8pmu_disable_intens(idx);
+ 	}
+ 
++	/* Clear the counters we flip at guest entry/exit */
++	kvm_clr_pmu_events(U32_MAX);
++
+ 	/*
+ 	 * Initialize & Reset PMNC. Request overflow interrupt for
+ 	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
 -- 
 2.7.4
