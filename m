@@ -1,64 +1,131 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v5 1/4] arm64: arm_pmu: remove unnecessary isb instruction
-Date: Wed,  5 Dec 2018 15:30:12 +0000
-Message-ID: <1544023815-16958-2-git-send-email-andrew.murray@arm.com>
-References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v9 5/8] KVM: arm64: Support PUD hugepage in
+ stage2_is_exec()
+Date: Wed, 5 Dec 2018 17:57:51 +0000
+Message-ID: <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-6-punit.agrawal@arm.com>
+ <20181101133848.GL12057@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECCC04A1F2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:27 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O7XuYfPN8WNY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 10:30:26 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDBFB4A2E9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:26 -0500 (EST)
-In-Reply-To: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181101133848.GL12057@e113682-lin.lund.arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Punit Agrawal <punit.agrawal@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The armv8pmu_enable_event_counter function issues an isb instruction
-after enabling a pair of counters - this doesn't provide any value
-and is inconsistent with the armv8pmu_disable_event_counter.
 
-In any case armv8pmu_enable_event_counter is always called with the
-PMU stopped. Starting the PMU with armv8pmu_start results in an isb
-instruction being issued prior to writing to PMCR_EL0.
 
-Let's remove the unnecessary isb instruction.
+On 01/11/2018 13:38, Christoffer Dall wrote:
+> On Wed, Oct 31, 2018 at 05:57:42PM +0000, Punit Agrawal wrote:
+>> In preparation for creating PUD hugepages at stage 2, add support for
+>> detecting execute permissions on PUD page table entries. Faults due to
+>> lack of execute permissions on page table entries is used to perform
+>> i-cache invalidation on first execute.
+>>
+>> Provide trivial implementations of arm32 helpers to allow sharing of
+>> code.
+>>
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Russell King <linux@armlinux.org.uk>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will.deacon@arm.com>
+>> ---
+>>   arch/arm/include/asm/kvm_mmu.h         |  6 +++
+>>   arch/arm64/include/asm/kvm_mmu.h       |  5 +++
+>>   arch/arm64/include/asm/pgtable-hwdef.h |  2 +
+>>   virt/kvm/arm/mmu.c                     | 53 +++++++++++++++++++++++---
+>>   4 files changed, 61 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+>> index 37bf85d39607..839a619873d3 100644
+>> --- a/arch/arm/include/asm/kvm_mmu.h
+>> +++ b/arch/arm/include/asm/kvm_mmu.h
+>> @@ -102,6 +102,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+>>   	return false;
+>>   }
+>>   
+>> +static inline bool kvm_s2pud_exec(pud_t *pud)
+>> +{
+>> +	BUG();
+> 
+> nit: I think this should be WARN() now :)
+> 
+>> +	return false;
+>> +}
+>> +
+>>   static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+>>   {
+>>   	pte_val(pte) |= L_PTE_S2_RDWR;
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index 8da6d1b2a196..c755b37b3f92 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -261,6 +261,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+>>   	return kvm_s2pte_readonly((pte_t *)pudp);
+>>   }
+>>   
+>> +static inline bool kvm_s2pud_exec(pud_t *pudp)
+>> +{
+>> +	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
+>> +}
+>> +
+>>   #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+>>   
+>>   #ifdef __PAGETABLE_PMD_FOLDED
+>> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+>> index 1d7d8da2ef9b..336e24cddc87 100644
+>> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+>> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+>> @@ -193,6 +193,8 @@
+>>   #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+>>   #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+>>   
+>> +#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
+>> +
+>>   /*
+>>    * Memory Attribute override for Stage-2 (MemAttr[3:0])
+>>    */
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 1c669c3c1208..8e44dccd1b47 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1083,23 +1083,66 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+>>   	return 0;
+>>   }
+>>   
+>> -static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+>> +/*
+>> + * stage2_get_leaf_entry - walk the stage2 VM page tables and return
+>> + * true if a valid and present leaf-entry is found. A pointer to the
+>> + * leaf-entry is returned in the appropriate level variable - pudpp,
+>> + * pmdpp, ptepp.
+>> + */
+>> +static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
+>> +				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
+> 
+> Do we need this type madness or could this just return a u64 pointer
+> (NULL if nothing is found) and pass that to kvm_s2pte_exec (because we
+> know it's the same bit we need to check regardless of the pgtable level
+> on both arm and arm64)?
+> 
+> Or do we consider that bad for some reason?
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
----
- arch/arm64/kernel/perf_event.c | 1 -
- 1 file changed, 1 deletion(-)
+Practically, yes the bit positions are same and thus we should be able
+to do this assuming that it is just a pte. When we get to independent stage2
+pgtable implementation which treats all page table entries as a single type
+with a level information, we should be able to get rid of these.
+But since we have followed the Linux way of page-table manipulation where we
+have "level" specific accessors. The other option is open code the walking
+sequence from the pgd to the leaf entry everywhere.
 
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index 8e38d52..de564ae 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -652,7 +652,6 @@ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
- 	armv8pmu_enable_counter(idx);
- 	if (armv8pmu_event_is_chained(event))
- 		armv8pmu_enable_counter(idx - 1);
--	isb();
- }
- 
- static inline int armv8pmu_disable_counter(int idx)
--- 
-2.7.4
+I am fine with changing this code, if you like.
+
+Cheers
+Suzuki
