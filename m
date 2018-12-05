@@ -1,23 +1,22 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v5 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Wed,  5 Dec 2018 15:30:15 +0000
-Message-ID: <1544023815-16958-5-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v5 1/4] arm64: arm_pmu: remove unnecessary isb instruction
+Date: Wed,  5 Dec 2018 15:30:12 +0000
+Message-ID: <1544023815-16958-2-git-send-email-andrew.murray@arm.com>
 References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DBD44A347
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECCC04A1F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VkwJ1BMBHv1h for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 10:30:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3E7E4A36C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:33 -0500 (EST)
+ with ESMTP id O7XuYfPN8WNY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Dec 2018 10:30:26 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDBFB4A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 10:30:26 -0500 (EST)
 In-Reply-To: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,111 +31,34 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
+The armv8pmu_enable_event_counter function issues an isb instruction
+after enabling a pair of counters - this doesn't provide any value
+and is inconsistent with the armv8pmu_disable_event_counter.
 
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+In any case armv8pmu_enable_event_counter is always called with the
+PMU stopped. Starting the PMU with armv8pmu_start results in an isb
+instruction being issued prior to writing to PMCR_EL0.
 
-The PMU may be on when we change which counters are enabled however
-we avoid adding an isb as we instead rely on existing context
-synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
-the eret from the hvc in kvm_call_hyp.
+Let's remove the unnecessary isb instruction.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ arch/arm64/kernel/perf_event.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d496ef5..e505cad 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -373,6 +373,32 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index 8e38d52..de564ae 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -652,7 +652,6 @@ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+ 	armv8pmu_enable_counter(idx);
+ 	if (armv8pmu_event_is_chained(event))
+ 		armv8pmu_enable_counter(idx - 1);
+-	isb();
  }
  
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 clr = host_ctxt->events_host & ~host_ctxt->events_guest;
-+	u32 set = host_ctxt->events_guest & ~host_ctxt->events_host;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+
-+	return (clr || set);
-+}
-+
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	u32 clr = host_ctxt->events_guest & ~host_ctxt->events_host;
-+	u32 set = host_ctxt->events_host & ~host_ctxt->events_guest;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -488,12 +514,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	host_ctxt = vcpu->arch.host_cpu_context;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	sysreg_save_host_state_vhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -524,6 +553,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
-@@ -532,6 +564,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
-@@ -540,6 +573,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -586,6 +621,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
+ static inline int armv8pmu_disable_counter(int idx)
 -- 
 2.7.4
