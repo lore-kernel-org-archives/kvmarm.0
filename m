@@ -1,87 +1,84 @@
-From: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH kvmtool 00/13] Implement reset of virtio devices
-Date: Wed, 5 Dec 2018 11:09:49 +0100
-Message-ID: <20181205100949.bq4zdvn52jltajat@sirius.home.kraxel.org>
-References: <1543921726-54571-1-git-send-email-julien.thierry@arm.com>
- <20181205082111.j6vxu7k7daxhgurw@sirius.home.kraxel.org>
- <8cc53cd8-1ab3-d7e1-6f21-e40a0447a0fd@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v9 2/8] KVM: arm/arm64: Re-factor setting the Stage 2
+ entry to exec on fault
+Date: Wed, 5 Dec 2018 10:47:10 +0000
+Message-ID: <f078ae84-9906-4394-957f-8f041b08827f@arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-3-punit.agrawal@arm.com>
+ <12212830-ffc6-a0e0-5de6-3e6a15ed7141@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CB34A211
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 05:09:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AYaDqEubx2Ci for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 05:09:51 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEE954A1E5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 05:09:51 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <8cc53cd8-1ab3-d7e1-6f21-e40a0447a0fd@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <12212830-ffc6-a0e0-5de6-3e6a15ed7141@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Anshuman Khandual <anshuman.khandual@arm.com>, Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBEZWMgMDUsIDIwMTggYXQgMDk6MTA6MzNBTSArMDAwMCwgSnVsaWVuIFRoaWVycnkg
-d3JvdGU6Cj4gCj4gCj4gT24gMDUvMTIvMTggMDg6MjEsIEdlcmQgSG9mZm1hbm4gd3JvdGU6Cj4g
-PiBPbiBUdWUsIERlYyAwNCwgMjAxOCBhdCAxMTowODozM0FNICswMDAwLCBKdWxpZW4gVGhpZXJy
-eSB3cm90ZToKPiA+PiBIaSwKPiA+Pgo+ID4+IFRoaXMgc2VyaWVzIHdhcyBkZXZlbG9wcGVkIGJ5
-IEplYW4tUGhpbGlwcGUgYW5kIGlzIG5lZWRlZCBmb3IgYSBzZXJpZXMKPiA+PiBJJ2xsIGJlIHBv
-c3Rpbmcgc2hvcnRseSBhZnRlciB0byBsb2FkIGZpcm13YXJlcyBvbiBhcm0ga3ZtdG9vbC4KPiA+
-Pgo+ID4+IEN1cnJlbnRseSwgd2hlbiBhIGd1ZXN0IHRyaWVzIHRvIHJlc2V0IGEgZGV2aWNlLCBh
-IGxvdCBvZiByZXNzb3VyY2VzCj4gPj4gYXJlbid0IHJlc2V0ICh0aHJlYWRzIGtlZXAgcnVubmlu
-ZywgdmlydGlvIHF1ZXVlIGtlZXAgdGhlaXIgc3RhdGUsIGV0YykuCj4gPj4KPiA+PiBXaGVuIHRo
-ZSBndWVzdCBvbmx5IGRvZXMgdGhlIHJlc2V0IHRvIGluaXRpYWxpemUgdGhlIGRldmljZSBhbmQg
-dGhlcmUKPiA+PiB3ZXJlIG5vIHByZXZpb3VzIHVzZXJzLCB0aGVyZSBpcyBubyBub3RpY2VhYmxl
-IGlzc3VlLiBCdXQgd2hlbiBhIGd1ZXN0Cj4gPj4gaGFzIGEgZmlybWFyZSArIExpbnV4LCBpZiB0
-aGUgZmlybXdhcmUgdXNlcyBhIHZpcnRpbyBkZXZpY2UsIExpbnV4IHdpbGwKPiA+PiBmYWlsIHRv
-IHByb2JlIHRoYXQgZGV2aWNlLgo+ID4+Cj4gPj4gVGhpcyBzZXJpZXMgYWltIHRvIHByb3Blcmx5
-IHJlc2V0IHRoZSB2aXJ0aW8gcmVzb3VyY2VzIHdoZW4gdGhlIGd1ZXN0cwo+ID4+IHJlcXVlc3Rz
-IGl0Lgo+ID4+Cj4gPj4gUmVzZXQgb2YgbmV0IHZob3N0IGlzIHVuc3VwcG9ydGVkIGZvciBub3cu
-Cj4gPj4KPiA+PiBQYXRjaCAxIGlzIGEgYnVnIGZpeCBvbiBpb2V2ZW50ZmQKPiA+PiBQYXRjaCAy
-LTYgcHJvdmlkZSB0aGUgY29yZSBzdXBwb3J0IHNvIGRldmljZXMgY2FuIGltcGxlbWVudCB0aGVp
-ciByZXNldAo+ID4+IFBhdGNoIDctMTMgaW1wbGVtZW50cyB0aGUgcmVzZXQgZm9yIHRoZSB2YXJp
-b3VzIHZpcnRpbyBkZXZpY2VzCj4gPiAKPiA+IEZhaWxzIHRvIGJ1aWxkOgo+ID4gCj4gPiBrcmF4
-ZWxAc2lyaXVzIH4vcHJvamVjdHMva3ZtdG9vbCAodmlydGlvKSMgbWFrZSAKPiA+IE1ha2VmaWxl
-OjMyMzogU2tpcHBpbmcgb3B0aW9uYWwgbGlicmFyaWVzOiB2bmNzZXJ2ZXIKPiA+ICAgQ0MgICAg
-ICAgdmlydGlvL2NvcmUubwo+ID4gSW4gZmlsZSBpbmNsdWRlZCBmcm9tIHZpcnRpby9jb3JlLmM6
-ODowOgo+ID4gdmlydGlvL2NvcmUuYzogSW4gZnVuY3Rpb24g4oCYdmlydGlvX25vdGlmeV9zdGF0
-dXPigJk6Cj4gPiBpbmNsdWRlL2t2bS92aXJ0aW8uaDozNzozOiBlcnJvcjog4oCYVklSVElPX0NP
-TkZJR19TX05FRURTX1JFU0VU4oCZCj4gPiB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBm
-dW5jdGlvbikKPiA+ICAgIFZJUlRJT19DT05GSUdfU19ORUVEU19SRVNFVCB8IFwKPiA+ICAgIF4K
-PiA+IHZpcnRpby9jb3JlLmM6MjMyOjE5OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g4oCY
-VklSVElPX0NPTkZJR19TX01BU0vigJkKPiA+ICAgdmRldi0+c3RhdHVzICY9IH5WSVJUSU9fQ09O
-RklHX1NfTUFTSzsKPiA+IAo+ID4gWWVzLCBpdCBpcyBhbiBvbGRlciBtYWNoaW5lIChyaGVsLTcp
-LCBWSVJUSU9fQ09ORklHX1NfTkVFRFNfUkVTRVQgaXNuJ3QKPiA+IGluIHRoZSBzeXN0ZW0gaGVh
-ZGVycyAoSUlSQyB0aGlzIGJpdCB3YXMgYWRkZWQgd2l0aCB2aXJ0aW8tMS4wKS4KPiA+IAo+IAo+
-IFRoYW5rcyBmb3IgcmVwb3J0aW5nIHRoZSBpc3N1ZS4gSSB0aGluayB0aGlzIHNlcmllcyB3YXMg
-aW5pdGlhbGx5Cj4gZGV2ZWxvcGVkIHdpdGggdGhlIGludGVudCBvZiBzdXBwb3J0aW5nIHZpcnRp
-by0xLjAgYnV0IHRoZW4gcmVzZXQgYW5kCj4gdmlydGlvLTEuMCB3ZXJlIHNwbGl0IGludG8gdHdv
-IHNlcmllcy4KPiAKPiBJIHRoaW5rIGhlcmUgSSBjYW4ganVzdCByZW1vdmUgdGhhdCBiaXQgZnJv
-bSB0aGUgY29uZmlnIG1hc2sgd2hpbGUKPiB2aXJ0aW8tMS4wIGlzIG5vdCBzdXBwb3J0ZWQsIGFu
-ZCB0aGluZ3Mgc2hvdWxkIHdvcmsuCgpGaXhlZCB0aGF0IHVzaW5nIC4uLgoKKyNpZm5kZWYgVklS
-VElPX0NPTkZJR19TX05FRURTX1JFU0VUCisjIGRlZmluZSBWSVJUSU9fQ09ORklHX1NfTkVFRFNf
-UkVTRVQgMHg0MAorI2VuZGlmCgouLi4gaW4gaW5jbHVkZS9rdm0vdmlydGlvLmgKCldpdGggdGhh
-dCBpbiBwbGFjZSBmaXJtd2FyZSBib290IHdvcmtzIGZvciB4ODYgdG9vLgoKV2VsbCwgdG8gYmUg
-ZXhhY3QsIHNvcnQgb2Ygc3RhcnRzIHdvcmtpbmcuICBUaGVyZSBpcyBzdGlsbCB0aGUgcHJvYmxl
-bQp0aGF0IGt2bXRvb2wgdHdlYWtzIHRoZSBsaW51eCBrZXJuZWwgY29tbWFuZCBsaW5lIHRvIGNv
-bXBlbnNhdGUgZm9yCmluY29tcGxldGUgZW11bGF0aW9uLiAgU28gd2hlbiBib290aW5nIGEga2Vy
-bmVsIGZyb20gdGhlIGRpc2sgaW1hZ2UgdmlhCmZpcm13YXJlIGFuZCBib290IGxvYWRlciB5b3Ug
-aGF2ZSB0byBhcHBseSB0aGUgc2FtZSB0d2Vha3MgdG8gdGhlIGJvb3QKbG9hZGVyIGNvbmZpZy4g
-IEF0IG1pbmltdW0gcGNpPWNvbmYxIGlzIHJlcXVpcmVkLCBvdGhlcndpc2UgdGhlIGtlcm5lbApk
-b2Vzbid0IGZpbmQgYW55IHBjaSBkZXZpY2VzIC4uLgoKY2hlZXJzLAogIEdlcmQKCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
-c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
-LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+
+
+On 03/12/2018 13:32, Anshuman Khandual wrote:
+> 
+> 
+> On 10/31/2018 11:27 PM, Punit Agrawal wrote:
+>> Stage 2 fault handler marks a page as executable if it is handling an
+>> execution fault or if it was a permission fault in which case the
+>> executable bit needs to be preserved.
+>>
+>> The logic to decide if the page should be marked executable is
+>> duplicated for PMD and PTE entries. To avoid creating another copy
+>> when support for PUD hugepages is introduced refactor the code to
+>> share the checks needed to mark a page table entry as executable.
+>>
+>> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>   virt/kvm/arm/mmu.c | 28 +++++++++++++++-------------
+>>   1 file changed, 15 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 59595207c5e1..6912529946fb 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1475,7 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   			  unsigned long fault_status)
+>>   {
+>>   	int ret;
+>> -	bool write_fault, exec_fault, writable, force_pte = false;
+>> +	bool write_fault, writable, force_pte = false;
+>> +	bool exec_fault, needs_exec;
+> 
+> New line not required, still within 80 characters.
+> 
+>>   	unsigned long mmu_seq;
+>>   	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+>>   	struct kvm *kvm = vcpu->kvm;
+>> @@ -1598,19 +1599,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	if (exec_fault)
+>>   		invalidate_icache_guest_page(pfn, vma_pagesize);
+>>   
+>> +	/*
+>> +	 * If we took an execution fault we have made the
+>> +	 * icache/dcache coherent above and should now let the s2
+> 
+> Coherent or invalidated with invalidate_icache_guest_page ?
+
+We also do clean_dcache above if needed. So that makes sure
+the data is coherent. Am I missing something here ?
+
+> 
+>> +	 * mapping be executable.
+>> +	 *
+>> +	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
+>> +	 * execute permissions, and we preserve whatever we have.
+>> +	 */
+> 
+> Otherwise looks good.
+> 
+
+
+Suzuki
