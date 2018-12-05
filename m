@@ -1,131 +1,92 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v9 5/8] KVM: arm64: Support PUD hugepage in
- stage2_is_exec()
-Date: Wed, 5 Dec 2018 17:57:51 +0000
-Message-ID: <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-6-punit.agrawal@arm.com>
- <20181101133848.GL12057@e113682-lin.lund.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [RFC PATCH v2 23/23] KVM: arm64/sve: Document KVM API extensions
+ for SVE
+Date: Wed, 5 Dec 2018 17:59:57 +0000
+Message-ID: <20181205175955.GT3505@e103592.cambridge.arm.com>
+References: <1538141967-15375-1-git-send-email-Dave.Martin@arm.com>
+ <1538141967-15375-24-git-send-email-Dave.Martin@arm.com>
+ <877eh5i0wo.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181101133848.GL12057@e113682-lin.lund.arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>, Punit Agrawal <punit.agrawal@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 961A44A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 13:00:03 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qYjajoV1cbxg for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Dec 2018 13:00:02 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81E354A1DE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 13:00:02 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <877eh5i0wo.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Thu, Nov 22, 2018 at 03:31:51PM +0000, Alex Benn=E9e wrote:
+> =
 
+> Dave Martin <Dave.Martin@arm.com> writes:
+> =
 
-On 01/11/2018 13:38, Christoffer Dall wrote:
-> On Wed, Oct 31, 2018 at 05:57:42PM +0000, Punit Agrawal wrote:
->> In preparation for creating PUD hugepages at stage 2, add support for
->> detecting execute permissions on PUD page table entries. Faults due to
->> lack of execute permissions on page table entries is used to perform
->> i-cache invalidation on first execute.
->>
->> Provide trivial implementations of arm32 helpers to allow sharing of
->> code.
->>
->> Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Russell King <linux@armlinux.org.uk>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_mmu.h         |  6 +++
->>   arch/arm64/include/asm/kvm_mmu.h       |  5 +++
->>   arch/arm64/include/asm/pgtable-hwdef.h |  2 +
->>   virt/kvm/arm/mmu.c                     | 53 +++++++++++++++++++++++---
->>   4 files changed, 61 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index 37bf85d39607..839a619873d3 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -102,6 +102,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
->>   	return false;
->>   }
->>   
->> +static inline bool kvm_s2pud_exec(pud_t *pud)
->> +{
->> +	BUG();
-> 
-> nit: I think this should be WARN() now :)
-> 
->> +	return false;
->> +}
->> +
->>   static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->>   {
->>   	pte_val(pte) |= L_PTE_S2_RDWR;
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 8da6d1b2a196..c755b37b3f92 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -261,6 +261,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
->>   	return kvm_s2pte_readonly((pte_t *)pudp);
->>   }
->>   
->> +static inline bool kvm_s2pud_exec(pud_t *pudp)
->> +{
->> +	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
->> +}
->> +
->>   #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
->>   
->>   #ifdef __PAGETABLE_PMD_FOLDED
->> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
->> index 1d7d8da2ef9b..336e24cddc87 100644
->> --- a/arch/arm64/include/asm/pgtable-hwdef.h
->> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
->> @@ -193,6 +193,8 @@
->>   #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
->>   #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
->>   
->> +#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
->> +
->>   /*
->>    * Memory Attribute override for Stage-2 (MemAttr[3:0])
->>    */
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 1c669c3c1208..8e44dccd1b47 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1083,23 +1083,66 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->>   	return 0;
->>   }
->>   
->> -static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
->> +/*
->> + * stage2_get_leaf_entry - walk the stage2 VM page tables and return
->> + * true if a valid and present leaf-entry is found. A pointer to the
->> + * leaf-entry is returned in the appropriate level variable - pudpp,
->> + * pmdpp, ptepp.
->> + */
->> +static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
->> +				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
-> 
-> Do we need this type madness or could this just return a u64 pointer
-> (NULL if nothing is found) and pass that to kvm_s2pte_exec (because we
-> know it's the same bit we need to check regardless of the pgtable level
-> on both arm and arm64)?
-> 
-> Or do we consider that bad for some reason?
+> > This patch adds sections to the KVM API documentation describing
+> > the extensions for supporting the Scalable Vector Extension (SVE)
+> > in guests.
+> >
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  Documentation/virtual/kvm/api.txt | 142 ++++++++++++++++++++++++++++++=
++++++++-
+> >  1 file changed, 139 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+> > index a58067b..b8257d4 100644
+> > --- a/Documentation/virtual/kvm/api.txt
+> > +++ b/Documentation/virtual/kvm/api.txt
+> > @@ -2054,13 +2054,21 @@ Specifically:
+> >    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
+> >    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
+> >    0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+> > -  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]
+> > -  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]
+> > +  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    (*)
+> > +  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    (*)
+> >      ...
+> > -  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]
+> > +  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]   (*)
+> >    0x6020 0000 0010 00d4 FPSR        32  fp_regs.fpsr
+> >    0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
+> >
+> > +(*) These encodings are not accepted for SVE-enabled vcpus.  See
+> > +    KVM_ARM_SVE_CONFIG for details of how SVE support is configured for
+> > +    a vcpu.
+> > +
+> > +    The equivalent register content can be accessed via bits [2047:0]
+> > of
+> =
 
-Practically, yes the bit positions are same and thus we should be able
-to do this assuming that it is just a pte. When we get to independent stage2
-pgtable implementation which treats all page table entries as a single type
-with a level information, we should be able to get rid of these.
-But since we have followed the Linux way of page-table manipulation where we
-have "level" specific accessors. The other option is open code the walking
-sequence from the pgd to the leaf entry everywhere.
+> You mean [127:0] I think.
 
-I am fine with changing this code, if you like.
+Good spot.  Yes.
+
+Possibly I meant "through the first slice of the corresponding Zn",
+though [127:0] should make it clear both which slice and which bits
+within the slice to look at.
+
+[...]
 
 Cheers
-Suzuki
+---Dave
