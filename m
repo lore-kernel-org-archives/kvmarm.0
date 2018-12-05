@@ -1,24 +1,25 @@
 From: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH 00/12] arm64: Paravirtualized time support
-Date: Wed, 5 Dec 2018 12:30:28 +0000
-Message-ID: <712d6c54-4b2f-c1ce-b6bb-8c73922095b1@arm.com>
+Subject: Re: [PATCH 01/12] KVM: arm64: Document PV-time interface
+Date: Wed, 5 Dec 2018 12:32:06 +0000
+Message-ID: <d83164bc-e1ff-3a1c-9cb6-0cc1aec6e36d@arm.com>
 References: <20181128144527.44710-1-steven.price@arm.com>
- <20181203132552.5exdbzda6dfud2d2@kamzik.brq.redhat.com>
+ <20181128144527.44710-2-steven.price@arm.com>
+ <20181203135042.v52wawfz4nc27fna@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C29B24A2E7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 07:30:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40CE84A32E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 07:32:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3a7vKSeYdSlG for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Dec 2018 07:30:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26A7E4A1E5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 07:30:32 -0500 (EST)
-In-Reply-To: <20181203132552.5exdbzda6dfud2d2@kamzik.brq.redhat.com>
+ with ESMTP id 8C7SUXIHZrRB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Dec 2018 07:32:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C90024A1E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Dec 2018 07:32:09 -0500 (EST)
+In-Reply-To: <20181203135042.v52wawfz4nc27fna@kamzik.brq.redhat.com>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,134 +34,271 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/12/2018 13:25, Andrew Jones wrote:
-> On Wed, Nov 28, 2018 at 02:45:15PM +0000, Steven Price wrote:
->> This series add support for paravirtualized time for Arm64 guests and
->> KVM hosts following the specification in Arm's document DEN 0057A:
+On 03/12/2018 13:50, Andrew Jones wrote:
+> On Wed, Nov 28, 2018 at 02:45:16PM +0000, Steven Price wrote:
+>> We introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
 >>
->> https://developer.arm.com/docs/den0057/a
-> 
-> Hi Steven,
-> 
-> As that specification is still a draft, then I guess this series is an
-> RFC. I just wanted to point that out, as I believe that tag should be
-> used in future postings until the spec is approved.
-
-Hi,
-
-Yes, sorry I should have included the RFC tag as we want feedback before
-the specification is finalised.
-
-> Regarding the spec, my understanding from kvm forum was that there was
-> still a need to explain why kvmclock, or an extension to kvmclock, is
-> insufficient.
-> 
-> If there hasn't been anything written up about that yet, would you mind
-> doing so?
-
-There are obviously similarities to kvmclock, but there are a few
-differences that enable some optimisations:
-
- * The coefficient for scaling from native frequency to PV frequency is
-a 64 bit integer that can be efficiently multiplied on arm64 hardware.
-kvmclock provides us with a 32 bit multiplier.
-
- * Rather than providing an offset in the structure (via
-tsc_timestamp/system_time) the CPU's CNTVOFF support is used to provide
-a virtual counter than simply needs scaling (no offset is applied by the
-guest).
-
-Given this is seemed sensible not to confuse matters by (ab)using the
-existing kvmclock implementation.
-
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on stolen time and
+>> Live Physical Time (LPT) that can be used to derive a stable
+>> counter/timer for a guest subject to migration between hosts with
+>> different counter frequencies.
 >>
->> It implements support for Live Physical Time (LPT) which provides the
->> guest with a method to derive a stable counter of time during which the
->> guest is executing even when the guest is being migrated between hosts
->> with different physical counter frequencies.
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virtual/kvm/arm/pvtime.txt | 169 +++++++++++++++++++++++
+>>  1 file changed, 169 insertions(+)
+>>  create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virtual/kvm/arm/pvtime.txt b/Documentation/virtual/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..1870b904075b
+>> --- /dev/null
+>> +++ b/Documentation/virtual/kvm/arm/pvtime.txt
+>> @@ -0,0 +1,169 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
+>> +
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
+>> +support for Aarch64 guests:
+>> +
+>> +https://developer.arm.com/docs/den0057/a
+>> +
+>> +KVM/Arm64 implements this specification by providing some hypervisor service
+>> +calls to support a paravirtualized guest obtaining a view of the amount of
+>> +time stolen from its execution and a concept of Live Physical Time (LPT) which
+>> +represents time during which the guest is running and works across migrations.
+>> +
+>> +Three new SMCCC compatible hypercalls are defined:
+>> +
+>> +PV_FEATURES 0xC5000020
+>> +PV_TIME_LPT 0xC5000021
+>> +PV_TIME_ST  0xC5000022
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
 > 
-> Intel has TSC scaling. Is there any reason Arm is proposing a PV
-> solution instead of adding a similar virt extension?
+> What happens when a new guest tries this hypercall on an old host? Why not
+> return a bitmap of all supported features so the guest doesn't have to
+> do multiple hypercalls to build its bitmap?
 
-As Marc has already pointed out - hardware changes will take a while to
-happen, this works for today's systems.
+As Marc pointed out - a guest shouldn't (the discover mechanism requires
+using SMCCC ARCH_FEATURES). However if a guest was to ignore this it
+would still receive the default NOT_SUPPORTED (-1) response.
 
-Thanks,
+The design of PV_FEATURES matches the existing SMCCC ARCH_FEATURES so
+does require multiple calls. It would be possible to return a bitmap but
+that would limit the room for expansion. It's not exactly a performance
+critical path ;)
+
+>> +
+>> +PV_TIME_LPT
+>> +    Function ID:  (uint32)  : 0xC5000021
+>> +    Flags:        (uint32)  : Bit[0]: Request migration interrupts
+>> +                                      (not currently supported by KVM)
+>> +    Return value: (int64)   : IPA of the shared live physical time data
+>> +                              structure or negative error code on failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +                              INVALID_PARAMETERS (-2)
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              (V)CPU. On failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +Live Physical Time
+>> +------------------
+>> +
+>> +The structure pointed to by the PV_TIME_LPT hypercall is as follows:
+>> +
+>> +  Field           | Byte Length | Byte Offset | Description
+>> +  --------------- | ----------- | ----------- | -------------------------------
+>> +  Revision        |      4      |      0      | Must be 0 for this revision
+>> +  Attributes      |      4      |      4      | Must be 0
+>> +  sequence_number |      8      |      8      | Bit 0: reserved
+>> +                  |             |             | Bits 1:63 number of migrations
+>> +  scale_mult      |      8      |      16     | Multiplier to scale from native
+>> +                  |             |             | frequency to PV frequency
+>> +  shift           |      4      |      24     | Shift applied before multiplier
+>> +  Reserved        |      4      |      28     | Must be 0
+>> +  Fn              |      8      |      32     | Native frequency
+>> +  Fpv             |      8      |      40     | Paravirtualized frequency seen
+>> +                  |             |             | by guest
+>> +  div_by_fpv_mult |      8      |      48     | Multiplier to implement fast
+>> +                  |             |             | divide by Fpv
+> 
+> Here's kvmclock's struct
+> 
+>  struct pvclock_vcpu_time_info {
+>         u32   version; 
+>         u32   pad0;
+>         u64   tsc_timestamp;
+>         u64   system_time;
+>         u32   tsc_to_system_mul;
+>         s8    tsc_shift;
+>         u8    flags;
+>         u8    pad[2];
+>  }
+> 
+>  Revision	 =>
+>  Attributes	 =>
+>  sequence_number => version
+>  scale_mult	 => tsc_to_system_mul	(this is reversed, but OK)
+>  shift		 => tsc_shift           (also reversed)
+>  Reserved	 =>
+>  Fn		 => (pvclock doesn't have, but does have system_time)
+>  Fpv		 =>
+>  div_by_fpv_mult =>
+> 
+> I haven't thought about this enough yet to be sure kvmclock's fields
+> are sufficient, but several look close - although the 'tsc' naming
+> isn't nice. Also, the pvclock struct could be extended by adding an
+> 'extended' flag to 'flags', and then appending more fields.
+
+While it may be possible to try to map the fields onto the existing
+structure it's not going to be a great fit, and I don't really see the
+point. Unless the meaning is going to exactly match x86 then it would be
+the same structure in name only.
+
+>> +
+>> +Where scale_mult is defined as 2^(64-shift) * Fpv / Fn
+>> +
+>> +The structure will be updated by the hypervisor whenever the guest is migrated
+>> +to a new host. It will be present within a reserved region of the normal
+>> +memory given to the guest. The guest should not attempt to write into this
+>> +memory.
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>> +  Attributes  |      4      |      4      | Must be 0
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor periodically as time is stolen
+>> +from the VCPU. It will be present within a reserved region of the normal
+>> +memory given to the guest. The guest should not attempt to write into this
+>> +memory. There is a structure by VCPU of the guest.
+>> +
+>> +User space interface
+>> +====================
+>> +
+>> +User space can request that KVM provide the paravirtualized time interface to
+>> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
+>> +
+>> +    struct kvm_create_device pvtime_device = {
+>> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
+>> +            .attr = 0,
+>> +            .flags = 0,
+>> +    };
+>> +
+>> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+>> +
+>> +The guest IPA of the structures must be given to KVM. This is the address of
+>> +the LPT structure and the base address of an array of stolen time structures
+>> +(one for each VCPU). For example:
+>> +
+>> +    struct kvm_device_attr lpt_base = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+>> +            .attr = KVM_DEV_ARM_PV_TIME_LPT,
+>> +            .addr = (u64)(unsigned long)&lpt_paddr
+>> +    };
+>> +    struct kvm_device_attr st_base = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+>> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
+>> +            .addr = (u64)(unsigned long)&st_paddr
+>> +    };
+>> +
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &lpt_base);
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+>> +
+>> +The paravirtualized frequency of the guest can also be set. By default this
+>> +will be the counter frequency of the host. However when migrating a guest from
+>> +another host, this must be manually set to ensure that the guest sees the same
+>> +frequency.
+>> +
+>> +    u32 frequency;
+>> +
+>> +    struct kvm_device_attr lpt_freq = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_FREQUENCY,
+>> +            .attr = KVM_DEV_ARM_PV_TIME_LPT,
+>> +            .addr = (u64)(unsigned long)&frequency
+>> +    };
+>> +
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &lpt_freq);
+>> +
+>> +For migration (or save/restore) of a guest it is necessary to save the contents
+>> +of the shared pages and later restore them. KVM_DEV_ARM_PV_TIME_STATE_SIZE
+>> +provides the size of this data and KVM_DEV_ARM_PV_TIME_STATE allows the state
+>> +to be read/written. The state for stolen time and LPT are accessed separately.
+> 
+> I guess there's no harm in userspace accessing these separately, but I
+> hope we'll be trying to put all the PV structures on one shared page
+> for the guest.
+
+Note that it's possible to only just one of the PV mechanisms. In
+particular if the hardware in the future supports clock scaling then we
+won't need LPT any more so you would just want to expose stolen time.
+
+The API allows the hypervisor to place the structure(s) arbitrarily in
+physical memory - the requirement is just to present them at the correct
+IPA to the guest. The implementation in this series uses one page for
+LPT and (at least) one page for stolen time.
+
+Thanks for the review,
 
 Steve
 
-> 
 > Thanks,
 > drew
 > 
->>
->> It also implements support for stolen time, allowing the guest to
->> identify time when it is forcibly not executing.
->>
->> Patch 1 provides some documentation
->> Patches 2-4, 8 and 11 provide some refactoring of existing code
->> Patch 5 implements the new PV_FEATURES discovery mechanism
->> Patches 6-7 implement live physical time
->> Patches 9-10 implement stolen time
->> Patch 12 adds the 'PV_TIME' device for user space to enable the features
->>
->> Christoffer Dall (2):
->>   KVM: arm/arm64: Factor out hypercall handling from PSCI code
->>   KVM: Export mark_page_dirty_in_slot
->>
->> Steven Price (10):
->>   KVM: arm64: Document PV-time interface
->>   arm/arm64: Provide a wrapper for SMCCC 1.1 calls
->>   arm/arm64: Make use of the SMCCC 1.1 wrapper
->>   KVM: arm64: Implement PV_FEATURES call
->>   KVM: arm64: Support Live Physical Time reporting
->>   clocksource: arm_arch_timer: Use paravirtualized LPT
->>   KVM: arm64: Support stolen time reporting via shared page
->>   arm64: Retrieve stolen time as paravirtualized guest
->>   KVM: Allow kvm_device_ops to be const
->>   KVM: arm64: Provide a PV_TIME device to user space
->>
->>  Documentation/virtual/kvm/arm/pvtime.txt | 169 ++++++++++++++
->>  arch/arm/kvm/Makefile                    |   2 +-
->>  arch/arm/kvm/handle_exit.c               |   2 +-
->>  arch/arm/mm/proc-v7-bugs.c               |  46 ++--
->>  arch/arm64/include/asm/arch_timer.h      |  32 ++-
->>  arch/arm64/include/asm/kvm_host.h        |  16 ++
->>  arch/arm64/include/asm/kvm_mmu.h         |   2 +
->>  arch/arm64/include/asm/pvclock-abi.h     |  32 +++
->>  arch/arm64/include/uapi/asm/kvm.h        |   8 +
->>  arch/arm64/kernel/Makefile               |   1 +
->>  arch/arm64/kernel/cpu_errata.c           |  47 +---
->>  arch/arm64/kernel/cpuinfo.c              |   2 +-
->>  arch/arm64/kernel/kvm.c                  | 156 +++++++++++++
->>  arch/arm64/kvm/Kconfig                   |   1 +
->>  arch/arm64/kvm/Makefile                  |   2 +
->>  arch/arm64/kvm/handle_exit.c             |   4 +-
->>  drivers/clocksource/arm_arch_timer.c     | 176 ++++++++++++++-
->>  include/kvm/arm_arch_timer.h             |   2 +
->>  include/kvm/arm_hypercalls.h             |  44 ++++
->>  include/kvm/arm_psci.h                   |   2 +-
->>  include/kvm/arm_pv.h                     |  28 +++
->>  include/linux/arm-smccc.h                |  45 ++++
->>  include/linux/cpuhotplug.h               |   1 +
->>  include/linux/kvm_host.h                 |   5 +-
->>  include/linux/kvm_types.h                |   2 +
->>  include/uapi/linux/kvm.h                 |   2 +
->>  virt/kvm/arm/arm.c                       |  25 +-
->>  virt/kvm/arm/hypercalls.c                | 276 +++++++++++++++++++++++
->>  virt/kvm/arm/mmu.c                       |  44 ++++
->>  virt/kvm/arm/psci.c                      |  76 +------
->>  virt/kvm/arm/pvtime.c                    | 243 ++++++++++++++++++++
->>  virt/kvm/kvm_main.c                      |  12 +-
->>  32 files changed, 1348 insertions(+), 157 deletions(-)
->>  create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
->>  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
->>  create mode 100644 arch/arm64/kernel/kvm.c
->>  create mode 100644 include/kvm/arm_hypercalls.h
->>  create mode 100644 include/kvm/arm_pv.h
->>  create mode 100644 virt/kvm/arm/hypercalls.c
->>  create mode 100644 virt/kvm/arm/pvtime.c
->>
+>> +It is also necessary for the physical address and frequency to be set
+>> +identically when restoring. The kernel will update the structure on first run
+>> +of the vCPU(s) to contain the new coefficients.
+>> +
+>> +    void *save_state(int fd, u64 attr, u32 *size) {
+>> +        struct kvm_device_attr get_size = {
+>> +                .group = KVM_DEV_ARM_PV_TIME_STATE_SIZE,
+>> +                .attr = attr,
+>> +                .addr = (u64)(unsigned long)size
+>> +        };
+>> +
+>> +        ioctl(fd, KVM_GET_DEVICE_ATTR, get_size);
+>> +
+>> +        void *buffer = malloc(*size);
+>> +
+>> +        struct kvm_device_attr get_state = {
+>> +                .group = KVM_DEV_ARM_PV_TIME_STATE,
+>> +                .attr = attr,
+>> +                .addr = (u64)(unsigned long)size
+>> +        };
+>> +
+>> +        ioctl(fd, KVM_GET_DEVICE_ATTR, buffer);
+>> +    }
+>> +
+>> +    void *lpt_state = save_state(pvtime_fd, KVM_DEV_ARM_PV_TIME_LPT, &lpt_size);
+>> +    void *st_state = save_state(pvtime_fd, KVM_DEV_ARM_PV_TIME_ST, &st_size);
+>> +
 >> -- 
 >> 2.19.2
 >>
