@@ -1,24 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 8/8] arm64: Add configuration/documentation for Cortex-A76
- erratum 1165522
-Date: Thu,  6 Dec 2018 17:31:26 +0000
-Message-ID: <20181206173126.139877-9-marc.zyngier@arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 3/4] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Thu, 6 Dec 2018 18:49:26 +0000
+Message-ID: <f2f18b3c-66a5-89ca-0eda-77107324694b@arm.com>
+References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
+ <1544023815-16958-4-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F36654A37F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 12:31:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4EB4A214
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 13:49:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HN9edX7VaiRM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Dec 2018 12:31:51 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF1AE4A2FC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 12:31:50 -0500 (EST)
-In-Reply-To: <20181206173126.139877-1-marc.zyngier@arm.com>
+ with ESMTP id ddI-W5ZeQooG for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Dec 2018 13:49:30 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A78DC4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 13:49:30 -0500 (EST)
+In-Reply-To: <1544023815-16958-4-git-send-email-andrew.murray@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,53 +30,28 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
+To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the infrastructure to handle erratum 1165522 is in place,
-let's make it a selectable option and add the required documentation.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- Documentation/arm64/silicon-errata.txt |  1 +
- arch/arm64/Kconfig                     | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
 
-diff --git a/Documentation/arm64/silicon-errata.txt b/Documentation/arm64/silicon-errata.txt
-index 76ccded8b74c..04f0bc4690c6 100644
---- a/Documentation/arm64/silicon-errata.txt
-+++ b/Documentation/arm64/silicon-errata.txt
-@@ -57,6 +57,7 @@ stable kernels.
- | ARM            | Cortex-A73      | #858921         | ARM64_ERRATUM_858921        |
- | ARM            | Cortex-A55      | #1024718        | ARM64_ERRATUM_1024718       |
- | ARM            | Cortex-A76      | #1188873        | ARM64_ERRATUM_1188873       |
-+| ARM            | Cortex-A76      | #1165522        | ARM64_ERRATUM_1165522       |
- | ARM            | MMU-500         | #841119,#826419 | N/A                         |
- |                |                 |                 |                             |
- | Cavium         | ThunderX ITS    | #22375, #24313  | CAVIUM_ERRATUM_22375        |
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 787d7850e064..a68bc6cc2167 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -497,6 +497,18 @@ config ARM64_ERRATUM_1188873
- 
- 	  If unsure, say Y.
- 
-+config ARM64_ERRATUM_1165522
-+	bool "Cortex-A76: Speculative AT instruction using out-of-context translation regime could cause subsequent request to generate an incorrect translation"
-+	default y
-+	help
-+	  This option adds work arounds for ARM Cortex-A76 erratum 1165522
-+
-+	  Affected Cortex-A76 cores (r0p0, r1p0, r2p0) could end-up with
-+	  corrupted TLBs by speculating an AT instruction during a guest
-+	  context switch.
-+
-+	  If unsure, say Y.
-+
- config CAVIUM_ERRATUM_22375
- 	bool "Cavium erratum 22375, 24313"
- 	default y
--- 
-2.19.2
+On 05/12/2018 15:30, Andrew Murray wrote:
+> Add support for the :G and :H attributes in perf by handling the
+> exclude_host/exclude_guest event attributes.
+> 
+> We notify KVM of counters that we wish to be enabled or disabled on
+> guest entry/exit and thus defer from starting or stopping :G events
+> as per the events exclude_host attribute.
+> 
+> With both VHE and non-VHE we switch the counters between host/guest
+> at EL2. We are able to eliminate counters counting host events on
+> the boundaries of guest entry/exit when using :G by filtering out
+> EL2 for exclude_host. However when using :H unless exclude_hv is set
+> on non-VHE then there is a small blackout window at the guest
+> entry/exit where host events are not captured.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
