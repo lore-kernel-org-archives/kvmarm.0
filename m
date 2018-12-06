@@ -1,26 +1,26 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 23/25] arm64: acpi: Make apei_claim_sea() synchronise
- with APEI's irq work
-Date: Thu, 6 Dec 2018 16:18:17 +0000
-Message-ID: <20181206161817.GN54495@arrakis.emea.arm.com>
+Subject: Re: [PATCH v7 24/25] firmware: arm_sdei: Add ACPI GHES registration
+ helper
+Date: Thu, 6 Dec 2018 16:18:45 +0000
+Message-ID: <20181206161844.GO54495@arrakis.emea.arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-24-james.morse@arm.com>
+ <20181203180613.228133-25-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DAD74A2BE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B25E74A2FB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GxbC-Tb3uiFW for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Dec 2018 11:18:23 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E9DC4A1DF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:23 -0500 (EST)
+ with ESMTP id zfITIO7fLoxu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Dec 2018 11:18:50 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFE584A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:50 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-24-james.morse@arm.com>
+In-Reply-To: <20181203180613.228133-25-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,25 +34,18 @@ To: James Morse <james.morse@arm.com>
 Cc: Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:06:11PM +0000, James Morse wrote:
-> APEI is unable to do all of its error handling work in nmi-context, so
-> it defers non-fatal work onto the irq_work queue. arch_irq_work_raise()
-> sends an IPI to the calling cpu, but this is not guaranteed to be taken
-> before returning to user-space.
+On Mon, Dec 03, 2018 at 06:06:12PM +0000, James Morse wrote:
+> APEI's Generic Hardware Error Source structures do not describe
+> whether the SDEI event is shared or private, as this information is
+> discoverable via the API.
 > 
-> Unless the exception interrupted a context with irqs-masked,
-> irq_work_run() can run immediately. Otherwise return -EINPROGRESS to
-> indicate ghes_notify_sea() found some work to do, but it hasn't
-> finished yet.
+> GHES needs to know whether an event is normal or critical to avoid
+> sharing locks or fixmap entries, but GHES shouldn't have to know about
+> the SDEI API.
 > 
-> With this apei_claim_sea() returning '0' means this external-abort was
-> also notification of a firmware-first RAS error, and that APEI has
-> processed the CPER records.
+> Add a helper to register the GHES using the appropriate normal or
+> critical callback.
 > 
 > Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-> CC: Xie XiuQi <xiexiuqi@huawei.com>
-> CC: gengdongjiu <gengdongjiu@huawei.com>
 
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
