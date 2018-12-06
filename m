@@ -1,73 +1,137 @@
 From: lantianyu1986@gmail.com
-Subject: [Resend PATCH V5 3/10] x86/Hyper-v: Add trace in the
- hyperv_nested_flush_guest_mapping_range()
-Date: Thu,  6 Dec 2018 21:21:06 +0800
-Message-ID: <20181206132113.2691-4-Tianyu.Lan@microsoft.com>
+Subject: [Resend PATCH V5 4/10] KVM/VMX: Add hv tlb range flush support
+Date: Thu,  6 Dec 2018 21:21:07 +0800
+Message-ID: <20181206132113.2691-5-Tianyu.Lan@microsoft.com>
 References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-Cc: linux-mips@linux-mips.org, kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, devel@linuxdriverproject.org, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
+Sender: linux-kernel-owner@vger.kernel.org
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, kys@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to trace log in the hyperv_nested_flush_
-guest_mapping_range().
+This patch is to register tlb_remote_flush_with_range callback with
+hv tlb range flush interface.
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- arch/x86/hyperv/nested.c            |  1 +
- arch/x86/include/asm/trace/hyperv.h | 14 ++++++++++++++
- 2 files changed, 15 insertions(+)
+Change since v4:
+	- Use new function kvm_fill_hv_flush_list_func() to fill flush
+       request.
+Change since v3:
+	- Merge Vitaly's don't pass EPT configuration info to
+vmx_hv_remote_flush_tlb() fix.
+Change since v1:
+	- Pass flush range with new hyper-v tlb flush struct rather
+       than KVM tlb flush struct.
+---
+ arch/x86/kvm/vmx.c | 63 +++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 46 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/hyperv/nested.c b/arch/x86/hyperv/nested.c
-index 3d0f31e46954..dd0a843f766d 100644
---- a/arch/x86/hyperv/nested.c
-+++ b/arch/x86/hyperv/nested.c
-@@ -130,6 +130,7 @@ int hyperv_flush_guest_mapping_range(u64 as,
- 	else
- 		ret = status;
- fault:
-+	trace_hyperv_nested_flush_guest_mapping_range(as, ret);
+diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
+index 2356118ea440..bad2aa6c5ca1 100644
+--- a/arch/x86/kvm/vmx.c
++++ b/arch/x86/kvm/vmx.c
+@@ -1569,7 +1569,34 @@ static void check_ept_pointer_match(struct kvm *kvm)
+ 	to_kvm_vmx(kvm)->ept_pointers_match = EPT_POINTERS_MATCH;
+ }
+ 
+-static int vmx_hv_remote_flush_tlb(struct kvm *kvm)
++int kvm_fill_hv_flush_list_func(struct hv_guest_mapping_flush_list *flush,
++		void *data)
++{
++	struct kvm_tlb_range *range = data;
++
++	return hyperv_fill_flush_guest_mapping_list(flush, range->start_gfn,
++			range->pages);
++}
++
++static inline int __hv_remote_flush_tlb_with_range(struct kvm *kvm,
++		struct kvm_vcpu *vcpu, struct kvm_tlb_range *range)
++{
++	u64 ept_pointer = to_vmx(vcpu)->ept_pointer;
++
++	/*
++	 * FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE hypercall needs address
++	 * of the base of EPT PML4 table, strip off EPT configuration
++	 * information.
++	 */
++	if (range)
++		return hyperv_flush_guest_mapping_range(ept_pointer & PAGE_MASK,
++				kvm_fill_hv_flush_list_func, (void *)range);
++	else
++		return hyperv_flush_guest_mapping(ept_pointer & PAGE_MASK);
++}
++
++static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
++		struct kvm_tlb_range *range)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	int ret = -ENOTSUPP, i;
+@@ -1579,29 +1606,26 @@ static int vmx_hv_remote_flush_tlb(struct kvm *kvm)
+ 	if (to_kvm_vmx(kvm)->ept_pointers_match == EPT_POINTERS_CHECK)
+ 		check_ept_pointer_match(kvm);
+ 
+-	/*
+-	 * FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE hypercall needs the address of the
+-	 * base of EPT PML4 table, strip off EPT configuration information.
+-	 * If ept_pointer is invalid pointer, bypass the flush request.
+-	 */
+ 	if (to_kvm_vmx(kvm)->ept_pointers_match != EPT_POINTERS_MATCH) {
+ 		kvm_for_each_vcpu(i, vcpu, kvm) {
+-			u64 ept_pointer = to_vmx(vcpu)->ept_pointer;
+-
+-			if (!VALID_PAGE(ept_pointer))
+-				continue;
+-
+-			ret |= hyperv_flush_guest_mapping(
+-				ept_pointer & PAGE_MASK);
++			/* If ept_pointer is invalid pointer, bypass flush request. */
++			if (VALID_PAGE(to_vmx(vcpu)->ept_pointer))
++				ret |= __hv_remote_flush_tlb_with_range(
++						kvm, vcpu, range);
+ 		}
+ 	} else {
+-		ret = hyperv_flush_guest_mapping(
+-			to_vmx(kvm_get_vcpu(kvm, 0))->ept_pointer & PAGE_MASK);
++		ret = __hv_remote_flush_tlb_with_range(kvm,
++				kvm_get_vcpu(kvm, 0), range);
+ 	}
+ 
+ 	spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
  	return ret;
  }
- EXPORT_SYMBOL_GPL(hyperv_flush_guest_mapping_range);
-diff --git a/arch/x86/include/asm/trace/hyperv.h b/arch/x86/include/asm/trace/hyperv.h
-index 2e6245a023ef..ace464f09681 100644
---- a/arch/x86/include/asm/trace/hyperv.h
-+++ b/arch/x86/include/asm/trace/hyperv.h
-@@ -42,6 +42,20 @@ TRACE_EVENT(hyperv_nested_flush_guest_mapping,
- 	    TP_printk("address space %llx ret %d", __entry->as, __entry->ret)
- 	);
++
++static int hv_remote_flush_tlb(struct kvm *kvm)
++{
++	return hv_remote_flush_tlb_with_range(kvm, NULL);
++}
+ #else /* !IS_ENABLED(CONFIG_HYPERV) */
+ static inline void evmcs_write64(unsigned long field, u64 value) {}
+ static inline void evmcs_write32(unsigned long field, u32 value) {}
+@@ -7971,8 +7995,11 @@ static __init int hardware_setup(void)
  
-+TRACE_EVENT(hyperv_nested_flush_guest_mapping_range,
-+	    TP_PROTO(u64 as, int ret),
-+	    TP_ARGS(as, ret),
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
+-	    && enable_ept)
+-		kvm_x86_ops->tlb_remote_flush = vmx_hv_remote_flush_tlb;
++	    && enable_ept) {
++		kvm_x86_ops->tlb_remote_flush = hv_remote_flush_tlb;
++		kvm_x86_ops->tlb_remote_flush_with_range =
++				hv_remote_flush_tlb_with_range;
++	}
+ #endif
+ 
+ 	if (!cpu_has_vmx_ple()) {
+@@ -11612,6 +11639,8 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	vmx->nested.posted_intr_nv = -1;
+ 	vmx->nested.current_vmptr = -1ull;
+ 
++	vmx->ept_pointer = INVALID_PAGE;
 +
-+	    TP_STRUCT__entry(
-+		    __field(u64, as)
-+		    __field(int, ret)
-+		    ),
-+	    TP_fast_assign(__entry->as = as;
-+			   __entry->ret = ret;
-+		    ),
-+	    TP_printk("address space %llx ret %d", __entry->as, __entry->ret)
-+	);
-+
- TRACE_EVENT(hyperv_send_ipi_mask,
- 	    TP_PROTO(const struct cpumask *cpus,
- 		     int vector),
+ 	vmx->msr_ia32_feature_control_valid_bits = FEATURE_CONTROL_LOCKED;
+ 
+ 	/*
 -- 
 2.14.4
