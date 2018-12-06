@@ -1,59 +1,65 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] kvm/arm: return 0 when the number of objects is not
- lessthan min
-Date: Thu, 6 Dec 2018 15:29:32 +0100
-Message-ID: <20181206142932.kmt3srhncfpyznu5@kamzik.brq.redhat.com>
-References: <20181205083236.5tzhnxfhi4h4nknn@kamzik.brq.redhat.com>
- <201812060956304771332@zte.com.cn>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v7 13/25] KVM: arm/arm64: Add kvm_ras.h to collect kvm
+ specific RAS plumbing
+Date: Thu, 6 Dec 2018 16:17:08 +0000
+Message-ID: <20181206161707.GL54495@arrakis.emea.arm.com>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-14-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0F414A2F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:17:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gZ9twzmUebgj for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Dec 2018 11:17:14 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FBA34A2BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:17:14 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <201812060956304771332@zte.com.cn>
-Sender: linux-kernel-owner@vger.kernel.org
-To: peng.hao2@zte.com.cn
-Cc: christoffer.dall@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20181203180613.228133-14-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 06, 2018 at 09:56:30AM +0800, peng.hao2@zte.com.cn wrote:
-> >On Wed, Dec 05, 2018 at 09:15:51AM +0800, Peng Hao wrote:
-> >> Return 0 when there is enough kvm_mmu_memory_cache object.
-> >>
-> >> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-> >> ---
-> >>  virt/kvm/arm/mmu.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> >> index ed162a6..fcda0ce 100644
-> >> --- a/virt/kvm/arm/mmu.c
-> >> +++ b/virt/kvm/arm/mmu.c
-> >> @@ -127,7 +127,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
-> >>      while (cache->nobjs < max) {
-> >>          page = (void *)__get_free_page(PGALLOC_GFP);
-> >>          if (!page)
-> >> -            return -ENOMEM;
-> >> +            return cache->nobjs >= min ? 0 : -ENOMEM;
-> >
-> >This condition will never be true here, as the exact same condition is
-> >already checked above, and if it had been true, then we wouldn't be here.
-> >
-> >What problem are you attempting to solve?
-> >
-> if (cache->nobjs >= min)                      ------here cache->nobjs<min,it can continue downward 
->      return 0;
-> while (cache->nobjs < max) {
->     page = (void *)__get_free_page(PGALLOC_GFP);
->     if (!page)
->        return -ENOMEM;                         -----here it is possible that  (cache->nobjs >= min) and (cache->nobjs<max)
->     cache->objects[cache->nobjs++] = page; ---here cache->nobjs increasing
->   }
+On Mon, Dec 03, 2018 at 06:06:01PM +0000, James Morse wrote:
+> To split up APEIs in_nmi() path, the caller needs to always be
+> in_nmi(). KVM shouldn't have to know about this, pull the RAS plumbing
+> out into a header file.
 > 
-> I just think the logic of this function is to return 0 as long as (cache->nobjs >= min).
-> thanks.
+> Currently guest synchronous external aborts are claimed as RAS
+> notifications by handle_guest_sea(), which is hidden in the arch codes
+> mm/fault.c. 32bit gets a dummy declaration in system_misc.h.
+> 
+> There is going to be more of this in the future if/when the kernel
+> supports the SError-based firmware-first notification mechanism and/or
+> kernel-first notifications for both synchronous external abort and
+> SError. Each of these will come with some Kconfig symbols and a
+> handful of header files.
+> 
+> Create a header file for all this.
+> 
+> This patch gives handle_guest_sea() a 'kvm_' prefix, and moves the
+> declarations to kvm_ras.h as preparation for a future patch that moves
+> the ACPI-specific RAS code out of mm/fault.c.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
 
-Oh, I see now. This is the case where we can do enough allocating to over
-the min line, but fail before we get to the max.
+For the arm64 bits here:
 
-Thanks,
-drew
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
