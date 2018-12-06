@@ -1,51 +1,80 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 24/25] firmware: arm_sdei: Add ACPI GHES registration
- helper
-Date: Thu, 6 Dec 2018 16:18:45 +0000
-Message-ID: <20181206161844.GO54495@arrakis.emea.arm.com>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-25-james.morse@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 2/4] arm64: KVM: add accessors to track guest/host only
+ counters
+Date: Thu, 6 Dec 2018 17:21:09 +0000
+Message-ID: <97301473-69d0-9a0b-b957-5568a43a6551@arm.com>
+References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
+ <1544023815-16958-3-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B25E74A2FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:51 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zfITIO7fLoxu for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Dec 2018 11:18:50 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFE584A1DF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Dec 2018 11:18:50 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-25-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1544023815-16958-3-git-send-email-andrew.murray@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:06:12PM +0000, James Morse wrote:
-> APEI's Generic Hardware Error Source structures do not describe
-> whether the SDEI event is shared or private, as this information is
-> discoverable via the API.
-> 
-> GHES needs to know whether an event is normal or critical to avoid
-> sharing locks or fixmap entries, but GHES shouldn't have to know about
-> the SDEI API.
-> 
-> Add a helper to register the GHES using the appropriate normal or
-> critical callback.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
+Hi Andrew,
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+On 05/12/2018 15:30, Andrew Murray wrote:
+> In order to effeciently enable/disable guest/host only perf counters
+> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
+> host events as well as accessors for updating them.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>   arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1550192..800c87b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -203,6 +203,8 @@ struct kvm_cpu_context {
+>   	};
+>   
+>   	struct kvm_vcpu *__hyp_running_vcpu;
+> +	u32 events_host;
+> +	u32 events_guest;
+>   };
+>   
+>   typedef struct kvm_cpu_context kvm_cpu_context_t;
+> @@ -467,11 +469,33 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+>   void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>   void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+>   
+> +#define KVM_PMU_EVENTS_HOST	1
+> +#define KVM_PMU_EVENTS_GUEST	2
+> +
+>   #ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
+>   static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>   {
+>   	return kvm_arch_vcpu_run_map_fp(vcpu);
+>   }
+> +static inline void kvm_set_pmu_events(u32 set, int flags)
+> +{
+> +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
+> +
+> +	if (flags & KVM_PMU_EVENTS_HOST)
+> +		ctx->events_host |= set;
+> +	if (flags & KVM_PMU_EVENTS_GUEST)
+> +		ctx->events_guest |= set;
+
+You seem to be passing a single flag at a time ever, in the next patch.
+Either we can batch the calls in the next patch, or make this a real number and
+not a flag. g.g, enum { HOST,  GUEST } or even a bool.
+
+I think the former sounds better.
+
+Cheers
+Suzuki
