@@ -1,22 +1,22 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [PATCH v6 05/13] arm64: Don't trap host pointer auth use to EL2
-Date: Fri,  7 Dec 2018 18:39:23 +0000
-Message-ID: <20181207183931.4285-6-kristina.martsenko@arm.com>
+Subject: [PATCH v6 06/13] arm64/cpufeature: detect pointer authentication
+Date: Fri,  7 Dec 2018 18:39:24 +0000
+Message-ID: <20181207183931.4285-7-kristina.martsenko@arm.com>
 References: <20181207183931.4285-1-kristina.martsenko@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 783FF4A32E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 057684A321
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yhEtamrv4tfo for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Dec 2018 13:40:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE174A329
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:20 -0500 (EST)
+ with ESMTP id ylPfke1XZZxr for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Dec 2018 13:40:24 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA364A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:24 -0500 (EST)
 In-Reply-To: <20181207183931.4285-1-kristina.martsenko@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,52 +33,192 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Mark Rutland <mark.rutland@arm.com>
 
-To allow EL0 (and/or EL1) to use pointer authentication functionality,
-we must ensure that pointer authentication instructions and accesses to
-pointer authentication keys are not trapped to EL2.
+So that we can dynamically handle the presence of pointer authentication
+functionality, wire up probing code in cpufeature.c.
 
-This patch ensures that HCR_EL2 is configured appropriately when the
-kernel is booted at EL2. For non-VHE kernels we set HCR_EL2.{API,APK},
-ensuring that EL1 can access keys and permit EL0 use of instructions.
-For VHE kernels host EL0 (TGE && E2H) is unaffected by these settings,
-and it doesn't matter how we configure HCR_EL2.{API,APK}, so we don't
-bother setting them.
+>From ARMv8.3 onwards, ID_AA64ISAR1 is no longer entirely RES0, and now
+has four fields describing the presence of pointer authentication
+functionality:
 
-This does not enable support for KVM guests, since KVM manages HCR_EL2
-itself when running VMs.
+* APA - address authentication present, using an architected algorithm
+* API - address authentication present, using an IMP DEF algorithm
+* GPA - generic authentication present, using an architected algorithm
+* GPI - generic authentication present, using an IMP DEF algorithm
+
+This patch checks for both address and generic authentication,
+separately. It is assumed that if all CPUs support an IMP DEF algorithm,
+the same algorithm is used across all CPUs.
 
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm64/include/asm/kvm_arm.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/cpucaps.h    |  8 +++-
+ arch/arm64/include/asm/cpufeature.h | 12 +++++
+ arch/arm64/kernel/cpufeature.c      | 90 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 109 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index c8825c5a8dd0..f9123fe8fcf3 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -24,6 +24,8 @@
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 6e2d254c09eb..62fc48604263 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -54,7 +54,13 @@
+ #define ARM64_HAS_CRC32				33
+ #define ARM64_SSBS				34
+ #define ARM64_WORKAROUND_1188873		35
++#define ARM64_HAS_ADDRESS_AUTH_ARCH		36
++#define ARM64_HAS_ADDRESS_AUTH_IMP_DEF		37
++#define ARM64_HAS_ADDRESS_AUTH			38
++#define ARM64_HAS_GENERIC_AUTH_ARCH		39
++#define ARM64_HAS_GENERIC_AUTH_IMP_DEF		40
++#define ARM64_HAS_GENERIC_AUTH			41
  
- /* Hyp Configuration Register (HCR) bits */
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_API		(UL(1) << 41)
-+#define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
- #define HCR_TERR	(UL(1) << 36)
- #define HCR_TLOR	(UL(1) << 35)
-@@ -87,7 +89,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW)
-+#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+-#define ARM64_NCAPS				36
++#define ARM64_NCAPS				42
  
- /* TCR_EL2 Registers bits */
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 7e2ec64aa414..1c8393ffabff 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -514,6 +514,18 @@ static inline bool system_supports_cnp(void)
+ 		cpus_have_const_cap(ARM64_HAS_CNP);
+ }
+ 
++static inline bool system_supports_address_auth(void)
++{
++	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
++		cpus_have_const_cap(ARM64_HAS_ADDRESS_AUTH);
++}
++
++static inline bool system_supports_generic_auth(void)
++{
++	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
++		cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH);
++}
++
+ #define ARM64_SSBD_UNKNOWN		-1
+ #define ARM64_SSBD_FORCE_DISABLE	0
+ #define ARM64_SSBD_KERNEL		1
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index aec5ecb85737..f8e3c3568a79 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -141,9 +141,17 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_GPI_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_GPA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_LRCPC_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_FCMA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_JSCVT_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_API_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_APA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_DPB_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+ };
+@@ -1145,6 +1153,36 @@ static void cpu_clear_disr(const struct arm64_cpu_capabilities *__unused)
+ }
+ #endif /* CONFIG_ARM64_RAS_EXTN */
+ 
++#ifdef CONFIG_ARM64_PTR_AUTH
++static bool has_address_auth(const struct arm64_cpu_capabilities *entry,
++			     int __unused)
++{
++	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	bool api, apa;
++
++	apa = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_APA_SHIFT) > 0;
++	api = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_API_SHIFT) > 0;
++
++	return apa || api;
++}
++
++static bool has_generic_auth(const struct arm64_cpu_capabilities *entry,
++			     int __unused)
++{
++	u64 isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	bool gpi, gpa;
++
++	gpa = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_GPA_SHIFT) > 0;
++	gpi = cpuid_feature_extract_unsigned_field(isar1,
++					ID_AA64ISAR1_GPI_SHIFT) > 0;
++
++	return gpa || gpi;
++}
++#endif /* CONFIG_ARM64_PTR_AUTH */
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -1368,6 +1406,58 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.cpu_enable = cpu_enable_cnp,
+ 	},
+ #endif
++#ifdef CONFIG_ARM64_PTR_AUTH
++	{
++		.desc = "Address authentication (architected algorithm)",
++		.capability = ARM64_HAS_ADDRESS_AUTH_ARCH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_APA_SHIFT,
++		.min_field_value = ID_AA64ISAR1_APA_ARCHITECTED,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.desc = "Address authentication (IMP DEF algorithm)",
++		.capability = ARM64_HAS_ADDRESS_AUTH_IMP_DEF,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_API_SHIFT,
++		.min_field_value = ID_AA64ISAR1_API_IMP_DEF,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.capability = ARM64_HAS_ADDRESS_AUTH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_address_auth,
++	},
++	{
++		.desc = "Generic authentication (architected algorithm)",
++		.capability = ARM64_HAS_GENERIC_AUTH_ARCH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_GPA_SHIFT,
++		.min_field_value = ID_AA64ISAR1_GPA_ARCHITECTED,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.desc = "Generic authentication (IMP DEF algorithm)",
++		.capability = ARM64_HAS_GENERIC_AUTH_IMP_DEF,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64ISAR1_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64ISAR1_GPI_SHIFT,
++		.min_field_value = ID_AA64ISAR1_GPI_IMP_DEF,
++		.matches = has_cpuid_feature,
++	},
++	{
++		.capability = ARM64_HAS_GENERIC_AUTH,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_generic_auth,
++	},
++#endif /* CONFIG_ARM64_PTR_AUTH */
+ 	{},
+ };
+ 
 -- 
 2.11.0
