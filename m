@@ -1,24 +1,29 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 0/8] Workaround for Cortex-A76 erratum 1165522
-Date: Fri, 7 Dec 2018 11:09:40 +0000
-Message-ID: <da3f6f5a-9d39-3b51-661e-723742727f35@arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v5 2/4] arm64: KVM: add accessors to track guest/host only
+ counters
+Date: Fri, 7 Dec 2018 14:08:02 +0000
+Message-ID: <441d603e-eb30-821b-a59b-eec1bd6c8e22@arm.com>
+References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
+ <1544023815-16958-3-git-send-email-andrew.murray@arm.com>
+ <97301473-69d0-9a0b-b957-5568a43a6551@arm.com>
+ <fefadc01-05dd-f714-667e-71c3589083e7@arm.com>
+ <20181206192108.GA51311@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6137C4A2E4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 06:09:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CAC44A331
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 09:08:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id btMAj8gimRBD for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Dec 2018 06:09:44 -0500 (EST)
+ with ESMTP id hQYcuvf4u3xu for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Dec 2018 09:08:07 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48D844A1FA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 06:09:44 -0500 (EST)
-In-Reply-To: <20181206173126.139877-1-marc.zyngier@arm.com>
-Content-Language: en-GB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D37484A2F8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 09:08:06 -0500 (EST)
+In-Reply-To: <20181206192108.GA51311@e119886-lin.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,32 +33,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
 
-On 06/12/2018 17:31, Marc Zyngier wrote:
-> Early Cortex-A76 suffer from an erratum that can result in invalid
-> TLBs when the CPU speculatively executes an AT instruction in the
-> middle of a guest world switch, while the guest virtual memory
-> configuration is in an inconsistent state.
+
+On 06/12/2018 19:21, Andrew Murray wrote:
+> On Thu, Dec 06, 2018 at 06:51:37PM +0000, Suzuki K Poulose wrote:
+>>
+>>
+>> On 06/12/2018 17:21, Suzuki K Poulose wrote:
+>>> Hi Andrew,
+>>>
+>>> On 05/12/2018 15:30, Andrew Murray wrote:
+>>>> In order to effeciently enable/disable guest/host only perf counters
+>>>> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
+>>>> host events as well as accessors for updating them.
+>>>>
+>>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>>>> ---
+>>>>     arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
+>>>>     1 file changed, 24 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index 1550192..800c87b 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -203,6 +203,8 @@ struct kvm_cpu_context {
+>>>>     	};
+>>>>     	struct kvm_vcpu *__hyp_running_vcpu;
+>>>> +	u32 events_host;
+>>>> +	u32 events_guest;
+>>>>     };
+>>>>     typedef struct kvm_cpu_context kvm_cpu_context_t;
+>>>> @@ -467,11 +469,33 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+>>>>     void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>>>>     void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+>>>> +#define KVM_PMU_EVENTS_HOST	1
+>>>> +#define KVM_PMU_EVENTS_GUEST	2
+>>>> +
+>>>>     #ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
+>>>>     static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>>>>     {
+>>>>     	return kvm_arch_vcpu_run_map_fp(vcpu);
+>>>>     }
+>>>> +static inline void kvm_set_pmu_events(u32 set, int flags)
+>>>> +{
+>>>> +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
+>>>> +
+>>>> +	if (flags & KVM_PMU_EVENTS_HOST)
+>>>> +		ctx->events_host |= set;
+>>>> +	if (flags & KVM_PMU_EVENTS_GUEST)
+>>>> +		ctx->events_guest |= set;
+>>>
+>>> You seem to be passing a single flag at a time ever, in the next patch.
+>>> Either we can batch the calls in the next patch, or make this a real number and
+>>> not a flag. g.g, enum { HOST,  GUEST } or even a bool.
+>>>
+>>> I think the former sounds better.
+>>
+>> Having another look at patch-3, we can never club set() calls for host &
+>> guest events, we should go for the latter.
 > 
-> We handle this issue by mandating the use of VHE and making sure that
-> the guest context is fully installed before switching HCR_EL2.TGE to
-> zero. This ensures that a speculated AT instruction is either executed
-> on the host context (TGE set) or the guest context (TGE clear), and
-> that there is no intermediate state.
+> Well we could always do this..
 > 
-> There is some additional complexity in the TLB invalidation code,
-> where we most make sure that a speculated AT instruction cannot mess
-> the stage-1 TLBs.
+>          u32 flags = 0;
+>          if (!attr->exclude_host)
+>                  flags |= KVM_PMU_EVENTS_HOST;
+>          if (!attr->exclude_guest)
+>                  flags |= KVM_PMU_EVENTS_GUEST;
+> 
+>          kvm_set_pmu_events(counter_bits, flags);
 
-For the series:
-Reviewed-by: James Morse <james.morse@arm.com>
+Yes, I think this should be fine.
 
-
-Thanks,
-
-James
+Cheers
+Suzuki
