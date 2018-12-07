@@ -1,57 +1,67 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v5 4/4] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Fri, 7 Dec 2018 14:24:24 +0000
-Message-ID: <261f418f-ff68-069c-51e3-1f630786d88f@arm.com>
-References: <1544023815-16958-1-git-send-email-andrew.murray@arm.com>
- <1544023815-16958-5-git-send-email-andrew.murray@arm.com>
+From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH] kvm/arm: return 0 when the number of objects is not less
+ than min
+Date: Fri, 7 Dec 2018 14:49:29 +0000
+Message-ID: <4c32963e-0dc7-1867-aa76-7314334315c4@arm.com>
+References: <1543972551-60951-1-git-send-email-peng.hao2@zte.com.cn>
+ <20181205083236.5tzhnxfhi4h4nknn@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B20434A2FB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 09:24:29 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jwmVLCN04RAn for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Dec 2018 09:24:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 841664A1F2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 09:24:28 -0500 (EST)
-In-Reply-To: <1544023815-16958-5-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181205083236.5tzhnxfhi4h4nknn@kamzik.brq.redhat.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>, Peng Hao <peng.hao2@zte.com.cn>
+Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 05/12/2018 08:32, Andrew Jones wrote:
+> On Wed, Dec 05, 2018 at 09:15:51AM +0800, Peng Hao wrote:
+>> Return 0 when there is enough kvm_mmu_memory_cache object.
+>>
+>> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+>> ---
+>>  virt/kvm/arm/mmu.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index ed162a6..fcda0ce 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -127,7 +127,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+>>  	while (cache->nobjs < max) {
+>>  		page = (void *)__get_free_page(PGALLOC_GFP);
+>>  		if (!page)
+>> -			return -ENOMEM;
+>> +			return cache->nobjs >= min ? 0 : -ENOMEM;
+> 
+> This condition will never be true here, as the exact same condition is
+> already checked above, and if it had been true, then we wouldn't be here.
 
+The condition can be true if the loop is executed at least once. This
+change would appear to allow the call to succeed in the case where the
+cache can be topped up to at least "min", but not as far as "max".
 
-On 05/12/2018 15:30, Andrew Murray wrote:
-> Enable/disable event counters as appropriate when entering and exiting
-> the guest to enable support for guest or host only event counting.
-> 
-> For both VHE and non-VHE we switch the counters between host/guest at
-> EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
-> 
-> The PMU may be on when we change which counters are enabled however
-> we avoid adding an isb as we instead rely on existing context
-> synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
-> the eret from the hvc in kvm_call_hyp.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->   arch/arm64/kvm/hyp/switch.c | 38 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 38 insertions(+)
-> 
+It would be good to know in what situation this has actually been hit
+though (and indeed whether this has actually been seen) - the system
+must be very short on memory to need this, and I'd be surprised if
+further failures didn't happen later on.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> What problem are you attempting to solve?
+> 
+>>  		cache->objects[cache->nobjs++] = page;
+>>  	}
+>>  	return 0;
+>> -- 
+>> 1.8.3.1
+>>
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
