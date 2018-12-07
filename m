@@ -1,218 +1,167 @@
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: [PATCH v6 13/13] arm64: docs: document pointer authentication
-Date: Fri,  7 Dec 2018 18:39:31 +0000
-Message-ID: <20181207183931.4285-14-kristina.martsenko@arm.com>
-References: <20181207183931.4285-1-kristina.martsenko@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
+Date: Fri, 7 Dec 2018 18:52:31 +0000
+Message-ID: <e1dde79c-0bc4-ea99-1bb0-9e70b56955fb@arm.com>
+References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
+ <20181122193801.50510-6-jean-philippe.brucker@arm.com>
+ <20181123165206-mutt-send-email-mst@kernel.org>
+ <e76a51ba-7a0f-3fca-a1ae-640131f9dfe1@arm.com>
+ <20181127130527-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F1F44A2FB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:54 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zbLcRpIORoqi for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Dec 2018 13:40:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 798534A367
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Dec 2018 13:40:52 -0500 (EST)
-In-Reply-To: <20181207183931.4285-1-kristina.martsenko@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Jacob Bramley <jacob.bramley@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Adam Wallis <awallis@codeaurora.org>, Richard Henderson <richard.henderson@linaro.org>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Cyrill Gorcunov <gorcunov@gmail.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <amit.kachhap@arm.com>, Dave P Martin <dave.martin@arm.com>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
+Return-path: <virtio-dev-return-5145-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <20181127130527-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: mark.rutland@arm.com, virtio-dev@lists.oasis-open.org, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, devicetree@vger.kernel.org, marc.zyngier@arm.com, linux-pci@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, virtualization@lists.linux-foundation.org, eric.auger@redhat.com, iommu@lists.linux-foundation.org, robh+dt@kernel.org, bhelgaas@google.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+Sorry for the delay, I wanted to do a little more performance analysis
+before continuing.
 
-Now that we've added code to support pointer authentication, add some
-documentation so that people can figure out if/how to use it.
+On 27/11/2018 18:10, Michael S. Tsirkin wrote:
+> On Tue, Nov 27, 2018 at 05:55:20PM +0000, Jean-Philippe Brucker wrote:
+>>>> +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
+>>>> +	    !virtio_has_feature(vdev, VIRTIO_IOMMU_F_MAP_UNMAP))
+>>>
+>>> Why bother with a feature bit for this then btw?
+>>
+>> We'll need a new feature bit for sharing page tables with the hardware,
+>> because they require different requests (attach_table/invalidate instead
+>> of map/unmap.) A future device supporting page table sharing won't
+>> necessarily need to support map/unmap.
+>>
+> I don't see virtio iommu being extended to support ARM specific
+> requests. This just won't scale, too many different
+> descriptor formats out there.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-Reviewed-by: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
----
- Documentation/arm64/booting.txt                |  8 +++
- Documentation/arm64/cpu-feature-registers.txt  |  8 +++
- Documentation/arm64/elf_hwcaps.txt             | 12 ++++
- Documentation/arm64/pointer-authentication.txt | 93 ++++++++++++++++++++++++++
- 4 files changed, 121 insertions(+)
- create mode 100644 Documentation/arm64/pointer-authentication.txt
+They aren't really ARM specific requests. The two new requests are
+ATTACH_TABLE and INVALIDATE, which would be used by x86 IOMMUs as well.
 
-diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-index 8d0df62c3fe0..8df9f4658d6f 100644
---- a/Documentation/arm64/booting.txt
-+++ b/Documentation/arm64/booting.txt
-@@ -205,6 +205,14 @@ Before jumping into the kernel, the following conditions must be met:
-     ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b0.
-   - The DT or ACPI tables must describe a GICv2 interrupt controller.
- 
-+  For CPUs with pointer authentication functionality:
-+  - If EL3 is present:
-+    SCR_EL3.APK (bit 16) must be initialised to 0b1
-+    SCR_EL3.API (bit 17) must be initialised to 0b1
-+  - If the kernel is entered at EL1:
-+    HCR_EL2.APK (bit 40) must be initialised to 0b1
-+    HCR_EL2.API (bit 41) must be initialised to 0b1
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.
-diff --git a/Documentation/arm64/cpu-feature-registers.txt b/Documentation/arm64/cpu-feature-registers.txt
-index 7964f03846b1..d4b4dd1fe786 100644
---- a/Documentation/arm64/cpu-feature-registers.txt
-+++ b/Documentation/arm64/cpu-feature-registers.txt
-@@ -184,12 +184,20 @@ infrastructure:
-      x--------------------------------------------------x
-      | Name                         |  bits   | visible |
-      |--------------------------------------------------|
-+     | GPI                          | [31-28] |    y    |
-+     |--------------------------------------------------|
-+     | GPA                          | [27-24] |    y    |
-+     |--------------------------------------------------|
-      | LRCPC                        | [23-20] |    y    |
-      |--------------------------------------------------|
-      | FCMA                         | [19-16] |    y    |
-      |--------------------------------------------------|
-      | JSCVT                        | [15-12] |    y    |
-      |--------------------------------------------------|
-+     | API                          | [11-8]  |    y    |
-+     |--------------------------------------------------|
-+     | APA                          | [7-4]   |    y    |
-+     |--------------------------------------------------|
-      | DPB                          | [3-0]   |    y    |
-      x--------------------------------------------------x
- 
-diff --git a/Documentation/arm64/elf_hwcaps.txt b/Documentation/arm64/elf_hwcaps.txt
-index ea819ae024dd..13d6691b37be 100644
---- a/Documentation/arm64/elf_hwcaps.txt
-+++ b/Documentation/arm64/elf_hwcaps.txt
-@@ -182,3 +182,15 @@ HWCAP_FLAGM
- HWCAP_SSBS
- 
-     Functionality implied by ID_AA64PFR1_EL1.SSBS == 0b0010.
-+
-+HWCAP_PACA
-+
-+    Functionality implied by ID_AA64ISAR1_EL1.APA == 0b0001 or
-+    ID_AA64ISAR1_EL1.API == 0b0001, as described by
-+    Documentation/arm64/pointer-authentication.txt.
-+
-+HWCAP_PACG
-+
-+    Functionality implied by ID_AA64ISAR1_EL1.GPA == 0b0001 or
-+    ID_AA64ISAR1_EL1.GPI == 0b0001, as described by
-+    Documentation/arm64/pointer-authentication.txt.
-diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-new file mode 100644
-index 000000000000..5baca42ba146
---- /dev/null
-+++ b/Documentation/arm64/pointer-authentication.txt
-@@ -0,0 +1,93 @@
-+Pointer authentication in AArch64 Linux
-+=======================================
-+
-+Author: Mark Rutland <mark.rutland@arm.com>
-+Date: 2017-07-19
-+
-+This document briefly describes the provision of pointer authentication
-+functionality in AArch64 Linux.
-+
-+
-+Architecture overview
-+---------------------
-+
-+The ARMv8.3 Pointer Authentication extension adds primitives that can be
-+used to mitigate certain classes of attack where an attacker can corrupt
-+the contents of some memory (e.g. the stack).
-+
-+The extension uses a Pointer Authentication Code (PAC) to determine
-+whether pointers have been modified unexpectedly. A PAC is derived from
-+a pointer, another value (such as the stack pointer), and a secret key
-+held in system registers.
-+
-+The extension adds instructions to insert a valid PAC into a pointer,
-+and to verify/remove the PAC from a pointer. The PAC occupies a number
-+of high-order bits of the pointer, which varies dependent on the
-+configured virtual address size and whether pointer tagging is in use.
-+
-+A subset of these instructions have been allocated from the HINT
-+encoding space. In the absence of the extension (or when disabled),
-+these instructions behave as NOPs. Applications and libraries using
-+these instructions operate correctly regardless of the presence of the
-+extension.
-+
-+The extension provides five separate keys to generate PACs - two for
-+instruction addresses (APIAKey, APIBKey), two for data addresses
-+(APDAKey, APDBKey), and one for generic authentication (APGAKey).
-+
-+
-+Basic support
-+-------------
-+
-+When CONFIG_ARM64_PTR_AUTH is selected, and relevant HW support is
-+present, the kernel will assign random key values to each process at
-+exec*() time. The keys are shared by all threads within the process, and
-+are preserved across fork().
-+
-+Presence of address authentication functionality is advertised via
-+HWCAP_PACA, and generic authentication functionality via HWCAP_PACG.
-+
-+The number of bits that the PAC occupies in a pointer is 55 minus the
-+virtual address size configured by the kernel. For example, with a
-+virtual address size of 48, the PAC is 7 bits wide.
-+
-+Recent versions of GCC can compile code with APIAKey-based return
-+address protection when passed the -msign-return-address option. This
-+uses instructions in the HINT space (unless -march=armv8.3-a or higher
-+is also passed), and such code can run on systems without the pointer
-+authentication extension.
-+
-+In addition to exec(), keys can also be reinitialized to random values
-+using the PR_PAC_RESET_KEYS prctl. A bitmask of PR_PAC_APIAKEY,
-+PR_PAC_APIBKEY, PR_PAC_APDAKEY, PR_PAC_APDBKEY and PR_PAC_APGAKEY
-+specifies which keys are to be reinitialized; specifying 0 means "all
-+keys".
-+
-+
-+Debugging
-+---------
-+
-+When CONFIG_ARM64_PTR_AUTH is selected, and HW support for address
-+authentication is present, the kernel will expose the position of TTBR0
-+PAC bits in the NT_ARM_PAC_MASK regset (struct user_pac_mask), which
-+userspace can acquire via PTRACE_GETREGSET.
-+
-+The regset is exposed only when HWCAP_PACA is set. Separate masks are
-+exposed for data pointers and instruction pointers, as the set of PAC
-+bits can vary between the two. Note that the masks apply to TTBR0
-+addresses, and are not valid to apply to TTBR1 addresses (e.g. kernel
-+pointers).
-+
-+Additionally, when CONFIG_CHECKPOINT_RESTORE is also set, the kernel
-+will expose the NT_ARM_PACA_KEYS and NT_ARM_PACG_KEYS regsets (struct
-+user_pac_address_keys and struct user_pac_generic_keys). These can be
-+used to get and set the keys for a thread.
-+
-+
-+Virtualization
-+--------------
-+
-+Pointer authentication is not currently supported in KVM guests. KVM
-+will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-+the feature will result in an UNDEFINED exception being injected into
-+the guest.
--- 
-2.11.0
+Sharing CPU address space with the HW IOMMU (SVM) has been in the scope
+of virtio-iommu since the first RFC, and I've been working with that
+extension in mind since the beginning. As an example you can have a look
+at my current draft for this [1], which is inspired from the VFIO work
+we've been doing with Intel.
+
+The negotiation phase inevitably requires vendor-specific fields in the
+descriptors - host tells which formats are supported, guest chooses a
+format and attaches page tables. But invalidation and fault reporting
+descriptors are fairly generic.
+
+> If you want to go that way down the road, you should avoid
+> virtio iommu, instead emulate and share code with the ARM SMMU (probably
+> with a different vendor id so you can implement the
+> report on map for devices without PRI).
+
+vSMMU has to stay in userspace though. The main reason we're proposing
+virtio-iommu is that emulating every possible vIOMMU model in the kernel
+would be unmaintainable. With virtio-iommu we can process the fast path
+in the host kernel, through vhost-iommu, and do the heavy lifting in
+userspace. As said above, I'm trying to keep the fast path for
+virtio-iommu generic.
+
+
+More notes on what I consider to be the fast path, and comparison with
+vSMMU:
+
+(1) The primary use-case we have in mind for vIOMMU is something like
+DPDK in the guest, assigning a hardware device to guest userspace. DPDK
+maps a large amount of memory statically, to be used by a pass-through
+device. For this case I don't think we care about vIOMMU performance.
+Setup and teardown need to be reasonably fast, sure, but the MAP/UNMAP
+requests don't have to be optimal.
+
+
+(2) If the assigned device is owned by the guest kernel, then mappings
+are dynamic and require dma_map/unmap() to be fast, but there generally
+is no need for a vIOMMU, since device and drivers are trusted by the
+guest kernel. Even when the user does enable a vIOMMU for this case
+(allowing to over-commit guest memory, which needs to be pinned
+otherwise), we generally play tricks like lazy TLBI (non-strict mode) to
+make it faster. Here device and drivers are trusted, therefore the
+vulnerability window of lazy mode isn't a concern.
+
+If the reason to enable the vIOMMU is over-comitting guest memory
+however, you can't use nested translation because it requires pinning
+the second-level tables. For this case performance matters a bit,
+because your invalidate-on-map needs to be fast, even if you enable lazy
+mode and only receive inval-on-unmap every 10ms. It won't ever be as
+fast as nested translation, though. For this case I think vSMMU+Caching
+Mode and userspace virtio-iommu with MAP/UNMAP would perform similarly
+(given page-sized payloads), because the pagetable walk doesn't add a
+lot of overhead compared to the context switch. But given the results
+below, vhost-iommu would be faster than vSMMU+CM.
+
+
+(3) Then there is SVM. For SVM, any destructive change to the process
+address space requires a synchronous invalidation command to the
+hardware (at least when using PCI ATS). Given that SVM is based on page
+faults, fault reporting from host to guest also needs to be fast, as
+well as fault response from guest to host.
+
+I think this is where performance matters the most. To get a feel of the
+advantage we get with virtio-iommu, I compared the vSMMU page-table
+sharing implementation [2] and vhost-iommu + VFIO with page table
+sharing (based on Tomasz Nowicki's vhost-iommu prototype). That's on a
+ThunderX2 with a 10Gb NIC assigned to the guest kernel, which
+corresponds to case (2) above, with nesting page tables and without the
+lazy mode. The host's only job is forwarding invalidation to the HW SMMU.
+
+vhost-iommu performed on average 1.8x and 5.5x better than vSMMU on
+netperf TCP_STREAM and TCP_MAERTS respectively (~200 samples). I think
+this can be further optimized (that was still polling under the vq
+lock), and unlike vSMMU, virtio-iommu offers the possibility of
+multi-queue for improved scalability. In addition, the guest will need
+to send both TLB and ATC invalidations with vSMMU, but virtio-iommu
+allows to multiplex those, and to invalidate ranges. Similarly for fault
+injection, having the ability to report page faults to the guest from
+the host kernel should be significantly faster than having to go to
+userspace and back to the kernel.
+
+
+(4) Virtio and vhost endpoints weren't really a priority for the base
+virtio-iommu device, we were looking mainly at device pass-through. I
+have optimizations in mind for this, although a lot of them are based on
+page tables, not MAP/UNMAP requests. But just getting the vIOMMU closer
+to vhost devices, avoiding the trip to userspace through vhost-tlb,
+should already improve things.
+
+The important difference when DMA is done by software is that you don't
+need to mirror all mappings into the HW IOMMU - you don't need
+inval-on-map. The endpoint can ask the vIOMMU for mappings when it needs
+them, like vhost-iotlb does for example. So the MAP/UNMAP interface of
+virtio-iommu performs poorly for emulated/PV endpoints compared to an
+emulated IOMMU, since it requires three context switches for DMA
+(MAP/DMA/UNMAP) between host and guest, rather than two (DMA/INVAL).
+There is a feature I call "posted MAP", that avoids the kick on MAP and
+instead lets the device fetch the MAP request on TLB miss, but I haven't
+spent enough time experimenting with this.
+
+> Others on the TC might feel differently.
+> 
+> If someone's looking into adding virtio iommu support in hardware,
+> that's a different matter. Which is it?
+
+I'm not aware of anything like that, and suspect that no one would
+consider it until virtio-iommu is more widely adopted.
+
+Thanks,
+Jean
+
+
+[1] Diff between current spec and page table sharing draft
+    (Very rough, missing page fault support and I'd like to rework the
+     PASID model a bit, but table descriptors p.24-26 for both Arm
+     SMMUv2 and SMMUv3.)
+
+http://jpbrucker.net/virtio-iommu/spec-table/diffs/virtio-iommu-pdf-diff-v0.9-v0.10.dev03.pdf
+
+[2] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration
+    https://www.mail-archive.com/qemu-devel@nongnu.org/msg562369.html
