@@ -1,133 +1,87 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v9 5/8] KVM: arm64: Support PUD hugepage in
- stage2_is_exec()
-Date: Mon, 10 Dec 2018 10:06:07 +0100
-Message-ID: <20181210090607.GF30263@e113682-lin.lund.arm.com>
-References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-6-punit.agrawal@arm.com>
- <20181101133848.GL12057@e113682-lin.lund.arm.com>
- <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: [PATCH v6 0/4] arm64: Support perf event modifiers :G and :H
+Date: Mon, 10 Dec 2018 09:45:55 +0000
+Message-ID: <1544435159-54781-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A1B4A211
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:20 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WHLmuWQzFZ-T for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 04:46:19 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 595654A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:19 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 05, 2018 at 05:57:51PM +0000, Suzuki K Poulose wrote:
-> 
-> 
-> On 01/11/2018 13:38, Christoffer Dall wrote:
-> >On Wed, Oct 31, 2018 at 05:57:42PM +0000, Punit Agrawal wrote:
-> >>In preparation for creating PUD hugepages at stage 2, add support for
-> >>detecting execute permissions on PUD page table entries. Faults due to
-> >>lack of execute permissions on page table entries is used to perform
-> >>i-cache invalidation on first execute.
-> >>
-> >>Provide trivial implementations of arm32 helpers to allow sharing of
-> >>code.
-> >>
-> >>Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-> >>Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>Cc: Christoffer Dall <christoffer.dall@arm.com>
-> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>Cc: Russell King <linux@armlinux.org.uk>
-> >>Cc: Catalin Marinas <catalin.marinas@arm.com>
-> >>Cc: Will Deacon <will.deacon@arm.com>
-> >>---
-> >>  arch/arm/include/asm/kvm_mmu.h         |  6 +++
-> >>  arch/arm64/include/asm/kvm_mmu.h       |  5 +++
-> >>  arch/arm64/include/asm/pgtable-hwdef.h |  2 +
-> >>  virt/kvm/arm/mmu.c                     | 53 +++++++++++++++++++++++---
-> >>  4 files changed, 61 insertions(+), 5 deletions(-)
-> >>
-> >>diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> >>index 37bf85d39607..839a619873d3 100644
-> >>--- a/arch/arm/include/asm/kvm_mmu.h
-> >>+++ b/arch/arm/include/asm/kvm_mmu.h
-> >>@@ -102,6 +102,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
-> >>  	return false;
-> >>  }
-> >>+static inline bool kvm_s2pud_exec(pud_t *pud)
-> >>+{
-> >>+	BUG();
-> >
-> >nit: I think this should be WARN() now :)
-> >
-> >>+	return false;
-> >>+}
-> >>+
-> >>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
-> >>  {
-> >>  	pte_val(pte) |= L_PTE_S2_RDWR;
-> >>diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> >>index 8da6d1b2a196..c755b37b3f92 100644
-> >>--- a/arch/arm64/include/asm/kvm_mmu.h
-> >>+++ b/arch/arm64/include/asm/kvm_mmu.h
-> >>@@ -261,6 +261,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
-> >>  	return kvm_s2pte_readonly((pte_t *)pudp);
-> >>  }
-> >>+static inline bool kvm_s2pud_exec(pud_t *pudp)
-> >>+{
-> >>+	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
-> >>+}
-> >>+
-> >>  #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-> >>  #ifdef __PAGETABLE_PMD_FOLDED
-> >>diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> >>index 1d7d8da2ef9b..336e24cddc87 100644
-> >>--- a/arch/arm64/include/asm/pgtable-hwdef.h
-> >>+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> >>@@ -193,6 +193,8 @@
-> >>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
-> >>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
-> >>+#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
-> >>+
-> >>  /*
-> >>   * Memory Attribute override for Stage-2 (MemAttr[3:0])
-> >>   */
-> >>diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> >>index 1c669c3c1208..8e44dccd1b47 100644
-> >>--- a/virt/kvm/arm/mmu.c
-> >>+++ b/virt/kvm/arm/mmu.c
-> >>@@ -1083,23 +1083,66 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
-> >>  	return 0;
-> >>  }
-> >>-static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
-> >>+/*
-> >>+ * stage2_get_leaf_entry - walk the stage2 VM page tables and return
-> >>+ * true if a valid and present leaf-entry is found. A pointer to the
-> >>+ * leaf-entry is returned in the appropriate level variable - pudpp,
-> >>+ * pmdpp, ptepp.
-> >>+ */
-> >>+static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
-> >>+				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
-> >
-> >Do we need this type madness or could this just return a u64 pointer
-> >(NULL if nothing is found) and pass that to kvm_s2pte_exec (because we
-> >know it's the same bit we need to check regardless of the pgtable level
-> >on both arm and arm64)?
-> >
-> >Or do we consider that bad for some reason?
-> 
-> Practically, yes the bit positions are same and thus we should be able
-> to do this assuming that it is just a pte. When we get to independent stage2
-> pgtable implementation which treats all page table entries as a single type
-> with a level information, we should be able to get rid of these.
-> But since we have followed the Linux way of page-table manipulation where we
-> have "level" specific accessors. The other option is open code the walking
-> sequence from the pgd to the leaf entry everywhere.
-> 
-> I am fine with changing this code, if you like.
-> 
+This patchset provides support for perf event modifiers :G and :H which
+allows for filtering of PMU events between host and guests when used
+with KVM.
 
-Meh, it just looked a bit over-engineered to me when I originally looked
-at the patches, but you're right, they align with the rest of the
-implementation.
+As the underlying hardware cannot distinguish between guest and host
+context, the performance counters must be stopped and started upon
+entry/exit to the guest. This is performed at EL2 in a way that
+minimizes overhead and improves accuracy of recording events that only
+occur in the requested context.
 
-Thanks,
+This has been tested with VHE and non-VHE kernels with a KVM guest.
 
-    Christoffer
+Changes from v5:
+
+ - Tweak logic in use of kvm_set_pmu_events
+
+Changes from v4:
+
+ - Prevent unnecessary write_sysreg calls by improving
+   __pmu_switch_to_xxx logic.
+
+Changes from v3:
+
+ - Remove confusing _only suffix from bitfields in kvm_cpu_context
+ - Remove unnecessary condition when clearing event bits in disable
+ - Simplify API of KVM accessors
+ - Prevent unnecessary setting of pmcnten when guest/host events are
+   the same.
+
+Changes from v2:
+
+ - Ensured that exclude_kernel works for guest
+ - Removed unnecessary exclusion of EL2 with exclude_host on !VHE
+ - Renamed kvm_clr_set_host_pmu_events to reflect args order
+ - Added additional information to isb patch
+
+Changes from v1:
+
+ - Removed unnecessary exclusion of EL1 with exclude_guest on VHE
+ - Removed unnecessary isb from existing perf_event.c driver
+ - Folded perf_event.c patches together
+ - Added additional information to last patch commit message
+
+Andrew Murray (4):
+  arm64: arm_pmu: remove unnecessary isb instruction
+  arm64: KVM: add accessors to track guest/host only counters
+  arm64: arm_pmu: Add support for exclude_host/exclude_guest attributes
+  arm64: KVM: Enable support for :G/:H perf event modifiers
+
+ arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++
+ arch/arm64/kernel/perf_event.c    | 52 +++++++++++++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/switch.c       | 38 ++++++++++++++++++++++++++++
+ 3 files changed, 106 insertions(+), 8 deletions(-)
+
+-- 
+2.7.4
