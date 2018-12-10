@@ -1,25 +1,26 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: KVM arm realtime performance optimization
-Date: Mon, 10 Dec 2018 14:18:34 +0100
-Message-ID: <20181210131834.GQ30263@e113682-lin.lund.arm.com>
-References: <DB7PR08MB360939B98F8943EF9BE9FF40F0A90@DB7PR08MB3609.eurprd08.prod.outlook.com>
- <DB7PR08MB36090AADD259F89702C3AEF1F0A50@DB7PR08MB3609.eurprd08.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH 03/12] arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+Date: Mon, 10 Dec 2018 13:52:17 +0000
+Message-ID: <32c77d11-047d-cc78-7be2-9a7a72b08deb@arm.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181128144527.44710-4-steven.price@arm.com>
+ <20181210102736.2iluzzfuryfnf4rk@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F5EE4A2BB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:18:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E39D24A1D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:52:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OS6oypvYWSOE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 08:18:37 -0500 (EST)
+ with ESMTP id mlcnUoPAQcJY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 08:52:21 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6BCF4A211
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:18:36 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <DB7PR08MB36090AADD259F89702C3AEF1F0A50@DB7PR08MB3609.eurprd08.prod.outlook.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45F5149F87
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:52:21 -0500 (EST)
+In-Reply-To: <20181210102736.2iluzzfuryfnf4rk@lakrids.cambridge.arm.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,100 +30,109 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Steven Miao (Arm Technology China)" <Steven.Miao@arm.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 10, 2018 at 05:36:09AM +0000, Steven Miao (Arm Technology China) wrote:
+On 10/12/2018 10:27, Mark Rutland wrote:
+> On Wed, Nov 28, 2018 at 02:45:18PM +0000, Steven Price wrote:
+>> SMCCC 1.1 calls may use either HVC or SMC depending on the PSCI
+>> conduit. Rather than coding this in every call site provide a macro
+>> which uses the correct instruction. The macro also handles the case
+>> where no PSCI conduit is configured returning a not supported error
+>> in res, along with returning the conduit used for the call.
+>>
+>> This allow us to remove some duplicated code and will be useful later
+>> when adding paravirtualized time hypervisor calls.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  include/linux/arm-smccc.h | 44 +++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 44 insertions(+)
+>>
+>> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+>> index 18863d56273c..b047009e7a0a 100644
+>> --- a/include/linux/arm-smccc.h
+>> +++ b/include/linux/arm-smccc.h
+>> @@ -311,5 +311,49 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
+>>  #define SMCCC_RET_NOT_SUPPORTED			-1
+>>  #define SMCCC_RET_NOT_REQUIRED			-2
+>>  
+>> +/* Like arm_smccc_1_1* but always returns SMCCC_RET_NOT_SUPPORTED.
+>> + * Used when the PSCI conduit is not defined. The empty asm statement
+>> + * avoids compiler warnings about unused variables.
+>> + */
+>> +#define __fail_smccc_1_1(...)						\
+>> +	do {								\
+>> +		__declare_args(__count_args(__VA_ARGS__), __VA_ARGS__);	\
+>> +		asm ("" __constraints(__count_args(__VA_ARGS__)));	\
+>> +		if (___res)						\
+>> +			___res->a0 = SMCCC_RET_NOT_SUPPORTED;		\
+>> +	} while (0)
+>> +
+>> +/*
+>> + * arm_smccc_1_1() - make an SMCCC v1.1 compliant call
+>> + *
+>> + * This is a variadic macro taking one to eight source arguments, and
+>> + * an optional return structure.
+>> + *
+>> + * @a0-a7: arguments passed in registers 0 to 7
+>> + * @res: result values from registers 0 to 3
+>> + *
+>> + * This macro will make either an HVC call or an SMC call depending on the
+>> + * current PSCI conduit. If no valid conduit is available then -1
+>> + * (SMCCC_RET_NOT_SUPPORTED) is returned in @res.a0 (if supplied).
+>> + *
+>> + * The return value also provides the conduit that was used.
+>> + */
+>> +#define arm_smccc_1_1(...) ({						\
 > 
-> From: kvmarm-bounces@lists.cs.columbia.edu <kvmarm-bounces@lists.cs.columbia.edu> On Behalf Of Steven Miao (Arm Technology China)
-> Sent: Thursday, December 6, 2018 3:05 PM
-> To: kvmarm@lists.cs.columbia.edu
-> Subject: KVM arm realtime performance optimization
-> 
-> Hi Everyone,
-> 
-> I' currently testing KVM arm realtime performance on a hikey960 board. My test benchmark is cyclictest to measure thread wake up latency both on Host linux OS and KVM Guest linux OS.
-> 
-> Host OS:
-> 
-> hikey960:/mnt/debian/usr/src/linux#  cyclictest -p 99 -t 4 -m -n -a 0-3 -l 100000
-> # /dev/cpu_dma_latency set to 0us
-> WARN: Running on unknown kernel version...YMMV
-> policy: fifo: loadavg: 0.00 0.00 0.00 1/165 3270
-> 
-> T: 0 ( 3266) P:99 I:1000 C: 100000 Min:      4 Act:   15 Avg:   15 Max:     139
-> T: 1 ( 3267) P:99 I:1500 C:  66736 Min:      4 Act:   15 Avg:   15 Max:     239
-> T: 2 ( 3268) P:99 I:2000 C:  50051 Min:      4 Act:   19 Avg:   15 Max:      43
-> T: 3 ( 3269) P:99 I:2500 C:  40039 Min:      5 Act:   15 Avg:   16 Max:      74
-> 
-> Guest OS:
-> root@genericarmv8:~# cyclictest -p 99 -t 4 -m -n -a 0-3 -l 100000
-> # /dev/cpu_dma_latency set to 0us
-> WARN: Running on unknown kernel version...YMMV
-> policy: fifo: loadavg: 0.13 0.05 0.01 1/70 293
-> 
-> T: 0 (  290) P:99 I:1000 C: 100000 Min:      7 Act:   44 Avg:   85 Max:   16111
-> T: 1 (  291) P:99 I:1500 C:  66665 Min:      7 Act:   81 Avg:   90 Max:   15306
-> T: 2 (  292) P:99 I:2000 C:  49995 Min:      7 Act:   88 Avg:   87 Max:   16703
-> T: 3 (  293) P:99 I:2500 C:  39992 Min:      8 Act:   72 Avg:   97 Max:   14976
-> 
-> 
-> RT performance on KVM guest OS is poor compared to that on host OS. The average wake up latency is about 6 - 7 times on Guest OS vs on Host OS.
-> I've tried some configurations to improve RT in KVM, like:
-> 1 Can be combined with CPU isolation
-> 2 Host OS and Guest OS use RT preempt kernel
-> 3 Host CPU avoid frequency change
-> 4 Configure NO_HZ_FULL for Guest OS
-> 
-> There could be a little improvement after apply above configuration, but the RT performance is still very poor.
-> 
-> 5 Guest OS use idle poll instead of WFI to avoid trap and switch out
-> 
-> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> index 2dc0f84..53aef78 100644
-> --- a/arch/arm64/kernel/process.c
-> +++ b/arch/arm64/kernel/process.c
-> @@ -83,7 +83,7 @@ void arch_cpu_idle(void)
->          * tricks
->          */
->         trace_cpu_idle_rcuidle(1, smp_processor_id());
-> -       cpu_do_idle();
-> +       cpu_relax();
->         local_irq_enable();
->         trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
->  }
-> 
-> root@genericarmv8:~# cyclictest -p 99 -t 4 -m -n  -l 100000
-> # /dev/cpu_dma_latency set to 0us
-> WARN: Running on unknown kernel version...YMMV
-> policy: fifo: loadavg: 0.07 0.03 0.00 1/99 328
-> 
-> T: 0 (  325) P:99 I:1000 C: 100000 Min:      3 Act:    6 Avg:   13 Max:    4999
-> T: 1 (  326) P:99 I:1500 C:  66659 Min:      5 Act:    7 Avg:   14 Max:    3449
-> T: 2 (  327) P:99 I:2000 C:  49989 Min:      4 Act:    7 Avg:    9 Max:   11471
-> T: 3 (  328) P:99 I:2500 C:  39986 Min:      4 Act:   14 Avg:   14 Max:   11253
-> 
-> The method 5 can improve Guest OS RT performance a lot, the average thread wake up latency on Guest OS is almost same as its on Host OS, but the Max wake up latency is still very poor.
-> 
-> Anyone has any idea to improve RT performance on KVM Guest OS? Although method 5 can improve RT performance on Guest OS a lot, I think it is not good idea.
-> 
-This is a known problem and there have been presentations about similar
-problems on x86 in past KVM Forums.
+> As a minor nit, could we please give call this something like
+> arm_smccc_1_1_call() or arm_smccc_1_1_invoke(), to make it clear what
+> action this performs?
 
-The first thing to do is analyze the critical path that adds latency to
-a wakeup.  One way to do that is to instrument the path by adding time
-counter reads to the path and figuring out what takes time.
+Sure, arm_smccc_1_1_call() works for me.
 
-One thing you can look at is having a configurable grace period in KVM's
-block function before the process actually goes to sleep (and calls
-kvm_vcpu_put) and the host scheduler, and see if that helps anything.
+> I had some patches [1] cleaning up the SMCCC API, it would be nice if we
+> could pick up some of those as preparatory bits, before we spread some
+> of the current design warts (e.g. SMCCC depending on PSCI definitions).
 
-At the end of the day, virtualization is going to add a lot of latency
-when you have to switch the entire state of your CPU, and in terms of
-virtual RT, you end up with a very high minimal latency.
-
+Looks like a similar approach, just extended to include
+s/PSCI_CONDUIT/SMCCC_CONDUIT/ and making arm_smccc_1_1_* return res.
+Would you like me to drop this (and the next) patch in favour of yours?
 
 Thanks,
 
-    Christoffer
+Steve
+
+> Thanks,
+> Mark.
+> 
+> [1] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/smccc-cleanup
+> 
+>> +		int method = psci_ops.conduit;				\
+>> +		switch (method) {					\
+>> +		case PSCI_CONDUIT_HVC:					\
+>> +			arm_smccc_1_1_hvc(__VA_ARGS__);			\
+>> +			break;						\
+>> +		case PSCI_CONDUIT_SMC:					\
+>> +			arm_smccc_1_1_smc(__VA_ARGS__);			\
+>> +			break;						\
+>> +		default:						\
+>> +			__fail_smccc_1_1(__VA_ARGS__);			\
+>> +			method = PSCI_CONDUIT_NONE;			\
+>> +			break;						\
+>> +		}							\
+>> +		method;							\
+>> +	})
+>> +
+>>  #endif /*__ASSEMBLY__*/
+>>  #endif /*__LINUX_ARM_SMCCC_H*/
+>> -- 
+>> 2.19.2
+>>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
