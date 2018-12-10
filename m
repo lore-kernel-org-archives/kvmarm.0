@@ -1,74 +1,70 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v3 2/8] KVM: arm64: Rework detection of SVE, !VHE systems
-Date: Mon, 10 Dec 2018 12:40:44 +0000
-Message-ID: <20181210124043.GA25144@edgewater-inn.cambridge.arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
- <20181206173126.139877-3-marc.zyngier@arm.com>
- <20181210101305.GH30263@e113682-lin.lund.arm.com>
- <aff2750e-6746-3378-6d4d-dcbfc2028154@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH] kvm/arm: return 0 when the number of objects is not
+ lessthan min
+Date: Mon, 10 Dec 2018 14:13:17 +0100
+Message-ID: <20181210131317.GP30263@e113682-lin.lund.arm.com>
+References: <20181205083236.5tzhnxfhi4h4nknn@kamzik.brq.redhat.com>
+ <201812060956304771332@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DA7C4A2E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 07:40:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ip50evcHmYhM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 07:40:22 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB844A2B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 07:40:22 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <aff2750e-6746-3378-6d4d-dcbfc2028154@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <201812060956304771332@zte.com.cn>
+Sender: linux-kernel-owner@vger.kernel.org
+To: peng.hao2@zte.com.cn
+Cc: drjones@redhat.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 10, 2018 at 10:28:05AM +0000, Marc Zyngier wrote:
-> On 10/12/2018 10:13, Christoffer Dall wrote:
-> > On Thu, Dec 06, 2018 at 05:31:20PM +0000, Marc Zyngier wrote:
-> >> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >> index 23774970c9df..1db4c15edcdd 100644
-> >> --- a/virt/kvm/arm/arm.c
-> >> +++ b/virt/kvm/arm/arm.c
-> >> @@ -1640,8 +1640,10 @@ int kvm_arch_init(void *opaque)
-> >>  		return -ENODEV;
-> >>  	}
-> >>  
-> >> -	if (!kvm_arch_check_sve_has_vhe()) {
-> >> -		kvm_pr_unimpl("SVE system without VHE unsupported.  Broken cpu?");
-> >> +	in_hyp_mode = is_kernel_in_hyp_mode();
-> >> +
-> >> +	if (!in_hyp_mode && kvm_arch_requires_vhe()) {
-> >> +		kvm_pr_unimpl("CPU requiring VHE was booted in non-VHE mode");
-> > 
-> > nit: The error message feels weird to me (are we reporting CPU bugs?)
-> > and I'm not sure about the unimpl and I think there's a linse space
-> > missing.
-> > 
-> > How about:
-> > 
-> > 	kvm_err("Cannot support this CPU in non-VHE mode, not initializing\n");
+On Thu, Dec 06, 2018 at 09:56:30AM +0800, peng.hao2@zte.com.cn wrote:
+> >On Wed, Dec 05, 2018 at 09:15:51AM +0800, Peng Hao wrote:
+> >> Return 0 when there is enough kvm_mmu_memory_cache object.
+> >>
+> >> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> >> ---
+> >>  virt/kvm/arm/mmu.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> >> index ed162a6..fcda0ce 100644
+> >> --- a/virt/kvm/arm/mmu.c
+> >> +++ b/virt/kvm/arm/mmu.c
+> >> @@ -127,7 +127,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+> >>      while (cache->nobjs < max) {
+> >>          page = (void *)__get_free_page(PGALLOC_GFP);
+> >>          if (!page)
+> >> -            return -ENOMEM;
+> >> +            return cache->nobjs >= min ? 0 : -ENOMEM;
+> >
+> >This condition will never be true here, as the exact same condition is
+> >already checked above, and if it had been true, then we wouldn't be here.
+> >
+> >What problem are you attempting to solve?
+> >
+> if (cache->nobjs >= min)                      ------here cache->nobjs<min,it can continue downward 
+>      return 0;
+> while (cache->nobjs < max) {
+>     page = (void *)__get_free_page(PGALLOC_GFP);
+>     if (!page)
+>        return -ENOMEM;                         -----here it is possible that  (cache->nobjs >= min) and (cache->nobjs<max)
+>     cache->objects[cache->nobjs++] = page; ---here cache->nobjs increasing
+>   }
 > 
-> Yup, works for me. Will, do you mind changing this message for me?
+> I just think the logic of this function is to return 0 as long as (cache->nobjs >= min).
+> thanks.
 
-I pushed out an updated branch here:
+That's not the intention, nor is it on any of the other architectures
+implementing the same thing (this one goes on the list of stuff we
+should be sharing between architectures).
 
-https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=kvm/cortex-a76-erratum-1165522
+The idea is that you fill up the cache when it goes below min, and you
+are always able to fill up to max.
 
-which should address all of Christoffer's comments and add his tags.
+If you're not able to fill up to max, then your system is seriously low
+on memory and continuing to run this VM is not likely to be a good idea,
+so you might as well tell user space to do something now instead of
+waiting until the situation is even worse.
 
-I plan to merge that into for-next/core later today.
 
-Will
+Thanks,
+
+    Christoffer
