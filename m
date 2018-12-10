@@ -1,576 +1,200 @@
-From: "Steven Miao (Arm Technology China)" <Steven.Miao@arm.com>
-Subject: RE: KVM arm realtime performance optimization
-Date: Mon, 10 Dec 2018 05:36:09 +0000
-Message-ID: <DB7PR08MB36090AADD259F89702C3AEF1F0A50@DB7PR08MB3609.eurprd08.prod.outlook.com>
-References: <DB7PR08MB360939B98F8943EF9BE9FF40F0A90@DB7PR08MB3609.eurprd08.prod.outlook.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v9 1/8] KVM: arm/arm64: Share common code in
+ user_mem_abort()
+Date: Mon, 10 Dec 2018 09:56:16 +0100
+Message-ID: <20181210085616.GB30263@e113682-lin.lund.arm.com>
+References: <20181031175745.18650-1-punit.agrawal@arm.com>
+ <20181031175745.18650-2-punit.agrawal@arm.com>
+ <ad4b316a-054f-24d9-d32d-8fbe7972b5ad@arm.com>
+ <8fd34e5f-7d75-4de2-3fee-d6d70805685c@arm.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1889764761557841406=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4190B4A211
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 00:36:15 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sFO1Tj5U7+nL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 00:36:12 -0500 (EST)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-eopbgr140077.outbound.protection.outlook.com [40.107.14.77])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 558C44A1FA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 00:36:12 -0500 (EST)
-In-Reply-To: <DB7PR08MB360939B98F8943EF9BE9FF40F0A90@DB7PR08MB3609.eurprd08.prod.outlook.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <8fd34e5f-7d75-4de2-3fee-d6d70805685c@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============1889764761557841406==
-Content-Language: en-US
-Content-Type: multipart/alternative;
-	boundary="_000_DB7PR08MB36090AADD259F89702C3AEF1F0A50DB7PR08MB3609eurp_"
+On Mon, Dec 03, 2018 at 01:37:37PM +0000, Suzuki K Poulose wrote:
+> Hi Anshuman,
+> 
+> On 03/12/2018 12:11, Anshuman Khandual wrote:
+> >
+> >
+> >On 10/31/2018 11:27 PM, Punit Agrawal wrote:
+> >>The code for operations such as marking the pfn as dirty, and
+> >>dcache/icache maintenance during stage 2 fault handling is duplicated
+> >>between normal pages and PMD hugepages.
+> >>
+> >>Instead of creating another copy of the operations when we introduce
+> >>PUD hugepages, let's share them across the different pagesizes.
+> >>
+> >>Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> >>Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>Cc: Christoffer Dall <christoffer.dall@arm.com>
+> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>---
+> >>  virt/kvm/arm/mmu.c | 49 ++++++++++++++++++++++++++++------------------
+> >>  1 file changed, 30 insertions(+), 19 deletions(-)
+> >>
+> >>diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> >>index 5eca48bdb1a6..59595207c5e1 100644
+> >>--- a/virt/kvm/arm/mmu.c
+> >>+++ b/virt/kvm/arm/mmu.c
+> >>@@ -1475,7 +1475,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  			  unsigned long fault_status)
+> >>  {
+> >>  	int ret;
+> >>-	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
+> >>+	bool write_fault, exec_fault, writable, force_pte = false;
+> >>  	unsigned long mmu_seq;
+> >>  	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+> >>  	struct kvm *kvm = vcpu->kvm;
+> >>@@ -1484,7 +1484,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  	kvm_pfn_t pfn;
+> >>  	pgprot_t mem_type = PAGE_S2;
+> >>  	bool logging_active = memslot_is_logging(memslot);
+> >>-	unsigned long flags = 0;
+> >>+	unsigned long vma_pagesize, flags = 0;
+> >
+> >A small nit s/vma_pagesize/pagesize. Why call it VMA ? Its implicit.
+> 
+> May be we could call it mapsize. pagesize is confusing.
+> 
 
---_000_DB7PR08MB36090AADD259F89702C3AEF1F0A50DB7PR08MB3609eurp_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+I'm ok with mapsize.  I see the vma_pagesize name coming from the fact
+that this is initially set to the return value from vma_kernel_pagesize.
 
-Ping...
+I have not problems with either vma_pagesize or mapsize.
 
-Any idea about configure a RT KVM hypervisor?
+> >
+> >>  	write_fault = kvm_is_write_fault(vcpu);
+> >>  	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+> >>@@ -1504,10 +1504,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  		return -EFAULT;
+> >>  	}
+> >>-	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+> >>-		hugetlb = true;
+> >>+	vma_pagesize = vma_kernel_pagesize(vma);
+> >>+	if (vma_pagesize == PMD_SIZE && !logging_active) {
+> >>  		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+> >>  	} else {
+> >>+		/*
+> >>+		 * Fallback to PTE if it's not one of the Stage 2
+> >>+		 * supported hugepage sizes
+> >>+		 */
+> >>+		vma_pagesize = PAGE_SIZE;
+> >
+> >This seems redundant and should be dropped. vma_kernel_pagesize() here either
+> >calls hugetlb_vm_op_pagesize (via hugetlb_vm_ops->pagesize) or simply returns
+> >PAGE_SIZE. The vm_ops path is taken if the QEMU VMA covering any given HVA is
+> >backed either by HugeTLB pages or simply normal pages. vma_pagesize would
+> >either has a value of PMD_SIZE (HugeTLB hstate based) or PAGE_SIZE. Hence if
+> >its not PMD_SIZE it must be PAGE_SIZE which should not be assigned again.
+> 
+> We may want to force using the PTE mappings when logging_active (e.g, migration
+> ?) to prevent keep tracking of huge pages. So the check is still valid.
+> 
+> 
 
-From: kvmarm-bounces@lists.cs.columbia.edu <kvmarm-bounces@lists.cs.columbi=
-a.edu> On Behalf Of Steven Miao (Arm Technology China)
-Sent: Thursday, December 6, 2018 3:05 PM
-To: kvmarm@lists.cs.columbia.edu
-Subject: KVM arm realtime performance optimization
+Agreed, and let's not try additionally change the logic and flow with
+this patch.
 
-Hi Everyone,
+> >
+> >>+
+> >>  		/*
+> >>  		 * Pages belonging to memslots that don't have the same
+> >>  		 * alignment for userspace and IPA cannot be mapped using
+> >>@@ -1573,23 +1579,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  	if (mmu_notifier_retry(kvm, mmu_seq))
+> >>  		goto out_unlock;
+> >>-	if (!hugetlb && !force_pte)
+> >>-		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+> >>+	if (vma_pagesize == PAGE_SIZE && !force_pte) {
+> >>+		/*
+> >>+		 * Only PMD_SIZE transparent hugepages(THP) are
+> >>+		 * currently supported. This code will need to be
+> >>+		 * updated to support other THP sizes.
+> >>+		 */
+> >
+> >This comment belongs to transparent_hugepage_adjust() but not here.
+> 
+> I think this is relevant here than in thp_adjust, unless we rename
+> the function below to something generic, handle_hugepage_adjust().
+> 
 
-I' currently testing KVM arm realtime performance on a hikey960 board. My t=
-est benchmark is cyclictest to measure thread wake up latency both on Host =
-linux OS and KVM Guest linux OS.
+Agreed.
 
-Host OS:
+> >>+		if (transparent_hugepage_adjust(&pfn, &fault_ipa))
+> >>+			vma_pagesize = PMD_SIZE;
+> >
+> >IIUC transparent_hugepage_adjust() is only getting called here. Instead of
+> >returning 'true' when it is able to detect a huge page backing and doing
+> >an adjustment there after, it should rather return THP size (PMD_SIZE) to
+> >accommodate probable multi size THP support in future .
+> 
+> That makes sense.
+> 
 
-hikey960:/mnt/debian/usr/src/linux#  cyclictest -p 99 -t 4 -m -n -a 0-3 -l =
-100000
-# /dev/cpu_dma_latency set to 0us
-WARN: Running on unknown kernel version...YMMV
-policy: fifo: loadavg: 0.00 0.00 0.00 1/165 3270
+That's fine.
 
-T: 0 ( 3266) P:99 I:1000 C: 100000 Min:      4 Act:   15 Avg:   15 Max:    =
- 139
-T: 1 ( 3267) P:99 I:1500 C:  66736 Min:      4 Act:   15 Avg:   15 Max:    =
- 239
-T: 2 ( 3268) P:99 I:2000 C:  50051 Min:      4 Act:   19 Avg:   15 Max:    =
-  43
-T: 3 ( 3269) P:99 I:2500 C:  40039 Min:      5 Act:   15 Avg:   16 Max:    =
-  74
+> >
+> >>+	}
+> >>+
+> >>+	if (writable)
+> >>+		kvm_set_pfn_dirty(pfn);
+> >>-	if (hugetlb) {
+> >>+	if (fault_status != FSC_PERM)
+> >>+		clean_dcache_guest_page(pfn, vma_pagesize);
+> >>+
+> >>+	if (exec_fault)
+> >>+		invalidate_icache_guest_page(pfn, vma_pagesize);
+> >>+
+> >>+	if (vma_pagesize == PMD_SIZE) {
+> >>  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+> >>  		new_pmd = pmd_mkhuge(new_pmd);
+> >>-		if (writable) {
+> >>+		if (writable)
+> >>  			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+> >>-			kvm_set_pfn_dirty(pfn);
+> >>-		}
+> >>-
+> >>-		if (fault_status != FSC_PERM)
+> >>-			clean_dcache_guest_page(pfn, PMD_SIZE);
+> >>  		if (exec_fault) {
+> >>  			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+> >>-			invalidate_icache_guest_page(pfn, PMD_SIZE);
+> >>  		} else if (fault_status == FSC_PERM) {
+> >>  			/* Preserve execute if XN was already cleared */
+> >>  			if (stage2_is_exec(kvm, fault_ipa))
+> >>@@ -1602,16 +1618,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  		if (writable) {
+> >>  			new_pte = kvm_s2pte_mkwrite(new_pte);
+> >>-			kvm_set_pfn_dirty(pfn);
+> >>  			mark_page_dirty(kvm, gfn);
+> >>  		}
+> >>-		if (fault_status != FSC_PERM)
+> >>-			clean_dcache_guest_page(pfn, PAGE_SIZE);
+> >>-
+> >>  		if (exec_fault) {
+> >>  			new_pte = kvm_s2pte_mkexec(new_pte);
+> >>-			invalidate_icache_guest_page(pfn, PAGE_SIZE);
+> >>  		} else if (fault_status == FSC_PERM) {
+> >>  			/* Preserve execute if XN was already cleared */
+> >>  			if (stage2_is_exec(kvm, fault_ipa))
+> >>
+> >
+> >kvm_set_pfn_dirty, clean_dcache_guest_page, invalidate_icache_guest_page
+> >can all be safely moved before setting the page table entries either as
+> >PMD or PTE.
+> 
+> I think this is what we do currently. So I assume this is fine.
+> 
+Agreed, I don't understand the comment raised by Anshuman here.
 
-Guest OS:
-root@genericarmv8:~# cyclictest -p 99 -t 4 -m -n -a 0-3 -l 100000
-# /dev/cpu_dma_latency set to 0us
-WARN: Running on unknown kernel version...YMMV
-policy: fifo: loadavg: 0.13 0.05 0.01 1/70 293
-
-T: 0 (  290) P:99 I:1000 C: 100000 Min:      7 Act:   44 Avg:   85 Max:   1=
-6111
-T: 1 (  291) P:99 I:1500 C:  66665 Min:      7 Act:   81 Avg:   90 Max:   1=
-5306
-T: 2 (  292) P:99 I:2000 C:  49995 Min:      7 Act:   88 Avg:   87 Max:   1=
-6703
-T: 3 (  293) P:99 I:2500 C:  39992 Min:      8 Act:   72 Avg:   97 Max:   1=
-4976
-
-
-RT performance on KVM guest OS is poor compared to that on host OS. The ave=
-rage wake up latency is about 6 - 7 times on Guest OS vs on Host OS.
-I've tried some configurations to improve RT in KVM, like:
-1 Can be combined with CPU isolation
-2 Host OS and Guest OS use RT preempt kernel
-3 Host CPU avoid frequency change
-4 Configure NO_HZ_FULL for Guest OS
-
-There could be a little improvement after apply above configuration, but th=
-e RT performance is still very poor.
-
-5 Guest OS use idle poll instead of WFI to avoid trap and switch out
-
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 2dc0f84..53aef78 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -83,7 +83,7 @@ void arch_cpu_idle(void)
-         * tricks
-         */
-        trace_cpu_idle_rcuidle(1, smp_processor_id());
--       cpu_do_idle();
-+       cpu_relax();
-        local_irq_enable();
-        trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
- }
-
-root@genericarmv8:~# cyclictest -p 99 -t 4 -m -n  -l 100000
-# /dev/cpu_dma_latency set to 0us
-WARN: Running on unknown kernel version...YMMV
-policy: fifo: loadavg: 0.07 0.03 0.00 1/99 328
-
-T: 0 (  325) P:99 I:1000 C: 100000 Min:      3 Act:    6 Avg:   13 Max:    =
-4999
-T: 1 (  326) P:99 I:1500 C:  66659 Min:      5 Act:    7 Avg:   14 Max:    =
-3449
-T: 2 (  327) P:99 I:2000 C:  49989 Min:      4 Act:    7 Avg:    9 Max:   1=
-1471
-T: 3 (  328) P:99 I:2500 C:  39986 Min:      4 Act:   14 Avg:   14 Max:   1=
-1253
-
-The method 5 can improve Guest OS RT performance a lot, the average thread =
-wake up latency on Guest OS is almost same as its on Host OS, but the Max w=
-ake up latency is still very poor.
-
-Anyone has any idea to improve RT performance on KVM Guest OS? Although met=
-hod 5 can improve RT performance on Guest OS a lot, I think it is not good =
-idea.
 
 Thanks,
-Steven
 
-
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
-
---_000_DB7PR08MB36090AADD259F89702C3AEF1F0A50DB7PR08MB3609eurp_
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
-osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
-//www.w3.org/TR/REC-html40">
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
->
-<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
-<style><!--
-/* Font Definitions */
-@font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:DengXian;
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
-@font-face
-	{font-family:"\@DengXian";
-	panose-1:2 1 6 0 3 1 1 1 1 1;}
-@font-face
-	{font-family:Consolas;
-	panose-1:2 11 6 9 2 2 4 3 2 4;}
-/* Style Definitions */
-p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:#0563C1;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:#954F72;
-	text-decoration:underline;}
-code
-	{mso-style-priority:99;
-	font-family:"Courier New";}
-p.msonormal0, li.msonormal0, div.msonormal0
-	{mso-style-name:msonormal;
-	mso-margin-top-alt:auto;
-	margin-right:0in;
-	mso-margin-bottom-alt:auto;
-	margin-left:0in;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-span.EmailStyle19
-	{mso-style-type:personal;
-	font-family:"Calibri",sans-serif;}
-span.EmailStyle20
-	{mso-style-type:personal-reply;
-	font-family:"Calibri",sans-serif;}
-.MsoChpDefault
-	{mso-style-type:export-only;
-	font-size:10.0pt;}
-@page WordSection1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;}
-div.WordSection1
-	{page:WordSection1;}
---></style><!--[if gte mso 9]><xml>
-<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
-<o:shapelayout v:ext=3D"edit">
-<o:idmap v:ext=3D"edit" data=3D"1" />
-</o:shapelayout></xml><![endif]-->
-</head>
-<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
-<div class=3D"WordSection1">
-<p class=3D"MsoNormal">Ping&#8230;<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Any idea about configure a RT KVM hypervisor?<o:p></=
-o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<div style=3D"border:none;border-left:solid blue 1.5pt;padding:0in 0in 0in =
-4.0pt">
-<div>
-<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
-0in 0in">
-<p class=3D"MsoNormal"><b>From:</b> kvmarm-bounces@lists.cs.columbia.edu &l=
-t;kvmarm-bounces@lists.cs.columbia.edu&gt;
-<b>On Behalf Of </b>Steven Miao (Arm Technology China)<br>
-<b>Sent:</b> Thursday, December 6, 2018 3:05 PM<br>
-<b>To:</b> kvmarm@lists.cs.columbia.edu<br>
-<b>Subject:</b> KVM arm realtime performance optimization<o:p></o:p></p>
-</div>
-</div>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Hi <span style=3D"font-size:12.0pt;font-family:&quot=
-;Arial&quot;,sans-serif;color:#222222;background:white">
-Everyone</span>,<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">I&#8217; currently testing KVM arm realtime performa=
-nce on a hikey960 board. My test benchmark is cyclictest to measure thread =
-wake up latency both on Host linux OS and KVM Guest linux OS.<o:p></o:p></p=
->
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Host OS:<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">hikey960:/mnt/debian/usr/src/linux#&nbsp=
-; cyclictest -p&nbsp;99</span><span style=3D"font-size:10.5pt;font-family:C=
-onsolas;color:#333333">&nbsp;<span style=3D"border:none windowtext 1.0pt;pa=
-dding:0in">-t&nbsp;4</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">-m
- -n -a&nbsp;0-3</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;pad=
-ding:0in">-l&nbsp;100000</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in"># /dev/cpu_dma_latency set to 0us</span>=
-<span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333"><o:p></=
-o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">WARN: Running on unknown kernel version.=
-..YMMV</span><span style=3D"font-size:10.5pt;font-family:Consolas;color:#33=
-3333"><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">policy: fifo: loadavg:&nbsp;0.00</span><=
-span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;<s=
-pan style=3D"border:none windowtext 1.0pt;padding:0in">0.00</span>&nbsp;<sp=
-an style=3D"border:none windowtext 1.0pt;padding:0in">0.00</span>&nbsp;<spa=
-n style=3D"border:none windowtext 1.0pt;padding:0in">1/165</span>&nbsp;<spa=
-n style=3D"border:none windowtext 1.0pt;padding:0in">3270</span><o:p></o:p>=
-</span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;0</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;3266)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:1000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;100000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;pad=
-ding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4</span>&nbsp;<span style=
-=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;15</spa=
-n>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&nbsp;=
-&nbsp;&nbsp;15</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padd=
-ing:0in">Max:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;139</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;1</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;3267)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:1500</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;66736</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;15=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;15</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;239</span><o:p></o:p></span=
-></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;2</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;3268)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:2000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;50051</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;19=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;15</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;43</span><o:p></o:p><=
-/span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;3</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;3269)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:2500</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;40039</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;15=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;16</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;74</span><o:p></o:p><=
-/span></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Guest OS:<o:p></o:p></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span lang=3D"FR" style=3D"font-size:10.5pt;font-family:Consolas;color:#33=
-3333;border:none windowtext 1.0pt;padding:0in">root@genericarmv8:~# cyclict=
-est -p&nbsp;99</span><span lang=3D"FR" style=3D"font-size:10.5pt;font-famil=
-y:Consolas;color:#333333">&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">-t&nbsp;4</span>&nbsp;<span style=3D"border:none windowtext 1=
-.0pt;padding:0in">-m
- -n -a&nbsp;0-3</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;pad=
-ding:0in">-l&nbsp;100000</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in"># /dev/cpu_dma_latency set to 0us</span>=
-<span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333"><o:p></=
-o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">WARN: Running on unknown kernel version.=
-..YMMV</span><span style=3D"font-size:10.5pt;font-family:Consolas;color:#33=
-3333"><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">policy: fifo: loadavg:&nbsp;0.13</span><=
-span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;<s=
-pan style=3D"border:none windowtext 1.0pt;padding:0in">0.05</span>&nbsp;<sp=
-an style=3D"border:none windowtext 1.0pt;padding:0in">0.01</span>&nbsp;<spa=
-n style=3D"border:none windowtext 1.0pt;padding:0in">1/70</span>&nbsp;<span=
- style=3D"border:none windowtext 1.0pt;padding:0in">293</span><o:p></o:p></=
-span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;0</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;&nbsp;290)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:1000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;100000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;pad=
-ding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7</span>&nbsp;<span style=
-=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;44</spa=
-n>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&nbsp;=
-&nbsp;&nbsp;85</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padd=
-ing:0in">Max:&nbsp;&nbsp;&nbsp;16111</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;1</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;&nbsp;291)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:1500</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;66665</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;81=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;90</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;15306</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333;border:=
-none windowtext 1.0pt;padding:0in">T:&nbsp;2</span><span style=3D"font-size=
-:10.5pt;font-family:Consolas;color:#333333">&nbsp;<span style=3D"border:non=
-e windowtext 1.0pt;padding:0in">(&nbsp;&nbsp;292)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:2000</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;49995</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;88=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;87</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;16703</span><o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;font-family:Consolas=
-;color:#333333;border:none windowtext 1.0pt;padding:0in">T:&nbsp;3</span><s=
-pan style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;<sp=
-an style=3D"border:none windowtext 1.0pt;padding:0in">(&nbsp;&nbsp;293)
- P:99</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">=
-I:2500</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in"=
->C:&nbsp;&nbsp;39992</span>&nbsp;<span style=3D"border:none windowtext 1.0p=
-t;padding:0in">Min:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8</span>&nbsp;<span =
-style=3D"border:none windowtext 1.0pt;padding:0in">Act:&nbsp;&nbsp;&nbsp;72=
-</span>&nbsp;<span style=3D"border:none windowtext 1.0pt;padding:0in">Avg:&=
-nbsp;&nbsp;&nbsp;97</span>&nbsp;<span style=3D"border:none windowtext 1.0pt=
-;padding:0in">Max:&nbsp;&nbsp;&nbsp;14976<o:p></o:p></span></span></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;font-family:&quot;Ar=
-ial&quot;,sans-serif;color:#333333;background:white">RT performance on KVM =
-guest OS is poor compared to that on host OS. The average wake up latency i=
-s about 6 &#8211; 7 times on Guest OS vs on Host OS.<o:p></o:p></span></p>
-<p class=3D"MsoNormal">I&#8217;ve tried <span style=3D"font-family:&quot;Ar=
-ial&quot;,sans-serif">some configurations to improve RT in KVM, like:<o:p><=
-/o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Arial&quot;,sans-se=
-rif">1 Can be combined with CPU isolation</span><o:p></o:p></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Arial&quot;,sans-se=
-rif">2 Host OS and Guest OS use RT preempt kernel</span><o:p></o:p></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Arial&quot;,sans-se=
-rif">3 Host CPU avoid frequency change<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Arial&quot;,sans-se=
-rif">4 Configure NO_HZ_FULL for Guest OS<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">There could be a little improvement after apply abov=
-e configuration, but the RT performance is still very poor.<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Arial&quot;,sans-se=
-rif">5 Guest OS use idle poll instead of WFI to avoid trap and switch out</=
-span><o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">diff -=
--git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c<o:p></o:p>=
-</span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">index =
-2dc0f84..53aef78 100644<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">--- a/=
-arch/arm64/kernel/process.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&#43;&=
-#43;&#43; b/arch/arm64/kernel/process.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">@@ -83=
-,7 &#43;83,7 @@ void arch_cpu_idle(void)<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
- &nbsp; &nbsp; &nbsp; &nbsp;* tricks<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
- &nbsp; &nbsp; &nbsp; &nbsp;*/<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
- &nbsp; &nbsp; &nbsp; trace_cpu_idle_rcuidle(1, smp_processor_id());<o:p></=
-o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">-&nbsp=
-; &nbsp; &nbsp; &nbsp;cpu_do_idle();<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&#43;&=
-nbsp; &nbsp; &nbsp; &nbsp;cpu_relax();<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
- &nbsp; &nbsp; &nbsp; local_irq_enable();<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
- &nbsp; &nbsp; &nbsp; trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_=
-id());<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">&nbsp;=
-}<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">root@g=
-enericarmv8:~# cyclictest -p 99 -t 4 -m -n&nbsp; -l 100000<o:p></o:p></span=
-></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333"># /dev=
-/cpu_dma_latency set to 0us<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">WARN: =
-Running on unknown kernel version...YMMV<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">policy=
-: fifo: loadavg: 0.07 0.03 0.00 1/99 328<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333"><o:p>&=
-nbsp;</o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">T: 0 (=
-&nbsp; 325) P:99 I:1000 C: 100000 Min:&nbsp; &nbsp; &nbsp; 3 Act:&nbsp; &nb=
-sp; 6 Avg:&nbsp; &nbsp;13 Max:&nbsp; &nbsp; 4999<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">T: 1 (=
-&nbsp; 326) P:99 I:1500 C:&nbsp; 66659 Min:&nbsp; &nbsp; &nbsp; 5 Act:&nbsp=
-; &nbsp; 7 Avg:&nbsp; &nbsp;14 Max:&nbsp; &nbsp; 3449<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">T: 2 (=
-&nbsp; 327) P:99 I:2000 C:&nbsp; 49989 Min:&nbsp; &nbsp; &nbsp; 4 Act:&nbsp=
-; &nbsp; 7 Avg:&nbsp; &nbsp; 9 Max:&nbsp; &nbsp;11471<o:p></o:p></span></p>
-<p class=3D"MsoNormal" style=3D"line-height:15.0pt;vertical-align:baseline"=
-><span style=3D"font-size:10.5pt;font-family:Consolas;color:#333333">T: 3 (=
-&nbsp; 328) P:99 I:2500 C:&nbsp; 39986 Min:&nbsp; &nbsp; &nbsp; 4 Act:&nbsp=
-; &nbsp;14 Avg:&nbsp; &nbsp;14 Max:&nbsp; &nbsp;11253<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">The method 5 can improve Guest OS RT performance a l=
-ot, the average thread wake up latency on Guest OS is almost same as its on=
- Host OS, but the Max wake up latency is still very poor.<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Anyone has any idea to improve RT performance on KVM=
- Guest OS? Although method 5 can improve RT performance on Guest OS a lot, =
-I think it is not good idea.<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">Thanks,<o:p></o:p></p>
-<p class=3D"MsoNormal">Steven<o:p></o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
-<p class=3D"MsoNormal">IMPORTANT NOTICE: The contents of this email and any=
- attachments are confidential and may also be privileged. If you are not th=
-e intended recipient, please notify the sender immediately and do not discl=
-ose the contents to any other person,
- use it for any purpose, or store or copy the information in any medium. Th=
-ank you.
-<o:p></o:p></p>
-</div>
-</div>
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose,
- or store or copy the information in any medium. Thank you.
-</body>
-</html>
-
---_000_DB7PR08MB36090AADD259F89702C3AEF1F0A50DB7PR08MB3609eurp_--
-
---===============1889764761557841406==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1889764761557841406==--
+    Christoffer
