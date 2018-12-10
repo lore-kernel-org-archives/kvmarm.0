@@ -1,119 +1,166 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
-Date: Mon, 10 Dec 2018 15:06:47 +0000
-Message-ID: <29bdf062-06cb-4b7d-1753-33fac609ddc3@arm.com>
-References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
- <20181122193801.50510-6-jean-philippe.brucker@arm.com>
- <20181123165742-mutt-send-email-mst@kernel.org>
- <fd221210-7e12-1d15-0c80-52a761f6893d@arm.com>
- <20181127125424-mutt-send-email-mst@kernel.org>
- <ef97313f-4795-9537-e0b8-8bf6751db6a6@arm.com>
- <20181127131455-mutt-send-email-mst@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH 06/12] KVM: arm64: Support Live Physical Time reporting
+Date: Mon, 10 Dec 2018 15:45:59 +0000
+Message-ID: <e1382ebc-e8fa-9281-0050-03b77bcf5ca3@arm.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181128144527.44710-7-steven.price@arm.com>
+ <20181210105632.hjdnszkcqwiqbyub@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <virtio-dev-return-5152-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <20181127131455-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Mark Rutland <Mark.Rutland@arm.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "joro@8bytes.org" <joro@8bytes.org>, Will Deacon <Will.Deacon@arm.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C224A361
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 10:46:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id k2ntivHYyhNP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 10:46:03 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3FB74A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 10:46:02 -0500 (EST)
+In-Reply-To: <20181210105632.hjdnszkcqwiqbyub@lakrids.cambridge.arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/11/2018 18:53, Michael S. Tsirkin wrote:
-> On Tue, Nov 27, 2018 at 06:10:46PM +0000, Jean-Philippe Brucker wrote:
->> On 27/11/2018 18:04, Michael S. Tsirkin wrote:
->>> On Tue, Nov 27, 2018 at 05:50:50PM +0000, Jean-Philippe Brucker wrote:
->>>> On 23/11/2018 22:02, Michael S. Tsirkin wrote:
->>>>>> +/*
->>>>>> + * __viommu_sync_req - Complete all in-flight requests
->>>>>> + *
->>>>>> + * Wait for all added requests to complete. When this function returns, all
->>>>>> + * requests that were in-flight at the time of the call have completed.
->>>>>> + */
->>>>>> +static int __viommu_sync_req(struct viommu_dev *viommu)
->>>>>> +{
->>>>>> +	int ret = 0;
->>>>>> +	unsigned int len;
->>>>>> +	size_t write_len;
->>>>>> +	struct viommu_request *req;
->>>>>> +	struct virtqueue *vq = viommu->vqs[VIOMMU_REQUEST_VQ];
->>>>>> +
->>>>>> +	assert_spin_locked(&viommu->request_lock);
->>>>>> +
->>>>>> +	virtqueue_kick(vq);
->>>>>> +
->>>>>> +	while (!list_empty(&viommu->requests)) {
->>>>>> +		len = 0;
->>>>>> +		req = virtqueue_get_buf(vq, &len);
->>>>>> +		if (!req)
->>>>>> +			continue;
->>>>>> +
->>>>>> +		if (!len)
->>>>>> +			viommu_set_req_status(req->buf, req->len,
->>>>>> +					      VIRTIO_IOMMU_S_IOERR);
->>>>>> +
->>>>>> +		write_len = req->len - req->write_offset;
->>>>>> +		if (req->writeback && len == write_len)
->>>>>> +			memcpy(req->writeback, req->buf + req->write_offset,
->>>>>> +			       write_len);
->>>>>> +
->>>>>> +		list_del(&req->list);
->>>>>> +		kfree(req);
->>>>>> +	}
->>>>>
->>>>> I didn't notice this in the past but it seems this will spin
->>>>> with interrupts disabled until host handles the request.
->>>>> Please do not do this - host execution can be another
->>>>> task that needs the same host CPU. This will then disable
->>>>> interrupts for a very very long time.
->>>>
->>>> In the guest yes, but that doesn't prevent the host from running another
->>>> task right?
->>>
->>> Doesn't prevent it but it will delay it significantly
->>> until scheduler decides to kick the VCPU task out.
->>>
->>>> My tests run fine when QEMU is bound to a single CPU, even
->>>> though vcpu and viommu run in different threads
->>>>
->>>>> What to do then? Queue in software and wake up task.
->>>>
->>>> Unfortunately I can't do anything here, because IOMMU drivers can't
->>>> sleep in the iommu_map() or iommu_unmap() path.
->>>>
->>>> The problem is the same
->>>> for all IOMMU drivers. That's because the DMA API allows drivers to call
->>>> some functions with interrupts disabled. For example
->>>> Documentation/DMA-API-HOWTO.txt allows dma_alloc_coherent() and
->>>> dma_unmap_single() to be called in interrupt context.
->>>
->>> In fact I don't really understand how it's supposed to
->>> work at all: you only sync when ring is full.
->>> So host may not have seen your map request if ring
->>> is not full.
->>> Why is it safe to use the address with a device then?
->>
->> viommu_map() calls viommu_send_req_sync(), which does the sync
->> immediately after adding the MAP request.
->>
->> Thanks,
->> Jean
+On 10/12/2018 10:56, Mark Rutland wrote:
+> On Wed, Nov 28, 2018 at 02:45:21PM +0000, Steven Price wrote:
+>> Provide a method for a guest to derive a paravirtualized counter/timer
+>> which isn't dependent on the host's counter frequency. This allows a
+>> guest to be migrated onto a new host which doesn't have the same
+>> frequency without the virtual counter being disturbed.
 > 
-> I see. So it happens on every request. Maybe you should clear
-> event index then. This way if exits are disabled you know that
-> host is processing the ring. Event index is good for when
-> you don't care when it will be processed, you just want
-> to reduce number of exits as much as possible.
+> I have a number of concerns about paravirtualizing the timer frequency,
+> but I'll bring that up in reply to the cover letter.
 > 
+> I have some orthogonal comments below.
+> 
+>> The host provides a shared page which contains coefficients that can be
+>> used to map the real counter from the host (the Arm "virtual counter")
+>> to a paravirtualized view of time. On migration the new host updates the
+>> coefficients to ensure that the guests view of time (after using the
+>> coefficients) doesn't change and that the derived counter progresses at
+>> the same real frequency.
+> 
+> Can we please avoid using the term 'page' here?
+> 
+> There is a data structure in shared memory, but it is not page-sized,
+> and referring to it as a page here and elsewhere is confusing. The spec
+> never uses the term 'page'
+> 
+> Could we please say something like:
+> 
+>   The host provides a datastrucutre in shared memory which ...
+> 
+> ... to avoid the implication this is page sized/aligned etc.
+> 
+> [...]
 
-I think that's already the case: since we don't attach a callback to the
-request queue, VRING_AVAIL_F_NO_INTERRUPT is set in avail_flags_shadow,
-which causes the used event index to stay clear.
+Sure, I'll update to avoid referring to it as a page. Although note that
+when mapping it into the guest we can obviously only map in page sized
+granules, so in practise the LPT structure is contained within a entire
+page given to the guest...
+
+>> +	struct kvm_arch_pvtime {
+>> +		void *pv_page;
+>> +
+>> +		gpa_t lpt_page;
+>> +		u32 lpt_fpv;
+>> +	} pvtime;
+> 
+> To remove the page terminology, perhaps something like:
+> 
+> 	struct kvm_arch_pvtime {
+>  		struct lpt	*lpt;
+>  		gpa_t		lpt_gpa;
+>  		u32		lpt_fpv;
+>  	};
+> 
+> [...]
+> 
+>> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+>> index 8bf259dae9f6..fd3a2caabeb2 100644
+>> --- a/include/linux/kvm_types.h
+>> +++ b/include/linux/kvm_types.h
+>> @@ -49,6 +49,8 @@ typedef unsigned long  gva_t;
+>>  typedef u64            gpa_t;
+>>  typedef u64            gfn_t;
+>>  
+>> +#define GPA_INVALID    -1
+> 
+> To avoid any fun with signed/unsigned comparison, can we please make
+> this:
+> 
+> #define GPA_INVALID	((gpa_t)-1)
+> 
+> ... or:
+> 
+> #define GPA_INVALID     (~(gpa_t)0)
+> 
+> [...]
+
+I'll go with the latter as I think that's clearer.
+
+>> +static void update_vtimer_cval(struct kvm *kvm, u32 previous_rate)
+>> +{
+>> +	u32 current_rate = arch_timer_get_rate();
+>> +	u64 current_time = kvm_phys_timer_read();
+>> +	int i;
+>> +	struct kvm_vcpu *vcpu;
+>> +	u64 rel_cval;
+>> +
+>> +	/* Early out if there's nothing to do */
+>> +	if (likely(previous_rate == current_rate))
+>> +		return;
+> 
+> Given this only happens on migration, I don't think we need to care
+> about likely/unlikely here, and can drop that from the condition.
+
+Fair enough
+
+> [...]
+> 
+>> +int kvm_arm_update_lpt_sequence(struct kvm *kvm)
+>> +{
+>> +	struct pvclock_vm_time_info *pvclock;
+>> +	u64 lpt_ipa = kvm->arch.pvtime.lpt_page;
+>> +	u64 native_freq, pv_freq, scale_mult, div_by_pv_freq_mult;
+>> +	u64 shift = 0;
+>> +	u64 sequence_number = 0;
+>> +
+>> +	if (lpt_ipa == GPA_INVALID)
+>> +		return -EINVAL;
+>> +
+>> +	/* Page address must be 64 byte aligned */
+>> +	if (lpt_ipa & 63)
+>> +		return -EINVAL;
+> 
+> Please use IS_ALIGNED(), e.g.
+> 
+> 	if (!IS_ALIGNED(lpt_ipa, 64))
+> 		return -EINVAL;
+
+Yes, much clearer - no need for the comment :)
 
 Thanks,
-Jean
+
+Steve
+
+> Thanks,
+> Mark.
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
