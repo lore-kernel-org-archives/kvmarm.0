@@ -1,28 +1,24 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 7/8] arm64: KVM: Handle ARM erratum 1165522 in TLB
- invalidation
-Date: Mon, 10 Dec 2018 11:15:00 +0000
-Message-ID: <c71d902b-c748-770a-5e6e-f33a204dcb8d@arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
- <20181206173126.139877-8-marc.zyngier@arm.com>
- <20181210101912.GK30263@e113682-lin.lund.arm.com>
- <50e6a07d-868b-db43-fd4e-4b6359a5128e@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 00/12] arm64: Paravirtualized time support
+Date: Mon, 10 Dec 2018 11:40:47 +0000
+Message-ID: <20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73E144A330
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 06:15:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AE754A334
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 06:40:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ECJWLfwyJYpQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 06:15:05 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B77E4A1DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 06:15:05 -0500 (EST)
-In-Reply-To: <50e6a07d-868b-db43-fd4e-4b6359a5128e@arm.com>
-Content-Language: en-GB
+ with ESMTP id IdBOXaie4gb9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 06:40:52 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E3F4A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 06:40:52 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20181128144527.44710-1-steven.price@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,49 +28,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Steven Price <steven.price@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Christoffer,
-
-On 10/12/2018 10:46, Marc Zyngier wrote:
-> On 10/12/2018 10:19, Christoffer Dall wrote:
->> On Thu, Dec 06, 2018 at 05:31:25PM +0000, Marc Zyngier wrote:
->>> In order to avoid TLB corruption whilst invalidating TLBs on CPUs
->>> affected by erratum 1165522, we need to prevent S1 page tables
->>> from being usable.
->>>
->>> For this, we set the EL1 S1 MMU on, and also disable the page table
->>> walker (by setting the TCR_EL1.EPD* bits to 1).
->>>
->>> This ensures that once we switch to the EL1/EL0 translation regime,
->>> speculated AT instructions won't be able to parse the page tables.
-
->>> @@ -64,11 +93,18 @@ static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
->>>  	write_sysreg(0, vttbr_el2);
->>>  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
->>>  	isb();
->>> -	local_irq_restore(flags);
->>> +
->>> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1165522)) {
->>> +		/* Restore the guest's registers to what they were */
->>
->> host's ?
+On Wed, Nov 28, 2018 at 02:45:15PM +0000, Steven Price wrote:
+> This series add support for paravirtualized time for Arm64 guests and
+> KVM hosts following the specification in Arm's document DEN 0057A:
 > 
-> Hum... Yes, silly thinko.
+> https://developer.arm.com/docs/den0057/a
+> 
+> It implements support for Live Physical Time (LPT) which provides the
+> guest with a method to derive a stable counter of time during which the
+> guest is executing even when the guest is being migrated between hosts
+> with different physical counter frequencies.
+> 
+> It also implements support for stolen time, allowing the guest to
+> identify time when it is forcibly not executing.
 
-I thought these were the guests registers because they are EL1 registers and
-this is a VHE-only path.
-'interrupted guest' was how I read this. This stuff can get called if memory is
-allocated for guest-A while a vcpu is loaded, and reclaims memory from guest-B
-causing an mmu-notifier call for stage2. This is why we have to put guest-A's
-registers back as we weren't pre-empted, and we expect EL1 to be untouched.
+I know that stolen time reporting is important, and I think that we
+definitely want to pick up that part of the spec (once it is published
+in some non-draft form).
 
-I agree they could belong to no-guest if a vcpu isn't loaded at all... is host
-the term used here?
+However, I am very concerned with the pv-freq part of LPT, and I'd like
+to avoid that if at all possible. I say that because:
 
+* By design, it breaks architectural guarantees from the PoV of SW in
+  the guest.
+
+  A VM may host multiple SW agents serially (e.g. when booting, or
+  across kexec), or concurrently (e.g. Linux w/ EFI runtime services),
+  and the host has no way to tell whether all software in the guest will
+  function correctly. Due to this, it's not possible to have a guest
+  opt-in to the architecturally-broken timekeeping.
+
+  Existing guests will not work correctly once pv-freq is in use, and if
+  configured without pv-freq (or if the guest fails to discover pv-freq
+  for any reason), the administrator may encounter anything between
+  subtle breakage or fatally incorrect timekeeping.
+
+  There's plenty of SW agents other than Linux which runs in a guest,
+  which would need to be updated to handle pv-freq, e.g. GRUB, *BSD,
+  iPXE.
+
+  Given this, I think that this is going to lead to subtle breakage in
+  real-world scenarios. 
+
+* It is (necessarily) invasive to the low-level arch timer code. This is
+  unfortunate, and I strongly suspect this is going to be an area with
+  long-term subtle breakage.
+
+* It's not clear to me how strongly people need this. My understanding
+  is that datacenters would run largely homogeneous platforms. I suspect
+  large datacenters which would use migration are in a position to
+  mandate a standard timer frequency from their OEMs or SiPs.
+
+  I strongly believe that an architectural fix (e.g. in-hw scaling)
+  would be the better solution.
+
+I understand that LPT is supposed to account for time lost during the
+migration. Can we account for this without pv-freq? e.g. is it possible
+to account for this in the same way as stolen time?
 
 Thanks,
-
-James
+Mark.
