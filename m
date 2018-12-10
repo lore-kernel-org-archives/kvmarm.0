@@ -1,26 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 2/8] KVM: arm64: Rework detection of SVE, !VHE systems
-Date: Mon, 10 Dec 2018 10:28:05 +0000
-Message-ID: <aff2750e-6746-3378-6d4d-dcbfc2028154@arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
- <20181206173126.139877-3-marc.zyngier@arm.com>
- <20181210101305.GH30263@e113682-lin.lund.arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 05/12] KVM: arm64: Implement PV_FEATURES call
+Date: Mon, 10 Dec 2018 10:39:44 +0000
+Message-ID: <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181128144527.44710-6-steven.price@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B848A4A331
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:28:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB09B4A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:39:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e6iNngFBhsKs for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 05:28:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 608714A2BB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:28:10 -0500 (EST)
-In-Reply-To: <20181210101305.GH30263@e113682-lin.lund.arm.com>
-Content-Language: en-US
+ with ESMTP id 7fxjjY9pRjSz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 05:39:48 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DB244A2BB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:39:48 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20181128144527.44710-6-steven.price@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,123 +29,160 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Steven Price <steven.price@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/12/2018 10:13, Christoffer Dall wrote:
-> On Thu, Dec 06, 2018 at 05:31:20PM +0000, Marc Zyngier wrote:
->> An SVE system is so far the only case where we mandate VHE. As we're
->> starting to grow this requirements, let's slightly rework the way we
->> deal with that situation, allowing for easy extension of this check.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h   | 2 +-
->>  arch/arm64/include/asm/kvm_host.h | 6 +++---
->>  virt/kvm/arm/arm.c                | 8 ++++----
->>  3 files changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 5ca5d9af0c26..2184d9ddb418 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -285,7 +285,7 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->>  
->>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->>  
->> -static inline bool kvm_arch_check_sve_has_vhe(void) { return true; }
->> +static inline bool kvm_arch_requires_vhe(void) { return false; }
->>  static inline void kvm_arch_hardware_unsetup(void) {}
->>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 52fbc823ff8c..d6d9aa76a943 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -422,7 +422,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
->>  	}
->>  }
->>  
->> -static inline bool kvm_arch_check_sve_has_vhe(void)
->> +static inline bool kvm_arch_requires_vhe(void)
->>  {
->>  	/*
->>  	 * The Arm architecture specifies that implementation of SVE
->> @@ -430,9 +430,9 @@ static inline bool kvm_arch_check_sve_has_vhe(void)
->>  	 * relies on this when SVE is present:
->>  	 */
->>  	if (system_supports_sve())
->> -		return has_vhe();
->> -	else
->>  		return true;
->> +
->> +	return false;
->>  }
->>  
->>  static inline void kvm_arch_hardware_unsetup(void) {}
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 23774970c9df..1db4c15edcdd 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -1640,8 +1640,10 @@ int kvm_arch_init(void *opaque)
->>  		return -ENODEV;
->>  	}
->>  
->> -	if (!kvm_arch_check_sve_has_vhe()) {
->> -		kvm_pr_unimpl("SVE system without VHE unsupported.  Broken cpu?");
->> +	in_hyp_mode = is_kernel_in_hyp_mode();
->> +
->> +	if (!in_hyp_mode && kvm_arch_requires_vhe()) {
->> +		kvm_pr_unimpl("CPU requiring VHE was booted in non-VHE mode");
+On Wed, Nov 28, 2018 at 02:45:20PM +0000, Steven Price wrote:
+> This provides a mechanism for querying which paravirtualized features
+> are available in this hypervisor.
 > 
-> nit: The error message feels weird to me (are we reporting CPU bugs?)
-> and I'm not sure about the unimpl and I think there's a linse space
-> missing.
+> Also add the header file which defines the ABI for the paravirtualized
+> clock features we're about to add.
 > 
-> How about:
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/pvclock-abi.h | 32 ++++++++++++++++++++++++++++
+>  include/kvm/arm_pv.h                 | 28 ++++++++++++++++++++++++
+>  include/linux/arm-smccc.h            |  1 +
+>  virt/kvm/arm/hypercalls.c            |  9 ++++++++
+>  4 files changed, 70 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+>  create mode 100644 include/kvm/arm_pv.h
 > 
-> 	kvm_err("Cannot support this CPU in non-VHE mode, not initializing\n");
+> diff --git a/arch/arm64/include/asm/pvclock-abi.h b/arch/arm64/include/asm/pvclock-abi.h
+> new file mode 100644
+> index 000000000000..64ce041c8922
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/pvclock-abi.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (C) 2018 Arm Ltd. */
+> +
+> +#ifndef __ASM_PVCLOCK_ABI_H
+> +#define __ASM_PVCLOCK_ABI_H
+> +
+> +#include <kvm/arm_pv.h>
+> +
+> +struct pvclock_vm_time_info {
+> +	__le32 revision;
+> +	__le32 attributes;
+> +	__le64 sequence_number;
+> +	__le64 scale_mult;
+> +	__le32 shift;
+> +	__le32 reserved;
+> +	__le64 native_freq;
+> +	__le64 pv_freq;
+> +	__le64 div_by_pv_freq_mult;
+> +} __packed;
+> +
+> +struct pvclock_vcpu_stolen_time_info {
+> +	__le32 revision;
+> +	__le32 attributes;
+> +	__le64 stolen_time;
+> +	/* Structure must be 64 byte aligned, pad to that size */
+> +	u8 padding[48];
+> +} __packed;
+> +
+> +#define PV_VM_TIME_NOT_SUPPORTED	-1
+> +#define PV_VM_TIME_INVALID_PARAMETERS	-2
 
-Yup, works for me. Will, do you mind changing this message for me?
+Could you please add a comment describing that these are defined in ARM
+DEN0057A?
 
-> 
-> If we wanted to be super helpful, we could expand
-> kvm_arch_requires_vhe() with a print statement saying:
-> 		
-> 	kvm_err("SVE detected, requiring VHE mode\n");
-> 
-> But thay may be overkill.
+> +
+> +#endif
+> diff --git a/include/kvm/arm_pv.h b/include/kvm/arm_pv.h
+> new file mode 100644
+> index 000000000000..19d2dafff31a
+> --- /dev/null
+> +++ b/include/kvm/arm_pv.h
+> @@ -0,0 +1,28 @@
+> +/* SPDX-License-Identifier: GPL-2.0
+> + * Copyright (C) 2018 Arm Ltd.
+> + */
+> +
+> +#ifndef __KVM_ARM_PV_H
+> +#define __KVM_ARM_PV_H
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#define ARM_SMCCC_HV_PV_FEATURES					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
+> +			   0x20)
+> +
+> +#define ARM_SMCCC_HV_PV_TIME_LPT					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
+> +			   0x21)
+> +
+> +#define ARM_SMCCC_HV_PV_TIME_ST					\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
+> +			   ARM_SMCCC_SMC_64,			\
+> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
+> +			   0x22)
+> +
+> +#endif /* __KVM_ARM_PV_H */
 
-I started with that, but having kvm_pr*() in an include file has proved
-to be challenging, so I decided to spend my time on something more
-useful and quickly gave up... :-/
+Do these need to live in a separate header, away from the struct
+definitions?
 
-> 
-> 
->>  		return -ENODEV;
->>  	}
->>  
->> @@ -1657,8 +1659,6 @@ int kvm_arch_init(void *opaque)
->>  	if (err)
->>  		return err;
->>  
->> -	in_hyp_mode = is_kernel_in_hyp_mode();
->> -
->>  	if (!in_hyp_mode) {
->>  		err = init_hyp_mode();
->>  		if (err)
->> -- 
->> 2.19.2
->>
-> 
-> Otherwise:
-> 
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-> 
+I'd be happy for these to live in <linux/arm-smccc.h>, given they're
+standard calls.
+
+As before, a comment referring to ARM DEN0057A would be nice.
+
+
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index b047009e7a0a..4e0866cc48c0 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -54,6 +54,7 @@
+>  #define ARM_SMCCC_OWNER_SIP		2
+>  #define ARM_SMCCC_OWNER_OEM		3
+>  #define ARM_SMCCC_OWNER_STANDARD	4
+> +#define ARM_SMCCC_OWNER_HYP_STANDARD	5
+
+Minor nit, but could we make that STANDARD_HYP?
+
+>  #define ARM_SMCCC_OWNER_TRUSTED_APP	48
+>  #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
+>  #define ARM_SMCCC_OWNER_TRUSTED_OS	50
+> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+> index 153aa7642100..ba13b798f0f8 100644
+> --- a/virt/kvm/arm/hypercalls.c
+> +++ b/virt/kvm/arm/hypercalls.c
+> @@ -5,6 +5,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/pvclock-abi.h>
+>  
+>  #include <kvm/arm_hypercalls.h>
+>  #include <kvm/arm_psci.h>
+> @@ -40,6 +41,14 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  				break;
+>  			}
+>  			break;
+> +		case ARM_SMCCC_HV_PV_FEATURES:
+> +			val = SMCCC_RET_SUCCESS;
+> +			break;
+> +		}
+> +		break;
+> +	case ARM_SMCCC_HV_PV_FEATURES:
+> +		feature = smccc_get_arg1(vcpu);
+> +		switch (feature) {
+>  		}
+
+IIUC, at this point in time, this happens to always return
+SMCCC_RET_NOT_SUPPORTED.
+
+If you leave this part out of the patch, and add it as required, this
+patch is purely adding definitions, which would be a bit nicer for
+review.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Mark.
