@@ -1,25 +1,25 @@
 From: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH 03/12] arm/arm64: Provide a wrapper for SMCCC 1.1 calls
-Date: Mon, 10 Dec 2018 13:52:17 +0000
-Message-ID: <32c77d11-047d-cc78-7be2-9a7a72b08deb@arm.com>
+Subject: Re: [PATCH 05/12] KVM: arm64: Implement PV_FEATURES call
+Date: Mon, 10 Dec 2018 14:20:09 +0000
+Message-ID: <570e1234-bbed-d0cf-1bf0-3d95747fecb9@arm.com>
 References: <20181128144527.44710-1-steven.price@arm.com>
- <20181128144527.44710-4-steven.price@arm.com>
- <20181210102736.2iluzzfuryfnf4rk@lakrids.cambridge.arm.com>
+ <20181128144527.44710-6-steven.price@arm.com>
+ <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E39D24A1D8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:52:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0471B4A214
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 09:20:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mlcnUoPAQcJY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 08:52:21 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45F5149F87
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 08:52:21 -0500 (EST)
-In-Reply-To: <20181210102736.2iluzzfuryfnf4rk@lakrids.cambridge.arm.com>
+ with ESMTP id aiiFmui5ygS3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 09:20:12 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D8A44A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 09:20:12 -0500 (EST)
+In-Reply-To: <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,105 +34,110 @@ To: Mark Rutland <mark.rutland@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/12/2018 10:27, Mark Rutland wrote:
-> On Wed, Nov 28, 2018 at 02:45:18PM +0000, Steven Price wrote:
->> SMCCC 1.1 calls may use either HVC or SMC depending on the PSCI
->> conduit. Rather than coding this in every call site provide a macro
->> which uses the correct instruction. The macro also handles the case
->> where no PSCI conduit is configured returning a not supported error
->> in res, along with returning the conduit used for the call.
->>
->> This allow us to remove some duplicated code and will be useful later
->> when adding paravirtualized time hypervisor calls.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  include/linux/arm-smccc.h | 44 +++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 44 insertions(+)
->>
->> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
->> index 18863d56273c..b047009e7a0a 100644
->> --- a/include/linux/arm-smccc.h
->> +++ b/include/linux/arm-smccc.h
->> @@ -311,5 +311,49 @@ asmlinkage void __arm_smccc_hvc(unsigned long a0, unsigned long a1,
->>  #define SMCCC_RET_NOT_SUPPORTED			-1
->>  #define SMCCC_RET_NOT_REQUIRED			-2
->>  
->> +/* Like arm_smccc_1_1* but always returns SMCCC_RET_NOT_SUPPORTED.
->> + * Used when the PSCI conduit is not defined. The empty asm statement
->> + * avoids compiler warnings about unused variables.
->> + */
->> +#define __fail_smccc_1_1(...)						\
->> +	do {								\
->> +		__declare_args(__count_args(__VA_ARGS__), __VA_ARGS__);	\
->> +		asm ("" __constraints(__count_args(__VA_ARGS__)));	\
->> +		if (___res)						\
->> +			___res->a0 = SMCCC_RET_NOT_SUPPORTED;		\
->> +	} while (0)
->> +
->> +/*
->> + * arm_smccc_1_1() - make an SMCCC v1.1 compliant call
->> + *
->> + * This is a variadic macro taking one to eight source arguments, and
->> + * an optional return structure.
->> + *
->> + * @a0-a7: arguments passed in registers 0 to 7
->> + * @res: result values from registers 0 to 3
->> + *
->> + * This macro will make either an HVC call or an SMC call depending on the
->> + * current PSCI conduit. If no valid conduit is available then -1
->> + * (SMCCC_RET_NOT_SUPPORTED) is returned in @res.a0 (if supplied).
->> + *
->> + * The return value also provides the conduit that was used.
->> + */
->> +#define arm_smccc_1_1(...) ({						\
-> 
-> As a minor nit, could we please give call this something like
-> arm_smccc_1_1_call() or arm_smccc_1_1_invoke(), to make it clear what
-> action this performs?
-
-Sure, arm_smccc_1_1_call() works for me.
-
-> I had some patches [1] cleaning up the SMCCC API, it would be nice if we
-> could pick up some of those as preparatory bits, before we spread some
-> of the current design warts (e.g. SMCCC depending on PSCI definitions).
-
-Looks like a similar approach, just extended to include
-s/PSCI_CONDUIT/SMCCC_CONDUIT/ and making arm_smccc_1_1_* return res.
-Would you like me to drop this (and the next) patch in favour of yours?
-
-Thanks,
-
-Steve
-
-> Thanks,
-> Mark.
-> 
-> [1] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git arm64/smccc-cleanup
-> 
->> +		int method = psci_ops.conduit;				\
->> +		switch (method) {					\
->> +		case PSCI_CONDUIT_HVC:					\
->> +			arm_smccc_1_1_hvc(__VA_ARGS__);			\
->> +			break;						\
->> +		case PSCI_CONDUIT_SMC:					\
->> +			arm_smccc_1_1_smc(__VA_ARGS__);			\
->> +			break;						\
->> +		default:						\
->> +			__fail_smccc_1_1(__VA_ARGS__);			\
->> +			method = PSCI_CONDUIT_NONE;			\
->> +			break;						\
->> +		}							\
->> +		method;							\
->> +	})
->> +
->>  #endif /*__ASSEMBLY__*/
->>  #endif /*__LINUX_ARM_SMCCC_H*/
->> -- 
->> 2.19.2
->>
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+T24gMTAvMTIvMjAxOCAxMDozOSwgTWFyayBSdXRsYW5kIHdyb3RlOgo+IE9uIFdlZCwgTm92IDI4
+LCAyMDE4IGF0IDAyOjQ1OjIwUE0gKzAwMDAsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4gVGhpcyBw
+cm92aWRlcyBhIG1lY2hhbmlzbSBmb3IgcXVlcnlpbmcgd2hpY2ggcGFyYXZpcnR1YWxpemVkIGZl
+YXR1cmVzCj4+IGFyZSBhdmFpbGFibGUgaW4gdGhpcyBoeXBlcnZpc29yLgo+Pgo+PiBBbHNvIGFk
+ZCB0aGUgaGVhZGVyIGZpbGUgd2hpY2ggZGVmaW5lcyB0aGUgQUJJIGZvciB0aGUgcGFyYXZpcnR1
+YWxpemVkCj4+IGNsb2NrIGZlYXR1cmVzIHdlJ3JlIGFib3V0IHRvIGFkZC4KPj4KPj4gU2lnbmVk
+LW9mZi1ieTogU3RldmVuIFByaWNlIDxzdGV2ZW4ucHJpY2VAYXJtLmNvbT4KPj4gLS0tCj4+ICBh
+cmNoL2FybTY0L2luY2x1ZGUvYXNtL3B2Y2xvY2stYWJpLmggfCAzMiArKysrKysrKysrKysrKysr
+KysrKysrKysrKysrCj4+ICBpbmNsdWRlL2t2bS9hcm1fcHYuaCAgICAgICAgICAgICAgICAgfCAy
+OCArKysrKysrKysrKysrKysrKysrKysrKysKPj4gIGluY2x1ZGUvbGludXgvYXJtLXNtY2NjLmgg
+ICAgICAgICAgICB8ICAxICsKPj4gIHZpcnQva3ZtL2FybS9oeXBlcmNhbGxzLmMgICAgICAgICAg
+ICB8ICA5ICsrKysrKysrCj4+ICA0IGZpbGVzIGNoYW5nZWQsIDcwIGluc2VydGlvbnMoKykKPj4g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3B2Y2xvY2stYWJpLmgK
+Pj4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2t2bS9hcm1fcHYuaAo+Pgo+PiBkaWZmIC0t
+Z2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oIGIvYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4+IGluZGV4
+IDAwMDAwMDAwMDAwMC4uNjRjZTA0MWM4OTIyCj4+IC0tLSAvZGV2L251bGwKPj4gKysrIGIvYXJj
+aC9hcm02NC9pbmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oCj4+IEBAIC0wLDAgKzEsMzIgQEAKPj4g
+Ky8qIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wICovCj4+ICsvKiBDb3B5cmlnaHQg
+KEMpIDIwMTggQXJtIEx0ZC4gKi8KPj4gKwo+PiArI2lmbmRlZiBfX0FTTV9QVkNMT0NLX0FCSV9I
+Cj4+ICsjZGVmaW5lIF9fQVNNX1BWQ0xPQ0tfQUJJX0gKPj4gKwo+PiArI2luY2x1ZGUgPGt2bS9h
+cm1fcHYuaD4KPj4gKwo+PiArc3RydWN0IHB2Y2xvY2tfdm1fdGltZV9pbmZvIHsKPj4gKwlfX2xl
+MzIgcmV2aXNpb247Cj4+ICsJX19sZTMyIGF0dHJpYnV0ZXM7Cj4+ICsJX19sZTY0IHNlcXVlbmNl
+X251bWJlcjsKPj4gKwlfX2xlNjQgc2NhbGVfbXVsdDsKPj4gKwlfX2xlMzIgc2hpZnQ7Cj4+ICsJ
+X19sZTMyIHJlc2VydmVkOwo+PiArCV9fbGU2NCBuYXRpdmVfZnJlcTsKPj4gKwlfX2xlNjQgcHZf
+ZnJlcTsKPj4gKwlfX2xlNjQgZGl2X2J5X3B2X2ZyZXFfbXVsdDsKPj4gK30gX19wYWNrZWQ7Cj4+
+ICsKPj4gK3N0cnVjdCBwdmNsb2NrX3ZjcHVfc3RvbGVuX3RpbWVfaW5mbyB7Cj4+ICsJX19sZTMy
+IHJldmlzaW9uOwo+PiArCV9fbGUzMiBhdHRyaWJ1dGVzOwo+PiArCV9fbGU2NCBzdG9sZW5fdGlt
+ZTsKPj4gKwkvKiBTdHJ1Y3R1cmUgbXVzdCBiZSA2NCBieXRlIGFsaWduZWQsIHBhZCB0byB0aGF0
+IHNpemUgKi8KPj4gKwl1OCBwYWRkaW5nWzQ4XTsKPj4gK30gX19wYWNrZWQ7Cj4+ICsKPj4gKyNk
+ZWZpbmUgUFZfVk1fVElNRV9OT1RfU1VQUE9SVEVECS0xCj4+ICsjZGVmaW5lIFBWX1ZNX1RJTUVf
+SU5WQUxJRF9QQVJBTUVURVJTCS0yCj4gCj4gQ291bGQgeW91IHBsZWFzZSBhZGQgYSBjb21tZW50
+IGRlc2NyaWJpbmcgdGhhdCB0aGVzZSBhcmUgZGVmaW5lZCBpbiBBUk0KPiBERU4wMDU3QT8KCk5v
+IHByb2JsZW0uCgo+PiArCj4+ICsjZW5kaWYKPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUva3ZtL2Fy
+bV9wdi5oIGIvaW5jbHVkZS9rdm0vYXJtX3B2LmgKPj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQKPj4g
+aW5kZXggMDAwMDAwMDAwMDAwLi4xOWQyZGFmZmYzMWEKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysg
+Yi9pbmNsdWRlL2t2bS9hcm1fcHYuaAo+PiBAQCAtMCwwICsxLDI4IEBACj4+ICsvKiBTUERYLUxp
+Y2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+PiArICogQ29weXJpZ2h0IChDKSAyMDE4IEFybSBM
+dGQuCj4+ICsgKi8KPj4gKwo+PiArI2lmbmRlZiBfX0tWTV9BUk1fUFZfSAo+PiArI2RlZmluZSBf
+X0tWTV9BUk1fUFZfSAo+PiArCj4+ICsjaW5jbHVkZSA8bGludXgvYXJtLXNtY2NjLmg+Cj4+ICsK
+Pj4gKyNkZWZpbmUgQVJNX1NNQ0NDX0hWX1BWX0ZFQVRVUkVTCQkJCQlcCj4+ICsJQVJNX1NNQ0ND
+X0NBTExfVkFMKEFSTV9TTUNDQ19GQVNUX0NBTEwsCQkJXAo+PiArCQkJICAgQVJNX1NNQ0NDX1NN
+Q182NCwJCQlcCj4+ICsJCQkgICBBUk1fU01DQ0NfT1dORVJfSFlQX1NUQU5EQVJELAlcCj4+ICsJ
+CQkgICAweDIwKQo+PiArCj4+ICsjZGVmaW5lIEFSTV9TTUNDQ19IVl9QVl9USU1FX0xQVAkJCQkJ
+XAo+PiArCUFSTV9TTUNDQ19DQUxMX1ZBTChBUk1fU01DQ0NfRkFTVF9DQUxMLAkJCVwKPj4gKwkJ
+CSAgIEFSTV9TTUNDQ19TTUNfNjQsCQkJXAo+PiArCQkJICAgQVJNX1NNQ0NDX09XTkVSX0hZUF9T
+VEFOREFSRCwJXAo+PiArCQkJICAgMHgyMSkKPj4gKwo+PiArI2RlZmluZSBBUk1fU01DQ0NfSFZf
+UFZfVElNRV9TVAkJCQkJXAo+PiArCUFSTV9TTUNDQ19DQUxMX1ZBTChBUk1fU01DQ0NfRkFTVF9D
+QUxMLAkJCVwKPj4gKwkJCSAgIEFSTV9TTUNDQ19TTUNfNjQsCQkJXAo+PiArCQkJICAgQVJNX1NN
+Q0NDX09XTkVSX0hZUF9TVEFOREFSRCwJXAo+PiArCQkJICAgMHgyMikKPj4gKwo+PiArI2VuZGlm
+IC8qIF9fS1ZNX0FSTV9QVl9IICovCj4gCj4gRG8gdGhlc2UgbmVlZCB0byBsaXZlIGluIGEgc2Vw
+YXJhdGUgaGVhZGVyLCBhd2F5IGZyb20gdGhlIHN0cnVjdAo+IGRlZmluaXRpb25zPwo+IAo+IEkn
+ZCBiZSBoYXBweSBmb3IgdGhlc2UgdG8gbGl2ZSBpbiA8bGludXgvYXJtLXNtY2NjLmg+LCBnaXZl
+biB0aGV5J3JlCj4gc3RhbmRhcmQgY2FsbHMuCgpJJ2xsIG1vdmUgdGhlbSB0byBsaW51eC9hcm0t
+c21jY2MuaCAtIEkgZGlkbid0IHdhbnQgdG8gcGxhY2UgdGhlbSBpbgpwdmNsb2NrLWFiaS5oIGFz
+IGl0IHNlZW1lZCB3cm9uZyB0byBwdWxsIHRoYXQgaW50byB0aGUgZ2VuZXJpYyBTTUNDQwpjb2Rl
+IHdoaWNoIGRvZXNuJ3QgY2FyZSBhYm91dCB0aGVzZSBzdHJ1Y3R1cmVzLgoKPiBBcyBiZWZvcmUs
+IGEgY29tbWVudCByZWZlcnJpbmcgdG8gQVJNIERFTjAwNTdBIHdvdWxkIGJlIG5pY2UuCgpXaWxs
+IGFkZAoKPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYXJtLXNtY2NjLmggYi9pbmNsdWRl
+L2xpbnV4L2FybS1zbWNjYy5oCj4+IGluZGV4IGIwNDcwMDllN2EwYS4uNGUwODY2Y2M0OGMwIDEw
+MDY0NAo+PiAtLS0gYS9pbmNsdWRlL2xpbnV4L2FybS1zbWNjYy5oCj4+ICsrKyBiL2luY2x1ZGUv
+bGludXgvYXJtLXNtY2NjLmgKPj4gQEAgLTU0LDYgKzU0LDcgQEAKPj4gICNkZWZpbmUgQVJNX1NN
+Q0NDX09XTkVSX1NJUAkJMgo+PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfT0VNCQkzCj4+ICAj
+ZGVmaW5lIEFSTV9TTUNDQ19PV05FUl9TVEFOREFSRAk0Cj4+ICsjZGVmaW5lIEFSTV9TTUNDQ19P
+V05FUl9IWVBfU1RBTkRBUkQJNQo+IAo+IE1pbm9yIG5pdCwgYnV0IGNvdWxkIHdlIG1ha2UgdGhh
+dCBTVEFOREFSRF9IWVA/CgpTdXJlCgo+PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfVFJVU1RF
+RF9BUFAJNDgKPj4gICNkZWZpbmUgQVJNX1NNQ0NDX09XTkVSX1RSVVNURURfQVBQX0VORAk0OQo+
+PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfVFJVU1RFRF9PUwk1MAo+PiBkaWZmIC0tZ2l0IGEv
+dmlydC9rdm0vYXJtL2h5cGVyY2FsbHMuYyBiL3ZpcnQva3ZtL2FybS9oeXBlcmNhbGxzLmMKPj4g
+aW5kZXggMTUzYWE3NjQyMTAwLi5iYTEzYjc5OGYwZjggMTAwNjQ0Cj4+IC0tLSBhL3ZpcnQva3Zt
+L2FybS9oeXBlcmNhbGxzLmMKPj4gKysrIGIvdmlydC9rdm0vYXJtL2h5cGVyY2FsbHMuYwo+PiBA
+QCAtNSw2ICs1LDcgQEAKPj4gICNpbmNsdWRlIDxsaW51eC9rdm1faG9zdC5oPgo+PiAgCj4+ICAj
+aW5jbHVkZSA8YXNtL2t2bV9lbXVsYXRlLmg+Cj4+ICsjaW5jbHVkZSA8YXNtL3B2Y2xvY2stYWJp
+Lmg+Cj4+ICAKPj4gICNpbmNsdWRlIDxrdm0vYXJtX2h5cGVyY2FsbHMuaD4KPj4gICNpbmNsdWRl
+IDxrdm0vYXJtX3BzY2kuaD4KPj4gQEAgLTQwLDYgKzQxLDE0IEBAIGludCBrdm1faHZjX2NhbGxf
+aGFuZGxlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICAJCQkJYnJlYWs7Cj4+ICAJCQl9Cj4+
+ICAJCQlicmVhazsKPj4gKwkJY2FzZSBBUk1fU01DQ0NfSFZfUFZfRkVBVFVSRVM6Cj4+ICsJCQl2
+YWwgPSBTTUNDQ19SRVRfU1VDQ0VTUzsKPj4gKwkJCWJyZWFrOwo+PiArCQl9Cj4+ICsJCWJyZWFr
+Owo+PiArCWNhc2UgQVJNX1NNQ0NDX0hWX1BWX0ZFQVRVUkVTOgo+PiArCQlmZWF0dXJlID0gc21j
+Y2NfZ2V0X2FyZzEodmNwdSk7Cj4+ICsJCXN3aXRjaCAoZmVhdHVyZSkgewo+PiAgCQl9Cj4gCj4g
+SUlVQywgYXQgdGhpcyBwb2ludCBpbiB0aW1lLCB0aGlzIGhhcHBlbnMgdG8gYWx3YXlzIHJldHVy
+bgo+IFNNQ0NDX1JFVF9OT1RfU1VQUE9SVEVELgoKWWVzLCB0aGlzIGlzIGJlY2F1c2Ugb24gYW4g
+b2RkaXR5IGluIHRoZSBzcGVjaWZpY2F0aW9uIHRoYXQgSSdtIHRlbXB0ZWQKdG8gaWdub3JlLiBJ
+IG9yaWdpbmFsbHkgaGFkIFBWX0ZFQVRVUkVTIChvbmx5KSBpbiB0aGUgc3dpdGNoIGluIHRoaXMK
+cGF0Y2guIEhvd2V2ZXIgdGhlIHNwZWNpZmljYXRpb24gc3RhdGVzOgoKICBJZiBQVl9mdW5jX2lk
+IGlkZW50aWZpZXMgIFBWX0ZFQVRVUkVTIHRoaXMgZnVuY3Rpb24gY2FuIHJldHVybjoKICDigKIg
+Tk9UX1NVUFBPUlRFRCAoLTEpIHRvIGluZGljYXRlIHRoYXQgYWxsIGZ1bmN0aW9ucyBpbiB0aGlz
+CiAgICBzcGVjaWZpY2F0aW9uIGFyZSBub3Qgc3VwcG9ydGVkLgogIOKAoiBTVUNDRVNTICgwKSB0
+byBpbmRpY2F0ZSB0aGF0IG9uZSBvciBtb3JlCiAgICBwYXJhdmlydHVhbGl6YXRpb24gZnVuY3Rp
+b25zIGFyZSBzdXBwb3J0ZWQuCgpTaW5jZSBieSB0aGlzIHBhdGNoIHdlIGhhdmVuJ3QgcmVhY2hl
+ZCAib25lIG9yIG1vcmUiIGZ1bmN0aW9ucyBhIHN0cmljdApyZWFkaW5nIG9mIHRoZSBzcGVjaWZp
+Y2F0aW9uIHNheXMgdGhhdCBldmVuIFBWX0ZFQVRVUkVTIHNob3VsZCBiZQpyZXR1cm5pbmcgTk9U
+X1NVUFBPUlRFRC4KCj4gSWYgeW91IGxlYXZlIHRoaXMgcGFydCBvdXQgb2YgdGhlIHBhdGNoLCBh
+bmQgYWRkIGl0IGFzIHJlcXVpcmVkLCB0aGlzCj4gcGF0Y2ggaXMgcHVyZWx5IGFkZGluZyBkZWZp
+bml0aW9ucywgd2hpY2ggd291bGQgYmUgYSBiaXQgbmljZXIgZm9yCj4gcmV2aWV3LgoKQmVmb3Jl
+IGdldHRpbmcgbG9zdCBpbiB0aGUgYWJvdmUgd29yZGluZyB0aGUgc3BlY2lmaWNhdGlvbiBJIGhh
+ZCB0cmllZAp0byBtYWtlIHRoZSBMUFQgYW5kIHN0b2xlbiB0aW1lIHBhdGNoZXMgbm90IGRlcGVu
+ZGVudCBvbiBlYWNoIG90aGVyLgpHaXZlbiB5b3VyIG90aGVyIGNvbW1lbnRzIChpbiByZXBseSB0
+byB0aGUgY292ZXIgbGV0dGVyKSwgSSB0aGluayBJJ2xsCm1lcmdlIHRoaXMgY2h1bmsgd2l0aCB0
+aGUgZmlyc3Qgc3RvbGVuIHRpbWUgcGF0Y2ggYW5kIHB1dCBhbGwgdGhlIHN0b2xlbgp0aW1lIHBh
+dGNoZXMgZmlyc3QuCgpUaGFua3MsCgpTdGV2ZQoKPiBUaGFua3MsCj4gTWFyay4KPiBfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IGt2bWFybSBtYWlsaW5n
+IGxpc3QKPiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cj4gaHR0cHM6Ly9saXN0cy5jcy5j
+b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0KPiAKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
