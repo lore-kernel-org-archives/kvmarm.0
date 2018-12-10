@@ -1,21 +1,23 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v6 0/4] arm64: Support perf event modifiers :G and :H
-Date: Mon, 10 Dec 2018 09:45:55 +0000
-Message-ID: <1544435159-54781-1-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v6 1/4] arm64: arm_pmu: remove unnecessary isb instruction
+Date: Mon, 10 Dec 2018 09:45:56 +0000
+Message-ID: <1544435159-54781-2-git-send-email-andrew.murray@arm.com>
+References: <1544435159-54781-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A1B4A211
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F4B44A348
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WHLmuWQzFZ-T for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 04:46:19 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 595654A1DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:19 -0500 (EST)
+ with ESMTP id nXO4Na0Dj5pG for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 04:46:21 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 933904A32B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 04:46:21 -0500 (EST)
+In-Reply-To: <1544435159-54781-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,59 +31,34 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patchset provides support for perf event modifiers :G and :H which
-allows for filtering of PMU events between host and guests when used
-with KVM.
+The armv8pmu_enable_event_counter function issues an isb instruction
+after enabling a pair of counters - this doesn't provide any value
+and is inconsistent with the armv8pmu_disable_event_counter.
 
-As the underlying hardware cannot distinguish between guest and host
-context, the performance counters must be stopped and started upon
-entry/exit to the guest. This is performed at EL2 in a way that
-minimizes overhead and improves accuracy of recording events that only
-occur in the requested context.
+In any case armv8pmu_enable_event_counter is always called with the
+PMU stopped. Starting the PMU with armv8pmu_start results in an isb
+instruction being issued prior to writing to PMCR_EL0.
 
-This has been tested with VHE and non-VHE kernels with a KVM guest.
+Let's remove the unnecessary isb instruction.
 
-Changes from v5:
+Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+---
+ arch/arm64/kernel/perf_event.c | 1 -
+ 1 file changed, 1 deletion(-)
 
- - Tweak logic in use of kvm_set_pmu_events
-
-Changes from v4:
-
- - Prevent unnecessary write_sysreg calls by improving
-   __pmu_switch_to_xxx logic.
-
-Changes from v3:
-
- - Remove confusing _only suffix from bitfields in kvm_cpu_context
- - Remove unnecessary condition when clearing event bits in disable
- - Simplify API of KVM accessors
- - Prevent unnecessary setting of pmcnten when guest/host events are
-   the same.
-
-Changes from v2:
-
- - Ensured that exclude_kernel works for guest
- - Removed unnecessary exclusion of EL2 with exclude_host on !VHE
- - Renamed kvm_clr_set_host_pmu_events to reflect args order
- - Added additional information to isb patch
-
-Changes from v1:
-
- - Removed unnecessary exclusion of EL1 with exclude_guest on VHE
- - Removed unnecessary isb from existing perf_event.c driver
- - Folded perf_event.c patches together
- - Added additional information to last patch commit message
-
-Andrew Murray (4):
-  arm64: arm_pmu: remove unnecessary isb instruction
-  arm64: KVM: add accessors to track guest/host only counters
-  arm64: arm_pmu: Add support for exclude_host/exclude_guest attributes
-  arm64: KVM: Enable support for :G/:H perf event modifiers
-
- arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++
- arch/arm64/kernel/perf_event.c    | 52 +++++++++++++++++++++++++++++++++------
- arch/arm64/kvm/hyp/switch.c       | 38 ++++++++++++++++++++++++++++
- 3 files changed, 106 insertions(+), 8 deletions(-)
-
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index 8e38d52..de564ae 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -652,7 +652,6 @@ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+ 	armv8pmu_enable_counter(idx);
+ 	if (armv8pmu_event_is_chained(event))
+ 		armv8pmu_enable_counter(idx - 1);
+-	isb();
+ }
+ 
+ static inline int armv8pmu_disable_counter(int idx)
 -- 
 2.7.4
