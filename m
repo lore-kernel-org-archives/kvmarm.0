@@ -1,143 +1,52 @@
-From: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH 05/12] KVM: arm64: Implement PV_FEATURES call
-Date: Mon, 10 Dec 2018 14:20:09 +0000
-Message-ID: <570e1234-bbed-d0cf-1bf0-3d95747fecb9@arm.com>
-References: <20181128144527.44710-1-steven.price@arm.com>
- <20181128144527.44710-6-steven.price@arm.com>
- <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v6 08/13] arm64: expose user PAC bit positions via ptrace
+Date: Mon, 10 Dec 2018 08:22:06 -0600
+Message-ID: <ba48e082-3e47-43bc-77d1-97d741c59284@linaro.org>
+References: <20181207183931.4285-1-kristina.martsenko@arm.com>
+ <20181207183931.4285-9-kristina.martsenko@arm.com>
+ <a31ca10a-ee1a-71fb-2c3d-a6184e12b543@linaro.org>
+ <20181210120330.GB4048@arrakis.emea.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0471B4A214
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 09:20:15 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aiiFmui5ygS3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 09:20:12 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D8A44A1FA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 09:20:12 -0500 (EST)
-In-Reply-To: <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181210120330.GB4048@arrakis.emea.arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Andrew Jones <drjones@redhat.com>, Jacob Bramley <jacob.bramley@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Adam Wallis <awallis@codeaurora.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Cyrill Gorcunov <gorcunov@gmail.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <amit.kachhap@arm.com>, Dave P Martin <dave.martin@arm.com>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, Steve Capper <Steve.Capper@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTAvMTIvMjAxOCAxMDozOSwgTWFyayBSdXRsYW5kIHdyb3RlOgo+IE9uIFdlZCwgTm92IDI4
-LCAyMDE4IGF0IDAyOjQ1OjIwUE0gKzAwMDAsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4gVGhpcyBw
-cm92aWRlcyBhIG1lY2hhbmlzbSBmb3IgcXVlcnlpbmcgd2hpY2ggcGFyYXZpcnR1YWxpemVkIGZl
-YXR1cmVzCj4+IGFyZSBhdmFpbGFibGUgaW4gdGhpcyBoeXBlcnZpc29yLgo+Pgo+PiBBbHNvIGFk
-ZCB0aGUgaGVhZGVyIGZpbGUgd2hpY2ggZGVmaW5lcyB0aGUgQUJJIGZvciB0aGUgcGFyYXZpcnR1
-YWxpemVkCj4+IGNsb2NrIGZlYXR1cmVzIHdlJ3JlIGFib3V0IHRvIGFkZC4KPj4KPj4gU2lnbmVk
-LW9mZi1ieTogU3RldmVuIFByaWNlIDxzdGV2ZW4ucHJpY2VAYXJtLmNvbT4KPj4gLS0tCj4+ICBh
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL3B2Y2xvY2stYWJpLmggfCAzMiArKysrKysrKysrKysrKysr
-KysrKysrKysrKysrCj4+ICBpbmNsdWRlL2t2bS9hcm1fcHYuaCAgICAgICAgICAgICAgICAgfCAy
-OCArKysrKysrKysrKysrKysrKysrKysrKysKPj4gIGluY2x1ZGUvbGludXgvYXJtLXNtY2NjLmgg
-ICAgICAgICAgICB8ICAxICsKPj4gIHZpcnQva3ZtL2FybS9oeXBlcmNhbGxzLmMgICAgICAgICAg
-ICB8ICA5ICsrKysrKysrCj4+ICA0IGZpbGVzIGNoYW5nZWQsIDcwIGluc2VydGlvbnMoKykKPj4g
-IGNyZWF0ZSBtb2RlIDEwMDY0NCBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3B2Y2xvY2stYWJpLmgK
-Pj4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2t2bS9hcm1fcHYuaAo+Pgo+PiBkaWZmIC0t
-Z2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oIGIvYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4+IGluZGV4
-IDAwMDAwMDAwMDAwMC4uNjRjZTA0MWM4OTIyCj4+IC0tLSAvZGV2L251bGwKPj4gKysrIGIvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9wdmNsb2NrLWFiaS5oCj4+IEBAIC0wLDAgKzEsMzIgQEAKPj4g
-Ky8qIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wICovCj4+ICsvKiBDb3B5cmlnaHQg
-KEMpIDIwMTggQXJtIEx0ZC4gKi8KPj4gKwo+PiArI2lmbmRlZiBfX0FTTV9QVkNMT0NLX0FCSV9I
-Cj4+ICsjZGVmaW5lIF9fQVNNX1BWQ0xPQ0tfQUJJX0gKPj4gKwo+PiArI2luY2x1ZGUgPGt2bS9h
-cm1fcHYuaD4KPj4gKwo+PiArc3RydWN0IHB2Y2xvY2tfdm1fdGltZV9pbmZvIHsKPj4gKwlfX2xl
-MzIgcmV2aXNpb247Cj4+ICsJX19sZTMyIGF0dHJpYnV0ZXM7Cj4+ICsJX19sZTY0IHNlcXVlbmNl
-X251bWJlcjsKPj4gKwlfX2xlNjQgc2NhbGVfbXVsdDsKPj4gKwlfX2xlMzIgc2hpZnQ7Cj4+ICsJ
-X19sZTMyIHJlc2VydmVkOwo+PiArCV9fbGU2NCBuYXRpdmVfZnJlcTsKPj4gKwlfX2xlNjQgcHZf
-ZnJlcTsKPj4gKwlfX2xlNjQgZGl2X2J5X3B2X2ZyZXFfbXVsdDsKPj4gK30gX19wYWNrZWQ7Cj4+
-ICsKPj4gK3N0cnVjdCBwdmNsb2NrX3ZjcHVfc3RvbGVuX3RpbWVfaW5mbyB7Cj4+ICsJX19sZTMy
-IHJldmlzaW9uOwo+PiArCV9fbGUzMiBhdHRyaWJ1dGVzOwo+PiArCV9fbGU2NCBzdG9sZW5fdGlt
-ZTsKPj4gKwkvKiBTdHJ1Y3R1cmUgbXVzdCBiZSA2NCBieXRlIGFsaWduZWQsIHBhZCB0byB0aGF0
-IHNpemUgKi8KPj4gKwl1OCBwYWRkaW5nWzQ4XTsKPj4gK30gX19wYWNrZWQ7Cj4+ICsKPj4gKyNk
-ZWZpbmUgUFZfVk1fVElNRV9OT1RfU1VQUE9SVEVECS0xCj4+ICsjZGVmaW5lIFBWX1ZNX1RJTUVf
-SU5WQUxJRF9QQVJBTUVURVJTCS0yCj4gCj4gQ291bGQgeW91IHBsZWFzZSBhZGQgYSBjb21tZW50
-IGRlc2NyaWJpbmcgdGhhdCB0aGVzZSBhcmUgZGVmaW5lZCBpbiBBUk0KPiBERU4wMDU3QT8KCk5v
-IHByb2JsZW0uCgo+PiArCj4+ICsjZW5kaWYKPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUva3ZtL2Fy
-bV9wdi5oIGIvaW5jbHVkZS9rdm0vYXJtX3B2LmgKPj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQKPj4g
-aW5kZXggMDAwMDAwMDAwMDAwLi4xOWQyZGFmZmYzMWEKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysg
-Yi9pbmNsdWRlL2t2bS9hcm1fcHYuaAo+PiBAQCAtMCwwICsxLDI4IEBACj4+ICsvKiBTUERYLUxp
-Y2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+PiArICogQ29weXJpZ2h0IChDKSAyMDE4IEFybSBM
-dGQuCj4+ICsgKi8KPj4gKwo+PiArI2lmbmRlZiBfX0tWTV9BUk1fUFZfSAo+PiArI2RlZmluZSBf
-X0tWTV9BUk1fUFZfSAo+PiArCj4+ICsjaW5jbHVkZSA8bGludXgvYXJtLXNtY2NjLmg+Cj4+ICsK
-Pj4gKyNkZWZpbmUgQVJNX1NNQ0NDX0hWX1BWX0ZFQVRVUkVTCQkJCQlcCj4+ICsJQVJNX1NNQ0ND
-X0NBTExfVkFMKEFSTV9TTUNDQ19GQVNUX0NBTEwsCQkJXAo+PiArCQkJICAgQVJNX1NNQ0NDX1NN
-Q182NCwJCQlcCj4+ICsJCQkgICBBUk1fU01DQ0NfT1dORVJfSFlQX1NUQU5EQVJELAlcCj4+ICsJ
-CQkgICAweDIwKQo+PiArCj4+ICsjZGVmaW5lIEFSTV9TTUNDQ19IVl9QVl9USU1FX0xQVAkJCQkJ
-XAo+PiArCUFSTV9TTUNDQ19DQUxMX1ZBTChBUk1fU01DQ0NfRkFTVF9DQUxMLAkJCVwKPj4gKwkJ
-CSAgIEFSTV9TTUNDQ19TTUNfNjQsCQkJXAo+PiArCQkJICAgQVJNX1NNQ0NDX09XTkVSX0hZUF9T
-VEFOREFSRCwJXAo+PiArCQkJICAgMHgyMSkKPj4gKwo+PiArI2RlZmluZSBBUk1fU01DQ0NfSFZf
-UFZfVElNRV9TVAkJCQkJXAo+PiArCUFSTV9TTUNDQ19DQUxMX1ZBTChBUk1fU01DQ0NfRkFTVF9D
-QUxMLAkJCVwKPj4gKwkJCSAgIEFSTV9TTUNDQ19TTUNfNjQsCQkJXAo+PiArCQkJICAgQVJNX1NN
-Q0NDX09XTkVSX0hZUF9TVEFOREFSRCwJXAo+PiArCQkJICAgMHgyMikKPj4gKwo+PiArI2VuZGlm
-IC8qIF9fS1ZNX0FSTV9QVl9IICovCj4gCj4gRG8gdGhlc2UgbmVlZCB0byBsaXZlIGluIGEgc2Vw
-YXJhdGUgaGVhZGVyLCBhd2F5IGZyb20gdGhlIHN0cnVjdAo+IGRlZmluaXRpb25zPwo+IAo+IEkn
-ZCBiZSBoYXBweSBmb3IgdGhlc2UgdG8gbGl2ZSBpbiA8bGludXgvYXJtLXNtY2NjLmg+LCBnaXZl
-biB0aGV5J3JlCj4gc3RhbmRhcmQgY2FsbHMuCgpJJ2xsIG1vdmUgdGhlbSB0byBsaW51eC9hcm0t
-c21jY2MuaCAtIEkgZGlkbid0IHdhbnQgdG8gcGxhY2UgdGhlbSBpbgpwdmNsb2NrLWFiaS5oIGFz
-IGl0IHNlZW1lZCB3cm9uZyB0byBwdWxsIHRoYXQgaW50byB0aGUgZ2VuZXJpYyBTTUNDQwpjb2Rl
-IHdoaWNoIGRvZXNuJ3QgY2FyZSBhYm91dCB0aGVzZSBzdHJ1Y3R1cmVzLgoKPiBBcyBiZWZvcmUs
-IGEgY29tbWVudCByZWZlcnJpbmcgdG8gQVJNIERFTjAwNTdBIHdvdWxkIGJlIG5pY2UuCgpXaWxs
-IGFkZAoKPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYXJtLXNtY2NjLmggYi9pbmNsdWRl
-L2xpbnV4L2FybS1zbWNjYy5oCj4+IGluZGV4IGIwNDcwMDllN2EwYS4uNGUwODY2Y2M0OGMwIDEw
-MDY0NAo+PiAtLS0gYS9pbmNsdWRlL2xpbnV4L2FybS1zbWNjYy5oCj4+ICsrKyBiL2luY2x1ZGUv
-bGludXgvYXJtLXNtY2NjLmgKPj4gQEAgLTU0LDYgKzU0LDcgQEAKPj4gICNkZWZpbmUgQVJNX1NN
-Q0NDX09XTkVSX1NJUAkJMgo+PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfT0VNCQkzCj4+ICAj
-ZGVmaW5lIEFSTV9TTUNDQ19PV05FUl9TVEFOREFSRAk0Cj4+ICsjZGVmaW5lIEFSTV9TTUNDQ19P
-V05FUl9IWVBfU1RBTkRBUkQJNQo+IAo+IE1pbm9yIG5pdCwgYnV0IGNvdWxkIHdlIG1ha2UgdGhh
-dCBTVEFOREFSRF9IWVA/CgpTdXJlCgo+PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfVFJVU1RF
-RF9BUFAJNDgKPj4gICNkZWZpbmUgQVJNX1NNQ0NDX09XTkVSX1RSVVNURURfQVBQX0VORAk0OQo+
-PiAgI2RlZmluZSBBUk1fU01DQ0NfT1dORVJfVFJVU1RFRF9PUwk1MAo+PiBkaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL2h5cGVyY2FsbHMuYyBiL3ZpcnQva3ZtL2FybS9oeXBlcmNhbGxzLmMKPj4g
-aW5kZXggMTUzYWE3NjQyMTAwLi5iYTEzYjc5OGYwZjggMTAwNjQ0Cj4+IC0tLSBhL3ZpcnQva3Zt
-L2FybS9oeXBlcmNhbGxzLmMKPj4gKysrIGIvdmlydC9rdm0vYXJtL2h5cGVyY2FsbHMuYwo+PiBA
-QCAtNSw2ICs1LDcgQEAKPj4gICNpbmNsdWRlIDxsaW51eC9rdm1faG9zdC5oPgo+PiAgCj4+ICAj
-aW5jbHVkZSA8YXNtL2t2bV9lbXVsYXRlLmg+Cj4+ICsjaW5jbHVkZSA8YXNtL3B2Y2xvY2stYWJp
-Lmg+Cj4+ICAKPj4gICNpbmNsdWRlIDxrdm0vYXJtX2h5cGVyY2FsbHMuaD4KPj4gICNpbmNsdWRl
-IDxrdm0vYXJtX3BzY2kuaD4KPj4gQEAgLTQwLDYgKzQxLDE0IEBAIGludCBrdm1faHZjX2NhbGxf
-aGFuZGxlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICAJCQkJYnJlYWs7Cj4+ICAJCQl9Cj4+
-ICAJCQlicmVhazsKPj4gKwkJY2FzZSBBUk1fU01DQ0NfSFZfUFZfRkVBVFVSRVM6Cj4+ICsJCQl2
-YWwgPSBTTUNDQ19SRVRfU1VDQ0VTUzsKPj4gKwkJCWJyZWFrOwo+PiArCQl9Cj4+ICsJCWJyZWFr
-Owo+PiArCWNhc2UgQVJNX1NNQ0NDX0hWX1BWX0ZFQVRVUkVTOgo+PiArCQlmZWF0dXJlID0gc21j
-Y2NfZ2V0X2FyZzEodmNwdSk7Cj4+ICsJCXN3aXRjaCAoZmVhdHVyZSkgewo+PiAgCQl9Cj4gCj4g
-SUlVQywgYXQgdGhpcyBwb2ludCBpbiB0aW1lLCB0aGlzIGhhcHBlbnMgdG8gYWx3YXlzIHJldHVy
-bgo+IFNNQ0NDX1JFVF9OT1RfU1VQUE9SVEVELgoKWWVzLCB0aGlzIGlzIGJlY2F1c2Ugb24gYW4g
-b2RkaXR5IGluIHRoZSBzcGVjaWZpY2F0aW9uIHRoYXQgSSdtIHRlbXB0ZWQKdG8gaWdub3JlLiBJ
-IG9yaWdpbmFsbHkgaGFkIFBWX0ZFQVRVUkVTIChvbmx5KSBpbiB0aGUgc3dpdGNoIGluIHRoaXMK
-cGF0Y2guIEhvd2V2ZXIgdGhlIHNwZWNpZmljYXRpb24gc3RhdGVzOgoKICBJZiBQVl9mdW5jX2lk
-IGlkZW50aWZpZXMgIFBWX0ZFQVRVUkVTIHRoaXMgZnVuY3Rpb24gY2FuIHJldHVybjoKICDigKIg
-Tk9UX1NVUFBPUlRFRCAoLTEpIHRvIGluZGljYXRlIHRoYXQgYWxsIGZ1bmN0aW9ucyBpbiB0aGlz
-CiAgICBzcGVjaWZpY2F0aW9uIGFyZSBub3Qgc3VwcG9ydGVkLgogIOKAoiBTVUNDRVNTICgwKSB0
-byBpbmRpY2F0ZSB0aGF0IG9uZSBvciBtb3JlCiAgICBwYXJhdmlydHVhbGl6YXRpb24gZnVuY3Rp
-b25zIGFyZSBzdXBwb3J0ZWQuCgpTaW5jZSBieSB0aGlzIHBhdGNoIHdlIGhhdmVuJ3QgcmVhY2hl
-ZCAib25lIG9yIG1vcmUiIGZ1bmN0aW9ucyBhIHN0cmljdApyZWFkaW5nIG9mIHRoZSBzcGVjaWZp
-Y2F0aW9uIHNheXMgdGhhdCBldmVuIFBWX0ZFQVRVUkVTIHNob3VsZCBiZQpyZXR1cm5pbmcgTk9U
-X1NVUFBPUlRFRC4KCj4gSWYgeW91IGxlYXZlIHRoaXMgcGFydCBvdXQgb2YgdGhlIHBhdGNoLCBh
-bmQgYWRkIGl0IGFzIHJlcXVpcmVkLCB0aGlzCj4gcGF0Y2ggaXMgcHVyZWx5IGFkZGluZyBkZWZp
-bml0aW9ucywgd2hpY2ggd291bGQgYmUgYSBiaXQgbmljZXIgZm9yCj4gcmV2aWV3LgoKQmVmb3Jl
-IGdldHRpbmcgbG9zdCBpbiB0aGUgYWJvdmUgd29yZGluZyB0aGUgc3BlY2lmaWNhdGlvbiBJIGhh
-ZCB0cmllZAp0byBtYWtlIHRoZSBMUFQgYW5kIHN0b2xlbiB0aW1lIHBhdGNoZXMgbm90IGRlcGVu
-ZGVudCBvbiBlYWNoIG90aGVyLgpHaXZlbiB5b3VyIG90aGVyIGNvbW1lbnRzIChpbiByZXBseSB0
-byB0aGUgY292ZXIgbGV0dGVyKSwgSSB0aGluayBJJ2xsCm1lcmdlIHRoaXMgY2h1bmsgd2l0aCB0
-aGUgZmlyc3Qgc3RvbGVuIHRpbWUgcGF0Y2ggYW5kIHB1dCBhbGwgdGhlIHN0b2xlbgp0aW1lIHBh
-dGNoZXMgZmlyc3QuCgpUaGFua3MsCgpTdGV2ZQoKPiBUaGFua3MsCj4gTWFyay4KPiBfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IGt2bWFybSBtYWlsaW5n
-IGxpc3QKPiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cj4gaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0KPiAKCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
-QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
-bWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 12/10/18 6:03 AM, Catalin Marinas wrote:
+>> However, it won't be too long before someone implements support for
+>> ARMv8.2-LVA, at which point, without changes to mandatory pointer tagging, we
+>> will only have 3 authentication bits: [54:52].  This seems useless and easily
+>> brute-force-able.
+> 
+> Such support is already here (about to be queued):
+> 
+> https://lore.kernel.org/linux-arm-kernel/20181206225042.11548-1-steve.capper@arm.com/
+
+Thanks for the pointer.
+
+>> Unfortunately, there is no obvious path to making this optional that does not
+>> break compatibility with Documentation/arm64/tagged-pointers.txt.
+> 
+> There is also the ARMv8.5 MTE (memory tagging) which relies on tagged
+> pointers.
+
+So it does.  I hadn't read through that extension completely before.
+
+> An alternative would be to allow the opt-in to 52-bit VA, leaving it at
+> 48-bit by default. However, it has the problem of changing the PAC size
+> and not being able to return.
+
+Perhaps the opt-in should be at exec time, with ELF flags (or equivalent) on
+the application.  Because, as you say, changing the shape of the PAC in the
+middle of execution is in general not possible.
+
+It isn't perfect, since old kernels won't fail to exec an application setting
+flags that can't be supported.  And it requires tooling changes.
+
+
+r~
