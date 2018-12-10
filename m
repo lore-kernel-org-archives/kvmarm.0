@@ -1,25 +1,27 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 05/12] KVM: arm64: Implement PV_FEATURES call
-Date: Mon, 10 Dec 2018 10:39:44 +0000
-Message-ID: <20181210103943.g5txylpjvfxdolpi@lakrids.cambridge.arm.com>
-References: <20181128144527.44710-1-steven.price@arm.com>
- <20181128144527.44710-6-steven.price@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 7/8] arm64: KVM: Handle ARM erratum 1165522 in TLB
+ invalidation
+Date: Mon, 10 Dec 2018 10:46:16 +0000
+Message-ID: <50e6a07d-868b-db43-fd4e-4b6359a5128e@arm.com>
+References: <20181206173126.139877-1-marc.zyngier@arm.com>
+ <20181206173126.139877-8-marc.zyngier@arm.com>
+ <20181210101912.GK30263@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB09B4A2BD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:39:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A4184A319
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:46:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7fxjjY9pRjSz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 05:39:48 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DB244A2BB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:39:48 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181128144527.44710-6-steven.price@arm.com>
+ with ESMTP id bEW3xomsbBLl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 05:46:22 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 588064A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:46:22 -0500 (EST)
+In-Reply-To: <20181210101912.GK30263@e113682-lin.lund.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,160 +31,124 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steven Price <steven.price@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 28, 2018 at 02:45:20PM +0000, Steven Price wrote:
-> This provides a mechanism for querying which paravirtualized features
-> are available in this hypervisor.
+On 10/12/2018 10:19, Christoffer Dall wrote:
+> On Thu, Dec 06, 2018 at 05:31:25PM +0000, Marc Zyngier wrote:
+>> In order to avoid TLB corruption whilst invalidating TLBs on CPUs
+>> affected by erratum 1165522, we need to prevent S1 page tables
+>> from being usable.
+>>
+>> For this, we set the EL1 S1 MMU on, and also disable the page table
+>> walker (by setting the TCR_EL1.EPD* bits to 1).
+>>
+>> This ensures that once we switch to the EL1/EL0 translation regime,
+>> speculated AT instructions won't be able to parse the page tables.
+>>
+>> Reviewed-by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/kvm/hyp/tlb.c | 66 +++++++++++++++++++++++++++++++---------
+>>  1 file changed, 51 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+>> index 7fcc9c1a5f45..ec157543d5a9 100644
+>> --- a/arch/arm64/kvm/hyp/tlb.c
+>> +++ b/arch/arm64/kvm/hyp/tlb.c
+>> @@ -21,12 +21,36 @@
+>>  #include <asm/kvm_mmu.h>
+>>  #include <asm/tlbflush.h>
+>>  
+>> +struct tlb_inv_context {
+>> +	unsigned long	flags;
+>> +	u64		tcr;
+>> +	u64		sctlr;
+>> +};
+>> +
+>>  static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+>> -						 unsigned long *flags)
+>> +						 struct tlb_inv_context *cxt)
+>>  {
+>>  	u64 val;
+>>  
+>> -	local_irq_save(*flags);
+>> +	local_irq_save(cxt->flags);
+>> +
+>> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1165522)) {
+>> +		/*
+>> +		 * For CPUs that are affected by ARM erratum 1165522, we
+>> +		 * cannot trust stage-1 to be in a correct state at that
+>> +		 * point. Since we do not want to force a full load of the
+>> +		 * vcpu state, we prevent the EL1 page-table walker to
+>> +		 * allocate new TLBs. This is done by setting the EPD bits
+>> +		 * in the TCR_EL1 register. We also need to prevent it to
+>> +		 * allocate IPA->PA walks, so we enable the S1 MMU...
+>> +		 */
+>> +		val = cxt->tcr = read_sysreg_el1(tcr);
+>> +		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
+>> +		write_sysreg_el1(val, tcr);
+>> +		val = cxt->sctlr = read_sysreg_el1(sctlr);
+>> +		val |= SCTLR_ELx_M;
+>> +		write_sysreg_el1(val, sctlr);
+>> +	}
+>>  
+>>  	/*
+>>  	 * With VHE enabled, we have HCR_EL2.{E2H,TGE} = {1,1}, and
+>> @@ -34,6 +58,11 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+>>  	 * guest TLBs (EL1/EL0), we need to change one of these two
+>>  	 * bits. Changing E2H is impossible (goodbye TTBR1_EL2), so
+>>  	 * let's flip TGE before executing the TLB operation.
+>> +	 *
+>> +	 * ARM erratum 1165522 requires some special handling (again),
+>> +	 * as we need to make sure both stages of translation are in
+>> +	 * place before clearing TGE. __load_guest_stage2() already
+>> +	 * has an ISB in order to deal with this.
+>>  	 */
+>>  	__load_guest_stage2(kvm);
+>>  	val = read_sysreg(hcr_el2);
+>> @@ -43,7 +72,7 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+>>  }
+>>  
+>>  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+>> -						  unsigned long *flags)
+>> +						  struct tlb_inv_context *cxt)
+>>  {
+>>  	__load_guest_stage2(kvm);
+>>  	isb();
+>> @@ -55,7 +84,7 @@ static hyp_alternate_select(__tlb_switch_to_guest,
+>>  			    ARM64_HAS_VIRT_HOST_EXTN);
+>>  
+>>  static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
+>> -						unsigned long flags)
+>> +						struct tlb_inv_context *cxt)
+>>  {
+>>  	/*
+>>  	 * We're done with the TLB operation, let's restore the host's
+>> @@ -64,11 +93,18 @@ static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
+>>  	write_sysreg(0, vttbr_el2);
+>>  	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+>>  	isb();
+>> -	local_irq_restore(flags);
+>> +
+>> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1165522)) {
+>> +		/* Restore the guest's registers to what they were */
 > 
-> Also add the header file which defines the ABI for the paravirtualized
-> clock features we're about to add.
+> host's ?
+
+Hum... Yes, silly thinko.
+
+[...]
+
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/pvclock-abi.h | 32 ++++++++++++++++++++++++++++
->  include/kvm/arm_pv.h                 | 28 ++++++++++++++++++++++++
->  include/linux/arm-smccc.h            |  1 +
->  virt/kvm/arm/hypercalls.c            |  9 ++++++++
->  4 files changed, 70 insertions(+)
->  create mode 100644 arch/arm64/include/asm/pvclock-abi.h
->  create mode 100644 include/kvm/arm_pv.h
+> Otherwise:
 > 
-> diff --git a/arch/arm64/include/asm/pvclock-abi.h b/arch/arm64/include/asm/pvclock-abi.h
-> new file mode 100644
-> index 000000000000..64ce041c8922
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/pvclock-abi.h
-> @@ -0,0 +1,32 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (C) 2018 Arm Ltd. */
-> +
-> +#ifndef __ASM_PVCLOCK_ABI_H
-> +#define __ASM_PVCLOCK_ABI_H
-> +
-> +#include <kvm/arm_pv.h>
-> +
-> +struct pvclock_vm_time_info {
-> +	__le32 revision;
-> +	__le32 attributes;
-> +	__le64 sequence_number;
-> +	__le64 scale_mult;
-> +	__le32 shift;
-> +	__le32 reserved;
-> +	__le64 native_freq;
-> +	__le64 pv_freq;
-> +	__le64 div_by_pv_freq_mult;
-> +} __packed;
-> +
-> +struct pvclock_vcpu_stolen_time_info {
-> +	__le32 revision;
-> +	__le32 attributes;
-> +	__le64 stolen_time;
-> +	/* Structure must be 64 byte aligned, pad to that size */
-> +	u8 padding[48];
-> +} __packed;
-> +
-> +#define PV_VM_TIME_NOT_SUPPORTED	-1
-> +#define PV_VM_TIME_INVALID_PARAMETERS	-2
-
-Could you please add a comment describing that these are defined in ARM
-DEN0057A?
-
-> +
-> +#endif
-> diff --git a/include/kvm/arm_pv.h b/include/kvm/arm_pv.h
-> new file mode 100644
-> index 000000000000..19d2dafff31a
-> --- /dev/null
-> +++ b/include/kvm/arm_pv.h
-> @@ -0,0 +1,28 @@
-> +/* SPDX-License-Identifier: GPL-2.0
-> + * Copyright (C) 2018 Arm Ltd.
-> + */
-> +
-> +#ifndef __KVM_ARM_PV_H
-> +#define __KVM_ARM_PV_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#define ARM_SMCCC_HV_PV_FEATURES					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
-> +			   0x20)
-> +
-> +#define ARM_SMCCC_HV_PV_TIME_LPT					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
-> +			   0x21)
-> +
-> +#define ARM_SMCCC_HV_PV_TIME_ST					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_HYP_STANDARD,	\
-> +			   0x22)
-> +
-> +#endif /* __KVM_ARM_PV_H */
-
-Do these need to live in a separate header, away from the struct
-definitions?
-
-I'd be happy for these to live in <linux/arm-smccc.h>, given they're
-standard calls.
-
-As before, a comment referring to ARM DEN0057A would be nice.
-
-
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index b047009e7a0a..4e0866cc48c0 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -54,6 +54,7 @@
->  #define ARM_SMCCC_OWNER_SIP		2
->  #define ARM_SMCCC_OWNER_OEM		3
->  #define ARM_SMCCC_OWNER_STANDARD	4
-> +#define ARM_SMCCC_OWNER_HYP_STANDARD	5
-
-Minor nit, but could we make that STANDARD_HYP?
-
->  #define ARM_SMCCC_OWNER_TRUSTED_APP	48
->  #define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
->  #define ARM_SMCCC_OWNER_TRUSTED_OS	50
-> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> index 153aa7642100..ba13b798f0f8 100644
-> --- a/virt/kvm/arm/hypercalls.c
-> +++ b/virt/kvm/arm/hypercalls.c
-> @@ -5,6 +5,7 @@
->  #include <linux/kvm_host.h>
->  
->  #include <asm/kvm_emulate.h>
-> +#include <asm/pvclock-abi.h>
->  
->  #include <kvm/arm_hypercalls.h>
->  #include <kvm/arm_psci.h>
-> @@ -40,6 +41,14 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  				break;
->  			}
->  			break;
-> +		case ARM_SMCCC_HV_PV_FEATURES:
-> +			val = SMCCC_RET_SUCCESS;
-> +			break;
-> +		}
-> +		break;
-> +	case ARM_SMCCC_HV_PV_FEATURES:
-> +		feature = smccc_get_arg1(vcpu);
-> +		switch (feature) {
->  		}
-
-IIUC, at this point in time, this happens to always return
-SMCCC_RET_NOT_SUPPORTED.
-
-If you leave this part out of the patch, and add it as required, this
-patch is purely adding definitions, which would be a bit nicer for
-review.
+> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+> 
 
 Thanks,
-Mark.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
