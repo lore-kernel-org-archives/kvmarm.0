@@ -1,44 +1,132 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v9 3/8] KVM: arm/arm64: Introduce helpers to manipulate
- page table entries
-Date: Mon, 10 Dec 2018 10:01:45 +0100
-Message-ID: <20181210090145.GE30263@e113682-lin.lund.arm.com>
+Subject: Re: [PATCH v9 5/8] KVM: arm64: Support PUD hugepage in
+ stage2_is_exec()
+Date: Mon, 10 Dec 2018 10:06:07 +0100
+Message-ID: <20181210090607.GF30263@e113682-lin.lund.arm.com>
 References: <20181031175745.18650-1-punit.agrawal@arm.com>
- <20181031175745.18650-4-punit.agrawal@arm.com>
- <396402d5-fddf-ab72-01c4-80dd1a0d4d44@arm.com>
+ <20181031175745.18650-6-punit.agrawal@arm.com>
+ <20181101133848.GL12057@e113682-lin.lund.arm.com>
+ <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <396402d5-fddf-ab72-01c4-80dd1a0d4d44@arm.com>
+In-Reply-To: <5fddc14d-f6b6-bb97-5f5d-8e1e05e5da95@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com, marc.zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, will.deacon@arm.com, linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>, punitagrawal@gmail.com, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Punit Agrawal <punit.agrawal@arm.com>, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, punitagrawal@gmail.com, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 07:20:08PM +0530, Anshuman Khandual wrote:
+On Wed, Dec 05, 2018 at 05:57:51PM +0000, Suzuki K Poulose wrote:
 > 
 > 
-> On 10/31/2018 11:27 PM, Punit Agrawal wrote:
-> > Introduce helpers to abstract architectural handling of the conversion
-> > of pfn to page table entries and marking a PMD page table entry as a
-> > block entry.
+> On 01/11/2018 13:38, Christoffer Dall wrote:
+> >On Wed, Oct 31, 2018 at 05:57:42PM +0000, Punit Agrawal wrote:
+> >>In preparation for creating PUD hugepages at stage 2, add support for
+> >>detecting execute permissions on PUD page table entries. Faults due to
+> >>lack of execute permissions on page table entries is used to perform
+> >>i-cache invalidation on first execute.
+> >>
+> >>Provide trivial implementations of arm32 helpers to allow sharing of
+> >>code.
+> >>
+> >>Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+> >>Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>Cc: Christoffer Dall <christoffer.dall@arm.com>
+> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>Cc: Russell King <linux@armlinux.org.uk>
+> >>Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >>Cc: Will Deacon <will.deacon@arm.com>
+> >>---
+> >>  arch/arm/include/asm/kvm_mmu.h         |  6 +++
+> >>  arch/arm64/include/asm/kvm_mmu.h       |  5 +++
+> >>  arch/arm64/include/asm/pgtable-hwdef.h |  2 +
+> >>  virt/kvm/arm/mmu.c                     | 53 +++++++++++++++++++++++---
+> >>  4 files changed, 61 insertions(+), 5 deletions(-)
+> >>
+> >>diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> >>index 37bf85d39607..839a619873d3 100644
+> >>--- a/arch/arm/include/asm/kvm_mmu.h
+> >>+++ b/arch/arm/include/asm/kvm_mmu.h
+> >>@@ -102,6 +102,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+> >>  	return false;
+> >>  }
+> >>+static inline bool kvm_s2pud_exec(pud_t *pud)
+> >>+{
+> >>+	BUG();
+> >
+> >nit: I think this should be WARN() now :)
+> >
+> >>+	return false;
+> >>+}
+> >>+
+> >>  static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+> >>  {
+> >>  	pte_val(pte) |= L_PTE_S2_RDWR;
+> >>diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> >>index 8da6d1b2a196..c755b37b3f92 100644
+> >>--- a/arch/arm64/include/asm/kvm_mmu.h
+> >>+++ b/arch/arm64/include/asm/kvm_mmu.h
+> >>@@ -261,6 +261,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+> >>  	return kvm_s2pte_readonly((pte_t *)pudp);
+> >>  }
+> >>+static inline bool kvm_s2pud_exec(pud_t *pudp)
+> >>+{
+> >>+	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
+> >>+}
+> >>+
+> >>  #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+> >>  #ifdef __PAGETABLE_PMD_FOLDED
+> >>diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> >>index 1d7d8da2ef9b..336e24cddc87 100644
+> >>--- a/arch/arm64/include/asm/pgtable-hwdef.h
+> >>+++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> >>@@ -193,6 +193,8 @@
+> >>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+> >>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+> >>+#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
+> >>+
+> >>  /*
+> >>   * Memory Attribute override for Stage-2 (MemAttr[3:0])
+> >>   */
+> >>diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> >>index 1c669c3c1208..8e44dccd1b47 100644
+> >>--- a/virt/kvm/arm/mmu.c
+> >>+++ b/virt/kvm/arm/mmu.c
+> >>@@ -1083,23 +1083,66 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+> >>  	return 0;
+> >>  }
+> >>-static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+> >>+/*
+> >>+ * stage2_get_leaf_entry - walk the stage2 VM page tables and return
+> >>+ * true if a valid and present leaf-entry is found. A pointer to the
+> >>+ * leaf-entry is returned in the appropriate level variable - pudpp,
+> >>+ * pmdpp, ptepp.
+> >>+ */
+> >>+static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
+> >>+				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
+> >
+> >Do we need this type madness or could this just return a u64 pointer
+> >(NULL if nothing is found) and pass that to kvm_s2pte_exec (because we
+> >know it's the same bit we need to check regardless of the pgtable level
+> >on both arm and arm64)?
+> >
+> >Or do we consider that bad for some reason?
 > 
-> Why is this necessary ? we would still need to access PMD, PUD as is
-> without any conversion. IOW KVM knows the breakdown of the page table
-> at various levels. Is this something required from generic KVM code ?
->   
-> > 
-> > The helpers are introduced in preparation for supporting PUD hugepages
-> > at stage 2 - which are supported on arm64 but do not exist on arm.
+> Practically, yes the bit positions are same and thus we should be able
+> to do this assuming that it is just a pte. When we get to independent stage2
+> pgtable implementation which treats all page table entries as a single type
+> with a level information, we should be able to get rid of these.
+> But since we have followed the Linux way of page-table manipulation where we
+> have "level" specific accessors. The other option is open code the walking
+> sequence from the pgd to the leaf entry everywhere.
 > 
-> Some of these patches (including the earlier two) are good on it's
-> own. Do we have still mention in commit message about the incoming PUD
-> enablement as the reason for these cleanup patches ?
+> I am fine with changing this code, if you like.
 > 
 
-Does it hurt?  What is your concern here?
-
+Meh, it just looked a bit over-engineered to me when I originally looked
+at the patches, but you're right, they align with the rest of the
+implementation.
 
 Thanks,
 
