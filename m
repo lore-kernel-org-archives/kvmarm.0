@@ -1,27 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 1/8] arm64: KVM: Make VHE Stage-2 TLB invalidation
- operations non-interruptible
-Date: Mon, 10 Dec 2018 10:24:31 +0000
-Message-ID: <d9219768-bbef-5d51-3bb4-84cf35714a4d@arm.com>
-References: <20181206173126.139877-1-marc.zyngier@arm.com>
- <20181206173126.139877-2-marc.zyngier@arm.com>
- <20181210100356.GG30263@e113682-lin.lund.arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v6 2/4] arm64: KVM: add accessors to track guest/host
+ only counters
+Date: Mon, 10 Dec 2018 11:26:34 +0100
+Message-ID: <20181210102634.GL30263@e113682-lin.lund.arm.com>
+References: <1544435159-54781-1-git-send-email-andrew.murray@arm.com>
+ <1544435159-54781-3-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 721F04A329
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:24:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB0EA4A333
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:26:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lv+63uZWlbvE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Dec 2018 05:24:35 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B674A2E7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:24:35 -0500 (EST)
-In-Reply-To: <20181210100356.GG30263@e113682-lin.lund.arm.com>
-Content-Language: en-US
+ with ESMTP id cCwGqGt6hm2M for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Dec 2018 05:26:37 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F0E4A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Dec 2018 05:26:37 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1544435159-54781-3-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,44 +30,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQ2hyaXN0b2ZmZXIsCgpPbiAxMC8xMi8yMDE4IDEwOjAzLCBDaHJpc3RvZmZlciBEYWxsIHdy
-b3RlOgo+IE9uIFRodSwgRGVjIDA2LCAyMDE4IGF0IDA1OjMxOjE5UE0gKzAwMDAsIE1hcmMgWnlu
-Z2llciB3cm90ZToKPj4gQ29udHJhcnkgdG8gdGhlIG5vbi1WSEUgdmVyc2lvbiBvZiB0aGUgVExC
-IGludmFsaWRhdGlvbiBoZWxwZXJzLCB0aGUgVkhFCj4+IGNvZGUgIGhhcyBpbnRlcnJ1cHRzIGVu
-YWJsZWQsIG1lYW5pbmcgdGhhdCB3ZSBjYW4gdGFrZSBhbiBpbnRlcnJ1cHQgaW4KPj4gdGhlIG1p
-ZGRsZSBvZiBzdWNoIGEgc2VxdWVuY2UsIGFuZCBzdGFydCBydW5uaW5nIHNvbWV0aGluZyBlbHNl
-IHdpdGgKPj4gSENSX0VMMi5UR0UgY2xlYXJlZC4KPiAKPiBEbyB3ZSBoYXZlIHRvIGNsZWFyIFRH
-RSB0byBwZXJmb3JtIHRoZSBUTEIgaW52YWxpZGF0aW9uLCBvciBpcyB0aGF0IGp1c3QKPiBhIHNp
-ZGUtZWZmZWN0IG9mIHJlLXVzaW5nIGNvZGU/CgpXZSByZWFsbHkgZG8gbmVlZCB0byBjbGVhciBU
-R0UuIEZyb20gdGhlIGRlc2NyaXB0aW9uIG9mIFRMQkkgVk1BTExFMUlTOgoKPHF1b3RlPgpXaGVu
-IEVMMiBpcyBpbXBsZW1lbnRlZCBhbmQgZW5hYmxlZCBpbiB0aGUgY3VycmVudCBTZWN1cml0eSBz
-dGF0ZToK4oCUIElmIEhDUl9FTDIue0UySCwgVEdFfSBpcyBub3QgezEsIDF9LCB0aGUgZW50cnkg
-d291bGQgYmUgdXNlZCB3aXRoIHRoZQpjdXJyZW50IFZNSUQgYW5kIHdvdWxkIGJlIHJlcXVpcmVk
-IHRvIHRyYW5zbGF0ZSB0aGUgc3BlY2lmaWVkIFZBIHVzaW5nCnRoZSBFTDEmMCB0cmFuc2xhdGlv
-biByZWdpbWUuCuKAlCBJZiBIQ1JfRUwyLntFMkgsIFRHRX0gaXMgezEsIDF9LCB0aGUgZW50cnkg
-d291bGQgYmUgcmVxdWlyZWQgdG8KdHJhbnNsYXRlIHRoZSBzcGVjaWZpZWQgVkEgdXNpbmcgdGhl
-IEVMMiYwIHRyYW5zbGF0aW9uIHJlZ2ltZS4KPC9xdW90ZT4KCj4gQWxzbywgZG8gd2UgZ2VuZXJh
-bGx5IHBlcmZvcm0gVExCIGludmFsaWRhdGlvbnMgaW4gdGhlIGtlcm5lbCB3aXRoCj4gaW50ZXJy
-dXB0cyBkaXNhYmxlZCwgb3IgaXMgdGhpcyBqdXN0IGEgcmVzdWx0IG9mIGNsZWFyaW5nIFRHRT8K
-ClRoYXQncyBkZWZpbml0ZWx5IGEgcmVzdWx0IG9mIGNsZWFyaW5nIFRHRS4gV2UgY291bGQgYmUg
-dGFraW5nIGFuCmludGVycnVwdCBoZXJlLCBhbmQgZXhlY3V0ZSBhIHVzZXIgYWNjZXNzIG9uIHRo
-ZSBiYWNrIG9mIGl0IChwZXJmIHdpbGwKaGFwcGlseSB3YWxrIGEgdXNlci1zcGFjZSBzdGFjayBp
-biB0aGF0IGNvbnRleHQsIGZvciBleGFtcGxlKS4gSGF2aW5nClRHRSBjbGVhciBpbiB0aGF0IGNv
-bnRleHQuIEFuIGFsdGVybmF0aXZlIHNvbHV0aW9uIHdvdWxkIGJlIHRvCnNhdmUvcmVzdG9yZSBU
-R0Ugb24gaW50ZXJydXB0IGVudHJ5L2V4aXQsIGJ1dCB0aGF0J3MgYSBiaXQgb3ZlcmtpbGwgd2hl
-bgp5b3UgY29uc2lkZXIgaG93IHJhcmVseSB3ZSBpc3N1ZSBzdWNoIFRMQiBpbnZhbGlkYXRpb24u
-Cgo+IFNvbWVob3cgSSBmZWVsIGxpa2UgdGhpcyBzaG91bGQgbG9vayBtb3JlIGxpa2UganVzdCBh
-bm90aGVyIFRMQgo+IGludmFsaWRhdGlvbiBpbiB0aGUga2VybmVsLCBidXQgaWYgdGhlcmUncyBh
-IGdvb2QgcmVhc29uIHdoeSBpdCBjYW4ndAo+IHRoZW4gdGhpcyBpcyBmaW5lLgoKVGhlIHJlc3Qg
-b2YgdGhlIFRMQiBpbnZhbGlkYXRpb24gaW4gdGhlIGtlcm5lbCBkb2Vzbid0IG5lZWQgdG8Kc2F2
-ZS9yZXN0b3JlIGFueSBjb250ZXh0LiBUaGV5IGFwcGx5IHRvIGEgc2V0IG9mIHBhcmFtZXRlcnMg
-dGhhdCBhcmUKYWxyZWFkeSBsb2FkZWQgb24gdGhlIENQVS4gV2hhdCB3ZSBoYXZlIGhlcmUgaXMg
-c3Vic3RhbnRpYWxseSBkaWZmZXJlbnQuCgpUaGFua3MsCgoJTS4KLS0gCkphenogaXMgbm90IGRl
-YWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
-bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
-L2t2bWFybQo=
+On Mon, Dec 10, 2018 at 09:45:57AM +0000, Andrew Murray wrote:
+> In order to effeciently enable/disable guest/host only perf counters
+> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
+> host events as well as accessors for updating them.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1550192..800c87b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -203,6 +203,8 @@ struct kvm_cpu_context {
+>  	};
+>  
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+> +	u32 events_host;
+> +	u32 events_guest;
+
+This is confusing to me.
+
+These values appear only to be used for the host instance, which makes
+me wonder why we add them to kvm_cpu_context, which is also used for the
+guest state?  Should we not instead consider moving them to their own
+data structure and add a per-cpu data structure or something more fancy
+like having a new data structure, kvm_percpu_host_data, which contains
+the kvm_cpu_context and the events flags?
+
+I don't know much about perf, but doesn't this design also imply that
+you can only set these modifiers at a per-cpu level, and not attach
+the modifiers to a task/vcpu or vm ?  Is that by design?
+
+
+Thanks,
+
+    Christoffer
+
+>  };
+>  
+>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+> @@ -467,11 +469,33 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+>  
+> +#define KVM_PMU_EVENTS_HOST	1
+> +#define KVM_PMU_EVENTS_GUEST	2
+> +
+>  #ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
+>  static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_arch_vcpu_run_map_fp(vcpu);
+>  }
+> +static inline void kvm_set_pmu_events(u32 set, int flags)
+> +{
+> +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
+> +
+> +	if (flags & KVM_PMU_EVENTS_HOST)
+> +		ctx->events_host |= set;
+> +	if (flags & KVM_PMU_EVENTS_GUEST)
+> +		ctx->events_guest |= set;
+> +}
+> +static inline void kvm_clr_pmu_events(u32 clr)
+> +{
+> +	kvm_cpu_context_t *ctx = this_cpu_ptr(&kvm_host_cpu_state);
+> +
+> +	ctx->events_host &= ~clr;
+> +	ctx->events_guest &= ~clr;
+> +}
+> +#else
+> +static inline void kvm_set_pmu_events(u32 set, int flags) {}
+> +static inline void kvm_clr_pmu_events(u32 clr) {}
+>  #endif
+>  
+>  static inline void kvm_arm_vhe_guest_enter(void)
+> -- 
+> 2.7.4
+> 
