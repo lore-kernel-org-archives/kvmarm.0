@@ -1,23 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v10 2/8] KVM: arm/arm64: Re-factor setting the Stage 2 entry
- to exec on fault
-Date: Tue, 11 Dec 2018 17:10:35 +0000
-Message-ID: <1544548241-6417-3-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v10 5/8] KVM: arm64: Support PUD hugepage in stage2_is_exec()
+Date: Tue, 11 Dec 2018 17:10:38 +0000
+Message-ID: <1544548241-6417-6-git-send-email-suzuki.poulose@arm.com>
 References: <1544548241-6417-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 255FE4A329
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:12:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0DA04A33F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:12:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id djcqRNocl2bb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 12:12:11 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 987884A2BB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:12:10 -0500 (EST)
+ with ESMTP id VUrShbdamyuJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 12:12:16 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E8CC4A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:12:16 -0500 (EST)
 In-Reply-To: <1544548241-6417-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,84 +33,150 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Punit Agrawal <punit.agrawal@arm.com>
 
-Stage 2 fault handler marks a page as executable if it is handling an
-execution fault or if it was a permission fault in which case the
-executable bit needs to be preserved.
+In preparation for creating PUD hugepages at stage 2, add support for
+detecting execute permissions on PUD page table entries. Faults due to
+lack of execute permissions on page table entries is used to perform
+i-cache invalidation on first execute.
 
-The logic to decide if the page should be marked executable is
-duplicated for PMD and PTE entries. To avoid creating another copy
-when support for PUD hugepages is introduced refactor the code to
-share the checks needed to mark a page table entry as executable.
+Provide trivial implementations of arm32 helpers to allow sharing of
+code.
 
 Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+[ Replaced BUG() => WARN_ON(1) in arm32 PUD helpers ]
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/mmu.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h         |  6 ++++
+ arch/arm64/include/asm/kvm_mmu.h       |  5 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h |  2 ++
+ virt/kvm/arm/mmu.c                     | 53 ++++++++++++++++++++++++++++++----
+ 4 files changed, 61 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 9fe6c30..a49655f 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -102,6 +102,12 @@ static inline bool kvm_s2pud_readonly(pud_t *pud)
+ 	return false;
+ }
+ 
++static inline bool kvm_s2pud_exec(pud_t *pud)
++{
++	WARN_ON(1);
++	return false;
++}
++
+ static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
+ {
+ 	pte_val(pte) |= L_PTE_S2_RDWR;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 8da6d1b..c755b37 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -261,6 +261,11 @@ static inline bool kvm_s2pud_readonly(pud_t *pudp)
+ 	return kvm_s2pte_readonly((pte_t *)pudp);
+ }
+ 
++static inline bool kvm_s2pud_exec(pud_t *pudp)
++{
++	return !(READ_ONCE(pud_val(*pudp)) & PUD_S2_XN);
++}
++
+ #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+ 
+ #ifdef __PAGETABLE_PMD_FOLDED
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 1d7d8da..336e24c 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -193,6 +193,8 @@
+ #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+ #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+ 
++#define PUD_S2_XN		(_AT(pudval_t, 2) << 53)  /* XN[1:0] */
++
+ /*
+  * Memory Attribute override for Stage-2 (MemAttr[3:0])
+  */
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 5959520..6912529 100644
+index 1c669c3..8e44dcc 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1475,7 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  unsigned long fault_status)
+@@ -1083,23 +1083,66 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	return 0;
+ }
+ 
+-static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++/*
++ * stage2_get_leaf_entry - walk the stage2 VM page tables and return
++ * true if a valid and present leaf-entry is found. A pointer to the
++ * leaf-entry is returned in the appropriate level variable - pudpp,
++ * pmdpp, ptepp.
++ */
++static bool stage2_get_leaf_entry(struct kvm *kvm, phys_addr_t addr,
++				  pud_t **pudpp, pmd_t **pmdpp, pte_t **ptepp)
  {
- 	int ret;
--	bool write_fault, exec_fault, writable, force_pte = false;
-+	bool write_fault, writable, force_pte = false;
-+	bool exec_fault, needs_exec;
- 	unsigned long mmu_seq;
- 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
- 	struct kvm *kvm = vcpu->kvm;
-@@ -1598,19 +1599,25 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault)
- 		invalidate_icache_guest_page(pfn, vma_pagesize);
++	pud_t *pudp;
+ 	pmd_t *pmdp;
+ 	pte_t *ptep;
  
-+	/*
-+	 * If we took an execution fault we have made the
-+	 * icache/dcache coherent above and should now let the s2
-+	 * mapping be executable.
-+	 *
-+	 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
-+	 * execute permissions, and we preserve whatever we have.
-+	 */
-+	needs_exec = exec_fault ||
-+		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
+-	pmdp = stage2_get_pmd(kvm, NULL, addr);
++	*pudpp = NULL;
++	*pmdpp = NULL;
++	*ptepp = NULL;
 +
- 	if (vma_pagesize == PMD_SIZE) {
- 		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
- 		new_pmd = pmd_mkhuge(new_pmd);
- 		if (writable)
- 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
++	pudp = stage2_get_pud(kvm, NULL, addr);
++	if (!pudp || stage2_pud_none(kvm, *pudp) || !stage2_pud_present(kvm, *pudp))
++		return false;
++
++	if (stage2_pud_huge(kvm, *pudp)) {
++		*pudpp = pudp;
++		return true;
++	}
++
++	pmdp = stage2_pmd_offset(kvm, pudp, addr);
+ 	if (!pmdp || pmd_none(*pmdp) || !pmd_present(*pmdp))
+ 		return false;
  
--		if (exec_fault) {
-+		if (needs_exec)
- 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
--		} else if (fault_status == FSC_PERM) {
--			/* Preserve execute if XN was already cleared */
--			if (stage2_is_exec(kvm, fault_ipa))
--				new_pmd = kvm_s2pmd_mkexec(new_pmd);
--		}
+-	if (pmd_thp_or_huge(*pmdp))
+-		return kvm_s2pmd_exec(pmdp);
++	if (pmd_thp_or_huge(*pmdp)) {
++		*pmdpp = pmdp;
++		return true;
++	}
  
- 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
- 	} else {
-@@ -1621,13 +1628,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			mark_page_dirty(kvm, gfn);
- 		}
+ 	ptep = pte_offset_kernel(pmdp, addr);
+ 	if (!ptep || pte_none(*ptep) || !pte_present(*ptep))
+ 		return false;
  
--		if (exec_fault) {
-+		if (needs_exec)
- 			new_pte = kvm_s2pte_mkexec(new_pte);
--		} else if (fault_status == FSC_PERM) {
--			/* Preserve execute if XN was already cleared */
--			if (stage2_is_exec(kvm, fault_ipa))
--				new_pte = kvm_s2pte_mkexec(new_pte);
--		}
+-	return kvm_s2pte_exec(ptep);
++	*ptepp = ptep;
++	return true;
++}
++
++static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
++{
++	pud_t *pudp;
++	pmd_t *pmdp;
++	pte_t *ptep;
++	bool found;
++
++	found = stage2_get_leaf_entry(kvm, addr, &pudp, &pmdp, &ptep);
++	if (!found)
++		return false;
++
++	if (pudp)
++		return kvm_s2pud_exec(pudp);
++	else if (pmdp)
++		return kvm_s2pmd_exec(pmdp);
++	else
++		return kvm_s2pte_exec(ptep);
+ }
  
- 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
- 	}
+ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
 -- 
 2.7.4
