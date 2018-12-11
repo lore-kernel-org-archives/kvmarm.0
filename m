@@ -1,21 +1,24 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 00/24] KVM: arm64: SVE guest support
-Date: Tue, 11 Dec 2018 23:28:37 +0000
-Message-ID: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v3 01/24] arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on
+ task state flush
+Date: Tue, 11 Dec 2018 23:28:38 +0000
+Message-ID: <1544570941-7377-2-git-send-email-Dave.Martin@arm.com>
+References: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E73C64A333
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DD414A320
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RbWv1EWX9OBG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 18:29:10 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4190C4A1DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:10 -0500 (EST)
+ with ESMTP id AaAs6ZRTfHA2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 18:29:52 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA8B34A319
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:51 -0500 (EST)
+In-Reply-To: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,144 +32,82 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series implements support for allowing KVM guests to use the Arm
-Scalable Vector Extension (SVE).
-
-The patches are also available on a branch for reviewer convenience. [1]
-
-The patches are based on v4.20-rc5, with [3] applied (which includes
-some needed refactoring).
-
-This is an interim posting of rework of the previous preliminary
-series [2], addressing mostly minor comments, plus one significant
-change outlined below which is likely to require discussion -- I'm
-posting this series now so that people can comment while I try to work
-out how best to improve it.
-
-In the interest of getting this series out for review, this series
-remains untested.
-
-For description of minor updates, see the individual patches.
-
-
-Major changes:
-
- * Due to sequencing problems between KVM_ARM_VCPU_INIT /
-   KVM_ARM_SVE_CONFIG / KVM_ARM_GET_REG_LIST, I have attempted to add
-   some enforcement to the order in which ioctls are issued.
-
-   This enforcement is applied on a opt-in basis, enabled by userspace
-   specifying the KVM_VM_TYPE_ARM_SVE flag in KVM_CREATE_VM.
-
-   This makes is possible to enforce SVE configuration to happen before
-   (and only before) KVM_VCPU_INIT is called.
-
-   **Discussion required**
-
-I'm now doubtful about the resulting model, because:
-
- * Calling kvm_vcpu_set_target() (via KVM_VCPU_INIT) _after_ setting
-   the vcpu's vector lengths "feels wrong".  Surely selecting the
-   target CPU would determine the set of vector lengths (or at least
-   establish a default set which might subsequently be customised by
-   the caller)?
-
- * The main issue with KVM_VCPU_INIT seems to be that it selects the
-   target vcpu and resets it in a single call, providing no
-   opportunity to configure the vcpu further before it gets reset and
-   is marked ready to run.
-
-   This oddity is also highlighted by the fact that further
-   KVM_VCPU_INIT calls are not allowed to reconfigure the vcpu, but
-   reset it instead; so KVM_VCPU_INIT is actually welding together two
-   different actions.
-
-   Perhaps it would be better to select a modified KVM_VCPU_INIT
-   behaviour via a feature flag in kvm_vcpu_init.features, that makes
-   KVM_VCPU_INIT return something like -EINPROGRESS after
-   kvm_vcpu_set_target().  Then, supplementary config could be done
-   via KVM_ARM_SVE_CONFIG etc.
-
-   We could add a dedicated KVM_VCPU_RESET call to finalise the vcpu
-   configuration (if unfinalised) and reset it.
-
-   I haven't tried this model out yet, but I'd be interested in
-   people's views on it.
-
-   Alternatively, there may be other better ways to crowbar the SVE
-   setup into the vcpu creation/initialisation sequence.
-
-   We want something that can be reused without needing to be
-   reinvented yet again to support another feature...
-
-   
-
-Known issues:
-
- * kvmtool/qemu updates are needed to enable creation of SVE-enabled
-   guests (to be discussed separately).
-
- * Build-tested only.
-
-
-[1]
-http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm/rfcv3
-git://linux-arm.org/linux-dm.git sve-kvm/rfcv3
-
-[2] [RFC PATCH v2 00/23] KVM: arm64: Initial support for SVE guests
-http://lists.infradead.org/pipermail/linux-arm-kernel/2018-September/604550.html
-
-[3] [PATCH 0/3] Fix KVM_GET_REG_LIST invalid register ID regression
-https://lists.cs.columbia.edu/pipermail/kvmarm/2018-December/033710.html
-
-
-Dave Martin (24):
-  arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on task state flush
-  KVM: arm64: Delete orphaned declaration for __fpsimd_enabled()
-  KVM: arm64: Refactor kvm_arm_num_regs() for easier maintenance
-  KVM: arm64: Add missing #include of <linux/bitmap.h> to kvm_host.h
-  arm64/sve: Check SVE virtualisability
-  arm64/sve: Clarify role of the VQ map maintenance functions
-  arm64/sve: Enable SVE state tracking for non-task contexts
-  KVM: arm64: Add a vcpu flag to control SVE visibility for the guest
-  KVM: arm64: Propagate vcpu into read_id_reg()
-  KVM: arm64: Extend reset_unknown() to handle mixed RES0/UNKNOWN
-    registers
-  KVM: arm64: Support runtime sysreg filtering for KVM_GET_REG_LIST
-  KVM: arm64/sve: System register context switch and access support
-  KVM: arm64/sve: Context switch the SVE registers
-  KVM: Allow 2048-bit register access via ioctl interface
-  KVM: arm64: Reject ioctl access to FPSIMD V-regs on SVE vcpus
-  KVM: arm64/sve: Add SVE support to register access ioctl interface
-  KVM: arm64: Enumerate SVE register indices for KVM_GET_REG_LIST
-  arm64/sve: In-kernel vector length availability query interface
-  KVM: arm: Move detection of invalid VM type bits to generic code
-  KVM: arm: Add support for early vcpu configuration ioctls
-  KVM: arm64/sve: Report and enable SVE API extensions for userspace
-  KVM: arm64/sve: allow KVM_ARM_SVE_CONFIG_QUERY on vm fd
-  KVM: Documentation: Document arm64 core registers in detail
-  KVM: arm64/sve: Document KVM API extensions for SVE
-
- Documentation/virtual/kvm/api.txt | 194 +++++++++++++++++++
- arch/arm/include/asm/kvm_host.h   |  21 +-
- arch/arm/include/uapi/asm/kvm.h   |   3 +
- arch/arm64/include/asm/fpsimd.h   |  33 +++-
- arch/arm64/include/asm/kvm_host.h |  40 +++-
- arch/arm64/include/asm/kvm_hyp.h  |   1 -
- arch/arm64/include/asm/sysreg.h   |   3 +
- arch/arm64/include/uapi/asm/kvm.h |  24 +++
- arch/arm64/kernel/cpufeature.c    |   2 +-
- arch/arm64/kernel/fpsimd.c        | 172 ++++++++++++-----
- arch/arm64/kernel/signal.c        |   5 -
- arch/arm64/kvm/fpsimd.c           |  15 +-
- arch/arm64/kvm/guest.c            | 396 +++++++++++++++++++++++++++++++++++---
- arch/arm64/kvm/hyp/switch.c       |  70 +++++--
- arch/arm64/kvm/reset.c            |  69 ++++++-
- arch/arm64/kvm/sys_regs.c         | 144 ++++++++++++--
- arch/arm64/kvm/sys_regs.h         |  15 +-
- include/uapi/linux/kvm.h          |  14 ++
- virt/kvm/arm/arm.c                |  16 +-
- 19 files changed, 1107 insertions(+), 130 deletions(-)
-
--- 
-2.1.4
+VGhpcyBwYXRjaCB1cGRhdGVzIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgdG8gbWlycm9yIHRo
+ZSBuZXcKc2VtYW50aWNzIG9mIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUoKTogYm90aCBmdW5jdGlv
+bnMgbm93CmltcGxpY2l0bHkgc2V0IFRJRl9GT1JFSUdOX0ZQU1RBVEUgdG8gaW5kaWNhdGUgdGhh
+dCB0aGUgdGFzaydzCkZQU0lNRCBzdGF0ZSBpcyBub3QgbG9hZGVkIGludG8gdGhlIGNwdS4KCkFz
+IGEgc2lkZS1lZmZlY3QsIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgbm93IHNldHMKVElGX0ZP
+UkVJR05fRlBTVEFURSBldmVuIGZvciBub24tcnVubmluZyB0YXNrcy4gIEluIHRoZSBjYXNlIG9m
+Cm5vbi1ydW5uaW5nIHRhc2tzIHRoaXMgaXMgbm90IHVzZWZ1bCBidXQgYWxzbyBoYXJtbGVzcywg
+YmVjYXVzZSB0aGUKZmxhZyBpcyBsaXZlIG9ubHkgd2hpbGUgdGhlIGNvcnJlc3BvbmRpbmcgdGFz
+ayBpcyBydW5uaW5nLiAgVGhpcwpmdW5jdGlvbiBpcyBub3QgY2FsbGVkIGZyb20gZmFzdCBwYXRo
+cywgc28gc3BlY2lhbC1jYXNpbmcgdGhpcyBmb3IKdGhlIHRhc2sgPT0gY3VycmVudCBjYXNlIGlz
+IG5vdCByZWFsbHkgd29ydGggaXQuCgpDb21waWxlciBiYXJyaWVycyBwcmV2aW91c2x5IHByZXNl
+bnQgaW4gcmVzdG9yZV9zdmVfZnBzaW1kX2NvbnRleHQoKQphcmUgcHVsbGVkIGludG8gZnBzaW1k
+X2ZsdXNoX3Rhc2tfc3RhdGUoKSBzbyB0aGF0IGl0IGNhbiBiZSBzYWZlbHkKY2FsbGVkIHdpdGgg
+cHJlZW1wdGlvbiBlbmFibGVkIGlmIG5lY2Vzc2FyeS4KCkV4cGxpY2l0IGNhbGxzIHRvIHNldCBU
+SUZfRk9SRUlHTl9GUFNUQVRFIHRoYXQgYWNjb21wYW55CmZwc2ltZF9mbHVzaF90YXNrX3N0YXRl
+KCkgY2FsbHMgYW5kIGFyZSBub3cgcmVkdW5kYW50IGFyZSByZW1vdmVkCmFzIGFwcHJvcHJpYXRl
+LgoKZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUoKSBpcyB1c2VkIHRvIGdldCBleGNsdXNpdmUgYWNj
+ZXNzIHRvIHRoZQpyZXByZXNlbnRhdGlvbiBvZiB0aGUgdGFzaydzIHN0YXRlIHZpYSB0YXNrX3N0
+cnVjdCwgZm9yIHRoZSBwdXJwb3NlCm9mIHJlcGxhY2luZyB0aGUgc3RhdGUuICBUaHVzLCB0aGUg
+Y2FsbCB0byB0aGlzIGZ1bmN0aW9uIHNob3VsZApoYXBwZW4gYmVmb3JlIG1hbmlwdWxhdGluZyBm
+cHNpbWRfc3RhdGUgb3Igc3ZlX3N0YXRlIGV0Yy4gaW4KdGFza19zdHJ1Y3QuICBBbm9tYWxvdXMg
+Y2FzZXMgYXJlIHJlb3JkZXJlZCBhcHByb3ByaWF0ZWx5IGluIG9yZGVyCnRvIG1ha2UgdGhlIGNv
+ZGUgbW9yZSBjb25zaXN0ZW50LCBhbHRob3VnaCB0aGVyZSBzaG91bGQgYmUgbm8KZnVuY3Rpb25h
+bCBkaWZmZXJlbmNlIHNpbmNlIHRoZXNlIGNhc2VzIGFyZSBwcm90ZWN0ZWQgYnkKbG9jYWxfYmhf
+ZGlzYWJsZSgpIGFueXdheS4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRp
+bkBhcm0uY29tPgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8u
+b3JnPgotLS0KIGFyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jIHwgMjUgKysrKysrKysrKysrKysr
+KysrKy0tLS0tLQogYXJjaC9hcm02NC9rZXJuZWwvc2lnbmFsLmMgfCAgNSAtLS0tLQogMiBmaWxl
+cyBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCAxMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5j
+CmluZGV4IDVlYmU3M2IuLjYyYzM3ZjAgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva2VybmVsL2Zw
+c2ltZC5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCkBAIC01NTAsNyArNTUwLDYg
+QEAgaW50IHN2ZV9zZXRfdmVjdG9yX2xlbmd0aChzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRhc2ssCiAJ
+CWxvY2FsX2JoX2Rpc2FibGUoKTsKIAogCQlmcHNpbWRfc2F2ZSgpOwotCQlzZXRfdGhyZWFkX2Zs
+YWcoVElGX0ZPUkVJR05fRlBTVEFURSk7CiAJfQogCiAJZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUo
+dGFzayk7CkBAIC04MTYsMTIgKzgxNSwxMSBAQCBhc21saW5rYWdlIHZvaWQgZG9fc3ZlX2FjYyh1
+bnNpZ25lZCBpbnQgZXNyLCBzdHJ1Y3QgcHRfcmVncyAqcmVncykKIAlsb2NhbF9iaF9kaXNhYmxl
+KCk7CiAKIAlmcHNpbWRfc2F2ZSgpOwotCWZwc2ltZF90b19zdmUoY3VycmVudCk7CiAKIAkvKiBG
+b3JjZSByZXRfdG9fdXNlciB0byByZWxvYWQgdGhlIHJlZ2lzdGVyczogKi8KIAlmcHNpbWRfZmx1
+c2hfdGFza19zdGF0ZShjdXJyZW50KTsKLQlzZXRfdGhyZWFkX2ZsYWcoVElGX0ZPUkVJR05fRlBT
+VEFURSk7CiAKKwlmcHNpbWRfdG9fc3ZlKGN1cnJlbnQpOwogCWlmICh0ZXN0X2FuZF9zZXRfdGhy
+ZWFkX2ZsYWcoVElGX1NWRSkpCiAJCVdBUk5fT04oMSk7IC8qIFNWRSBhY2Nlc3Mgc2hvdWxkbid0
+IGhhdmUgdHJhcHBlZCAqLwogCkBAIC04OTQsOSArODkyLDkgQEAgdm9pZCBmcHNpbWRfZmx1c2hf
+dGhyZWFkKHZvaWQpCiAKIAlsb2NhbF9iaF9kaXNhYmxlKCk7CiAKKwlmcHNpbWRfZmx1c2hfdGFz
+a19zdGF0ZShjdXJyZW50KTsKIAltZW1zZXQoJmN1cnJlbnQtPnRocmVhZC51dy5mcHNpbWRfc3Rh
+dGUsIDAsCiAJICAgICAgIHNpemVvZihjdXJyZW50LT50aHJlYWQudXcuZnBzaW1kX3N0YXRlKSk7
+Ci0JZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUoY3VycmVudCk7CiAKIAlpZiAoc3lzdGVtX3N1cHBv
+cnRzX3N2ZSgpKSB7CiAJCWNsZWFyX3RocmVhZF9mbGFnKFRJRl9TVkUpOwpAQCAtOTMzLDggKzkz
+MSw2IEBAIHZvaWQgZnBzaW1kX2ZsdXNoX3RocmVhZCh2b2lkKQogCQkJY3VycmVudC0+dGhyZWFk
+LnN2ZV92bF9vbmV4ZWMgPSAwOwogCX0KIAotCXNldF90aHJlYWRfZmxhZyhUSUZfRk9SRUlHTl9G
+UFNUQVRFKTsKLQogCWxvY2FsX2JoX2VuYWJsZSgpOwogfQogCkBAIC0xMDQzLDEyICsxMDM5LDI5
+IEBAIHZvaWQgZnBzaW1kX3VwZGF0ZV9jdXJyZW50X3N0YXRlKHN0cnVjdCB1c2VyX2Zwc2ltZF9z
+dGF0ZSBjb25zdCAqc3RhdGUpCiAKIC8qCiAgKiBJbnZhbGlkYXRlIGxpdmUgQ1BVIGNvcGllcyBv
+ZiB0YXNrIHQncyBGUFNJTUQgc3RhdGUKKyAqCisgKiBUaGlzIGZ1bmN0aW9uIG1heSBiZSBjYWxs
+ZWQgd2l0aCBwcmVlbXB0aW9uIGVuYWJsZWQuICBUaGUgYmFycmllcigpCisgKiBlbnN1cmVzIHRo
+YXQgdGhlIGFzc2lnbm1lbnQgdG8gZnBzaW1kX2NwdSBpcyB2aXNpYmxlIHRvIGFueQorICogcHJl
+ZW1wdGlvbi9zb2Z0aXJxIHRoYXQgY291bGQgcmFjZSB3aXRoIHNldF90c2tfdGhyZWFkX2ZsYWco
+KSwgc28KKyAqIHRoYXQgVElGX0ZPUkVJR05fRlBTVEFURSBjYW5ub3QgYmUgc3B1cmlvdXNseSBy
+ZS1jbGVhcmVkLgorICoKKyAqIFRoZSBmaW5hbCBiYXJyaWVyIGVuc3VyZXMgdGhhdCBUSUZfRk9S
+RUlHTl9GUFNUQVRFIGlzIHNlZW4gc2V0IGJ5IGFueQorICogc3Vic2VxdWVudCBjb2RlLgogICov
+CiB2b2lkIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKHN0cnVjdCB0YXNrX3N0cnVjdCAqdCkKIHsK
+IAl0LT50aHJlYWQuZnBzaW1kX2NwdSA9IE5SX0NQVVM7CisKKwliYXJyaWVyKCk7CisJc2V0X3Rz
+a190aHJlYWRfZmxhZyh0LCBUSUZfRk9SRUlHTl9GUFNUQVRFKTsKKworCWJhcnJpZXIoKTsKIH0K
+IAorLyoKKyAqIEludmFsaWRhdGUgYW55IHRhc2sncyBGUFNJTUQgc3RhdGUgdGhhdCBpcyBwcmVz
+ZW50IG9uIHRoaXMgY3B1LgorICogVGhpcyBmdW5jdGlvbiBtdXN0IGJlIGNhbGxlZCB3aXRoIHNv
+ZnRpcnFzIGRpc2FibGVkLgorICovCiB2b2lkIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUodm9pZCkK
+IHsKIAlfX3RoaXNfY3B1X3dyaXRlKGZwc2ltZF9sYXN0X3N0YXRlLnN0LCBOVUxMKTsKZGlmZiAt
+LWdpdCBhL2FyY2gvYXJtNjQva2VybmVsL3NpZ25hbC5jIGIvYXJjaC9hcm02NC9rZXJuZWwvc2ln
+bmFsLmMKaW5kZXggNWRjYzk0Mi4uN2RjZjBmMSAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJu
+ZWwvc2lnbmFsLmMKKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvc2lnbmFsLmMKQEAgLTI5NiwxMSAr
+Mjk2LDYgQEAgc3RhdGljIGludCByZXN0b3JlX3N2ZV9mcHNpbWRfY29udGV4dChzdHJ1Y3QgdXNl
+cl9jdHhzICp1c2VyKQogCSAqLwogCiAJZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUoY3VycmVudCk7
+Ci0JYmFycmllcigpOwotCS8qIEZyb20gbm93LCBmcHNpbWRfdGhyZWFkX3N3aXRjaCgpIHdvbid0
+IGNsZWFyIFRJRl9GT1JFSUdOX0ZQU1RBVEUgKi8KLQotCXNldF90aHJlYWRfZmxhZyhUSUZfRk9S
+RUlHTl9GUFNUQVRFKTsKLQliYXJyaWVyKCk7CiAJLyogRnJvbSBub3csIGZwc2ltZF90aHJlYWRf
+c3dpdGNoKCkgd29uJ3QgdG91Y2ggdGhyZWFkLnN2ZV9zdGF0ZSAqLwogCiAJc3ZlX2FsbG9jKGN1
+cnJlbnQpOwotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
+dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
