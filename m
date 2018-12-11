@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 02/24] KVM: arm64: Delete orphaned declaration for
- __fpsimd_enabled()
-Date: Tue, 11 Dec 2018 23:28:39 +0000
-Message-ID: <1544570941-7377-3-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v3 03/24] KVM: arm64: Refactor kvm_arm_num_regs() for
+ easier maintenance
+Date: Tue, 11 Dec 2018 23:28:40 +0000
+Message-ID: <1544570941-7377-4-git-send-email-Dave.Martin@arm.com>
 References: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE9FA4A329
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18CE54A37E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ox0HhxafGCGv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 18:29:54 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1D14A319
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:53 -0500 (EST)
+ with ESMTP id 4Q525Bed2ZSG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 18:29:56 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 166614A370
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:29:56 -0500 (EST)
 In-Reply-To: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,21 +32,26 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-X19mcHNpbWRfZW5hYmxlZCgpIG5vIGxvbmdlciBleGlzdHMsIGJ1dCBhIGRhbmdsaW5nIGRlY2xh
-cmF0aW9uIGhhcwpzdXJ2aXZlZCBpbiBrdm1faHlwLmguCgpUaGlzIHBhdGNoIGdldHMgcmlkIG9m
-IGl0LgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+ClJl
-dmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Ci0tLQogYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmggfCAxIC0KIDEgZmlsZSBjaGFuZ2VkLCAxIGRl
-bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmgg
-Yi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAppbmRleCAyM2FjYTY2Li4wMzJjM2Nk
-IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAorKysgYi9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaApAQCAtMTQ3LDcgKzE0Nyw2IEBAIHZvaWQgX19k
-ZWJ1Z19zd2l0Y2hfdG9faG9zdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogCiB2b2lkIF9fZnBz
-aW1kX3NhdmVfc3RhdGUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpmcF9yZWdzKTsKIHZvaWQg
-X19mcHNpbWRfcmVzdG9yZV9zdGF0ZShzdHJ1Y3QgdXNlcl9mcHNpbWRfc3RhdGUgKmZwX3JlZ3Mp
-OwotYm9vbCBfX2Zwc2ltZF9lbmFibGVkKHZvaWQpOwogCiB2b2lkIGFjdGl2YXRlX3RyYXBzX3Zo
-ZV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB2b2lkIGRlYWN0aXZhdGVfdHJhcHNfdmhl
-X3B1dCh2b2lkKTsKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+a3ZtX2FybV9udW1fcmVncygpIGFkZHMgdG9nZXRoZXIgdmFyaW91cyBwYXJ0aWFsIHJlZ2lzdGVy
+IGNvdW50cyBpbgphIGZyZWVmb3JtIHN1bSBleHByZXNzaW9uLCB3aGljaCBtYWtlcyBpdCBoYXJk
+ZXIgdGhhbiBuZWNlc3NhcnkgdG8KcmVhZCBkaWZmcyB0aGF0IGFkZCwgbW9kaWZ5IG9yIHJlbW92
+ZSBhIHNpbmdsZSB0ZXJtIGluIHRoZSBzdW0KKHdoaWNoIGlzIGV4cGVjdGVkIHRvIHRoZSBjb21t
+b24gY2FzZSB1bmRlciBtYWludGVuYW5jZSkuCgpUaGlzIHBhdGNoIHJlZmFjdG9ycyB0aGUgY29k
+ZSB0byBhZGQgdGhlIHRlcm0gb25lIHBlciBsaW5lLCBmb3IKbWF4aW11bSByZWFkYWJpbGl0eS4K
+ClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdl
+ZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgotLS0KIGFyY2gvYXJt
+NjQva3ZtL2d1ZXN0LmMgfCAxMCArKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRp
+b25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0
+LmMgYi9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCmluZGV4IDFkNTQ3ZGIuLjBiZjBlZDMgMTAwNjQ0
+Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3Qu
+YwpAQCAtMzA4LDggKzMwOCwxNCBAQCBzdGF0aWMgaW50IGdldF90aW1lcl9yZWcoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKICAqLwogdW5zaWdu
+ZWQgbG9uZyBrdm1fYXJtX251bV9yZWdzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKLQlyZXR1
+cm4gbnVtX2NvcmVfcmVncygpICsga3ZtX2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KQotCQkr
+IGt2bV9hcm1fZ2V0X2Z3X251bV9yZWdzKHZjcHUpCSsgTlVNX1RJTUVSX1JFR1M7CisJdW5zaWdu
+ZWQgbG9uZyByZXMgPSAwOworCisJcmVzICs9IG51bV9jb3JlX3JlZ3MoKTsKKwlyZXMgKz0ga3Zt
+X2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KTsKKwlyZXMgKz0ga3ZtX2FybV9nZXRfZndfbnVt
+X3JlZ3ModmNwdSk7CisJcmVzICs9IE5VTV9USU1FUl9SRUdTOworCisJcmV0dXJuIHJlczsKIH0K
+IAogLyoqCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
