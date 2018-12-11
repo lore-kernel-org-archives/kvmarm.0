@@ -1,103 +1,69 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 09/25] ACPI / APEI: Generalise the estatus queue's
- notify code
-Date: Tue, 11 Dec 2018 18:44:49 +0100
-Message-ID: <20181211174449.GM27375@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-10-james.morse@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v6 0/7] Add virtio-iommu driver
+Date: Tue, 11 Dec 2018 18:20:57 +0000
+Message-ID: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC3244A1DC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:45:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zPYQpTwUMxDu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 12:45:00 -0500 (EST)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 073044A0CC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:45:00 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-10-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
+To: iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mst@redhat.com
+Cc: mark.rutland@arm.com, lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, eric.auger@redhat.com, robh+dt@kernel.org, bhelgaas@google.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:05:57PM +0000, James Morse wrote:
-> Refactor the estatus queue's pool notification routine from
-> NOTIFY_NMI's handlers. This will allow another notification
-> method to use the estatus queue without duplicating this code.
-> 
-> This patch adds rcu_read_lock()/rcu_read_unlock() around the list
+Implement the virtio-iommu driver, following specification v0.9 [1].
 
-s/This patch adds/Add/
+Only minor changes since v5 [2]. I fixed issues reported by Michael and
+added tags from Eric and Bharat. Thanks!
 
-> list_for_each_entry_rcu() walker. These aren't strictly necessary as
-> the whole nmi_enter/nmi_exit() window is a spooky RCU read-side
-> critical section.
-> 
-> _in_nmi_notify_one() is separate from the rcu-list walker for a later
-> caller that doesn't need to walk a list.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-> 
-> ---
-> Changes since v6:
->  * Removed pool grow/remove code as this is no longer necessary.
-> 
-> Changes since v3:
->  * Removed duplicate or redundant paragraphs in commit message.
->  * Fixed the style of a zero check.
-> Changes since v1:
->    * Tidied up _in_nmi_notify_one().
-> ---
->  drivers/acpi/apei/ghes.c | 63 ++++++++++++++++++++++++++--------------
->  1 file changed, 41 insertions(+), 22 deletions(-)
+You can find Linux driver and kvmtool device on v0.9 branches [3],
+module and x86 support on virtio-iommu/devel. Also tested with Eric's
+QEMU device [4].
 
-...
+[1] Virtio-iommu specification v0.9, sources and pdf
+    git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+    http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
 
-> +static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
-> +{
-> +	int ret = NMI_DONE;
-> +
-> +	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
-> +		return ret;
-> +
-> +	if (!ghes_estatus_queue_notified(&ghes_nmi))
-> +		ret = NMI_HANDLED;
+[2] [PATCH v5 0/7] Add virtio-iommu driver
+    https://www.spinics.net/lists/linux-pci/msg78158.html
 
-So this reads kinda the other way around, at least to me:
+[3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9.1
+    git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
 
-	"if the queue was *not* notified, the NMI was handled."
+[4] [RFC v9 00/17] VIRTIO-IOMMU device
+    https://www.mail-archive.com/qemu-devel@nongnu.org/msg575578.html
 
-Maybe rename to this:
+Jean-Philippe Brucker (7):
+  dt-bindings: virtio-mmio: Add IOMMU description
+  dt-bindings: virtio: Add virtio-pci-iommu node
+  of: Allow the iommu-map property to omit untranslated devices
+  PCI: OF: Initialize dev->fwnode appropriately
+  iommu: Add virtio-iommu driver
+  iommu/virtio: Add probe request
+  iommu/virtio: Add event queue
 
-	err = process_queue(&ghes_nmi);
-	if (!err)
-		ret = NMI_HANDLED;
-
-to make it clearer...
-
-And yeah, all those static functions having "ghes_" prefix is just
-encumbering readability for no good reason.
-
-Thx.
+ .../devicetree/bindings/virtio/iommu.txt      |   66 +
+ .../devicetree/bindings/virtio/mmio.txt       |   30 +
+ MAINTAINERS                                   |    7 +
+ drivers/iommu/Kconfig                         |   11 +
+ drivers/iommu/Makefile                        |    1 +
+ drivers/iommu/virtio-iommu.c                  | 1157 +++++++++++++++++
+ drivers/of/base.c                             |   10 +-
+ drivers/pci/of.c                              |    7 +
+ include/uapi/linux/virtio_ids.h               |    1 +
+ include/uapi/linux/virtio_iommu.h             |  161 +++
+ 10 files changed, 1448 insertions(+), 3 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+ create mode 100644 drivers/iommu/virtio-iommu.c
+ create mode 100644 include/uapi/linux/virtio_iommu.h
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.19.1
