@@ -1,156 +1,122 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v7 5/5] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Tue, 11 Dec 2018 12:13:40 +0000
-Message-ID: <1544530420-1477-6-git-send-email-andrew.murray@arm.com>
-References: <1544530420-1477-1-git-send-email-andrew.murray@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 503C24A1FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:14:19 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jiXROCc8n-9p for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 07:14:17 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 614234A36A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:14:16 -0500 (EST)
-In-Reply-To: <1544530420-1477-1-git-send-email-andrew.murray@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Fix VMID alloc race by reverting to lock-less
+Date: Tue, 11 Dec 2018 13:23:57 +0100
+Message-ID: <20181211122357.15320-1-christoffer.dall@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, julien.thierry@arm.com, Christoffer Dall <christoffer.dall@arm.com>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
+We recently addressed a VMID generation race by introducing a read/write
+lock around accesses and updates to the vmid generation values.
 
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+However, kvm_arch_vcpu_ioctl_run() also calls need_new_vmid_gen() but
+does so without taking the read lock.
 
-The PMU may be on when we change which counters are enabled however
-we avoid adding an isb as we instead rely on existing context
-synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
-the eret from the hvc in kvm_call_hyp.
+As far as I can tell, this can lead to the same kind of race:
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+  VM 0, VCPU 0			VM 0, VCPU 1
+  ------------			------------
+  update_vttbr (vmid 254)
+  				update_vttbr (vmid 1) // roll over
+				read_lock(kvm_vmid_lock);
+				force_vm_exit()
+  local_irq_disable
+  need_new_vmid_gen == false //because vmid gen matches
+
+  enter_guest (vmid 254)
+  				kvm_arch.vttbr = <PGD>:<VMID 1>
+				read_unlock(kvm_vmid_lock);
+
+  				enter_guest (vmid 1)
+
+Which results in running two VCPUs in the same VM with different VMIDs
+and (even worse) other VCPUs from other VMs could now allocate clashing
+VMID 254 from the new generation as long as VCPU 0 is not exiting.
+
+Attempt to solve this by making sure vttbr is updated before another CPU
+can observe the updated VMID generation.
+
+Cc: stable@vger.kernel.org
+Fixes: f0cf47d939d0 "KVM: arm/arm64: Close VMID generation race"
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ virt/kvm/arm/arm.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d496ef5..bad713f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -373,6 +373,46 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 23774970c9df..abcd29db2d7a 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -66,7 +66,7 @@ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
+ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+ static u32 kvm_next_vmid;
+ static unsigned int kvm_vmid_bits __read_mostly;
+-static DEFINE_RWLOCK(kvm_vmid_lock);
++static DEFINE_SPINLOCK(kvm_vmid_lock);
+ 
+ static bool vgic_present;
+ 
+@@ -484,7 +484,9 @@ void force_vm_exit(const cpumask_t *mask)
+  */
+ static bool need_new_vmid_gen(struct kvm *kvm)
+ {
+-	return unlikely(kvm->arch.vmid_gen != atomic64_read(&kvm_vmid_gen));
++	u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
++	smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
++	return unlikely(READ_ONCE(kvm->arch.vmid_gen) != current_vmid_gen);
  }
  
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
-+	u32 clr, set;
-+
-+	host = container_of(host_ctxt, struct kvm_host_data, __kvm_cpu_state);
-+	pmu = &host->pmu_events;
-+
-+	clr = pmu->events_host & ~pmu->events_guest;
-+	set = pmu->events_guest & ~pmu->events_host;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+
-+	return (clr || set);
-+}
-+
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
-+	u32 clr, set;
-+
-+	host = container_of(host_ctxt, struct kvm_host_data, __kvm_cpu_state);
-+	pmu = &host->pmu_events;
-+
-+	clr = pmu->events_guest & ~pmu->events_host;
-+	set = pmu->events_host & ~pmu->events_guest;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -488,12 +528,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ /**
+@@ -499,16 +501,11 @@ static void update_vttbr(struct kvm *kvm)
  {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
+ 	phys_addr_t pgd_phys;
+ 	u64 vmid, cnp = kvm_cpu_has_cnp() ? VTTBR_CNP_BIT : 0;
+-	bool new_gen;
  
- 	host_ctxt = vcpu->arch.host_cpu_context;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
+-	read_lock(&kvm_vmid_lock);
+-	new_gen = need_new_vmid_gen(kvm);
+-	read_unlock(&kvm_vmid_lock);
+-
+-	if (!new_gen)
++	if (!need_new_vmid_gen(kvm))
+ 		return;
  
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	sysreg_save_host_state_vhe(host_ctxt);
+-	write_lock(&kvm_vmid_lock);
++	spin_lock(&kvm_vmid_lock);
  
- 	__activate_traps(vcpu);
-@@ -524,6 +567,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
-@@ -532,6 +578,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
-@@ -540,6 +587,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -586,6 +635,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * We need to re-check the vmid_gen here to ensure that if another vcpu
+@@ -516,7 +513,7 @@ static void update_vttbr(struct kvm *kvm)
+ 	 * use the same vmid.
  	 */
- 	__debug_switch_to_host(vcpu);
+ 	if (!need_new_vmid_gen(kvm)) {
+-		write_unlock(&kvm_vmid_lock);
++		spin_unlock(&kvm_vmid_lock);
+ 		return;
+ 	}
  
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
+@@ -539,7 +536,6 @@ static void update_vttbr(struct kvm *kvm)
+ 		kvm_call_hyp(__kvm_flush_vm_context);
+ 	}
+ 
+-	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
+ 	kvm->arch.vmid = kvm_next_vmid;
+ 	kvm_next_vmid++;
+ 	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
+@@ -550,7 +546,10 @@ static void update_vttbr(struct kvm *kvm)
+ 	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
+ 	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid | cnp;
+ 
+-	write_unlock(&kvm_vmid_lock);
++	smp_wmb();
++	WRITE_ONCE(kvm->arch.vmid_gen, atomic64_read(&kvm_vmid_gen));
 +
- 	return exit_code;
++	spin_unlock(&kvm_vmid_lock);
  }
  
+ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
 -- 
-2.7.4
+2.18.0
