@@ -1,35 +1,82 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
-Date: Tue, 11 Dec 2018 10:31:01 -0800
-Message-ID: <20181211183101.GA31936@infradead.org>
-References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Tue, 11 Dec 2018 19:36:34 +0100
+Message-ID: <20181211183634.GO27375@zn.tnic>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-11-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 949F34A200
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 13:36:58 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nuldoJk68oT7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 13:36:57 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B2ABF4A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 13:36:57 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20181211182104.18241-1-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+In-Reply-To: <20181203180613.228133-11-james.morse@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 11, 2018 at 06:20:57PM +0000, Jean-Philippe Brucker wrote:
-> Implement the virtio-iommu driver, following specification v0.9 [1].
+On Mon, Dec 03, 2018 at 06:05:58PM +0000, James Morse wrote:
+> ACPI has a GHESv2 which is used on hardware reduced platforms to
+> explicitly acknowledge that the memory for CPER records has been
+> consumed. This lets an external agent know it can re-use this
+> memory for something else.
 > 
-> Only minor changes since v5 [2]. I fixed issues reported by Michael and
-> added tags from Eric and Bharat. Thanks!
+> Previously notify_nmi and the estatus queue didn't do this as
+> they were never used on hardware reduced platforms. Once we move
+> notify_sea over to use the estatus queue, it may become necessary.
 > 
-> You can find Linux driver and kvmtool device on v0.9 branches [3],
-> module and x86 support on virtio-iommu/devel. Also tested with Eric's
-> QEMU device [4].
+> Add the call. This is safe for use in NMI context as the
+> read_ack_register is pre-mapped by ghes_new() before the
+> ghes can be added to an RCU list, and then found by the
+> notification handler.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  drivers/acpi/apei/ghes.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+> index 366dbdd41ef3..15d94373ba72 100644
+> --- a/drivers/acpi/apei/ghes.c
+> +++ b/drivers/acpi/apei/ghes.c
+> @@ -926,6 +926,10 @@ static int _in_nmi_notify_one(struct ghes *ghes)
+>  	__process_error(ghes);
+>  	ghes_clear_estatus(ghes, buf_paddr);
+>  
+> +	if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
 
-Just curious, what is the use case for it?
+Since ghes_ack_error() is always prepended with this check, you could
+push it down into the function:
+
+ghes_ack_error(ghes)
+...
+
+	if (!is_hest_type_generic_v2(ghes))
+		return 0;
+
+and simplify the two callsites :)
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
