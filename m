@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 09/24] KVM: arm64: Propagate vcpu into read_id_reg()
-Date: Tue, 11 Dec 2018 23:28:46 +0000
-Message-ID: <1544570941-7377-10-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v3 10/24] KVM: arm64: Extend reset_unknown() to handle
+ mixed RES0/UNKNOWN registers
+Date: Tue, 11 Dec 2018 23:28:47 +0000
+Message-ID: <1544570941-7377-11-git-send-email-Dave.Martin@arm.com>
 References: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 300A04A374
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D094C4A384
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8gJVWUS-BeF4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 18:30:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FDD4A370
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:07 -0500 (EST)
+ with ESMTP id Wx9tPX--1Y6C for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 18:30:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B67414A370
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:09 -0500 (EST)
 In-Reply-To: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +32,69 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QXJjaGl0ZWN0dXJlIGZlYXR1cmVzIHRoYXQgYXJlIGNvbmRpdGlvbmFsbHkgdmlzaWJsZSB0byB0
-aGUgZ3Vlc3QKd2lsbCByZXF1aXJlIHJ1bi10aW1lIGNoZWNrcyBpbiB0aGUgSUQgcmVnaXN0ZXIg
-YWNjZXNzb3IgZnVuY3Rpb25zLgpJbiBwYXJ0aWN1bGFyLCByZWFkX2lkX3JlZygpIHdpbGwgbmVl
-ZCB0byBwZXJmb3JtIGNoZWNrcyBpbiBvcmRlcgp0byBnZW5lcmF0ZSB0aGUgY29ycmVjdCBlbXVs
-YXRlZCB2YWx1ZSBmb3IgY2VydGFpbiBJRCByZWdpc3RlcgpmaWVsZHMgc3VjaCBhcyBJRF9BQTY0
-UEZSMF9FTDEuU1ZFIGZvciBleGFtcGxlLgoKVGhpcyBwYXRjaCBwcm9wYWdhdGVzIHZjcHUgaW50
-byByZWFkX2lkX3JlZygpIHNvIHRoYXQgZnV0dXJlCnBhdGNoZXMgY2FuIGFkZCBydW4tdGltZSBj
-aGVja3Mgb24gdGhlIGd1ZXN0IGNvbmZpZ3VyYXRpb24gaGVyZS4KCkZvciBub3csIHRoZXJlIGlz
-IG5vIGZ1bmN0aW9uYWwgY2hhbmdlLgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUu
-TWFydGluQGFybS5jb20+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxp
-bmFyby5vcmc+Ci0tLQogYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDIzICsrKysrKysrKysr
-KystLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRp
-b25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJt
-NjQva3ZtL3N5c19yZWdzLmMKaW5kZXggMjJmYmJkYi4uMGRmZDA2NCAxMDA2NDQKLS0tIGEvYXJj
-aC9hcm02NC9rdm0vc3lzX3JlZ3MuYworKysgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCkBA
-IC0xMDI5LDcgKzEwMjksOCBAQCBzdGF0aWMgYm9vbCBhY2Nlc3NfY250cF9jdmFsKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwKIH0KIAogLyogUmVhZCBhIHNhbml0aXNlZCBjcHVmZWF0dXJlIElEIHJl
-Z2lzdGVyIGJ5IHN5c19yZWdfZGVzYyAqLwotc3RhdGljIHU2NCByZWFkX2lkX3JlZyhzdHJ1Y3Qg
-c3lzX3JlZ19kZXNjIGNvbnN0ICpyLCBib29sIHJheikKK3N0YXRpYyB1NjQgcmVhZF9pZF9yZWco
-Y29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQlzdHJ1Y3Qgc3lzX3JlZ19kZXNjIGNvbnN0
-ICpyLCBib29sIHJheikKIHsKIAl1MzIgaWQgPSBzeXNfcmVnKCh1MzIpci0+T3AwLCAodTMyKXIt
-Pk9wMSwKIAkJCSAodTMyKXItPkNSbiwgKHUzMilyLT5DUm0sICh1MzIpci0+T3AyKTsKQEAgLTEw
-NjAsNyArMTA2MSw3IEBAIHN0YXRpYyBib29sIF9fYWNjZXNzX2lkX3JlZyhzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsCiAJaWYgKHAtPmlzX3dyaXRlKQogCQlyZXR1cm4gd3JpdGVfdG9fcmVhZF9vbmx5
-KHZjcHUsIHAsIHIpOwogCi0JcC0+cmVndmFsID0gcmVhZF9pZF9yZWcociwgcmF6KTsKKwlwLT5y
-ZWd2YWwgPSByZWFkX2lkX3JlZyh2Y3B1LCByLCByYXopOwogCXJldHVybiB0cnVlOwogfQogCkBA
-IC0xMDg5LDE2ICsxMDkwLDE4IEBAIHN0YXRpYyB1NjQgc3lzX3JlZ190b19pbmRleChjb25zdCBz
-dHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZWcpOwogICogYXJlIHN0b3JlZCwgYW5kIGZvciBzZXRfaWRf
-cmVnKCkgd2UgZG9uJ3QgYWxsb3cgdGhlIGVmZmVjdGl2ZSB2YWx1ZQogICogdG8gYmUgY2hhbmdl
-ZC4KICAqLwotc3RhdGljIGludCBfX2dldF9pZF9yZWcoY29uc3Qgc3RydWN0IHN5c19yZWdfZGVz
-YyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKK3N0YXRpYyBpbnQgX19nZXRfaWRfcmVnKGNvbnN0
-IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJCWNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJk
-LCB2b2lkIF9fdXNlciAqdWFkZHIsCiAJCQlib29sIHJheikKIHsKIAljb25zdCB1NjQgaWQgPSBz
-eXNfcmVnX3RvX2luZGV4KHJkKTsKLQljb25zdCB1NjQgdmFsID0gcmVhZF9pZF9yZWcocmQsIHJh
-eik7CisJY29uc3QgdTY0IHZhbCA9IHJlYWRfaWRfcmVnKHZjcHUsIHJkLCByYXopOwogCiAJcmV0
-dXJuIHJlZ190b191c2VyKHVhZGRyLCAmdmFsLCBpZCk7CiB9CiAKLXN0YXRpYyBpbnQgX19zZXRf
-aWRfcmVnKGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLCB2b2lkIF9fdXNlciAqdWFkZHIs
-CitzdGF0aWMgaW50IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCisJ
-CQljb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIgKnVhZGRyLAogCQkJ
-Ym9vbCByYXopCiB7CiAJY29uc3QgdTY0IGlkID0gc3lzX3JlZ190b19pbmRleChyZCk7CkBAIC0x
-MTEwLDcgKzExMTMsNyBAQCBzdGF0aWMgaW50IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qgc3lz
-X3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIgKnVhZGRyLAogCQlyZXR1cm4gZXJyOwogCiAJLyog
-VGhpcyBpcyB3aGF0IHdlIG1lYW4gYnkgaW52YXJpYW50OiB5b3UgY2FuJ3QgY2hhbmdlIGl0LiAq
-LwotCWlmICh2YWwgIT0gcmVhZF9pZF9yZWcocmQsIHJheikpCisJaWYgKHZhbCAhPSByZWFkX2lk
-X3JlZyh2Y3B1LCByZCwgcmF6KSkKIAkJcmV0dXJuIC1FSU5WQUw7CiAKIAlyZXR1cm4gMDsKQEAg
-LTExMTksMjUgKzExMjIsMjUgQEAgc3RhdGljIGludCBfX3NldF9pZF9yZWcoY29uc3Qgc3RydWN0
-IHN5c19yZWdfZGVzYyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKIHN0YXRpYyBpbnQgZ2V0X2lk
-X3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJk
-LAogCQkgICAgICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVh
-ZGRyKQogewotCXJldHVybiBfX2dldF9pZF9yZWcocmQsIHVhZGRyLCBmYWxzZSk7CisJcmV0dXJu
-IF9fZ2V0X2lkX3JlZyh2Y3B1LCByZCwgdWFkZHIsIGZhbHNlKTsKIH0KIAogc3RhdGljIGludCBz
-ZXRfaWRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVz
-YyAqcmQsCiAJCSAgICAgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNl
-ciAqdWFkZHIpCiB7Ci0JcmV0dXJuIF9fc2V0X2lkX3JlZyhyZCwgdWFkZHIsIGZhbHNlKTsKKwly
-ZXR1cm4gX19zZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRkciwgZmFsc2UpOwogfQogCiBzdGF0aWMg
-aW50IGdldF9yYXpfaWRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5
-c19yZWdfZGVzYyAqcmQsCiAJCQkgIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lk
-IF9fdXNlciAqdWFkZHIpCiB7Ci0JcmV0dXJuIF9fZ2V0X2lkX3JlZyhyZCwgdWFkZHIsIHRydWUp
-OworCXJldHVybiBfX2dldF9pZF9yZWcodmNwdSwgcmQsIHVhZGRyLCB0cnVlKTsKIH0KIAogc3Rh
-dGljIGludCBzZXRfcmF6X2lkX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVj
-dCBzeXNfcmVnX2Rlc2MgKnJkLAogCQkJICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywg
-dm9pZCBfX3VzZXIgKnVhZGRyKQogewotCXJldHVybiBfX3NldF9pZF9yZWcocmQsIHVhZGRyLCB0
-cnVlKTsKKwlyZXR1cm4gX19zZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRkciwgdHJ1ZSk7CiB9CiAK
-IC8qIHN5c19yZWdfZGVzYyBpbml0aWFsaXNlciBmb3Iga25vd24gY3B1ZmVhdHVyZSBJRCByZWdp
-c3RlcnMgKi8KLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
-ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+The reset_unknown() system register helper initialises a guest
+register to a distinctive junk value on vcpu reset, to help expose
+and debug deficient register initialisation within the guest.
+
+Some registers such as the SVE control register ZCR_EL1 contain a
+mixture of UNKNOWN fields and RES0 bits.  For these,
+reset_unknown() does not work at present, since it sets all bits to
+junk values instead of just the wanted bits.
+
+There is no need to craft another special helper just for that,
+since reset_unknown() almost does the appropriate thing anyway.
+This patch takes advantage of the ununused val field in struct
+sys_reg_desc to specify a mask of bits that should be initialised
+to zero instead of junk.
+
+All existing users of reset_unknown() do not (and should not)
+define a value for val, so they will implicitly set it to zero,
+resulting in all bits being made UNKNOWN by this function: thus,
+this patch makes no functional change for currently defined
+registers.
+
+Future patches will make use of non-zero val.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+
+---
+
+Changes since RFC v2:
+
+ * Document the reset_unknown() semantics of val in the struct
+   sys_reg_desc definition in sys_regs.h.
+---
+ arch/arm64/kvm/sys_regs.h | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index cd710f8..add27cc 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -53,7 +53,12 @@ struct sys_reg_desc {
+ 	/* Index into sys_reg[], or 0 if we don't need to save it. */
+ 	int reg;
+ 
+-	/* Value (usually reset value) */
++	/*
++	 * Value (usually reset value)
++	 * For reset_unknown, each bit set to 1 in val is treated as
++	 * RES0 in the register: the corresponding register bit is
++	 * reset to 0 instead of "unknown".
++	 */
+ 	u64 val;
+ 
+ 	/* Custom get/set_user functions, fallback to generic if NULL */
+@@ -89,7 +94,9 @@ static inline void reset_unknown(struct kvm_vcpu *vcpu,
+ {
+ 	BUG_ON(!r->reg);
+ 	BUG_ON(r->reg >= NR_SYS_REGS);
+-	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL;
++
++	/* If non-zero, r->val specifies which register bits are RES0: */
++	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL & ~r->val;
+ }
+ 
+ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-- 
+2.1.4
