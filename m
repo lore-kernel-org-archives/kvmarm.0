@@ -1,112 +1,104 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 06/25] ACPI / APEI: Don't store CPER records physical
- address in struct ghes
-Date: Tue, 11 Dec 2018 18:04:30 +0100
-Message-ID: <20181211170430.GK27375@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-7-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4C8D4A2BB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:04:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rOJWc9lEKHjq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 12:04:40 -0500 (EST)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12D504A1DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 12:04:40 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-7-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v10 0/8] kvm: arm64: Support PUD hugepage at stage 2
+Date: Tue, 11 Dec 2018 17:10:33 +0000
+Message-ID: <1544548241-6417-1-git-send-email-suzuki.poulose@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: suzuki.poulose@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@arm.com, will.deacon@arm.com, catalin.marinas@arm.com, anshuman.khandual@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:05:54PM +0000, James Morse wrote:
-> When CPER records are found the address of the records is stashed
-> in the struct ghes. Once the records have been processed, this
-> address is overwritten with zero so that it won't be processed
-> again without being re-populated by firmware.
-> 
-> This goes wrong if a struct ghes can be processed concurrently,
-> as can happen at probe time when an NMI occurs. If the NMI arrives
-> on another CPU, the probing CPU may call ghes_clear_estatus() on the
-> records before the handler had finished with them.
-> Even on the same CPU, once the interrupted handler is resumed, it
-> will call ghes_clear_estatus() on the NMIs records, this memory may
-> have already been re-used by firmware.
-> 
-> Avoid this stashing by letting the caller hold the address. A
-> later patch will do away with the use of ghes->flags in the
-> read/clear code too.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> 
-> ---
-> Changes since v6:
->  * Moved earlier in the series
->  * Added buf_adder = 0 on all the error paths, and test for it in
->    ghes_estatus_clear() for extra sanity.
-> ---
->  drivers/acpi/apei/ghes.c | 40 +++++++++++++++++++++++-----------------
->  include/acpi/ghes.h      |  1 -
->  2 files changed, 23 insertions(+), 18 deletions(-)
+This series is an update to the PUD hugepage support previously posted
+at [0]. This patchset adds support for PUD hugepages at stage 2 a
+feature that is useful on cores that have support for large sized TLB
+mappings (e.g., 1GB for 4K granule).
 
-...
+The patches are based on v4.20-rc4
 
-> @@ -349,17 +350,20 @@ static int ghes_read_estatus(struct ghes *ghes)
->  	if (rc)
->  		pr_warn_ratelimited(FW_WARN GHES_PFX
->  				    "Failed to read error status block!\n");
-> +
->  	return rc;
->  }
->  
-> -static void ghes_clear_estatus(struct ghes *ghes)
-> +static void ghes_clear_estatus(struct ghes *ghes, u64 buf_paddr)
->  {
->  	ghes->estatus->block_status = 0;
->  	if (!(ghes->flags & GHES_TO_CLEAR))
->  		return;
-> -	ghes_copy_tofrom_phys(ghes->estatus, ghes->buffer_paddr,
-> -			      sizeof(ghes->estatus->block_status), 0);
-> -	ghes->flags &= ~GHES_TO_CLEAR;
+The patches have been tested on AMD Seattle system with the following
+hugepage sizes - 2M and 1G.
 
-<---- newline here.
+Right now the PUD hugepage for stage2 is only supported if the stage2
+has 4 levels. i.e, with an IPA size of minimum 44bits with 4K pages.
+This could be relaxed to stage2 with 3 levels, with the stage1 PUD huge
+page mapped in the entry level of the stage2 (i.e, pgd). I have not
+added the change here to keep this version stable w.r.t the previous
+version. I could post a patch later after further discussions in the
+list.
 
-> +	if (buf_paddr) {
 
-Also, you can save yourself an indendation level:
+[0] https://patchwork.kernel.org/cover/10622379/
 
-	if (!buf_paddr)
-		return;
+v9 -> v10
+* Address comments on v9. Mainly converting BUG() => WARN_ON(1)
+  in arm32 for PUD helpers.
+* Dropped Suzuki's "Review" tags from the patches which were modified.
 
-	ghes_copy...
+v8 -> v9
 
-> +		ghes_copy_tofrom_phys(ghes->estatus, buf_paddr,
-> +				      sizeof(ghes->estatus->block_status), 0);
-> +		ghes->flags &= ~GHES_TO_CLEAR;
-> +	}
->  }
+* Dropped bugfix patch 1 which has been merged
 
-With that addressed:
+v7 -> v8
 
-Reviewed-by: Borislav Petkov <bp@suse.de>
+* Add kvm_stage2_has_pud() helper on arm32
+* Rebased to v6 of 52bit dynamic IPA support
+
+v6 -> v7
+
+* Restrict thp check to exclude hugetlbfs pages - Patch 1
+* Don't update PUD entry if there's no change - Patch 9
+* Add check for PUD level in stage 2 - Patch 9
+
+v5 -> v6
+
+* Split Patch 1 to move out the refactoring of exec permissions on
+  page table entries.
+* Patch 4 - Initialise p*dpp pointers in stage2_get_leaf_entry()
+* Patch 5 - Trigger a BUG() in kvm_pud_pfn() on arm
+
+v4 -> v5:
+* Patch 1 - Drop helper stage2_should_exec() and refactor the
+  condition to decide if a page table entry should be marked
+  executable
+* Patch 4-6 - Introduce stage2_get_leaf_entry() and use it in this and
+  latter patches
+* Patch 7 - Use stage 2 accessors instead of using the page table
+  helpers directly
+* Patch 7 - Add a note to update the PUD hugepage support when number
+  of levels of stage 2 tables differs from stage 1
+
+v3 -> v4:
+* Patch 1 and 7 - Don't put down hugepages pte if logging is enabled
+* Patch 4-5 - Add PUD hugepage support for exec and access faults
+* Patch 6 - PUD hugepage support for aging page table entries
+
+v2 -> v3:
+* Update vma_pagesize directly if THP [1/4]. Previsouly this was done
+  indirectly via hugetlb
+* Added review tag [4/4]
+
+v1 -> v2:
+* Create helper to check if the page should have exec permission [1/4]
+* Fix broken condition to detect THP hugepage [1/4]
+* Fix in-correct hunk resulting from a rebase [4/4]
+
+Punit Agrawal (8):
+  KVM: arm/arm64: Share common code in user_mem_abort()
+  KVM: arm/arm64: Re-factor setting the Stage 2 entry to exec on fault
+  KVM: arm/arm64: Introduce helpers to manipulate page table entries
+  KVM: arm64: Support dirty page tracking for PUD hugepages
+  KVM: arm64: Support PUD hugepage in stage2_is_exec()
+  KVM: arm64: Support handling access faults for PUD hugepages
+  KVM: arm64: Update age handlers to support PUD hugepages
+  KVM: arm64: Add support for creating PUD hugepages at stage 2
+
+ arch/arm/include/asm/kvm_mmu.h         |  61 +++++++
+ arch/arm/include/asm/stage2_pgtable.h  |   5 +
+ arch/arm64/include/asm/kvm_mmu.h       |  48 +++++
+ arch/arm64/include/asm/pgtable-hwdef.h |   4 +
+ arch/arm64/include/asm/pgtable.h       |   9 +
+ virt/kvm/arm/mmu.c                     | 312 ++++++++++++++++++++++++---------
+ 6 files changed, 360 insertions(+), 79 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.7.4
