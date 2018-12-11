@@ -1,122 +1,141 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH] KVM: arm/arm64: Fix VMID alloc race by reverting to lock-less
-Date: Tue, 11 Dec 2018 13:23:57 +0100
-Message-ID: <20181211122357.15320-1-christoffer.dall@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, julien.thierry@arm.com, Christoffer Dall <christoffer.dall@arm.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v7 2/5] arm64: KVM: encapsulate kvm_cpu_context in
+ kvm_host_data
+Date: Tue, 11 Dec 2018 13:29:51 +0100
+Message-ID: <20181211122951.GY30263@e113682-lin.lund.arm.com>
+References: <1544530420-1477-1-git-send-email-andrew.murray@arm.com>
+ <1544530420-1477-3-git-send-email-andrew.murray@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2024A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:29:55 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kx5HEKHXI3v0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 07:29:54 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64DB84A1DC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:29:54 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1544530420-1477-3-git-send-email-andrew.murray@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We recently addressed a VMID generation race by introducing a read/write
-lock around accesses and updates to the vmid generation values.
+On Tue, Dec 11, 2018 at 12:13:37PM +0000, Andrew Murray wrote:
+> The virt/arm core allocates a percpu structure as per the kvm_cpu_context_t
+> type, at present this is typedef'd to kvm_cpu_context and used to store
+> host cpu context. The kvm_cpu_context structure is also used elsewhere to
+> hold vcpu context. In order to use the percpu to hold additional future
+> host information we encapsulate kvm_cpu_context in a new structure.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 8 ++++++--
+>  arch/arm64/kernel/asm-offsets.c   | 3 ++-
+>  virt/kvm/arm/arm.c                | 4 +++-
+>  3 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1550192..bcf9d60 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -205,7 +205,11 @@ struct kvm_cpu_context {
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+>  };
+>  
+> -typedef struct kvm_cpu_context kvm_cpu_context_t;
+> +struct kvm_host_data {
+> +	struct kvm_cpu_context __kvm_cpu_state;
+> +};
+> +
+> +typedef struct kvm_host_data kvm_cpu_context_t;
 
-However, kvm_arch_vcpu_ioctl_run() also calls need_new_vmid_gen() but
-does so without taking the read lock.
+Now I'm confused based on the conversation on the last version.
 
-As far as I can tell, this can lead to the same kind of race:
+I think it's bizarre to use the typedef to rename things in this way.
 
-  VM 0, VCPU 0			VM 0, VCPU 1
-  ------------			------------
-  update_vttbr (vmid 254)
-  				update_vttbr (vmid 1) // roll over
-				read_lock(kvm_vmid_lock);
-				force_vm_exit()
-  local_irq_disable
-  need_new_vmid_gen == false //because vmid gen matches
+Can you please make this:
 
-  enter_guest (vmid 254)
-  				kvm_arch.vttbr = <PGD>:<VMID 1>
-				read_unlock(kvm_vmid_lock);
+   struct kvm_cpu_context;
+   typedef struct kvm_cpu_context kvm_cpu_context_t;
 
-  				enter_guest (vmid 1)
+   struct kvm_host_data;
+   typedef struct kvm_host_data kvm_host_data_t;
 
-Which results in running two VCPUs in the same VM with different VMIDs
-and (even worse) other VCPUs from other VMs could now allocate clashing
-VMID 254 from the new generation as long as VCPU 0 is not exiting.
+And change the code with the fallout from that.
 
-Attempt to solve this by making sure vttbr is updated before another CPU
-can observe the updated VMID generation.
 
-Cc: stable@vger.kernel.org
-Fixes: f0cf47d939d0 "KVM: arm/arm64: Close VMID generation race"
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- virt/kvm/arm/arm.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+>  
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+> @@ -241,7 +245,7 @@ struct kvm_vcpu_arch {
+>  	struct kvm_guest_debug_arch external_debug_state;
+>  
+>  	/* Pointer to host CPU context */
+> -	kvm_cpu_context_t *host_cpu_context;
+> +	struct kvm_cpu_context *host_cpu_context;
+>  
+>  	struct thread_info *host_thread_info;	/* hyp VA */
+>  	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index 323aeb5..da34022 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -142,7 +142,8 @@ int main(void)
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+>    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+> -  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
+> +  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu)
+> +				+ offsetof(struct kvm_host_data, __kvm_cpu_state));
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 23774970c9df..abcd29db2d7a 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -66,7 +66,7 @@ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_arm_running_vcpu);
- static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
- static u32 kvm_next_vmid;
- static unsigned int kvm_vmid_bits __read_mostly;
--static DEFINE_RWLOCK(kvm_vmid_lock);
-+static DEFINE_SPINLOCK(kvm_vmid_lock);
- 
- static bool vgic_present;
- 
-@@ -484,7 +484,9 @@ void force_vm_exit(const cpumask_t *mask)
-  */
- static bool need_new_vmid_gen(struct kvm *kvm)
- {
--	return unlikely(kvm->arch.vmid_gen != atomic64_read(&kvm_vmid_gen));
-+	u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
-+	smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
-+	return unlikely(READ_ONCE(kvm->arch.vmid_gen) != current_vmid_gen);
- }
- 
- /**
-@@ -499,16 +501,11 @@ static void update_vttbr(struct kvm *kvm)
- {
- 	phys_addr_t pgd_phys;
- 	u64 vmid, cnp = kvm_cpu_has_cnp() ? VTTBR_CNP_BIT : 0;
--	bool new_gen;
- 
--	read_lock(&kvm_vmid_lock);
--	new_gen = need_new_vmid_gen(kvm);
--	read_unlock(&kvm_vmid_lock);
--
--	if (!new_gen)
-+	if (!need_new_vmid_gen(kvm))
- 		return;
- 
--	write_lock(&kvm_vmid_lock);
-+	spin_lock(&kvm_vmid_lock);
- 
- 	/*
- 	 * We need to re-check the vmid_gen here to ensure that if another vcpu
-@@ -516,7 +513,7 @@ static void update_vttbr(struct kvm *kvm)
- 	 * use the same vmid.
- 	 */
- 	if (!need_new_vmid_gen(kvm)) {
--		write_unlock(&kvm_vmid_lock);
-+		spin_unlock(&kvm_vmid_lock);
- 		return;
- 	}
- 
-@@ -539,7 +536,6 @@ static void update_vttbr(struct kvm *kvm)
- 		kvm_call_hyp(__kvm_flush_vm_context);
- 	}
- 
--	kvm->arch.vmid_gen = atomic64_read(&kvm_vmid_gen);
- 	kvm->arch.vmid = kvm_next_vmid;
- 	kvm_next_vmid++;
- 	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
-@@ -550,7 +546,10 @@ static void update_vttbr(struct kvm *kvm)
- 	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
- 	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid | cnp;
- 
--	write_unlock(&kvm_vmid_lock);
-+	smp_wmb();
-+	WRITE_ONCE(kvm->arch.vmid_gen, atomic64_read(&kvm_vmid_gen));
-+
-+	spin_unlock(&kvm_vmid_lock);
- }
- 
- static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
--- 
-2.18.0
+This should be HOST_DATA_VCPU, then.
+
+
+Thanks,
+
+    Christoffer
+
+>  #endif
+>  #ifdef CONFIG_CPU_PM
+>    DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 150c8a6..4f2e534 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -361,8 +361,10 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	int *last_ran;
+> +	kvm_cpu_context_t *cpu_ctxt;
+>  
+>  	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
+> +	cpu_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
+>  
+>  	/*
+>  	 * We might get preempted before the vCPU actually runs, but
+> @@ -374,7 +376,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	}
+>  
+>  	vcpu->cpu = cpu;
+> -	vcpu->arch.host_cpu_context = this_cpu_ptr(&kvm_host_cpu_state);
+> +	vcpu->arch.host_cpu_context = &cpu_ctxt->__kvm_cpu_state;
+>  
+>  	kvm_arm_set_running_vcpu(vcpu);
+>  	kvm_vgic_load(vcpu);
+> -- 
+> 2.7.4
+> 
