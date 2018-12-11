@@ -1,58 +1,94 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH] KVM: arm/arm64: vgic-v2: Set active_source to 0 when restoring state
-Date: Tue, 11 Dec 2018 12:51:03 +0100
-Message-ID: <20181211115103.12212-1-christoffer.dall@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, stable@vger.kernel.org
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: [PATCH v7 0/5] arm64: Support perf event modifiers :G and :H
+Date: Tue, 11 Dec 2018 12:13:35 +0000
+Message-ID: <1544530420-1477-1-git-send-email-andrew.murray@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 45F4B4A36F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:14:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WW0TTRN9BHPk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 07:14:05 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 459024A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 07:14:05 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When restoring the active state from userspace, we don't know which CPU
-was the source for the active state, and this is not architecturally
-exposed in any of the register state.
+This patchset provides support for perf event modifiers :G and :H which
+allows for filtering of PMU events between host and guests when used
+with KVM.
 
-Set the active_source to 0 in this case.  In the future, we can expand
-on this and exposse the information as additional information to
-userspace for GICv2 if anyone cares.
+As the underlying hardware cannot distinguish between guest and host
+context, the performance counters must be stopped and started upon
+entry/exit to the guest. This is performed at EL2 in a way that
+minimizes overhead and improves accuracy of recording events that only
+occur in the requested context.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- virt/kvm/arm/vgic/vgic-mmio.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+This has been tested with VHE and non-VHE kernels with a KVM guest.
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index f56ff1cf52ec..2b450d49a046 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -338,11 +338,26 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
- 	} else {
- 		u32 model = vcpu->kvm->arch.vgic.vgic_model;
-+		u8 active_source;
- 
- 		irq->active = active;
-+
-+		/*
-+		 * The GICv2 architecture indicates that the source CPUID for
-+		 * an SGI should be provided during an EOI which implies that
-+		 * the active state is stored somewhere, but at the same time
-+		 * this state is not architecturally exposed anywhere and we
-+		 * have no way of knowing the right source.
-+		 *
-+		 * This may lead to a VCPU not being able to receive
-+		 * additional instances of a particular SGI after migration
-+		 * for a GICv2 VM on some GIC implementations.  Oh well.
-+		 */
-+		active_source = (requester_vcpu) ? requester_vcpu->vcpu_id : 0;
-+
- 		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
- 		    active && vgic_irq_is_sgi(irq->intid))
--			irq->active_source = requester_vcpu->vcpu_id;
-+			irq->active_source = active_source;
- 	}
- 
- 	if (irq->active)
+Changes from v6:
+
+ - Move events_host/events_guest out of kvm_cpu_context
+
+Changes from v5:
+
+ - Tweak logic in use of kvm_set_pmu_events
+
+Changes from v4:
+
+ - Prevent unnecessary write_sysreg calls by improving
+   __pmu_switch_to_xxx logic.
+
+Changes from v3:
+
+ - Remove confusing _only suffix from bitfields in kvm_cpu_context
+ - Remove unnecessary condition when clearing event bits in disable
+ - Simplify API of KVM accessors
+ - Prevent unnecessary setting of pmcnten when guest/host events are
+   the same.
+
+Changes from v2:
+
+ - Ensured that exclude_kernel works for guest
+ - Removed unnecessary exclusion of EL2 with exclude_host on !VHE
+ - Renamed kvm_clr_set_host_pmu_events to reflect args order
+ - Added additional information to isb patch
+
+Changes from v1:
+
+ - Removed unnecessary exclusion of EL1 with exclude_guest on VHE
+ - Removed unnecessary isb from existing perf_event.c driver
+ - Folded perf_event.c patches together
+ - Added additional information to last patch commit message
+
+Andrew Murray (5):
+  arm64: arm_pmu: remove unnecessary isb instruction
+  arm64: KVM: encapsulate kvm_cpu_context in kvm_host_data
+  arm64: KVM: add accessors to track guest/host only counters
+  arm64: arm_pmu: Add support for exclude_host/exclude_guest attributes
+  arm64: KVM: Enable support for :G/:H perf event modifiers
+
+ arch/arm64/include/asm/kvm_host.h | 36 +++++++++++++++++++++++++--
+ arch/arm64/kernel/asm-offsets.c   |  3 ++-
+ arch/arm64/kernel/perf_event.c    | 52 +++++++++++++++++++++++++++++++++------
+ arch/arm64/kvm/hyp/switch.c       | 52 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/arm.c                |  4 ++-
+ 5 files changed, 135 insertions(+), 12 deletions(-)
+
 -- 
-2.18.0
+2.7.4
