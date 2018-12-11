@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 16/24] KVM: arm64/sve: Add SVE support to register
- access ioctl interface
-Date: Tue, 11 Dec 2018 23:28:53 +0000
-Message-ID: <1544570941-7377-17-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v3 19/24] KVM: arm: Move detection of invalid VM type bits
+ to generic code
+Date: Tue, 11 Dec 2018 23:28:56 +0000
+Message-ID: <1544570941-7377-20-git-send-email-Dave.Martin@arm.com>
 References: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5EB34A2BA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5959D4A370
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a8YFVfik7b0j for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 18:30:21 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62CD24A327
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:21 -0500 (EST)
+ with ESMTP id 2HaEEQ2qvQQq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 18:30:27 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1665B4A394
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:27 -0500 (EST)
 In-Reply-To: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,35 +32,16 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds the following registers for access via the
-KVM_{GET,SET}_ONE_REG interface:
+Currently, the detection of invalid bits in the KVM_CREATE_VM type
+argument is done in the kvm_arm_setup_stage2() backend.
 
- * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
- * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
- * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
+In order to make it easier to add type flags with independent
+meanings, this patch moves the logic for rejecting invalid bits to
+kvm_arch_init_vm().  Backend functions are now responsible for
+clearing bits they know about from type, so that if any remain
+after all such functions are called, we know they are invalid.
 
-In order to adapt gracefully to future architectural extensions,
-the registers are divided up into slices as noted above:  the i
-parameter denotes the slice index.
-
-For simplicity, bits or slices that exceed the maximum vector
-length supported for the vcpu are ignored for KVM_SET_ONE_REG, and
-read as zero for KVM_GET_ONE_REG.
-
-For the current architecture, only slice i = 0 is significant.  The
-interface design allows i to increase to up to 31 in the future if
-required by future architectural amendments.
-
-The registers are only visible for vcpus that have SVE enabled.
-They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
-have SVE.  In all cases, surplus slices are not enumerated by
-KVM_GET_REG_LIST.
-
-Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
-allowed for SVE-enabled vcpus: SVE-aware userspace can use the
-KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
-register state.  This avoids some complex and pointless emluation
-in the kernel.
+No functional change.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
@@ -68,222 +49,112 @@ Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
 Changes since RFC v2:
 
- * In the SVE kvm reg ID macros, encode the mask extent explicitly in
-   the GENMASK() arguments, instead of shifting the result.
+ * New patch.
 
-   Shifting GENMASK(), though it works, is not typical usage.
+   **Discussion required**
 
- * Add missing include of <linux/bits.h> for GENMASK().
+   This change facilitates the addition of special-purpose flags in the
+   KVM_CREATE_VM type argument, which may be used to control API
+   features at VM granularity.
 
- * Make the intent to fall through the switch in kvm_arm_{get,set}_reg()
-   explicit.
+   This is currently one of two main options I can see for
+   controlling the sequencing of the KVM_ARM_VCPU_INIT ioctl, since
+   KVM_CREATE_VCPU has no spare argument bits and there is no obvious
+   place to hook in.  (The other, perhaps better option is to alter
+   KVM_ARM_VCPU_INIT's behaviour with a feature flag in struct
+   kvm_vcpu_init.)
 
-   No functional change, but it should help avoid surprises during
-   future maintenance.
+   If API behaviour does not need to diverge before KVM_VCPU_INIT,
+   then we can get away without this patch.
 
- * Split out KVM_REG_ARM_CORE access rejection for the FPSIMD V-regs
-   on SVE vcpus out into the preceding patch so that it can be merged
-   in a sane way with other related changes occurring since RFC v2.
+   The API presented in this series _does_ require divergence however:
+   it requires KVM_ARM_SVE_CONFIG_SET before KVM_VCPU_INIT.
+
+   It remains up for discussion whether this change is appropriate/
+   needed.
 ---
- arch/arm64/include/uapi/asm/kvm.h |  10 +++
- arch/arm64/kvm/guest.c            | 131 ++++++++++++++++++++++++++++++++++----
- 2 files changed, 129 insertions(+), 12 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 6 +++---
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/reset.c            | 8 +++-----
+ virt/kvm/arm/arm.c                | 6 +++++-
+ 4 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 97c3478..1ff68fa 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -226,6 +226,16 @@ struct kvm_vcpu_events {
- 					 KVM_REG_ARM_FW | ((r) & 0xffff))
- #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 5ca5d9a..8d385ec 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -354,13 +354,13 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
+ struct kvm *kvm_arch_alloc_vm(void);
+ void kvm_arch_free_vm(struct kvm *kvm);
  
-+/* SVE registers */
-+#define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
-+#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-+					 KVM_REG_SIZE_U2048 |		\
-+					 ((n) << 5) | (i))
-+#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-+					 KVM_REG_SIZE_U256 |		\
-+					 ((n) << 5) | (i) | 0x400)
-+#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
-+
- /* Device Control API: ARM VGIC */
- #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
- #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index e1ea73e..29f3f54 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -19,8 +19,10 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
-+#include <linux/bits.h>
- #include <linux/errno.h>
- #include <linux/err.h>
-+#include <linux/kernel.h>
- #include <linux/kvm_host.h>
- #include <linux/module.h>
- #include <linux/vmalloc.h>
-@@ -28,9 +30,12 @@
- #include <kvm/arm_psci.h>
- #include <asm/cputype.h>
- #include <linux/uaccess.h>
-+#include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_host.h>
-+#include <asm/sigcontext.h>
- 
- #include "trace.h"
- 
-@@ -198,6 +203,108 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return err;
- }
- 
-+struct kreg_region {
-+	char *kptr;
-+	size_t size;
-+	size_t zeropad;
-+};
-+
-+#define SVE_REG_SLICE_SHIFT	0
-+#define SVE_REG_SLICE_BITS	5
-+#define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-+#define SVE_REG_ID_BITS		5
-+
-+#define SVE_REG_SLICE_MASK					\
-+	GENMASK(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS - 1,	\
-+		SVE_REG_SLICE_SHIFT)
-+#define SVE_REG_ID_MASK							\
-+	GENMASK(SVE_REG_ID_SHIFT + SVE_REG_ID_BITS - 1, SVE_REG_ID_SHIFT)
-+
-+#define SVE_NUM_SLICES (1 << SVE_REG_SLICE_BITS)
-+
-+static int sve_reg_region(struct kreg_region *b,
-+			  const struct kvm_vcpu *vcpu,
-+			  const struct kvm_one_reg *reg)
-+{
-+	const unsigned int vl = vcpu->arch.sve_max_vl;
-+	const unsigned int vq = sve_vq_from_vl(vl);
-+
-+	const unsigned int reg_num =
-+		(reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-+	const unsigned int slice_num =
-+		(reg->id & SVE_REG_SLICE_MASK) >> SVE_REG_SLICE_SHIFT;
-+
-+	unsigned int slice_size, offset, limit;
-+
-+	if (reg->id >= KVM_REG_ARM64_SVE_ZREG(0, 0) &&
-+	    reg->id <= KVM_REG_ARM64_SVE_ZREG(SVE_NUM_ZREGS - 1,
-+					      SVE_NUM_SLICES - 1)) {
-+		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0));
-+
-+		/* Compute start and end of the register: */
-+		offset = SVE_SIG_ZREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
-+		limit = offset + SVE_SIG_ZREG_SIZE(vq);
-+
-+		offset += slice_size * slice_num; /* start of requested slice */
-+
-+	} else if (reg->id >= KVM_REG_ARM64_SVE_PREG(0, 0) &&
-+		   reg->id <= KVM_REG_ARM64_SVE_FFR(SVE_NUM_SLICES - 1)) {
-+		/* (FFR is P16 for our purposes) */
-+
-+		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0));
-+
-+		/* Compute start and end of the register: */
-+		offset = SVE_SIG_PREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
-+		limit = offset + SVE_SIG_PREG_SIZE(vq);
-+
-+		offset += slice_size * slice_num; /* start of requested slice */
-+
-+	} else {
-+		return -ENOENT;
-+	}
-+
-+	b->kptr = (char *)vcpu->arch.sve_state + offset;
-+
-+	/*
-+	 * If the slice starts after the end of the reg, just pad.
-+	 * Otherwise, copy as much as possible up to slice_size and pad
-+	 * the remainder:
-+	 */
-+	b->size = offset >= limit ? 0 : min(limit - offset, slice_size);
-+	b->zeropad = slice_size - b->size;
-+
-+	return 0;
-+}
-+
-+static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	struct kreg_region kreg;
-+	char __user *uptr = (char __user *)reg->addr;
-+
-+	if (!vcpu_has_sve(vcpu) || sve_reg_region(&kreg, vcpu, reg))
-+		return -ENOENT;
-+
-+	if (copy_to_user(uptr, kreg.kptr, kreg.size) ||
-+	    clear_user(uptr + kreg.size, kreg.zeropad))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	struct kreg_region kreg;
-+	char __user *uptr = (char __user *)reg->addr;
-+
-+	if (!vcpu_has_sve(vcpu) || sve_reg_region(&kreg, vcpu, reg))
-+		return -ENOENT;
-+
-+	if (copy_from_user(kreg.kptr, uptr, kreg.size))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
- int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+-static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
++static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type)
  {
- 	return -EINVAL;
-@@ -365,12 +472,12 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+ 	/*
+ 	 * On 32bit ARM, VMs get a static 40bit IPA stage2 setup,
+-	 * so any non-zero value used as type is illegal.
++	 * so any non-zero value used in the IPA size field is illegal.
+ 	 */
+-	if (type)
++	if (*type & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
  		return -EINVAL;
+ 	return 0;
+ }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f36cfc0..9fd8729 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -534,6 +534,6 @@ void kvm_set_ipa_limit(void);
+ struct kvm *kvm_arch_alloc_vm(void);
+ void kvm_arch_free_vm(struct kvm *kvm);
  
--	/* Register group 16 means we want a core register. */
--	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
--		return get_core_reg(vcpu, reg);
+-int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
++int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type);
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b72a3dd..9503fec 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -188,16 +188,14 @@ void kvm_set_ipa_limit(void)
+  * all CPUs, as it is safe to run with or without the feature and
+  * the bit is RES0 on CPUs that don't support it.
+  */
+-int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
++int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type)
+ {
+ 	u64 vtcr = VTCR_EL2_FLAGS;
+ 	u32 parange, phys_shift;
+ 	u8 lvls;
+ 
+-	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+-		return -EINVAL;
 -
--	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
--		return kvm_arm_get_fw_reg(vcpu, reg);
-+	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-+	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
-+	case KVM_REG_ARM_FW:	return kvm_arm_get_fw_reg(vcpu, reg);
-+	case KVM_REG_ARM64_SVE:	return get_sve_reg(vcpu, reg);
-+	default: break; /* fall through */
-+	}
+-	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
++	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(*type);
++	*type &= ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK;
+ 	if (phys_shift) {
+ 		if (phys_shift > kvm_ipa_limit ||
+ 		    phys_shift < 32)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 2377497..f7bf43a 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -120,10 +120,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	int ret, cpu;
  
- 	if (is_timer_reg(reg->id))
- 		return get_timer_reg(vcpu, reg);
-@@ -384,12 +491,12 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
+-	ret = kvm_arm_setup_stage2(kvm, type);
++	ret = kvm_arm_setup_stage2(kvm, &type);
+ 	if (ret)
+ 		return ret;
  
--	/* Register group 16 means we set a core register. */
--	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
--		return set_core_reg(vcpu, reg);
--
--	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
--		return kvm_arm_set_fw_reg(vcpu, reg);
-+	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-+	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
-+	case KVM_REG_ARM_FW:	return kvm_arm_set_fw_reg(vcpu, reg);
-+	case KVM_REG_ARM64_SVE:	return set_sve_reg(vcpu, reg);
-+	default: break; /* fall through */
-+	}
- 
- 	if (is_timer_reg(reg->id))
- 		return set_timer_reg(vcpu, reg);
++	/* Fail if there are type bits that nobody understood: */
++	if (type)
++		return -EINVAL;
++
+ 	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+ 	if (!kvm->arch.last_vcpu_ran)
+ 		return -ENOMEM;
 -- 
 2.1.4
