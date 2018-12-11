@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH v3 19/24] KVM: arm: Move detection of invalid VM type bits
- to generic code
-Date: Tue, 11 Dec 2018 23:28:56 +0000
-Message-ID: <1544570941-7377-20-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH v3 20/24] KVM: arm: Add support for early vcpu
+ configuration ioctls
+Date: Tue, 11 Dec 2018 23:28:57 +0000
+Message-ID: <1544570941-7377-21-git-send-email-Dave.Martin@arm.com>
 References: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5959D4A370
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EF904A1DE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2HaEEQ2qvQQq for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Dec 2018 18:30:27 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1665B4A394
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:27 -0500 (EST)
+ with ESMTP id stXHX4-9Xz9x for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Dec 2018 18:30:29 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A9BE4A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Dec 2018 18:30:29 -0500 (EST)
 In-Reply-To: <1544570941-7377-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,16 +32,25 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, the detection of invalid bits in the KVM_CREATE_VM type
-argument is done in the kvm_arm_setup_stage2() backend.
+SVE will require the KVM_ARM_SVE_CONFIG ioctl to be used early to
+configure a vcpu before other arch vcpu ioctls will behave in a
+consistent way.
 
-In order to make it easier to add type flags with independent
-meanings, this patch moves the logic for rejecting invalid bits to
-kvm_arch_init_vm().  Backend functions are now responsible for
-clearing bits they know about from type, so that if any remain
-after all such functions are called, we know they are invalid.
+To hide these effects from userspace while minimising mess in the
+generic code, this patch splits arch vcpu ioctls into two phases:
+early configuration ioctls, and normal ioctls.  A new arch helper
+vcpu_needs_configuration() reports whether any arch vcpu ioctls
+other than early configuration ioctls are allowed.
 
-No functional change.
+This entire behaviour will be need to be opt-in for userspace.
+
+There are currently no early configuration ioctls; one will be
+added for SVE in a subsequent patch, along with a suitable opt-in
+mechanism.
+
+It is assumed that no core vcpu ioctls are affected by any of the
+early configuration we want to do.  In any case, most "generic"
+vcpu ioctls are stubbed out for arm/arm64 and return -EINVAL.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
@@ -53,108 +62,67 @@ Changes since RFC v2:
 
    **Discussion required**
 
-   This change facilitates the addition of special-purpose flags in the
-   KVM_CREATE_VM type argument, which may be used to control API
-   features at VM granularity.
+   This patch splits arch vcpu ioctls into two phases.  We will
+   almost certainly need to do something like this for SVE, since
+   until the vector lengths are configured we will be in some kind
+   of half-initialised state where most ioctls (in particular
+   KVM_GET_REG_LIST, KVM_RUN etc.) cannot be used.
 
-   This is currently one of two main options I can see for
-   controlling the sequencing of the KVM_ARM_VCPU_INIT ioctl, since
-   KVM_CREATE_VCPU has no spare argument bits and there is no obvious
-   place to hook in.  (The other, perhaps better option is to alter
-   KVM_ARM_VCPU_INIT's behaviour with a feature flag in struct
-   kvm_vcpu_init.)
+   This is a bit inelegant, and does not interact nicely with
+   the core KVM core: we have to assume that all the core vcpu
+   ioctls are "harmless" while a vcpu is half-initialised, or
+   stubbed out (which seems to be the case for many of the core
+   vcpu ioctls on arm/arm64).
 
-   If API behaviour does not need to diverge before KVM_VCPU_INIT,
-   then we can get away without this patch.
-
-   The API presented in this series _does_ require divergence however:
-   it requires KVM_ARM_SVE_CONFIG_SET before KVM_VCPU_INIT.
-
-   It remains up for discussion whether this change is appropriate/
-   needed.
+   The choice of error codes here may not be ideal.  We should
+   try to avoid picking anything that could be confused with other
+   error situations.
 ---
- arch/arm/include/asm/kvm_host.h   | 6 +++---
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 8 +++-----
- virt/kvm/arm/arm.c                | 6 +++++-
- 4 files changed, 12 insertions(+), 10 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 3 +++
+ arch/arm64/include/asm/kvm_host.h | 3 +++
+ virt/kvm/arm/arm.c                | 6 ++++++
+ 3 files changed, 12 insertions(+)
 
 diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 5ca5d9a..8d385ec 100644
+index 8d385ec..d61077c 100644
 --- a/arch/arm/include/asm/kvm_host.h
 +++ b/arch/arm/include/asm/kvm_host.h
-@@ -354,13 +354,13 @@ static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
- 
--static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
-+static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type)
- {
- 	/*
- 	 * On 32bit ARM, VMs get a static 40bit IPA stage2 setup,
--	 * so any non-zero value used as type is illegal.
-+	 * so any non-zero value used in the IPA size field is illegal.
- 	 */
--	if (type)
-+	if (*type & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
- 		return -EINVAL;
+@@ -365,4 +365,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type)
  	return 0;
  }
+ 
++/* Forbid "ordinary" vcpu ioctls if this returns true: */
++#define vcpu_needs_configuration(vcpu) false
++
+ #endif /* __ARM_KVM_HOST_H__ */
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f36cfc0..9fd8729 100644
+index 9fd8729..7599c70 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -534,6 +534,6 @@ void kvm_set_ipa_limit(void);
- struct kvm *kvm_arch_alloc_vm(void);
- void kvm_arch_free_vm(struct kvm *kvm);
+@@ -536,4 +536,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
  
--int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
-+int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type);
+ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type);
  
++/* Forbid "ordinary" vcpu ioctls if this returns true: */
++#define vcpu_needs_configuration(vcpu) false
++
  #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b72a3dd..9503fec 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -188,16 +188,14 @@ void kvm_set_ipa_limit(void)
-  * all CPUs, as it is safe to run with or without the feature and
-  * the bit is RES0 on CPUs that don't support it.
-  */
--int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
-+int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long *type)
- {
- 	u64 vtcr = VTCR_EL2_FLAGS;
- 	u32 parange, phys_shift;
- 	u8 lvls;
- 
--	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
--		return -EINVAL;
--
--	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
-+	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(*type);
-+	*type &= ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK;
- 	if (phys_shift) {
- 		if (phys_shift > kvm_ipa_limit ||
- 		    phys_shift < 32)
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 2377497..f7bf43a 100644
+index f7bf43a..7bfc06d 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -120,10 +120,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	int ret, cpu;
+@@ -1090,6 +1090,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	struct kvm_device_attr attr;
+ 	long r;
  
--	ret = kvm_arm_setup_stage2(kvm, type);
-+	ret = kvm_arm_setup_stage2(kvm, &type);
- 	if (ret)
- 		return ret;
- 
-+	/* Fail if there are type bits that nobody understood: */
-+	if (type)
-+		return -EINVAL;
++	/* Early configuration ioctls will be handled here */
 +
- 	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
- 	if (!kvm->arch.last_vcpu_ran)
- 		return -ENOMEM;
++	/* Other ioctls require configuration to have been done first: */
++	if (vcpu_needs_configuration(vcpu))
++		return -EBADFD;
++
+ 	switch (ioctl) {
+ 	case KVM_ARM_VCPU_INIT: {
+ 		struct kvm_vcpu_init init;
 -- 
 2.1.4
