@@ -1,22 +1,23 @@
 From: Steven Price <steven.price@arm.com>
-Subject: [RFC PATCH v2 10/12] KVM: arm64: Support Live Physical Time reporting
-Date: Wed, 12 Dec 2018 15:02:24 +0000
-Message-ID: <20181212150226.38051-11-steven.price@arm.com>
+Subject: [RFC PATCH v2 11/12] clocksource: arm_arch_timer: Use paravirtualized
+ LPT
+Date: Wed, 12 Dec 2018 15:02:25 +0000
+Message-ID: <20181212150226.38051-12-steven.price@arm.com>
 References: <20181212150226.38051-1-steven.price@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 837D94A382
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C3074A371
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GB9CTgEe-K2M for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 10:03:19 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0B734A399
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:16 -0500 (EST)
+ with ESMTP id 7FwCCILLSPDk for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 10:03:22 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C88444A392
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:18 -0500 (EST)
 In-Reply-To: <20181212150226.38051-1-steven.price@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,252 +32,363 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Price <steven.price@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Provide a method for a guest to derive a paravirtualized counter/timer
-which isn't dependent on the host's counter frequency. This allows a
-guest to be migrated onto a new host which doesn't have the same
-frequency without the virtual counter being disturbed.
+Enable paravirtualized time to be used in a KVM guest if the host
+supports it. This allows the guest to derive a counter which is clocked
+at a persistent rate even when the guest is migrated.
 
-The host provides a shared structure which contains coefficients that
-can be used to map the real counter from the host (the Arm "virtual
-counter") to a paravirtualized view of time. On migration the new host
-updates the coefficients to ensure that the guests view of time (after
-using the coefficients) doesn't change and that the derived counter
-progresses at the same real frequency.
+If we discover that the system supports SMCCC v1.1 then we probe to
+determine whether the hypervisor supports paravirtualized features and
+finally whether it supports "Live Physical Time" reporting. If so a
+shared structure is made available to the guest containing coefficients
+to calculate the derived clock.
 
-The guest can probe the existence of this support using the PV_FEATURES
-SMCCC interface provided in a previous patch.
+The guest kernel uses the coefficients to present a clock to user space
+that is always clocked at the same rate whenever the guest is running
+('live'), even if the physical clock changes (due to the guest being
+migrated).
+
+The existing workaround framework for CNTVCT is used to disable the VDSO
+and trap user space accesses to the timer registers so we can present the
+derived clock.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   4 +
- include/kvm/arm_arch_timer.h      |   2 +
- virt/kvm/arm/arm.c                |   5 ++
- virt/kvm/arm/hypercalls.c         | 141 ++++++++++++++++++++++++++++++
- 4 files changed, 152 insertions(+)
+ arch/arm64/include/asm/arch_timer.h  |  32 ++++-
+ arch/arm64/kernel/cpuinfo.c          |   2 +-
+ drivers/clocksource/arm_arch_timer.c | 177 ++++++++++++++++++++++++++-
+ 3 files changed, 205 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index bab7bc720992..a4efe6699dd3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -85,6 +85,10 @@ struct kvm_arch {
- 	struct kvm_arch_pvtime {
- 		void *st;
- 		gpa_t st_base;
+diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+index f2a234d6516c..ec0e7250c453 100644
+--- a/arch/arm64/include/asm/arch_timer.h
++++ b/arch/arm64/include/asm/arch_timer.h
+@@ -20,12 +20,14 @@
+ #define __ASM_ARCH_TIMER_H
+ 
+ #include <asm/barrier.h>
++#include <asm/pvclock-abi.h>
+ #include <asm/sysreg.h>
+ 
+ #include <linux/bug.h>
+ #include <linux/init.h>
+ #include <linux/jump_label.h>
+ #include <linux/smp.h>
++#include <linux/static_key.h>
+ #include <linux/types.h>
+ 
+ #include <clocksource/arm_arch_timer.h>
+@@ -79,6 +81,19 @@ DECLARE_PER_CPU(const struct arch_timer_erratum_workaround *,
+ 	_val;								\
+ })
+ 
++void pvclock_reg_write_cntv_tval_el0(u32 val);
++extern struct static_key_false arch_counter_cntfrq_ool_enabled;
++extern u64 pvclock_get_cntfrq(void);
++extern struct static_key_false arch_counter_cntvct_ool_enabled;
++extern u64 pvclock_get_cntvct(void);
 +
-+		void *lpt;
-+		gpa_t lpt_base;
-+		u32 lpt_fpv;
- 	} pvtime;
- };
- 
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 6502feb9524b..c8cdd96052e0 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -92,6 +92,8 @@ void kvm_timer_init_vhe(void);
- 
- bool kvm_arch_timer_get_input_level(int vintid);
- 
-+int kvm_arm_update_lpt_sequence(struct kvm *kvm);
-+
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index b347ba38cb11..e347da3ae123 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -150,7 +150,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.max_vcpus = vgic_present ?
- 				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
- 
-+	/* Set the PV Time addresses to invalid values */
- 	kvm->arch.pvtime.st_base = GPA_INVALID;
-+	kvm->arch.pvtime.lpt_base = GPA_INVALID;
-+
- 	return ret;
- out_free_stage2_pgd:
- 	kvm_free_stage2_pgd(kvm);
-@@ -591,6 +594,8 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 
- 	ret = kvm_arm_pmu_v3_enable(vcpu);
- 
-+	kvm_arm_update_lpt_sequence(kvm);
-+
- 	return ret;
- }
- 
-diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-index 595d1cf3a871..69ce87278f36 100644
---- a/virt/kvm/arm/hypercalls.c
-+++ b/virt/kvm/arm/hypercalls.c
-@@ -2,6 +2,7 @@
- // Copyright (C) 2018 Arm Ltd.
- 
- #include <linux/arm-smccc.h>
-+#include <linux/highmem.h>
- #include <linux/kvm_host.h>
- 
- #include <asm/kvm_emulate.h>
-@@ -74,6 +75,143 @@ static int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
- 	smccc_set_retval(vcpu, ret, 0, 0, 0);
- 	return 1;
- }
-+#include <clocksource/arm_arch_timer.h>
-+
-+/*
-+ * Returns ((u128)dividend << 64) / divisor
-+ * Precondition: dividend < divisor
-+ */
-+static u64 shift64_div(u32 dividend, u32 divisor)
++static __always_inline void __write_cntv_tval_el0(u32 val)
 +{
-+	u64 high = (u64)dividend << 32;
-+	u64 low;
-+	u64 rem;
-+
-+	WARN_ON(dividend >= divisor);
-+
-+	rem = do_div(high, divisor);
-+	low = rem << 32;
-+	do_div(low, divisor);
-+
-+	return (high << 32) | low;
++	if (static_branch_unlikely(&arch_counter_cntvct_ool_enabled))
++		return pvclock_reg_write_cntv_tval_el0(val);
++	write_sysreg(val, cntv_tval_el0);
 +}
 +
-+/*
-+ * Calculate the relative offset of each vCPU's timer and convert that to the
-+ * new timer rate.
-+ */
-+static void update_vtimer_cval(struct kvm *kvm, u32 previous_rate)
-+{
-+	u32 current_rate = arch_timer_get_rate();
-+	u64 current_time = kvm_phys_timer_read();
-+	int i;
-+	struct kvm_vcpu *vcpu;
-+	u64 rel_cval;
-+
-+	/* Early out if there's nothing to do */
-+	if (previous_rate == current_rate)
-+		return;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-+		u64 cntvct;
-+		u64 new_cntvct;
-+
-+		/*
-+		 * The vtimer should not be already loaded as this function is
-+		 * only called on the first run of the first VCPU before any
-+		 * timers are loaded.
-+		 */
-+		if (WARN_ON(vtimer->loaded))
-+			continue;
-+
-+		cntvct = current_time - vtimer->cntvoff;
-+		new_cntvct = mul_u64_u32_div(cntvct, current_rate,
-+					     previous_rate);
-+		vtimer->cntvoff = current_time - new_cntvct;
-+
-+		rel_cval = vtimer->cnt_cval - cntvct;
-+
-+		rel_cval = mul_u64_u32_div(rel_cval, current_rate,
-+					   previous_rate);
-+
-+		vtimer->cnt_cval = new_cntvct + rel_cval;
-+	}
-+}
-+
-+int kvm_arm_update_lpt_sequence(struct kvm *kvm)
-+{
-+	struct pvclock_vm_time_info *pvclock;
-+	u64 lpt_ipa = kvm->arch.pvtime.lpt_base;
-+	u64 native_freq, pv_freq, scale_mult, div_by_pv_freq_mult;
-+	u64 shift = 0;
-+	u64 sequence_number = 0;
-+
-+	if (lpt_ipa == GPA_INVALID)
-+		return -EINVAL;
-+
-+	if (!IS_ALIGNED(lpt_ipa, 64))
-+		return -EINVAL;
-+
-+	pvclock = kvm->arch.pvtime.lpt;
-+
-+	if (!pvclock)
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	sequence_number = le64_to_cpu(pvclock->sequence_number);
-+	native_freq = le64_to_cpu(pvclock->native_freq);
-+
-+	if (native_freq) {
-+		/*
-+		 * The VM has been migrated, so update the sequence number
-+		 * and correct the compare for the timer if the frequency has
-+		 * changed
-+		 */
-+		sequence_number = sequence_number + 2;
-+		update_vtimer_cval(kvm, native_freq);
-+	}
-+
-+	native_freq = arch_timer_get_rate();
-+	pv_freq = kvm->arch.pvtime.lpt_fpv;
-+
-+	if (pv_freq >= native_freq)
-+		shift = ilog2(pv_freq / native_freq) + 1;
-+
-+	WARN_ON(native_freq > U32_MAX);
-+	/* scale_mult = (pv_freq << 64) / (native_freq << shift) */
-+	scale_mult = shift64_div(pv_freq, native_freq << shift);
-+	/* div_by_pv_freq_mult = (1 << 64) / pv_freq */
-+	div_by_pv_freq_mult = shift64_div(1, pv_freq);
-+
-+	pvclock->sequence_number = cpu_to_le64(sequence_number);
-+	pvclock->native_freq = cpu_to_le64(native_freq);
-+	pvclock->pv_freq = cpu_to_le64(pv_freq);
-+	pvclock->shift = cpu_to_le32(shift);
-+	pvclock->scale_mult = cpu_to_le64(scale_mult);
-+	pvclock->div_by_pv_freq_mult = cpu_to_le64(div_by_pv_freq_mult);
-+
-+	mutex_unlock(&kvm->lock);
-+
-+	return 0;
-+}
-+
-+static int kvm_hypercall_time_lpt(struct kvm_vcpu *vcpu)
-+{
-+	u32 flags;
-+	u64 ret = vcpu->kvm->arch.pvtime.lpt_base;
-+
-+	flags = smccc_get_arg1(vcpu);
-+
-+	if (flags) {
-+		/* Currently no support for any flags */
-+		ret = PV_VM_TIME_INVALID_PARAMETERS;
-+	}
-+
-+	smccc_set_retval(vcpu, ret, 0, 0, 0);
-+	return 1;
-+}
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- {
- 	u32 func_id = smccc_get_function(vcpu);
-@@ -115,12 +253,15 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		switch (feature) {
- 		case ARM_SMCCC_HV_PV_FEATURES:
- 		case ARM_SMCCC_HV_PV_TIME_ST:
-+		case ARM_SMCCC_HV_PV_TIME_LPT:
- 			val = SMCCC_RET_SUCCESS;
+ /*
+  * These register accessors are marked inline so the compiler can
+  * nicely work out which register we want, and chuck away the rest of
+@@ -102,7 +117,7 @@ void arch_timer_reg_write_cp15(int access, enum arch_timer_reg reg, u32 val)
+ 			write_sysreg(val, cntv_ctl_el0);
+ 			break;
+ 		case ARCH_TIMER_REG_TVAL:
+-			write_sysreg(val, cntv_tval_el0);
++			__write_cntv_tval_el0(val);
  			break;
  		}
- 		break;
- 	case ARM_SMCCC_HV_PV_TIME_ST:
- 		return kvm_hypercall_stolen_time(vcpu);
-+	case ARM_SMCCC_HV_PV_TIME_LPT:
-+		return kvm_hypercall_time_lpt(vcpu);
- 	default:
- 		return kvm_psci_call(vcpu);
  	}
+@@ -134,7 +149,10 @@ u32 arch_timer_reg_read_cp15(int access, enum arch_timer_reg reg)
+ 
+ static inline u32 arch_timer_get_cntfrq(void)
+ {
+-	return read_sysreg(cntfrq_el0);
++	if (static_branch_unlikely(&arch_counter_cntfrq_ool_enabled))
++		return pvclock_get_cntfrq();
++	else
++		return read_sysreg(cntfrq_el0);
+ }
+ 
+ static inline u32 arch_timer_get_cntkctl(void)
+@@ -154,12 +172,20 @@ static inline u64 arch_counter_get_cntpct(void)
+ 	return arch_timer_reg_read_stable(cntpct_el0);
+ }
+ 
+-static inline u64 arch_counter_get_cntvct(void)
++static inline u64 __arch_counter_get_cntvct(void)
+ {
+ 	isb();
+ 	return arch_timer_reg_read_stable(cntvct_el0);
+ }
+ 
++static inline u64 arch_counter_get_cntvct(void)
++{
++	if (static_branch_unlikely(&arch_counter_cntvct_ool_enabled))
++		return pvclock_get_cntvct();
++	else
++		return __arch_counter_get_cntvct();
++}
++
+ static inline int arch_timer_arch_init(void)
+ {
+ 	return 0;
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index bcc2831399cb..74410727829d 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -324,7 +324,7 @@ static void cpuinfo_detect_icache_policy(struct cpuinfo_arm64 *info)
+ 
+ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+ {
+-	info->reg_cntfrq = arch_timer_get_cntfrq();
++	info->reg_cntfrq = read_cpuid(CNTFRQ_EL0);
+ 	/*
+ 	 * Use the effective value of the CTR_EL0 than the raw value
+ 	 * exposed by the CPU. CTR_E0.IDC field value must be interpreted
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index 9a7d4dc00b6e..6e84e1acc4f4 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -11,6 +11,7 @@
+ 
+ #define pr_fmt(fmt)	"arm_arch_timer: " fmt
+ 
++#include <linux/arm-smccc.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/device.h>
+@@ -23,6 +24,8 @@
+ #include <linux/of_irq.h>
+ #include <linux/of_address.h>
+ #include <linux/io.h>
++#include <linux/psci.h>
++#include <linux/reboot.h>
+ #include <linux/slab.h>
+ #include <linux/sched/clock.h>
+ #include <linux/sched_clock.h>
+@@ -86,6 +89,171 @@ static int __init early_evtstrm_cfg(char *buf)
+ }
+ early_param("clocksource.arm_arch_timer.evtstrm", early_evtstrm_cfg);
+ 
++#ifdef CONFIG_ARM64
++/* Paravirtualised time is only supported for 64 bit */
++static struct pvclock_vm_time_info *pvclock_vm_time_info;
++
++DEFINE_STATIC_KEY_FALSE(arch_counter_cntvct_ool_enabled);
++EXPORT_SYMBOL_GPL(arch_counter_cntvct_ool_enabled);
++DEFINE_STATIC_KEY_FALSE(arch_counter_cntfrq_ool_enabled);
++EXPORT_SYMBOL_GPL(arch_counter_cntfrq_ool_enabled);
++
++static inline u64 native_to_pv_cycles(const struct pvclock_vm_time_info *info,
++		u64 cnt)
++{
++	u32 shift = le32_to_cpu(info->shift);
++	u64 scale_mult = le64_to_cpu(info->scale_mult);
++
++	cnt <<= shift;
++	return mul_u64_u64_shr(scale_mult, cnt, 64);
++}
++
++static inline u64 pv_to_native_cycles(const struct pvclock_vm_time_info *info,
++		u64 cnt)
++{
++	u64 native_freq = le64_to_cpu(info->native_freq);
++	u64 pv_freq = le64_to_cpu(info->pv_freq);
++	u64 div_by_pv_freq_mult = le64_to_cpu(info->div_by_pv_freq_mult);
++
++	cnt = native_freq * cnt + pv_freq - 1;
++	return mul_u64_u64_shr(div_by_pv_freq_mult, cnt, 64);
++}
++
++u64 pvclock_get_cntvct(void)
++{
++	u64 cval;
++	__le64 seq_begin, seq_end;
++
++	do {
++		seq_begin = READ_ONCE(pvclock_vm_time_info->sequence_number);
++
++		barrier();
++
++		cval = __arch_counter_get_cntvct();
++		cval = native_to_pv_cycles(pvclock_vm_time_info, cval);
++
++		barrier();
++		seq_end = READ_ONCE(pvclock_vm_time_info->sequence_number);
++	} while (unlikely(seq_begin != seq_end));
++
++	return cval;
++}
++
++u64 pvclock_get_cntfrq(void)
++{
++	return le64_to_cpu(pvclock_vm_time_info->pv_freq);
++}
++
++static void arch_timer_pvclock_init(void)
++{
++	struct arm_smccc_res res;
++	void *kaddr;
++
++	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
++		return;
++
++	arm_smccc_1_1_call(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
++			   ARM_SMCCC_HV_PV_FEATURES, &res);
++
++	if (res.a0 != SMCCC_RET_SUCCESS)
++		return;
++
++	arm_smccc_1_1_call(ARM_SMCCC_HV_PV_FEATURES,
++			   ARM_SMCCC_HV_PV_TIME_LPT, &res);
++
++	if ((s32)res.a0 < 0)
++		return;
++
++	arm_smccc_1_1_call(ARM_SMCCC_HV_PV_TIME_LPT, 0, &res);
++
++	if ((s64)res.a0 < 0)
++		return;
++
++	kaddr = memremap(res.a0,
++			sizeof(struct pvclock_vm_time_info),
++			MEMREMAP_WB);
++
++	if (!kaddr) {
++		pr_warn("Failed to map LPT structure for paravirtualized clock\n");
++		return;
++	}
++
++	pvclock_vm_time_info = kaddr;
++
++	static_branch_enable(&arch_counter_cntvct_ool_enabled);
++	static_branch_enable(&arch_counter_cntfrq_ool_enabled);
++
++	pr_info("Using paravirtualized clock\n");
++}
++
++static inline bool pvclock_trap_cntvct(void)
++{
++	return static_branch_unlikely(&arch_counter_cntvct_ool_enabled);
++}
++
++static inline void arch_timer_reg_write_cntv_tval(u32 val,
++						  struct arch_timer *timer)
++{
++	__le64 seq_begin, seq_end;
++
++	if (!static_branch_unlikely(&arch_counter_cntvct_ool_enabled)) {
++		writel_relaxed(val, timer->base + CNTV_TVAL);
++		return;
++	}
++
++	do {
++		u32 n_val;
++
++		seq_begin = READ_ONCE(pvclock_vm_time_info->sequence_number);
++
++		barrier();
++
++		n_val = pv_to_native_cycles(pvclock_vm_time_info, val);
++
++		writel_relaxed(n_val, timer->base + CNTV_TVAL);
++		barrier();
++
++		seq_end = READ_ONCE(pvclock_vm_time_info->sequence_number);
++	} while (unlikely(seq_begin != seq_end));
++}
++
++void pvclock_reg_write_cntv_tval_el0(u32 val)
++{
++	__le64 seq_begin, seq_end;
++
++	do {
++		u32 n_val;
++
++		seq_begin = READ_ONCE(pvclock_vm_time_info->sequence_number);
++
++		barrier();
++
++		n_val = pv_to_native_cycles(pvclock_vm_time_info, val);
++
++		write_sysreg(n_val, cntv_tval_el0);
++		barrier();
++
++		seq_end = READ_ONCE(pvclock_vm_time_info->sequence_number);
++	} while (unlikely(seq_begin != seq_end));
++}
++
++#else /* CONFIG_ARM64 */
++static void arch_timer_pvclock_init(void)
++{
++}
++
++static inline bool pvclock_trap_cntvct(void)
++{
++	return false;
++}
++
++static inline void arch_timer_reg_write_cntv_tval(u32 val,
++						 struct arch_timer *timer)
++{
++	writel_relaxed(val, timer->base + CNTV_TVAL);
++}
++#endif /* CONFIG_ARM64 */
++
+ /*
+  * Architected system timer support.
+  */
+@@ -111,7 +279,7 @@ void arch_timer_reg_write(int access, enum arch_timer_reg reg, u32 val,
+ 			writel_relaxed(val, timer->base + CNTV_CTL);
+ 			break;
+ 		case ARCH_TIMER_REG_TVAL:
+-			writel_relaxed(val, timer->base + CNTV_TVAL);
++			arch_timer_reg_write_cntv_tval(val, timer);
+ 			break;
+ 		}
+ 	} else {
+@@ -589,6 +757,7 @@ static bool arch_timer_this_cpu_has_cntvct_wa(void)
+ #define erratum_set_next_event_tval_phys(...)		({BUG(); 0;})
+ #define erratum_handler(fn, r, ...)			({false;})
+ #define arch_timer_this_cpu_has_cntvct_wa()		({false;})
++
+ #endif /* CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND */
+ 
+ static __always_inline irqreturn_t timer_handler(const int access,
+@@ -815,7 +984,7 @@ static void arch_counter_set_user_access(void)
+ 	 * need to be workaround. The vdso may have been already
+ 	 * disabled though.
+ 	 */
+-	if (arch_timer_this_cpu_has_cntvct_wa())
++	if (pvclock_trap_cntvct() || arch_timer_this_cpu_has_cntvct_wa())
+ 		pr_info("CPU%d: Trapping CNTVCT access\n", smp_processor_id());
+ 	else
+ 		cntkctl |= ARCH_TIMER_USR_VCT_ACCESS_EN;
+@@ -1222,6 +1391,8 @@ static int __init arch_timer_of_init(struct device_node *np)
+ 
+ 	arch_timer_kvm_info.virtual_irq = arch_timer_ppi[ARCH_TIMER_VIRT_PPI];
+ 
++	arch_timer_pvclock_init();
++
+ 	rate = arch_timer_get_cntfrq();
+ 	arch_timer_of_configure_rate(rate, np);
+ 
+@@ -1552,6 +1723,8 @@ static int __init arch_timer_acpi_init(struct acpi_table_header *table)
+ 
+ 	arch_timer_kvm_info.virtual_irq = arch_timer_ppi[ARCH_TIMER_VIRT_PPI];
+ 
++	arch_timer_pvclock_init();
++
+ 	/*
+ 	 * When probing via ACPI, we have no mechanism to override the sysreg
+ 	 * CNTFRQ value. This *must* be correct.
 -- 
 2.19.2
