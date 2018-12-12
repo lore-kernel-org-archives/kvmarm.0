@@ -1,25 +1,26 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
 Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
  exclude_host/exclude_guest attributes
-Date: Wed, 12 Dec 2018 10:42:11 +0000
-Message-ID: <89242306-a445-017b-553e-105ae52d8cbe@arm.com>
+Date: Wed, 12 Dec 2018 10:47:41 +0000
+Message-ID: <5fe821a9-a2b2-c40d-7a83-b014d7b8f4d1@arm.com>
 References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
  <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
+ <89242306-a445-017b-553e-105ae52d8cbe@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE7134A2BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:42:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E76A4A200
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:47:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yklzjOTObHDx for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 05:42:16 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE0B74A1DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:42:16 -0500 (EST)
-In-Reply-To: <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
+ with ESMTP id Bio0aDECM5ov for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 05:47:45 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2DEA4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:47:45 -0500 (EST)
+In-Reply-To: <89242306-a445-017b-553e-105ae52d8cbe@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,96 +31,77 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 12/12/2018 10:29, Andrew Murray wrote:
-> Add support for the :G and :H attributes in perf by handling the
-> exclude_host/exclude_guest event attributes.
-> 
-> We notify KVM of counters that we wish to be enabled or disabled on
-> guest entry/exit and thus defer from starting or stopping :G events
-> as per the events exclude_host attribute.
-> 
-> With both VHE and non-VHE we switch the counters between host/guest
-> at EL2. We are able to eliminate counters counting host events on
-> the boundaries of guest entry/exit when using :G by filtering out
-> EL2 for exclude_host. However when using :H unless exclude_hv is set
-> on non-VHE then there is a small blackout window at the guest
-> entry/exit where host events are not captured.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->   arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
->   1 file changed, 44 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> index de564ae..4a3c73d 100644
-> --- a/arch/arm64/kernel/perf_event.c
-> +++ b/arch/arm64/kernel/perf_event.c
-> @@ -26,6 +26,7 @@
->   
->   #include <linux/acpi.h>
->   #include <linux/clocksource.h>
-> +#include <linux/kvm_host.h>
->   #include <linux/of.h>
->   #include <linux/perf/arm_pmu.h>
->   #include <linux/platform_device.h>
-> @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
->   
->   static inline void armv8pmu_enable_event_counter(struct perf_event *event)
->   {
-> +	struct perf_event_attr *attr = &event->attr;
->   	int idx = event->hw.idx;
-> +	int flags = 0;
-> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
->   
-> -	armv8pmu_enable_counter(idx);
->   	if (armv8pmu_event_is_chained(event))
-> -		armv8pmu_enable_counter(idx - 1);
-> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> +
-> +	if (!attr->exclude_host)
-> +		flags |= KVM_PMU_EVENTS_HOST;
-> +	if (!attr->exclude_guest)
-> +		flags |= KVM_PMU_EVENTS_GUEST;
-> +
-> +	kvm_set_pmu_events(counter_bits, flags);
-> +
-> +	if (!attr->exclude_host) {
-> +		armv8pmu_enable_counter(idx);
-> +		if (armv8pmu_event_is_chained(event))
-> +			armv8pmu_enable_counter(idx - 1);
-> +	}
->   }
->   
->   static inline int armv8pmu_disable_counter(int idx)
-> @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
->   static inline void armv8pmu_disable_event_counter(struct perf_event *event)
->   {
->   	struct hw_perf_event *hwc = &event->hw;
-> +	struct perf_event_attr *attr = &event->attr;
->   	int idx = hwc->idx;
-> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
->   
->   	if (armv8pmu_event_is_chained(event))
-> -		armv8pmu_disable_counter(idx - 1);
-> -	armv8pmu_disable_counter(idx);
-> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> +
-> +	kvm_clr_pmu_events(counter_bits);
-> +
-> +	if (!attr->exclude_host) {
-> +		if (armv8pmu_event_is_chained(event))
-> +			armv8pmu_disable_counter(idx - 1);
-> +		armv8pmu_disable_counter(idx);
-> +	}
-
-Shouldn't we disable the events, irrespective of whether it is for host or/and 
-guest ? Otherwise looks good to me.
-
-Cheers
-Suzuki
+CgpPbiAxMi8xMi8yMDE4IDEwOjQyLCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+IAo+IAo+IE9u
+IDEyLzEyLzIwMTggMTA6MjksIEFuZHJldyBNdXJyYXkgd3JvdGU6Cj4+IEFkZCBzdXBwb3J0IGZv
+ciB0aGUgOkcgYW5kIDpIIGF0dHJpYnV0ZXMgaW4gcGVyZiBieSBoYW5kbGluZyB0aGUKPj4gZXhj
+bHVkZV9ob3N0L2V4Y2x1ZGVfZ3Vlc3QgZXZlbnQgYXR0cmlidXRlcy4KPj4KPj4gV2Ugbm90aWZ5
+IEtWTSBvZiBjb3VudGVycyB0aGF0IHdlIHdpc2ggdG8gYmUgZW5hYmxlZCBvciBkaXNhYmxlZCBv
+bgo+PiBndWVzdCBlbnRyeS9leGl0IGFuZCB0aHVzIGRlZmVyIGZyb20gc3RhcnRpbmcgb3Igc3Rv
+cHBpbmcgOkcgZXZlbnRzCj4+IGFzIHBlciB0aGUgZXZlbnRzIGV4Y2x1ZGVfaG9zdCBhdHRyaWJ1
+dGUuCj4+Cj4+IFdpdGggYm90aCBWSEUgYW5kIG5vbi1WSEUgd2Ugc3dpdGNoIHRoZSBjb3VudGVy
+cyBiZXR3ZWVuIGhvc3QvZ3Vlc3QKPj4gYXQgRUwyLiBXZSBhcmUgYWJsZSB0byBlbGltaW5hdGUg
+Y291bnRlcnMgY291bnRpbmcgaG9zdCBldmVudHMgb24KPj4gdGhlIGJvdW5kYXJpZXMgb2YgZ3Vl
+c3QgZW50cnkvZXhpdCB3aGVuIHVzaW5nIDpHIGJ5IGZpbHRlcmluZyBvdXQKPj4gRUwyIGZvciBl
+eGNsdWRlX2hvc3QuIEhvd2V2ZXIgd2hlbiB1c2luZyA6SCB1bmxlc3MgZXhjbHVkZV9odiBpcyBz
+ZXQKPj4gb24gbm9uLVZIRSB0aGVuIHRoZXJlIGlzIGEgc21hbGwgYmxhY2tvdXQgd2luZG93IGF0
+IHRoZSBndWVzdAo+PiBlbnRyeS9leGl0IHdoZXJlIGhvc3QgZXZlbnRzIGFyZSBub3QgY2FwdHVy
+ZWQuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJldyBNdXJyYXkgPGFuZHJldy5tdXJyYXlAYXJt
+LmNvbT4KPj4gLS0tCj4+IMKgIGFyY2gvYXJtNjQva2VybmVsL3BlcmZfZXZlbnQuYyB8IDUxCj4+
+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLQo+PiDCoCAxIGZpbGUg
+Y2hhbmdlZCwgNDQgaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKPj4KPj4gZGlmZiAtLWdp
+dCBhL2FyY2gvYXJtNjQva2VybmVsL3BlcmZfZXZlbnQuYwo+PiBiL2FyY2gvYXJtNjQva2VybmVs
+L3BlcmZfZXZlbnQuYwo+PiBpbmRleCBkZTU2NGFlLi40YTNjNzNkIDEwMDY0NAo+PiAtLS0gYS9h
+cmNoL2FybTY0L2tlcm5lbC9wZXJmX2V2ZW50LmMKPj4gKysrIGIvYXJjaC9hcm02NC9rZXJuZWwv
+cGVyZl9ldmVudC5jCj4+IEBAIC0yNiw2ICsyNiw3IEBACj4+IMKgIMKgICNpbmNsdWRlIDxsaW51
+eC9hY3BpLmg+Cj4+IMKgICNpbmNsdWRlIDxsaW51eC9jbG9ja3NvdXJjZS5oPgo+PiArI2luY2x1
+ZGUgPGxpbnV4L2t2bV9ob3N0Lmg+Cj4+IMKgICNpbmNsdWRlIDxsaW51eC9vZi5oPgo+PiDCoCAj
+aW5jbHVkZSA8bGludXgvcGVyZi9hcm1fcG11Lmg+Cj4+IMKgICNpbmNsdWRlIDxsaW51eC9wbGF0
+Zm9ybV9kZXZpY2UuaD4KPj4gQEAgLTY0NywxMSArNjQ4LDI2IEBAIHN0YXRpYyBpbmxpbmUgaW50
+IGFybXY4cG11X2VuYWJsZV9jb3VudGVyKGludCBpZHgpCj4+IMKgIMKgIHN0YXRpYyBpbmxpbmUg
+dm9pZCBhcm12OHBtdV9lbmFibGVfZXZlbnRfY291bnRlcihzdHJ1Y3QgcGVyZl9ldmVudAo+PiAq
+ZXZlbnQpCj4+IMKgIHsKPj4gK8KgwqDCoCBzdHJ1Y3QgcGVyZl9ldmVudF9hdHRyICphdHRyID0g
+JmV2ZW50LT5hdHRyOwo+PiDCoMKgwqDCoMKgIGludCBpZHggPSBldmVudC0+aHcuaWR4Owo+PiAr
+wqDCoMKgIGludCBmbGFncyA9IDA7Cj4+ICvCoMKgwqAgdTMyIGNvdW50ZXJfYml0cyA9IEJJVChB
+Uk1WOF9JRFhfVE9fQ09VTlRFUihpZHgpKTsKPj4gwqAgLcKgwqDCoCBhcm12OHBtdV9lbmFibGVf
+Y291bnRlcihpZHgpOwo+PiDCoMKgwqDCoMKgIGlmIChhcm12OHBtdV9ldmVudF9pc19jaGFpbmVk
+KGV2ZW50KSkKPj4gLcKgwqDCoMKgwqDCoMKgIGFybXY4cG11X2VuYWJsZV9jb3VudGVyKGlkeCAt
+IDEpOwo+PiArwqDCoMKgwqDCoMKgwqAgY291bnRlcl9iaXRzIHw9IEJJVChBUk1WOF9JRFhfVE9f
+Q09VTlRFUihpZHggLSAxKSk7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoIWF0dHItPmV4Y2x1ZGVfaG9z
+dCkKPj4gK8KgwqDCoMKgwqDCoMKgIGZsYWdzIHw9IEtWTV9QTVVfRVZFTlRTX0hPU1Q7Cj4+ICvC
+oMKgwqAgaWYgKCFhdHRyLT5leGNsdWRlX2d1ZXN0KQo+PiArwqDCoMKgwqDCoMKgwqAgZmxhZ3Mg
+fD0gS1ZNX1BNVV9FVkVOVFNfR1VFU1Q7Cj4+ICsKPj4gK8KgwqDCoCBrdm1fc2V0X3BtdV9ldmVu
+dHMoY291bnRlcl9iaXRzLCBmbGFncyk7Cj4+ICsKPj4gK8KgwqDCoCBpZiAoIWF0dHItPmV4Y2x1
+ZGVfaG9zdCkgewo+PiArwqDCoMKgwqDCoMKgwqAgYXJtdjhwbXVfZW5hYmxlX2NvdW50ZXIoaWR4
+KTsKPj4gK8KgwqDCoMKgwqDCoMKgIGlmIChhcm12OHBtdV9ldmVudF9pc19jaGFpbmVkKGV2ZW50
+KSkKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYXJtdjhwbXVfZW5hYmxlX2NvdW50ZXIoaWR4
+IC0gMSk7Cj4+ICvCoMKgwqAgfQo+PiDCoCB9Cj4+IMKgIMKgIHN0YXRpYyBpbmxpbmUgaW50IGFy
+bXY4cG11X2Rpc2FibGVfY291bnRlcihpbnQgaWR4KQo+PiBAQCAtNjY0LDExICs2ODAsMjAgQEAg
+c3RhdGljIGlubGluZSBpbnQgYXJtdjhwbXVfZGlzYWJsZV9jb3VudGVyKGludCBpZHgpCj4+IMKg
+IHN0YXRpYyBpbmxpbmUgdm9pZCBhcm12OHBtdV9kaXNhYmxlX2V2ZW50X2NvdW50ZXIoc3RydWN0
+IHBlcmZfZXZlbnQKPj4gKmV2ZW50KQo+PiDCoCB7Cj4+IMKgwqDCoMKgwqAgc3RydWN0IGh3X3Bl
+cmZfZXZlbnQgKmh3YyA9ICZldmVudC0+aHc7Cj4+ICvCoMKgwqAgc3RydWN0IHBlcmZfZXZlbnRf
+YXR0ciAqYXR0ciA9ICZldmVudC0+YXR0cjsKPj4gwqDCoMKgwqDCoCBpbnQgaWR4ID0gaHdjLT5p
+ZHg7Cj4+ICvCoMKgwqAgdTMyIGNvdW50ZXJfYml0cyA9IEJJVChBUk1WOF9JRFhfVE9fQ09VTlRF
+UihpZHgpKTsKPj4gwqAgwqDCoMKgwqDCoCBpZiAoYXJtdjhwbXVfZXZlbnRfaXNfY2hhaW5lZChl
+dmVudCkpCj4+IC3CoMKgwqDCoMKgwqDCoCBhcm12OHBtdV9kaXNhYmxlX2NvdW50ZXIoaWR4IC0g
+MSk7Cj4+IC3CoMKgwqAgYXJtdjhwbXVfZGlzYWJsZV9jb3VudGVyKGlkeCk7Cj4+ICvCoMKgwqDC
+oMKgwqDCoCBjb3VudGVyX2JpdHMgfD0gQklUKEFSTVY4X0lEWF9UT19DT1VOVEVSKGlkeCAtIDEp
+KTsKPj4gKwo+PiArwqDCoMKgIGt2bV9jbHJfcG11X2V2ZW50cyhjb3VudGVyX2JpdHMpOwo+PiAr
+Cj4+ICvCoMKgwqAgaWYgKCFhdHRyLT5leGNsdWRlX2hvc3QpIHsKPj4gK8KgwqDCoMKgwqDCoMKg
+IGlmIChhcm12OHBtdV9ldmVudF9pc19jaGFpbmVkKGV2ZW50KSkKPj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgYXJtdjhwbXVfZGlzYWJsZV9jb3VudGVyKGlkeCAtIDEpOwo+PiArwqDCoMKgwqDC
+oMKgwqAgYXJtdjhwbXVfZGlzYWJsZV9jb3VudGVyKGlkeCk7Cj4+ICvCoMKgwqAgfQo+IAo+IFNo
+b3VsZG4ndCB3ZSBkaXNhYmxlIHRoZSBldmVudHMsIGlycmVzcGVjdGl2ZSBvZiB3aGV0aGVyIGl0
+IGlzIGZvciBob3N0Cj4gb3IvYW5kIGd1ZXN0ID8gT3RoZXJ3aXNlIGxvb2tzIGdvb2QgdG8gbWUu
+Cj4gCgpJIG1hZGUgdGhlIG9wcG9zaXRlIHJlbWFyayBvbiBvbmUgb2YgdGhlIGVhcmx5IHZlcnNp
+b24uIE15IHJlYXNvbmluZyBpcwp0aGF0LCBpZiB3ZSByZWx5IG9uIHRoZSBoeXBlcnZpc29yIHRv
+IGVuYWJsZSBldmVudCB0aGF0IGV4Y2x1ZGUgdGhlCmhvc3QsIHdlIHNob3VsZCBhbHNvIHJlbHkg
+b24gdGhlIGh5cGVydmlzb3IgZGlzYWJsaW5nIHRoZXNlIGV2ZW50cy4KCkF0IGxlYXN0IGluIG15
+IG1pbmQgaXQgbWFrZXMgbW9yZSBzZW5zZSB0aGlzIHdheS4KCkNoZWVycywKCi0tIApKdWxpZW4g
+VGhpZXJyeQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
+dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
+aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
