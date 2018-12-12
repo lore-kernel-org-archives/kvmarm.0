@@ -1,39 +1,32 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
-Date: Tue, 11 Dec 2018 19:39:28 -0500
-Message-ID: <20181211193249-mutt-send-email-mst@kernel.org>
-References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
- <20181211183101.GA31936@infradead.org>
+From: Paul Mackerras <paulus@ozlabs.org>
+Subject: Re: [Resend PATCH V5 7/10] KVM: Make kvm_set_spte_hva() return int
+Date: Wed, 12 Dec 2018 16:03:53 +1100
+Message-ID: <20181212050353.GF22265@blackberry>
+References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
+ <20181206132113.2691-8-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <virtio-dev-return-5186-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20181211183101.GA31936@infradead.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, joro@8bytes.org, mark.rutland@arm.com, kevin.tian@intel.com, tnowicki@caviumnetworks.com, marc.zyngier@arm.com, robin.murphy@arm.com, jasowang@redhat.com, will.deacon@arm.com, robh+dt@kernel.org, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20181206132113.2691-8-Tianyu.Lan@microsoft.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: lantianyu1986@gmail.com
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, benh@kernel.crashing.org, mpe@ellerman.id.au, pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, kys@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 11, 2018 at 10:31:01AM -0800, Christoph Hellwig wrote:
-> On Tue, Dec 11, 2018 at 06:20:57PM +0000, Jean-Philippe Brucker wrote:
-> > Implement the virtio-iommu driver, following specification v0.9 [1].
-> > 
-> > Only minor changes since v5 [2]. I fixed issues reported by Michael and
-> > added tags from Eric and Bharat. Thanks!
-> > 
-> > You can find Linux driver and kvmtool device on v0.9 branches [3],
-> > module and x86 support on virtio-iommu/devel. Also tested with Eric's
-> > QEMU device [4].
+On Thu, Dec 06, 2018 at 09:21:10PM +0800, lantianyu1986@gmail.com wrote:
+> From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 > 
-> Just curious, what is the use case for it?
+> The patch is to make kvm_set_spte_hva() return int and caller can
+> check return value to determine flush tlb or not.
 
-If what I saw is any indication, it allows a very simple implementation
-of page table shadowing on the host, at the cost of not being able to
-accelerate with a hardware nested page tables support when available.
+It would be helpful if the patch description told the reader which
+return value(s) mean that the caller should flush the tlb.  I would
+guess that non-zero means to do the flush, but you should make that
+explicit.
 
--- 
-MST
+> Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
+
+For the powerpc bits:
+
+Acked-by: Paul Mackerras <paulus@ozlabs.org>
