@@ -1,26 +1,27 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v8 3/5] arm64: KVM: add accessors to track guest/host only
- counters
-Date: Wed, 12 Dec 2018 10:56:11 +0000
-Message-ID: <344aa2be-ea9d-24fe-b3e5-742b3344722d@arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v8 2/5] arm64: KVM: encapsulate kvm_cpu_context in
+ kvm_host_data
+Date: Wed, 12 Dec 2018 12:31:38 +0000
+Message-ID: <20181212123121.GI13393@e119886-lin.cambridge.arm.com>
 References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
- <1544610573-28446-4-git-send-email-andrew.murray@arm.com>
+ <1544610573-28446-3-git-send-email-andrew.murray@arm.com>
+ <c31a1e2b-511a-4441-1fb2-8bf32691656f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CF894A200
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:56:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B8F44A33D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 07:31:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z8c78i5D0Rg2 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 05:56:15 -0500 (EST)
+ with ESMTP id yDwPSZQw6vLL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 07:31:42 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B8C04A1FA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:56:15 -0500 (EST)
-In-Reply-To: <1544610573-28446-4-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D998E4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 07:31:41 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <c31a1e2b-511a-4441-1fb2-8bf32691656f@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,17 +31,92 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 12/12/2018 10:29, Andrew Murray wrote:
-> In order to effeciently enable/disable guest/host only perf counters
-> at guest entry/exit we add bitfields to kvm_cpu_context for guest and
-> host events as well as accessors for updating them.
+On Wed, Dec 12, 2018 at 10:37:54AM +0000, Suzuki K Poulose wrote:
+> Hi Andrew,
 > 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> On 12/12/2018 10:29, Andrew Murray wrote:
+> > The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
+> > a typedef to kvm_cpu_context and is used to store host cpu context. The
+> > kvm_cpu_context structure is also used elsewhere to hold vcpu context.
+> > In order to use the percpu to hold additional future host information we
+> > encapsulate kvm_cpu_context in a new structure and rename the typedef and
+> > percpu to match.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
+> >   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
+> >   arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
+> >   arch/arm64/kernel/asm-offsets.c   |  2 +-
+> >   virt/kvm/arm/arm.c                | 10 ++++++----
+> >   5 files changed, 25 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index 79906ce..71645ba 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -145,7 +145,11 @@ struct kvm_cpu_context {
+> >   	u32 cp15[NR_CP15_REGS];
+> >   };
+> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
+> > +struct kvm_host_data {
+> > +	struct kvm_cpu_context host_ctxt;
+> > +};
+> > +
+> > +typedef struct kvm_host_data kvm_host_data_t;
+> >   struct kvm_vcpu_arch {
+> >   	struct kvm_cpu_context ctxt;
+> > @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
+> >   	struct kvm_vcpu_fault_info fault;
+> >   	/* Host FP context */
+> > -	kvm_cpu_context_t *host_cpu_context;
+> > +	struct kvm_cpu_context *host_cpu_context;
+> >   	/* VGIC state */
+> >   	struct vgic_cpu vgic_cpu;
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index 102b5a5..6a9bfd4 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
+> >   .endm
+> >   .macro get_host_ctxt reg, tmp
+> > -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
+> > +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
+> >   .endm
+> >   .macro get_vcpu_ptr vcpu, ctxt
+> >   	get_host_ctxt \ctxt, \vcpu
+> > -	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
+> > +	ldr	\vcpu, [\ctxt, #HOST_DATA_VCPU]
+> >   	kern_hyp_va	\vcpu
+> >   .endm
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 1550192..1d3ca91 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -205,7 +205,12 @@ struct kvm_cpu_context {
+> >   	struct kvm_vcpu *__hyp_running_vcpu;
+> >   };
+> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
+> > +struct kvm_host_data {
+> > +	struct kvm_cpu_context host_ctxt;
+> > +	struct kvm_pmu_events pmu_events;
+> > +};
+> > +
+> 
+> Unfortunately this would fail to build as we don't have the kvm_pmu_events
+> defined in this patch and will break the git bisects.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Doh, this must have crept in when I was rebasing.
+
+Andrew Murray
+
+> 
+> Otherwise looks good to me.
+> 
+> 
+> Cheers
+> Suzuki
