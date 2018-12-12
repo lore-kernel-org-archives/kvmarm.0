@@ -1,109 +1,38 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 3/6] builtin-run: Do not look for default kernel
- when firmware is provided
-Date: Wed, 12 Dec 2018 18:16:23 +0000
-Message-ID: <20181212181623.00007bb0@donnerap.cambridge.arm.com>
-References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
- <1543922073-55530-4-git-send-email-julien.thierry@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v6 00/13] ARMv8.3 pointer authentication userspace support
+Date: Wed, 12 Dec 2018 19:35:44 +0000
+Message-ID: <20181212193544.GB22013@edgewater-inn.cambridge.arm.com>
+References: <20181207183931.4285-1-kristina.martsenko@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 495FB4A200
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 13:16:29 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FBGhkUG7Sfva for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 13:16:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A6A4A2BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 13:16:28 -0500 (EST)
-In-Reply-To: <1543922073-55530-4-git-send-email-julien.thierry@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20181207183931.4285-1-kristina.martsenko@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <amit.kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Dave P Martin <dave.martin@arm.com>, Jacob Bramley <jacob.bramley@arm.com>, Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>, Mark Rutland <mark.rutland@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue,  4 Dec 2018 11:14:30 +0000
-Julien Thierry <julien.thierry@arm.com> wrote:
+Hi Kristina,
 
-Hi,
+On Fri, Dec 07, 2018 at 06:39:18PM +0000, Kristina Martsenko wrote:
+> This series adds support for the ARMv8.3 pointer authentication extension,
+> enabling userspace return address protection with GCC 7 and above.
 
-> When a firmware file is provided, kvmtool is not responsible for
-> loading a kernel image.
-> 
-> There is no reason for looking for a default kernel image when loading
-> a firmware.
-> 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+I've pushed this out to for-next/ptr-auth with the following changes:
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+  * Rebased onto for-next/core
+  * Dropped the GET/SET ptrace requests for now, due to fragile regset usage
+  * Moved the user key state from thread_info to thread_struct
+  * Removed use of VA_BITS for the PAC mask (doesn't work with 52-bit user VAs)
+  * Added a patch to use _BITUL for the bit definitions in sysreg.h
+  * Tidied up the HWCAP generation [need to run this past Suzuki]
+  * Reduced the number of CPU caps from 6 to 4 [also need to run past Suzuki]
+  * Added Reviewed-by tags
 
-Just wondering whether we actually need this unconditional printf in
-the first place ...
+I've not merged it into for-next/core yet, because it could use some testing
+and review first.
 
 Cheers,
-Andre.
 
-> ---
->  builtin-run.c | 24 ++++++++++++++++--------
->  1 file changed, 16 insertions(+), 8 deletions(-)
-> 
-> diff --git a/builtin-run.c b/builtin-run.c
-> index 443c10b..82e2b2e 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -512,12 +512,13 @@ static struct kvm *kvm_cmd_run_init(int argc,
-> const char **argv) 
->  	kvm->nr_disks = kvm->cfg.image_count;
->  
-> -	if (!kvm->cfg.kernel_filename)
-> +	if (!kvm->cfg.kernel_filename
-> && !kvm->cfg.firmware_filename) { kvm->cfg.kernel_filename =
-> find_kernel(); 
-> -	if (!kvm->cfg.kernel_filename) {
-> -		kernel_usage_with_options();
-> -		return ERR_PTR(-EINVAL);
-> +		if (!kvm->cfg.kernel_filename) {
-> +			kernel_usage_with_options();
-> +			return ERR_PTR(-EINVAL);
-> +		}
->  	}
->  
->  	kvm->cfg.vmlinux_filename = find_vmlinux();
-> @@ -639,10 +640,17 @@ static struct kvm *kvm_cmd_run_init(int argc,
-> const char **argv) 
->  	kvm->cfg.real_cmdline = real_cmdline;
->  
-> -	printf("  # %s run -k %s -m %Lu -c %d --name %s\n",
-> KVM_BINARY_NAME,
-> -		kvm->cfg.kernel_filename,
-> -		(unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
-> -		kvm->cfg.nrcpus, kvm->cfg.guest_name);
-> +	if (kvm->cfg.kernel_filename) {
-> +		printf("  # %s run -k %s -m %Lu -c %d --name %s\n",
-> KVM_BINARY_NAME,
-> +		       kvm->cfg.kernel_filename,
-> +		       (unsigned long long)kvm->cfg.ram_size /
-> 1024 / 1024,
-> +		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
-> +	} else if (kvm->cfg.firmware_filename) {
-> +		printf("  # %s run --firmware %s -m %Lu -c %d --name
-> %s\n", KVM_BINARY_NAME,
-> +		       kvm->cfg.firmware_filename,
-> +		       (unsigned long long)kvm->cfg.ram_size /
-> 1024 / 1024,
-> +		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
-> +	}
->  
->  	if (init_list__init(kvm) < 0)
->  		die ("Initialisation failed");
+Will
