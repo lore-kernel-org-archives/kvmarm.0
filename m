@@ -1,23 +1,25 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v7 10/25] arm64: kvm: Unmask PMR before entering guest
-Date: Wed, 12 Dec 2018 16:47:10 +0000
-Message-ID: <1544633245-6036-11-git-send-email-julien.thierry@arm.com>
-References: <1544633245-6036-1-git-send-email-julien.thierry@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool 1/6] rtc: Initialize the Register D for MC146818
+ RTC
+Date: Wed, 12 Dec 2018 18:16:01 +0000
+Message-ID: <20181212181601.7afcba1c@donnerap.cambridge.arm.com>
+References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
+ <1543922073-55530-2-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 349EB4A2F8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 11:48:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CF14A2BB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 13:16:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XaiQGzXIm5Qj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 11:48:12 -0500 (EST)
+ with ESMTP id rHw3rsZ8HL+d for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 13:16:06 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0464B4A2E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 11:48:11 -0500 (EST)
-In-Reply-To: <1544633245-6036-1-git-send-email-julien.thierry@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B54884A200
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 13:16:06 -0500 (EST)
+In-Reply-To: <1543922073-55530-2-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,97 +29,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: daniel.thompson@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, joel@joelfernandes.org, kvmarm@lists.cs.columbia.edu
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
-means that hypervisor will not receive masked interrupts while running a
-guest.
+On Tue,  4 Dec 2018 11:14:28 +0000
+Julien Thierry <julien.thierry@arm.com> wrote:
 
-Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
+> From: Sami Mujawar <sami.mujawar@arm.com>
+> 
+> Some software drivers check the VRT bit (BIT7) of Register D before
+> using the MC146818 RTC. Initialized the VRT bit in rtc__init() to
+> indicate that the RAM and time contents are valid.
+> 
+> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
- arch/arm64/kvm/hyp/switch.c       | 16 ++++++++++++++++
- 2 files changed, 28 insertions(+)
+Checked against the data sheet.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 52fbc82..5c2fe50 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -24,6 +24,7 @@
- 
- #include <linux/types.h>
- #include <linux/kvm_types.h>
-+#include <asm/arch_gicv3.h>
- #include <asm/cpufeature.h>
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
-@@ -471,6 +472,17 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- static inline void kvm_arm_vhe_guest_enter(void)
- {
- 	local_daif_mask();
-+
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (system_uses_irq_prio_masking()) {
-+		gic_write_pmr(GIC_PRIO_IRQON);
-+		dsb(sy);
-+	}
- }
- 
- static inline void kvm_arm_vhe_guest_exit(void)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 7cc175c..88ed590 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -22,6 +22,7 @@
- 
- #include <kvm/arm_psci.h>
- 
-+#include <asm/arch_gicv3.h>
- #include <asm/cpufeature.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -537,6 +538,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (system_uses_irq_prio_masking()) {
-+		gic_write_pmr(GIC_PRIO_IRQON);
-+		dsb(sy);
-+	}
-+
- 	vcpu = kern_hyp_va(vcpu);
- 
- 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-@@ -589,6 +601,10 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	/* Returning to host will clear PSR.I, remask PMR if needed */
-+	if (system_uses_irq_prio_masking())
-+		gic_write_pmr(GIC_PRIO_IRQOFF);
-+
- 	return exit_code;
- }
- 
--- 
-1.9.1
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+This is quite interesting: we build the RTC emulation unconditionally
+for every architecture, but don't expose it in the DT (for arm/arm64).
+The Linux driver can't even be configured for arm64.
+Interestingly it works if one pokes 0x70 and 0x71 directly in memory
+from a guest. Which sounds hackish (do we want that?), but fits more a
+less the firmware use case. We would just need to make sure it actually
+works correctly on ARM, since nobody tested this properly before.
+
+I guess EDK2 would just hardcode the address?
+
+Cheers,
+Andre.
+
+> ---
+>  hw/rtc.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/rtc.c b/hw/rtc.c
+> index 0649b5d..c1fa72f 100644
+> --- a/hw/rtc.c
+> +++ b/hw/rtc.c
+> @@ -25,6 +25,11 @@
+>  #define RTC_REG_C			0x0C
+>  #define RTC_REG_D			0x0D
+>  
+> +/*
+> + * Register D Bits
+> + */
+> +#define RTC_REG_D_VRT			(1 << 7)
+> +
+>  struct rtc_device {
+>  	u8			cmos_idx;
+>  	u8			cmos_data[128];
+> @@ -140,6 +145,9 @@ int rtc__init(struct kvm *kvm)
+>  		return r;
+>  	}
+>  
+> +	/* Set the VRT bit in Register D to indicate valid RAM and
+> time */
+> +	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
+> +
+>  	return r;
+>  }
+>  dev_init(rtc__init);
