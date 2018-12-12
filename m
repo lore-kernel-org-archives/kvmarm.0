@@ -1,38 +1,78 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v6 00/13] ARMv8.3 pointer authentication userspace support
-Date: Wed, 12 Dec 2018 19:35:44 +0000
-Message-ID: <20181212193544.GB22013@edgewater-inn.cambridge.arm.com>
-References: <20181207183931.4285-1-kristina.martsenko@arm.com>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: fix off-by-one bug in vgic_get_irq()
+Date: Wed, 12 Dec 2018 14:11:23 -0600
+Message-ID: <20181212201123.GA26674@embeddedor>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20181207183931.4285-1-kristina.martsenko@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <amit.kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Dave P Martin <dave.martin@arm.com>, Jacob Bramley <jacob.bramley@arm.com>, Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>, Mark Rutland <mark.rutland@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Kristina,
+When using the nospec API, it should be taken into account that:
 
-On Fri, Dec 07, 2018 at 06:39:18PM +0000, Kristina Martsenko wrote:
-> This series adds support for the ARMv8.3 pointer authentication extension,
-> enabling userspace return address protection with GCC 7 and above.
+"...if the CPU speculates past the bounds check then
+ * array_index_nospec() will clamp the index within the range of [0,
+ * size)."
 
-I've pushed this out to for-next/ptr-auth with the following changes:
+The above is part of the header for macro array_index_nospec() in
+linux/nospec.h
 
-  * Rebased onto for-next/core
-  * Dropped the GET/SET ptrace requests for now, due to fragile regset usage
-  * Moved the user key state from thread_info to thread_struct
-  * Removed use of VA_BITS for the PAC mask (doesn't work with 52-bit user VAs)
-  * Added a patch to use _BITUL for the bit definitions in sysreg.h
-  * Tidied up the HWCAP generation [need to run this past Suzuki]
-  * Reduced the number of CPU caps from 6 to 4 [also need to run past Suzuki]
-  * Added Reviewed-by tags
+Now, in this particular case, if intid evaluates to exactly VGIC_MAX_SPI
+or to exaclty VGIC_MAX_PRIVATE, the array_index_nospec() macro ends up
+returning VGIC_MAX_SPI - 1 or VGIC_MAX_PRIVATE - 1 respectively, instead
+of VGIC_MAX_SPI or VGIC_MAX_PRIVATE, which, based on the original logic:
 
-I've not merged it into for-next/core yet, because it could use some testing
-and review first.
+	/* SGIs and PPIs */
+	if (intid <= VGIC_MAX_PRIVATE)
+ 		return &vcpu->arch.vgic_cpu.private_irqs[intid];
 
-Cheers,
+ 	/* SPIs */
+	if (intid <= VGIC_MAX_SPI)
+ 		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
 
-Will
+are valid values for intid.
+
+Fix this by calling array_index_nospec() macro with VGIC_MAX_PRIVATE + 1
+and VGIC_MAX_SPI + 1 as arguments for its parameter size.
+
+Fixes: 41b87599c743 ("KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_get_irq()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ virt/kvm/arm/vgic/vgic.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 50e25438fb3c..5db40696055a 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -103,13 +103,13 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ {
+ 	/* SGIs and PPIs */
+ 	if (intid <= VGIC_MAX_PRIVATE) {
+-		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE);
++		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE + 1);
+ 		return &vcpu->arch.vgic_cpu.private_irqs[intid];
+ 	}
+ 
+ 	/* SPIs */
+ 	if (intid <= VGIC_MAX_SPI) {
+-		intid = array_index_nospec(intid, VGIC_MAX_SPI);
++		intid = array_index_nospec(intid, VGIC_MAX_SPI + 1);
+ 		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
+ 	}
+ 
+-- 
+2.17.1
