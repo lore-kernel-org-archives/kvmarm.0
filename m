@@ -1,197 +1,117 @@
-From: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [virtio-dev] Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
-Date: Wed, 12 Dec 2018 09:56:27 -0500
-Message-ID: <20181212093709-mutt-send-email-mst@kernel.org>
-References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
-	<20181122193801.50510-6-jean-philippe.brucker@arm.com>
-	<20181123165206-mutt-send-email-mst@kernel.org>
-	<e76a51ba-7a0f-3fca-a1ae-640131f9dfe1@arm.com>
-	<20181127130527-mutt-send-email-mst@kernel.org>
-	<e1dde79c-0bc4-ea99-1bb0-9e70b56955fb@arm.com>
+From: Steven Price <steven.price@arm.com>
+Subject: [RFC PATCH v2 00/12] arm64: Paravirtualized time support
+Date: Wed, 12 Dec 2018 15:02:14 +0000
+Message-ID: <20181212150226.38051-1-steven.price@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <e1dde79c-0bc4-ea99-1bb0-9e70b56955fb-5wv7dgnIgG8@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E60E4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1i9VSMH6YnAp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 10:02:54 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32EFA4A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:02:54 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Price <steven.price@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 07, 2018 at 06:52:31PM +0000, Jean-Philippe Brucker wrote:
-> Sorry for the delay, I wanted to do a little more performance analysis
-> before continuing.
-> 
-> On 27/11/2018 18:10, Michael S. Tsirkin wrote:
-> > On Tue, Nov 27, 2018 at 05:55:20PM +0000, Jean-Philippe Brucker wrote:
-> >>>> +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
-> >>>> +	    !virtio_has_feature(vdev, VIRTIO_IOMMU_F_MAP_UNMAP))
-> >>>
-> >>> Why bother with a feature bit for this then btw?
-> >>
-> >> We'll need a new feature bit for sharing page tables with the hardware,
-> >> because they require different requests (attach_table/invalidate instead
-> >> of map/unmap.) A future device supporting page table sharing won't
-> >> necessarily need to support map/unmap.
-> >>
-> > I don't see virtio iommu being extended to support ARM specific
-> > requests. This just won't scale, too many different
-> > descriptor formats out there.
-> 
-> They aren't really ARM specific requests. The two new requests are
-> ATTACH_TABLE and INVALIDATE, which would be used by x86 IOMMUs as well.
-> 
-> Sharing CPU address space with the HW IOMMU (SVM) has been in the scope
-> of virtio-iommu since the first RFC, and I've been working with that
-> extension in mind since the beginning. As an example you can have a look
-> at my current draft for this [1], which is inspired from the VFIO work
-> we've been doing with Intel.
-> 
-> The negotiation phase inevitably requires vendor-specific fields in the
-> descriptors - host tells which formats are supported, guest chooses a
-> format and attaches page tables. But invalidation and fault reporting
-> descriptors are fairly generic.
+This series add support for paravirtualized time for Arm64 guests and
+KVM hosts following the specification in Arm's document DEN 0057A:
 
-We need to tread carefully here.  People expect it that if user does
-lspci and sees a virtio device then it's reasonably portable.
+https://developer.arm.com/docs/den0057/a
 
-> > If you want to go that way down the road, you should avoid
-> > virtio iommu, instead emulate and share code with the ARM SMMU (probably
-> > with a different vendor id so you can implement the
-> > report on map for devices without PRI).
-> 
-> vSMMU has to stay in userspace though. The main reason we're proposing
-> virtio-iommu is that emulating every possible vIOMMU model in the kernel
-> would be unmaintainable. With virtio-iommu we can process the fast path
-> in the host kernel, through vhost-iommu, and do the heavy lifting in
-> userspace.
+It implements support for Live Physical Time (LPT) which provides the
+guest with a method to derive a stable counter of time during which the
+guest is executing even when the guest is being migrated between hosts
+with different physical counter frequencies.
 
-Interesting.
+It also implements support for stolen time, allowing the guest to
+identify time when it is forcibly not executing.
 
-> As said above, I'm trying to keep the fast path for
-> virtio-iommu generic.
-> 
-> More notes on what I consider to be the fast path, and comparison with
-> vSMMU:
-> 
-> (1) The primary use-case we have in mind for vIOMMU is something like
-> DPDK in the guest, assigning a hardware device to guest userspace. DPDK
-> maps a large amount of memory statically, to be used by a pass-through
-> device. For this case I don't think we care about vIOMMU performance.
-> Setup and teardown need to be reasonably fast, sure, but the MAP/UNMAP
-> requests don't have to be optimal.
-> 
-> 
-> (2) If the assigned device is owned by the guest kernel, then mappings
-> are dynamic and require dma_map/unmap() to be fast, but there generally
-> is no need for a vIOMMU, since device and drivers are trusted by the
-> guest kernel. Even when the user does enable a vIOMMU for this case
-> (allowing to over-commit guest memory, which needs to be pinned
-> otherwise),
+Patch 1 provides some documentation
+Patches 2-4 and 8 provide some refactoring of existing code
+Patches 5-7 and 9 implement cmmon code and support for stolen time
+Patches 10-12 implement Live Physical Time
 
-BTW that's in theory in practice it doesn't really work.
+Changes since v1:
+ * Live physical time changes split up and moved to the last three patches
+   of the series.
+ * Renamed arm_smccc_1_1 to arm_smccc_1_1_call to match Mark Rutland's series
+   tidying SMCCC up. Potentially these changes can be dropped in favour of
+   Mark's series.
+ * Renamed things to avoid use of "page" as the shared structures are not
+   necessarily an entire/single page.
+ * Moved the contents of include/kvm/arm_pv.h to include/linux/arm-smccc.h
+ * Fix definition of GPA_INVALID to be sign-extension safe
 
-> we generally play tricks like lazy TLBI (non-strict mode) to
-> make it faster.
+Christoffer Dall (1):
+  KVM: arm/arm64: Factor out hypercall handling from PSCI code
 
-Simple lazy TLB for guest/userspace drivers would be a big no no.
-You need something smarter.
+Steven Price (11):
+  KVM: arm64: Document PV-time interface
+  arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+  arm/arm64: Make use of the SMCCC 1.1 wrapper
+  KVM: arm64: Implement PV_FEATURES call
+  KVM: arm64: Support stolen time reporting via shared structure
+  arm64: Retrieve stolen time as paravirtualized guest
+  KVM: Allow kvm_device_ops to be const
+  KVM: arm64: Provide a PV_TIME device to user space
+  KVM: arm64: Support Live Physical Time reporting
+  clocksource: arm_arch_timer: Use paravirtualized LPT
+  KVM: arm64: Export LPT using PV_TIME device
 
-> Here device and drivers are trusted, therefore the
-> vulnerability window of lazy mode isn't a concern.
-> 
-> If the reason to enable the vIOMMU is over-comitting guest memory
-> however, you can't use nested translation because it requires pinning
-> the second-level tables. For this case performance matters a bit,
-> because your invalidate-on-map needs to be fast, even if you enable lazy
-> mode and only receive inval-on-unmap every 10ms. It won't ever be as
-> fast as nested translation, though. For this case I think vSMMU+Caching
-> Mode and userspace virtio-iommu with MAP/UNMAP would perform similarly
-> (given page-sized payloads), because the pagetable walk doesn't add a
-> lot of overhead compared to the context switch. But given the results
-> below, vhost-iommu would be faster than vSMMU+CM.
-> 
-> 
-> (3) Then there is SVM. For SVM, any destructive change to the process
-> address space requires a synchronous invalidation command to the
-> hardware (at least when using PCI ATS). Given that SVM is based on page
-> faults, fault reporting from host to guest also needs to be fast, as
-> well as fault response from guest to host.
-> 
-> I think this is where performance matters the most. To get a feel of the
-> advantage we get with virtio-iommu, I compared the vSMMU page-table
-> sharing implementation [2] and vhost-iommu + VFIO with page table
-> sharing (based on Tomasz Nowicki's vhost-iommu prototype). That's on a
-> ThunderX2 with a 10Gb NIC assigned to the guest kernel, which
-> corresponds to case (2) above, with nesting page tables and without the
-> lazy mode. The host's only job is forwarding invalidation to the HW SMMU.
-> 
-> vhost-iommu performed on average 1.8x and 5.5x better than vSMMU on
-> netperf TCP_STREAM and TCP_MAERTS respectively (~200 samples). I think
-> this can be further optimized (that was still polling under the vq
-> lock), and unlike vSMMU, virtio-iommu offers the possibility of
-> multi-queue for improved scalability. In addition, the guest will need
-> to send both TLB and ATC invalidations with vSMMU, but virtio-iommu
-> allows to multiplex those, and to invalidate ranges. Similarly for fault
-> injection, having the ability to report page faults to the guest from
-> the host kernel should be significantly faster than having to go to
-> userspace and back to the kernel.
+ Documentation/virtual/kvm/arm/pvtime.txt | 169 ++++++++++++++
+ arch/arm/kvm/Makefile                    |   2 +-
+ arch/arm/kvm/handle_exit.c               |   2 +-
+ arch/arm/mm/proc-v7-bugs.c               |  46 ++--
+ arch/arm64/include/asm/arch_timer.h      |  32 ++-
+ arch/arm64/include/asm/kvm_host.h        |  16 ++
+ arch/arm64/include/asm/kvm_mmu.h         |   2 +
+ arch/arm64/include/asm/pvclock-abi.h     |  32 +++
+ arch/arm64/include/uapi/asm/kvm.h        |   8 +
+ arch/arm64/kernel/Makefile               |   1 +
+ arch/arm64/kernel/cpu_errata.c           |  47 +---
+ arch/arm64/kernel/cpuinfo.c              |   2 +-
+ arch/arm64/kernel/kvm.c                  | 156 +++++++++++++
+ arch/arm64/kvm/Kconfig                   |   1 +
+ arch/arm64/kvm/Makefile                  |   2 +
+ arch/arm64/kvm/handle_exit.c             |   4 +-
+ drivers/clocksource/arm_arch_timer.c     | 177 ++++++++++++++-
+ include/kvm/arm_arch_timer.h             |   2 +
+ include/kvm/arm_hypercalls.h             |  44 ++++
+ include/kvm/arm_psci.h                   |   2 +-
+ include/linux/arm-smccc.h                |  64 ++++++
+ include/linux/cpuhotplug.h               |   1 +
+ include/linux/kvm_host.h                 |   4 +-
+ include/linux/kvm_types.h                |   2 +
+ include/uapi/linux/kvm.h                 |   2 +
+ virt/kvm/arm/arm.c                       |  25 ++-
+ virt/kvm/arm/hypercalls.c                | 271 +++++++++++++++++++++++
+ virt/kvm/arm/mmu.c                       |  44 ++++
+ virt/kvm/arm/psci.c                      |  76 +------
+ virt/kvm/arm/pvtime.c                    | 244 ++++++++++++++++++++
+ virt/kvm/kvm_main.c                      |   6 +-
+ 31 files changed, 1333 insertions(+), 153 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/arm/pvtime.txt
+ create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+ create mode 100644 arch/arm64/kernel/kvm.c
+ create mode 100644 include/kvm/arm_hypercalls.h
+ create mode 100644 virt/kvm/arm/hypercalls.c
+ create mode 100644 virt/kvm/arm/pvtime.c
 
-Fascinating. Any data about host CPU utilization?
-
-Eric what do you think?
-
-Is it true that SMMUv3 is fundmentally slow at the architecture level
-and so a PV interface will always scale better until
-a new hardware interface is designed?
-
-
-> 
-> (4) Virtio and vhost endpoints weren't really a priority for the base
-> virtio-iommu device, we were looking mainly at device pass-through. I
-> have optimizations in mind for this, although a lot of them are based on
-> page tables, not MAP/UNMAP requests. But just getting the vIOMMU closer
-> to vhost devices, avoiding the trip to userspace through vhost-tlb,
-> should already improve things.
-> 
-> The important difference when DMA is done by software is that you don't
-> need to mirror all mappings into the HW IOMMU - you don't need
-> inval-on-map. The endpoint can ask the vIOMMU for mappings when it needs
-> them, like vhost-iotlb does for example. So the MAP/UNMAP interface of
-> virtio-iommu performs poorly for emulated/PV endpoints compared to an
-> emulated IOMMU, since it requires three context switches for DMA
-> (MAP/DMA/UNMAP) between host and guest, rather than two (DMA/INVAL).
-> There is a feature I call "posted MAP", that avoids the kick on MAP and
-> instead lets the device fetch the MAP request on TLB miss, but I haven't
-> spent enough time experimenting with this.
-> 
-> > Others on the TC might feel differently.
-> > 
-> > If someone's looking into adding virtio iommu support in hardware,
-> > that's a different matter. Which is it?
-> 
-> I'm not aware of anything like that, and suspect that no one would
-> consider it until virtio-iommu is more widely adopted.
-> 
-> Thanks,
-> Jean
-> 
-> 
-> [1] Diff between current spec and page table sharing draft
->     (Very rough, missing page fault support and I'd like to rework the
->      PASID model a bit, but table descriptors p.24-26 for both Arm
->      SMMUv2 and SMMUv3.)
-> 
-> http://jpbrucker.net/virtio-iommu/spec-table/diffs/virtio-iommu-pdf-diff-v0.9-v0.10.dev03.pdf
-> 
-> [2] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration
->     https://www.mail-archive.com/qemu-devel-qX2TKyscuCcdnm+yROfE0A@public.gmane.org/msg562369.html
+-- 
+2.19.2
