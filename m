@@ -1,211 +1,234 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v6 11/13] arm64: add ptrace regsets for ptrauth key
- management
-Date: Wed, 12 Dec 2018 15:23:47 +0000
-Message-ID: <20181212152347.GY3505@e103592.cambridge.arm.com>
-References: <20181207183931.4285-1-kristina.martsenko@arm.com>
- <20181207183931.4285-12-kristina.martsenko@arm.com>
+From: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [virtio-dev] Re: [PATCH v5 5/7] iommu: Add virtio-iommu driver
+Date: Wed, 12 Dec 2018 16:27:01 +0100
+Message-ID: <eb267a7c-a881-afd9-9ce2-bcdc317d16d7@redhat.com>
+References: <20181122193801.50510-1-jean-philippe.brucker@arm.com>
+	<20181122193801.50510-6-jean-philippe.brucker@arm.com>
+	<20181123165206-mutt-send-email-mst@kernel.org>
+	<e76a51ba-7a0f-3fca-a1ae-640131f9dfe1@arm.com>
+	<20181127130527-mutt-send-email-mst@kernel.org>
+	<e1dde79c-0bc4-ea99-1bb0-9e70b56955fb@arm.com>
+	<20181212093709-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181207183931.4285-12-kristina.martsenko@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Jacob Bramley <jacob.bramley@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Adam Wallis <awallis@codeaurora.org>, Richard Henderson <richard.henderson@linaro.org>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Cyrill Gorcunov <gorcunov@gmail.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <amit.kachhap@arm.com>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20181212093709-mutt-send-email-mst-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 07, 2018 at 06:39:29PM +0000, Kristina Martsenko wrote:
-> Add two new ptrace regsets, which can be used to request and change the
-> pointer authentication keys of a thread. NT_ARM_PACA_KEYS gives access
-> to the instruction/data address keys, and NT_ARM_PACG_KEYS to the
-> generic authentication key.
+Hi,
+
+On 12/12/18 3:56 PM, Michael S. Tsirkin wrote:
+> On Fri, Dec 07, 2018 at 06:52:31PM +0000, Jean-Philippe Brucker wrote:
+>> Sorry for the delay, I wanted to do a little more performance analysis
+>> before continuing.
+>>
+>> On 27/11/2018 18:10, Michael S. Tsirkin wrote:
+>>> On Tue, Nov 27, 2018 at 05:55:20PM +0000, Jean-Philippe Brucker wrote:
+>>>>>> +	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1) ||
+>>>>>> +	    !virtio_has_feature(vdev, VIRTIO_IOMMU_F_MAP_UNMAP))
+>>>>>
+>>>>> Why bother with a feature bit for this then btw?
+>>>>
+>>>> We'll need a new feature bit for sharing page tables with the hardware,
+>>>> because they require different requests (attach_table/invalidate instead
+>>>> of map/unmap.) A future device supporting page table sharing won't
+>>>> necessarily need to support map/unmap.
+>>>>
+>>> I don't see virtio iommu being extended to support ARM specific
+>>> requests. This just won't scale, too many different
+>>> descriptor formats out there.
+>>
+>> They aren't really ARM specific requests. The two new requests are
+>> ATTACH_TABLE and INVALIDATE, which would be used by x86 IOMMUs as well.
+>>
+>> Sharing CPU address space with the HW IOMMU (SVM) has been in the scope
+>> of virtio-iommu since the first RFC, and I've been working with that
+>> extension in mind since the beginning. As an example you can have a look
+>> at my current draft for this [1], which is inspired from the VFIO work
+>> we've been doing with Intel.
+>>
+>> The negotiation phase inevitably requires vendor-specific fields in the
+>> descriptors - host tells which formats are supported, guest chooses a
+>> format and attaches page tables. But invalidation and fault reporting
+>> descriptors are fairly generic.
 > 
-> The regsets are only exposed if the kernel is compiled with
-> CONFIG_CHECKPOINT_RESTORE=y, as the intended use case is checkpointing
-> and restoring processes that are using pointer authentication. Normally
-> applications or debuggers should not need to know the keys (and exposing
-> the keys is a security risk), so the regsets are not exposed by default.
+> We need to tread carefully here.  People expect it that if user does
+> lspci and sees a virtio device then it's reasonably portable.
+> 
+>>> If you want to go that way down the road, you should avoid
+>>> virtio iommu, instead emulate and share code with the ARM SMMU (probably
+>>> with a different vendor id so you can implement the
+>>> report on map for devices without PRI).
+>>
+>> vSMMU has to stay in userspace though. The main reason we're proposing
+>> virtio-iommu is that emulating every possible vIOMMU model in the kernel
+>> would be unmaintainable. With virtio-iommu we can process the fast path
+>> in the host kernel, through vhost-iommu, and do the heavy lifting in
+>> userspace.
+> 
+> Interesting.
+> 
+>> As said above, I'm trying to keep the fast path for
+>> virtio-iommu generic.
+>>
+>> More notes on what I consider to be the fast path, and comparison with
+>> vSMMU:
+>>
+>> (1) The primary use-case we have in mind for vIOMMU is something like
+>> DPDK in the guest, assigning a hardware device to guest userspace. DPDK
+>> maps a large amount of memory statically, to be used by a pass-through
+>> device. For this case I don't think we care about vIOMMU performance.
+>> Setup and teardown need to be reasonably fast, sure, but the MAP/UNMAP
+>> requests don't have to be optimal.
+>>
+>>
+>> (2) If the assigned device is owned by the guest kernel, then mappings
+>> are dynamic and require dma_map/unmap() to be fast, but there generally
+>> is no need for a vIOMMU, since device and drivers are trusted by the
+>> guest kernel. Even when the user does enable a vIOMMU for this case
+>> (allowing to over-commit guest memory, which needs to be pinned
+>> otherwise),
+> 
+> BTW that's in theory in practice it doesn't really work.
+> 
+>> we generally play tricks like lazy TLBI (non-strict mode) to
+>> make it faster.
+> 
+> Simple lazy TLB for guest/userspace drivers would be a big no no.
+> You need something smarter.
+> 
+>> Here device and drivers are trusted, therefore the
+>> vulnerability window of lazy mode isn't a concern.
+>>
+>> If the reason to enable the vIOMMU is over-comitting guest memory
+>> however, you can't use nested translation because it requires pinning
+>> the second-level tables. For this case performance matters a bit,
+>> because your invalidate-on-map needs to be fast, even if you enable lazy
+>> mode and only receive inval-on-unmap every 10ms. It won't ever be as
+>> fast as nested translation, though. For this case I think vSMMU+Caching
+>> Mode and userspace virtio-iommu with MAP/UNMAP would perform similarly
+>> (given page-sized payloads), because the pagetable walk doesn't add a
+>> lot of overhead compared to the context switch. But given the results
+>> below, vhost-iommu would be faster than vSMMU+CM.
+>>
+>>
+>> (3) Then there is SVM. For SVM, any destructive change to the process
+>> address space requires a synchronous invalidation command to the
+>> hardware (at least when using PCI ATS). Given that SVM is based on page
+>> faults, fault reporting from host to guest also needs to be fast, as
+>> well as fault response from guest to host.
+>>
+>> I think this is where performance matters the most. To get a feel of the
+>> advantage we get with virtio-iommu, I compared the vSMMU page-table
+>> sharing implementation [2] and vhost-iommu + VFIO with page table
+>> sharing (based on Tomasz Nowicki's vhost-iommu prototype). That's on a
+>> ThunderX2 with a 10Gb NIC assigned to the guest kernel, which
+>> corresponds to case (2) above, with nesting page tables and without the
+>> lazy mode. The host's only job is forwarding invalidation to the HW SMMU.
+>>
+>> vhost-iommu performed on average 1.8x and 5.5x better than vSMMU on
+>> netperf TCP_STREAM and TCP_MAERTS respectively (~200 samples). I think
+>> this can be further optimized (that was still polling under the vq
+>> lock), and unlike vSMMU, virtio-iommu offers the possibility of
+>> multi-queue for improved scalability. In addition, the guest will need
+>> to send both TLB and ATC invalidations with vSMMU, but virtio-iommu
+>> allows to multiplex those, and to invalidate ranges. Similarly for fault
+>> injection, having the ability to report page faults to the guest from
+>> the host kernel should be significantly faster than having to go to
+>> userspace and back to the kernel.
+> 
+> Fascinating. Any data about host CPU utilization?
+> 
+> Eric what do you think?
+> 
+> Is it true that SMMUv3 is fundmentally slow at the architecture level
+> and so a PV interface will always scale better until
+> a new hardware interface is designed?
 
-If CONFIG_CHECKPOINT_RESTORE is a useful feature, it will be =y on a
-wide variety of systems.  So I think making the ptrace interface depend
-on it may just add potentially untested config variations with little
-real security benefit.
+As far as I understand the figures above correspond to vhost-iommu
+against vsmmuv3. In the 2 cases the guest owns stage1 tables so the
+difference comes from the IOTLB invalidation handling. With vhost we
+avoid a kernel <-> userspace round trip which may mostly explain the
+difference.
 
-If there is perceived to be a security issue here, we would need some
-mechanism therefore to control ptrace visibiliy of the keys on a finer
-grained basis, and then #ifdeffing the regsets out becomes pointless.
+About SMMUv3 issues I already reported one big limitation with respect
+to hugepage invalidation. See [RFC v2 4/4] iommu/arm-smmu-v3: add
+CMD_TLBI_NH_VA_AM command for iova range invalidation
+(https://lkml.org/lkml/2017/8/11/428).
+
+At smmuv3 guest driver level, arm_smmu_tlb_inv_range_nosync(), when
+called with a hugepage size, invalidates each 4K/64K page of the region
+and not the whole region at once. Each of them are trapped by the SMMUv3
+device which forwards them to the host. This stalls the guest. This
+issue can be observed in DPDK case - not the use case benchmarked above - .
+
+I raised this point again in recent discussions and it is unclear
+whether this is an SMMUv3 driver limitation or an architecture
+limitation. Seems a single invalidation within the block mapping should
+invalidate the whole mapping at HW level. In the past I hacked a
+workaround by defining an implementation defined invalidation command.
+
+Robin/Will, could you please explain the rationale behind the
+arm_smmu_tlb_inv_range_nosync() implementation.
+
+Thanks
+
+Eric
 
 
-There are alreads mechanisms to restrict ptrace at runtime though --
-are those not sufficient for us?
-
-(For example, without CAP_PTRACE_ATTACH, other users' or setuid
-processes are not accessible via ptrace.  Some security modules, Yama
-for example, add additional, runtime controllable restrictions, such
-as forbidding a process from tracing a task that it not one of its
-children.)
-
-In my opinion if a process is ptraceable at all then the tracer can
-compromise it trivially in a wide variety of ways, even in the presence
-of ptrauth.
-
-So we should keep things simple and expose the keys unconditionally.
-
-(Others' views might differ of course, but I can't see a convincing
-counterargument right now.  I haven't looked at historical posts, so
-maybe there was discussion already...)
 
 > 
-> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-> ---
->  arch/arm64/include/uapi/asm/ptrace.h | 18 +++++++++
->  arch/arm64/kernel/ptrace.c           | 72 ++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/elf.h             |  2 +
->  3 files changed, 92 insertions(+)
 > 
-> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-> index c2f249bcd829..fafa7f6decf9 100644
-> --- a/arch/arm64/include/uapi/asm/ptrace.h
-> +++ b/arch/arm64/include/uapi/asm/ptrace.h
-> @@ -236,6 +236,24 @@ struct user_pac_mask {
->  	__u64		insn_mask;
->  };
->  
-> +/* pointer authentication keys (NT_ARM_PACA_KEYS, NT_ARM_PACG_KEYS) */
-> +
-> +struct user_pac_address_keys {
-> +	__u64		apiakey_lo;
-> +	__u64		apiakey_hi;
-> +	__u64		apibkey_lo;
-> +	__u64		apibkey_hi;
-> +	__u64		apdakey_lo;
-> +	__u64		apdakey_hi;
-> +	__u64		apdbkey_lo;
-> +	__u64		apdbkey_hi;
-> +};
-> +
-> +struct user_pac_generic_keys {
-> +	__u64		apgakey_lo;
-> +	__u64		apgakey_hi;
-> +};
-> +
-
-Are these intentionally different from the kernel's struct ptrauth_keys?
-
->  #endif /* __ASSEMBLY__ */
->  
->  #endif /* _UAPI__ASM_PTRACE_H */
-> diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-> index 6c1f63cb6c4e..f18f14c64d1e 100644
-> --- a/arch/arm64/kernel/ptrace.c
-> +++ b/arch/arm64/kernel/ptrace.c
-> @@ -979,6 +979,56 @@ static int pac_mask_get(struct task_struct *target,
->  
->  	return user_regset_copyout(&pos, &count, &kbuf, &ubuf, &uregs, 0, -1);
->  }
-> +
-> +#ifdef CONFIG_CHECKPOINT_RESTORE
-> +static int pac_address_keys_get(struct task_struct *target,
-> +				const struct user_regset *regset,
-> +				unsigned int pos, unsigned int count,
-> +				void *kbuf, void __user *ubuf)
-> +{
-> +	if (!system_supports_address_auth())
-> +		return -EINVAL;
-> +
-> +	return user_regset_copyout(&pos, &count, &kbuf, &ubuf,
-> +			&target->thread_info.keys_user, 0, -1);
-
-How does this interact with CONFIG_HARDENED_USERCOPY?
-(I haven't really played with this myself, but the issue was reported
-by someone else when I was working on the SVE regset implementation.)
-
-Because thread_info is in task_struct for arm64, I think it will be
-subject to the arch_thread_struct_whitelist() (see <asm/processor.h>.)
-This may cause failures reading/writing the ptrauth regsets when this
-option is enabled.  (It seems =n in our defconfig today.)
-
-The usercopy hardening code seems to cope with a contiguous whitelisted
-region only, so it probably couldn't easily include the ptrauth keys.
-
-(Possibly this is a non-issue for reasone I'm not seeing -- I haven't
-tried this configuration recently.)
-
-
-If we cannot avoid the use of incompatible types for the user and kernel
-views of the ptrauth keys, then it may be more straightforward to simply
-declare a local struct user_pac_address_keys here and populate it field
-by field from thread_info, then do the _copyout on that.
-
-I'm not too keen on the type mismatch and the "-1" here.  That means we
-rely on regset->n and regset->size being set correctly elsewhere in
-order to guard against buffer overruns in thread_info, but in this
-case the regset size and the sizeof keys_user are not even the same.
-
-This is a potential pitfall for future maintenance that it would be
-preferable to avoid: if the regset definition and kernel structures
-go out of sync in some way in the future, we could be vulnerable to
-kernel buffer overruns, rather than just userspace seeing wrong
-behaviour.
-
-> +}
-> +
-> +static int pac_address_keys_set(struct task_struct *target,
-> +				const struct user_regset *regset,
-> +				unsigned int pos, unsigned int count,
-> +				const void *kbuf, const void __user *ubuf)
-> +{
-> +	if (!system_supports_address_auth())
-> +		return -EINVAL;
-> +
-> +	return user_regset_copyin(&pos, &count, &kbuf, &ubuf,
-> +			&target->thread_info.keys_user, 0, -1);
-
-The same comments apply here.
-
-Note, if using a local struct, you need to be careful to avoid leaking
-uninitialised kernel stack into the regset, so the struct must be fully
-initialised and must not have any implicit tail-padding or padding
-between fields.  (user_pac_address_keys and user_pac_generic_keys look
-OK on this point.)
-
-The most straightforward way to do this is to populate your struct from
-thread_info, do the _copyin(), then transfer the fields of the modified
-local struct back to thread_info.
-
-You'll have to do these copies in a couple of places, so if you go
-down this route it may be worth wrapping them in helpers.
-
-> +}
-> +
-> +static int pac_generic_keys_get(struct task_struct *target,
-> +				const struct user_regset *regset,
-> +				unsigned int pos, unsigned int count,
-> +				void *kbuf, void __user *ubuf)
-> +{
-> +	if (!system_supports_generic_auth())
-> +		return -EINVAL;
-> +
-> +	return user_regset_copyout(&pos, &count, &kbuf, &ubuf,
-> +			&target->thread_info.keys_user.apga, 0, -1);
-> +}
-> +
-> +static int pac_generic_keys_set(struct task_struct *target,
-> +				const struct user_regset *regset,
-> +				unsigned int pos, unsigned int count,
-> +				const void *kbuf, const void __user *ubuf)
-> +{
-> +	if (!system_supports_generic_auth())
-> +		return -EINVAL;
-> +
-> +	return user_regset_copyin(&pos, &count, &kbuf, &ubuf,
-> +			&target->thread_info.keys_user.apga, 0, -1);
-> +}
-> +#endif /* CONFIG_CHECKPOINT_RESTORE */
->  #endif /* CONFIG_ARM64_PTR_AUTH */
-
-[...]
-
-Cheers
----Dave
+>>
+>> (4) Virtio and vhost endpoints weren't really a priority for the base
+>> virtio-iommu device, we were looking mainly at device pass-through. I
+>> have optimizations in mind for this, although a lot of them are based on
+>> page tables, not MAP/UNMAP requests. But just getting the vIOMMU closer
+>> to vhost devices, avoiding the trip to userspace through vhost-tlb,
+>> should already improve things.
+>>
+>> The important difference when DMA is done by software is that you don't
+>> need to mirror all mappings into the HW IOMMU - you don't need
+>> inval-on-map. The endpoint can ask the vIOMMU for mappings when it needs
+>> them, like vhost-iotlb does for example. So the MAP/UNMAP interface of
+>> virtio-iommu performs poorly for emulated/PV endpoints compared to an
+>> emulated IOMMU, since it requires three context switches for DMA
+>> (MAP/DMA/UNMAP) between host and guest, rather than two (DMA/INVAL).
+>> There is a feature I call "posted MAP", that avoids the kick on MAP and
+>> instead lets the device fetch the MAP request on TLB miss, but I haven't
+>> spent enough time experimenting with this.
+>>
+>>> Others on the TC might feel differently.
+>>>
+>>> If someone's looking into adding virtio iommu support in hardware,
+>>> that's a different matter. Which is it?
+>>
+>> I'm not aware of anything like that, and suspect that no one would
+>> consider it until virtio-iommu is more widely adopted.
+>>
+>> Thanks,
+>> Jean
+>>
+>>
+>> [1] Diff between current spec and page table sharing draft
+>>     (Very rough, missing page fault support and I'd like to rework the
+>>      PASID model a bit, but table descriptors p.24-26 for both Arm
+>>      SMMUv2 and SMMUv3.)
+>>
+>> http://jpbrucker.net/virtio-iommu/spec-table/diffs/virtio-iommu-pdf-diff-v0.9-v0.10.dev03.pdf
+>>
+>> [2] [RFC v2 00/28] vSMMUv3/pSMMUv3 2 stage VFIO integration
+>>     https://www.mail-archive.com/qemu-devel-qX2TKyscuCcdnm+yROfE0A@public.gmane.org/msg562369.html
