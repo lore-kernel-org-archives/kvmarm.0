@@ -1,195 +1,200 @@
-From: Steven Price <steven.price@arm.com>
-Subject: [RFC PATCH v2 12/12] KVM: arm64: Export LPT using PV_TIME device
-Date: Wed, 12 Dec 2018 15:02:26 +0000
-Message-ID: <20181212150226.38051-13-steven.price@arm.com>
-References: <20181212150226.38051-1-steven.price@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v6 10/13] arm64: add prctl control for resetting ptrauth
+ keys
+Date: Wed, 12 Dec 2018 15:22:14 +0000
+Message-ID: <20181212152214.GX3505@e103592.cambridge.arm.com>
+References: <20181207183931.4285-1-kristina.martsenko@arm.com>
+ <20181207183931.4285-11-kristina.martsenko@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 184634A384
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:28 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i0fpO73VYD2X for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 10:03:22 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77FE64A38D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:20 -0500 (EST)
-In-Reply-To: <20181212150226.38051-1-steven.price@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Price <steven.price@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20181207183931.4285-11-kristina.martsenko@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Jacob Bramley <jacob.bramley@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Adam Wallis <awallis@codeaurora.org>, Richard Henderson <richard.henderson@linaro.org>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Cyrill Gorcunov <gorcunov@gmail.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Kachhap <amit.kachhap@arm.com>, linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Extend the PV_TIME device to allow setting up Live Physical Time and
-saving/restoring the state necessary for migration.
+On Fri, Dec 07, 2018 at 06:39:28PM +0000, Kristina Martsenko wrote:
+> Add an arm64-specific prctl to allow a thread to reinitialize its
+> pointer authentication keys to random values. This can be useful when
+> exec() is not used for starting new processes, to ensure that different
+> processes still have different keys.
+> 
+> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+> ---
+>  arch/arm64/include/asm/pointer_auth.h |  3 +++
+>  arch/arm64/include/asm/processor.h    |  4 +++
+>  arch/arm64/kernel/Makefile            |  1 +
+>  arch/arm64/kernel/pointer_auth.c      | 47 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/prctl.h            |  8 ++++++
+>  kernel/sys.c                          |  8 ++++++
+>  6 files changed, 71 insertions(+)
+>  create mode 100644 arch/arm64/kernel/pointer_auth.c
+> 
+> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+> index 89190d93c850..7797bc346c6b 100644
+> --- a/arch/arm64/include/asm/pointer_auth.h
+> +++ b/arch/arm64/include/asm/pointer_auth.h
+> @@ -59,6 +59,8 @@ static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
+>  		__ptrauth_key_install(APGA, keys->apga);
+>  }
+>  
+> +extern int ptrauth_prctl_reset_keys(struct task_struct *tsk, unsigned long arg);
+> +
+>  /*
+>   * The EL0 pointer bits used by a pointer authentication code.
+>   * This is dependent on TBI0 being enabled, or bits 63:56 would also apply.
+> @@ -82,6 +84,7 @@ do {									\
+>  	ptrauth_keys_switch(&(tsk)->thread_info.keys_user)
+>  
+>  #else /* CONFIG_ARM64_PTR_AUTH */
+> +#define ptrauth_prctl_reset_keys(tsk, arg)	(-EINVAL)
+>  #define ptrauth_strip_insn_pac(lr)	(lr)
+>  #define ptrauth_thread_init_user(tsk)
+>  #define ptrauth_thread_switch(tsk)
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 6b0d4dff5012..40ccfb7605b6 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -46,6 +46,7 @@
+>  #include <asm/hw_breakpoint.h>
+>  #include <asm/lse.h>
+>  #include <asm/pgtable-hwdef.h>
+> +#include <asm/pointer_auth.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/types.h>
+>  
+> @@ -270,6 +271,9 @@ extern void __init minsigstksz_setup(void);
+>  #define SVE_SET_VL(arg)	sve_set_current_vl(arg)
+>  #define SVE_GET_VL()	sve_get_current_vl()
+>  
+> +/* PR_PAC_RESET_KEYS prctl */
+> +#define PAC_RESET_KEYS(tsk, arg)	ptrauth_prctl_reset_keys(tsk, arg)
+> +
+>  /*
+>   * For CONFIG_GCC_PLUGIN_STACKLEAK
+>   *
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index 4c8b13bede80..096740ab81d2 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -57,6 +57,7 @@ arm64-obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
+>  arm64-obj-$(CONFIG_CRASH_CORE)		+= crash_core.o
+>  arm64-obj-$(CONFIG_ARM_SDE_INTERFACE)	+= sdei.o
+>  arm64-obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
+> +arm64-obj-$(CONFIG_ARM64_PTR_AUTH)	+= pointer_auth.o
+>  
+>  obj-y					+= $(arm64-obj-y) vdso/ probes/
+>  obj-m					+= $(arm64-obj-m)
+> diff --git a/arch/arm64/kernel/pointer_auth.c b/arch/arm64/kernel/pointer_auth.c
+> new file mode 100644
+> index 000000000000..b9f6f5f3409a
+> --- /dev/null
+> +++ b/arch/arm64/kernel/pointer_auth.c
+> @@ -0,0 +1,47 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/errno.h>
+> +#include <linux/prctl.h>
+> +#include <linux/random.h>
+> +#include <linux/sched.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/pointer_auth.h>
+> +
+> +int ptrauth_prctl_reset_keys(struct task_struct *tsk, unsigned long arg)
+> +{
+> +	struct ptrauth_keys *keys = &tsk->thread_info.keys_user;
+> +	unsigned long addr_key_mask = PR_PAC_APIAKEY | PR_PAC_APIBKEY |
+> +				      PR_PAC_APDAKEY | PR_PAC_APDBKEY;
+> +	unsigned long key_mask = addr_key_mask | PR_PAC_APGAKEY;
+> +
+> +	if (!system_supports_address_auth() && !system_supports_generic_auth())
+> +		return -EINVAL;
+> +
+> +	if (!arg) {
+> +		ptrauth_keys_init(keys);
+> +		ptrauth_keys_switch(keys);
+> +		return 0;
+> +	}
+> +
+> +	if (arg & ~key_mask)
+> +		return -EINVAL;
+> +
+> +	if (((arg & addr_key_mask) && !system_supports_address_auth()) ||
+> +	    ((arg & PR_PAC_APGAKEY) && !system_supports_generic_auth()))
+> +		return -EINVAL;
+> +
+> +	if (arg & PR_PAC_APIAKEY)
+> +		get_random_bytes(&keys->apia, sizeof(keys->apia));
+> +	if (arg & PR_PAC_APIBKEY)
+> +		get_random_bytes(&keys->apib, sizeof(keys->apib));
+> +	if (arg & PR_PAC_APDAKEY)
+> +		get_random_bytes(&keys->apda, sizeof(keys->apda));
+> +	if (arg & PR_PAC_APDBKEY)
+> +		get_random_bytes(&keys->apdb, sizeof(keys->apdb));
+> +	if (arg & PR_PAC_APGAKEY)
+> +		get_random_bytes(&keys->apga, sizeof(keys->apga));
+> +
+> +	ptrauth_keys_switch(keys);
+> +
+> +	return 0;
+> +}
+> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
+> index b17201edfa09..b4875a93363a 100644
+> --- a/include/uapi/linux/prctl.h
+> +++ b/include/uapi/linux/prctl.h
+> @@ -220,4 +220,12 @@ struct prctl_mm_map {
+>  # define PR_SPEC_DISABLE		(1UL << 2)
+>  # define PR_SPEC_FORCE_DISABLE		(1UL << 3)
+>  
+> +/* Reset arm64 pointer authentication keys */
+> +#define PR_PAC_RESET_KEYS		54
+> +# define PR_PAC_APIAKEY			(1UL << 0)
+> +# define PR_PAC_APIBKEY			(1UL << 1)
+> +# define PR_PAC_APDAKEY			(1UL << 2)
+> +# define PR_PAC_APDBKEY			(1UL << 3)
+> +# define PR_PAC_APGAKEY			(1UL << 4)
+> +
+>  #endif /* _LINUX_PRCTL_H */
+> diff --git a/kernel/sys.c b/kernel/sys.c
+> index 123bd73046ec..64b5a230f38d 100644
+> --- a/kernel/sys.c
+> +++ b/kernel/sys.c
+> @@ -121,6 +121,9 @@
+>  #ifndef SVE_GET_VL
+>  # define SVE_GET_VL()		(-EINVAL)
+>  #endif
+> +#ifndef PAC_RESET_KEYS
+> +# define PAC_RESET_KEYS(a, b)	(-EINVAL)
+> +#endif
+>  
+>  /*
+>   * this is where the system-wide overflow UID and GID are defined, for
+> @@ -2476,6 +2479,11 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+>  			return -EINVAL;
+>  		error = arch_prctl_spec_ctrl_set(me, arg2, arg3);
+>  		break;
+> +	case PR_PAC_RESET_KEYS:
+> +		if (arg3 || arg4 || arg5)
+> +			return -EINVAL;
+> +		error = PAC_RESET_KEYS(me, arg2);
+> +		break;
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/uapi/asm/kvm.h |  2 ++
- virt/kvm/arm/pvtime.c             | 55 +++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+If this only ever operated on current, can we drop the task argument?
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index e1d42ff35430..d3b0d70cdd9f 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -310,8 +310,10 @@ struct kvm_vcpu_events {
- /* Device Control API: PV_TIME */
- #define KVM_DEV_ARM_PV_TIME_PADDR	0
- #define  KVM_DEV_ARM_PV_TIME_ST		0
-+#define  KVM_DEV_ARM_PV_TIME_LPT	1
- #define KVM_DEV_ARM_PV_TIME_STATE_SIZE	1
- #define KVM_DEV_ARM_PV_TIME_STATE	2
-+#define KVM_DEV_ARM_PV_TIME_FREQUENCY	3
- 
- #endif
- 
-diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-index e033f55e3ee4..345798aebebf 100644
---- a/virt/kvm/arm/pvtime.c
-+++ b/virt/kvm/arm/pvtime.c
-@@ -25,6 +25,14 @@ static int kvm_arm_pvtime_create(struct kvm_device *dev, u32 type)
- 	if (!pvtime->st)
- 		return -ENOMEM;
- 
-+	pvtime->lpt = (void *)get_zeroed_page(GFP_KERNEL);
-+	if (!pvtime->lpt) {
-+		free_pages_exact(pvtime->st, max_stolen_size());
-+		return -ENOMEM;
-+	}
-+
-+	pvtime->lpt_fpv = arch_timer_get_rate();
-+
- 	return 0;
- }
- 
-@@ -32,8 +40,10 @@ static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
- {
- 	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
- 
-+	pvtime->lpt_base = GPA_INVALID;
- 	pvtime->st_base = GPA_INVALID;
- 	free_pages_exact(pvtime->st, max_stolen_size());
-+	free_page((unsigned long)pvtime->lpt);
- }
- 
- static int pvtime_map_pages(struct kvm *kvm, gpa_t guest_paddr,
-@@ -50,6 +60,10 @@ static int pvtime_save_state(struct kvm *kvm, u64 type, void __user *user)
- 	size_t size;
- 
- 	switch (type) {
-+	case KVM_DEV_ARM_PV_TIME_LPT:
-+		source = kvm->arch.pvtime.lpt;
-+		size = sizeof(struct pvclock_vm_time_info);
-+		break;
- 	case KVM_DEV_ARM_PV_TIME_ST:
- 		source = kvm->arch.pvtime.st;
- 		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
-@@ -70,6 +84,10 @@ static int pvtime_restore_state(struct kvm *kvm, u64 type, void __user *user)
- 	size_t size;
- 
- 	switch (type) {
-+	case KVM_DEV_ARM_PV_TIME_LPT:
-+		dest = kvm->arch.pvtime.lpt;
-+		size = sizeof(struct pvclock_vm_time_info);
-+		break;
- 	case KVM_DEV_ARM_PV_TIME_ST:
- 		dest = kvm->arch.pvtime.st;
- 		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
-@@ -91,6 +109,7 @@ static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
- 	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
- 	u64 __user *user = (u64 __user *)attr->addr;
- 	u64 paddr;
-+	u32 frequency;
- 	int ret;
- 
- 	switch (attr->group) {
-@@ -100,6 +119,15 @@ static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
- 		if (paddr & 63)
- 			return -EINVAL;
- 		switch (attr->attr) {
-+		case KVM_DEV_ARM_PV_TIME_LPT:
-+			if (pvtime->lpt_base != GPA_INVALID)
-+				return -EEXIST;
-+			ret = pvtime_map_pages(dev->kvm, paddr, pvtime->lpt,
-+					PAGE_SIZE);
-+			if (ret)
-+				return ret;
-+			pvtime->lpt_base = paddr;
-+			return kvm_arm_update_lpt_sequence(dev->kvm);
- 		case KVM_DEV_ARM_PV_TIME_ST:
- 			if (pvtime->st_base != GPA_INVALID)
- 				return -EEXIST;
-@@ -111,6 +139,13 @@ static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
- 			return 0;
- 		}
- 		break;
-+	case KVM_DEV_ARM_PV_TIME_FREQUENCY:
-+		if (attr->attr != KVM_DEV_ARM_PV_TIME_LPT)
-+			break;
-+		if (get_user(frequency, user))
-+			return -EFAULT;
-+		pvtime->lpt_fpv = frequency;
-+		return kvm_arm_update_lpt_sequence(dev->kvm);
- 	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
- 		return -EPERM;
- 	case KVM_DEV_ARM_PV_TIME_STATE:
-@@ -128,14 +163,27 @@ static int kvm_arm_pvtime_get_attr(struct kvm_device *dev,
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_PV_TIME_PADDR:
- 		switch (attr->attr) {
-+		case KVM_DEV_ARM_PV_TIME_LPT:
-+			if (put_user(dev->kvm->arch.pvtime.lpt_base, user))
-+				return -EFAULT;
-+			return 0;
- 		case KVM_DEV_ARM_PV_TIME_ST:
- 			if (put_user(dev->kvm->arch.pvtime.st_base, user))
- 				return -EFAULT;
- 			return 0;
- 		}
- 		break;
-+	case KVM_DEV_ARM_PV_TIME_FREQUENCY:
-+		if (attr->attr != KVM_DEV_ARM_PV_TIME_LPT)
-+			break;
-+		if (put_user(dev->kvm->arch.pvtime.lpt_fpv, user))
-+			return -EFAULT;
-+		return 0;
- 	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
- 		switch (attr->attr) {
-+		case KVM_DEV_ARM_PV_TIME_LPT:
-+			size = sizeof(struct pvclock_vm_time_info);
-+			break;
- 		case KVM_DEV_ARM_PV_TIME_ST:
- 			size = sizeof(struct pvclock_vcpu_stolen_time_info);
- 			size *= atomic_read(&dev->kvm->online_vcpus);
-@@ -160,10 +208,17 @@ static int kvm_arm_pvtime_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
- 	case KVM_DEV_ARM_PV_TIME_STATE:
- 		switch (attr->attr) {
-+		case KVM_DEV_ARM_PV_TIME_LPT:
- 		case KVM_DEV_ARM_PV_TIME_ST:
- 			return 0;
- 		}
- 		break;
-+	case KVM_DEV_ARM_PV_TIME_FREQUENCY:
-+		switch (attr->attr) {
-+		case KVM_DEV_ARM_PV_TIME_LPT:
-+			return 0;
-+		}
-+		break;
- 	}
- 	return -ENXIO;
- }
--- 
-2.19.2
+(Last time I looked, the task argument is useless for all existing
+prctls -- I have some outstanding refactoring to get rid of it entirely.)
+
+Since arg2 contains unused flag bits and we already return -EINVAL if
+any of those are set, we can define a new flag in arg2 in the future if
+we want to extend this interface.
+
+So I think we can drop the checks on arg3..arg5 and avoid the need
+for the caller to supply , 0, 0, 0) in every call to this prctl.
+
+(But if someone else objects to this approach I'm happy to concede on
+this point).
+
+Cheers
+---Dave
