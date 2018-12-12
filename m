@@ -1,23 +1,23 @@
 From: Steven Price <steven.price@arm.com>
-Subject: [RFC PATCH v2 02/12] KVM: arm/arm64: Factor out hypercall handling
- from PSCI code
-Date: Wed, 12 Dec 2018 15:02:16 +0000
-Message-ID: <20181212150226.38051-3-steven.price@arm.com>
+Subject: [RFC PATCH v2 06/12] KVM: arm64: Support stolen time reporting via
+ shared structure
+Date: Wed, 12 Dec 2018 15:02:20 +0000
+Message-ID: <20181212150226.38051-7-steven.price@arm.com>
 References: <20181212150226.38051-1-steven.price@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0F514A2BD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F654A32E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qTvm2HlH1-6S for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 10:03:03 -0500 (EST)
+ with ESMTP id V-Ahhuscwwmi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 10:03:14 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A554A371
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 085954A371
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 10:03:10 -0500 (EST)
 In-Reply-To: <20181212150226.38051-1-steven.price@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,318 +32,261 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Price <steven.price@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Implement the service call for configuring a shared structre between a
+VCPU and the hypervisor in which the hypervisor can write the time
+stolen from the VCPU's execution time by other tasks on the host.
 
-We currently intertwine the KVM PSCI implementation with the general
-dispatch of hypercall handling, which makes perfect sense because PSCI
-is the only category of hypercalls we support.
+The hypervisor allocates memory which is placed at an IPA chosen by user
+space. The hypervisor then uses WRITE_ONCE() to update the shared
+structre ensuring single copy atomicity of the 64-bit unsigned value
+that reports stolen time in nanoseconds.
 
-However, as we are about to support additional hypercalls, factor out
-this functionality into a separate hypercall handler file.
+Whenever stolen time is enabled by the guest, the stolen time counter is
+reset.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[steven.price@arm.com: rebased]
+The stolen time itself is retrieved from the sched_info structure
+maintained by the Linux scheduler code. We enable SCHEDSTATS when
+selecting KVM Kconfig to ensure this value is meaningful.
+
 Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/kvm/Makefile        |  2 +-
- arch/arm/kvm/handle_exit.c   |  2 +-
- arch/arm64/kvm/Makefile      |  1 +
- arch/arm64/kvm/handle_exit.c |  4 +-
- include/kvm/arm_hypercalls.h | 43 ++++++++++++++++++++
- include/kvm/arm_psci.h       |  2 +-
- virt/kvm/arm/hypercalls.c    | 51 ++++++++++++++++++++++++
- virt/kvm/arm/psci.c          | 76 +-----------------------------------
- 8 files changed, 102 insertions(+), 79 deletions(-)
- create mode 100644 include/kvm/arm_hypercalls.h
- create mode 100644 virt/kvm/arm/hypercalls.c
+ arch/arm64/include/asm/kvm_host.h | 12 ++++++
+ arch/arm64/kvm/Kconfig            |  1 +
+ include/kvm/arm_hypercalls.h      |  1 +
+ include/linux/kvm_types.h         |  2 +
+ virt/kvm/arm/arm.c                | 20 ++++++++-
+ virt/kvm/arm/hypercalls.c         | 70 +++++++++++++++++++++++++++++++
+ 6 files changed, 104 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index 48de846f2246..5994f3b3d375 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -24,7 +24,7 @@ obj-y += kvm-arm.o init.o interrupts.o
- obj-y += handle_exit.o guest.o emulate.o reset.o
- obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
- obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
--obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
-+obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o $(KVM)/arm/hypercalls.o
- obj-y += $(KVM)/arm/aarch32.o
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 52fbc823ff8c..bab7bc720992 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -48,6 +48,7 @@
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
++#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(2)
  
- obj-y += $(KVM)/arm/vgic/vgic.o
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index 910bd8dabb3c..404c67a06a2f 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -21,7 +21,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_coproc.h>
- #include <asm/kvm_mmu.h>
--#include <kvm/arm_psci.h>
-+#include <kvm/arm_hypercalls.h>
- #include <trace/events/kvm.h>
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
  
- #include "trace.h"
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 0f2a135ba15b..45bb68f6c161 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -15,6 +15,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
+@@ -80,6 +81,11 @@ struct kvm_arch {
  
- kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
- kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 35a81bebd02b..5f5e426cab3b 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -22,8 +22,6 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- 
--#include <kvm/arm_psci.h>
--
- #include <asm/esr.h>
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
-@@ -33,6 +31,8 @@
- #include <asm/debug-monitors.h>
- #include <asm/traps.h>
- 
-+#include <kvm/arm_hypercalls.h>
+ 	/* Mandated version of PSCI */
+ 	u32 psci_version;
 +
++	struct kvm_arch_pvtime {
++		void *st;
++		gpa_t st_base;
++	} pvtime;
+ };
+ 
+ #define KVM_NR_MEM_OBJS     40
+@@ -300,6 +306,12 @@ struct kvm_vcpu_arch {
+ 	/* True when deferrable sysregs are loaded on the physical CPU,
+ 	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+ 	bool sysregs_loaded_on_cpu;
++
++	/* Guest PV state */
++	struct {
++		u64 steal;
++		u64 last_steal;
++	} steal;
+ };
+ 
+ /* vcpu_arch flags field values: */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 47b23bf617c7..92676920d671 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -40,6 +40,7 @@ config KVM
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
++	select SCHEDSTATS
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index e5f7f81196b6..2e03e993ad64 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -7,6 +7,7 @@
+ #include <asm/kvm_emulate.h>
+ 
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
++int kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+ 
+ static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+ {
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 8bf259dae9f6..ff0e314c7dcd 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -49,6 +49,8 @@ typedef unsigned long  gva_t;
+ typedef u64            gpa_t;
+ typedef u64            gfn_t;
+ 
++#define GPA_INVALID	(~(gpa_t)0)
++
+ typedef unsigned long  hva_t;
+ typedef u64            hpa_t;
+ typedef u64            hfn_t;
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 23774970c9df..b347ba38cb11 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -32,8 +32,6 @@
+ #include <linux/irqbypass.h>
+ #include <linux/sched/stat.h>
+ #include <trace/events/kvm.h>
+-#include <kvm/arm_pmu.h>
+-#include <kvm/arm_psci.h>
+ 
  #define CREATE_TRACE_POINTS
  #include "trace.h"
+@@ -52,6 +50,10 @@
+ #include <asm/kvm_coproc.h>
+ #include <asm/sections.h>
  
-diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-new file mode 100644
-index 000000000000..e5f7f81196b6
---- /dev/null
-+++ b/include/kvm/arm_hypercalls.h
-@@ -0,0 +1,43 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2018 Arm Ltd. */
-+
-+#ifndef __KVM_ARM_HYPERCALLS_H
-+#define __KVM_ARM_HYPERCALLS_H
-+
-+#include <asm/kvm_emulate.h>
-+
-+int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-+
-+static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 0);
-+}
-+
-+static inline unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 1);
-+}
-+
-+static inline unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 2);
-+}
-+
-+static inline unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_get_reg(vcpu, 3);
-+}
-+
-+static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
-+			     unsigned long a0,
-+			     unsigned long a1,
-+			     unsigned long a2,
-+			     unsigned long a3)
-+{
-+	vcpu_set_reg(vcpu, 0, a0);
-+	vcpu_set_reg(vcpu, 1, a1);
-+	vcpu_set_reg(vcpu, 2, a2);
-+	vcpu_set_reg(vcpu, 3, a3);
-+}
-+
-+#endif
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 4b1548129fa2..ac8cd19d2456 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -51,7 +51,7 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
- }
- 
- 
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-+int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
- struct kvm_one_reg;
- 
-diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-new file mode 100644
-index 000000000000..153aa7642100
---- /dev/null
-+++ b/virt/kvm/arm/hypercalls.c
-@@ -0,0 +1,51 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2018 Arm Ltd.
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_emulate.h>
-+
 +#include <kvm/arm_hypercalls.h>
++#include <kvm/arm_pmu.h>
 +#include <kvm/arm_psci.h>
 +
-+int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-+{
-+	u32 func_id = smccc_get_function(vcpu);
-+	u32 val = SMCCC_RET_NOT_SUPPORTED;
-+	u32 feature;
-+
-+	switch (func_id) {
-+	case ARM_SMCCC_VERSION_FUNC_ID:
-+		val = ARM_SMCCC_VERSION_1_1;
-+		break;
-+	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-+		feature = smccc_get_arg1(vcpu);
-+		switch (feature) {
-+		case ARM_SMCCC_ARCH_WORKAROUND_1:
-+			if (kvm_arm_harden_branch_predictor())
-+				val = SMCCC_RET_SUCCESS;
-+			break;
-+		case ARM_SMCCC_ARCH_WORKAROUND_2:
-+			switch (kvm_arm_have_ssbd()) {
-+			case KVM_SSBD_FORCE_DISABLE:
-+			case KVM_SSBD_UNKNOWN:
-+				break;
-+			case KVM_SSBD_KERNEL:
-+				val = SMCCC_RET_SUCCESS;
-+				break;
-+			case KVM_SSBD_FORCE_ENABLE:
-+			case KVM_SSBD_MITIGATED:
-+				val = SMCCC_RET_NOT_REQUIRED;
-+				break;
-+			}
-+			break;
-+		}
-+		break;
-+	default:
-+		return kvm_psci_call(vcpu);
-+	}
-+
-+	smccc_set_retval(vcpu, val, 0, 0, 0);
-+	return 1;
-+}
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 9b73d3ad918a..4f24836cb8cd 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -26,6 +26,7 @@
- #include <asm/kvm_host.h>
+ #ifdef REQUIRES_VIRT
+ __asm__(".arch_extension	virt");
+ #endif
+@@ -148,6 +150,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm->arch.max_vcpus = vgic_present ?
+ 				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
  
- #include <kvm/arm_psci.h>
-+#include <kvm/arm_hypercalls.h>
++	kvm->arch.pvtime.st_base = GPA_INVALID;
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(kvm);
+@@ -383,6 +386,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_timer_vcpu_load(vcpu);
+ 	kvm_vcpu_load_sysregs(vcpu);
+ 	kvm_arch_vcpu_load_fp(vcpu);
++	kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
  
- /*
-  * This is an implementation of the Power State Coordination Interface
-@@ -34,38 +35,6 @@
- 
- #define AFFINITY_MASK(level)	~((0x1UL << ((level) * MPIDR_LEVEL_BITS)) - 1)
- 
--static u32 smccc_get_function(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 0);
--}
--
--static unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 1);
--}
--
--static unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 2);
--}
--
--static unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
--{
--	return vcpu_get_reg(vcpu, 3);
--}
--
--static void smccc_set_retval(struct kvm_vcpu *vcpu,
--			     unsigned long a0,
--			     unsigned long a1,
--			     unsigned long a2,
--			     unsigned long a3)
--{
--	vcpu_set_reg(vcpu, 0, a0);
--	vcpu_set_reg(vcpu, 1, a1);
--	vcpu_set_reg(vcpu, 2, a2);
--	vcpu_set_reg(vcpu, 3, a3);
--}
--
- static unsigned long psci_affinity_mask(unsigned long affinity_level)
- {
- 	if (affinity_level <= 3)
-@@ -388,7 +357,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
-  * Errors:
-  * -EINVAL: Unrecognized PSCI function
-  */
--static int kvm_psci_call(struct kvm_vcpu *vcpu)
-+int kvm_psci_call(struct kvm_vcpu *vcpu)
- {
- 	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
- 	case KVM_ARM_PSCI_1_0:
-@@ -402,47 +371,6 @@ static int kvm_psci_call(struct kvm_vcpu *vcpu)
- 	};
+ 	if (single_task_running())
+ 		vcpu_clear_wfe_traps(vcpu);
+@@ -629,6 +633,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+ 	}
  }
  
--int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
--{
--	u32 func_id = smccc_get_function(vcpu);
--	u32 val = SMCCC_RET_NOT_SUPPORTED;
--	u32 feature;
--
--	switch (func_id) {
--	case ARM_SMCCC_VERSION_FUNC_ID:
--		val = ARM_SMCCC_VERSION_1_1;
--		break;
--	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
--		feature = smccc_get_arg1(vcpu);
--		switch(feature) {
--		case ARM_SMCCC_ARCH_WORKAROUND_1:
--			if (kvm_arm_harden_branch_predictor())
--				val = SMCCC_RET_SUCCESS;
--			break;
--		case ARM_SMCCC_ARCH_WORKAROUND_2:
--			switch (kvm_arm_have_ssbd()) {
--			case KVM_SSBD_FORCE_DISABLE:
--			case KVM_SSBD_UNKNOWN:
--				break;
--			case KVM_SSBD_KERNEL:
--				val = SMCCC_RET_SUCCESS;
--				break;
--			case KVM_SSBD_FORCE_ENABLE:
--			case KVM_SSBD_MITIGATED:
--				val = SMCCC_RET_NOT_REQUIRED;
--				break;
--			}
--			break;
--		}
--		break;
--	default:
--		return kvm_psci_call(vcpu);
--	}
--
--	smccc_set_retval(vcpu, val, 0, 0, 0);
--	return 1;
--}
--
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
++static void vcpu_req_record_steal(struct kvm_vcpu *vcpu)
++{
++	int idx;
++
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
++	kvm_update_stolen_time(vcpu);
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
++}
++
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
  {
- 	return 1;		/* PSCI version */
+ 	return vcpu->arch.target >= 0;
+@@ -645,6 +658,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		 * that a VCPU sees new virtual interrupts.
+ 		 */
+ 		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
++
++		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
++			vcpu_req_record_steal(vcpu);
+ 	}
+ }
+ 
+diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+index ba13b798f0f8..595d1cf3a871 100644
+--- a/virt/kvm/arm/hypercalls.c
++++ b/virt/kvm/arm/hypercalls.c
+@@ -10,6 +10,70 @@
+ #include <kvm/arm_hypercalls.h>
+ #include <kvm/arm_psci.h>
+ 
++
++static struct pvclock_vcpu_stolen_time_info *pvtime_get_st(
++		struct kvm_vcpu *vcpu)
++{
++	struct pvclock_vcpu_stolen_time_info *st = vcpu->kvm->arch.pvtime.st;
++
++	if (!st)
++		return NULL;
++
++	return &st[kvm_vcpu_get_idx(vcpu)];
++}
++
++int kvm_update_stolen_time(struct kvm_vcpu *vcpu)
++{
++	u64 steal;
++	struct pvclock_vcpu_stolen_time_info *kaddr;
++
++	if (vcpu->kvm->arch.pvtime.st_base == GPA_INVALID)
++		return -ENOTSUPP;
++
++	kaddr = pvtime_get_st(vcpu);
++
++	if (!kaddr)
++		return -ENOTSUPP;
++
++	kaddr->revision = 0;
++	kaddr->attributes = 0;
++
++	/* Let's do the local bookkeeping */
++	steal = vcpu->arch.steal.steal;
++	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
++	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
++	vcpu->arch.steal.steal = steal;
++
++	/* Now write out the value to the shared page */
++	WRITE_ONCE(kaddr->stolen_time, cpu_to_le64(steal));
++
++	return 0;
++}
++
++static int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
++{
++	u64 ret;
++	int err;
++
++	/*
++	 * Start counting stolen time from the time the guest requests
++	 * the feature enabled.
++	 */
++	vcpu->arch.steal.steal = 0;
++	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
++
++	err = kvm_update_stolen_time(vcpu);
++
++	if (err)
++		ret = SMCCC_RET_NOT_SUPPORTED;
++	else
++		ret = vcpu->kvm->arch.pvtime.st_base +
++			(sizeof(struct pvclock_vcpu_stolen_time_info) *
++			 kvm_vcpu_get_idx(vcpu));
++
++	smccc_set_retval(vcpu, ret, 0, 0, 0);
++	return 1;
++}
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	u32 func_id = smccc_get_function(vcpu);
+@@ -49,8 +113,14 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	case ARM_SMCCC_HV_PV_FEATURES:
+ 		feature = smccc_get_arg1(vcpu);
+ 		switch (feature) {
++		case ARM_SMCCC_HV_PV_FEATURES:
++		case ARM_SMCCC_HV_PV_TIME_ST:
++			val = SMCCC_RET_SUCCESS;
++			break;
+ 		}
+ 		break;
++	case ARM_SMCCC_HV_PV_TIME_ST:
++		return kvm_hypercall_stolen_time(vcpu);
+ 	default:
+ 		return kvm_psci_call(vcpu);
+ 	}
 -- 
 2.19.2
