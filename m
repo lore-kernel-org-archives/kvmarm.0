@@ -1,25 +1,25 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v8 2/5] arm64: KVM: encapsulate kvm_cpu_context in
- kvm_host_data
-Date: Wed, 12 Dec 2018 10:37:54 +0000
-Message-ID: <c31a1e2b-511a-4441-1fb2-8bf32691656f@arm.com>
+Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Wed, 12 Dec 2018 10:42:11 +0000
+Message-ID: <89242306-a445-017b-553e-105ae52d8cbe@arm.com>
 References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
- <1544610573-28446-3-git-send-email-andrew.murray@arm.com>
+ <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8864A2BA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:37:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE7134A2BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:42:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PmaeyBLYmMLO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 05:37:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4DFD4A1DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:37:57 -0500 (EST)
-In-Reply-To: <1544610573-28446-3-git-send-email-andrew.murray@arm.com>
+ with ESMTP id yklzjOTObHDx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Dec 2018 05:42:16 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE0B74A1DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 05:42:16 -0500 (EST)
+In-Reply-To: <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,90 +34,92 @@ To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@ar
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
+
 
 On 12/12/2018 10:29, Andrew Murray wrote:
-> The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
-> a typedef to kvm_cpu_context and is used to store host cpu context. The
-> kvm_cpu_context structure is also used elsewhere to hold vcpu context.
-> In order to use the percpu to hold additional future host information we
-> encapsulate kvm_cpu_context in a new structure and rename the typedef and
-> percpu to match.
+> Add support for the :G and :H attributes in perf by handling the
+> exclude_host/exclude_guest event attributes.
+> 
+> We notify KVM of counters that we wish to be enabled or disabled on
+> guest entry/exit and thus defer from starting or stopping :G events
+> as per the events exclude_host attribute.
+> 
+> With both VHE and non-VHE we switch the counters between host/guest
+> at EL2. We are able to eliminate counters counting host events on
+> the boundaries of guest entry/exit when using :G by filtering out
+> EL2 for exclude_host. However when using :H unless exclude_hv is set
+> on non-VHE then there is a small blackout window at the guest
+> entry/exit where host events are not captured.
 > 
 > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 > ---
->   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
->   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
->   arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
->   arch/arm64/kernel/asm-offsets.c   |  2 +-
->   virt/kvm/arm/arm.c                | 10 ++++++----
->   5 files changed, 25 insertions(+), 14 deletions(-)
+>   arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
+>   1 file changed, 44 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 79906ce..71645ba 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -145,7 +145,11 @@ struct kvm_cpu_context {
->   	u32 cp15[NR_CP15_REGS];
->   };
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index de564ae..4a3c73d 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -26,6 +26,7 @@
 >   
-> -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> +struct kvm_host_data {
-> +	struct kvm_cpu_context host_ctxt;
-> +};
+>   #include <linux/acpi.h>
+>   #include <linux/clocksource.h>
+> +#include <linux/kvm_host.h>
+>   #include <linux/of.h>
+>   #include <linux/perf/arm_pmu.h>
+>   #include <linux/platform_device.h>
+> @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
+>   
+>   static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+>   {
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = event->hw.idx;
+> +	int flags = 0;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+> -	armv8pmu_enable_counter(idx);
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_enable_counter(idx - 1);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
 > +
-> +typedef struct kvm_host_data kvm_host_data_t;
->   
->   struct kvm_vcpu_arch {
->   	struct kvm_cpu_context ctxt;
-> @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
->   	struct kvm_vcpu_fault_info fault;
->   
->   	/* Host FP context */
-> -	kvm_cpu_context_t *host_cpu_context;
-> +	struct kvm_cpu_context *host_cpu_context;
->   
->   	/* VGIC state */
->   	struct vgic_cpu vgic_cpu;
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 102b5a5..6a9bfd4 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
->   .endm
->   
->   .macro get_host_ctxt reg, tmp
-> -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
-> +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
->   .endm
->   
->   .macro get_vcpu_ptr vcpu, ctxt
->   	get_host_ctxt \ctxt, \vcpu
-> -	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-> +	ldr	\vcpu, [\ctxt, #HOST_DATA_VCPU]
->   	kern_hyp_va	\vcpu
->   .endm
->   
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1550192..1d3ca91 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -205,7 +205,12 @@ struct kvm_cpu_context {
->   	struct kvm_vcpu *__hyp_running_vcpu;
->   };
->   
-> -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> +struct kvm_host_data {
-> +	struct kvm_cpu_context host_ctxt;
-> +	struct kvm_pmu_events pmu_events;
-> +};
+> +	if (!attr->exclude_host)
+> +		flags |= KVM_PMU_EVENTS_HOST;
+> +	if (!attr->exclude_guest)
+> +		flags |= KVM_PMU_EVENTS_GUEST;
 > +
+> +	kvm_set_pmu_events(counter_bits, flags);
+> +
+> +	if (!attr->exclude_host) {
+> +		armv8pmu_enable_counter(idx);
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_enable_counter(idx - 1);
+> +	}
+>   }
+>   
+>   static inline int armv8pmu_disable_counter(int idx)
+> @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
+>   static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+>   {
+>   	struct hw_perf_event *hwc = &event->hw;
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = hwc->idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_disable_counter(idx - 1);
+> -	armv8pmu_disable_counter(idx);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	kvm_clr_pmu_events(counter_bits);
+> +
+> +	if (!attr->exclude_host) {
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_disable_counter(idx - 1);
+> +		armv8pmu_disable_counter(idx);
+> +	}
 
-Unfortunately this would fail to build as we don't have the kvm_pmu_events
-defined in this patch and will break the git bisects.
-
-Otherwise looks good to me.
-
+Shouldn't we disable the events, irrespective of whether it is for host or/and 
+guest ? Otherwise looks good to me.
 
 Cheers
 Suzuki
