@@ -1,122 +1,58 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v8 2/5] arm64: KVM: encapsulate kvm_cpu_context in
- kvm_host_data
-Date: Wed, 12 Dec 2018 12:31:38 +0000
-Message-ID: <20181212123121.GI13393@e119886-lin.cambridge.arm.com>
-References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
- <1544610573-28446-3-git-send-email-andrew.murray@arm.com>
- <c31a1e2b-511a-4441-1fb2-8bf32691656f@arm.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
+Date: Wed, 12 Dec 2018 09:35:19 -0500
+Message-ID: <20181212093413-mutt-send-email-mst@kernel.org>
+References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
+ <20181212103545.GV16835@8bytes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B8F44A33D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 07:31:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yDwPSZQw6vLL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Dec 2018 07:31:42 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D998E4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Dec 2018 07:31:41 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <virtio-dev-return-5188-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
 Content-Disposition: inline
-In-Reply-To: <c31a1e2b-511a-4441-1fb2-8bf32691656f@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20181212103545.GV16835@8bytes.org>
+To: Joerg Roedel <joro@8bytes.org>
+Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org, devicetree@vger.kernel.org, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jasowang@redhat.com, robh+dt@kernel.org, mark.rutland@arm.com, bhelgaas@google.com, frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com, tnowicki@caviumnetworks.com, kevin.tian@intel.com, marc.zyngier@arm.com, robin.murphy@arm.com, will.deacon@arm.com, lorenzo.pieralisi@arm.com, bharat.bhushan@nxp.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 12, 2018 at 10:37:54AM +0000, Suzuki K Poulose wrote:
-> Hi Andrew,
+On Wed, Dec 12, 2018 at 11:35:45AM +0100, Joerg Roedel wrote:
+> Hi,
 > 
-> On 12/12/2018 10:29, Andrew Murray wrote:
-> > The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
-> > a typedef to kvm_cpu_context and is used to store host cpu context. The
-> > kvm_cpu_context structure is also used elsewhere to hold vcpu context.
-> > In order to use the percpu to hold additional future host information we
-> > encapsulate kvm_cpu_context in a new structure and rename the typedef and
-> > percpu to match.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
-> >   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
-> >   arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
-> >   arch/arm64/kernel/asm-offsets.c   |  2 +-
-> >   virt/kvm/arm/arm.c                | 10 ++++++----
-> >   5 files changed, 25 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index 79906ce..71645ba 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -145,7 +145,11 @@ struct kvm_cpu_context {
-> >   	u32 cp15[NR_CP15_REGS];
-> >   };
-> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> > +struct kvm_host_data {
-> > +	struct kvm_cpu_context host_ctxt;
-> > +};
-> > +
-> > +typedef struct kvm_host_data kvm_host_data_t;
-> >   struct kvm_vcpu_arch {
-> >   	struct kvm_cpu_context ctxt;
-> > @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
-> >   	struct kvm_vcpu_fault_info fault;
-> >   	/* Host FP context */
-> > -	kvm_cpu_context_t *host_cpu_context;
-> > +	struct kvm_cpu_context *host_cpu_context;
-> >   	/* VGIC state */
-> >   	struct vgic_cpu vgic_cpu;
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index 102b5a5..6a9bfd4 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
-> >   .endm
-> >   .macro get_host_ctxt reg, tmp
-> > -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
-> > +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
-> >   .endm
-> >   .macro get_vcpu_ptr vcpu, ctxt
-> >   	get_host_ctxt \ctxt, \vcpu
-> > -	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-> > +	ldr	\vcpu, [\ctxt, #HOST_DATA_VCPU]
-> >   	kern_hyp_va	\vcpu
-> >   .endm
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 1550192..1d3ca91 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -205,7 +205,12 @@ struct kvm_cpu_context {
-> >   	struct kvm_vcpu *__hyp_running_vcpu;
-> >   };
-> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> > +struct kvm_host_data {
-> > +	struct kvm_cpu_context host_ctxt;
-> > +	struct kvm_pmu_events pmu_events;
-> > +};
-> > +
+> to make progress on this, we should first agree on the protocol used
+> between guest and host. I have a few points to discuss on the protocol
+> first.
 > 
-> Unfortunately this would fail to build as we don't have the kvm_pmu_events
-> defined in this patch and will break the git bisects.
+> On Tue, Dec 11, 2018 at 06:20:57PM +0000, Jean-Philippe Brucker wrote:
+> > [1] Virtio-iommu specification v0.9, sources and pdf
+> >     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+> >     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
+> 
+> Looking at this I wonder why it doesn't make the IOTLB visible to the
+> guest. the UNMAP requests seem to require that the TLB is already
+> flushed to make the unmap visible.
+> 
+> I think that will cost significant performance for both, vfio and
+> dma-iommu use-cases which both do (vfio at least to some degree),
+> deferred flushing.
+> 
+> I also wonder whether the protocol should implement a
+> protocol version handshake
 
-Doh, this must have crept in when I was rebasing.
+virtio has a builtin version handshake so devices don't need to.
 
-Andrew Murray
+> and iommu-feature set queries.
+> 
+> > [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9.1
+> >     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
+> 
+> Unfortunatly gitweb seems to be broken on linux-arm.org. What is missing
+> in this patch-set to make this work on x86?
 
+And I wonder about pcc too.
+
+> Regards,
 > 
-> Otherwise looks good to me.
-> 
-> 
-> Cheers
-> Suzuki
+> 	Joerg
