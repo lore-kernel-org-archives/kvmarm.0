@@ -1,44 +1,83 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
-Subject: Re: [Resend PATCH V5 7/10] KVM: Make kvm_set_spte_hva() return int
-Date: Thu, 13 Dec 2018 15:47:31 +0800
-Message-ID: <CAOLK0pyKsS2hLagZ6pumMdfRokPig2P+KJambVOq7p+NU-OqgA@mail.gmail.com>
-References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
- <20181206132113.2691-8-Tianyu.Lan@microsoft.com> <20181212050353.GF22265@blackberry>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: fix off-by-one bug in
+ vgic_get_irq()
+Date: Thu, 13 Dec 2018 10:52:52 +0000
+Message-ID: <d01370b0-5b80-b537-3168-88c166a17e7e@arm.com>
+References: <20181212201123.GA26674@embeddedor>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181212050353.GF22265@blackberry>
+In-Reply-To: <20181212201123.GA26674@embeddedor>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: paulus@ozlabs.org
-Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, benh@kernel.crashing.org, mpe@ellerman.id.au, Paolo Bonzini <pbonzini@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, bp@alien8.de, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, linux-mips@linux-mips.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm <kvm@vger.kernel.org>, michael.h.kelley@microsoft.com, kys@
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paul:
-             Thanks for your review.
-On Wed, Dec 12, 2018 at 1:03 PM Paul Mackerras <paulus@ozlabs.org> wrote:
->
-> On Thu, Dec 06, 2018 at 09:21:10PM +0800, lantianyu1986@gmail.com wrote:
-> > From: Lan Tianyu <Tianyu.Lan@microsoft.com>
-> >
-> > The patch is to make kvm_set_spte_hva() return int and caller can
-> > check return value to determine flush tlb or not.
->
-> It would be helpful if the patch description told the reader which
-> return value(s) mean that the caller should flush the tlb.  I would
-> guess that non-zero means to do the flush, but you should make that
-> explicit.
+Hi Gustavo,
 
-OK. Thanks for suggestion and will update in the next version.
+On 12/12/2018 20:11, Gustavo A. R. Silva wrote:
+> When using the nospec API, it should be taken into account that:
+> 
+> "...if the CPU speculates past the bounds check then
+>  * array_index_nospec() will clamp the index within the range of [0,
+>  * size)."
+> 
+> The above is part of the header for macro array_index_nospec() in
+> linux/nospec.h
+> 
+> Now, in this particular case, if intid evaluates to exactly VGIC_MAX_SPI
+> or to exaclty VGIC_MAX_PRIVATE, the array_index_nospec() macro ends up
+> returning VGIC_MAX_SPI - 1 or VGIC_MAX_PRIVATE - 1 respectively, instead
+> of VGIC_MAX_SPI or VGIC_MAX_PRIVATE, which, based on the original logic:
+> 
+> 	/* SGIs and PPIs */
+> 	if (intid <= VGIC_MAX_PRIVATE)
+>  		return &vcpu->arch.vgic_cpu.private_irqs[intid];
+> 
+>  	/* SPIs */
+> 	if (intid <= VGIC_MAX_SPI)
+>  		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
+> 
+> are valid values for intid.
+> 
+> Fix this by calling array_index_nospec() macro with VGIC_MAX_PRIVATE + 1
+> and VGIC_MAX_SPI + 1 as arguments for its parameter size.
+> 
+> Fixes: 41b87599c743 ("KVM: arm/arm64: vgic: fix possible spectre-v1 in vgic_get_irq()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> ---
+>  virt/kvm/arm/vgic/vgic.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 50e25438fb3c..5db40696055a 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -103,13 +103,13 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  {
+>  	/* SGIs and PPIs */
+>  	if (intid <= VGIC_MAX_PRIVATE) {
+> -		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE);
+> +		intid = array_index_nospec(intid, VGIC_MAX_PRIVATE + 1);
+>  		return &vcpu->arch.vgic_cpu.private_irqs[intid];
+>  	}
+>  
+>  	/* SPIs */
+>  	if (intid <= VGIC_MAX_SPI) {
+> -		intid = array_index_nospec(intid, VGIC_MAX_SPI);
+> +		intid = array_index_nospec(intid, VGIC_MAX_SPI + 1);
+>  		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
+>  	}
+>  
+> 
 
->
-> > Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
->
-> For the powerpc bits:
->
-> Acked-by: Paul Mackerras <paulus@ozlabs.org>
+That's a good one. Out of curiosity, how did you find it?
 
-
-
+Thanks,
+	
+	M.
 -- 
-Best regards
-Tianyu Lan
+Jazz is not dead. It just smells funny...
