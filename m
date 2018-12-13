@@ -1,42 +1,40 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
-Date: Thu, 13 Dec 2018 06:17:46 -0800
-Message-ID: <20181213141746.GA19757@infradead.org>
-References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
- <20181212103545.GV16835@8bytes.org>
- <9110873f-d344-b6b9-c722-9accfc329db2@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0DD4A2BB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Dec 2018 09:18:05 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sa5PQXNBko1X for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Dec 2018 09:18:03 -0500 (EST)
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43C3B4A1D8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Dec 2018 09:18:02 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <9110873f-d344-b6b9-c722-9accfc329db2@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>, Will Deacon <Will.Deacon@arm.com>, "frowand.list@gmail.com" <frowand.list@gmail.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "bhelgaas@google.com" <bhelgaas@google.com>, Robin Murphy <Robin.Murphy@arm.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: [PATCH] arm64: kvm: Avoid setting the upper 32 bits of VTCR_EL2 to 1
+Date: Thu, 13 Dec 2018 16:06:14 +0000
+Message-ID: <1544717174-15116-1-git-send-email-will.deacon@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will.deacon@arm.com>, stable@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 13, 2018 at 12:50:29PM +0000, Jean-Philippe Brucker wrote:
-> * DMA ops for x86 (see "HACK" commit). I'd like to use dma-iommu but I'm
-> not sure how to implement the glue that sets dma_ops properly.
+Although bit 31 of VTCR_EL2 is RES1, we inadvertently end up setting all
+of the upper 32 bits to 1 as well because we define VTCR_EL2_RES1 as
+signed, which is sign-extended when assigning to kvm->arch.vtcr.
 
-http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/dma-iommu-ops
+Lucky for us, the architecture currently treats these upper bits as RES0
+so, whilst we've been naughty, we haven't set fire to anything yet.
+
+Cc: <stable@vger.kernel.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+---
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 6f602af5263c..2dafd936d84d 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -104,7 +104,7 @@
+ 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
+ 
+ /* VTCR_EL2 Registers bits */
+-#define VTCR_EL2_RES1		(1 << 31)
++#define VTCR_EL2_RES1		(1U << 31)
+ #define VTCR_EL2_HD		(1 << 22)
+ #define VTCR_EL2_HA		(1 << 21)
+ #define VTCR_EL2_PS_SHIFT	TCR_EL2_PS_SHIFT
+-- 
+2.1.4
