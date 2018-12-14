@@ -1,330 +1,112 @@
-From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: Re: [RFC v2 14/20] iommu: introduce device fault data
-Date: Fri, 14 Dec 2018 16:30:23 -0800
-Message-ID: <20181214163023.156aada9@jacob-builder>
-References: <20180918142457.3325-1-eric.auger@redhat.com>
-	<20180918142457.3325-15-eric.auger@redhat.com>
-	<20180920150653.567287c5@jacob-builder>
-	<09404da4-98c6-7afc-4510-caeaeaf6e4c4@redhat.com>
+From: Sami Mujawar <Sami.Mujawar@arm.com>
+Subject: RE: [PATCH kvmtool 1/6] rtc: Initialize the Register D for MC146818
+ RTC
+Date: Fri, 14 Dec 2018 18:58:13 +0000
+Message-ID: <DB6PR0802MB2375C8F28CBDBF7DD7B38AF084A10@DB6PR0802MB2375.eurprd08.prod.outlook.com>
+References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
+ <1543922073-55530-2-git-send-email-julien.thierry@arm.com>
+ <20181212181601.7afcba1c@donnerap.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <09404da4-98c6-7afc-4510-caeaeaf6e4c4-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: tianyu.lan-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C82774A320
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:58:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Gs4S1T5fL-eK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Dec 2018 13:58:17 -0500 (EST)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+ (mail-eopbgr80041.outbound.protection.outlook.com [40.107.8.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 563C24A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:58:17 -0500 (EST)
+In-Reply-To: <20181212181601.7afcba1c@donnerap.cambridge.arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <Andre.Przywara@arm.com>, Julien Thierry <Julien.Thierry@arm.com>
+Cc: Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 12 Dec 2018 09:21:43 +0100
-Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Hi Andre,
 
-> Hi Jacob,
-> 
-> On 9/21/18 12:06 AM, Jacob Pan wrote:
-> > On Tue, 18 Sep 2018 16:24:51 +0200
-> > Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> >   
-> >> From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-> >>
-> >> Device faults detected by IOMMU can be reported outside IOMMU
-> >> subsystem for further processing. This patch intends to provide
-> >> a generic device fault data such that device drivers can be
-> >> communicated with IOMMU faults without model specific knowledge.
-> >>
-> >> The proposed format is the result of discussion at:
-> >> https://lkml.org/lkml/2017/11/10/291
-> >> Part of the code is based on Jean-Philippe Brucker's patchset
-> >> (https://patchwork.kernel.org/patch/9989315/).
-> >>
-> >> The assumption is that model specific IOMMU driver can filter and
-> >> handle most of the internal faults if the cause is within IOMMU
-> >> driver control. Therefore, the fault reasons can be reported are
-> >> grouped and generalized based common specifications such as PCI
-> >> ATS.
-> >>
-> >> Signed-off-by: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-> >> Signed-off-by: Jean-Philippe Brucker
-> >> <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org> Signed-off-by: Liu, Yi L
-> >> <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> Signed-off-by: Ashok Raj
-> >> <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> Signed-off-by: Eric Auger
-> >> <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> [moved part of the iommu_fault_event
-> >> struct in the uapi, enriched the fault reasons to be able to map
-> >> unrecoverable SMMUv3 errors]  
-> > Sounds good to me.
-> > There are also other "enrichment" we need to do to support mdev or
-> > finer granularity fault reporting below physical device. e.g. PASID
-> > level.
-> > 
-> > The current scheme works for PCIe physical device level, where each
-> > device registers a single handler only once. When device fault is
-> > detected by the IOMMU, it will find the matching handler and private
-> > data to report back. However, for devices partitioned by PASID and
-> > represented by mdev this may not work. Since IOMMU is not mdev aware
-> > and only works at physical device level.
-> > So I am thinking we should allow multiple registration of fault
-> > handler with different data and ID. i.e.
-> > 
-> > int iommu_register_device_fault_handler(struct device *dev,
-> > 					iommu_dev_fault_handler_t
-> > handler, int id,
-> > 					void *data)
-> > 
-> > where the new "id field" is
-> >  * @id: Identification of the handler private data, will be used by
-> > fault
-> >  *      reporting code to match the handler data to be returned.
-> > For page
-> >  *      request, this can be the PASID. ID must be unique per
-> > device, i.e.
-> >  *      each ID can only be registered once per device.
-> >  *      - IOMMU_DEV_FAULT_ID_UNRECOVERY (~0U) is reserved for fault
-> > reporting
-> >  *      w/o ID. e.g. unrecoverable faults.
-> > 
-> > I am still testing, but just wanted to have feedback on this idea.  
-> 
-> I am currently respinning this series. Do you have a respin for this
-> patch including iommu_register_device_fault_handler with the @id param
-> as you suggested above? Otherwise 2 solutions: I keep the code as is
-> or I do the modification myself implementing a list of fault_params?
-> 
-you can keep the code as is if it fits your current needs. Yi and I
-have thought of some new cases for supporting mdev. We are thinking to
-support many to many handler vs PASID relationship. i.e. allow
-registration of many fault handlers per device, each associated with an
-ID and data. The use case is that a physical device may register a
-fault handler for its own PASID or non-PASID related faults. Such
-physical device can also be partitioned into sub-device, e.g. mdev, but
-fault handler registration is at physical device level in that IOMMU is
-not mdev aware.
-Anyway, still need some work to flush out the details.
-> Besides do you plans for "[PATCH v5 00/23] IOMMU and VT-d driver
-> support for Shared Virtual Address (SVA)" respin - hope I didn't miss
-> anything? - ?
-> 
-You did not miss anything. Yes, we are still working on some internal
-integration issues. It should not affect the common interface much. Or
-I can send out a common API spin first once we have the functionality
-tested.
+We are using the edk2 PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe RTC driver. This RTC driver derives the IO port values for the Index and Target register from Pcds (Platform Configuration Database), which can be considered as constants defined at build time, so sort of hardcoded.
+We have also added MMIO capability to this driver (enabled by setting the PcdRtcUseMmio to TRUE). This change effectively performs MMIO accesses on 0x70 and 0x71.
 
-Thanks for checking.
+Regards,
 
-> Thanks
-> 
-> Eric
-> > 
-> > Thanks,
-> > 
-> > Jacob
-> > 
-> >   
-> >> ---
-> >>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
-> >>  include/uapi/linux/iommu.h | 83
-> >> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
-> >> insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> >> index 9bd3e63d562b..7529c14ff506 100644
-> >> --- a/include/linux/iommu.h
-> >> +++ b/include/linux/iommu.h
-> >> @@ -49,13 +49,17 @@ struct bus_type;
-> >>  struct device;
-> >>  struct iommu_domain;
-> >>  struct notifier_block;
-> >> +struct iommu_fault_event;
-> >>  
-> >>  /* iommu fault flags */
-> >> -#define IOMMU_FAULT_READ	0x0
-> >> -#define IOMMU_FAULT_WRITE	0x1
-> >> +#define IOMMU_FAULT_READ		(1 << 0)
-> >> +#define IOMMU_FAULT_WRITE		(1 << 1)
-> >> +#define IOMMU_FAULT_EXEC		(1 << 2)
-> >> +#define IOMMU_FAULT_PRIV		(1 << 3)
-> >>  
-> >>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
-> >>  			struct device *, unsigned long, int, void
-> >> *); +typedef int (*iommu_dev_fault_handler_t)(struct
-> >> iommu_fault_event *, void *); 
-> >>  struct iommu_domain_geometry {
-> >>  	dma_addr_t aperture_start; /* First address that can be
-> >> mapped    */ @@ -262,6 +266,52 @@ struct iommu_device {
-> >>  	struct device *dev;
-> >>  };
-> >>  
-> >> +/**
-> >> + * struct iommu_fault_event - Generic per device fault data
-> >> + *
-> >> + * - PCI and non-PCI devices
-> >> + * - Recoverable faults (e.g. page request), information based on
-> >> PCI ATS
-> >> + * and PASID spec.
-> >> + * - Un-recoverable faults of device interest
-> >> + * - DMA remapping and IRQ remapping faults
-> >> + *
-> >> + * @fault: fault descriptor
-> >> + * @device_private: if present, uniquely identify device-specific
-> >> + *                  private data for an individual page request.
-> >> + * @iommu_private: used by the IOMMU driver for storing
-> >> fault-specific
-> >> + *                 data. Users should not modify this field before
-> >> + *                 sending the fault response.
-> >> + */
-> >> +struct iommu_fault_event {
-> >> +	struct iommu_fault fault;
-> >> +	u64 device_private;
-> >> +	u64 iommu_private;
-> >> +};
-> >> +
-> >> +/**
-> >> + * struct iommu_fault_param - per-device IOMMU fault data
-> >> + * @dev_fault_handler: Callback function to handle IOMMU faults at
-> >> device level
-> >> + * @data: handler private data
-> >> + *
-> >> + */
-> >> +struct iommu_fault_param {
-> >> +	iommu_dev_fault_handler_t handler;
-> >> +	void *data;
-> >> +};
-> >> +
-> >> +/**
-> >> + * struct iommu_param - collection of per-device IOMMU data
-> >> + *
-> >> + * @fault_param: IOMMU detected device fault reporting data
-> >> + *
-> >> + * TODO: migrate other per device data pointers under
-> >> iommu_dev_data, e.g.
-> >> + *	struct iommu_group	*iommu_group;
-> >> + *	struct iommu_fwspec	*iommu_fwspec;
-> >> + */
-> >> +struct iommu_param {
-> >> +	struct iommu_fault_param *fault_param;
-> >> +};
-> >> +
-> >>  int  iommu_device_register(struct iommu_device *iommu);
-> >>  void iommu_device_unregister(struct iommu_device *iommu);
-> >>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
-> >> @@ -429,6 +479,7 @@ struct iommu_ops {};
-> >>  struct iommu_group {};
-> >>  struct iommu_fwspec {};
-> >>  struct iommu_device {};
-> >> +struct iommu_fault_param {};
-> >>  
-> >>  static inline bool iommu_present(struct bus_type *bus)
-> >>  {
-> >> diff --git a/include/uapi/linux/iommu.h
-> >> b/include/uapi/linux/iommu.h index 21adb2a964e5..a0fe5c2fb236
-> >> 100644 --- a/include/uapi/linux/iommu.h
-> >> +++ b/include/uapi/linux/iommu.h
-> >> @@ -150,5 +150,88 @@ struct iommu_guest_msi_binding {
-> >>  	__u64		gpa;
-> >>  	__u32		granule;
-> >>  };
-> >> +
-> >> +/*  Generic fault types, can be expanded IRQ remapping fault */
-> >> +enum iommu_fault_type {
-> >> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable
-> >> fault */
-> >> +	IOMMU_FAULT_PAGE_REQ,		/* page request
-> >> fault */ +};
-> >> +
-> >> +enum iommu_fault_reason {
-> >> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
-> >> +
-> >> +	/* IOMMU internal error, no specific reason to report out
-> >> */
-> >> +	IOMMU_FAULT_REASON_INTERNAL,
-> >> +
-> >> +	/* Could not access the PASID table (fetch caused external
-> >> abort) */
-> >> +	IOMMU_FAULT_REASON_PASID_FETCH,
-> >> +
-> >> +	/* could not access the device context (fetch caused
-> >> external abort) */
-> >> +	IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH,
-> >> +
-> >> +	/* pasid entry is invalid or has configuration errors */
-> >> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
-> >> +
-> >> +	/* device context entry is invalid or has configuration
-> >> errors */
-> >> +	IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY,
-> >> +	/*
-> >> +	 * PASID is out of range (e.g. exceeds the maximum PASID
-> >> +	 * supported by the IOMMU) or disabled.
-> >> +	 */
-> >> +	IOMMU_FAULT_REASON_PASID_INVALID,
-> >> +
-> >> +	/* source id is out of range */
-> >> +	IOMMU_FAULT_REASON_SOURCEID_INVALID,
-> >> +
-> >> +	/*
-> >> +	 * An external abort occurred fetching (or updating) a
-> >> translation
-> >> +	 * table descriptor
-> >> +	 */
-> >> +	IOMMU_FAULT_REASON_WALK_EABT,
-> >> +
-> >> +	/*
-> >> +	 * Could not access the page table entry (Bad address),
-> >> +	 * actual translation fault
-> >> +	 */
-> >> +	IOMMU_FAULT_REASON_PTE_FETCH,
-> >> +
-> >> +	/* Protection flag check failed */
-> >> +	IOMMU_FAULT_REASON_PERMISSION,
-> >> +
-> >> +	/* access flag check failed */
-> >> +	IOMMU_FAULT_REASON_ACCESS,
-> >> +
-> >> +	/* Output address of a translation stage caused Address
-> >> Size fault */
-> >> +	IOMMU_FAULT_REASON_OOR_ADDRESS
-> >> +};
-> >> +
-> >> +/**
-> >> + * struct iommu_fault - Generic fault data
-> >> + *
-> >> + * @type contains fault type
-> >> + * @reason fault reasons if relevant outside IOMMU driver.
-> >> + * IOMMU driver internal faults are not reported.
-> >> + * @addr: tells the offending page address
-> >> + * @fetch_addr: tells the address that caused an abort, if any
-> >> + * @pasid: contains process address space ID, used in shared
-> >> virtual memory
-> >> + * @page_req_group_id: page request group index
-> >> + * @last_req: last request in a page request group
-> >> + * @pasid_valid: indicates if the PRQ has a valid PASID
-> >> + * @prot: page access protection flag:
-> >> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
-> >> + */
-> >> +
-> >> +struct iommu_fault {
-> >> +	__u32	type;   /* enum iommu_fault_type */
-> >> +	__u32	reason; /* enum iommu_fault_reason */
-> >> +	__u64	addr;
-> >> +	__u64	fetch_addr;
-> >> +	__u32	pasid;
-> >> +	__u32	page_req_group_id;
-> >> +	__u32	last_req;
-> >> +	__u32	pasid_valid;
-> >> +	__u32	prot;
-> >> +	__u32	access;
-> >> +};
-> >>  #endif /* _UAPI_IOMMU_H */
-> >>    
-> > 
-> > [Jacob Pan]
-> >   
+Sami Mujawar
 
-[Jacob Pan]
+-----Original Message-----
+From: Andre Przywara <andre.przywara@arm.com>
+Sent: 12 December 2018 06:16 PM
+To: Julien Thierry <Julien.Thierry@arm.com>
+Cc: kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; Will Deacon <Will.Deacon@arm.com>; Sami Mujawar <Sami.Mujawar@arm.com>; Mark Rutland <Mark.Rutland@arm.com>
+Subject: Re: [PATCH kvmtool 1/6] rtc: Initialize the Register D for MC146818 RTC
+
+On Tue,  4 Dec 2018 11:14:28 +0000
+Julien Thierry <julien.thierry@arm.com> wrote:
+
+> From: Sami Mujawar <sami.mujawar@arm.com>
+>
+> Some software drivers check the VRT bit (BIT7) of Register D before
+> using the MC146818 RTC. Initialized the VRT bit in rtc__init() to
+> indicate that the RAM and time contents are valid.
+>
+> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+
+Checked against the data sheet.
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+This is quite interesting: we build the RTC emulation unconditionally for every architecture, but don't expose it in the DT (for arm/arm64).
+The Linux driver can't even be configured for arm64.
+Interestingly it works if one pokes 0x70 and 0x71 directly in memory from a guest. Which sounds hackish (do we want that?), but fits more a less the firmware use case. We would just need to make sure it actually works correctly on ARM, since nobody tested this properly before.
+
+I guess EDK2 would just hardcode the address?
+
+Cheers,
+Andre.
+
+> ---
+>  hw/rtc.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/hw/rtc.c b/hw/rtc.c
+> index 0649b5d..c1fa72f 100644
+> --- a/hw/rtc.c
+> +++ b/hw/rtc.c
+> @@ -25,6 +25,11 @@
+>  #define RTC_REG_C0x0C
+>  #define RTC_REG_D0x0D
+>
+> +/*
+> + * Register D Bits
+> + */
+> +#define RTC_REG_D_VRT(1 << 7)
+> +
+>  struct rtc_device {
+>  u8cmos_idx;
+>  u8cmos_data[128];
+> @@ -140,6 +145,9 @@ int rtc__init(struct kvm *kvm)
+>  return r;
+>  }
+>
+> +/* Set the VRT bit in Register D to indicate valid RAM and
+> time */
+> +rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
+> +
+>  return r;
+>  }
+>  dev_init(rtc__init);
+
+IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
