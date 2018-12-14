@@ -1,24 +1,25 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 5/6] kvm: Add arch specific reset
-Date: Fri, 14 Dec 2018 18:11:24 +0000
-Message-ID: <20181214181124.5374b2d0@donnerap.cambridge.arm.com>
-References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
- <1543922073-55530-6-git-send-email-julien.thierry@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH REPOST] KVM: arm64: Treat FPEXC32_EL2 as a regular guest
+ system register
+Date: Fri, 14 Dec 2018 19:54:47 +0000
+Message-ID: <20181214195447.GI3505@e103592.cambridge.arm.com>
+References: <1544554096-23451-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 619BF4A327
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:11:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 745344A2BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 14:54:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xHiu2nBH6Lpv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Dec 2018 13:11:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D74C44A2E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:11:29 -0500 (EST)
-In-Reply-To: <1543922073-55530-6-git-send-email-julien.thierry@arm.com>
+ with ESMTP id VB2QSN3pgGWs for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Dec 2018 14:54:52 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF3314A1F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 14:54:51 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1544554096-23451-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,119 +29,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue,  4 Dec 2018 11:14:32 +0000
-Julien Thierry <julien.thierry@arm.com> wrote:
-
-Hi,
-
-> Add a callback that allows to set arch specific default values when
-> creating fresh VM.
-
-So is this needed just for initialising the LIST_HEAD in the next
-patch? Can't we use some dev_init() call for that purpose, or even add
-the nonvolatile memory device to all architectures and init this in one
-place?
-
-Cheers,
-Andre.
-
+On Tue, Dec 11, 2018 at 06:48:16PM +0000, Dave Martin wrote:
+> Currently FPEXC32_EL2 is handled specially when context-switching.
 > 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> However, FPEXC has no architectural effect when running in AArch64.
+> The only case where an arm64 host may execute in AArch32 is when
+> running compat user code at EL0: the architecture explicitly
+> documents FPEXC as having no effect in this case either when the
+> kernel (EL2 in the VHE case; otherwise EL1) is AArch64.
+> 
+> So, we can just handle FPEXC32_EL2 (which is the AArch64 alias for
+> this register) as a regular AArch32-only system register and switch
+> it without any special handling or synchronisation.
+> 
+> This allows some gnarly special-case code to be eliminated from
+> hyp.  The extra isb() in __activate_traps_fpsimd32() is dropped
+> too: for the reasons explained above arm64 never required this
+> anyway.
+> 
+> Note that the comment in the deleted __activate_traps_fpsimd32()
+> function about the need to inhibit traps to EL1 is only meaningful
+> if the guest's value for FPEXC is not restored (thus potentially
+> causing an unexpected trap to EL1 in the guest unless we're careful
+> to set the EN bit).  This arises from the treatment of FPEXC32_EL2
+> as if it were part of the the FPSIMD state to be switched lazily,
+> whereas it is really more natural to consider it as part of the EL1
+> system register state to be switched eagerly at the appropriate
+> times.
+> 
+> In fact, we explicitly don't care about seeing any trap until the
+> guest accesses the FPSIMD registers for real, provided that the
+> guest sees the behaviour it expects.  So ensuring that the guest's
+> view of FPEXC is alawys up to date (as implemented by this patch)
+> should be sufficient.  Since we always had to write FPEXC32_EL2
+> anyway (in order to work around the possibility of not restoring it
+> properly for the guest) this should not add significant cost.  In
+> any case, this patch moves any cost off the hyp switch critical
+> path, to vcpu_load/put().
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> 
 > ---
->  arm/kvm.c         | 4 ++++
->  include/kvm/kvm.h | 1 +
->  kvm.c             | 2 ++
->  mips/kvm.c        | 4 ++++
->  powerpc/kvm.c     | 4 ++++
->  x86/kvm.c         | 4 ++++
->  6 files changed, 19 insertions(+)
 > 
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index d5bbbc3..1a2cfdc 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -57,6 +57,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
-> video) {
->  }
->  
-> +void kvm__arch_reset(struct kvm *kvm)
-> +{
-> +}
-> +
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
-> ram_size) {
->  	/*
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 1edacfd..eeeb10c 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -136,6 +136,7 @@ int kvm__enumerate_instances(int
-> (*callback)(const char *name, int pid)); void
-> kvm__remove_socket(const char *name); 
->  void kvm__arch_set_cmdline(char *cmdline, bool video);
-> +void kvm__arch_reset(struct kvm *kvm);
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
-> ram_size); void kvm__arch_delete_ram(struct kvm *kvm);
->  int kvm__arch_setup_firmware(struct kvm *kvm);
-> diff --git a/kvm.c b/kvm.c
-> index 7de825a..05ad0b6 100644
-> --- a/kvm.c
-> +++ b/kvm.c
-> @@ -158,6 +158,8 @@ struct kvm *kvm__new(void)
->  	kvm->sys_fd = -1;
->  	kvm->vm_fd = -1;
->  
-> +	kvm__arch_reset(kvm);
-> +
->  	return kvm;
->  }
->  
-> diff --git a/mips/kvm.c b/mips/kvm.c
-> index 211770d..3f6fd20 100644
-> --- a/mips/kvm.c
-> +++ b/mips/kvm.c
-> @@ -56,6 +56,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
-> video) 
->  }
->  
-> +void kvm__arch_reset(struct kvm *kvm)
-> +{
-> +}
-> +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
-> ram_size) {
-> diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-> index 702d67d..5bb721b 100644
-> --- a/powerpc/kvm.c
-> +++ b/powerpc/kvm.c
-> @@ -87,6 +87,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
-> video) /* We don't need anything unusual in here. */
->  }
->  
-> +void kvm__arch_reset(struct kvm *kvm)
-> +{
-> +}
-> +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
-> ram_size) {
-> diff --git a/x86/kvm.c b/x86/kvm.c
-> index 3e0f0b7..e017d36 100644
-> --- a/x86/kvm.c
-> +++ b/x86/kvm.c
-> @@ -129,6 +129,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
-> video) strcat(cmdline, " earlyprintk=serial i8042.noaux=1");
->  }
->  
-> +void kvm__arch_reset(struct kvm *kvm)
-> +{
-> +}
-> +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
-> ram_size) {
+> **Build-tested only**
+
+Dang, it turns out that writing FPEXC32_EL2 from EL2 triggers a trap to
+EL2 if FPSIMD traps to EL2 are enabled via CPTR_EL2.
+
+This seems illogical, but I've seen it trigger a Hyp panic on Juno
+(r0) (non-VHE, but looking at the Arm ARM it appears that something
+equivalent happens for VHE too).
+
+So this needs a rethink :|
+
+I think we can still defer the save until vcpu_put(), and save a
+sysreg write by not restoring it lazily (since we have to write it once
+anyway to set EN bit if we want to trap FPSIMD to EL2).
+
+Anyway, definitely not a priority for v4.21.
+
+[...]
+
+Cheers
+---Dave
