@@ -1,118 +1,191 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v7 04/25] ACPI / APEI: Make hest.c manage the estatus
- memory pool
-Date: Fri, 14 Dec 2018 13:56:16 +0000
-Message-ID: <ad48f9a1-404e-7878-3173-f8a4a417a723@arm.com>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-5-james.morse@arm.com>
- <20181211164802.GI27375@zn.tnic>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Filter out invalid core register IDs
+ in KVM_GET_REG_LIST
+Date: Fri, 14 Dec 2018 15:25:45 +0100
+Message-ID: <20181214142545.25rj2haxhhhzw4px@kamzik.brq.redhat.com>
+References: <1544645824-16461-1-git-send-email-Dave.Martin@arm.com>
+ <1544645824-16461-2-git-send-email-Dave.Martin@arm.com>
+ <20181213183038.GC3505@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 026A54A319
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 08:56:23 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7QftOD3fEAL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Dec 2018 08:56:21 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 211DC4A2BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 08:56:21 -0500 (EST)
-In-Reply-To: <20181211164802.GI27375@zn.tnic>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Borislav Petkov <bp@alien8.de>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20181213183038.GC3505@e103592.cambridge.arm.com>
+Sender: stable-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Boris,
 
-On 11/12/2018 16:48, Borislav Petkov wrote:
-> On Mon, Dec 03, 2018 at 06:05:52PM +0000, James Morse wrote:
->> ghes.c has a memory pool it uses for the estatus cache and the estatus
->> queue. The cache is initialised when registering the platform driver.
->> For the queue, an NMI-like notification has to grow/shrink the pool
->> as it is registered and unregistered.
->>
->> This is all pretty noisy when adding new NMI-like notifications, it
->> would be better to replace this with a static pool size based on the
->> number of users.
->>
->> As a precursor, move the call that creates the pool from ghes_init(),
->> into hest.c. Later this will take the number of ghes entries and
->> consolidate the queue allocations.
->> Remove ghes_estatus_pool_exit() as hest.c doesn't have anywhere to put
->> this.
->>
->> The pool is now initialised as part of ACPI's subsys_initcall():
->> (acpi_init(), acpi_scan_init(), acpi_pci_root_init(), acpi_hest_init())
->> Before this patch it happened later as a GHES specific device_initcall().
+Hi Dave,
 
->> diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
->> index b1e9f81ebeea..da5fabaeb48f 100644
->> --- a/drivers/acpi/apei/hest.c
->> +++ b/drivers/acpi/apei/hest.c
->> @@ -32,6 +32,7 @@
->>  #include <linux/io.h>
->>  #include <linux/platform_device.h>
->>  #include <acpi/apei.h>
->> +#include <acpi/ghes.h>
->>  
->>  #include "apei-internal.h"
->>  
->> @@ -200,6 +201,10 @@ static int __init hest_ghes_dev_register(unsigned int ghes_count)
->>  	if (!ghes_arr.ghes_devs)
->>  		return -ENOMEM;
->>  
->> +	rc = ghes_estatus_pool_init();
->> +	if (rc)
->> +		goto out;
-> 
-> Right, this happens before...
-> 
->> +
->>  	rc = apei_hest_parse(hest_parse_ghes, &ghes_arr);
-> 
-> ... this but do we even want to do any memory allocations if we don't
-> have any HEST tables or we've been disabled by hest_disable?
-
-I agree we shouldn't,
-
-
-> IOW, we should swap those two calls, methinks.
-
-/me digs a bit,
-
-ghes_estatus_pool_init() allocates memory from hest_ghes_dev_register().
-Its caller is behind a 'if (!ghes_disable)' in acpi_hest_init(), and is after
-another 2 calls to apei_hest_parse().
-
-If ghes_disable is set, we don't call this thing.
-If hest_disable is set, acpi_hest_init() exits early.
-If we don't have a HEST table, acpi_hest_init() exits early.
-
-... if the HEST table doesn't have any GHES entries, hest_ghes_dev_register() is
-called with ghes_count==0, and does nothing useful. (kmalloc_alloc_array(0,...)
-great!) But we do call ghes_estatus_pool_init().
-
-I think a check that ghes_count is non-zero before calling
-hest_ghes_dev_register() is the cleanest way to avoid this.
-
-I wanted the estatus pool to be initialised before creating the platform devices
-in case the order of these things is changed in the future and they get probed
-immediately, before the pool is initialised.
-
+The below looks like a nice kvm selftest. Care to fit it into that
+framework (tools/testing/selftests/kvm/) and post it?
 
 Thanks,
+drew
 
-James
+> [1]
+> 
+> #include <assert.h>
+> #include <errno.h>
+> #include <limits.h>
+> #include <stddef.h>
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <stdint.h>
+> #include <string.h>
+> #include <fcntl.h>
+> #include <sys/ioctl.h>
+> #include <linux/kvm.h>
+> 
+> #define KVM_PATH "/dev/kvm"
+> 
+> #define ARRAY_SIZE(array) (sizeof (array) / sizeof *(array))
+> 
+> static int get_reg_list(int vcpu, struct kvm_reg_list **pregs, size_t *psize)
+> {
+> 	struct kvm_reg_list *regs = *pregs;
+> 	size_t num_needed = 0;
+> 	const size_t reg_offset = (char *)&regs->reg - (char *)regs;
+> 
+> 	while (1) {
+> 		size_t size_needed = num_needed * sizeof regs->reg[0]
+> 					+ reg_offset;
+> 		if (size_needed > *psize) {
+> 			regs = realloc(regs, size_needed);
+> 			if (!regs)
+> 				goto nomem;
+> 
+> 			*pregs = regs;
+> 			*psize = size_needed;
+> 		}
+> 
+> 		regs->n = (*psize - reg_offset) / sizeof regs->reg[0];
+> 		if (!ioctl(vcpu, KVM_GET_REG_LIST, regs))
+> 			break;
+> 
+> 		if (errno != E2BIG) {
+> 			perror("KVM_GET_REG_LIST");
+> 			goto error;
+> 		}
+> 
+> 		num_needed = regs->n;
+> 	}
+> 
+> 	return 0;	
+> 
+> nomem:
+> 	errno = ENOMEM;
+> 	perror(NULL);
+> error:
+> 	return -1;
+> }
+> 
+> int main(void)
+> {
+> 	int fail = 0;
+> 	int kvm_fd, vm, vcpu;
+> 	struct kvm_vcpu_init init;
+> 	size_t i;
+> 	struct kvm_reg_list *regs = NULL;
+> 	size_t regs_size = 0;
+> 	uint64_t regdata[2];
+> 	struct kvm_one_reg reg;
+> 
+> 	kvm_fd = open(KVM_PATH, O_RDWR);
+> 	if (kvm_fd == -1) {
+> 		perror(KVM_PATH);
+> 		goto error;
+> 	}
+> 
+> 	vm = ioctl(kvm_fd, KVM_CREATE_VM, 0);
+> 	if (vm == -1) {
+> 		perror("KVM_CREATE_VM");
+> 		goto error;
+> 	}
+> 
+> 	if (ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init)) {
+> 		perror("KVM_ARM_PREFERRED_TARGET");
+> 		goto error;
+> 	}
+> 
+> 	printf("KVM_ARM_PREFERRED_TARGET:\n"
+> 	       "\ttarget = %lu\n",
+> 	       (unsigned long)init.target);
+> 	for (i = 0; i < ARRAY_SIZE(init.features); ++i)
+> 		printf("\tfeatures[0] = 0x%.8lx\n",
+> 		       (unsigned long)init.features[i]);
+> 	
+> 	vcpu = ioctl(vm, KVM_CREATE_VCPU, 0);
+> 	if (vcpu == -1) {
+> 		perror("KVM_CREATE_VCPU");
+> 		goto error;
+> 	}
+> 
+> 	if (!get_reg_list(vcpu, &regs, &regs_size)) {
+> 		fputs("Strange, KVM_GET_REG_LIST succeeded before KVM_VCPU_INIT!\n",
+> 		      stderr);
+> 			
+> 		goto error;
+> 	}
+> 
+> 	if (ioctl(vcpu, KVM_ARM_VCPU_INIT, &init)) {
+> 		perror("KVM_ARM_VCPU_INIT");
+> 		goto error;
+> 	}
+> 
+> 	if (get_reg_list(vcpu, &regs, &regs_size))
+> 		goto error;
+> 
+> 	assert(1 <= -1ULL >> 32);
+> 	assert(ULONG_MAX >= (1ULL << 32) - 1);
+> 	for (i = 0; i < regs->n; ++i) {
+> 		size_t size;
+> 		char const *s1 = "OK", *s2 = "", *s3 = "";;
+> 
+> 		size = (size_t)1 << ((regs->reg[i] & KVM_REG_SIZE_MASK) >>
+> 				     KVM_REG_SIZE_SHIFT);
+> 		if (size < 4 || size > 16) {
+> 			s1 = "BADSIZE";
+> 			fail = 1;
+> 		} else {
+> 			memset(&reg, 0, sizeof reg);
+> 
+> 			reg.id = regs->reg[i];
+> 			reg.addr = (__u64)&regdata;
+> 			if (ioctl(vcpu, KVM_GET_ONE_REG, &reg)) {
+> 				s1 = "FAIL (";
+> 				s2 = strerror(errno);
+> 				s3 = ")";
+> 				fail = 1;
+> 			}
+> 		}
+> 
+> 		printf("\t0x%.16lx\t%s%s%s\n",
+> 		       (unsigned long)reg.id, s1, s2, s3);
+> 	
+> 	}
+> 
+> 	if (ferror(stdout) || fflush(stdout))
+> 		goto stdout_error;
+> 	
+> 	if (fail) {
+> 		puts("FAIL");
+> 		goto error;
+> 	}
+> 
+> 	if (puts("\nPASS") == EOF || fclose(stdout))
+> 		goto stdout_error;
+> 
+> 	return EXIT_SUCCESS;
+> 
+> stdout_error:
+> 	fputs("I/O error", stderr);
+> error:
+> 	return EXIT_FAILURE;
+> }
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
