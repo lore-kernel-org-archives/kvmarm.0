@@ -1,121 +1,118 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm/arm64: vgic: Do not cond_resched_lock()
- with IRQs disabled
-Date: Fri, 14 Dec 2018 09:36:59 +0000
-Message-ID: <0573c8b2-db76-19e3-db76-5433b2e4ad0a@arm.com>
-References: <1543256807-9768-1-git-send-email-julien.thierry@arm.com>
- <1543256807-9768-2-git-send-email-julien.thierry@arm.com>
- <20181211102015.GV30263@e113682-lin.lund.arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v7 04/25] ACPI / APEI: Make hest.c manage the estatus
+ memory pool
+Date: Fri, 14 Dec 2018 13:56:16 +0000
+Message-ID: <ad48f9a1-404e-7878-3173-f8a4a417a723@arm.com>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-5-james.morse@arm.com>
+ <20181211164802.GI27375@zn.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20181211102015.GV30263@e113682-lin.lund.arm.com>
-Content-Language: en-US
-Sender: stable-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, stable@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 026A54A319
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 08:56:23 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id V7QftOD3fEAL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Dec 2018 08:56:21 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 211DC4A2BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 08:56:21 -0500 (EST)
+In-Reply-To: <20181211164802.GI27375@zn.tnic>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Borislav Petkov <bp@alien8.de>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Boris,
 
+On 11/12/2018 16:48, Borislav Petkov wrote:
+> On Mon, Dec 03, 2018 at 06:05:52PM +0000, James Morse wrote:
+>> ghes.c has a memory pool it uses for the estatus cache and the estatus
+>> queue. The cache is initialised when registering the platform driver.
+>> For the queue, an NMI-like notification has to grow/shrink the pool
+>> as it is registered and unregistered.
+>>
+>> This is all pretty noisy when adding new NMI-like notifications, it
+>> would be better to replace this with a static pool size based on the
+>> number of users.
+>>
+>> As a precursor, move the call that creates the pool from ghes_init(),
+>> into hest.c. Later this will take the number of ghes entries and
+>> consolidate the queue allocations.
+>> Remove ghes_estatus_pool_exit() as hest.c doesn't have anywhere to put
+>> this.
+>>
+>> The pool is now initialised as part of ACPI's subsys_initcall():
+>> (acpi_init(), acpi_scan_init(), acpi_pci_root_init(), acpi_hest_init())
+>> Before this patch it happened later as a GHES specific device_initcall().
 
-On 11/12/2018 10:20, Christoffer Dall wrote:
-> On Mon, Nov 26, 2018 at 06:26:44PM +0000, Julien Thierry wrote:
->> To change the active state of an MMIO, halt is requested for all vcpus of
->> the affected guest before modifying the IRQ state. This is done by calling
->> cond_resched_lock() in vgic_mmio_change_active(). However interrupts are
->> disabled at this point and we cannot reschedule a vcpu.
->>
->> Solve this by waiting for all vcpus to be halted after emmiting the halt
->> request.
->>
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: stable@vger.kernel.org
->> ---
->>  virt/kvm/arm/vgic/vgic-mmio.c | 36 ++++++++++++++----------------------
->>  1 file changed, 14 insertions(+), 22 deletions(-)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
->> index f56ff1c..5c76a92 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
->> @@ -313,27 +313,6 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>> diff --git a/drivers/acpi/apei/hest.c b/drivers/acpi/apei/hest.c
+>> index b1e9f81ebeea..da5fabaeb48f 100644
+>> --- a/drivers/acpi/apei/hest.c
+>> +++ b/drivers/acpi/apei/hest.c
+>> @@ -32,6 +32,7 @@
+>>  #include <linux/io.h>
+>>  #include <linux/platform_device.h>
+>>  #include <acpi/apei.h>
+>> +#include <acpi/ghes.h>
 >>  
->>  	spin_lock_irqsave(&irq->irq_lock, flags);
+>>  #include "apei-internal.h"
 >>  
->> -	/*
->> -	 * If this virtual IRQ was written into a list register, we
->> -	 * have to make sure the CPU that runs the VCPU thread has
->> -	 * synced back the LR state to the struct vgic_irq.
->> -	 *
->> -	 * As long as the conditions below are true, we know the VCPU thread
->> -	 * may be on its way back from the guest (we kicked the VCPU thread in
->> -	 * vgic_change_active_prepare)  and still has to sync back this IRQ,
->> -	 * so we release and re-acquire the spin_lock to let the other thread
->> -	 * sync back the IRQ.
->> -	 *
->> -	 * When accessing VGIC state from user space, requester_vcpu is
->> -	 * NULL, which is fine, because we guarantee that no VCPUs are running
->> -	 * when accessing VGIC state from user space so irq->vcpu->cpu is
->> -	 * always -1.
->> -	 */
->> -	while (irq->vcpu && /* IRQ may have state in an LR somewhere */
->> -	       irq->vcpu != requester_vcpu && /* Current thread is not the VCPU thread */
->> -	       irq->vcpu->cpu != -1) /* VCPU thread is running */
->> -		cond_resched_lock(&irq->irq_lock);
->> -
->>  	if (irq->hw) {
->>  		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
->>  	} else {
->> @@ -368,8 +347,21 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->>   */
->>  static void vgic_change_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
->>  {
->> -	if (intid > VGIC_NR_PRIVATE_IRQS)
->> +	if (intid > VGIC_NR_PRIVATE_IRQS) {
->> +		struct kvm_vcpu *tmp;
->> +		int i;
+>> @@ -200,6 +201,10 @@ static int __init hest_ghes_dev_register(unsigned int ghes_count)
+>>  	if (!ghes_arr.ghes_devs)
+>>  		return -ENOMEM;
+>>  
+>> +	rc = ghes_estatus_pool_init();
+>> +	if (rc)
+>> +		goto out;
+> 
+> Right, this happens before...
+> 
 >> +
->>  		kvm_arm_halt_guest(vcpu->kvm);
->> +
->> +		/* Wait for each vcpu to be halted */
->> +		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
->> +			if (tmp == vcpu)
->> +				continue;
->> +
->> +			while (tmp->cpu != -1)
->> +				cond_resched();
->> +		}
+>>  	rc = apei_hest_parse(hest_parse_ghes, &ghes_arr);
 > 
-> I'm actually thinking we don't need this loop at all after the requet
-> rework which causes:
-> 
->  1. kvm_arm_halt_guest() to use kvm_make_all_cpus_request(kvm, KVM_REQ_SLEEP), and
->  2. KVM_REQ_SLEEP uses REQ_WAIT, and
->  3. REQ_WAIT requires the VCPU to respond to IPIs before returning, and
->  4. a VCPU thread can only respond when it enables interrupt, and
->  5. enabling interrupts when running a VCPU only happens after syncing
->     the VGIC hwstate.
-> 
-> Does that make sense?
+> ... this but do we even want to do any memory allocations if we don't
+> have any HEST tables or we've been disabled by hest_disable?
 
-I'm not super familiar with what goes on with the vgic hwstate syncing,
-but looking at kvm_arm_halt_guest() and kvm_arch_vcpu_ioctl_run(), I
-agree with the reasoning.
+I agree we shouldn't,
 
-> It would be good if someone can validate this, but if it holds this
-> patch just becomes a nice deletion of the logic in
-> vgic-mmio_change_active.
-> 
 
-As long as running kvm_vgic_sync_hwstate() on each vcpu is all that is
-needed before we can modify the active state, I think your solution is
-definitely the way to go.
+> IOW, we should swap those two calls, methinks.
+
+/me digs a bit,
+
+ghes_estatus_pool_init() allocates memory from hest_ghes_dev_register().
+Its caller is behind a 'if (!ghes_disable)' in acpi_hest_init(), and is after
+another 2 calls to apei_hest_parse().
+
+If ghes_disable is set, we don't call this thing.
+If hest_disable is set, acpi_hest_init() exits early.
+If we don't have a HEST table, acpi_hest_init() exits early.
+
+... if the HEST table doesn't have any GHES entries, hest_ghes_dev_register() is
+called with ghes_count==0, and does nothing useful. (kmalloc_alloc_array(0,...)
+great!) But we do call ghes_estatus_pool_init().
+
+I think a check that ghes_count is non-zero before calling
+hest_ghes_dev_register() is the cleanest way to avoid this.
+
+I wanted the estatus pool to be initialised before creating the platform devices
+in case the order of these things is changed in the future and they get probed
+immediately, before the pool is initialised.
+
 
 Thanks,
 
--- 
-Julien Thierry
+James
