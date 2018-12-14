@@ -1,216 +1,195 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Filter out invalid core register IDs
- in KVM_GET_REG_LIST
-Date: Fri, 14 Dec 2018 15:44:47 +0100
-Message-ID: <20181214144447.5fax3f3k7lbwrdo7@kamzik.brq.redhat.com>
-References: <1544645824-16461-1-git-send-email-Dave.Martin@arm.com>
- <1544645824-16461-2-git-send-email-Dave.Martin@arm.com>
- <20181213183038.GC3505@e103592.cambridge.arm.com>
- <20181214142545.25rj2haxhhhzw4px@kamzik.brq.redhat.com>
- <20181214144119.GG3505@e103592.cambridge.arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool 4/6] arm: Support firmware loading
+Date: Fri, 14 Dec 2018 18:08:11 +0000
+Message-ID: <20181214180811.059760dc@donnerap.cambridge.arm.com>
+References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
+ <1543922073-55530-5-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181214144119.GG3505@e103592.cambridge.arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 578D04A2BD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:08:27 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id z38ep2YVdCJx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Dec 2018 13:08:25 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFCA84A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Dec 2018 13:08:25 -0500 (EST)
+In-Reply-To: <1543922073-55530-5-git-send-email-julien.thierry@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 14, 2018 at 02:41:21PM +0000, Dave Martin wrote:
-> On Fri, Dec 14, 2018 at 03:25:45PM +0100, Andrew Jones wrote:
-> > 
-> > Hi Dave,
-> > 
-> > The below looks like a nice kvm selftest. Care to fit it into that
-> > framework (tools/testing/selftests/kvm/) and post it?
-> 
-> Sure, it makes sense not to drop this on the floor.  Do you feel the
-> test needs to go in alongside the fix, or is it alright if I repost this
-> later on?
+On Tue,  4 Dec 2018 11:14:31 +0000
+Julien Thierry <julien.thierry@arm.com> wrote:
 
-I'm fine with it getting posted whenever. I'll just be happy that it gets
-posted :-)
+Hi,
 
-Thanks,
-drew
+> Implement firmware image loading for arm and set the boot start
+> address to the firmware address.
+> 
+> Add an option for the user to specify where to map the firmware.
 
+How is the user supposed to know this address? Will EDKII be linked
+against a certain address, which has to be reflected in this parameter?
+
+Wouldn't it be feasible to provide a default value, say the beginning
+of DRAM? (See below)
+
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+> ---
+>  arm/fdt.c                                | 14 +++++++-
+>  arm/include/arm-common/kvm-config-arch.h |  5 ++-
+>  arm/kvm.c                                | 58
+> +++++++++++++++++++++++++++++++- 3 files changed, 74 insertions(+), 3
+> deletions(-)
 > 
-> It will need a bit of cleanup, and I'm juggling other stuff too...
-> 
-> Cheers
-> ---Dave
-> 
-> > 
-> > Thanks,
-> > drew
-> > 
-> > > [1]
-> > > 
-> > > #include <assert.h>
-> > > #include <errno.h>
-> > > #include <limits.h>
-> > > #include <stddef.h>
-> > > #include <stdio.h>
-> > > #include <stdlib.h>
-> > > #include <stdint.h>
-> > > #include <string.h>
-> > > #include <fcntl.h>
-> > > #include <sys/ioctl.h>
-> > > #include <linux/kvm.h>
-> > > 
-> > > #define KVM_PATH "/dev/kvm"
-> > > 
-> > > #define ARRAY_SIZE(array) (sizeof (array) / sizeof *(array))
-> > > 
-> > > static int get_reg_list(int vcpu, struct kvm_reg_list **pregs, size_t *psize)
-> > > {
-> > > 	struct kvm_reg_list *regs = *pregs;
-> > > 	size_t num_needed = 0;
-> > > 	const size_t reg_offset = (char *)&regs->reg - (char *)regs;
-> > > 
-> > > 	while (1) {
-> > > 		size_t size_needed = num_needed * sizeof regs->reg[0]
-> > > 					+ reg_offset;
-> > > 		if (size_needed > *psize) {
-> > > 			regs = realloc(regs, size_needed);
-> > > 			if (!regs)
-> > > 				goto nomem;
-> > > 
-> > > 			*pregs = regs;
-> > > 			*psize = size_needed;
-> > > 		}
-> > > 
-> > > 		regs->n = (*psize - reg_offset) / sizeof regs->reg[0];
-> > > 		if (!ioctl(vcpu, KVM_GET_REG_LIST, regs))
-> > > 			break;
-> > > 
-> > > 		if (errno != E2BIG) {
-> > > 			perror("KVM_GET_REG_LIST");
-> > > 			goto error;
-> > > 		}
-> > > 
-> > > 		num_needed = regs->n;
-> > > 	}
-> > > 
-> > > 	return 0;	
-> > > 
-> > > nomem:
-> > > 	errno = ENOMEM;
-> > > 	perror(NULL);
-> > > error:
-> > > 	return -1;
-> > > }
-> > > 
-> > > int main(void)
-> > > {
-> > > 	int fail = 0;
-> > > 	int kvm_fd, vm, vcpu;
-> > > 	struct kvm_vcpu_init init;
-> > > 	size_t i;
-> > > 	struct kvm_reg_list *regs = NULL;
-> > > 	size_t regs_size = 0;
-> > > 	uint64_t regdata[2];
-> > > 	struct kvm_one_reg reg;
-> > > 
-> > > 	kvm_fd = open(KVM_PATH, O_RDWR);
-> > > 	if (kvm_fd == -1) {
-> > > 		perror(KVM_PATH);
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	vm = ioctl(kvm_fd, KVM_CREATE_VM, 0);
-> > > 	if (vm == -1) {
-> > > 		perror("KVM_CREATE_VM");
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	if (ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init)) {
-> > > 		perror("KVM_ARM_PREFERRED_TARGET");
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	printf("KVM_ARM_PREFERRED_TARGET:\n"
-> > > 	       "\ttarget = %lu\n",
-> > > 	       (unsigned long)init.target);
-> > > 	for (i = 0; i < ARRAY_SIZE(init.features); ++i)
-> > > 		printf("\tfeatures[0] = 0x%.8lx\n",
-> > > 		       (unsigned long)init.features[i]);
-> > > 	
-> > > 	vcpu = ioctl(vm, KVM_CREATE_VCPU, 0);
-> > > 	if (vcpu == -1) {
-> > > 		perror("KVM_CREATE_VCPU");
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	if (!get_reg_list(vcpu, &regs, &regs_size)) {
-> > > 		fputs("Strange, KVM_GET_REG_LIST succeeded before KVM_VCPU_INIT!\n",
-> > > 		      stderr);
-> > > 			
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	if (ioctl(vcpu, KVM_ARM_VCPU_INIT, &init)) {
-> > > 		perror("KVM_ARM_VCPU_INIT");
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	if (get_reg_list(vcpu, &regs, &regs_size))
-> > > 		goto error;
-> > > 
-> > > 	assert(1 <= -1ULL >> 32);
-> > > 	assert(ULONG_MAX >= (1ULL << 32) - 1);
-> > > 	for (i = 0; i < regs->n; ++i) {
-> > > 		size_t size;
-> > > 		char const *s1 = "OK", *s2 = "", *s3 = "";;
-> > > 
-> > > 		size = (size_t)1 << ((regs->reg[i] & KVM_REG_SIZE_MASK) >>
-> > > 				     KVM_REG_SIZE_SHIFT);
-> > > 		if (size < 4 || size > 16) {
-> > > 			s1 = "BADSIZE";
-> > > 			fail = 1;
-> > > 		} else {
-> > > 			memset(&reg, 0, sizeof reg);
-> > > 
-> > > 			reg.id = regs->reg[i];
-> > > 			reg.addr = (__u64)&regdata;
-> > > 			if (ioctl(vcpu, KVM_GET_ONE_REG, &reg)) {
-> > > 				s1 = "FAIL (";
-> > > 				s2 = strerror(errno);
-> > > 				s3 = ")";
-> > > 				fail = 1;
-> > > 			}
-> > > 		}
-> > > 
-> > > 		printf("\t0x%.16lx\t%s%s%s\n",
-> > > 		       (unsigned long)reg.id, s1, s2, s3);
-> > > 	
-> > > 	}
-> > > 
-> > > 	if (ferror(stdout) || fflush(stdout))
-> > > 		goto stdout_error;
-> > > 	
-> > > 	if (fail) {
-> > > 		puts("FAIL");
-> > > 		goto error;
-> > > 	}
-> > > 
-> > > 	if (puts("\nPASS") == EOF || fclose(stdout))
-> > > 		goto stdout_error;
-> > > 
-> > > 	return EXIT_SUCCESS;
-> > > 
-> > > stdout_error:
-> > > 	fputs("I/O error", stderr);
-> > > error:
-> > > 	return EXIT_FAILURE;
-> > > }
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> diff --git a/arm/fdt.c b/arm/fdt.c
+> index 664bb62..2936986 100644
+> --- a/arm/fdt.c
+> +++ b/arm/fdt.c
+> @@ -131,7 +131,19 @@ static int setup_fdt(struct kvm *kvm)
+>  	/* /chosen */
+>  	_FDT(fdt_begin_node(fdt, "chosen"));
+>  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
+> -	_FDT(fdt_property_string(fdt, "bootargs",
+> kvm->cfg.real_cmdline)); +
+> +	if (kvm->cfg.firmware_filename) {
+> +		/*
+> +		 * When using a firmware, command line is not passed
+> through DT,
+> +		 * or the firmware can add it itself
+> +		 */
+> +		if (kvm->cfg.kernel_cmdline)
+> +			pr_warning("Ignoring custom bootargs: %s\n",
+> +				   kvm->cfg.kernel_cmdline);
+> +	} else
+> +		_FDT(fdt_property_string(fdt, "bootargs",
+> +					 kvm->cfg.real_cmdline));
+> +
+>  	_FDT(fdt_property_u64(fdt, "kaslr-seed",
+> kvm->cfg.arch.kaslr_seed)); 
+>  	/* Initrd */
+> diff --git a/arm/include/arm-common/kvm-config-arch.h
+> b/arm/include/arm-common/kvm-config-arch.h index 6a196f1..5734c46
+> 100644 --- a/arm/include/arm-common/kvm-config-arch.h
+> +++ b/arm/include/arm-common/kvm-config-arch.h
+> @@ -11,6 +11,7 @@ struct kvm_config_arch {
+>  	bool		has_pmuv3;
+>  	u64		kaslr_seed;
+>  	enum irqchip_type irqchip;
+> +	u64		fw_addr;
+>  };
+>  
+>  int irqchip_parser(const struct option *opt, const char *arg, int
+> unset); @@ -30,6 +31,8 @@ int irqchip_parser(const struct option
+> *opt, const char *arg, int unset); OPT_CALLBACK('\0', "irqchip",
+> &(cfg)->irqchip,				\
+> "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+> "Type of interrupt controller to emulate in the guest",	\
+> -		     irqchip_parser, NULL),
+> +		     irqchip_parser,
+> NULL),					\
+> +	OPT_U64('\0', "firmware-address",
+> &(cfg)->fw_addr,			\
+> +		"Address where firmware should be loaded"),
+>  
+>  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index c6843e5..d5bbbc3 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -169,9 +169,65 @@ bool kvm__arch_load_kernel_image(struct kvm
+> *kvm, int fd_kernel, int fd_initrd, return true;
+>  }
+>  
+> +static bool validate_fw_addr(struct kvm *kvm)
+> +{
+> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
+> +	u64 ram_phys;
+> +
+> +	ram_phys = host_to_guest_flat(kvm, kvm->ram_start);
+> +
+> +	if (fw_addr < ram_phys || fw_addr >= ram_phys +
+> kvm->ram_size) {
+> +		pr_err("Provide --firmware-address an address in
+> RAM: "
+> +		       "0x%016llx - 0x%016llx",
+> +		       ram_phys, ram_phys + kvm->ram_size);
+> +
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  bool kvm__load_firmware(struct kvm *kvm, const char
+> *firmware_filename) {
+> -	return false;
+> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
+> +	void *host_pos;
+> +	void *limit;
+> +	ssize_t fw_sz;
+> +	int fd;
+> +
+> +	limit = kvm->ram_start + kvm->ram_size;
+
+What about we check here for fw_addr being 0, which is the default
+value and would be rejected by the next call.
+So can't we set it to some sensible default value here?
+
+	/* If not specified, use default load address at start of RAM */
+	if (fw_addr == 0)
+		fw_addr = ARM_MEMORY_AREA;
+
+Cheers,
+Andre.
+
+> +	if (!validate_fw_addr(kvm))
+> +		die("Bad firmware destination: 0x%016llx", fw_addr);
+> +
+> +	fd = open(firmware_filename, O_RDONLY);
+> +	if (fd < 0)
+> +		return false;
+> +
+> +	host_pos = guest_flat_to_host(kvm, fw_addr);
+> +	if (!host_pos || host_pos < kvm->ram_start)
+> +		return false;
+> +
+> +	fw_sz = read_file(fd, host_pos, limit - host_pos);
+> +	if (fw_sz < 0)
+> +		die("failed to load firmware");
+> +	close(fd);
+> +
+> +	/* Kernel isn't loaded by kvm, point start address to
+> firmware */
+> +	kvm->arch.kern_guest_start = fw_addr;
+> +
+> +	/* Load dtb just after the firmware image*/
+> +	host_pos += fw_sz;
+> +	if (host_pos + FDT_MAX_SIZE > limit)
+> +		die("not enough space to load fdt");
+> +
+> +	kvm->arch.dtb_guest_start = ALIGN(host_to_guest_flat(kvm,
+> host_pos),
+> +					  FDT_ALIGN);
+> +	pr_info("Placing fdt at 0x%llx - 0x%llx",
+> +		kvm->arch.dtb_guest_start,
+> +		kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
+> +
+> +	return true;
+>  }
+>  
+>  int kvm__arch_setup_firmware(struct kvm *kvm)
