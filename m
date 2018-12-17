@@ -1,25 +1,25 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH kvmtool 4/6] arm: Support firmware loading
-Date: Mon, 17 Dec 2018 10:05:01 +0000
-Message-ID: <de025d94-b5ba-82e7-ca63-08bee2fb6ce8@arm.com>
+Subject: Re: [PATCH kvmtool 5/6] kvm: Add arch specific reset
+Date: Mon, 17 Dec 2018 10:25:07 +0000
+Message-ID: <4ab9d2f2-a73d-517d-d1d9-d816bd81e5f6@arm.com>
 References: <1543922073-55530-1-git-send-email-julien.thierry@arm.com>
- <1543922073-55530-5-git-send-email-julien.thierry@arm.com>
- <20181214180811.059760dc@donnerap.cambridge.arm.com>
+ <1543922073-55530-6-git-send-email-julien.thierry@arm.com>
+ <20181214181124.5374b2d0@donnerap.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F3A4A321
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Dec 2018 05:05:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 587044A375
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Dec 2018 05:25:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 81XafxmKALnb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Dec 2018 05:05:06 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33E314A200
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Dec 2018 05:05:06 -0500 (EST)
-In-Reply-To: <20181214180811.059760dc@donnerap.cambridge.arm.com>
+ with ESMTP id C7aChpqKS3Qs for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Dec 2018 05:25:11 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B966D4A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Dec 2018 05:25:11 -0500 (EST)
+In-Reply-To: <20181214181124.5374b2d0@donnerap.cambridge.arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,181 +36,138 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi,
 
-On 14/12/2018 18:08, Andre Przywara wrote:
-> On Tue,  4 Dec 2018 11:14:31 +0000
+On 14/12/2018 18:11, Andre Przywara wrote:
+> On Tue,  4 Dec 2018 11:14:32 +0000
 > Julien Thierry <julien.thierry@arm.com> wrote:
 > 
 > Hi,
 > 
->> Implement firmware image loading for arm and set the boot start
->> address to the firmware address.
->>
->> Add an option for the user to specify where to map the firmware.
+>> Add a callback that allows to set arch specific default values when
+>> creating fresh VM.
 > 
-> How is the user supposed to know this address? Will EDKII be linked
-> against a certain address, which has to be reflected in this parameter?
-> 
-
-For EDKII I believe any address in RAM is fine (although I'm unsure
-whether there are other alignment properties).
-
-For other firmwares/bootloaders, only the user can know depending on
-what they are loading.
-
-> Wouldn't it be feasible to provide a default value, say the beginning
-> of DRAM? (See below)
-> 
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> ---
->>  arm/fdt.c                                | 14 +++++++-
->>  arm/include/arm-common/kvm-config-arch.h |  5 ++-
->>  arm/kvm.c                                | 58
->> +++++++++++++++++++++++++++++++- 3 files changed, 74 insertions(+), 3
->> deletions(-)
->>
->> diff --git a/arm/fdt.c b/arm/fdt.c
->> index 664bb62..2936986 100644
->> --- a/arm/fdt.c
->> +++ b/arm/fdt.c
->> @@ -131,7 +131,19 @@ static int setup_fdt(struct kvm *kvm)
->>  	/* /chosen */
->>  	_FDT(fdt_begin_node(fdt, "chosen"));
->>  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
->> -	_FDT(fdt_property_string(fdt, "bootargs",
->> kvm->cfg.real_cmdline)); +
->> +	if (kvm->cfg.firmware_filename) {
->> +		/*
->> +		 * When using a firmware, command line is not passed
->> through DT,
->> +		 * or the firmware can add it itself
->> +		 */
->> +		if (kvm->cfg.kernel_cmdline)
->> +			pr_warning("Ignoring custom bootargs: %s\n",
->> +				   kvm->cfg.kernel_cmdline);
->> +	} else
->> +		_FDT(fdt_property_string(fdt, "bootargs",
->> +					 kvm->cfg.real_cmdline));
->> +
->>  	_FDT(fdt_property_u64(fdt, "kaslr-seed",
->> kvm->cfg.arch.kaslr_seed)); 
->>  	/* Initrd */
->> diff --git a/arm/include/arm-common/kvm-config-arch.h
->> b/arm/include/arm-common/kvm-config-arch.h index 6a196f1..5734c46
->> 100644 --- a/arm/include/arm-common/kvm-config-arch.h
->> +++ b/arm/include/arm-common/kvm-config-arch.h
->> @@ -11,6 +11,7 @@ struct kvm_config_arch {
->>  	bool		has_pmuv3;
->>  	u64		kaslr_seed;
->>  	enum irqchip_type irqchip;
->> +	u64		fw_addr;
->>  };
->>  
->>  int irqchip_parser(const struct option *opt, const char *arg, int
->> unset); @@ -30,6 +31,8 @@ int irqchip_parser(const struct option
->> *opt, const char *arg, int unset); OPT_CALLBACK('\0', "irqchip",
->> &(cfg)->irqchip,				\
->> "[gicv2|gicv2m|gicv3|gicv3-its]",				\
->> "Type of interrupt controller to emulate in the guest",	\
->> -		     irqchip_parser, NULL),
->> +		     irqchip_parser,
->> NULL),					\
->> +	OPT_U64('\0', "firmware-address",
->> &(cfg)->fw_addr,			\
->> +		"Address where firmware should be loaded"),
->>  
->>  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
->> diff --git a/arm/kvm.c b/arm/kvm.c
->> index c6843e5..d5bbbc3 100644
->> --- a/arm/kvm.c
->> +++ b/arm/kvm.c
->> @@ -169,9 +169,65 @@ bool kvm__arch_load_kernel_image(struct kvm
->> *kvm, int fd_kernel, int fd_initrd, return true;
->>  }
->>  
->> +static bool validate_fw_addr(struct kvm *kvm)
->> +{
->> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
->> +	u64 ram_phys;
->> +
->> +	ram_phys = host_to_guest_flat(kvm, kvm->ram_start);
->> +
->> +	if (fw_addr < ram_phys || fw_addr >= ram_phys +
->> kvm->ram_size) {
->> +		pr_err("Provide --firmware-address an address in
->> RAM: "
->> +		       "0x%016llx - 0x%016llx",
->> +		       ram_phys, ram_phys + kvm->ram_size);
->> +
->> +		return false;
->> +	}
->> +
->> +	return true;
->> +}
->> +
->>  bool kvm__load_firmware(struct kvm *kvm, const char
->> *firmware_filename) {
->> -	return false;
->> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
->> +	void *host_pos;
->> +	void *limit;
->> +	ssize_t fw_sz;
->> +	int fd;
->> +
->> +	limit = kvm->ram_start + kvm->ram_size;
-> 
-> What about we check here for fw_addr being 0, which is the default
-> value and would be rejected by the next call.
-> So can't we set it to some sensible default value here?
-> 
-> 	/* If not specified, use default load address at start of RAM */
-> 	if (fw_addr == 0)
-> 		fw_addr = ARM_MEMORY_AREA;
+> So is this needed just for initialising the LIST_HEAD in the next
+> patch? Can't we use some dev_init() call for that purpose, or even add
+> the nonvolatile memory device to all architectures and init this in one
+> place?
 > 
 
-Seems a bit random to me, but I guess we can. After all for the kernel
-image we just to put it at the end of DRAM.
+All the *_init() calls are done after option parsing, so this is not good.
+
+And I'm really unsure about adding nvmem for all arch as:
+1) I'm not familiar with the memory layouts of other archs and wouldn't
+know where to map them.
+2) I wouldn't know how to expose them as not all archs use DT (currently
+only arm/arm64 and powerpc seem to really require it).
+
+Or we could introduce an ARCH_WANT_NVMEM, and CONFIG_HAS_NVMEM. And when
+this is defined, the ARCH is required to provide an NVMEM_AREA when they
+want to start using ARCH_WANT_NVMEM.
+
+This way there is a base for other achitectures to start supporting it
+but avoids me breaking their memory layout or introducing an unusable
+option for them.
 
 Thanks,
 
 Julien
 
 > 
->> +	if (!validate_fw_addr(kvm))
->> +		die("Bad firmware destination: 0x%016llx", fw_addr);
->> +
->> +	fd = open(firmware_filename, O_RDONLY);
->> +	if (fd < 0)
->> +		return false;
->> +
->> +	host_pos = guest_flat_to_host(kvm, fw_addr);
->> +	if (!host_pos || host_pos < kvm->ram_start)
->> +		return false;
->> +
->> +	fw_sz = read_file(fd, host_pos, limit - host_pos);
->> +	if (fw_sz < 0)
->> +		die("failed to load firmware");
->> +	close(fd);
->> +
->> +	/* Kernel isn't loaded by kvm, point start address to
->> firmware */
->> +	kvm->arch.kern_guest_start = fw_addr;
->> +
->> +	/* Load dtb just after the firmware image*/
->> +	host_pos += fw_sz;
->> +	if (host_pos + FDT_MAX_SIZE > limit)
->> +		die("not enough space to load fdt");
->> +
->> +	kvm->arch.dtb_guest_start = ALIGN(host_to_guest_flat(kvm,
->> host_pos),
->> +					  FDT_ALIGN);
->> +	pr_info("Placing fdt at 0x%llx - 0x%llx",
->> +		kvm->arch.dtb_guest_start,
->> +		kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
->> +
->> +	return true;
+>>
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> ---
+>>  arm/kvm.c         | 4 ++++
+>>  include/kvm/kvm.h | 1 +
+>>  kvm.c             | 2 ++
+>>  mips/kvm.c        | 4 ++++
+>>  powerpc/kvm.c     | 4 ++++
+>>  x86/kvm.c         | 4 ++++
+>>  6 files changed, 19 insertions(+)
+>>
+>> diff --git a/arm/kvm.c b/arm/kvm.c
+>> index d5bbbc3..1a2cfdc 100644
+>> --- a/arm/kvm.c
+>> +++ b/arm/kvm.c
+>> @@ -57,6 +57,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
+>> video) {
 >>  }
 >>  
->>  int kvm__arch_setup_firmware(struct kvm *kvm)
+>> +void kvm__arch_reset(struct kvm *kvm)
+>> +{
+>> +}
+>> +
+>>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
+>> ram_size) {
+>>  	/*
+>> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+>> index 1edacfd..eeeb10c 100644
+>> --- a/include/kvm/kvm.h
+>> +++ b/include/kvm/kvm.h
+>> @@ -136,6 +136,7 @@ int kvm__enumerate_instances(int
+>> (*callback)(const char *name, int pid)); void
+>> kvm__remove_socket(const char *name); 
+>>  void kvm__arch_set_cmdline(char *cmdline, bool video);
+>> +void kvm__arch_reset(struct kvm *kvm);
+>>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
+>> ram_size); void kvm__arch_delete_ram(struct kvm *kvm);
+>>  int kvm__arch_setup_firmware(struct kvm *kvm);
+>> diff --git a/kvm.c b/kvm.c
+>> index 7de825a..05ad0b6 100644
+>> --- a/kvm.c
+>> +++ b/kvm.c
+>> @@ -158,6 +158,8 @@ struct kvm *kvm__new(void)
+>>  	kvm->sys_fd = -1;
+>>  	kvm->vm_fd = -1;
+>>  
+>> +	kvm__arch_reset(kvm);
+>> +
+>>  	return kvm;
+>>  }
+>>  
+>> diff --git a/mips/kvm.c b/mips/kvm.c
+>> index 211770d..3f6fd20 100644
+>> --- a/mips/kvm.c
+>> +++ b/mips/kvm.c
+>> @@ -56,6 +56,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
+>> video) 
+>>  }
+>>  
+>> +void kvm__arch_reset(struct kvm *kvm)
+>> +{
+>> +}
+>> +
+>>  /* Architecture-specific KVM init */
+>>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
+>> ram_size) {
+>> diff --git a/powerpc/kvm.c b/powerpc/kvm.c
+>> index 702d67d..5bb721b 100644
+>> --- a/powerpc/kvm.c
+>> +++ b/powerpc/kvm.c
+>> @@ -87,6 +87,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
+>> video) /* We don't need anything unusual in here. */
+>>  }
+>>  
+>> +void kvm__arch_reset(struct kvm *kvm)
+>> +{
+>> +}
+>> +
+>>  /* Architecture-specific KVM init */
+>>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
+>> ram_size) {
+>> diff --git a/x86/kvm.c b/x86/kvm.c
+>> index 3e0f0b7..e017d36 100644
+>> --- a/x86/kvm.c
+>> +++ b/x86/kvm.c
+>> @@ -129,6 +129,10 @@ void kvm__arch_set_cmdline(char *cmdline, bool
+>> video) strcat(cmdline, " earlyprintk=serial i8042.noaux=1");
+>>  }
+>>  
+>> +void kvm__arch_reset(struct kvm *kvm)
+>> +{
+>> +}
+>> +
+>>  /* Architecture-specific KVM init */
+>>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64
+>> ram_size) {
 > 
 
 -- 
