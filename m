@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/28] KVM: arm/arm64: Fixup the kvm_exit tracepoint
-Date: Wed, 19 Dec 2018 18:03:40 +0000
-Message-ID: <20181219180349.242681-20-marc.zyngier@arm.com>
+Subject: [PATCH 20/28] KVM: arm/arm64: Remove arch timer workqueue
+Date: Wed, 19 Dec 2018 18:03:41 +0000
+Message-ID: <20181219180349.242681-21-marc.zyngier@arm.com>
 References: <20181219180349.242681-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA004A378
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CED1749F94
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rfqZ1w0djtmb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Dec 2018 13:05:02 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9B094A398
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:02 -0500 (EST)
+ with ESMTP id BRa53Uuw6veY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Dec 2018 13:05:06 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79E5D4A37A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:05 -0500 (EST)
 In-Reply-To: <20181219180349.242681-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,97 +33,139 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-The kvm_exit tracepoint strangely always reported exits as being IRQs.
-This seems to be because either the __print_symbolic or the tracepoint
-macros use a variable named idx.
+The use of a work queue in the hrtimer expire function for the bg_timer
+is a leftover from the time when we would inject interrupts when the
+bg_timer expired.
 
-Take this chance to update the fields in the tracepoint to reflect the
-concepts in the arm64 architecture that we pass to the tracepoint and
-move the exception type table to the same location and header files as
-the exits code.
+Since we are no longer doing that, we can instead call
+kvm_vcpu_wake_up() directly from the hrtimer function and remove all
+workqueue functionality from the arch timer code.
 
-We also clear out the exception code to 0 for IRQ exits (which
-translates to UNKNOWN in text) to make it slighyly less confusing to
-parse the trace output.
-
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |  4 ----
- arch/arm64/include/asm/kvm_asm.h |  6 ++++++
- virt/kvm/arm/trace.h             | 18 +++++++++---------
- 3 files changed, 15 insertions(+), 13 deletions(-)
+ include/kvm/arm_arch_timer.h |  4 ----
+ virt/kvm/arm/arch_timer.c    | 34 +++++++---------------------------
+ 2 files changed, 7 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 6f602af5263c..9921bb7ab6d8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -320,10 +320,6 @@
- #define PAR_TO_HPFAR(par)		\
- 	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 6502feb9524b..33771352dcd6 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -21,7 +21,6 @@
  
--#define kvm_arm_exception_type	\
--	{0, "IRQ" }, 		\
--	{1, "TRAP" }
+ #include <linux/clocksource.h>
+ #include <linux/hrtimer.h>
+-#include <linux/workqueue.h>
+ 
+ struct arch_timer_context {
+ 	/* Registers: control register, timer value */
+@@ -52,9 +51,6 @@ struct arch_timer_cpu {
+ 	/* Background timer used when the guest is not running */
+ 	struct hrtimer			bg_timer;
+ 
+-	/* Work queued with the above timer expires */
+-	struct work_struct		expired;
 -
- #define ECN(x) { ESR_ELx_EC_##x, #x }
+ 	/* Physical timer emulation */
+ 	struct hrtimer			phys_timer;
  
- #define kvm_arm_exception_class \
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index aea01a09eb94..b2e12c99db7d 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -34,6 +34,12 @@
- /* The hyp-stub will return this for any kvm_call_hyp() call */
- #define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 17cecc96f735..da261f5e2a91 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -70,11 +70,9 @@ static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+ 		      HRTIMER_MODE_ABS);
+ }
  
-+#define kvm_arm_exception_type					\
-+	{ARM_EXCEPTION_IRQ,		"IRQ"		},	\
-+	{ARM_EXCEPTION_EL1_SERROR, 	"SERROR"	},	\
-+	{ARM_EXCEPTION_TRAP, 		"TRAP"		},	\
-+	{ARM_EXCEPTION_HYP_GONE,	"HYP_GONE"	}
-+
- #ifndef __ASSEMBLY__
+-static void soft_timer_cancel(struct hrtimer *hrt, struct work_struct *work)
++static void soft_timer_cancel(struct hrtimer *hrt)
+ {
+ 	hrtimer_cancel(hrt);
+-	if (work)
+-		cancel_work_sync(work);
+ }
  
- #include <linux/mm.h>
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-index 57b3edebbb40..f21f04f8036d 100644
---- a/virt/kvm/arm/trace.h
-+++ b/virt/kvm/arm/trace.h
-@@ -26,25 +26,25 @@ TRACE_EVENT(kvm_entry,
- );
+ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+@@ -102,23 +100,6 @@ static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
  
- TRACE_EVENT(kvm_exit,
--	TP_PROTO(int idx, unsigned int exit_reason, unsigned long vcpu_pc),
--	TP_ARGS(idx, exit_reason, vcpu_pc),
-+	TP_PROTO(int ret, unsigned int esr_ec, unsigned long vcpu_pc),
-+	TP_ARGS(ret, esr_ec, vcpu_pc),
+-/*
+- * Work function for handling the backup timer that we schedule when a vcpu is
+- * no longer running, but had a timer programmed to fire in the future.
+- */
+-static void kvm_timer_inject_irq_work(struct work_struct *work)
+-{
+-	struct kvm_vcpu *vcpu;
+-
+-	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+-
+-	/*
+-	 * If the vcpu is blocked we want to wake it up so that it will see
+-	 * the timer has expired when entering the guest.
+-	 */
+-	kvm_vcpu_wake_up(vcpu);
+-}
+-
+ static u64 kvm_timer_compute_delta(struct arch_timer_context *timer_ctx)
+ {
+ 	u64 cval, now;
+@@ -188,7 +169,7 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
+ 		return HRTIMER_RESTART;
+ 	}
  
- 	TP_STRUCT__entry(
--		__field(	int,		idx		)
--		__field(	unsigned int,	exit_reason	)
-+		__field(	int,		ret		)
-+		__field(	unsigned int,	esr_ec		)
- 		__field(	unsigned long,	vcpu_pc		)
- 	),
+-	schedule_work(&timer->expired);
++	kvm_vcpu_wake_up(vcpu);
+ 	return HRTIMER_NORESTART;
+ }
  
- 	TP_fast_assign(
--		__entry->idx			= idx;
--		__entry->exit_reason		= exit_reason;
-+		__entry->ret			= ARM_EXCEPTION_CODE(ret);
-+		__entry->esr_ec = (ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_TRAP) ? esr_ec : 0;
- 		__entry->vcpu_pc		= vcpu_pc;
- 	),
+@@ -300,7 +281,7 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+ 	 * then we also don't need a soft timer.
+ 	 */
+ 	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
+-		soft_timer_cancel(&timer->phys_timer, NULL);
++		soft_timer_cancel(&timer->phys_timer);
+ 		return;
+ 	}
  
- 	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
--		  __print_symbolic(__entry->idx, kvm_arm_exception_type),
--		  __entry->exit_reason,
--		  __print_symbolic(__entry->exit_reason, kvm_arm_exception_class),
-+		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
-+		  __entry->esr_ec,
-+		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
- 		  __entry->vcpu_pc)
- );
+@@ -426,7 +407,7 @@ void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+ 
+ 	vtimer_restore_state(vcpu);
+ 
+-	soft_timer_cancel(&timer->bg_timer, &timer->expired);
++	soft_timer_cancel(&timer->bg_timer);
+ }
+ 
+ static void set_cntvoff(u64 cntvoff)
+@@ -544,7 +525,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 	 * In any case, we re-schedule the hrtimer for the physical timer when
+ 	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
+ 	 */
+-	soft_timer_cancel(&timer->phys_timer, NULL);
++	soft_timer_cancel(&timer->phys_timer);
+ 
+ 	/*
+ 	 * The kernel may decide to run userspace after calling vcpu_put, so
+@@ -637,7 +618,6 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+ 	vcpu_ptimer(vcpu)->cntvoff = 0;
+ 
+-	INIT_WORK(&timer->expired, kvm_timer_inject_irq_work);
+ 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+ 	timer->bg_timer.function = kvm_bg_timer_expire;
+ 
+@@ -794,8 +774,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 
+-	soft_timer_cancel(&timer->bg_timer, &timer->expired);
+-	soft_timer_cancel(&timer->phys_timer, NULL);
++	soft_timer_cancel(&timer->bg_timer);
++	soft_timer_cancel(&timer->phys_timer);
+ 	kvm_vgic_unmap_phys_irq(vcpu, vtimer->irq.irq);
+ }
  
 -- 
 2.19.2
