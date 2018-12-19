@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 05/28] KVM: arm/arm64: vgic-v2: Set active_source to 0 when
- restoring state
-Date: Wed, 19 Dec 2018 18:03:26 +0000
-Message-ID: <20181219180349.242681-6-marc.zyngier@arm.com>
+Subject: [PATCH 06/28] KVM: arm/arm64: Share common code in user_mem_abort()
+Date: Wed, 19 Dec 2018 18:03:27 +0000
+Message-ID: <20181219180349.242681-7-marc.zyngier@arm.com>
 References: <20181219180349.242681-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F3AD4A376
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:04:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 408414A398
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:04:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lTLxXB4M5FyK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Dec 2018 13:04:24 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17D274A38C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:04:24 -0500 (EST)
+ with ESMTP id 9DTilF3YU6Hz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Dec 2018 13:04:26 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B96FC4A376
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:04:26 -0500 (EST)
 In-Reply-To: <20181219180349.242681-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,54 +31,125 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Punit Agrawal <punit.agrawal@arm.com>, kvm@vger.kernel.org, "Gustavo A . R . Silva" <gustavo@embeddedor.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Lukas Braun <koomi@moshbit.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Punit Agrawal <punit.agrawal@arm.com>
 
-When restoring the active state from userspace, we don't know which CPU
-was the source for the active state, and this is not architecturally
-exposed in any of the register state.
+The code for operations such as marking the pfn as dirty, and
+dcache/icache maintenance during stage 2 fault handling is duplicated
+between normal pages and PMD hugepages.
 
-Set the active_source to 0 in this case.  In the future, we can expand
-on this and exposse the information as additional information to
-userspace for GICv2 if anyone cares.
+Instead of creating another copy of the operations when we introduce
+PUD hugepages, let's share them across the different pagesizes.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Punit Agrawal <punit.agrawal@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ virt/kvm/arm/mmu.c | 49 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index f56ff1cf52ec..2b450d49a046 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -338,11 +338,26 @@ static void vgic_mmio_change_active(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 		vgic_hw_irq_change_active(vcpu, irq, active, !requester_vcpu);
- 	} else {
- 		u32 model = vcpu->kvm->arch.vgic.vgic_model;
-+		u8 active_source;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 5eca48bdb1a6..59595207c5e1 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1475,7 +1475,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  unsigned long fault_status)
+ {
+ 	int ret;
+-	bool write_fault, exec_fault, writable, hugetlb = false, force_pte = false;
++	bool write_fault, exec_fault, writable, force_pte = false;
+ 	unsigned long mmu_seq;
+ 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -1484,7 +1484,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	kvm_pfn_t pfn;
+ 	pgprot_t mem_type = PAGE_S2;
+ 	bool logging_active = memslot_is_logging(memslot);
+-	unsigned long flags = 0;
++	unsigned long vma_pagesize, flags = 0;
  
- 		irq->active = active;
-+
-+		/*
-+		 * The GICv2 architecture indicates that the source CPUID for
-+		 * an SGI should be provided during an EOI which implies that
-+		 * the active state is stored somewhere, but at the same time
-+		 * this state is not architecturally exposed anywhere and we
-+		 * have no way of knowing the right source.
-+		 *
-+		 * This may lead to a VCPU not being able to receive
-+		 * additional instances of a particular SGI after migration
-+		 * for a GICv2 VM on some GIC implementations.  Oh well.
-+		 */
-+		active_source = (requester_vcpu) ? requester_vcpu->vcpu_id : 0;
-+
- 		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
- 		    active && vgic_irq_is_sgi(irq->intid))
--			irq->active_source = requester_vcpu->vcpu_id;
-+			irq->active_source = active_source;
+ 	write_fault = kvm_is_write_fault(vcpu);
+ 	exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
+@@ -1504,10 +1504,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
  	}
  
- 	if (irq->active)
+-	if (vma_kernel_pagesize(vma) == PMD_SIZE && !logging_active) {
+-		hugetlb = true;
++	vma_pagesize = vma_kernel_pagesize(vma);
++	if (vma_pagesize == PMD_SIZE && !logging_active) {
+ 		gfn = (fault_ipa & PMD_MASK) >> PAGE_SHIFT;
+ 	} else {
++		/*
++		 * Fallback to PTE if it's not one of the Stage 2
++		 * supported hugepage sizes
++		 */
++		vma_pagesize = PAGE_SIZE;
++
+ 		/*
+ 		 * Pages belonging to memslots that don't have the same
+ 		 * alignment for userspace and IPA cannot be mapped using
+@@ -1573,23 +1579,33 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (mmu_notifier_retry(kvm, mmu_seq))
+ 		goto out_unlock;
+ 
+-	if (!hugetlb && !force_pte)
+-		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
++	if (vma_pagesize == PAGE_SIZE && !force_pte) {
++		/*
++		 * Only PMD_SIZE transparent hugepages(THP) are
++		 * currently supported. This code will need to be
++		 * updated to support other THP sizes.
++		 */
++		if (transparent_hugepage_adjust(&pfn, &fault_ipa))
++			vma_pagesize = PMD_SIZE;
++	}
++
++	if (writable)
++		kvm_set_pfn_dirty(pfn);
+ 
+-	if (hugetlb) {
++	if (fault_status != FSC_PERM)
++		clean_dcache_guest_page(pfn, vma_pagesize);
++
++	if (exec_fault)
++		invalidate_icache_guest_page(pfn, vma_pagesize);
++
++	if (vma_pagesize == PMD_SIZE) {
+ 		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+ 		new_pmd = pmd_mkhuge(new_pmd);
+-		if (writable) {
++		if (writable)
+ 			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
+-			kvm_set_pfn_dirty(pfn);
+-		}
+-
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PMD_SIZE);
+ 
+ 		if (exec_fault) {
+ 			new_pmd = kvm_s2pmd_mkexec(new_pmd);
+-			invalidate_icache_guest_page(pfn, PMD_SIZE);
+ 		} else if (fault_status == FSC_PERM) {
+ 			/* Preserve execute if XN was already cleared */
+ 			if (stage2_is_exec(kvm, fault_ipa))
+@@ -1602,16 +1618,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 		if (writable) {
+ 			new_pte = kvm_s2pte_mkwrite(new_pte);
+-			kvm_set_pfn_dirty(pfn);
+ 			mark_page_dirty(kvm, gfn);
+ 		}
+ 
+-		if (fault_status != FSC_PERM)
+-			clean_dcache_guest_page(pfn, PAGE_SIZE);
+-
+ 		if (exec_fault) {
+ 			new_pte = kvm_s2pte_mkexec(new_pte);
+-			invalidate_icache_guest_page(pfn, PAGE_SIZE);
+ 		} else if (fault_status == FSC_PERM) {
+ 			/* Preserve execute if XN was already cleared */
+ 			if (stage2_is_exec(kvm, fault_ipa))
 -- 
 2.19.2
