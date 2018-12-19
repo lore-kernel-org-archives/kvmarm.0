@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 22/28] KVM: arm64: Make vcpu const in vcpu_read_sys_reg
-Date: Wed, 19 Dec 2018 18:03:43 +0000
-Message-ID: <20181219180349.242681-23-marc.zyngier@arm.com>
+Subject: [PATCH 23/28] arm64: KVM: Add trapped system register access
+ tracepoint
+Date: Wed, 19 Dec 2018 18:03:44 +0000
+Message-ID: <20181219180349.242681-24-marc.zyngier@arm.com>
 References: <20181219180349.242681-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9199D4A373
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CB0F4A373
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mrBUayWwpjTI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Dec 2018 13:05:12 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07D1F4A3B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:11 -0500 (EST)
+ with ESMTP id fr+eT7nID8El for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Dec 2018 13:05:14 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED0124A378
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:13 -0500 (EST)
 In-Reply-To: <20181219180349.242681-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,45 +32,110 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: Punit Agrawal <punit.agrawal@arm.com>, kvm@vger.kernel.org, "Gustavo A . R . Silva" <gustavo@embeddedor.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Lukas Braun <koomi@moshbit.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+We're pretty blind when it comes to system register tracing,
+and rely on the ESR value displayed by kvm_handle_sys, which
+isn't much.
 
-vcpu_read_sys_reg should not be modifying the VCPU structure.
-Eventually, to handle EL2 sysregs for nested virtualization, we will
-call vcpu_read_sys_reg from places that have a const vcpu pointer, which
-will complain about the lack of the const modifier on the read path.
+Instead, let's add an actual name to the sysreg entries, so that
+we can finally print it as we're about to perform the access
+itself.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+The new tracepoint is conveniently called kvm_sys_access.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/sys_regs.c         | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c |  2 ++
+ arch/arm64/kvm/sys_regs.h |  4 ++++
+ arch/arm64/kvm/trace.h    | 35 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7a5035f9c5c3..c22e50ba3473 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -319,7 +319,7 @@ struct kvm_vcpu_arch {
-  */
- #define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
- 
--u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg);
-+u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
- void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
- 
- /*
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ecbf67ccabf5..965c6f1706d6 100644
+index 965c6f1706d6..a1f57fcb1bdb 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -76,7 +76,7 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
- 	return false;
- }
- 
--u64 vcpu_read_sys_reg(struct kvm_vcpu *vcpu, int reg)
-+u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+@@ -1850,6 +1850,8 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *params,
+ 			   const struct sys_reg_desc *r)
  {
- 	if (!vcpu->arch.sysregs_loaded_on_cpu)
- 		goto immediate_read;
++	trace_kvm_sys_access(*vcpu_pc(vcpu), params, r);
++
+ 	/*
+ 	 * Not having an accessor means that we have configured a trap
+ 	 * that we don't know how to handle. This certainly qualifies
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index cd710f8b63e0..3b1bc7f01d0b 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -35,6 +35,9 @@ struct sys_reg_params {
+ };
+ 
+ struct sys_reg_desc {
++	/* Sysreg string for debug */
++	const char *name;
++
+ 	/* MRS/MSR instruction which accesses it. */
+ 	u8	Op0;
+ 	u8	Op1;
+@@ -130,6 +133,7 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
+ #define Op2(_x) 	.Op2 = _x
+ 
+ #define SYS_DESC(reg)					\
++	.name = #reg,					\
+ 	Op0(sys_reg_Op0(reg)), Op1(sys_reg_Op1(reg)),	\
+ 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
+ 	Op2(sys_reg_Op2(reg))
+diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
+index 3b82fb1ddd09..eab91ad0effb 100644
+--- a/arch/arm64/kvm/trace.h
++++ b/arch/arm64/kvm/trace.h
+@@ -3,6 +3,7 @@
+ #define _TRACE_ARM64_KVM_H
+ 
+ #include <linux/tracepoint.h>
++#include "sys_regs.h"
+ 
+ #undef TRACE_SYSTEM
+ #define TRACE_SYSTEM kvm
+@@ -152,6 +153,40 @@ TRACE_EVENT(kvm_handle_sys_reg,
+ 	TP_printk("HSR 0x%08lx", __entry->hsr)
+ );
+ 
++TRACE_EVENT(kvm_sys_access,
++	TP_PROTO(unsigned long vcpu_pc, struct sys_reg_params *params, const struct sys_reg_desc *reg),
++	TP_ARGS(vcpu_pc, params, reg),
++
++	TP_STRUCT__entry(
++		__field(unsigned long,			vcpu_pc)
++		__field(bool,				is_write)
++		__field(const char *,			name)
++		__field(u8,				Op0)
++		__field(u8,				Op1)
++		__field(u8,				CRn)
++		__field(u8,				CRm)
++		__field(u8,				Op2)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_pc = vcpu_pc;
++		__entry->is_write = params->is_write;
++		__entry->name = reg->name;
++		__entry->Op0 = reg->Op0;
++		__entry->Op0 = reg->Op0;
++		__entry->Op1 = reg->Op1;
++		__entry->CRn = reg->CRn;
++		__entry->CRm = reg->CRm;
++		__entry->Op2 = reg->Op2;
++	),
++
++	TP_printk("PC: %lx %s (%d,%d,%d,%d,%d) %s",
++		  __entry->vcpu_pc, __entry->name ?: "UNKN",
++		  __entry->Op0, __entry->Op1, __entry->CRn,
++		  __entry->CRm, __entry->Op2,
++		  __entry->is_write ? "write" : "read")
++);
++
+ TRACE_EVENT(kvm_set_guest_debug,
+ 	TP_PROTO(struct kvm_vcpu *vcpu, __u32 guest_debug),
+ 	TP_ARGS(vcpu, guest_debug),
 -- 
 2.19.2
