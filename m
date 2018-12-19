@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/28] KVM: arm/arm64: vgic: Consider priority and active
- state for pending irq
-Date: Wed, 19 Dec 2018 18:03:39 +0000
-Message-ID: <20181219180349.242681-19-marc.zyngier@arm.com>
+Subject: [PATCH 19/28] KVM: arm/arm64: Fixup the kvm_exit tracepoint
+Date: Wed, 19 Dec 2018 18:03:40 +0000
+Message-ID: <20181219180349.242681-20-marc.zyngier@arm.com>
 References: <20181219180349.242681-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 602964A1DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA004A378
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q92YDPeMbUds for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Dec 2018 13:05:00 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E08694A38B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:04:59 -0500 (EST)
+ with ESMTP id rfqZ1w0djtmb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Dec 2018 13:05:02 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9B094A398
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Dec 2018 13:05:02 -0500 (EST)
 In-Reply-To: <20181219180349.242681-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,46 +33,97 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-When checking if there are any pending IRQs for the VM, consider the
-active state and priority of the IRQs as well.
+The kvm_exit tracepoint strangely always reported exits as being IRQs.
+This seems to be because either the __print_symbolic or the tracepoint
+macros use a variable named idx.
 
-Otherwise we could be continuously scheduling a guest hypervisor without
-it seeing an IRQ.
+Take this chance to update the fields in the tracepoint to reflect the
+concepts in the arm64 architecture that we pass to the tracepoint and
+move the exception type table to the same location and header files as
+the exits code.
+
+We also clear out the exception code to 0 for IRQ exits (which
+translates to UNKNOWN in text) to make it slighyly less confusing to
+parse the trace output.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h |  4 ----
+ arch/arm64/include/asm/kvm_asm.h |  6 ++++++
+ virt/kvm/arm/trace.h             | 18 +++++++++---------
+ 3 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index f884a54b2601..a6b135491b6c 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -908,6 +908,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 	struct vgic_irq *irq;
- 	bool pending = false;
- 	unsigned long flags;
-+	struct vgic_vmcr vmcr;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 6f602af5263c..9921bb7ab6d8 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -320,10 +320,6 @@
+ #define PAR_TO_HPFAR(par)		\
+ 	(((par) & GENMASK_ULL(PHYS_MASK_SHIFT - 1, 12)) >> 8)
  
- 	if (!vcpu->kvm->arch.vgic.enabled)
- 		return false;
-@@ -915,11 +916,15 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
- 		return true;
+-#define kvm_arm_exception_type	\
+-	{0, "IRQ" }, 		\
+-	{1, "TRAP" }
+-
+ #define ECN(x) { ESR_ELx_EC_##x, #x }
  
-+	vgic_get_vmcr(vcpu, &vmcr);
+ #define kvm_arm_exception_class \
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index aea01a09eb94..b2e12c99db7d 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -34,6 +34,12 @@
+ /* The hyp-stub will return this for any kvm_call_hyp() call */
+ #define ARM_EXCEPTION_HYP_GONE	  HVC_STUB_ERR
+ 
++#define kvm_arm_exception_type					\
++	{ARM_EXCEPTION_IRQ,		"IRQ"		},	\
++	{ARM_EXCEPTION_EL1_SERROR, 	"SERROR"	},	\
++	{ARM_EXCEPTION_TRAP, 		"TRAP"		},	\
++	{ARM_EXCEPTION_HYP_GONE,	"HYP_GONE"	}
 +
- 	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+ #ifndef __ASSEMBLY__
  
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		spin_lock(&irq->irq_lock);
--		pending = irq_is_pending(irq) && irq->enabled;
-+		pending = irq_is_pending(irq) && irq->enabled &&
-+			  !irq->active &&
-+			  irq->priority < vmcr.pmr;
- 		spin_unlock(&irq->irq_lock);
+ #include <linux/mm.h>
+diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+index 57b3edebbb40..f21f04f8036d 100644
+--- a/virt/kvm/arm/trace.h
++++ b/virt/kvm/arm/trace.h
+@@ -26,25 +26,25 @@ TRACE_EVENT(kvm_entry,
+ );
  
- 		if (pending)
+ TRACE_EVENT(kvm_exit,
+-	TP_PROTO(int idx, unsigned int exit_reason, unsigned long vcpu_pc),
+-	TP_ARGS(idx, exit_reason, vcpu_pc),
++	TP_PROTO(int ret, unsigned int esr_ec, unsigned long vcpu_pc),
++	TP_ARGS(ret, esr_ec, vcpu_pc),
+ 
+ 	TP_STRUCT__entry(
+-		__field(	int,		idx		)
+-		__field(	unsigned int,	exit_reason	)
++		__field(	int,		ret		)
++		__field(	unsigned int,	esr_ec		)
+ 		__field(	unsigned long,	vcpu_pc		)
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->idx			= idx;
+-		__entry->exit_reason		= exit_reason;
++		__entry->ret			= ARM_EXCEPTION_CODE(ret);
++		__entry->esr_ec = (ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_TRAP) ? esr_ec : 0;
+ 		__entry->vcpu_pc		= vcpu_pc;
+ 	),
+ 
+ 	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
+-		  __print_symbolic(__entry->idx, kvm_arm_exception_type),
+-		  __entry->exit_reason,
+-		  __print_symbolic(__entry->exit_reason, kvm_arm_exception_class),
++		  __print_symbolic(__entry->ret, kvm_arm_exception_type),
++		  __entry->esr_ec,
++		  __print_symbolic(__entry->esr_ec, kvm_arm_exception_class),
+ 		  __entry->vcpu_pc)
+ );
+ 
 -- 
 2.19.2
