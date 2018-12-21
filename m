@@ -1,154 +1,105 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
-Date: Thu, 20 Dec 2018 13:17:34 -0500
-Message-ID: <20181220130443-mutt-send-email-mst@kernel.org>
-References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
- <20181212103545.GV16835@8bytes.org>
- <9110873f-d344-b6b9-c722-9accfc329db2@arm.com>
- <20181219180417-mutt-send-email-mst@kernel.org>
- <e1c7aee9-083d-103a-87a9-b59d5e63d7aa@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Resend PATCH V5 0/10] x86/KVM/Hyper-v: Add HV ept tlb range
+ flush hypercall support in KVM
+Date: Fri, 21 Dec 2018 10:31:28 +0100
+Message-ID: <36f1e16f-2390-fa61-e5e0-07320abea9ba@redhat.com>
+References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E56864A383
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Dec 2018 13:17:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gIzhGSxYqqR9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Dec 2018 13:17:42 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E75114A2F8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Dec 2018 13:17:41 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <e1c7aee9-083d-103a-87a9-b59d5e63d7aa@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>, Will Deacon <Will.Deacon@arm.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: lantianyu1986@gmail.com
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com, christoffer.dall@arm.com, devel@linuxdriverproject.org, haiyangz@microsoft.com, hpa@zytor.com, jhogan@kernel.org, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, kys@microsoft.com, linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, linuxppc-dev@lists.ozlabs.org, marc.zyngier@arm.com, mingo@redhat.com, mpe@ellerman.id.au, paul.burton@mips.com, paulus@ozlabs.org, ralf@linux-mips.org, rkrcmar@redhat.com, sthemmin@microsoft.com, tglx@linutronix.de, will.deacon@arm.com, x86@kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Dec 20, 2018 at 05:59:46PM +0000, Jean-Philippe Brucker wrote:
-> On 19/12/2018 23:09, Michael S. Tsirkin wrote:
-> > On Thu, Dec 13, 2018 at 12:50:29PM +0000, Jean-Philippe Brucker wrote:
-> >>>> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9.1
-> >>>> =A0=A0=A0=A0 git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9
-> >>>
-> >>> Unfortunatly gitweb seems to be broken on linux-arm.org. What is miss=
-ing
-> >>> in this patch-set to make this work on x86?
-> >>
-> >> You should be able to access it here:
-> >> http://www.linux-arm.org/git?p=3Dlinux-jpb.git;a=3Dshortlog;h=3Drefs/h=
-eads/virtio-iommu/devel
-> >>
-> >> That branch contains missing bits for x86 support:
-> >>
-> >> * ACPI support. We have the code but it's waiting for an IORT spec
-> >> update, to reserve the IORT node ID. I expect it to take a while, given
-> >> that I'm alone requesting a change for something that's not upstream or
-> >> in hardware.
-> > =
+On 06/12/18 14:21, lantianyu1986@gmail.com wrote:
+> From: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> 
+> For nested memory virtualization, Hyper-v doesn't set write-protect
+> L1 hypervisor EPT page directory and page table node to track changes 
+> while it relies on guest to tell it changes via HvFlushGuestAddressLlist
+> hypercall. HvFlushGuestAddressLlist hypercall provides a way to flush
+> EPT page table with ranges which are specified by L1 hypervisor.
+> 
+> If L1 hypervisor uses INVEPT or HvFlushGuestAddressSpace hypercall to
+> flush EPT tlb, Hyper-V will invalidate associated EPT shadow page table
+> and sync L1's EPT table when next EPT page fault is triggered.
+> HvFlushGuestAddressLlist hypercall helps to avoid such redundant EPT
+> page fault and synchronization of shadow page table.
+> 
+> This patchset is based on the Patch "KVM/VMX: Check ept_pointer before
+> flushing ept tlb"(https://marc.info/?l=kvm&m=154408169705686&w=2).
+> 
+> Change since v4:
+>        1) Split flush address and flush list patches. This patchset only contains
+>        flush address patches. Will post flush list patches later.
+>        2) Expose function hyperv_fill_flush_guest_mapping_list()
+>        out of hyperv file
+>        3) Adjust parameter of hyperv_flush_guest_mapping_range()
+>        4) Reorder patchset and move Hyper-V and VMX changes ahead.
+> 
+> Change since v3:
+>         1) Remove code of updating "tlbs_dirty" in kvm_flush_remote_tlbs_with_range()
+>         2) Remove directly tlb flush in the kvm_handle_hva_range()
+>         3) Move tlb flush in kvm_set_pte_rmapp() to kvm_mmu_notifier_change_pte()
+>         4) Combine Vitaly's "don't pass EPT configuration info to
+> vmx_hv_remote_flush_tlb()" fix
+> 
+> Change since v2:
+>        1) Fix comment in the kvm_flush_remote_tlbs_with_range()
+>        2) Move HV_MAX_FLUSH_PAGES and HV_MAX_FLUSH_REP_COUNT to
+>         hyperv-tlfs.h.
+>        3) Calculate HV_MAX_FLUSH_REP_COUNT in the macro definition
+>        4) Use HV_MAX_FLUSH_REP_COUNT to define length of gpa_list in
+>         struct hv_guest_mapping_flush_list.
+> 
+> Change since v1:
+>        1) Convert "end_gfn" of struct kvm_tlb_range to "pages" in order
+>           to avoid confusion as to whether "end_gfn" is inclusive or exlusive.
+>        2) Add hyperv tlb range struct and replace kvm tlb range struct
+>           with new struct in order to avoid using kvm struct in the hyperv
+>           code directly.
+> 
+> 
+> 
+> Lan Tianyu (10):
+>   KVM: Add tlb_remote_flush_with_range callback in kvm_x86_ops
+>   x86/hyper-v: Add HvFlushGuestAddressList hypercall support
+>   x86/Hyper-v: Add trace in the
+>     hyperv_nested_flush_guest_mapping_range()
+>   KVM/VMX: Add hv tlb range flush support
+>   KVM/MMU: Add tlb flush with range helper function
+>   KVM: Replace old tlb flush function with new one to flush a specified
+>     range.
+>   KVM: Make kvm_set_spte_hva() return int
+>   KVM/MMU: Move tlb flush in kvm_set_pte_rmapp() to
+>     kvm_mmu_notifier_change_pte()
+>   KVM/MMU: Flush tlb directly in the kvm_set_pte_rmapp()
+>   KVM/MMU: Flush tlb directly in the kvm_zap_gfn_range()
+> 
+>  arch/arm/include/asm/kvm_host.h     |  2 +-
+>  arch/arm64/include/asm/kvm_host.h   |  2 +-
+>  arch/mips/include/asm/kvm_host.h    |  2 +-
+>  arch/mips/kvm/mmu.c                 |  3 +-
+>  arch/powerpc/include/asm/kvm_host.h |  2 +-
+>  arch/powerpc/kvm/book3s.c           |  3 +-
+>  arch/powerpc/kvm/e500_mmu_host.c    |  3 +-
+>  arch/x86/hyperv/nested.c            | 80 +++++++++++++++++++++++++++++++
+>  arch/x86/include/asm/hyperv-tlfs.h  | 32 +++++++++++++
+>  arch/x86/include/asm/kvm_host.h     |  9 +++-
+>  arch/x86/include/asm/mshyperv.h     | 15 ++++++
+>  arch/x86/include/asm/trace/hyperv.h | 14 ++++++
+>  arch/x86/kvm/mmu.c                  | 96 +++++++++++++++++++++++++++++--------
+>  arch/x86/kvm/paging_tmpl.h          |  3 +-
+>  arch/x86/kvm/vmx.c                  | 63 +++++++++++++++++-------
+>  virt/kvm/arm/mmu.c                  |  6 ++-
+>  virt/kvm/kvm_main.c                 |  5 +-
+>  17 files changed, 292 insertions(+), 48 deletions(-)
+> 
 
-> > Frankly I think you should take a hard look at just getting the data
-> > needed from the PCI device itself.  You don't need to depend on virtio,
-> > it can be a small driver that gets you that data from the device config
-> > space and then just goes away.
-> > =
+Queued, thanks.
 
-> > If you want help with writing such a small driver let me know.
-> > =
-
-> > If there's an advantage to virtio-iommu then that would be its
-> > portability, and it all goes out of the window because
-> > of dependencies on ACPI and DT and OF and the rest of the zoo.
-> =
-
-> But the portable solutions are ACPI and DT.
-> =
-
-> Describing the DMA dependency through a device would require the guest
-> to probe the device before all others. How do we communicate this?
-> * pass a kernel parameter saying something like "probe_first=3D00:01.0"
-> * make sure that the PCI root complex is probed before any other
-> platform device (since the IOMMU can manage DMA of platform devices).
-
-My idea was to just find and probe the specific device.
-
-> * change DT, ACPI and PCI core code to handle this probe_first kernel
-> parameter.
-> =
-
-> Better go with something standard, that any OS and hypervisor knows how
-> to use, and that other IOMMU devices already use.
-> =
-
-> >> * DMA ops for x86 (see "HACK" commit). I'd like to use dma-iommu but I=
-'m
-> >> not sure how to implement the glue that sets dma_ops properly.
-> >>
-> >> Thanks,
-> >> Jean
-> > =
-
-> > OK so IIUC you are looking into Christoph's suggestions to fix that up?
-> =
-
-> Eventually yes. I'll give it a try next year, once the dma-iommu changes
-> are on the list. It's not a priority for me, given that x86 already has
-> a pvIOMMU with VT-d, and that Arm still needs one.
-
-
-Well that's a kind of a weak usecase, isn't it?
-Can we just build VTD on ARM?
-
-
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index d9a25715650e..009fa98e9363 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -174,7 +174,7 @@ config DMAR_TABLE
- =
-
- config INTEL_IOMMU
- 	bool "Support for Intel IOMMU using DMA Remapping Devices"
--	depends on PCI_MSI && ACPI && (X86 || IA64_GENERIC)
-+	depends on PCI_MSI && ACPI && (X86 || IA64_GENERIC || ARM)
- 	select IOMMU_API
- 	select IOMMU_IOVA
- 	select NEED_DMA_MAP_STATE
-
-
-didn't try this one ...
-
-
-
-> It shouldn't block
-> this series.
-> =
-
-> > There's still a bit of time left before the merge window,
-> > maybe you can make above changes.
-> =
-
-> I'll wait to see if Joerg has other concerns about the design or the
-> code, and resend in January. I think that IOMMU driver changes should go
-> through his tree.
-> =
-
-> Thanks,
-> Jean
-
-Sorry which changes do you mean?
-
--- =
-
-MST
+Paolo
