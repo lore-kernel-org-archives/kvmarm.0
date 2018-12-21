@@ -1,105 +1,51 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Resend PATCH V5 0/10] x86/KVM/Hyper-v: Add HV ept tlb range
- flush hypercall support in KVM
-Date: Fri, 21 Dec 2018 10:31:28 +0100
-Message-ID: <36f1e16f-2390-fa61-e5e0-07320abea9ba@redhat.com>
+Subject: Re: [Resend PATCH V5 2/10] x86/hyper-v: Add HvFlushGuestAddressList
+ hypercall support
+Date: Fri, 21 Dec 2018 10:32:21 +0100
+Message-ID: <3f936a6e-b727-c152-05fb-4d77f33e1745@redhat.com>
 References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
+ <20181206132113.2691-3-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8B94A375
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 04:32:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id giFdJ4Q4Fune for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Dec 2018 04:32:24 -0500 (EST)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 300C34A2F1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 04:32:24 -0500 (EST)
+Received: by mail-wm1-f66.google.com with SMTP id a62so4627888wmh.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 01:32:24 -0800 (PST)
+In-Reply-To: <20181206132113.2691-3-Tianyu.Lan@microsoft.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: lantianyu1986@gmail.com
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com, christoffer.dall@arm.com, devel@linuxdriverproject.org, haiyangz@microsoft.com, hpa@zytor.com, jhogan@kernel.org, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, kys@microsoft.com, linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, linuxppc-dev@lists.ozlabs.org, marc.zyngier@arm.com, mingo@redhat.com, mpe@ellerman.id.au, paul.burton@mips.com, paulus@ozlabs.org, ralf@linux-mips.org, rkrcmar@redhat.com, sthemmin@microsoft.com, tglx@linutronix.de, will.deacon@arm.com, x86@kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
+Cc: linux-mips@linux-mips.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, ralf@linux-mips.org, paul.burton@mips.com, devel@linuxdriverproject.org, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 06/12/18 14:21, lantianyu1986@gmail.com wrote:
-> From: Lan Tianyu <Tianyu.Lan@microsoft.com>
-> 
-> For nested memory virtualization, Hyper-v doesn't set write-protect
-> L1 hypervisor EPT page directory and page table node to track changes 
-> while it relies on guest to tell it changes via HvFlushGuestAddressLlist
-> hypercall. HvFlushGuestAddressLlist hypercall provides a way to flush
-> EPT page table with ranges which are specified by L1 hypervisor.
-> 
-> If L1 hypervisor uses INVEPT or HvFlushGuestAddressSpace hypercall to
-> flush EPT tlb, Hyper-V will invalidate associated EPT shadow page table
-> and sync L1's EPT table when next EPT page fault is triggered.
-> HvFlushGuestAddressLlist hypercall helps to avoid such redundant EPT
-> page fault and synchronization of shadow page table.
-> 
-> This patchset is based on the Patch "KVM/VMX: Check ept_pointer before
-> flushing ept tlb"(https://marc.info/?l=kvm&m=154408169705686&w=2).
-> 
-> Change since v4:
->        1) Split flush address and flush list patches. This patchset only contains
->        flush address patches. Will post flush list patches later.
->        2) Expose function hyperv_fill_flush_guest_mapping_list()
->        out of hyperv file
->        3) Adjust parameter of hyperv_flush_guest_mapping_range()
->        4) Reorder patchset and move Hyper-V and VMX changes ahead.
-> 
-> Change since v3:
->         1) Remove code of updating "tlbs_dirty" in kvm_flush_remote_tlbs_with_range()
->         2) Remove directly tlb flush in the kvm_handle_hva_range()
->         3) Move tlb flush in kvm_set_pte_rmapp() to kvm_mmu_notifier_change_pte()
->         4) Combine Vitaly's "don't pass EPT configuration info to
-> vmx_hv_remote_flush_tlb()" fix
-> 
-> Change since v2:
->        1) Fix comment in the kvm_flush_remote_tlbs_with_range()
->        2) Move HV_MAX_FLUSH_PAGES and HV_MAX_FLUSH_REP_COUNT to
->         hyperv-tlfs.h.
->        3) Calculate HV_MAX_FLUSH_REP_COUNT in the macro definition
->        4) Use HV_MAX_FLUSH_REP_COUNT to define length of gpa_list in
->         struct hv_guest_mapping_flush_list.
-> 
-> Change since v1:
->        1) Convert "end_gfn" of struct kvm_tlb_range to "pages" in order
->           to avoid confusion as to whether "end_gfn" is inclusive or exlusive.
->        2) Add hyperv tlb range struct and replace kvm tlb range struct
->           with new struct in order to avoid using kvm struct in the hyperv
->           code directly.
-> 
-> 
-> 
-> Lan Tianyu (10):
->   KVM: Add tlb_remote_flush_with_range callback in kvm_x86_ops
->   x86/hyper-v: Add HvFlushGuestAddressList hypercall support
->   x86/Hyper-v: Add trace in the
->     hyperv_nested_flush_guest_mapping_range()
->   KVM/VMX: Add hv tlb range flush support
->   KVM/MMU: Add tlb flush with range helper function
->   KVM: Replace old tlb flush function with new one to flush a specified
->     range.
->   KVM: Make kvm_set_spte_hva() return int
->   KVM/MMU: Move tlb flush in kvm_set_pte_rmapp() to
->     kvm_mmu_notifier_change_pte()
->   KVM/MMU: Flush tlb directly in the kvm_set_pte_rmapp()
->   KVM/MMU: Flush tlb directly in the kvm_zap_gfn_range()
-> 
->  arch/arm/include/asm/kvm_host.h     |  2 +-
->  arch/arm64/include/asm/kvm_host.h   |  2 +-
->  arch/mips/include/asm/kvm_host.h    |  2 +-
->  arch/mips/kvm/mmu.c                 |  3 +-
->  arch/powerpc/include/asm/kvm_host.h |  2 +-
->  arch/powerpc/kvm/book3s.c           |  3 +-
->  arch/powerpc/kvm/e500_mmu_host.c    |  3 +-
->  arch/x86/hyperv/nested.c            | 80 +++++++++++++++++++++++++++++++
->  arch/x86/include/asm/hyperv-tlfs.h  | 32 +++++++++++++
->  arch/x86/include/asm/kvm_host.h     |  9 +++-
->  arch/x86/include/asm/mshyperv.h     | 15 ++++++
->  arch/x86/include/asm/trace/hyperv.h | 14 ++++++
->  arch/x86/kvm/mmu.c                  | 96 +++++++++++++++++++++++++++++--------
->  arch/x86/kvm/paging_tmpl.h          |  3 +-
->  arch/x86/kvm/vmx.c                  | 63 +++++++++++++++++-------
->  virt/kvm/arm/mmu.c                  |  6 ++-
->  virt/kvm/kvm_main.c                 |  5 +-
->  17 files changed, 292 insertions(+), 48 deletions(-)
-> 
+>  static inline int hyperv_flush_guest_mapping(u64 as) { return -1; }
+> +static inline int hyperv_flush_guest_mapping_range(u64 as,
+> +		hyperv_fill_flush_list_func fill_func, void *data);
+> +{
+> +	return -1;
 
-Queued, thanks.
+This part for !IS_ENABLED(CONFIG_HYPERV) does not compile.
+
+No big deal, but please add that to your testing procedures.
 
 Paolo
