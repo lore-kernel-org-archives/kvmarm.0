@@ -1,51 +1,53 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Resend PATCH V5 2/10] x86/hyper-v: Add HvFlushGuestAddressList
- hypercall support
-Date: Fri, 21 Dec 2018 10:32:21 +0100
-Message-ID: <3f936a6e-b727-c152-05fb-4d77f33e1745@redhat.com>
-References: <20181206132113.2691-1-Tianyu.Lan@microsoft.com>
- <20181206132113.2691-3-Tianyu.Lan@microsoft.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8B94A375
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 04:32:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id giFdJ4Q4Fune for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Dec 2018 04:32:24 -0500 (EST)
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
- [209.85.128.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 300C34A2F1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 04:32:24 -0500 (EST)
-Received: by mail-wm1-f66.google.com with SMTP id a62so4627888wmh.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Dec 2018 01:32:24 -0800 (PST)
-In-Reply-To: <20181206132113.2691-3-Tianyu.Lan@microsoft.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: lantianyu1986@gmail.com
-Cc: linux-mips@linux-mips.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, ralf@linux-mips.org, paul.burton@mips.com, devel@linuxdriverproject.org, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
+From: Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH]  kvm/arm64 : reduce the size of kvm_vcpu
+Date: Mon, 24 Dec 2018 18:42:24 +0800
+Message-ID: <1545648144-64778-1-git-send-email-peng.hao2@zte.com.cn>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Peng Hao <peng.hao2@zte.com.cn>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/12/18 14:21, lantianyu1986@gmail.com wrote:
->  static inline int hyperv_flush_guest_mapping(u64 as) { return -1; }
-> +static inline int hyperv_flush_guest_mapping_range(u64 as,
-> +		hyperv_fill_flush_list_func fill_func, void *data);
-> +{
-> +	return -1;
+According to adjust the position of variables in kvm_vcpu_arch,
+the size of kvm_vcpu can reduce 16 bytes.
+before:
+cat /proc/slabinfo | grep kvm
+kvm_vcpu  252    252   9120   28  ...
 
-This part for !IS_ENABLED(CONFIG_HYPERV) does not compile.
+after:
+cat /proc/slabinfo | grep kvm
+kvm_vcpu   28     28   9104   28  ...
 
-No big deal, but please add that to your testing procedures.
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ arch/arm64/include/asm/kvm_host.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Paolo
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 52fbc82..e805b7e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -287,16 +287,17 @@ struct kvm_vcpu_arch {
+ 	/* Cache some mmu pages needed inside spinlock regions */
+ 	struct kvm_mmu_memory_cache mmu_page_cache;
+ 
++	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
++	u64 vsesr_el2;
++
++	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
++
+ 	/* Target CPU and feature flags */
+ 	int target;
+-	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
+ 
+ 	/* Detect first run of a vcpu */
+ 	bool has_run_once;
+ 
+-	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+-	u64 vsesr_el2;
+-
+ 	/* True when deferrable sysregs are loaded on the physical CPU,
+ 	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+ 	bool sysregs_loaded_on_cpu;
+-- 
+1.8.3.1
