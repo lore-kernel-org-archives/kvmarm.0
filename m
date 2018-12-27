@@ -1,57 +1,53 @@
 From: Peng Hao <peng.hao2@zte.com.cn>
-Subject: [PATCH]  kvm/arm : remove unnecessary local variable
-Date: Tue, 25 Dec 2018 12:56:15 +0800
-Message-ID: <1545713775-69870-1-git-send-email-peng.hao2@zte.com.cn>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Peng Hao <peng.hao2@zte.com.cn>
+Subject: [PATCH]  kvm:arm/arm64: vgic: remove unnecessary semicolon
+Date: Thu, 27 Dec 2018 09:04:27 +0800
+Message-ID: <1545872667-82509-1-git-send-email-peng.hao2@zte.com.cn>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 049D44A391
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Dec 2018 19:43:50 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id DKSZyb8gaCGe for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Dec 2018 19:43:46 -0500 (EST)
+Received: from mxct.zte.com.cn (out1.zte.com.cn [202.103.147.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C28F54A381
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Dec 2018 19:43:45 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@arm.com, marc.zyngier@arm.com
+Cc: Peng Hao <peng.hao2@zte.com.cn>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Remove unnecessary local variable in vgic_set_common_attr
+Remove unnecessary semicolon in vgic_put_irq.
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 114dce9..53e5df7 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -163,7 +163,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- static int vgic_set_common_attr(struct kvm_device *dev,
- 				struct kvm_device_attr *attr)
- {
--	int r;
-+	int r = 0;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 7cfdfbc..f9ff5c7 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -142,7 +142,7 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	if (!kref_put(&irq->refcount, vgic_irq_release)) {
+ 		spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 		return;
+-	};
++	}
  
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
-@@ -180,7 +180,6 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
- 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
- 		u32 val;
--		int ret = 0;
- 
- 		if (get_user(val, uaddr))
- 			return -EFAULT;
-@@ -199,14 +198,14 @@ static int vgic_set_common_attr(struct kvm_device *dev,
- 		mutex_lock(&dev->kvm->lock);
- 
- 		if (vgic_ready(dev->kvm) || dev->kvm->arch.vgic.nr_spis)
--			ret = -EBUSY;
-+			r = -EBUSY;
- 		else
- 			dev->kvm->arch.vgic.nr_spis =
- 				val - VGIC_NR_PRIVATE_IRQS;
- 
- 		mutex_unlock(&dev->kvm->lock);
- 
--		return ret;
-+		return r;
- 	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		switch (attr->attr) {
+ 	list_del(&irq->lpi_list);
+ 	dist->lpi_list_count--;
 -- 
 1.8.3.1
