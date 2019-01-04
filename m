@@ -1,15 +1,15 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 3/6] arm64/kvm: add a userspace option to enable
- pointer authentication
-Date: Fri, 4 Jan 2019 17:57:54 +0000
-Message-ID: <49474d5f-6f4e-b57d-4b45-94c16d85136c@arm.com>
+Subject: Re: [PATCH v4 4/6] arm64/kvm: enable pointer authentication
+ cpufeature conditionally
+Date: Fri, 4 Jan 2019 17:58:40 +0000
+Message-ID: <33542a00-23f4-b159-91f5-f05d3afa5b9f@arm.com>
 References: <1545119810-12182-1-git-send-email-amit.kachhap@arm.com>
- <1545119810-12182-4-git-send-email-amit.kachhap@arm.com>
+ <1545119810-12182-5-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1545119810-12182-4-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1545119810-12182-5-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
 To: Amit Daniel Kachhap <amit.kachhap@arm.com>
@@ -19,78 +19,38 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Amit,
 
 On 18/12/2018 07:56, Amit Daniel Kachhap wrote:
-> This feature will allow the KVM guest to allow the handling of
-> pointer authentication instructions or to treat them as undefined
-> if not set. It uses the existing vcpu API KVM_ARM_VCPU_INIT to
-> supply this parameter instead of creating a new API.
-> 
-> A new register is not created to pass this parameter via
-> SET/GET_ONE_REG interface as just a flag (KVM_ARM_VCPU_PTRAUTH)
-> supplied is enough to select this feature.
+> According to userspace settings, pointer authentication cpufeature
+> is enabled/disabled from guests.
 
-What is the motivation for doing this? Doesn't ptrauth 'just' need turning on?
-It doesn't need additional setup to be useable, or rely on some qemu support to
-work properly. There isn't any hidden state that can't be migrated in the usual way.
-Is it just because we don't want to commit to the ABI?
+This reads like the guest is changing something in the host. Isn't this hiding
+the id-register values from the guest?
 
 
-> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-> index 5baca42..8c0f338 100644
-> --- a/Documentation/arm64/pointer-authentication.txt
-> +++ b/Documentation/arm64/pointer-authentication.txt
-> @@ -87,7 +87,8 @@ used to get and set the keys for a thread.
->  Virtualization
->  --------------
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 6af6c7d..ce6144a 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1066,6 +1066,15 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+>  			kvm_debug("SVE unsupported for guests, suppressing\n");
 >  
-> -Pointer authentication is not currently supported in KVM guests. KVM
-> -will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-> -the feature will result in an UNDEFINED exception being injected into
-> -the guest.
-> +Pointer authentication is enabled in KVM guest when virtual machine is
-> +created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
-> +to be enabled. Without this flag, pointer authentication is not enabled
-> +in KVM guests and attempted use of the feature will result in an UNDEFINED
-> +exception being injected into the guest.
+>  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> +	} else if (id == SYS_ID_AA64ISAR1_EL1) {
+> +		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> +					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> +					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+> +					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
+> +		if (!kvm_arm_vcpu_ptrauth_allowed(vcpu)) {
+> +			kvm_debug("ptrauth unsupported for guests, suppressing\n");
+> +			val &= ~ptrauth_mask;
+> +		}
 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index cd209f7..e20583a 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2634,6 +2634,10 @@ Possible features:
->  	  Depends on KVM_CAP_ARM_PSCI_0_2.
->  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
->  	  Depends on KVM_CAP_ARM_PMU_V3.
-> +	- KVM_ARM_VCPU_PTRAUTH: Emulate Pointer authentication for the CPU.
-> +	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
-> +	  set, then the KVM guest allows the execution of pointer authentication
-> +	  instructions or treats them as undefined if not set.
+I think this hunk should have been in the previous patch as otherwise its a
+bisection oddity.
 
-> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
-> index 1bfaf74..03999bb 100644
-> --- a/arch/arm64/kvm/hyp/ptrauth-sr.c
-> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
-> @@ -71,3 +71,19 @@ void __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
->  	__ptrauth_save_state(guest_ctxt);
->  	__ptrauth_restore_state(host_ctxt);
->  }
-> +
-> +/**
-> + * kvm_arm_vcpu_ptrauth_allowed - checks if ptrauth feature is present in vcpu
-> + *
-> + * @vcpu: The VCPU pointer
-> + *
-> + * This function will be used to enable/disable ptrauth in guest as configured
-> + * by the KVM userspace API.
-> + */
-> +bool kvm_arm_vcpu_ptrauth_allowed(struct kvm_vcpu *vcpu)
-> +{
-> +	if (test_bit(KVM_ARM_VCPU_PTRAUTH, vcpu->arch.features))
-> +		return true;
-> +	else
-> +		return false;
-> +}
+Could you merge this hunk with the previous patch, and move the mechanical bits
+that pass vcpu around to a prior preparatory patch.
 
-Can't you return the result of test_bit() directly?
+(I'm still unsure if we need to hide this as a user-controlled policy)
 
 
 Thanks,
