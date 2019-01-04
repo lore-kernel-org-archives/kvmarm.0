@@ -1,25 +1,25 @@
 From: lantianyu1986@gmail.com
-Subject: [PATCH 2/11] KVM/VMX: Fill range list in kvm_fill_hv_flush_list_func()
-Date: Fri,  4 Jan 2019 16:53:56 +0800
-Message-ID: <20190104085405.40356-3-Tianyu.Lan@microsoft.com>
+Subject: [PATCH 3/11] KVM: Add spte's point in the struct kvm_mmu_page
+Date: Fri,  4 Jan 2019 16:53:57 +0800
+Message-ID: <20190104085405.40356-4-Tianyu.Lan@microsoft.com>
 References: <20190104085405.40356-1-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE7214A320
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 03:54:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D0FA4A39B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 03:54:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nmwzjrMkj3SW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jan 2019 03:54:35 -0500 (EST)
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com
- [209.85.214.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 864374A319
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 03:54:35 -0500 (EST)
-Received: by mail-pl1-f196.google.com with SMTP id e5so17155108plb.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Jan 2019 00:54:35 -0800 (PST)
+ with ESMTP id p4GoU14iCi-q for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jan 2019 03:54:43 -0500 (EST)
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com
+ [209.85.210.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40CDC4A32D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 03:54:43 -0500 (EST)
+Received: by mail-pf1-f194.google.com with SMTP id c73so17983469pfe.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Jan 2019 00:54:43 -0800 (PST)
 In-Reply-To: <20190104085405.40356-1-Tianyu.Lan@microsoft.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,43 +35,92 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-Populate ranges on the flush list into struct hv_guest_mapping_flush_list
-when flush list is available in the struct kvm_tlb_range.
+It's necessary to check whether mmu page is last or large page when add
+mmu page into flush list. "spte" is needed for such check and so add
+spte point in the struct kvm_mmu_page.
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/mmu.c              | 5 +++++
+ arch/x86/kvm/paging_tmpl.h      | 2 ++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 2c159efedc40..384f4782afba 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -427,9 +427,23 @@ int kvm_fill_hv_flush_list_func(struct hv_guest_mapping_flush_list *flush,
- 		void *data)
- {
- 	struct kvm_tlb_range *range = data;
-+	struct kvm_mmu_page *sp;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4660ce90de7f..78d2a6714c3b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -332,6 +332,7 @@ struct kvm_mmu_page {
+ 	int root_count;          /* Currently serving as active root */
+ 	unsigned int unsync_children;
+ 	struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
++	u64 *sptep;
  
--	return hyperv_fill_flush_guest_mapping_list(flush, 0, range->start_gfn,
--			range->pages);
-+	if (!range->flush_list) {
-+		return hyperv_fill_flush_guest_mapping_list(flush,
-+			0, range->start_gfn, range->pages);
-+	} else {
-+		int offset = 0;
-+
-+		list_for_each_entry(sp, range->flush_list, flush_link) {
-+			int pages = KVM_PAGES_PER_HPAGE(sp->role.level);
-+
-+			offset = hyperv_fill_flush_guest_mapping_list(flush,
-+					offset, sp->gfn, pages);
-+		}
-+
-+		return offset;
-+	}
- }
+ 	/* The page is obsolete if mmu_valid_gen != kvm->arch.mmu_valid_gen.  */
+ 	unsigned long mmu_valid_gen;
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index ce770b446238..068694fa2371 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -3160,6 +3160,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, int write, int map_writable,
+ 			pseudo_gfn = base_addr >> PAGE_SHIFT;
+ 			sp = kvm_mmu_get_page(vcpu, pseudo_gfn, iterator.addr,
+ 					      iterator.level - 1, 1, ACC_ALL);
++			sp->sptep = iterator.sptep;
  
- static inline int __hv_remote_flush_tlb_with_range(struct kvm *kvm,
+ 			link_shadow_page(vcpu, iterator.sptep, sp);
+ 		}
+@@ -3588,6 +3589,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 		sp = kvm_mmu_get_page(vcpu, 0, 0,
+ 				vcpu->arch.mmu->shadow_root_level, 1, ACC_ALL);
+ 		++sp->root_count;
++		sp->sptep = NULL;
+ 		spin_unlock(&vcpu->kvm->mmu_lock);
+ 		vcpu->arch.mmu->root_hpa = __pa(sp->spt);
+ 	} else if (vcpu->arch.mmu->shadow_root_level == PT32E_ROOT_LEVEL) {
+@@ -3604,6 +3606,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 					i << 30, PT32_ROOT_LEVEL, 1, ACC_ALL);
+ 			root = __pa(sp->spt);
+ 			++sp->root_count;
++			sp->sptep = NULL;
+ 			spin_unlock(&vcpu->kvm->mmu_lock);
+ 			vcpu->arch.mmu->pae_root[i] = root | PT_PRESENT_MASK;
+ 		}
+@@ -3644,6 +3647,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 				vcpu->arch.mmu->shadow_root_level, 0, ACC_ALL);
+ 		root = __pa(sp->spt);
+ 		++sp->root_count;
++		sp->sptep = NULL;
+ 		spin_unlock(&vcpu->kvm->mmu_lock);
+ 		vcpu->arch.mmu->root_hpa = root;
+ 		return 0;
+@@ -3681,6 +3685,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 				      0, ACC_ALL);
+ 		root = __pa(sp->spt);
+ 		++sp->root_count;
++		sp->sptep = NULL;
+ 		spin_unlock(&vcpu->kvm->mmu_lock);
+ 
+ 		vcpu->arch.mmu->pae_root[i] = root | pm_mask;
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 6bdca39829bc..833e8855bbc9 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -633,6 +633,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
+ 			table_gfn = gw->table_gfn[it.level - 2];
+ 			sp = kvm_mmu_get_page(vcpu, table_gfn, addr, it.level-1,
+ 					      false, access);
++			sp->sptep = it.sptep;
+ 		}
+ 
+ 		/*
+@@ -663,6 +664,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
+ 
+ 		sp = kvm_mmu_get_page(vcpu, direct_gfn, addr, it.level-1,
+ 				      true, direct_access);
++		sp->sptep = it.sptep;
+ 		link_shadow_page(vcpu, it.sptep, sp);
+ 	}
+ 
 -- 
 2.14.4
