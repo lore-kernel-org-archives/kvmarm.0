@@ -1,77 +1,154 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v6 07/13] arm64: add basic pointer authentication support
-Date: Fri, 4 Jan 2019 10:33:40 +0100
-Message-ID: <20190104093340.GA28150@amd>
-References: <20181207183931.4285-1-kristina.martsenko@arm.com>
- <20181207183931.4285-8-kristina.martsenko@arm.com>
- <20190103202901.GA21564@amd>
- <681a2835-1a70-f3c3-3534-7b4cf6139cac@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Fri, 4 Jan 2019 15:32:06 +0000
+Message-ID: <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
+References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
+ <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
+ <20181218120226.GC25383@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F9A44A33F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 10:32:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GG8Rzn3v3Jsg for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Jan 2019 10:32:06 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA684A332
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 10:32:06 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <681a2835-1a70-f3c3-3534-7b4cf6139cac@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org, Adam Wallis <awallis@codeaurora.org>, Amit Kachhap <amit.kachhap@arm.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Dave P Martin <dave.martin@arm.com>, Jacob Bramley <jacob.bramley@arm.com>, Kees Cook <keescook@chromium.org>, Mark Rutland <mark.rutland@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+In-Reply-To: <20181218120226.GC25383@e113682-lin.lund.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, joro@8bytes.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Tue, Dec 18, 2018 at 01:02:26PM +0100, Christoffer Dall wrote:
+> On Wed, Dec 12, 2018 at 10:29:32AM +0000, Andrew Murray wrote:
+> > Add support for the :G and :H attributes in perf by handling the
+> > exclude_host/exclude_guest event attributes.
+> > 
+> > We notify KVM of counters that we wish to be enabled or disabled on
+> > guest entry/exit and thus defer from starting or stopping :G events
+> > as per the events exclude_host attribute.
+> > 
+> > With both VHE and non-VHE we switch the counters between host/guest
+> > at EL2. We are able to eliminate counters counting host events on
+> > the boundaries of guest entry/exit when using :G by filtering out
+> > EL2 for exclude_host. However when using :H unless exclude_hv is set
+> > on non-VHE then there is a small blackout window at the guest
+> > entry/exit where host events are not captured.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 44 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> > index de564ae..4a3c73d 100644
+> > --- a/arch/arm64/kernel/perf_event.c
+> > +++ b/arch/arm64/kernel/perf_event.c
+> > @@ -26,6 +26,7 @@
+> >  
+> >  #include <linux/acpi.h>
+> >  #include <linux/clocksource.h>
+> > +#include <linux/kvm_host.h>
+> >  #include <linux/of.h>
+> >  #include <linux/perf/arm_pmu.h>
+> >  #include <linux/platform_device.h>
+> > @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
+> >  
+> >  static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+> >  {
+> > +	struct perf_event_attr *attr = &event->attr;
+> >  	int idx = event->hw.idx;
+> > +	int flags = 0;
+> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+> >  
+> > -	armv8pmu_enable_counter(idx);
+> >  	if (armv8pmu_event_is_chained(event))
+> > -		armv8pmu_enable_counter(idx - 1);
+> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> > +
+> > +	if (!attr->exclude_host)
+> > +		flags |= KVM_PMU_EVENTS_HOST;
+> > +	if (!attr->exclude_guest)
+> > +		flags |= KVM_PMU_EVENTS_GUEST;
+> > +
+> > +	kvm_set_pmu_events(counter_bits, flags);
+> > +
+> > +	if (!attr->exclude_host) {
+> > +		armv8pmu_enable_counter(idx);
+> > +		if (armv8pmu_event_is_chained(event))
+> > +			armv8pmu_enable_counter(idx - 1);
+> > +	}
+> >  }
+> >  
+> >  static inline int armv8pmu_disable_counter(int idx)
+> > @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
+> >  static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+> >  {
+> >  	struct hw_perf_event *hwc = &event->hw;
+> > +	struct perf_event_attr *attr = &event->attr;
+> >  	int idx = hwc->idx;
+> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+> >  
+> >  	if (armv8pmu_event_is_chained(event))
+> > -		armv8pmu_disable_counter(idx - 1);
+> > -	armv8pmu_disable_counter(idx);
+> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> > +
+> > +	kvm_clr_pmu_events(counter_bits);
+> > +
+> > +	if (!attr->exclude_host) {
+> > +		if (armv8pmu_event_is_chained(event))
+> > +			armv8pmu_disable_counter(idx - 1);
+> > +		armv8pmu_disable_counter(idx);
+> > +	}
+> >  }
+> >  
+> >  static inline int armv8pmu_enable_intens(int idx)
+> > @@ -943,16 +968,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+> >  	 * Therefore we ignore exclude_hv in this configuration, since
+> >  	 * there's no hypervisor to sample anyway. This is consistent
+> >  	 * with other architectures (x86 and Power).
+> > +	 *
+> > +	 * To eliminate counting host events on the boundaries of
+> > +	 * guest entry/exit we ensure EL2 is not included in hyp mode
+> > +	 * with !exclude_host.
+> >  	 */
+> >  	if (is_kernel_in_hyp_mode()) {
+> > -		if (!attr->exclude_kernel)
+> > +		if (!attr->exclude_kernel && !attr->exclude_host)
+> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> >  	} else {
+> > -		if (attr->exclude_kernel)
+> > -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> >  		if (!attr->exclude_hv)
+> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> 
+> I'm not sure about the current use of exclude_hv here.  The comment says
+> it's consistent with other architectures, but I can't find an example to
+> confirm this, and I don't think we have a comparable thing to the split
+> of the hypervisor between EL1 and EL2 we have on non-VHE.
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+FWIW, that comment came from this thread:
 
-On Fri 2019-01-04 09:21:30, Marc Zyngier wrote:
-> On 03/01/2019 20:29, Pavel Machek wrote:
-> > On Fri 2018-12-07 18:39:25, Kristina Martsenko wrote:
-> >> From: Mark Rutland <mark.rutland@arm.com>
-> >>=20
-> >> This patch adds basic support for pointer authentication,
-> >> allowing userspace to make use of APIAKey, APIBKey, APDAKey,
-> >> APDBKey, and APGAKey. The kernel maintains key values for each
-> >> process (shared by all threads within), which are initialised to
-> >> random values at exec()
-> > time.
-> >=20
-> > ...
-> >=20
-> >> +/* + * We give each process its own keys, which are shared by
-> >> all threads. The keys + * are inherited upon fork(), and
-> >> reinitialised upon exec*(). + */ +struct ptrauth_keys { +	struct
-> >> ptrauth_key apia; +	struct ptrauth_key apib; +	struct ptrauth_key
-> >> apda; +	struct ptrauth_key apdb; +	struct ptrauth_key apga; +};
-> >=20
-> > intstruction_a, data_a, generic_a? Should be easier to understand
-> > than "apdb" ...
->=20
-> ... until you realize that these names do match the documentation,
-> which makes it even easier to understand how the code uses the
-> architecture.
+http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/503908.html
 
-See how not even the commit log matches the documentation then?
+That was painful enough at the time, so I'd /really/ prefer not to change
+the semantics of this again if we can avoid it.
 
-Naming something "apdb" is just bad... Just because the documentation
-is evil does not mean it should be followed...
-
-								Pavel
-
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---dDRMvlgZJXvWKvBx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlwvKHQACgkQMOfwapXb+vId1ACfZu1/2mlOKgYdetcH5OjGU8y2
-f8oAnjknOWchHLjiz4DjrU/M29jxFfKp
-=vyqJ
------END PGP SIGNATURE-----
-
---dDRMvlgZJXvWKvBx--
+Will
