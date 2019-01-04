@@ -1,154 +1,74 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
- exclude_host/exclude_guest attributes
-Date: Fri, 4 Jan 2019 15:32:06 +0000
-Message-ID: <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
-References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
- <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
- <20181218120226.GC25383@e113682-lin.lund.arm.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 7/11] KVM: Remove redundant check in the
+ kvm_get_dirty_log_protect()
+Date: Fri, 4 Jan 2019 07:50:36 -0800
+Message-ID: <20190104155036.GA11288@linux.intel.com>
+References: <20190104085405.40356-1-Tianyu.Lan@microsoft.com>
+ <20190104085405.40356-8-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F9A44A33F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 10:32:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GG8Rzn3v3Jsg for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Jan 2019 10:32:06 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA684A332
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Jan 2019 10:32:06 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20181218120226.GC25383@e113682-lin.lund.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, joro@8bytes.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190104085405.40356-8-Tianyu.Lan@microsoft.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: lantianyu1986@gmail.com
+Cc: kvm@vger.kernel.org, rkrcmar@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 18, 2018 at 01:02:26PM +0100, Christoffer Dall wrote:
-> On Wed, Dec 12, 2018 at 10:29:32AM +0000, Andrew Murray wrote:
-> > Add support for the :G and :H attributes in perf by handling the
-> > exclude_host/exclude_guest event attributes.
-> > 
-> > We notify KVM of counters that we wish to be enabled or disabled on
-> > guest entry/exit and thus defer from starting or stopping :G events
-> > as per the events exclude_host attribute.
-> > 
-> > With both VHE and non-VHE we switch the counters between host/guest
-> > at EL2. We are able to eliminate counters counting host events on
-> > the boundaries of guest entry/exit when using :G by filtering out
-> > EL2 for exclude_host. However when using :H unless exclude_hv is set
-> > on non-VHE then there is a small blackout window at the guest
-> > entry/exit where host events are not captured.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 44 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> > index de564ae..4a3c73d 100644
-> > --- a/arch/arm64/kernel/perf_event.c
-> > +++ b/arch/arm64/kernel/perf_event.c
-> > @@ -26,6 +26,7 @@
-> >  
-> >  #include <linux/acpi.h>
-> >  #include <linux/clocksource.h>
-> > +#include <linux/kvm_host.h>
-> >  #include <linux/of.h>
-> >  #include <linux/perf/arm_pmu.h>
-> >  #include <linux/platform_device.h>
-> > @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
-> >  
-> >  static inline void armv8pmu_enable_event_counter(struct perf_event *event)
-> >  {
-> > +	struct perf_event_attr *attr = &event->attr;
-> >  	int idx = event->hw.idx;
-> > +	int flags = 0;
-> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> >  
-> > -	armv8pmu_enable_counter(idx);
-> >  	if (armv8pmu_event_is_chained(event))
-> > -		armv8pmu_enable_counter(idx - 1);
-> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> > +
-> > +	if (!attr->exclude_host)
-> > +		flags |= KVM_PMU_EVENTS_HOST;
-> > +	if (!attr->exclude_guest)
-> > +		flags |= KVM_PMU_EVENTS_GUEST;
-> > +
-> > +	kvm_set_pmu_events(counter_bits, flags);
-> > +
-> > +	if (!attr->exclude_host) {
-> > +		armv8pmu_enable_counter(idx);
-> > +		if (armv8pmu_event_is_chained(event))
-> > +			armv8pmu_enable_counter(idx - 1);
-> > +	}
-> >  }
-> >  
-> >  static inline int armv8pmu_disable_counter(int idx)
-> > @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
-> >  static inline void armv8pmu_disable_event_counter(struct perf_event *event)
-> >  {
-> >  	struct hw_perf_event *hwc = &event->hw;
-> > +	struct perf_event_attr *attr = &event->attr;
-> >  	int idx = hwc->idx;
-> > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> >  
-> >  	if (armv8pmu_event_is_chained(event))
-> > -		armv8pmu_disable_counter(idx - 1);
-> > -	armv8pmu_disable_counter(idx);
-> > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> > +
-> > +	kvm_clr_pmu_events(counter_bits);
-> > +
-> > +	if (!attr->exclude_host) {
-> > +		if (armv8pmu_event_is_chained(event))
-> > +			armv8pmu_disable_counter(idx - 1);
-> > +		armv8pmu_disable_counter(idx);
-> > +	}
-> >  }
-> >  
-> >  static inline int armv8pmu_enable_intens(int idx)
-> > @@ -943,16 +968,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
-> >  	 * Therefore we ignore exclude_hv in this configuration, since
-> >  	 * there's no hypervisor to sample anyway. This is consistent
-> >  	 * with other architectures (x86 and Power).
-> > +	 *
-> > +	 * To eliminate counting host events on the boundaries of
-> > +	 * guest entry/exit we ensure EL2 is not included in hyp mode
-> > +	 * with !exclude_host.
-> >  	 */
-> >  	if (is_kernel_in_hyp_mode()) {
-> > -		if (!attr->exclude_kernel)
-> > +		if (!attr->exclude_kernel && !attr->exclude_host)
-> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> >  	} else {
-> > -		if (attr->exclude_kernel)
-> > -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
-> >  		if (!attr->exclude_hv)
-> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+On Fri, Jan 04, 2019 at 04:54:01PM +0800, lantianyu1986@gmail.com wrote:
+> From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 > 
-> I'm not sure about the current use of exclude_hv here.  The comment says
-> it's consistent with other architectures, but I can't find an example to
-> confirm this, and I don't think we have a comparable thing to the split
-> of the hypervisor between EL1 and EL2 we have on non-VHE.
+> The dirty bits have already been checked in the previous check of
+> "dirty_bitmap" and mask must be non-zero value at this point.
+> 
+> Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
+> ---
+>  virt/kvm/kvm_main.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cf7cc0554094..e75dbb15fd09 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1206,11 +1206,9 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
+>  			mask = xchg(&dirty_bitmap[i], 0);
+>  			dirty_bitmap_buffer[i] = mask;
+>  
+> -			if (mask) {
+> -				offset = i * BITS_PER_LONG;
+> -				kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+> -									offset, mask);
+> -			}
+> +			offset = i * BITS_PER_LONG;
+> +			kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot,
+> +								offset, mask);
 
-FWIW, that comment came from this thread:
+Hmm, the check against mask was explicitly added by commit 58d2930f4ee3
+("KVM: Eliminate extra function calls in kvm_get_dirty_log_protect()").
+AFAIK KVM only *sets* bits in dirty_bitmap without holding slots_lock
+and/or mmu_lock, so I agree that checking mask is redundant, but it'd be
+nice to elaborate a bit more in the changelog.
 
-http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/503908.html
+At the very least this needs a Fixes tag for the aforementioned commit.
 
-That was painful enough at the time, so I'd /really/ prefer not to change
-the semantics of this again if we can avoid it.
 
-Will
+Tangentially related, does mmu_lock actually need to be held while we
+walk dirty_bitmap in kvm_{clear,get}_dirty_log_protect()?  The bitmap
+itself is protected by slots_lock (a lockdep assertion would be nice
+too), e.g. can we grab the lock iff dirty_bitmap[i] != 0?
+
+>  		}
+>  		spin_unlock(&kvm->mmu_lock);
+>  	}
+> -- 
+> 2.14.4
+> 
