@@ -1,15 +1,15 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v4 4/6] arm64/kvm: enable pointer authentication
- cpufeature conditionally
-Date: Fri, 4 Jan 2019 17:58:40 +0000
-Message-ID: <33542a00-23f4-b159-91f5-f05d3afa5b9f@arm.com>
+Subject: Re: [PATCH v4 6/6] arm/kvm: arm64: Add a vcpu feature for pointer
+ authentication
+Date: Fri, 4 Jan 2019 17:59:27 +0000
+Message-ID: <1d5f5167-8606-3bda-a195-b962c99eb196@arm.com>
 References: <1545119810-12182-1-git-send-email-amit.kachhap@arm.com>
- <1545119810-12182-5-git-send-email-amit.kachhap@arm.com>
+ <1545119810-12182-7-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1545119810-12182-5-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1545119810-12182-7-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
 To: Amit Daniel Kachhap <amit.kachhap@arm.com>
@@ -19,38 +19,11 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Amit,
 
 On 18/12/2018 07:56, Amit Daniel Kachhap wrote:
-> According to userspace settings, pointer authentication cpufeature
-> is enabled/disabled from guests.
+> This is a runtime feature and can be enabled by --ptrauth option.
 
-This reads like the guest is changing something in the host. Isn't this hiding
-the id-register values from the guest?
-
-
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6af6c7d..ce6144a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1066,6 +1066,15 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
->  			kvm_debug("SVE unsupported for guests, suppressing\n");
->  
->  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-> +	} else if (id == SYS_ID_AA64ISAR1_EL1) {
-> +		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> +					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> +					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> +					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
-> +		if (!kvm_arm_vcpu_ptrauth_allowed(vcpu)) {
-> +			kvm_debug("ptrauth unsupported for guests, suppressing\n");
-> +			val &= ~ptrauth_mask;
-> +		}
-
-I think this hunk should have been in the previous patch as otherwise its a
-bisection oddity.
-
-Could you merge this hunk with the previous patch, and move the mechanical bits
-that pass vcpu around to a prior preparatory patch.
-
-(I'm still unsure if we need to hide this as a user-controlled policy)
+It took me a little while to realise this was a kvmtool patch. could you put
+something in the patch-subject to make this obvious? e.g:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2018-September/thread.html#32734
 
 
 Thanks,
