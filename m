@@ -1,165 +1,56 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v9 5/5] arm64: KVM: Enable support for :G/:H perf event
- modifiers
-Date: Mon,  7 Jan 2019 14:41:29 +0000
-Message-ID: <1546872089-56278-6-git-send-email-andrew.murray@arm.com>
-References: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2494A3E7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:59 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c0waxT2tOWoe for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jan 2019 09:41:58 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A52BE4A41A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:57 -0500 (EST)
-In-Reply-To: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v3 0/3] KVM: arm/arm64: vgic: Use raw_spinlock for locks taken in IRQ context
+Date: Mon,  7 Jan 2019 15:06:14 +0000
+Message-ID: <1546873577-13895-1-git-send-email-julien.thierry@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, Christoffer.Dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-rt-users@vger.kernel.org, tglx@linutronix.de, rostedt@goodmis.org, bigeasy@linutronix.de, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
+Hi,
 
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+While testing KVM running on PREEMPT_RT, starting guest could simply
+freeze the machine. This is because we are using spinlocks for VGIC
+locks, which is invalid in the VGIC case since the locks must be take
+with interrupts disabled.
 
-The PMU may be on when we change which counters are enabled however
-we avoid adding an isb as we instead rely on existing context
-synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
-the eret from the hvc in kvm_call_hyp.
+The solution is to use raw_spinlock instead of spinlocks.
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kvm/hyp/switch.c | 60 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+Changes since v2[1]:
+- Rebase on v5.0-rc1
+- Remove first patch from series as it has been applied
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d496ef5..bec6521 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -373,6 +373,54 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
-+	u32 clr, set;
-+
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
-+
-+	/* We can potentially avoid a sysreg write by only changing bits that
-+	 * differ between the guest/host. E.g. where events are enabled in
-+	 * both guest and host
-+	 */
-+	clr = pmu->events_host & ~pmu->events_guest;
-+	set = pmu->events_guest & ~pmu->events_host;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+
-+	return (clr || set);
-+}
-+
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
-+	u32 clr, set;
-+
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
-+
-+	/* We can potentially avoid a sysreg write by only changing bits that
-+	 * differ between the guest/host. E.g. where events are enabled in
-+	 * both guest and host
-+	 */
-+	clr = pmu->events_guest & ~pmu->events_host;
-+	set = pmu->events_host & ~pmu->events_guest;
-+
-+	if (clr)
-+		write_sysreg(clr, pmcntenclr_el0);
-+
-+	if (set)
-+		write_sysreg(set, pmcntenset_el0);
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -488,12 +536,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	host_ctxt = vcpu->arch.host_cpu_context;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	sysreg_save_host_state_vhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -524,6 +575,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
-@@ -532,6 +586,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
-@@ -540,6 +595,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
-+
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_traps(vcpu);
-@@ -586,6 +643,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
-+
- 	return exit_code;
- }
- 
--- 
-2.7.4
+Changes since v1[2]:
+- Rebase on v4.20-rc4
+- Add Christoffer's Acked-by
+- Fix potential lock up when waiting for vcpus to halt
+
+[1] https://lkml.org/lkml/2018/11/27/20
+[2] https://lkml.org/lkml/2018/11/19/776
+
+Cheers,
+
+Julien
+
+-->
+
+Julien Thierry (3):
+  KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock
+  KVM: arm/arm64: vgic: Make vgic_dist->lpi_list_lock a raw_spinlock
+  KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a raw_spinlock
+
+ include/kvm/arm_vgic.h           |   6 +-
+ virt/kvm/arm/vgic/vgic-debug.c   |   4 +-
+ virt/kvm/arm/vgic/vgic-init.c    |   8 +--
+ virt/kvm/arm/vgic/vgic-its.c     |  22 ++++----
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |  14 ++---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  12 ++--
+ virt/kvm/arm/vgic/vgic-mmio.c    |  34 +++++------
+ virt/kvm/arm/vgic/vgic-v2.c      |   4 +-
+ virt/kvm/arm/vgic/vgic-v3.c      |   8 +--
+ virt/kvm/arm/vgic/vgic.c         | 118 +++++++++++++++++++--------------------
+ 10 files changed, 115 insertions(+), 115 deletions(-)
+
+--
+1.9.1
