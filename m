@@ -1,23 +1,23 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v9 2/5] arm64: KVM: encapsulate kvm_cpu_context in
- kvm_host_data
-Date: Mon,  7 Jan 2019 14:41:26 +0000
-Message-ID: <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v9 4/5] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Mon,  7 Jan 2019 14:41:28 +0000
+Message-ID: <1546872089-56278-5-git-send-email-andrew.murray@arm.com>
 References: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAD004A3C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EB514A409
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mZNpEQ0zBuXj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jan 2019 09:41:51 -0500 (EST)
+ with ESMTP id ptqgxD5UGn5F for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jan 2019 09:41:55 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD3BB4A3FA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AC124A41F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 09:41:55 -0500 (EST)
 In-Reply-To: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,172 +32,130 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
-a typedef to kvm_cpu_context and is used to store host cpu context. The
-kvm_cpu_context structure is also used elsewhere to hold vcpu context.
-In order to use the percpu to hold additional future host information we
-encapsulate kvm_cpu_context in a new structure and rename the typedef and
-percpu to match.
+Add support for the :G and :H attributes in perf by handling the
+exclude_host/exclude_guest event attributes.
+
+We notify KVM of counters that we wish to be enabled or disabled on
+guest entry/exit and thus defer from starting or stopping :G events
+as per the events exclude_host attribute.
+
+With both VHE and non-VHE we switch the counters between host/guest
+at EL2. We are able to eliminate counters counting host events on
+the boundaries of guest entry/exit when using :G by filtering out
+EL2 for exclude_host. However when using :H unless exclude_hv is set
+on non-VHE then there is a small blackout window at the guest
+entry/exit where host events are not captured.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  8 ++++++--
- arch/arm64/include/asm/kvm_asm.h  |  4 ++--
- arch/arm64/include/asm/kvm_host.h | 14 +++++++++-----
- arch/arm64/kernel/asm-offsets.c   |  2 +-
- virt/kvm/arm/arm.c                | 12 +++++++-----
- 5 files changed, 25 insertions(+), 15 deletions(-)
+ arch/arm64/kernel/perf_event.c | 53 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 46 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 79906ce..71645ba 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -145,7 +145,11 @@ struct kvm_cpu_context {
- 	u32 cp15[NR_CP15_REGS];
- };
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index de564ae..64dde86 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -26,6 +26,7 @@
  
--typedef struct kvm_cpu_context kvm_cpu_context_t;
-+struct kvm_host_data {
-+	struct kvm_cpu_context host_ctxt;
-+};
-+
-+typedef struct kvm_host_data kvm_host_data_t;
+ #include <linux/acpi.h>
+ #include <linux/clocksource.h>
++#include <linux/kvm_host.h>
+ #include <linux/of.h>
+ #include <linux/perf/arm_pmu.h>
+ #include <linux/platform_device.h>
+@@ -647,11 +648,27 @@ static inline int armv8pmu_enable_counter(int idx)
  
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
-@@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_vcpu_fault_info fault;
- 
- 	/* Host FP context */
--	kvm_cpu_context_t *host_cpu_context;
-+	struct kvm_cpu_context *host_cpu_context;
- 
- 	/* VGIC state */
- 	struct vgic_cpu vgic_cpu;
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 102b5a5..6a9bfd4 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
- .endm
- 
- .macro get_host_ctxt reg, tmp
--	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
-+	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
- .endm
- 
- .macro get_vcpu_ptr vcpu, ctxt
- 	get_host_ctxt \ctxt, \vcpu
--	ldr	\vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-+	ldr	\vcpu, [\ctxt, #HOST_DATA_VCPU]
- 	kern_hyp_va	\vcpu
- .endm
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1550192..9ab4b13 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -205,7 +205,11 @@ struct kvm_cpu_context {
- 	struct kvm_vcpu *__hyp_running_vcpu;
- };
- 
--typedef struct kvm_cpu_context kvm_cpu_context_t;
-+struct kvm_host_data {
-+	struct kvm_cpu_context host_ctxt;
-+};
-+
-+typedef struct kvm_host_data kvm_host_data_t;
- 
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
-@@ -241,7 +245,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch external_debug_state;
- 
- 	/* Pointer to host CPU context */
--	kvm_cpu_context_t *host_cpu_context;
-+	struct kvm_cpu_context *host_cpu_context;
- 
- 	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
-@@ -387,7 +391,7 @@ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
- 
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
--DECLARE_PER_CPU(kvm_cpu_context_t, kvm_host_cpu_state);
-+DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
- 
- void __kvm_enable_ssbs(void);
- 
-@@ -400,8 +404,8 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
- 	 * so that we can use adr_l to access per-cpu variables in EL2.
- 	 */
--	u64 tpidr_el2 = ((u64)this_cpu_ptr(&kvm_host_cpu_state) -
--			 (u64)kvm_ksym_ref(kvm_host_cpu_state));
-+	u64 tpidr_el2 = ((u64)this_cpu_ptr(&kvm_host_data) -
-+			 (u64)kvm_ksym_ref(kvm_host_data));
- 
- 	/*
- 	 * Call initialization code, and switch to the full blown HYP code.
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 323aeb5..cb968ff 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -142,7 +142,7 @@ int main(void)
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
-   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
-   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
--  DEFINE(HOST_CONTEXT_VCPU,	offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
-+  DEFINE(HOST_DATA_VCPU,	offsetof(struct kvm_host_data, host_ctxt.__hyp_running_vcpu));
- #endif
- #ifdef CONFIG_CPU_PM
-   DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 150c8a6..160ab30 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -56,7 +56,7 @@
- __asm__(".arch_extension	virt");
- #endif
- 
--DEFINE_PER_CPU(kvm_cpu_context_t, kvm_host_cpu_state);
-+DEFINE_PER_CPU(kvm_host_data_t, kvm_host_data);
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
- 
- /* Per-CPU variable containing the currently running vcpu. */
-@@ -361,8 +361,10 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
  {
- 	int *last_ran;
-+	kvm_host_data_t *cpu_data;
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = event->hw.idx;
++	int flags = 0;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
  
- 	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
-+	cpu_data = this_cpu_ptr(&kvm_host_data);
+-	armv8pmu_enable_counter(idx);
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_enable_counter(idx - 1);
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
++
++	if (!attr->exclude_host)
++		flags |= KVM_PMU_EVENTS_HOST;
++	if (!attr->exclude_guest)
++		flags |= KVM_PMU_EVENTS_GUEST;
++
++	kvm_set_pmu_events(counter_bits, flags);
++
++	/* We rely on the hypervisor switch code to enable guest counters */
++	if (!attr->exclude_host) {
++		armv8pmu_enable_counter(idx);
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_enable_counter(idx - 1);
++	}
+ }
  
+ static inline int armv8pmu_disable_counter(int idx)
+@@ -664,11 +681,21 @@ static inline int armv8pmu_disable_counter(int idx)
+ static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+ {
+ 	struct hw_perf_event *hwc = &event->hw;
++	struct perf_event_attr *attr = &event->attr;
+ 	int idx = hwc->idx;
++	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+ 
+ 	if (armv8pmu_event_is_chained(event))
+-		armv8pmu_disable_counter(idx - 1);
+-	armv8pmu_disable_counter(idx);
++		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
++
++	kvm_clr_pmu_events(counter_bits);
++
++	/* We rely on the hypervisor switch code to disable guest counters */
++	if (!attr->exclude_host) {
++		if (armv8pmu_event_is_chained(event))
++			armv8pmu_disable_counter(idx - 1);
++		armv8pmu_disable_counter(idx);
++	}
+ }
+ 
+ static inline int armv8pmu_enable_intens(int idx)
+@@ -943,16 +970,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+ 	 * Therefore we ignore exclude_hv in this configuration, since
+ 	 * there's no hypervisor to sample anyway. This is consistent
+ 	 * with other architectures (x86 and Power).
++	 *
++	 * To eliminate counting host events on the boundaries of
++	 * guest entry/exit we ensure EL2 is not included in hyp mode
++	 * with !exclude_host.
+ 	 */
+ 	if (is_kernel_in_hyp_mode()) {
+-		if (!attr->exclude_kernel)
++		if (!attr->exclude_kernel && !attr->exclude_host)
+ 			config_base |= ARMV8_PMU_INCLUDE_EL2;
+ 	} else {
+-		if (attr->exclude_kernel)
+-			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+ 		if (!attr->exclude_hv)
+ 			config_base |= ARMV8_PMU_INCLUDE_EL2;
+ 	}
++
++	/*
++	 * Filter out !VHE kernels and guest kernels
++	 */
++	if (attr->exclude_kernel)
++		config_base |= ARMV8_PMU_EXCLUDE_EL1;
++
+ 	if (attr->exclude_user)
+ 		config_base |= ARMV8_PMU_EXCLUDE_EL0;
+ 
+@@ -976,6 +1012,9 @@ static void armv8pmu_reset(void *info)
+ 		armv8pmu_disable_intens(idx);
+ 	}
+ 
++	/* Clear the counters we flip at guest entry/exit */
++	kvm_clr_pmu_events(U32_MAX);
++
  	/*
- 	 * We might get preempted before the vCPU actually runs, but
-@@ -374,7 +376,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	}
- 
- 	vcpu->cpu = cpu;
--	vcpu->arch.host_cpu_context = this_cpu_ptr(&kvm_host_cpu_state);
-+	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
- 
- 	kvm_arm_set_running_vcpu(vcpu);
- 	kvm_vgic_load(vcpu);
-@@ -1547,10 +1549,10 @@ static int init_hyp_mode(void)
- 	}
- 
- 	for_each_possible_cpu(cpu) {
--		kvm_cpu_context_t *cpu_ctxt;
-+		kvm_host_data_t *cpu_data;
- 
--		cpu_ctxt = per_cpu_ptr(&kvm_host_cpu_state, cpu);
--		err = create_hyp_mappings(cpu_ctxt, cpu_ctxt + 1, PAGE_HYP);
-+		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
-+		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
- 
- 		if (err) {
- 			kvm_err("Cannot map host CPU state: %d\n", err);
+ 	 * Initialize & Reset PMNC. Request overflow interrupt for
+ 	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
 -- 
 2.7.4
