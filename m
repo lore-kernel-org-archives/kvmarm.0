@@ -1,24 +1,29 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v3 3/3] KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a
- raw_spinlock
-Date: Mon,  7 Jan 2019 15:06:17 +0000
-Message-ID: <1546873577-13895-4-git-send-email-julien.thierry@arm.com>
-References: <1546873577-13895-1-git-send-email-julien.thierry@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 6/11] KVM/MMU: Flush tlb with range list in sync_page()
+Date: Mon, 7 Jan 2019 17:07:58 +0100
+Message-ID: <99e47cc1-43d6-ff05-46b8-6a96ebc34b2a@redhat.com>
+References: <20190104085405.40356-1-Tianyu.Lan@microsoft.com>
+ <20190104085405.40356-7-Tianyu.Lan@microsoft.com>
+ <20190104163035.GC11288@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FC0B4A3FE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 10:06:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2490E4A3EA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 11:08:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aRUAe62OtyKZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Jan 2019 10:06:41 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D03274A3E4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 10:06:39 -0500 (EST)
-In-Reply-To: <1546873577-13895-1-git-send-email-julien.thierry@arm.com>
+ with ESMTP id X+ovNrDjVBPl for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Jan 2019 11:08:03 -0500 (EST)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F4264A3E1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Jan 2019 11:08:03 -0500 (EST)
+Received: by mail-wr1-f65.google.com with SMTP id 96so1003434wrb.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Jan 2019 08:08:02 -0800 (PST)
+In-Reply-To: <20190104163035.GC11288@linux.intel.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,179 +33,37 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: linux-rt-users@vger.kernel.org, marc.zyngier@arm.com, bigeasy@linutronix.de, rostedt@goodmis.org, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org
+To: Sean Christopherson <sean.j.christopherson@intel.com>, lantianyu1986@gmail.com
+Cc: kvm@vger.kernel.org, benh@kernel.crashing.org, will.deacon@arm.com, linux-mips@vger.kernel.org, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, catalin.marinas@arm.com, jhogan@kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ralf@linux-mips.org, paul.burton@mips.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-vgic_cpu->ap_list_lock must always be taken with interrupts disabled as
-it is used in interrupt context.
+On 04/01/19 17:30, Sean Christopherson wrote:
+>> +
+>> +		if (kvm_available_flush_tlb_with_range()
+>> +		    && (tmp_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH)) {
+>> +			struct kvm_mmu_page *leaf_sp = page_header(sp->spt[i]
+>> +					& PT64_BASE_ADDR_MASK);
+>> +			list_add(&leaf_sp->flush_link, &flush_list);
+>> +		}
+>> +
+>> +		set_spte_ret |= tmp_spte_ret;
+>> +
+>>  	}
+>>  
+>>  	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH)
+>> -		kvm_flush_remote_tlbs(vcpu->kvm);
+>> +		kvm_flush_remote_tlbs_with_list(vcpu->kvm, &flush_list);
+> This is a bit confusing and potentially fragile.  It's not obvious that
+> kvm_flush_remote_tlbs_with_list() is guaranteed to call
+> kvm_flush_remote_tlbs() when kvm_available_flush_tlb_with_range() is
+> false, and you're relying on the kvm_flush_remote_tlbs_with_list() call
+> chain to never optimize away the empty list case.  Rechecking
+> kvm_available_flush_tlb_with_range() isn't expensive.
+> 
 
-For configurations such as PREEMPT_RT_FULL, this means that it should
-be a raw_spinlock since RT spinlocks are interruptible.
+Alternatively, do not check it during the loop: always build the
+flush_list, and always call kvm_flush_remote_tlbs_with_list.  The
+function can then check whether the list is empty, and the OR of
+tmp_spte_ret on every iteration goes away.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
----
- include/kvm/arm_vgic.h        |  2 +-
- virt/kvm/arm/vgic/vgic-init.c |  2 +-
- virt/kvm/arm/vgic/vgic.c      | 37 +++++++++++++++++++------------------
- 3 files changed, 21 insertions(+), 20 deletions(-)
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 32954e1..c36c86f 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -307,7 +307,7 @@ struct vgic_cpu {
- 	unsigned int used_lrs;
- 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
- 
--	spinlock_t ap_list_lock;	/* Protects the ap_list */
-+	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
- 
- 	/*
- 	 * List of IRQs that this VCPU should consider because they are either
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 330c1ad..dfbfcb1 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -206,7 +206,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
- 
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
--	spin_lock_init(&vgic_cpu->ap_list_lock);
-+	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
- 
- 	/*
- 	 * Enable and configure all SGIs to be edge-triggered and
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index ea54a19..abd9c73 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -54,11 +54,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
-  * When taking more than one ap_list_lock at the same time, always take the
-  * lowest numbered VCPU's ap_list_lock first, so:
-  *   vcpuX->vcpu_id < vcpuY->vcpu_id:
-- *     spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
-- *     spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
-+ *     raw_spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
-+ *     raw_spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
-  *
-  * Since the VGIC must support injecting virtual interrupts from ISRs, we have
-- * to use the spin_lock_irqsave/spin_unlock_irqrestore versions of outer
-+ * to use the raw_spin_lock_irqsave/raw_spin_unlock_irqrestore versions of outer
-  * spinlocks for any lock that may be taken while injecting an interrupt.
-  */
- 
-@@ -351,7 +351,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 
- 	/* someone can do stuff here, which we re-check below */
- 
--	spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
- 	raw_spin_lock(&irq->irq_lock);
- 
- 	/*
-@@ -368,7 +368,8 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 
- 	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
- 		raw_spin_unlock(&irq->irq_lock);
--		spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
-+					   flags);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 		goto retry;
-@@ -383,7 +384,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 	irq->vcpu = vcpu;
- 
- 	raw_spin_unlock(&irq->irq_lock);
--	spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
- 
- 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
- 	kvm_vcpu_kick(vcpu);
-@@ -597,7 +598,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
- 
- retry:
--	spin_lock(&vgic_cpu->ap_list_lock);
-+	raw_spin_lock(&vgic_cpu->ap_list_lock);
- 
- 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
- 		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
-@@ -638,7 +639,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		/* This interrupt looks like it has to be migrated. */
- 
- 		raw_spin_unlock(&irq->irq_lock);
--		spin_unlock(&vgic_cpu->ap_list_lock);
-+		raw_spin_unlock(&vgic_cpu->ap_list_lock);
- 
- 		/*
- 		 * Ensure locking order by always locking the smallest
-@@ -652,9 +653,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 			vcpuB = vcpu;
- 		}
- 
--		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
--		spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
--				 SINGLE_DEPTH_NESTING);
-+		raw_spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
-+		raw_spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
-+				      SINGLE_DEPTH_NESTING);
- 		raw_spin_lock(&irq->irq_lock);
- 
- 		/*
-@@ -676,8 +677,8 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		}
- 
- 		raw_spin_unlock(&irq->irq_lock);
--		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
--		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
-+		raw_spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
-+		raw_spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
- 
- 		if (target_vcpu_needs_kick) {
- 			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
-@@ -687,7 +688,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		goto retry;
- 	}
- 
--	spin_unlock(&vgic_cpu->ap_list_lock);
-+	raw_spin_unlock(&vgic_cpu->ap_list_lock);
- }
- 
- static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
-@@ -872,9 +873,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
- 
--	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+	raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
- 	vgic_flush_lr_state(vcpu);
--	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+	raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
- 
- 	if (can_access_vgic_from_kernel())
- 		vgic_restore_state(vcpu);
-@@ -918,7 +919,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 
- 	vgic_get_vmcr(vcpu, &vmcr);
- 
--	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
-+	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
- 		raw_spin_lock(&irq->irq_lock);
-@@ -931,7 +932,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 			break;
- 	}
- 
--	spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
- 
- 	return pending;
- }
--- 
-1.9.1
+Paolo
