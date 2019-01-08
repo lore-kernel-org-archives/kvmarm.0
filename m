@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v3 16/21] iommu: introduce device fault report API
-Date: Tue,  8 Jan 2019 11:26:28 +0100
-Message-ID: <20190108102633.17482-17-eric.auger@redhat.com>
+Subject: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
+Date: Tue,  8 Jan 2019 11:26:29 +0100
+Message-ID: <20190108102633.17482-18-eric.auger@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2894A42C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4290C4A442
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mMlY53cK2NFa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 05:28:36 -0500 (EST)
+ with ESMTP id pzXtTI7UqqzQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Jan 2019 05:28:40 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20E624A41C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F04D4A420
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:40 -0500 (EST)
 In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,321 +31,178 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundatio
 Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+When a stage 1 related fault event is read from the event queue,
+let's propagate it to potential external fault listeners, ie. users
+who registered a fault handler.
 
-Traditionally, device specific faults are detected and handled within
-their own device drivers. When IOMMU is enabled, faults such as DMA
-related transactions are detected by IOMMU. There is no generic
-reporting mechanism to report faults back to the in-kernel device
-driver or the guest OS in case of assigned devices.
-
-Faults detected by IOMMU is based on the transaction's source ID which
-can be reported at per device basis, regardless of the device type is a
-PCI device or not.
-
-The fault types include recoverable (e.g. page request) and
-unrecoverable faults(e.g. access error). In most cases, faults can be
-handled by IOMMU drivers internally. The primary use cases are as
-follows:
-1. page request fault originated from an SVM capable device that is
-assigned to guest via vIOMMU. In this case, the first level page tables
-are owned by the guest. Page request must be propagated to the guest to
-let guest OS fault in the pages then send page response. In this
-mechanism, the direct receiver of IOMMU fault notification is VFIO,
-which can relay notification events to QEMU or other user space
-software.
-
-2. faults need more subtle handling by device drivers. Other than
-simply invoke reset function, there are needs to let device driver
-handle the fault with a smaller impact.
-
-This patchset is intended to create a generic fault report API such
-that it can scale as follows:
-- all IOMMU types
-- PCI and non-PCI devices
-- recoverable and unrecoverable faults
-- VFIO and other other in kernel users
-- DMA & IRQ remapping (TBD)
-The original idea was brought up by David Woodhouse and discussions
-summarized at https://lwn.net/Articles/608914/.
-
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-[adapt to new iommu_fault fault field, test fault_param on
- iommu_unregister_device_fault_handler]
 ---
- drivers/iommu/iommu.c | 153 +++++++++++++++++++++++++++++++++++++++++-
- include/linux/iommu.h |  33 ++++++++-
- 2 files changed, 184 insertions(+), 2 deletions(-)
+ drivers/iommu/arm-smmu-v3.c | 124 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 113 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index ea11442e7054..fb13d83914a6 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -648,6 +648,13 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
- 		goto err_free_name;
- 	}
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 999ee470a2ae..6a711cbbb228 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -168,6 +168,26 @@
+ #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
+ #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
  
-+	dev->iommu_param = kzalloc(sizeof(*dev->iommu_param), GFP_KERNEL);
-+	if (!dev->iommu_param) {
-+		ret = -ENOMEM;
-+		goto err_free_name;
-+	}
-+	mutex_init(&dev->iommu_param->lock);
++/* Events */
++#define ARM_SMMU_EVT_F_UUT		0x01
++#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
++#define ARM_SMMU_EVT_F_STE_FETCH	0x03
++#define ARM_SMMU_EVT_C_BAD_STE		0x04
++#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
++#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
++#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
++#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
++#define ARM_SMMU_EVT_F_CD_FETCH		0x09
++#define ARM_SMMU_EVT_C_BAD_CD		0x0a
++#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
++#define ARM_SMMU_EVT_F_TRANSLATION	0x10
++#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
++#define ARM_SMMU_EVT_F_ACCESS		0x12
++#define ARM_SMMU_EVT_F_PERMISSION	0x13
++#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
++#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
++#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
 +
- 	kobject_get(group->devices_kobj);
+ /* Common MSI config fields */
+ #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
+ #define MSI_CFG2_SH			GENMASK(5, 4)
+@@ -333,6 +353,11 @@
+ #define EVTQ_MAX_SZ_SHIFT		7
  
- 	dev->iommu_group = group;
-@@ -678,6 +685,7 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
- 	mutex_unlock(&group->mutex);
- 	dev->iommu_group = NULL;
- 	kobject_put(group->devices_kobj);
-+	kfree(dev->iommu_param);
- err_free_name:
- 	kfree(device->name);
- err_remove_link:
-@@ -724,7 +732,7 @@ void iommu_group_remove_device(struct device *dev)
- 	sysfs_remove_link(&dev->kobj, "iommu_group");
+ #define EVTQ_0_ID			GENMASK_ULL(7, 0)
++#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
++#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
++#define EVTQ_1_S2			GENMASK_ULL(39, 39)
++#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
++#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
  
- 	trace_remove_device_from_group(group->id, dev);
--
-+	kfree(dev->iommu_param);
- 	kfree(device->name);
- 	kfree(device);
- 	dev->iommu_group = NULL;
-@@ -858,6 +866,149 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
- }
- EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
- 
-+/**
-+ * iommu_register_device_fault_handler() - Register a device fault handler
-+ * @dev: the device
-+ * @handler: the fault handler
-+ * @data: private data passed as argument to the handler
-+ *
-+ * When an IOMMU fault event is received, call this handler with the fault event
-+ * and data as argument. The handler should return 0 on success. If the fault is
-+ * recoverable (IOMMU_FAULT_PAGE_REQ), the handler can also complete
-+ * the fault by calling iommu_page_response() with one of the following
-+ * response code:
-+ * - IOMMU_PAGE_RESP_SUCCESS: retry the translation
-+ * - IOMMU_PAGE_RESP_INVALID: terminate the fault
-+ * - IOMMU_PAGE_RESP_FAILURE: terminate the fault and stop reporting
-+ *   page faults if possible.
-+ *
-+ * Return 0 if the fault handler was installed successfully, or an error.
-+ */
-+int iommu_register_device_fault_handler(struct device *dev,
-+					iommu_dev_fault_handler_t handler,
-+					void *data)
-+{
-+	struct iommu_param *param = dev->iommu_param;
-+	int ret = 0;
-+
-+	/*
-+	 * Device iommu_param should have been allocated when device is
-+	 * added to its iommu_group.
-+	 */
-+	if (!param)
-+		return -EINVAL;
-+
-+	mutex_lock(&param->lock);
-+	/* Only allow one fault handler registered for each device */
-+	if (param->fault_param) {
-+		ret = -EBUSY;
-+		goto done_unlock;
-+	}
-+
-+	get_device(dev);
-+	param->fault_param =
-+		kzalloc(sizeof(struct iommu_fault_param), GFP_KERNEL);
-+	if (!param->fault_param) {
-+		put_device(dev);
-+		ret = -ENOMEM;
-+		goto done_unlock;
-+	}
-+	mutex_init(&param->fault_param->lock);
-+	param->fault_param->handler = handler;
-+	param->fault_param->data = data;
-+	INIT_LIST_HEAD(&param->fault_param->faults);
-+
-+done_unlock:
-+	mutex_unlock(&param->lock);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_register_device_fault_handler);
-+
-+/**
-+ * iommu_unregister_device_fault_handler() - Unregister the device fault handler
-+ * @dev: the device
-+ *
-+ * Remove the device fault handler installed with
-+ * iommu_register_device_fault_handler().
-+ *
-+ * Return 0 on success, or an error.
-+ */
-+int iommu_unregister_device_fault_handler(struct device *dev)
-+{
-+	struct iommu_param *param = dev->iommu_param;
-+	int ret = 0;
-+
-+	if (!param)
-+		return -EINVAL;
-+
-+	mutex_lock(&param->lock);
-+
-+	if (!param->fault_param)
-+		goto unlock;
-+
-+	/* we cannot unregister handler if there are pending faults */
-+	if (!list_empty(&param->fault_param->faults)) {
-+		ret = -EBUSY;
-+		goto unlock;
-+	}
-+
-+	kfree(param->fault_param);
-+	param->fault_param = NULL;
-+	put_device(dev);
-+unlock:
-+	mutex_unlock(&param->lock);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_unregister_device_fault_handler);
-+
-+
-+/**
-+ * iommu_report_device_fault() - Report fault event to device
-+ * @dev: the device
-+ * @evt: fault event data
-+ *
-+ * Called by IOMMU model specific drivers when fault is detected, typically
-+ * in a threaded IRQ handler.
-+ *
-+ * Return 0 on success, or an error.
-+ */
-+int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
-+{
-+	int ret = 0;
-+	struct iommu_fault_event *evt_pending;
-+	struct iommu_fault_param *fparam;
-+
-+	/* iommu_param is allocated when device is added to group */
-+	if (!dev->iommu_param | !evt)
-+		return -EINVAL;
-+	/* we only report device fault if there is a handler registered */
-+	mutex_lock(&dev->iommu_param->lock);
-+	if (!dev->iommu_param->fault_param ||
-+		!dev->iommu_param->fault_param->handler) {
-+		ret = -EINVAL;
-+		goto done_unlock;
-+	}
-+	fparam = dev->iommu_param->fault_param;
-+	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ && evt->fault.last_req) {
-+		evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
-+				GFP_KERNEL);
-+		if (!evt_pending) {
-+			ret = -ENOMEM;
-+			goto done_unlock;
-+		}
-+		mutex_lock(&fparam->lock);
-+		list_add_tail(&evt_pending->list, &fparam->faults);
-+		mutex_unlock(&fparam->lock);
-+	}
-+	ret = fparam->handler(evt, fparam->data);
-+done_unlock:
-+	mutex_unlock(&dev->iommu_param->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_report_device_fault);
-+
- /**
-  * iommu_group_id - Return ID for a group
-  * @group: the group to ID
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 1dedc2d247c2..a39bf9e040d4 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -269,6 +269,7 @@ struct iommu_device {
-  * - DMA remapping and IRQ remapping faults
-  *
-  * @fault: fault descriptor
-+ * @list pending fault event list, used for tracking responses
-  * @device_private: if present, uniquely identify device-specific
-  *                  private data for an individual page request.
-  * @iommu_private: used by the IOMMU driver for storing fault-specific
-@@ -276,6 +277,7 @@ struct iommu_device {
-  *                 sending the fault response.
-  */
- struct iommu_fault_event {
-+	struct list_head list;
- 	struct iommu_fault fault;
- 	u64 device_private;
- 	u64 iommu_private;
-@@ -285,10 +287,13 @@ struct iommu_fault_event {
-  * struct iommu_fault_param - per-device IOMMU fault data
-  * @dev_fault_handler: Callback function to handle IOMMU faults at device level
-  * @data: handler private data
-- *
-+ * @faults: holds the pending faults which needs response, e.g. page response.
-+ * @lock: protect pending PRQ event list
-  */
- struct iommu_fault_param {
- 	iommu_dev_fault_handler_t handler;
-+	struct list_head faults;
-+	struct mutex lock;
- 	void *data;
- };
- 
-@@ -302,6 +307,7 @@ struct iommu_fault_param {
-  *	struct iommu_fwspec	*iommu_fwspec;
-  */
- struct iommu_param {
-+	struct mutex lock;
- 	struct iommu_fault_param *fault_param;
- };
- 
-@@ -402,6 +408,14 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
- 					 struct notifier_block *nb);
- extern int iommu_group_unregister_notifier(struct iommu_group *group,
- 					   struct notifier_block *nb);
-+extern int iommu_register_device_fault_handler(struct device *dev,
-+					iommu_dev_fault_handler_t handler,
-+					void *data);
-+
-+extern int iommu_unregister_device_fault_handler(struct device *dev);
-+
-+extern int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt);
-+
- extern int iommu_group_id(struct iommu_group *group);
- extern struct iommu_group *iommu_group_get_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
-@@ -682,6 +696,23 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
+ /* PRI queue */
+ #define PRIQ_ENT_DWORDS			2
+@@ -1270,7 +1295,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
  	return 0;
  }
  
-+static inline int iommu_register_device_fault_handler(struct device *dev,
-+						iommu_dev_fault_handler_t handler,
-+						void *data)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int iommu_unregister_device_fault_handler(struct device *dev)
-+{
-+	return 0;
-+}
-+
-+static inline int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
-+{
-+	return -ENODEV;
-+}
-+
- static inline int iommu_group_id(struct iommu_group *group)
+-__maybe_unused
+ static struct arm_smmu_master_data *
+ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
  {
- 	return -ENODEV;
+@@ -1296,24 +1320,102 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
+ 	return master;
+ }
+ 
++static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
++{
++	u64 fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
++	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
++	bool s1 = !FIELD_GET(EVTQ_1_S2, evt[1]);
++	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
++	struct arm_smmu_master_data *master;
++	struct iommu_fault_event event;
++	bool propagate = true;
++	u64 addr = evt[2];
++	int i;
++
++	master = arm_smmu_find_master(smmu, sid);
++	if (WARN_ON(!master))
++		return;
++
++	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
++
++	switch (type) {
++	case ARM_SMMU_EVT_C_BAD_STREAMID:
++		event.fault.reason = IOMMU_FAULT_REASON_SOURCEID_INVALID;
++		break;
++	case ARM_SMMU_EVT_F_STREAM_DISABLED:
++	case ARM_SMMU_EVT_C_BAD_SUBSTREAMID:
++		event.fault.reason = IOMMU_FAULT_REASON_PASID_INVALID;
++		break;
++	case ARM_SMMU_EVT_F_CD_FETCH:
++		event.fault.reason = IOMMU_FAULT_REASON_PASID_FETCH;
++		break;
++	case ARM_SMMU_EVT_F_WALK_EABT:
++		event.fault.reason = IOMMU_FAULT_REASON_WALK_EABT;
++		event.fault.addr = addr;
++		event.fault.fetch_addr = fetch_addr;
++		propagate = s1;
++		break;
++	case ARM_SMMU_EVT_F_TRANSLATION:
++		event.fault.reason = IOMMU_FAULT_REASON_PTE_FETCH;
++		event.fault.addr = addr;
++		event.fault.fetch_addr = fetch_addr;
++		propagate = s1;
++		break;
++	case ARM_SMMU_EVT_F_PERMISSION:
++		event.fault.reason = IOMMU_FAULT_REASON_PERMISSION;
++		event.fault.addr = addr;
++		propagate = s1;
++		break;
++	case ARM_SMMU_EVT_F_ACCESS:
++		event.fault.reason = IOMMU_FAULT_REASON_ACCESS;
++		event.fault.addr = addr;
++		propagate = s1;
++		break;
++	case ARM_SMMU_EVT_C_BAD_STE:
++		event.fault.reason = IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY;
++		break;
++	case ARM_SMMU_EVT_C_BAD_CD:
++		event.fault.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
++		break;
++	case ARM_SMMU_EVT_F_ADDR_SIZE:
++		event.fault.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
++		propagate = s1;
++		break;
++	case ARM_SMMU_EVT_F_STE_FETCH:
++		event.fault.reason = IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH;
++		event.fault.fetch_addr = fetch_addr;
++		break;
++	/* End of addition */
++	case ARM_SMMU_EVT_E_PAGE_REQUEST:
++	case ARM_SMMU_EVT_F_TLB_CONFLICT:
++	case ARM_SMMU_EVT_F_CFG_CONFLICT:
++	case ARM_SMMU_EVT_F_BAD_ATS_TREQ:
++	case ARM_SMMU_EVT_F_TRANSL_FORBIDDEN:
++	case ARM_SMMU_EVT_F_UUT:
++	default:
++		event.fault.reason = IOMMU_FAULT_REASON_UNKNOWN;
++	}
++	/* only propagate the error if it relates to stage 1 */
++	if (s1)
++		iommu_report_device_fault(master->dev, &event);
++
++	dev_info(smmu->dev, "event 0x%02x received:\n", type);
++	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
++		dev_info(smmu->dev, "\t0x%016llx\n",
++			 (unsigned long long)evt[i]);
++	}
++}
++
+ /* IRQ and event handlers */
+ static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
+ {
+-	int i;
+ 	struct arm_smmu_device *smmu = dev;
+ 	struct arm_smmu_queue *q = &smmu->evtq.q;
+ 	u64 evt[EVTQ_ENT_DWORDS];
+ 
+ 	do {
+-		while (!queue_remove_raw(q, evt)) {
+-			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
+-
+-			dev_info(smmu->dev, "event 0x%02x received:\n", id);
+-			for (i = 0; i < ARRAY_SIZE(evt); ++i)
+-				dev_info(smmu->dev, "\t0x%016llx\n",
+-					 (unsigned long long)evt[i]);
+-
+-		}
++		while (!queue_remove_raw(q, evt))
++			arm_smmu_report_event(smmu, evt);
+ 
+ 		/*
+ 		 * Not much we can do on overflow, so scream and pretend we're
 -- 
 2.17.2
