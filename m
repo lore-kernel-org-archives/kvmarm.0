@@ -1,208 +1,222 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
-Date: Tue,  8 Jan 2019 11:26:29 +0100
-Message-ID: <20190108102633.17482-18-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [RFC v3 18/21] vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
+Date: Tue,  8 Jan 2019 11:26:30 +0100
+Message-ID: <20190108102633.17482-19-eric.auger@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4290C4A442
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pzXtTI7UqqzQ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 05:28:40 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F04D4A420
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:28:40 -0500 (EST)
-In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190108102633.17482-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a stage 1 related fault event is read from the event queue,
-let's propagate it to potential external fault listeners, ie. users
-who registered a fault handler.
+This patch adds a new 64kB region aiming to report nested mode
+translation faults.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The region contains a header with the size of the queue,
+the producer and consumer indices and then the actual
+fault queue data. The producer is updated by the kernel while
+the consumer is updated by the userspace.
+
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
 ---
- drivers/iommu/arm-smmu-v3.c | 124 ++++++++++++++++++++++++++++++++----
- 1 file changed, 113 insertions(+), 11 deletions(-)
+---
+ drivers/vfio/pci/vfio_pci.c         | 102 +++++++++++++++++++++++++++-
+ drivers/vfio/pci/vfio_pci_private.h |   2 +
+ include/uapi/linux/vfio.h           |  15 ++++
+ 3 files changed, 118 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 999ee470a2ae..6a711cbbb228 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -168,6 +168,26 @@
- #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
- #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index ff60bd1ea587..2ba181ab2edd 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -56,6 +56,11 @@ module_param(disable_idle_d3, bool, S_IRUGO | S_IWUSR);
+ MODULE_PARM_DESC(disable_idle_d3,
+ 		 "Disable using the PCI D3 low power state for idle, unused devices");
  
-+/* Events */
-+#define ARM_SMMU_EVT_F_UUT		0x01
-+#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
-+#define ARM_SMMU_EVT_F_STE_FETCH	0x03
-+#define ARM_SMMU_EVT_C_BAD_STE		0x04
-+#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
-+#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
-+#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
-+#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
-+#define ARM_SMMU_EVT_F_CD_FETCH		0x09
-+#define ARM_SMMU_EVT_C_BAD_CD		0x0a
-+#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
-+#define ARM_SMMU_EVT_F_TRANSLATION	0x10
-+#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
-+#define ARM_SMMU_EVT_F_ACCESS		0x12
-+#define ARM_SMMU_EVT_F_PERMISSION	0x13
-+#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
-+#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
-+#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
++#define VFIO_FAULT_REGION_SIZE 0x10000
++#define VFIO_FAULT_QUEUE_SIZE	\
++	((VFIO_FAULT_REGION_SIZE - sizeof(struct vfio_fault_region_header)) / \
++	sizeof(struct iommu_fault))
 +
- /* Common MSI config fields */
- #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
- #define MSI_CFG2_SH			GENMASK(5, 4)
-@@ -333,6 +353,11 @@
- #define EVTQ_MAX_SZ_SHIFT		7
- 
- #define EVTQ_0_ID			GENMASK_ULL(7, 0)
-+#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
-+#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
-+#define EVTQ_1_S2			GENMASK_ULL(39, 39)
-+#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
-+#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
- 
- /* PRI queue */
- #define PRIQ_ENT_DWORDS			2
-@@ -1270,7 +1295,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
- 	return 0;
- }
- 
--__maybe_unused
- static struct arm_smmu_master_data *
- arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
+ static inline bool vfio_vga_disabled(void)
  {
-@@ -1296,24 +1320,102 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
- 	return master;
- }
+ #ifdef CONFIG_VFIO_PCI_VGA
+@@ -1226,6 +1231,100 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ static int vfio_pci_reflck_attach(struct vfio_pci_device *vdev);
+ static void vfio_pci_reflck_put(struct vfio_pci_reflck *reflck);
  
-+static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
++static size_t
++vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev, char __user *buf,
++		      size_t count, loff_t *ppos, bool iswrite)
 +{
-+	u64 fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
-+	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
-+	bool s1 = !FIELD_GET(EVTQ_1_S2, evt[1]);
-+	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
-+	struct arm_smmu_master_data *master;
-+	struct iommu_fault_event event;
-+	bool propagate = true;
-+	u64 addr = evt[2];
-+	int i;
++	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
++	void *base = vdev->region[i].data;
++	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
 +
-+	master = arm_smmu_find_master(smmu, sid);
-+	if (WARN_ON(!master))
-+		return;
++	if (pos >= vdev->region[i].size)
++		return -EINVAL;
 +
-+	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
++	count = min(count, (size_t)(vdev->region[i].size - pos));
 +
-+	switch (type) {
-+	case ARM_SMMU_EVT_C_BAD_STREAMID:
-+		event.fault.reason = IOMMU_FAULT_REASON_SOURCEID_INVALID;
-+		break;
-+	case ARM_SMMU_EVT_F_STREAM_DISABLED:
-+	case ARM_SMMU_EVT_C_BAD_SUBSTREAMID:
-+		event.fault.reason = IOMMU_FAULT_REASON_PASID_INVALID;
-+		break;
-+	case ARM_SMMU_EVT_F_CD_FETCH:
-+		event.fault.reason = IOMMU_FAULT_REASON_PASID_FETCH;
-+		break;
-+	case ARM_SMMU_EVT_F_WALK_EABT:
-+		event.fault.reason = IOMMU_FAULT_REASON_WALK_EABT;
-+		event.fault.addr = addr;
-+		event.fault.fetch_addr = fetch_addr;
-+		propagate = s1;
-+		break;
-+	case ARM_SMMU_EVT_F_TRANSLATION:
-+		event.fault.reason = IOMMU_FAULT_REASON_PTE_FETCH;
-+		event.fault.addr = addr;
-+		event.fault.fetch_addr = fetch_addr;
-+		propagate = s1;
-+		break;
-+	case ARM_SMMU_EVT_F_PERMISSION:
-+		event.fault.reason = IOMMU_FAULT_REASON_PERMISSION;
-+		event.fault.addr = addr;
-+		propagate = s1;
-+		break;
-+	case ARM_SMMU_EVT_F_ACCESS:
-+		event.fault.reason = IOMMU_FAULT_REASON_ACCESS;
-+		event.fault.addr = addr;
-+		propagate = s1;
-+		break;
-+	case ARM_SMMU_EVT_C_BAD_STE:
-+		event.fault.reason = IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY;
-+		break;
-+	case ARM_SMMU_EVT_C_BAD_CD:
-+		event.fault.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
-+		break;
-+	case ARM_SMMU_EVT_F_ADDR_SIZE:
-+		event.fault.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
-+		propagate = s1;
-+		break;
-+	case ARM_SMMU_EVT_F_STE_FETCH:
-+		event.fault.reason = IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH;
-+		event.fault.fetch_addr = fetch_addr;
-+		break;
-+	/* End of addition */
-+	case ARM_SMMU_EVT_E_PAGE_REQUEST:
-+	case ARM_SMMU_EVT_F_TLB_CONFLICT:
-+	case ARM_SMMU_EVT_F_CFG_CONFLICT:
-+	case ARM_SMMU_EVT_F_BAD_ATS_TREQ:
-+	case ARM_SMMU_EVT_F_TRANSL_FORBIDDEN:
-+	case ARM_SMMU_EVT_F_UUT:
-+	default:
-+		event.fault.reason = IOMMU_FAULT_REASON_UNKNOWN;
-+	}
-+	/* only propagate the error if it relates to stage 1 */
-+	if (s1)
-+		iommu_report_device_fault(master->dev, &event);
++	if (copy_to_user(buf, base + pos, count))
++		return -EFAULT;
 +
-+	dev_info(smmu->dev, "event 0x%02x received:\n", type);
-+	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
-+		dev_info(smmu->dev, "\t0x%016llx\n",
-+			 (unsigned long long)evt[i]);
-+	}
++	*ppos += count;
++
++	return count;
 +}
 +
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
++static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
++				   struct vfio_pci_region *region,
++				   struct vm_area_struct *vma)
++{
++	u64 phys_len, req_len, pgoff, req_start;
++	unsigned long long addr;
++	unsigned int index;
++
++	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
++
++	if (vma->vm_end < vma->vm_start)
++		return -EINVAL;
++	if ((vma->vm_flags & VM_SHARED) == 0)
++		return -EINVAL;
++
++	phys_len = VFIO_FAULT_REGION_SIZE;
++
++	req_len = vma->vm_end - vma->vm_start;
++	pgoff = vma->vm_pgoff &
++		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	req_start = pgoff << PAGE_SHIFT;
++
++	if (req_start + req_len > phys_len)
++		return -EINVAL;
++
++	addr = virt_to_phys(vdev->fault_region);
++	vma->vm_private_data = vdev;
++	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
++
++	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
++			       req_len, vma->vm_page_prot);
++}
++
++void vfio_pci_dma_fault_release(struct vfio_pci_device *vdev,
++				struct vfio_pci_region *region)
++{
++}
++
++static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
++	.rw		= vfio_pci_dma_fault_rw,
++	.mmap		= vfio_pci_dma_fault_mmap,
++	.release	= vfio_pci_dma_fault_release,
++};
++
++static int vfio_pci_init_dma_fault_region(struct vfio_pci_device *vdev)
++{
++	u32 flags = VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE |
++		    VFIO_REGION_INFO_FLAG_MMAP;
++	int ret;
++
++	spin_lock_init(&vdev->fault_queue_lock);
++
++	vdev->fault_region = kmalloc(VFIO_FAULT_REGION_SIZE, GFP_KERNEL);
++	if (!vdev->fault_region)
++		return -ENOMEM;
++
++	ret = vfio_pci_register_dev_region(vdev,
++		VFIO_REGION_TYPE_NESTED,
++		VFIO_REGION_SUBTYPE_NESTED_FAULT_REGION,
++		&vfio_pci_dma_fault_regops, VFIO_FAULT_REGION_SIZE,
++		flags, vdev->fault_region);
++	if (ret) {
++		kfree(vdev->fault_region);
++		return ret;
++	}
++
++	vdev->fault_region->header.prod = 0;
++	vdev->fault_region->header.cons = 0;
++	vdev->fault_region->header.reserved = 0;
++	vdev->fault_region->header.size = VFIO_FAULT_QUEUE_SIZE;
++	return 0;
++}
++
+ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  {
--	int i;
- 	struct arm_smmu_device *smmu = dev;
- 	struct arm_smmu_queue *q = &smmu->evtq.q;
- 	u64 evt[EVTQ_ENT_DWORDS];
+ 	struct vfio_pci_device *vdev;
+@@ -1300,7 +1399,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		pci_set_power_state(pdev, PCI_D3hot);
+ 	}
  
- 	do {
--		while (!queue_remove_raw(q, evt)) {
--			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
--
--			dev_info(smmu->dev, "event 0x%02x received:\n", id);
--			for (i = 0; i < ARRAY_SIZE(evt); ++i)
--				dev_info(smmu->dev, "\t0x%016llx\n",
--					 (unsigned long long)evt[i]);
--
--		}
-+		while (!queue_remove_raw(q, evt))
-+			arm_smmu_report_event(smmu, evt);
+-	return ret;
++	return vfio_pci_init_dma_fault_region(vdev);
+ }
  
- 		/*
- 		 * Not much we can do on overflow, so scream and pretend we're
+ static void vfio_pci_remove(struct pci_dev *pdev)
+@@ -1315,6 +1414,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+ 
+ 	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
+ 	kfree(vdev->region);
++	kfree(vdev->fault_region);
+ 	mutex_destroy(&vdev->ioeventfds_lock);
+ 	kfree(vdev);
+ 
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index 8c0009f00818..38b5d1764a26 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -120,6 +120,8 @@ struct vfio_pci_device {
+ 	int			ioeventfds_nr;
+ 	struct eventfd_ctx	*err_trigger;
+ 	struct eventfd_ctx	*req_trigger;
++	spinlock_t              fault_queue_lock;
++	struct vfio_fault_region *fault_region;
+ 	struct list_head	dummy_resources_list;
+ 	struct mutex		ioeventfds_lock;
+ 	struct list_head	ioeventfds_list;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 352e795a93c8..b78c2c62af6d 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -307,6 +307,9 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_TYPE_GFX                    (1)
+ #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+ 
++#define VFIO_REGION_TYPE_NESTED			(2)
++#define VFIO_REGION_SUBTYPE_NESTED_FAULT_REGION	(1)
++
+ /**
+  * struct vfio_region_gfx_edid - EDID region layout.
+  *
+@@ -697,6 +700,18 @@ struct vfio_device_ioeventfd {
+ 
+ #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++struct vfio_fault_region_header {
++	__u32	size;		/* Read-Only */
++	__u32	prod;		/* Read-Only */
++	__u32	cons;
++	__u32	reserved;	/* must be 0 */
++};
++
++struct vfio_fault_region {
++	struct vfio_fault_region_header header;
++	struct iommu_fault queue[0];
++};
++
+ /* -------- API for Type1 VFIO IOMMU -------- */
+ 
+ /**
 -- 
 2.17.2
