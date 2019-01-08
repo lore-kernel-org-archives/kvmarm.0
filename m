@@ -1,172 +1,171 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v4 1/6] arm64/kvm: preserve host HCR_EL2 value
-Date: Tue, 8 Jan 2019 10:46:57 +0530
-Message-ID: <CADGdYn5VvAgmTbjmA_1hM0LFoOcvzMO6BziSvWax85Q1hSPxsQ@mail.gmail.com>
-References: <1545119810-12182-1-git-send-email-amit.kachhap@arm.com>
- <1545119810-12182-2-git-send-email-amit.kachhap@arm.com> <47a81c5b-1b1b-2c87-8c90-af5ef63d1364@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Tue, 8 Jan 2019 11:18:43 +0100
+Message-ID: <20190108101843.GH10769@e113682-lin.lund.arm.com>
+References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
+ <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
+ <20181218120226.GC25383@e113682-lin.lund.arm.com>
+ <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <47a81c5b-1b1b-2c87-8c90-af5ef63d1364@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>
-Cc: LAK <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 953234A417
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:18:49 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id o54dVOV0KuOS for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Jan 2019 05:18:46 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F934A3E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:18:46 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, joro@8bytes.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Fri, Jan 04, 2019 at 03:32:06PM +0000, Will Deacon wrote:
+> On Tue, Dec 18, 2018 at 01:02:26PM +0100, Christoffer Dall wrote:
+> > On Wed, Dec 12, 2018 at 10:29:32AM +0000, Andrew Murray wrote:
+> > > Add support for the :G and :H attributes in perf by handling the
+> > > exclude_host/exclude_guest event attributes.
+> > > 
+> > > We notify KVM of counters that we wish to be enabled or disabled on
+> > > guest entry/exit and thus defer from starting or stopping :G events
+> > > as per the events exclude_host attribute.
+> > > 
+> > > With both VHE and non-VHE we switch the counters between host/guest
+> > > at EL2. We are able to eliminate counters counting host events on
+> > > the boundaries of guest entry/exit when using :G by filtering out
+> > > EL2 for exclude_host. However when using :H unless exclude_hv is set
+> > > on non-VHE then there is a small blackout window at the guest
+> > > entry/exit where host events are not captured.
+> > > 
+> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > ---
+> > >  arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
+> > >  1 file changed, 44 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> > > index de564ae..4a3c73d 100644
+> > > --- a/arch/arm64/kernel/perf_event.c
+> > > +++ b/arch/arm64/kernel/perf_event.c
+> > > @@ -26,6 +26,7 @@
+> > >  
+> > >  #include <linux/acpi.h>
+> > >  #include <linux/clocksource.h>
+> > > +#include <linux/kvm_host.h>
+> > >  #include <linux/of.h>
+> > >  #include <linux/perf/arm_pmu.h>
+> > >  #include <linux/platform_device.h>
+> > > @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
+> > >  
+> > >  static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+> > >  {
+> > > +	struct perf_event_attr *attr = &event->attr;
+> > >  	int idx = event->hw.idx;
+> > > +	int flags = 0;
+> > > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+> > >  
+> > > -	armv8pmu_enable_counter(idx);
+> > >  	if (armv8pmu_event_is_chained(event))
+> > > -		armv8pmu_enable_counter(idx - 1);
+> > > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> > > +
+> > > +	if (!attr->exclude_host)
+> > > +		flags |= KVM_PMU_EVENTS_HOST;
+> > > +	if (!attr->exclude_guest)
+> > > +		flags |= KVM_PMU_EVENTS_GUEST;
+> > > +
+> > > +	kvm_set_pmu_events(counter_bits, flags);
+> > > +
+> > > +	if (!attr->exclude_host) {
+> > > +		armv8pmu_enable_counter(idx);
+> > > +		if (armv8pmu_event_is_chained(event))
+> > > +			armv8pmu_enable_counter(idx - 1);
+> > > +	}
+> > >  }
+> > >  
+> > >  static inline int armv8pmu_disable_counter(int idx)
+> > > @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
+> > >  static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+> > >  {
+> > >  	struct hw_perf_event *hwc = &event->hw;
+> > > +	struct perf_event_attr *attr = &event->attr;
+> > >  	int idx = hwc->idx;
+> > > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+> > >  
+> > >  	if (armv8pmu_event_is_chained(event))
+> > > -		armv8pmu_disable_counter(idx - 1);
+> > > -	armv8pmu_disable_counter(idx);
+> > > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> > > +
+> > > +	kvm_clr_pmu_events(counter_bits);
+> > > +
+> > > +	if (!attr->exclude_host) {
+> > > +		if (armv8pmu_event_is_chained(event))
+> > > +			armv8pmu_disable_counter(idx - 1);
+> > > +		armv8pmu_disable_counter(idx);
+> > > +	}
+> > >  }
+> > >  
+> > >  static inline int armv8pmu_enable_intens(int idx)
+> > > @@ -943,16 +968,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+> > >  	 * Therefore we ignore exclude_hv in this configuration, since
+> > >  	 * there's no hypervisor to sample anyway. This is consistent
+> > >  	 * with other architectures (x86 and Power).
+> > > +	 *
+> > > +	 * To eliminate counting host events on the boundaries of
+> > > +	 * guest entry/exit we ensure EL2 is not included in hyp mode
+> > > +	 * with !exclude_host.
+> > >  	 */
+> > >  	if (is_kernel_in_hyp_mode()) {
+> > > -		if (!attr->exclude_kernel)
+> > > +		if (!attr->exclude_kernel && !attr->exclude_host)
+> > >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> > >  	} else {
+> > > -		if (attr->exclude_kernel)
+> > > -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> > >  		if (!attr->exclude_hv)
+> > >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+> > 
+> > I'm not sure about the current use of exclude_hv here.  The comment says
+> > it's consistent with other architectures, but I can't find an example to
+> > confirm this, and I don't think we have a comparable thing to the split
+> > of the hypervisor between EL1 and EL2 we have on non-VHE.
+> 
+> FWIW, that comment came from this thread:
+> 
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/503908.html
+> 
+> That was painful enough at the time, so I'd /really/ prefer not to change
+> the semantics of this again if we can avoid it.
 
-On Sat, Jan 5, 2019 at 12:05 AM James Morse <james.morse@arm.com> wrote:
->
-> Hi Amit,
->
-> On 18/12/2018 07:56, Amit Daniel Kachhap wrote:
-> > When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
-> > is a constant value. This works today, as the host HCR_EL2 value is
-> > always the same, but this will get in the way of supporting extensions
-> > that require HCR_EL2 bits to be set conditionally for the host.
-> >
-> > To allow such features to work without KVM having to explicitly handle
-> > every possible host feature combination, this patch has KVM save/restore
-> > the host HCR when switching to/from a guest HCR. The saving of the
-> > register is done once during cpu hypervisor initialization state and is
-> > just restored after switch from guest.
-> >
-> > For fetching HCR_EL2 during kvm initilisation, a hyp call is made using
->
-> (initialisation)
->
->
-> > kvm_call_hyp and is helpful in NHVE case.
-> >
-> > For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
-> > to toggle the TGE bit with a RMW sequence, as we already do in
-> > __tlb_switch_to_guest_vhe().
->
->
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index aea01a0..25ac9fa 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -73,6 +73,8 @@ extern void __vgic_v3_init_lrs(void);
-> >
-> >  extern u32 __kvm_get_mdcr_el2(void);
-> >
-> > +extern u64 __read_hyp_hcr_el2(void);
->
-> How come this isn't __kvm_get_hcr_el2() like mdcr?
-yes.
->
->
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 52fbc82..1b9eed9 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -196,13 +196,17 @@ enum vcpu_sysreg {
-> >
-> >  #define NR_COPRO_REGS        (NR_SYS_REGS * 2)
-> >
-> > +struct kvm_cpu_init_host_regs {
-> > +     u64 hcr_el2;
-> > +};
-> > +
-> >  struct kvm_cpu_context {
-> >       struct kvm_regs gp_regs;
-> >       union {
-> >               u64 sys_regs[NR_SYS_REGS];
-> >               u32 copro[NR_COPRO_REGS];
-> >       };
-> > -
-> > +     struct kvm_cpu_init_host_regs init_regs;
-> >       struct kvm_vcpu *__hyp_running_vcpu;
-> >  };
->
-> Hmm, so we grow every vcpu's struct kvm_cpu_context with some host-only registers...
->
->
-> > @@ -211,7 +215,7 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
-> >  struct kvm_vcpu_arch {
-> >       struct kvm_cpu_context ctxt;
-> >
-> > -     /* HYP configuration */
-> > +     /* Guest HYP configuration */
-> >       u64 hcr_el2;
-> >       u32 mdcr_el2;
->
-> ... but they aren't actually host-only.
->
->
-> I think it would be tidier to move these two into struct kvm_cpu_context (not as
-> some init_host state), as both host and vcpu's have these values.
-> You could then add the mdcr_el2 stashing to your __cpu_copy_host_registers()
-> too. This way they both work in the same way, otherwise one is per-cpu, the
-> other is in a special bit of only the host's kvm_cpu_context.
->
-Your suggestion looks doable. I will implement in next iteration.
->
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index f6e02cc..85a2a5c 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -139,15 +139,15 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-> >               __activate_traps_nvhe(vcpu);
-> >  }
-> >
-> > -static void deactivate_traps_vhe(void)
-> > +static void deactivate_traps_vhe(struct kvm_cpu_context *host_ctxt)
-> >  {
-> >       extern char vectors[];  /* kernel exception vectors */
-> > -     write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-> > +     write_sysreg(host_ctxt->init_regs.hcr_el2, hcr_el2);
-> >       write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
-> >       write_sysreg(vectors, vbar_el1);
-> >  }
-> >
-> > -static void __hyp_text __deactivate_traps_nvhe(void)
-> > +static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
-> >  {
-> >       u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> >
-> > @@ -157,12 +157,15 @@ static void __hyp_text __deactivate_traps_nvhe(void)
-> >       mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
-> >
-> >       write_sysreg(mdcr_el2, mdcr_el2);
->
-> Strangely we try to rebuild the host's mdcr value here. If we had the host mdcr
-> value in host_ctxt we could restore it directly.
-yes. I will check if initial value host value is same as calculated.
->
->
-> > -     write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
-> > +     write_sysreg(host_ctxt->init_regs.hcr_el2, hcr_el2);
-> >       write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
-> >  }
->
-> >  static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-> >  {
-> > +     struct kvm_cpu_context *host_ctxt;
-> > +
-> > +     host_ctxt = vcpu->arch.host_cpu_context;
-> >       /*
-> >        * If we pended a virtual abort, preserve it until it gets
-> >        * cleared. See D1.14.3 (Virtual Interrupts) for details, but
-> > @@ -173,9 +176,9 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-> >               vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
-> >
-> >       if (has_vhe())
-> > -             deactivate_traps_vhe();
-> > +             deactivate_traps_vhe(host_ctxt);
-> >       else
-> > -             __deactivate_traps_nvhe();
-> > +             __deactivate_traps_nvhe(host_ctxt);
-> >  }
->
-> (Alternatively each of these deactivate_traps() calls could retrieve the
-> host_ctxt directly as its a per-cpu variable, but as we have the struct vcpu
-> here, this is probably better.)
->
->
-> Thanks,
->
-> James
+The comment makes sense for the is_kernel_in_hyp_mode() case.
 
-//Amit
+However, for the !is_kernel_in_hyp_mode() case I can't see the current
+behavior of exclude_hv being similar in other architectures.
+
+I don't think the current semantics of excluding EL2 on a non-VHE host
+system makes much sense, and I doubt anyone is using that for something
+meaningful.  I think changing behavior for excldue_hv to depend on
+is_hyp_mode_available rather than is_kernel_in_hyp_mode is the right
+thing to do which would also align the semantics with other
+architectures and between VHE and non-VHE.
+
+
+Thanks,
+
+    Christoffer
