@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v3 03/21] iommu: Introduce bind_guest_msi
-Date: Tue,  8 Jan 2019 11:26:15 +0100
-Message-ID: <20190108102633.17482-4-eric.auger@redhat.com>
+Subject: [RFC v3 04/21] vfio: VFIO_IOMMU_SET_PASID_TABLE
+Date: Tue,  8 Jan 2019 11:26:16 +0100
+Message-ID: <20190108102633.17482-5-eric.auger@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 937DB4A40A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:27:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7CA4A42F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:27:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SBL4ur2Sr4bU for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 05:27:10 -0500 (EST)
+ with ESMTP id 8+EoLn5wRs1R for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Jan 2019 05:27:15 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB6924A401
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:27:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D3734A42A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:27:15 -0500 (EST)
 In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,115 +31,102 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundatio
 Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARM, MSI are translated by the SMMU. An IOVA is allocated
-for each MSI doorbell. If both the host and the guest are exposed
-with SMMUs, we end up with 2 different IOVAs allocated by each.
-guest allocates an IOVA (gIOVA) to map onto the guest MSI
-doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
-onto the physical doorbell (hDB).
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-So we end up with 2 untied mappings:
-         S1            S2
-gIOVA    ->    gDB
-              hIOVA    ->    gDB
+This patch adds VFIO_IOMMU_SET_PASID_TABLE ioctl which aims at
+passing the virtual iommu guest configuration to the VFIO driver
+downto to the iommu subsystem.
 
-Currently the PCI device is programmed by the host with hIOVA
-as MSI doorbell. So this does not work.
-
-This patch introduces an API to pass gIOVA/gDB to the host so
-that gIOVA can be reused by the host instead of re-allocating
-a new IOVA. So the goal is to create the following nested mapping:
-
-         S1            S2
-gIOVA    ->    gDB     ->    hDB
-
-and program the PCI device with gIOVA MSI doorbell.
-
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-
 v2 -> v3:
-- add a struct device handle
----
- drivers/iommu/iommu.c      | 10 ++++++++++
- include/linux/iommu.h      | 13 +++++++++++++
- include/uapi/linux/iommu.h |  6 ++++++
- 3 files changed, 29 insertions(+)
+- s/BIND_PASID_TABLE/SET_PASID_TABLE
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index b2e248770508..ea11442e7054 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1431,6 +1431,16 @@ static void __iommu_detach_device(struct iommu_domain *domain,
- 	trace_detach_device_from_domain(dev);
+v1 -> v2:
+- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+- remove the struct device arg
+---
+ drivers/vfio/vfio_iommu_type1.c | 31 +++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       |  8 ++++++++
+ 2 files changed, 39 insertions(+)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 7651cfb14836..d9dd23f64f00 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1644,6 +1644,24 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+ 	return ret;
  }
  
-+int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			 struct iommu_guest_msi_binding *binding)
++static int
++vfio_set_pasid_table(struct vfio_iommu *iommu,
++		      struct vfio_iommu_type1_set_pasid_table *ustruct)
 +{
-+	if (unlikely(!domain->ops->bind_guest_msi))
-+		return -ENODEV;
++	struct vfio_domain *d;
++	int ret = 0;
 +
-+	return domain->ops->bind_guest_msi(domain, dev, binding);
++	mutex_lock(&iommu->lock);
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		ret = iommu_set_pasid_table(d->domain, &ustruct->config);
++		if (ret)
++			break;
++	}
++	mutex_unlock(&iommu->lock);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
 +
- void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
  {
- 	struct iommu_group *group;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 96d59886f230..244c1a3d5989 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -235,6 +235,9 @@ struct iommu_ops {
- 	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
- 				struct iommu_cache_invalidate_info *inv_info);
+@@ -1714,6 +1732,19 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
  
-+	int (*bind_guest_msi)(struct iommu_domain *domain, struct device *dev,
-+			      struct iommu_guest_msi_binding *binding);
+ 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+ 			-EFAULT : 0;
++	} else if (cmd == VFIO_IOMMU_SET_PASID_TABLE) {
++		struct vfio_iommu_type1_set_pasid_table ustruct;
 +
- 	unsigned long pgsize_bitmap;
- };
++		minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table,
++				    config);
++
++		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (ustruct.argsz < minsz || ustruct.flags)
++			return -EINVAL;
++
++		return vfio_set_pasid_table(iommu, &ustruct);
+ 	}
  
-@@ -301,6 +304,9 @@ extern int iommu_set_pasid_table(struct iommu_domain *domain,
- extern int iommu_cache_invalidate(struct iommu_domain *domain,
- 				struct device *dev,
- 				struct iommu_cache_invalidate_info *inv_info);
-+extern int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+				struct iommu_guest_msi_binding *binding);
-+
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -724,6 +730,13 @@ iommu_cache_invalidate(struct iommu_domain *domain,
- 	return -ENODEV;
- }
+ 	return -ENOTTY;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 02bb7ad6e986..0d9f4090c95d 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -14,6 +14,7 @@
  
-+static inline
-+int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			 struct iommu_guest_msi_binding *binding)
-+{
-+	return -ENODEV;
-+}
-+
- #endif /* CONFIG_IOMMU_API */
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
++#include <linux/iommu.h>
  
- #ifdef CONFIG_IOMMU_DEBUGFS
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 4605f5cfac84..f28cd9a1aa96 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -142,4 +142,10 @@ struct iommu_cache_invalidate_info {
- 	__u64		arch_id;
- 	__u64		addr;
- };
-+
-+struct iommu_guest_msi_binding {
-+	__u64		iova;
-+	__u64		gpa;
-+	__u32		granule;
+ #define VFIO_API_VERSION	0
+ 
+@@ -759,6 +760,13 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++struct vfio_iommu_type1_set_pasid_table {
++	__u32	argsz;
++	__u32	flags;
++	struct iommu_pasid_table_config config;
 +};
- #endif /* _UAPI_IOMMU_H */
++#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.17.2
