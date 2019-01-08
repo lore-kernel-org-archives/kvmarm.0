@@ -1,137 +1,191 @@
-From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [RFC v3 00/21] SMMUv3 Nested Stage Setup
-Date: Tue,  8 Jan 2019 11:26:12 +0100
-Message-ID: <20190108102633.17482-1-eric.auger@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
-Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [RFC v3 01/21] iommu: Introduce set_pasid_table API
+Date: Tue,  8 Jan 2019 11:26:13 +0100
+Message-ID: <20190108102633.17482-2-eric.auger@redhat.com>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series allows a virtualizer to program the nested stage mode.
-This is useful when both the host and the guest are exposed with
-an SMMUv3 and a PCI device is assigned to the guest using VFIO.
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-In this mode, the physical IOMMU must be programmed to translate
-the two stages: the one set up by the guest (IOVA -> GPA) and the
-one set up by the host VFIO driver as part of the assignment process
-(GPA -> HPA).
+In virtualization use case, when a guest is assigned
+a PCI host device, protected by a virtual IOMMU on a guest,
+the physical IOMMU must be programmed to be consistent with
+the guest mappings. If the physical IOMMU supports two
+translation stages it makes sense to program guest mappings
+onto the first stage/level (ARM/VTD terminology) while to host
+owns the stage/level 2.
 
-On Intel, this is traditionnaly achieved by combining the 2 stages
-into a single physical stage. However this relies on the capability
-to trap on each guest translation structure update. This is possible
-by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
-not offer a similar mechanism.
+In that case, it is mandated to trap on guest configuration
+settings and pass those to the physical iommu driver.
 
-However, the ARM SMMUv3 architecture supports 2 physical stages! Those
-were devised exactly with that use case in mind. Assuming the HW
-implements both stages (optional), the guest now can use stage 1
-while the host uses stage 2.
+This patch adds a new API to the iommu subsystem that allows
+to set the pasid table information.
 
-This assumes the virtualizer has means to propagate guest settings
-to the host SMMUv3 driver. This series brings this VFIO/IOMMU
-infrastructure.  Those services are:
-- bind the guest stage 1 configuration to the stream table entry
-- propagate guest TLB invalidations
-- bind MSI IOVAs
-- propagate faults collected at physical level up to the virtualizer
+A generic iommu_pasid_table_config struct is introduced in
+a new iommu.h uapi header. This is going to be used by the VFIO
+user API. We foresee at least two specializations of this struct,
+for PASID table passing and ARM SMMUv3.
 
-This series largely reuses the user API and infrastructure originally
-devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
-[1-2] and Jean-Philippe [3-4].
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Best Regards
+---
 
-Eric
-
-This series can be found at:
-https://github.com/eauger/linux/tree/v5.0-rc1-2stage-rfc-v3
-
-This was tested on Qualcomm HW featuring SMMUv3 and with adapted QEMU
-vSMMUv3.
-
-References:
-[1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
-    Address (SVA)
-    https://lwn.net/Articles/754331/
-[2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
-    (VFIO part)
-    https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
-[3] [v2,00/40] Shared Virtual Addressing for the IOMMU
-    https://patchwork.ozlabs.org/cover/912129/
-[4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
-    https://patchwork.kernel.org/cover/10608299/
-
-History:
+This patch generalizes the API introduced by Jacob & co-authors in
+https://lwn.net/Articles/754331/
 
 v2 -> v3:
-- When registering the S1 MSI binding we now store the device handle. This
-  addresses Robin's comment about discimination of devices beonging to
-  different S1 groups and using different physical MSI doorbells.
-- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
-  set the eventfd and expose the faults through an mmappable fault region
+- replace unbind/bind by set_pasid_table
+- move table pointer and pasid bits in the generic part of the struct
 
 v1 -> v2:
-- Added the fault reporting capability
-- asid properly passed on invalidation (fix assignment of multiple
-  devices)
-- see individual change logs for more info
-
-Eric Auger (12):
-  iommu: Introduce bind_guest_msi
-  vfio: VFIO_IOMMU_BIND_MSI
-  iommu/smmuv3: Get prepared for nested stage support
-  iommu/smmuv3: Implement set_pasid_table
-  iommu/smmuv3: Implement cache_invalidate
-  dma-iommu: Implement NESTED_MSI cookie
-  iommu/smmuv3: Implement bind_guest_msi
-  iommu/smmuv3: Report non recoverable faults
-  vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
-  vfio-pci: Register an iommu fault handler
-  vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
-  vfio: Document nested stage control
-
-Jacob Pan (4):
-  iommu: Introduce set_pasid_table API
-  iommu: introduce device fault data
-  driver core: add per device iommu param
-  iommu: introduce device fault report API
-
-Jean-Philippe Brucker (2):
-  iommu/arm-smmu-v3: Link domains and devices
-  iommu/arm-smmu-v3: Maintain a SID->device structure
-
-Liu, Yi L (3):
-  iommu: Introduce cache_invalidate API
-  vfio: VFIO_IOMMU_SET_PASID_TABLE
-  vfio: VFIO_IOMMU_CACHE_INVALIDATE
-
- Documentation/vfio.txt              |  62 ++++
- drivers/iommu/arm-smmu-v3.c         | 460 ++++++++++++++++++++++++++--
- drivers/iommu/dma-iommu.c           | 112 ++++++-
- drivers/iommu/iommu.c               | 187 ++++++++++-
- drivers/vfio/pci/vfio_pci.c         | 147 ++++++++-
- drivers/vfio/pci/vfio_pci_intrs.c   |  19 ++
- drivers/vfio/pci/vfio_pci_private.h |   3 +
- drivers/vfio/vfio_iommu_type1.c     | 105 +++++++
- include/linux/device.h              |   3 +
- include/linux/dma-iommu.h           |  11 +
- include/linux/iommu.h               | 127 +++++++-
- include/uapi/linux/iommu.h          | 234 ++++++++++++++
- include/uapi/linux/vfio.h           |  38 +++
- 13 files changed, 1476 insertions(+), 32 deletions(-)
+- restore the original pasid table name
+- remove the struct device * parameter in the API
+- reworked iommu_pasid_smmuv3
+---
+ drivers/iommu/iommu.c      | 10 ++++++++
+ include/linux/iommu.h      | 14 +++++++++++
+ include/uapi/linux/iommu.h | 50 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 74 insertions(+)
  create mode 100644 include/uapi/linux/iommu.h
 
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 3ed4db334341..0f2b7f1fc7c8 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1393,6 +1393,16 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+ }
+ EXPORT_SYMBOL_GPL(iommu_attach_device);
+ 
++int iommu_set_pasid_table(struct iommu_domain *domain,
++			  struct iommu_pasid_table_config *cfg)
++{
++	if (unlikely(!domain->ops->set_pasid_table))
++		return -ENODEV;
++
++	return domain->ops->set_pasid_table(domain, cfg);
++}
++EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
++
+ static void __iommu_detach_device(struct iommu_domain *domain,
+ 				  struct device *dev)
+ {
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index e90da6b6f3d1..1da2a2357ea4 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -25,6 +25,7 @@
+ #include <linux/errno.h>
+ #include <linux/err.h>
+ #include <linux/of.h>
++#include <uapi/linux/iommu.h>
+ 
+ #define IOMMU_READ	(1 << 0)
+ #define IOMMU_WRITE	(1 << 1)
+@@ -184,6 +185,7 @@ struct iommu_resv_region {
+  * @domain_window_disable: Disable a particular window for a domain
+  * @of_xlate: add OF master IDs to iommu grouping
+  * @pgsize_bitmap: bitmap of all possible supported page sizes
++ * @set_pasid_table: set pasid table
+  */
+ struct iommu_ops {
+ 	bool (*capable)(enum iommu_cap);
+@@ -226,6 +228,9 @@ struct iommu_ops {
+ 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+ 	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
+ 
++	int (*set_pasid_table)(struct iommu_domain *domain,
++			       struct iommu_pasid_table_config *cfg);
++
+ 	unsigned long pgsize_bitmap;
+ };
+ 
+@@ -287,6 +292,8 @@ extern int iommu_attach_device(struct iommu_domain *domain,
+ 			       struct device *dev);
+ extern void iommu_detach_device(struct iommu_domain *domain,
+ 				struct device *dev);
++extern int iommu_set_pasid_table(struct iommu_domain *domain,
++				 struct iommu_pasid_table_config *cfg);
+ extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+ extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+ extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+@@ -696,6 +703,13 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
+ 	return NULL;
+ }
+ 
++static inline
++int iommu_set_pasid_table(struct iommu_domain *domain,
++			  struct iommu_pasid_table_config *cfg)
++{
++	return -ENODEV;
++}
++
+ #endif /* CONFIG_IOMMU_API */
+ 
+ #ifdef CONFIG_IOMMU_DEBUGFS
+diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+new file mode 100644
+index 000000000000..7a7cf7a3de7c
+--- /dev/null
++++ b/include/uapi/linux/iommu.h
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * IOMMU user API definitions
++ *
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef _UAPI_IOMMU_H
++#define _UAPI_IOMMU_H
++
++#include <linux/types.h>
++
++/**
++ * SMMUv3 Stream Table Entry stage 1 related information
++ * @abort: shall the STE lead to abort
++ * @s1fmt: STE s1fmt field as set by the guest
++ * @s1dss: STE s1dss as set by the guest
++ * All field names match the smmu 3.0/3.1 spec (ARM IHI 0070A)
++ */
++struct iommu_pasid_smmuv3 {
++	__u8 abort;
++	__u8 s1fmt;
++	__u8 s1dss;
++};
++
++/**
++ * PASID table data used to bind guest PASID table to the host IOMMU
++ * Note PASID table corresponds to the Context Table on ARM SMMUv3.
++ *
++ * @version: API version to prepare for future extensions
++ * @format: format of the PASID table
++ *
++ */
++struct iommu_pasid_table_config {
++#define PASID_TABLE_CFG_VERSION_1 1
++	__u32	version;
++#define IOMMU_PASID_FORMAT_SMMUV3	(1 << 0)
++	__u32	format;
++	__u64	base_ptr;
++	__u8	pasid_bits;
++	__u8	bypass;
++	union {
++		struct iommu_pasid_smmuv3 smmuv3;
++	};
++};
++
++#endif /* _UAPI_IOMMU_H */
 -- 
 2.17.2
