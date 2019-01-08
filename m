@@ -1,216 +1,174 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v3 08/21] iommu/arm-smmu-v3: Maintain a SID->device structure
-Date: Tue,  8 Jan 2019 11:26:20 +0100
-Message-ID: <20190108102633.17482-9-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [RFC v3 09/21] iommu/smmuv3: Get prepared for nested stage support
+Date: Tue,  8 Jan 2019 11:26:21 +0100
+Message-ID: <20190108102633.17482-10-eric.auger@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190108102633.17482-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+To allow nested stage support, we need to store both
+stage 1 and stage 2 configurations (and remove the former
+union).
 
-When handling faults from the event or PRI queue, we need to find the
-struct device associated to a SID. Add a rb_tree to keep track of SIDs.
+arm_smmu_write_strtab_ent() is modified to write both stage
+fields in the STE.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+We add a nested_bypass field to the S1 configuration as the first
+stage can be bypassed. Also the guest may force the STE to abort:
+this information gets stored into the nested_abort field.
+
+Only S2 stage is "finalized" as the host does not configure
+S1 CD, guest does.
+
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
 ---
- drivers/iommu/arm-smmu-v3.c | 136 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 132 insertions(+), 4 deletions(-)
+
+v1 -> v2:
+- invalidate the STE before moving from a live STE config to another
+- add the nested_abort and nested_bypass fields
+---
+ drivers/iommu/arm-smmu-v3.c | 43 ++++++++++++++++++++++++++++---------
+ 1 file changed, 33 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index ce222705f52b..9af68266bbb1 100644
+index 9af68266bbb1..9716a301d9ae 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -589,6 +589,16 @@ struct arm_smmu_device {
+@@ -212,6 +212,7 @@
+ #define STRTAB_STE_0_CFG_BYPASS		4
+ #define STRTAB_STE_0_CFG_S1_TRANS	5
+ #define STRTAB_STE_0_CFG_S2_TRANS	6
++#define STRTAB_STE_0_CFG_NESTED		7
  
- 	/* IOMMU core code handle */
- 	struct iommu_device		iommu;
-+
-+	struct rb_root			streams;
-+	struct mutex			streams_mutex;
-+
-+};
-+
-+struct arm_smmu_stream {
-+	u32				id;
-+	struct arm_smmu_master_data	*master;
-+	struct rb_node			node;
+ #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
+ #define STRTAB_STE_0_S1FMT_LINEAR	0
+@@ -491,6 +492,10 @@ struct arm_smmu_strtab_l1_desc {
+ struct arm_smmu_s1_cfg {
+ 	__le64				*cdptr;
+ 	dma_addr_t			cdptr_dma;
++	/* in nested mode, tells s1 must be bypassed */
++	bool				nested_bypass;
++	/* in nested mode, abort is forced by guest */
++	bool				nested_abort;
+ 
+ 	struct arm_smmu_ctx_desc {
+ 		u16	asid;
+@@ -515,6 +520,7 @@ struct arm_smmu_strtab_ent {
+ 	 * configured according to the domain type.
+ 	 */
+ 	bool				assigned;
++	bool				nested;
+ 	struct arm_smmu_s1_cfg		*s1_cfg;
+ 	struct arm_smmu_s2_cfg		*s2_cfg;
  };
+@@ -629,10 +635,8 @@ struct arm_smmu_domain {
+ 	bool				non_strict;
  
- /* SMMU private data for each master */
-@@ -598,6 +608,7 @@ struct arm_smmu_master_data {
+ 	enum arm_smmu_domain_stage	stage;
+-	union {
+-		struct arm_smmu_s1_cfg	s1_cfg;
+-		struct arm_smmu_s2_cfg	s2_cfg;
+-	};
++	struct arm_smmu_s1_cfg	s1_cfg;
++	struct arm_smmu_s2_cfg	s2_cfg;
  
- 	struct arm_smmu_domain		*domain;
- 	struct list_head		list; /* domain->devices */
-+	struct arm_smmu_stream		*streams;
+ 	struct iommu_domain		domain;
  
- 	struct device			*dev;
- };
-@@ -1244,6 +1255,32 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
- 	return 0;
- }
+@@ -1139,10 +1143,11 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 			break;
+ 		case STRTAB_STE_0_CFG_S1_TRANS:
+ 		case STRTAB_STE_0_CFG_S2_TRANS:
++		case STRTAB_STE_0_CFG_NESTED:
+ 			ste_live = true;
+ 			break;
+ 		case STRTAB_STE_0_CFG_ABORT:
+-			if (disable_bypass)
++			if (disable_bypass || ste->nested)
+ 				break;
+ 		default:
+ 			BUG(); /* STE corruption */
+@@ -1154,7 +1159,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
  
-+__maybe_unused
-+static struct arm_smmu_master_data *
-+arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
-+{
-+	struct rb_node *node;
-+	struct arm_smmu_stream *stream;
-+	struct arm_smmu_master_data *master = NULL;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	node = smmu->streams.rb_node;
-+	while (node) {
-+		stream = rb_entry(node, struct arm_smmu_stream, node);
-+		if (stream->id < sid) {
-+			node = node->rb_right;
-+		} else if (stream->id > sid) {
-+			node = node->rb_left;
-+		} else {
-+			master = stream->master;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return master;
-+}
-+
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
- {
-@@ -1882,6 +1919,71 @@ static bool arm_smmu_sid_in_range(struct arm_smmu_device *smmu, u32 sid)
- 	return sid < limit;
- }
- 
-+static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
-+				  struct arm_smmu_master_data *master)
-+{
-+	int i;
-+	int ret = 0;
-+	struct arm_smmu_stream *new_stream, *cur_stream;
-+	struct rb_node **new_node, *parent_node = NULL;
-+	struct iommu_fwspec *fwspec = master->dev->iommu_fwspec;
-+
-+	master->streams = kcalloc(fwspec->num_ids,
-+				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
-+	if (!master->streams)
-+		return -ENOMEM;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < fwspec->num_ids && !ret; i++) {
-+		new_stream = &master->streams[i];
-+		new_stream->id = fwspec->ids[i];
-+		new_stream->master = master;
-+
-+		new_node = &(smmu->streams.rb_node);
-+		while (*new_node) {
-+			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
-+					      node);
-+			parent_node = *new_node;
-+			if (cur_stream->id > new_stream->id) {
-+				new_node = &((*new_node)->rb_left);
-+			} else if (cur_stream->id < new_stream->id) {
-+				new_node = &((*new_node)->rb_right);
-+			} else {
-+				dev_warn(master->dev,
-+					 "stream %u already in tree\n",
-+					 cur_stream->id);
-+				ret = -EINVAL;
-+				break;
-+			}
-+		}
-+
-+		if (!ret) {
-+			rb_link_node(&new_stream->node, parent_node, new_node);
-+			rb_insert_color(&new_stream->node, &smmu->streams);
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return ret;
-+}
-+
-+static void arm_smmu_remove_master(struct arm_smmu_device *smmu,
-+				   struct arm_smmu_master_data *master)
-+{
-+	int i;
-+	struct iommu_fwspec *fwspec = master->dev->iommu_fwspec;
-+
-+	if (!master->streams)
-+		return;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < fwspec->num_ids; i++)
-+		rb_erase(&master->streams[i].node, &smmu->streams);
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	kfree(master->streams);
-+}
-+
- static struct iommu_ops arm_smmu_ops;
- 
- static int arm_smmu_add_device(struct device *dev)
-@@ -1930,13 +2032,35 @@ static int arm_smmu_add_device(struct device *dev)
- 		}
+ 	/* Bypass/fault */
+ 	if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
+-		if (!ste->assigned && disable_bypass)
++		if ((!ste->assigned && disable_bypass) ||
++				(ste->s1_cfg && ste->s1_cfg->nested_abort))
+ 			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
+ 		else
+ 			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_BYPASS);
+@@ -1172,8 +1178,17 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 		return;
  	}
  
-+	ret = iommu_device_link(&smmu->iommu, dev);
-+	if (ret)
-+		goto err_free_master;
++	if (ste->nested && ste_live) {
++		/*
++		 * When enabling nested, the STE may be transitionning from
++		 * s2 to nested and back. Invalidate the STE before changing it.
++		 */
++		dst[0] = cpu_to_le64(0);
++		arm_smmu_sync_ste_for_sid(smmu, sid);
++		val = STRTAB_STE_0_V;
++	}
 +
-+	ret = arm_smmu_insert_master(smmu, master);
-+	if (ret)
-+		goto err_unlink;
-+
- 	group = iommu_group_get_for_dev(dev);
--	if (!IS_ERR(group)) {
--		iommu_group_put(group);
--		iommu_device_link(&smmu->iommu, dev);
-+	if (IS_ERR(group)) {
-+		ret = PTR_ERR(group);
-+		goto err_remove_master;
+ 	if (ste->s1_cfg) {
+-		BUG_ON(ste_live);
+ 		dst[1] = cpu_to_le64(
+ 			 FIELD_PREP(STRTAB_STE_1_S1CIR, STRTAB_STE_1_S1C_CACHE_WBRA) |
+ 			 FIELD_PREP(STRTAB_STE_1_S1COR, STRTAB_STE_1_S1C_CACHE_WBRA) |
+@@ -1187,12 +1202,12 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+ 		   !(smmu->features & ARM_SMMU_FEAT_STALL_FORCE))
+ 			dst[1] |= cpu_to_le64(STRTAB_STE_1_S1STALLD);
+ 
+-		val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
+-			FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
++		if (!ste->s1_cfg->nested_bypass)
++			val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
++				FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
  	}
  
--	return PTR_ERR_OR_ZERO(group);
-+	iommu_group_put(group);
-+
-+	return 0;
-+
-+err_remove_master:
-+	arm_smmu_remove_master(smmu, master);
-+
-+err_unlink:
-+	iommu_device_unlink(&smmu->iommu, dev);
-+
-+err_free_master:
-+	kfree(master);
-+	fwspec->iommu_priv = NULL;
-+
-+	return ret;
- }
- 
- static void arm_smmu_remove_device(struct device *dev)
-@@ -1953,6 +2077,7 @@ static void arm_smmu_remove_device(struct device *dev)
- 	if (master && master->ste.assigned)
- 		arm_smmu_detach_dev(dev);
- 	iommu_group_remove_device(dev);
-+	arm_smmu_remove_master(smmu, master);
- 	iommu_device_unlink(&smmu->iommu, dev);
- 	kfree(master);
- 	iommu_fwspec_free(dev);
-@@ -2266,6 +2391,9 @@ static int arm_smmu_init_structures(struct arm_smmu_device *smmu)
- {
- 	int ret;
- 
-+	mutex_init(&smmu->streams_mutex);
-+	smmu->streams = RB_ROOT;
-+
- 	ret = arm_smmu_init_queues(smmu);
- 	if (ret)
- 		return ret;
+ 	if (ste->s2_cfg) {
+-		BUG_ON(ste_live);
+ 		dst[2] = cpu_to_le64(
+ 			 FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
+ 			 FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
+@@ -1454,6 +1469,10 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+ 		cmd.tlbi.vmid	= 0;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
++		cmd.opcode      = CMDQ_OP_TLBI_NH_ASID;
++		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+ 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+@@ -1484,6 +1503,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
++		cmd.opcode      = CMDQ_OP_TLBI_NH_VA;
++		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+ 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
 -- 
 2.17.2
