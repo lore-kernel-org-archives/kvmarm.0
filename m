@@ -1,116 +1,115 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [RFC v3 20/21] vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
-Date: Tue,  8 Jan 2019 11:26:32 +0100
-Message-ID: <20190108102633.17482-21-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [RFC v3 21/21] vfio: Document nested stage control
+Date: Tue,  8 Jan 2019 11:26:33 +0100
+Message-ID: <20190108102633.17482-22-eric.auger@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3552C4A3EC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:29:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YLoTYItEO47c for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 05:29:03 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49BB04A429
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:29:03 -0500 (EST)
-In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190108102633.17482-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new VFIO_PCI_DMA_FAULT_IRQ_INDEX index. This allows to
-set/unset an eventfd that will be triggered when DMA translation
-faults are detected at physical level when the nested mode is used.
+New iotcls were introduced to pass information about guest stage1
+to the host through VFIO. Let's document the nested stage control.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
 ---
- drivers/vfio/pci/vfio_pci.c       |  3 +++
- drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
- include/uapi/linux/vfio.h         |  1 +
- 3 files changed, 23 insertions(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index f9e2c8292e60..66d44736e71d 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -495,6 +495,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
- 			return 1;
- 	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
- 		return 1;
-+	} else if (irq_type == VFIO_PCI_DMA_FAULT_IRQ_INDEX) {
-+		return 1;
- 	}
+v2 -> v3:
+- document the new fault API
+
+v1 -> v2:
+- use the new ioctl names
+- add doc related to fault handling
+---
+ Documentation/vfio.txt | 62 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
+index f1a4d3c3ba0b..620e38ed0c4a 100644
+--- a/Documentation/vfio.txt
++++ b/Documentation/vfio.txt
+@@ -239,6 +239,68 @@ group and can access them as follows::
+ 	/* Gratuitous device reset and go... */
+ 	ioctl(device, VFIO_DEVICE_RESET);
  
- 	return 0;
-@@ -822,6 +824,7 @@ static long vfio_pci_ioctl(void *device_data,
- 		switch (info.index) {
- 		case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
- 		case VFIO_PCI_REQ_IRQ_INDEX:
-+		case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
- 			break;
- 		case VFIO_PCI_ERR_IRQ_INDEX:
- 			if (pci_is_pcie(vdev->pdev))
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1c46045b0e7f..28a96117daf3 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -622,6 +622,18 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
- 					       count, flags, data);
- }
- 
-+static int vfio_pci_set_dma_fault_trigger(struct vfio_pci_device *vdev,
-+					  unsigned index, unsigned start,
-+					  unsigned count, uint32_t flags,
-+					  void *data)
-+{
-+	if (index != VFIO_PCI_DMA_FAULT_IRQ_INDEX || start != 0 || count > 1)
-+		return -EINVAL;
++IOMMU Dual Stage Control
++------------------------
 +
-+	return vfio_pci_set_ctx_trigger_single(&vdev->dma_fault_trigger,
-+					       count, flags, data);
-+}
++Some IOMMUs support 2 stages/levels of translation. "Stage" corresponds to
++the ARM terminology while "level" corresponds to Intel's VTD terminology. In
++the following text we use either without distinction.
 +
- int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
- 			    unsigned index, unsigned start, unsigned count,
- 			    void *data)
-@@ -671,6 +683,13 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
- 			break;
- 		}
- 		break;
-+	case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
-+		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-+		case VFIO_IRQ_SET_ACTION_TRIGGER:
-+			func = vfio_pci_set_dma_fault_trigger;
-+			break;
-+		}
-+		break;
- 	}
- 
- 	if (!func)
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index b78c2c62af6d..47b65ef9d448 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -554,6 +554,7 @@ enum {
- 	VFIO_PCI_MSIX_IRQ_INDEX,
- 	VFIO_PCI_ERR_IRQ_INDEX,
- 	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_DMA_FAULT_IRQ_INDEX,
- 	VFIO_PCI_NUM_IRQS
- };
++This is useful when the guest is exposed with a virtual IOMMU and some
++devices are assigned to the guest through VFIO. Then the guest OS can use
++stage 1 (IOVA -> GPA), while the hypervisor uses stage 2 for VM isolation
++(GPA -> HPA).
++
++The guest gets ownership of the stage 1 page tables and also owns stage 1
++configuration structures. The hypervisor owns the root configuration structure
++(for security reason), including stage 2 configuration. This works as long
++configuration structures and page table format are compatible between the
++virtual IOMMU and the physical IOMMU.
++
++Assuming the HW supports it, this nested mode is selected by choosing the
++VFIO_TYPE1_NESTING_IOMMU type through:
++
++ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
++
++This forces the hypervisor to use the stage 2, leaving stage 1 available for
++guest usage.
++
++Once groups are attached to the container, the guest stage 1 translation
++configuration data can be passed to VFIO by using
++
++ioctl(container, VFIO_IOMMU_BIND_PASID_TABLE, &pasid_table_info);
++
++This allows to combine guest stage 1 configuration structure along with
++hypervisor stage 2 configuration structure. stage 1 configuration structures
++are dependent on the IOMMU type.
++
++As the stage 1 translation is fully delegated to the HW, physical events that
++may occur (especially translation faults), need to be propagated up to
++the virtualizer and re-injected into the guest.
++
++By using VFIO_DEVICE_SET_IRQS along with the VFIO_PCI_DMA_FAULT_IRQ_INDEX
++index, the virtualizer can register an eventfd signalled whenever a
++fault is observed at physical level. The actual faults can be retrieved
++from the device fault region whose type/subtype is:
++VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_REGION.
++
++This region can be mmapped. When a fault is consumed, the user must increment
++the consumer index.
++
++When the guest invalidates stage 1 related caches, invalidations must be
++forwarded to the host through
++ioctl(container, VFIO_IOMMU_CACHE_INVALIDATE, &inv_data);
++Those invalidations can happen at various granularity levels, page, context, ...
++
++The ARM SMMU specification introduces another challenge: MSIs are translated by
++both the virtual SMMU and the physical SMMU. To build a nested mapping for the
++IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
++doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
++binding eventually translating into the physical MSI doorbell.
++
++This is achieved by
++ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
++
+ VFIO User API
+ -------------------------------------------------------------------------------
  
 -- 
 2.17.2
