@@ -1,115 +1,113 @@
-From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [RFC v3 21/21] vfio: Document nested stage control
-Date: Tue,  8 Jan 2019 11:26:33 +0100
-Message-ID: <20190108102633.17482-22-eric.auger@redhat.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 00/12] arm64: Paravirtualized time support
+Date: Tue, 8 Jan 2019 11:36:37 +0100
+Message-ID: <20190108103637.GI10769@e113682-lin.lund.arm.com>
+References: <20181128144527.44710-1-steven.price@arm.com>
+ <20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20190108102633.17482-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
-Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 806DA4A41D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:36:41 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5s1xbv1OVrpx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Jan 2019 05:36:40 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26F784A3F9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:36:40 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-New iotcls were introduced to pass information about guest stage1
-to the host through VFIO. Let's document the nested stage control.
+On Mon, Dec 10, 2018 at 11:40:47AM +0000, Mark Rutland wrote:
+> On Wed, Nov 28, 2018 at 02:45:15PM +0000, Steven Price wrote:
+> > This series add support for paravirtualized time for Arm64 guests and
+> > KVM hosts following the specification in Arm's document DEN 0057A:
+> > 
+> > https://developer.arm.com/docs/den0057/a
+> > 
+> > It implements support for Live Physical Time (LPT) which provides the
+> > guest with a method to derive a stable counter of time during which the
+> > guest is executing even when the guest is being migrated between hosts
+> > with different physical counter frequencies.
+> > 
+> > It also implements support for stolen time, allowing the guest to
+> > identify time when it is forcibly not executing.
+> 
+> I know that stolen time reporting is important, and I think that we
+> definitely want to pick up that part of the spec (once it is published
+> in some non-draft form).
+> 
+> However, I am very concerned with the pv-freq part of LPT, and I'd like
+> to avoid that if at all possible. I say that because:
+> 
+> * By design, it breaks architectural guarantees from the PoV of SW in
+>   the guest.
+> 
+>   A VM may host multiple SW agents serially (e.g. when booting, or
+>   across kexec), or concurrently (e.g. Linux w/ EFI runtime services),
+>   and the host has no way to tell whether all software in the guest will
+>   function correctly. Due to this, it's not possible to have a guest
+>   opt-in to the architecturally-broken timekeeping.
 
-Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Is this necessarily true?
 
----
+As I understood the intention of the spec, there would be no change to
+behavior of the timers as exposed by the hypervisor unless a software
+agent specifically ops-int to LPT and pv-freq.
 
-v2 -> v3:
-- document the new fault API
+In a scenario with Linux and UEFI running, they must clearly agree on
+using functionality that changes the underlying behavior.  For
+kdump/kexec scenarios, the OS would have to tear down the functionality
+to work across migration after loading a secondary SW agent, which
+probably needs adding to the spec.
 
-v1 -> v2:
-- use the new ioctl names
-- add doc related to fault handling
----
- Documentation/vfio.txt | 62 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+> 
+>   Existing guests will not work correctly once pv-freq is in use, and if
+>   configured without pv-freq (or if the guest fails to discover pv-freq
+>   for any reason), the administrator may encounter anything between
+>   subtle breakage or fatally incorrect timekeeping.
+> 
+>   There's plenty of SW agents other than Linux which runs in a guest,
+>   which would need to be updated to handle pv-freq, e.g. GRUB, *BSD,
+>   iPXE.
+> 
+>   Given this, I think that this is going to lead to subtle breakage in
+>   real-world scenarios. 
 
-diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
-index f1a4d3c3ba0b..620e38ed0c4a 100644
---- a/Documentation/vfio.txt
-+++ b/Documentation/vfio.txt
-@@ -239,6 +239,68 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
- 
-+IOMMU Dual Stage Control
-+------------------------
-+
-+Some IOMMUs support 2 stages/levels of translation. "Stage" corresponds to
-+the ARM terminology while "level" corresponds to Intel's VTD terminology. In
-+the following text we use either without distinction.
-+
-+This is useful when the guest is exposed with a virtual IOMMU and some
-+devices are assigned to the guest through VFIO. Then the guest OS can use
-+stage 1 (IOVA -> GPA), while the hypervisor uses stage 2 for VM isolation
-+(GPA -> HPA).
-+
-+The guest gets ownership of the stage 1 page tables and also owns stage 1
-+configuration structures. The hypervisor owns the root configuration structure
-+(for security reason), including stage 2 configuration. This works as long
-+configuration structures and page table format are compatible between the
-+virtual IOMMU and the physical IOMMU.
-+
-+Assuming the HW supports it, this nested mode is selected by choosing the
-+VFIO_TYPE1_NESTING_IOMMU type through:
-+
-+ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
-+
-+This forces the hypervisor to use the stage 2, leaving stage 1 available for
-+guest usage.
-+
-+Once groups are attached to the container, the guest stage 1 translation
-+configuration data can be passed to VFIO by using
-+
-+ioctl(container, VFIO_IOMMU_BIND_PASID_TABLE, &pasid_table_info);
-+
-+This allows to combine guest stage 1 configuration structure along with
-+hypervisor stage 2 configuration structure. stage 1 configuration structures
-+are dependent on the IOMMU type.
-+
-+As the stage 1 translation is fully delegated to the HW, physical events that
-+may occur (especially translation faults), need to be propagated up to
-+the virtualizer and re-injected into the guest.
-+
-+By using VFIO_DEVICE_SET_IRQS along with the VFIO_PCI_DMA_FAULT_IRQ_INDEX
-+index, the virtualizer can register an eventfd signalled whenever a
-+fault is observed at physical level. The actual faults can be retrieved
-+from the device fault region whose type/subtype is:
-+VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_REGION.
-+
-+This region can be mmapped. When a fault is consumed, the user must increment
-+the consumer index.
-+
-+When the guest invalidates stage 1 related caches, invalidations must be
-+forwarded to the host through
-+ioctl(container, VFIO_IOMMU_CACHE_INVALIDATE, &inv_data);
-+Those invalidations can happen at various granularity levels, page, context, ...
-+
-+The ARM SMMU specification introduces another challenge: MSIs are translated by
-+both the virtual SMMU and the physical SMMU. To build a nested mapping for the
-+IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
-+doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
-+binding eventually translating into the physical MSI doorbell.
-+
-+This is achieved by
-+ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
-+
- VFIO User API
- -------------------------------------------------------------------------------
- 
--- 
-2.17.2
+I think we'd definitely need to limit the exposure of pv-freq to Linux
+and (if necessary) UEFI runtime services.  Do you see scenarios where
+this would not be possible?
+
+
+[...]
+
+> 
+> I understand that LPT is supposed to account for time lost during the
+> migration. Can we account for this without pv-freq? e.g. is it possible
+> to account for this in the same way as stolen time?
+> 
+
+I think we can indeed account for lost time during migration or host
+system suspend by simply adjusting CNTVOFF_EL2 (as Steve points out, KVM
+already supports this, but QEMU doesn't make use of that today -- there
+were some patches attempting to address that recently).
+
+
+Thanks,
+
+    Christoffer
