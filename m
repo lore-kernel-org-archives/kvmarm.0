@@ -1,171 +1,137 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v8 4/5] arm64: arm_pmu: Add support for
- exclude_host/exclude_guest attributes
-Date: Tue, 8 Jan 2019 11:18:43 +0100
-Message-ID: <20190108101843.GH10769@e113682-lin.lund.arm.com>
-References: <1544610573-28446-1-git-send-email-andrew.murray@arm.com>
- <1544610573-28446-5-git-send-email-andrew.murray@arm.com>
- <20181218120226.GC25383@e113682-lin.lund.arm.com>
- <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [RFC v3 00/21] SMMUv3 Nested Stage Setup
+Date: Tue,  8 Jan 2019 11:26:12 +0100
+Message-ID: <20190108102633.17482-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 953234A417
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:18:49 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o54dVOV0KuOS for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 05:18:46 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F934A3E6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 05:18:46 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190104153205.GA31479@edgewater-inn.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, joro@8bytes.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Cc: marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 04, 2019 at 03:32:06PM +0000, Will Deacon wrote:
-> On Tue, Dec 18, 2018 at 01:02:26PM +0100, Christoffer Dall wrote:
-> > On Wed, Dec 12, 2018 at 10:29:32AM +0000, Andrew Murray wrote:
-> > > Add support for the :G and :H attributes in perf by handling the
-> > > exclude_host/exclude_guest event attributes.
-> > > 
-> > > We notify KVM of counters that we wish to be enabled or disabled on
-> > > guest entry/exit and thus defer from starting or stopping :G events
-> > > as per the events exclude_host attribute.
-> > > 
-> > > With both VHE and non-VHE we switch the counters between host/guest
-> > > at EL2. We are able to eliminate counters counting host events on
-> > > the boundaries of guest entry/exit when using :G by filtering out
-> > > EL2 for exclude_host. However when using :H unless exclude_hv is set
-> > > on non-VHE then there is a small blackout window at the guest
-> > > entry/exit where host events are not captured.
-> > > 
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >  arch/arm64/kernel/perf_event.c | 51 ++++++++++++++++++++++++++++++++++++------
-> > >  1 file changed, 44 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> > > index de564ae..4a3c73d 100644
-> > > --- a/arch/arm64/kernel/perf_event.c
-> > > +++ b/arch/arm64/kernel/perf_event.c
-> > > @@ -26,6 +26,7 @@
-> > >  
-> > >  #include <linux/acpi.h>
-> > >  #include <linux/clocksource.h>
-> > > +#include <linux/kvm_host.h>
-> > >  #include <linux/of.h>
-> > >  #include <linux/perf/arm_pmu.h>
-> > >  #include <linux/platform_device.h>
-> > > @@ -647,11 +648,26 @@ static inline int armv8pmu_enable_counter(int idx)
-> > >  
-> > >  static inline void armv8pmu_enable_event_counter(struct perf_event *event)
-> > >  {
-> > > +	struct perf_event_attr *attr = &event->attr;
-> > >  	int idx = event->hw.idx;
-> > > +	int flags = 0;
-> > > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> > >  
-> > > -	armv8pmu_enable_counter(idx);
-> > >  	if (armv8pmu_event_is_chained(event))
-> > > -		armv8pmu_enable_counter(idx - 1);
-> > > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> > > +
-> > > +	if (!attr->exclude_host)
-> > > +		flags |= KVM_PMU_EVENTS_HOST;
-> > > +	if (!attr->exclude_guest)
-> > > +		flags |= KVM_PMU_EVENTS_GUEST;
-> > > +
-> > > +	kvm_set_pmu_events(counter_bits, flags);
-> > > +
-> > > +	if (!attr->exclude_host) {
-> > > +		armv8pmu_enable_counter(idx);
-> > > +		if (armv8pmu_event_is_chained(event))
-> > > +			armv8pmu_enable_counter(idx - 1);
-> > > +	}
-> > >  }
-> > >  
-> > >  static inline int armv8pmu_disable_counter(int idx)
-> > > @@ -664,11 +680,20 @@ static inline int armv8pmu_disable_counter(int idx)
-> > >  static inline void armv8pmu_disable_event_counter(struct perf_event *event)
-> > >  {
-> > >  	struct hw_perf_event *hwc = &event->hw;
-> > > +	struct perf_event_attr *attr = &event->attr;
-> > >  	int idx = hwc->idx;
-> > > +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
-> > >  
-> > >  	if (armv8pmu_event_is_chained(event))
-> > > -		armv8pmu_disable_counter(idx - 1);
-> > > -	armv8pmu_disable_counter(idx);
-> > > +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
-> > > +
-> > > +	kvm_clr_pmu_events(counter_bits);
-> > > +
-> > > +	if (!attr->exclude_host) {
-> > > +		if (armv8pmu_event_is_chained(event))
-> > > +			armv8pmu_disable_counter(idx - 1);
-> > > +		armv8pmu_disable_counter(idx);
-> > > +	}
-> > >  }
-> > >  
-> > >  static inline int armv8pmu_enable_intens(int idx)
-> > > @@ -943,16 +968,25 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
-> > >  	 * Therefore we ignore exclude_hv in this configuration, since
-> > >  	 * there's no hypervisor to sample anyway. This is consistent
-> > >  	 * with other architectures (x86 and Power).
-> > > +	 *
-> > > +	 * To eliminate counting host events on the boundaries of
-> > > +	 * guest entry/exit we ensure EL2 is not included in hyp mode
-> > > +	 * with !exclude_host.
-> > >  	 */
-> > >  	if (is_kernel_in_hyp_mode()) {
-> > > -		if (!attr->exclude_kernel)
-> > > +		if (!attr->exclude_kernel && !attr->exclude_host)
-> > >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> > >  	} else {
-> > > -		if (attr->exclude_kernel)
-> > > -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
-> > >  		if (!attr->exclude_hv)
-> > >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> > 
-> > I'm not sure about the current use of exclude_hv here.  The comment says
-> > it's consistent with other architectures, but I can't find an example to
-> > confirm this, and I don't think we have a comparable thing to the split
-> > of the hypervisor between EL1 and EL2 we have on non-VHE.
-> 
-> FWIW, that comment came from this thread:
-> 
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2017-April/503908.html
-> 
-> That was painful enough at the time, so I'd /really/ prefer not to change
-> the semantics of this again if we can avoid it.
+This series allows a virtualizer to program the nested stage mode.
+This is useful when both the host and the guest are exposed with
+an SMMUv3 and a PCI device is assigned to the guest using VFIO.
 
-The comment makes sense for the is_kernel_in_hyp_mode() case.
+In this mode, the physical IOMMU must be programmed to translate
+the two stages: the one set up by the guest (IOVA -> GPA) and the
+one set up by the host VFIO driver as part of the assignment process
+(GPA -> HPA).
 
-However, for the !is_kernel_in_hyp_mode() case I can't see the current
-behavior of exclude_hv being similar in other architectures.
+On Intel, this is traditionnaly achieved by combining the 2 stages
+into a single physical stage. However this relies on the capability
+to trap on each guest translation structure update. This is possible
+by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
+not offer a similar mechanism.
 
-I don't think the current semantics of excluding EL2 on a non-VHE host
-system makes much sense, and I doubt anyone is using that for something
-meaningful.  I think changing behavior for excldue_hv to depend on
-is_hyp_mode_available rather than is_kernel_in_hyp_mode is the right
-thing to do which would also align the semantics with other
-architectures and between VHE and non-VHE.
+However, the ARM SMMUv3 architecture supports 2 physical stages! Those
+were devised exactly with that use case in mind. Assuming the HW
+implements both stages (optional), the guest now can use stage 1
+while the host uses stage 2.
 
+This assumes the virtualizer has means to propagate guest settings
+to the host SMMUv3 driver. This series brings this VFIO/IOMMU
+infrastructure.  Those services are:
+- bind the guest stage 1 configuration to the stream table entry
+- propagate guest TLB invalidations
+- bind MSI IOVAs
+- propagate faults collected at physical level up to the virtualizer
 
-Thanks,
+This series largely reuses the user API and infrastructure originally
+devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
+[1-2] and Jean-Philippe [3-4].
 
-    Christoffer
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.0-rc1-2stage-rfc-v3
+
+This was tested on Qualcomm HW featuring SMMUv3 and with adapted QEMU
+vSMMUv3.
+
+References:
+[1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
+    Address (SVA)
+    https://lwn.net/Articles/754331/
+[2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
+    (VFIO part)
+    https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
+[3] [v2,00/40] Shared Virtual Addressing for the IOMMU
+    https://patchwork.ozlabs.org/cover/912129/
+[4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
+    https://patchwork.kernel.org/cover/10608299/
+
+History:
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
+
+Eric Auger (12):
+  iommu: Introduce bind_guest_msi
+  vfio: VFIO_IOMMU_BIND_MSI
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement set_pasid_table
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Implement bind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
+  vfio-pci: Register an iommu fault handler
+  vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
+  vfio: Document nested stage control
+
+Jacob Pan (4):
+  iommu: Introduce set_pasid_table API
+  iommu: introduce device fault data
+  driver core: add per device iommu param
+  iommu: introduce device fault report API
+
+Jean-Philippe Brucker (2):
+  iommu/arm-smmu-v3: Link domains and devices
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+Liu, Yi L (3):
+  iommu: Introduce cache_invalidate API
+  vfio: VFIO_IOMMU_SET_PASID_TABLE
+  vfio: VFIO_IOMMU_CACHE_INVALIDATE
+
+ Documentation/vfio.txt              |  62 ++++
+ drivers/iommu/arm-smmu-v3.c         | 460 ++++++++++++++++++++++++++--
+ drivers/iommu/dma-iommu.c           | 112 ++++++-
+ drivers/iommu/iommu.c               | 187 ++++++++++-
+ drivers/vfio/pci/vfio_pci.c         | 147 ++++++++-
+ drivers/vfio/pci/vfio_pci_intrs.c   |  19 ++
+ drivers/vfio/pci/vfio_pci_private.h |   3 +
+ drivers/vfio/vfio_iommu_type1.c     | 105 +++++++
+ include/linux/device.h              |   3 +
+ include/linux/dma-iommu.h           |  11 +
+ include/linux/iommu.h               | 127 +++++++-
+ include/uapi/linux/iommu.h          | 234 ++++++++++++++
+ include/uapi/linux/vfio.h           |  38 +++
+ 13 files changed, 1476 insertions(+), 32 deletions(-)
+ create mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.17.2
