@@ -1,124 +1,461 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 59/75]
- arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c:252:7: error:
- 'KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ' undeclared; did you mean
- 'KVM_DEV_ARM_VGIC_GRP_NR_IRQS'?
-Date: Thu, 10 Jan 2019 00:19:18 +0800
-Message-ID: <201901100027.I6PBAJBQ%fengguang.wu@intel.com>
+Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 65/75]
+ arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:893:7: error: implicit
+ declaration of function 'vcpu_el2_e2h_is_set'
+Date: Thu, 10 Jan 2019 01:37:46 +0800
+Message-ID: <201901100104.1pLNkalM%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="6TrnltStXW4iwmi0"
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC4984A461
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 11:19:42 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r22mRMTNy48i for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jan 2019 11:19:40 -0500 (EST)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 756534A458
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 11:19:40 -0500 (EST)
+Content-Type: multipart/mixed; boundary="7JfCtLOvnd9MIVvH"
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---6TrnltStXW4iwmi0
+--7JfCtLOvnd9MIVvH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm64/nv-wip-v5.0-rc1
 head:   688c386ca096f2c1f2eee386697586c88df5d5bc
-commit: 43c8e3e9d31cc009b7d37241859505293e494f4d [59/75] KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+commit: bd3721cc25cec20d64c5c073fbc0879067cf86e7 [65/75] arm64: KVM: nv: Add handling of EL2-specific timer registers
 config: arm-axm55xx_defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
 reproduce:
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 43c8e3e9d31cc009b7d37241859505293e494f4d
+        git checkout bd3721cc25cec20d64c5c073fbc0879067cf86e7
         # save the attached .config to linux build tree
         GCC_VERSION=7.2.0 make.cross ARCH=arm 
 
 All errors (new ones prefixed by >>):
 
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c: In function 'vgic_get_common_attr':
->> arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c:252:7: error: 'KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ' undeclared (first use in this function); did you mean 'KVM_DEV_ARM_VGIC_GRP_NR_IRQS'?
-     case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c:252:7: note: each undeclared identifier is reported only once for each function it appears in
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c: In function 'vgic_v3_set_attr':
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c:644:7: error: 'KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ' undeclared (first use in this function); did you mean 'KVM_DEV_ARM_VGIC_GRP_NR_IRQS'?
-     case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c: In function 'vgic_v3_has_attr':
-   arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c:744:7: error: 'KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ' undeclared (first use in this function); did you mean 'KVM_DEV_ARM_VGIC_GRP_NR_IRQS'?
-     case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'get_timer_map':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:78:7: error: implicit declaration of function 'is_hyp_ctxt'; did you mean '__hyp_text'? [-Werror=implicit-function-declaration]
+      if (is_hyp_ctxt(vcpu)) {
+          ^~~~~~~~~~~
+          __hyp_text
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_timer_should_fire':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:277:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+    ^  ~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+   arch/arm/include/asm/cp15.h:63:27: error: '__read_sysreg' undeclared (first use in this function); did you mean 'vcpu_sysreg'?
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+   arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:277:14: note: in expansion of macro 'read_sysreg_el0'
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+                 ^~~~~~~~~~~~~~~
+   arch/arm/include/asm/cp15.h:63:27: note: each undeclared identifier is reported only once for each function it appears in
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+   arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:277:14: note: in expansion of macro 'read_sysreg_el0'
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+                 ^~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'timer_save_state':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:398:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+      ctx->cnt_ctl = read_sysreg_el0(cntp_ctl);
+    ^ ~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+   arch/arm/include/asm/cp15.h:63:27: error: '__read_sysreg' undeclared (first use in this function); did you mean 'vcpu_sysreg'?
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+   arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:398:18: note: in expansion of macro 'read_sysreg_el0'
+      ctx->cnt_ctl = read_sysreg_el0(cntp_ctl);
+                     ^~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:399:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+      ctx->cnt_cval = read_sysreg_el0(cntp_cval);
+    ^ ~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:402:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(0, cntp_ctl);
+    ^ ~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+   arch/arm/include/asm/cp15.h:66:31: error: '__write_sysreg' undeclared (first use in this function); did you mean '__read_sysreg'?
+    #define write_sysreg(v, ...)  __write_sysreg(v, __VA_ARGS__)
+                                  ^
+   arch/arm/include/asm/kvm_hyp.h:95:33: note: in expansion of macro 'write_sysreg'
+    #define write_sysreg_el0(v, r)  write_sysreg(v, r##_el0)
+                                    ^~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:402:3: note: in expansion of macro 'write_sysreg_el0'
+      write_sysreg_el0(0, cntp_ctl);
+      ^~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'timer_restore_state':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:476:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(ctx->cnt_cval, cntp_cval);
+    ^ ~~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+   arch/arm/include/asm/cp15.h:66:31: error: '__write_sysreg' undeclared (first use in this function); did you mean '__write_msi_msg'?
+    #define write_sysreg(v, ...)  __write_sysreg(v, __VA_ARGS__)
+                                  ^
+   arch/arm/include/asm/kvm_hyp.h:95:33: note: in expansion of macro 'write_sysreg'
+    #define write_sysreg_el0(v, r)  write_sysreg(v, r##_el0)
+                                    ^~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:476:3: note: in expansion of macro 'write_sysreg_el0'
+      write_sysreg_el0(ctx->cnt_cval, cntp_cval);
+      ^~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:478:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(ctx->cnt_ctl, cntp_ctl);
+    ^ ~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'get_timer_from_sysreg':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:889:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:890:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:891:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:893:7: error: implicit declaration of function 'vcpu_el2_e2h_is_set' [-Werror=implicit-function-declaration]
+          vcpu_el2_e2h_is_set(vcpu))
+          ^~~~~~~~~~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:897:7: error: 'cntp_tval_EL02' undeclared (first use in this function); did you mean 'cntv_cval_el0'?
+     case cntp_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntv_cval_el0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:898:7: error: 'cntp_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_tval_EL02
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:899:7: error: 'cntp_cval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:900:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:901:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:902:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:905:7: error: 'SYS_CNTVOFF_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_CTL_EL0'?
+     case SYS_CNTVOFF_EL2:
+          ^~~~~~~~~~~~~~~
+          SYS_CNTP_CTL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:906:7: error: 'cntv_tval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntv_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:907:7: error: 'cntv_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_ctl_EL02'?
+     case cntv_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_ctl_EL02
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:908:7: error: 'cntv_cval_EL02' undeclared (first use in this function); did you mean 'cntv_tval_EL02'?
+     case cntv_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntv_tval_EL02
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:911:7: error: 'SYS_CNTHP_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTHP_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:912:7: error: 'SYS_CNTHP_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_CTL_EL0'?
+     case SYS_CNTHP_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_CTL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:913:7: error: 'SYS_CNTHP_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHP_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:916:7: error: 'SYS_CNTHV_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHV_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:917:7: error: 'SYS_CNTHV_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_CTL_EL2'?
+     case SYS_CNTHV_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTHP_CTL_EL2
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:918:7: error: 'SYS_CNTHV_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHV_TVAL_EL2'?
+     case SYS_CNTHV_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHV_TVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_read_sysreg':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:937:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:938:7: error: 'cntp_tval_EL02' undeclared (first use in this function); did you mean 'cntv_cval_el0'?
+     case cntp_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntv_cval_el0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:939:7: error: 'cntv_tval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntv_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:940:7: error: 'SYS_CNTHP_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTHP_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:941:7: error: 'SYS_CNTHV_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHV_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:942:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:946:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:947:7: error: 'cntp_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:948:7: error: 'cntv_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_ctl_EL02'?
+     case cntv_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_ctl_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:949:7: error: 'SYS_CNTHP_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_CTL_EL0'?
+     case SYS_CNTHP_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_CTL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:950:7: error: 'SYS_CNTHV_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_CTL_EL2'?
+     case SYS_CNTHV_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTHP_CTL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:951:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:955:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:956:7: error: 'cntp_cval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:957:7: error: 'cntv_cval_EL02' undeclared (first use in this function); did you mean 'cntp_cval_EL02'?
+     case cntv_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_cval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:958:7: error: 'SYS_CNTHP_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHP_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:959:7: error: 'SYS_CNTHV_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_CVAL_EL2'?
+     case SYS_CNTHV_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_CVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:960:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:964:7: error: 'SYS_CNTVOFF_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHV_CTL_EL2'?
+     case SYS_CNTVOFF_EL2:
+          ^~~~~~~~~~~~~~~
+          SYS_CNTHV_CTL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_write_sysreg':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:988:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:989:7: error: 'cntp_tval_EL02' undeclared (first use in this function); did you mean 'cntv_cval_el0'?
+     case cntp_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntv_cval_el0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:990:7: error: 'cntv_tval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntv_tval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:991:7: error: 'SYS_CNTHP_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTHP_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:992:7: error: 'SYS_CNTHV_TVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHV_TVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:993:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:997:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:998:7: error: 'cntp_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:999:7: error: 'cntv_ctl_EL02' undeclared (first use in this function); did you mean 'cntp_ctl_EL02'?
+     case cntv_ctl_EL02:
+          ^~~~~~~~~~~~~
+          cntp_ctl_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1000:7: error: 'SYS_CNTHP_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTP_CTL_EL0'?
+     case SYS_CNTHP_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_CTL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1001:7: error: 'SYS_CNTHV_CTL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_CTL_EL2'?
+     case SYS_CNTHV_CTL_EL2:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTHP_CTL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1002:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1006:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1007:7: error: 'cntp_cval_EL02' undeclared (first use in this function); did you mean 'cntp_tval_EL02'?
+     case cntp_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_tval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1008:7: error: 'cntv_cval_EL02' undeclared (first use in this function); did you mean 'cntp_cval_EL02'?
+     case cntv_cval_EL02:
+          ^~~~~~~~~~~~~~
+          cntp_cval_EL02
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1009:7: error: 'SYS_CNTHP_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_TVAL_EL2'?
+     case SYS_CNTHP_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_TVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1010:7: error: 'SYS_CNTHV_CVAL_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHP_CVAL_EL2'?
+     case SYS_CNTHV_CVAL_EL2:
+          ^~~~~~~~~~~~~~~~~~
+          SYS_CNTHP_CVAL_EL2
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1011:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:1015:7: error: 'SYS_CNTVOFF_EL2' undeclared (first use in this function); did you mean 'SYS_CNTHV_CTL_EL2'?
+     case SYS_CNTVOFF_EL2:
+          ^~~~~~~~~~~~~~~
+          SYS_CNTHV_CTL_EL2
+   cc1: some warnings being treated as errors
 
-vim +252 arch/arm/kvm/../../../virt/kvm/arm/vgic/vgic-kvm-device.c
+vim +/vcpu_el2_e2h_is_set +893 arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c
 
-   225	
-   226	static int vgic_get_common_attr(struct kvm_device *dev,
-   227					struct kvm_device_attr *attr)
-   228	{
-   229		int r = -ENXIO;
-   230	
-   231		switch (attr->group) {
-   232		case KVM_DEV_ARM_VGIC_GRP_ADDR: {
-   233			u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-   234			u64 addr;
-   235			unsigned long type = (unsigned long)attr->attr;
-   236	
-   237			r = kvm_vgic_addr(dev->kvm, type, &addr, false);
-   238			if (r)
-   239				return (r == -ENODEV) ? -ENXIO : r;
-   240	
-   241			if (copy_to_user(uaddr, &addr, sizeof(addr)))
-   242				return -EFAULT;
-   243			break;
-   244		}
-   245		case KVM_DEV_ARM_VGIC_GRP_NR_IRQS: {
-   246			u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-   247	
-   248			r = put_user(dev->kvm->arch.vgic.nr_spis +
-   249				     VGIC_NR_PRIVATE_IRQS, uaddr);
-   250			break;
-   251		}
- > 252		case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-   253			u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-   254	
-   255			r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
-   256			break;
-   257		}
-   258		}
-   259	
-   260		return r;
-   261	}
-   262	
+   884	
+   885	static struct arch_timer_context *get_timer_from_sysreg(struct kvm_vcpu *vcpu,
+   886								u32 sr)
+   887	{
+   888		switch (sr) {
+   889		case SYS_CNTP_TVAL_EL0:
+ > 890		case SYS_CNTP_CTL_EL0:
+ > 891		case SYS_CNTP_CVAL_EL0:
+   892			if (vcpu_mode_el2(vcpu) &&
+ > 893			    vcpu_el2_e2h_is_set(vcpu))
+   894				return vcpu_hptimer(vcpu);
+   895			/* fall through */
+   896	
+ > 897		case cntp_tval_EL02:
+ > 898		case cntp_ctl_EL02:
+ > 899		case cntp_cval_EL02:
+   900		case SYS_AARCH32_CNTP_TVAL:
+   901		case SYS_AARCH32_CNTP_CTL:
+ > 902		case SYS_AARCH32_CNTP_CVAL:
+   903			return vcpu_ptimer(vcpu);
+   904	
+ > 905		case SYS_CNTVOFF_EL2:
+ > 906		case cntv_tval_EL02:
+ > 907		case cntv_ctl_EL02:
+ > 908		case cntv_cval_EL02:
+   909			return vcpu_vtimer(vcpu);
+   910	
+ > 911		case SYS_CNTHP_TVAL_EL2:
+ > 912		case SYS_CNTHP_CTL_EL2:
+ > 913		case SYS_CNTHP_CVAL_EL2:
+   914			return vcpu_hptimer(vcpu);
+   915	
+ > 916		case SYS_CNTHV_TVAL_EL2:
+ > 917		case SYS_CNTHV_CTL_EL2:
+ > 918		case SYS_CNTHV_CVAL_EL2:
+   919			return vcpu_hvtimer(vcpu);
+   920	
+   921		default:
+   922			BUG();
+   923		}
+   924	}
+   925	
+   926	u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu, u32 sr)
+   927	{
+   928		struct arch_timer_context *timer;
+   929		u64 val;
+   930	
+   931		preempt_disable();
+   932		kvm_timer_vcpu_put(vcpu);
+   933	
+   934		timer = get_timer_from_sysreg(vcpu, sr);
+   935	
+   936		switch (sr) {
+   937		case SYS_CNTP_TVAL_EL0:
+   938		case cntp_tval_EL02:
+   939		case cntv_tval_EL02:
+   940		case SYS_CNTHP_TVAL_EL2:
+   941		case SYS_CNTHV_TVAL_EL2:
+   942		case SYS_AARCH32_CNTP_TVAL:
+   943			val = kvm_phys_timer_read() - timer->cntvoff - timer->cnt_cval;
+   944			break;
+   945	
+   946		case SYS_CNTP_CTL_EL0:
+   947		case cntp_ctl_EL02:
+   948		case cntv_ctl_EL02:
+   949		case SYS_CNTHP_CTL_EL2:
+   950		case SYS_CNTHV_CTL_EL2:
+   951		case SYS_AARCH32_CNTP_CTL:
+   952			val = read_timer_ctl(timer);
+   953			break;
+   954	
+ > 955		case SYS_CNTP_CVAL_EL0:
+   956		case cntp_cval_EL02:
+ > 957		case cntv_cval_EL02:
+   958		case SYS_CNTHP_CVAL_EL2:
+ > 959		case SYS_CNTHV_CVAL_EL2:
+   960		case SYS_AARCH32_CNTP_CVAL:
+   961			val = timer->cnt_cval;
+   962			break;
+   963	
+ > 964		case SYS_CNTVOFF_EL2:
+   965			val = timer->cntvoff;
+   966			break;
+   967	
+   968		default:
+   969			BUG();
+   970		}
+   971	
+   972		kvm_timer_vcpu_load(vcpu);
+   973		preempt_enable();
+   974	
+   975		return val;
+   976	}
+   977	
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---6TrnltStXW4iwmi0
+--7JfCtLOvnd9MIVvH
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICI4YNlwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
+H4sICAIvNlwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
 Tka1tuwjyzOTvz/dACkBJMjsVCoTdjfujb5Dv/7y64i8n16ed6f94+7p6cfoe3WojrtT9W30
 +/6p+t9RxEcZz0c0YvlvQJzsD+9/f9odn0fXv41/G388Pk5Gy+p4qJ5G4cvh9/33d2i8fzn8
 8usv8OdXAD6/Qj/H/xlBm49P2Prj98N7tfu6//j98XH0j6j6ut8dRre/TaG3yeSf5l/QNuRZ
@@ -498,15 +835,15 @@ v2NYf4v7WDJHJmJCSVMmA2W5gnWC6ffJFkP83GsOGYEH5mdsgqTYxgM7glfpTT5DoSYBH4xy
 WEgXnx5vbu+//EQN5jP89+XpuPm0b8doEh7hhPzytr1VN7vH90bAZo3PrJQk7kFDyBg7Jj3V
 iHk8Ter/XKNaf6hNAQA=
 
---6TrnltStXW4iwmi0
+--7JfCtLOvnd9MIVvH
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
---6TrnltStXW4iwmi0--
+--7JfCtLOvnd9MIVvH--
