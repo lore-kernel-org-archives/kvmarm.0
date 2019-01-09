@@ -1,116 +1,146 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 3/75]
- arch/arm/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c:229:11: note: in
- expansion of macro 'read_gicreg'
-Date: Wed, 9 Jan 2019 11:45:46 +0800
-Message-ID: <201901091103.jHQ7Aktk%fengguang.wu@intel.com>
+Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 4/75]
+ arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: error:
+ 'SYS_CNTP_TVAL_EL0' undeclared
+Date: Wed, 9 Jan 2019 12:40:06 +0800
+Message-ID: <201901091219.igdmvhpC%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="7JfCtLOvnd9MIVvH"
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E48A4A448
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 22:46:36 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id coQ5cVuCbe4V for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Jan 2019 22:46:34 -0500 (EST)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E1504A43C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Jan 2019 22:46:34 -0500 (EST)
+Content-Type: multipart/mixed; boundary="Kj7319i9nmIyA2yE"
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---7JfCtLOvnd9MIVvH
+--Kj7319i9nmIyA2yE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm64/nv-wip-v5.0-rc1
 head:   688c386ca096f2c1f2eee386697586c88df5d5bc
-commit: b8e5fdc85a46524d44283eca009e13f1dc91920c [3/75] KVM: arm64: Fix ICH_ELRSR_EL2 sysreg naming
+commit: 2b1265c58a873d917e99ac762e243c1274481dbf [4/75] KVM: arm/arm64: consolidate arch timer trap handlers
 config: arm-axm55xx_defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
 reproduce:
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout b8e5fdc85a46524d44283eca009e13f1dc91920c
+        git checkout 2b1265c58a873d917e99ac762e243c1274481dbf
         # save the attached .config to linux build tree
         GCC_VERSION=7.2.0 make.cross ARCH=arm 
 
-All error/warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
-   In file included from include/linux/irqchip/arm-gic-v3.h:578:0,
-                    from arch/arm/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c:19:
-   arch/arm/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c: In function '__vgic_v3_save_state':
->> arch/arm/include/asm/arch_gicv3.h:184:40: error: implicit declaration of function 'read_ICH_ELRSR_EL2'; did you mean 'read_ICH_ELSR_EL2'? [-Werror=implicit-function-declaration]
-    #define read_gicreg(r)                 read_##r()
-                                           ^
->> arch/arm/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c:229:11: note: in expansion of macro 'read_gicreg'
-      elrsr = read_gicreg(ICH_ELRSR_EL2);
-              ^~~~~~~~~~~
-   cc1: some warnings being treated as errors
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'get_timer_from_sysreg':
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: note: each undeclared identifier is reported only once for each function it appears in
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:701:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:702:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:703:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:704:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:705:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_read_sysreg':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:723:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:724:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:728:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:729:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:733:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:734:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_write_sysreg':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:758:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+     case SYS_CNTP_TVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:759:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+     case SYS_AARCH32_CNTP_TVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:763:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CTL_EL0:
+          ^~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:764:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CTL:
+          ^~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:768:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+     case SYS_CNTP_CVAL_EL0:
+          ^~~~~~~~~~~~~~~~~
+          SYS_CNTP_TVAL_EL0
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:769:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+     case SYS_AARCH32_CNTP_CVAL:
+          ^~~~~~~~~~~~~~~~~~~~~
+          SYS_AARCH32_CNTP_TVAL
 
-vim +/read_gicreg +229 arch/arm/kvm/hyp/../../../../virt/kvm/arm/hyp/vgic-v3-sr.c
+vim +/SYS_CNTP_TVAL_EL0 +700 arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c
 
-   207	
-   208	void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
-   209	{
-   210		struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-   211		u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
-   212	
-   213		/*
-   214		 * Make sure stores to the GIC via the memory mapped interface
-   215		 * are now visible to the system register interface when reading the
-   216		 * LRs, and when reading back the VMCR on non-VHE systems.
-   217		 */
-   218		if (used_lrs || !has_vhe()) {
-   219			if (!cpu_if->vgic_sre) {
-   220				dsb(sy);
-   221				isb();
-   222			}
-   223		}
-   224	
-   225		if (used_lrs) {
-   226			int i;
-   227			u32 elrsr;
-   228	
- > 229			elrsr = read_gicreg(ICH_ELRSR_EL2);
-   230	
-   231			write_gicreg(cpu_if->vgic_hcr & ~ICH_HCR_EN, ICH_HCR_EL2);
-   232	
-   233			for (i = 0; i < used_lrs; i++) {
-   234				if (elrsr & (1 << i))
-   235					cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
-   236				else
-   237					cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
-   238	
-   239				__gic_v3_set_lr(0, i);
-   240			}
-   241		}
-   242	}
-   243	
+   695	
+   696	static struct arch_timer_context *get_timer_from_sysreg(struct kvm_vcpu *vcpu,
+   697								u32 sr)
+   698	{
+   699		switch (sr) {
+ > 700		case SYS_CNTP_TVAL_EL0:
+ > 701		case SYS_CNTP_CTL_EL0:
+ > 702		case SYS_CNTP_CVAL_EL0:
+ > 703		case SYS_AARCH32_CNTP_TVAL:
+ > 704		case SYS_AARCH32_CNTP_CTL:
+ > 705		case SYS_AARCH32_CNTP_CVAL:
+   706			return vcpu_ptimer(vcpu);
+   707		default:
+   708			BUG();
+   709		}
+   710	}
+   711	
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---7JfCtLOvnd9MIVvH
+--Kj7319i9nmIyA2yE
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICFdtNVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
+H4sICPh4NVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
 Tka1tuwjyzOTvz/dACkBJMjsVCoTdjfujb5Dv/7y64i8n16ed6f94+7p6cfoe3WojrtT9W30
 +/6p+t9RxEcZz0c0YvlvQJzsD+9/f9odn0fXv41/G388Pk5Gy+p4qJ5G4cvh9/33d2i8fzn8
 8usv8OdXAD6/Qj/H/xlBm49P2Prj98N7tfu6//j98XH0j6j6ut8dRre/TaG3yeSf5l/QNuRZ
@@ -490,15 +520,15 @@ v2NYf4v7WDJHJmJCSVMmA2W5gnWC6ffJFkP83GsOGYEH5mdsgqTYxgM7glfpTT5DoSYBH4xy
 WEgXnx5vbu+//EQN5jP89+XpuPm0b8doEh7hhPzytr1VN7vH90bAZo3PrJQk7kFDyBg7Jj3V
 iHk8Ter/XKNaf6hNAQA=
 
---7JfCtLOvnd9MIVvH
+--Kj7319i9nmIyA2yE
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
---7JfCtLOvnd9MIVvH--
+--Kj7319i9nmIyA2yE--
