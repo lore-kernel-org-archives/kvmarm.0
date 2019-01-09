@@ -1,146 +1,295 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 4/75]
- arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: error:
- 'SYS_CNTP_TVAL_EL0' undeclared
-Date: Wed, 9 Jan 2019 12:40:06 +0800
-Message-ID: <201901091219.igdmvhpC%fengguang.wu@intel.com>
+Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 7/75]
+ arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro
+ 'read_sysreg'
+Date: Wed, 9 Jan 2019 13:29:42 +0800
+Message-ID: <201901091357.x4T8b3LT%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="Kj7319i9nmIyA2yE"
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: multipart/mixed; boundary="RnlQjJ0d97Da+TV1"
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CFBC4A46B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 00:30:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aXi9cVvmxHJB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jan 2019 00:30:09 -0500 (EST)
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E26CD4A42C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 00:30:08 -0500 (EST)
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---Kj7319i9nmIyA2yE
+--RnlQjJ0d97Da+TV1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm64/nv-wip-v5.0-rc1
 head:   688c386ca096f2c1f2eee386697586c88df5d5bc
-commit: 2b1265c58a873d917e99ac762e243c1274481dbf [4/75] KVM: arm/arm64: consolidate arch timer trap handlers
+commit: a20386f683ceee36d9e2dfee115f6f8ae6ece031 [7/75] KVM: arm/arm64: arch_timer: Assign the phys timer on VHE systems
 config: arm-axm55xx_defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
 reproduce:
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 2b1265c58a873d917e99ac762e243c1274481dbf
+        git checkout a20386f683ceee36d9e2dfee115f6f8ae6ece031
         # save the attached .config to linux build tree
         GCC_VERSION=7.2.0 make.cross ARCH=arm 
 
-All errors (new ones prefixed by >>):
+All error/warnings (new ones prefixed by >>):
 
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_timer_should_fire':
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:221:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+    ^  ~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+>> arch/arm/include/asm/cp15.h:63:27: error: '__read_sysreg' undeclared (first use in this function); did you mean 'vcpu_sysreg'?
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+>> arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:221:14: note: in expansion of macro 'read_sysreg_el0'
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+                 ^~~~~~~~~~~~~~~
+   arch/arm/include/asm/cp15.h:63:27: note: each undeclared identifier is reported only once for each function it appears in
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+>> arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:221:14: note: in expansion of macro 'read_sysreg_el0'
+       cnt_ctl = read_sysreg_el0(cntp_ctl);
+                 ^~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'timer_save_state':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:371:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+      ctx->cnt_ctl = read_sysreg_el0(cntp_ctl);
+    ^ ~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+>> arch/arm/include/asm/cp15.h:63:27: error: '__read_sysreg' undeclared (first use in this function); did you mean 'vcpu_sysreg'?
+    #define read_sysreg(...)  __read_sysreg(__VA_ARGS__)
+                              ^
+>> arch/arm/include/asm/kvm_hyp.h:94:29: note: in expansion of macro 'read_sysreg'
+    #define read_sysreg_el0(r)  read_sysreg(r##_el0)
+                                ^~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:371:18: note: in expansion of macro 'read_sysreg_el0'
+      ctx->cnt_ctl = read_sysreg_el0(cntp_ctl);
+                     ^~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:372:1: error: macro "__read_sysreg" requires 4 arguments, but only 1 given
+      ctx->cnt_cval = read_sysreg_el0(cntp_cval);
+    ^ ~~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:375:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(0, cntp_ctl);
+    ^ ~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+>> arch/arm/include/asm/cp15.h:66:31: error: '__write_sysreg' undeclared (first use in this function); did you mean '__read_sysreg'?
+    #define write_sysreg(v, ...)  __write_sysreg(v, __VA_ARGS__)
+                                  ^
+>> arch/arm/include/asm/kvm_hyp.h:95:33: note: in expansion of macro 'write_sysreg'
+    #define write_sysreg_el0(v, r)  write_sysreg(v, r##_el0)
+                                    ^~~~~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:375:3: note: in expansion of macro 'write_sysreg_el0'
+      write_sysreg_el0(0, cntp_ctl);
+      ^~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'timer_restore_state':
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:441:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(ctx->cnt_cval, cntp_cval);
+    ^ ~~~~~~~~~~~
+   In file included from arch/arm/include/asm/kvm_hyp.h:23:0,
+                    from arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:29:
+>> arch/arm/include/asm/cp15.h:66:31: error: '__write_sysreg' undeclared (first use in this function); did you mean '__write_msi_msg'?
+    #define write_sysreg(v, ...)  __write_sysreg(v, __VA_ARGS__)
+                                  ^
+>> arch/arm/include/asm/kvm_hyp.h:95:33: note: in expansion of macro 'write_sysreg'
+    #define write_sysreg_el0(v, r)  write_sysreg(v, r##_el0)
+                                    ^~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:441:3: note: in expansion of macro 'write_sysreg_el0'
+      write_sysreg_el0(ctx->cnt_cval, cntp_cval);
+      ^~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:443:1: error: macro "__write_sysreg" requires 5 arguments, but only 2 given
+      write_sysreg_el0(ctx->cnt_ctl, cntp_ctl);
+    ^ ~~~~~~~~~~
    arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'get_timer_from_sysreg':
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:774:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
      case SYS_CNTP_TVAL_EL0:
           ^~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: note: each undeclared identifier is reported only once for each function it appears in
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:701:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:775:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CTL_EL0:
           ^~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:702:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:776:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CVAL_EL0:
           ^~~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:703:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:777:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
      case SYS_AARCH32_CNTP_TVAL:
           ^~~~~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:704:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:778:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CTL:
           ^~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
->> arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:705:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:779:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CVAL:
           ^~~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
    arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_read_sysreg':
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:723:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:797:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
      case SYS_CNTP_TVAL_EL0:
           ^~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:724:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:798:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
      case SYS_AARCH32_CNTP_TVAL:
           ^~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:728:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:802:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CTL_EL0:
           ^~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:729:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:803:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CTL:
           ^~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:733:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:807:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CVAL_EL0:
           ^~~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:734:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:808:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CVAL:
           ^~~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
    arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c: In function 'kvm_arm_timer_write_sysreg':
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:758:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:832:7: error: 'SYS_CNTP_TVAL_EL0' undeclared (first use in this function)
      case SYS_CNTP_TVAL_EL0:
           ^~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:759:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:833:7: error: 'SYS_AARCH32_CNTP_TVAL' undeclared (first use in this function)
      case SYS_AARCH32_CNTP_TVAL:
           ^~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:763:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:837:7: error: 'SYS_CNTP_CTL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CTL_EL0:
           ^~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:764:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:838:7: error: 'SYS_AARCH32_CNTP_CTL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CTL:
           ^~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:768:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:842:7: error: 'SYS_CNTP_CVAL_EL0' undeclared (first use in this function); did you mean 'SYS_CNTP_TVAL_EL0'?
      case SYS_CNTP_CVAL_EL0:
           ^~~~~~~~~~~~~~~~~
           SYS_CNTP_TVAL_EL0
-   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:769:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
+   arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:843:7: error: 'SYS_AARCH32_CNTP_CVAL' undeclared (first use in this function); did you mean 'SYS_AARCH32_CNTP_TVAL'?
      case SYS_AARCH32_CNTP_CVAL:
           ^~~~~~~~~~~~~~~~~~~~~
           SYS_AARCH32_CNTP_TVAL
 
-vim +/SYS_CNTP_TVAL_EL0 +700 arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c
+vim +/read_sysreg +94 arch/arm/include/asm/kvm_hyp.h
 
-   695	
-   696	static struct arch_timer_context *get_timer_from_sysreg(struct kvm_vcpu *vcpu,
-   697								u32 sr)
-   698	{
-   699		switch (sr) {
- > 700		case SYS_CNTP_TVAL_EL0:
- > 701		case SYS_CNTP_CTL_EL0:
- > 702		case SYS_CNTP_CVAL_EL0:
- > 703		case SYS_AARCH32_CNTP_TVAL:
- > 704		case SYS_AARCH32_CNTP_CTL:
- > 705		case SYS_AARCH32_CNTP_CVAL:
-   706			return vcpu_ptimer(vcpu);
-   707		default:
-   708			BUG();
-   709		}
-   710	}
-   711	
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  20  
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  21  #include <linux/compiler.h>
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  22  #include <linux/kvm_host.h>
+4f2546384 arch/arm/include/asm/kvm_hyp.h Vladimir Murzin 2016-09-12 @23  #include <asm/cp15.h>
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  24  #include <asm/vfp.h>
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  25  
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  26  #define __hyp_text __section(.hyp.text) notrace
+08dcbfda0 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2015-10-21  27  
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  28  #define __ACCESS_VFP(CRn)			\
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  29  	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
+3c2956876 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-02  30  
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  31  #define write_special(v, r)					\
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  32  	asm volatile("msr " __stringify(r) ", %0" : : "r" (v))
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  33  #define read_special(r) ({					\
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  34  	u32 __val;						\
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  35  	asm volatile("mrs %0, " __stringify(r) : "=r" (__val));	\
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  36  	__val;							\
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  37  })
+33280b4cd arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  38  
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  39  #define TTBR0		__ACCESS_CP15_64(0, c2)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  40  #define TTBR1		__ACCESS_CP15_64(1, c2)
+1d58d2cbf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-02  41  #define VTTBR		__ACCESS_CP15_64(6, c2)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  42  #define PAR		__ACCESS_CP15_64(0, c7)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  43  #define CNTV_CVAL	__ACCESS_CP15_64(3, c14)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  44  #define CNTVOFF		__ACCESS_CP15_64(4, c14)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  45  
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  46  #define MIDR		__ACCESS_CP15(c0, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  47  #define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  48  #define VPIDR		__ACCESS_CP15(c0, 4, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  49  #define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  50  #define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  51  #define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  52  #define HCR		__ACCESS_CP15(c1, 4, c1, 0)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  53  #define HDCR		__ACCESS_CP15(c1, 4, c1, 1)
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  54  #define HCPTR		__ACCESS_CP15(c1, 4, c1, 2)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  55  #define HSTR		__ACCESS_CP15(c1, 4, c1, 3)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  56  #define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
+d4c7688c5 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-02-01  57  #define HTCR		__ACCESS_CP15(c2, 4, c0, 2)
+d4c7688c5 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-02-01  58  #define VTCR		__ACCESS_CP15(c2, 4, c1, 2)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  59  #define DACR		__ACCESS_CP15(c3, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  60  #define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  61  #define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  62  #define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  63  #define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
+97e964371 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-13  64  #define HSR		__ACCESS_CP15(c5, 4, c2, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  65  #define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  66  #define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  67  #define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
+97e964371 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-13  68  #define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
+97e964371 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-13  69  #define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
+1d58d2cbf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-02  70  #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
+91c703e03 arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2017-10-23  71  #define BPIALLIS	__ACCESS_CP15(c7, 0, c1, 6)
+91c703e03 arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2017-10-23  72  #define ICIMVAU		__ACCESS_CP15(c7, 0, c5, 1)
+97e964371 arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-13  73  #define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
+1d58d2cbf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-02  74  #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+94d0e5980 arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2016-10-18  75  #define TLBIALL		__ACCESS_CP15(c8, 0, c7, 0)
+1d58d2cbf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-02  76  #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  77  #define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  78  #define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  79  #define AMAIR0		__ACCESS_CP15(c10, 0, c3, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  80  #define AMAIR1		__ACCESS_CP15(c10, 0, c3, 1)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  81  #define VBAR		__ACCESS_CP15(c12, 0, c0, 0)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  82  #define CID		__ACCESS_CP15(c13, 0, c0, 1)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  83  #define TID_URW		__ACCESS_CP15(c13, 0, c0, 2)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  84  #define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  85  #define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
+9dddc2dfa arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-05  86  #define HTPIDR		__ACCESS_CP15(c13, 4, c0, 2)
+c7ce6c63a arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-03  87  #define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  88  #define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  89  #define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
+e59bff9bf arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  90  
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  91  #define VFP_FPEXC	__ACCESS_VFP(FPEXC)
+59cbcdb5d arch/arm/kvm/hyp/hyp.h         Marc Zyngier    2016-01-04  92  
+68130cb5d arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2016-01-28  93  /* AArch64 compatibility macros, only for the timer so far */
+68130cb5d arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2016-01-28 @94  #define read_sysreg_el0(r)		read_sysreg(r##_el0)
+68130cb5d arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2016-01-28 @95  #define write_sysreg_el0(v, r)		write_sysreg(v, r##_el0)
+68130cb5d arch/arm/include/asm/kvm_hyp.h Marc Zyngier    2016-01-28  96  
+
+:::::: The code at line 94 was first introduced by commit
+:::::: 68130cb5db09cb8a285a59f70ac72d2bfa8685fd ARM: KVM: Use common version of timer-sr.c
+
+:::::: TO: Marc Zyngier <marc.zyngier@arm.com>
+:::::: CC: Marc Zyngier <marc.zyngier@arm.com>
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---Kj7319i9nmIyA2yE
+--RnlQjJ0d97Da+TV1
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICPh4NVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
+H4sICF2FNVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
 Tka1tuwjyzOTvz/dACkBJMjsVCoTdjfujb5Dv/7y64i8n16ed6f94+7p6cfoe3WojrtT9W30
 +/6p+t9RxEcZz0c0YvlvQJzsD+9/f9odn0fXv41/G388Pk5Gy+p4qJ5G4cvh9/33d2i8fzn8
 8usv8OdXAD6/Qj/H/xlBm49P2Prj98N7tfu6//j98XH0j6j6ut8dRre/TaG3yeSf5l/QNuRZ
@@ -520,15 +669,15 @@ v2NYf4v7WDJHJmJCSVMmA2W5gnWC6ffJFkP83GsOGYEH5mdsgqTYxgM7glfpTT5DoSYBH4xy
 WEgXnx5vbu+//EQN5jP89+XpuPm0b8doEh7hhPzytr1VN7vH90bAZo3PrJQk7kFDyBg7Jj3V
 iHk8Ter/XKNaf6hNAQA=
 
---Kj7319i9nmIyA2yE
+--RnlQjJ0d97Da+TV1
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-linux-arm-kernel mailing list
-linux-arm-kernel@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---Kj7319i9nmIyA2yE--
+--RnlQjJ0d97Da+TV1--
