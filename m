@@ -1,94 +1,109 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 4/75]
- arch/arm/kvm/../../../virt/kvm/arm/arch_timer.c:700:7: error:
- 'SYS_CNTP_TVAL_EL0' undeclared
-Date: Wed, 9 Jan 2019 10:09:51 +0000
-Message-ID: <8fd0977c-9ca1-8ad8-a6b7-e36e115745b8@arm.com>
-References: <201901091219.igdmvhpC%fengguang.wu@intel.com>
- <a82a7868-f3c0-0b3e-d0b7-182992c268fa@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v4 3/6] arm64/kvm: add a userspace option to enable
+ pointer authentication
+Date: Wed, 9 Jan 2019 15:43:50 +0530
+Message-ID: <CADGdYn7t7-vXNmQxBUxnCWq5UxG8uGJraCnRxjDgwvC0V6y8jA@mail.gmail.com>
+References: <1545119810-12182-1-git-send-email-amit.kachhap@arm.com>
+ <1545119810-12182-4-git-send-email-amit.kachhap@arm.com> <49474d5f-6f4e-b57d-4b45-94c16d85136c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E44624A439
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 05:09:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a5ofVl-sampY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jan 2019 05:09:54 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF6D4A3E1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 05:09:54 -0500 (EST)
-In-Reply-To: <a82a7868-f3c0-0b3e-d0b7-182992c268fa@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <49474d5f-6f4e-b57d-4b45-94c16d85136c@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: LAK <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/01/2019 09:13, Andr=E9 Przywara wrote:
-> On 09/01/2019 04:40, kbuild test robot wrote:
-> =
+Hi,
 
-> Marc, Christoffer,
-> =
+On Sat, Jan 5, 2019 at 12:05 AM James Morse <james.morse@arm.com> wrote:
+>
+> Hi Amit,
+>
+> On 18/12/2018 07:56, Amit Daniel Kachhap wrote:
+> > This feature will allow the KVM guest to allow the handling of
+> > pointer authentication instructions or to treat them as undefined
+> > if not set. It uses the existing vcpu API KVM_ARM_VCPU_INIT to
+> > supply this parameter instead of creating a new API.
+> >
+> > A new register is not created to pass this parameter via
+> > SET/GET_ONE_REG interface as just a flag (KVM_ARM_VCPU_PTRAUTH)
+> > supplied is enough to select this feature.
+>
+> What is the motivation for doing this? Doesn't ptrauth 'just' need turning on?
+> It doesn't need additional setup to be useable, or rely on some qemu support to
+> work properly. There isn't any hidden state that can't be migrated in the usual way.
+> Is it just because we don't want to commit to the ABI?
+This allows migration of guest to non pointer authenticated supported
+systems and hides the extra ptrauth registers.
+Basically this suggestion was given by Christoffer
+(https://lore.kernel.org/lkml/20180206123847.GY21802@cbox/).
+ I don't have strong reservation to have this option and can be
+dropped if this doesn't make sense.
+>
+>
+> > diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
+> > index 5baca42..8c0f338 100644
+> > --- a/Documentation/arm64/pointer-authentication.txt
+> > +++ b/Documentation/arm64/pointer-authentication.txt
+> > @@ -87,7 +87,8 @@ used to get and set the keys for a thread.
+> >  Virtualization
+> >  --------------
+> >
+> > -Pointer authentication is not currently supported in KVM guests. KVM
+> > -will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
+> > -the feature will result in an UNDEFINED exception being injected into
+> > -the guest.
+> > +Pointer authentication is enabled in KVM guest when virtual machine is
+> > +created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
+> > +to be enabled. Without this flag, pointer authentication is not enabled
+> > +in KVM guests and attempted use of the feature will result in an UNDEFINED
+> > +exception being injected into the guest.
+>
+> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> > index cd209f7..e20583a 100644
+> > --- a/Documentation/virtual/kvm/api.txt
+> > +++ b/Documentation/virtual/kvm/api.txt
+> > @@ -2634,6 +2634,10 @@ Possible features:
+> >         Depends on KVM_CAP_ARM_PSCI_0_2.
+> >       - KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+> >         Depends on KVM_CAP_ARM_PMU_V3.
+> > +     - KVM_ARM_VCPU_PTRAUTH: Emulate Pointer authentication for the CPU.
+> > +       Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
+> > +       set, then the KVM guest allows the execution of pointer authentication
+> > +       instructions or treats them as undefined if not set.
+>
+> > diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> > index 1bfaf74..03999bb 100644
+> > --- a/arch/arm64/kvm/hyp/ptrauth-sr.c
+> > +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> > @@ -71,3 +71,19 @@ void __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> >       __ptrauth_save_state(guest_ctxt);
+> >       __ptrauth_restore_state(host_ctxt);
+> >  }
+> > +
+> > +/**
+> > + * kvm_arm_vcpu_ptrauth_allowed - checks if ptrauth feature is present in vcpu
+> > + *
+> > + * @vcpu: The VCPU pointer
+> > + *
+> > + * This function will be used to enable/disable ptrauth in guest as configured
+> > + * by the KVM userspace API.
+> > + */
+> > +bool kvm_arm_vcpu_ptrauth_allowed(struct kvm_vcpu *vcpu)
+> > +{
+> > +     if (test_bit(KVM_ARM_VCPU_PTRAUTH, vcpu->arch.features))
+> > +             return true;
+> > +     else
+> > +             return false;
+> > +}
+>
+> Can't you return the result of test_bit() directly?
+ok.
+>
+>
+> Thanks,
+>
+> James
 
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.gi=
-t kvm-arm64/nv-wip-v5.0-rc1
->> head:   688c386ca096f2c1f2eee386697586c88df5d5bc
->> commit: 2b1265c58a873d917e99ac762e243c1274481dbf [4/75] KVM: arm/arm64: =
-consolidate arch timer trap handlers
->> config: arm-axm55xx_defconfig (attached as .config)
->> compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
->> reproduce:
->>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sb=
-in/make.cross -O ~/bin/make.cross
->>         chmod +x ~/bin/make.cross
->>         git checkout 2b1265c58a873d917e99ac762e243c1274481dbf
->>         # save the attached .config to linux build tree
->>         GCC_VERSION=3D7.2.0 make.cross ARCH=3Darm =
-
->>
->> All errors (new ones prefixed by >>):
-> =
-
-> I was looking at this yesterday: It's a bit nasty, don't know a good
-> solution beside bringing back this part of my original timer rework serie=
-s.
-> The problem is that those symbols contains the Aarch64 specific
-> (instruction) encoding of the timer registers, plus we need the AArch32
-> encodings for 32-on-64 guests.
-
-Why? There is exactly one timer that needs trapping for AArch32 (the EL1
-physical timer). All we need is:
-
-- the SYS_AARCH32_CNTP_* encodings on 32bit
-- some CPP magic to prevent the compilation from breaking
-
-> =
-
-> That's why I used the generic UAPI encoding for the registers, because
-> we only need *some* identification for them, it doesn't need to be
-> something defined by the architecture.
-
-I disagree. By doing so, you're conflating userspace access and
-trapping, which has proved to be a bad idea in the past. For example,
-you'd end-up having both CVAL and TVAL in UAPI, which is not something
-I'm keen to have. On the other hand, the trapping function do need to be
-able to handle these.
-
-Thanks,
-
-	M.
--- =
-
-Jazz is not dead. It just smells funny...
+//Amit
