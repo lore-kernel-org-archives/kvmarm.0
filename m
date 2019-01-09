@@ -1,24 +1,26 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH 0/3] arm64: KVM: Allow direct function calls on VHE
-Date: Wed, 9 Jan 2019 14:11:36 +0000
-Message-ID: <20190109141135.GG56789@e119886-lin.cambridge.arm.com>
+Subject: Re: [PATCH 2/3] arm64: KVM: Allow for direct call of HYP functions
+ when using VHE
+Date: Wed, 9 Jan 2019 14:24:08 +0000
+Message-ID: <20190109142407.GH56789@e119886-lin.cambridge.arm.com>
 References: <20190109135435.178664-1-marc.zyngier@arm.com>
+ <20190109135435.178664-3-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CBCA4A41B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:11:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B49814A443
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:24:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x9kOebkBhucs for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jan 2019 09:11:38 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDE214A36C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:11:38 -0500 (EST)
+ with ESMTP id 2U0Zp7WRaCtD for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jan 2019 09:24:11 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6914A43C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:24:11 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190109135435.178664-1-marc.zyngier@arm.com>
+In-Reply-To: <20190109135435.178664-3-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,41 +34,71 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 09, 2019 at 01:54:32PM +0000, Marc Zyngier wrote:
-> It recently appeared that the nasty hack we use to call a HYP function
-> on a non-VHE system has an interesting side effect on VHE: We wrap any
-> such call into a hypercall, losing any form of type checking between
-> the caller and the callee.
+On Wed, Jan 09, 2019 at 01:54:34PM +0000, Marc Zyngier wrote:
+> When running VHE, there is no need to jump via some stub to perform
+> a "HYP" function call, as there is a single address space.
 > 
-> This isn't a big deal if you can guarantee to write code that is
-> always 100% correct, but it appears that I'm not you.
+> Let's thus change kvm_call_hyp() and co to perform a direct call
+> in this case. Although this results in a bit of code expansion,
+> it allows the compiler to check for type compatibility, something
+> that we are missing so far.
 > 
-> In order to restore some sanity, let's use the following property: On
-> a VHE system, it is always possible to call any function directly as
-> they live in the same address space. We can thus always emit a direct
-> call, and use a static key to flip from one to the other. As a bonus,
-> this also sanitizes !VHE systems as we always generate code for noth
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 32 +++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e54cb7c88a4e..df32edbadd69 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -370,8 +370,36 @@ void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+>  u64 __kvm_call_hyp(void *hypfn, ...);
+> -#define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__)
+> -#define kvm_call_hyp_ret(f, ...) kvm_call_hyp(f, ##__VA_ARGS__)
+> +
+> +/*
+> + * The couple of isb() below are there to guarantee the same behaviour
+> + * on VHE as on !VHE, where the eret to EL1 acts as a context
+> + * synchronization event.
+> + */
+> +#define kvm_call_hyp(f, ...)						\
+> +	do {								\
+> +		if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN)) {	\
+> +			f(__VA_ARGS__);					\
+> +			isb();						\
+> +		} else {						\
+> +			__kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__); \
+> +		}							\
+> +	} while(0)
+> +
+> +#define kvm_call_hyp_ret(f, ...)					\
+> +	({								\
+> +		u64 ret;						\
+> +									\
+> +		if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN)) {	\
+> +			ret = f(__VA_ARGS__);				\
 
-s/noth/both/g
+__kvm_get_mdcr_el2 and __kvm_vcpu_run_nvhe don't return u64 type, they
+return a smaller type. I guess any issues would be picked up when compiling,
+but should the name of the macro be clearer as to the assumptions it makes?
+Or perhaps take an argument which is the type of ret?
 
 Andrew Murray
 
-> revisions of the architecture.
-> 
-> Marc Zyngier (3):
->   arm/arm64: KVM: Introduce kvm_call_hyp_ret()
->   arm64: KVM: Allow for direct call of HYP functions when using VHE
->   arm64: KVM: Drop VHE-specific HYP call stub
-> 
->  arch/arm/include/asm/kvm_host.h   |  3 +++
->  arch/arm64/include/asm/kvm_host.h | 31 ++++++++++++++++++++++++++++++-
->  arch/arm64/kvm/debug.c            |  2 +-
->  arch/arm64/kvm/hyp.S              |  3 ---
->  arch/arm64/kvm/hyp/hyp-entry.S    | 12 ------------
->  virt/kvm/arm/arm.c                |  2 +-
->  virt/kvm/arm/vgic/vgic-v3.c       |  4 ++--
->  7 files changed, 37 insertions(+), 20 deletions(-)
-> 
+> +			isb();						\
+> +		} else {						\
+> +			ret = __kvm_call_hyp(kvm_ksym_ref(f),		\
+> +					     ##__VA_ARGS__);		\
+> +		}							\
+> +									\
+> +		ret;							\
+> +	})
+>  
+>  void force_vm_exit(const cpumask_t *mask);
+>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
 > -- 
 > 2.20.1
 > 
