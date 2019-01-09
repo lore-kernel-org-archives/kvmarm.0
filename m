@@ -1,22 +1,22 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 43/75]
- arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1709:6: error: implicit declaration
- of function 'kvm_is_shadow_s2_fault'; did you mean 'kvm_is_write_fault'?
-Date: Wed, 9 Jan 2019 15:55:47 +0800
-Message-ID: <201901091559.lLmZCCoD%fengguang.wu@intel.com>
+Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 44/75]
+ arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1982:9: error: implicit declaration
+ of function 'kvm_s2_handle_perm_fault'; did you mean 'handle_mm_fault'?
+Date: Wed, 9 Jan 2019 16:37:26 +0800
+Message-ID: <201901091637.6vklYQKx%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Type: multipart/mixed; boundary="RnlQjJ0d97Da+TV1"
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E52174A45E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 02:56:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A4864A446
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 03:37:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W+G7S3MggTl1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jan 2019 02:56:38 -0500 (EST)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7B534A431
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 02:56:37 -0500 (EST)
+ with ESMTP id f2Zc8D91ydmU for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jan 2019 03:37:43 -0500 (EST)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612624A435
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 03:37:43 -0500 (EST)
 Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,94 +32,24 @@ Cc: Marc Zyngier <marc.zyngier@arm.com>, Jintack Lim <jintack.lim@linaro.org>, k
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---Nq2Wo0NMKNjxTN9z
+--RnlQjJ0d97Da+TV1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm64/nv-wip-v5.0-rc1
 head:   688c386ca096f2c1f2eee386697586c88df5d5bc
-commit: 7804bbf602f8d97fc5237ea12cdf28064952085c [43/75] KVM: arm64: nv: Handle shadow stage 2 page faults
+commit: fbdecc14dd15c696fd86d28247a9b95b4635b8b1 [44/75] KVM: arm64: nv: Forward the guest hypervisor's stage 2 permission faults
 config: arm-axm55xx_defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
 reproduce:
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 7804bbf602f8d97fc5237ea12cdf28064952085c
+        git checkout fbdecc14dd15c696fd86d28247a9b95b4635b8b1
         # save the attached .config to linux build tree
         GCC_VERSION=7.2.0 make.cross ARCH=arm 
 
-All error/warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1188:35: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr)
-                                      ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_is_exec':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1195:32: error: passing argument 1 of 'stage2_get_leaf_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     found = stage2_get_leaf_entry(mmu, addr, &pudp, &pmdp, &ptep);
-                                   ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1150:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static bool stage2_get_leaf_entry(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-                ^~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1207:34: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static int stage2_set_pte(struct kvm_s2_mmu *mmu,
-                                     ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_set_pte':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1212:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1222:23: error: passing argument 1 of 'stage2_get_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     pud = stage2_get_pud(mmu, cache, addr);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1023:15: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
-                  ^~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1236:23: error: passing argument 1 of 'stage2_dissolve_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      stage2_dissolve_pud(mmu, addr, pud);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:127:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t *pudp)
-                ^~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1260:23: error: passing argument 1 of 'stage2_dissolve_pmd' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      stage2_dissolve_pmd(mmu, addr, pmd);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:108:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
-                ^~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1284:26: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      kvm_tlb_flush_vmid_ipa(mmu, addr);
-                             ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1212:14: warning: unused variable 'kvm' [-Wunused-variable]
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_phys_addr_ioremap':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1350:34: error: 'struct kvm_arch' has no member named 'mmu'
-      ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
-                                     ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1439:35: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
-                                      ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_wp_pmds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1442:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1469:36: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
-                                       ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_wp_puds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1472:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1484:20: error: passing argument 1 of 'stage2_wp_pmds' from incompatible pointer type [-Werror=incompatible-pointer-types]
-        stage2_wp_pmds(mmu, pud, addr, next);
                        ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1439:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
     static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
@@ -150,18 +80,18 @@ All error/warnings (new ones prefixed by >>):
      stage2_wp_range(&kvm->arch.mmu, start, end);
                                ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1665:13: warning: 'struct kvm_s2_trans' declared inside parameter list will not be visible outside of this definition or declaration
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1665:13: warning: 'struct kvm_s2_trans' declared inside parameter list will not be visible outside of this definition or declaration
          struct kvm_s2_trans *nested,
                 ^~~~~~~~~~~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'user_mem_abort':
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1682:37: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
      struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
                                         ^
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1709:6: error: implicit declaration of function 'kvm_is_shadow_s2_fault'; did you mean 'kvm_is_write_fault'? [-Werror=implicit-function-declaration]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1709:6: error: implicit declaration of function 'kvm_is_shadow_s2_fault'; did you mean 'kvm_is_write_fault'? [-Werror=implicit-function-declaration]
      if (kvm_is_shadow_s2_fault(vcpu)) {
          ^~~~~~~~~~~~~~~~~~~~~~
          kvm_is_write_fault
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1710:15: error: dereferencing pointer to incomplete type 'struct kvm_s2_trans'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1710:15: error: dereferencing pointer to incomplete type 'struct kvm_s2_trans'
       ipa = nested->output;
                   ^~
    In file included from include/asm-generic/bug.h:18:0,
@@ -177,7 +107,7 @@ All error/warnings (new ones prefixed by >>):
    include/linux/kernel.h:879:19: note: in expansion of macro '__careful_cmp'
     #define min(x, y) __careful_cmp(x, y, <)
                       ^~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1717:18: note: in expansion of macro 'min'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1717:18: note: in expansion of macro 'min'
       max_map_size = min(nested->block_size, max_map_size);
                      ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1810:47: error: passing argument 1 of 'stage2_is_exec' from incompatible pointer type [-Werror=incompatible-pointer-types]
@@ -209,64 +139,68 @@ All error/warnings (new ones prefixed by >>):
      if (!stage2_get_leaf_entry(vcpu->arch.hw_mmu, fault_ipa, &pud, &pmd, &pte))
                                           ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_handle_guest_abort':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1916:22: error: storage size of 'nested_trans' isn't known
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1916:22: error: storage size of 'nested_trans' isn't known
      struct kvm_s2_trans nested_trans;
                          ^~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1975:9: error: implicit declaration of function 'kvm_walk_nested_s2'; did you mean 'kvm_inject_nested_irq'? [-Werror=implicit-function-declaration]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1975:9: error: implicit declaration of function 'kvm_walk_nested_s2'; did you mean 'kvm_inject_nested_irq'? [-Werror=implicit-function-declaration]
       ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
             ^~~~~~~~~~~~~~~~~~
             kvm_inject_nested_irq
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1977:4: error: implicit declaration of function 'kvm_inject_s2_fault'; did you mean 'kvm_inject_pabt'? [-Werror=implicit-function-declaration]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1977:4: error: implicit declaration of function 'kvm_inject_s2_fault'; did you mean 'kvm_inject_pabt'? [-Werror=implicit-function-declaration]
        kvm_inject_s2_fault(vcpu, nested_trans.esr);
        ^~~~~~~~~~~~~~~~~~~
        kvm_inject_pabt
+>> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1982:9: error: implicit declaration of function 'kvm_s2_handle_perm_fault'; did you mean 'handle_mm_fault'? [-Werror=implicit-function-declaration]
+      ret = kvm_s2_handle_perm_fault(vcpu, fault_ipa, &nested_trans);
+            ^~~~~~~~~~~~~~~~~~~~~~~~
+            handle_mm_fault
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1916:22: warning: unused variable 'nested_trans' [-Wunused-variable]
      struct kvm_s2_trans nested_trans;
                          ^~~~~~~~~~~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_unmap_hva_handler':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2075:35: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2082:35: error: 'struct kvm_arch' has no member named 'mmu'
      kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
                                       ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_unmap_hva_range':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2082:16: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2089:16: error: 'struct kvm_arch' has no member named 'mmu'
      if (!kvm->arch.mmu.pgd)
                    ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_set_spte_handler':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2102:27: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2109:27: error: 'struct kvm_arch' has no member named 'mmu'
      stage2_set_pte(&kvm->arch.mmu, NULL, gpa, pte, 0);
                               ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_set_spte_hva':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2113:16: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2120:16: error: 'struct kvm_arch' has no member named 'mmu'
      if (!kvm->arch.mmu.pgd)
                    ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_age_hva_handler':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2136:39: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2143:39: error: 'struct kvm_arch' has no member named 'mmu'
      if (!stage2_get_leaf_entry(&kvm->arch.mmu, gpa, &pud, &pmd, &pte))
                                           ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_test_age_hva_handler':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2154:39: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2161:39: error: 'struct kvm_arch' has no member named 'mmu'
      if (!stage2_get_leaf_entry(&kvm->arch.mmu, gpa, &pud, &pmd, &pte))
                                           ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_age_hva':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2167:16: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2174:16: error: 'struct kvm_arch' has no member named 'mmu'
      if (!kvm->arch.mmu.pgd)
                    ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_test_age_hva':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2175:16: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2182:16: error: 'struct kvm_arch' has no member named 'mmu'
      if (!kvm->arch.mmu.pgd)
                    ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_prepare_memory_region':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2388:36: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2395:36: error: 'struct kvm_arch' has no member named 'mmu'
       kvm_unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
                                        ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2390:34: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2397:34: error: 'struct kvm_arch' has no member named 'mmu'
       stage2_flush_memslot(&kvm->arch.mmu, memslot);
                                      ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_flush_shadow_all':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2416:27: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2423:27: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
      for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
                               ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2417:38: error: 'struct kvm_arch' has no member named 'nested_mmus'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2424:38: error: 'struct kvm_arch' has no member named 'nested_mmus'
       struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
                                          ^
    In file included from arch/arm/include/asm/bug.h:60:0,
@@ -275,426 +209,200 @@ All error/warnings (new ones prefixed by >>):
                     from include/linux/mm.h:9,
                     from include/linux/mman.h:5,
                     from arch/arm/kvm/../../../virt/kvm/arm/mmu.c:19:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2419:14: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2426:14: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
       WARN_ON(mmu->usage_count > 0);
                  ^
    include/asm-generic/bug.h:122:25: note: in definition of macro 'WARN_ON'
      int __ret_warn_on = !!(condition);    \
                             ^~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2422:24: error: passing argument 1 of 'kvm_free_stage2_pgd' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2429:24: error: passing argument 1 of 'kvm_free_stage2_pgd' from incompatible pointer type [-Werror=incompatible-pointer-types]
        kvm_free_stage2_pgd(mmu);
                            ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1005:6: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
     void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
          ^~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2424:17: error: 'struct kvm_arch' has no member named 'nested_mmus'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2431:17: error: 'struct kvm_arch' has no member named 'nested_mmus'
      kfree(kvm->arch.nested_mmus);
                     ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2425:11: error: 'struct kvm_arch' has no member named 'nested_mmus'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2432:11: error: 'struct kvm_arch' has no member named 'nested_mmus'
      kvm->arch.nested_mmus = NULL;
               ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2426:11: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2433:11: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
      kvm->arch.nested_mmus_size = 0;
               ^
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2427:32: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2434:32: error: 'struct kvm_arch' has no member named 'mmu'
      kvm_free_stage2_pgd(&kvm->arch.mmu);
                                    ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_flush_shadow_memslot':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2437:35: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2444:35: error: 'struct kvm_arch' has no member named 'mmu'
      kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
                                       ^
    cc1: some warnings being treated as errors
 
-vim +1709 arch/arm/kvm/../../../virt/kvm/arm/mmu.c
+vim +1982 arch/arm/kvm/../../../virt/kvm/arm/mmu.c
 
-  1521	
-  1522	/**
-  1523	 * kvm_mmu_wp_memory_region() - write protect stage 2 entries for memory slot
-  1524	 * @kvm:	The KVM pointer
-  1525	 * @slot:	The memory slot to write protect
-  1526	 *
-  1527	 * Called to start logging dirty pages after memory region
-  1528	 * KVM_MEM_LOG_DIRTY_PAGES operation is called. After this function returns
-  1529	 * all present PUD, PMD and PTEs are write protected in the memory region.
-  1530	 * Afterwards read of dirty page log can be called.
-  1531	 *
-  1532	 * Acquires kvm_mmu_lock. Called with kvm->slots_lock mutex acquired,
-  1533	 * serializing operations for VM memory regions.
-  1534	 */
-  1535	void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
-  1536	{
-  1537		struct kvm_memslots *slots = kvm_memslots(kvm);
-  1538		struct kvm_memory_slot *memslot = id_to_memslot(slots, slot);
-  1539		phys_addr_t start = memslot->base_gfn << PAGE_SHIFT;
-  1540		phys_addr_t end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
-  1541	
-  1542		spin_lock(&kvm->mmu_lock);
-> 1543		stage2_wp_range(&kvm->arch.mmu, start, end);
-  1544		spin_unlock(&kvm->mmu_lock);
-  1545		kvm_flush_remote_tlbs(kvm);
-  1546	}
-  1547	
-  1548	/**
-  1549	 * kvm_mmu_write_protect_pt_masked() - write protect dirty pages
-  1550	 * @kvm:	The KVM pointer
-  1551	 * @slot:	The memory slot associated with mask
-  1552	 * @gfn_offset:	The gfn offset in memory slot
-  1553	 * @mask:	The mask of dirty pages at offset 'gfn_offset' in this memory
-  1554	 *		slot to be write protected
-  1555	 *
-  1556	 * Walks bits set in mask write protects the associated pte's. Caller must
-  1557	 * acquire kvm_mmu_lock.
-  1558	 */
-  1559	static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
-  1560			struct kvm_memory_slot *slot,
-  1561			gfn_t gfn_offset, unsigned long mask)
-  1562	{
-  1563		phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
-  1564		phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
-  1565		phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-  1566	
-  1567		stage2_wp_range(&kvm->arch.mmu, start, end);
-  1568	}
-  1569	
-  1570	/*
-  1571	 * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
-  1572	 * dirty pages.
-  1573	 *
-  1574	 * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
-  1575	 * enable dirty logging for them.
-  1576	 */
-  1577	void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-  1578			struct kvm_memory_slot *slot,
-  1579			gfn_t gfn_offset, unsigned long mask)
-  1580	{
-  1581		kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
-  1582	}
-  1583	
-  1584	static void clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
-  1585	{
-  1586		__clean_dcache_guest_page(pfn, size);
-  1587	}
-  1588	
-  1589	static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
-  1590	{
-  1591		__invalidate_icache_guest_page(pfn, size);
-  1592	}
-  1593	
-  1594	static void kvm_send_hwpoison_signal(unsigned long address,
-  1595					     struct vm_area_struct *vma)
-  1596	{
-  1597		short lsb;
-  1598	
-  1599		if (is_vm_hugetlb_page(vma))
-  1600			lsb = huge_page_shift(hstate_vma(vma));
-  1601		else
-  1602			lsb = PAGE_SHIFT;
-  1603	
-  1604		send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
-  1605	}
-  1606	
-  1607	static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
-  1608						       unsigned long hva)
-  1609	{
-  1610		gpa_t gpa_start, gpa_end;
-  1611		hva_t uaddr_start, uaddr_end;
-  1612		size_t size;
-  1613	
-  1614		size = memslot->npages * PAGE_SIZE;
-  1615	
-  1616		gpa_start = memslot->base_gfn << PAGE_SHIFT;
-  1617		gpa_end = gpa_start + size;
-  1618	
-  1619		uaddr_start = memslot->userspace_addr;
-  1620		uaddr_end = uaddr_start + size;
-  1621	
-  1622		/*
-  1623		 * Pages belonging to memslots that don't have the same alignment
-  1624		 * within a PMD for userspace and IPA cannot be mapped with stage-2
-  1625		 * PMD entries, because we'll end up mapping the wrong pages.
-  1626		 *
-  1627		 * Consider a layout like the following:
-  1628		 *
-  1629		 *    memslot->userspace_addr:
-  1630		 *    +-----+--------------------+--------------------+---+
-  1631		 *    |abcde|fgh  Stage-1 PMD    |    Stage-1 PMD   tv|xyz|
-  1632		 *    +-----+--------------------+--------------------+---+
-  1633		 *
-  1634		 *    memslot->base_gfn << PAGE_SIZE:
-  1635		 *      +---+--------------------+--------------------+-----+
-  1636		 *      |abc|def  Stage-2 PMD    |    Stage-2 PMD     |tvxyz|
-  1637		 *      +---+--------------------+--------------------+-----+
-  1638		 *
-  1639		 * If we create those stage-2 PMDs, we'll end up with this incorrect
-  1640		 * mapping:
-  1641		 *   d -> f
-  1642		 *   e -> g
-  1643		 *   f -> h
-  1644		 */
-  1645		if ((gpa_start & ~S2_PMD_MASK) != (uaddr_start & ~S2_PMD_MASK))
-  1646			return false;
-  1647	
-  1648		/*
-  1649		 * Next, let's make sure we're not trying to map anything not covered
-  1650		 * by the memslot. This means we have to prohibit PMD size mappings
-  1651		 * for the beginning and end of a non-PMD aligned and non-PMD sized
-  1652		 * memory slot (illustrated by the head and tail parts of the
-  1653		 * userspace view above containing pages 'abcde' and 'xyz',
-  1654		 * respectively).
-  1655		 *
-  1656		 * Note that it doesn't matter if we do the check using the
-  1657		 * userspace_addr or the base_gfn, as both are equally aligned (per
-  1658		 * the check above) and equally sized.
-  1659		 */
-  1660		return (hva & S2_PMD_MASK) >= uaddr_start &&
-  1661		       (hva & S2_PMD_MASK) + S2_PMD_SIZE <= uaddr_end;
-  1662	}
-  1663	
-  1664	static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> 1665				  struct kvm_s2_trans *nested,
-  1666				  struct kvm_memory_slot *memslot,
-  1667				  unsigned long hva, unsigned long fault_status)
-  1668	{
-  1669		int ret;
-  1670		bool write_fault, writable;
-  1671		bool exec_fault, needs_exec;
-  1672		unsigned long mmu_seq;
-  1673		phys_addr_t ipa = fault_ipa;
-  1674		gfn_t gfn;
-  1675		struct kvm *kvm = vcpu->kvm;
-  1676		struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-  1677		struct vm_area_struct *vma;
-  1678		kvm_pfn_t pfn;
-  1679		pgprot_t mem_type = PAGE_S2;
-  1680		bool logging_active = memslot_is_logging(memslot);
-  1681		unsigned long vma_pagesize, flags = 0;
-> 1682		struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
-  1683		unsigned long max_map_size = PUD_SIZE;
-  1684	
-  1685		write_fault = kvm_is_write_fault(vcpu);
-  1686		exec_fault = kvm_vcpu_trap_is_iabt(vcpu);
-  1687		VM_BUG_ON(write_fault && exec_fault);
-  1688	
-  1689		if (fault_status == FSC_PERM && !write_fault && !exec_fault) {
-  1690			kvm_err("Unexpected L2 read permission error\n");
-  1691			return -EFAULT;
-  1692		}
-  1693	
-  1694		if (!fault_supports_stage2_pmd_mappings(memslot, hva))
-  1695			max_map_size = PAGE_SIZE;
-  1696	
-  1697		if (logging_active)
-  1698			max_map_size = PAGE_SIZE;
-  1699	
-  1700		/* Let's check if we will get back a huge page backed by hugetlbfs */
-  1701		down_read(&current->mm->mmap_sem);
-  1702		vma = find_vma_intersection(current->mm, hva, hva + 1);
-  1703		if (unlikely(!vma)) {
-  1704			kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
-  1705			up_read(&current->mm->mmap_sem);
-  1706			return -EFAULT;
-  1707		}
-  1708	
-> 1709		if (kvm_is_shadow_s2_fault(vcpu)) {
-> 1710			ipa = nested->output;
-  1711	
-  1712			/*
-  1713			 * If we're about to create a shadow stage 2 entry, then we
-  1714			 * can only create a block mapping if the guest stage 2 page
-  1715			 * table uses at least as big a mapping.
-  1716			 */
-> 1717			max_map_size = min(nested->block_size, max_map_size);
-  1718		}
-  1719		gfn = ipa >> PAGE_SHIFT;
-  1720	
-  1721		vma_pagesize = min(vma_kernel_pagesize(vma), max_map_size);
-  1722		/*
-  1723		 * PUD level may not exist for a VM but PMD is guaranteed to
-  1724		 * exist.
-  1725		 */
-  1726		if ((vma_pagesize == PMD_SIZE ||
-  1727		     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pud(kvm)))) {
-  1728			gfn = (ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
-  1729		}
-  1730		up_read(&current->mm->mmap_sem);
-  1731	
-  1732	
-  1733		/* We need minimum second+third level pages */
-  1734		ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm),
-  1735					     KVM_NR_MEM_OBJS);
-  1736		if (ret)
-  1737			return ret;
-  1738	
-  1739		mmu_seq = vcpu->kvm->mmu_notifier_seq;
-  1740		/*
-  1741		 * Ensure the read of mmu_notifier_seq happens before we call
-  1742		 * gfn_to_pfn_prot (which calls get_user_pages), so that we don't risk
-  1743		 * the page we just got a reference to gets unmapped before we have a
-  1744		 * chance to grab the mmu_lock, which ensure that if the page gets
-  1745		 * unmapped afterwards, the call to kvm_unmap_hva will take it away
-  1746		 * from us again properly. This smp_rmb() interacts with the smp_wmb()
-  1747		 * in kvm_mmu_notifier_invalidate_<page|range_end>.
-  1748		 */
-  1749		smp_rmb();
-  1750	
-  1751		pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-  1752		if (pfn == KVM_PFN_ERR_HWPOISON) {
-  1753			kvm_send_hwpoison_signal(hva, vma);
-  1754			return 0;
-  1755		}
-  1756		if (is_error_noslot_pfn(pfn))
-  1757			return -EFAULT;
-  1758	
-  1759		if (kvm_is_device_pfn(pfn)) {
-  1760			mem_type = PAGE_S2_DEVICE;
-  1761			flags |= KVM_S2PTE_FLAG_IS_IOMAP;
-  1762		} else if (logging_active) {
-  1763			/*
-  1764			 * Faults on pages in a memslot with logging enabled
-  1765			 * should not be mapped with huge pages (it introduces churn
-  1766			 * and performance degradation), so force a pte mapping.
-  1767			 */
-  1768			flags |= KVM_S2_FLAG_LOGGING_ACTIVE;
-  1769	
-  1770			/*
-  1771			 * Only actually map the page as writable if this was a write
-  1772			 * fault.
-  1773			 */
-  1774			if (!write_fault)
-  1775				writable = false;
-  1776		}
-  1777	
-  1778		spin_lock(&kvm->mmu_lock);
-  1779		if (mmu_notifier_retry(kvm, mmu_seq))
-  1780			goto out_unlock;
-  1781	
-  1782		if (vma_pagesize == PAGE_SIZE && max_map_size >= PMD_SIZE) {
-  1783			/*
-  1784			 * Only PMD_SIZE transparent hugepages(THP) are
-  1785			 * currently supported. This code will need to be
-  1786			 * updated to support other THP sizes.
-  1787			 */
-  1788			if (transparent_hugepage_adjust(&pfn, &ipa, &fault_ipa))
-  1789				vma_pagesize = PMD_SIZE;
-  1790		}
-  1791	
-  1792		if (writable)
-  1793			kvm_set_pfn_dirty(pfn);
-  1794	
-  1795		if (fault_status != FSC_PERM)
-  1796			clean_dcache_guest_page(pfn, vma_pagesize);
-  1797	
-  1798		if (exec_fault)
-  1799			invalidate_icache_guest_page(pfn, vma_pagesize);
-  1800	
-  1801		/*
-  1802		 * If we took an execution fault we have made the
-  1803		 * icache/dcache coherent above and should now let the s2
-  1804		 * mapping be executable.
-  1805		 *
-  1806		 * Write faults (!exec_fault && FSC_PERM) are orthogonal to
-  1807		 * execute permissions, and we preserve whatever we have.
-  1808		 */
-  1809		needs_exec = exec_fault ||
-  1810			(fault_status == FSC_PERM && stage2_is_exec(mmu, fault_ipa));
-  1811	
-  1812		if (vma_pagesize == PUD_SIZE) {
-  1813			pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
-  1814	
-  1815			new_pud = kvm_pud_mkhuge(new_pud);
-  1816			if (writable)
-  1817				new_pud = kvm_s2pud_mkwrite(new_pud);
-  1818	
-  1819			if (needs_exec)
-  1820				new_pud = kvm_s2pud_mkexec(new_pud);
-  1821	
-  1822			ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
-  1823		} else if (vma_pagesize == PMD_SIZE) {
-  1824			pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
-  1825	
-  1826			new_pmd = kvm_pmd_mkhuge(new_pmd);
-  1827	
-  1828			if (writable)
-  1829				new_pmd = kvm_s2pmd_mkwrite(new_pmd);
-  1830	
-  1831			if (needs_exec)
-  1832				new_pmd = kvm_s2pmd_mkexec(new_pmd);
-  1833	
-  1834			ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
-  1835		} else {
-  1836			pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
-  1837	
-  1838			if (writable) {
-  1839				new_pte = kvm_s2pte_mkwrite(new_pte);
-  1840				mark_page_dirty(kvm, gfn);
-  1841			}
-  1842	
-  1843			if (needs_exec)
-  1844				new_pte = kvm_s2pte_mkexec(new_pte);
-  1845	
-  1846			ret = stage2_set_pte(mmu, memcache, fault_ipa, &new_pte, flags);
-  1847		}
-  1848	
-  1849	out_unlock:
-  1850		spin_unlock(&kvm->mmu_lock);
-  1851		kvm_set_pfn_accessed(pfn);
-  1852		kvm_release_pfn_clean(pfn);
-  1853		return ret;
-  1854	}
-  1855	
-  1856	/*
-  1857	 * Resolve the access fault by making the page young again.
-  1858	 * Note that because the faulting entry is guaranteed not to be
-  1859	 * cached in the TLB, we don't need to invalidate anything.
-  1860	 * Only the HW Access Flag updates are supported for Stage 2 (no DBM),
-  1861	 * so there is no need for atomic (pte|pmd)_mkyoung operations.
-  1862	 */
-  1863	static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
-  1864	{
-  1865		pud_t *pud;
-  1866		pmd_t *pmd;
-  1867		pte_t *pte;
-  1868		kvm_pfn_t pfn;
-  1869		bool pfn_valid = false;
-  1870	
-  1871		trace_kvm_access_fault(fault_ipa);
-  1872	
-  1873		spin_lock(&vcpu->kvm->mmu_lock);
-  1874	
-> 1875		if (!stage2_get_leaf_entry(vcpu->arch.hw_mmu, fault_ipa, &pud, &pmd, &pte))
-  1876			goto out;
-  1877	
-  1878		if (pud) {		/* HugeTLB */
-  1879			*pud = kvm_s2pud_mkyoung(*pud);
-  1880			pfn = kvm_pud_pfn(*pud);
-  1881			pfn_valid = true;
-  1882		} else	if (pmd) {	/* THP, HugeTLB */
-  1883			*pmd = pmd_mkyoung(*pmd);
-  1884			pfn = pmd_pfn(*pmd);
-  1885			pfn_valid = true;
-  1886		} else {
-  1887			*pte = pte_mkyoung(*pte);	/* Just a page... */
-  1888			pfn = pte_pfn(*pte);
-  1889			pfn_valid = true;
-  1890		}
-  1891	
-  1892	out:
-  1893		spin_unlock(&vcpu->kvm->mmu_lock);
-  1894		if (pfn_valid)
-  1895			kvm_set_pfn_accessed(pfn);
-  1896	}
   1897	
+  1898	/**
+  1899	 * kvm_handle_guest_abort - handles all 2nd stage aborts
+  1900	 * @vcpu:	the VCPU pointer
+  1901	 * @run:	the kvm_run structure
+  1902	 *
+  1903	 * Any abort that gets to the host is almost guaranteed to be caused by a
+  1904	 * missing second stage translation table entry, which can mean that either the
+  1905	 * guest simply needs more memory and we must allocate an appropriate page or it
+  1906	 * can mean that the guest tried to access I/O memory, which is emulated by user
+  1907	 * space. The distinction is based on the IPA causing the fault and whether this
+  1908	 * memory region has been registered as standard RAM by user space.
+  1909	 */
+  1910	int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
+  1911	{
+  1912		unsigned long fault_status;
+  1913		phys_addr_t fault_ipa; /* The address we faulted on */
+  1914		phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
+  1915		struct kvm_memory_slot *memslot;
+  1916		struct kvm_s2_trans nested_trans;
+  1917		unsigned long hva;
+  1918		bool is_iabt, write_fault, writable;
+  1919		gfn_t gfn;
+  1920		int ret, idx;
+  1921	
+  1922		fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
+  1923	
+  1924		fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+  1925		ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+  1926		is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+  1927	
+  1928		/* Synchronous External Abort? */
+  1929		if (kvm_vcpu_dabt_isextabt(vcpu)) {
+  1930			/*
+  1931			 * For RAS the host kernel may handle this abort.
+  1932			 * There is no need to pass the error into the guest.
+  1933			 */
+  1934			if (!handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
+  1935				return 1;
+  1936	
+  1937			if (unlikely(!is_iabt)) {
+  1938				kvm_inject_vabt(vcpu);
+  1939				return 1;
+  1940			}
+  1941		}
+  1942	
+  1943		trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_hsr(vcpu),
+  1944				      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+  1945	
+  1946		/* Check the stage-2 fault is trans. fault or write fault */
+  1947		if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
+  1948		    fault_status != FSC_ACCESS) {
+  1949			/*
+  1950			 * We must never see an address size fault on shadow stage 2
+  1951			 * page table walk, because we would have injected an addr
+  1952			 * size fault when we walked the nested s2 page and not
+  1953			 * create the shadow entry.
+  1954			 */
+  1955			kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+  1956				kvm_vcpu_trap_get_class(vcpu),
+  1957				(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
+  1958				(unsigned long)kvm_vcpu_get_hsr(vcpu));
+  1959			return -EFAULT;
+  1960		}
+  1961	
+  1962		idx = srcu_read_lock(&vcpu->kvm->srcu);
+  1963	
+  1964		/*
+  1965		 * We may have faulted on a shadow stage 2 page table if we are
+  1966		 * running a nested guest.  In this case, we have to resovle the L2
+  1967		 * IPA to the L1 IPA first, before knowing what kind of memory should
+  1968		 * back the L1 IPA.
+  1969		 *
+  1970		 * If the shadow stage 2 page table walk faults, then we simply inject
+  1971		 * this to the guest and carry on.
+  1972		 */
+  1973		if (kvm_is_shadow_s2_fault(vcpu)) {
+  1974			nested_trans.esr = 0;
+> 1975			ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
+  1976			if (nested_trans.esr)
+  1977				kvm_inject_s2_fault(vcpu, nested_trans.esr);
+  1978			if (ret)
+  1979				goto out_unlock;
+  1980	
+  1981			nested_trans.esr = 0;
+> 1982			ret = kvm_s2_handle_perm_fault(vcpu, fault_ipa, &nested_trans);
+  1983			if (nested_trans.esr)
+  1984				kvm_inject_s2_fault(vcpu, nested_trans.esr);
+  1985			if (ret)
+  1986				goto out_unlock;
+  1987	
+  1988			ipa = nested_trans.output;
+  1989		}
+  1990	
+  1991		gfn = ipa >> PAGE_SHIFT;
+  1992		memslot = gfn_to_memslot(vcpu->kvm, gfn);
+  1993		hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+  1994		write_fault = kvm_is_write_fault(vcpu);
+  1995		if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+  1996			if (is_iabt) {
+  1997				/* Prefetch Abort on I/O address */
+  1998				kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+  1999				ret = 1;
+  2000				goto out_unlock;
+  2001			}
+  2002	
+  2003			/*
+  2004			 * Check for a cache maintenance operation. Since we
+  2005			 * ended-up here, we know it is outside of any memory
+  2006			 * slot. But we can't find out if that is for a device,
+  2007			 * or if the guest is just being stupid. The only thing
+  2008			 * we know for sure is that this range cannot be cached.
+  2009			 *
+  2010			 * So let's assume that the guest is just being
+  2011			 * cautious, and skip the instruction.
+  2012			 */
+  2013			if (kvm_vcpu_dabt_is_cm(vcpu)) {
+  2014				kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+  2015				ret = 1;
+  2016				goto out_unlock;
+  2017			}
+  2018	
+  2019			/*
+  2020			 * The IPA is reported as [MAX:12], so we need to
+  2021			 * complement it with the bottom 12 bits from the
+  2022			 * faulting VA. This is always 12 bits, irrespective
+  2023			 * of the page size.
+  2024			 */
+  2025			ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+  2026			ret = io_mem_abort(vcpu, run, ipa);
+  2027			goto out_unlock;
+  2028		}
+  2029	
+  2030		/* Userspace should not be able to register out-of-bounds IPAs */
+  2031		VM_BUG_ON(ipa >= kvm_phys_size(vcpu->kvm));
+  2032	
+  2033		if (fault_status == FSC_ACCESS) {
+  2034			handle_access_fault(vcpu, fault_ipa);
+  2035			ret = 1;
+  2036			goto out_unlock;
+  2037		}
+  2038	
+  2039		ret = user_mem_abort(vcpu, fault_ipa, &nested_trans,
+  2040				     memslot, hva, fault_status);
+  2041		if (ret == 0)
+  2042			ret = 1;
+  2043	out_unlock:
+  2044		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+  2045		return ret;
+  2046	}
+  2047	
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---Nq2Wo0NMKNjxTN9z
+--RnlQjJ0d97Da+TV1
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICHenNVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
+H4sICAiwNVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
 Tka1tuwjyzOTvz/dACkBJMjsVCoTdjfujb5Dv/7y64i8n16ed6f94+7p6cfoe3WojrtT9W30
 +/6p+t9RxEcZz0c0YvlvQJzsD+9/f9odn0fXv41/G388Pk5Gy+p4qJ5G4cvh9/33d2i8fzn8
 8usv8OdXAD6/Qj/H/xlBm49P2Prj98N7tfu6//j98XH0j6j6ut8dRre/TaG3yeSf5l/QNuRZ
@@ -1074,7 +782,7 @@ v2NYf4v7WDJHJmJCSVMmA2W5gnWC6ffJFkP83GsOGYEH5mdsgqTYxgM7glfpTT5DoSYBH4xy
 WEgXnx5vbu+//EQN5jP89+XpuPm0b8doEh7hhPzytr1VN7vH90bAZo3PrJQk7kFDyBg7Jj3V
 iHk8Ter/XKNaf6hNAQA=
 
---Nq2Wo0NMKNjxTN9z
+--RnlQjJ0d97Da+TV1
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1085,4 +793,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---Nq2Wo0NMKNjxTN9z--
+--RnlQjJ0d97Da+TV1--
