@@ -1,47 +1,57 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 40/75]
- arch/arm/kvm/../../../virt/kvm/arm/arm.c:133:39: error: 'struct kvm_arch'
- has no member named 'mmu'
-Date: Wed, 9 Jan 2019 14:10:46 +0800
-Message-ID: <201901091403.VSDKMPS2%fengguang.wu@intel.com>
+Subject: [kvmarm:kvm-arm64/nv-wip-v5.0-rc1 41/75]
+ arch/arm/kvm/../../../virt/kvm/arm/arm.c:143:11: error: 'struct kvm_arch'
+ has no member named 'nested_mmus'
+Date: Wed, 9 Jan 2019 14:57:03 +0800
+Message-ID: <201901091419.kRMgsLkB%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="h31gzZEtNLTqOjlF"
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: multipart/mixed; boundary="T4sUOijqQbZv57TR"
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D5F34A451
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 01:57:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id C4Mz6TD3cizY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Jan 2019 01:57:25 -0500 (EST)
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB4994A434
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 01:57:24 -0500 (EST)
 Content-Disposition: inline
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kbuild-all@01.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---h31gzZEtNLTqOjlF
+--T4sUOijqQbZv57TR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm64/nv-wip-v5.0-rc1
 head:   688c386ca096f2c1f2eee386697586c88df5d5bc
-commit: 80fce777386b95e1c6f5fdf09237b73397a1016f [40/75] KVM: arm/arm64: nv: Factor out stage 2 page table data from struct kvm
+commit: 0b00bd6b80de27c662fbf905a92a6390ff13d7c6 [41/75] KVM: arm/arm64: nv: Support multiple nested stage 2 mmu structures
 config: arm-axm55xx_defconfig (attached as .config)
 compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
 reproduce:
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        git checkout 80fce777386b95e1c6f5fdf09237b73397a1016f
+        git checkout 0b00bd6b80de27c662fbf905a92a6390ff13d7c6
         # save the attached .config to linux build tree
         GCC_VERSION=7.2.0 make.cross ARCH=arm 
 
-All error/warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
    arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_arch_init_vm':
->> arch/arm/kvm/../../../virt/kvm/arm/arm.c:133:39: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:133:39: error: 'struct kvm_arch' has no member named 'mmu'
      ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
                                           ^
    arch/arm/kvm/../../../virt/kvm/arm/arm.c:138:11: error: 'struct kvm_arch' has no member named 'mmu'
@@ -50,185 +60,74 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/arm.c:139:11: error: 'struct kvm_arch' has no member named 'mmu'
      kvm->arch.mmu.kvm = kvm;
               ^
-   arch/arm/kvm/../../../virt/kvm/arm/arm.c:153:32: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:140:11: error: 'struct kvm_arch' has no member named 'mmu'
+     kvm->arch.mmu.vttbr = -1;
+              ^
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:141:11: error: 'struct kvm_arch' has no member named 'mmu'
+     kvm->arch.mmu.nested_stage2_enabled = false;
+              ^
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:143:11: error: 'struct kvm_arch' has no member named 'nested_mmus'
+     kvm->arch.nested_mmus = NULL;
+              ^
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:144:11: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
+     kvm->arch.nested_mmus_size = 0;
+              ^
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:158:32: error: 'struct kvm_arch' has no member named 'mmu'
      kvm_free_stage2_pgd(&kvm->arch.mmu);
                                    ^
    arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_arch_vcpu_init':
->> arch/arm/kvm/../../../virt/kvm/arm/arm.c:358:12: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:363:12: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
      vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
                ^
-   arch/arm/kvm/../../../virt/kvm/arm/arm.c:358:38: error: 'struct kvm_arch' has no member named 'mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:363:38: error: 'struct kvm_arch' has no member named 'mmu'
      vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
                                          ^
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_arch_vcpu_load':
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:372:2: error: implicit declaration of function 'kvm_vcpu_load_hw_mmu'; did you mean 'kvm_vcpu_load_sysregs'? [-Werror=implicit-function-declaration]
+     kvm_vcpu_load_hw_mmu(vcpu);
+     ^~~~~~~~~~~~~~~~~~~~
+     kvm_vcpu_load_sysregs
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_arch_vcpu_put':
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:406:2: error: implicit declaration of function 'kvm_vcpu_put_hw_mmu'; did you mean 'kvm_vcpu_dabt_is_cm'? [-Werror=implicit-function-declaration]
+     kvm_vcpu_put_hw_mmu(vcpu);
+     ^~~~~~~~~~~~~~~~~~~
+     kvm_vcpu_dabt_is_cm
    arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_arch_vcpu_ioctl_run':
-   arch/arm/kvm/../../../virt/kvm/arm/arm.c:681:26: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:689:26: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
       update_vmid(&vcpu->arch.hw_mmu->vmid);
                              ^
-   arch/arm/kvm/../../../virt/kvm/arm/arm.c:730:48: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:738:48: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
       if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
                                                    ^
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c: In function 'kvm_vcpu_set_target':
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:973:15: error: 'KVM_ARM_VCPU_NESTED_VIRT' undeclared (first use in this function); did you mean 'KVM_ARM_VCPU_TIMER_CTRL'?
+     if (test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features)) {
+                  ^~~~~~~~~~~~~~~~~~~~~~~~
+                  KVM_ARM_VCPU_TIMER_CTRL
+   arch/arm/kvm/../../../virt/kvm/arm/arm.c:973:15: note: each undeclared identifier is reported only once for each function it appears in
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:976:8: error: implicit declaration of function 'cpus_have_const_cap'; did you mean 'cpu_have_feature'? [-Werror=implicit-function-declaration]
+      if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
+           ^~~~~~~~~~~~~~~~~~~
+           cpu_have_feature
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:976:28: error: 'ARM64_HAS_NESTED_VIRT' undeclared (first use in this function); did you mean 'KVM_ARM_VCPU_NESTED_VIRT'?
+      if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
+                               ^~~~~~~~~~~~~~~~~~~~~
+                               KVM_ARM_VCPU_NESTED_VIRT
+>> arch/arm/kvm/../../../virt/kvm/arm/arm.c:979:9: error: implicit declaration of function 'kvm_vcpu_init_nested'; did you mean 'kvm_vcpu_initialized'? [-Werror=implicit-function-declaration]
+      ret = kvm_vcpu_init_nested(vcpu);
+            ^~~~~~~~~~~~~~~~~~~~
+            kvm_vcpu_initialized
+   cc1: some warnings being treated as errors
 --
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_flush_remote_tlbs':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:66:46: error: 'struct kvm_arch' has no member named 'mmu'
-     kvm_call_hyp(__kvm_tlb_flush_vmid, kvm->arch.mmu);
-                                                 ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:43: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                                              ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:108:40: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
-                                           ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_dissolve_pmd':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:114:25: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     kvm_tlb_flush_vmid_ipa(mmu, addr);
-                            ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:127:40: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t *pudp)
-                                           ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_dissolve_pud':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:129:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:135:25: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     kvm_tlb_flush_vmid_ipa(mmu, addr);
-                            ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:129:14: warning: unused variable 'kvm' [-Wunused-variable]
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:171:43: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr_t addr)
-                                              ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'clear_stage2_pgd_entry':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:173:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:177:25: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     kvm_tlb_flush_vmid_ipa(mmu, addr);
-                            ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:173:14: warning: unused variable 'kvm' [-Wunused-variable]
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:182:43: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr_t addr)
-                                              ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'clear_stage2_pud_entry':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:184:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:189:25: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     kvm_tlb_flush_vmid_ipa(mmu, addr);
-                            ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:184:14: warning: unused variable 'kvm' [-Wunused-variable]
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:194:43: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr_t addr)
-                                              ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'clear_stage2_pmd_entry':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:199:25: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     kvm_tlb_flush_vmid_ipa(mmu, addr);
-                            ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:257:38: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
-                                         ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'unmap_stage2_ptes':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:269:27: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-       kvm_tlb_flush_vmid_ipa(mmu, addr);
-                              ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:280:26: error: passing argument 1 of 'clear_stage2_pmd_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      clear_stage2_pmd_entry(mmu, pmd, start_addr);
-                             ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:194:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr_t addr)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:283:38: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
-                                         ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'unmap_stage2_pmds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:286:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:298:28: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-        kvm_tlb_flush_vmid_ipa(mmu, addr);
-                               ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:304:23: error: passing argument 1 of 'unmap_stage2_ptes' from incompatible pointer type [-Werror=incompatible-pointer-types]
-        unmap_stage2_ptes(mmu, pmd, addr, next);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:257:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void unmap_stage2_ptes(struct kvm_s2_mmu *mmu, pmd_t *pmd,
-                ^~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:310:26: error: passing argument 1 of 'clear_stage2_pud_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      clear_stage2_pud_entry(mmu, pud, start_addr);
-                             ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:182:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr_t addr)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:313:38: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
-                                         ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'unmap_stage2_puds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:316:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:328:28: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-        kvm_tlb_flush_vmid_ipa(mmu, addr);
-                               ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:332:23: error: passing argument 1 of 'unmap_stage2_pmds' from incompatible pointer type [-Werror=incompatible-pointer-types]
-        unmap_stage2_pmds(mmu, pud, addr, next);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:283:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void unmap_stage2_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
-                ^~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:338:26: error: passing argument 1 of 'clear_stage2_pgd_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      clear_stage2_pgd_entry(mmu, pgd, start_addr);
-                             ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:171:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void clear_stage2_pgd_entry(struct kvm_s2_mmu *mmu, pgd_t *pgd, phys_addr_t addr)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:316:14: warning: unused variable 'kvm' [-Wunused-variable]
-     struct kvm *kvm = mmu->kvm;
-                 ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:352:39: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-                                          ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'unmap_stage2_range':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:352:36: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
+    void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+                                       ^~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_unmap_stage2_range':
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:354:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:373:22: error: passing argument 1 of 'unmap_stage2_puds' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:373:22: error: passing argument 1 of 'unmap_stage2_puds' from incompatible pointer type [-Werror=incompatible-pointer-types]
        unmap_stage2_puds(mmu, pgd, addr, next);
                          ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:313:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -245,7 +144,7 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:398:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:409:23: error: passing argument 1 of 'stage2_flush_ptes' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:409:23: error: passing argument 1 of 'stage2_flush_ptes' from incompatible pointer type [-Werror=incompatible-pointer-types]
         stage2_flush_ptes(mmu, pmd, addr, next);
                           ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:383:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -259,7 +158,7 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:417:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:428:23: error: passing argument 1 of 'stage2_flush_pmds' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:428:23: error: passing argument 1 of 'stage2_flush_pmds' from incompatible pointer type [-Werror=incompatible-pointer-types]
         stage2_flush_pmds(mmu, pud, addr, next);
                           ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:395:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -276,7 +175,7 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:436:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:446:22: error: passing argument 1 of 'stage2_flush_puds' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:446:22: error: passing argument 1 of 'stage2_flush_puds' from incompatible pointer type [-Werror=incompatible-pointer-types]
        stage2_flush_puds(mmu, pgd, addr, next);
                          ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:414:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -302,14 +201,14 @@ All error/warnings (new ones prefixed by >>):
      if (mmu->pgd != NULL) {
             ^~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_unmap_memslot':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:973:33: error: 'struct kvm_arch' has no member named 'mmu'
-       unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-                                    ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:973:37: error: 'struct kvm_arch' has no member named 'mmu'
+       kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
+                                        ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1005:33: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
     void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
                                     ^~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1005:6: error: conflicting types for 'kvm_free_stage2_pgd'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1005:6: error: conflicting types for 'kvm_free_stage2_pgd'
     void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
          ^~~~~~~~~~~~~~~~~~~
    In file included from arch/arm/kvm/../../../virt/kvm/arm/mmu.c:28:0:
@@ -320,13 +219,13 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1007:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1012:22: error: passing argument 1 of 'unmap_stage2_range' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
-                         ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:352:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-                ^~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1013:7: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+>> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1012:26: error: passing argument 1 of 'kvm_unmap_stage2_range' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
+                             ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:352:6: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+         ^~~~~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1013:7: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
       pgd = READ_ONCE(mmu->pgd);
           ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
@@ -348,7 +247,7 @@ All error/warnings (new ones prefixed by >>):
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1045:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1049:23: error: passing argument 1 of 'stage2_get_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1049:23: error: passing argument 1 of 'stage2_get_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
      pud = stage2_get_pud(mmu, cache, addr);
                           ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1023:15: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -362,7 +261,7 @@ All error/warnings (new ones prefixed by >>):
     static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
                                           ^~~~~~~~~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_set_pmd_huge':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1070:23: error: passing argument 1 of 'stage2_get_pmd' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1070:23: error: passing argument 1 of 'stage2_get_pmd' from incompatible pointer type [-Werror=incompatible-pointer-types]
      pmd = stage2_get_pmd(mmu, cache, addr);
                           ^~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1042:15: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
@@ -419,69 +318,152 @@ All error/warnings (new ones prefixed by >>):
     static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr)
                                       ^~~~~~~~~~
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_is_exec':
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1195:32: error: passing argument 1 of 'stage2_get_leaf_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1195:32: error: passing argument 1 of 'stage2_get_leaf_entry' from incompatible pointer type [-Werror=incompatible-pointer-types]
      found = stage2_get_leaf_entry(mmu, addr, &pudp, &pmdp, &ptep);
-                                   ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1150:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static bool stage2_get_leaf_entry(struct kvm_s2_mmu *mmu, phys_addr_t addr,
-                ^~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1207:34: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static int stage2_set_pte(struct kvm_s2_mmu *mmu,
-                                     ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_set_pte':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1212:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1222:23: error: passing argument 1 of 'stage2_get_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
-     pud = stage2_get_pud(mmu, cache, addr);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1023:15: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
-                  ^~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1236:23: error: passing argument 1 of 'stage2_dissolve_pud' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      stage2_dissolve_pud(mmu, addr, pud);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:127:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void stage2_dissolve_pud(struct kvm_s2_mmu *mmu, phys_addr_t addr, pud_t *pudp)
-                ^~~~~~~~~~~~~~~~~~~
->> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1260:23: error: passing argument 1 of 'stage2_dissolve_pmd' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      stage2_dissolve_pmd(mmu, addr, pmd);
-                          ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:108:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
-                ^~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1284:26: error: passing argument 1 of 'kvm_tlb_flush_vmid_ipa' from incompatible pointer type [-Werror=incompatible-pointer-types]
-      kvm_tlb_flush_vmid_ipa(mmu, addr);
-                             ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:69:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
-    static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-                ^~~~~~~~~~~~~~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1212:14: warning: unused variable 'kvm' [-Wunused-variable]
+--
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1437:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+                ^~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1470:14: warning: unused variable 'kvm' [-Wunused-variable]
      struct kvm *kvm = mmu->kvm;
                  ^~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_phys_addr_ioremap':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1350:34: error: 'struct kvm_arch' has no member named 'mmu'
-      ret = stage2_set_pte(&kvm->arch.mmu, &cache, addr, &pte,
-                                     ^
    arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1437:35: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
-                                      ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_wp_pmds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1440:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
-     struct kvm *kvm = mmu->kvm;
-                          ^~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: At top level:
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1467:36: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
-    static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1494:36: warning: 'struct kvm_s2_mmu' declared inside parameter list will not be visible outside of this definition or declaration
+    static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
                                        ^~~~~~~~~~
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_wp_puds':
-   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1470:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'stage2_wp_range':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1496:23: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
      struct kvm *kvm = mmu->kvm;
                           ^~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1516:19: error: passing argument 1 of 'stage2_wp_puds' from incompatible pointer type [-Werror=incompatible-pointer-types]
+       stage2_wp_puds(mmu, pgd, addr, next);
+                      ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1467:14: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+                 ^~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_mmu_wp_memory_region':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1541:28: error: 'struct kvm_arch' has no member named 'mmu'
+     stage2_wp_range(&kvm->arch.mmu, start, end);
+                               ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_mmu_write_protect_pt_masked':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1565:28: error: 'struct kvm_arch' has no member named 'mmu'
+     stage2_wp_range(&kvm->arch.mmu, start, end);
+                               ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'user_mem_abort':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1678:37: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
+     struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
+                                        ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1793:47: error: passing argument 1 of 'stage2_is_exec' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      (fault_status == FSC_PERM && stage2_is_exec(mmu, fault_ipa));
+                                                  ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1188:13: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static bool stage2_is_exec(struct kvm_s2_mmu *mmu, phys_addr_t addr)
+                ^~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1805:29: error: passing argument 1 of 'stage2_set_pud_huge' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      ret = stage2_set_pud_huge(mmu, memcache, fault_ipa, &new_pud);
+                                ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1112:12: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
+               ^~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1817:29: error: passing argument 1 of 'stage2_set_pmd_huge' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      ret = stage2_set_pmd_huge(mmu, memcache, fault_ipa, &new_pmd);
+                                ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1064:12: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
+               ^~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1829:24: error: passing argument 1 of 'stage2_set_pte' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      ret = stage2_set_pte(mmu, memcache, fault_ipa, &new_pte, flags);
+                           ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1207:12: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    static int stage2_set_pte(struct kvm_s2_mmu *mmu,
+               ^~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'handle_access_fault':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1858:39: error: 'struct kvm_vcpu_arch' has no member named 'hw_mmu'
+     if (!stage2_get_leaf_entry(vcpu->arch.hw_mmu, fault_ipa, &pud, &pmd, &pte))
+                                          ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_unmap_hva_handler':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2028:35: error: 'struct kvm_arch' has no member named 'mmu'
+     kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+                                      ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_unmap_hva_range':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2035:16: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!kvm->arch.mmu.pgd)
+                   ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_set_spte_handler':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2055:27: error: 'struct kvm_arch' has no member named 'mmu'
+     stage2_set_pte(&kvm->arch.mmu, NULL, gpa, pte, 0);
+                              ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_set_spte_hva':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2066:16: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!kvm->arch.mmu.pgd)
+                   ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_age_hva_handler':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2089:39: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!stage2_get_leaf_entry(&kvm->arch.mmu, gpa, &pud, &pmd, &pte))
+                                          ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_test_age_hva_handler':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2107:39: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!stage2_get_leaf_entry(&kvm->arch.mmu, gpa, &pud, &pmd, &pte))
+                                          ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_age_hva':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2120:16: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!kvm->arch.mmu.pgd)
+                   ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_test_age_hva':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2128:16: error: 'struct kvm_arch' has no member named 'mmu'
+     if (!kvm->arch.mmu.pgd)
+                   ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_prepare_memory_region':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2341:36: error: 'struct kvm_arch' has no member named 'mmu'
+      kvm_unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
+                                       ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2343:34: error: 'struct kvm_arch' has no member named 'mmu'
+      stage2_flush_memslot(&kvm->arch.mmu, memslot);
+                                     ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_flush_shadow_all':
+>> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2369:27: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
+     for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+                              ^
+>> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2370:38: error: 'struct kvm_arch' has no member named 'nested_mmus'
+      struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+                                         ^
+   In file included from arch/arm/include/asm/bug.h:60:0,
+                    from include/linux/bug.h:5,
+                    from include/linux/mmdebug.h:5,
+                    from include/linux/mm.h:9,
+                    from include/linux/mman.h:5,
+                    from arch/arm/kvm/../../../virt/kvm/arm/mmu.c:19:
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2372:14: error: dereferencing pointer to incomplete type 'struct kvm_s2_mmu'
+      WARN_ON(mmu->usage_count > 0);
+                 ^
+   include/asm-generic/bug.h:122:25: note: in definition of macro 'WARN_ON'
+     int __ret_warn_on = !!(condition);    \
+                            ^~~~~~~~~
+>> arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2375:24: error: passing argument 1 of 'kvm_free_stage2_pgd' from incompatible pointer type [-Werror=incompatible-pointer-types]
+       kvm_free_stage2_pgd(mmu);
+                           ^~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:1005:6: note: expected 'struct kvm_s2_mmu *' but argument is of type 'struct kvm_s2_mmu *'
+    void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+         ^~~~~~~~~~~~~~~~~~~
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2377:17: error: 'struct kvm_arch' has no member named 'nested_mmus'
+     kfree(kvm->arch.nested_mmus);
+                    ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2378:11: error: 'struct kvm_arch' has no member named 'nested_mmus'
+     kvm->arch.nested_mmus = NULL;
+              ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2379:11: error: 'struct kvm_arch' has no member named 'nested_mmus_size'
+     kvm->arch.nested_mmus_size = 0;
+              ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2380:32: error: 'struct kvm_arch' has no member named 'mmu'
+     kvm_free_stage2_pgd(&kvm->arch.mmu);
+                                   ^
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c: In function 'kvm_arch_flush_shadow_memslot':
+   arch/arm/kvm/../../../virt/kvm/arm/mmu.c:2390:35: error: 'struct kvm_arch' has no member named 'mmu'
+     kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+                                      ^
+   cc1: some warnings being treated as errors
 
-vim +133 arch/arm/kvm/../../../virt/kvm/arm/arm.c
+vim +143 arch/arm/kvm/../../../virt/kvm/arm/arm.c
 
    112	
    113	
@@ -504,44 +486,49 @@ vim +133 arch/arm/kvm/../../../virt/kvm/arm/arm.c
    130		for_each_possible_cpu(cpu)
    131			*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
    132	
- > 133		ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
+   133		ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
    134		if (ret)
    135			goto out_fail_alloc;
    136	
    137		/* Mark the initial VMID generation invalid */
    138		kvm->arch.mmu.vmid.vmid_gen = 0;
  > 139		kvm->arch.mmu.kvm = kvm;
-   140	
-   141		ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
-   142		if (ret)
-   143			goto out_free_stage2_pgd;
-   144	
-   145		kvm_vgic_early_init(kvm);
-   146	
-   147		/* The maximum number of VCPUs is limited by the host's GIC model */
-   148		kvm->arch.max_vcpus = vgic_present ?
-   149					kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
-   150	
-   151		return ret;
-   152	out_free_stage2_pgd:
-   153		kvm_free_stage2_pgd(&kvm->arch.mmu);
-   154	out_fail_alloc:
-   155		free_percpu(kvm->arch.last_vcpu_ran);
-   156		kvm->arch.last_vcpu_ran = NULL;
-   157		return ret;
-   158	}
-   159	
+ > 140		kvm->arch.mmu.vttbr = -1;
+   141		kvm->arch.mmu.nested_stage2_enabled = false;
+   142	
+ > 143		kvm->arch.nested_mmus = NULL;
+ > 144		kvm->arch.nested_mmus_size = 0;
+   145	
+   146		ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
+   147		if (ret)
+   148			goto out_free_stage2_pgd;
+   149	
+   150		kvm_vgic_early_init(kvm);
+   151	
+   152		/* The maximum number of VCPUs is limited by the host's GIC model */
+   153		kvm->arch.max_vcpus = vgic_present ?
+   154					kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+   155	
+   156		return ret;
+   157	out_free_stage2_pgd:
+   158		kvm_free_stage2_pgd(&kvm->arch.mmu);
+   159	out_fail_alloc:
+   160		free_percpu(kvm->arch.last_vcpu_ran);
+   161		kvm->arch.last_vcpu_ran = NULL;
+   162		return ret;
+   163	}
+   164	
 
 ---
 0-DAY kernel test infrastructure                Open Source Technology Center
 https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---h31gzZEtNLTqOjlF
+--T4sUOijqQbZv57TR
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICGCONVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
+H4sICByZNVwAAy5jb25maWcAjDzbcts4su/zFarMy25tZaKLL/E55QeQBCWsSAIBSF38wlIc
 Tka1tuwjyzOTvz/dACkBJMjsVCoTdjfujb5Dv/7y64i8n16ed6f94+7p6cfoe3WojrtT9W30
 +/6p+t9RxEcZz0c0YvlvQJzsD+9/f9odn0fXv41/G388Pk5Gy+p4qJ5G4cvh9/33d2i8fzn8
 8usv8OdXAD6/Qj/H/xlBm49P2Prj98N7tfu6//j98XH0j6j6ut8dRre/TaG3yeSf5l/QNuRZ
@@ -921,15 +908,15 @@ v2NYf4v7WDJHJmJCSVMmA2W5gnWC6ffJFkP83GsOGYEH5mdsgqTYxgM7glfpTT5DoSYBH4xy
 WEgXnx5vbu+//EQN5jP89+XpuPm0b8doEh7hhPzytr1VN7vH90bAZo3PrJQk7kFDyBg7Jj3V
 iHk8Ter/XKNaf6hNAQA=
 
---h31gzZEtNLTqOjlF
+--T4sUOijqQbZv57TR
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-linux-arm-kernel mailing list
-linux-arm-kernel@lists.infradead.org
-http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---h31gzZEtNLTqOjlF--
+--T4sUOijqQbZv57TR--
