@@ -1,8 +1,8 @@
-From: Julien Thierry <julien.thierry@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH 2/3] arm64: KVM: Allow for direct call of HYP functions
  when using VHE
-Date: Wed, 9 Jan 2019 14:52:00 +0000
-Message-ID: <84607194-797f-cb82-ff64-f106a447c45a@arm.com>
+Date: Wed, 9 Jan 2019 16:01:56 +0000
+Message-ID: <c64d0652-3a29-4393-86d5-2e453e218d22@arm.com>
 References: <20190109135435.178664-1-marc.zyngier@arm.com>
  <20190109135435.178664-3-marc.zyngier@arm.com>
  <20190109142407.GH56789@e119886-lin.cambridge.arm.com>
@@ -11,33 +11,21 @@ References: <20190109135435.178664-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2D8D4A455
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:52:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PpPuRBgNZVWc for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Jan 2019 09:52:03 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E7C4A43C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Jan 2019 09:52:03 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <e09db09d-e781-00d7-5247-525969413e44@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Andrew Murray <andrew.murray@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Julien Thierry <julien.thierry@arm.com>, Andrew Murray <andrew.murray@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-
 
 On 09/01/2019 14:51, Julien Thierry wrote:
 > 
@@ -114,13 +102,9 @@ On 09/01/2019 14:51, Julien Thierry wrote:
 > 	typeof(f(__VA_ARGS__)) ret;
 > 
 > If typeof works anything like sizeof, I'd expect it would evaluate stuff
-
-it wouldn't*
-
 > passed as argument and we'd have the return type of the function.
-> 
-> Cheers,
-> 
+And it actually works! Thanks for the awful tip! ;-)
 
+	M.
 -- 
-Julien Thierry
+Jazz is not dead. It just smells funny...
