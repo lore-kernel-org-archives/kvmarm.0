@@ -1,26 +1,21 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v9 2/5] arm64: KVM: encapsulate kvm_cpu_context in
- kvm_host_data
-Date: Thu, 10 Jan 2019 11:36:01 +0000
-Message-ID: <a5ff581b-5cfb-fea2-74b8-aa4dc3403518@arm.com>
-References: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
- <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 00/13] Implement reset of virtio devices
+Date: Thu, 10 Jan 2019 14:12:37 +0000
+Message-ID: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C838C4A401
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 06:36:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09B064A41C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:12:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dxsgs1Nr8L5T for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 06:36:05 -0500 (EST)
+ with ESMTP id 4Dzs7YPmjf7v for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:12:57 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 678844A3EA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 06:36:05 -0500 (EST)
-In-Reply-To: <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6B4B4A3E6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:12:57 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,74 +25,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: will.deacon@arm.com, kraxel@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
+Hi,
 
-On 07/01/2019 14:41, Andrew Murray wrote:
-> The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
-> a typedef to kvm_cpu_context and is used to store host cpu context. The
-> kvm_cpu_context structure is also used elsewhere to hold vcpu context.
-> In order to use the percpu to hold additional future host information we
-> encapsulate kvm_cpu_context in a new structure and rename the typedef and
-> percpu to match.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
->   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
->   arch/arm64/include/asm/kvm_host.h | 14 +++++++++-----
->   arch/arm64/kernel/asm-offsets.c   |  2 +-
->   virt/kvm/arm/arm.c                | 12 +++++++-----
->   5 files changed, 25 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 79906ce..71645ba 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -145,7 +145,11 @@ struct kvm_cpu_context {
->   	u32 cp15[NR_CP15_REGS];
->   };
->   
-> -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> +struct kvm_host_data {
-> +	struct kvm_cpu_context host_ctxt;
-> +};
-> +
-> +typedef struct kvm_host_data kvm_host_data_t;
->   
->   struct kvm_vcpu_arch {
->   	struct kvm_cpu_context ctxt;
-> @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
->   	struct kvm_vcpu_fault_info fault;
->   
->   	/* Host FP context */
-> -	kvm_cpu_context_t *host_cpu_context;
-> +	struct kvm_cpu_context *host_cpu_context;
->   
->   	/* VGIC state */
->   	struct vgic_cpu vgic_cpu;
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 102b5a5..6a9bfd4 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
->   .endm
->   
->   .macro get_host_ctxt reg, tmp
-> -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
-> +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
->   .endm
+This series was developped by Jean-Philippe and is needed for a series
+I'll be posting shortly after to load firmwares on arm kvmtool.
 
-minor nit: We now load "kvm_host_data" instead of the host_ctxt here,
-even though they both are same. Do we need to make this explicitly load
-the address of the host_ctxt member to make sure this doesn't break
-with future changes to the structure ?
-i.e,
-	add	\reg, \reg, #HOST_DATA_CONTEXT
+Currently, when a guest tries to reset a device, a lot of ressources
+aren't reset (threads keep running, virtio queue keep their state, etc).
 
-Otherwise,
+When the guest only does the reset to initialize the device and there
+were no previous users, there is no noticeable issue. But when a guest
+has a firmare + Linux, if the firmware uses a virtio device, Linux will
+fail to probe that device.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+This series aim to properly reset the virtio resources when the guests
+requests it.
+
+Reset of net vhost is unsupported for now.
+
+Patch 1 is a bug fix on ioeventfd
+Patch 2-6 provide the core support so devices can implement their reset
+Patch 7-13 implements the reset for the various virtio devices
+
+Changes since v1[1]:
+- Fix build issue by removing reference to VIRTIO_CONFIG_S_NEEDS_RESET
+
+[1] https://marc.info/?l=kvm&m=154392208726108&w=2
+
+Thanks,
+
+Julien
+
+-->
+
+Jean-Philippe Brucker (13):
+  ioeventfd: Fix removal of ioeventfd
+  virtio: Implement notify_status
+  virtio: Add get_vq_count() callback
+  virtio: Add get_vq() callback
+  virtio: Add exit_vq() callback
+  virtio: Add reset() callback
+  net/uip: Add exit function
+  virtio/net: Clean virtqueue state
+  virtio/net: Implement device and virtqueue reset
+  virtio/blk: Reset virtqueue
+  threadpool: Add cancel() function
+  virtio/p9: Implement reset
+  virtio/console: Implement reset
+
+ include/kvm/threadpool.h  |   2 +
+ include/kvm/uip.h         |   6 ++
+ include/kvm/virtio-mmio.h |   1 +
+ include/kvm/virtio-pci.h  |   1 +
+ include/kvm/virtio.h      |  29 ++++++-
+ ioeventfd.c               |   6 +-
+ net/uip/core.c            |  17 ++++
+ net/uip/dhcp.c            |   6 ++
+ net/uip/tcp.c             |  54 ++++++++++---
+ net/uip/udp.c             |  41 ++++++++--
+ util/threadpool.c         |  25 +++++-
+ virtio/9p.c               |  33 +++++++-
+ virtio/balloon.c          |  17 +++-
+ virtio/blk.c              |  84 ++++++++++++++------
+ virtio/console.c          |  49 ++++++++----
+ virtio/core.c             |  42 ++++++++++
+ virtio/mmio.c             |  52 +++++++++----
+ virtio/net.c              | 195 +++++++++++++++++++++++++++++++++-------------
+ virtio/pci.c              |  49 ++++++++----
+ virtio/rng.c              |  12 ++-
+ virtio/scsi.c             |  17 +++-
+ 21 files changed, 581 insertions(+), 157 deletions(-)
+
+--
+1.9.1
