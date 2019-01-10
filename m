@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 1/6] rtc: Initialize the Register D for MC146818 RTC
-Date: Thu, 10 Jan 2019 14:20:41 +0000
-Message-ID: <1547130046-14729-2-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 2/6] arm: Move firmware function
+Date: Thu, 10 Jan 2019 14:20:42 +0000
+Message-ID: <1547130046-14729-3-git-send-email-julien.thierry@arm.com>
 References: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05CAE4A47F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50B784A47A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7B6Vq8mhTeYM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:20:55 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD9004A47A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:55 -0500 (EST)
+ with ESMTP id EMqraqs-fiqX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:20:57 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48C254A48D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:57 -0500 (EST)
 In-Reply-To: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,47 +28,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, Sami Mujawar <sami.mujawar@arm.com>, will.deacon@arm.com
+Cc: andre.przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Sami Mujawar <sami.mujawar@arm.com>
+Firmware loading/setup function are in fdt file while it is not very
+related to this.
 
-Some software drivers check the VRT bit (BIT7) of Register D before
-using the MC146818 RTC. Initialized the VRT bit in rtc__init() to
-indicate that the RAM and time contents are valid.
+Move them to the file that does the main init/setup for memory.
 
-Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 ---
- hw/rtc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arm/fdt.c | 10 ----------
+ arm/kvm.c | 10 ++++++++++
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/rtc.c b/hw/rtc.c
-index 0649b5d..c1fa72f 100644
---- a/hw/rtc.c
-+++ b/hw/rtc.c
-@@ -25,6 +25,11 @@
- #define RTC_REG_C			0x0C
- #define RTC_REG_D			0x0D
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 980015b..664bb62 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -14,16 +14,6 @@
+ #include <linux/sizes.h>
+ #include <linux/psci.h>
  
-+/*
-+ * Register D Bits
-+ */
-+#define RTC_REG_D_VRT			(1 << 7)
-+
- struct rtc_device {
- 	u8			cmos_idx;
- 	u8			cmos_data[128];
-@@ -140,6 +145,9 @@ int rtc__init(struct kvm *kvm)
- 		return r;
- 	}
+-bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+-{
+-	return false;
+-}
+-
+-int kvm__arch_setup_firmware(struct kvm *kvm)
+-{
+-	return 0;
+-}
+-
+ static void dump_fdt(const char *dtb_file, void *fdt)
+ {
+ 	int count, fd;
+diff --git a/arm/kvm.c b/arm/kvm.c
+index b824f63..c6843e5 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -168,3 +168,13 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
  
-+	/* Set the VRT bit in Register D to indicate valid RAM and time */
-+	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
-+
- 	return r;
+ 	return true;
  }
- dev_init(rtc__init);
++
++bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
++{
++	return false;
++}
++
++int kvm__arch_setup_firmware(struct kvm *kvm)
++{
++	return 0;
++}
 -- 
 1.9.1
