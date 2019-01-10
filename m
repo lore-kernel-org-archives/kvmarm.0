@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 06/13] virtio: Add reset() callback
-Date: Thu, 10 Jan 2019 14:12:43 +0000
-Message-ID: <1547129570-14351-7-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 05/13] virtio: Add exit_vq() callback
+Date: Thu, 10 Jan 2019 14:12:42 +0000
+Message-ID: <1547129570-14351-6-git-send-email-julien.thierry@arm.com>
 References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 28F3F4A471
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADA44A425
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dMyp6KtNSre5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:13:05 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F5894A496
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:05 -0500 (EST)
+ with ESMTP id 4w7w1rZjU-OM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:13:04 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C634A471
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:04 -0500 (EST)
 In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,168 +33,158 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-When the guest writes a status of 0, the device should be reset. Add a
-reset() callback for the transport layer to reset all queues and their
-ioeventfd.
+Virtio allows to reset individual virtqueues. For legacy devices, it's
+done by writing an address of 0 into the PFN register. Modern devices have
+an "enable" register. Add an exit_vq() callback to all devices. A lot more
+work is required by each device to clean up their virtqueue state, and by
+the core to reset things like MSI routes and ioeventfds.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/virtio-mmio.h |  1 +
- include/kvm/virtio-pci.h  |  1 +
- include/kvm/virtio.h      |  1 +
- virtio/core.c             |  9 +++++++++
- virtio/mmio.c             | 16 ++++++++++++----
- virtio/pci.c              | 20 +++++++++++++-------
- 6 files changed, 37 insertions(+), 11 deletions(-)
+ include/kvm/virtio.h |  5 +++++
+ virtio/core.c        | 10 ++++++++++
+ virtio/mmio.c        | 26 ++++++++++++++++++++------
+ virtio/pci.c         | 23 +++++++++++++++++++----
+ 4 files changed, 54 insertions(+), 10 deletions(-)
 
-diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
-index 835f421..0528947 100644
---- a/include/kvm/virtio-mmio.h
-+++ b/include/kvm/virtio-mmio.h
-@@ -54,6 +54,7 @@ struct virtio_mmio {
- int virtio_mmio_signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
- int virtio_mmio_signal_config(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev);
-+int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		      int device_id, int subsys_id, int class);
- void virtio_mmio_assign_irq(struct device_header *dev_hdr);
-diff --git a/include/kvm/virtio-pci.h b/include/kvm/virtio-pci.h
-index b70cadd..278a259 100644
---- a/include/kvm/virtio-pci.h
-+++ b/include/kvm/virtio-pci.h
-@@ -55,6 +55,7 @@ struct virtio_pci {
- int virtio_pci__signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
- int virtio_pci__signal_config(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev);
-+int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev);
- int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		     int device_id, int subsys_id, int class);
- 
 diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index f35c74d..19b9137 100644
+index e791298..f35c74d 100644
 --- a/include/kvm/virtio.h
 +++ b/include/kvm/virtio.h
-@@ -201,6 +201,7 @@ struct virtio_ops {
- 	int (*init)(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		    int device_id, int subsys_id, int class);
- 	int (*exit)(struct kvm *kvm, struct virtio_device *vdev);
-+	int (*reset)(struct kvm *kvm, struct virtio_device *vdev);
+@@ -51,6 +51,7 @@ struct virt_queue {
+ 	u16		last_used_signalled;
+ 	u16		endian;
+ 	bool		use_event_idx;
++	bool		enabled;
  };
  
- int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ /*
+@@ -187,6 +188,7 @@ struct virtio_ops {
+ 	int (*get_vq_count)(struct kvm *kvm, void *dev);
+ 	int (*init_vq)(struct kvm *kvm, void *dev, u32 vq, u32 page_size,
+ 		       u32 align, u32 pfn);
++	void (*exit_vq)(struct kvm *kvm, void *dev, u32 vq);
+ 	int (*notify_vq)(struct kvm *kvm, void *dev, u32 vq);
+ 	struct virt_queue *(*get_vq)(struct kvm *kvm, void *dev, u32 vq);
+ 	int (*get_size_vq)(struct kvm *kvm, void *dev, u32 vq);
+@@ -217,8 +219,11 @@ static inline void virtio_init_device_vq(struct virtio_device *vdev,
+ {
+ 	vq->endian = vdev->endian;
+ 	vq->use_event_idx = (vdev->features & VIRTIO_RING_F_EVENT_IDX);
++	vq->enabled = true;
+ }
+ 
++void virtio_exit_vq(struct kvm *kvm, struct virtio_device *vdev, void *dev,
++		    int num);
+ void virtio_set_guest_features(struct kvm *kvm, struct virtio_device *vdev,
+ 			       void *dev, u32 features);
+ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
 diff --git a/virtio/core.c b/virtio/core.c
-index 67d4114..e10ec36 100644
+index 9114f27..67d4114 100644
 --- a/virtio/core.c
 +++ b/virtio/core.c
-@@ -241,6 +241,13 @@ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
- 	} else if (!status && (vdev->status & VIRTIO__STATUS_START)) {
- 		vdev->status &= ~VIRTIO__STATUS_START;
- 		ext_status |= VIRTIO__STATUS_STOP;
-+
-+		/*
-+		 * Reset virtqueues and stop all traffic now, so that the device
-+		 * can safely reset the backend in notify_status().
-+		 */
-+		if (ext_status & VIRTIO__STATUS_STOP)
-+			vdev->ops->reset(kvm, vdev);
- 	}
- 
- 	if (vdev->ops->notify_status)
-@@ -264,6 +271,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		vdev->ops->signal_config	= virtio_pci__signal_config;
- 		vdev->ops->init			= virtio_pci__init;
- 		vdev->ops->exit			= virtio_pci__exit;
-+		vdev->ops->reset		= virtio_pci__reset;
- 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
- 		break;
- 	case VIRTIO_MMIO:
-@@ -276,6 +284,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		vdev->ops->signal_config	= virtio_mmio_signal_config;
- 		vdev->ops->init			= virtio_mmio_init;
- 		vdev->ops->exit			= virtio_mmio_exit;
-+		vdev->ops->reset		= virtio_mmio_reset;
- 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
- 		break;
- 	default:
-diff --git a/virtio/mmio.c b/virtio/mmio.c
-index 4b8c20e..eff147a 100644
---- a/virtio/mmio.c
-+++ b/virtio/mmio.c
-@@ -326,15 +326,23 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	return 0;
+@@ -166,6 +166,16 @@ u16 virt_queue__get_inout_iov(struct kvm *kvm, struct virt_queue *queue,
+ 	return head;
  }
  
-+int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev)
++void virtio_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
++			   void *dev, int num)
 +{
-+	int vq;
-+	struct virtio_mmio *vmmio = vdev->virtio;
++	struct virt_queue *vq = vdev->ops->get_vq(kvm, dev, num);
 +
-+	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vmmio->dev); vq++)
-+		virtio_mmio_exit_vq(kvm, vdev, vq);
-+
-+	return 0;
++	if (vq->enabled && vdev->ops->exit_vq)
++		vdev->ops->exit_vq(kvm, dev, num);
++	memset(vq, 0, sizeof(*vq));
 +}
 +
- int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev)
+ int virtio__get_dev_specific_field(int offset, bool msix, u32 *config_off)
  {
- 	struct virtio_mmio *vmmio = vdev->virtio;
--	int i;
- 
-+	virtio_mmio_reset(kvm, vdev);
- 	kvm__deregister_mmio(kvm, vmmio->addr);
- 
--	for (i = 0; i < VIRTIO_MMIO_MAX_VQ; i++)
--		ioeventfd__del_event(vmmio->addr + VIRTIO_MMIO_QUEUE_NOTIFY, i);
--
+ 	if (msix) {
+diff --git a/virtio/mmio.c b/virtio/mmio.c
+index 70f767e..4b8c20e 100644
+--- a/virtio/mmio.c
++++ b/virtio/mmio.c
+@@ -79,6 +79,15 @@ int virtio_mmio_signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq)
  	return 0;
  }
+ 
++static void virtio_mmio_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
++				int vq)
++{
++	struct virtio_mmio *vmmio = vdev->virtio;
++
++	ioeventfd__del_event(vmmio->addr + VIRTIO_MMIO_QUEUE_NOTIFY, vq);
++	virtio_exit_vq(kvm, vdev, vmmio->dev, vq);
++}
++
+ int virtio_mmio_signal_config(struct kvm *kvm, struct virtio_device *vdev)
+ {
+ 	struct virtio_mmio *vmmio = vdev->virtio;
+@@ -188,12 +197,17 @@ static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
+ 		break;
+ 	case VIRTIO_MMIO_QUEUE_PFN:
+ 		val = ioport__read32(data);
+-		virtio_mmio_init_ioeventfd(vmmio->kvm, vdev, vmmio->hdr.queue_sel);
+-		vdev->ops->init_vq(vmmio->kvm, vmmio->dev,
+-				   vmmio->hdr.queue_sel,
+-				   vmmio->hdr.guest_page_size,
+-				   vmmio->hdr.queue_align,
+-				   val);
++		if (val) {
++			virtio_mmio_init_ioeventfd(vmmio->kvm, vdev,
++						   vmmio->hdr.queue_sel);
++			vdev->ops->init_vq(vmmio->kvm, vmmio->dev,
++					   vmmio->hdr.queue_sel,
++					   vmmio->hdr.guest_page_size,
++					   vmmio->hdr.queue_align,
++					   val);
++		} else {
++			virtio_mmio_exit_vq(kvm, vdev, vmmio->hdr.queue_sel);
++		}
+ 		break;
+ 	case VIRTIO_MMIO_QUEUE_NOTIFY:
+ 		val = ioport__read32(data);
 diff --git a/virtio/pci.c b/virtio/pci.c
-index 2da2d3f..99653ca 100644
+index 8add770..2da2d3f 100644
 --- a/virtio/pci.c
 +++ b/virtio/pci.c
-@@ -77,8 +77,8 @@ static void virtio_pci_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
- {
- 	struct virtio_pci *vpci = vdev->virtio;
- 
--	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
- 	ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
-+	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
- 	virtio_exit_vq(kvm, vdev, vpci->dev, vq);
- }
- 
-@@ -522,19 +522,25 @@ free_ioport:
+@@ -72,6 +72,16 @@ free_ioport_evt:
  	return r;
  }
  
-+int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
++static void virtio_pci_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
++			       int vq)
 +{
-+	int vq;
 +	struct virtio_pci *vpci = vdev->virtio;
 +
-+	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vpci->dev); vq++)
-+		virtio_pci_exit_vq(kvm, vdev, vq);
-+
-+	return 0;
++	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
++	ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
++	virtio_exit_vq(kvm, vdev, vpci->dev, vq);
 +}
 +
- int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev)
+ static inline bool virtio_pci__msix_enabled(struct virtio_pci *vpci)
  {
- 	struct virtio_pci *vpci = vdev->virtio;
--	int i;
- 
-+	virtio_pci__reset(kvm, vdev);
- 	kvm__deregister_mmio(kvm, vpci->mmio_addr);
- 	kvm__deregister_mmio(kvm, vpci->msix_io_block);
- 	ioport__unregister(kvm, vpci->port_addr);
- 
--	for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++) {
--		ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
--		ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
--	}
--
- 	return 0;
- }
+ 	return vpci->pci_hdr.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE);
+@@ -270,10 +280,15 @@ static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
+ 		break;
+ 	case VIRTIO_PCI_QUEUE_PFN:
+ 		val = ioport__read32(data);
+-		virtio_pci__init_ioeventfd(kvm, vdev, vpci->queue_selector);
+-		vdev->ops->init_vq(kvm, vpci->dev, vpci->queue_selector,
+-				   1 << VIRTIO_PCI_QUEUE_ADDR_SHIFT,
+-				   VIRTIO_PCI_VRING_ALIGN, val);
++		if (val) {
++			virtio_pci__init_ioeventfd(kvm, vdev,
++						   vpci->queue_selector);
++			vdev->ops->init_vq(kvm, vpci->dev, vpci->queue_selector,
++					   1 << VIRTIO_PCI_QUEUE_ADDR_SHIFT,
++					   VIRTIO_PCI_VRING_ALIGN, val);
++		} else {
++			virtio_pci_exit_vq(kvm, vdev, vpci->queue_selector);
++		}
+ 		break;
+ 	case VIRTIO_PCI_QUEUE_SEL:
+ 		vpci->queue_selector = ioport__read16(data);
 -- 
 1.9.1
