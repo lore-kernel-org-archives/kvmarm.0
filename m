@@ -1,23 +1,21 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 10/13] virtio/blk: Reset virtqueue
-Date: Thu, 10 Jan 2019 14:12:47 +0000
-Message-ID: <1547129570-14351-11-git-send-email-julien.thierry@arm.com>
-References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 0/6] arm: Add support for firmware booting
+Date: Thu, 10 Jan 2019 14:20:40 +0000
+Message-ID: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 53B104A443
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0ED4A47B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zx1S9rE4PnYz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:13:11 -0500 (EST)
+ with ESMTP id 2VMPw7tYq2fM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:20:54 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AFA54A46D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:11 -0500 (EST)
-In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07FB34A476
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:20:53 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,153 +26,69 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: will.deacon@arm.com, kraxel@redhat.com
+Cc: andre.przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Hi,
 
-Move pthread creation to init_vq, and kill the thread in exit_vq.
-Initialize the virtqueue states at runtime.
+This series is based on the virtio reset series[1] posted earlier.
 
-All in-flight I/O is canceled with the virtqueue pthreads, except for AIO
-threads, but after reading the code I'm not sure if AIO has ever worked
-anyway.
+We would like to be able to load firmwares like UEFI in kvmtool.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
----
- virtio/blk.c | 67 ++++++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 45 insertions(+), 22 deletions(-)
+The series contains:
+A way to load the firmware into RAM and an option to be able to create
+non-volatile memory zones and load data into them.
 
-diff --git a/virtio/blk.c b/virtio/blk.c
-index 6a6b3b7..a57df2e 100644
---- a/virtio/blk.c
-+++ b/virtio/blk.c
-@@ -178,9 +178,29 @@ static void notify_status(struct kvm *kvm, void *dev, u32 status)
- {
- }
- 
-+static void *virtio_blk_thread(void *dev)
-+{
-+	struct blk_dev *bdev = dev;
-+	u64 data;
-+	int r;
-+
-+	kvm__set_thread_name("virtio-blk-io");
-+
-+	while (1) {
-+		r = read(bdev->io_efd, &data, sizeof(u64));
-+		if (r < 0)
-+			continue;
-+		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
-+	}
-+
-+	pthread_exit(NULL);
-+	return NULL;
-+}
-+
- static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 		   u32 pfn)
- {
-+	unsigned int i;
- 	struct blk_dev *bdev = dev;
- 	struct virt_queue *queue;
- 	void *p;
-@@ -194,26 +214,37 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 	vring_init(&queue->vring, VIRTIO_BLK_QUEUE_SIZE, p, align);
- 	virtio_init_device_vq(&bdev->vdev, queue);
- 
-+	if (vq != 0)
-+		return 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
-+		bdev->reqs[i] = (struct blk_dev_req) {
-+			.bdev = bdev,
-+			.kvm = kvm,
-+		};
-+	}
-+
-+	mutex_init(&bdev->mutex);
-+	bdev->io_efd = eventfd(0, 0);
-+	if (bdev->io_efd < 0)
-+		return -errno;
-+
-+	if (pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev))
-+		return -errno;
-+
- 	return 0;
- }
- 
--static void *virtio_blk_thread(void *dev)
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
- {
- 	struct blk_dev *bdev = dev;
--	u64 data;
--	int r;
- 
--	kvm__set_thread_name("virtio-blk-io");
-+	if (vq != 0)
-+		return;
- 
--	while (1) {
--		r = read(bdev->io_efd, &data, sizeof(u64));
--		if (r < 0)
--			continue;
--		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
--	}
--
--	pthread_exit(NULL);
--	return NULL;
-+	close(bdev->io_efd);
-+	pthread_cancel(bdev->io_thread);
-+	pthread_join(bdev->io_thread, NULL);
- }
- 
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
-@@ -259,6 +290,7 @@ static struct virtio_ops blk_dev_virtio_ops = {
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.notify_status		= notify_status,
- 	.notify_vq		= notify_vq,
- 	.get_vq			= get_vq,
-@@ -269,7 +301,6 @@ static struct virtio_ops blk_dev_virtio_ops = {
- static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- {
- 	struct blk_dev *bdev;
--	unsigned int i;
- 
- 	if (!disk)
- 		return -EINVAL;
-@@ -279,13 +310,11 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- 		return -ENOMEM;
- 
- 	*bdev = (struct blk_dev) {
--		.mutex			= MUTEX_INITIALIZER,
- 		.disk			= disk,
- 		.blk_config		= (struct virtio_blk_config) {
- 			.capacity	= disk->size / SECTOR_SIZE,
- 			.seg_max	= DISK_SEG_MAX,
- 		},
--		.io_efd			= eventfd(0, 0),
- 		.kvm			= kvm,
- 	};
- 
-@@ -295,14 +324,8 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
- 
- 	list_add_tail(&bdev->list, &bdevs);
- 
--	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
--		bdev->reqs[i].bdev = bdev;
--		bdev->reqs[i].kvm = kvm;
--	}
--
- 	disk_image__set_callback(bdev->disk, virtio_blk_complete);
- 
--	pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev);
- 	if (compat_id == -1)
- 		compat_id = virtio_compat_add_message("virtio-blk", "CONFIG_VIRTIO_BLK");
- 
--- 
+Those non-volatile memory are presented throught the DT with a node:
+
+	<flash>@<addr> {
+		compatible = "kvmtool,flash";
+		reg = < <addr> <size> >;
+		label = <name>;
+	}
+
+These are expected to be dealt with by specific kvmtool driver and not
+to be picked up by existing drivers (although technically it is just
+plain memory, mapped in the guest).
+
+
+Changes since v1[2]:
+* Added Andre's Reviewed-by tags.
+* Changed the DT binding for nvmem.
+* removed the requirement to provide firmware load address (defaults to
+  the start of RAM).
+
+[1] https://marc.info/?l=kvm&m=154712959125764&w=2
+[2] https://marc.info/?l=kvm&m=154392208726108&w=2
+
+Cheers,
+
+Julien
+
+-->
+
+Julien Thierry (5):
+  arm: Move firmware function
+  builtin-run: Do not look for default kernel when firmware is provided
+  arm: Support firmware loading
+  kvm: Add arch specific reset
+  arm: Support non-volatile memory
+
+Sami Mujawar (1):
+  rtc: Initialize the Register D for MC146818 RTC
+
+ arm/fdt.c                                |  58 +++++++--
+ arm/include/arm-common/kvm-arch.h        |   5 +-
+ arm/include/arm-common/kvm-config-arch.h |  21 +++-
+ arm/kvm.c                                | 207 +++++++++++++++++++++++++++++++
+ builtin-run.c                            |  24 ++--
+ hw/rtc.c                                 |   8 ++
+ include/kvm/kvm.h                        |   1 +
+ kvm.c                                    |   2 +
+ mips/kvm.c                               |   4 +
+ powerpc/kvm.c                            |   4 +
+ x86/kvm.c                                |   4 +
+ 11 files changed, 317 insertions(+), 21 deletions(-)
+
+--
 1.9.1
