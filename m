@@ -1,23 +1,22 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 6/6] arm: Support non-volatile memory
-Date: Thu, 10 Jan 2019 14:20:46 +0000
-Message-ID: <1547130046-14729-7-git-send-email-julien.thierry@arm.com>
-References: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: Always initialize the group of private
+ IRQs
+Date: Thu, 10 Jan 2019 15:33:52 +0100
+Message-ID: <20190110143352.17295-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6BF94A48D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:21:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C1D4A417
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:33:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pvImA99tN9vW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:21:04 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FB4B4A478
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:21:03 -0500 (EST)
-In-Reply-To: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
+ with ESMTP id wOTXsB4iJHVl for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:33:57 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 021474A3FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:33:56 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,305 +26,128 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an option to let user load files as non-volatile memory.
+We currently initialize the group of private IRQs during
+kvm_vgic_vcpu_init, and the value of the group depends on the GIC model
+we are emulating.  However, CPUs created before creating (and
+initializing) the VGIC might end up with the wrong group if the VGIC
+is created as GICv3 later.
 
-An additional range of addresses is reserved for nv memory.
-Loaded files must be a multiple of the system page size.
+Since we have no enforced ordering of creating the VGIC and creating
+VCPUs, we can end up with part the VCPUs being properly intialized and
+the remaining incorrectly initialized.  That also means that we have no
+single place to do the per-cpu data structure initialization which
+depends on knowing the emulated GIC model (which is only the group
+field).
 
-Users can chose whether the data written by the guest modifies the original
-file.
+This patch removes the incorrect comment from kvm_vgic_vcpu_init and
+initializes the group of all previously created VCPUs's private
+interrupts in vgic_init in addition to the existing initialization in
+kvm_vgic_vcpu_init.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arm/fdt.c                                |  34 ++++++++
- arm/include/arm-common/kvm-arch.h        |   5 +-
- arm/include/arm-common/kvm-config-arch.h |  18 ++++-
- arm/kvm.c                                | 134 +++++++++++++++++++++++++++++++
- 4 files changed, 189 insertions(+), 2 deletions(-)
+I tested this by modifying kvmtool to create the vgic in the middle of creating
+the VCPUs, and looking in /sys/kernel/debug/kvm/<pid>/vgic-state showed the
+first VCPU with private interrupts with group 0 for gicv3 and the secondary
+VCPU with group 1 prior to this patch, and both VCPUs with group 1 following
+this patch for GICv3 and both with group 0 with GICv2.
 
-diff --git a/arm/fdt.c b/arm/fdt.c
-index 2936986..e3a7a64 100644
---- a/arm/fdt.c
-+++ b/arm/fdt.c
-@@ -72,6 +72,37 @@ static void generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
- 	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
- }
- 
-+static void generate_nvmem_node(void *fdt, struct kvm_nv_mem *nvmem)
-+{
-+	char buf[22]; // 22 >= len("flash@" + 16 hex char + '\0')
-+	const u64 reg_prop[] = {
-+		cpu_to_fdt64(nvmem->map_addr),
-+		cpu_to_fdt64(nvmem->size)
-+	};
-+
-+	snprintf(buf, sizeof(buf), "flash@%llx", nvmem->map_addr);
-+	_FDT(fdt_begin_node(fdt, buf));
-+
-+	_FDT(fdt_property_string(fdt, "compatible", "kvmtool,flash"));
-+
-+	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
-+
-+	_FDT(fdt_property_string(fdt, "label", nvmem->name));
-+
-+	_FDT(fdt_end_node(fdt));
-+}
-+
-+static void generate_nvmem_nodes(void *fdt, struct kvm *kvm)
-+{
-+	struct list_head *nvmem_node;
-+
-+	list_for_each(nvmem_node, &kvm->cfg.arch.nvmem_list)
-+		generate_nvmem_node(fdt,
-+				    container_of(nvmem_node,
-+					         struct kvm_nv_mem,
-+					         node));
-+}
-+
- struct psci_fns {
- 	u32 cpu_suspend;
- 	u32 cpu_off;
-@@ -210,6 +241,9 @@ static int setup_fdt(struct kvm *kvm)
- 	_FDT(fdt_property_cell(fdt, "migrate", fns->migrate));
- 	_FDT(fdt_end_node(fdt));
- 
-+	/* Non volatile memories */
-+	generate_nvmem_nodes(fdt, kvm);
-+
- 	/* Finalise. */
- 	_FDT(fdt_end_node(fdt));
- 	_FDT(fdt_finish(fdt));
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index b9d486d..f425d86 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -10,6 +10,7 @@
- #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
- #define ARM_MMIO_AREA		_AC(0x0000000000010000, UL)
- #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
-+#define ARM_NVRAM_AREA		_AC(0x000000007f000000, UL)
- #define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
- 
- #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
-@@ -24,9 +25,11 @@
- #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
- #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
- #define ARM_PCI_CFG_SIZE	(1ULL << 24)
--#define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
-+#define ARM_PCI_MMIO_SIZE	(ARM_NVRAM_AREA - \
- 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
- 
-+#define ARM_NVRAM_SIZE		(ARM_MEMORY_AREA - ARM_NVRAM_AREA)
-+
- #define KVM_IOPORT_AREA		ARM_IOPORT_AREA
- #define KVM_PCI_CFG_AREA	ARM_AXI_AREA
- #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46..0f1fa11 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -1,8 +1,18 @@
- #ifndef ARM_COMMON__KVM_CONFIG_ARCH_H
- #define ARM_COMMON__KVM_CONFIG_ARCH_H
- 
-+#include <linux/list.h>
- #include "kvm/parse-options.h"
- 
-+struct kvm_nv_mem {
-+	char			*data_file;
-+	char			*name;
-+	ssize_t			size;
-+	u64			map_addr;
-+	bool			write_back;
-+	struct list_head	node;
-+};
-+
- struct kvm_config_arch {
- 	const char	*dump_dtb_filename;
- 	unsigned int	force_cntfrq;
-@@ -12,9 +22,11 @@ struct kvm_config_arch {
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-+	struct list_head nvmem_list;
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
-+int nvmem_parser(const struct option *opt, const char *arg, int unset);
- 
- #define OPT_ARCH_RUN(pfx, cfg)							\
- 	pfx,									\
-@@ -33,6 +45,10 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset);
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
--		"Address where firmware should be loaded"),
-+		"Address where firmware should be loaded"),			\
-+	OPT_CALLBACK('\0', "nvmem", NULL,					\
-+		     "<file>,<label>[,wb]",					\
-+		     "Load <file> as non-volatile memory",			\
-+		     nvmem_parser, kvm),
- 
- #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
 diff --git a/arm/kvm.c b/arm/kvm.c
-index 50faab5..eaa7005 100644
+index b824f63..c6c5fbc 100644
 --- a/arm/kvm.c
 +++ b/arm/kvm.c
-@@ -18,6 +18,53 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 },
- };
+@@ -82,10 +82,6 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
  
-+int nvmem_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	struct kvm *kvm = (struct kvm*) opt->ptr;
-+	struct kvm_nv_mem *nvmem;
-+	struct stat st;
-+	const char *ptr;
-+	uint32_t len;
-+
-+	nvmem = calloc(sizeof (*nvmem), 1);
-+
-+	if (!nvmem)
-+		die("nvmem: cannot add non-volatile memory");
-+
-+	ptr = strstr(arg, ",");
-+
-+	if (!ptr)
-+		die("nvmem: missing name for non-volatile memory");
-+
-+	len = ptr - arg + 1;
-+	nvmem->data_file = malloc(len);
-+	strncpy(nvmem->data_file, arg, len);
-+	nvmem->data_file[len - 1] = '\0';
-+
-+	if (stat(nvmem->data_file, &st))
-+		die("nvmem: failed to stat data file");
-+	nvmem->size = st.st_size;
-+
-+	arg = arg + len;
-+	for (ptr = arg; *ptr != '\0' && *ptr != ','; ++ptr)
-+		;
-+	len = ptr - arg + 1;
-+	nvmem->name = malloc(len);
-+	strncpy(nvmem->name, arg, len);
-+	nvmem->name[len - 1] = '\0';
-+
-+	if (*ptr == ',') {
-+		if (!strcmp(ptr + 1, "wb"))
-+			nvmem->write_back = true;
-+		else
-+			die("firmware-data: invalid option %s", ptr + 1);
-+	}
-+
-+	list_add(&nvmem->node, &kvm->cfg.arch.nvmem_list);
-+
-+	return 0;
-+}
-+
- bool kvm__arch_cpu_supports_vm(void)
- {
- 	/* The KVM capability check is enough. */
-@@ -59,6 +106,7 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- 
- void kvm__arch_reset(struct kvm *kvm)
- {
-+	INIT_LIST_HEAD(&kvm->cfg.arch.nvmem_list);
+ 	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+ 		MADV_HUGEPAGE);
+-
+-	/* Create the virtual GIC. */
+-	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+-		die("Failed to create virtual GIC");
  }
  
- void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-@@ -241,3 +289,89 @@ int kvm__arch_setup_firmware(struct kvm *kvm)
+ #define FDT_ALIGN	SZ_2M
+diff --git a/kvm-cpu.c b/kvm-cpu.c
+index cc8385f..7a2fde0 100644
+--- a/kvm-cpu.c
++++ b/kvm-cpu.c
+@@ -253,6 +253,7 @@ panic_kvm:
+ int kvm_cpu__init(struct kvm *kvm)
  {
- 	return 0;
- }
-+
-+static int setup_nvmem(struct kvm *kvm)
-+{
-+	u64 map_address = ARM_NVRAM_AREA;
-+	const u64 limit = ARM_NVRAM_AREA + ARM_NVRAM_SIZE;
-+	struct list_head *nvmem_node;
-+	const int pagesize = getpagesize();
-+
-+	list_for_each(nvmem_node, &kvm->cfg.arch.nvmem_list) {
-+		struct kvm_nv_mem *nvmem = container_of(nvmem_node,
-+							struct kvm_nv_mem,
-+							node);
-+		void *user_addr;
-+		int fd;
-+
-+		if (map_address + nvmem->size > limit)
-+			die("cannot map file %s in non-volatile memory, no space left",
-+			    nvmem->data_file);
-+
-+		if (nvmem->size & (pagesize - 1))
-+			die("size of non-volatile memory files must be a multiple of system page size (= %d)",
-+			    pagesize);
-+
-+		user_addr = mmap(NULL, nvmem->size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
-+		if (user_addr == MAP_FAILED)
-+			die("cannot create mapping for file %s",
-+			     nvmem->data_file);
-+
-+		fd = open(nvmem->data_file, O_RDONLY);
-+		if (fd < 0)
-+			die("cannot read file %s", nvmem->data_file);
-+		if (read_file(fd, user_addr, nvmem->size) < 0)
-+			die("failed to map nv memory data %s",
-+			    nvmem->data_file);
-+		close(fd);
-+
-+		if (kvm__register_dev_mem(kvm, map_address, nvmem->size,
-+					  user_addr))
-+			die("failed to register nv memory mapping for guest");
-+
-+		nvmem->map_addr = map_address;
-+		map_address += nvmem->size;
-+	}
-+
-+	return 0;
-+}
-+firmware_init(setup_nvmem);
-+
-+static int flush_nv_mem(struct kvm *kvm)
-+{
-+	struct list_head *nvmem_node;
-+	int err = 0;
-+
-+	list_for_each(nvmem_node, &kvm->cfg.arch.nvmem_list) {
-+		struct kvm_nv_mem *nvmem = container_of(nvmem_node,
-+							struct kvm_nv_mem,
-+							node);
-+		void *host_pos;
-+
-+		host_pos = guest_flat_to_host(kvm,
-+					      nvmem->map_addr);
-+
-+		if (nvmem->write_back) {
-+			int fd;
-+
-+			fd = open(nvmem->data_file, O_WRONLY);
-+			if (fd < 0) {
-+				pr_err("failed to open firmware data file for writting");
-+				err = -1;
-+				continue;
-+			}
-+
-+			if (write_in_full(fd, host_pos, nvmem->size) < 0) {
-+				pr_err("failed to flush firmware data to file");
-+				err = -1;
-+			}
-+			close(fd);
+ 	int max_cpus, recommended_cpus, i;
++	bool gic_created = false;
+ 
+ 	max_cpus = kvm__max_cpus(kvm);
+ 	recommended_cpus = kvm__recommended_cpus(kvm);
+@@ -281,6 +282,12 @@ int kvm_cpu__init(struct kvm *kvm)
+ 	}
+ 
+ 	for (i = 0; i < kvm->nrcpus; i++) {
++		if (i == 1) {
++			/* Create the virtual GIC. */
++			if (gic__create(kvm, kvm->cfg.arch.irqchip))
++				die("Failed to create virtual GIC");
++			gic_created = true;
 +		}
+ 		kvm->cpus[i] = kvm_cpu__arch_init(kvm, i);
+ 		if (!kvm->cpus[i]) {
+ 			pr_warning("unable to initialize KVM VCPU");
+@@ -288,6 +295,10 @@ int kvm_cpu__init(struct kvm *kvm)
+ 		}
+ 	}
+ 
++	/* Create the virtual GIC. */
++	if (!gic_created && gic__create(kvm, kvm->cfg.arch.irqchip))
++		die("Failed to create virtual GIC");
 +
-+		if (munmap(host_pos, nvmem->size))
-+			err = -1;
+ 	return 0;
+ 
+ fail_alloc:
+
+ virt/kvm/arm/vgic/vgic-init.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index c0c0b88af1d5..f935adc50626 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 			irq->config = VGIC_CONFIG_LEVEL;
+ 		}
+ 
+-		/*
+-		 * GICv3 can only be created via the KVM_DEVICE_CREATE API and
+-		 * so we always know the emulation type at this point as it's
+-		 * either explicitly configured as GICv3, or explicitly
+-		 * configured as GICv2, or not configured yet which also
+-		 * implies GICv2.
+-		 */
+ 		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+ 			irq->group = 1;
+ 		else
+@@ -298,6 +291,19 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
+ 
++	/* Initialize groups on CPUs created before the VGIC type was known */
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
++		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
++			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
++			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++				irq->group = 1;
++			else
++				irq->group = 0;
++		}
 +	}
 +
-+	return err;
-+}
-+firmware_exit(flush_nv_mem);
+ 	if (vgic_has_its(kvm)) {
+ 		ret = vgic_v4_init(kvm);
+ 		if (ret)
 -- 
-1.9.1
+2.18.0
