@@ -1,63 +1,103 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
-Subject: Re: [PATCH 9/11] KVM/MMU: Flush tlb in the kvm_mmu_write_protect_pt_masked()
-Date: Thu, 10 Jan 2019 17:06:25 +0800
-Message-ID: <CAOLK0pz6K90+QOMV2Vmhd3vC2t5+15vmUo0E=2rwax7cGDfxjw@mail.gmail.com>
-References: <20190104085405.40356-1-Tianyu.Lan@microsoft.com>
- <20190104085405.40356-10-Tianyu.Lan@microsoft.com> <7eb0cde4-9436-9719-dd13-caf4ab5083a2@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v9 2/5] arm64: KVM: encapsulate kvm_cpu_context in
+ kvm_host_data
+Date: Thu, 10 Jan 2019 11:36:01 +0000
+Message-ID: <a5ff581b-5cfb-fea2-74b8-aa4dc3403518@arm.com>
+References: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
+ <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7eb0cde4-9436-9719-dd13-caf4ab5083a2@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, Radim Krcmar <rkrcmar@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, bp@alien8.de, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm <kvm@vger.kernel.org>, michael.h.kelley@microsoft.com, kys@microsoft.com, vk
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C838C4A401
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 06:36:06 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dxsgs1Nr8L5T for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 06:36:05 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 678844A3EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 06:36:05 -0500 (EST)
+In-Reply-To: <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 8, 2019 at 12:26 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 04/01/19 09:54, lantianyu1986@gmail.com wrote:
-> >               rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-> >                                         PT_PAGE_TABLE_LEVEL, slot);
-> > -             __rmap_write_protect(kvm, rmap_head, false);
-> > +             flush |= __rmap_write_protect(kvm, rmap_head, false);
-> >
-> >               /* clear the first set bit */
-> >               mask &= mask - 1;
-> >       }
-> > +
-> > +     if (flush && kvm_available_flush_tlb_with_range()) {
-> > +             kvm_flush_remote_tlbs_with_address(kvm,
-> > +                             slot->base_gfn + gfn_offset,
-> > +                             hweight_long(mask));
->
-> Mask is zero here, so this probably won't work.
->
-> In addition, I suspect calling the hypercall once for every 64 pages is
-> not very efficient.  Passing a flush list into
-> kvm_mmu_write_protect_pt_masked, and flushing in
-> kvm_arch_mmu_enable_log_dirty_pt_masked, isn't efficient either because
-> kvm_arch_mmu_enable_log_dirty_pt_masked is also called once per word.
->
-Yes, this is not efficient.
+Hi Andrew,
 
-> I don't have any good ideas, except for moving the whole
-> kvm_clear_dirty_log_protect loop into architecture-specific code (which
-> is not the direction we want---architectures should share more code, not
-> less).
+On 07/01/2019 14:41, Andrew Murray wrote:
+> The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
+> a typedef to kvm_cpu_context and is used to store host cpu context. The
+> kvm_cpu_context structure is also used elsewhere to hold vcpu context.
+> In order to use the percpu to hold additional future host information we
+> encapsulate kvm_cpu_context in a new structure and rename the typedef and
+> percpu to match.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
+>   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
+>   arch/arm64/include/asm/kvm_host.h | 14 +++++++++-----
+>   arch/arm64/kernel/asm-offsets.c   |  2 +-
+>   virt/kvm/arm/arm.c                | 12 +++++++-----
+>   5 files changed, 25 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 79906ce..71645ba 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -145,7 +145,11 @@ struct kvm_cpu_context {
+>   	u32 cp15[NR_CP15_REGS];
+>   };
+>   
+> -typedef struct kvm_cpu_context kvm_cpu_context_t;
+> +struct kvm_host_data {
+> +	struct kvm_cpu_context host_ctxt;
+> +};
+> +
+> +typedef struct kvm_host_data kvm_host_data_t;
+>   
+>   struct kvm_vcpu_arch {
+>   	struct kvm_cpu_context ctxt;
+> @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
+>   	struct kvm_vcpu_fault_info fault;
+>   
+>   	/* Host FP context */
+> -	kvm_cpu_context_t *host_cpu_context;
+> +	struct kvm_cpu_context *host_cpu_context;
+>   
+>   	/* VGIC state */
+>   	struct vgic_cpu vgic_cpu;
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 102b5a5..6a9bfd4 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
+>   .endm
+>   
+>   .macro get_host_ctxt reg, tmp
+> -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
+> +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
+>   .endm
 
-kvm_vm_ioctl_clear_dirty_log/get_dirty_log()  is to get/clear dirty log with
-memslot as unit. We may just flush tlbs of the affected memslot instead of
-entire page table's when range flush is available.
+minor nit: We now load "kvm_host_data" instead of the host_ctxt here,
+even though they both are same. Do we need to make this explicitly load
+the address of the host_ctxt member to make sure this doesn't break
+with future changes to the structure ?
+i.e,
+	add	\reg, \reg, #HOST_DATA_CONTEXT
 
->
-> Paolo
->
-> > +             flush = false;
-> > +     }
-> > +
->
+Otherwise,
 
-
---
-Best regards
-Tianyu Lan
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
