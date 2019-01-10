@@ -1,125 +1,254 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
- consumed the records
-Date: Thu, 10 Jan 2019 18:22:56 +0000
-Message-ID: <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-11-james.morse@arm.com>
- <20181211183634.GO27375@zn.tnic>
+From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
+Date: Thu, 10 Jan 2019 10:45:44 -0800
+Message-ID: <20190110104544.26f3bcb1@jacob-builder>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+	<20190108102633.17482-15-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB514A46A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 13:23:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 09YbaayF8RkP for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 13:23:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4347D4A433
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 13:23:01 -0500 (EST)
-In-Reply-To: <20181211183634.GO27375@zn.tnic>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Borislav Petkov <bp@alien8.de>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, baicar.tyler@gmail.com, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190108102633.17482-15-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Boris,
+On Tue,  8 Jan 2019 11:26:26 +0100
+Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-(CC: +Tyler)
-
-On 11/12/2018 18:36, Borislav Petkov wrote:
-> On Mon, Dec 03, 2018 at 06:05:58PM +0000, James Morse wrote:
->> ACPI has a GHESv2 which is used on hardware reduced platforms to
->> explicitly acknowledge that the memory for CPER records has been
->> consumed. This lets an external agent know it can re-use this
->> memory for something else.
->>
->> Previously notify_nmi and the estatus queue didn't do this as
->> they were never used on hardware reduced platforms. Once we move
->> notify_sea over to use the estatus queue, it may become necessary.
->>
->> Add the call. This is safe for use in NMI context as the
->> read_ack_register is pre-mapped by ghes_new() before the
->> ghes can be added to an RCU list, and then found by the
->> notification handler.
-
->> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->> index 366dbdd41ef3..15d94373ba72 100644
->> --- a/drivers/acpi/apei/ghes.c
->> +++ b/drivers/acpi/apei/ghes.c
->> @@ -926,6 +926,10 @@ static int _in_nmi_notify_one(struct ghes *ghes)
->>  	__process_error(ghes);
->>  	ghes_clear_estatus(ghes, buf_paddr);
->>  
->> +	if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
+> From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 > 
-> Since ghes_ack_error() is always prepended with this check, you could
-> push it down into the function:
+> Device faults detected by IOMMU can be reported outside IOMMU
+> subsystem for further processing. This patch intends to provide
+> a generic device fault data such that device drivers can be
+> communicated with IOMMU faults without model specific knowledge.
 > 
-> ghes_ack_error(ghes)
-> ...
+> The proposed format is the result of discussion at:
+> https://lkml.org/lkml/2017/11/10/291
+> Part of the code is based on Jean-Philippe Brucker's patchset
+> (https://patchwork.kernel.org/patch/9989315/).
 > 
-> 	if (!is_hest_type_generic_v2(ghes))
-> 		return 0;
+> The assumption is that model specific IOMMU driver can filter and
+> handle most of the internal faults if the cause is within IOMMU driver
+> control. Therefore, the fault reasons can be reported are grouped
+> and generalized based common specifications such as PCI ATS.
 > 
-> and simplify the two callsites :)
+> Signed-off-by: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+> Signed-off-by: Liu, Yi L <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> Signed-off-by: Ashok Raj <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> [moved part of the iommu_fault_event struct in the uapi, enriched
+>  the fault reasons to be able to map unrecoverable SMMUv3 errors]
+> ---
+>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
+>  include/uapi/linux/iommu.h | 83
+> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
+> insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 244c1a3d5989..1dedc2d247c2 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -49,13 +49,17 @@ struct bus_type;
+>  struct device;
+>  struct iommu_domain;
+>  struct notifier_block;
+> +struct iommu_fault_event;
+>  
+>  /* iommu fault flags */
+> -#define IOMMU_FAULT_READ	0x0
+> -#define IOMMU_FAULT_WRITE	0x1
+> +#define IOMMU_FAULT_READ		(1 << 0)
+> +#define IOMMU_FAULT_WRITE		(1 << 1)
+> +#define IOMMU_FAULT_EXEC		(1 << 2)
+> +#define IOMMU_FAULT_PRIV		(1 << 3)
+>  
+>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+>  			struct device *, unsigned long, int, void *);
+> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *,
+> void *); 
+>  struct iommu_domain_geometry {
+>  	dma_addr_t aperture_start; /* First address that can be
+> mapped    */ @@ -255,6 +259,52 @@ struct iommu_device {
+>  	struct device *dev;
+>  };
+>  
+> +/**
+> + * struct iommu_fault_event - Generic per device fault data
+> + *
+> + * - PCI and non-PCI devices
+> + * - Recoverable faults (e.g. page request), information based on
+> PCI ATS
+> + * and PASID spec.
+> + * - Un-recoverable faults of device interest
+> + * - DMA remapping and IRQ remapping faults
+> + *
+> + * @fault: fault descriptor
+> + * @device_private: if present, uniquely identify device-specific
+> + *                  private data for an individual page request.
+> + * @iommu_private: used by the IOMMU driver for storing
+> fault-specific
+> + *                 data. Users should not modify this field before
+> + *                 sending the fault response.
+> + */
+> +struct iommu_fault_event {
+> +	struct iommu_fault fault;
+> +	u64 device_private;
+I think we want to move device_private to uapi since it gets injected
+into the guest, then returned by guest in case of page response. For
+VT-d we also need 128 bits of private data. VT-d spec. 7.7.1
 
-Great idea! ...
+For exception tracking (e.g. unanswered page request), I can add timer
+and list info later when I include PRQ. sounds ok?
+> +	u64 iommu_private;
 
-.. huh. Turns out for ghes_proc() we discard any errors other than ENOENT from
-ghes_read_estatus() if is_hest_type_generic_v2(). This masks EIO.
+> +};
+> +
+> +/**
+> + * struct iommu_fault_param - per-device IOMMU fault data
+> + * @dev_fault_handler: Callback function to handle IOMMU faults at
+> device level
+> + * @data: handler private data
+> + *
+> + */
+> +struct iommu_fault_param {
+> +	iommu_dev_fault_handler_t handler;
+> +	void *data;
+> +};
+> +
+> +/**
+> + * struct iommu_param - collection of per-device IOMMU data
+> + *
+> + * @fault_param: IOMMU detected device fault reporting data
+> + *
+> + * TODO: migrate other per device data pointers under
+> iommu_dev_data, e.g.
+> + *	struct iommu_group	*iommu_group;
+> + *	struct iommu_fwspec	*iommu_fwspec;
+> + */
+> +struct iommu_param {
+> +	struct iommu_fault_param *fault_param;
+> +};
+> +
+>  int  iommu_device_register(struct iommu_device *iommu);
+>  void iommu_device_unregister(struct iommu_device *iommu);
+>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
+> @@ -438,6 +488,7 @@ struct iommu_ops {};
+>  struct iommu_group {};
+>  struct iommu_fwspec {};
+>  struct iommu_device {};
+> +struct iommu_fault_param {};
+>  
+>  static inline bool iommu_present(struct bus_type *bus)
+>  {
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index f28cd9a1aa96..e9b5330a13c8 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -148,4 +148,87 @@ struct iommu_guest_msi_binding {
+>  	__u64		gpa;
+>  	__u32		granule;
+>  };
+> +
+> +/*  Generic fault types, can be expanded IRQ remapping fault */
+> +enum iommu_fault_type {
+> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
+> +	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
+> +};
+> +
+> +enum iommu_fault_reason {
+> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
+> +
+> +	/* IOMMU internal error, no specific reason to report out */
+> +	IOMMU_FAULT_REASON_INTERNAL,
+> +
+> +	/* Could not access the PASID table (fetch caused external
+> abort) */
+> +	IOMMU_FAULT_REASON_PASID_FETCH,
+> +
+> +	/* could not access the device context (fetch caused
+> external abort) */
+> +	IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH,
+> +
+> +	/* pasid entry is invalid or has configuration errors */
+> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
+> +
+> +	/* device context entry is invalid or has configuration
+> errors */
+> +	IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY,
+> +	/*
+> +	 * PASID is out of range (e.g. exceeds the maximum PASID
+> +	 * supported by the IOMMU) or disabled.
+> +	 */
+> +	IOMMU_FAULT_REASON_PASID_INVALID,
+> +
+> +	/* source id is out of range */
+> +	IOMMU_FAULT_REASON_SOURCEID_INVALID,
+> +
+> +	/*
+> +	 * An external abort occurred fetching (or updating) a
+> translation
+> +	 * table descriptor
+> +	 */
+> +	IOMMU_FAULT_REASON_WALK_EABT,
+> +
+> +	/*
+> +	 * Could not access the page table entry (Bad address),
+> +	 * actual translation fault
+> +	 */
+> +	IOMMU_FAULT_REASON_PTE_FETCH,
+> +
+> +	/* Protection flag check failed */
+> +	IOMMU_FAULT_REASON_PERMISSION,
+> +
+> +	/* access flag check failed */
+> +	IOMMU_FAULT_REASON_ACCESS,
+> +
+> +	/* Output address of a translation stage caused Address Size
+> fault */
+> +	IOMMU_FAULT_REASON_OOR_ADDRESS
+> +};
+> +
+> +/**
+> + * struct iommu_fault - Generic fault data
+> + *
+> + * @type contains fault type
+> + * @reason fault reasons if relevant outside IOMMU driver.
+> + * IOMMU driver internal faults are not reported.
+> + * @addr: tells the offending page address
+> + * @fetch_addr: tells the address that caused an abort, if any
+> + * @pasid: contains process address space ID, used in shared virtual
+> memory
+> + * @page_req_group_id: page request group index
+> + * @last_req: last request in a page request group
+> + * @pasid_valid: indicates if the PRQ has a valid PASID
+> + * @prot: page access protection flag:
+> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+> + */
+> +
+> +struct iommu_fault {
+> +	__u32	type;   /* enum iommu_fault_type */
+> +	__u32	reason; /* enum iommu_fault_reason */
+> +	__u64	addr;
+> +	__u64	fetch_addr;
+> +	__u32	pasid;
+> +	__u32	page_req_group_id;
+> +	__u32	last_req;
+> +	__u32	pasid_valid;
+> +	__u32	prot;
+> +	__u32	access;
+relocated to uapi, Yi can you confirm?
+	__u64 device_private[2];
 
-Most of the error sources discard the result, the worst thing I can find is
-ghes_irq_func() will return IRQ_HANDLED, instead of IRQ_NONE when we didn't
-really handle the IRQ. They're registered as SHARED, but I don't have an example
-of what goes wrong next.
-
-I think this will also stop the spurious handling code kicking in to shut it up
-if its broken and screaming. Unlikely, but not impossible.
-
-Fixed in a prior patch, with Boris' suggestion, ghes_proc()s tail ends up look
-like this:
-----------------------%<----------------------
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 0321d9420b1e..8d1f9930b159 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -700,18 +708,11 @@ static int ghes_proc(struct ghes *ghes)
-
- out:
-        ghes_clear_estatus(ghes, buf_paddr);
-+       if (rc != -ENOENT)
-+               rc_ack = ghes_ack_error(ghes);
-
--       if (rc == -ENOENT)
--               return rc;
--
--       /*
--        * GHESv2 type HEST entries introduce support for error acknowledgment,
--        * so only acknowledge the error if this support is present.
--        */
--       if (is_hest_type_generic_v2(ghes))
--               return ghes_ack_error(ghes->generic_v2);
--
--       return rc;
-+       /* If rc and rc_ack failed, return the first one */
-+       return rc ? rc : rc_ack;
- }
-----------------------%<----------------------
-
-
-Thanks,
-
-James
+> +};
+>  #endif /* _UAPI_IOMMU_H */
