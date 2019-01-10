@@ -1,27 +1,29 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v9 2/5] arm64: KVM: encapsulate kvm_cpu_context in
- kvm_host_data
-Date: Thu, 10 Jan 2019 15:16:05 +0000
-Message-ID: <20190110151605.GJ56789@e119886-lin.cambridge.arm.com>
-References: <1546872089-56278-1-git-send-email-andrew.murray@arm.com>
- <1546872089-56278-3-git-send-email-andrew.murray@arm.com>
- <a5ff581b-5cfb-fea2-74b8-aa4dc3403518@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v7 04/25] ACPI / APEI: Make hest.c manage the estatus
+ memory pool
+Date: Thu, 10 Jan 2019 18:20:35 +0000
+Message-ID: <7f1621ac-09ba-71c0-d47d-e9ad61660307@arm.com>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-5-james.morse@arm.com>
+ <20181211164802.GI27375@zn.tnic>
+ <ad48f9a1-404e-7878-3173-f8a4a417a723@arm.com>
+ <20181219144234.GA31643@zn.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9694A40A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 10:16:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1D2E4A47C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 13:20:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jtge8AobfBgh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 10:16:09 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C1A4A3FB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 10:16:08 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <a5ff581b-5cfb-fea2-74b8-aa4dc3403518@arm.com>
+ with ESMTP id Qsoub+4ho7JT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 13:20:40 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 809A94A433
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 13:20:40 -0500 (EST)
+In-Reply-To: <20181219144234.GA31643@zn.tnic>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,112 +33,101 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 10, 2019 at 11:36:01AM +0000, Suzuki K Poulose wrote:
-> Hi Andrew,
-> 
-> On 07/01/2019 14:41, Andrew Murray wrote:
-> > The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
-> > a typedef to kvm_cpu_context and is used to store host cpu context. The
-> > kvm_cpu_context structure is also used elsewhere to hold vcpu context.
-> > In order to use the percpu to hold additional future host information we
-> > encapsulate kvm_cpu_context in a new structure and rename the typedef and
-> > percpu to match.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
-> >   arch/arm64/include/asm/kvm_asm.h  |  4 ++--
-> >   arch/arm64/include/asm/kvm_host.h | 14 +++++++++-----
-> >   arch/arm64/kernel/asm-offsets.c   |  2 +-
-> >   virt/kvm/arm/arm.c                | 12 +++++++-----
-> >   5 files changed, 25 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index 79906ce..71645ba 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -145,7 +145,11 @@ struct kvm_cpu_context {
-> >   	u32 cp15[NR_CP15_REGS];
-> >   };
-> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
-> > +struct kvm_host_data {
-> > +	struct kvm_cpu_context host_ctxt;
-> > +};
-> > +
-> > +typedef struct kvm_host_data kvm_host_data_t;
-> >   struct kvm_vcpu_arch {
-> >   	struct kvm_cpu_context ctxt;
-> > @@ -163,7 +167,7 @@ struct kvm_vcpu_arch {
-> >   	struct kvm_vcpu_fault_info fault;
-> >   	/* Host FP context */
-> > -	kvm_cpu_context_t *host_cpu_context;
-> > +	struct kvm_cpu_context *host_cpu_context;
-> >   	/* VGIC state */
-> >   	struct vgic_cpu vgic_cpu;
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index 102b5a5..6a9bfd4 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -102,12 +102,12 @@ extern u32 __init_stage2_translation(void);
-> >   .endm
-> >   .macro get_host_ctxt reg, tmp
-> > -	hyp_adr_this_cpu \reg, kvm_host_cpu_state, \tmp
-> > +	hyp_adr_this_cpu \reg, kvm_host_data, \tmp
-> >   .endm
-> 
-> minor nit: We now load "kvm_host_data" instead of the host_ctxt here,
-> even though they both are same. Do we need to make this explicitly load
-> the address of the host_ctxt member to make sure this doesn't break
-> with future changes to the structure ?
-> i.e,
-> 	add	\reg, \reg, #HOST_DATA_CONTEXT
-> 
-> Otherwise,
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi Boris,
 
-Thanks for spotting this.
+On 19/12/2018 14:42, Borislav Petkov wrote:
+> On Fri, Dec 14, 2018 at 01:56:16PM +0000, James Morse wrote:
+>> /me digs a bit,
+>>
+>> ghes_estatus_pool_init() allocates memory from hest_ghes_dev_register().
+>> Its caller is behind a 'if (!ghes_disable)' in acpi_hest_init(), and is after
+>> another 2 calls to apei_hest_parse().
+>>
+>> If ghes_disable is set, we don't call this thing.
+>> If hest_disable is set, acpi_hest_init() exits early.
+>> If we don't have a HEST table, acpi_hest_init() exits early.
+>>
+>> ... if the HEST table doesn't have any GHES entries, hest_ghes_dev_register() is
+>> called with ghes_count==0, and does nothing useful. (kmalloc_alloc_array(0,...)
+>> great!) But we do call ghes_estatus_pool_init().
+>>
+>> I think a check that ghes_count is non-zero before calling
+>> hest_ghes_dev_register() is the cleanest way to avoid this.
+> 
+> Grrr, what an effing mess that code is! There's hest_disable *and*
+> ghes_disable. Do we really need them both?
 
-Are you happy for me to add the Reviewed-by tag if I squash in the following?
+ghes_disable lets you ignore the firmware-first notifications, but still 'use'
+the other error sources:
+drivers/pci/pcie/aer.c picks out the three AER types, and uses apei_hest_parse()
+to know if firmware is controlling AER, even if ghes_disable is set.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 6a9bfd4..f182d13 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -103,11 +103,12 @@ extern u32 __init_stage2_translation(void);
- 
- .macro get_host_ctxt reg, tmp
-        hyp_adr_this_cpu \reg, kvm_host_data, \tmp
-+       add     \reg, \reg, #HOST_DATA_CONTEXT
- .endm
- 
- .macro get_vcpu_ptr vcpu, ctxt
-        get_host_ctxt \ctxt, \vcpu
--       ldr     \vcpu, [\ctxt, #HOST_DATA_VCPU]
-+       ldr     \vcpu, [\ctxt, #HOST_CONTEXT_VCPU]
-        kern_hyp_va     \vcpu
- .endm
- 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index cb968ff..0deddfb 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -142,7 +142,8 @@ int main(void)
-   DEFINE(CPU_FP_REGS,          offsetof(struct kvm_regs, fp_regs));
-   DEFINE(VCPU_FPEXC32_EL2,     offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
-   DEFINE(VCPU_HOST_CONTEXT,    offsetof(struct kvm_vcpu, arch.host_cpu_context));
--  DEFINE(HOST_DATA_VCPU,       offsetof(struct kvm_host_data, host_ctxt.__hyp_running_vcpu));
-+  DEFINE(HOST_CONTEXT_VCPU,    offsetof(struct kvm_cpu_context, __hyp_running_vcpu));
-+  DEFINE(HOST_DATA_CONTEXT,    offsetof(struct kvm_host_data, host_ctxt));
- #endif
- #ifdef CONFIG_CPU_PM
-   DEFINE(CPU_SUSPEND_SZ,       sizeof(struct cpu_suspend_ctx));
+x86's arch_apei_enable_cmcff() looks like it disables MCE to get firmware to
+handle them. hest_disable would stop this, but instead ghes_disable keeps that,
+and stops the NOTIFY_NMI being registered.
+
+
+> With my simplifier hat on I wanna say, we should have a single switch -
+> apei_disable - and kill those other two. What a damn mess that is.
+
+(do you consider cmdline arguments as ABI, or hard to justify and hard to remove?)
+
+I don't think its broken enough to justify ripping them out. A user of
+ghes_disable would be someone with broken firmware-first handling of AER. They
+need to know firmware is changing the register values behind their back (so need
+to parse the HEST), but want to ignore the junk notifications. It doesn't sound
+like an unlikely scenario.
+
+
+>> I wanted the estatus pool to be initialised before creating the platform devices
+>> in case the order of these things is changed in the future and they get probed
+>> immediately, before the pool is initialised.
+> 
+> Hmmm.
+> 
+> Actually, I meant flipping those two calls:
+> 
+>         rc = ghes_estatus_pool_init(ghes_count);
+>         if (rc)
+>                 goto out;
+> 
+>         rc = apei_hest_parse(hest_parse_ghes, &ghes_arr);
+>         if (rc)
+>                 goto err;
+> 
+> to
+> 
+>         rc = apei_hest_parse(hest_parse_ghes, &ghes_arr);
+>         if (rc)
+>                 goto err;
+> 
+>         rc = ghes_estatus_pool_init(ghes_count);
+>         if (rc)
+>                 goto out;
+> 
+> so as not to alloc the pool unnecessarily if the parsing fails.
+> 
+> Also, AFAICT, the order you have them in now might be a problem anyway
+> if
+> 
+> 	apei_hest_parse(hest_parse_ghes, &ghes_arr);
+> 
+> fails because then you goto err and and that pool leaks, right?
+
+Right, yes. I've been ignoring errors like this on the probe path as it implies
+you've got busted ACPI tables, or so little memory you're never going to make it
+to user-space. I was more worried about ghes_probe() trying to use the pool
+memory before its been allocated. I doesn't seem right to register the device if
+the driver wouldn't work yet. But one is an subsys_initcall(), the drivers is
+device_initcall(), which is obvious enough.
+
+Fixed.
 
 
 Thanks,
 
-Andrew Murray
+James
