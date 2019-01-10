@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 13/13] virtio/console: Implement reset
-Date: Thu, 10 Jan 2019 14:12:50 +0000
-Message-ID: <1547129570-14351-14-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 10/13] virtio/blk: Reset virtqueue
+Date: Thu, 10 Jan 2019 14:12:47 +0000
+Message-ID: <1547129570-14351-11-git-send-email-julien.thierry@arm.com>
 References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2374F4A473
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53B104A443
  for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a3GvvrgfpAdC for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:13:15 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B202D4A4C2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:15 -0500 (EST)
+ with ESMTP id zx1S9rE4PnYz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:13:11 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AFA54A46D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:11 -0500 (EST)
 In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,100 +33,105 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-The virtio-console reset cancels all running jobs.
+Move pthread creation to init_vq, and kill the thread in exit_vq.
+Initialize the virtqueue states at runtime.
 
-Unfortunately we don't have a good way to prevent the term polling thread
-from getting in the way, read invalid data during reset and cause a
-segfault. To prevent this, move all handling of the Rx queue in the
-threadpool job.
+All in-flight I/O is canceled with the virtqueue pthreads, except for AIO
+threads, but after reading the code I'm not sure if AIO has ever worked
+anyway.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- virtio/console.c | 32 ++++++++++++++++++++------------
- 1 file changed, 20 insertions(+), 12 deletions(-)
+ virtio/blk.c | 67 ++++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
 
-diff --git a/virtio/console.c b/virtio/console.c
-index d2b312c..f1be025 100644
---- a/virtio/console.c
-+++ b/virtio/console.c
-@@ -35,8 +35,6 @@ struct con_dev {
- 	struct virt_queue		vqs[VIRTIO_CONSOLE_NUM_QUEUES];
- 	struct virtio_console_config	config;
- 	u32				features;
--
--	pthread_cond_t			poll_cond;
- 	int				vq_ready;
- 
- 	struct thread_pool__job		jobs[VIRTIO_CONSOLE_NUM_QUEUES];
-@@ -44,7 +42,6 @@ struct con_dev {
- 
- static struct con_dev cdev = {
- 	.mutex				= MUTEX_INITIALIZER,
--	.poll_cond			= PTHREAD_COND_INITIALIZER,
- 
- 	.vq_ready			= 0,
- 
-@@ -68,16 +65,10 @@ static void virtio_console__inject_interrupt_callback(struct kvm *kvm, void *par
- 	u16 head;
- 	int len;
- 
--	if (kvm->cfg.active_console != CONSOLE_VIRTIO)
--		return;
--
- 	mutex_lock(&cdev.mutex);
- 
- 	vq = param;
- 
--	if (!cdev.vq_ready)
--		pthread_cond_wait(&cdev.poll_cond, &cdev.mutex.mutex);
--
- 	if (term_readable(0) && virt_queue__available(vq)) {
- 		head = virt_queue__get_iov(vq, iov, &out, &in, kvm);
- 		len = term_getc_iov(kvm, iov, in, 0);
-@@ -90,8 +81,13 @@ static void virtio_console__inject_interrupt_callback(struct kvm *kvm, void *par
- 
- void virtio_console__inject_interrupt(struct kvm *kvm)
+diff --git a/virtio/blk.c b/virtio/blk.c
+index 6a6b3b7..a57df2e 100644
+--- a/virtio/blk.c
++++ b/virtio/blk.c
+@@ -178,9 +178,29 @@ static void notify_status(struct kvm *kvm, void *dev, u32 status)
  {
--	virtio_console__inject_interrupt_callback(kvm,
--					&cdev.vqs[VIRTIO_CONSOLE_RX_QUEUE]);
-+	if (kvm->cfg.active_console != CONSOLE_VIRTIO)
-+		return;
-+
-+	mutex_lock(&cdev.mutex);
-+	if (cdev.vq_ready)
-+		thread_pool__do_job(&cdev.jobs[VIRTIO_CONSOLE_RX_QUEUE]);
-+	mutex_unlock(&cdev.mutex);
  }
  
- static void virtio_console_handle_callback(struct kvm *kvm, void *param)
-@@ -168,13 +164,24 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 		/* Tell the waiting poll thread that we're ready to go */
- 		mutex_lock(&cdev.mutex);
- 		cdev.vq_ready = 1;
--		pthread_cond_signal(&cdev.poll_cond);
- 		mutex_unlock(&cdev.mutex);
- 	}
++static void *virtio_blk_thread(void *dev)
++{
++	struct blk_dev *bdev = dev;
++	u64 data;
++	int r;
++
++	kvm__set_thread_name("virtio-blk-io");
++
++	while (1) {
++		r = read(bdev->io_efd, &data, sizeof(u64));
++		if (r < 0)
++			continue;
++		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
++	}
++
++	pthread_exit(NULL);
++	return NULL;
++}
++
+ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 		   u32 pfn)
+ {
++	unsigned int i;
+ 	struct blk_dev *bdev = dev;
+ 	struct virt_queue *queue;
+ 	void *p;
+@@ -194,26 +214,37 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 	vring_init(&queue->vring, VIRTIO_BLK_QUEUE_SIZE, p, align);
+ 	virtio_init_device_vq(&bdev->vdev, queue);
  
++	if (vq != 0)
++		return 0;
++
++	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
++		bdev->reqs[i] = (struct blk_dev_req) {
++			.bdev = bdev,
++			.kvm = kvm,
++		};
++	}
++
++	mutex_init(&bdev->mutex);
++	bdev->io_efd = eventfd(0, 0);
++	if (bdev->io_efd < 0)
++		return -errno;
++
++	if (pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev))
++		return -errno;
++
  	return 0;
  }
  
+-static void *virtio_blk_thread(void *dev)
 +static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+	if (vq == VIRTIO_CONSOLE_RX_QUEUE) {
-+		mutex_lock(&cdev.mutex);
-+		cdev.vq_ready = 0;
-+		mutex_unlock(&cdev.mutex);
-+		thread_pool__cancel_job(&cdev.jobs[vq]);
-+	} else if (vq == VIRTIO_CONSOLE_TX_QUEUE) {
-+		thread_pool__cancel_job(&cdev.jobs[vq]);
-+	}
-+}
-+
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
  {
- 	struct con_dev *cdev = dev;
-@@ -213,6 +220,7 @@ static struct virtio_ops con_dev_virtio_ops = {
+ 	struct blk_dev *bdev = dev;
+-	u64 data;
+-	int r;
+ 
+-	kvm__set_thread_name("virtio-blk-io");
++	if (vq != 0)
++		return;
+ 
+-	while (1) {
+-		r = read(bdev->io_efd, &data, sizeof(u64));
+-		if (r < 0)
+-			continue;
+-		virtio_blk_do_io(bdev->kvm, &bdev->vqs[0], bdev);
+-	}
+-
+-	pthread_exit(NULL);
+-	return NULL;
++	close(bdev->io_efd);
++	pthread_cancel(bdev->io_thread);
++	pthread_join(bdev->io_thread, NULL);
+ }
+ 
+ static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+@@ -259,6 +290,7 @@ static struct virtio_ops blk_dev_virtio_ops = {
  	.set_guest_features	= set_guest_features,
  	.get_vq_count		= get_vq_count,
  	.init_vq		= init_vq,
@@ -134,5 +139,42 @@ index d2b312c..f1be025 100644
  	.notify_status		= notify_status,
  	.notify_vq		= notify_vq,
  	.get_vq			= get_vq,
+@@ -269,7 +301,6 @@ static struct virtio_ops blk_dev_virtio_ops = {
+ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
+ {
+ 	struct blk_dev *bdev;
+-	unsigned int i;
+ 
+ 	if (!disk)
+ 		return -EINVAL;
+@@ -279,13 +310,11 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
+ 		return -ENOMEM;
+ 
+ 	*bdev = (struct blk_dev) {
+-		.mutex			= MUTEX_INITIALIZER,
+ 		.disk			= disk,
+ 		.blk_config		= (struct virtio_blk_config) {
+ 			.capacity	= disk->size / SECTOR_SIZE,
+ 			.seg_max	= DISK_SEG_MAX,
+ 		},
+-		.io_efd			= eventfd(0, 0),
+ 		.kvm			= kvm,
+ 	};
+ 
+@@ -295,14 +324,8 @@ static int virtio_blk__init_one(struct kvm *kvm, struct disk_image *disk)
+ 
+ 	list_add_tail(&bdev->list, &bdevs);
+ 
+-	for (i = 0; i < ARRAY_SIZE(bdev->reqs); i++) {
+-		bdev->reqs[i].bdev = bdev;
+-		bdev->reqs[i].kvm = kvm;
+-	}
+-
+ 	disk_image__set_callback(bdev->disk, virtio_blk_complete);
+ 
+-	pthread_create(&bdev->io_thread, NULL, virtio_blk_thread, bdev);
+ 	if (compat_id == -1)
+ 		compat_id = virtio_compat_add_message("virtio-blk", "CONFIG_VIRTIO_BLK");
+ 
 -- 
 1.9.1
