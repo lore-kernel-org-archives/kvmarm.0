@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 11/13] threadpool: Add cancel() function
-Date: Thu, 10 Jan 2019 14:12:48 +0000
-Message-ID: <1547129570-14351-12-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 12/13] virtio/p9: Implement reset
+Date: Thu, 10 Jan 2019 14:12:49 +0000
+Message-ID: <1547129570-14351-13-git-send-email-julien.thierry@arm.com>
 References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D024A478
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 697BA4A450
  for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QqbhIQ2CM2NH for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id GDLZEgLup7Ym for <kvmarm@lists.cs.columbia.edu>;
  Thu, 10 Jan 2019 09:13:15 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BE104A4B9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:12 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28C704A492
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:14 -0500 (EST)
 In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,81 +33,54 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-When resetting a virtqueue, it is often necessary to make sure that the
-associated threadpool job isn't running anymore. Add a function to
-cancel a job.
-
-A threadpool job has three states: idle, queued and running. A job is
-queued when it is in the job list. It is running when it is out the
-list, but its signal count is greater than zero. It is idle when it is
-both out of the list and its signal count is zero. The cancel() function
-simply waits for the job to be idle. It is up to the caller to make sure
-that the job isn't queued concurrently.
+The p9 reset cancels all running jobs and closes any open fid.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/threadpool.h |  2 ++
- util/threadpool.c        | 25 ++++++++++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ virtio/9p.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/include/kvm/threadpool.h b/include/kvm/threadpool.h
-index bacb243..880487a 100644
---- a/include/kvm/threadpool.h
-+++ b/include/kvm/threadpool.h
-@@ -28,11 +28,13 @@ static inline void thread_pool__init_job(struct thread_pool__job *job, struct kv
- 		.data		= data,
- 		.mutex		= MUTEX_INITIALIZER,
- 	};
-+	INIT_LIST_HEAD(&job->queue);
- }
+diff --git a/virtio/9p.c b/virtio/9p.c
+index d9f45cf..6bae403 100644
+--- a/virtio/9p.c
++++ b/virtio/9p.c
+@@ -1384,6 +1384,14 @@ static void set_guest_features(struct kvm *kvm, void *dev, u32 features)
  
- int thread_pool__init(struct kvm *kvm);
- int thread_pool__exit(struct kvm *kvm);
- 
- void thread_pool__do_job(struct thread_pool__job *job);
-+void thread_pool__cancel_job(struct thread_pool__job *job);
- 
- #endif
-diff --git a/util/threadpool.c b/util/threadpool.c
-index e64aa26..1dc3bf7 100644
---- a/util/threadpool.c
-+++ b/util/threadpool.c
-@@ -25,7 +25,7 @@ static struct thread_pool__job *thread_pool__job_pop_locked(void)
- 		return NULL;
- 
- 	job = list_first_entry(&head, struct thread_pool__job, queue);
--	list_del(&job->queue);
-+	list_del_init(&job->queue);
- 
- 	return job;
- }
-@@ -173,3 +173,26 @@ void thread_pool__do_job(struct thread_pool__job *job)
- 	pthread_cond_signal(&job_cond);
- 	mutex_unlock(&job_mutex);
- }
+ static void notify_status(struct kvm *kvm, void *dev, u32 status)
+ {
++	struct p9_dev *p9dev = dev;
++	struct p9_fid *pfid, *next;
 +
-+void thread_pool__cancel_job(struct thread_pool__job *job)
++	if (!(status & VIRTIO__STATUS_STOP))
++		return;
++
++	rbtree_postorder_for_each_entry_safe(pfid, next, &p9dev->fids, node)
++		close_fid(p9dev, pfid->fid);
+ }
+ 
+ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+@@ -1413,6 +1421,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 	return 0;
+ }
+ 
++static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
 +{
-+	bool running;
++	struct p9_dev *p9dev = dev;
 +
-+	/*
-+	 * If the job is queued but not running, remove it. Otherwise, wait for
-+	 * the signalcount to drop to 0, indicating that it has finished
-+	 * running. We assume that nobody is queueing this job -
-+	 * thread_pool__do_job() isn't called - while this function is running.
-+	 */
-+	do {
-+		mutex_lock(&job_mutex);
-+		if (list_empty(&job->queue)) {
-+			running = job->signalcount > 0;
-+		} else {
-+			list_del_init(&job->queue);
-+			job->signalcount = 0;
-+			running = false;
-+		}
-+		mutex_unlock(&job_mutex);
-+	} while (running);
++	thread_pool__cancel_job(&p9dev->jobs[vq].job_id);
 +}
++
+ static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ {
+ 	struct p9_dev *p9dev = dev;
+@@ -1450,6 +1465,7 @@ struct virtio_ops p9_dev_virtio_ops = {
+ 	.get_host_features	= get_host_features,
+ 	.set_guest_features	= set_guest_features,
+ 	.init_vq		= init_vq,
++	.exit_vq		= exit_vq,
+ 	.notify_status		= notify_status,
+ 	.notify_vq		= notify_vq,
+ 	.get_vq			= get_vq,
 -- 
 1.9.1
