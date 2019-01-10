@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 03/13] virtio: Add get_vq_count() callback
-Date: Thu, 10 Jan 2019 14:12:40 +0000
-Message-ID: <1547129570-14351-4-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 06/13] virtio: Add reset() callback
+Date: Thu, 10 Jan 2019 14:12:43 +0000
+Message-ID: <1547129570-14351-7-git-send-email-julien.thierry@arm.com>
 References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0257B4A429
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28F3F4A471
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OZleA5g70Hat for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:13:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3CC54A471
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:01 -0500 (EST)
+ with ESMTP id dMyp6KtNSre5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:13:05 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F5894A496
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:05 -0500 (EST)
 In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,194 +33,168 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-Modern virtio requires devices to report how many queues they support. Add
-an operation to query all devices about their capacities.
+When the guest writes a status of 0, the device should be reset. Add a
+reset() callback for the transport layer to reset all queues and their
+ioeventfd.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/virtio.h | 1 +
- virtio/9p.c          | 6 ++++++
- virtio/balloon.c     | 6 ++++++
- virtio/blk.c         | 6 ++++++
- virtio/console.c     | 6 ++++++
- virtio/net.c         | 8 ++++++++
- virtio/rng.c         | 6 ++++++
- virtio/scsi.c        | 6 ++++++
- 8 files changed, 45 insertions(+)
+ include/kvm/virtio-mmio.h |  1 +
+ include/kvm/virtio-pci.h  |  1 +
+ include/kvm/virtio.h      |  1 +
+ virtio/core.c             |  9 +++++++++
+ virtio/mmio.c             | 16 ++++++++++++----
+ virtio/pci.c              | 20 +++++++++++++-------
+ 6 files changed, 37 insertions(+), 11 deletions(-)
 
+diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
+index 835f421..0528947 100644
+--- a/include/kvm/virtio-mmio.h
++++ b/include/kvm/virtio-mmio.h
+@@ -54,6 +54,7 @@ struct virtio_mmio {
+ int virtio_mmio_signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
+ int virtio_mmio_signal_config(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev);
++int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		      int device_id, int subsys_id, int class);
+ void virtio_mmio_assign_irq(struct device_header *dev_hdr);
+diff --git a/include/kvm/virtio-pci.h b/include/kvm/virtio-pci.h
+index b70cadd..278a259 100644
+--- a/include/kvm/virtio-pci.h
++++ b/include/kvm/virtio-pci.h
+@@ -55,6 +55,7 @@ struct virtio_pci {
+ int virtio_pci__signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq);
+ int virtio_pci__signal_config(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev);
++int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev);
+ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		     int device_id, int subsys_id, int class);
+ 
 diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index f143321..cc49c9d 100644
+index f35c74d..19b9137 100644
 --- a/include/kvm/virtio.h
 +++ b/include/kvm/virtio.h
-@@ -184,6 +184,7 @@ struct virtio_ops {
- 	u8 *(*get_config)(struct kvm *kvm, void *dev);
- 	u32 (*get_host_features)(struct kvm *kvm, void *dev);
- 	void (*set_guest_features)(struct kvm *kvm, void *dev, u32 features);
-+	int (*get_vq_count)(struct kvm *kvm, void *dev);
- 	int (*init_vq)(struct kvm *kvm, void *dev, u32 vq, u32 page_size,
- 		       u32 align, u32 pfn);
- 	int (*notify_vq)(struct kvm *kvm, void *dev, u32 vq);
-diff --git a/virtio/9p.c b/virtio/9p.c
-index 4b93b4c..94f7a8f 100644
---- a/virtio/9p.c
-+++ b/virtio/9p.c
-@@ -1440,6 +1440,11 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
- }
- 
-+static int get_vq_count(struct kvm *kvm, void *dev)
-+{
-+	return NUM_VIRT_QUEUES;
-+}
-+
- struct virtio_ops p9_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
-@@ -1450,6 +1455,7 @@ struct virtio_ops p9_dev_virtio_ops = {
- 	.get_pfn_vq		= get_pfn_vq,
- 	.get_size_vq		= get_size_vq,
- 	.set_size_vq		= set_size_vq,
-+	.get_vq_count		= get_vq_count,
+@@ -201,6 +201,7 @@ struct virtio_ops {
+ 	int (*init)(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		    int device_id, int subsys_id, int class);
+ 	int (*exit)(struct kvm *kvm, struct virtio_device *vdev);
++	int (*reset)(struct kvm *kvm, struct virtio_device *vdev);
  };
  
- int virtio_9p_rootdir_parser(const struct option *opt, const char *arg, int unset)
-diff --git a/virtio/balloon.c b/virtio/balloon.c
-index 871d6e0..2c2e24a 100644
---- a/virtio/balloon.c
-+++ b/virtio/balloon.c
-@@ -243,6 +243,11 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
+ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+diff --git a/virtio/core.c b/virtio/core.c
+index 67d4114..e10ec36 100644
+--- a/virtio/core.c
++++ b/virtio/core.c
+@@ -241,6 +241,13 @@ void virtio_notify_status(struct kvm *kvm, struct virtio_device *vdev,
+ 	} else if (!status && (vdev->status & VIRTIO__STATUS_START)) {
+ 		vdev->status &= ~VIRTIO__STATUS_START;
+ 		ext_status |= VIRTIO__STATUS_STOP;
++
++		/*
++		 * Reset virtqueues and stop all traffic now, so that the device
++		 * can safely reset the backend in notify_status().
++		 */
++		if (ext_status & VIRTIO__STATUS_STOP)
++			vdev->ops->reset(kvm, vdev);
+ 	}
+ 
+ 	if (vdev->ops->notify_status)
+@@ -264,6 +271,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		vdev->ops->signal_config	= virtio_pci__signal_config;
+ 		vdev->ops->init			= virtio_pci__init;
+ 		vdev->ops->exit			= virtio_pci__exit;
++		vdev->ops->reset		= virtio_pci__reset;
+ 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
+ 		break;
+ 	case VIRTIO_MMIO:
+@@ -276,6 +284,7 @@ int virtio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		vdev->ops->signal_config	= virtio_mmio_signal_config;
+ 		vdev->ops->init			= virtio_mmio_init;
+ 		vdev->ops->exit			= virtio_mmio_exit;
++		vdev->ops->reset		= virtio_mmio_reset;
+ 		vdev->ops->init(kvm, dev, vdev, device_id, subsys_id, class);
+ 		break;
+ 	default:
+diff --git a/virtio/mmio.c b/virtio/mmio.c
+index 4b8c20e..eff147a 100644
+--- a/virtio/mmio.c
++++ b/virtio/mmio.c
+@@ -326,15 +326,23 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 	return 0;
  }
  
-+static int get_vq_count(struct kvm *kvm, void *dev)
++int virtio_mmio_reset(struct kvm *kvm, struct virtio_device *vdev)
 +{
-+	return NUM_VIRT_QUEUES;
++	int vq;
++	struct virtio_mmio *vmmio = vdev->virtio;
++
++	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vmmio->dev); vq++)
++		virtio_mmio_exit_vq(kvm, vdev, vq);
++
++	return 0;
 +}
 +
- struct virtio_ops bln_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
-@@ -253,6 +258,7 @@ struct virtio_ops bln_dev_virtio_ops = {
- 	.get_pfn_vq		= get_pfn_vq,
- 	.get_size_vq		= get_size_vq,
- 	.set_size_vq            = set_size_vq,
-+	.get_vq_count		= get_vq_count,
- };
+ int virtio_mmio_exit(struct kvm *kvm, struct virtio_device *vdev)
+ {
+ 	struct virtio_mmio *vmmio = vdev->virtio;
+-	int i;
  
- int virtio_bln__init(struct kvm *kvm)
-diff --git a/virtio/blk.c b/virtio/blk.c
-index db9f4cc..6502b8c 100644
---- a/virtio/blk.c
-+++ b/virtio/blk.c
-@@ -248,10 +248,16 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
++	virtio_mmio_reset(kvm, vdev);
+ 	kvm__deregister_mmio(kvm, vmmio->addr);
+ 
+-	for (i = 0; i < VIRTIO_MMIO_MAX_VQ; i++)
+-		ioeventfd__del_event(vmmio->addr + VIRTIO_MMIO_QUEUE_NOTIFY, i);
+-
+ 	return 0;
+ }
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 2da2d3f..99653ca 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -77,8 +77,8 @@ static void virtio_pci_exit_vq(struct kvm *kvm, struct virtio_device *vdev,
+ {
+ 	struct virtio_pci *vpci = vdev->virtio;
+ 
+-	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
+ 	ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
++	ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, vq);
+ 	virtio_exit_vq(kvm, vdev, vpci->dev, vq);
  }
  
-+static int get_vq_count(struct kvm *kvm, void *dev)
-+{
-+	return NUM_VIRT_QUEUES;
-+}
-+
- static struct virtio_ops blk_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
-+	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
- 	.notify_status		= notify_status,
- 	.notify_vq		= notify_vq,
-diff --git a/virtio/console.c b/virtio/console.c
-index b9df5c9..c96bc11 100644
---- a/virtio/console.c
-+++ b/virtio/console.c
-@@ -202,10 +202,16 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
+@@ -522,19 +522,25 @@ free_ioport:
+ 	return r;
  }
  
-+static int get_vq_count(struct kvm *kvm, void *dev)
++int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
 +{
-+	return VIRTIO_CONSOLE_NUM_QUEUES;
++	int vq;
++	struct virtio_pci *vpci = vdev->virtio;
++
++	for (vq = 0; vq < vdev->ops->get_vq_count(kvm, vpci->dev); vq++)
++		virtio_pci_exit_vq(kvm, vdev, vq);
++
++	return 0;
 +}
 +
- static struct virtio_ops con_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
-+	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
- 	.notify_status		= notify_status,
- 	.notify_vq		= notify_vq,
-diff --git a/virtio/net.c b/virtio/net.c
-index 619b545..3b08aea 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -681,10 +681,18 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
+ int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev)
+ {
+ 	struct virtio_pci *vpci = vdev->virtio;
+-	int i;
+ 
++	virtio_pci__reset(kvm, vdev);
+ 	kvm__deregister_mmio(kvm, vpci->mmio_addr);
+ 	kvm__deregister_mmio(kvm, vpci->msix_io_block);
+ 	ioport__unregister(kvm, vpci->port_addr);
+ 
+-	for (i = 0; i < VIRTIO_PCI_MAX_VQ; i++) {
+-		ioeventfd__del_event(vpci->port_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
+-		ioeventfd__del_event(vpci->mmio_addr + VIRTIO_PCI_QUEUE_NOTIFY, i);
+-	}
+-
+ 	return 0;
  }
- 
-+static int get_vq_count(struct kvm *kvm, void *dev)
-+{
-+	struct net_dev *ndev = dev;
-+
-+	return ndev->queue_pairs * 2 + 1;
-+}
-+
- static struct virtio_ops net_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
- 	.set_guest_features	= set_guest_features,
-+	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
- 	.get_pfn_vq		= get_pfn_vq,
- 	.get_size_vq		= get_size_vq,
-diff --git a/virtio/rng.c b/virtio/rng.c
-index 9b9e128..fc0e320 100644
---- a/virtio/rng.c
-+++ b/virtio/rng.c
-@@ -141,6 +141,11 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
- }
- 
-+static int get_vq_count(struct kvm *kvm, void *dev)
-+{
-+	return NUM_VIRT_QUEUES;
-+}
-+
- static struct virtio_ops rng_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
-@@ -150,6 +155,7 @@ static struct virtio_ops rng_dev_virtio_ops = {
- 	.get_pfn_vq		= get_pfn_vq,
- 	.get_size_vq		= get_size_vq,
- 	.set_size_vq		= set_size_vq,
-+	.get_vq_count		= get_vq_count,
- };
- 
- int virtio_rng__init(struct kvm *kvm)
-diff --git a/virtio/scsi.c b/virtio/scsi.c
-index 788bfa2..e21263c 100644
---- a/virtio/scsi.c
-+++ b/virtio/scsi.c
-@@ -167,6 +167,11 @@ static int set_size_vq(struct kvm *kvm, void *dev, u32 vq, int size)
- 	return size;
- }
- 
-+static int get_vq_count(struct kvm *kvm, void *dev)
-+{
-+	return NUM_VIRT_QUEUES;
-+}
-+
- static struct virtio_ops scsi_dev_virtio_ops = {
- 	.get_config		= get_config,
- 	.get_host_features	= get_host_features,
-@@ -179,6 +184,7 @@ static struct virtio_ops scsi_dev_virtio_ops = {
- 	.notify_vq		= notify_vq,
- 	.notify_vq_gsi		= notify_vq_gsi,
- 	.notify_vq_eventfd	= notify_vq_eventfd,
-+	.get_vq_count		= get_vq_count,
- };
- 
- static void virtio_scsi_vhost_init(struct kvm *kvm, struct scsi_dev *sdev)
 -- 
 1.9.1
