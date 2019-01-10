@@ -1,23 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool v2 09/13] virtio/net: Implement device and virtqueue
- reset
-Date: Thu, 10 Jan 2019 14:12:46 +0000
-Message-ID: <1547129570-14351-10-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool v2 11/13] threadpool: Add cancel() function
+Date: Thu, 10 Jan 2019 14:12:48 +0000
+Message-ID: <1547129570-14351-12-git-send-email-julien.thierry@arm.com>
 References: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 233C34A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D024A478
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cCGOQpacPb6y for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Jan 2019 09:13:09 -0500 (EST)
+ with ESMTP id QqbhIQ2CM2NH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Jan 2019 09:13:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C86334A48C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BE104A4B9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Jan 2019 09:13:12 -0500 (EST)
 In-Reply-To: <1547129570-14351-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,127 +33,81 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
-On exit_vq(), clean all resources allocated for the queue. When the device
-is reset, clean the backend.
+When resetting a virtqueue, it is often necessary to make sure that the
+associated threadpool job isn't running anymore. Add a function to
+cancel a job.
+
+A threadpool job has three states: idle, queued and running. A job is
+queued when it is in the job list. It is running when it is out the
+list, but its signal count is greater than zero. It is idle when it is
+both out of the list and its signal count is zero. The cancel() function
+simply waits for the job to be idle. It is up to the caller to make sure
+that the job isn't queued concurrently.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- virtio/net.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ include/kvm/threadpool.h |  2 ++
+ util/threadpool.c        | 25 ++++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/virtio/net.c b/virtio/net.c
-index ef8e226..a05f4cd 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -43,6 +43,8 @@ struct net_dev_queue {
- 	pthread_t			thread;
- 	struct mutex			lock;
- 	pthread_cond_t			cond;
-+	int				gsi;
-+	int				irqfd;
- };
- 
- struct net_dev {
-@@ -361,6 +363,23 @@ fail:
- 	return 0;
+diff --git a/include/kvm/threadpool.h b/include/kvm/threadpool.h
+index bacb243..880487a 100644
+--- a/include/kvm/threadpool.h
++++ b/include/kvm/threadpool.h
+@@ -28,11 +28,13 @@ static inline void thread_pool__init_job(struct thread_pool__job *job, struct kv
+ 		.data		= data,
+ 		.mutex		= MUTEX_INITIALIZER,
+ 	};
++	INIT_LIST_HEAD(&job->queue);
  }
  
-+static void virtio_net__tap_exit(struct net_dev *ndev)
+ int thread_pool__init(struct kvm *kvm);
+ int thread_pool__exit(struct kvm *kvm);
+ 
+ void thread_pool__do_job(struct thread_pool__job *job);
++void thread_pool__cancel_job(struct thread_pool__job *job);
+ 
+ #endif
+diff --git a/util/threadpool.c b/util/threadpool.c
+index e64aa26..1dc3bf7 100644
+--- a/util/threadpool.c
++++ b/util/threadpool.c
+@@ -25,7 +25,7 @@ static struct thread_pool__job *thread_pool__job_pop_locked(void)
+ 		return NULL;
+ 
+ 	job = list_first_entry(&head, struct thread_pool__job, queue);
+-	list_del(&job->queue);
++	list_del_init(&job->queue);
+ 
+ 	return job;
+ }
+@@ -173,3 +173,26 @@ void thread_pool__do_job(struct thread_pool__job *job)
+ 	pthread_cond_signal(&job_cond);
+ 	mutex_unlock(&job_mutex);
+ }
++
++void thread_pool__cancel_job(struct thread_pool__job *job)
 +{
-+	int sock;
-+	struct ifreq ifr;
-+
-+	if (ndev->params->tapif)
-+		return;
-+
-+	sock = socket(AF_INET, SOCK_STREAM, 0);
-+	strncpy(ifr.ifr_name, ndev->tap_name, sizeof(ndev->tap_name));
-+	ioctl(sock, SIOCGIFFLAGS, &ifr);
-+	ifr.ifr_flags &= ~(IFF_UP | IFF_RUNNING);
-+	if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-+		pr_warning("Count not bring tap device down");
-+	close(sock);
-+}
-+
- static bool virtio_net__tap_create(struct net_dev *ndev)
- {
- 	int offload;
-@@ -533,10 +552,21 @@ static void virtio_net_start(struct net_dev *ndev)
- 	}
- }
- 
-+static void virtio_net_stop(struct net_dev *ndev)
-+{
-+	/* Undo whatever start() did */
-+	if (ndev->mode == NET_MODE_TAP)
-+		virtio_net__tap_exit(ndev);
-+	else
-+		uip_exit(&ndev->info);
-+}
-+
- static void notify_status(struct kvm *kvm, void *dev, u32 status)
- {
- 	if (status & VIRTIO__STATUS_START)
- 		virtio_net_start(dev);
-+	else if (status & VIRTIO__STATUS_STOP)
-+		virtio_net_stop(dev);
- }
- 
- static bool is_ctrl_vq(struct net_dev *ndev, u32 vq)
-@@ -611,6 +641,35 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
- 	return 0;
- }
- 
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+	struct net_dev *ndev = dev;
-+	struct net_dev_queue *queue = &ndev->queues[vq];
-+
-+	if (!is_ctrl_vq(ndev, vq) && queue->gsi) {
-+		irq__del_irqfd(kvm, queue->gsi, queue->irqfd);
-+		close(queue->irqfd);
-+		queue->gsi = queue->irqfd = 0;
-+	}
++	bool running;
 +
 +	/*
-+	 * TODO: vhost reset owner. It's the only way to cleanly stop vhost, but
-+	 * we can't restart it at the moment.
++	 * If the job is queued but not running, remove it. Otherwise, wait for
++	 * the signalcount to drop to 0, indicating that it has finished
++	 * running. We assume that nobody is queueing this job -
++	 * thread_pool__do_job() isn't called - while this function is running.
 +	 */
-+	if (ndev->vhost_fd && !is_ctrl_vq(ndev, vq)) {
-+		pr_warning("Cannot reset VHOST queue");
-+		ioctl(ndev->vhost_fd, VHOST_RESET_OWNER);
-+		return;
-+	}
-+
-+	/*
-+	 * Threads are waiting on cancellation points (readv or
-+	 * pthread_cond_wait) and should stop gracefully.
-+	 */
-+	pthread_cancel(queue->thread);
-+	pthread_join(queue->thread, NULL);
++	do {
++		mutex_lock(&job_mutex);
++		if (list_empty(&job->queue)) {
++			running = job->signalcount > 0;
++		} else {
++			list_del_init(&job->queue);
++			job->signalcount = 0;
++			running = false;
++		}
++		mutex_unlock(&job_mutex);
++	} while (running);
 +}
-+
- static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- {
- 	struct net_dev *ndev = dev;
-@@ -630,6 +689,9 @@ static void notify_vq_gsi(struct kvm *kvm, void *dev, u32 vq, u32 gsi)
- 	if (r < 0)
- 		die_perror("KVM_IRQFD failed");
- 
-+	queue->irqfd = file.fd;
-+	queue->gsi = gsi;
-+
- 	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_CALL, &file);
- 	if (r < 0)
- 		die_perror("VHOST_SET_VRING_CALL failed");
-@@ -698,6 +760,7 @@ static struct virtio_ops net_dev_virtio_ops = {
- 	.set_guest_features	= set_guest_features,
- 	.get_vq_count		= get_vq_count,
- 	.init_vq		= init_vq,
-+	.exit_vq		= exit_vq,
- 	.get_vq			= get_vq,
- 	.get_size_vq		= get_size_vq,
- 	.set_size_vq		= set_size_vq,
 -- 
 1.9.1
