@@ -1,31 +1,25 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
- consumed the records
-Date: Fri, 11 Jan 2019 18:09:28 +0000
-Message-ID: <0939c14d-de58-f21d-57a6-89bdce3bcb44@arm.com>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-11-james.morse@arm.com>
- <20181211183634.GO27375@zn.tnic>
- <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
- <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
- <20190111120322.GD4729@zn.tnic>
- <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [RFC v3 01/21] iommu: Introduce set_pasid_table API
+Date: Fri, 11 Jan 2019 18:16:06 +0000
+Message-ID: <0203e4ce-eace-be6e-7e95-5a02c069c8e8@arm.com>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+ <20190108102633.17482-2-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B50BF4A47C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:09:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C81A4A486
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:16:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WZp6Qrub1aMk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jan 2019 13:09:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C7774A47B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:09:34 -0500 (EST)
-In-Reply-To: <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
-Content-Language: en-GB
+ with ESMTP id qwvW8yqWYrP8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 13:16:24 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E86B4A484
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:16:24 -0500 (EST)
+In-Reply-To: <20190108102633.17482-2-eric.auger@redhat.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,134 +29,207 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tyler Baicar <baicar.tyler@gmail.com>, Borislav Petkov <bp@alien8.de>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi guys,
-
-On 11/01/2019 15:32, Tyler Baicar wrote:
-> On Fri, Jan 11, 2019 at 7:03 AM Borislav Petkov <bp@alien8.de> wrote:
->> On Thu, Jan 10, 2019 at 04:01:27PM -0500, Tyler Baicar wrote:
->>> On Thu, Jan 10, 2019 at 1:23 PM James Morse <james.morse@arm.com> wrote:
->>>>>>
->>>>>> +    if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
->>>>>
->>>>> Since ghes_ack_error() is always prepended with this check, you could
->>>>> push it down into the function:
->>>>>
->>>>> ghes_ack_error(ghes)
->>>>> ...
->>>>>
->>>>>       if (!is_hest_type_generic_v2(ghes))
->>>>>               return 0;
->>>>>
->>>>> and simplify the two callsites :)
->>>>
->>>> Great idea! ...
->>>>
->>>> .. huh. Turns out for ghes_proc() we discard any errors other than ENOENT from
->>>> ghes_read_estatus() if is_hest_type_generic_v2(). This masks EIO.
->>>>
->>>> Most of the error sources discard the result, the worst thing I can find is
->>>> ghes_irq_func() will return IRQ_HANDLED, instead of IRQ_NONE when we didn't
->>>> really handle the IRQ. They're registered as SHARED, but I don't have an example
->>>> of what goes wrong next.
->>>>
->>>> I think this will also stop the spurious handling code kicking in to shut it up
->>>> if its broken and screaming. Unlikely, but not impossible.
-
-[....]
-
->>> Looks good to me, I guess there's no harm in acking invalid error status blocks.
-
-Great, I didn't miss something nasty...
-
-
->> Err, why?
+On 08/01/2019 10:26, Eric Auger wrote:
+> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > 
-> If ghes_read_estatus() fails, then either there was no error populated or the
-> error status block was invalid.
-> If the error status block is invalid, then the kernel doesn't know what happened
-> in hardware.
-
-What do we mean by 'hardware' here? We're receiving a corrupt report of
-something via memory.
-The GHESv2 ack just means we're done with the memory. I think it exists because
-the external-agent can't peek into the CPU to see if its returned from the
-notification.
-
-
-> I originally thought this was changing what's acked, but it's just changing the
-> return value of ghes_proc() when ghes_read_estatus() returns -EIO.
-
-Sorry, that will be due to my bad description.
-
-
->> I don't know what the firmware glue does on ARM but if I'd have to
->> remain logical - which is hard to do with firmware - the proper thing to
->> do would be this:
->>
->>         rc = ghes_read_estatus(ghes, &buf_paddr);
->>         if (rc) {
->>                 ghes_reset_hardware();
+> In virtualization use case, when a guest is assigned
+> a PCI host device, protected by a virtual IOMMU on a guest,
+> the physical IOMMU must be programmed to be consistent with
+> the guest mappings. If the physical IOMMU supports two
+> translation stages it makes sense to program guest mappings
+> onto the first stage/level (ARM/VTD terminology) while to host
+> owns the stage/level 2.
 > 
-> The kernel would have no way of knowing what to do here.
+> In that case, it is mandated to trap on guest configuration
+> settings and pass those to the physical iommu driver.
+> 
+> This patch adds a new API to the iommu subsystem that allows
+> to set the pasid table information.
+> 
+> A generic iommu_pasid_table_config struct is introduced in
+> a new iommu.h uapi header. This is going to be used by the VFIO
+> user API. We foresee at least two specializations of this struct,
+> for PASID table passing and ARM SMMUv3.
 
-Is there anything wrong with what we do today? We stamp on the records so that
-we don't processes them again. (especially if is polled), and we tell firmware
-it can re-use this memory.
+Last sentence is a bit confusing. With SMMUv3 it is also used for the
+PASID table, even when it only has one entry and PASID is disabled.
 
-(I think we should return an error, or print a ratelimited warning for corrupt
-records)
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> This patch generalizes the API introduced by Jacob & co-authors in
+> https://lwn.net/Articles/754331/
+> 
+> v2 -> v3:
+> - replace unbind/bind by set_pasid_table
+> - move table pointer and pasid bits in the generic part of the struct
+> 
+> v1 -> v2:
+> - restore the original pasid table name
+> - remove the struct device * parameter in the API
+> - reworked iommu_pasid_smmuv3
+> ---
+>  drivers/iommu/iommu.c      | 10 ++++++++
+>  include/linux/iommu.h      | 14 +++++++++++
+>  include/uapi/linux/iommu.h | 50 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 74 insertions(+)
+>  create mode 100644 include/uapi/linux/iommu.h
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 3ed4db334341..0f2b7f1fc7c8 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1393,6 +1393,16 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+>  
+> +int iommu_set_pasid_table(struct iommu_domain *domain,
+> +			  struct iommu_pasid_table_config *cfg)
+> +{
+> +	if (unlikely(!domain->ops->set_pasid_table))
+> +		return -ENODEV;
+> +
+> +	return domain->ops->set_pasid_table(domain, cfg);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index e90da6b6f3d1..1da2a2357ea4 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -25,6 +25,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+>  #include <linux/of.h>
+> +#include <uapi/linux/iommu.h>
+>  
+>  #define IOMMU_READ	(1 << 0)
+>  #define IOMMU_WRITE	(1 << 1)
+> @@ -184,6 +185,7 @@ struct iommu_resv_region {
+>   * @domain_window_disable: Disable a particular window for a domain
+>   * @of_xlate: add OF master IDs to iommu grouping
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+> + * @set_pasid_table: set pasid table
+>   */
+>  struct iommu_ops {
+>  	bool (*capable)(enum iommu_cap);
+> @@ -226,6 +228,9 @@ struct iommu_ops {
+>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
+>  
+> +	int (*set_pasid_table)(struct iommu_domain *domain,
+> +			       struct iommu_pasid_table_config *cfg);
+> +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -287,6 +292,8 @@ extern int iommu_attach_device(struct iommu_domain *domain,
+>  			       struct device *dev);
+>  extern void iommu_detach_device(struct iommu_domain *domain,
+>  				struct device *dev);
+> +extern int iommu_set_pasid_table(struct iommu_domain *domain,
+> +				 struct iommu_pasid_table_config *cfg);
+>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> @@ -696,6 +703,13 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
+>  	return NULL;
+>  }
+>  
+> +static inline
+> +int iommu_set_pasid_table(struct iommu_domain *domain,
+> +			  struct iommu_pasid_table_config *cfg)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  #endif /* CONFIG_IOMMU_API */
+>  
+>  #ifdef CONFIG_IOMMU_DEBUGFS
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> new file mode 100644
+> index 000000000000..7a7cf7a3de7c
+> --- /dev/null
+> +++ b/include/uapi/linux/iommu.h
+> @@ -0,0 +1,50 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * IOMMU user API definitions
+> + *
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
 
+I don't think we need both the boilerplate and the SPDX header
 
->>         }
->>
->>         /* clear estatus and bla bla */
->>
->>         /* Now, I'm in the success case: */
->>          ghes_ack_error();
->>
->>
->> This way, you have the error path clear of something unexpected happened
->> when reading the hardware, obvious and separated. ghes_reset_hardware()
->> clears the registers and does the necessary steps to put the hardware in
->> good state again so that it can report the next error.
->>
->> And the success path simply acks the error and does possibly the same
->> thing. The naming of the functions is important though, to denote what
->> gets called when.
+> + */
+> +
+> +#ifndef _UAPI_IOMMU_H
+> +#define _UAPI_IOMMU_H
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * SMMUv3 Stream Table Entry stage 1 related information
+> + * @abort: shall the STE lead to abort
+> + * @s1fmt: STE s1fmt field as set by the guest
+> + * @s1dss: STE s1dss as set by the guest
+> + * All field names match the smmu 3.0/3.1 spec (ARM IHI 0070A)
 
-I think this duplicates the record-stamping/acking. If there is anything in that
-memory region, the action for processed/copied/ignored-because-its-corrupt is
-the same.
+Not really the case for @abort. Could you clarify whether @abort is
+valid in combination with @bypass?
 
-We can return on ENOENT out earlier, as nothing needs doing in that case. Its
-what the GHES_TO_CLEAR spaghetti is for, we can probably move the ack thing into
-ghes_clear_estatus(), that way that thing means 'I'm done with this memory'.
+> + */
+> +struct iommu_pasid_smmuv3 {
+> +	__u8 abort;
+> +	__u8 s1fmt;
+> +	__u8 s1dss;
+> +};
+> +
+> +/**
+> + * PASID table data used to bind guest PASID table to the host IOMMU
+> + * Note PASID table corresponds to the Context Table on ARM SMMUv3.
+> + *
+> + * @version: API version to prepare for future extensions
+> + * @format: format of the PASID table
+> + *
+> + */
+> +struct iommu_pasid_table_config {
+> +#define PASID_TABLE_CFG_VERSION_1 1
+> +	__u32	version;
+> +#define IOMMU_PASID_FORMAT_SMMUV3	(1 << 0)
+> +	__u32	format;
+> +	__u64	base_ptr;
+> +	__u8	pasid_bits;
+> +	__u8	bypass;
 
-Something like:
--------------------------
-rc = ghes_read_estatus();
-if (rc == -ENOENT)
-	return 0;
+We need some padding, in case someone adds a new struct to the union
+that requires 64-byte alignment
 
-if (!rc) {
-	ghes_do_proc() and friends;
-}
-
-ghes_clear_estatus();
-
-return rc;
--------------------------
-
-We would no longer return errors from the ack code, I suspect that can only
-happen for a corrupt gas, which we would have caught earlier as we rely on the
-mapping being cached.
-
-
+And 'bypass' might not be the right name if we're making it common,
+maybe 'reset' would be clearer? Or we just need to explain that bypass
+is the initial state of a nesting domain
 
 Thanks,
+Jean
 
-James
+> +	union {
+> +		struct iommu_pasid_smmuv3 smmuv3;
+> +	};
+> +};
+> +
+> +#endif /* _UAPI_IOMMU_H */
+> 
