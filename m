@@ -1,53 +1,208 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
- consumed the records
-Date: Fri, 11 Jan 2019 18:45:32 +0100
-Message-ID: <20190111174532.GI4729@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-11-james.morse@arm.com>
- <20181211183634.GO27375@zn.tnic>
- <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
- <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
- <20190111120322.GD4729@zn.tnic>
- <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
+Date: Fri, 11 Jan 2019 17:46:39 +0000
+Message-ID: <dae89fd8-6a82-d2f0-a8c7-ddbf12a7b047@arm.com>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+ <20190108102633.17482-18-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Tyler Baicar <baicar.tyler@gmail.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, James Morse <james.morse@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190108102633.17482-18-eric.auger@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 11, 2019 at 10:32:23AM -0500, Tyler Baicar wrote:
-> The kernel would have no way of knowing what to do here.
+On 08/01/2019 10:26, Eric Auger wrote:
+> When a stage 1 related fault event is read from the event queue,
+> let's propagate it to potential external fault listeners, ie. users
+> who registered a fault handler.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  drivers/iommu/arm-smmu-v3.c | 124 ++++++++++++++++++++++++++++++++----
+>  1 file changed, 113 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+> index 999ee470a2ae..6a711cbbb228 100644
+> --- a/drivers/iommu/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm-smmu-v3.c
+> @@ -168,6 +168,26 @@
+>  #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
+>  #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
+>  
+> +/* Events */
+> +#define ARM_SMMU_EVT_F_UUT		0x01
+> +#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
+> +#define ARM_SMMU_EVT_F_STE_FETCH	0x03
+> +#define ARM_SMMU_EVT_C_BAD_STE		0x04
+> +#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
+> +#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
+> +#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
+> +#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
+> +#define ARM_SMMU_EVT_F_CD_FETCH		0x09
+> +#define ARM_SMMU_EVT_C_BAD_CD		0x0a
+> +#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
+> +#define ARM_SMMU_EVT_F_TRANSLATION	0x10
+> +#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
+> +#define ARM_SMMU_EVT_F_ACCESS		0x12
+> +#define ARM_SMMU_EVT_F_PERMISSION	0x13
+> +#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
+> +#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
+> +#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
+> +
+>  /* Common MSI config fields */
+>  #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
+>  #define MSI_CFG2_SH			GENMASK(5, 4)
+> @@ -333,6 +353,11 @@
+>  #define EVTQ_MAX_SZ_SHIFT		7
+>  
+>  #define EVTQ_0_ID			GENMASK_ULL(7, 0)
+> +#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
+> +#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
+> +#define EVTQ_1_S2			GENMASK_ULL(39, 39)
+> +#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
+> +#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
+>  
+>  /* PRI queue */
+>  #define PRIQ_ENT_DWORDS			2
+> @@ -1270,7 +1295,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
+>  	return 0;
+>  }
+>  
+> -__maybe_unused
+>  static struct arm_smmu_master_data *
+>  arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
+>  {
+> @@ -1296,24 +1320,102 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
+>  	return master;
+>  }
+>  
+> +static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
+> +{
+> +	u64 fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
+> +	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
+> +	bool s1 = !FIELD_GET(EVTQ_1_S2, evt[1]);
+> +	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
+> +	struct arm_smmu_master_data *master;
+> +	struct iommu_fault_event event;
+> +	bool propagate = true;
+> +	u64 addr = evt[2];
+> +	int i;
+> +
+> +	master = arm_smmu_find_master(smmu, sid);
+> +	if (WARN_ON(!master))
+> +		return;
+> +
+> +	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
+> +
+> +	switch (type) {
+> +	case ARM_SMMU_EVT_C_BAD_STREAMID:
+> +		event.fault.reason = IOMMU_FAULT_REASON_SOURCEID_INVALID;
+> +		break;
+> +	case ARM_SMMU_EVT_F_STREAM_DISABLED:
+> +	case ARM_SMMU_EVT_C_BAD_SUBSTREAMID:
+> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_INVALID;
+> +		break;
+> +	case ARM_SMMU_EVT_F_CD_FETCH:
+> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_FETCH;
+> +		break;
+> +	case ARM_SMMU_EVT_F_WALK_EABT:
+> +		event.fault.reason = IOMMU_FAULT_REASON_WALK_EABT;
+> +		event.fault.addr = addr;
+> +		event.fault.fetch_addr = fetch_addr;
+> +		propagate = s1;
+> +		break;
+> +	case ARM_SMMU_EVT_F_TRANSLATION:
+> +		event.fault.reason = IOMMU_FAULT_REASON_PTE_FETCH;
+> +		event.fault.addr = addr;
+> +		event.fault.fetch_addr = fetch_addr;
+> +		propagate = s1;
+> +		break;
+> +	case ARM_SMMU_EVT_F_PERMISSION:
+> +		event.fault.reason = IOMMU_FAULT_REASON_PERMISSION;
+> +		event.fault.addr = addr;
+> +		propagate = s1;
+> +		break;
+> +	case ARM_SMMU_EVT_F_ACCESS:
+> +		event.fault.reason = IOMMU_FAULT_REASON_ACCESS;
+> +		event.fault.addr = addr;
+> +		propagate = s1;
+> +		break;
+> +	case ARM_SMMU_EVT_C_BAD_STE:
+> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY;
+> +		break;
+> +	case ARM_SMMU_EVT_C_BAD_CD:
+> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
+> +		break;
+> +	case ARM_SMMU_EVT_F_ADDR_SIZE:
+> +		event.fault.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
+> +		propagate = s1;
+> +		break;
+> +	case ARM_SMMU_EVT_F_STE_FETCH:
+> +		event.fault.reason = IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH;
+> +		event.fault.fetch_addr = fetch_addr;
+> +		break;
+> +	/* End of addition */
+> +	case ARM_SMMU_EVT_E_PAGE_REQUEST:
+> +	case ARM_SMMU_EVT_F_TLB_CONFLICT:
+> +	case ARM_SMMU_EVT_F_CFG_CONFLICT:
+> +	case ARM_SMMU_EVT_F_BAD_ATS_TREQ:
+> +	case ARM_SMMU_EVT_F_TRANSL_FORBIDDEN:
+> +	case ARM_SMMU_EVT_F_UUT:
+> +	default:
+> +		event.fault.reason = IOMMU_FAULT_REASON_UNKNOWN;
+> +	}
+> +	/* only propagate the error if it relates to stage 1 */
+> +	if (s1)
 
-What do you mean, there's no way of knowing what to do? It needs to
-clear registers so that the next error can get reported properly.
+if (propagate)
 
-Or of the status read failed and it doesn't need to do anything, then it
-shouldn't.
+But I don't quite understand how we're deciding what to propagate: a
+C_BAD_STE is most likely a bug in the SMMU driver, but is reported to
+userspace. On the other hand a stage-2 F_TRANSLATION is likely an error
+from the VMM (didn't setup stage-2 mappings properly), but we're not
+reporting it. Maybe we should add a bit to event.fault that tells
+whether the fault was stage 1 or 2, and let the VMM deal with it?
 
-Whatever it is, the kernel either needs to do something in the error
-case to clean up, or nothing if the firmware doesn't need anything done
-in the error case; *or* ack the error in the success case.
+> +		iommu_report_device_fault(master->dev, &event);
 
-This should all be written down somewhere in that GHES v2
-spec/doc/writeup whatever, explaining what the OS is supposed to do to
-signal the error has been read by the OS.
+We should return here if the fault is successfully injected
 
--- 
-Regards/Gruss,
-    Boris.
+Thanks,
+Jean
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+> +
+> +	dev_info(smmu->dev, "event 0x%02x received:\n", type);
+> +	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
+> +		dev_info(smmu->dev, "\t0x%016llx\n",
+> +			 (unsigned long long)evt[i]);
+> +	}
+> +}
+> +
+>  /* IRQ and event handlers */
+>  static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
+>  {
+> -	int i;
+>  	struct arm_smmu_device *smmu = dev;
+>  	struct arm_smmu_queue *q = &smmu->evtq.q;
+>  	u64 evt[EVTQ_ENT_DWORDS];
+>  
+>  	do {
+> -		while (!queue_remove_raw(q, evt)) {
+> -			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
+> -
+> -			dev_info(smmu->dev, "event 0x%02x received:\n", id);
+> -			for (i = 0; i < ARRAY_SIZE(evt); ++i)
+> -				dev_info(smmu->dev, "\t0x%016llx\n",
+> -					 (unsigned long long)evt[i]);
+> -
+> -		}
+> +		while (!queue_remove_raw(q, evt))
+> +			arm_smmu_report_event(smmu, evt);
+>  
+>  		/*
+>  		 * Not much we can do on overflow, so scream and pretend we're
+> 
