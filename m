@@ -1,24 +1,24 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RFC v3 01/21] iommu: Introduce set_pasid_table API
-Date: Fri, 11 Jan 2019 11:43:16 -0700
-Message-ID: <20190111114316.71e77d5f@x1.home>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-2-eric.auger@redhat.com>
+From: Publicity Chair ESORICS 2019 <esorics19.publicitychair@gmail.com>
+Subject: ESORICS 2019 - Call for Workshop Proposals [24th European Symposium
+ on Research in Computer Security, Luxembourg, 2019]
+Date: Fri, 11 Jan 2019 18:10:34 +0100
+Message-ID: <CANaQFR3pdR1EGKE8zSNqUfzWUDKZp49QBmWoXvdK8_R3reYYOg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============7696818511814642115=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4194A490
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:43:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 384824A49A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:53:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c+plcfq0dmqM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jan 2019 13:43:23 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7C264A486
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:43:23 -0500 (EST)
-In-Reply-To: <20190108102633.17482-2-eric.auger@redhat.com>
+ with ESMTP id TAdaRm5ZmGI5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 13:53:28 -0500 (EST)
+Received: from mail-ua1-f68.google.com (mail-ua1-f68.google.com
+ [209.85.222.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E44DE4A490
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:53:27 -0500 (EST)
+Received: by mail-ua1-f68.google.com with SMTP id j3so5098416uap.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 10:53:27 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,206 +28,180 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@redhat.com>
-Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue,  8 Jan 2019 11:26:13 +0100
-Eric Auger <eric.auger@redhat.com> wrote:
+--===============7696818511814642115==
+Content-Type: multipart/alternative; boundary="0000000000008dcacd057f31c6af"
 
-> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> 
-> In virtualization use case, when a guest is assigned
-> a PCI host device, protected by a virtual IOMMU on a guest,
-> the physical IOMMU must be programmed to be consistent with
-> the guest mappings. If the physical IOMMU supports two
-> translation stages it makes sense to program guest mappings
-> onto the first stage/level (ARM/VTD terminology) while to host
-> owns the stage/level 2.
-> 
-> In that case, it is mandated to trap on guest configuration
-> settings and pass those to the physical iommu driver.
-> 
-> This patch adds a new API to the iommu subsystem that allows
-> to set the pasid table information.
-> 
-> A generic iommu_pasid_table_config struct is introduced in
-> a new iommu.h uapi header. This is going to be used by the VFIO
-> user API. We foresee at least two specializations of this struct,
-> for PASID table passing and ARM SMMUv3.
-> 
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> This patch generalizes the API introduced by Jacob & co-authors in
-> https://lwn.net/Articles/754331/
-> 
-> v2 -> v3:
-> - replace unbind/bind by set_pasid_table
-> - move table pointer and pasid bits in the generic part of the struct
-> 
-> v1 -> v2:
-> - restore the original pasid table name
-> - remove the struct device * parameter in the API
-> - reworked iommu_pasid_smmuv3
-> ---
->  drivers/iommu/iommu.c      | 10 ++++++++
->  include/linux/iommu.h      | 14 +++++++++++
->  include/uapi/linux/iommu.h | 50 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 74 insertions(+)
->  create mode 100644 include/uapi/linux/iommu.h
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 3ed4db334341..0f2b7f1fc7c8 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1393,6 +1393,16 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
->  }
->  EXPORT_SYMBOL_GPL(iommu_attach_device);
->  
-> +int iommu_set_pasid_table(struct iommu_domain *domain,
-> +			  struct iommu_pasid_table_config *cfg)
-> +{
-> +	if (unlikely(!domain->ops->set_pasid_table))
-> +		return -ENODEV;
-> +
-> +	return domain->ops->set_pasid_table(domain, cfg);
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
-> +
->  static void __iommu_detach_device(struct iommu_domain *domain,
->  				  struct device *dev)
->  {
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index e90da6b6f3d1..1da2a2357ea4 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -25,6 +25,7 @@
->  #include <linux/errno.h>
->  #include <linux/err.h>
->  #include <linux/of.h>
-> +#include <uapi/linux/iommu.h>
->  
->  #define IOMMU_READ	(1 << 0)
->  #define IOMMU_WRITE	(1 << 1)
-> @@ -184,6 +185,7 @@ struct iommu_resv_region {
->   * @domain_window_disable: Disable a particular window for a domain
->   * @of_xlate: add OF master IDs to iommu grouping
->   * @pgsize_bitmap: bitmap of all possible supported page sizes
-> + * @set_pasid_table: set pasid table
->   */
->  struct iommu_ops {
->  	bool (*capable)(enum iommu_cap);
-> @@ -226,6 +228,9 @@ struct iommu_ops {
->  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
->  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
->  
-> +	int (*set_pasid_table)(struct iommu_domain *domain,
-> +			       struct iommu_pasid_table_config *cfg);
-> +
->  	unsigned long pgsize_bitmap;
->  };
->  
-> @@ -287,6 +292,8 @@ extern int iommu_attach_device(struct iommu_domain *domain,
->  			       struct device *dev);
->  extern void iommu_detach_device(struct iommu_domain *domain,
->  				struct device *dev);
-> +extern int iommu_set_pasid_table(struct iommu_domain *domain,
-> +				 struct iommu_pasid_table_config *cfg);
->  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
->  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
->  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-> @@ -696,6 +703,13 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
->  	return NULL;
->  }
->  
-> +static inline
-> +int iommu_set_pasid_table(struct iommu_domain *domain,
-> +			  struct iommu_pasid_table_config *cfg)
-> +{
-> +	return -ENODEV;
-> +}
-> +
->  #endif /* CONFIG_IOMMU_API */
->  
->  #ifdef CONFIG_IOMMU_DEBUGFS
-> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> new file mode 100644
-> index 000000000000..7a7cf7a3de7c
-> --- /dev/null
-> +++ b/include/uapi/linux/iommu.h
-> @@ -0,0 +1,50 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * IOMMU user API definitions
-> + *
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#ifndef _UAPI_IOMMU_H
-> +#define _UAPI_IOMMU_H
-> +
-> +#include <linux/types.h>
-> +
-> +/**
-> + * SMMUv3 Stream Table Entry stage 1 related information
-> + * @abort: shall the STE lead to abort
-> + * @s1fmt: STE s1fmt field as set by the guest
-> + * @s1dss: STE s1dss as set by the guest
-> + * All field names match the smmu 3.0/3.1 spec (ARM IHI 0070A)
-> + */
-> +struct iommu_pasid_smmuv3 {
-> +	__u8 abort;
-> +	__u8 s1fmt;
-> +	__u8 s1dss;
-> +};
-> +
+--0000000000008dcacd057f31c6af
+Content-Type: text/plain; charset="UTF-8"
 
-I can find STE.S1DSS and STE.S1FMT in the spec, but not STE.ABORT, is
-this something to do with Config[2:0]?  Are we allowed to describe what
-these fields are beyond their name and why they're necessary here vs
-the other fields or do the spec restrictions preclude that?
+[apologies for cross-posting]
 
-> +/**
-> + * PASID table data used to bind guest PASID table to the host IOMMU
-> + * Note PASID table corresponds to the Context Table on ARM SMMUv3.
-> + *
-> + * @version: API version to prepare for future extensions
-> + * @format: format of the PASID table
-> + *
-> + */
-> +struct iommu_pasid_table_config {
-> +#define PASID_TABLE_CFG_VERSION_1 1
-> +	__u32	version;
-> +#define IOMMU_PASID_FORMAT_SMMUV3	(1 << 0)
-> +	__u32	format;
-> +	__u64	base_ptr;
-> +	__u8	pasid_bits;
-> +	__u8	bypass;
-> +	union {
-> +		struct iommu_pasid_smmuv3 smmuv3;
-> +	};
-> +};
+======================================================================
+CALL for WORKSHOP PROPOSALS: ESORICS 2019
+24th European Symposium on Research in Computer Security
+University of Luxembourg, Luxembourg, September 23-27, 2019
 
-Structure is not naturally aligned or explicitly aligned for
-interchange with userspace.  It might work for smmuv3 since the
-structure is only composed of bytes, but looks troublesome in general.
-Should each format type also contain a version?  Is format intended to
-be a bit-field or a signature?  It seems we only need a signature, but
-only having a single format defined, it looks like a bit-field, which
-makes me worry what we do when we exhaust the bits.  The bypass field
-should be better defined, is it 0/1?  zero/non-zero?  more selective?
-Thanks,
+Website: https://esorics2019.uni.lu/workshops/
+======================================================================
 
-Alex
+Overview
+------------------------------------
+ESORICS is the annual European research event in Computer Security.
+The Symposium started in 1990 and has been held in several European
+countries, attracting a wide international audience from both the
+academic and industrial communities.
 
-> +
-> +#endif /* _UAPI_IOMMU_H */
+Proposals are solicited for Workshops to be held in conjunction with
+ESORICS 2019. A Workshop should aim at providing a forum on emerging
+topics of high interest to the security and privacy community.
+
+In the Workshop selection, particular consideration will be paid to:
+    * Its potential interest for the security and privacy community
+    * Its novelty with respect to other forums, especially with
+      respect to other ESORICS workshops.
+    * Its likely impact on the target community, including likely
+      high participation.
+
+A workshop can be either one day or two days in length.
+
+
+Important Dates
+------------------------------------
+    * Workshop proposals due: February 8, 2019
+    * Notification of decision: March 15, 2019
+
+
+Submitting a Workshop Proposal
+------------------------------------
+To submit a proposal send an email to the Workshop Chair with
+with the information requested in the application form:
+    * Joaquin Garcia-Alfaro (jgalfaro@ieee.org)
+
+The following application form should be used.
+(also available in Word format at http://j.mp/ESORICS19wsh)
+
+
+======================================================================
+ESORICS 2019 - WORKSHOP APPLICATION FORM:
+
+    - Title of the Workshop:
+
+    - Duration (maximum 2 days):
+
+    - Draft "Call for Papers", articulating the workshop's scope
+      and topics:
+
+    - Brief summary and justification for the workshop, including
+      anticipated benefits to the ESORICS community:
+
+    - Planned activities:
+
+    - Expected number of participants:
+
+    - Workshop organizers:
+        * PC Chair(s):
+        * General Chair(s):
+
+    - Workshop deadlines:
+        * Submission deadline:
+        * Notification to authors:
+        * Camera-ready versions:
+
+    - Planned publication of Workshop proceedings:
+
+    - Data of last three years for the workshop (if applicable):
+        * Number of submissions:
+        * Number of accepted papers:
+        * Number of participants:
+        * Publication of proceedings:
+        * Venue (co-location):
+======================================================================
+
+--0000000000008dcacd057f31c6af
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div>[apologies for cross-posting]</div><=
+div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D</div><div>CALL for WORKSHOP PROPOSALS: ESORICS 2019</div><div>24th E=
+uropean Symposium on Research in Computer Security</div><div>University of =
+Luxembourg, Luxembourg, September 23-27, 2019</div><div><br></div><div>Webs=
+ite: <a href=3D"https://esorics2019.uni.lu/workshops/">https://esorics2019.=
+uni.lu/workshops/</a></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D</div><div><br></div><div>Overview</div><div>------------=
+------------------------</div><div>ESORICS is the annual European research =
+event in Computer Security.</div><div>The Symposium started in 1990 and has=
+ been held in several European</div><div>countries, attracting a wide inter=
+national audience from both the</div><div>academic and industrial communiti=
+es.</div><div><br></div><div>Proposals are solicited for Workshops to be he=
+ld in conjunction with</div><div>ESORICS 2019. A Workshop should aim at pro=
+viding a forum on emerging</div><div>topics of high interest to the securit=
+y and privacy community.</div><div><br></div><div>In the Workshop selection=
+, particular consideration will be paid to:</div><div>=C2=A0 =C2=A0 * Its p=
+otential interest for the security and privacy community</div><div>=C2=A0 =
+=C2=A0 * Its novelty with respect to other forums, especially with</div><di=
+v>=C2=A0 =C2=A0 =C2=A0 respect to other ESORICS workshops.</div><div>=C2=A0=
+ =C2=A0 * Its likely impact on the target community, including likely</div>=
+<div>=C2=A0 =C2=A0 =C2=A0 high participation.</div><div><br></div><div>A wo=
+rkshop can be either one day or two days in length.</div><div><br></div><di=
+v><br></div><div>Important Dates</div><div>--------------------------------=
+----</div><div>=C2=A0 =C2=A0 * Workshop proposals due: February 8, 2019</di=
+v><div>=C2=A0 =C2=A0 * Notification of decision: March 15, 2019</div><div><=
+br></div><div><br></div><div>Submitting a Workshop Proposal</div><div>-----=
+-------------------------------</div><div>To submit a proposal send an emai=
+l to the Workshop Chair with</div><div>with the information requested in th=
+e application form:</div><div>=C2=A0 =C2=A0 * Joaquin Garcia-Alfaro (<a hre=
+f=3D"mailto:jgalfaro@ieee.org">jgalfaro@ieee.org</a>)</div><div><br></div><=
+div>The following application form should be used.</div><div>(also availabl=
+e in Word format at <a href=3D"http://j.mp/ESORICS19wsh">http://j.mp/ESORIC=
+S19wsh</a>)</div><div><br></div><div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div>ESORICS 2019 - WORKSHOP A=
+PPLICATION FORM:</div><div><br></div><div>=C2=A0 =C2=A0 - Title of the Work=
+shop:</div><div><br></div><div>=C2=A0 =C2=A0 - Duration (maximum 2 days):</=
+div><div><br></div><div>=C2=A0 =C2=A0 - Draft &quot;Call for Papers&quot;, =
+articulating the workshop&#39;s scope</div><div>=C2=A0 =C2=A0 =C2=A0 and to=
+pics:</div><div><br></div><div>=C2=A0 =C2=A0 - Brief summary and justificat=
+ion for the workshop, including</div><div>=C2=A0 =C2=A0 =C2=A0 anticipated =
+benefits to the ESORICS community:</div><div><br></div><div>=C2=A0 =C2=A0 -=
+ Planned activities:</div><div><br></div><div>=C2=A0 =C2=A0 - Expected numb=
+er of participants:</div><div><br></div><div>=C2=A0 =C2=A0 - Workshop organ=
+izers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * PC Chair(s):</div><div>=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 * General Chair(s):</div><div><br></div><div>=C2=
+=A0 =C2=A0 - Workshop deadlines:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Su=
+bmission deadline:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Notification to =
+authors:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Camera-ready versions:</di=
+v><div><br></div><div>=C2=A0 =C2=A0 - Planned publication of Workshop proce=
+edings:</div><div><br></div><div>=C2=A0 =C2=A0 - Data of last three years f=
+or the workshop (if applicable):</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Nu=
+mber of submissions:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of acce=
+pted papers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of participants=
+:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Publication of proceedings:</div>=
+<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Venue (co-location):</div><div>=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div><br></div></d=
+iv></div>
+
+--0000000000008dcacd057f31c6af--
+
+--===============7696818511814642115==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7696818511814642115==--
