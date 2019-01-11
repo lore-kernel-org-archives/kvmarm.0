@@ -1,165 +1,268 @@
-From: Tyler Baicar <baicar.tyler@gmail.com>
-Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
- consumed the records
-Date: Fri, 11 Jan 2019 15:53:56 -0500
-Message-ID: <CABo9ajB9TAkycLbe++yyDibXx33MntNV_Hy27JSXCVsvP6rf7g@mail.gmail.com>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-11-james.morse@arm.com>
- <20181211183634.GO27375@zn.tnic>
- <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
- <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
- <20190111120322.GD4729@zn.tnic>
- <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
- <0939c14d-de58-f21d-57a6-89bdce3bcb44@arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC v3 02/21] iommu: Introduce cache_invalidate API
+Date: Fri, 11 Jan 2019 14:30:42 -0700
+Message-ID: <20190111143042.183a27a7@x1.home>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+ <20190108102633.17482-3-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <0939c14d-de58-f21d-57a6-89bdce3bcb44@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D8DB4A4CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 16:30:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id DfOn-jLyoYz9 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 16:30:45 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1629E4A492
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 16:30:45 -0500 (EST)
+In-Reply-To: <20190108102633.17482-3-eric.auger@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 11, 2019 at 1:09 PM James Morse <james.morse@arm.com> wrote:
-> On 11/01/2019 15:32, Tyler Baicar wrote:
-> > On Fri, Jan 11, 2019 at 7:03 AM Borislav Petkov <bp@alien8.de> wrote:
-> >> On Thu, Jan 10, 2019 at 04:01:27PM -0500, Tyler Baicar wrote:
-> >>> On Thu, Jan 10, 2019 at 1:23 PM James Morse <james.morse@arm.com> wrote:
-> >>>>>>
-> >>>>>> +    if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
-> >>>>>
-> >>>>> Since ghes_ack_error() is always prepended with this check, you could
-> >>>>> push it down into the function:
-> >>>>>
-> >>>>> ghes_ack_error(ghes)
-> >>>>> ...
-> >>>>>
-> >>>>>       if (!is_hest_type_generic_v2(ghes))
-> >>>>>               return 0;
-> >>>>>
-> >>>>> and simplify the two callsites :)
-> >>>>
-> >>>> Great idea! ...
-> >>>>
-> >>>> .. huh. Turns out for ghes_proc() we discard any errors other than ENOENT from
-> >>>> ghes_read_estatus() if is_hest_type_generic_v2(). This masks EIO.
-> >>>>
-> >>>> Most of the error sources discard the result, the worst thing I can find is
-> >>>> ghes_irq_func() will return IRQ_HANDLED, instead of IRQ_NONE when we didn't
-> >>>> really handle the IRQ. They're registered as SHARED, but I don't have an example
-> >>>> of what goes wrong next.
-> >>>>
-> >>>> I think this will also stop the spurious handling code kicking in to shut it up
-> >>>> if its broken and screaming. Unlikely, but not impossible.
->
-> [....]
->
-> >>> Looks good to me, I guess there's no harm in acking invalid error status blocks.
->
-> Great, I didn't miss something nasty...
->
->
-> >> Err, why?
-> >
-> > If ghes_read_estatus() fails, then either there was no error populated or the
-> > error status block was invalid.
-> > If the error status block is invalid, then the kernel doesn't know what happened
-> > in hardware.
->
-> What do we mean by 'hardware' here? We're receiving a corrupt report of
-> something via memory.
+On Tue,  8 Jan 2019 11:26:14 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-By Hardware here I meant whatever hardware was reporting the error.
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+> 
+> In any virtualization use case, when the first translation stage
+> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+> of caching structure updates unless the guest invalidation activities
+> are trapped by the virtualizer and passed down to the host.
+> 
+> Since the invalidation data are obtained from user space and will be
+> written into physical IOMMU, we must allow security check at various
+> layers. Therefore, generic invalidation data format are proposed here,
+> model specific IOMMU drivers need to convert them into their own format.
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v1 -> v2:
+> - add arch_id field
+> - renamed tlb_invalidate into cache_invalidate as this API allows
+>   to invalidate context caches on top of IOTLBs
+> 
+> v1:
+> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+> header. Commit message reworded.
+> ---
+>  drivers/iommu/iommu.c      | 14 ++++++
+>  include/linux/iommu.h      | 14 ++++++
+>  include/uapi/linux/iommu.h | 95 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 123 insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 0f2b7f1fc7c8..b2e248770508 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1403,6 +1403,20 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
+>  
+> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+> +			   struct iommu_cache_invalidate_info *inv_info)
+> +{
+> +	int ret = 0;
+> +
+> +	if (unlikely(!domain->ops->cache_invalidate))
+> +		return -ENODEV;
+> +
+> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 1da2a2357ea4..96d59886f230 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -186,6 +186,7 @@ struct iommu_resv_region {
+>   * @of_xlate: add OF master IDs to iommu grouping
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>   * @set_pasid_table: set pasid table
+> + * @cache_invalidate: invalidate translation caches
+>   */
+>  struct iommu_ops {
+>  	bool (*capable)(enum iommu_cap);
+> @@ -231,6 +232,9 @@ struct iommu_ops {
+>  	int (*set_pasid_table)(struct iommu_domain *domain,
+>  			       struct iommu_pasid_table_config *cfg);
+>  
+> +	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
+> +				struct iommu_cache_invalidate_info *inv_info);
+> +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -294,6 +298,9 @@ extern void iommu_detach_device(struct iommu_domain *domain,
+>  				struct device *dev);
+>  extern int iommu_set_pasid_table(struct iommu_domain *domain,
+>  				 struct iommu_pasid_table_config *cfg);
+> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+> +				struct device *dev,
+> +				struct iommu_cache_invalidate_info *inv_info);
+>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> @@ -709,6 +716,13 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
+>  {
+>  	return -ENODEV;
+>  }
+> +static inline int
+> +iommu_cache_invalidate(struct iommu_domain *domain,
+> +		       struct device *dev,
+> +		       struct iommu_cache_invalidate_info *inv_info)
+> +{
+> +	return -ENODEV;
+> +}
+>  
+>  #endif /* CONFIG_IOMMU_API */
+>  
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index 7a7cf7a3de7c..4605f5cfac84 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -47,4 +47,99 @@ struct iommu_pasid_table_config {
+>  	};
+>  };
+>  
+> +/**
+> + * enum iommu_inv_granularity - Generic invalidation granularity
+> + * @IOMMU_INV_GRANU_DOMAIN_ALL_PASID:	TLB entries or PASID caches of all
+> + *					PASIDs associated with a domain ID
+> + * @IOMMU_INV_GRANU_PASID_SEL:		TLB entries or PASID cache associated
+> + *					with a PASID and a domain
+> + * @IOMMU_INV_GRANU_PAGE_PASID:		TLB entries of selected page range
+> + *					within a PASID
+> + *
+> + * When an invalidation request is passed down to IOMMU to flush translation
+> + * caches, it may carry different granularity levels, which can be specific
+> + * to certain types of translation caches.
+> + * This enum is a collection of granularities for all types of translation
+> + * caches. The idea is to make it easy for IOMMU model specific driver to
+> + * convert from generic to model specific value. Each IOMMU driver
+> + * can enforce check based on its own conversion table. The conversion is
+> + * based on 2D look-up with inputs as follows:
+> + * - translation cache types
+> + * - granularity
+> + *
+> + *             type |   DTLB    |    TLB    |   PASID   |
+> + *  granule         |           |           |   cache   |
+> + * -----------------+-----------+-----------+-----------+
+> + *  DN_ALL_PASID    |   Y       |   Y       |   Y       |
+> + *  PASID_SEL       |   Y       |   Y       |   Y       |
+> + *  PAGE_PASID      |   Y       |   Y       |   N/A     |
+> + *
+> + */
+> +enum iommu_inv_granularity {
+> +	IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
+> +	IOMMU_INV_GRANU_PASID_SEL,
+> +	IOMMU_INV_GRANU_PAGE_PASID,
+> +	IOMMU_INV_NR_GRANU,
+> +};
+> +
+> +/**
+> + * enum iommu_inv_type - Generic translation cache types for invalidation
+> + *
+> + * @IOMMU_INV_TYPE_DTLB:	device IOTLB
+> + * @IOMMU_INV_TYPE_TLB:		IOMMU paging structure cache
+> + * @IOMMU_INV_TYPE_PASID:	PASID cache
+> + * Invalidation requests sent to IOMMU for a given device need to indicate
+> + * which type of translation cache to be operated on. Combined with enum
+> + * iommu_inv_granularity, model specific driver can do a simple lookup to
+> + * convert from generic to model specific value.
+> + */
+> +enum iommu_inv_type {
+> +	IOMMU_INV_TYPE_DTLB,
+> +	IOMMU_INV_TYPE_TLB,
+> +	IOMMU_INV_TYPE_PASID,
+> +	IOMMU_INV_NR_TYPE
+> +};
+> +
+> +/**
+> + * Translation cache invalidation header that contains mandatory meta data.
+> + * @version:	info format version, expecting future extesions
+> + * @type:	type of translation cache to be invalidated
+> + */
+> +struct iommu_cache_invalidate_hdr {
+> +	__u32 version;
+> +#define TLB_INV_HDR_VERSION_1 1
+> +	enum iommu_inv_type type;
+> +};
+> +
+> +/**
+> + * Translation cache invalidation information, contains generic IOMMU
+> + * data which can be parsed based on model ID by model specific drivers.
+> + * Since the invalidation of second level page tables are included in the
+> + * unmap operation, this info is only applicable to the first level
+> + * translation caches, i.e. DMA request with PASID.
+> + *
+> + * @granularity:	requested invalidation granularity, type dependent
+> + * @size:		2^size of 4K pages, 0 for 4k, 9 for 2MB, etc.
 
-> The GHESv2 ack just means we're done with the memory. I think it exists because
-> the external-agent can't peek into the CPU to see if its returned from the
-> notification.
->
->
-> > I originally thought this was changing what's acked, but it's just changing the
-> > return value of ghes_proc() when ghes_read_estatus() returns -EIO.
->
-> Sorry, that will be due to my bad description.
->
->
-> >> I don't know what the firmware glue does on ARM but if I'd have to
-> >> remain logical - which is hard to do with firmware - the proper thing to
-> >> do would be this:
-> >>
-> >>         rc = ghes_read_estatus(ghes, &buf_paddr);
-> >>         if (rc) {
-> >>                 ghes_reset_hardware();
-> >
-> > The kernel would have no way of knowing what to do here.
->
-> Is there anything wrong with what we do today? We stamp on the records so that
-> we don't processes them again. (especially if is polled), and we tell firmware
-> it can re-use this memory.
->
-> (I think we should return an error, or print a ratelimited warning for corrupt
-> records)
+Why is this a 4K page centric interface?
 
-Agree, the print is already present in ghes_read_estatus.
+> + * @nr_pages:		number of pages to invalidate
+> + * @pasid:		processor address space ID value per PCI spec.
+> + * @arch_id:		architecture dependent id characterizing a context
+> + *			and tagging the caches, ie. domain Identfier on VTD,
+> + *			asid on ARM SMMU
+> + * @addr:		page address to be invalidated
+> + * @flags		IOMMU_INVALIDATE_ADDR_LEAF: leaf paging entries
+> + *			IOMMU_INVALIDATE_GLOBAL_PAGE: global pages
 
-> >>         }
-> >>
-> >>         /* clear estatus and bla bla */
-> >>
-> >>         /* Now, I'm in the success case: */
-> >>          ghes_ack_error();
-> >>
-> >>
-> >> This way, you have the error path clear of something unexpected happened
-> >> when reading the hardware, obvious and separated. ghes_reset_hardware()
-> >> clears the registers and does the necessary steps to put the hardware in
-> >> good state again so that it can report the next error.
-> >>
-> >> And the success path simply acks the error and does possibly the same
-> >> thing. The naming of the functions is important though, to denote what
-> >> gets called when.
->
-> I think this duplicates the record-stamping/acking. If there is anything in that
-> memory region, the action for processed/copied/ignored-because-its-corrupt is
-> the same.
->
-> We can return on ENOENT out earlier, as nothing needs doing in that case. Its
-> what the GHES_TO_CLEAR spaghetti is for, we can probably move the ack thing into
-> ghes_clear_estatus(), that way that thing means 'I'm done with this memory'.
->
-> Something like:
-> -------------------------
-> rc = ghes_read_estatus();
-> if (rc == -ENOENT)
->         return 0;
+Shouldn't some of these be tied the the granularity of the
+invalidation?  It seems like this should be more similar to
+iommu_pasid_table_config where the granularity of the invalidation
+defines which entry within a union at the end of the structure is valid
+and populated.  Otherwise we have fields that don't make sense for
+certain invalidations.
 
-We still should be returning at least the -ENOENT from ghes_read_estatus().
-That is being used by the SEA handling to determine if an SEA was properly
-reported/handled by the host kernel in the KVM SEA case.
+> + *
+> + */
+> +struct iommu_cache_invalidate_info {
+> +	struct iommu_cache_invalidate_hdr	hdr;
+> +	enum iommu_inv_granularity	granularity;
 
-Here are the relevant functions:
-https://elixir.bootlin.com/linux/latest/source/drivers/acpi/apei/ghes.c#L797
-https://elixir.bootlin.com/linux/latest/source/arch/arm64/mm/fault.c#L723
-https://elixir.bootlin.com/linux/latest/source/virt/kvm/arm/mmu.c#L1706
+A separate structure for hdr seems a little pointless.
 
->
-> if (!rc) {
->         ghes_do_proc() and friends;
-> }
->
-> ghes_clear_estatus();
->
-> return rc;
-> -------------------------
->
-> We would no longer return errors from the ack code, I suspect that can only
-> happen for a corrupt gas, which we would have caught earlier as we rely on the
-> mapping being cached.
+> +	__u32		flags;
+> +#define IOMMU_INVALIDATE_ADDR_LEAF	(1 << 0)
+> +#define IOMMU_INVALIDATE_GLOBAL_PAGE	(1 << 1)
+> +	__u8		size;
+
+Really need some padding or packing here for any hope of having
+consistency with userspace.
+
+> +	__u64		nr_pages;
+> +	__u32		pasid;
+
+Sub-optimal ordering for packing/padding.  Thanks,
+
+Alex
+
+> +	__u64		arch_id;
+> +	__u64		addr;
+> +};
+>  #endif /* _UAPI_IOMMU_H */
