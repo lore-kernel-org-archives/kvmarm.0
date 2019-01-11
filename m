@@ -1,24 +1,33 @@
-From: Publicity Chair ESORICS 2019 <esorics19.publicitychair@gmail.com>
-Subject: ESORICS 2019 - Call for Workshop Proposals [24th European Symposium
- on Research in Computer Security, Luxembourg, 2019]
-Date: Fri, 11 Jan 2019 18:10:34 +0100
-Message-ID: <CANaQFR3pdR1EGKE8zSNqUfzWUDKZp49QBmWoXvdK8_R3reYYOg@mail.gmail.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Fri, 11 Jan 2019 20:58:00 +0100
+Message-ID: <20190111195800.GA11723@zn.tnic>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-11-james.morse@arm.com>
+ <20181211183634.GO27375@zn.tnic>
+ <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+ <20190111174532.GI4729@zn.tnic>
+ <32025682-f85a-58ef-7386-7ee23296b944@arm.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7696818511814642115=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 384824A49A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:53:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 801144A4A1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 14:58:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TAdaRm5ZmGI5 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jan 2019 13:53:28 -0500 (EST)
-Received: from mail-ua1-f68.google.com (mail-ua1-f68.google.com
- [209.85.222.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E44DE4A490
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:53:27 -0500 (EST)
-Received: by mail-ua1-f68.google.com with SMTP id j3so5098416uap.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 10:53:27 -0800 (PST)
+ with ESMTP id rPDD8dOWsvCq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 14:58:09 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A03394A49B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 14:58:09 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <32025682-f85a-58ef-7386-7ee23296b944@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,180 +37,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <baicar.tyler@gmail.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============7696818511814642115==
-Content-Type: multipart/alternative; boundary="0000000000008dcacd057f31c6af"
+On Fri, Jan 11, 2019 at 06:25:21PM +0000, James Morse wrote:
+> We ack it in the corrupt-record case too, because we are done with the
+> memory.
 
---0000000000008dcacd057f31c6af
-Content-Type: text/plain; charset="UTF-8"
+Ok, so the only thing that we need to do unconditionally is ACK in order
+to free the memory. Or is there an exception to that set of steps in
+error handling?
 
-[apologies for cross-posting]
+> I think it is. 18.3.2.8 of ACPI v6.2 (search for Generic Hardware Error Source
+> version 2", then below the table):
+> * OSPM detects error (via interrupt/exception or polling the block status)
+> * OSPM copies the error status block
+> * OSPM clears the block status field of the error status block
+> * OSPM acknowledges the error via Read Ack register
+> 
+> The ENOENT case is excluded by 'polling the block status'.
 
-======================================================================
-CALL for WORKSHOP PROPOSALS: ESORICS 2019
-24th European Symposium on Research in Computer Security
-University of Luxembourg, Luxembourg, September 23-27, 2019
+Ok, so we signal the absence of an error record with ENOENT.
 
-Website: https://esorics2019.uni.lu/workshops/
-======================================================================
+        if (!buf_paddr)
+                return -ENOENT;
 
-Overview
-------------------------------------
-ESORICS is the annual European research event in Computer Security.
-The Symposium started in 1990 and has been held in several European
-countries, attracting a wide international audience from both the
-academic and industrial communities.
+Can that even happen?
 
-Proposals are solicited for Workshops to be held in conjunction with
-ESORICS 2019. A Workshop should aim at providing a forum on emerging
-topics of high interest to the security and privacy community.
+Also, in that case, what would happen if we ACK the error anyway? We'd
+confuse the firmware?
 
-In the Workshop selection, particular consideration will be paid to:
-    * Its potential interest for the security and privacy community
-    * Its novelty with respect to other forums, especially with
-      respect to other ESORICS workshops.
-    * Its likely impact on the target community, including likely
-      high participation.
+I sure hope firmware is prepared for spurious ACKs :)
 
-A workshop can be either one day or two days in length.
+> Unsurprisingly the spec doesn't consider the case that firmware generates
+> corrupt records!
 
+You mean the EIO case?
 
-Important Dates
-------------------------------------
-    * Workshop proposals due: February 8, 2019
-    * Notification of decision: March 15, 2019
+Not surprised at all. But we do not report that record so all good.
 
+Thx.
 
-Submitting a Workshop Proposal
-------------------------------------
-To submit a proposal send an email to the Workshop Chair with
-with the information requested in the application form:
-    * Joaquin Garcia-Alfaro (jgalfaro@ieee.org)
+-- 
+Regards/Gruss,
+    Boris.
 
-The following application form should be used.
-(also available in Word format at http://j.mp/ESORICS19wsh)
-
-
-======================================================================
-ESORICS 2019 - WORKSHOP APPLICATION FORM:
-
-    - Title of the Workshop:
-
-    - Duration (maximum 2 days):
-
-    - Draft "Call for Papers", articulating the workshop's scope
-      and topics:
-
-    - Brief summary and justification for the workshop, including
-      anticipated benefits to the ESORICS community:
-
-    - Planned activities:
-
-    - Expected number of participants:
-
-    - Workshop organizers:
-        * PC Chair(s):
-        * General Chair(s):
-
-    - Workshop deadlines:
-        * Submission deadline:
-        * Notification to authors:
-        * Camera-ready versions:
-
-    - Planned publication of Workshop proceedings:
-
-    - Data of last three years for the workshop (if applicable):
-        * Number of submissions:
-        * Number of accepted papers:
-        * Number of participants:
-        * Publication of proceedings:
-        * Venue (co-location):
-======================================================================
-
---0000000000008dcacd057f31c6af
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div>[apologies for cross-posting]</div><=
-div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D</div><div>CALL for WORKSHOP PROPOSALS: ESORICS 2019</div><div>24th E=
-uropean Symposium on Research in Computer Security</div><div>University of =
-Luxembourg, Luxembourg, September 23-27, 2019</div><div><br></div><div>Webs=
-ite: <a href=3D"https://esorics2019.uni.lu/workshops/">https://esorics2019.=
-uni.lu/workshops/</a></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D</div><div><br></div><div>Overview</div><div>------------=
-------------------------</div><div>ESORICS is the annual European research =
-event in Computer Security.</div><div>The Symposium started in 1990 and has=
- been held in several European</div><div>countries, attracting a wide inter=
-national audience from both the</div><div>academic and industrial communiti=
-es.</div><div><br></div><div>Proposals are solicited for Workshops to be he=
-ld in conjunction with</div><div>ESORICS 2019. A Workshop should aim at pro=
-viding a forum on emerging</div><div>topics of high interest to the securit=
-y and privacy community.</div><div><br></div><div>In the Workshop selection=
-, particular consideration will be paid to:</div><div>=C2=A0 =C2=A0 * Its p=
-otential interest for the security and privacy community</div><div>=C2=A0 =
-=C2=A0 * Its novelty with respect to other forums, especially with</div><di=
-v>=C2=A0 =C2=A0 =C2=A0 respect to other ESORICS workshops.</div><div>=C2=A0=
- =C2=A0 * Its likely impact on the target community, including likely</div>=
-<div>=C2=A0 =C2=A0 =C2=A0 high participation.</div><div><br></div><div>A wo=
-rkshop can be either one day or two days in length.</div><div><br></div><di=
-v><br></div><div>Important Dates</div><div>--------------------------------=
-----</div><div>=C2=A0 =C2=A0 * Workshop proposals due: February 8, 2019</di=
-v><div>=C2=A0 =C2=A0 * Notification of decision: March 15, 2019</div><div><=
-br></div><div><br></div><div>Submitting a Workshop Proposal</div><div>-----=
--------------------------------</div><div>To submit a proposal send an emai=
-l to the Workshop Chair with</div><div>with the information requested in th=
-e application form:</div><div>=C2=A0 =C2=A0 * Joaquin Garcia-Alfaro (<a hre=
-f=3D"mailto:jgalfaro@ieee.org">jgalfaro@ieee.org</a>)</div><div><br></div><=
-div>The following application form should be used.</div><div>(also availabl=
-e in Word format at <a href=3D"http://j.mp/ESORICS19wsh">http://j.mp/ESORIC=
-S19wsh</a>)</div><div><br></div><div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div>ESORICS 2019 - WORKSHOP A=
-PPLICATION FORM:</div><div><br></div><div>=C2=A0 =C2=A0 - Title of the Work=
-shop:</div><div><br></div><div>=C2=A0 =C2=A0 - Duration (maximum 2 days):</=
-div><div><br></div><div>=C2=A0 =C2=A0 - Draft &quot;Call for Papers&quot;, =
-articulating the workshop&#39;s scope</div><div>=C2=A0 =C2=A0 =C2=A0 and to=
-pics:</div><div><br></div><div>=C2=A0 =C2=A0 - Brief summary and justificat=
-ion for the workshop, including</div><div>=C2=A0 =C2=A0 =C2=A0 anticipated =
-benefits to the ESORICS community:</div><div><br></div><div>=C2=A0 =C2=A0 -=
- Planned activities:</div><div><br></div><div>=C2=A0 =C2=A0 - Expected numb=
-er of participants:</div><div><br></div><div>=C2=A0 =C2=A0 - Workshop organ=
-izers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * PC Chair(s):</div><div>=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 * General Chair(s):</div><div><br></div><div>=C2=
-=A0 =C2=A0 - Workshop deadlines:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Su=
-bmission deadline:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Notification to =
-authors:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Camera-ready versions:</di=
-v><div><br></div><div>=C2=A0 =C2=A0 - Planned publication of Workshop proce=
-edings:</div><div><br></div><div>=C2=A0 =C2=A0 - Data of last three years f=
-or the workshop (if applicable):</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Nu=
-mber of submissions:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of acce=
-pted papers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of participants=
-:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Publication of proceedings:</div>=
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Venue (co-location):</div><div>=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div><br></div></d=
-iv></div>
-
---0000000000008dcacd057f31c6af--
-
---===============7696818511814642115==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7696818511814642115==--
+Good mailing practices for 400: avoid top-posting and trim the reply.
