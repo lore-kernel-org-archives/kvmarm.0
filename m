@@ -1,50 +1,43 @@
-From: Joerg Roedel <joro@8bytes.org>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Subject: Re: [PATCH v6 0/7] Add virtio-iommu driver
-Date: Fri, 11 Jan 2019 13:28:46 +0100
-Message-ID: <20190111122846.GE5825@8bytes.org>
+Date: Fri, 11 Jan 2019 13:00:30 +0000
+Message-ID: <08283b53-2f87-05e7-e71c-8780b34d9018@arm.com>
 References: <20181211182104.18241-1-jean-philippe.brucker@arm.com>
  <20181212103545.GV16835@8bytes.org>
  <9110873f-d344-b6b9-c722-9accfc329db2@arm.com>
+ <20190111122846.GE5825@8bytes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 520594A49E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 07:28:50 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W6ZxYyjQ2Njq for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jan 2019 07:28:49 -0500 (EST)
-Received: from theia.8bytes.org (8bytes.org [81.169.241.247])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07F394A49C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 07:28:49 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <9110873f-d344-b6b9-c722-9accfc329db2@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, "frowand.list@gmail.com" <frowand.list@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "devicetree@vger.kernel.org" <devicetree@vger.ker>
+Return-path: <virtio-dev-return-5316-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
+Sender: <virtio-dev@lists.oasis-open.org>
+List-Post: <mailto:virtio-dev@lists.oasis-open.org>
+List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
+List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
+List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
+In-Reply-To: <20190111122846.GE5825@8bytes.org>
+Content-Language: en-US
+To: Joerg Roedel <joro@8bytes.org>
+Cc: "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "robh+dt@kernel.org" <robh+dt@kernel.org>, Mark Rutland <Mark.Rutland@arm.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "frowand.list@gmail.com" <frowand.list@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Robin Murphy <Robin.Mur>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean-Philippe,
+On 11/01/2019 12:28, Joerg Roedel wrote:
+> Hi Jean-Philippe,
+> 
+> On Thu, Dec 13, 2018 at 12:50:29PM +0000, Jean-Philippe Brucker wrote:
+>> We already do deferred flush: UNMAP requests are added to the queue by
+>> iommu_unmap(), and then flushed out by iotlb_sync(). So we switch to the
+>> host only on iotlb_sync(), or when the request queue is full.
+> 
+> So the mappings can stay in place until iotlb_sync() returns? What
+> happens when the guest sends a map-request for a region it sent and
+> unmap request before, but did not call iotlb_sync inbetween?
 
-On Thu, Dec 13, 2018 at 12:50:29PM +0000, Jean-Philippe Brucker wrote:
-> We already do deferred flush: UNMAP requests are added to the queue by
-> iommu_unmap(), and then flushed out by iotlb_sync(). So we switch to the
-> host only on iotlb_sync(), or when the request queue is full.
+At that point the unmap is still in the request queue, and the host will
+handle it before getting to the map request. For correctness requests
+are necessarily handled in-order by the host. So if the map and unmap
+refer to the same domain and IOVA, the host will remove the old mapping
+before creating the new one.
 
-So the mappings can stay in place until iotlb_sync() returns? What
-happens when the guest sends a map-request for a region it sent and
-unmap request before, but did not call iotlb_sync inbetween?
-
-Regards,
-
-	Joerg
+Thanks,
+Jean
