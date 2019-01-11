@@ -1,108 +1,53 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [RFC v3 11/21] iommu/smmuv3: Implement cache_invalidate
-Date: Fri, 11 Jan 2019 16:59:55 +0000
-Message-ID: <ee098c32-4c1f-90fe-eba3-b0e16995bacd@arm.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-12-eric.auger@redhat.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Fri, 11 Jan 2019 18:45:32 +0100
+Message-ID: <20190111174532.GI4729@zn.tnic>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-11-james.morse@arm.com>
+ <20181211183634.GO27375@zn.tnic>
+ <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190108102633.17482-12-eric.auger@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Tyler Baicar <baicar.tyler@gmail.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, James Morse <james.morse@arm.com>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/01/2019 10:26, Eric Auger wrote:
-> Implement IOMMU_INV_TYPE_TLB invalidations. When
-> nr_pages is null we interpret this as a context
-> invalidation.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> The user API needs to be refined to discriminate context
-> invalidations from NH_VA invalidations. Also the leaf attribute
-> is not yet properly handled.
-> 
-> v2 -> v3:
-> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
-> 
-> v1 -> v2:
-> - properly pass the asid
-> ---
->  drivers/iommu/arm-smmu-v3.c | 40 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index 0e006babc8a6..ca72e0ce92f6 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -2293,6 +2293,45 @@ static int arm_smmu_set_pasid_table(struct iommu_domain *domain,
->  	return ret;
->  }
->  
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	switch (inv_info->hdr.type) {
-> +	case IOMMU_INV_TYPE_TLB:
-> +		/*
-> +		 * TODO: On context invalidation, the userspace sets nr_pages
-> +		 * to 0. Refine the API to add a dedicated flags and also
-> +		 * properly handle the leaf parameter.
-> +		 */
+On Fri, Jan 11, 2019 at 10:32:23AM -0500, Tyler Baicar wrote:
+> The kernel would have no way of knowing what to do here.
 
-That's what inv->granularity is for: if inv->granularity is PASID_SEL,
-then the invalidation is for the whole context (and nr_pages, size,
-addr, etc. should be ignored). If inv->granularity is PAGE_PASID, then
-it's a range. The names could probably be improved but it's already in
-the API
+What do you mean, there's no way of knowing what to do? It needs to
+clear registers so that the next error can get reported properly.
 
-Thanks,
-Jean
+Or of the status read failed and it doesn't need to do anything, then it
+shouldn't.
 
-> +		if (!inv_info->nr_pages) {
-> +			smmu_domain->s1_cfg.cd.asid = inv_info->arch_id;
-> +			arm_smmu_tlb_inv_context(smmu_domain);
-> +		} else {
-> +			size_t granule = 1 << (inv_info->size + 12);
-> +			size_t size = inv_info->nr_pages * granule;
-> +
-> +			smmu_domain->s1_cfg.cd.asid = inv_info->arch_id;
-> +			arm_smmu_tlb_inv_range_nosync(inv_info->addr, size,
-> +						      granule, false,
-> +						      smmu_domain);
-> +			arm_smmu_cmdq_issue_sync(smmu);
-> +		}
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
->  static struct iommu_ops arm_smmu_ops = {
->  	.capable		= arm_smmu_capable,
->  	.domain_alloc		= arm_smmu_domain_alloc,
-> @@ -2312,6 +2351,7 @@ static struct iommu_ops arm_smmu_ops = {
->  	.get_resv_regions	= arm_smmu_get_resv_regions,
->  	.put_resv_regions	= arm_smmu_put_resv_regions,
->  	.set_pasid_table	= arm_smmu_set_pasid_table,
-> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->  	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
->  };
->  
-> 
+Whatever it is, the kernel either needs to do something in the error
+case to clean up, or nothing if the firmware doesn't need anything done
+in the error case; *or* ack the error in the success case.
+
+This should all be written down somewhere in that GHES v2
+spec/doc/writeup whatever, explaining what the OS is supposed to do to
+signal the error has been read by the OS.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
