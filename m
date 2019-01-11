@@ -1,208 +1,216 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
-Date: Fri, 11 Jan 2019 17:46:39 +0000
-Message-ID: <dae89fd8-6a82-d2f0-a8c7-ddbf12a7b047@arm.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-18-eric.auger@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool v2 4/6] arm: Support firmware loading
+Date: Fri, 11 Jan 2019 18:07:02 +0000
+Message-ID: <20190111180702.610a3114@donnerap.cambridge.arm.com>
+References: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
+ <1547130046-14729-5-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190108102633.17482-18-eric.auger@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 127104A47F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:08:11 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4R-vUAzm9ogk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 13:08:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93BCA4A431
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:08:08 -0500 (EST)
+In-Reply-To: <1547130046-14729-5-git-send-email-julien.thierry@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/01/2019 10:26, Eric Auger wrote:
-> When a stage 1 related fault event is read from the event queue,
-> let's propagate it to potential external fault listeners, ie. users
-> who registered a fault handler.
+On Thu, 10 Jan 2019 14:20:44 +0000
+Julien Thierry <julien.thierry@arm.com> wrote:
+
+Hi,
+
+> Implement firmware image loading for arm and set the boot start
+> address to the firmware address.
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Add an option for the user to specify where to map the firmware.
+
+Many thanks for making this optional!
+
+> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 > ---
->  drivers/iommu/arm-smmu-v3.c | 124 ++++++++++++++++++++++++++++++++----
->  1 file changed, 113 insertions(+), 11 deletions(-)
+>  arm/fdt.c                                | 14 +++++++-
+>  arm/include/arm-common/kvm-config-arch.h |  5 ++-
+>  arm/kvm.c                                | 61
+> +++++++++++++++++++++++++++++++- 3 files changed, 77 insertions(+), 3
+> deletions(-)
 > 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index 999ee470a2ae..6a711cbbb228 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -168,6 +168,26 @@
->  #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
->  #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
->  
-> +/* Events */
-> +#define ARM_SMMU_EVT_F_UUT		0x01
-> +#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
-> +#define ARM_SMMU_EVT_F_STE_FETCH	0x03
-> +#define ARM_SMMU_EVT_C_BAD_STE		0x04
-> +#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
-> +#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
-> +#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
-> +#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
-> +#define ARM_SMMU_EVT_F_CD_FETCH		0x09
-> +#define ARM_SMMU_EVT_C_BAD_CD		0x0a
-> +#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
-> +#define ARM_SMMU_EVT_F_TRANSLATION	0x10
-> +#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
-> +#define ARM_SMMU_EVT_F_ACCESS		0x12
-> +#define ARM_SMMU_EVT_F_PERMISSION	0x13
-> +#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
-> +#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
-> +#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
+> diff --git a/arm/fdt.c b/arm/fdt.c
+> index 664bb62..2936986 100644
+> --- a/arm/fdt.c
+> +++ b/arm/fdt.c
+> @@ -131,7 +131,19 @@ static int setup_fdt(struct kvm *kvm)
+>  	/* /chosen */
+>  	_FDT(fdt_begin_node(fdt, "chosen"));
+>  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
+> -	_FDT(fdt_property_string(fdt, "bootargs",
+> kvm->cfg.real_cmdline)); +
+> +	if (kvm->cfg.firmware_filename) {
+> +		/*
+> +		 * When using a firmware, command line is not passed
+> through DT,
+> +		 * or the firmware can add it itself
+> +		 */
+> +		if (kvm->cfg.kernel_cmdline)
+> +			pr_warning("Ignoring custom bootargs: %s\n",
+> +				   kvm->cfg.kernel_cmdline);
+> +	} else
+> +		_FDT(fdt_property_string(fdt, "bootargs",
+> +					 kvm->cfg.real_cmdline));
 > +
->  /* Common MSI config fields */
->  #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
->  #define MSI_CFG2_SH			GENMASK(5, 4)
-> @@ -333,6 +353,11 @@
->  #define EVTQ_MAX_SZ_SHIFT		7
+>  	_FDT(fdt_property_u64(fdt, "kaslr-seed",
+> kvm->cfg.arch.kaslr_seed)); 
+>  	/* Initrd */
+> diff --git a/arm/include/arm-common/kvm-config-arch.h
+> b/arm/include/arm-common/kvm-config-arch.h index 6a196f1..5734c46
+> 100644 --- a/arm/include/arm-common/kvm-config-arch.h
+> +++ b/arm/include/arm-common/kvm-config-arch.h
+> @@ -11,6 +11,7 @@ struct kvm_config_arch {
+>  	bool		has_pmuv3;
+>  	u64		kaslr_seed;
+>  	enum irqchip_type irqchip;
+> +	u64		fw_addr;
+>  };
 >  
->  #define EVTQ_0_ID			GENMASK_ULL(7, 0)
-> +#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
-> +#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
-> +#define EVTQ_1_S2			GENMASK_ULL(39, 39)
-> +#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
-> +#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
+>  int irqchip_parser(const struct option *opt, const char *arg, int
+> unset); @@ -30,6 +31,8 @@ int irqchip_parser(const struct option
+> *opt, const char *arg, int unset); OPT_CALLBACK('\0', "irqchip",
+> &(cfg)->irqchip,				\
+> "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+> "Type of interrupt controller to emulate in the guest",	\
+> -		     irqchip_parser, NULL),
+> +		     irqchip_parser,
+> NULL),					\
+> +	OPT_U64('\0', "firmware-address",
+> &(cfg)->fw_addr,			\
+> +		"Address where firmware should be loaded"),
 >  
->  /* PRI queue */
->  #define PRIQ_ENT_DWORDS			2
-> @@ -1270,7 +1295,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
->  	return 0;
+>  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index c6843e5..d3f8f5d 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -169,9 +169,68 @@ bool kvm__arch_load_kernel_image(struct kvm
+> *kvm, int fd_kernel, int fd_initrd, return true;
 >  }
 >  
-> -__maybe_unused
->  static struct arm_smmu_master_data *
->  arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
->  {
-> @@ -1296,24 +1320,102 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
->  	return master;
->  }
->  
-> +static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
+> +static bool validate_fw_addr(struct kvm *kvm, u64 fw_addr)
 > +{
-> +	u64 fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
-> +	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
-> +	bool s1 = !FIELD_GET(EVTQ_1_S2, evt[1]);
-> +	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
-> +	struct arm_smmu_master_data *master;
-> +	struct iommu_fault_event event;
-> +	bool propagate = true;
-> +	u64 addr = evt[2];
-> +	int i;
+> +	u64 ram_phys;
 > +
-> +	master = arm_smmu_find_master(smmu, sid);
-> +	if (WARN_ON(!master))
-> +		return;
+> +	ram_phys = host_to_guest_flat(kvm, kvm->ram_start);
 > +
-> +	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
+> +	if (fw_addr < ram_phys || fw_addr >= ram_phys +
+> kvm->ram_size) {
+
+I am OK with this check for now, but was wondering if we really *need*
+to have the firmware in RAM? Couldn't we possibly put it into some
+ROM/flash/nvmem device memory area and utilise XIP, for instance? I
+understand that EDKII does not support this at the moment, but was just
+thinking whether this would be an artificial restriction for other
+firmware ports.
+
+But I guess we can relax this later on, possibly when we support this
+properly.
+
+> +		pr_err("Provide --firmware-address an address in
+> RAM: "
+> +		       "0x%016llx - 0x%016llx",
+> +		       ram_phys, ram_phys + kvm->ram_size);
 > +
-> +	switch (type) {
-> +	case ARM_SMMU_EVT_C_BAD_STREAMID:
-> +		event.fault.reason = IOMMU_FAULT_REASON_SOURCEID_INVALID;
-> +		break;
-> +	case ARM_SMMU_EVT_F_STREAM_DISABLED:
-> +	case ARM_SMMU_EVT_C_BAD_SUBSTREAMID:
-> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_INVALID;
-> +		break;
-> +	case ARM_SMMU_EVT_F_CD_FETCH:
-> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_FETCH;
-> +		break;
-> +	case ARM_SMMU_EVT_F_WALK_EABT:
-> +		event.fault.reason = IOMMU_FAULT_REASON_WALK_EABT;
-> +		event.fault.addr = addr;
-> +		event.fault.fetch_addr = fetch_addr;
-> +		propagate = s1;
-> +		break;
-> +	case ARM_SMMU_EVT_F_TRANSLATION:
-> +		event.fault.reason = IOMMU_FAULT_REASON_PTE_FETCH;
-> +		event.fault.addr = addr;
-> +		event.fault.fetch_addr = fetch_addr;
-> +		propagate = s1;
-> +		break;
-> +	case ARM_SMMU_EVT_F_PERMISSION:
-> +		event.fault.reason = IOMMU_FAULT_REASON_PERMISSION;
-> +		event.fault.addr = addr;
-> +		propagate = s1;
-> +		break;
-> +	case ARM_SMMU_EVT_F_ACCESS:
-> +		event.fault.reason = IOMMU_FAULT_REASON_ACCESS;
-> +		event.fault.addr = addr;
-> +		propagate = s1;
-> +		break;
-> +	case ARM_SMMU_EVT_C_BAD_STE:
-> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY;
-> +		break;
-> +	case ARM_SMMU_EVT_C_BAD_CD:
-> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
-> +		break;
-> +	case ARM_SMMU_EVT_F_ADDR_SIZE:
-> +		event.fault.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
-> +		propagate = s1;
-> +		break;
-> +	case ARM_SMMU_EVT_F_STE_FETCH:
-> +		event.fault.reason = IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH;
-> +		event.fault.fetch_addr = fetch_addr;
-> +		break;
-> +	/* End of addition */
-> +	case ARM_SMMU_EVT_E_PAGE_REQUEST:
-> +	case ARM_SMMU_EVT_F_TLB_CONFLICT:
-> +	case ARM_SMMU_EVT_F_CFG_CONFLICT:
-> +	case ARM_SMMU_EVT_F_BAD_ATS_TREQ:
-> +	case ARM_SMMU_EVT_F_TRANSL_FORBIDDEN:
-> +	case ARM_SMMU_EVT_F_UUT:
-> +	default:
-> +		event.fault.reason = IOMMU_FAULT_REASON_UNKNOWN;
+> +		return false;
 > +	}
-> +	/* only propagate the error if it relates to stage 1 */
-> +	if (s1)
-
-if (propagate)
-
-But I don't quite understand how we're deciding what to propagate: a
-C_BAD_STE is most likely a bug in the SMMU driver, but is reported to
-userspace. On the other hand a stage-2 F_TRANSLATION is likely an error
-from the VMM (didn't setup stage-2 mappings properly), but we're not
-reporting it. Maybe we should add a bit to event.fault that tells
-whether the fault was stage 1 or 2, and let the VMM deal with it?
-
-> +		iommu_report_device_fault(master->dev, &event);
-
-We should return here if the fault is successfully injected
-
-Thanks,
-Jean
-
 > +
-> +	dev_info(smmu->dev, "event 0x%02x received:\n", type);
-> +	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
-> +		dev_info(smmu->dev, "\t0x%016llx\n",
-> +			 (unsigned long long)evt[i]);
-> +	}
+> +	return true;
 > +}
 > +
->  /* IRQ and event handlers */
->  static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
->  {
-> -	int i;
->  	struct arm_smmu_device *smmu = dev;
->  	struct arm_smmu_queue *q = &smmu->evtq.q;
->  	u64 evt[EVTQ_ENT_DWORDS];
+>  bool kvm__load_firmware(struct kvm *kvm, const char
+> *firmware_filename) {
+> -	return false;
+> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
+> +	void *host_pos;
+> +	void *limit;
+> +	ssize_t fw_sz;
+> +	int fd;
+> +
+> +	limit = kvm->ram_start + kvm->ram_size;
+> +
+> +	/* For default firmware address, lets load it at the
+> begining of RAM */
+> +	if (fw_addr == 0)
+> +		fw_addr = ARM_MEMORY_AREA;
+> +
+> +	if (!validate_fw_addr(kvm, fw_addr))
+> +		die("Bad firmware destination: 0x%016llx", fw_addr);
+> +
+> +	fd = open(firmware_filename, O_RDONLY);
+> +	if (fd < 0)
+> +		return false;
+> +
+> +	host_pos = guest_flat_to_host(kvm, fw_addr);
+> +	if (!host_pos || host_pos < kvm->ram_start)
+> +		return false;
+> +
+> +	fw_sz = read_file(fd, host_pos, limit - host_pos);
+> +	if (fw_sz < 0)
+> +		die("failed to load firmware");
+> +	close(fd);
+> +
+> +	/* Kernel isn't loaded by kvm, point start address to
+> firmware */
+> +	kvm->arch.kern_guest_start = fw_addr;
+> +
+> +	/* Load dtb just after the firmware image*/
+> +	host_pos += fw_sz;
+> +	if (host_pos + FDT_MAX_SIZE > limit)
+> +		die("not enough space to load fdt");
+> +
+> +	kvm->arch.dtb_guest_start = ALIGN(host_to_guest_flat(kvm,
+> host_pos),
+> +					  FDT_ALIGN);
+
+Does anyone know why we force a 2MB alignment (FDT_ALIGN) here? Will?
+The DT spec and the ARM and arm64 kernel boot protocols just require an
+8 byte alignment. So far this didn't really matter, but I guess the idea
+is that the firmware picks up its dtb by looking just after its image
+end (as U-Boot does, for instance). Forcing an additional 2MB alignment
+sounds surprising and fragile here.
+
+So is there any reason we can't reduce the alignment to the spec'ed 8
+bytes?
+
+On a related matter: I see that we still pass the DTB address in x0 (as
+in the kernel boot protocol) and the EDKII port relies on this. Should
+this be documented somewhere, then?
+
+
+Apart from that the patch looks good to me.
+
+Cheers,
+Andre
+
+> +	pr_info("Placing fdt at 0x%llx - 0x%llx",
+> +		kvm->arch.dtb_guest_start,
+> +		kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
+> +
+> +	return true;
+>  }
 >  
->  	do {
-> -		while (!queue_remove_raw(q, evt)) {
-> -			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
-> -
-> -			dev_info(smmu->dev, "event 0x%02x received:\n", id);
-> -			for (i = 0; i < ARRAY_SIZE(evt); ++i)
-> -				dev_info(smmu->dev, "\t0x%016llx\n",
-> -					 (unsigned long long)evt[i]);
-> -
-> -		}
-> +		while (!queue_remove_raw(q, evt))
-> +			arm_smmu_report_event(smmu, evt);
->  
->  		/*
->  		 * Not much we can do on overflow, so scream and pretend we're
-> 
+>  int kvm__arch_setup_firmware(struct kvm *kvm)
