@@ -1,161 +1,109 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
-Date: Fri, 11 Jan 2019 11:06:29 +0000
-Message-ID: <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-15-eric.auger@redhat.com>
- <20190110104544.26f3bcb1@jacob-builder>
+From: Borislav Petkov <bp@alien8.de>
+Subject: (ghes|hest)_disable
+Date: Fri, 11 Jan 2019 12:28:40 +0100
+Message-ID: <20190111112840.GB4729@zn.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190110104544.26f3bcb1@jacob-builder>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>, Eric Auger <eric.auger@redhat.com>
-Cc: "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Christoffer Dall <Christoffer.Dall@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 198C34A49E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 06:28:51 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XVXkslFtVP1E for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 06:28:49 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8FBD4A471
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 06:28:49 -0500 (EST)
+Content-Disposition: inline
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/01/2019 18:45, Jacob Pan wrote:
-> On Tue,  8 Jan 2019 11:26:26 +0100
-> Eric Auger <eric.auger@redhat.com> wrote:
+Ok,
+
+lemme split this out into a separate thread and add Tony.
+
+On Thu, Jan 10, 2019 at 06:20:35PM +0000, James Morse wrote:
+> > Grrr, what an effing mess that code is! There's hest_disable *and*
+> > ghes_disable. Do we really need them both?
 > 
->> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>
->> Device faults detected by IOMMU can be reported outside IOMMU
->> subsystem for further processing. This patch intends to provide
->> a generic device fault data such that device drivers can be
->> communicated with IOMMU faults without model specific knowledge.
->>
->> The proposed format is the result of discussion at:
->> https://lkml.org/lkml/2017/11/10/291
->> Part of the code is based on Jean-Philippe Brucker's patchset
->> (https://patchwork.kernel.org/patch/9989315/).
->>
->> The assumption is that model specific IOMMU driver can filter and
->> handle most of the internal faults if the cause is within IOMMU driver
->> control. Therefore, the fault reasons can be reported are grouped
->> and generalized based common specifications such as PCI ATS.
->>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> [moved part of the iommu_fault_event struct in the uapi, enriched
->>  the fault reasons to be able to map unrecoverable SMMUv3 errors]
->> ---
->>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
->>  include/uapi/linux/iommu.h | 83
->> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
->> insertions(+), 2 deletions(-)
->>
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index 244c1a3d5989..1dedc2d247c2 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -49,13 +49,17 @@ struct bus_type;
->>  struct device;
->>  struct iommu_domain;
->>  struct notifier_block;
->> +struct iommu_fault_event;
->>  
->>  /* iommu fault flags */
->> -#define IOMMU_FAULT_READ	0x0
->> -#define IOMMU_FAULT_WRITE	0x1
->> +#define IOMMU_FAULT_READ		(1 << 0)
->> +#define IOMMU_FAULT_WRITE		(1 << 1)
->> +#define IOMMU_FAULT_EXEC		(1 << 2)
->> +#define IOMMU_FAULT_PRIV		(1 << 3)
->>  
->>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
->>  			struct device *, unsigned long, int, void *);
->> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *,
->> void *); 
->>  struct iommu_domain_geometry {
->>  	dma_addr_t aperture_start; /* First address that can be
->> mapped    */ @@ -255,6 +259,52 @@ struct iommu_device {
->>  	struct device *dev;
->>  };
->>  
->> +/**
->> + * struct iommu_fault_event - Generic per device fault data
->> + *
->> + * - PCI and non-PCI devices
->> + * - Recoverable faults (e.g. page request), information based on
->> PCI ATS
->> + * and PASID spec.
->> + * - Un-recoverable faults of device interest
->> + * - DMA remapping and IRQ remapping faults
->> + *
->> + * @fault: fault descriptor
->> + * @device_private: if present, uniquely identify device-specific
->> + *                  private data for an individual page request.
->> + * @iommu_private: used by the IOMMU driver for storing
->> fault-specific
->> + *                 data. Users should not modify this field before
->> + *                 sending the fault response.
->> + */
->> +struct iommu_fault_event {
->> +	struct iommu_fault fault;
->> +	u64 device_private;
-> I think we want to move device_private to uapi since it gets injected
-> into the guest, then returned by guest in case of page response. For
-> VT-d we also need 128 bits of private data. VT-d spec. 7.7.1
+> ghes_disable lets you ignore the firmware-first notifications, but still 'use'
+> the other error sources:
+> drivers/pci/pcie/aer.c picks out the three AER types, and uses apei_hest_parse()
+> to know if firmware is controlling AER, even if ghes_disable is set.
 
-Ah, I didn't notice the format changed in VT-d rev3. On that topic, how
-do we manage future extensions to the iommu_fault struct? Should we add
-~48 bytes of padding after device_private, along with some flags telling
-which field is valid, or deal with it using a structure version like we
-do for the invalidate and bind structs? In the first case, iommu_fault
-wouldn't fit in a 64-byte cacheline anymore, but I'm not sure we care.
+Ok, that kinda makes sense.
 
-> For exception tracking (e.g. unanswered page request), I can add timer
-> and list info later when I include PRQ. sounds ok?
->> +	u64 iommu_private;
-[...]
->> +/**
->> + * struct iommu_fault - Generic fault data
->> + *
->> + * @type contains fault type
->> + * @reason fault reasons if relevant outside IOMMU driver.
->> + * IOMMU driver internal faults are not reported.
->> + * @addr: tells the offending page address
->> + * @fetch_addr: tells the address that caused an abort, if any
->> + * @pasid: contains process address space ID, used in shared virtual
->> memory
->> + * @page_req_group_id: page request group index
->> + * @last_req: last request in a page request group
->> + * @pasid_valid: indicates if the PRQ has a valid PASID
->> + * @prot: page access protection flag:
->> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
->> + */
->> +
->> +struct iommu_fault {
->> +	__u32	type;   /* enum iommu_fault_type */
->> +	__u32	reason; /* enum iommu_fault_reason */
->> +	__u64	addr;
->> +	__u64	fetch_addr;
->> +	__u32	pasid;
->> +	__u32	page_req_group_id;
->> +	__u32	last_req;
->> +	__u32	pasid_valid;
->> +	__u32	prot;
->> +	__u32	access;
+But look what our sparse documentation says:
 
-What does @access contain? Can it be squashed into @prot?
+        hest_disable    [ACPI]
+                        Disable Hardware Error Source Table (HEST) support;
+                        corresponding firmware-first mode error processing
+                        logic will be disabled.
 
-Thanks,
-Jean
 
-> relocated to uapi, Yi can you confirm?
-> 	__u64 device_private[2];
-> 
->> +};
->>  #endif /* _UAPI_IOMMU_H */
-> 
-> _______________________________________________
-> iommu mailing list
-> iommu@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> 
+and from looking at the code, hest_disable is kinda like the master
+switch because it gets evaluated first. Right?
+
+Which sounds to me like we want a generic switch which does:
+
+	apei=disable_ff_notifications
+
+to explicitly do exactly that - disable the firmware-first notification
+method. And then the master switch will be
+
+	apei=disable
+
+And we'll be able to pass whatever options here instead of all those
+different _disable switches which need lotsa code staring to figure out
+what exactly they even do in the first place.
+
+> x86's arch_apei_enable_cmcff() looks like it disables MCE to get firmware to
+> handle them. hest_disable would stop this, but instead ghes_disable keeps that,
+> and stops the NOTIFY_NMI being registered.
+
+Yeah, and when you boot with ghes_disable, that would say:
+
+	pr_info("HEST: Enabling Firmware First mode for corrected errors.\n");
+
+but there will be no notifications and users will scratch heads.
+
+> (do you consider cmdline arguments as ABI, or hard to justify and hard to remove?)
+
+I don't, frankly. I guess we will have to have a transition period where
+we keep them and issue a warning message that users should switch to
+"apei=xxx" instead and remove them after a lot of time has passed.
+
+> I don't think its broken enough to justify ripping them out. A user of
+> ghes_disable would be someone with broken firmware-first handling of AER. They
+> need to know firmware is changing the register values behind their back (so need
+> to parse the HEST), but want to ignore the junk notifications. It doesn't sound
+> like an unlikely scenario.
+
+Yes, that makes sense.
+
+But I think we should add a generic cmdline arg with suboptions and
+document exactly what all those do. Similar to "mce=" on x86 which is
+nicely documented in Documentation/x86/x86_64/boot-options.txt.
+
+Right now, only a few people understand what those do and in some of the
+cases they do too much/the wrong thing.
+
+Thoughts?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
