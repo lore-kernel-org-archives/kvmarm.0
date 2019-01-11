@@ -1,24 +1,31 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool v2 4/6] arm: Support firmware loading
-Date: Fri, 11 Jan 2019 18:07:02 +0000
-Message-ID: <20190111180702.610a3114@donnerap.cambridge.arm.com>
-References: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
- <1547130046-14729-5-git-send-email-julien.thierry@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Fri, 11 Jan 2019 18:09:28 +0000
+Message-ID: <0939c14d-de58-f21d-57a6-89bdce3bcb44@arm.com>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-11-james.morse@arm.com>
+ <20181211183634.GO27375@zn.tnic>
+ <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127104A47F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:08:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B50BF4A47C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:09:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4R-vUAzm9ogk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Jan 2019 13:08:09 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93BCA4A431
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:08:08 -0500 (EST)
-In-Reply-To: <1547130046-14729-5-git-send-email-julien.thierry@arm.com>
+ with ESMTP id WZp6Qrub1aMk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Jan 2019 13:09:34 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C7774A47B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Jan 2019 13:09:34 -0500 (EST)
+In-Reply-To: <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,189 +35,134 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Tyler Baicar <baicar.tyler@gmail.com>, Borislav Petkov <bp@alien8.de>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 10 Jan 2019 14:20:44 +0000
-Julien Thierry <julien.thierry@arm.com> wrote:
+Hi guys,
 
-Hi,
+On 11/01/2019 15:32, Tyler Baicar wrote:
+> On Fri, Jan 11, 2019 at 7:03 AM Borislav Petkov <bp@alien8.de> wrote:
+>> On Thu, Jan 10, 2019 at 04:01:27PM -0500, Tyler Baicar wrote:
+>>> On Thu, Jan 10, 2019 at 1:23 PM James Morse <james.morse@arm.com> wrote:
+>>>>>>
+>>>>>> +    if (is_hest_type_generic_v2(ghes) && ghes_ack_error(ghes->generic_v2))
+>>>>>
+>>>>> Since ghes_ack_error() is always prepended with this check, you could
+>>>>> push it down into the function:
+>>>>>
+>>>>> ghes_ack_error(ghes)
+>>>>> ...
+>>>>>
+>>>>>       if (!is_hest_type_generic_v2(ghes))
+>>>>>               return 0;
+>>>>>
+>>>>> and simplify the two callsites :)
+>>>>
+>>>> Great idea! ...
+>>>>
+>>>> .. huh. Turns out for ghes_proc() we discard any errors other than ENOENT from
+>>>> ghes_read_estatus() if is_hest_type_generic_v2(). This masks EIO.
+>>>>
+>>>> Most of the error sources discard the result, the worst thing I can find is
+>>>> ghes_irq_func() will return IRQ_HANDLED, instead of IRQ_NONE when we didn't
+>>>> really handle the IRQ. They're registered as SHARED, but I don't have an example
+>>>> of what goes wrong next.
+>>>>
+>>>> I think this will also stop the spurious handling code kicking in to shut it up
+>>>> if its broken and screaming. Unlikely, but not impossible.
 
-> Implement firmware image loading for arm and set the boot start
-> address to the firmware address.
+[....]
+
+>>> Looks good to me, I guess there's no harm in acking invalid error status blocks.
+
+Great, I didn't miss something nasty...
+
+
+>> Err, why?
 > 
-> Add an option for the user to specify where to map the firmware.
+> If ghes_read_estatus() fails, then either there was no error populated or the
+> error status block was invalid.
+> If the error status block is invalid, then the kernel doesn't know what happened
+> in hardware.
 
-Many thanks for making this optional!
+What do we mean by 'hardware' here? We're receiving a corrupt report of
+something via memory.
+The GHESv2 ack just means we're done with the memory. I think it exists because
+the external-agent can't peek into the CPU to see if its returned from the
+notification.
 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> ---
->  arm/fdt.c                                | 14 +++++++-
->  arm/include/arm-common/kvm-config-arch.h |  5 ++-
->  arm/kvm.c                                | 61
-> +++++++++++++++++++++++++++++++- 3 files changed, 77 insertions(+), 3
-> deletions(-)
+
+> I originally thought this was changing what's acked, but it's just changing the
+> return value of ghes_proc() when ghes_read_estatus() returns -EIO.
+
+Sorry, that will be due to my bad description.
+
+
+>> I don't know what the firmware glue does on ARM but if I'd have to
+>> remain logical - which is hard to do with firmware - the proper thing to
+>> do would be this:
+>>
+>>         rc = ghes_read_estatus(ghes, &buf_paddr);
+>>         if (rc) {
+>>                 ghes_reset_hardware();
 > 
-> diff --git a/arm/fdt.c b/arm/fdt.c
-> index 664bb62..2936986 100644
-> --- a/arm/fdt.c
-> +++ b/arm/fdt.c
-> @@ -131,7 +131,19 @@ static int setup_fdt(struct kvm *kvm)
->  	/* /chosen */
->  	_FDT(fdt_begin_node(fdt, "chosen"));
->  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
-> -	_FDT(fdt_property_string(fdt, "bootargs",
-> kvm->cfg.real_cmdline)); +
-> +	if (kvm->cfg.firmware_filename) {
-> +		/*
-> +		 * When using a firmware, command line is not passed
-> through DT,
-> +		 * or the firmware can add it itself
-> +		 */
-> +		if (kvm->cfg.kernel_cmdline)
-> +			pr_warning("Ignoring custom bootargs: %s\n",
-> +				   kvm->cfg.kernel_cmdline);
-> +	} else
-> +		_FDT(fdt_property_string(fdt, "bootargs",
-> +					 kvm->cfg.real_cmdline));
-> +
->  	_FDT(fdt_property_u64(fdt, "kaslr-seed",
-> kvm->cfg.arch.kaslr_seed)); 
->  	/* Initrd */
-> diff --git a/arm/include/arm-common/kvm-config-arch.h
-> b/arm/include/arm-common/kvm-config-arch.h index 6a196f1..5734c46
-> 100644 --- a/arm/include/arm-common/kvm-config-arch.h
-> +++ b/arm/include/arm-common/kvm-config-arch.h
-> @@ -11,6 +11,7 @@ struct kvm_config_arch {
->  	bool		has_pmuv3;
->  	u64		kaslr_seed;
->  	enum irqchip_type irqchip;
-> +	u64		fw_addr;
->  };
->  
->  int irqchip_parser(const struct option *opt, const char *arg, int
-> unset); @@ -30,6 +31,8 @@ int irqchip_parser(const struct option
-> *opt, const char *arg, int unset); OPT_CALLBACK('\0', "irqchip",
-> &(cfg)->irqchip,				\
-> "[gicv2|gicv2m|gicv3|gicv3-its]",				\
-> "Type of interrupt controller to emulate in the guest",	\
-> -		     irqchip_parser, NULL),
-> +		     irqchip_parser,
-> NULL),					\
-> +	OPT_U64('\0', "firmware-address",
-> &(cfg)->fw_addr,			\
-> +		"Address where firmware should be loaded"),
->  
->  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index c6843e5..d3f8f5d 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -169,9 +169,68 @@ bool kvm__arch_load_kernel_image(struct kvm
-> *kvm, int fd_kernel, int fd_initrd, return true;
->  }
->  
-> +static bool validate_fw_addr(struct kvm *kvm, u64 fw_addr)
-> +{
-> +	u64 ram_phys;
-> +
-> +	ram_phys = host_to_guest_flat(kvm, kvm->ram_start);
-> +
-> +	if (fw_addr < ram_phys || fw_addr >= ram_phys +
-> kvm->ram_size) {
+> The kernel would have no way of knowing what to do here.
 
-I am OK with this check for now, but was wondering if we really *need*
-to have the firmware in RAM? Couldn't we possibly put it into some
-ROM/flash/nvmem device memory area and utilise XIP, for instance? I
-understand that EDKII does not support this at the moment, but was just
-thinking whether this would be an artificial restriction for other
-firmware ports.
+Is there anything wrong with what we do today? We stamp on the records so that
+we don't processes them again. (especially if is polled), and we tell firmware
+it can re-use this memory.
 
-But I guess we can relax this later on, possibly when we support this
-properly.
-
-> +		pr_err("Provide --firmware-address an address in
-> RAM: "
-> +		       "0x%016llx - 0x%016llx",
-> +		       ram_phys, ram_phys + kvm->ram_size);
-> +
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  bool kvm__load_firmware(struct kvm *kvm, const char
-> *firmware_filename) {
-> -	return false;
-> +	u64 fw_addr = kvm->cfg.arch.fw_addr;
-> +	void *host_pos;
-> +	void *limit;
-> +	ssize_t fw_sz;
-> +	int fd;
-> +
-> +	limit = kvm->ram_start + kvm->ram_size;
-> +
-> +	/* For default firmware address, lets load it at the
-> begining of RAM */
-> +	if (fw_addr == 0)
-> +		fw_addr = ARM_MEMORY_AREA;
-> +
-> +	if (!validate_fw_addr(kvm, fw_addr))
-> +		die("Bad firmware destination: 0x%016llx", fw_addr);
-> +
-> +	fd = open(firmware_filename, O_RDONLY);
-> +	if (fd < 0)
-> +		return false;
-> +
-> +	host_pos = guest_flat_to_host(kvm, fw_addr);
-> +	if (!host_pos || host_pos < kvm->ram_start)
-> +		return false;
-> +
-> +	fw_sz = read_file(fd, host_pos, limit - host_pos);
-> +	if (fw_sz < 0)
-> +		die("failed to load firmware");
-> +	close(fd);
-> +
-> +	/* Kernel isn't loaded by kvm, point start address to
-> firmware */
-> +	kvm->arch.kern_guest_start = fw_addr;
-> +
-> +	/* Load dtb just after the firmware image*/
-> +	host_pos += fw_sz;
-> +	if (host_pos + FDT_MAX_SIZE > limit)
-> +		die("not enough space to load fdt");
-> +
-> +	kvm->arch.dtb_guest_start = ALIGN(host_to_guest_flat(kvm,
-> host_pos),
-> +					  FDT_ALIGN);
-
-Does anyone know why we force a 2MB alignment (FDT_ALIGN) here? Will?
-The DT spec and the ARM and arm64 kernel boot protocols just require an
-8 byte alignment. So far this didn't really matter, but I guess the idea
-is that the firmware picks up its dtb by looking just after its image
-end (as U-Boot does, for instance). Forcing an additional 2MB alignment
-sounds surprising and fragile here.
-
-So is there any reason we can't reduce the alignment to the spec'ed 8
-bytes?
-
-On a related matter: I see that we still pass the DTB address in x0 (as
-in the kernel boot protocol) and the EDKII port relies on this. Should
-this be documented somewhere, then?
+(I think we should return an error, or print a ratelimited warning for corrupt
+records)
 
 
-Apart from that the patch looks good to me.
+>>         }
+>>
+>>         /* clear estatus and bla bla */
+>>
+>>         /* Now, I'm in the success case: */
+>>          ghes_ack_error();
+>>
+>>
+>> This way, you have the error path clear of something unexpected happened
+>> when reading the hardware, obvious and separated. ghes_reset_hardware()
+>> clears the registers and does the necessary steps to put the hardware in
+>> good state again so that it can report the next error.
+>>
+>> And the success path simply acks the error and does possibly the same
+>> thing. The naming of the functions is important though, to denote what
+>> gets called when.
 
-Cheers,
-Andre
+I think this duplicates the record-stamping/acking. If there is anything in that
+memory region, the action for processed/copied/ignored-because-its-corrupt is
+the same.
 
-> +	pr_info("Placing fdt at 0x%llx - 0x%llx",
-> +		kvm->arch.dtb_guest_start,
-> +		kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
-> +
-> +	return true;
->  }
->  
->  int kvm__arch_setup_firmware(struct kvm *kvm)
+We can return on ENOENT out earlier, as nothing needs doing in that case. Its
+what the GHES_TO_CLEAR spaghetti is for, we can probably move the ack thing into
+ghes_clear_estatus(), that way that thing means 'I'm done with this memory'.
+
+Something like:
+-------------------------
+rc = ghes_read_estatus();
+if (rc == -ENOENT)
+	return 0;
+
+if (!rc) {
+	ghes_do_proc() and friends;
+}
+
+ghes_clear_estatus();
+
+return rc;
+-------------------------
+
+We would no longer return errors from the ack code, I suspect that can only
+happen for a corrupt gas, which we would have caught earlier as we rely on the
+mapping being cached.
+
+
+
+Thanks,
+
+James
