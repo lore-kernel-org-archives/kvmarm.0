@@ -1,70 +1,68 @@
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 Subject: Re: [PATCH] mm: Introduce GFP_PGTABLE
-Date: Mon, 14 Jan 2019 09:44:05 +0530
-Message-ID: <5e87d900-9548-1782-6244-6dcf7339139d@arm.com>
+Date: Mon, 14 Jan 2019 09:58:14 +0530
+Message-ID: <48f81a76-2b2d-5060-d9bc-c42d5b5975c3@arm.com>
 References: <1547288798-10243-1-git-send-email-anshuman.khandual@arm.com>
- <CALvZod5euX2mW7qgL28YZrTVQ-gYYR83aGKfOyZ9=BEzHwyJOw@mail.gmail.com>
+ <20190112121230.GQ6310@bombadil.infradead.org>
+ <ddd59fdc-3d8f-4015-e851-e7f099193a1b@c-s.fr>
+ <20190112154944.GT6310@bombadil.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALvZod5euX2mW7qgL28YZrTVQ-gYYR83aGKfOyZ9=BEzHwyJOw@mail.gmail.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBFE24A3F0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jan 2019 23:28:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ChH+w28WEHg8 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Jan 2019 23:28:23 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 042674A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jan 2019 23:28:22 -0500 (EST)
+In-Reply-To: <20190112154944.GT6310@bombadil.infradead.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Shakeel Butt <shakeelb@google.com>
-Cc: Linux MM <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, mpe@ellerman.id.au, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, peterz@infradead.org, christoffer.dall@arm.com, marc.zyngier@arm.com, "Kirill A. Shutemov" <kirill@shutemov.name>, Mike Rapoport <rppt@linux.vnet.ibm.com>, Michal Hocko <mhocko@suse.com>, ard.biesheuvel@linaro.org, mark.rutland@arm.com, steve.capper@arm.com, james.morse@arm.com, robin.murphy@arm.com, aneesh.kumar@linux.ibm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matthew Wilcox <willy@infradead.org>, Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: mhocko@suse.com, linux-sh@vger.kernel.org, peterz@infradead.org, catalin.marinas@arm.com, dave.hansen@linux.intel.com, will.deacon@arm.com, linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu, aneesh.kumar@linux.ibm.com, linux@armlinux.org.uk, mingo@redhat.com, vbabka@suse.cz, rientjes@google.com, marc.zyngier@arm.com, rppt@linux.vnet.ibm.com, shakeelb@google.com, kirill@shutemov.name, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, robin.murphy@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 01/12/2019 10:18 PM, Shakeel Butt wrote:
->> --- a/arch/x86/kernel/espfix_64.c
->> +++ b/arch/x86/kernel/espfix_64.c
->> @@ -57,8 +57,6 @@
->>  # error "Need more virtual address space for the ESPFIX hack"
->>  #endif
+On 01/12/2019 09:19 PM, Matthew Wilcox wrote:
+> On Sat, Jan 12, 2019 at 02:49:29PM +0100, Christophe Leroy wrote:
+>> As far as I can see,
 >>
->> -#define PGALLOC_GFP (GFP_KERNEL | __GFP_ZERO)
->> -
->>  /* This contains the *bottom* address of the espfix stack */
->>  DEFINE_PER_CPU_READ_MOSTLY(unsigned long, espfix_stack);
->>  DEFINE_PER_CPU_READ_MOSTLY(unsigned long, espfix_waddr);
->> @@ -172,7 +170,7 @@ void init_espfix_ap(int cpu)
->>         pud_p = &espfix_pud_page[pud_index(addr)];
->>         pud = *pud_p;
->>         if (!pud_present(pud)) {
->> -               struct page *page = alloc_pages_node(node, PGALLOC_GFP, 0);
->> +               struct page *page = alloc_pages_node(node, GFP_PGTABLE, 0);
+>> #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
 >>
->>                 pmd_p = (pmd_t *)page_address(page);
->>                 pud = __pud(__pa(pmd_p) | (PGTABLE_PROT & ptemask));
->> @@ -184,7 +182,7 @@ void init_espfix_ap(int cpu)
->>         pmd_p = pmd_offset(&pud, addr);
->>         pmd = *pmd_p;
->>         if (!pmd_present(pmd)) {
->> -               struct page *page = alloc_pages_node(node, PGALLOC_GFP, 0);
->> +               struct page *page = alloc_pages_node(node, GFP_PGTABLE, 0);
+>> So what's the difference between:
 >>
->>                 pte_p = (pte_t *)page_address(page);
->>                 pmd = __pmd(__pa(pte_p) | (PGTABLE_PROT & ptemask));
->> diff --git a/arch/x86/mm/pgtable.c b/arch/x86/mm/pgtable.c
->> index 7bd0170..d608b03 100644
->> --- a/arch/x86/mm/pgtable.c
->> +++ b/arch/x86/mm/pgtable.c
->> @@ -13,19 +13,17 @@ phys_addr_t physical_mask __ro_after_init = (1ULL << __PHYSICAL_MASK_SHIFT) - 1;
->>  EXPORT_SYMBOL(physical_mask);
->>  #endif
+>> (GFP_KERNEL_ACCOUNT | __GFP_ZERO) & ~__GFP_ACCOUNT
 >>
->> -#define PGALLOC_GFP (GFP_KERNEL_ACCOUNT | __GFP_ZERO)
->> -
-> You have silently dropped __GFP_ACCOUNT from all the allocations in this file.
-
-Right, they need to be added back explicitly after GFP_PGTABLE. Matthew had
-pointed this earlier. Will fix it next time around.
-
+>> and
+>>
+>> (GFP_KERNEL | __GFP_ZERO) & ~__GFP_ACCOUNT
 > 
-> BTW why other archs not using __GFP_ACCOUNT for the user page tables?
+> Nothing.  But there's a huge difference in the other parts of that same
+> file where GFP_ACCOUNT is _not_ used.
 > 
+> I think this unification is too small to bother with.  Something I've
+> had on my todo list for some time and have not done anything about
+> is to actually unify all of the architecture pte/pmd/... allocations.
+> There are tricks some architectures use that others would benefit from.
 
-Some archs do and some dont. User page tables pages should use __GFP_ACCOUNT
-for allocation. I am working on fixing it for arm64.
+Sure. Could you please elaborate on this ?
+
+Invariably all kernel pgtable page allocations should use GFP_PGTABLE and
+all user page table allocation should use (GFP_PGTABLE | __GFP_ACCOUNT).
+Ideally there should be default generic functions user_pgtable_gfp() or
+kernel_pgtable_gfp() returning these values. Overrides can be provided if
+an arch still wants some more control.
