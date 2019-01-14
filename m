@@ -1,68 +1,62 @@
-From: Anshuman Khandual <anshuman.khandual@arm.com>
+From: Michal Hocko <mhocko@kernel.org>
 Subject: Re: [PATCH] mm: Introduce GFP_PGTABLE
-Date: Mon, 14 Jan 2019 09:58:14 +0530
-Message-ID: <48f81a76-2b2d-5060-d9bc-c42d5b5975c3@arm.com>
+Date: Mon, 14 Jan 2019 08:01:37 +0100
+Message-ID: <20190114070137.GB21345@dhcp22.suse.cz>
 References: <1547288798-10243-1-git-send-email-anshuman.khandual@arm.com>
- <20190112121230.GQ6310@bombadil.infradead.org>
- <ddd59fdc-3d8f-4015-e851-e7f099193a1b@c-s.fr>
- <20190112154944.GT6310@bombadil.infradead.org>
+ <20190113173555.GC1578@dhcp22.suse.cz>
+ <f9f333a5-5533-996a-dc8e-1ff1096c1d19@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBFE24A3F0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jan 2019 23:28:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ChH+w28WEHg8 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Jan 2019 23:28:23 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 042674A3BF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Jan 2019 23:28:22 -0500 (EST)
-In-Reply-To: <20190112154944.GT6310@bombadil.infradead.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Matthew Wilcox <willy@infradead.org>, Christophe Leroy <christophe.leroy@c-s.fr>
-Cc: mhocko@suse.com, linux-sh@vger.kernel.org, peterz@infradead.org, catalin.marinas@arm.com, dave.hansen@linux.intel.com, will.deacon@arm.com, linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu, aneesh.kumar@linux.ibm.com, linux@armlinux.org.uk, mingo@redhat.com, vbabka@suse.cz, rientjes@google.com, marc.zyngier@arm.com, rppt@linux.vnet.ibm.com, shakeelb@google.com, kirill@shutemov.name, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, robin.murphy@arm.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <f9f333a5-5533-996a-dc8e-1ff1096c1d19@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-mm@kvack.org, akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, mpe@ellerman.id.au, tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com, peterz@infradead.org, christoffer.dall@arm.com, marc.zyngier@arm.com, kirill@shutemov.name, rppt@linux.vnet.ibm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, steve.capper@arm.com, james.morse@arm.com, robin.murphy@arm.com, aneesh.kumar@linux.ibm.com, vbabka@suse.cz, shakeelb@google.com, rientjes@google.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 01/12/2019 09:19 PM, Matthew Wilcox wrote:
-> On Sat, Jan 12, 2019 at 02:49:29PM +0100, Christophe Leroy wrote:
->> As far as I can see,
->>
->> #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
->>
->> So what's the difference between:
->>
->> (GFP_KERNEL_ACCOUNT | __GFP_ZERO) & ~__GFP_ACCOUNT
->>
->> and
->>
->> (GFP_KERNEL | __GFP_ZERO) & ~__GFP_ACCOUNT
+On Mon 14-01-19 09:30:55, Anshuman Khandual wrote:
 > 
-> Nothing.  But there's a huge difference in the other parts of that same
-> file where GFP_ACCOUNT is _not_ used.
 > 
-> I think this unification is too small to bother with.  Something I've
-> had on my todo list for some time and have not done anything about
-> is to actually unify all of the architecture pte/pmd/... allocations.
-> There are tricks some architectures use that others would benefit from.
+> On 01/13/2019 11:05 PM, Michal Hocko wrote:
+> > On Sat 12-01-19 15:56:38, Anshuman Khandual wrote:
+> >> All architectures have been defining their own PGALLOC_GFP as (GFP_KERNEL |
+> >> __GFP_ZERO) and using it for allocating page table pages. This causes some
+> >> code duplication which can be easily avoided. GFP_KERNEL allocated and
+> >> cleared out pages (__GFP_ZERO) are required for page tables on any given
+> >> architecture. This creates a new generic GFP flag flag which can be used
+> >> for any page table page allocation. Does not cause any functional change.
+> > 
+> > I agree that some unification is due but GFP_PGTABLE is not something to
+> > expose in generic gfp.h IMHO. It just risks an abuse. I would be looking
+> 
+> Why would you think that it risks an abuse ? It does not create new semantics
+> of allocation in the buddy. Its just uses existing GFP_KERNEL allocation which
+> is then getting zeroed out. The risks (if any) is exactly same as GFP_KERNEL.
 
-Sure. Could you please elaborate on this ?
+Beucase my experience just tells me that people tend to use whatever
+they find and name fits what they think they need.
 
-Invariably all kernel pgtable page allocations should use GFP_PGTABLE and
-all user page table allocation should use (GFP_PGTABLE | __GFP_ACCOUNT).
-Ideally there should be default generic functions user_pgtable_gfp() or
-kernel_pgtable_gfp() returning these values. Overrides can be provided if
-an arch still wants some more control.
+> > at providing asm-generic implementation and reuse it to remove the code
+> 
+> Does that mean GFP_PGTABLE can be created but not in gfp.h but in some other
+> memory related header file ?
+
+I would just keep it close to its users. If that is a single arch
+generic place then only better. But I suspect some arches have special
+requirements.
+
+> > duplication. But I haven't tried that to know that it will work out due
+> > to small/subtle differences between arches.
+> 
+> IIUC from the allocation perspective GFP_ACCOUNT is the only thing which gets
+> added with GFP_PGTABLE for user page table for memcg accounting purpose. There
+> does not seem to be any other differences unless I am missing something.
+
+It's been some time since I've checked the last time. Some arches were
+using GPF_REPEAT (__GFP_RETRY_MAYFAIL) back then. I have removed most of
+those but some were doing a higher order allocations so they probably
+have stayed.
+-- 
+Michal Hocko
+SUSE Labs
