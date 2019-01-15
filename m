@@ -1,174 +1,146 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
-Date: Tue, 15 Jan 2019 22:27:11 +0100
-Message-ID: <07fc2059-3a4e-6b36-262b-779eb98b2334@redhat.com>
+Subject: Re: [RFC v3 04/21] vfio: VFIO_IOMMU_SET_PASID_TABLE
+Date: Tue, 15 Jan 2019 22:34:55 +0100
+Message-ID: <7871c319-9a40-2752-c484-e89059e442f4@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-15-eric.auger@redhat.com>
- <20190110104544.26f3bcb1@jacob-builder>
- <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
+ <20190108102633.17482-5-eric.auger@redhat.com>
+ <20190111155028.4f0e2ddd@x1.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
+In-Reply-To: <20190111155028.4f0e2ddd@x1.home>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Christoffer Dall <Christoffer.Dall@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
+Hi Alex,
 
-On 1/11/19 12:06 PM, Jean-Philippe Brucker wrote:
-> On 10/01/2019 18:45, Jacob Pan wrote:
->> On Tue,  8 Jan 2019 11:26:26 +0100
->> Eric Auger <eric.auger@redhat.com> wrote:
+On 1/11/19 11:50 PM, Alex Williamson wrote:
+> On Tue,  8 Jan 2019 11:26:16 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 >>
->>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>>
->>> Device faults detected by IOMMU can be reported outside IOMMU
->>> subsystem for further processing. This patch intends to provide
->>> a generic device fault data such that device drivers can be
->>> communicated with IOMMU faults without model specific knowledge.
->>>
->>> The proposed format is the result of discussion at:
->>> https://lkml.org/lkml/2017/11/10/291
->>> Part of the code is based on Jean-Philippe Brucker's patchset
->>> (https://patchwork.kernel.org/patch/9989315/).
->>>
->>> The assumption is that model specific IOMMU driver can filter and
->>> handle most of the internal faults if the cause is within IOMMU driver
->>> control. Therefore, the fault reasons can be reported are grouped
->>> and generalized based common specifications such as PCI ATS.
->>>
->>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>> [moved part of the iommu_fault_event struct in the uapi, enriched
->>>  the fault reasons to be able to map unrecoverable SMMUv3 errors]
->>> ---
->>>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
->>>  include/uapi/linux/iommu.h | 83
->>> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
->>> insertions(+), 2 deletions(-)
->>>
->>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->>> index 244c1a3d5989..1dedc2d247c2 100644
->>> --- a/include/linux/iommu.h
->>> +++ b/include/linux/iommu.h
->>> @@ -49,13 +49,17 @@ struct bus_type;
->>>  struct device;
->>>  struct iommu_domain;
->>>  struct notifier_block;
->>> +struct iommu_fault_event;
->>>  
->>>  /* iommu fault flags */
->>> -#define IOMMU_FAULT_READ	0x0
->>> -#define IOMMU_FAULT_WRITE	0x1
->>> +#define IOMMU_FAULT_READ		(1 << 0)
->>> +#define IOMMU_FAULT_WRITE		(1 << 1)
->>> +#define IOMMU_FAULT_EXEC		(1 << 2)
->>> +#define IOMMU_FAULT_PRIV		(1 << 3)
->>>  
->>>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
->>>  			struct device *, unsigned long, int, void *);
->>> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *,
->>> void *); 
->>>  struct iommu_domain_geometry {
->>>  	dma_addr_t aperture_start; /* First address that can be
->>> mapped    */ @@ -255,6 +259,52 @@ struct iommu_device {
->>>  	struct device *dev;
->>>  };
->>>  
->>> +/**
->>> + * struct iommu_fault_event - Generic per device fault data
->>> + *
->>> + * - PCI and non-PCI devices
->>> + * - Recoverable faults (e.g. page request), information based on
->>> PCI ATS
->>> + * and PASID spec.
->>> + * - Un-recoverable faults of device interest
->>> + * - DMA remapping and IRQ remapping faults
->>> + *
->>> + * @fault: fault descriptor
->>> + * @device_private: if present, uniquely identify device-specific
->>> + *                  private data for an individual page request.
->>> + * @iommu_private: used by the IOMMU driver for storing
->>> fault-specific
->>> + *                 data. Users should not modify this field before
->>> + *                 sending the fault response.
->>> + */
->>> +struct iommu_fault_event {
->>> +	struct iommu_fault fault;
->>> +	u64 device_private;
->> I think we want to move device_private to uapi since it gets injected
->> into the guest, then returned by guest in case of page response. For
->> VT-d we also need 128 bits of private data. VT-d spec. 7.7.1
+>> This patch adds VFIO_IOMMU_SET_PASID_TABLE ioctl which aims at
+>> passing the virtual iommu guest configuration to the VFIO driver
+>> downto to the iommu subsystem.
+>>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v2 -> v3:
+>> - s/BIND_PASID_TABLE/SET_PASID_TABLE
+>>
+>> v1 -> v2:
+>> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+>> - remove the struct device arg
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 31 +++++++++++++++++++++++++++++++
+>>  include/uapi/linux/vfio.h       |  8 ++++++++
+>>  2 files changed, 39 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 7651cfb14836..d9dd23f64f00 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -1644,6 +1644,24 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>>  	return ret;
+>>  }
+>>  
+>> +static int
+>> +vfio_set_pasid_table(struct vfio_iommu *iommu,
+>> +		      struct vfio_iommu_type1_set_pasid_table *ustruct)
+>> +{
+>> +	struct vfio_domain *d;
+>> +	int ret = 0;
+>> +
+>> +	mutex_lock(&iommu->lock);
+>> +
+>> +	list_for_each_entry(d, &iommu->domain_list, next) {
+>> +		ret = iommu_set_pasid_table(d->domain, &ustruct->config);
+>> +		if (ret)
+>> +			break;
+>> +	}
 > 
-> Ah, I didn't notice the format changed in VT-d rev3. On that topic, how
-> do we manage future extensions to the iommu_fault struct? Should we add
-> ~48 bytes of padding after device_private, along with some flags telling
-> which field is valid, or deal with it using a structure version like we
-> do for the invalidate and bind structs? In the first case, iommu_fault
-> wouldn't fit in a 64-byte cacheline anymore, but I'm not sure we care.
+> There's no unwind on failure here, leaves us in an inconsistent state
+> should something go wrong or domains don't have homogeneous PASID
+> support.  What's expected to happen if a PASID table is already set for
+> a domain, does it replace the old one or return -EBUSY?
+Effectively the setting can succeed on one domain and fail on another
+one, typically if one underlying SMMU does not support nested while the
+others support it.
+
+At the moment setting a new PASID table whereas one is installed does
+not return any error in the SMMU code, just overwrite the associated
+fields in the stream table entry. This is also the way we turn nested
+off (cfg->bypass == true). Needs to be clarified anyway.
 > 
->> For exception tracking (e.g. unanswered page request), I can add timer
->> and list info later when I include PRQ. sounds ok?
->>> +	u64 iommu_private;
-> [...]
->>> +/**
->>> + * struct iommu_fault - Generic fault data
->>> + *
->>> + * @type contains fault type
->>> + * @reason fault reasons if relevant outside IOMMU driver.
->>> + * IOMMU driver internal faults are not reported.
->>> + * @addr: tells the offending page address
->>> + * @fetch_addr: tells the address that caused an abort, if any
->>> + * @pasid: contains process address space ID, used in shared virtual
->>> memory
->>> + * @page_req_group_id: page request group index
->>> + * @last_req: last request in a page request group
->>> + * @pasid_valid: indicates if the PRQ has a valid PASID
->>> + * @prot: page access protection flag:
->>> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
->>> + */
->>> +
->>> +struct iommu_fault {
->>> +	__u32	type;   /* enum iommu_fault_type */
->>> +	__u32	reason; /* enum iommu_fault_reason */
->>> +	__u64	addr;
->>> +	__u64	fetch_addr;
->>> +	__u32	pasid;
->>> +	__u32	page_req_group_id;
->>> +	__u32	last_req;
->>> +	__u32	pasid_valid;
->>> +	__u32	prot;
->>> +	__u32	access;
+>> +	mutex_unlock(&iommu->lock);
+>> +	return ret;
+>> +}
+>> +
+>>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  				   unsigned int cmd, unsigned long arg)
+>>  {
+>> @@ -1714,6 +1732,19 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  
+>>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>>  			-EFAULT : 0;
+>> +	} else if (cmd == VFIO_IOMMU_SET_PASID_TABLE) {
+>> +		struct vfio_iommu_type1_set_pasid_table ustruct;
+>> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table,
+>> +				    config);
+>> +
+>> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (ustruct.argsz < minsz || ustruct.flags)
+>> +			return -EINVAL;
+>> +
+>> +		return vfio_set_pasid_table(iommu, &ustruct);
+>>  	}
+>>  
+>>  	return -ENOTTY;
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 02bb7ad6e986..0d9f4090c95d 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -14,6 +14,7 @@
+>>  
+>>  #include <linux/types.h>
+>>  #include <linux/ioctl.h>
+>> +#include <linux/iommu.h>
+>>  
+>>  #define VFIO_API_VERSION	0
+>>  
+>> @@ -759,6 +760,13 @@ struct vfio_iommu_type1_dma_unmap {
+>>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>>  
+>> +struct vfio_iommu_type1_set_pasid_table {
+>> +	__u32	argsz;
+>> +	__u32	flags;
+>> +	struct iommu_pasid_table_config config;
+>> +};
+>> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
 > 
-> What does @access contain? Can it be squashed into @prot?
-it was related to F_ACCESS event record and was a placeholder for
-reporting access attributes of the input transaction (Rnw, InD, PnU
-fields). But I wonder whether this is needed to implement such fine
-level fault reporting. Do we really care?
+> -ENOCOMMENTS  Thanks,
+sure
 
 Thanks
 
 Eric
 > 
-> Thanks,
-> Jean
+> Alex
 > 
->> relocated to uapi, Yi can you confirm?
->> 	__u64 device_private[2];
->>
->>> +};
->>>  #endif /* _UAPI_IOMMU_H */
->>
->> _______________________________________________
->> iommu mailing list
->> iommu@lists.linux-foundation.org
->> https://lists.linuxfoundation.org/mailman/listinfo/iommu
->>
+>> +
+>>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>>  
+>>  /*
 > 
