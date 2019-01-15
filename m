@@ -1,204 +1,157 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
-Date: Tue, 15 Jan 2019 22:06:27 +0100
-Message-ID: <e634adee-f7ab-b90d-aac6-06400fa9ffb4@redhat.com>
+Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
+Date: Tue, 15 Jan 2019 22:27:11 +0100
+Message-ID: <07fc2059-3a4e-6b36-262b-779eb98b2334@redhat.com>
 References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-18-eric.auger@redhat.com>
- <dae89fd8-6a82-d2f0-a8c7-ddbf12a7b047@arm.com>
+ <20190108102633.17482-15-eric.auger@redhat.com>
+ <20190110104544.26f3bcb1@jacob-builder>
+ <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FE0D4A3B7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jan 2019 16:06:39 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fmEQroMNKiPL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Jan 2019 16:06:37 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3D4D4A3B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Jan 2019 16:06:37 -0500 (EST)
-In-Reply-To: <dae89fd8-6a82-d2f0-a8c7-ddbf12a7b047@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Christoffer Dall <Christoffer.Dall@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Jean,
 
-On 1/11/19 6:46 PM, Jean-Philippe Brucker wrote:
-> On 08/01/2019 10:26, Eric Auger wrote:
->> When a stage 1 related fault event is read from the event queue,
->> let's propagate it to potential external fault listeners, ie. users
->> who registered a fault handler.
+On 1/11/19 12:06 PM, Jean-Philippe Brucker wrote:
+> On 10/01/2019 18:45, Jacob Pan wrote:
+>> On Tue,  8 Jan 2019 11:26:26 +0100
+>> Eric Auger <eric.auger@redhat.com> wrote:
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/iommu/arm-smmu-v3.c | 124 ++++++++++++++++++++++++++++++++----
->>  1 file changed, 113 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->> index 999ee470a2ae..6a711cbbb228 100644
->> --- a/drivers/iommu/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm-smmu-v3.c
->> @@ -168,6 +168,26 @@
->>  #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
->>  #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
->>  
->> +/* Events */
->> +#define ARM_SMMU_EVT_F_UUT		0x01
->> +#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
->> +#define ARM_SMMU_EVT_F_STE_FETCH	0x03
->> +#define ARM_SMMU_EVT_C_BAD_STE		0x04
->> +#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
->> +#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
->> +#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
->> +#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
->> +#define ARM_SMMU_EVT_F_CD_FETCH		0x09
->> +#define ARM_SMMU_EVT_C_BAD_CD		0x0a
->> +#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
->> +#define ARM_SMMU_EVT_F_TRANSLATION	0x10
->> +#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
->> +#define ARM_SMMU_EVT_F_ACCESS		0x12
->> +#define ARM_SMMU_EVT_F_PERMISSION	0x13
->> +#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
->> +#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
->> +#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
->> +
->>  /* Common MSI config fields */
->>  #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
->>  #define MSI_CFG2_SH			GENMASK(5, 4)
->> @@ -333,6 +353,11 @@
->>  #define EVTQ_MAX_SZ_SHIFT		7
->>  
->>  #define EVTQ_0_ID			GENMASK_ULL(7, 0)
->> +#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
->> +#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
->> +#define EVTQ_1_S2			GENMASK_ULL(39, 39)
->> +#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
->> +#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
->>  
->>  /* PRI queue */
->>  #define PRIQ_ENT_DWORDS			2
->> @@ -1270,7 +1295,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
->>  	return 0;
->>  }
->>  
->> -__maybe_unused
->>  static struct arm_smmu_master_data *
->>  arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
->>  {
->> @@ -1296,24 +1320,102 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
->>  	return master;
->>  }
->>  
->> +static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
->> +{
->> +	u64 fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
->> +	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
->> +	bool s1 = !FIELD_GET(EVTQ_1_S2, evt[1]);
->> +	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
->> +	struct arm_smmu_master_data *master;
->> +	struct iommu_fault_event event;
->> +	bool propagate = true;
->> +	u64 addr = evt[2];
->> +	int i;
->> +
->> +	master = arm_smmu_find_master(smmu, sid);
->> +	if (WARN_ON(!master))
->> +		return;
->> +
->> +	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
->> +
->> +	switch (type) {
->> +	case ARM_SMMU_EVT_C_BAD_STREAMID:
->> +		event.fault.reason = IOMMU_FAULT_REASON_SOURCEID_INVALID;
->> +		break;
->> +	case ARM_SMMU_EVT_F_STREAM_DISABLED:
->> +	case ARM_SMMU_EVT_C_BAD_SUBSTREAMID:
->> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_INVALID;
->> +		break;
->> +	case ARM_SMMU_EVT_F_CD_FETCH:
->> +		event.fault.reason = IOMMU_FAULT_REASON_PASID_FETCH;
->> +		break;
->> +	case ARM_SMMU_EVT_F_WALK_EABT:
->> +		event.fault.reason = IOMMU_FAULT_REASON_WALK_EABT;
->> +		event.fault.addr = addr;
->> +		event.fault.fetch_addr = fetch_addr;
->> +		propagate = s1;
->> +		break;
->> +	case ARM_SMMU_EVT_F_TRANSLATION:
->> +		event.fault.reason = IOMMU_FAULT_REASON_PTE_FETCH;
->> +		event.fault.addr = addr;
->> +		event.fault.fetch_addr = fetch_addr;
->> +		propagate = s1;
->> +		break;
->> +	case ARM_SMMU_EVT_F_PERMISSION:
->> +		event.fault.reason = IOMMU_FAULT_REASON_PERMISSION;
->> +		event.fault.addr = addr;
->> +		propagate = s1;
->> +		break;
->> +	case ARM_SMMU_EVT_F_ACCESS:
->> +		event.fault.reason = IOMMU_FAULT_REASON_ACCESS;
->> +		event.fault.addr = addr;
->> +		propagate = s1;
->> +		break;
->> +	case ARM_SMMU_EVT_C_BAD_STE:
->> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_DEVICE_CONTEXT_ENTRY;
->> +		break;
->> +	case ARM_SMMU_EVT_C_BAD_CD:
->> +		event.fault.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
->> +		break;
->> +	case ARM_SMMU_EVT_F_ADDR_SIZE:
->> +		event.fault.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
->> +		propagate = s1;
->> +		break;
->> +	case ARM_SMMU_EVT_F_STE_FETCH:
->> +		event.fault.reason = IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH;
->> +		event.fault.fetch_addr = fetch_addr;
->> +		break;
->> +	/* End of addition */
->> +	case ARM_SMMU_EVT_E_PAGE_REQUEST:
->> +	case ARM_SMMU_EVT_F_TLB_CONFLICT:
->> +	case ARM_SMMU_EVT_F_CFG_CONFLICT:
->> +	case ARM_SMMU_EVT_F_BAD_ATS_TREQ:
->> +	case ARM_SMMU_EVT_F_TRANSL_FORBIDDEN:
->> +	case ARM_SMMU_EVT_F_UUT:
->> +	default:
->> +		event.fault.reason = IOMMU_FAULT_REASON_UNKNOWN;
->> +	}
->> +	/* only propagate the error if it relates to stage 1 */
->> +	if (s1)
+>>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>>
+>>> Device faults detected by IOMMU can be reported outside IOMMU
+>>> subsystem for further processing. This patch intends to provide
+>>> a generic device fault data such that device drivers can be
+>>> communicated with IOMMU faults without model specific knowledge.
+>>>
+>>> The proposed format is the result of discussion at:
+>>> https://lkml.org/lkml/2017/11/10/291
+>>> Part of the code is based on Jean-Philippe Brucker's patchset
+>>> (https://patchwork.kernel.org/patch/9989315/).
+>>>
+>>> The assumption is that model specific IOMMU driver can filter and
+>>> handle most of the internal faults if the cause is within IOMMU driver
+>>> control. Therefore, the fault reasons can be reported are grouped
+>>> and generalized based common specifications such as PCI ATS.
+>>>
+>>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> [moved part of the iommu_fault_event struct in the uapi, enriched
+>>>  the fault reasons to be able to map unrecoverable SMMUv3 errors]
+>>> ---
+>>>  include/linux/iommu.h      | 55 ++++++++++++++++++++++++-
+>>>  include/uapi/linux/iommu.h | 83
+>>> ++++++++++++++++++++++++++++++++++++++ 2 files changed, 136
+>>> insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>>> index 244c1a3d5989..1dedc2d247c2 100644
+>>> --- a/include/linux/iommu.h
+>>> +++ b/include/linux/iommu.h
+>>> @@ -49,13 +49,17 @@ struct bus_type;
+>>>  struct device;
+>>>  struct iommu_domain;
+>>>  struct notifier_block;
+>>> +struct iommu_fault_event;
+>>>  
+>>>  /* iommu fault flags */
+>>> -#define IOMMU_FAULT_READ	0x0
+>>> -#define IOMMU_FAULT_WRITE	0x1
+>>> +#define IOMMU_FAULT_READ		(1 << 0)
+>>> +#define IOMMU_FAULT_WRITE		(1 << 1)
+>>> +#define IOMMU_FAULT_EXEC		(1 << 2)
+>>> +#define IOMMU_FAULT_PRIV		(1 << 3)
+>>>  
+>>>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+>>>  			struct device *, unsigned long, int, void *);
+>>> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *,
+>>> void *); 
+>>>  struct iommu_domain_geometry {
+>>>  	dma_addr_t aperture_start; /* First address that can be
+>>> mapped    */ @@ -255,6 +259,52 @@ struct iommu_device {
+>>>  	struct device *dev;
+>>>  };
+>>>  
+>>> +/**
+>>> + * struct iommu_fault_event - Generic per device fault data
+>>> + *
+>>> + * - PCI and non-PCI devices
+>>> + * - Recoverable faults (e.g. page request), information based on
+>>> PCI ATS
+>>> + * and PASID spec.
+>>> + * - Un-recoverable faults of device interest
+>>> + * - DMA remapping and IRQ remapping faults
+>>> + *
+>>> + * @fault: fault descriptor
+>>> + * @device_private: if present, uniquely identify device-specific
+>>> + *                  private data for an individual page request.
+>>> + * @iommu_private: used by the IOMMU driver for storing
+>>> fault-specific
+>>> + *                 data. Users should not modify this field before
+>>> + *                 sending the fault response.
+>>> + */
+>>> +struct iommu_fault_event {
+>>> +	struct iommu_fault fault;
+>>> +	u64 device_private;
+>> I think we want to move device_private to uapi since it gets injected
+>> into the guest, then returned by guest in case of page response. For
+>> VT-d we also need 128 bits of private data. VT-d spec. 7.7.1
 > 
-> if (propagate)
+> Ah, I didn't notice the format changed in VT-d rev3. On that topic, how
+> do we manage future extensions to the iommu_fault struct? Should we add
+> ~48 bytes of padding after device_private, along with some flags telling
+> which field is valid, or deal with it using a structure version like we
+> do for the invalidate and bind structs? In the first case, iommu_fault
+> wouldn't fit in a 64-byte cacheline anymore, but I'm not sure we care.
 > 
-> But I don't quite understand how we're deciding what to propagate: a
-> C_BAD_STE is most likely a bug in the SMMU driver, but is reported to
-> userspace. On the other hand a stage-2 F_TRANSLATION is likely an error
-> from the VMM (didn't setup stage-2 mappings properly), but we're not
-> reporting it. Maybe we should add a bit to event.fault that tells
-> whether the fault was stage 1 or 2, and let the VMM deal with it?
-Yes I mixed this up. propagate should be false by default. In case the
-event has an S2 field and S2 == 0 we can safely propagate to the guest.
-Otherwise it is case by case and I need to do another review. If it
-relates to structures owned by the guest propagate.
+>> For exception tracking (e.g. unanswered page request), I can add timer
+>> and list info later when I include PRQ. sounds ok?
+>>> +	u64 iommu_private;
+> [...]
+>>> +/**
+>>> + * struct iommu_fault - Generic fault data
+>>> + *
+>>> + * @type contains fault type
+>>> + * @reason fault reasons if relevant outside IOMMU driver.
+>>> + * IOMMU driver internal faults are not reported.
+>>> + * @addr: tells the offending page address
+>>> + * @fetch_addr: tells the address that caused an abort, if any
+>>> + * @pasid: contains process address space ID, used in shared virtual
+>>> memory
+>>> + * @page_req_group_id: page request group index
+>>> + * @last_req: last request in a page request group
+>>> + * @pasid_valid: indicates if the PRQ has a valid PASID
+>>> + * @prot: page access protection flag:
+>>> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+>>> + */
+>>> +
+>>> +struct iommu_fault {
+>>> +	__u32	type;   /* enum iommu_fault_type */
+>>> +	__u32	reason; /* enum iommu_fault_reason */
+>>> +	__u64	addr;
+>>> +	__u64	fetch_addr;
+>>> +	__u32	pasid;
+>>> +	__u32	page_req_group_id;
+>>> +	__u32	last_req;
+>>> +	__u32	pasid_valid;
+>>> +	__u32	prot;
+>>> +	__u32	access;
 > 
->> +		iommu_report_device_fault(master->dev, &event);
-> 
-> We should return here if the fault is successfully injected
-
-Even if the fault gets injected in the guest can't it be still useful to
-get the message below on host side?
+> What does @access contain? Can it be squashed into @prot?
+it was related to F_ACCESS event record and was a placeholder for
+reporting access attributes of the input transaction (Rnw, InD, PnU
+fields). But I wonder whether this is needed to implement such fine
+level fault reporting. Do we really care?
 
 Thanks
 
@@ -207,36 +160,15 @@ Eric
 > Thanks,
 > Jean
 > 
->> +
->> +	dev_info(smmu->dev, "event 0x%02x received:\n", type);
->> +	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
->> +		dev_info(smmu->dev, "\t0x%016llx\n",
->> +			 (unsigned long long)evt[i]);
->> +	}
->> +}
->> +
->>  /* IRQ and event handlers */
->>  static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
->>  {
->> -	int i;
->>  	struct arm_smmu_device *smmu = dev;
->>  	struct arm_smmu_queue *q = &smmu->evtq.q;
->>  	u64 evt[EVTQ_ENT_DWORDS];
->>  
->>  	do {
->> -		while (!queue_remove_raw(q, evt)) {
->> -			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
->> -
->> -			dev_info(smmu->dev, "event 0x%02x received:\n", id);
->> -			for (i = 0; i < ARRAY_SIZE(evt); ++i)
->> -				dev_info(smmu->dev, "\t0x%016llx\n",
->> -					 (unsigned long long)evt[i]);
->> -
->> -		}
->> +		while (!queue_remove_raw(q, evt))
->> +			arm_smmu_report_event(smmu, evt);
->>  
->>  		/*
->>  		 * Not much we can do on overflow, so scream and pretend we're
+>> relocated to uapi, Yi can you confirm?
+>> 	__u64 device_private[2];
+>>
+>>> +};
+>>>  #endif /* _UAPI_IOMMU_H */
+>>
+>> _______________________________________________
+>> iommu mailing list
+>> iommu@lists.linux-foundation.org
+>> https://lists.linuxfoundation.org/mailman/listinfo/iommu
 >>
 > 
