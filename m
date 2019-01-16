@@ -1,53 +1,40 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [RFC v3 17/21] iommu/smmuv3: Report non recoverable faults
-Date: Wed, 16 Jan 2019 12:25:38 +0000
-Message-ID: <c0328bbe-e02c-c337-ec52-c899dc0025d3@arm.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-18-eric.auger@redhat.com>
- <dae89fd8-6a82-d2f0-a8c7-ddbf12a7b047@arm.com>
- <e634adee-f7ab-b90d-aac6-06400fa9ffb4@redhat.com>
+From: Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH V2] mm: Introduce GFP_PGTABLE
+Date: Wed, 16 Jan 2019 04:30:18 -0800
+Message-ID: <20190116123018.GF6310@bombadil.infradead.org>
+References: <1547619692-7946-1-git-send-email-anshuman.khandual@arm.com>
+ <20190116065703.GE24149@dhcp22.suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9F444A3A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jan 2019 07:25:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z7pOutYvddyj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Jan 2019 07:25:57 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 938474A332
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Jan 2019 07:25:57 -0500 (EST)
-In-Reply-To: <e634adee-f7ab-b90d-aac6-06400fa9ffb4@redhat.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20190116065703.GE24149@dhcp22.suse.cz>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Michal Hocko <mhocko@kernel.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org, akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-riscv@lists.infradead.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, mpe@ellerman.id.au, tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com, peterz@infradead.org, christoffer.dall@arm.com, marc.zyngier@arm.com, kirill@shutemov.name, rppt@linux.vnet.ibm.com, ard.biesheuvel@linaro.org, mark.rutland@arm.com, steve.capper@arm.com, james.morse@arm.com, robin.murphy@arm.com, aneesh.kumar@linux.ibm.com, vbabka@suse.cz, shakeelb@google.com, rientjes@google.com, palmer@sifive.com, greentime@
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/01/2019 21:06, Auger Eric wrote:
->>> +		iommu_report_device_fault(master->dev, &event);
->>
->> We should return here if the fault is successfully injected
+On Wed, Jan 16, 2019 at 07:57:03AM +0100, Michal Hocko wrote:
+> On Wed 16-01-19 11:51:32, Anshuman Khandual wrote:
+> > All architectures have been defining their own PGALLOC_GFP as (GFP_KERNEL |
+> > __GFP_ZERO) and using it for allocating page table pages. This causes some
+> > code duplication which can be easily avoided. GFP_KERNEL allocated and
+> > cleared out pages (__GFP_ZERO) are required for page tables on any given
+> > architecture. This creates a new generic GFP flag flag which can be used
+> > for any page table page allocation. Does not cause any functional change.
+> > 
+> > GFP_PGTABLE is being added into include/asm-generic/pgtable.h which is the
+> > generic page tabe header just to prevent it's potential misuse as a general
+> > allocation flag if included in include/linux/gfp.h.
 > 
-> Even if the fault gets injected in the guest can't it be still useful to
-> get the message below on host side?
+> I haven't reviewed the patch yet but I am wondering whether this is
+> really worth it without going all the way down to unify the common code
+> and remove much more code duplication. Or is this not possible for some
+> reason?
 
-I don't think we should let the guest flood the host log by issuing
-invalid DMA (or are there other cases where the guest can freely print
-stuff in the host?) We do print all errors at the moment, but we should
-tighten this once there is an upstream solution to let the guest control
-DMA mappings.
+Exactly what I suggested doing in response to v1.
 
-Thanks,
-Jean
+Also, the approach taken here is crazy.  x86 has a feature that no other
+architecture has bothered to implement yet -- accounting page tables
+to the process.  Yet instead of spreading that goodness to all other
+architectures, Anshuman has gone to more effort to avoid doing that.
