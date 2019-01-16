@@ -1,63 +1,131 @@
-From: Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH V2] mm: Introduce GFP_PGTABLE
-Date: Wed, 16 Jan 2019 06:20:14 -0800
-Message-ID: <20190116142014.GJ6310@bombadil.infradead.org>
-References: <1547619692-7946-1-git-send-email-anshuman.khandual@arm.com>
- <20190116065703.GE24149@dhcp22.suse.cz>
- <20190116123018.GF6310@bombadil.infradead.org>
- <07d6a264-dccd-78ab-e8a9-2410bbef7b97@arm.com>
- <20190116131827.GH6310@bombadil.infradead.org>
- <521d8511-4c87-49c6-de03-67a71d5bacca@c-s.fr>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
+Date: Wed, 16 Jan 2019 15:52:20 +0000
+Message-ID: <519a1669-1343-1296-8f04-6ba63085d9a5@arm.com>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+ <20190108102633.17482-15-eric.auger@redhat.com>
+ <20190110104544.26f3bcb1@jacob-builder>
+ <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
+ <20190114143208.66eac25a@jacob-builder>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <521d8511-4c87-49c6-de03-67a71d5bacca@c-s.fr>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-riscv/>
-List-Post: <mailto:linux-riscv@lists.infradead.org>
-List-Help: <mailto:linux-riscv-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-riscv>,
- <mailto:linux-riscv-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-Errors-To: linux-riscv-bounces+glpr-linux-riscv=m.gmane.org@lists.infradead.org
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Cc: mark.rutland@arm.com, christoffer.dall@arm.com, linux-sh@vger.kernel.org, peterz@infradead.org, catalin.marinas@arm.com, palmer@sifive.com, will.deacon@arm.com, Michal Hocko <mhocko@kernel.org>, linux-mm@kvack.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, aneesh.kumar@linux.ibm.com, greentime@andestech.com, linux@armlinux.org.uk, mingo@redhat.com, linux-arm-kernel@lists.infradead.org, rientjes@google.com, dave.hansen@linux.intel.com, Anshuman Khandual <anshuman.khandual@arm.com>, marc.zyngier@arm.com, rppt@linux.vnet.ibm.com, shakeelb@google.com, kirill@shutemov.name, tglx@linutronix.de, vbabka@suse.cz, ard.biesheuvel@linaro.org, linuxppc-dev@lists.ozlabs.org, steve.capper@arm.com, linux-kernel@vger.kernel.org, james.morse@arm.com, akpm@linux-foundation.org, robin.murphy@arm.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190114143208.66eac25a@jacob-builder>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, Christoffer Dall <Christoffer.Dall@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 16, 2019 at 02:47:16PM +0100, Christophe Leroy wrote:
-> Le 16/01/2019 =E0 14:18, Matthew Wilcox a =E9crit=A0:
-> > I disagree with your objective.  Making more code common is a great ide=
-a,
-> > but this patch is too unambitious.  We should be heading towards one or
-> > two page table allocation functions instead of having every architectur=
-e do
-> > its own thing.
-> > =
+On 14/01/2019 22:32, Jacob Pan wrote:
+>> [...]
+>>>> +/**
+>>>> + * struct iommu_fault - Generic fault data
+>>>> + *
+>>>> + * @type contains fault type
+>>>> + * @reason fault reasons if relevant outside IOMMU driver.
+>>>> + * IOMMU driver internal faults are not reported.
+>>>> + * @addr: tells the offending page address
+>>>> + * @fetch_addr: tells the address that caused an abort, if any
+>>>> + * @pasid: contains process address space ID, used in shared
+>>>> virtual memory
+>>>> + * @page_req_group_id: page request group index
+>>>> + * @last_req: last request in a page request group
+>>>> + * @pasid_valid: indicates if the PRQ has a valid PASID
+>>>> + * @prot: page access protection flag:
+>>>> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+>>>> + */
+>>>> +
+>>>> +struct iommu_fault {
+>>>> +	__u32	type;   /* enum iommu_fault_type */
+>>>> +	__u32	reason; /* enum iommu_fault_reason */
+>>>> +	__u64	addr;
+>>>> +	__u64	fetch_addr;
+>>>> +	__u32	pasid;
+>>>> +	__u32	page_req_group_id;
+>>>> +	__u32	last_req;
+>>>> +	__u32	pasid_valid;
+>>>> +	__u32	prot;
+>>>> +	__u32	access;  
+>>
+>> What does @access contain? Can it be squashed into @prot?
+>>
+> I agreed.
+> 
+> how about this?
+> #define IOMMU_FAULT_VERSION_V1 0x1
+> struct iommu_fault {
+> 	__u16 version;
 
-> > So start there.  Move the x86 function into common code and convert one
-> > other architecture to use it too.
-> =
+Right, but the version field becomes redundant when we present a batch
+of these to userspace, in patch 18 (assuming we don't want to mix fault
+structure versions within a batch... I certainly don't).
 
-> Are we talking about pte_alloc_one_kernel() and pte_alloc_one() ?
-> =
+When introducing IOMMU_FAULT_VERSION_V2, in a distant future, I think we
+still need to support a userspace that uses IOMMU_FAULT_VERSION_V1. One
+strategy for this:
 
-> I'm not sure x86 function is the best common one, as it seems to allocate=
- a
-> multiple of PAGE_SIZE only.
+* We define structs iommu_fault_v1 (the current iommu_fault) and
+  iommu_fault_v2.
+* Userspace selects IOMMU_FAULT_VERSION_V1 when registering the fault
+  queue
+* The IOMMU driver fills iommu_fault_v2 and passes it to VFIO
+* VFIO does its best to translate this into a iommu_fault_v1 struct
 
-And that's the common case.  Most architectures use a single page for at
-least one level of the pte/pmd/pud/p4d/pgd hierarchy.  Some use multiple
-pages and some use a fraction of a page.
+So what we need now, is a way for userspace to tell the kernel which
+structure version it expects. I'm not sure we even need to pass the
+actual version number we're using back to userspace. Agreeing on one
+version at registration should be sufficient.
 
-> Some arches like powerpc use pagetables which are smaller than a page, for
-> instance powerpc 8xx uses 4k pagetables even with 16k pages, which means a
-> single page can be used by 4 pagetables.
+> 	__u16 type;
+> 	__u32 reason;
+> 	__u64 addr;
 
-Those can be added later.  Note I said "one or two", and that's what I
-had in mind; I think we want one function that allocates just a page
-and another that allocates a page fragment.  Then we can have a good
-discussion about what method we use; s390 and ppc use different techniques
-today and there's really no good reason for that.
+I'm in favor of keeping @fetch_addr as well, it can contain useful
+information. For example, while attempting to translate an IOVA
+0xfffff000, the IOMMU can't find the PASID table that we installed with
+address 0xdead - the guest passed an invalid address to
+bind_pasid_table(). We can then report 0xfffff000 in @addr, and 0xdead
+in @fetch_addr.
+
+> 	__u32 pasid;
+> 	__u32 page_req_group_id;
+> 	__u32 last_req : 1;
+> 	__u32 pasid_valid : 1;
+
+Agreed, with some explicit padding or combined as a @flag field. In fact
+if we do add the @fetch_addr field, I think we need a bit that indicates
+its validity as well.
+
+Thanks,
+Jean
+
+> 	__u32 prot;
+> 	__u64 device_private[2];
+> 	__u8 padding[48];
+> };
+> 
+> 
+>> Thanks,
+>> Jean
+>>
+>>> relocated to uapi, Yi can you confirm?
+>>> 	__u64 device_private[2];
+>>>   
+>>>> +};
+>>>>  #endif /* _UAPI_IOMMU_H */  
+>>>
+>>> _______________________________________________
+>>> iommu mailing list
+>>> iommu@lists.linux-foundation.org
+>>> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+>>>   
+>>
+> 
+> [Jacob Pan]
+> _______________________________________________
+> iommu mailing list
+> iommu@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+> 
