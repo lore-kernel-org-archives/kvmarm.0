@@ -1,156 +1,65 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v3 14/21] iommu: introduce device fault data
-Date: Wed, 16 Jan 2019 19:33:38 +0100
-Message-ID: <d1bee719-4d15-6f60-41ae-7937d74e6999@redhat.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-15-eric.auger@redhat.com>
- <20190110104544.26f3bcb1@jacob-builder>
- <63a19100-c3dd-9dbd-b37a-9dfbe254459e@arm.com>
- <20190114143208.66eac25a@jacob-builder>
- <519a1669-1343-1296-8f04-6ba63085d9a5@arm.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH V2] mm: Introduce GFP_PGTABLE
+Date: Thu, 17 Jan 2019 20:56:34 +1100
+Message-ID: <87tvi74nfx.fsf@concordia.ellerman.id.au>
+References: <1547619692-7946-1-git-send-email-anshuman.khandual@arm.com>
+ <20190116065703.GE24149@dhcp22.suse.cz>
+ <20190116123018.GF6310@bombadil.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <519a1669-1343-1296-8f04-6ba63085d9a5@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, Robin Murphy <Robin.Murphy@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3FF44A3A6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 04:56:44 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oP2fQ5HTvk9c for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jan 2019 04:56:43 -0500 (EST)
+Received: from ozlabs.org (ozlabs.org [203.11.71.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 31FA14A376
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 04:56:43 -0500 (EST)
+In-Reply-To: <20190116123018.GF6310@bombadil.infradead.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Matthew Wilcox <willy@infradead.org>, Michal Hocko <mhocko@kernel.org>
+Cc: linux-sh@vger.kernel.org, peterz@infradead.org, catalin.marinas@arm.com, dave.hansen@linux.intel.com, will.deacon@arm.com, linux-mm@kvack.org, linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu, aneesh.kumar@linux.ibm.com, greentime@andestech.com, linux@armlinux.org.uk, mingo@redhat.com, vbabka@suse.cz, rientjes@google.com, palmer@sifive.com, Anshuman Khandual <anshuman.khandual@arm.com>, marc.zyngier@arm.com, rppt@linux.vnet.ibm.com, shakeelb@google.com, kirill@shutemov.name, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, ard.biesheuvel@linaro.org, robin.murphy@arm.com, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
+Matthew Wilcox <willy@infradead.org> writes:
 
-On 1/16/19 4:52 PM, Jean-Philippe Brucker wrote:
-> On 14/01/2019 22:32, Jacob Pan wrote:
->>> [...]
->>>>> +/**
->>>>> + * struct iommu_fault - Generic fault data
->>>>> + *
->>>>> + * @type contains fault type
->>>>> + * @reason fault reasons if relevant outside IOMMU driver.
->>>>> + * IOMMU driver internal faults are not reported.
->>>>> + * @addr: tells the offending page address
->>>>> + * @fetch_addr: tells the address that caused an abort, if any
->>>>> + * @pasid: contains process address space ID, used in shared
->>>>> virtual memory
->>>>> + * @page_req_group_id: page request group index
->>>>> + * @last_req: last request in a page request group
->>>>> + * @pasid_valid: indicates if the PRQ has a valid PASID
->>>>> + * @prot: page access protection flag:
->>>>> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
->>>>> + */
->>>>> +
->>>>> +struct iommu_fault {
->>>>> +	__u32	type;   /* enum iommu_fault_type */
->>>>> +	__u32	reason; /* enum iommu_fault_reason */
->>>>> +	__u64	addr;
->>>>> +	__u64	fetch_addr;
->>>>> +	__u32	pasid;
->>>>> +	__u32	page_req_group_id;
->>>>> +	__u32	last_req;
->>>>> +	__u32	pasid_valid;
->>>>> +	__u32	prot;
->>>>> +	__u32	access;  
->>>
->>> What does @access contain? Can it be squashed into @prot?
->>>
->> I agreed.
->>
->> how about this?
->> #define IOMMU_FAULT_VERSION_V1 0x1
->> struct iommu_fault {
->> 	__u16 version;
-> 
-> Right, but the version field becomes redundant when we present a batch
-> of these to userspace, in patch 18 (assuming we don't want to mix fault
-> structure versions within a batch... I certainly don't).>
-> When introducing IOMMU_FAULT_VERSION_V2, in a distant future, I think we
-> still need to support a userspace that uses IOMMU_FAULT_VERSION_V1. One
-> strategy for this:
-> 
-> * We define structs iommu_fault_v1 (the current iommu_fault) and
->   iommu_fault_v2.
-> * Userspace selects IOMMU_FAULT_VERSION_V1 when registering the fault
->   queue
-> * The IOMMU driver fills iommu_fault_v2 and passes it to VFIO
-> * VFIO does its best to translate this into a iommu_fault_v1 struct
-> 
-> So what we need now, is a way for userspace to tell the kernel which
-> structure version it expects. I'm not sure we even need to pass the
-> actual version number we're using back to userspace. Agreeing on one
-> version at registration should be sufficient.
+> On Wed, Jan 16, 2019 at 07:57:03AM +0100, Michal Hocko wrote:
+>> On Wed 16-01-19 11:51:32, Anshuman Khandual wrote:
+>> > All architectures have been defining their own PGALLOC_GFP as (GFP_KERNEL |
+>> > __GFP_ZERO) and using it for allocating page table pages. This causes some
+>> > code duplication which can be easily avoided. GFP_KERNEL allocated and
+>> > cleared out pages (__GFP_ZERO) are required for page tables on any given
+>> > architecture. This creates a new generic GFP flag flag which can be used
+>> > for any page table page allocation. Does not cause any functional change.
+>> > 
+>> > GFP_PGTABLE is being added into include/asm-generic/pgtable.h which is the
+>> > generic page tabe header just to prevent it's potential misuse as a general
+>> > allocation flag if included in include/linux/gfp.h.
+>> 
+>> I haven't reviewed the patch yet but I am wondering whether this is
+>> really worth it without going all the way down to unify the common code
+>> and remove much more code duplication. Or is this not possible for some
+>> reason?
+>
+> Exactly what I suggested doing in response to v1.
+>
+> Also, the approach taken here is crazy.  x86 has a feature that no other
+> architecture has bothered to implement yet -- accounting page tables
+> to the process.
 
-As we expose a VFIO region we can report its size, entry size, max
-supported entry version, actual entry version in the region capabilities.
+powerpc does __GFP_ACCOUNT for user page tables too. Shamelessly cribbed
+from the x86 version of course :)
 
-Conveying the version along with the eventfd at registration time will
-require to introduce a new flag at vfio_irq_set level (if we still plan
-to use this VFIO_DEVICE_SET_IRQS API) but that should be feasible.
-> 
->> 	__u16 type;
->> 	__u32 reason;
->> 	__u64 addr;
-> 
-> I'm in favor of keeping @fetch_addr as well, it can contain useful
-> information. For example, while attempting to translate an IOVA
-> 0xfffff000, the IOMMU can't find the PASID table that we installed with
-> address 0xdead - the guest passed an invalid address to
-> bind_pasid_table(). We can then report 0xfffff000 in @addr, and 0xdead
-> in @fetch_addr.
-agreed
-> 
->> 	__u32 pasid;
->> 	__u32 page_req_group_id;
->> 	__u32 last_req : 1;
->> 	__u32 pasid_valid : 1;
-> 
-> Agreed, with some explicit padding or combined as a @flag field. In fact
-> if we do add the @fetch_addr field, I think we need a bit that indicates
-> its validity as well.
-Can't we simply state fetch_addr is valid for
-IOMMU_FAULT_REASON_PASID_FETCH, IOMMU_FAULT_REASON_DEVICE_CONTEXT_FETCH,
-IOMMU_FAULT_REASON_WALK_EABT which maps to its usage in SMMU spec.
-
-Thanks
-
-Eric
-
-> 
-> Thanks,
-> Jean
-> 
->> 	__u32 prot;
->> 	__u64 device_private[2];
->> 	__u8 padding[48];
->> };
->>
->>
->>> Thanks,
->>> Jean
->>>
->>>> relocated to uapi, Yi can you confirm?
->>>> 	__u64 device_private[2];
->>>>   
->>>>> +};
->>>>>  #endif /* _UAPI_IOMMU_H */  
->>>>
->>>> _______________________________________________
->>>> iommu mailing list
->>>> iommu@lists.linux-foundation.org
->>>> https://lists.linuxfoundation.org/mailman/listinfo/iommu
->>>>   
->>>
->>
->> [Jacob Pan]
->> _______________________________________________
->> iommu mailing list
->> iommu@lists.linux-foundation.org
->> https://lists.linuxfoundation.org/mailman/listinfo/iommu
->>
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+cheers
