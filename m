@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v4 04/25] KVM: arm64: Refactor kvm_arm_num_regs() for easier
- maintenance
-Date: Thu, 17 Jan 2019 20:33:18 +0000
-Message-ID: <1547757219-19439-5-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v4 07/25] arm64/sve: Clarify role of the VQ map maintenance
+ functions
+Date: Thu, 17 Jan 2019 20:33:21 +0000
+Message-ID: <1547757219-19439-8-git-send-email-Dave.Martin@arm.com>
 References: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5429A4A3AC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E01414A379
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6SxzpnOnoS4s for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jan 2019 15:34:38 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B9EF4A3A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:38 -0500 (EST)
+ with ESMTP id HZDL8exesoEz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jan 2019 15:34:45 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F884A3BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:44 -0500 (EST)
 In-Reply-To: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,26 +32,55 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-a3ZtX2FybV9udW1fcmVncygpIGFkZHMgdG9nZXRoZXIgdmFyaW91cyBwYXJ0aWFsIHJlZ2lzdGVy
-IGNvdW50cyBpbgphIGZyZWVmb3JtIHN1bSBleHByZXNzaW9uLCB3aGljaCBtYWtlcyBpdCBoYXJk
-ZXIgdGhhbiBuZWNlc3NhcnkgdG8KcmVhZCBkaWZmcyB0aGF0IGFkZCwgbW9kaWZ5IG9yIHJlbW92
-ZSBhIHNpbmdsZSB0ZXJtIGluIHRoZSBzdW0KKHdoaWNoIGlzIGV4cGVjdGVkIHRvIHRoZSBjb21t
-b24gY2FzZSB1bmRlciBtYWludGVuYW5jZSkuCgpUaGlzIHBhdGNoIHJlZmFjdG9ycyB0aGUgY29k
-ZSB0byBhZGQgdGhlIHRlcm0gb25lIHBlciBsaW5lLCBmb3IKbWF4aW11bSByZWFkYWJpbGl0eS4K
-ClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdl
-ZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgotLS0KIGFyY2gvYXJt
-NjQva3ZtL2d1ZXN0LmMgfCAxMCArKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRp
-b25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0
-LmMgYi9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCmluZGV4IDQ2ZWI4NjcuLjY1ZjQzMzggMTAwNjQ0
-Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3Qu
-YwpAQCAtMzEyLDggKzMxMiwxNCBAQCBzdGF0aWMgaW50IGdldF90aW1lcl9yZWcoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKICAqLwogdW5zaWdu
-ZWQgbG9uZyBrdm1fYXJtX251bV9yZWdzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKLQlyZXR1
-cm4gbnVtX2NvcmVfcmVncygpICsga3ZtX2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KQotCQkr
-IGt2bV9hcm1fZ2V0X2Z3X251bV9yZWdzKHZjcHUpCSsgTlVNX1RJTUVSX1JFR1M7CisJdW5zaWdu
-ZWQgbG9uZyByZXMgPSAwOworCisJcmVzICs9IG51bV9jb3JlX3JlZ3MoKTsKKwlyZXMgKz0ga3Zt
-X2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KTsKKwlyZXMgKz0ga3ZtX2FybV9nZXRfZndfbnVt
-X3JlZ3ModmNwdSk7CisJcmVzICs9IE5VTV9USU1FUl9SRUdTOworCisJcmV0dXJuIHJlczsKIH0K
-IAogLyoqCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+The roles of sve_init_vq_map(), sve_update_vq_map() and
+sve_verify_vq_map() are highly non-obvious to anyone who has not dug
+through cpufeatures.c in detail.
+
+Since the way these functions interact with each other is more
+important here than a full understanding of the cpufeatures code, this
+patch adds comments to make the functions' roles clearer.
+
+No functional change.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+ arch/arm64/kernel/fpsimd.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 64729e2..92c2331 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -647,6 +647,10 @@ static void sve_probe_vqs(DECLARE_BITMAP(map, SVE_VQ_MAX))
+ 	}
+ }
+ 
++/*
++ * Initialise the set of known supported VQs for the boot CPU.
++ * This is called during kernel boot, before secondary CPUs are brought up.
++ */
+ void __init sve_init_vq_map(void)
+ {
+ 	sve_probe_vqs(sve_vq_map);
+@@ -656,6 +660,7 @@ void __init sve_init_vq_map(void)
+ /*
+  * If we haven't committed to the set of supported VQs yet, filter out
+  * those not supported by the current CPU.
++ * This function is called during the bring-up of early secondary CPUs only.
+  */
+ void sve_update_vq_map(void)
+ {
+@@ -666,7 +671,10 @@ void sve_update_vq_map(void)
+ 	bitmap_or(sve_vq_partial_map, sve_vq_partial_map, tmp_map, SVE_VQ_MAX);
+ }
+ 
+-/* Check whether the current CPU supports all VQs in the committed set */
++/*
++ * Check whether the current CPU supports all VQs in the committed set.
++ * This function is called during the bring-up of late secondary CPUs only.
++ */
+ int sve_verify_vq_map(void)
+ {
+ 	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
+-- 
+2.1.4
