@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v4 12/25] KVM: arm64: Support runtime sysreg filtering for
- KVM_GET_REG_LIST
-Date: Thu, 17 Jan 2019 20:33:26 +0000
-Message-ID: <1547757219-19439-13-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v4 15/25] KVM: Allow 2048-bit register access via ioctl
+ interface
+Date: Thu, 17 Jan 2019 20:33:29 +0000
+Message-ID: <1547757219-19439-16-git-send-email-Dave.Martin@arm.com>
 References: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E64554A382
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9534A3A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:35:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DmoF2CZ-H8NM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Jan 2019 15:34:56 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E1D84A332
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:34:55 -0500 (EST)
+ with ESMTP id sQmcApmYAOQz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Jan 2019 15:35:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 471494A3C3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Jan 2019 15:35:01 -0500 (EST)
 In-Reply-To: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,82 +32,30 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM_GET_REG_LIST should only enumerate registers that are actually
-accessible, so it is necessary to filter out any register that is
-not exposed to the guest.  For features that are configured at
-runtime, this will require a dynamic check.
-
-For example, ZCR_EL1 and ID_AA64ZFR0_EL1 would need to be hidden
-if SVE is not enabled for the guest.
-
-Special-casing walk_one_sys_reg() for specific registers will make
-the code unnecessarily messy, so this patch adds a new sysreg
-method check_present() that, if defined, indicates whether the
-sysreg should be enumerated.  If the guest runtime configuration
-may require a particular system register to be hidden,
-check_present should point to a function that returns true or false
-to enable or disable enumeration of that register respectively.
-
-Currently check_present() is not used for any other purpose, but it
-may be a useful foundation for abstracting other parts of the code
-to handle conditionally-present sysregs, if required.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 10 +++++++---
- arch/arm64/kvm/sys_regs.h |  4 ++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 71c5825..bca32d5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2447,7 +2447,8 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- 	return true;
- }
- 
--static int walk_one_sys_reg(const struct sys_reg_desc *rd,
-+static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
-+			    const struct sys_reg_desc *rd,
- 			    u64 __user **uind,
- 			    unsigned int *total)
- {
-@@ -2458,6 +2459,9 @@ static int walk_one_sys_reg(const struct sys_reg_desc *rd,
- 	if (!(rd->reg || rd->get_user))
- 		return 0;
- 
-+	if (rd->check_present && !rd->check_present(vcpu, rd))
-+		return 0;
-+
- 	if (!copy_reg_to_user(rd, uind))
- 		return -EFAULT;
- 
-@@ -2486,9 +2490,9 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 		int cmp = cmp_sys_reg(i1, i2);
- 		/* target-specific overrides generic entry. */
- 		if (cmp <= 0)
--			err = walk_one_sys_reg(i1, &uind, &total);
-+			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
- 		else
--			err = walk_one_sys_reg(i2, &uind, &total);
-+			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
- 
- 		if (err)
- 			return err;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 174ffc0..472e8f1 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -69,6 +69,10 @@ struct sys_reg_desc {
- 			const struct kvm_one_reg *reg, void __user *uaddr);
- 	int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			const struct kvm_one_reg *reg, void __user *uaddr);
-+
-+	/* Return true iff the register exists; assume present if NULL */
-+	bool (*check_present)(const struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_desc *rd);
- };
- 
- static inline void print_sys_reg_instr(const struct sys_reg_params *p)
--- 
-2.1.4
+VGhlIEFybSBTVkUgYXJjaGl0ZWN0dXJlIGRlZmluZXMgcmVnaXN0ZXJzIHRoYXQgYXJlIHVwIHRv
+IDIwNDggYml0cwppbiBzaXplICh3aXRoIHNvbWUgcG9zc2liaWxpdHkgb2YgZnVydGhlciBmdXR1
+cmUgZXhwYW5zaW9uKS4KCkluIG9yZGVyIHRvIGF2b2lkIHRoZSBuZWVkIGZvciBhbiBleGNlc3Np
+dmVseSBsYXJnZSBudW1iZXIgb2YKaW9jdGxzIHdoZW4gc2F2aW5nIGFuZCByZXN0b3JpbmcgYSB2
+Y3B1J3MgcmVnaXN0ZXJzLCB0aGlzIHBhdGNoCmFkZHMgYSAjZGVmaW5lIHRvIG1ha2Ugc3VwcG9y
+dCBmb3IgaW5kaXZpZHVhbCAyMDQ4LWJpdCByZWdpc3RlcnMKdGhyb3VnaCB0aGUgS1ZNX3tHRVQs
+U0VUfV9PTkVfUkVHIGlvY3RsIGludGVyZmFjZSBvZmZpY2lhbC4gIFRoaXMKd2lsbCBhbGxvdyBl
+YWNoIFNWRSByZWdpc3RlciB0byBiZSBhY2Nlc3NlZCBpbiBhIHNpbmdsZSBjYWxsLgoKVGhlcmUg
+YXJlIHN1ZmZpY2llbnQgc3BhcmUgYml0cyBpbiB0aGUgcmVnaXN0ZXIgaWQgc2l6ZSBmaWVsZCBm
+b3IKdGhpcyBjaGFuZ2UsIHNvIHRoZXJlIGlzIG5vIEFCSSBpbXBhY3QgcHJvdmlkaW5nIHRoYXQK
+S1ZNX0dFVF9SRUdfTElTVCBkb2VzIG5vdCBlbnVtZXJhdGUgYW55IDIwNDgtYml0IHJlZ2lzdGVy
+IHVubGVzcwp1c2Vyc3BhY2UgZXhwbGljaXRseSBvcHRzIGluIHRvIHRoZSByZWxldmFudCBhcmNo
+aXRlY3R1cmUtc3BlY2lmaWMKZmVhdHVyZXMuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8
+RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5u
+ZWVAbGluYXJvLm9yZz4KLS0tCiBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggfCAxICsKIDEgZmls
+ZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51
+eC9rdm0uaCBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAppbmRleCA2ZDRlYTRiLi5kYzc3YTVh
+IDEwMDY0NAotLS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKKysrIGIvaW5jbHVkZS91YXBp
+L2xpbnV4L2t2bS5oCkBAIC0xMTQ1LDYgKzExNDUsNyBAQCBzdHJ1Y3Qga3ZtX2RpcnR5X3RsYiB7
+CiAjZGVmaW5lIEtWTV9SRUdfU0laRV9VMjU2CTB4MDA1MDAwMDAwMDAwMDAwMFVMTAogI2RlZmlu
+ZSBLVk1fUkVHX1NJWkVfVTUxMgkweDAwNjAwMDAwMDAwMDAwMDBVTEwKICNkZWZpbmUgS1ZNX1JF
+R19TSVpFX1UxMDI0CTB4MDA3MDAwMDAwMDAwMDAwMFVMTAorI2RlZmluZSBLVk1fUkVHX1NJWkVf
+VTIwNDgJMHgwMDgwMDAwMDAwMDAwMDAwVUxMCiAKIHN0cnVjdCBrdm1fcmVnX2xpc3QgewogCV9f
+dTY0IG47IC8qIG51bWJlciBvZiByZWdzICovCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
