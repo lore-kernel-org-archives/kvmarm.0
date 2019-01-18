@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [RFC PATCH 08/12] arm64: [HACK] Basic SVE support
-Date: Fri, 18 Jan 2019 16:14:17 +0000
-Message-ID: <1547828061-20462-9-git-send-email-Dave.Martin@arm.com>
+Subject: [RFC PATCH 06/12] arm64: [HACK] Pull in kvm UAPI header updates from
+ SVE development branch
+Date: Fri, 18 Jan 2019 16:14:15 +0000
+Message-ID: <1547828061-20462-7-git-send-email-Dave.Martin@arm.com>
 References: <1547828061-20462-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 175064A3D2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jan 2019 11:15:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E655F4A3AC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jan 2019 11:15:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VBNpCivSpiBU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Jan 2019 11:15:32 -0500 (EST)
+ with ESMTP id NuMtReC+Y411 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Jan 2019 11:15:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C62794A3BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jan 2019 11:15:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6424D4A3C8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Jan 2019 11:15:28 -0500 (EST)
 In-Reply-To: <1547828061-20462-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,61 +32,65 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For compatibility reasons, new vcpus created by KVM always have SVE
-disabled by default.
-
-To enable SVE to be turned on, this patch adds an option --sve.
-
-Currently, no independent control is added per-vcpu.  This means
-that it is not currently possible to create a VM containing a mix
-of SVE-enabled and non-SVE-enabled vcpus.  This functionality could
-be added later if desired.
+This patch pulls in SVE-related declarations from my kernel SVE
+development branch, so that kvmtool can make use of them.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arm/aarch64/include/kvm/kvm-config-arch.h | 2 ++
- arm/aarch64/include/kvm/kvm-cpu-arch.h    | 3 ++-
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- 3 files changed, 5 insertions(+), 1 deletion(-)
+ arm/aarch64/include/asm/kvm.h | 13 +++++++++++++
+ include/linux/kvm.h           |  2 ++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index cb3f8bc..7710f14 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "sve", &(cfg)->has_sve,			\
-+		    "Enable SVE for the guest"),			\
- 	OPT_BOOLEAN('\0', "show-reg-list", &(cfg)->show_reg_list,	\
- 		    "Show the list of KVM register IDs on startup"),	\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563..6aeddde 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -8,7 +8,8 @@
- #define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{				\
- 	[0] = ((!!(cpuid) << KVM_ARM_VCPU_POWER_OFF) |				\
- 	       (!!(kvm)->cfg.arch.aarch32_guest << KVM_ARM_VCPU_EL1_32BIT) |	\
--	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3))		\
-+	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3) |		\
-+	       (!!(kvm)->cfg.arch.has_sve << KVM_ARM_VCPU_SVE))			\
- }
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index 97c3478..fc613af 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -102,6 +102,7 @@ struct kvm_regs {
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+ #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
+ #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
++#define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
  
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index f18bfd4..6abb170 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		has_sve;
- 	bool		show_reg_list;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
+ struct kvm_vcpu_init {
+ 	__u32 target;
+@@ -226,6 +227,18 @@ struct kvm_vcpu_events {
+ 					 KVM_REG_ARM_FW | ((r) & 0xffff))
+ #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+ 
++/* SVE registers */
++#define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
++#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
++					 KVM_REG_SIZE_U2048 |		\
++					 ((n) << 5) | (i))
++#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
++					 KVM_REG_SIZE_U256 |		\
++					 ((n) << 5) | (i) | 0x400)
++#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
++#define KVM_REG_ARM64_SVE_VLS		(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
++					 KVM_REG_SIZE_U512 | 0xffff)
++
+ /* Device Control API: ARM VGIC */
+ #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+ #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 6d4ea4b..4ea0d92 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_VM_IPA_SIZE 165
+ #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
+ #define KVM_CAP_HYPERV_CPUID 167
++#define KVM_CAP_ARM_SVE 168
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1145,6 +1146,7 @@ struct kvm_dirty_tlb {
+ #define KVM_REG_SIZE_U256	0x0050000000000000ULL
+ #define KVM_REG_SIZE_U512	0x0060000000000000ULL
+ #define KVM_REG_SIZE_U1024	0x0070000000000000ULL
++#define KVM_REG_SIZE_U2048	0x0080000000000000ULL
+ 
+ struct kvm_reg_list {
+ 	__u64 n; /* number of regs */
 -- 
 2.1.4
