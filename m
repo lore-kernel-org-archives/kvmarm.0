@@ -1,143 +1,119 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v3 00/21] SMMUv3 Nested Stage Setup
-Date: Fri, 18 Jan 2019 11:02:25 +0100
-Message-ID: <293d58aa-6978-9262-64c3-d92317d8759a@redhat.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
+From: "Michael S. Tsirkin" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
+Date: Fri, 18 Jan 2019 10:51:20 -0500
+Message-ID: <20190118103235-mutt-send-email-mst@kernel.org>
+References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190108102633.17482-1-eric.auger@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20190115121959.23763-1-jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Cc: mark.rutland-5wv7dgnIgG8@public.gmane.org, virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org, frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-On 1/8/19 11:26 AM, Eric Auger wrote:
-> This series allows a virtualizer to program the nested stage mode.
-> This is useful when both the host and the guest are exposed with
-> an SMMUv3 and a PCI device is assigned to the guest using VFIO.
-> 
-> In this mode, the physical IOMMU must be programmed to translate
-> the two stages: the one set up by the guest (IOVA -> GPA) and the
-> one set up by the host VFIO driver as part of the assignment process
-> (GPA -> HPA).
-> 
-> On Intel, this is traditionnaly achieved by combining the 2 stages
-> into a single physical stage. However this relies on the capability
-> to trap on each guest translation structure update. This is possible
-> by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
-> not offer a similar mechanism.
-> 
-> However, the ARM SMMUv3 architecture supports 2 physical stages! Those
-> were devised exactly with that use case in mind. Assuming the HW
-> implements both stages (optional), the guest now can use stage 1
-> while the host uses stage 2.
-> 
-> This assumes the virtualizer has means to propagate guest settings
-> to the host SMMUv3 driver. This series brings this VFIO/IOMMU
-> infrastructure.  Those services are:
-> - bind the guest stage 1 configuration to the stream table entry
-> - propagate guest TLB invalidations
-> - bind MSI IOVAs
-> - propagate faults collected at physical level up to the virtualizer
-> 
-> This series largely reuses the user API and infrastructure originally
-> devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
-> [1-2] and Jean-Philippe [3-4].
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/linux/tree/v5.0-rc1-2stage-rfc-v3
-If someone is willing to test this series with QEMU you can use the
-branch below, until I send a formal respin.
 
-https://github.com/eauger/qemu/commits/v3.1.0-rc5-2stage-v3-for-rfc3-test-only.
+On Tue, Jan 15, 2019 at 12:19:52PM +0000, Jean-Philippe Brucker wrote:
+> Implement the virtio-iommu driver, following specification v0.9 [1].
+> 
+> This is a simple rebase onto Linux v5.0-rc2. We now use the
+> dev_iommu_fwspec_get() helper introduced in v5.0 instead of accessing
+> dev->iommu_fwspec, but there aren't any functional change from v6 [2].
+> 
+> Our current goal for virtio-iommu is to get a paravirtual IOMMU working
+> on Arm, and enable device assignment to guest userspace. In this
+> use-case the mappings are static, and don't require optimal performance,
+> so this series tries to keep things simple. However there is plenty more
+> to do for features and optimizations, and having this base in v5.1 would
+> be good. Given that most of the changes are to drivers/iommu, I believe
+> the driver and future changes should go via the IOMMU tree.
+> 
+> You can find Linux driver and kvmtool device on v0.9.2 branches [3],
+> module and x86 support on virtio-iommu/devel. Also tested with Eric's
+> QEMU device [4]. Please note that the series depends on Robin's
+> probe-deferral fix [5], which will hopefully land in v5.0.
+> 
+> [1] Virtio-iommu specification v0.9, sources and pdf
+>     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+>     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
+> 
+> [2] [PATCH v6 0/7] Add virtio-iommu driver
+>     https://lists.linuxfoundation.org/pipermail/iommu/2018-December/032127.html
+> 
+> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9.2
+>     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9.2
+> 
+> [4] [RFC v9 00/17] VIRTIO-IOMMU device
+>     https://www.mail-archive.com/qemu-devel-qX2TKyscuCcdnm+yROfE0A@public.gmane.org/msg575578.html
+> 
+> [5] [PATCH] iommu/of: Fix probe-deferral
+>     https://www.spinics.net/lists/arm-kernel/msg698371.html
+
+Thanks for the work!
+So really my only issue with this is that there's no
+way for the IOMMU to describe the devices that it
+covers.
+
+As a result that is then done in a platform-specific way.
+
+And this means that for example it does not solve the problem that e.g.
+some power people have in that their platform simply does not have a way
+to specify which devices are covered by the IOMMU.
+
+Solving that problem would make me much more excited about
+this device.
+
+On the other hand I can see that while there have been some
+developments most of the code has been stable for quite a while now.
+
+So what I am trying to do right about now, is making a small module that
+loads early and pokes at the IOMMU sufficiently to get the data about
+which devices use the IOMMU out of it using standard virtio config
+space.  IIUC it's claimed to be impossible without messy changes to the
+boot sequence.
+
+If I succeed at least on some platforms I'll ask that this design is
+worked into this device, minimizing info that goes through DT/ACPI.  If
+I see I can't make it in time to meet the next merge window, I plan
+merging the existing patches using DT (barring surprises).
+
+As I only have a very small amount of time to spend on this attempt, If
+someone else wants to try doing that in parallel, that would be great!
 
 
-Thanks
-
-Eric
-
-
+> Jean-Philippe Brucker (7):
+>   dt-bindings: virtio-mmio: Add IOMMU description
+>   dt-bindings: virtio: Add virtio-pci-iommu node
+>   of: Allow the iommu-map property to omit untranslated devices
+>   PCI: OF: Initialize dev->fwnode appropriately
+>   iommu: Add virtio-iommu driver
+>   iommu/virtio: Add probe request
+>   iommu/virtio: Add event queue
 > 
-> This was tested on Qualcomm HW featuring SMMUv3 and with adapted QEMU
-> vSMMUv3.
+>  .../devicetree/bindings/virtio/iommu.txt      |   66 +
+>  .../devicetree/bindings/virtio/mmio.txt       |   30 +
+>  MAINTAINERS                                   |    7 +
+>  drivers/iommu/Kconfig                         |   11 +
+>  drivers/iommu/Makefile                        |    1 +
+>  drivers/iommu/virtio-iommu.c                  | 1158 +++++++++++++++++
+>  drivers/of/base.c                             |   10 +-
+>  drivers/pci/of.c                              |    7 +
+>  include/uapi/linux/virtio_ids.h               |    1 +
+>  include/uapi/linux/virtio_iommu.h             |  161 +++
+>  10 files changed, 1449 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/virtio/iommu.txt
+>  create mode 100644 drivers/iommu/virtio-iommu.c
+>  create mode 100644 include/uapi/linux/virtio_iommu.h
 > 
-> References:
-> [1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
->     Address (SVA)
->     https://lwn.net/Articles/754331/
-> [2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
->     (VFIO part)
->     https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
-> [3] [v2,00/40] Shared Virtual Addressing for the IOMMU
->     https://patchwork.ozlabs.org/cover/912129/
-> [4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
->     https://patchwork.kernel.org/cover/10608299/
-> 
-> History:
-> 
-> v2 -> v3:
-> - When registering the S1 MSI binding we now store the device handle. This
->   addresses Robin's comment about discimination of devices beonging to
->   different S1 groups and using different physical MSI doorbells.
-> - Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
->   set the eventfd and expose the faults through an mmappable fault region
-> 
-> v1 -> v2:
-> - Added the fault reporting capability
-> - asid properly passed on invalidation (fix assignment of multiple
->   devices)
-> - see individual change logs for more info
-> 
-> Eric Auger (12):
->   iommu: Introduce bind_guest_msi
->   vfio: VFIO_IOMMU_BIND_MSI
->   iommu/smmuv3: Get prepared for nested stage support
->   iommu/smmuv3: Implement set_pasid_table
->   iommu/smmuv3: Implement cache_invalidate
->   dma-iommu: Implement NESTED_MSI cookie
->   iommu/smmuv3: Implement bind_guest_msi
->   iommu/smmuv3: Report non recoverable faults
->   vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
->   vfio-pci: Register an iommu fault handler
->   vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
->   vfio: Document nested stage control
-> 
-> Jacob Pan (4):
->   iommu: Introduce set_pasid_table API
->   iommu: introduce device fault data
->   driver core: add per device iommu param
->   iommu: introduce device fault report API
-> 
-> Jean-Philippe Brucker (2):
->   iommu/arm-smmu-v3: Link domains and devices
->   iommu/arm-smmu-v3: Maintain a SID->device structure
-> 
-> Liu, Yi L (3):
->   iommu: Introduce cache_invalidate API
->   vfio: VFIO_IOMMU_SET_PASID_TABLE
->   vfio: VFIO_IOMMU_CACHE_INVALIDATE
-> 
->  Documentation/vfio.txt              |  62 ++++
->  drivers/iommu/arm-smmu-v3.c         | 460 ++++++++++++++++++++++++++--
->  drivers/iommu/dma-iommu.c           | 112 ++++++-
->  drivers/iommu/iommu.c               | 187 ++++++++++-
->  drivers/vfio/pci/vfio_pci.c         | 147 ++++++++-
->  drivers/vfio/pci/vfio_pci_intrs.c   |  19 ++
->  drivers/vfio/pci/vfio_pci_private.h |   3 +
->  drivers/vfio/vfio_iommu_type1.c     | 105 +++++++
->  include/linux/device.h              |   3 +
->  include/linux/dma-iommu.h           |  11 +
->  include/linux/iommu.h               | 127 +++++++-
->  include/uapi/linux/iommu.h          | 234 ++++++++++++++
->  include/uapi/linux/vfio.h           |  38 +++
->  13 files changed, 1476 insertions(+), 32 deletions(-)
->  create mode 100644 include/uapi/linux/iommu.h
-> 
+> -- 
+> 2.19.1
