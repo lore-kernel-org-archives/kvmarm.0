@@ -1,41 +1,23 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.20 016/111] arm64: Dont trap host pointer auth use to EL2
-Date: Mon, 21 Jan 2019 14:42:10 +0100
-Message-ID: <20190121122457.528441269@linuxfoundation.org>
-References: <20190121122455.819406896@linuxfoundation.org>
+Subject: [PATCH 4.14 12/59] arm64: Dont trap host pointer auth use to EL2
+Date: Mon, 21 Jan 2019 14:43:37 +0100
+Message-ID: <20190121122457.858718771@linuxfoundation.org>
+References: <20190121122456.529172919@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E3394A39E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:46:37 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vs2r+OwMhIcG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Jan 2019 08:46:33 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2EBF4A32E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:46:33 -0500 (EST)
-In-Reply-To: <20190121122455.819406896@linuxfoundation.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190121122456.529172919@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Richard Henderson <richard.henderson@linaro.org>, Kristina Martsenko <kristina.martsenko@arm.com>, stable@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, Sasha Levin <sashal@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.20-stable review patch.  If anyone has any objections, please let me know.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-[ Upstream commit b3669b1e1c09890d61109a1a8ece2c5b66804714 ]
+[ Backport of upstream commit b3669b1e1c09890d61109a1a8ece2c5b66804714 ]
 
 To allow EL0 (and/or EL1) to use pointer authentication functionality,
 we must ensure that pointer authentication instructions and accesses to
@@ -53,35 +35,36 @@ itself when running VMs.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Will Deacon <will.deacon@arm.com>
+[kristina: backport to 4.14.y: adjust context]
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
  arch/arm64/include/asm/kvm_arm.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 7b914c6fb855..bc2327d4a505 100644
+index 9b25a1e2d583..1d6d980f80ac 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -24,6 +24,8 @@
+@@ -23,6 +23,8 @@
+ #include <asm/types.h>
  
  /* Hyp Configuration Register (HCR) bits */
- #define HCR_FWB		(UL(1) << 46)
 +#define HCR_API		(UL(1) << 41)
 +#define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
- #define HCR_TERR	(UL(1) << 36)
- #define HCR_TLOR	(UL(1) << 35)
-@@ -87,7 +89,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
+ #define HCR_E2H		(UL(1) << 34)
+ #define HCR_ID		(UL(1) << 33)
+ #define HCR_CD		(UL(1) << 32)
+@@ -82,7 +84,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
 -#define HCR_HOST_NVHE_FLAGS (HCR_RW)
 +#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
