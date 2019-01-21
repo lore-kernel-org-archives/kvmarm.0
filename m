@@ -1,141 +1,113 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 18/25] ACPI / APEI: Split ghes_read_estatus() to allow
- a peek at the CPER length
-Date: Mon, 21 Jan 2019 14:53:04 +0100
-Message-ID: <20190121135304.GI29166@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-19-james.morse@arm.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.9 11/51] arm64/kvm: consistently handle host HCR_EL2 flags
+Date: Mon, 21 Jan 2019 14:44:07 +0100
+Message-ID: <20190121122454.525427907@linuxfoundation.org>
+References: <20190121122453.700446926@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-19-james.morse@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 445574A382
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:54:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id hKnQ+Dd7dILT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Jan 2019 08:54:27 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E0BF4A330
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:54:27 -0500 (EST)
+In-Reply-To: <20190121122453.700446926@linuxfoundation.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-kernel@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Richard Henderson <richard.henderson@linaro.org>, stable@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:06:06PM +0000, James Morse wrote:
-> ghes_read_estatus() reads the record address, then the record's
-> header, then performs some sanity checks before reading the
-> records into the provided estatus buffer.
-> 
-> To provide this estatus buffer the caller must know the size of the
-> records in advance, or always provide a worst-case sized buffer as
-> happens today for the non-NMI notifications.
-> 
-> Add a function to peek at the record's header to find the size. This
-> will let the NMI path allocate the right amount of memory before reading
-> the records, instead of using the worst-case size, and having to copy
-> the records.
-> 
-> Split ghes_read_estatus() to create __ghes_peek_estatus() which
-> returns the address and size of the CPER records.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> 
-> Changes since v6:
->  * Additional buf_addr = 0 error handling
->  * Moved checking out of peek-estatus
->  * Reworded an error message so we can tell them apart
-> ---
->  drivers/acpi/apei/ghes.c | 59 ++++++++++++++++++++++++++++++++--------
->  1 file changed, 47 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index b70f5fd962cc..07a12aac4c1a 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -277,12 +277,12 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
->  	}
->  }
->  
-> -static int ghes_read_estatus(struct ghes *ghes,
-> -			     struct acpi_hest_generic_status *estatus,
-> -			     u64 *buf_paddr, int fixmap_idx)
-> +/* Read the CPER block and returning its address, and header in estatus. */
+4.9-stable review patch.  If anyone has any objections, please let me know.
 
-s/and /,/
+------------------
 
-> +static int __ghes_peek_estatus(struct ghes *ghes, int fixmap_idx,
-> +			       struct acpi_hest_generic_status *estatus,
+[ Backport of upstream commit 4eaed6aa2c628101246bcabc91b203bfac1193f8 ]
 
-Also, we probably should stick to some order of arguments of those
-functions for easier code staring, i.e.
+In KVM we define the configuration of HCR_EL2 for a VHE HOST in
+HCR_HOST_VHE_FLAGS, but we don't have a similar definition for the
+non-VHE host flags, and open-code HCR_RW. Further, in head.S we
+open-code the flags for VHE and non-VHE configurations.
 
-	function_name(ghes, estatus, buf_paddr, fixmap_idx)
+In future, we're going to want to configure more flags for the host, so
+lets add a HCR_HOST_NVHE_FLAGS defintion, and consistently use both
+HCR_HOST_VHE_FLAGS and HCR_HOST_NVHE_FLAGS in the kvm code and head.S.
 
-or so.
+We now use mov_q to generate the HCR_EL2 value, as we use when
+configuring other registers in head.S.
 
-> +			       u64 *buf_paddr)
->  {
->  	struct acpi_hest_generic *g = ghes->generic;
-> -	u32 len;
->  	int rc;
->  
->  	rc = apei_read(buf_paddr, &g->error_status_address);
-> @@ -303,29 +303,64 @@ static int ghes_read_estatus(struct ghes *ghes,
->  		return -ENOENT;
->  	}
->  
-> -	rc = -EIO;
-> -	len = cper_estatus_len(estatus);
-> +	return 0;
-> +}
-> +
-> +/* Check the top-level record header has an appropriate size. */
-> +int __ghes_check_estatus(struct ghes *ghes,
-> +			 struct acpi_hest_generic_status *estatus)
-> +{
-> +	u32 len = cper_estatus_len(estatus);
-> +	int rc = -EIO;
-> +
->  	if (len < sizeof(*estatus))
->  		goto err_read_block;
->  	if (len > ghes->generic->error_block_length)
->  		goto err_read_block;
->  	if (cper_estatus_check_header(estatus))
->  		goto err_read_block;
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+[kristina: backport to 4.9.y: adjust context]
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h | 1 +
+ arch/arm64/kernel/head.S         | 5 ++---
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Please make this chunk more user-friendly, maybe in a separate patch ontop:
-
-/* Check the top-level record header has an appropriate size. */
-int __ghes_check_estatus(struct ghes *ghes,
-                         struct acpi_hest_generic_status *estatus)
-{
-        u32 len = cper_estatus_len(estatus);
-
-        if (len < sizeof(*estatus)) {
-                pr_warn_ratelimited(FW_WARN GHES_PFX "Truncated error status block!\n");
-                return -EIO;
-        }
-
-        if (len > ghes->generic->error_block_length) {
-                pr_warn_ratelimited(FW_WARN GHES_PFX "Invalid error status block length!\n");
-                return -EIO;
-        }
-
-        if (cper_estatus_check_header(estatus)) {
-                pr_warn_ratelimited(FW_WARN GHES_PFX "Invalid CPER header!\n");
-                return -EIO;
-        }
-
-        return 0;
-}
-
-Thx.
-
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 68dedca5a47e..352bf2f7f60a 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -82,6 +82,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
++#define HCR_HOST_NVHE_FLAGS (HCR_RW)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+ 
+ /* TCR_EL2 Registers bits */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index fa52817d84c5..3289d1458791 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -517,10 +517,9 @@ CPU_LE(	bic	x0, x0, #(3 << 24)	)	// Clear the EE and E0E bits for EL1
+ #endif
+ 
+ 	/* Hyp configuration. */
+-	mov	x0, #HCR_RW			// 64-bit EL1
++	mov_q	x0, HCR_HOST_NVHE_FLAGS
+ 	cbz	x2, set_hcr
+-	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
+-	orr	x0, x0, #HCR_E2H
++	mov_q	x0, HCR_HOST_VHE_FLAGS
+ set_hcr:
+ 	msr	hcr_el2, x0
+ 	isb
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 12f9d1ecdf4c..115b0955715f 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -112,7 +112,7 @@ static void __hyp_text __deactivate_traps_vhe(void)
+ 
+ static void __hyp_text __deactivate_traps_nvhe(void)
+ {
+-	write_sysreg(HCR_RW, hcr_el2);
++	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.19.1
