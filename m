@@ -1,103 +1,81 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v9 10/26] arm64: kvm: Unmask PMR before entering guest
-Date: Mon, 21 Jan 2019 15:33:29 +0000
-Message-ID: <1548084825-8803-11-git-send-email-julien.thierry@arm.com>
-References: <1548084825-8803-1-git-send-email-julien.thierry@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1548084825-8803-1-git-send-email-julien.thierry@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH 0/4] Fix some KVM/HYP interactions with kprobes
+Date: Mon, 21 Jan 2019 17:04:00 +0000
+Message-ID: <20190121170404.142966-1-james.morse@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B1A4A387
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 12:04:16 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VuKoQx8zcfQm for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Jan 2019 12:04:15 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E444A393
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 12:04:15 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, daniel.thompson@linaro.org, joel@joelfernandes.org, marc.zyngier@arm.com, christoffer.dall@arm.com, james.morse@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com, Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
-means that hypervisor will not receive masked interrupts while running a
-guest.
+Hi guys,
 
-Avoid this by making sure ICC_PMR_EL1 is unmasked when we enter a guest.
+When looking at Masami Hiramatsu's kprobe cleanup series, it occurred
+to me the 'no KVM' isn't just about the EL1/EL2  split on non-VHE systems,
+but whether KVM is prepared to handle stepping on a breakpoint. It's not.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm64/include/asm/kvm_host.h | 12 ++++++++++++
- arch/arm64/kvm/hyp/switch.c       | 16 ++++++++++++++++
- 2 files changed, 28 insertions(+)
+This moves all the VHE-only KVM functions that run during world switch
+into the __kprobes section, and always blacklists __hyp_text for kprobes
+to cover the common guest entry/exit code.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7732d0b..a1f9f55 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -24,6 +24,7 @@
- 
- #include <linux/types.h>
- #include <linux/kvm_types.h>
-+#include <asm/arch_gicv3.h>
- #include <asm/cpufeature.h>
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
-@@ -474,6 +475,17 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- static inline void kvm_arm_vhe_guest_enter(void)
- {
- 	local_daif_mask();
-+
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (system_uses_irq_prio_masking()) {
-+		gic_write_pmr(GIC_PRIO_IRQON);
-+		dsb(sy);
-+	}
- }
- 
- static inline void kvm_arm_vhe_guest_exit(void)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b0b1478..6a4c2d6 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -22,6 +22,7 @@
- 
- #include <kvm/arm_psci.h>
- 
-+#include <asm/arch_gicv3.h>
- #include <asm/cpufeature.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -521,6 +522,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
-+	/*
-+	 * Having IRQs masked via PMR when entering the guest means the GIC
-+	 * will not signal the CPU of interrupts of lower priority, and the
-+	 * only way to get out will be via guest exceptions.
-+	 * Naturally, we want to avoid this.
-+	 */
-+	if (system_uses_irq_prio_masking()) {
-+		gic_write_pmr(GIC_PRIO_IRQON);
-+		dsb(sy);
-+	}
-+
- 	vcpu = kern_hyp_va(vcpu);
- 
- 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-@@ -573,6 +585,10 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	/* Returning to host will clear PSR.I, remask PMR if needed */
-+	if (system_uses_irq_prio_masking())
-+		gic_write_pmr(GIC_PRIO_IRQOFF);
-+
- 	return exit_code;
- }
- 
+I anticipate patch 1 going via the KVM tree to avoid conflicts.
+Patch 2 will conflict with [0].
+
+
+I'm not sure what the best thing to do with the hyp-stub is.
+Patch 3 moves it to __hyp_text, and patch 4 covers the hibernate fallout
+from doing that. We don't have any other mmu-off but not idmap'd text.
+Probing the hyp-stub has to be done by address as the symbol names
+alias those in the __entry_text, which is blacklisted. (although this
+might depend on link order). I think anyone doing this is trying to
+shoot themselves in the foot.
+
+
+Know issues:
+* Other regions we should blacklist are the kexec and hibernate 'copy
+  everything' code, as the vectors may have been overwritten by the time
+  we step on the probe. cpu-suspend needs investigating...
+
+
+Thanks,
+
+James
+
+[0] lore.kernel.org/r/154753341900.31541.8135985235882849464.stgit@devbox
+
+James Morse (4):
+  KVM: arm64: Forbid kprobing of the VHE world-switch code
+  arm64: kprobe: Always blacklist the KVM world-switch code
+  arm64: hyp-stub: Forbid kprobing of the hyp-stub
+  arm64: hibernate: Clean the __hyp_text to PoC after resume
+
+ arch/arm64/kernel/hibernate.c      |  4 +++-
+ arch/arm64/kernel/hyp-stub.S       |  2 ++
+ arch/arm64/kernel/probes/kprobes.c |  6 +++---
+ arch/arm64/kvm/hyp/switch.c        | 11 ++++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c     |  9 +++++----
+ 5 files changed, 19 insertions(+), 13 deletions(-)
+
 -- 
-1.9.1
+2.20.1
