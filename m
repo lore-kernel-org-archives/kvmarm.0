@@ -1,23 +1,23 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.9 12/51] arm64: Dont trap host pointer auth use to EL2
-Date: Mon, 21 Jan 2019 14:44:08 +0100
-Message-ID: <20190121122454.624917610@linuxfoundation.org>
-References: <20190121122453.700446926@linuxfoundation.org>
+Subject: [PATCH 4.19 19/99] arm64: Dont trap host pointer auth use to EL2
+Date: Mon, 21 Jan 2019 14:48:11 +0100
+Message-ID: <20190121134914.646580377@linuxfoundation.org>
+References: <20190121134913.924726465@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190121122453.700446926@linuxfoundation.org>
+In-Reply-To: <20190121134913.924726465@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, Sasha Levin <sashal@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Sasha Levin <sashal@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-4.9-stable review patch.  If anyone has any objections, please let me know.
+4.19-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-[ Backport of upstream commit b3669b1e1c09890d61109a1a8ece2c5b66804714 ]
+[ Upstream commit b3669b1e1c09890d61109a1a8ece2c5b66804714 ]
 
 To allow EL0 (and/or EL1) to use pointer authentication functionality,
 we must ensure that pointer authentication instructions and accesses to
@@ -35,36 +35,35 @@ itself when running VMs.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Will Deacon <will.deacon@arm.com>
-[kristina: backport to 4.9.y: adjust context]
-Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
  arch/arm64/include/asm/kvm_arm.h | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 352bf2f7f60a..a11c8c2915c9 100644
+index 2297284e33f2..8b284cbf8162 100644
 --- a/arch/arm64/include/asm/kvm_arm.h
 +++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,8 @@
- #include <asm/types.h>
+@@ -24,6 +24,8 @@
  
  /* Hyp Configuration Register (HCR) bits */
+ #define HCR_FWB		(UL(1) << 46)
 +#define HCR_API		(UL(1) << 41)
 +#define HCR_APK		(UL(1) << 40)
- #define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
-@@ -82,7 +84,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
+ #define HCR_TEA		(UL(1) << 37)
+ #define HCR_TERR	(UL(1) << 36)
+ #define HCR_TLOR	(UL(1) << 35)
+@@ -87,7 +89,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO)
  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
 -#define HCR_HOST_NVHE_FLAGS (HCR_RW)
 +#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
