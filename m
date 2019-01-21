@@ -1,26 +1,23 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 17/25] ACPI / APEI: Pass ghes and estatus separately
- to avoid a later copy
-Date: Mon, 21 Jan 2019 14:35:40 +0100
-Message-ID: <20190121133539.GH29166@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-18-james.morse@arm.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.20 015/111] arm64/kvm: consistently handle host HCR_EL2 flags
+Date: Mon, 21 Jan 2019 14:42:09 +0100
+Message-ID: <20190121122457.382354635@linuxfoundation.org>
+References: <20190121122455.819406896@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B14D4A399
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:35:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B9B4A39E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:46:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GKWhRZmufsVm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Jan 2019 08:35:47 -0500 (EST)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CBB64A32E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:35:47 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20181203180613.228133-18-james.morse@arm.com>
+ with ESMTP id hTovNCwbtVMy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Jan 2019 08:46:31 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98D094A32E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Jan 2019 08:46:31 -0500 (EST)
+In-Reply-To: <20190121122455.819406896@linuxfoundation.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,34 +27,86 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Richard Henderson <richard.henderson@linaro.org>, Kristina Martsenko <kristina.martsenko@arm.com>, stable@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 03, 2018 at 06:06:05PM +0000, James Morse wrote:
-> The NMI-like notifications scribble over ghes->estatus, before
-> copying it somewhere else. If this interrupts the ghes_probe() code
-> calling ghes_proc() on each struct ghes, the data is corrupted.
-> 
-> All the NMI-like notifications should use a queued estatus entry
-> from the beginning, instead of the ghes version, then copying it.
-> To do this, break up any use of "ghes->estatus" so that all
-> functions take the estatus as an argument.
-> 
-> This patch just moves these ghes->estatus dereferences into separate
+4.20-stable review patch.  If anyone has any objections, please let me know.
 
-s/This patch just moves/Move/
+------------------
 
-> arguments, no change in behaviour. struct ghes becomes unused in
-> ghes_clear_estatus() as it only wanted ghes->estatus, which we now
-> pass directly. This is removed.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
+[ Upstream commit 4eaed6aa2c628101246bcabc91b203bfac1193f8 ]
 
-...
+In KVM we define the configuration of HCR_EL2 for a VHE HOST in
+HCR_HOST_VHE_FLAGS, but we don't have a similar definition for the
+non-VHE host flags, and open-code HCR_RW. Further, in head.S we
+open-code the flags for VHE and non-VHE configurations.
 
+In future, we're going to want to configure more flags for the host, so
+lets add a HCR_HOST_NVHE_FLAGS defintion, and consistently use both
+HCR_HOST_VHE_FLAGS and HCR_HOST_NVHE_FLAGS in the kvm code and head.S.
+
+We now use mov_q to generate the HCR_EL2 value, as we use when
+configuring other registers in head.S.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h | 1 +
+ arch/arm64/kernel/head.S         | 5 ++---
+ arch/arm64/kvm/hyp/switch.c      | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 2dafd936d84d..7b914c6fb855 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -87,6 +87,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
++#define HCR_HOST_NVHE_FLAGS (HCR_RW)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+ 
+ /* TCR_EL2 Registers bits */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 4471f570a295..b207a2ce4bc6 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -496,10 +496,9 @@ ENTRY(el2_setup)
+ #endif
+ 
+ 	/* Hyp configuration. */
+-	mov	x0, #HCR_RW			// 64-bit EL1
++	mov_q	x0, HCR_HOST_NVHE_FLAGS
+ 	cbz	x2, set_hcr
+-	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
+-	orr	x0, x0, #HCR_E2H
++	mov_q	x0, HCR_HOST_VHE_FLAGS
+ set_hcr:
+ 	msr	hcr_el2, x0
+ 	isb
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 7cc175c88a37..f6e02cc4d856 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -157,7 +157,7 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+ 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+ 
+ 	write_sysreg(mdcr_el2, mdcr_el2);
+-	write_sysreg(HCR_RW, hcr_el2);
++	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+ 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.19.1
