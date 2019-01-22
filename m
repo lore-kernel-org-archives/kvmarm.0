@@ -1,250 +1,220 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v4 17/25] KVM: arm64/sve: Add SVE support to register
- access ioctl interface
-Date: Tue, 22 Jan 2019 17:24:39 +0000
-Message-ID: <20190122172439.GK3578@e103592.cambridge.arm.com>
-References: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
- <1547757219-19439-18-git-send-email-Dave.Martin@arm.com>
- <74aad8f1-e9f0-689a-1f2b-60a30de41b65@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 3/4] KVM: arm/arm64: lazily create perf events on enable
+Date: Tue, 22 Jan 2019 22:12:22 +0000
+Message-ID: <82bb5635-0bca-8326-03e1-084792dd939d@arm.com>
+References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+ <1548154197-5470-4-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E4864A3CC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:24:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pRk0bBWR406G for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jan 2019 12:24:44 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3150B4A36D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:24:44 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <74aad8f1-e9f0-689a-1f2b-60a30de41b65@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1548154197-5470-4-git-send-email-andrew.murray@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 18, 2019 at 05:58:33PM +0000, Marc Zyngier wrote:
-> On 17/01/2019 20:33, Dave Martin wrote:
-> > This patch adds the following registers for access via the
-> > KVM_{GET,SET}_ONE_REG interface:
-> > 
-> >  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
-> >  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
-> >  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
-> > 
-> > In order to adapt gracefully to future architectural extensions,
-> > the registers are divided up into slices as noted above:  the i
-> > parameter denotes the slice index.
-> > 
-> > For simplicity, bits or slices that exceed the maximum vector
-> > length supported for the vcpu are ignored for KVM_SET_ONE_REG, and
-> > read as zero for KVM_GET_ONE_REG.
-> > 
-> > For the current architecture, only slice i = 0 is significant.  The
-> > interface design allows i to increase to up to 31 in the future if
-> > required by future architectural amendments.
-> > 
-> > The registers are only visible for vcpus that have SVE enabled.
-> > They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
-> > have SVE.  In all cases, surplus slices are not enumerated by
-> > KVM_GET_REG_LIST.
-> > 
-> > Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
-> > allowed for SVE-enabled vcpus: SVE-aware userspace can use the
-> > KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
-> > register state.  This avoids some complex and pointless emluation
+Hi Andrew,
+
+On 01/22/2019 10:49 AM, Andrew Murray wrote:
+> To prevent re-creating perf events everytime the counter registers
+> are changed, let's instead lazily create the event when the event
+> is first enabled and destroy it when it changes.
 > 
-> nit: emulation.
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+
+
+> ---
+>   virt/kvm/arm/pmu.c | 114 ++++++++++++++++++++++++++++++++++++-----------------
+>   1 file changed, 78 insertions(+), 36 deletions(-)
 > 
-> > in the kernel.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > ---
-> >  arch/arm64/include/uapi/asm/kvm.h |  10 +++
-> >  arch/arm64/kvm/guest.c            | 131 ++++++++++++++++++++++++++++++++++----
-> >  2 files changed, 129 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index 97c3478..1ff68fa 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -226,6 +226,16 @@ struct kvm_vcpu_events {
-> >  					 KVM_REG_ARM_FW | ((r) & 0xffff))
-> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
-> >  
-> > +/* SVE registers */
-> > +#define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
-> > +#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-> > +					 KVM_REG_SIZE_U2048 |		\
-> > +					 ((n) << 5) | (i))
-> > +#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-> > +					 KVM_REG_SIZE_U256 |		\
-> > +					 ((n) << 5) | (i) | 0x400)
-> 
-> Can we please have a name for this 0x400 bit?
-> 
-> 
-> > +#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
-> > +
-> >  /* Device Control API: ARM VGIC */
-> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-> >  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index ffa38d4..b8f9c1e 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -19,8 +19,10 @@
-> >   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> >   */
-> >  
-> > +#include <linux/bits.h>
-> >  #include <linux/errno.h>
-> >  #include <linux/err.h>
-> > +#include <linux/kernel.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/module.h>
-> >  #include <linux/vmalloc.h>
-> > @@ -28,9 +30,12 @@
-> >  #include <kvm/arm_psci.h>
-> >  #include <asm/cputype.h>
-> >  #include <linux/uaccess.h>
-> > +#include <asm/fpsimd.h>
-> >  #include <asm/kvm.h>
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_coproc.h>
-> > +#include <asm/kvm_host.h>
-> > +#include <asm/sigcontext.h>
-> >  
-> >  #include "trace.h"
-> >  
-> > @@ -210,6 +215,108 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  	return err;
-> >  }
-> >  
-> > +struct kreg_region {
-> > +	char *kptr;
-> 
-> Should this rather be void * instead?
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 4464899..1921ca9 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -24,8 +24,11 @@
+>   #include <kvm/arm_pmu.h>
+>   #include <kvm/arm_vgic.h>
+>   
+> -static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+> -				      u64 select_idx);
+> +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu, u64 pair);
 
-This was to support address arithmetic on kptr without explicit casting.
+I find the approach good. However the function names are a bit odd and
+it makes the code read a bit difficult.
 
-Maybe this is ill-advised.  GCC supports pointer arithmetic on void *
-with equivalent behaviour as if the pointer were to a character type,
-without any cast.
+I think we could :
 
-If we rely elsewhere on this working, then we can do it here.
+1) Rename the existing
+  kvm_pmu_{enable/disable}_counter => kvm_pmu_{enable/disable}_[mask or 
+counters ]
+as they operate on a set of counters (as a mask) instead of a single
+counter.
+And then you may be able to drop "_single" from
+kvm_pmu_{enable/disable}_counter"_single() functions below, which makes
+better sense for what they do.
 
-However... [see below]
+> +static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
+> +						      u64 select_idx);
 
-> > +	size_t size;
-> > +	size_t zeropad;
-> > +};
-> > +
-> > +#define SVE_REG_SLICE_SHIFT	0
-> > +#define SVE_REG_SLICE_BITS	5
-> > +#define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-> > +#define SVE_REG_ID_BITS		5
-> > +
-> > +#define SVE_REG_SLICE_MASK					\
-> > +	GENMASK(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS - 1,	\
-> > +		SVE_REG_SLICE_SHIFT)
-> > +#define SVE_REG_ID_MASK							\
-> > +	GENMASK(SVE_REG_ID_SHIFT + SVE_REG_ID_BITS - 1, SVE_REG_ID_SHIFT)
-> > +
-> > +#define SVE_NUM_SLICES (1 << SVE_REG_SLICE_BITS)
-> > +
-> > +static int sve_reg_region(struct kreg_region *b,
-> > +			  const struct kvm_vcpu *vcpu,
-> > +			  const struct kvm_one_reg *reg)
-> > +{
-> > +	const unsigned int vl = vcpu->arch.sve_max_vl;
-> > +	const unsigned int vq = sve_vq_from_vl(vl);
-> > +
-> > +	const unsigned int reg_num =
-> > +		(reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-> > +	const unsigned int slice_num =
-> > +		(reg->id & SVE_REG_SLICE_MASK) >> SVE_REG_SLICE_SHIFT;
-> > +
-> > +	unsigned int slice_size, offset, limit;
-> > +
-> > +	if (reg->id >= KVM_REG_ARM64_SVE_ZREG(0, 0) &&
-> > +	    reg->id <= KVM_REG_ARM64_SVE_ZREG(SVE_NUM_ZREGS - 1,
-> > +					      SVE_NUM_SLICES - 1)) {
-> > +		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0));
-> > +
-> > +		/* Compute start and end of the register: */
-> > +		offset = SVE_SIG_ZREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
-> > +		limit = offset + SVE_SIG_ZREG_SIZE(vq);
-> > +
-> > +		offset += slice_size * slice_num; /* start of requested slice */
-> > +
-> > +	} else if (reg->id >= KVM_REG_ARM64_SVE_PREG(0, 0) &&
-> > +		   reg->id <= KVM_REG_ARM64_SVE_FFR(SVE_NUM_SLICES - 1)) {
-> > +		/* (FFR is P16 for our purposes) */
-> > +
-> > +		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0));
-> > +
-> > +		/* Compute start and end of the register: */
-> > +		offset = SVE_SIG_PREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
-> > +		limit = offset + SVE_SIG_PREG_SIZE(vq);
-> > +
-> > +		offset += slice_size * slice_num; /* start of requested slice */
-> > +
-> > +	} else {
-> > +		return -ENOENT;
-> > +	}
-> > +
-> > +	b->kptr = (char *)vcpu->arch.sve_state + offset;
-> 
-> I'm very uneasy with this pointer that, at this stage, may point to an
-> arbitrary location in memory, given that the slice number is controlled
-> by userspace. It feels like a disaster waiting to happen as a potential
-> spectre-v1 gadget.
+Could we simply keep kvm_pmu_counter_create_event() and add a comment 
+above the function explaining that the events are enabled as they are
+created lazily ?
 
-Hmmm, yes, that does seem a concern.  We only guard against accessing
-that address with an if(), so while the compiler cannot emit an explicit
-access, the CPU can emit a speculative read.
+> +static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> +
+>   /**
+>    * kvm_pmu_get_counter_value - get PMU counter value
+>    * @vcpu: The vcpu pointer
+> @@ -59,18 +62,16 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>    */
+>   void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>   {
+> -	u64 reg, data;
+> +	u64 reg;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>   
+>   	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+>   	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+>   	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+>   
+> -	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+> -	data = __vcpu_sys_reg(vcpu, reg + select_idx);
+> -
+> -	/* Recreate the perf event to reflect the updated sample_period */
+> -	kvm_pmu_create_perf_event(vcpu, data, select_idx);
+> +	kvm_pmu_stop_counter(vcpu, pmc);
+> +	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
+>   }
+>   
+>   /**
+> @@ -88,6 +89,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>   
+>   /**
+>    * kvm_pmu_stop_counter - stop PMU counter
+> + * @vcpu: The vcpu pointer
+>    * @pmc: The PMU counter pointer
+>    *
+>    * If this counter has been configured to monitor some event, release it here.
+> @@ -150,6 +152,25 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>   }
+>   
+>   /**
+> + * kvm_pmu_enable_counter_single - create/enable a unpaired counter
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +static void kvm_pmu_enable_counter_single(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (!pmc->perf_event) {
+> +		kvm_pmu_counter_create_enabled_perf_event(vcpu, select_idx);
+> +	} else if (pmc->perf_event) {
+> +		perf_event_enable(pmc->perf_event);
+> +		if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> +			kvm_debug("fail to enable perf event\n");
 
-So, a speculation-safe bounds check would be appropriate here, at
-minimum.
+nit: failed
 
-> And actually, we don't have any requirement to handle non-zero slices,
-> do we? The important thing is that you've nicely reserved extra space in
-> the encoding, and that we can expand the API in a very straightforward way.
-> 
-> So at this stage, I'd drop all support for non-zero slices and return an
-> error instead.
+> +	}
+> +}
+> +
+> +/**
+>    * kvm_pmu_enable_counter - enable selected PMU counter
 
-Since the extra-slices thing is for the far future (or never), we can
-probably drop this code for now.
+nit: This is a bit misleading. We could be enabling a set of counters.
+Please could we update the comment.
 
-This means that we can drop the enumeration of extra slices too.
+>    * @vcpu: The vcpu pointer
+>    * @val: the value guest writes to PMCNTENSET register
+> @@ -159,8 +180,6 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>   void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+>   {
+>   	int i;
+> -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -	struct kvm_pmc *pmc;
+>   
+>   	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
+>   		return;
+> @@ -169,16 +188,44 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+>   		if (!(val & BIT(i)))
+>   			continue;
+>   
+> -		pmc = &pmu->pmc[i];
+> -		if (pmc->perf_event) {
+> -			perf_event_enable(pmc->perf_event);
+> -			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> -				kvm_debug("fail to enable perf event\n");
+> -		}
+> +		kvm_pmu_enable_counter_single(vcpu, i);
+>   	}
+>   }
+>   
+>   /**
+> + * kvm_pmu_reenable_enabled_single - reenable a counter if it should be enabled
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu,
+> +					    u64 select_idx)
+> +{
+> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+> +	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +
+> +	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+> +		return;
+> +
+> +	if (set & BIT(select_idx))
+> +		kvm_pmu_enable_counter_single(vcpu, select_idx);
 
+Could we not reuse kvm_pmu_enable_counter() here :
+	i.e,
+static inline void kvm_pmu_reenable_counter(struct kvm_vcpu *vcpu, u64
+						select_idx)
+{
+	kvm_pmu_enable_counter(vcpu, BIT(select_idx));
+}
 
-If the vector length is > 256 bytes, I'll do pr_warn() and clamp the
-vector lengths seen by the guest to <= 256 so that no extra slices are
-needed.
+> +}
+> +
+> +/**
+> + * kvm_pmu_disable_counter - disable selected PMU counter
 
-In any case, we can keep the space reserved in the register ID encoding
-to allow larger vectors to be supported later if need be.
+Stale comment
 
+> + * @vcpu: The vcpu pointer
+> + * @pmc: The counter to dissable
 
-I'll write up the rule for determining the number of slices somewhere,
-but in userspace it will never be effectively tested.  Too bad, I
-guess: we might add an explicit capability for larger vectors if we
-eventually risk hitting incompatibilities here.
+nit: s/dissable/disable/
 
-Cheers
----Dave
+> + */
+> +static void kvm_pmu_disable_counter_single(struct kvm_vcpu *vcpu,
+> +					   u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (pmc->perf_event)
+> +		perf_event_disable(pmc->perf_event);
+> +}
+> +
+> +/**
+>    * kvm_pmu_disable_counter - disable selected PMU counter
+
+While you are at this, please could you make the comment a bit more
+clear. i.e, we disable a set of PMU counters not a single one.
+
+Suzuki
