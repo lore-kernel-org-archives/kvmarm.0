@@ -1,27 +1,26 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v4 13/25] KVM: arm64/sve: System register context switch
- and access support
-Date: Tue, 22 Jan 2019 16:27:53 +0000
-Message-ID: <20190122162752.GI3578@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v4 14/25] KVM: arm64/sve: Context switch the SVE registers
+Date: Tue, 22 Jan 2019 17:12:06 +0000
+Message-ID: <20190122171205.GJ3578@e103592.cambridge.arm.com>
 References: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
- <1547757219-19439-14-git-send-email-Dave.Martin@arm.com>
- <3d6da606-d7ae-5232-8317-4c550370b469@arm.com>
+ <1547757219-19439-15-git-send-email-Dave.Martin@arm.com>
+ <3bb2407f-a28d-6a6b-79ba-eda4c4194c80@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8667E4A3A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 11:27:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 691EB4A3A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:12:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jtLRQXSLF+Mu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jan 2019 11:27:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 209814A397
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 11:27:58 -0500 (EST)
+ with ESMTP id RKGy+GE2qZ5J for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jan 2019 12:12:11 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 041B84A36D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:12:10 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <3d6da606-d7ae-5232-8317-4c550370b469@arm.com>
+In-Reply-To: <3bb2407f-a28d-6a6b-79ba-eda4c4194c80@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,104 +34,174 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 18, 2019 at 04:42:07PM +0000, Marc Zyngier wrote:
+On Fri, Jan 18, 2019 at 05:15:07PM +0000, Marc Zyngier wrote:
 > On 17/01/2019 20:33, Dave Martin wrote:
-> > This patch adds the necessary support for context switching ZCR_EL1
-> > for each vcpu.
+> > In order to give each vcpu its own view of the SVE registers, this
+> > patch adds context storage via a new sve_state pointer in struct
+> > vcpu_arch.  An additional member sve_max_vl is also added for each
+> > vcpu, to determine the maximum vector length visible to the guest
+> > and thus the value to be configured in ZCR_EL2.LEN while the is
+> > active.  This also determines the layout and size of the storage in
+> > sve_state, which is read and written by the same backend functions
+> > that are used for context-switching the SVE state for host tasks.
 > > 
-> > ZCR_EL1 is trapped alongside the FPSIMD/SVE registers, so it makes
-> > sense for it to be handled as part of the guest FPSIMD/SVE context
-> > for context switch purposes instead of handling it as a general
-> > system register.  This means that it can be switched in lazily at
-> > the appropriate time.  No effort is made to track host context for
-> > this register, since SVE requires VHE: thus the hosts's value for
-> > this register lives permanently in ZCR_EL2 and does not alias the
-> > guest's value at any time.
+> > On SVE-enabled vcpus, SVE access traps are now handled by switching
+> > in the vcpu's SVE context and disabling the trap before returning
+> > to the guest.  On other vcpus, the trap is not handled and an exit
+> > back to the host occurs, where the handle_sve() fallback path
+> > reflects an undefined instruction exception back to the guest,
+> > consistently with the behaviour of non-SVE-capable hardware (as was
+> > done unconditionally prior to this patch).
 > > 
-> > The Hyp switch and fpsimd context handling code is extended
-> > appropriately.
-> > 
-> > Accessors are added in sys_regs.c to expose the SVE system
-> > registers and ID register fields.  Because these need to be
-> > conditionally visible based on the guest configuration, they are
-> > implemented separately for now rather than by use of the generic
-> > system register helpers.  This may be abstracted better later on
-> > when/if there are more features requiring this model.
-> > 
-> > ID_AA64ZFR0_EL1 is RO-RAZ for MRS/MSR when SVE is disabled for the
-> > guest, but for compatibility with non-SVE aware KVM implementations
-> > the register should not be enumerated at all for KVM_GET_REG_LIST
-> > in this case.  For consistency we also reject ioctl access to the
-> > register.  This ensures that a non-SVE-enabled guest looks the same
-> > to userspace, irrespective of whether the kernel KVM implementation
-> > supports SVE.
+> > No SVE handling is added on non-VHE-only paths, since VHE is an
+> > architectural and Kconfig prerequisite of SVE.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > 
+> > ---
+> > 
+> > Changes since RFC v3:
+> > 
+> >  * Ensure guest_has_sve is initialised before use.  Previously the
+> >    order of the code allowed this to be used before initilaisation
+> >    on some paths.  Mysteriously the compiler failed to warn.
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  6 ++++
+> >  arch/arm64/kvm/fpsimd.c           |  5 +--
+> >  arch/arm64/kvm/hyp/switch.c       | 70 ++++++++++++++++++++++++++++++---------
+> >  3 files changed, 64 insertions(+), 17 deletions(-)
 
 [...]
 
-> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > index 1cf4f02..5ff2d90 100644
-> > --- a/arch/arm64/kvm/fpsimd.c
-> > +++ b/arch/arm64/kvm/fpsimd.c
-> > @@ -103,6 +103,8 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
-> >  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
-> >  {
-> >  	unsigned long flags;
-> > +	bool host_has_sve = system_supports_sve();
-> > +	bool guest_has_sve = vcpu_has_sve(vcpu);
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 9f07403..f7a8e3b 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -98,7 +98,10 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+> >  	val = read_sysreg(cpacr_el1);
+> >  	val |= CPACR_EL1_TTA;
+> >  	val &= ~CPACR_EL1_ZEN;
+> > -	if (!update_fp_enabled(vcpu)) {
+> > +	if (update_fp_enabled(vcpu)) {
+> > +		if (vcpu_has_sve(vcpu))
+> > +			val |= CPACR_EL1_ZEN;
+> > +	} else {
+> >  		val &= ~CPACR_EL1_FPEN;
+> >  		__activate_traps_fpsimd32(vcpu);
+> >  	}
+> > @@ -313,26 +316,59 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+> >  	return true;
+> >  }
 > >  
-> >  	local_irq_save(flags);
-> >  
-> > @@ -110,7 +112,11 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
-> >  		/* Clean guest FP state to memory and invalidate cpu view */
-> >  		fpsimd_save();
-> >  		fpsimd_flush_cpu_state();
-> > -	} else if (system_supports_sve()) {
+> > -static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> > +/*
+> > + * if () with a gating check for SVE support to minimise branch
+> > + * mispredictions in non-SVE systems.
+> > + * (system_supports_sve() is resolved at build time or via a static key.)
+> > + */
+> > +#define if_sve(cond) if (system_supports_sve() && (cond))
+> 
+> I really hate this kind of construct, as while it provides an apparent
+> benefit, it actually leads to code that is harder to read. Do we have
+> any data showing that this adversely impacts any known workload on
+> non-SVE systems, given how rarely this exception is triggered?
+> 
+> At any rate, I'd rather see system_supports_sve() as part of the condition.
+
+The alternative was to have a lot of if (system_supports_sve() && foo),
+which makes for more branchy code.
+
+But I'll agree that we don't have good evidence to justify this
+if_sve () thing either.
+
+
+I'll see if I can come up with something saner.
+
+Is it worth at least annotating paths with likely/unlikely, or is that
+again something we shouldn't do without some benchmarking that backs
+it up?
+
 > > +
-> > +		if (guest_has_sve)
-> > +			vcpu->arch.ctxt.sys_regs[ZCR_EL1] =
-> > +				read_sysreg_s(SYS_ZCR_EL12);
+> > +/* Check for an FPSIMD/SVE trap and handle as appropriate */
+> > +static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+> > +	u8 trap_class;
+> > +	bool guest_has_sve;
+> >  
+> > -	if (has_vhe())
+> > -		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
+> > -			     cpacr_el1);
+> > -	else
+> > +	if (!system_supports_fpsimd())
+> > +		return false;
+> > +
+> > +	guest_has_sve = vcpu_has_sve(vcpu);
+> > +	trap_class = kvm_vcpu_trap_get_class(vcpu);
+> > +
+> > +	if (trap_class == ESR_ELx_EC_FP_ASIMD)
+> > +		goto handle;
+> > +
+> > +	if_sve (guest_has_sve && trap_class == ESR_ELx_EC_SVE)
+> > +		goto handle;
+> > +
+> > +	return false;
 > 
-> nit: Please keep assignments on a single line.
+> In the end, this is the stuff we want to handle quickly: nothing to do
+> at all. Given that vcpu_has_sve() is already gated by
 
-My antipathy for long lines got the better of me here.
+True -- would it be worth renaming the function __try_handle_fpsimd() or
+similar, to make it clearer that the function may actually not handle
+FPSIMD (or do anything material) in the common case?
 
-If I can come up with a non-ridiculous way of shortening this line I'll
-do that, otherwise I'm can join these lines and live with it.
+I may have led myself astray with the current naming.
 
+> system_supports_sve(), I'm pretty sure that there is no difference in
+> code generation between your if_sve() construct and a simple if().
+
+Maybe so.  At least, if_sve () may make the code more obscure in
+practice for no good reason.
+
+> > +
+> > +handle:
+> > +	/* The trap is an FPSIMD/SVE trap: switch the context */
+> > +
+> > +	if (has_vhe()) {
+> > +		u64 reg = read_sysreg(cpacr_el1) | CPACR_EL1_FPEN;
+> > +
+> > +		if_sve (guest_has_sve)
+> > +			reg |= CPACR_EL1_ZEN;
+> > +
+> > +		write_sysreg(reg, cpacr_el1);
+> > +	} else {
+> >  		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
+> >  			     cptr_el2);
+> > +	}
+> >  
+> >  	isb();
+> >  
+> >  	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
+> > +		struct user_fpsimd_state *host_fpsimd =
+> > +			vcpu->arch.host_fpsimd_state;
+> > +
 > 
-> > +	} else if (host_has_sve) {
+> Single line, please. Or split declaration and assignment.
+
+Can do.
+
 > >  		/*
-> >  		 * The FPSIMD/SVE state in the CPU has not been touched, and we
-> >  		 * have SVE (and VHE): CPACR_EL1 (alias CPTR_EL2) has been
-
-[...]
-
-> >  /*
-> >   * cpufeature ID register user accessors
-> >   *
-> > @@ -1278,7 +1374,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	ID_SANITISED(ID_AA64PFR1_EL1),
-> >  	ID_UNALLOCATED(4,2),
-> >  	ID_UNALLOCATED(4,3),
-> > +#ifdef CONFIG_ARM64_SVE
-> > +	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, .check_present = sve_check_present },
-> > +#else
-> >  	ID_UNALLOCATED(4,4),
-> > +#endif
-> 
-> Can't we always have this code present and fallback to the "unallocated"
-> behaviour at runtime?
-
-This may actually be preferable, since "check_present()" sounds like it
-ought to be used to check whether the register is present for all
-purposes, whereas right now it's only called to check whether to
-enumerate the register in KVM_GET_REG_LIST.  This behaviour may confuse
-us later on...
-
-There may have been some difficulty with this, but if so I can't
-remember what.  I'll take a look.
+> >  		 * In the SVE case, VHE is assumed: it is enforced by
+> >  		 * Kconfig and kvm_arch_init().
+> >  		 */
+> > -		if (system_supports_sve() &&
+> > -		    (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE)) {
+> > +		if_sve (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE) {
+> >  			struct thread_struct *thread = container_of(
+> >  				host_fpsimd,
+> >  				struct thread_struct, uw.fpsimd_state);
+> > @@ -345,10 +381,14 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> >  		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
+> >  	}
 
 [...]
 
