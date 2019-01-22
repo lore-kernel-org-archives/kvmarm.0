@@ -1,26 +1,27 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v4 14/25] KVM: arm64/sve: Context switch the SVE registers
-Date: Tue, 22 Jan 2019 17:12:06 +0000
-Message-ID: <20190122171205.GJ3578@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v4 17/25] KVM: arm64/sve: Add SVE support to register
+ access ioctl interface
+Date: Tue, 22 Jan 2019 17:24:39 +0000
+Message-ID: <20190122172439.GK3578@e103592.cambridge.arm.com>
 References: <1547757219-19439-1-git-send-email-Dave.Martin@arm.com>
- <1547757219-19439-15-git-send-email-Dave.Martin@arm.com>
- <3bb2407f-a28d-6a6b-79ba-eda4c4194c80@arm.com>
+ <1547757219-19439-18-git-send-email-Dave.Martin@arm.com>
+ <74aad8f1-e9f0-689a-1f2b-60a30de41b65@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 691EB4A3A1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:12:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E4864A3CC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:24:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RKGy+GE2qZ5J for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jan 2019 12:12:11 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 041B84A36D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:12:10 -0500 (EST)
+ with ESMTP id pRk0bBWR406G for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jan 2019 12:24:44 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3150B4A36D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 12:24:44 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <3bb2407f-a28d-6a6b-79ba-eda4c4194c80@arm.com>
+In-Reply-To: <74aad8f1-e9f0-689a-1f2b-60a30de41b65@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,176 +35,216 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 18, 2019 at 05:15:07PM +0000, Marc Zyngier wrote:
+On Fri, Jan 18, 2019 at 05:58:33PM +0000, Marc Zyngier wrote:
 > On 17/01/2019 20:33, Dave Martin wrote:
-> > In order to give each vcpu its own view of the SVE registers, this
-> > patch adds context storage via a new sve_state pointer in struct
-> > vcpu_arch.  An additional member sve_max_vl is also added for each
-> > vcpu, to determine the maximum vector length visible to the guest
-> > and thus the value to be configured in ZCR_EL2.LEN while the is
-> > active.  This also determines the layout and size of the storage in
-> > sve_state, which is read and written by the same backend functions
-> > that are used for context-switching the SVE state for host tasks.
+> > This patch adds the following registers for access via the
+> > KVM_{GET,SET}_ONE_REG interface:
 > > 
-> > On SVE-enabled vcpus, SVE access traps are now handled by switching
-> > in the vcpu's SVE context and disabling the trap before returning
-> > to the guest.  On other vcpus, the trap is not handled and an exit
-> > back to the host occurs, where the handle_sve() fallback path
-> > reflects an undefined instruction exception back to the guest,
-> > consistently with the behaviour of non-SVE-capable hardware (as was
-> > done unconditionally prior to this patch).
+> >  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
+> >  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
+> >  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
 > > 
-> > No SVE handling is added on non-VHE-only paths, since VHE is an
-> > architectural and Kconfig prerequisite of SVE.
+> > In order to adapt gracefully to future architectural extensions,
+> > the registers are divided up into slices as noted above:  the i
+> > parameter denotes the slice index.
+> > 
+> > For simplicity, bits or slices that exceed the maximum vector
+> > length supported for the vcpu are ignored for KVM_SET_ONE_REG, and
+> > read as zero for KVM_GET_ONE_REG.
+> > 
+> > For the current architecture, only slice i = 0 is significant.  The
+> > interface design allows i to increase to up to 31 in the future if
+> > required by future architectural amendments.
+> > 
+> > The registers are only visible for vcpus that have SVE enabled.
+> > They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
+> > have SVE.  In all cases, surplus slices are not enumerated by
+> > KVM_GET_REG_LIST.
+> > 
+> > Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
+> > allowed for SVE-enabled vcpus: SVE-aware userspace can use the
+> > KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
+> > register state.  This avoids some complex and pointless emluation
+> 
+> nit: emulation.
+> 
+> > in the kernel.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > 
 > > ---
+> >  arch/arm64/include/uapi/asm/kvm.h |  10 +++
+> >  arch/arm64/kvm/guest.c            | 131 ++++++++++++++++++++++++++++++++++----
+> >  2 files changed, 129 insertions(+), 12 deletions(-)
 > > 
-> > Changes since RFC v3:
-> > 
-> >  * Ensure guest_has_sve is initialised before use.  Previously the
-> >    order of the code allowed this to be used before initilaisation
-> >    on some paths.  Mysteriously the compiler failed to warn.
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  6 ++++
-> >  arch/arm64/kvm/fpsimd.c           |  5 +--
-> >  arch/arm64/kvm/hyp/switch.c       | 70 ++++++++++++++++++++++++++++++---------
-> >  3 files changed, 64 insertions(+), 17 deletions(-)
-
-[...]
-
-> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> > index 9f07403..f7a8e3b 100644
-> > --- a/arch/arm64/kvm/hyp/switch.c
-> > +++ b/arch/arm64/kvm/hyp/switch.c
-> > @@ -98,7 +98,10 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
-> >  	val = read_sysreg(cpacr_el1);
-> >  	val |= CPACR_EL1_TTA;
-> >  	val &= ~CPACR_EL1_ZEN;
-> > -	if (!update_fp_enabled(vcpu)) {
-> > +	if (update_fp_enabled(vcpu)) {
-> > +		if (vcpu_has_sve(vcpu))
-> > +			val |= CPACR_EL1_ZEN;
-> > +	} else {
-> >  		val &= ~CPACR_EL1_FPEN;
-> >  		__activate_traps_fpsimd32(vcpu);
-> >  	}
-> > @@ -313,26 +316,59 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
-> >  	return true;
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 97c3478..1ff68fa 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -226,6 +226,16 @@ struct kvm_vcpu_events {
+> >  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+> >  
+> > +/* SVE registers */
+> > +#define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
+> > +#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
+> > +					 KVM_REG_SIZE_U2048 |		\
+> > +					 ((n) << 5) | (i))
+> > +#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
+> > +					 KVM_REG_SIZE_U256 |		\
+> > +					 ((n) << 5) | (i) | 0x400)
+> 
+> Can we please have a name for this 0x400 bit?
+> 
+> 
+> > +#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
+> > +
+> >  /* Device Control API: ARM VGIC */
+> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+> >  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index ffa38d4..b8f9c1e 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -19,8 +19,10 @@
+> >   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >   */
+> >  
+> > +#include <linux/bits.h>
+> >  #include <linux/errno.h>
+> >  #include <linux/err.h>
+> > +#include <linux/kernel.h>
+> >  #include <linux/kvm_host.h>
+> >  #include <linux/module.h>
+> >  #include <linux/vmalloc.h>
+> > @@ -28,9 +30,12 @@
+> >  #include <kvm/arm_psci.h>
+> >  #include <asm/cputype.h>
+> >  #include <linux/uaccess.h>
+> > +#include <asm/fpsimd.h>
+> >  #include <asm/kvm.h>
+> >  #include <asm/kvm_emulate.h>
+> >  #include <asm/kvm_coproc.h>
+> > +#include <asm/kvm_host.h>
+> > +#include <asm/sigcontext.h>
+> >  
+> >  #include "trace.h"
+> >  
+> > @@ -210,6 +215,108 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  	return err;
 > >  }
 > >  
-> > -static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
-> > +/*
-> > + * if () with a gating check for SVE support to minimise branch
-> > + * mispredictions in non-SVE systems.
-> > + * (system_supports_sve() is resolved at build time or via a static key.)
-> > + */
-> > +#define if_sve(cond) if (system_supports_sve() && (cond))
+> > +struct kreg_region {
+> > +	char *kptr;
 > 
-> I really hate this kind of construct, as while it provides an apparent
-> benefit, it actually leads to code that is harder to read. Do we have
-> any data showing that this adversely impacts any known workload on
-> non-SVE systems, given how rarely this exception is triggered?
-> 
-> At any rate, I'd rather see system_supports_sve() as part of the condition.
+> Should this rather be void * instead?
 
-The alternative was to have a lot of if (system_supports_sve() && foo),
-which makes for more branchy code.
+This was to support address arithmetic on kptr without explicit casting.
 
-But I'll agree that we don't have good evidence to justify this
-if_sve () thing either.
+Maybe this is ill-advised.  GCC supports pointer arithmetic on void *
+with equivalent behaviour as if the pointer were to a character type,
+without any cast.
 
+If we rely elsewhere on this working, then we can do it here.
 
-I'll see if I can come up with something saner.
+However... [see below]
 
-Is it worth at least annotating paths with likely/unlikely, or is that
-again something we shouldn't do without some benchmarking that backs
-it up?
-
+> > +	size_t size;
+> > +	size_t zeropad;
+> > +};
 > > +
-> > +/* Check for an FPSIMD/SVE trap and handle as appropriate */
-> > +static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
-> >  {
-> > -	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
-> > +	u8 trap_class;
-> > +	bool guest_has_sve;
-> >  
-> > -	if (has_vhe())
-> > -		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
-> > -			     cpacr_el1);
-> > -	else
-> > +	if (!system_supports_fpsimd())
-> > +		return false;
+> > +#define SVE_REG_SLICE_SHIFT	0
+> > +#define SVE_REG_SLICE_BITS	5
+> > +#define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
+> > +#define SVE_REG_ID_BITS		5
 > > +
-> > +	guest_has_sve = vcpu_has_sve(vcpu);
-> > +	trap_class = kvm_vcpu_trap_get_class(vcpu);
+> > +#define SVE_REG_SLICE_MASK					\
+> > +	GENMASK(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS - 1,	\
+> > +		SVE_REG_SLICE_SHIFT)
+> > +#define SVE_REG_ID_MASK							\
+> > +	GENMASK(SVE_REG_ID_SHIFT + SVE_REG_ID_BITS - 1, SVE_REG_ID_SHIFT)
 > > +
-> > +	if (trap_class == ESR_ELx_EC_FP_ASIMD)
-> > +		goto handle;
+> > +#define SVE_NUM_SLICES (1 << SVE_REG_SLICE_BITS)
 > > +
-> > +	if_sve (guest_has_sve && trap_class == ESR_ELx_EC_SVE)
-> > +		goto handle;
+> > +static int sve_reg_region(struct kreg_region *b,
+> > +			  const struct kvm_vcpu *vcpu,
+> > +			  const struct kvm_one_reg *reg)
+> > +{
+> > +	const unsigned int vl = vcpu->arch.sve_max_vl;
+> > +	const unsigned int vq = sve_vq_from_vl(vl);
 > > +
-> > +	return false;
-> 
-> In the end, this is the stuff we want to handle quickly: nothing to do
-> at all. Given that vcpu_has_sve() is already gated by
-
-True -- would it be worth renaming the function __try_handle_fpsimd() or
-similar, to make it clearer that the function may actually not handle
-FPSIMD (or do anything material) in the common case?
-
-I may have led myself astray with the current naming.
-
-> system_supports_sve(), I'm pretty sure that there is no difference in
-> code generation between your if_sve() construct and a simple if().
-
-Maybe so.  At least, if_sve () may make the code more obscure in
-practice for no good reason.
-
+> > +	const unsigned int reg_num =
+> > +		(reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
+> > +	const unsigned int slice_num =
+> > +		(reg->id & SVE_REG_SLICE_MASK) >> SVE_REG_SLICE_SHIFT;
 > > +
-> > +handle:
-> > +	/* The trap is an FPSIMD/SVE trap: switch the context */
+> > +	unsigned int slice_size, offset, limit;
 > > +
-> > +	if (has_vhe()) {
-> > +		u64 reg = read_sysreg(cpacr_el1) | CPACR_EL1_FPEN;
+> > +	if (reg->id >= KVM_REG_ARM64_SVE_ZREG(0, 0) &&
+> > +	    reg->id <= KVM_REG_ARM64_SVE_ZREG(SVE_NUM_ZREGS - 1,
+> > +					      SVE_NUM_SLICES - 1)) {
+> > +		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0));
 > > +
-> > +		if_sve (guest_has_sve)
-> > +			reg |= CPACR_EL1_ZEN;
+> > +		/* Compute start and end of the register: */
+> > +		offset = SVE_SIG_ZREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
+> > +		limit = offset + SVE_SIG_ZREG_SIZE(vq);
 > > +
-> > +		write_sysreg(reg, cpacr_el1);
+> > +		offset += slice_size * slice_num; /* start of requested slice */
+> > +
+> > +	} else if (reg->id >= KVM_REG_ARM64_SVE_PREG(0, 0) &&
+> > +		   reg->id <= KVM_REG_ARM64_SVE_FFR(SVE_NUM_SLICES - 1)) {
+> > +		/* (FFR is P16 for our purposes) */
+> > +
+> > +		slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0));
+> > +
+> > +		/* Compute start and end of the register: */
+> > +		offset = SVE_SIG_PREG_OFFSET(vq, reg_num) - SVE_SIG_REGS_OFFSET;
+> > +		limit = offset + SVE_SIG_PREG_SIZE(vq);
+> > +
+> > +		offset += slice_size * slice_num; /* start of requested slice */
+> > +
 > > +	} else {
-> >  		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
-> >  			     cptr_el2);
+> > +		return -ENOENT;
 > > +	}
-> >  
-> >  	isb();
-> >  
-> >  	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
-> > +		struct user_fpsimd_state *host_fpsimd =
-> > +			vcpu->arch.host_fpsimd_state;
 > > +
+> > +	b->kptr = (char *)vcpu->arch.sve_state + offset;
 > 
-> Single line, please. Or split declaration and assignment.
+> I'm very uneasy with this pointer that, at this stage, may point to an
+> arbitrary location in memory, given that the slice number is controlled
+> by userspace. It feels like a disaster waiting to happen as a potential
+> spectre-v1 gadget.
 
-Can do.
+Hmmm, yes, that does seem a concern.  We only guard against accessing
+that address with an if(), so while the compiler cannot emit an explicit
+access, the CPU can emit a speculative read.
 
-> >  		/*
-> >  		 * In the SVE case, VHE is assumed: it is enforced by
-> >  		 * Kconfig and kvm_arch_init().
-> >  		 */
-> > -		if (system_supports_sve() &&
-> > -		    (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE)) {
-> > +		if_sve (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE) {
-> >  			struct thread_struct *thread = container_of(
-> >  				host_fpsimd,
-> >  				struct thread_struct, uw.fpsimd_state);
-> > @@ -345,10 +381,14 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
-> >  		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
-> >  	}
+So, a speculation-safe bounds check would be appropriate here, at
+minimum.
 
-[...]
+> And actually, we don't have any requirement to handle non-zero slices,
+> do we? The important thing is that you've nicely reserved extra space in
+> the encoding, and that we can expand the API in a very straightforward way.
+> 
+> So at this stage, I'd drop all support for non-zero slices and return an
+> error instead.
+
+Since the extra-slices thing is for the far future (or never), we can
+probably drop this code for now.
+
+This means that we can drop the enumeration of extra slices too.
+
+
+If the vector length is > 256 bytes, I'll do pr_warn() and clamp the
+vector lengths seen by the guest to <= 256 so that no extra slices are
+needed.
+
+In any case, we can keep the space reserved in the register ID encoding
+to allow larger vectors to be supported later if need be.
+
+
+I'll write up the rule for determining the number of slices somewhere,
+but in userspace it will never be effectively tested.  Too bad, I
+guess: we might add an explicit capability for larger vectors if we
+eventually risk hitting incompatibilities here.
 
 Cheers
 ---Dave
