@@ -1,23 +1,28 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH 3/4] KVM: arm/arm64: lazily create perf events on enable
-Date: Tue, 22 Jan 2019 10:49:56 +0000
-Message-ID: <1548154197-5470-4-git-send-email-andrew.murray@arm.com>
-References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 22/25] ACPI / APEI: Kick the memory_failure() queue
+ for synchronous errors
+Date: Tue, 22 Jan 2019 11:51:43 +0100
+Message-ID: <20190122105143.GB26587@zn.tnic>
+References: <20181203180613.228133-1-james.morse@arm.com>
+ <20181203180613.228133-23-james.morse@arm.com>
+ <9d153a07-aa7a-6e0c-3bd3-994a66f9639a@huawei.com>
+ <5c775aa9-ea57-dea7-6083-c1e3fc160b29@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7674B4A394
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 05:50:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDC084A387
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 05:51:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nQw4uBOjbLti for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Jan 2019 05:50:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEB534A3A0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 05:50:07 -0500 (EST)
-In-Reply-To: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+ with ESMTP id Q4XRQMmX97hX for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Jan 2019 05:51:50 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D535C4A382
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Jan 2019 05:51:50 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <5c775aa9-ea57-dea7-6083-c1e3fc160b29@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,232 +32,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-acpi@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Wang Xiongfeng <wangxiongfeng2@huawei.com>, linux-mm@kvack.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To prevent re-creating perf events everytime the counter registers
-are changed, let's instead lazily create the event when the event
-is first enabled and destroy it when it changes.
+On Mon, Dec 10, 2018 at 07:15:13PM +0000, James Morse wrote:
+> What happens if we miss MF_ACTION_REQUIRED?
 
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
----
- virt/kvm/arm/pmu.c | 114 ++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 78 insertions(+), 36 deletions(-)
+AFAICU, the logic is to force-send a signal to the user process, i.e.,
+force_sig_info() which cannot be ignored. IOW, an "enlightened" process
+would know how to do recovery action from a memory error.
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 4464899..1921ca9 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -24,8 +24,11 @@
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_vgic.h>
- 
--static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
--				      u64 select_idx);
-+static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu, u64 pair);
-+static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
-+						      u64 select_idx);
-+static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
-+
- /**
-  * kvm_pmu_get_counter_value - get PMU counter value
-  * @vcpu: The vcpu pointer
-@@ -59,18 +62,16 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-  */
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- {
--	u64 reg, data;
-+	u64 reg;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
- 
- 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
- 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
- 	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
- 
--	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
--	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
--	data = __vcpu_sys_reg(vcpu, reg + select_idx);
--
--	/* Recreate the perf event to reflect the updated sample_period */
--	kvm_pmu_create_perf_event(vcpu, data, select_idx);
-+	kvm_pmu_stop_counter(vcpu, pmc);
-+	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
- }
- 
- /**
-@@ -88,6 +89,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
- 
- /**
-  * kvm_pmu_stop_counter - stop PMU counter
-+ * @vcpu: The vcpu pointer
-  * @pmc: The PMU counter pointer
-  *
-  * If this counter has been configured to monitor some event, release it here.
-@@ -150,6 +152,25 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- }
- 
- /**
-+ * kvm_pmu_enable_counter_single - create/enable a unpaired counter
-+ * @vcpu: The vcpu pointer
-+ * @select_idx: The counter index
-+ */
-+static void kvm_pmu_enable_counter_single(struct kvm_vcpu *vcpu, u64 select_idx)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-+
-+	if (!pmc->perf_event) {
-+		kvm_pmu_counter_create_enabled_perf_event(vcpu, select_idx);
-+	} else if (pmc->perf_event) {
-+		perf_event_enable(pmc->perf_event);
-+		if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-+			kvm_debug("fail to enable perf event\n");
-+	}
-+}
-+
-+/**
-  * kvm_pmu_enable_counter - enable selected PMU counter
-  * @vcpu: The vcpu pointer
-  * @val: the value guest writes to PMCNTENSET register
-@@ -159,8 +180,6 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
- {
- 	int i;
--	struct kvm_pmu *pmu = &vcpu->arch.pmu;
--	struct kvm_pmc *pmc;
- 
- 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
- 		return;
-@@ -169,16 +188,44 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
- 		if (!(val & BIT(i)))
- 			continue;
- 
--		pmc = &pmu->pmc[i];
--		if (pmc->perf_event) {
--			perf_event_enable(pmc->perf_event);
--			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
--				kvm_debug("fail to enable perf event\n");
--		}
-+		kvm_pmu_enable_counter_single(vcpu, i);
- 	}
- }
- 
- /**
-+ * kvm_pmu_reenable_enabled_single - reenable a counter if it should be enabled
-+ * @vcpu: The vcpu pointer
-+ * @select_idx: The counter index
-+ */
-+static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu,
-+					    u64 select_idx)
-+{
-+	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
-+	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
-+
-+	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
-+		return;
-+
-+	if (set & BIT(select_idx))
-+		kvm_pmu_enable_counter_single(vcpu, select_idx);
-+}
-+
-+/**
-+ * kvm_pmu_disable_counter - disable selected PMU counter
-+ * @vcpu: The vcpu pointer
-+ * @pmc: The counter to dissable
-+ */
-+static void kvm_pmu_disable_counter_single(struct kvm_vcpu *vcpu,
-+					   u64 select_idx)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-+
-+	if (pmc->perf_event)
-+		perf_event_disable(pmc->perf_event);
-+}
-+
-+/**
-  * kvm_pmu_disable_counter - disable selected PMU counter
-  * @vcpu: The vcpu pointer
-  * @val: the value guest writes to PMCNTENCLR register
-@@ -188,8 +235,6 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
- {
- 	int i;
--	struct kvm_pmu *pmu = &vcpu->arch.pmu;
--	struct kvm_pmc *pmc;
- 
- 	if (!val)
- 		return;
-@@ -198,9 +243,7 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
- 		if (!(val & BIT(i)))
- 			continue;
- 
--		pmc = &pmu->pmc[i];
--		if (pmc->perf_event)
--			perf_event_disable(pmc->perf_event);
-+		kvm_pmu_disable_counter_single(vcpu, i);
- 	}
- }
- 
-@@ -382,28 +425,22 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 	}
- }
- 
--static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
--{
--	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
--	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(select_idx));
--}
--
- /**
-- * kvm_pmu_create_perf_event - create a perf event for a counter
-+ * kvm_pmu_counter_create_enabled_perf_event - create a perf event for a counter
-  * @vcpu: The vcpu pointer
-- * @data: Type of event as per PMXEVTYPER_EL0 format
-  * @select_idx: The number of selected counter
-  */
--static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
--				      u64 select_idx)
-+static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
-+						u64 select_idx)
- {
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
- 	struct perf_event *event;
- 	struct perf_event_attr attr;
--	u64 eventsel, counter;
-+	u64 eventsel, counter, data;
-+
-+	data = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + select_idx);
- 
--	kvm_pmu_stop_counter(vcpu, pmc);
- 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
- 
- 	/* Software increment event does't need to be backed by a perf event */
-@@ -415,7 +452,6 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
- 	attr.type = PERF_TYPE_RAW;
- 	attr.size = sizeof(attr);
- 	attr.pinned = 1;
--	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, select_idx);
- 	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
- 	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
- 	attr.exclude_hv = 1; /* Don't count EL2 events */
-@@ -451,7 +487,13 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx)
- {
--	kvm_pmu_create_perf_event(vcpu, data, select_idx);
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-+	u64 event_type = data & ARMV8_PMU_EVTYPE_MASK;
-+
-+	kvm_pmu_stop_counter(vcpu, pmc);
-+	__vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + select_idx) = event_type;
-+	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
- }
- 
- bool kvm_arm_support_pmu_v3(void)
+VS the action optional thing which you can handle at your leisure.
+
+So the question boils down to what kind of severity do the errors
+reported through SEA have? I mean, if the hw would go the trouble to do
+the synchronous reporting, then something important must've happened and
+it wants us to know about it and handle it.
+
+> Surely the page still gets unmapped as its PG_Poisoned, an AO signal
+> may be pending, but if user-space touches the page it will get an AR
+> signal. Is this just about removing an extra AO signal to user-space?
+>
+> If we do need this, I'd like to pick it up from the CPER records, as x86's
+> NOTIFY_NMI looks like it covers both AO/AR cases. (as does NOTIFY_SDEI). The
+> Master/Target abort or Invalid-address types in the memory-error-section CPER
+> records look like the best bet.
+
+Right, and we do all kinds of severity mapping there aka ghes_severity()
+so that'll be a good start, methinks.
+
 -- 
-2.7.4
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
