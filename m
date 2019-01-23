@@ -1,26 +1,33 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v7 20/25] ACPI / APEI: Use separate fixmap pages for arm64
- NMI-like notifications
-Date: Wed, 23 Jan 2019 18:33:02 +0000
-Message-ID: <bee87ef4-60ae-d4a4-2855-159543072fc5@arm.com>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Wed, 23 Jan 2019 18:36:38 +0000
+Message-ID: <18138b57-51ba-c99c-5b8d-b263fb964714@arm.com>
 References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-21-james.morse@arm.com>
- <20190121172743.GN29166@zn.tnic>
+ <20181203180613.228133-11-james.morse@arm.com>
+ <20181211183634.GO27375@zn.tnic>
+ <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+ <20190111174532.GI4729@zn.tnic>
+ <32025682-f85a-58ef-7386-7ee23296b944@arm.com>
+ <20190111195800.GA11723@zn.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A59A74A3C5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Jan 2019 13:33:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 481294A3C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Jan 2019 13:36:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gaw0NV7gsock for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Jan 2019 13:33:08 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30C9A4A39E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Jan 2019 13:33:08 -0500 (EST)
-In-Reply-To: <20190121172743.GN29166@zn.tnic>
+ with ESMTP id oRSfHxdUfEL7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Jan 2019 13:36:43 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E7EA4A3C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Jan 2019 13:36:43 -0500 (EST)
+In-Reply-To: <20190111195800.GA11723@zn.tnic>
 Content-Language: en-GB
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,87 +39,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Borislav Petkov <bp@alien8.de>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <baicar.tyler@gmail.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Boris,
 
-On 21/01/2019 17:27, Borislav Petkov wrote:
-> On Mon, Dec 03, 2018 at 06:06:08PM +0000, James Morse wrote:
->> Now that ghes notification helpers provide the fixmap slots and
->> take the lock themselves, multiple NMI-like notifications can
->> be used on arm64.
->>
->> These should be named after their notification method as they can't
->> all be called 'NMI'. x86's NOTIFY_NMI already is, change the SEA
->> fixmap entry to be called FIX_APEI_GHES_SEA.
->>
->> Future patches can add support for FIX_APEI_GHES_SEI and
->> FIX_APEI_GHES_SDEI_{NORMAL,CRITICAL}.
->>
->> Because all of ghes.c builds on both architectures, provide a
->> constant for each fixmap entry that the architecture will never
->> use.
-
->> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
->> index 849da0d43a21..6cbf9471b2a2 100644
->> --- a/drivers/acpi/apei/ghes.c
->> +++ b/drivers/acpi/apei/ghes.c
->> @@ -85,6 +85,14 @@
->>  	((struct acpi_hest_generic_status *)				\
->>  	 ((struct ghes_estatus_node *)(estatus_node) + 1))
->>  
->> +/* NMI-like notifications vary by architecture. Fill in the fixmap gaps */
->> +#ifndef CONFIG_HAVE_ACPI_APEI_NMI
->> +#define FIX_APEI_GHES_NMI	-1
->> +#endif
->> +#ifndef CONFIG_ACPI_APEI_SEA
->> +#define FIX_APEI_GHES_SEA	-1
+On 11/01/2019 19:58, Borislav Petkov wrote:
+> On Fri, Jan 11, 2019 at 06:25:21PM +0000, James Morse wrote:
+>> We ack it in the corrupt-record case too, because we are done with the
+>> memory.
 > 
-> I'm guessing those -1 are going to cause __set_fixmap() to fail, right?
+> Ok, so the only thing that we need to do unconditionally is ACK in order
+> to free the memory. Or is there an exception to that set of steps in
+> error handling?
 
-It shouldn't be possible, these are just to give the compiler something int
-shaped to work with, until it prunes all the callers.
+Do you consider ENOENT an error? We don't ack in that case as the memory wasn't
+in use.
 
-But for arm64, yes if would fail. -1 shouldn't alias an existing entry, and it
-will get caught by:
-| BUG_ON(idx <= FIX_HOLE || idx >= __end_of_fixed_addresses);
-
-I wanted BUILD_BUG_ON() here, as any user of these should be optimised out, but
-the compiler choked on that.
-
-__end_of_fixed_addresses would be a better arch-agnostic invalid value. It has
-to be defined as the last value in the enum for core code's fix_to_virt() to work.
+For the other cases its because the records are bogus, but we still
+unconditionally tell firmware we're done with them.
 
 
-These two look like something left behind from when we had different #ifdeffery.
-The users of these two are now behind arch specific #ifdefs that since patch 12
-of this series, can't be turned off, so I can remove these.
+>> I think it is. 18.3.2.8 of ACPI v6.2 (search for Generic Hardware Error Source
+>> version 2", then below the table):
+>> * OSPM detects error (via interrupt/exception or polling the block status)
+>> * OSPM copies the error status block
+>> * OSPM clears the block status field of the error status block
+>> * OSPM acknowledges the error via Read Ack register
+>>
+>> The ENOENT case is excluded by 'polling the block status'.
+> 
+> Ok, so we signal the absence of an error record with ENOENT.
+> 
+>         if (!buf_paddr)
+>                 return -ENOENT;
+> 
+> Can that even happen?
 
-We do need them for SDEI, as it is relying on IS_ENABLED() and the compiler's
-dead code elimination. But the compiler wants that symbol to have the right type
-before it gets that far.
+Yes, for NOTIFY_POLLED its the norm. For the IRQ flavours that walk a list of
+GHES, all but one of them will return ENOENT.
 
 
-|#define FIX_APEI_GHES_SDEI_NORMAL      (BUILD_BUG(), -1)
+> Also, in that case, what would happen if we ACK the error anyway? We'd
+> confuse the firmware?
 
-Was the best I had, but this trips the BUILD_BUG() too early.
-With it, x86 BUILD_BUG()s. With just the -1 the path gets pruned out, and there
-are no 'sdei' symbols in the object file.
+No idea.
 
-...at this point, I stopped caring!
+> I sure hope firmware is prepared for spurious ACKs :)
+
+We could try it and see. It depends if firmware shares ack locations between
+multiple GHES. We could ack an empty GHES, and it removes the records of one we
+haven't looked at yet.
 
 
-> I'm wondering if we could catch that situation in ghes_map() already to
-> protect ourselves against future changes in the fixmap code...
+>> Unsurprisingly the spec doesn't consider the case that firmware generates
+>> corrupt records!
+> 
+> You mean the EIO case?
 
-We already skip registering notifiers if the kconfig option wasn't selected.
+Yup,
 
-We can't catch this at compile time, as the dead-code elimination seems to
-happen in multiple passes.
+> Not surprised at all. But we do not report that record so all good.
 
-I'll switch the SDEI ones to __end_of_fixed_addresses, as both architectures
-BUG() when they see this.
 
 
 Thanks,
