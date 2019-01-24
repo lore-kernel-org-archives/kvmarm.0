@@ -1,23 +1,22 @@
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [kvm-unit-tests PATCH 6/7] lib: argv: Implement argv_find() for test
- parameters
-Date: Thu, 24 Jan 2019 11:16:33 +0000
-Message-ID: <20190124111634.4727-7-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH 7/7] arm/arm64: Use argv_find() for test names
+Date: Thu, 24 Jan 2019 11:16:34 +0000
+Message-ID: <20190124111634.4727-8-alexandru.elisei@arm.com>
 References: <20190124111634.4727-1-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E184A3F0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 06:17:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 046E94A3FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 06:17:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oOZHNuO7poN0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 06:17:07 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EB244A412
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 06:17:07 -0500 (EST)
+ with ESMTP id 6LDesJNI71S2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jan 2019 06:17:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCC524A40E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 06:17:08 -0500 (EST)
 In-Reply-To: <20190124111634.4727-1-alexandru.elisei@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,47 +31,110 @@ To: kvm@vger.kernel.org
 Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current behavior when searching for a specific parameter is to exit
-with an error when the first unexpected parameter is found.
+Instead of aborting the test when an unexpected parameter is found, use
+argv_find() to search for the desired parameter. On arm and arm64, this
+allows kvm-unit-tests to be used with virtual machine monitors like kvmtool
+which automatically adds parameters to the kernel command line.
 
-The function argv_find() will search for a specific parameter, ignoring all
-other parameters.
+For example, to run the gicv3-ipi test the following command was used:
 
-Consumers for the function will be added in a later patch.
+lkvm run -k gic.flat -c 8 -m 410 -p "ipi" --irqchip=gicv3
+
+The resulting kernel command line that was passed to kvm-unit-tests was:
+
+"console=ttyS0 rw rootflags=trans=virtio,version=9p2000.L,cache=loose rootfstype=9p init=/virt/init  ip=dhcp ipi"
+
+Without the patch, the following error occurs:
+"ABORT: gicv3: Unknown subtest 'console=ttyS0'"
+
+With the patch, the test is able to run.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/argv.h |  1 +
- lib/argv.c | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ arm/gic.c      |  7 ++++---
+ arm/selftest.c | 19 ++++++++++++-------
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/lib/argv.h b/lib/argv.h
-index 2104dd42748d..efc390ae4fae 100644
---- a/lib/argv.h
-+++ b/lib/argv.h
-@@ -8,3 +8,4 @@
- extern void __setup_args(void);
- extern void setup_args_progname(const char *args);
- extern void setup_env(char *env, int size);
-+extern int argv_find(const char *needle, int argc, char **argv);
-diff --git a/lib/argv.c b/lib/argv.c
-index f0e183a8f02f..6e4593997e0b 100644
---- a/lib/argv.c
-+++ b/lib/argv.c
-@@ -144,3 +144,14 @@ void setup_env(char *env, int size)
- 		*env++ = '\0';
- 	}
- }
+diff --git a/arm/gic.c b/arm/gic.c
+index ed5642e74f70..f3746de4bfd8 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -12,6 +12,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ #include <libcflat.h>
++#include <argv.h>
+ #include <asm/setup.h>
+ #include <asm/processor.h>
+ #include <asm/delay.h>
+@@ -533,13 +534,13 @@ int main(int argc, char **argv)
+ 	if (argc < 2)
+ 		report_abort("no test specified");
+ 
+-	if (strcmp(argv[1], "ipi") == 0) {
++	if (argv_find("ipi", argc, argv) != -1) {
+ 		report_prefix_push(argv[1]);
+ 		nr_cpu_check(2);
+ 		on_cpus(ipi_test, NULL);
+-	} else if (strcmp(argv[1], "active") == 0) {
++	} else if (argv_find("active", argc, argv) != -1) {
+ 		run_active_clear_test();
+-	} else if (strcmp(argv[1], "mmio") == 0) {
++	} else if (argv_find("mmio", argc, argv) != -1) {
+ 		report_prefix_push(argv[1]);
+ 		gic_test_mmio();
+ 		report_prefix_pop();
+diff --git a/arm/selftest.c b/arm/selftest.c
+index ea5101ef7217..44b2f23ca115 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -8,6 +8,7 @@
+ #include <libcflat.h>
+ #include <util.h>
+ #include <devicetree.h>
++#include <argv.h>
+ #include <asm/setup.h>
+ #include <asm/ptrace.h>
+ #include <asm/asm-offsets.h>
+@@ -319,28 +320,32 @@ static void cpu_report(void *data __unused)
+ 
+ int main(int argc, char **argv)
+ {
++	int pos;
 +
-+int argv_find(const char *needle, int argc, char **argv)
-+{
-+	int i;
-+
-+	for (i = 0; i < argc; i++)
-+		if (strcmp(argv[i], needle) == 0)
-+			return i;
-+
-+	return -1;
-+}
+ 	report_prefix_push("selftest");
+ 
+ 	if (argc < 2)
+ 		report_abort("no test specified");
+ 
+-	report_prefix_push(argv[1]);
+-
+-	if (strcmp(argv[1], "setup") == 0) {
++	if ((pos = argv_find("setup", argc, argv)) != -1) {
+ 
+-		check_setup(argc-2, &argv[2]);
++		report_prefix_push("setup");
++		check_setup(argc-(pos+1), &argv[pos+1]);
+ 
+-	} else if (strcmp(argv[1], "vectors-kernel") == 0) {
++	} else if (argv_find("vectors-kernel", argc, argv) != -1) {
+ 
++		report_prefix_push("vectors-kernel");
+ 		check_vectors(NULL);
+ 
+-	} else if (strcmp(argv[1], "vectors-user") == 0) {
++	} else if (argv_find("vectors-user", argc, argv) != -1) {
+ 
++		report_prefix_push("vectors-user");
+ 		start_usr(check_vectors, NULL,
+ 				(unsigned long)thread_stack_alloc());
+ 
+-	} else if (strcmp(argv[1], "smp") == 0) {
++	} else if (argv_find("smp", argc, argv) != -1) {
+ 
++		report_prefix_push("smp");
+ 		report("PSCI version", psci_check());
+ 		on_cpus(cpu_report, NULL);
+ 
 -- 
 2.17.0
