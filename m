@@ -1,23 +1,22 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 09/14] KVM: arm64: Reuse sys_reg() macro when searching the
- trap table
-Date: Thu, 24 Jan 2019 15:00:27 +0100
-Message-ID: <20190124140032.8588-10-christoffer.dall@arm.com>
+Subject: [PATCH 07/14] KVM: arm/arm64: Simplify bg_timer programming
+Date: Thu, 24 Jan 2019 15:00:25 +0100
+Message-ID: <20190124140032.8588-8-christoffer.dall@arm.com>
 References: <20190124140032.8588-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6795A4A3D1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:01:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 651C34A3E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:01:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oaLkrc9zdTiK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 09:01:01 -0500 (EST)
+ with ESMTP id g0SfbPl4dwJi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jan 2019 09:00:59 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B71CE4A3A7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:00:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ECE44A410
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:00:53 -0500 (EST)
 In-Reply-To: <20190124140032.8588-1-christoffer.dall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,64 +31,143 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Instead of calling into kvm_timer_[un]schedule from the main kvm
+blocking path, test if the VCPU is on the wait queue from the load/put
+path and perform the background timer setup/cancel in this path.
 
-Instead of having an open-coded macro, reuse the sys_reg() macro
-that does the exact same thing.
+This has the distinct advantage that we no longer race between load/put
+and schedule/unschedule and programming and canceling of the bg_timer
+always happens when the timer state is not loaded.
 
+Note that we must now remove the checks in kvm_timer_blocking that do
+not schedule a background timer if one of the timers can fire, because
+we no longer have a guarantee that kvm_vcpu_check_block() will be called
+before kvm_timer_blocking.
+
+Reported-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ include/kvm/arm_arch_timer.h |  3 ---
+ virt/kvm/arm/arch_timer.c    | 35 ++++++++++++++---------------------
+ virt/kvm/arm/arm.c           |  2 --
+ 3 files changed, 14 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e3e37228ae4e..1a5bea4285e4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -965,6 +965,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 33771352dcd6..d6e6a45d1d24 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -76,9 +76,6 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
  
-+#define reg_to_encoding(x)						\
-+	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
-+		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2);
-+
- /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
- #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
- 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-@@ -1820,30 +1824,19 @@ static const struct sys_reg_desc *get_target_table(unsigned target,
- 	}
- }
+ bool kvm_timer_is_pending(struct kvm_vcpu *vcpu);
  
--#define reg_to_match_value(x)						\
--	({								\
--		unsigned long val;					\
--		val  = (x)->Op0 << 14;					\
--		val |= (x)->Op1 << 11;					\
--		val |= (x)->CRn << 7;					\
--		val |= (x)->CRm << 3;					\
--		val |= (x)->Op2;					\
--		val;							\
--	 })
+-void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+-void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
 -
- static int match_sys_reg(const void *key, const void *elt)
- {
- 	const unsigned long pval = (unsigned long)key;
- 	const struct sys_reg_desc *r = elt;
+ u64 kvm_phys_timer_read(void);
  
--	return pval - reg_to_match_value(r);
-+	return pval - reg_to_encoding(r);
+ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index b07ac4614e1c..4986028d9829 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -349,22 +349,12 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+  * thread is removed from its waitqueue and made runnable when there's a timer
+  * interrupt to handle.
+  */
+-void kvm_timer_schedule(struct kvm_vcpu *vcpu)
++static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+ 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+ 
+-	vtimer_save_state(vcpu);
+-
+-	/*
+-	 * No need to schedule a background timer if any guest timer has
+-	 * already expired, because kvm_vcpu_block will return before putting
+-	 * the thread to sleep.
+-	 */
+-	if (kvm_timer_should_fire(vtimer) || kvm_timer_should_fire(ptimer))
+-		return;
+-
+ 	/*
+ 	 * If both timers are not capable of raising interrupts (disabled or
+ 	 * masked), then there's no more work for us to do.
+@@ -373,12 +363,19 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	/*
+-	 * The guest timers have not yet expired, schedule a background timer.
++	 * At least one guest time will expire. Schedule a background timer.
+ 	 * Set the earliest expiration time among the guest timers.
+ 	 */
+ 	soft_timer_start(&timer->bg_timer, kvm_timer_earliest_exp(vcpu));
  }
  
- static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
- 					 const struct sys_reg_desc table[],
- 					 unsigned int num)
++static void kvm_timer_unblocking(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	soft_timer_cancel(&timer->bg_timer);
++}
++
+ static void vtimer_restore_state(struct kvm_vcpu *vcpu)
  {
--	unsigned long pval = reg_to_match_value(params);
-+	unsigned long pval = reg_to_encoding(params);
- 
- 	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+@@ -401,15 +398,6 @@ static void vtimer_restore_state(struct kvm_vcpu *vcpu)
+ 	local_irq_restore(flags);
  }
+ 
+-void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+-{
+-	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+-
+-	vtimer_restore_state(vcpu);
+-
+-	soft_timer_cancel(&timer->bg_timer);
+-}
+-
+ static void set_cntvoff(u64 cntvoff)
+ {
+ 	u32 low = lower_32_bits(cntvoff);
+@@ -485,6 +473,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+ 	/* Set the background timer for the physical timer emulation. */
+ 	phys_timer_emulate(vcpu);
+ 
++	kvm_timer_unblocking(vcpu);
++
+ 	/* If the timer fired while we weren't running, inject it now */
+ 	if (kvm_timer_should_fire(ptimer) != ptimer->irq.level)
+ 		kvm_timer_update_irq(vcpu, !ptimer->irq.level, ptimer);
+@@ -527,6 +517,9 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 	 */
+ 	soft_timer_cancel(&timer->phys_timer);
+ 
++	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
++		kvm_timer_blocking(vcpu);
++
+ 	/*
+ 	 * The kernel may decide to run userspace after calling vcpu_put, so
+ 	 * we reset cntvoff to 0 to ensure a consistent read between user
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index b77db673bb03..9fbdb9e1c51f 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -335,13 +335,11 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+-	kvm_timer_schedule(vcpu);
+ 	kvm_vgic_v4_enable_doorbell(vcpu);
+ }
+ 
+ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+-	kvm_timer_unschedule(vcpu);
+ 	kvm_vgic_v4_disable_doorbell(vcpu);
+ }
+ 
 -- 
 2.18.0
