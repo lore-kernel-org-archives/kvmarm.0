@@ -1,138 +1,100 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 06/14] KVM: arm/arm64: Factor out VMID into struct kvm_vmid
-Date: Thu, 24 Jan 2019 19:01:57 +0000
-Message-ID: <9ec36462-5a93-8246-85d3-a3c528959341@arm.com>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
- <20190124140032.8588-7-christoffer.dall@arm.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.4 040/104] arm64/kvm: consistently handle host HCR_EL2 flags
+Date: Thu, 24 Jan 2019 20:19:29 +0100
+Message-ID: <20190124190159.774535855@linuxfoundation.org>
+References: <20190124190154.968308875@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEFC54A3E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 14:02:04 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eCk+j-a1n4Ud for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 14:02:03 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F45C4A3B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 14:02:02 -0500 (EST)
-In-Reply-To: <20190124140032.8588-7-christoffer.dall@arm.com>
-Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190124190154.968308875@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, Sasha Levin <sashal@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi guys,
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
-(CC: +Suzuki)
+------------------
 
-On 24/01/2019 14:00, Christoffer Dall wrote:
-> In preparation for nested virtualization where we are going to have more
-> than a single VMID per VM, let's factor out the VMID data into a
-> separate VMID data structure and change the VMID allocator to operate on
-> this new structure instead of using a struct kvm.
-> 
-> This also means that udate_vttbr now becomes update_vmid, and that the
-> vttbr itself is generated on the fly based on the stage 2 page table
-> base address and the vmid.
-> 
-> We cache the physical address of the pgd when allocating the pgd to
-> avoid doing the calculation on every entry to the guest and to avoid
-> calling into potentially non-hyp-mapped code from hyp/EL2.
-> 
-> If we wanted to merge the VMID allocator with the arm64 ASID allocator
-> at some point in the future, it should actually become easier to do that
-> after this patch.
+[ Backport of upstream commit 4eaed6aa2c628101246bcabc91b203bfac1193f8 ]
 
-> Note that to avoid mapping the kvm_vmid_bits variable into hyp, we
-> simply forego the masking of the vmid value in kvm_get_vttbr and rely on
-> update_vmid to always assign a valid vmid value (within the supported
-> range).
+In KVM we define the configuration of HCR_EL2 for a VHE HOST in
+HCR_HOST_VHE_FLAGS, but we don't have a similar definition for the
+non-VHE host flags, and open-code HCR_RW. Further, in head.S we
+open-code the flags for VHE and non-VHE configurations.
 
+In future, we're going to want to configure more flags for the host, so
+lets add a HCR_HOST_NVHE_FLAGS defintion, and consistently use both
+HCR_HOST_VHE_FLAGS and HCR_HOST_NVHE_FLAGS in the kvm code and head.S.
 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 8af4b1befa42..189d93461d33 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -596,5 +596,16 @@ static inline bool kvm_cpu_has_cnp(void)
->  	return system_supports_cnp();
->  }
->  
-> +static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
-> +{
-> +	struct kvm_vmid *vmid = &kvm->arch.vmid;
-> +	u64 vmid_field, baddr;
-> +	u64 cnp = kvm_cpu_has_cnp() ? VTTBR_CNP_BIT : 0;
-> +
-> +	baddr = kvm->arch.pgd_phys;
-> +	vmid_field = (u64)vmid->vmid << VTTBR_VMID_SHIFT;
-> +	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
-> +}
+We now use mov_q to generate the HCR_EL2 value, as we use when
+configuring other registers in head.S.
 
-(32bits version is the same ... but I guess there is nowhere to put it!)
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+[kristina: backport to 4.4.y: non-VHE only; __deactivate_traps_nvhe in
+  assembly; add #include]
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h | 1 +
+ arch/arm64/kernel/head.S         | 3 ++-
+ arch/arm64/kvm/hyp.S             | 2 +-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
-
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 3dd240ea9e76..b77db673bb03 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -536,18 +529,12 @@ static void update_vttbr(struct kvm *kvm)
->  		kvm_call_hyp(__kvm_flush_vm_context);
->  	}
->  
-> -	kvm->arch.vmid = kvm_next_vmid;
-> +	vmid->vmid = kvm_next_vmid;
->  	kvm_next_vmid++;
-> -	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
-> -
-> -	/* update vttbr to be used with the new vmid */
-> -	pgd_phys = virt_to_phys(kvm->arch.pgd);
-
-> -	BUG_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm));
-
-Where did this go? (escaped during a turbulent rebase?)
-
-This removes the only caller of kvm_vttbr_baddr_mask()... It looks like this is
-a safety check that the stage2-pgd is correctly aligned when the IPA size, and
-thus size of the top level entry can by set by user-space.
-
-... or is it unnecessary if alloc_pages_exact() can only return naturally
-aligned groups of pages? (which I haven't checked)
-
-Keeping it sounds like a good thing to have in case we accidentally merge
-stage2/host-stage1 pgd's somewhere down the line.
-
-(Suzuki suggested it would make more sense in kvm_alloc_stage2_pgd(), where we
-could fail vm creation, instead of BUG()ing).
-
-(this was added by e55cac5bf2a9c ("kvm: arm/arm64: Prepare for VM specific
-stage2 translations"), the bulk of the logic is in 595583306434c ("kvm: arm64:
-Dynamic configuration of VTTBR mask"))
-
-
-> -	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
-> -	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid | cnp;
-> +	kvm_next_vmid &= (1 << kvm_get_vmid_bits()) - 1;
->  
->  	smp_wmb();
-> -	WRITE_ONCE(kvm->arch.vmid_gen, atomic64_read(&kvm_vmid_gen));
-> +	WRITE_ONCE(vmid->vmid_gen, atomic64_read(&kvm_vmid_gen));
->  
->  	spin_unlock(&kvm_vmid_lock);
->  }
-
-
-Thanks,
-
-James
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index ef8e13d379cb..013b7de45ee7 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -81,6 +81,7 @@
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
+ #define HCR_VIRT_EXCP_MASK (HCR_VA | HCR_VI | HCR_VF)
+ #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
++#define HCR_HOST_NVHE_FLAGS (HCR_RW)
+ 
+ 
+ /* Hyp System Control Register (SCTLR_EL2) bits */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index d019c3a58cc2..0382eba4bf7b 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -30,6 +30,7 @@
+ #include <asm/cache.h>
+ #include <asm/cputype.h>
+ #include <asm/kernel-pgtable.h>
++#include <asm/kvm_arm.h>
+ #include <asm/memory.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/pgtable.h>
+@@ -464,7 +465,7 @@ CPU_LE(	bic	x0, x0, #(3 << 24)	)	// Clear the EE and E0E bits for EL1
+ 	ret
+ 
+ 	/* Hyp configuration. */
+-2:	mov	x0, #(1 << 31)			// 64-bit EL1
++2:	mov_q	x0, HCR_HOST_NVHE_FLAGS
+ 	msr	hcr_el2, x0
+ 
+ 	/* Generic timers. */
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 86c289832272..8d3da858c257 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -494,7 +494,7 @@
+ .endm
+ 
+ .macro deactivate_traps
+-	mov	x2, #HCR_RW
++	mov_q	x2, HCR_HOST_NVHE_FLAGS
+ 	msr	hcr_el2, x2
+ 	msr	hstr_el2, xzr
+ 
+-- 
+2.19.1
