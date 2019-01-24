@@ -1,22 +1,23 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 04/14] ARM: KVM: Teach some form of type-safety to kvm_call_hyp
-Date: Thu, 24 Jan 2019 15:00:22 +0100
-Message-ID: <20190124140032.8588-5-christoffer.dall@arm.com>
+Subject: [PATCH 05/14] arm/arm64: KVM: Statically configure the host's view of
+ MPIDR
+Date: Thu, 24 Jan 2019 15:00:23 +0100
+Message-ID: <20190124140032.8588-6-christoffer.dall@arm.com>
 References: <20190124140032.8588-1-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 097A44A3A7
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 901B94A3D2
  for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:00:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5dhmUgeymk2D for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 09:00:46 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 750C84A3F5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:00:46 -0500 (EST)
+ with ESMTP id h8z3fzEQeigr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jan 2019 09:00:50 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC7614A3D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:00:49 -0500 (EST)
 In-Reply-To: <20190124140032.8588-1-christoffer.dall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,98 +34,114 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-Just like on arm64, and for the same reasons, kvm_call_hyp removes
-any form of type safety when calling into HYP. But we can still
-try to tell the compiler what we're trying to achieve.
+We currently eagerly save/restore MPIDR. It turns out to be
+slightly pointless:
+- On the host, this value is known as soon as we're scheduled on a
+  physical CPU
+- In the guest, this value cannot change, as it is set by KVM
+  (and this is a read-only register)
 
-Here, we can add code that would do the function call if it wasn't
-guarded by an always-false predicate. Hopefully, the compiler is
-dumb enough to do the type checking and clever enough to not emit
-the corresponding code...
+The result of the above is that we can perfectly avoid the eager
+saving of MPIDR_EL1, and only keep the restore. We just have
+to setup the host contexts appropriately at boot time.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h | 31 ++++++++++++++++++++++++++++---
- arch/arm/kvm/hyp/hyp-entry.S    |  2 +-
- arch/arm/kvm/interrupts.S       |  4 ++--
- 3 files changed, 31 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 8 ++++++++
+ arch/arm/kvm/hyp/cp15-sr.c        | 1 -
+ arch/arm64/include/asm/kvm_host.h | 8 ++++++++
+ arch/arm64/kvm/hyp/sysreg-sr.c    | 1 -
+ virt/kvm/arm/arm.c                | 1 +
+ 5 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 023c9f2b1eea..4b6193f2f0f6 100644
+index 4b6193f2f0f6..43e343e00fb8 100644
 --- a/arch/arm/include/asm/kvm_host.h
 +++ b/arch/arm/include/asm/kvm_host.h
-@@ -215,8 +215,33 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+@@ -26,6 +26,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
+ #include <asm/fpstate.h>
++#include <asm/smp_plat.h>
+ #include <kvm/arm_arch_timer.h>
  
--unsigned long kvm_call_hyp(void *hypfn, ...);
--#define kvm_call_hyp_ret(f, ...) kvm_call_hyp(f, ##__VA_ARGS__)
-+unsigned long __kvm_call_hyp(void *hypfn, ...);
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -147,6 +148,13 @@ struct kvm_cpu_context {
+ 
+ typedef struct kvm_cpu_context kvm_cpu_context_t;
+ 
++static inline void kvm_init_host_cpu_context(kvm_cpu_context_t *cpu_ctxt,
++					     int cpu)
++{
++	/* The host's MPIDR is immutable, so let's set it up at boot time */
++	cpu_ctxt->cp15[c0_MPIDR] = cpu_logical_map(cpu);
++}
 +
-+/*
-+ * The has_vhe() part doesn't get emitted, but is used for type-checking.
-+ */
-+#define kvm_call_hyp(f, ...)						\
-+	do {								\
-+		if (has_vhe()) {					\
-+			f(__VA_ARGS__);					\
-+		} else {						\
-+			__kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__); \
-+		}							\
-+	} while(0)
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
+ 
+diff --git a/arch/arm/kvm/hyp/cp15-sr.c b/arch/arm/kvm/hyp/cp15-sr.c
+index c4782812714c..8bf895ec6e04 100644
+--- a/arch/arm/kvm/hyp/cp15-sr.c
++++ b/arch/arm/kvm/hyp/cp15-sr.c
+@@ -27,7 +27,6 @@ static u64 *cp15_64(struct kvm_cpu_context *ctxt, int idx)
+ 
+ void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->cp15[c0_MPIDR]		= read_sysreg(VMPIDR);
+ 	ctxt->cp15[c0_CSSELR]		= read_sysreg(CSSELR);
+ 	ctxt->cp15[c1_SCTLR]		= read_sysreg(SCTLR);
+ 	ctxt->cp15[c1_CPACR]		= read_sysreg(CPACR);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8b7702bdb219..f497bb31031f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -30,6 +30,7 @@
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
++#include <asm/smp_plat.h>
+ #include <asm/thread_info.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -418,6 +419,13 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+ 
+ DECLARE_PER_CPU(kvm_cpu_context_t, kvm_host_cpu_state);
+ 
++static inline void kvm_init_host_cpu_context(kvm_cpu_context_t *cpu_ctxt,
++					     int cpu)
++{
++	/* The host's MPIDR is immutable, so let's set it up at boot time */
++	cpu_ctxt->sys_regs[MPIDR_EL1] = cpu_logical_map(cpu);
++}
 +
-+#define kvm_call_hyp_ret(f, ...)					\
-+	({								\
-+		typeof(f(__VA_ARGS__)) ret;				\
-+									\
-+		if (has_vhe()) {					\
-+			ret = f(__VA_ARGS__);				\
-+		} else {						\
-+			ret = __kvm_call_hyp(kvm_ksym_ref(f),		\
-+					     ##__VA_ARGS__);		\
-+		}							\
-+									\
-+		ret;							\
-+	})
+ void __kvm_enable_ssbs(void);
  
- void force_vm_exit(const cpumask_t *mask);
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
-@@ -268,7 +293,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
- 	 * compliant with the PCS!).
- 	 */
+ static inline void __cpu_init_hyp_mode(phys_addr_t pgd_ptr,
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 68d6f7c3b237..2498f86defcb 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -52,7 +52,6 @@ static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
  
--	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
-+	__kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
- }
+ static void __hyp_text __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ {
+-	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+ 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+ 	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg_el1(sctlr);
+ 	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 4d55f98f97f7..3dd240ea9e76 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1561,6 +1561,7 @@ static int init_hyp_mode(void)
+ 		kvm_cpu_context_t *cpu_ctxt;
  
- static inline void __cpu_init_stage2(void)
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index aa3f9a9837ac..6ed3cf23fe89 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -176,7 +176,7 @@ THUMB(	orr	lr, lr, #PSR_T_BIT	)
- 	msr	spsr_cxsf, lr
- 	ldr	lr, =panic
- 	msr	ELR_hyp, lr
--	ldr	lr, =kvm_call_hyp
-+	ldr	lr, =__kvm_call_hyp
- 	clrex
- 	eret
- ENDPROC(__hyp_do_panic)
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 80a1d6cd261c..a08e6419ebe9 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -42,7 +42,7 @@
-  *   r12:     caller save
-  *   rest:    callee save
-  */
--ENTRY(kvm_call_hyp)
-+ENTRY(__kvm_call_hyp)
- 	hvc	#0
- 	bx	lr
--ENDPROC(kvm_call_hyp)
-+ENDPROC(__kvm_call_hyp)
+ 		cpu_ctxt = per_cpu_ptr(&kvm_host_cpu_state, cpu);
++		kvm_init_host_cpu_context(cpu_ctxt, cpu);
+ 		err = create_hyp_mappings(cpu_ctxt, cpu_ctxt + 1, PAGE_HYP);
+ 
+ 		if (err) {
 -- 
 2.18.0
