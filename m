@@ -1,105 +1,98 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 14/14] KVM: arm/arm64: Move kvm_is_write_fault to header file
-Date: Thu, 24 Jan 2019 15:00:32 +0100
-Message-ID: <20190124140032.8588-15-christoffer.dall@arm.com>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
+Date: Thu, 24 Jan 2019 16:03:55 +0000
+Message-ID: <a6315ab3-bffb-7470-365d-b26df6524bda@arm.com>
+References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
+	<20190123083435.x3svwqp472mdgglw@8bytes.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 353514A3DC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:01:17 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sFRnwNbjdo1i for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 09:01:14 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 614A84A411
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 09:01:11 -0500 (EST)
-In-Reply-To: <20190124140032.8588-1-christoffer.dall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190123083435.x3svwqp472mdgglw-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
+Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, Robin Murphy <Robin.Murphy-5wv7dgnIgG8@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org" <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, "frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Hi Joerg,
 
-Move this little function to the header files for arm/arm64 so other
-code can make use of it directly.
+On 23/01/2019 08:34, Joerg Roedel wrote:
+> Hi Jean-Philippe,
+> 
+> thanks for all your hard work on this!
+> 
+> On Tue, Jan 15, 2019 at 12:19:52PM +0000, Jean-Philippe Brucker wrote:
+>> Implement the virtio-iommu driver, following specification v0.9 [1].
+> 
+> To make progress on this I think the spec needs to be close to something
+> that can be included into the official virtio-specification. Have you
+> proposed the specification for inclusion there?
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_emulate.h   | 8 ++++++++
- arch/arm64/include/asm/kvm_emulate.h | 8 ++++++++
- virt/kvm/arm/mmu.c                   | 8 --------
- 3 files changed, 16 insertions(+), 8 deletions(-)
+I haven't yet. I did send a few drafts of the spec to the mailing list,
+using arbitrary version numbers (0.1 - 0.9), and received excellent
+feedback from Eric, Kevin, Ashok and others [2], but I hadn't formally
+asked for inclusion yet. Since I haven't made any major change to the
+interface in a while, I'll get on that.
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 77121b713bef..8927cae7c966 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -265,6 +265,14 @@ static inline bool kvm_vcpu_dabt_isextabt(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_trap_is_iabt(vcpu))
-+		return false;
-+
-+	return kvm_vcpu_dabt_iswrite(vcpu);
-+}
-+
- static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_HVC_IMM_MASK;
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 506386a3edde..a0d1ce9ae12b 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -331,6 +331,14 @@ static inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
- 	return ESR_ELx_SYS64_ISS_RT(esr);
- }
- 
-+static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_trap_is_iabt(vcpu))
-+		return false;
-+
-+	return kvm_vcpu_dabt_iswrite(vcpu);
-+}
-+
- static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- {
- 	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index bffcbc423f4c..c17010bc33a9 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1398,14 +1398,6 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
- 	return false;
- }
- 
--static bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
--{
--	if (kvm_vcpu_trap_is_iabt(vcpu))
--		return false;
--
--	return kvm_vcpu_dabt_iswrite(vcpu);
--}
--
- /**
-  * stage2_wp_ptes - write protect PMD range
-  * @pmd:	pointer to pmd entry
--- 
-2.18.0
+> This is because I can't merge a driver that might be incompatible to
+> future implementations because the specification needs to be changed on
+> its way to an official standard.
+
+Makes sense, though I think other virtio devices have been developed a
+little more organically: device and driver code got upstreamed first,
+and then the specification describing their interface got merged into
+the standard. For example I believe that code for crypto, input and GPU
+devices were upstreamed long before the specification was merged. Once
+an implementation is upstream, the interface is expected to be
+backward-compatible (all subsequent changes are introduced using feature
+bits).
+
+So I've been working with this process in mind, also described by Jens
+at KVM forum 2017 [3]:
+(1) Reserve a device ID, and get that merged into virtio (ID 23 for
+virtio-iommu was reserved last year)
+(2) Open-source an implementation (this driver and Eric's device)
+(3) Formalize and upstream the device specification
+
+But I get that some overlap between (2) and (3) would have been better.
+So far the spec document has been reviewed mainly from the IOMMU point
+of view, and might require more changes to be in line with the other
+virtio devices -- hopefully just wording changes. I'll kick off step
+(3), but I think the virtio folks are a bit busy with finalizing the 1.1
+spec so I expect it to take a while.
+
+Thanks,
+Jean
+
+[2] RFC https://markmail.org/thread/l6b2rpc46nua4egs
+    0.4 https://markmail.org/thread/f5k37mab7tnrslin
+    0.5 https://markmail.org/thread/tz65oolu5do7hi6n
+    0.6 https://markmail.org/thread/dppbg6owzrx2km2n
+    0.7 https://markmail.org/thread/dgdy4hicswpakmsq
+
+[3] The future of virtio: riddles, myths and surprises
+    https://www.linux-kvm.org/images/0/03/Virtio_fall_2017.pdf
+    https://www.youtube.com/watch?v=z9cWwgYH97A
+
+
+> I had a short discussion with Michael S. Tsirkin about that and from
+> what I understood the spec needs to be proposed for inclusion on the
+> virtio-comment[1] mailing list and later the TC needs to vote on it.
+> Please work with Michael on this to get the specification official (or
+> at least pretty close to something that will be part of the official
+> virtio standard).
+> 
+> Regards,
+> 
+> 	Joerg
+> 
+> [1] https://www.oasis-open.org/committees/comments/index.php?wg_abbrev=virtio
