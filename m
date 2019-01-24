@@ -1,27 +1,26 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 2/7] lib: arm: Remove warning about
- uart0_base mismatch
-Date: Thu, 24 Jan 2019 13:37:40 +0100
-Message-ID: <20190124123740.v52nkbcki5dp2hpq@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 3/7] lib: chr-testdev: Make
+ chr_testdev_init() return status
+Date: Thu, 24 Jan 2019 13:56:07 +0100
+Message-ID: <20190124125607.l3q5dgtecgwmei3j@kamzik.brq.redhat.com>
 References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-3-alexandru.elisei@arm.com>
- <20190124115943.12296810@donnerap.cambridge.arm.com>
+ <20190124111634.4727-4-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3757A4A3A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 07:37:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FEBC4A3A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 07:56:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w9ge04B3b-Vk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Jan 2019 07:37:45 -0500 (EST)
+ with ESMTP id XzJxXlVERBAt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jan 2019 07:56:12 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 34FC14A399
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 07:37:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DAA14A39E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 07:56:12 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190124115943.12296810@donnerap.cambridge.arm.com>
+In-Reply-To: <20190124111634.4727-4-alexandru.elisei@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,65 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 24, 2019 at 11:59:43AM +0000, Andre Przywara wrote:
-> On Thu, 24 Jan 2019 11:16:29 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, Jan 24, 2019 at 11:16:30AM +0000, Alexandru Elisei wrote:
+> Make chr_testdev_init() return 0 (success) if the virtio console was
+> initialized properly, otherwise return -1 (failure).
 > 
-> > A warning is displayed if uart0_base is different from what the code
-> > expects qemu to generate for the pl011 UART in the device tree.
-> > However, now we support the ns16550a UART emulated by kvmtool, which
-> > has a different address. This leads to the  warning being displayed
-> > even though the UART is configured and working as expected.
-> > 
-> > Now that we support multiple UARTs, the warning serves no purpose, so
-> > remove it.
-> 
-> Mmh, but we use that address before, right? So for anything not
-> emulating an UART at this QEMU specific address we write to some random
-> (device) memory?
-> 
-> Drew, how important is this early print feature for kvm-unit-tests?
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/chr-testdev.h | 2 +-
+>  lib/chr-testdev.c | 8 +++++---
+>  2 files changed, 6 insertions(+), 4 deletions(-)
 
-The setup code passes through quite a few asserts before getting through
-io_init() (including in uart0_init), so I think there's still value in
-having a guessed UART address. Maybe we can provide guesses for both
-QEMU and kvmtool, and some selection method, that would be used until
-we've properly assigned uart0_base from DT?
+This patch isn't necessary. I'll explain why in patch 5/7.
 
 > 
-> Cheers,
-> Andre.
+> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
+> index ffd9a851aa9b..fdd0582e2da1 100644
+> --- a/lib/chr-testdev.h
+> +++ b/lib/chr-testdev.h
+> @@ -9,6 +9,6 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> -extern void chr_testdev_init(void);
+> +extern int chr_testdev_init(void);
+>  extern void chr_testdev_exit(int code);
+>  #endif
+> diff --git a/lib/chr-testdev.c b/lib/chr-testdev.c
+> index 6890f63c8b29..26e14301e3db 100644
+> --- a/lib/chr-testdev.c
+> +++ b/lib/chr-testdev.c
+> @@ -47,7 +47,7 @@ out:
+>  	spin_unlock(&lock);
+>  }
+>  
+> -void chr_testdev_init(void)
+> +int chr_testdev_init(void)
+>  {
+>  	const char *io_names[] = { "input", "output" };
+>  	struct virtqueue *vqs[2];
+> @@ -57,7 +57,7 @@ void chr_testdev_init(void)
+>  	if (vcon == NULL) {
+>  		printf("%s: %s: can't find a virtio-console\n",
+>  				__func__, TESTDEV_NAME);
+> -		return;
+> +		return -1;
+>  	}
+>  
+>  	ret = vcon->config->find_vqs(vcon, 2, vqs, NULL, io_names);
+> @@ -65,9 +65,11 @@ void chr_testdev_init(void)
+>  		printf("%s: %s: can't init virtqueues\n",
+>  				__func__, TESTDEV_NAME);
+>  		vcon = NULL;
+> -		return;
+> +		return -1;
+>  	}
+>  
+>  	in_vq = vqs[0];
+>  	out_vq = vqs[1];
+> +
+> +	return 0;
+>  }
+> -- 
+> 2.17.0
 > 
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  lib/arm/io.c | 6 ------
-> >  1 file changed, 6 deletions(-)
-> > 
-> > diff --git a/lib/arm/io.c b/lib/arm/io.c
-> > index 35fc05aeb4db..87435150f73e 100644
-> > --- a/lib/arm/io.c
-> > +++ b/lib/arm/io.c
-> > @@ -61,12 +61,6 @@ static void uart0_init(void)
-> >  	}
-> >  
-> >  	uart0_base = ioremap(base.addr, base.size);
-> > -
-> > -	if (uart0_base != (u8 *)UART_EARLY_BASE) {
-> > -		printf("WARNING: early print support may not work. "
-> > -		       "Found uart at %p, but early base is %p.\n",
-> > -			uart0_base, (u8 *)UART_EARLY_BASE);
-> > -	}
-> >  }
-
-This warning is doing what it should, which is pointing out that the
-UART_EARLY_BASE guess appears to be wrong. If we can provide a way
-to support more than one guess, then we should keep this warning but
-adjust it to match one of any of the guesses.
-
-Thanks,
-drew
