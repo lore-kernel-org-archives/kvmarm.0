@@ -1,98 +1,81 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-Date: Thu, 24 Jan 2019 16:03:55 +0000
-Message-ID: <a6315ab3-bffb-7470-365d-b26df6524bda@arm.com>
-References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
-	<20190123083435.x3svwqp472mdgglw@8bytes.org>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH v2 0/4] Fix some KVM/HYP interactions with kprobes
+Date: Thu, 24 Jan 2019 16:32:53 +0000
+Message-ID: <20190124163257.233929-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20190123083435.x3svwqp472mdgglw-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, Robin Murphy <Robin.Murphy-5wv7dgnIgG8@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org" <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, "frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C5A4A3AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 11:33:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mEZ-b6TsW1Ff for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Jan 2019 11:33:14 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB224A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Jan 2019 11:33:14 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Joerg,
+Hi guys,
 
-On 23/01/2019 08:34, Joerg Roedel wrote:
-> Hi Jean-Philippe,
-> 
-> thanks for all your hard work on this!
-> 
-> On Tue, Jan 15, 2019 at 12:19:52PM +0000, Jean-Philippe Brucker wrote:
->> Implement the virtio-iommu driver, following specification v0.9 [1].
-> 
-> To make progress on this I think the spec needs to be close to something
-> that can be included into the official virtio-specification. Have you
-> proposed the specification for inclusion there?
+When looking at Masami Hiramatsu's kprobe cleanup series, it occurred
+to me the 'no KVM' isn't just about the EL1/EL2  split on non-VHE systems,
+but whether KVM is prepared to handle stepping on a breakpoint. It's not.
 
-I haven't yet. I did send a few drafts of the spec to the mailing list,
-using arbitrary version numbers (0.1 - 0.9), and received excellent
-feedback from Eric, Kevin, Ashok and others [2], but I hadn't formally
-asked for inclusion yet. Since I haven't made any major change to the
-interface in a while, I'll get on that.
+This labels all the VHE-only KVM functions that run during world switch
+with NOKPROBE_SYMBOL(), and always blacklists __hyp_text for kprobes
+to cover the common guest entry/exit code.
 
-> This is because I can't merge a driver that might be incompatible to
-> future implementations because the specification needs to be changed on
-> its way to an official standard.
+I anticipate patch 1 going via the KVM tree to avoid conflicts.
+Patch 2 will conflict with [0].
 
-Makes sense, though I think other virtio devices have been developed a
-little more organically: device and driver code got upstreamed first,
-and then the specification describing their interface got merged into
-the standard. For example I believe that code for crypto, input and GPU
-devices were upstreamed long before the specification was merged. Once
-an implementation is upstream, the interface is expected to be
-backward-compatible (all subsequent changes are introduced using feature
-bits).
 
-So I've been working with this process in mind, also described by Jens
-at KVM forum 2017 [3]:
-(1) Reserve a device ID, and get that merged into virtio (ID 23 for
-virtio-iommu was reserved last year)
-(2) Open-source an implementation (this driver and Eric's device)
-(3) Formalize and upstream the device specification
+I'm not sure what the best thing to do with the hyp-stub is.
+Patch 3 moves it to __hyp_text, and patch 4 covers the hibernate fallout
+from doing that. We don't have any other mmu-off but not idmap'd text.
+Probing the hyp-stub has to be done by address as the symbol names
+alias those in the __entry_text, which is blacklisted. (although this
+might depend on link order). I think anyone doing this is trying to
+shoot themselves in the foot.
 
-But I get that some overlap between (2) and (3) would have been better.
-So far the spec document has been reviewed mainly from the IOMMU point
-of view, and might require more changes to be in line with the other
-virtio devices -- hopefully just wording changes. I'll kick off step
-(3), but I think the virtio folks are a bit busy with finalizing the 1.1
-spec so I expect it to take a while.
+
+Know issues:
+* Other regions we should blacklist are the kexec and hibernate 'copy
+  everything' code, as the vectors may have been overwritten by the time
+  we step on the probe. cpu-suspend needs investigating...
+
 
 Thanks,
-Jean
 
-[2] RFC https://markmail.org/thread/l6b2rpc46nua4egs
-    0.4 https://markmail.org/thread/f5k37mab7tnrslin
-    0.5 https://markmail.org/thread/tz65oolu5do7hi6n
-    0.6 https://markmail.org/thread/dppbg6owzrx2km2n
-    0.7 https://markmail.org/thread/dgdy4hicswpakmsq
+James
 
-[3] The future of virtio: riddles, myths and surprises
-    https://www.linux-kvm.org/images/0/03/Virtio_fall_2017.pdf
-    https://www.youtube.com/watch?v=z9cWwgYH97A
+[0] lore.kernel.org/r/154753341900.31541.8135985235882849464.stgit@devbox
 
+James Morse (4):
+  KVM: arm64: Forbid kprobing of the VHE world-switch code
+  arm64: kprobe: Always blacklist the KVM world-switch code
+  arm64: hyp-stub: Forbid kprobing of the hyp-stub
+  arm64: hibernate: Clean the __hyp_text to PoC after resume
 
-> I had a short discussion with Michael S. Tsirkin about that and from
-> what I understood the spec needs to be proposed for inclusion on the
-> virtio-comment[1] mailing list and later the TC needs to vote on it.
-> Please work with Michael on this to get the specification official (or
-> at least pretty close to something that will be part of the official
-> virtio standard).
-> 
-> Regards,
-> 
-> 	Joerg
-> 
-> [1] https://www.oasis-open.org/committees/comments/index.php?wg_abbrev=virtio
+ arch/arm64/kernel/hibernate.c      | 4 +++-
+ arch/arm64/kernel/hyp-stub.S       | 2 ++
+ arch/arm64/kernel/probes/kprobes.c | 6 +++---
+ arch/arm64/kvm/hyp/switch.c        | 5 +++++
+ arch/arm64/kvm/hyp/sysreg-sr.c     | 5 +++++
+ 5 files changed, 18 insertions(+), 4 deletions(-)
+
+-- 
+2.20.1
