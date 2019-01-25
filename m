@@ -1,21 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH kvmtool 0/6] Various convenience fixes
-Date: Fri, 25 Jan 2019 18:07:55 +0000
-Message-ID: <20190125180801.209910-1-andre.przywara@arm.com>
+Subject: [PATCH kvmtool 2/6] arm: fdt: add stdout-path to /chosen node
+Date: Fri, 25 Jan 2019 18:07:57 +0000
+Message-ID: <20190125180801.209910-3-andre.przywara@arm.com>
+References: <20190125180801.209910-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2637A4A3AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 13:08:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA284A3DC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 13:08:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M2pgJWXaThNi for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Jan 2019 13:08:08 -0500 (EST)
+ with ESMTP id cLJmggjt7Crf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jan 2019 13:08:10 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E68174A3A2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 13:08:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3AB4A3A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 13:08:10 -0500 (EST)
+In-Reply-To: <20190125180801.209910-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,41 +31,33 @@ To: Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As I found myself using kvmtool more often in the last weeks, I got more
-and more annoyed by some smaller "ticks" that kvmtool shows.
+The DT spec describes the stdout-path property in the /chosen node to
+contain the DT path for a default device usable for outputting characters.
+The Linux kernel uses this for earlycon (without further parameters),
+other DT users might rely on this as well.
 
-So this is an attempt to post various smaller fixes I gathered up over
-the years, but never found worth enough to send out:
+Add a property containing the path to our emulated 8250 serial device.
 
-- drop unnecessarily detailed debug output
-- add /chosen/stdout-path node in .dtb
-- honour make -s switch
-- remove pointless kvmtool version number
-- improve meaningless PMU error message
-- introduce autodetection of supported GIC type
+Even when we use the virtio console, the serial console is still there
+and works, so we can expose this unconditionally. Putting the virtio
+console path in there will not work anyway.
 
-Please have a look!
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/fdt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Cheers,
-Andre.
-
-Andre Przywara (6):
-  arm: turn pr_info() into pr_debug() messages
-  arm: fdt: add stdout-path to /chosen node
-  Makefile: support -s switch
-  Makefile: Remove echoing of kvmtools version file
-  arm: pmu: Improve PMU error reporting
-  arm: Auto-detect guest GIC type
-
- Makefile                     | 16 +++++++++++++++-
- arm/fdt.c                    |  3 ++-
- arm/gic.c                    | 25 +++++++++++++++++++++++++
- arm/include/arm-common/gic.h |  1 +
- arm/kvm.c                    | 16 ++++++++--------
- arm/pmu.c                    |  2 +-
- util/KVMTOOLS-VERSION-GEN    |  1 -
- virtio/mmio.c                |  3 ++-
- 8 files changed, 54 insertions(+), 13 deletions(-)
-
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 28ba1c2c..8cda3ded 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -143,6 +143,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
+ 	_FDT(fdt_property_string(fdt, "bootargs", kvm->cfg.real_cmdline));
+ 	_FDT(fdt_property_u64(fdt, "kaslr-seed", kvm->cfg.arch.kaslr_seed));
++	_FDT(fdt_property_string(fdt, "stdout-path", "/U6_16550A@3f8"));
+ 
+ 	/* Initrd */
+ 	if (kvm->arch.initrd_size != 0) {
 -- 
 2.17.1
