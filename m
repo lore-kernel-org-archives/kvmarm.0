@@ -1,29 +1,21 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 5/7] lib: arm: Fallback to
- psci_system_off() in exit()
-Date: Fri, 25 Jan 2019 16:31:37 +0100
-Message-ID: <20190125153137.dakwla2ozmd22vq2@kamzik.brq.redhat.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-6-alexandru.elisei@arm.com>
- <20190124130020.5gjoblt5lqqujzqw@kamzik.brq.redhat.com>
- <20190124133511.3izvap4y2crqrbbp@kamzik.brq.redhat.com>
- <6cf2fe9d-9c35-ae42-6cb4-d34dfdc2df3b@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH kvmtool] arm: Allow command line for firmware
+Date: Fri, 25 Jan 2019 15:43:08 +0000
+Message-ID: <20190125154308.185131-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3574A3BD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 10:31:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B53F04A3C6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 10:43:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DbGnUI0mzD1y for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Jan 2019 10:31:43 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4312D4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 10:31:43 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <6cf2fe9d-9c35-ae42-6cb4-d34dfdc2df3b@arm.com>
+ with ESMTP id kI46jbBMpQti for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jan 2019 10:43:28 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B05714A3BD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 10:43:28 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,57 +25,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 25, 2019 at 02:56:30PM +0000, Alexandru Elisei wrote:
-> 
-> On 1/24/19 1:35 PM, Andrew Jones wrote:
-> > On Thu, Jan 24, 2019 at 02:00:20PM +0100, Andrew Jones wrote:
-> >> [..]
-> >> chr_testdev_init() ensures vcon is NULL if it fails to initialize.
-> >> chr_testdev_exit() immediately returns if vcon is NULL. This was
-> >> done by design to allow fallback exits to be placed below the
-> >> chr_testdev_exit call, e.g. halt().
-> >>
-> >> We should be able to drop patch 3/7 and change exit() to this
-> >>
-> >>   void exit(int code)
-> >>   {
-> >>       chr_testdev_exit(code);
-> >>       psci_system_off();
-> >>       halt(code);
-> >>       __builtin_unreachable();
-> >>   }
-> >>
-> > There's also a framework for exits that can't return status codes. powerpc
-> > uses it. Before exiting with psci_system_off we need to make this print
-> > statement
-> >
-> >  printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1); 
-> >
-> > And run_qemu in arm/run needs to be changed to run_qemu_status. It's
-> > hacky, but maybe we can live with it until kvmtool offers some sort of
-> > debug exit.
-> >
-> > Thanks,
-> > drew
-> 
-> I can make the change, but if I understand the scripts/arch-run.bash code
-> correctly, run_qemu() will check if QEMU was terminated because of a signal and
-> adjust the return code to take that into account. Using run_qemu_status() means
-> that check won't be made when the tests are run under QEMU, is that acceptable?
->
+When loading a firmware instead of a kernel, we can still pass on any
+*user-provided* command line, as /chosen/bootargs is a generic device tree
+feature. We just need to make sure to not pass our mangled-for-Linux
+version.
 
-run_qemu_status() first calls run_qemu(). If the return value from
-run_qemu() is 1, then it'll change the value to whatever the EXIT:
-status line says it should be. If run_qemu() detected that a signal
-caused the exit, then the return value won't be 1. In that case
-run_qemu_status() will simply propagate the value to the caller.
+This allows to run "firmware" images which make use of a command line,
+still are not Linux kernels, like kvm-unit-tests.
 
-It might be worth doing a few tests to ensure that all works out as
-designed, but I'm pretty sure it should.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+Hi Will,
 
-Thanks,
-drew
+this goes on top of Julien's firmware series (which did not yet appear
+on kernel.org?)
+This fixes an issue with some kvm-unit-tests support. [1]
+
+Cheers,
+Andre.
+
+[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2019-January/034251.html
+
+ arm/fdt.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/arm/fdt.c b/arm/fdt.c
+index e3a7a647..a1f8e912 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -163,14 +163,11 @@ static int setup_fdt(struct kvm *kvm)
+ 	_FDT(fdt_begin_node(fdt, "chosen"));
+ 	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
+ 
++	/* Pass on our amended command line to a Linux kernel only. */
+ 	if (kvm->cfg.firmware_filename) {
+-		/*
+-		 * When using a firmware, command line is not passed through DT,
+-		 * or the firmware can add it itself
+-		 */
+ 		if (kvm->cfg.kernel_cmdline)
+-			pr_warning("Ignoring custom bootargs: %s\n",
+-				   kvm->cfg.kernel_cmdline);
++			_FDT(fdt_property_string(fdt, "bootargs",
++						 kvm->cfg.kernel_cmdline));
+ 	} else
+ 		_FDT(fdt_property_string(fdt, "bootargs",
+ 					 kvm->cfg.real_cmdline));
+-- 
+2.17.1
