@@ -1,25 +1,26 @@
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/7] lib: arm: Discover ns16550a UART
-Date: Fri, 25 Jan 2019 14:07:01 +0000
-Message-ID: <1a899929-de03-5e7a-dd99-795cbd168138@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 4/7] lib: arm: Implement PSCI SYSTEM_OFF in
+ psci_system_off()
+Date: Fri, 25 Jan 2019 14:08:45 +0000
+Message-ID: <c7a56d94-f972-d541-9cdd-c34bacd24557@arm.com>
 References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-2-alexandru.elisei@arm.com>
- <20190124131151.zv7bncpuqyogvgf6@kamzik.brq.redhat.com>
+ <20190124111634.4727-5-alexandru.elisei@arm.com>
+ <20190124130129.bkefj6kqofnohkt7@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 616154A3B0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:07:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE2C84A3C6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:08:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5+zJCLQX9H6A for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Jan 2019 09:07:05 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDF694A3A6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:07:04 -0500 (EST)
-In-Reply-To: <20190124131151.zv7bncpuqyogvgf6@kamzik.brq.redhat.com>
+ with ESMTP id X98Kc4kkvBbA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jan 2019 09:08:48 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B3754A3B0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:08:48 -0500 (EST)
+In-Reply-To: <20190124130129.bkefj6kqofnohkt7@kamzik.brq.redhat.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,62 +36,56 @@ Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
-On 1/24/19 1:11 PM, Andrew Jones wrote:
-> On Thu, Jan 24, 2019 at 11:16:28AM +0000, Alexandru Elisei wrote:
->> Add support for discovering the ns16550a UART from the device tree. This
->> particular UART model is emulated by kvmtool.
+On 1/24/19 1:01 PM, Andrew Jones wrote:
+> On Thu, Jan 24, 2019 at 11:16:31AM +0000, Alexandru Elisei wrote:
+>> A new function psci_system_off() is added which implements the PSCI
+>> SYSTEM_OFF function. A call causes the hypervisor to terminate the virtual
+>> machine.
 >>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> Consumers for the function will be added in a later patch.
+>>
+>> Signed-off-by: Alexandru Elisei<alexandru.elisei@arm.com>
 >> ---
->>   lib/arm/io.c | 18 +++++++++++-------
->>   1 file changed, 11 insertions(+), 7 deletions(-)
+>>   lib/arm/asm/psci.h | 1 +
+>>   lib/arm/psci.c     | 6 ++++++
+>>   2 files changed, 7 insertions(+)
 >>
->> diff --git a/lib/arm/io.c b/lib/arm/io.c
->> index d2c1a07c19ee..35fc05aeb4db 100644
->> --- a/lib/arm/io.c
->> +++ b/lib/arm/io.c
->> @@ -32,22 +32,26 @@ static volatile u8 *uart0_base = (u8 *)UART_EARLY_BASE;
+>> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
+>> index ed51708fd265..93409996349a 100644
+>> --- a/lib/arm/asm/psci.h
+>> +++ b/lib/arm/asm/psci.h
+>> @@ -9,5 +9,6 @@ extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
+>>   extern void psci_sys_reset(void);
+>>   extern int cpu_psci_cpu_boot(unsigned int cpu);
+>>   extern void cpu_psci_cpu_die(void);
+>> +extern void psci_system_off(void);
 >>   
->>   static void uart0_init(void)
->>   {
->> -	const char *compatible = "arm,pl011";
->> +	const char *compatible[] = {"arm,pl011", "ns16550a"};
->>   	struct dt_pbus_reg base;
->> -	int ret;
->> +	int i, ret;
+>>   #endif /* _ASMARM_PSCI_H_ */
+>> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+>> index 119f74e57e91..d8dc428e8e8b 100644
+>> --- a/lib/arm/psci.c
+>> +++ b/lib/arm/psci.c
+>> @@ -48,6 +48,12 @@ void cpu_psci_cpu_die(void)
+>>   	printf("CPU%d unable to power off (error = %d)\n", smp_processor_id(), err);
+>>   }
 >>   
->>   	ret = dt_get_default_console_node();
->>   	assert(ret >= 0 || ret == -FDT_ERR_NOTFOUND);
->>   
->>   	if (ret == -FDT_ERR_NOTFOUND) {
->>   
->> -		ret = dt_pbus_get_base_compatible(compatible, &base);
->> -		assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
->> +		for (i = 0; i < ARRAY_SIZE(compatible); i++) {
->> +			ret = dt_pbus_get_base_compatible(compatible[i], &base);
->> +			assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
+>> +void psci_system_off(void)
+>> +{
+>> +	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
+>> +	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
+>> +}
 >> +
->> +			if (ret == 0)
->> +				break;
->> +		}
->>   
->>   		if (ret) {
->> -			printf("%s: %s not found in the device tree, "
->> -				"aborting...\n",
->> -				__func__, compatible);
->> +			printf("%s: Compatible UART not found in the device tree, "
->> +				"aborting...\n", __func__);
->>   			abort();
->>   		}
->>   
+>>   void psci_sys_reset(void)
+>>   {
+>>   	psci_invoke(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
 >> -- 
 >> 2.17.0
 >>
-> I agree with Andre that we should document this UART "driver" only ever
-> writes to the TX register. And that it assumes that TX register is at
-> the 0th offset.
+> We should either rename psci_sys_reset to psci_system_reset or name this
+> new function with the psci_sys_* pattern.
 >
 > Thanks,
 > drew
-Sure, I'll write a comment documenting this behavior in the next version of the 
-patches.
+I am thinking we should rename psci_sys_reset() to match the PSCI specification 
+function name, which is SYSTEM_OFF. If you're ok with it, I'll do the rename in 
+the next patch set version.
