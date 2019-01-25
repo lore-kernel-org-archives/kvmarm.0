@@ -1,28 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 4/7] lib: arm: Implement PSCI SYSTEM_OFF
- in psci_system_off()
-Date: Fri, 25 Jan 2019 15:25:19 +0100
-Message-ID: <20190125142519.n7ytozr2scgsymju@kamzik.brq.redhat.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-5-alexandru.elisei@arm.com>
- <20190124130129.bkefj6kqofnohkt7@kamzik.brq.redhat.com>
- <c7a56d94-f972-d541-9cdd-c34bacd24557@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
+Date: Fri, 25 Jan 2019 14:46:57 +0000
+Message-ID: <20190125144657.3db91c91@donnerap.cambridge.arm.com>
+References: <20190107120537.184252-1-andre.przywara@arm.com>
+ <20190107120537.184252-2-andre.przywara@arm.com>
+ <20190122151714.GG3578@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6C564A3A8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:25:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70AE14A3D9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:47:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id apvR9xOMSGcI for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Jan 2019 09:25:24 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC7214A39E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:25:24 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <c7a56d94-f972-d541-9cdd-c34bacd24557@arm.com>
+ with ESMTP id o0t31ZwUn6Xh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Jan 2019 09:47:02 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B87C64A0CC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Jan 2019 09:47:02 -0500 (EST)
+In-Reply-To: <20190122151714.GG3578@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,65 +30,200 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 25, 2019 at 02:08:45PM +0000, Alexandru Elisei wrote:
-> 
-> On 1/24/19 1:01 PM, Andrew Jones wrote:
-> > On Thu, Jan 24, 2019 at 11:16:31AM +0000, Alexandru Elisei wrote:
-> > > A new function psci_system_off() is added which implements the PSCI
-> > > SYSTEM_OFF function. A call causes the hypervisor to terminate the virtual
-> > > machine.
-> > > 
-> > > Consumers for the function will be added in a later patch.
-> > > 
-> > > Signed-off-by: Alexandru Elisei<alexandru.elisei@arm.com>
-> > > ---
-> > >   lib/arm/asm/psci.h | 1 +
-> > >   lib/arm/psci.c     | 6 ++++++
-> > >   2 files changed, 7 insertions(+)
-> > > 
-> > > diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> > > index ed51708fd265..93409996349a 100644
-> > > --- a/lib/arm/asm/psci.h
-> > > +++ b/lib/arm/asm/psci.h
-> > > @@ -9,5 +9,6 @@ extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
-> > >   extern void psci_sys_reset(void);
-> > >   extern int cpu_psci_cpu_boot(unsigned int cpu);
-> > >   extern void cpu_psci_cpu_die(void);
-> > > +extern void psci_system_off(void);
-> > >   #endif /* _ASMARM_PSCI_H_ */
-> > > diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-> > > index 119f74e57e91..d8dc428e8e8b 100644
-> > > --- a/lib/arm/psci.c
-> > > +++ b/lib/arm/psci.c
-> > > @@ -48,6 +48,12 @@ void cpu_psci_cpu_die(void)
-> > >   	printf("CPU%d unable to power off (error = %d)\n", smp_processor_id(), err);
-> > >   }
-> > > +void psci_system_off(void)
-> > > +{
-> > > +	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
-> > > +	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
-> > > +}
-> > > +
-> > >   void psci_sys_reset(void)
-> > >   {
-> > >   	psci_invoke(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
-> > > -- 
-> > > 2.17.0
-> > > 
-> > We should either rename psci_sys_reset to psci_system_reset or name this
-> > new function with the psci_sys_* pattern.
+On Tue, 22 Jan 2019 15:17:14 +0000
+Dave Martin <Dave.Martin@arm.com> wrote:
+
+Hi Dave,
+
+thanks for having a look!
+
+> On Mon, Jan 07, 2019 at 12:05:36PM +0000, Andre Przywara wrote:
+> > KVM implements the firmware interface for mitigating cache
+> > speculation vulnerabilities. Guests may use this interface to
+> > ensure mitigation is active.
+> > If we want to migrate such a guest to a host with a different
+> > support level for those workarounds, migration might need to fail,
+> > to ensure that critical guests don't loose their protection.
 > > 
-> > Thanks,
-> > drew
-> I am thinking we should rename psci_sys_reset() to match the PSCI
-> specification function name, which is SYSTEM_OFF. If you're ok with it, I'll
-> do the rename in the next patch set version.
+> > Introduce a way for userland to save and restore the workarounds
+> > state. On restoring we do checks that make sure we don't downgrade
+> > our mitigation level.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arch/arm/include/asm/kvm_emulate.h   |  10 ++
+> >  arch/arm/include/uapi/asm/kvm.h      |   9 ++
+> >  arch/arm64/include/asm/kvm_emulate.h |  14 +++
+> >  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
+> >  virt/kvm/arm/psci.c                  | 138
+> > ++++++++++++++++++++++++++- 5 files changed, 178 insertions(+), 2
+> > deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_emulate.h
+> > b/arch/arm/include/asm/kvm_emulate.h index
+> > 77121b713bef..2255c50debab 100644 ---
+> > a/arch/arm/include/asm/kvm_emulate.h +++
+> > b/arch/arm/include/asm/kvm_emulate.h @@ -275,6 +275,16 @@ static
+> > inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> > return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK; }
+> >  
+> > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct
+> > kvm_vcpu *vcpu) +{
+> > +	return false;
+> > +}
+> > +
+> > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
+> > kvm_vcpu *vcpu,
+> > +						      bool flag)
+> > +{
+> > +}
+> > +
+> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  {
+> >  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+> > diff --git a/arch/arm/include/uapi/asm/kvm.h
+> > b/arch/arm/include/uapi/asm/kvm.h index 4602464ebdfb..02c93b1d8f6d
+> > 100644 --- a/arch/arm/include/uapi/asm/kvm.h
+> > +++ b/arch/arm/include/uapi/asm/kvm.h
+> > @@ -214,6 +214,15 @@ struct kvm_vcpu_events {
+> >  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM |
+> > KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) & 0xffff))
+> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1
+> > KVM_REG_ARM_FW_REG(1) +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4 
+> >  /* Device Control API: ARM VGIC */
+> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h
+> > b/arch/arm64/include/asm/kvm_emulate.h index
+> > 506386a3edde..a44f07f68da4 100644 ---
+> > a/arch/arm64/include/asm/kvm_emulate.h +++
+> > b/arch/arm64/include/asm/kvm_emulate.h @@ -336,6 +336,20 @@ static
+> > inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> > return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK; }
+> >  
+> > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct
+> > kvm_vcpu *vcpu) +{
+> > +	return vcpu->arch.workaround_flags &
+> > VCPU_WORKAROUND_2_FLAG; +}
+> > +
+> > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
+> > kvm_vcpu *vcpu,
+> > +						      bool flag)
+> > +{
+> > +	if (flag)
+> > +		vcpu->arch.workaround_flags |=
+> > VCPU_WORKAROUND_2_FLAG;
+> > +	else
+> > +		vcpu->arch.workaround_flags &=
+> > ~VCPU_WORKAROUND_2_FLAG; +}
+> > +
+> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  {
+> >  	if (vcpu_mode_is_32bit(vcpu)) {
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h
+> > b/arch/arm64/include/uapi/asm/kvm.h index
+> > 97c3478ee6e7..4a19ef199a99 100644 ---
+> > a/arch/arm64/include/uapi/asm/kvm.h +++
+> > b/arch/arm64/include/uapi/asm/kvm.h @@ -225,6 +225,15 @@ struct
+> > kvm_vcpu_events { #define KVM_REG_ARM_FW_REG(r)
+> > (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) &
+> > 0xffff)) #define KVM_REG_ARM_PSCI_VERSION
+> > KVM_REG_ARM_FW_REG(0) +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
+> > KVM_REG_ARM_FW_REG(2) +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2 +#define
+> > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4  
+> 
+> If this is the first exposure of this information to userspace, I
+> wonder if we can come up with some common semantics that avoid having
+> to add new ad-hoc code (and bugs) every time a new
+> vulnerability/workaround is defined.
+> 
+> We seem to have at least the two following independent properties
+> for a vulnerability, with the listed values for each:
+> 
+>  * vulnerability (Vulnerable, Unknown, Not Vulnerable)
+> 
+>  * mitigation support (Not Requestable, Requestable)
+> 
+> Migrations must not move to the left in _either_ list for any
+> vulnerability.
+> 
+> If we want to hedge out bets we could follow the style of the ID
+> registers and allocate to each theoretical vulnerability a pair of
+> signed 2- or (for more expansion room if we think we might need it)
+> 4-bit fields.
+> 
+> We could perhaps allocate as follows:
+> 
+>  * -1=Vulnerable, 0=Unknown, 1=Not Vulnerable
+>  *  0=Mitigation not requestable, 1=Mitigation requestable
 
-Yup, I'm fine with the renaming.
+So as discussed in person, that sounds quite neat. I implemented
+that, but the sign extension and masking to n bits is not very pretty
+and limits readability.
+However the property of having a kind of "vulnerability scale", where a
+simple comparison would determine compatibility, is a good thing to
+have and drastically simplifies the checking code.
 
-Thanks,
-drew
+> Checking code wouldn't need to know which fields describe mitigation
+> mechanisms and which describe vulnerabilities: we'd just do a strict
+> >= comparison on each.
+> 
+> Further, if a register is never written before the vcpu is first run,
+> we should imply a write of 0 to it as part of KVM_RUN (so that if the
+> destination node has a negative value anywhere, KVM_RUN barfs cleanly.
+
+What I like about the signedness is this "0 means unknown", which is
+magically forwards compatible. However I am not sure we can transfer
+this semantic into every upcoming register that pops up in the future.
+Actually we might not need this:
+My understanding of how QEMU handles this in migration is that it reads
+the f/w reg on the originating host A and writes this into the target
+host B, without itself interpreting this in any way. It's up to the
+target kernel (basically this code here) to check compatibility. So I am
+not sure we actually need a stable scheme. If host A doesn't know about
+a certain register, it won't appear in the result of the
+KVM_GET_REG_LIST ioctl, so it won't be transferred to host B at all. In
+the opposite case the receiving host would reject an unknown register,
+which I believe is safer, although I see that it leaves the "unknown"
+case on the table.
+
+It would be good to have some opinion of how forward looking we want to
+(and can) be here.
+
+Meanwhile I am sending a v2 which implements the linear scale idea,
+without using signed values, as this indeed simplifies the code.
+I have the signed version still in a branch here, let me know if you
+want to have a look.
+
+Cheers,
+Andre.
+
+> (Those semantics should apply equally to the CPU ID registers, though
+> we don't currently do that.)
+> 
+> Thoughts?
+> 
+> [...]
+> 
+> Cheers
+> ---Dave
