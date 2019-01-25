@@ -1,7 +1,7 @@
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/3] KVM: arm/arm64: fix TRACE_INCLUDE_PATH
-Date: Fri, 25 Jan 2019 16:57:28 +0900
-Message-ID: <1548403050-6585-2-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 2/3] KVM: arm/arm64: remove -I. header search paths
+Date: Fri, 25 Jan 2019 16:57:29 +0900
+Message-ID: <1548403050-6585-3-git-send-email-yamada.masahiro@socionext.com>
 References: <1548403050-6585-1-git-send-email-yamada.masahiro@socionext.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -18,36 +18,48 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As the comment block in include/trace/define_trace.h says,
-TRACE_INCLUDE_PATH should be a relative path to the define_trace.h
+The header search path -I. in kernel Makefiles is very suspicious;
+it allows the compiler to search for headers in the top of $(srctree),
+where obviously no header file exists.
 
-../../virt/kvm/arm is the correct relative path.
-
-../../../virt/kvm/arm is working by coincidence because the top
-Makefile adds -I$(srctree)/arch/$(SRCARCH)/include as a header
-search path, but we should not rely on it.
+I was able to build without these extra header search paths.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- virt/kvm/arm/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/kvm/Makefile   | 3 +--
+ arch/arm64/kvm/Makefile | 2 --
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-index 3828bea..853f3b1 100644
---- a/virt/kvm/arm/trace.h
-+++ b/virt/kvm/arm/trace.h
-@@ -265,7 +265,7 @@ TRACE_EVENT(kvm_timer_update_irq,
- #endif /* _TRACE_KVM_H */
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index 48de846..bca775e 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -9,8 +9,7 @@ ifeq ($(plus_virt),+virt)
+ endif
  
- #undef TRACE_INCLUDE_PATH
--#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm
-+#define TRACE_INCLUDE_PATH ../../virt/kvm/arm
- #undef TRACE_INCLUDE_FILE
- #define TRACE_INCLUDE_FILE trace
+ ccflags-y += -Iarch/arm/kvm -Ivirt/kvm/arm/vgic
+-CFLAGS_arm.o := -I. $(plus_virt_def)
+-CFLAGS_mmu.o := -I.
++CFLAGS_arm.o := $(plus_virt_def)
+ 
+ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
+ AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 0f2a135..3089b31 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -4,8 +4,6 @@
+ #
+ 
+ ccflags-y += -Iarch/arm64/kvm -Ivirt/kvm/arm/vgic
+-CFLAGS_arm.o := -I.
+-CFLAGS_mmu.o := -I.
+ 
+ KVM=../../../virt/kvm
  
 -- 
 2.7.4
