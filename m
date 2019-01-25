@@ -1,72 +1,234 @@
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 3/3] KVM: arm/arm64: prefix header search paths with
- $(srctree)/
-Date: Fri, 25 Jan 2019 16:57:30 +0900
-Message-ID: <1548403050-6585-4-git-send-email-yamada.masahiro@socionext.com>
-References: <1548403050-6585-1-git-send-email-yamada.masahiro@socionext.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC v3 01/21] iommu: Introduce set_pasid_table API
+Date: Fri, 25 Jan 2019 09:39:47 +0100
+Message-ID: <c8ec9b40-d011-caa9-1fc2-7cacb43da02e@redhat.com>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+ <20190108102633.17482-2-eric.auger@redhat.com>
+ <0203e4ce-eace-be6e-7e95-5a02c069c8e8@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1548403050-6585-1-git-send-email-yamada.masahiro@socionext.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <0203e4ce-eace-be6e-7e95-5a02c069c8e8@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, the Kbuild core manipulates header search paths in a crazy
-way [1].
+Hi Jean-Philippe,
 
-To fix this mess, I want all Makefiles to add explicit $(srctree)/ to
-the search paths in the srctree. Some Makefiles are already written in
-that way, but not all. The goal of this work is to make the notation
-consistent, and finally get rid of the gross hacks.
-
-Having whitespaces after -I does not matter since commit 48f6e3cf5bc6
-("kbuild: do not drop -I without parameter").
-
-[1]: https://patchwork.kernel.org/patch/9632347/
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- arch/arm/kvm/Makefile   | 2 +-
- arch/arm64/kvm/Makefile | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index bca775e..531e59f 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -8,7 +8,7 @@ ifeq ($(plus_virt),+virt)
- 	plus_virt_def := -DREQUIRES_VIRT=1
- endif
- 
--ccflags-y += -Iarch/arm/kvm -Ivirt/kvm/arm/vgic
-+ccflags-y += -I $(srctree)/$(src) -I $(srctree)/virt/kvm/arm/vgic
- CFLAGS_arm.o := $(plus_virt_def)
- 
- AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 3089b31..690e033 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -3,7 +3,7 @@
- # Makefile for Kernel-based Virtual Machine module
- #
- 
--ccflags-y += -Iarch/arm64/kvm -Ivirt/kvm/arm/vgic
-+ccflags-y += -I $(srctree)/$(src) -I $(srctree)/virt/kvm/arm/vgic
- 
- KVM=../../../virt/kvm
- 
--- 
-2.7.4
+On 1/11/19 7:16 PM, Jean-Philippe Brucker wrote:
+> On 08/01/2019 10:26, Eric Auger wrote:
+>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>
+>> In virtualization use case, when a guest is assigned
+>> a PCI host device, protected by a virtual IOMMU on a guest,
+>> the physical IOMMU must be programmed to be consistent with
+>> the guest mappings. If the physical IOMMU supports two
+>> translation stages it makes sense to program guest mappings
+>> onto the first stage/level (ARM/VTD terminology) while to host
+>> owns the stage/level 2.
+>>
+>> In that case, it is mandated to trap on guest configuration
+>> settings and pass those to the physical iommu driver.
+>>
+>> This patch adds a new API to the iommu subsystem that allows
+>> to set the pasid table information.
+>>
+>> A generic iommu_pasid_table_config struct is introduced in
+>> a new iommu.h uapi header. This is going to be used by the VFIO
+>> user API. We foresee at least two specializations of this struct,
+>> for PASID table passing and ARM SMMUv3.
+> 
+> Last sentence is a bit confusing. With SMMUv3 it is also used for the
+> PASID table, even when it only has one entry and PASID is disabled.
+OK removed
+> 
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> This patch generalizes the API introduced by Jacob & co-authors in
+>> https://lwn.net/Articles/754331/
+>>
+>> v2 -> v3:
+>> - replace unbind/bind by set_pasid_table
+>> - move table pointer and pasid bits in the generic part of the struct
+>>
+>> v1 -> v2:
+>> - restore the original pasid table name
+>> - remove the struct device * parameter in the API
+>> - reworked iommu_pasid_smmuv3
+>> ---
+>>  drivers/iommu/iommu.c      | 10 ++++++++
+>>  include/linux/iommu.h      | 14 +++++++++++
+>>  include/uapi/linux/iommu.h | 50 ++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 74 insertions(+)
+>>  create mode 100644 include/uapi/linux/iommu.h
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 3ed4db334341..0f2b7f1fc7c8 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1393,6 +1393,16 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+>>  }
+>>  EXPORT_SYMBOL_GPL(iommu_attach_device);
+>>  
+>> +int iommu_set_pasid_table(struct iommu_domain *domain,
+>> +			  struct iommu_pasid_table_config *cfg)
+>> +{
+>> +	if (unlikely(!domain->ops->set_pasid_table))
+>> +		return -ENODEV;
+>> +
+>> +	return domain->ops->set_pasid_table(domain, cfg);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
+>> +
+>>  static void __iommu_detach_device(struct iommu_domain *domain,
+>>  				  struct device *dev)
+>>  {
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index e90da6b6f3d1..1da2a2357ea4 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -25,6 +25,7 @@
+>>  #include <linux/errno.h>
+>>  #include <linux/err.h>
+>>  #include <linux/of.h>
+>> +#include <uapi/linux/iommu.h>
+>>  
+>>  #define IOMMU_READ	(1 << 0)
+>>  #define IOMMU_WRITE	(1 << 1)
+>> @@ -184,6 +185,7 @@ struct iommu_resv_region {
+>>   * @domain_window_disable: Disable a particular window for a domain
+>>   * @of_xlate: add OF master IDs to iommu grouping
+>>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>> + * @set_pasid_table: set pasid table
+>>   */
+>>  struct iommu_ops {
+>>  	bool (*capable)(enum iommu_cap);
+>> @@ -226,6 +228,9 @@ struct iommu_ops {
+>>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+>>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
+>>  
+>> +	int (*set_pasid_table)(struct iommu_domain *domain,
+>> +			       struct iommu_pasid_table_config *cfg);
+>> +
+>>  	unsigned long pgsize_bitmap;
+>>  };
+>>  
+>> @@ -287,6 +292,8 @@ extern int iommu_attach_device(struct iommu_domain *domain,
+>>  			       struct device *dev);
+>>  extern void iommu_detach_device(struct iommu_domain *domain,
+>>  				struct device *dev);
+>> +extern int iommu_set_pasid_table(struct iommu_domain *domain,
+>> +				 struct iommu_pasid_table_config *cfg);
+>>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>> @@ -696,6 +703,13 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
+>>  	return NULL;
+>>  }
+>>  
+>> +static inline
+>> +int iommu_set_pasid_table(struct iommu_domain *domain,
+>> +			  struct iommu_pasid_table_config *cfg)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +
+>>  #endif /* CONFIG_IOMMU_API */
+>>  
+>>  #ifdef CONFIG_IOMMU_DEBUGFS
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> new file mode 100644
+>> index 000000000000..7a7cf7a3de7c
+>> --- /dev/null
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -0,0 +1,50 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * IOMMU user API definitions
+>> + *
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+> 
+> I don't think we need both the boilerplate and the SPDX header
+OK I only kept the SPDX header.
+> 
+>> + */
+>> +
+>> +#ifndef _UAPI_IOMMU_H
+>> +#define _UAPI_IOMMU_H
+>> +
+>> +#include <linux/types.h>
+>> +
+>> +/**
+>> + * SMMUv3 Stream Table Entry stage 1 related information
+>> + * @abort: shall the STE lead to abort
+>> + * @s1fmt: STE s1fmt field as set by the guest
+>> + * @s1dss: STE s1dss as set by the guest
+>> + * All field names match the smmu 3.0/3.1 spec (ARM IHI 0070A)
+> 
+> Not really the case for @abort. Could you clarify whether @abort is
+> valid in combination with @bypass?
+> abort corresponds to !Config[2]. In that case the spec says "report
+abort to device, no event recorded". S1 bypass corresponds to
+Config=0b1x0. What about removing abort in the SMMUv3 specific part and
+encode the stage state in the generic part. See below proposal ...
+>> + */
+>> +struct iommu_pasid_smmuv3 {
+>> +	__u8 abort;
+>> +	__u8 s1fmt;
+>> +	__u8 s1dss;
+>> +};
+>> +
+>> +/**
+>> + * PASID table data used to bind guest PASID table to the host IOMMU
+>> + * Note PASID table corresponds to the Context Table on ARM SMMUv3.
+>> + *
+>> + * @version: API version to prepare for future extensions
+>> + * @format: format of the PASID table
+>> + *
+>> + */
+>> +struct iommu_pasid_table_config {
+>> +#define PASID_TABLE_CFG_VERSION_1 1
+>> +	__u32	version;
+>> +#define IOMMU_PASID_FORMAT_SMMUV3	(1 << 0)
+>> +	__u32	format;
+>> +	__u64	base_ptr;
+>> +	__u8	pasid_bits;
+>> +	__u8	bypass
+#define IOMMU_PASID_STREAM_ABORT  (1 << 0)
+#define IOMMU_PASID_STREAM_BYPASS (1 << 1)
+#define IOMMU_PASID_STREAM_TRANSLATE (1 << 2)
+__u8 config;
+> 
+> We need some padding, in case someone adds a new struct to the union
+> that requires 64-byte alignment
+OK
+> 
+> And 'bypass' might not be the right name if we're making it common,
+> maybe 'reset' would be clearer? Or we just need to explain that bypass
+> is the initial state of a nesting domain
+I will add such comment. To me the "bypass" terminology sounds clearer
+than "reset"
+> 
+> Thanks,
+> Jean
+> 
+>> +	union {
+>> +		struct iommu_pasid_smmuv3 smmuv3;
+>> +	};
+>> +};
+>> +
+>> +#endif /* _UAPI_IOMMU_H */
+>>
+> 
