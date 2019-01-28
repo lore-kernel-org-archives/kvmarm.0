@@ -1,136 +1,395 @@
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/7] lib: arm: Remove warning about
- uart0_base mismatch
-Date: Mon, 28 Jan 2019 14:24:29 +0000
-Message-ID: <42b3a17b-088b-b9b7-4dac-34f07aa09c8a@arm.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-3-alexandru.elisei@arm.com>
- <20190124115943.12296810@donnerap.cambridge.arm.com>
- <20190124123740.v52nkbcki5dp2hpq@kamzik.brq.redhat.com>
- <ffcc5f60-c5a0-c7f1-7fb1-658d8eea6fc4@arm.com>
- <20190125164751.cdfip3kv63uonl7n@kamzik.brq.redhat.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v5 3/5] arm64/kvm: context-switch ptrauth registers
+Date: Mon, 28 Jan 2019 14:25:06 +0000
+Message-ID: <5a1c670c-700f-b3c3-6981-7ebb37b0d49a@arm.com>
+References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
+ <1548658727-14271-4-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A9124A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 09:24:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UaPU7YSGGBFK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Jan 2019 09:24:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F4D64A2AC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 09:24:32 -0500 (EST)
-In-Reply-To: <20190125164751.cdfip3kv63uonl7n@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1548658727-14271-4-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMS8yNS8xOSA0OjQ3IFBNLCBBbmRyZXcgSm9uZXMgd3JvdGU6Cj4gT24gRnJpLCBKYW4gMjUs
-IDIwMTkgYXQgMDQ6MzY6MTNQTSArMDAwMCwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4gT24g
-MS8yNC8xOSAxMjozNyBQTSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+Pj4gT24gVGh1LCBKYW4gMjQs
-IDIwMTkgYXQgMTE6NTk6NDNBTSArMDAwMCwgQW5kcmUgUHJ6eXdhcmEgd3JvdGU6Cj4+Pj4gT24g
-VGh1LCAyNCBKYW4gMjAxOSAxMToxNjoyOSArMDAwMAo+Pj4+IEFsZXhhbmRydSBFbGlzZWkgPGFs
-ZXhhbmRydS5lbGlzZWlAYXJtLmNvbT4gd3JvdGU6Cj4+Pj4KPj4+Pj4gQSB3YXJuaW5nIGlzIGRp
-c3BsYXllZCBpZiB1YXJ0MF9iYXNlIGlzIGRpZmZlcmVudCBmcm9tIHdoYXQgdGhlIGNvZGUKPj4+
-Pj4gZXhwZWN0cyBxZW11IHRvIGdlbmVyYXRlIGZvciB0aGUgcGwwMTEgVUFSVCBpbiB0aGUgZGV2
-aWNlIHRyZWUuCj4+Pj4+IEhvd2V2ZXIsIG5vdyB3ZSBzdXBwb3J0IHRoZSBuczE2NTUwYSBVQVJU
-IGVtdWxhdGVkIGJ5IGt2bXRvb2wsIHdoaWNoCj4+Pj4+IGhhcyBhIGRpZmZlcmVudCBhZGRyZXNz
-LiBUaGlzIGxlYWRzIHRvIHRoZSAgd2FybmluZyBiZWluZyBkaXNwbGF5ZWQKPj4+Pj4gZXZlbiB0
-aG91Z2ggdGhlIFVBUlQgaXMgY29uZmlndXJlZCBhbmQgd29ya2luZyBhcyBleHBlY3RlZC4KPj4+
-Pj4KPj4+Pj4gTm93IHRoYXQgd2Ugc3VwcG9ydCBtdWx0aXBsZSBVQVJUcywgdGhlIHdhcm5pbmcg
-c2VydmVzIG5vIHB1cnBvc2UsIHNvCj4+Pj4+IHJlbW92ZSBpdC4KPj4+PiBNbWgsIGJ1dCB3ZSB1
-c2UgdGhhdCBhZGRyZXNzIGJlZm9yZSwgcmlnaHQ/IFNvIGZvciBhbnl0aGluZyBub3QKPj4+PiBl
-bXVsYXRpbmcgYW4gVUFSVCBhdCB0aGlzIFFFTVUgc3BlY2lmaWMgYWRkcmVzcyB3ZSB3cml0ZSB0
-byBzb21lIHJhbmRvbQo+Pj4+IChkZXZpY2UpIG1lbW9yeT8KPj4+Pgo+Pj4+IERyZXcsIGhvdyBp
-bXBvcnRhbnQgaXMgdGhpcyBlYXJseSBwcmludCBmZWF0dXJlIGZvciBrdm0tdW5pdC10ZXN0cz8K
-Pj4+IFRoZSBzZXR1cCBjb2RlIHBhc3NlcyB0aHJvdWdoIHF1aXRlIGEgZmV3IGFzc2VydHMgYmVm
-b3JlIGdldHRpbmcgdGhyb3VnaAo+Pj4gaW9faW5pdCgpIChpbmNsdWRpbmcgaW4gdWFydDBfaW5p
-dCksIHNvIEkgdGhpbmsgdGhlcmUncyBzdGlsbCB2YWx1ZSBpbgo+Pj4gaGF2aW5nIGEgZ3Vlc3Nl
-ZCBVQVJUIGFkZHJlc3MuIE1heWJlIHdlIGNhbiBwcm92aWRlIGd1ZXNzZXMgZm9yIGJvdGgKPj4+
-IFFFTVUgYW5kIGt2bXRvb2wsIGFuZCBzb21lIHNlbGVjdGlvbiBtZXRob2QsIHRoYXQgd291bGQg
-YmUgdXNlZCB1bnRpbAo+Pj4gd2UndmUgcHJvcGVybHkgYXNzaWduZWQgdWFydDBfYmFzZSBmcm9t
-IERUPwo+Pj4KPj4+PiBDaGVlcnMsCj4+Pj4gQW5kcmUuCj4+Pj4KPj4+Pj4gU2lnbmVkLW9mZi1i
-eTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+Pj4+PiAtLS0K
-Pj4+Pj4gIGxpYi9hcm0vaW8uYyB8IDYgLS0tLS0tCj4+Pj4+ICAxIGZpbGUgY2hhbmdlZCwgNiBk
-ZWxldGlvbnMoLSkKPj4+Pj4KPj4+Pj4gZGlmZiAtLWdpdCBhL2xpYi9hcm0vaW8uYyBiL2xpYi9h
-cm0vaW8uYwo+Pj4+PiBpbmRleCAzNWZjMDVhZWI0ZGIuLjg3NDM1MTUwZjczZSAxMDA2NDQKPj4+
-Pj4gLS0tIGEvbGliL2FybS9pby5jCj4+Pj4+ICsrKyBiL2xpYi9hcm0vaW8uYwo+Pj4+PiBAQCAt
-NjEsMTIgKzYxLDYgQEAgc3RhdGljIHZvaWQgdWFydDBfaW5pdCh2b2lkKQo+Pj4+PiAgCX0KPj4+
-Pj4gIAo+Pj4+PiAgCXVhcnQwX2Jhc2UgPSBpb3JlbWFwKGJhc2UuYWRkciwgYmFzZS5zaXplKTsK
-Pj4+Pj4gLQo+Pj4+PiAtCWlmICh1YXJ0MF9iYXNlICE9ICh1OCAqKVVBUlRfRUFSTFlfQkFTRSkg
-ewo+Pj4+PiAtCQlwcmludGYoIldBUk5JTkc6IGVhcmx5IHByaW50IHN1cHBvcnQgbWF5IG5vdCB3
-b3JrLiAiCj4+Pj4+IC0JCSAgICAgICAiRm91bmQgdWFydCBhdCAlcCwgYnV0IGVhcmx5IGJhc2Ug
-aXMgJXAuXG4iLAo+Pj4+PiAtCQkJdWFydDBfYmFzZSwgKHU4ICopVUFSVF9FQVJMWV9CQVNFKTsK
-Pj4+Pj4gLQl9Cj4+Pj4+ICB9Cj4+PiBUaGlzIHdhcm5pbmcgaXMgZG9pbmcgd2hhdCBpdCBzaG91
-bGQsIHdoaWNoIGlzIHBvaW50aW5nIG91dCB0aGF0IHRoZQo+Pj4gVUFSVF9FQVJMWV9CQVNFIGd1
-ZXNzIGFwcGVhcnMgdG8gYmUgd3JvbmcuIElmIHdlIGNhbiBwcm92aWRlIGEgd2F5Cj4+PiB0byBz
-dXBwb3J0IG1vcmUgdGhhbiBvbmUgZ3Vlc3MsIHRoZW4gd2Ugc2hvdWxkIGtlZXAgdGhpcyB3YXJu
-aW5nIGJ1dAo+Pj4gYWRqdXN0IGl0IHRvIG1hdGNoIG9uZSBvZiBhbnkgb2YgdGhlIGd1ZXNzZXMu
-Cj4+Pgo+Pj4gVGhhbmtzLAo+Pj4gZHJldwo+PiBJJ20gbm90IHJlYWxseSBzdXJlIGhvdyB0byBp
-bXBsZW1lbnQgYSBzZWxlY3Rpb24gbWV0aG9kLiBJJ3ZlIGxvb2tlZCBhdAo+PiBzcGxpdHRpbmcg
-aW9faW5pdCgpIGludG8gdWFydDBfaW5pdCgpIGFuZCBjaHJfdGVzdGRldl9pbml0KCkgYW5kIGNh
-bGxpbmcKPj4gdWFydDBfaW5pdCgpIHZlcnkgZWFybHkgaW4gdGhlIHNldHVwIHByb2Nlc3MsIGJ1
-dCB1YXJ0MF9pbml0KCkgaXRzZWxmIHVzZXMKPj4gcHJpbnRmKCkgYW5kIGFzc2VydCgpLgo+Pgo+
-PiBJJ3ZlIGFsc28gdGhvdWdodCBhYm91dCBhZGRpbmcgYW5vdGhlciBmdW5jdGlvbiwgc29tZXRo
-aW5nIGxpa2UKPj4gdWFydDBfZWFybHlfaW5pdCgpLCB0aGF0IGlzIGNhbGxlZCB2ZXJ5IGVhcmx5
-IGluIHNldHVwKCkgYW5kIGdldHMgdGhlIGJhc2UKPj4gYWRkcmVzcyBmcm9tIHRoZSBkdGIgYm9v
-dGFyZ3MuIEJ1dCB0aGF0IG1lYW5zIGNhbGxpbmcgZHRfaW5pdCgpIGFuZAo+PiBkdF9nZXRfYm9v
-dGFyZ3MoKSwgd2hpY2ggY2FuIGZhaWwuCj4+Cj4+IE9uZSBvdGhlciBvcHRpb24gdGhhdCBjb3Vs
-ZCB3b3JrIGlzIHRvIG1ha2UgaXQgYSBjb21waWxlLXRpbWUgY29uZmlndXJhdGlvbi4KPj4KPj4g
-V2hhdCBkbyB5b3UgdGhpbms/Cj4+Cj4gQ29tcGlsZS10aW1lIGlzIGZpbmUsIHdoaWNoIEkgZ3Vl
-c3Mgd2lsbCByZXN1bHQgaW4gYSBuZXcgY29uZmlndXJlIHNjcmlwdAo+IG9wdGlvbiBhcyB3ZWxs
-LiBJIHdvbmRlciBpZiB3ZSBzaG91bGRuJ3QgY29uc2lkZXIgZ2VuZXJhdGluZyBhIGNvbmZpZy5o
-Cj4gZmlsZSB3aXRoIHN0dWZmIGxpa2UgdGhpcyByYXRoZXIgdGhhbiBhZGRpbmcgYW5vdGhlciAt
-RCB0byB0aGUgY29tcGlsZQo+IGxpbmUuCj4KPiBkcmV3IAoKSSBwcm9wb3NlIGEgbmV3IGNvbmZp
-Z3VyYXRpb24gb3B0aW9uIGNhbGxlZCAtLXZtbSwgd2l0aCBwb3NzaWJsZSB2YWx1ZXMgcWVtdSBh
-bmQKa3ZtdG9vbCwgd2hpY2ggZGVmYXVsdHMgdG8gcWVtdSBpZiBub3Qgc2V0LgoKQW5vdGhlciBw
-b3NzaWJpbGl0eSB3b3VsZCBiZSB0byBoYXZlIGFuIC0tdWFydC1iYXNlIG9wdGlvbiwgYnV0IHRo
-YXQgbWVhbnMgd2UKYXJlIGV4cGVjdGluZyB0aGUgdXNlciB0byBiZSBhd2FyZSBvZiB0aGUgdWFy
-dCBiYXNlIGFkZHJlc3MgZm9yIHRoZSB2aXJ0dWFsCm1hY2hpbmUgbWFuYWdlciwgd2hpY2ggbWln
-aHQgYmUgdW5yZWFzb25hYmxlLgoKVGhpcyBpcyBhIHF1aWNrIHByb3RvdHlwZSBvZiBob3cgdXNp
-bmcgLUQgZm9yIGNvbmRpdGlvbmFsIGNvbXBpbGF0aW9uIHdvdWxkIGxvb2sKbGlrZSAodGhlIGNv
-bmZpZ3VyZSBjaGFuZ2VzIGFyZSBpbmNsdWRlZCB0b28pOgoKZGlmZiAtLWdpdCBhL2NvbmZpZ3Vy
-ZSBiL2NvbmZpZ3VyZQppbmRleCBkZjg1ODFlM2E5MDYuLjdhNTZiYTQ3NzA3ZiAxMDA3NTUKLS0t
-IGEvY29uZmlndXJlCisrKyBiL2NvbmZpZ3VyZQpAQCAtNzAsNiArNzAsOSBAQCB3aGlsZSBbWyAi
-JDEiID0gLSogXV07IGRvCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgOzsKwqDCoMKgwqDCoMKgwqAg
-LS1sZCkKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsZD0iJGFyZyIKK8KgwqDCoMKgwqDCoMKgIDs7
-CivCoMKgwqAgLS12bW0pCivCoMKgwqDCoMKgwqDCoCB2bW09IiRhcmciCsKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgOzsKwqDCoMKgwqDCoMKgwqAgLS1lbmFibGUtcHJldHR5LXByaW50LXN0YWNrcykK
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwcmV0dHlfcHJpbnRfc3RhY2tzPXllcwpAQCAtMTA4LDYg
-KzExMSwxNCBAQCBpZiBbICIkYXJjaCIgPSAiaTM4NiIgXSB8fCBbICIkYXJjaCIgPSAieDg2XzY0
-IiBdOyB0aGVuCsKgwqDCoMKgIHRlc3RkaXI9eDg2CsKgZWxpZiBbICIkYXJjaCIgPSAiYXJtIiBd
-IHx8IFsgIiRhcmNoIiA9ICJhcm02NCIgXTsgdGhlbgrCoMKgwqDCoCB0ZXN0ZGlyPWFybQorwqDC
-oMKgIGlmIFsgLXogIiR2bW0iIF0gfHwgWyAiJHZtbSIgPSAicWVtdSIgXTsgdGhlbgorwqDCoMKg
-wqDCoMKgwqAgdWFydF9lYXJseV9iYXNlPTB4MDkwMDAwMDBVTAorwqDCoMKgIGVsaWYgWyAiJHZt
-bSIgPSAia3ZtdG9vbCIgXTsgdGhlbgorwqDCoMKgwqDCoMKgwqAgdWFydF9lYXJseV9iYXNlPTB4
-M2Y4CivCoMKgwqAgZWxzZQorwqDCoMKgwqDCoMKgwqAgZWNobyAnLS12bW0gbXVzdCBiZSBvbmUg
-b2YgInFlbXUiIG9yICJrdm10b29sIicKK8KgwqDCoMKgwqDCoMKgIHVzYWdlCivCoMKgwqAgZmkK
-wqBlbGlmIFsgIiRhcmNoIiA9ICJwcGM2NCIgXTsgdGhlbgrCoMKgwqDCoCB0ZXN0ZGlyPXBvd2Vy
-cGMKwqDCoMKgwqAgZmlybXdhcmU9IiR0ZXN0ZGlyL2Jvb3Rfcm9tLmJpbiIKQEAgLTE5Nyw0ICsy
-MDgsNSBAQCBQUkVUVFlfUFJJTlRfU1RBQ0tTPSRwcmV0dHlfcHJpbnRfc3RhY2tzCsKgRU5WSVJP
-Tl9ERUZBVUxUPSRlbnZpcm9uX2RlZmF1bHQKwqBFUlJBVEFUWFQ9ZXJyYXRhLnR4dArCoFUzMl9M
-T05HX0ZNVD0kdTMyX2xvbmcKK1VBUlRfRUFSTFlfQkFTRT0kdWFydF9lYXJseV9iYXNlCsKgRU9G
-CmRpZmYgLS1naXQgYS9NYWtlZmlsZSBiL01ha2VmaWxlCmluZGV4IGU5ZjAyMjcyZTE1Ni4uMjI1
-YzJhNTI1Y2RmIDEwMDY0NAotLS0gYS9NYWtlZmlsZQorKysgYi9NYWtlZmlsZQpAQCAtNzIsNiAr
-NzIsMTAgQEAgQ09NTU9OX0NGTEFHUyArPSAkKGZub19waWMpICQobm9fcGllKQrCoENGTEFHUyAr
-PSAkKENPTU1PTl9DRkxBR1MpCsKgQ0ZMQUdTICs9IC1XbWlzc2luZy1wYXJhbWV0ZXItdHlwZSAt
-V29sZC1zdHlsZS1kZWNsYXJhdGlvbiAtV292ZXJyaWRlLWluaXQKwqAKK2lmbmVxICgkKFVBUlRf
-RUFSTFlfQkFTRSksKQorQ0ZMQUdTICs9IC1EVUFSVF9FQVJMWV9CQVNFPSQoVUFSVF9FQVJMWV9C
-QVNFKQorZW5kaWYKKwrCoENYWEZMQUdTICs9ICQoQ09NTU9OX0NGTEFHUykKwqAKwqBhdXRvZGVw
-ZW5kLWZsYWdzID0gLU1NRCAtTUYgJChkaXIgJCopLiQobm90ZGlyICQqKS5kCgpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0
-Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5l
-ZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Amit,
+
+On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
+> 
+> Pointer authentication feature is only enabled when VHE is built
+> into the kernel and present into CPU implementation so only VHE code
+> paths are modified.
+> 
+> When we schedule a vcpu, we disable guest usage of pointer
+> authentication instructions and accesses to the keys. While these are
+> disabled, we avoid context-switching the keys. When we trap the guest
+> trying to use pointer authentication functionality, we change to eagerly
+> context-switching the keys, and enable the feature. The next time the
+> vcpu is scheduled out/in, we start again.
+> 
+> Pointer authentication consists of address authentication and generic
+> authentication, and CPUs in a system might have varied support for
+> either. Where support for either feature is not uniform, it is hidden
+> from guests via ID register emulation, as a result of the cpufeature
+> framework in the host.
+> 
+> Unfortunately, address authentication and generic authentication cannot
+> be trapped separately, as the architecture provides a single EL2 trap
+> covering both. If we wish to expose one without the other, we cannot
+> prevent a (badly-written) guest from intermittently using a feature
+> which is not uniformly supported (when scheduled on a physical CPU which
+> supports the relevant feature). When the guest is scheduled on a
+> physical CPU lacking the feature, these attempts will result in an UNDEF
+> being taken by the guest.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Kristina Martsenko <kristina.martsenko@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h     |  1 +
+>  arch/arm64/include/asm/cpufeature.h |  5 +++++
+>  arch/arm64/include/asm/kvm_host.h   | 24 ++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_hyp.h    |  7 ++++++
+>  arch/arm64/kernel/traps.c           |  1 +
+>  arch/arm64/kvm/handle_exit.c        | 23 +++++++++++--------
+>  arch/arm64/kvm/hyp/Makefile         |  1 +
+>  arch/arm64/kvm/hyp/ptrauth-sr.c     | 44 +++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/switch.c         |  4 ++++
+>  arch/arm64/kvm/sys_regs.c           | 40 ++++++++++++++++++++++++++-------
+>  virt/kvm/arm/arm.c                  |  2 ++
+>  11 files changed, 135 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/ptrauth-sr.c
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 704667e..b200c14 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -345,6 +345,7 @@ static inline int kvm_arm_have_ssbd(void)
+>  
+>  static inline void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arm_vcpu_ptrauth_reset(struct kvm_vcpu *vcpu) {}
+>  
+>  #define __KVM_HAVE_ARCH_VM_ALLOC
+>  struct kvm *kvm_arch_alloc_vm(void);
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index dfcfba7..e1bf2a5 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -612,6 +612,11 @@ static inline bool system_supports_generic_auth(void)
+>  		 cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH_IMP_DEF));
+>  }
+>  
+> +static inline bool kvm_supports_ptrauth(void)
+> +{
+> +	return system_supports_address_auth() && system_supports_generic_auth();
+> +}
+> +
+>  #define ARM64_SSBD_UNKNOWN		-1
+>  #define ARM64_SSBD_FORCE_DISABLE	0
+>  #define ARM64_SSBD_KERNEL		1
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1f2d237..c798d0c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -146,6 +146,18 @@ enum vcpu_sysreg {
+>  	PMSWINC_EL0,	/* Software Increment Register */
+>  	PMUSERENR_EL0,	/* User Enable Register */
+>  
+> +	/* Pointer Authentication Registers */
+> +	APIAKEYLO_EL1,
+> +	APIAKEYHI_EL1,
+> +	APIBKEYLO_EL1,
+> +	APIBKEYHI_EL1,
+> +	APDAKEYLO_EL1,
+> +	APDAKEYHI_EL1,
+> +	APDBKEYLO_EL1,
+> +	APDBKEYHI_EL1,
+> +	APGAKEYLO_EL1,
+> +	APGAKEYHI_EL1,
+> +
+>  	/* 32bit specific registers. Keep them at the end of the range */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> @@ -439,6 +451,18 @@ static inline bool kvm_arch_requires_vhe(void)
+>  	return false;
+>  }
+>  
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu);
+> +
+> +static inline void kvm_arm_vcpu_ptrauth_reset(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Disable ptrauth and use it in a lazy context via traps */
+> +	if (has_vhe() && kvm_supports_ptrauth())
+
+Since we state that our support of ptrauth for kvm guests depends on
+vhe, maybe it would make sense to put has_vhe() inside
+kvm_supports_ptrauth(). This way the dependency is explicitly expressed
+in the code.
+
+> +		kvm_arm_vcpu_ptrauth_disable(vcpu);
+> +}
+> +
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
+> +
+>  static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 6e65cad..e559836 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -153,6 +153,13 @@ bool __fpsimd_enabled(void);
+>  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+>  void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+>  
+> +void __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +			       struct kvm_cpu_context *host_ctxt,
+> +			       struct kvm_cpu_context *guest_ctxt);
+> +void __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +			      struct kvm_cpu_context *host_ctxt,
+> +			      struct kvm_cpu_context *guest_ctxt);
+> +
+>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>  void __noreturn __hyp_do_panic(unsigned long, ...);
+>  
+> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+> index 4e2fb87..5cac605 100644
+> --- a/arch/arm64/kernel/traps.c
+> +++ b/arch/arm64/kernel/traps.c
+> @@ -749,6 +749,7 @@ static const char *esr_class_str[] = {
+>  	[ESR_ELx_EC_CP14_LS]		= "CP14 LDC/STC",
+>  	[ESR_ELx_EC_FP_ASIMD]		= "ASIMD",
+>  	[ESR_ELx_EC_CP10_ID]		= "CP10 MRC/VMRS",
+> +	[ESR_ELx_EC_PAC]		= "Pointer authentication trap",
+>  	[ESR_ELx_EC_CP14_64]		= "CP14 MCRR/MRRC",
+>  	[ESR_ELx_EC_ILL]		= "PSTATE.IL",
+>  	[ESR_ELx_EC_SVC32]		= "SVC (AArch32)",
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 0b79834..5b980e7 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -174,19 +174,24 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  }
+>  
+>  /*
+> + * Handle the guest trying to use a ptrauth instruction, or trying to access a
+> + * ptrauth register.
+> + */
+> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
+
+Nit: I was wondering whether it would make more sense as static inline
+in the same header as "kvm_arm_vcpu_ptrauth_reset()"
+
+> +{
+> +	if (has_vhe() && kvm_supports_ptrauth())> +		kvm_arm_vcpu_ptrauth_enable(vcpu);
+> +	else
+> +		kvm_inject_undefined(vcpu);
+> +}
+> +
+> +/*
+>   * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
+> - * a NOP).
+> + * a NOP), or guest EL1 access to a ptrauth register.
+
+Nit: This comment becomes a bit redundant with the one above, don't know
+whether that's a bad thing.
+
+
+Otherwise things look good to me:
+
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+>   */
+>  static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+> -	/*
+> -	 * We don't currently support ptrauth in a guest, and we mask the ID
+> -	 * registers to prevent well-behaved guests from trying to make use of
+> -	 * it.
+> -	 *
+> -	 * Inject an UNDEF, as if the feature really isn't present.
+> -	 */
+> -	kvm_inject_undefined(vcpu);
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+>  	return 1;
+>  }
+>  
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 82d1904..17cec99 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -19,6 +19,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += ptrauth-sr.o
+>  
+>  # KVM code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> new file mode 100644
+> index 0000000..0576c01
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * arch/arm64/kvm/hyp/ptrauth-sr.c: Guest/host ptrauth save/restore
+> + *
+> + * Copyright 2018 Arm Limited
+> + * Author: Mark Rutland <mark.rutland@arm.com>
+> + *         Amit Daniel Kachhap <amit.kachhap@arm.com>
+> + */
+> +#include <linux/compiler.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/cpucaps.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/pointer_auth.h>
+> +
+> +static __always_inline bool __hyp_text __ptrauth_is_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
+> +			vcpu->arch.ctxt.hcr_el2 & (HCR_API | HCR_APK);
+> +}
+> +
+> +void __no_ptrauth __hyp_text __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +					  struct kvm_cpu_context *host_ctxt,
+> +					  struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	ptrauth_keys_store((struct ptrauth_keys *) &host_ctxt->sys_regs[APIAKEYLO_EL1]);
+> +	ptrauth_keys_switch((struct ptrauth_keys *) &guest_ctxt->sys_regs[APIAKEYLO_EL1]);
+> +}
+> +
+> +void __no_ptrauth __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
+> +					 struct kvm_cpu_context *host_ctxt,
+> +					 struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+> +	ptrauth_keys_store((struct ptrauth_keys *) &guest_ctxt->sys_regs[APIAKEYLO_EL1]);
+> +	ptrauth_keys_switch((struct ptrauth_keys *) &host_ctxt->sys_regs[APIAKEYLO_EL1]);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 03b36f1..301d332 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -483,6 +483,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> +	__ptrauth_switch_to_guest(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	__set_guest_arch_workaround_state(vcpu);
+>  
+>  	do {
+> @@ -494,6 +496,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  
+>  	__set_host_arch_workaround_state(vcpu);
+>  
+> +	__ptrauth_switch_to_host(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	sysreg_save_guest_state_vhe(guest_ctxt);
+>  
+>  	__deactivate_traps(vcpu);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e3e3722..2546a65 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -986,6 +986,32 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	{ SYS_DESC(SYS_PMEVTYPERn_EL0(n)),					\
+>  	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
+>  
+> +
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.ctxt.hcr_el2 |= (HCR_API | HCR_APK);
+> +}
+> +
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.ctxt.hcr_el2 &= ~(HCR_API | HCR_APK);
+> +}
+> +
+> +static bool trap_ptrauth(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *rd)
+> +{
+> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
+> +	return false;
+> +}
+> +
+> +#define __PTRAUTH_KEY(k)						\
+> +	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k }
+> +
+> +#define PTRAUTH_KEY(k)							\
+> +	__PTRAUTH_KEY(k ## KEYLO_EL1),					\
+> +	__PTRAUTH_KEY(k ## KEYHI_EL1)
+> +
+>  static bool access_cntp_tval(struct kvm_vcpu *vcpu,
+>  		struct sys_reg_params *p,
+>  		const struct sys_reg_desc *r)
+> @@ -1040,14 +1066,6 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+>  			kvm_debug("SVE unsupported for guests, suppressing\n");
+>  
+>  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> -	} else if (id == SYS_ID_AA64ISAR1_EL1) {
+> -		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
+> -		if (val & ptrauth_mask)
+> -			kvm_debug("ptrauth unsupported for guests, suppressing\n");
+> -		val &= ~ptrauth_mask;
+>  	} else if (id == SYS_ID_AA64MMFR1_EL1) {
+>  		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
+>  			kvm_debug("LORegions unsupported for guests, suppressing\n");
+> @@ -1316,6 +1334,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+>  
+> +	PTRAUTH_KEY(APIA),
+> +	PTRAUTH_KEY(APIB),
+> +	PTRAUTH_KEY(APDA),
+> +	PTRAUTH_KEY(APDB),
+> +	PTRAUTH_KEY(APGA),
+> +
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 2d65ada..6d377d3 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -388,6 +388,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		vcpu_clear_wfe_traps(vcpu);
+>  	else
+>  		vcpu_set_wfe_traps(vcpu);
+> +
+> +	kvm_arm_vcpu_ptrauth_reset(vcpu);
+>  }
+>  
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> 
+
+-- 
+Julien Thierry
