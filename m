@@ -1,200 +1,117 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [RFC v3 09/21] iommu/smmuv3: Get prepared for nested stage
- support
-Date: Fri, 25 Jan 2019 19:27:49 +0000
-Message-ID: <1d03f9bc-68e9-215b-8ac5-c7b07a7d55fc@arm.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-10-eric.auger@redhat.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: [PATCH v5 1/5] arm64: Add utilities to save restore pointer
+ authentication keys
+Date: Mon, 28 Jan 2019 12:28:42 +0530
+Message-ID: <1548658727-14271-2-git-send-email-amit.kachhap@arm.com>
+References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190108102633.17482-10-eric.auger@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A40384A369
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 01:59:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id YPzOILdVKlsA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Jan 2019 01:59:18 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73BD44A41A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 01:59:18 -0500 (EST)
+In-Reply-To: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/01/2019 10:26, Eric Auger wrote:
-> To allow nested stage support, we need to store both
-> stage 1 and stage 2 configurations (and remove the former
-> union).
-> 
-> arm_smmu_write_strtab_ent() is modified to write both stage
-> fields in the STE.
-> 
-> We add a nested_bypass field to the S1 configuration as the first
-> stage can be bypassed. Also the guest may force the STE to abort:
-> this information gets stored into the nested_abort field.
-> 
-> Only S2 stage is "finalized" as the host does not configure
-> S1 CD, guest does.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - invalidate the STE before moving from a live STE config to another
-> - add the nested_abort and nested_bypass fields
-> ---
->   drivers/iommu/arm-smmu-v3.c | 43 ++++++++++++++++++++++++++++---------
->   1 file changed, 33 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index 9af68266bbb1..9716a301d9ae 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -212,6 +212,7 @@
->   #define STRTAB_STE_0_CFG_BYPASS		4
->   #define STRTAB_STE_0_CFG_S1_TRANS	5
->   #define STRTAB_STE_0_CFG_S2_TRANS	6
-> +#define STRTAB_STE_0_CFG_NESTED		7
->   
->   #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
->   #define STRTAB_STE_0_S1FMT_LINEAR	0
-> @@ -491,6 +492,10 @@ struct arm_smmu_strtab_l1_desc {
->   struct arm_smmu_s1_cfg {
->   	__le64				*cdptr;
->   	dma_addr_t			cdptr_dma;
-> +	/* in nested mode, tells s1 must be bypassed */
-> +	bool				nested_bypass;
+The keys can be switched either inside an assembly or such
+functions which do not have pointer authentication checks, so a GCC
+attribute is added to enable it.
 
-Couldn't that be inferred from "s1_cfg == NULL"?
+A function ptrauth_keys_store is added which is similar to existing
+function ptrauth_keys_switch but saves the key values in memory.
+This may be useful for save/restore scenarios when CPU changes
+privilege levels, suspend/resume etc.
 
-> +	/* in nested mode, abort is forced by guest */
-> +	bool				nested_abort;
+Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Kristina Martsenko <kristina.martsenko@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+---
+ arch/arm64/include/asm/pointer_auth.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-Couldn't that be inferred from "s1_cfg == NULL && s2_cfg == NULL && 
-smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED"?
-
->   	struct arm_smmu_ctx_desc {
->   		u16	asid;
-> @@ -515,6 +520,7 @@ struct arm_smmu_strtab_ent {
->   	 * configured according to the domain type.
->   	 */
->   	bool				assigned;
-> +	bool				nested;
-
-AFAICS, "nested" really only serves a differentiator between the 
-assigned-as-bypass and assigned-as-fault cases. The latter isn't 
-actually unique to nested though, I'd say it's more just that nobody's 
-found reason to do anything with IOMMU_DOMAIN_BLOCKED yet. There's some 
-argument for upgrading "assigned" into a tristate enum, but I think it 
-might have a few drawbacks elsewhere, so an extra flag here seems 
-reasonable, but I think it should just be named "abort". If we have both 
-s1_cfg and s2_cfg set, we can see it's nested; if we only have s2_cfg, I 
-don't think we really care whether the host or guest asked for stage 1 
-bypass; and if in future we care about the difference between host- vs. 
-guest-requested abort, leaving s2_cfg set for the latter would probably 
-suffice.
-
->   	struct arm_smmu_s1_cfg		*s1_cfg;
->   	struct arm_smmu_s2_cfg		*s2_cfg;
->   };
-> @@ -629,10 +635,8 @@ struct arm_smmu_domain {
->   	bool				non_strict;
->   
->   	enum arm_smmu_domain_stage	stage;
-> -	union {
-> -		struct arm_smmu_s1_cfg	s1_cfg;
-> -		struct arm_smmu_s2_cfg	s2_cfg;
-> -	};
-> +	struct arm_smmu_s1_cfg	s1_cfg;
-> +	struct arm_smmu_s2_cfg	s2_cfg;
->   
->   	struct iommu_domain		domain;
->   
-> @@ -1139,10 +1143,11 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   			break;
->   		case STRTAB_STE_0_CFG_S1_TRANS:
->   		case STRTAB_STE_0_CFG_S2_TRANS:
-> +		case STRTAB_STE_0_CFG_NESTED:
->   			ste_live = true;
->   			break;
->   		case STRTAB_STE_0_CFG_ABORT:
-> -			if (disable_bypass)
-> +			if (disable_bypass || ste->nested)
->   				break;
->   		default:
->   			BUG(); /* STE corruption */
-> @@ -1154,7 +1159,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   
->   	/* Bypass/fault */
->   	if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
-> -		if (!ste->assigned && disable_bypass)
-> +		if ((!ste->assigned && disable_bypass) ||
-> +				(ste->s1_cfg && ste->s1_cfg->nested_abort))
-
-Yikes, these conditions were hard enough to follow before...
-
-
-I think what I've proposed above might allow the logic here to be a bit 
-less convoluted, but even then it may be time to hoist all these checks 
-out and have a temporary decision variable for the bypass/abort/valid 
-config outcome.
-
-Robin.
-
->   			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
->   		else
->   			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_BYPASS);
-> @@ -1172,8 +1178,17 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   		return;
->   	}
->   
-> +	if (ste->nested && ste_live) {
-> +		/*
-> +		 * When enabling nested, the STE may be transitionning from
-> +		 * s2 to nested and back. Invalidate the STE before changing it.
-> +		 */
-> +		dst[0] = cpu_to_le64(0);
-> +		arm_smmu_sync_ste_for_sid(smmu, sid);
-> +		val = STRTAB_STE_0_V;
-> +	}
-> +
->   	if (ste->s1_cfg) {
-> -		BUG_ON(ste_live);
->   		dst[1] = cpu_to_le64(
->   			 FIELD_PREP(STRTAB_STE_1_S1CIR, STRTAB_STE_1_S1C_CACHE_WBRA) |
->   			 FIELD_PREP(STRTAB_STE_1_S1COR, STRTAB_STE_1_S1C_CACHE_WBRA) |
-> @@ -1187,12 +1202,12 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   		   !(smmu->features & ARM_SMMU_FEAT_STALL_FORCE))
->   			dst[1] |= cpu_to_le64(STRTAB_STE_1_S1STALLD);
->   
-> -		val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
-> -			FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
-> +		if (!ste->s1_cfg->nested_bypass)
-> +			val |= (ste->s1_cfg->cdptr_dma & STRTAB_STE_0_S1CTXPTR_MASK) |
-> +				FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S1_TRANS);
->   	}
->   
->   	if (ste->s2_cfg) {
-> -		BUG_ON(ste_live);
->   		dst[2] = cpu_to_le64(
->   			 FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
->   			 FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
-> @@ -1454,6 +1469,10 @@ static void arm_smmu_tlb_inv_context(void *cookie)
->   		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
->   		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
->   		cmd.tlbi.vmid	= 0;
-> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
-> +		cmd.opcode      = CMDQ_OP_TLBI_NH_ASID;
-> +		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
-> +		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
->   	} else {
->   		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
->   		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
-> @@ -1484,6 +1503,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
->   	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->   		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
->   		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
-> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED) {
-> +		cmd.opcode      = CMDQ_OP_TLBI_NH_VA;
-> +		cmd.tlbi.asid   = smmu_domain->s1_cfg.cd.asid;
-> +		cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
->   	} else {
->   		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
->   		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
-> 
+diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
+index 15d4951..98441ce 100644
+--- a/arch/arm64/include/asm/pointer_auth.h
++++ b/arch/arm64/include/asm/pointer_auth.h
+@@ -11,6 +11,13 @@
+ 
+ #ifdef CONFIG_ARM64_PTR_AUTH
+ /*
++ * Compile the function without pointer authentication instructions. This
++ * allows pointer authentication to be enabled/disabled within the function
++ * (but leaves the function unprotected by pointer authentication).
++ */
++#define __no_ptrauth	__attribute__((target("sign-return-address=none")))
++
++/*
+  * Each key is a 128-bit quantity which is split across a pair of 64-bit
+  * registers (Lo and Hi).
+  */
+@@ -50,6 +57,13 @@ do {								\
+ 	write_sysreg_s(__pki_v.hi, SYS_ ## k ## KEYHI_EL1);	\
+ } while (0)
+ 
++#define __ptrauth_key_save(k, v)				\
++do {								\
++	struct ptrauth_key __pki_v = (v);			\
++	__pki_v.lo = read_sysreg_s(SYS_ ## k ## KEYLO_EL1);	\
++	__pki_v.hi = read_sysreg_s(SYS_ ## k ## KEYHI_EL1);	\
++} while (0)
++
+ static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
+ {
+ 	if (system_supports_address_auth()) {
+@@ -63,6 +77,19 @@ static inline void ptrauth_keys_switch(struct ptrauth_keys *keys)
+ 		__ptrauth_key_install(APGA, keys->apga);
+ }
+ 
++static inline void ptrauth_keys_store(struct ptrauth_keys *keys)
++{
++	if (system_supports_address_auth()) {
++		__ptrauth_key_save(APIA, keys->apia);
++		__ptrauth_key_save(APIB, keys->apib);
++		__ptrauth_key_save(APDA, keys->apda);
++		__ptrauth_key_save(APDB, keys->apdb);
++	}
++
++	if (system_supports_generic_auth())
++		__ptrauth_key_save(APGA, keys->apga);
++}
++
+ extern int ptrauth_prctl_reset_keys(struct task_struct *tsk, unsigned long arg);
+ 
+ /*
+@@ -88,6 +115,7 @@ do {									\
+ 	ptrauth_keys_switch(&(tsk)->thread.keys_user)
+ 
+ #else /* CONFIG_ARM64_PTR_AUTH */
++#define __no_ptrauth
+ #define ptrauth_prctl_reset_keys(tsk, arg)	(-EINVAL)
+ #define ptrauth_strip_insn_pac(lr)	(lr)
+ #define ptrauth_thread_init_user(tsk)
+-- 
+2.7.4
