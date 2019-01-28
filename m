@@ -1,237 +1,312 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 2/7] lib: arm: Remove warning about
- uart0_base mismatch
-Date: Mon, 28 Jan 2019 17:31:01 +0100
-Message-ID: <20190128163101.dajq6ofgmpctg3ne@kamzik.brq.redhat.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-3-alexandru.elisei@arm.com>
- <20190124115943.12296810@donnerap.cambridge.arm.com>
- <20190124123740.v52nkbcki5dp2hpq@kamzik.brq.redhat.com>
- <ffcc5f60-c5a0-c7f1-7fb1-658d8eea6fc4@arm.com>
- <20190125164751.cdfip3kv63uonl7n@kamzik.brq.redhat.com>
- <42b3a17b-088b-b9b7-4dac-34f07aa09c8a@arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH 3/4] KVM: arm/arm64: lazily create perf events on enable
+Date: Mon, 28 Jan 2019 17:02:40 +0000
+Message-ID: <20190128170240.GC16627@e119886-lin.cambridge.arm.com>
+References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+ <1548154197-5470-4-git-send-email-andrew.murray@arm.com>
+ <a092da72-a1d3-2176-64e8-0316f2aeb299@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE1004A2F8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 11:31:07 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qww3yknkuGVC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Jan 2019 11:31:06 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC5414A2E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 11:31:05 -0500 (EST)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <42b3a17b-088b-b9b7-4dac-34f07aa09c8a@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <a092da72-a1d3-2176-64e8-0316f2aeb299@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 28, 2019 at 02:24:29PM +0000, Alexandru Elisei wrote:
-> On 1/25/19 4:47 PM, Andrew Jones wrote:
-> > On Fri, Jan 25, 2019 at 04:36:13PM +0000, Alexandru Elisei wrote:
-> >> On 1/24/19 12:37 PM, Andrew Jones wrote:
-> >>> On Thu, Jan 24, 2019 at 11:59:43AM +0000, Andre Przywara wrote:
-> >>>> On Thu, 24 Jan 2019 11:16:29 +0000
-> >>>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >>>>
-> >>>>> A warning is displayed if uart0_base is different from what the code
-> >>>>> expects qemu to generate for the pl011 UART in the device tree.
-> >>>>> However, now we support the ns16550a UART emulated by kvmtool, which
-> >>>>> has a different address. This leads to the  warning being displayed
-> >>>>> even though the UART is configured and working as expected.
-> >>>>>
-> >>>>> Now that we support multiple UARTs, the warning serves no purpose, =
-so
-> >>>>> remove it.
-> >>>> Mmh, but we use that address before, right? So for anything not
-> >>>> emulating an UART at this QEMU specific address we write to some ran=
-dom
-> >>>> (device) memory?
-> >>>>
-> >>>> Drew, how important is this early print feature for kvm-unit-tests?
-> >>> The setup code passes through quite a few asserts before getting thro=
-ugh
-> >>> io_init() (including in uart0_init), so I think there's still value in
-> >>> having a guessed UART address. Maybe we can provide guesses for both
-> >>> QEMU and kvmtool, and some selection method, that would be used until
-> >>> we've properly assigned uart0_base from DT?
-> >>>
-> >>>> Cheers,
-> >>>> Andre.
-> >>>>
-> >>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >>>>> ---
-> >>>>>  lib/arm/io.c | 6 ------
-> >>>>>  1 file changed, 6 deletions(-)
-> >>>>>
-> >>>>> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> >>>>> index 35fc05aeb4db..87435150f73e 100644
-> >>>>> --- a/lib/arm/io.c
-> >>>>> +++ b/lib/arm/io.c
-> >>>>> @@ -61,12 +61,6 @@ static void uart0_init(void)
-> >>>>>  	}
-> >>>>>  =
+On Tue, Jan 22, 2019 at 01:41:49PM +0000, Julien Thierry wrote:
+> Hi Andrew,
+> 
+> On 22/01/2019 10:49, Andrew Murray wrote:
+> > To prevent re-creating perf events everytime the counter registers
+> > are changed, let's instead lazily create the event when the event
+> > is first enabled and destroy it when it changes.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >  virt/kvm/arm/pmu.c | 114 ++++++++++++++++++++++++++++++++++++-----------------
+> >  1 file changed, 78 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 4464899..1921ca9 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -24,8 +24,11 @@
+> >  #include <kvm/arm_pmu.h>
+> >  #include <kvm/arm_vgic.h>
+> >  
+> > -static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+> > -				      u64 select_idx);
+> > +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu, u64 pair);
+> > +static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
+> > +						      u64 select_idx);
+> > +static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> > +
+> >  /**
+> >   * kvm_pmu_get_counter_value - get PMU counter value
+> >   * @vcpu: The vcpu pointer
+> > @@ -59,18 +62,16 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+> >   */
+> >  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+> >  {
+> > -	u64 reg, data;
+> > +	u64 reg;
+> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> >  
+> >  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> >  	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+> >  	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+> >  
+> > -	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> > -	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+> > -	data = __vcpu_sys_reg(vcpu, reg + select_idx);
+> > -
+> > -	/* Recreate the perf event to reflect the updated sample_period */
+> > -	kvm_pmu_create_perf_event(vcpu, data, select_idx);
+> > +	kvm_pmu_stop_counter(vcpu, pmc);
+> 
+> Shouldn't this be before we do the write to __vcpu_sys_reg()?
 
-> >>>>>  	uart0_base =3D ioremap(base.addr, base.size);
-> >>>>> -
-> >>>>> -	if (uart0_base !=3D (u8 *)UART_EARLY_BASE) {
-> >>>>> -		printf("WARNING: early print support may not work. "
-> >>>>> -		       "Found uart at %p, but early base is %p.\n",
-> >>>>> -			uart0_base, (u8 *)UART_EARLY_BASE);
-> >>>>> -	}
-> >>>>>  }
-> >>> This warning is doing what it should, which is pointing out that the
-> >>> UART_EARLY_BASE guess appears to be wrong. If we can provide a way
-> >>> to support more than one guess, then we should keep this warning but
-> >>> adjust it to match one of any of the guesses.
-> >>>
-> >>> Thanks,
-> >>> drew
-> >> I'm not really sure how to implement a selection method. I've looked at
-> >> splitting io_init() into uart0_init() and chr_testdev_init() and calli=
-ng
-> >> uart0_init() very early in the setup process, but uart0_init() itself =
-uses
-> >> printf() and assert().
-> >>
-> >> I've also thought about adding another function, something like
-> >> uart0_early_init(), that is called very early in setup() and gets the =
-base
-> >> address from the dtb bootargs. But that means calling dt_init() and
-> >> dt_get_bootargs(), which can fail.
-> >>
-> >> One other option that could work is to make it a compile-time configur=
-ation.
-> >>
-> >> What do you think?
-> >>
-> > Compile-time is fine, which I guess will result in a new configure scri=
-pt
-> > option as well. I wonder if we shouldn't consider generating a config.h
-> > file with stuff like this rather than adding another -D to the compile
-> > line.
-> >
-> > drew =
+I don't think we need to. It's the users choice to set a counter value whilst
+it's still counting. In fact the later we leave it the better as there is then
+a smaller period of time where we're not counting when we should be.
 
-> =
+> 
+> > +	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
+> >  }
+> >  
+> >  /**
+> > @@ -88,6 +89,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+> >  
+> >  /**
+> >   * kvm_pmu_stop_counter - stop PMU counter
+> > + * @vcpu: The vcpu pointer
+> >   * @pmc: The PMU counter pointer
+> >   *
+> >   * If this counter has been configured to monitor some event, release it here.
+> > @@ -150,6 +152,25 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+> >  }
+> >  
+> >  /**
+> > + * kvm_pmu_enable_counter_single - create/enable a unpaired counter
+> > + * @vcpu: The vcpu pointer
+> > + * @select_idx: The counter index
+> > + */
+> > +static void kvm_pmu_enable_counter_single(struct kvm_vcpu *vcpu, u64 select_idx)
+> > +{
+> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> > +
+> > +	if (!pmc->perf_event) {
+> > +		kvm_pmu_counter_create_enabled_perf_event(vcpu, select_idx);
+> > +	} else if (pmc->perf_event) {
+> 
+> "else" is enough here, no need for "else if" :) .
 
-> I propose a new configuration option called --vmm, with possible values q=
-emu and
-> kvmtool, which defaults to qemu if not set.
-> =
+Not sure where that come from!
 
-> Another possibility would be to have an --uart-base option, but that mean=
-s we
-> are expecting the user to be aware of the uart base address for the virtu=
-al
-> machine manager, which might be unreasonable.
-> =
+> 
+> 
+> Actually, after we call kvm_pmu_counter_create_enabled_perf_event() we
+> know that pmc->perf_event != NULL.
+> 
+> Shouldn't we execute the code below unconditionally?
 
-> This is a quick prototype of how using -D for conditional compilation wou=
-ld look
-> like (the configure changes are included too):
-> =
+I guess I wanted to avoid calling perf_event_enable on an event that
+was already enabled (in the case pmc->perf_event is NULL on entry here).
 
-> diff --git a/configure b/configure
-> index df8581e3a906..7a56ba47707f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -70,6 +70,9 @@ while [[ "$1" =3D -* ]]; do
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ;;
-> =A0=A0=A0=A0=A0=A0=A0 --ld)
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ld=3D"$arg"
-> +=A0=A0=A0=A0=A0=A0=A0 ;;
-> +=A0=A0=A0 --vmm)
-> +=A0=A0=A0=A0=A0=A0=A0 vmm=3D"$arg"
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ;;
-> =A0=A0=A0=A0=A0=A0=A0 --enable-pretty-print-stacks)
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 pretty_print_stacks=3Dyes
-> @@ -108,6 +111,14 @@ if [ "$arch" =3D "i386" ] || [ "$arch" =3D "x86_64" =
-]; then
-> =A0=A0=A0=A0 testdir=3Dx86
-> =A0elif [ "$arch" =3D "arm" ] || [ "$arch" =3D "arm64" ]; then
-> =A0=A0=A0=A0 testdir=3Darm
-> +=A0=A0=A0 if [ -z "$vmm" ] || [ "$vmm" =3D "qemu" ]; then
-> +=A0=A0=A0=A0=A0=A0=A0 uart_early_base=3D0x09000000UL
+Though along with Suzuki's feedback, I'll take your suggestion here, but
+update kvm_pmu_counter_create_enabled_perf_event to not enable the event
+by default. It's clearer then all around.
 
-You can drop the 'UL'.
+> 
+> > +		perf_event_enable(pmc->perf_event);
+> > +		if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> > +			kvm_debug("fail to enable perf event\n");
+> > +	}
+> > +}
+> > +
+> > +/**
+> >   * kvm_pmu_enable_counter - enable selected PMU counter
+> >   * @vcpu: The vcpu pointer
+> >   * @val: the value guest writes to PMCNTENSET register
+> > @@ -159,8 +180,6 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+> >  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+> >  {
+> >  	int i;
+> > -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > -	struct kvm_pmc *pmc;
+> >  
+> >  	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
+> >  		return;
+> > @@ -169,16 +188,44 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+> >  		if (!(val & BIT(i)))
+> >  			continue;
+> >  
+> > -		pmc = &pmu->pmc[i];
+> > -		if (pmc->perf_event) {
+> > -			perf_event_enable(pmc->perf_event);
+> > -			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> > -				kvm_debug("fail to enable perf event\n");
+> > -		}
+> > +		kvm_pmu_enable_counter_single(vcpu, i);
+> >  	}
+> >  }
+> >  
+> >  /**
+> > + * kvm_pmu_reenable_enabled_single - reenable a counter if it should be enabled
+> > + * @vcpu: The vcpu pointer
+> > + * @select_idx: The counter index
+> > + */
+> > +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu,
+> > +					    u64 select_idx)
+> 
+> Not completely convinced by the name. kvm_pmu_sync_counter_status() ?
+> 
+> Or maybe have the callers check whether they actually need to
+> disable/enable and not have this function.
 
-> +=A0=A0=A0 elif [ "$vmm" =3D "kvmtool" ]; then
-> +=A0=A0=A0=A0=A0=A0=A0 uart_early_base=3D0x3f8
-> +=A0=A0=A0 else
-> +=A0=A0=A0=A0=A0=A0=A0 echo '--vmm must be one of "qemu" or "kvmtool"'
-> +=A0=A0=A0=A0=A0=A0=A0 usage
+I don't think checking in the callers is the right approach.
 
-You're outputting usage here, but you didn't add vmm to the help text.
+Though perhaps kvm_pmu_sync_counter_enable is more understandable.
 
-> +=A0=A0=A0 fi
-> =A0elif [ "$arch" =3D "ppc64" ]; then
-> =A0=A0=A0=A0 testdir=3Dpowerpc
-> =A0=A0=A0=A0 firmware=3D"$testdir/boot_rom.bin"
-> @@ -197,4 +208,5 @@ PRETTY_PRINT_STACKS=3D$pretty_print_stacks
-> =A0ENVIRON_DEFAULT=3D$environ_default
-> =A0ERRATATXT=3Derrata.txt
-> =A0U32_LONG_FMT=3D$u32_long
-> +UART_EARLY_BASE=3D$uart_early_base
-> =A0EOF
-> diff --git a/Makefile b/Makefile
-> index e9f02272e156..225c2a525cdf 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -72,6 +72,10 @@ COMMON_CFLAGS +=3D $(fno_pic) $(no_pie)
-> =A0CFLAGS +=3D $(COMMON_CFLAGS)
-> =A0CFLAGS +=3D -Wmissing-parameter-type -Wold-style-declaration -Woverrid=
-e-init
-> =A0
-> +ifneq ($(UART_EARLY_BASE),)
-> +CFLAGS +=3D -DUART_EARLY_BASE=3D$(UART_EARLY_BASE)
-> +endif
+> 
+> > +{
+> > +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+> > +	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> > +
+> > +	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+> > +		return;
+> > +
+> > +	if (set & BIT(select_idx))
+> > +		kvm_pmu_enable_counter_single(vcpu, select_idx);
+> > +}
+> > +
+> > +/**
+> > + * kvm_pmu_disable_counter - disable selected PMU counter
+> > + * @vcpu: The vcpu pointer
+> > + * @pmc: The counter to dissable
+> > + */
+> > +static void kvm_pmu_disable_counter_single(struct kvm_vcpu *vcpu,
+> > +					   u64 select_idx)
+> > +{
+> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> > +
+> > +	if (pmc->perf_event)
+> > +		perf_event_disable(pmc->perf_event);
+> > +}
+> > +
+> > +/**
+> >   * kvm_pmu_disable_counter - disable selected PMU counter
+> >   * @vcpu: The vcpu pointer
+> >   * @val: the value guest writes to PMCNTENCLR register
+> > @@ -188,8 +235,6 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+> >  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
+> >  {
+> >  	int i;
+> > -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > -	struct kvm_pmc *pmc;
+> >  
+> >  	if (!val)
+> >  		return;
+> > @@ -198,9 +243,7 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
+> >  		if (!(val & BIT(i)))
+> >  			continue;
+> >  
+> > -		pmc = &pmu->pmc[i];
+> > -		if (pmc->perf_event)
+> > -			perf_event_disable(pmc->perf_event);
+> > +		kvm_pmu_disable_counter_single(vcpu, i);
+> >  	}
+> >  }
+> >  
+> > @@ -382,28 +425,22 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+> >  	}
+> >  }
+> >  
+> > -static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+> > -{
+> > -	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
+> > -	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(select_idx));
+> > -}
+> > -
+> >  /**
+> > - * kvm_pmu_create_perf_event - create a perf event for a counter
+> > + * kvm_pmu_counter_create_enabled_perf_event - create a perf event for a counter
+> >   * @vcpu: The vcpu pointer
+> > - * @data: Type of event as per PMXEVTYPER_EL0 format
+> >   * @select_idx: The number of selected counter
+> >   */
+> > -static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+> > -				      u64 select_idx)
+> > +static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
+> > +						u64 select_idx)
+> >  {
+> >  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> >  	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> >  	struct perf_event *event;
+> >  	struct perf_event_attr attr;
+> > -	u64 eventsel, counter;
+> > +	u64 eventsel, counter, data;
+> > +
+> > +	data = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + select_idx);
+> 
+> Should we worry about the case select_idx == ARMV8_PMU_CYCLE_IDX?
+> 
+> >  
+> > -	kvm_pmu_stop_counter(vcpu, pmc);
+> >  	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+> >  
+> >  	/* Software increment event does't need to be backed by a perf event */
+> > @@ -415,7 +452,6 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+> >  	attr.type = PERF_TYPE_RAW;
+> >  	attr.size = sizeof(attr);
+> >  	attr.pinned = 1;
+> > -	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, select_idx);
+> >  	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
+> >  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+> >  	attr.exclude_hv = 1; /* Don't count EL2 events */
+> > @@ -451,7 +487,13 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+> >  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> >  				    u64 select_idx)
+> >  {
+> > -	kvm_pmu_create_perf_event(vcpu, data, select_idx);
+> > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> > +	u64 event_type = data & ARMV8_PMU_EVTYPE_MASK;
+> > +
+> > +	kvm_pmu_stop_counter(vcpu, pmc);
+> > +	__vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + select_idx) = event_type;
+> 
+> Why don't we take into account the select_idx == ARMV8_PMU_CYCLE_IDX
+> case into account anymore?
+> 
 
-This type of thing is what I would like to avoid by introducing a
-config.h file. In the least we shouldn't add this -D to CFLAGS for
-all architectures. It can be added to the %.elf rule in
-arm/Makefile.common
-
-> +
-> =A0CXXFLAGS +=3D $(COMMON_CFLAGS)
-> =A0
-> =A0autodepend-flags =3D -MMD -MF $(dir $*).$(notdir $*).d
->
-
-You'll also want to patch lib/arm/io.c with
- =
-
--/*
-- * Use this guess for the pl011 base in order to make an attempt at
-- * having earlier printf support. We'll overwrite it with the real
-- * base address that we read from the device tree later. This is
-- * the address we expect QEMU's mach-virt machine type to put in
-- * its generated device tree.
-- */
--#define UART_EARLY_BASE 0x09000000UL
--
- static struct spinlock uart_lock;
--static volatile u8 *uart0_base =3D (u8 *)UART_EARLY_BASE;
-+static volatile u8 *uart0_base =3D (u8 *)(unsigned long)UART_EARLY_BASE;
-
-
-
-This is all a bit on the ugly side, but I can't think of anything
-better. =
-
+We should, I've missed this - thanks for spotting this.
 
 Thanks,
-drew
+
+Andrew Murray
+
+> > +	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
+> >  }
+> >  
+> >  bool kvm_arm_support_pmu_v3(void)
+> > 
+> 
+> Cheers,
+> 
+> -- 
+> Julien Thierry
