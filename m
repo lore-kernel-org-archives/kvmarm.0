@@ -1,119 +1,332 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 1/5] KVM: arm/arm64: Reset the VCPU without preemption
- and vcpu state loaded
-Date: Tue, 29 Jan 2019 16:48:58 +0100
-Message-ID: <20190129154858.docsos3ncoyuld7m@kamzik.brq.redhat.com>
+Subject: Re: [PATCH 2/5] arm/arm64: KVM: Allow a VCPU to fully reset itself
+Date: Tue, 29 Jan 2019 17:03:47 +0100
+Message-ID: <20190129160347.fcbry76igwyatqzx@kamzik.brq.redhat.com>
 References: <20190125094656.5026-1-christoffer.dall@arm.com>
- <20190125094656.5026-2-christoffer.dall@arm.com>
+ <20190125094656.5026-3-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B1DC4A2BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:03:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pbU0yxITHRKW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 11:03:53 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA6214A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:03:52 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190125094656.5026-2-christoffer.dall@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20190125094656.5026-3-christoffer.dall@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-On Fri, Jan 25, 2019 at 10:46:52AM +0100, Christoffer Dall wrote:
-> Resetting the VCPU state modifies the system register state in memory,
-> but this may interact with vcpu_load/vcpu_put if running with preemption
-> disabled, which in turn may lead to corrupted system register state.
-  ^ enabled
+On Fri, Jan 25, 2019 at 10:46:53AM +0100, Christoffer Dall wrote:
+> From: Marc Zyngier <marc.zyngier@arm.com>
 > 
-> Address this by disabling preemption and doing put/load if required
-> around the reset logic.
+> The current kvm_psci_vcpu_on implementation will directly try to
+> manipulate the state of the VCPU to reset it.  However, since this is
+> not done on the thread that runs the VCPU, we can end up in a strangely
+> corrupted state when the source and target VCPUs are running at the same
+> time.
+> 
+> Fix this by factoring out all reset logic from the PSCI implementation
+> and forwarding the required information along with a request to the
+> target VCPU.
 
-I'm having trouble understanding how disabling preemption helps here.
-There shouldn't be an issue with the KVM_ARM_VCPU_INIT case, since the
-target vcpu is guaranteed not to be loaded and therefore it doesn't
-have preempt notifiers registered either. Also, KVM_ARM_VCPU_INIT holds
-the vcpu mutex, so there's no chance for a load to occur until it's
-complete.
-
-For the PSCI case it makes sense to force a vcpu load after the reset,
-otherwise the sleeping target vcpu won't have the correct state loaded.
-The initial put also makes sense in case we're not resetting everything.
-I don't understand how we're ensuring the target vcpu thread's preemption
-is disabled though. This modified kvm_reset_vcpu would need to be run
-from the target vcpu thread to work, but that's not how the PSCI code
-currently does it.
+The last patch makes more sense, now that I see this one. I guess their
+order should be swapped.
 
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > ---
->  arch/arm64/kvm/reset.c | 26 ++++++++++++++++++++++++--
->  1 file changed, 24 insertions(+), 2 deletions(-)
+>  arch/arm/include/asm/kvm_host.h   | 10 +++++++++
+>  arch/arm/kvm/reset.c              | 24 +++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++++
+>  arch/arm64/kvm/reset.c            | 24 +++++++++++++++++++++
+>  virt/kvm/arm/arm.c                | 10 +++++++++
+>  virt/kvm/arm/psci.c               | 36 ++++++++++++++-----------------
+>  6 files changed, 95 insertions(+), 20 deletions(-)
 > 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index ca56537b61bc..50e89869178a 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -48,6 +48,7 @@
+>  #define KVM_REQ_SLEEP \
+>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> +#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+>  
+>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>  
+> @@ -147,6 +148,13 @@ struct kvm_cpu_context {
+>  
+>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+>  
+> +struct vcpu_reset_state {
+> +	unsigned long	pc;
+> +	unsigned long	r0;
+> +	bool		be;
+> +	bool		reset;
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+>  
+> @@ -186,6 +194,8 @@ struct kvm_vcpu_arch {
+>  	/* Cache some mmu pages needed inside spinlock regions */
+>  	struct kvm_mmu_memory_cache mmu_page_cache;
+>  
+> +	struct vcpu_reset_state reset_state;
+> +
+>  	/* Detect first run of a vcpu */
+>  	bool has_run_once;
+>  };
+> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+> index 5ed0c3ee33d6..de41255eebcd 100644
+> --- a/arch/arm/kvm/reset.c
+> +++ b/arch/arm/kvm/reset.c
+> @@ -26,6 +26,7 @@
+>  #include <asm/cputype.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_coproc.h>
+> +#include <asm/kvm_emulate.h>
+>  
+>  #include <kvm/arm_arch_timer.h>
+>  
+> @@ -69,6 +70,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	/* Reset CP15 registers */
+>  	kvm_reset_coprocs(vcpu);
+>  
+> +	/*
+> +	 * Additional reset state handling that PSCI may have imposed on us.
+> +	 * Must be done after all the sys_reg reset.
+> +	 */
+> +	if (vcpu->arch.reset_state.reset) {
+> +		unsigned long target_pc = vcpu->arch.reset_state.pc;
+> +
+> +		/* Gracefully handle Thumb2 entry point */
+> +		if (target_pc & 1) {
+> +			target_pc &= ~1UL;
+> +			vcpu_set_thumb(vcpu);
+> +		}
+> +
+> +		/* Propagate caller endianness */
+> +		if (vcpu->arch.reset_state.be)
+> +			kvm_vcpu_set_be(vcpu);
+> +
+> +		*vcpu_pc(vcpu) = target_pc;
+> +		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+> +
+> +		vcpu->arch.reset_state.reset = false;
+> +	}
+> +
+>  	/* Reset arch_timer context */
+>  	return kvm_timer_vcpu_reset(vcpu);
+>  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7732d0ba4e60..da3fc7324d68 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -48,6 +48,7 @@
+>  #define KVM_REQ_SLEEP \
+>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> +#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+>  
+>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>  
+> @@ -208,6 +209,13 @@ struct kvm_cpu_context {
+>  
+>  typedef struct kvm_cpu_context kvm_cpu_context_t;
+>  
+> +struct vcpu_reset_state {
+> +	unsigned long	pc;
+> +	unsigned long	r0;
+> +	bool		be;
+> +	bool		reset;
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+>  
+> @@ -297,6 +305,9 @@ struct kvm_vcpu_arch {
+>  	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+>  	u64 vsesr_el2;
+>  
+> +	/* Additional reset state */
+> +	struct vcpu_reset_state	reset_state;
+> +
+>  	/* True when deferrable sysregs are loaded on the physical CPU,
+>  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+>  	bool sysregs_loaded_on_cpu;
 > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index b72a3dd56204..f21a2a575939 100644
+> index f21a2a575939..f16a5f8ff2b4 100644
 > --- a/arch/arm64/kvm/reset.c
 > +++ b/arch/arm64/kvm/reset.c
-> @@ -105,16 +105,33 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   * This function finds the right table above and sets the registers on
->   * the virtual CPU struct to their architecturally defined reset
->   * values.
-> + *
-> + * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
-> + * ioctl or as part of handling a request issued by another VCPU in the PSCI
-> + * handling code.  In the first case, the VCPU will not be loaded, and in the
-> + * second case the VCPU will be loaded.  Because this function operates purely
-> + * on the memory-backed valus of system registers, we want to do a full put if
-                           ^ values
-> + * we were loaded (handling a request) and load the values back at the end of
-> + * the function.  Otherwise we leave the state alone.  In both cases, we
-> + * disable preemption around the vcpu reset as we would otherwise race with
-> + * preempt notifiers which also call put/load.
->   */
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	const struct kvm_regs *cpu_reset;
-> +	int ret = -EINVAL;
-> +	bool loaded;
+> @@ -32,6 +32,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_coproc.h>
+> +#include <asm/kvm_emulate.h>
+>  #include <asm/kvm_mmu.h>
+>  
+>  /* Maximum phys_shift supported for any VM on this host */
+> @@ -146,6 +147,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	/* Reset system registers */
+>  	kvm_reset_sys_regs(vcpu);
+>  
+> +	/*
+> +	 * Additional reset state handling that PSCI may have imposed on us.
+> +	 * Must be done after all the sys_reg reset.
+> +	 */
+> +	if (vcpu->arch.reset_state.reset) {
+> +		unsigned long target_pc = vcpu->arch.reset_state.pc;
 > +
-> +	preempt_disable();
-> +	loaded = (vcpu->cpu != -1);
-> +	if (loaded)
-> +		kvm_arch_vcpu_put(vcpu);
+> +		/* Gracefully handle Thumb2 entry point */
+> +		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> +			target_pc &= ~1UL;
+> +			vcpu_set_thumb(vcpu);
+> +		}
+> +
+> +		/* Propagate caller endianness */
+> +		if (vcpu->arch.reset_state.be)
+> +			kvm_vcpu_set_be(vcpu);
+> +
+> +		*vcpu_pc(vcpu) = target_pc;
+> +		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+> +
+> +		vcpu->arch.reset_state.reset = false;
+> +	}
+> +
+>  	/* Reset PMU */
+>  	kvm_pmu_vcpu_reset(vcpu);
 >  
->  	switch (vcpu->arch.target) {
->  	default:
->  		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
->  			if (!cpu_has_32bit_el1())
-> -				return -EINVAL;
-> +				goto out;
->  			cpu_reset = &default_regs_reset32;
->  		} else {
->  			cpu_reset = &default_regs_reset;
-> @@ -137,7 +154,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
->  
->  	/* Reset timer */
-> -	return kvm_timer_vcpu_reset(vcpu);
-> +	ret = kvm_timer_vcpu_reset(vcpu);
-> +out:
-> +	if (loaded)
-> +		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +	preempt_enable();
-> +	return ret;
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 9e350fd34504..9c486fad3f9f 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -626,6 +626,13 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  		/* Awaken to handle a signal, request we sleep again later. */
+>  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	}
+> +
+> +	/*
+> +	 * Make sure we will observe a potential reset request if we've
+> +	 * observed a change to the power state. Pairs with the smp_wmb() in
+> +	 * kvm_psci_vcpu_on().
+> +	 */
+> +	smp_rmb();
+
+I don't believe this should be necessary, because...
+
 >  }
 >  
->  void kvm_set_ipa_limit(void)
+>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> @@ -639,6 +646,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+>  			vcpu_req_sleep(vcpu);
+>  
+> +		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+> +			kvm_reset_vcpu(vcpu);
+
+... we do kvm_check_request here before using the reset data, and we do...
+
+> +
+>  		/*
+>  		 * Clear IRQ_PENDING requests that were made to guarantee
+>  		 * that a VCPU sees new virtual interrupts.
+> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> index 9b73d3ad918a..b9cff1d4b06d 100644
+> --- a/virt/kvm/arm/psci.c
+> +++ b/virt/kvm/arm/psci.c
+> @@ -104,12 +104,10 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+>  
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  {
+> +	struct vcpu_reset_state *reset_state;
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+> -	struct swait_queue_head *wq;
+>  	unsigned long cpu_id;
+> -	unsigned long context_id;
+> -	phys_addr_t target_pc;
+>  
+>  	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
+>  	if (vcpu_mode_is_32bit(source_vcpu))
+> @@ -130,32 +128,30 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  			return PSCI_RET_INVALID_PARAMS;
+>  	}
+>  
+> -	target_pc = smccc_get_arg2(source_vcpu);
+> -	context_id = smccc_get_arg3(source_vcpu);
+> +	reset_state = &vcpu->arch.reset_state;
+>  
+> -	kvm_reset_vcpu(vcpu);
+> -
+> -	/* Gracefully handle Thumb2 entry point */
+> -	if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> -		target_pc &= ~((phys_addr_t) 1);
+> -		vcpu_set_thumb(vcpu);
+> -	}
+> +	reset_state->pc = smccc_get_arg2(source_vcpu);
+>  
+>  	/* Propagate caller endianness */
+> -	if (kvm_vcpu_is_be(source_vcpu))
+> -		kvm_vcpu_set_be(vcpu);
+> +	reset_state->be = kvm_vcpu_is_be(source_vcpu);
+>  
+> -	*vcpu_pc(vcpu) = target_pc;
+>  	/*
+>  	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
+>  	 * the general puspose registers are undefined upon CPU_ON.
+>  	 */
+> -	smccc_set_retval(vcpu, context_id, 0, 0, 0);
+> -	vcpu->arch.power_off = false;
+> -	smp_mb();		/* Make sure the above is visible */
+> +	reset_state->r0 = smccc_get_arg3(source_vcpu);
+> +
+> +	reset_state->reset = true;
+> +	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+
+... this kvm_make_request() after writing the reset data. The
+kvm_make_request/kvm_check_request embeds the necessary barriers.
+
+>  
+> -	wq = kvm_arch_vcpu_wq(vcpu);
+> -	swake_up_one(wq);
+> +	/*
+> +	 * Make sure the reset request is observed if the change to
+> +	 * power_state is observed.
+> +	 */
+> +	smp_wmb();
+> +
+> +	vcpu->arch.power_off = false;
+
+Or you want to tie the reset data to the observability of the power_off
+state? Why not just tie it to the KVM_REQ_VCPU_RESET request?
+
+> +	kvm_vcpu_wake_up(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+>  }
 > -- 
 > 2.18.0
->
+> 
 
 Thanks,
-drew 
+drew
