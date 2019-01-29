@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v8 08/26] ACPI / APEI: Don't update struct ghes' flags in
- read/clear estatus
-Date: Tue, 29 Jan 2019 18:48:44 +0000
-Message-ID: <20190129184902.102850-9-james.morse@arm.com>
+Subject: [PATCH v8 10/26] ACPI / APEI: Don't allow ghes_ack_error() to mask
+ earlier errors
+Date: Tue, 29 Jan 2019 18:48:46 +0000
+Message-ID: <20190129184902.102850-11-james.morse@arm.com>
 References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE7B4A36C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B07D04A36B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FyB-OTQZdV6a for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 13:50:03 -0500 (EST)
+ with ESMTP id f+EOM94kfPuW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 13:50:08 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A81D4A36D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4582E4A2D3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:08 -0500 (EST)
 In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,77 +32,113 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ghes_read_estatus() sets a flag in struct ghes if the buffer of
-CPER records needs to be cleared once the records have been
-processed. This flag value is a problem if a struct ghes can be
-processed concurrently, as happens at probe time if an NMI arrives
-for the same error source. The NMI clears the flag, meaning the
-interrupted handler may never do the ghes_estatus_clear() work.
+During ghes_proc() we use ghes_ack_error() to tell an external agent
+we are done with these records and it can re-use the memory.
 
-The GHES_TO_CLEAR flags is only set at the same time as
-buffer_paddr, which is now owned by the caller and passed to
-ghes_clear_estatus(). Use this value as the flag.
+rc may hold an error returned by ghes_read_estatus(), ENOENT causes
+us to skip ghes_ack_error() (as there is nothing to ack), but rc may
+also by EIO, which gets supressed.
 
-A non-zero buf_paddr returned by ghes_read_estatus() means
-ghes_clear_estatus() should clear this address. ghes_read_estatus()
-already checks for a read of error_status_address being zero,
-so CPER records cannot be written here.
+ghes_clear_estatus() is where we mark the records as processed for
+non GHESv2 error sources, and already spots the ENOENT case as
+buf_paddr is set to 0 by ghes_read_estatus().
+
+Move the ghes_ack_error() call in here to avoid extra logic with
+the return code in ghes_proc().
+
+This enables GHESv2 acking for NMI-like error sources. This is safe
+as the buffer is pre-mapped by map_gen_v2() before the GHES is added
+to any NMI handler lists.
+
+This same pre-mapping step means we can't receive an error from
+apei_read()/write() here as apei_check_gar() succeeded when it
+was mapped, and the mapping was cached, so the address can't be
+rejected at runtime. Remove the error-returns as this is now
+called from a function with no return.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Borislav Petkov <bp@suse.de>
-
---
-Changes since v6:
- * Added Boris' RB, then:
- * Moved earlier in the series,
- * Tinkered with the commit message,
- * Always cleared buf_paddr on errors in the previous patch, which was
-   previously in here.
 ---
- drivers/acpi/apei/ghes.c | 5 -----
- include/acpi/ghes.h      | 1 -
- 2 files changed, 6 deletions(-)
+ drivers/acpi/apei/ghes.c | 47 +++++++++++++++++++---------------------
+ 1 file changed, 22 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index c20e1d0947b1..af3c10f47f20 100644
+index cb3d88de711f..bd58749d31bb 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -329,8 +329,6 @@ static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
- 		return -ENOENT;
- 	}
+@@ -197,6 +197,21 @@ static void unmap_gen_v2(struct ghes *ghes)
+ 	apei_unmap_generic_address(&ghes->generic_v2->read_ack_register);
+ }
  
--	ghes->flags |= GHES_TO_CLEAR;
--
- 	rc = -EIO;
- 	len = cper_estatus_len(ghes->estatus);
- 	if (len < sizeof(*ghes->estatus))
-@@ -357,15 +355,12 @@ static int ghes_read_estatus(struct ghes *ghes, u64 *buf_paddr)
- static void ghes_clear_estatus(struct ghes *ghes, u64 buf_paddr)
++static void ghes_ack_error(struct acpi_hest_generic_v2 *gv2)
++{
++	int rc;
++	u64 val = 0;
++
++	rc = apei_read(&val, &gv2->read_ack_register);
++	if (rc)
++		return;
++
++	val &= gv2->read_ack_preserve << gv2->read_ack_register.bit_offset;
++	val |= gv2->read_ack_write    << gv2->read_ack_register.bit_offset;
++
++	apei_write(val, &gv2->read_ack_register);
++}
++
+ static struct ghes *ghes_new(struct acpi_hest_generic *generic)
  {
- 	ghes->estatus->block_status = 0;
--	if (!(ghes->flags & GHES_TO_CLEAR))
--		return;
- 
- 	if (!buf_paddr)
- 		return;
+ 	struct ghes *ghes;
+@@ -361,6 +376,13 @@ static void ghes_clear_estatus(struct ghes *ghes, u64 buf_paddr)
  
  	ghes_copy_tofrom_phys(ghes->estatus, buf_paddr,
  			      sizeof(ghes->estatus->block_status), 0);
--	ghes->flags &= ~GHES_TO_CLEAR;
++
++	/*
++	 * GHESv2 type HEST entries introduce support for error acknowledgment,
++	 * so only acknowledge the error if this support is present.
++	 */
++	if (is_hest_type_generic_v2(ghes))
++		ghes_ack_error(ghes->generic_v2);
  }
  
  static void ghes_handle_memory_failure(struct acpi_hest_generic_data *gdata, int sev)
-diff --git a/include/acpi/ghes.h b/include/acpi/ghes.h
-index f82f4a7ddd90..e3f1cddb4ac8 100644
---- a/include/acpi/ghes.h
-+++ b/include/acpi/ghes.h
-@@ -13,7 +13,6 @@
-  * estatus: memory buffer for error status block, allocated during
-  * HEST parsing.
-  */
--#define GHES_TO_CLEAR		0x0001
- #define GHES_EXITING		0x0002
+@@ -652,21 +674,6 @@ static void ghes_estatus_cache_add(
+ 	rcu_read_unlock();
+ }
  
- struct ghes {
+-static int ghes_ack_error(struct acpi_hest_generic_v2 *gv2)
+-{
+-	int rc;
+-	u64 val = 0;
+-
+-	rc = apei_read(&val, &gv2->read_ack_register);
+-	if (rc)
+-		return rc;
+-
+-	val &= gv2->read_ack_preserve << gv2->read_ack_register.bit_offset;
+-	val |= gv2->read_ack_write    << gv2->read_ack_register.bit_offset;
+-
+-	return apei_write(val, &gv2->read_ack_register);
+-}
+-
+ static void __ghes_panic(struct ghes *ghes, u64 buf_paddr)
+ {
+ 	__ghes_print_estatus(KERN_EMERG, ghes->generic, ghes->estatus);
+@@ -701,16 +708,6 @@ static int ghes_proc(struct ghes *ghes)
+ out:
+ 	ghes_clear_estatus(ghes, buf_paddr);
+ 
+-	if (rc == -ENOENT)
+-		return rc;
+-
+-	/*
+-	 * GHESv2 type HEST entries introduce support for error acknowledgment,
+-	 * so only acknowledge the error if this support is present.
+-	 */
+-	if (is_hest_type_generic_v2(ghes))
+-		return ghes_ack_error(ghes->generic_v2);
+-
+ 	return rc;
+ }
+ 
 -- 
 2.20.1
