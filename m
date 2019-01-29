@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v8 24/26] arm64: acpi: Make apei_claim_sea() synchronise with
- APEI's irq work
-Date: Tue, 29 Jan 2019 18:49:00 +0000
-Message-ID: <20190129184902.102850-25-james.morse@arm.com>
+Subject: [PATCH v8 26/26] ACPI / APEI: Add support for the SDEI GHES
+ Notification type
+Date: Tue, 29 Jan 2019 18:49:02 +0000
+Message-ID: <20190129184902.102850-27-james.morse@arm.com>
 References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A23684A330
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A33A4A39F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wGbHNoMFAoT3 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 13:50:49 -0500 (EST)
+ with ESMTP id nE+hBu9j7bXl for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 13:50:55 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 454174A2E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3274A399
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:55 -0500 (EST)
 In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,121 +32,182 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-APEI is unable to do all of its error handling work in nmi-context, so
-it defers non-fatal work onto the irq_work queue. arch_irq_work_raise()
-sends an IPI to the calling cpu, but this is not guaranteed to be taken
-before returning to user-space.
+If the GHES notification type is SDEI, register the provided event
+using the SDEI-GHES helper.
 
-Unless the exception interrupted a context with irqs-masked,
-irq_work_run() can run immediately. Otherwise return -EINPROGRESS to
-indicate ghes_notify_sea() found some work to do, but it hasn't
-finished yet.
-
-With this apei_claim_sea() returning '0' means this external-abort was
-also notification of a firmware-first RAS error, and that APEI has
-processed the CPER records.
+SDEI may be one of two types of event, normal and critical. Critical
+events can interrupt normal events, so these must have separate
+fixmap slots and locks in case both event types are in use.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-CC: Xie XiuQi <xiexiuqi@huawei.com>
-CC: gengdongjiu <gengdongjiu@huawei.com>
 
----
+--
 Changes since v7:
- * Added Catalin's ack, then:
- * Added __irq_enter()/exit() calls so if we interrupted preemptible code, the
-   preempt count matches what other irq-work expects.
- * Changed the 'if (!arch_irqs_disabled_flags(interrupted_flags))' test to be
-   safe before/after Julien's PMR series.
+ * Use __end_of_fixed_addresses as an arch-agnostic invalid fixmap entry
+ * Move the locks definition into the function that uses them to make it
+   clear these are NMI only.
 
 Changes since v6:
- * Added pr_warn() for the EINPROGRESS case so panic-tracebacks show
-   'APEI was here'.
- * Tinkered with the commit message
+ * Tinkering due to the absence of #ifdef
+ * Added SDEI to the new ghes_is_synchronous() helper.
 
-Changes since v2:
- * Removed IS_ENABLED() check, done by the caller unless we have a dummy
-   definition.
 ---
- arch/arm64/kernel/acpi.c | 23 +++++++++++++++++++++++
- arch/arm64/mm/fault.c    |  9 ++++-----
- 2 files changed, 27 insertions(+), 5 deletions(-)
+ drivers/acpi/apei/ghes.c | 85 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/arm_sdei.h |  3 ++
+ 2 files changed, 88 insertions(+)
 
-diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
-index 803f0494dd3e..8288ae0c8f3b 100644
---- a/arch/arm64/kernel/acpi.c
-+++ b/arch/arm64/kernel/acpi.c
-@@ -22,6 +22,7 @@
+diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
+index dfa8f155f964..d0f0a219bf8f 100644
+--- a/drivers/acpi/apei/ghes.c
++++ b/drivers/acpi/apei/ghes.c
+@@ -25,6 +25,7 @@
+  * GNU General Public License for more details.
+  */
+ 
++#include <linux/arm_sdei.h>
+ #include <linux/kernel.h>
+ #include <linux/moduleparam.h>
  #include <linux/init.h>
- #include <linux/irq.h>
- #include <linux/irqdomain.h>
-+#include <linux/irq_work.h>
- #include <linux/memblock.h>
- #include <linux/of_fdt.h>
- #include <linux/smp.h>
-@@ -268,12 +269,17 @@ pgprot_t __acpi_get_mem_attribute(phys_addr_t addr)
- int apei_claim_sea(struct pt_regs *regs)
+@@ -86,6 +87,15 @@
+ 	((struct acpi_hest_generic_status *)				\
+ 	 ((struct ghes_estatus_node *)(estatus_node) + 1))
+ 
++/*
++ *  NMI-like notifications vary by architecture, before the compiler can prune
++ *  unused static functions it needs a value for these enums.
++ */
++#ifndef CONFIG_ARM_SDE_INTERFACE
++#define FIX_APEI_GHES_SDEI_NORMAL	__end_of_fixed_addresses
++#define FIX_APEI_GHES_SDEI_CRITICAL	__end_of_fixed_addresses
++#endif
++
+ static inline bool is_hest_type_generic_v2(struct ghes *ghes)
  {
- 	int err = -ENOENT;
-+	bool return_to_irqs_enabled;
- 	unsigned long current_flags;
+ 	return ghes->generic->header.type == ACPI_HEST_TYPE_GENERIC_ERROR_V2;
+@@ -1088,6 +1098,63 @@ static void ghes_nmi_init_cxt(void)
+ 	init_irq_work(&ghes_proc_irq_work, ghes_proc_in_irq);
+ }
  
- 	if (!IS_ENABLED(CONFIG_ACPI_APEI_GHES))
- 		return err;
- 
- 	current_flags = arch_local_save_flags();
-+	return_to_irqs_enabled = !irqs_disabled_flags(current_flags);
++static int __ghes_sdei_callback(struct ghes *ghes,
++				enum fixed_addresses fixmap_idx)
++{
++	if (!ghes_in_nmi_queue_one_entry(ghes, fixmap_idx)) {
++		irq_work_queue(&ghes_proc_irq_work);
 +
-+	if (regs)
-+		return_to_irqs_enabled = interrupts_enabled(regs);
- 
- 	/*
- 	 * SEA can interrupt SError, mask it and describe this as an NMI so
-@@ -283,6 +289,23 @@ int apei_claim_sea(struct pt_regs *regs)
- 	nmi_enter();
- 	err = ghes_notify_sea();
- 	nmi_exit();
-+
-+	/*
-+	 * APEI NMI-like notifications are deferred to irq_work. Unless
-+	 * we interrupted irqs-masked code, we can do that now.
-+	 */
-+	if (!err) {
-+		if (return_to_irqs_enabled) {
-+			local_daif_restore(DAIF_PROCCTX_NOIRQ);
-+			__irq_enter();
-+			irq_work_run();
-+			__irq_exit();
-+		} else {
-+			pr_warn("APEI work queued but not completed");
-+			err = -EINPROGRESS;
-+		}
-+	}
-+
- 	local_daif_restore(current_flags);
- 
- 	return err;
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index e1c84c2e1cab..1611714f8333 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -642,11 +642,10 @@ static int do_sea(unsigned long addr, unsigned int esr, struct pt_regs *regs)
- 
- 	inf = esr_to_fault_info(esr);
- 
--	/*
--	 * Return value ignored as we rely on signal merging.
--	 * Future patches will make this more robust.
--	 */
--	apei_claim_sea(regs);
-+	if (apei_claim_sea(regs) == 0) {
-+		/* APEI claimed this as a firmware-first notification */
 +		return 0;
 +	}
++
++	return -ENOENT;
++}
++
++static int ghes_sdei_normal_callback(u32 event_num, struct pt_regs *regs,
++				      void *arg)
++{
++	static DEFINE_RAW_SPINLOCK(ghes_notify_lock_sdei_normal);
++	struct ghes *ghes = arg;
++	int err;
++
++	raw_spin_lock(&ghes_notify_lock_sdei_normal);
++	err = __ghes_sdei_callback(ghes, FIX_APEI_GHES_SDEI_NORMAL);
++	raw_spin_unlock(&ghes_notify_lock_sdei_normal);
++
++	return err;
++}
++
++static int ghes_sdei_critical_callback(u32 event_num, struct pt_regs *regs,
++				       void *arg)
++{
++	static DEFINE_RAW_SPINLOCK(ghes_notify_lock_sdei_critical);
++	struct ghes *ghes = arg;
++	int err;
++
++	raw_spin_lock(&ghes_notify_lock_sdei_critical);
++	err = __ghes_sdei_callback(ghes, FIX_APEI_GHES_SDEI_CRITICAL);
++	raw_spin_unlock(&ghes_notify_lock_sdei_critical);
++
++	return err;
++}
++
++static int apei_sdei_register_ghes(struct ghes *ghes)
++{
++	if (!IS_ENABLED(CONFIG_ARM_SDE_INTERFACE))
++		return -EOPNOTSUPP;
++
++	return sdei_register_ghes(ghes, ghes_sdei_normal_callback,
++				 ghes_sdei_critical_callback);
++}
++
++static int apei_sdei_unregister_ghes(struct ghes *ghes)
++{
++	if (!IS_ENABLED(CONFIG_ARM_SDE_INTERFACE))
++		return -EOPNOTSUPP;
++
++	return sdei_unregister_ghes(ghes);
++}
++
+ static int ghes_probe(struct platform_device *ghes_dev)
+ {
+ 	struct acpi_hest_generic *generic;
+@@ -1123,6 +1190,13 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 			goto err;
+ 		}
+ 		break;
++	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
++		if (!IS_ENABLED(CONFIG_ARM_SDE_INTERFACE)) {
++			pr_warn(GHES_PFX "Generic hardware error source: %d notified via SDE Interface is not supported!\n",
++				generic->header.source_id);
++			goto err;
++		}
++		break;
+ 	case ACPI_HEST_NOTIFY_LOCAL:
+ 		pr_warning(GHES_PFX "Generic hardware error source: %d notified via local interrupt is not supported!\n",
+ 			   generic->header.source_id);
+@@ -1186,6 +1260,11 @@ static int ghes_probe(struct platform_device *ghes_dev)
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_add(ghes);
+ 		break;
++	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
++		rc = apei_sdei_register_ghes(ghes);
++		if (rc)
++			goto err;
++		break;
+ 	default:
+ 		BUG();
+ 	}
+@@ -1211,6 +1290,7 @@ static int ghes_probe(struct platform_device *ghes_dev)
  
- 	if (esr & ESR_ELx_FnV)
- 		siaddr = NULL;
+ static int ghes_remove(struct platform_device *ghes_dev)
+ {
++	int rc;
+ 	struct ghes *ghes;
+ 	struct acpi_hest_generic *generic;
+ 
+@@ -1243,6 +1323,11 @@ static int ghes_remove(struct platform_device *ghes_dev)
+ 	case ACPI_HEST_NOTIFY_NMI:
+ 		ghes_nmi_remove(ghes);
+ 		break;
++	case ACPI_HEST_NOTIFY_SOFTWARE_DELEGATED:
++		rc = apei_sdei_unregister_ghes(ghes);
++		if (rc)
++			return rc;
++		break;
+ 	default:
+ 		BUG();
+ 		break;
+diff --git a/include/linux/arm_sdei.h b/include/linux/arm_sdei.h
+index 393899192906..3305ea7f9dc7 100644
+--- a/include/linux/arm_sdei.h
++++ b/include/linux/arm_sdei.h
+@@ -12,7 +12,10 @@ enum sdei_conduit_types {
+ };
+ 
+ #include <acpi/ghes.h>
++
++#ifdef CONFIG_ARM_SDE_INTERFACE
+ #include <asm/sdei.h>
++#endif
+ 
+ /* Arch code should override this to set the entry point from firmware... */
+ #ifndef sdei_arch_get_entry_point
 -- 
 2.20.1
