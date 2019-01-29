@@ -1,34 +1,27 @@
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/7] lib: arm: Remove warning about
- uart0_base mismatch
-Date: Tue, 29 Jan 2019 13:40:30 +0000
-Message-ID: <540aea28-5d18-9419-3738-b7641e289d60@arm.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-3-alexandru.elisei@arm.com>
- <20190124115943.12296810@donnerap.cambridge.arm.com>
- <20190124123740.v52nkbcki5dp2hpq@kamzik.brq.redhat.com>
- <ffcc5f60-c5a0-c7f1-7fb1-658d8eea6fc4@arm.com>
- <20190125164751.cdfip3kv63uonl7n@kamzik.brq.redhat.com>
- <42b3a17b-088b-b9b7-4dac-34f07aa09c8a@arm.com>
- <20190128163101.dajq6ofgmpctg3ne@kamzik.brq.redhat.com>
- <39bc7b61-ddac-3180-2cb8-410e1d400cb3@arm.com>
- <20190129122323.bdevmczzyafnzhsl@kamzik.brq.redhat.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Move mmu_memory_cache functions to common
+ code
+Date: Tue, 29 Jan 2019 15:25:29 +0100
+Message-ID: <20190129142529.GC13482@e113682-lin.lund.arm.com>
+References: <20190128144843.11635-1-christoffer.dall@arm.com>
+ <20190128144843.11635-2-christoffer.dall@arm.com>
+ <20190128161956.GB24792@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40AA54A332
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 08:40:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F9704A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 09:25:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MIbZZgOv4tTW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 08:40:33 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F7AC4A2B6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 08:40:33 -0500 (EST)
-In-Reply-To: <20190129122323.bdevmczzyafnzhsl@kamzik.brq.redhat.com>
-Content-Language: en-US
+ with ESMTP id 9nXcBu7bzZk9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 09:25:32 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 137CE4A200
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 09:25:32 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190128161956.GB24792@linux.intel.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,220 +31,435 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>, Anshuman Khandual <anshuman.khandual@arm.com>, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMS8yOS8xOSAxMjoyMyBQTSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+IE9uIFR1ZSwgSmFuIDI5
-LCAyMDE5IGF0IDExOjE2OjA1QU0gKzAwMDAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+IE9u
-IDEvMjgvMTkgNDozMSBQTSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+Pj4gT24gTW9uLCBKYW4gMjgs
-IDIwMTkgYXQgMDI6MjQ6MjlQTSArMDAwMCwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4+PiBP
-biAxLzI1LzE5IDQ6NDcgUE0sIEFuZHJldyBKb25lcyB3cm90ZToKPj4+Pj4gT24gRnJpLCBKYW4g
-MjUsIDIwMTkgYXQgMDQ6MzY6MTNQTSArMDAwMCwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPj4+
-Pj4+IE9uIDEvMjQvMTkgMTI6MzcgUE0sIEFuZHJldyBKb25lcyB3cm90ZToKPj4+Pj4+PiBPbiBU
-aHUsIEphbiAyNCwgMjAxOSBhdCAxMTo1OTo0M0FNICswMDAwLCBBbmRyZSBQcnp5d2FyYSB3cm90
-ZToKPj4+Pj4+Pj4gT24gVGh1LCAyNCBKYW4gMjAxOSAxMToxNjoyOSArMDAwMAo+Pj4+Pj4+PiBB
-bGV4YW5kcnUgRWxpc2VpIDxhbGV4YW5kcnUuZWxpc2VpQGFybS5jb20+IHdyb3RlOgo+Pj4+Pj4+
-Pgo+Pj4+Pj4+Pj4gQSB3YXJuaW5nIGlzIGRpc3BsYXllZCBpZiB1YXJ0MF9iYXNlIGlzIGRpZmZl
-cmVudCBmcm9tIHdoYXQgdGhlIGNvZGUKPj4+Pj4+Pj4+IGV4cGVjdHMgcWVtdSB0byBnZW5lcmF0
-ZSBmb3IgdGhlIHBsMDExIFVBUlQgaW4gdGhlIGRldmljZSB0cmVlLgo+Pj4+Pj4+Pj4gSG93ZXZl
-ciwgbm93IHdlIHN1cHBvcnQgdGhlIG5zMTY1NTBhIFVBUlQgZW11bGF0ZWQgYnkga3ZtdG9vbCwg
-d2hpY2gKPj4+Pj4+Pj4+IGhhcyBhIGRpZmZlcmVudCBhZGRyZXNzLiBUaGlzIGxlYWRzIHRvIHRo
-ZSAgd2FybmluZyBiZWluZyBkaXNwbGF5ZWQKPj4+Pj4+Pj4+IGV2ZW4gdGhvdWdoIHRoZSBVQVJU
-IGlzIGNvbmZpZ3VyZWQgYW5kIHdvcmtpbmcgYXMgZXhwZWN0ZWQuCj4+Pj4+Pj4+Pgo+Pj4+Pj4+
-Pj4gTm93IHRoYXQgd2Ugc3VwcG9ydCBtdWx0aXBsZSBVQVJUcywgdGhlIHdhcm5pbmcgc2VydmVz
-IG5vIHB1cnBvc2UsIHNvCj4+Pj4+Pj4+PiByZW1vdmUgaXQuCj4+Pj4+Pj4+IE1taCwgYnV0IHdl
-IHVzZSB0aGF0IGFkZHJlc3MgYmVmb3JlLCByaWdodD8gU28gZm9yIGFueXRoaW5nIG5vdAo+Pj4+
-Pj4+PiBlbXVsYXRpbmcgYW4gVUFSVCBhdCB0aGlzIFFFTVUgc3BlY2lmaWMgYWRkcmVzcyB3ZSB3
-cml0ZSB0byBzb21lIHJhbmRvbQo+Pj4+Pj4+PiAoZGV2aWNlKSBtZW1vcnk/Cj4+Pj4+Pj4+Cj4+
-Pj4+Pj4+IERyZXcsIGhvdyBpbXBvcnRhbnQgaXMgdGhpcyBlYXJseSBwcmludCBmZWF0dXJlIGZv
-ciBrdm0tdW5pdC10ZXN0cz8KPj4+Pj4+PiBUaGUgc2V0dXAgY29kZSBwYXNzZXMgdGhyb3VnaCBx
-dWl0ZSBhIGZldyBhc3NlcnRzIGJlZm9yZSBnZXR0aW5nIHRocm91Z2gKPj4+Pj4+PiBpb19pbml0
-KCkgKGluY2x1ZGluZyBpbiB1YXJ0MF9pbml0KSwgc28gSSB0aGluayB0aGVyZSdzIHN0aWxsIHZh
-bHVlIGluCj4+Pj4+Pj4gaGF2aW5nIGEgZ3Vlc3NlZCBVQVJUIGFkZHJlc3MuIE1heWJlIHdlIGNh
-biBwcm92aWRlIGd1ZXNzZXMgZm9yIGJvdGgKPj4+Pj4+PiBRRU1VIGFuZCBrdm10b29sLCBhbmQg
-c29tZSBzZWxlY3Rpb24gbWV0aG9kLCB0aGF0IHdvdWxkIGJlIHVzZWQgdW50aWwKPj4+Pj4+PiB3
-ZSd2ZSBwcm9wZXJseSBhc3NpZ25lZCB1YXJ0MF9iYXNlIGZyb20gRFQ/Cj4+Pj4+Pj4KPj4+Pj4+
-Pj4gQ2hlZXJzLAo+Pj4+Pj4+PiBBbmRyZS4KPj4+Pj4+Pj4KPj4+Pj4+Pj4+IFNpZ25lZC1vZmYt
-Ynk6IEFsZXhhbmRydSBFbGlzZWkgPGFsZXhhbmRydS5lbGlzZWlAYXJtLmNvbT4KPj4+Pj4+Pj4+
-IC0tLQo+Pj4+Pj4+Pj4gIGxpYi9hcm0vaW8uYyB8IDYgLS0tLS0tCj4+Pj4+Pj4+PiAgMSBmaWxl
-IGNoYW5nZWQsIDYgZGVsZXRpb25zKC0pCj4+Pj4+Pj4+Pgo+Pj4+Pj4+Pj4gZGlmZiAtLWdpdCBh
-L2xpYi9hcm0vaW8uYyBiL2xpYi9hcm0vaW8uYwo+Pj4+Pj4+Pj4gaW5kZXggMzVmYzA1YWViNGRi
-Li44NzQzNTE1MGY3M2UgMTAwNjQ0Cj4+Pj4+Pj4+PiAtLS0gYS9saWIvYXJtL2lvLmMKPj4+Pj4+
-Pj4+ICsrKyBiL2xpYi9hcm0vaW8uYwo+Pj4+Pj4+Pj4gQEAgLTYxLDEyICs2MSw2IEBAIHN0YXRp
-YyB2b2lkIHVhcnQwX2luaXQodm9pZCkKPj4+Pj4+Pj4+ICAJfQo+Pj4+Pj4+Pj4gIAo+Pj4+Pj4+
-Pj4gIAl1YXJ0MF9iYXNlID0gaW9yZW1hcChiYXNlLmFkZHIsIGJhc2Uuc2l6ZSk7Cj4+Pj4+Pj4+
-PiAtCj4+Pj4+Pj4+PiAtCWlmICh1YXJ0MF9iYXNlICE9ICh1OCAqKVVBUlRfRUFSTFlfQkFTRSkg
-ewo+Pj4+Pj4+Pj4gLQkJcHJpbnRmKCJXQVJOSU5HOiBlYXJseSBwcmludCBzdXBwb3J0IG1heSBu
-b3Qgd29yay4gIgo+Pj4+Pj4+Pj4gLQkJICAgICAgICJGb3VuZCB1YXJ0IGF0ICVwLCBidXQgZWFy
-bHkgYmFzZSBpcyAlcC5cbiIsCj4+Pj4+Pj4+PiAtCQkJdWFydDBfYmFzZSwgKHU4ICopVUFSVF9F
-QVJMWV9CQVNFKTsKPj4+Pj4+Pj4+IC0JfQo+Pj4+Pj4+Pj4gIH0KPj4+Pj4+PiBUaGlzIHdhcm5p
-bmcgaXMgZG9pbmcgd2hhdCBpdCBzaG91bGQsIHdoaWNoIGlzIHBvaW50aW5nIG91dCB0aGF0IHRo
-ZQo+Pj4+Pj4+IFVBUlRfRUFSTFlfQkFTRSBndWVzcyBhcHBlYXJzIHRvIGJlIHdyb25nLiBJZiB3
-ZSBjYW4gcHJvdmlkZSBhIHdheQo+Pj4+Pj4+IHRvIHN1cHBvcnQgbW9yZSB0aGFuIG9uZSBndWVz
-cywgdGhlbiB3ZSBzaG91bGQga2VlcCB0aGlzIHdhcm5pbmcgYnV0Cj4+Pj4+Pj4gYWRqdXN0IGl0
-IHRvIG1hdGNoIG9uZSBvZiBhbnkgb2YgdGhlIGd1ZXNzZXMuCj4+Pj4+Pj4KPj4+Pj4+PiBUaGFu
-a3MsCj4+Pj4+Pj4gZHJldwo+Pj4+Pj4gSSdtIG5vdCByZWFsbHkgc3VyZSBob3cgdG8gaW1wbGVt
-ZW50IGEgc2VsZWN0aW9uIG1ldGhvZC4gSSd2ZSBsb29rZWQgYXQKPj4+Pj4+IHNwbGl0dGluZyBp
-b19pbml0KCkgaW50byB1YXJ0MF9pbml0KCkgYW5kIGNocl90ZXN0ZGV2X2luaXQoKSBhbmQgY2Fs
-bGluZwo+Pj4+Pj4gdWFydDBfaW5pdCgpIHZlcnkgZWFybHkgaW4gdGhlIHNldHVwIHByb2Nlc3Ms
-IGJ1dCB1YXJ0MF9pbml0KCkgaXRzZWxmIHVzZXMKPj4+Pj4+IHByaW50ZigpIGFuZCBhc3NlcnQo
-KS4KPj4+Pj4+Cj4+Pj4+PiBJJ3ZlIGFsc28gdGhvdWdodCBhYm91dCBhZGRpbmcgYW5vdGhlciBm
-dW5jdGlvbiwgc29tZXRoaW5nIGxpa2UKPj4+Pj4+IHVhcnQwX2Vhcmx5X2luaXQoKSwgdGhhdCBp
-cyBjYWxsZWQgdmVyeSBlYXJseSBpbiBzZXR1cCgpIGFuZCBnZXRzIHRoZSBiYXNlCj4+Pj4+PiBh
-ZGRyZXNzIGZyb20gdGhlIGR0YiBib290YXJncy4gQnV0IHRoYXQgbWVhbnMgY2FsbGluZyBkdF9p
-bml0KCkgYW5kCj4+Pj4+PiBkdF9nZXRfYm9vdGFyZ3MoKSwgd2hpY2ggY2FuIGZhaWwuCj4+Pj4+
-Pgo+Pj4+Pj4gT25lIG90aGVyIG9wdGlvbiB0aGF0IGNvdWxkIHdvcmsgaXMgdG8gbWFrZSBpdCBh
-IGNvbXBpbGUtdGltZSBjb25maWd1cmF0aW9uLgo+Pj4+Pj4KPj4+Pj4+IFdoYXQgZG8geW91IHRo
-aW5rPwo+Pj4+Pj4KPj4+Pj4gQ29tcGlsZS10aW1lIGlzIGZpbmUsIHdoaWNoIEkgZ3Vlc3Mgd2ls
-bCByZXN1bHQgaW4gYSBuZXcgY29uZmlndXJlIHNjcmlwdAo+Pj4+PiBvcHRpb24gYXMgd2VsbC4g
-SSB3b25kZXIgaWYgd2Ugc2hvdWxkbid0IGNvbnNpZGVyIGdlbmVyYXRpbmcgYSBjb25maWcuaAo+
-Pj4+PiBmaWxlIHdpdGggc3R1ZmYgbGlrZSB0aGlzIHJhdGhlciB0aGFuIGFkZGluZyBhbm90aGVy
-IC1EIHRvIHRoZSBjb21waWxlCj4+Pj4+IGxpbmUuCj4+Pj4+Cj4+Pj4+IGRyZXcgCj4+Pj4gSSBw
-cm9wb3NlIGEgbmV3IGNvbmZpZ3VyYXRpb24gb3B0aW9uIGNhbGxlZCAtLXZtbSwgd2l0aCBwb3Nz
-aWJsZSB2YWx1ZXMgcWVtdSBhbmQKPj4+PiBrdm10b29sLCB3aGljaCBkZWZhdWx0cyB0byBxZW11
-IGlmIG5vdCBzZXQuCj4+Pj4KPj4+PiBBbm90aGVyIHBvc3NpYmlsaXR5IHdvdWxkIGJlIHRvIGhh
-dmUgYW4gLS11YXJ0LWJhc2Ugb3B0aW9uLCBidXQgdGhhdCBtZWFucyB3ZQo+Pj4+IGFyZSBleHBl
-Y3RpbmcgdGhlIHVzZXIgdG8gYmUgYXdhcmUgb2YgdGhlIHVhcnQgYmFzZSBhZGRyZXNzIGZvciB0
-aGUgdmlydHVhbAo+Pj4+IG1hY2hpbmUgbWFuYWdlciwgd2hpY2ggbWlnaHQgYmUgdW5yZWFzb25h
-YmxlLgo+Pj4+Cj4+Pj4gVGhpcyBpcyBhIHF1aWNrIHByb3RvdHlwZSBvZiBob3cgdXNpbmcgLUQg
-Zm9yIGNvbmRpdGlvbmFsIGNvbXBpbGF0aW9uIHdvdWxkIGxvb2sKPj4+PiBsaWtlICh0aGUgY29u
-ZmlndXJlIGNoYW5nZXMgYXJlIGluY2x1ZGVkIHRvbyk6Cj4+Pj4KPj4+PiBkaWZmIC0tZ2l0IGEv
-Y29uZmlndXJlIGIvY29uZmlndXJlCj4+Pj4gaW5kZXggZGY4NTgxZTNhOTA2Li43YTU2YmE0Nzcw
-N2YgMTAwNzU1Cj4+Pj4gLS0tIGEvY29uZmlndXJlCj4+Pj4gKysrIGIvY29uZmlndXJlCj4+Pj4g
-QEAgLTcwLDYgKzcwLDkgQEAgd2hpbGUgW1sgIiQxIiA9IC0qIF1dOyBkbwo+Pj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgOzsKPj4+PiDCoMKgwqDCoMKgwqDCoCAtLWxkKQo+Pj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgbGQ9IiRhcmciCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIDs7Cj4+Pj4gK8Kg
-wqDCoCAtLXZtbSkKPj4+PiArwqDCoMKgwqDCoMKgwqAgdm1tPSIkYXJnIgo+Pj4+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgOzsKPj4+PiDCoMKgwqDCoMKgwqDCoCAtLWVuYWJsZS1wcmV0dHktcHJp
-bnQtc3RhY2tzKQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJldHR5X3ByaW50X3N0YWNr
-cz15ZXMKPj4+PiBAQCAtMTA4LDYgKzExMSwxNCBAQCBpZiBbICIkYXJjaCIgPSAiaTM4NiIgXSB8
-fCBbICIkYXJjaCIgPSAieDg2XzY0IiBdOyB0aGVuCj4+Pj4gwqDCoMKgwqAgdGVzdGRpcj14ODYK
-Pj4+PiDCoGVsaWYgWyAiJGFyY2giID0gImFybSIgXSB8fCBbICIkYXJjaCIgPSAiYXJtNjQiIF07
-IHRoZW4KPj4+PiDCoMKgwqDCoCB0ZXN0ZGlyPWFybQo+Pj4+ICvCoMKgwqAgaWYgWyAteiAiJHZt
-bSIgXSB8fCBbICIkdm1tIiA9ICJxZW11IiBdOyB0aGVuCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHVh
-cnRfZWFybHlfYmFzZT0weDA5MDAwMDAwVUwKPj4+IFlvdSBjYW4gZHJvcCB0aGUgJ1VMJy4KPj4+
-Cj4+Pj4gK8KgwqDCoCBlbGlmIFsgIiR2bW0iID0gImt2bXRvb2wiIF07IHRoZW4KPj4+PiArwqDC
-oMKgwqDCoMKgwqAgdWFydF9lYXJseV9iYXNlPTB4M2Y4Cj4+Pj4gK8KgwqDCoCBlbHNlCj4+Pj4g
-K8KgwqDCoMKgwqDCoMKgIGVjaG8gJy0tdm1tIG11c3QgYmUgb25lIG9mICJxZW11IiBvciAia3Zt
-dG9vbCInCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIHVzYWdlCj4+PiBZb3UncmUgb3V0cHV0dGluZyB1
-c2FnZSBoZXJlLCBidXQgeW91IGRpZG4ndCBhZGQgdm1tIHRvIHRoZSBoZWxwIHRleHQuCj4+Pgo+
-Pj4+ICvCoMKgwqAgZmkKPj4+PiDCoGVsaWYgWyAiJGFyY2giID0gInBwYzY0IiBdOyB0aGVuCj4+
-Pj4gwqDCoMKgwqAgdGVzdGRpcj1wb3dlcnBjCj4+Pj4gwqDCoMKgwqAgZmlybXdhcmU9IiR0ZXN0
-ZGlyL2Jvb3Rfcm9tLmJpbiIKPj4+PiBAQCAtMTk3LDQgKzIwOCw1IEBAIFBSRVRUWV9QUklOVF9T
-VEFDS1M9JHByZXR0eV9wcmludF9zdGFja3MKPj4+PiDCoEVOVklST05fREVGQVVMVD0kZW52aXJv
-bl9kZWZhdWx0Cj4+Pj4gwqBFUlJBVEFUWFQ9ZXJyYXRhLnR4dAo+Pj4+IMKgVTMyX0xPTkdfRk1U
-PSR1MzJfbG9uZwo+Pj4+ICtVQVJUX0VBUkxZX0JBU0U9JHVhcnRfZWFybHlfYmFzZQo+Pj4+IMKg
-RU9GCj4+Pj4gZGlmZiAtLWdpdCBhL01ha2VmaWxlIGIvTWFrZWZpbGUKPj4+PiBpbmRleCBlOWYw
-MjI3MmUxNTYuLjIyNWMyYTUyNWNkZiAxMDA2NDQKPj4+PiAtLS0gYS9NYWtlZmlsZQo+Pj4+ICsr
-KyBiL01ha2VmaWxlCj4+Pj4gQEAgLTcyLDYgKzcyLDEwIEBAIENPTU1PTl9DRkxBR1MgKz0gJChm
-bm9fcGljKSAkKG5vX3BpZSkKPj4+PiDCoENGTEFHUyArPSAkKENPTU1PTl9DRkxBR1MpCj4+Pj4g
-wqBDRkxBR1MgKz0gLVdtaXNzaW5nLXBhcmFtZXRlci10eXBlIC1Xb2xkLXN0eWxlLWRlY2xhcmF0
-aW9uIC1Xb3ZlcnJpZGUtaW5pdAo+Pj4+IMKgCj4+Pj4gK2lmbmVxICgkKFVBUlRfRUFSTFlfQkFT
-RSksKQo+Pj4+ICtDRkxBR1MgKz0gLURVQVJUX0VBUkxZX0JBU0U9JChVQVJUX0VBUkxZX0JBU0Up
-Cj4+Pj4gK2VuZGlmCj4+PiBUaGlzIHR5cGUgb2YgdGhpbmcgaXMgd2hhdCBJIHdvdWxkIGxpa2Ug
-dG8gYXZvaWQgYnkgaW50cm9kdWNpbmcgYQo+Pj4gY29uZmlnLmggZmlsZS4gSW4gdGhlIGxlYXN0
-IHdlIHNob3VsZG4ndCBhZGQgdGhpcyAtRCB0byBDRkxBR1MgZm9yCj4+PiBhbGwgYXJjaGl0ZWN0
-dXJlcy4gSXQgY2FuIGJlIGFkZGVkIHRvIHRoZSAlLmVsZiBydWxlIGluCj4+PiBhcm0vTWFrZWZp
-bGUuY29tbW9uCj4+Pgo+Pj4+ICsKPj4+PiDCoENYWEZMQUdTICs9ICQoQ09NTU9OX0NGTEFHUykK
-Pj4+PiDCoAo+Pj4+IMKgYXV0b2RlcGVuZC1mbGFncyA9IC1NTUQgLU1GICQoZGlyICQqKS4kKG5v
-dGRpciAkKikuZAo+Pj4+Cj4+PiBZb3UnbGwgYWxzbyB3YW50IHRvIHBhdGNoIGxpYi9hcm0vaW8u
-YyB3aXRoCj4+PiAgCj4+PiAtLyoKPj4+IC0gKiBVc2UgdGhpcyBndWVzcyBmb3IgdGhlIHBsMDEx
-IGJhc2UgaW4gb3JkZXIgdG8gbWFrZSBhbiBhdHRlbXB0IGF0Cj4+PiAtICogaGF2aW5nIGVhcmxp
-ZXIgcHJpbnRmIHN1cHBvcnQuIFdlJ2xsIG92ZXJ3cml0ZSBpdCB3aXRoIHRoZSByZWFsCj4+PiAt
-ICogYmFzZSBhZGRyZXNzIHRoYXQgd2UgcmVhZCBmcm9tIHRoZSBkZXZpY2UgdHJlZSBsYXRlci4g
-VGhpcyBpcwo+Pj4gLSAqIHRoZSBhZGRyZXNzIHdlIGV4cGVjdCBRRU1VJ3MgbWFjaC12aXJ0IG1h
-Y2hpbmUgdHlwZSB0byBwdXQgaW4KPj4+IC0gKiBpdHMgZ2VuZXJhdGVkIGRldmljZSB0cmVlLgo+
-Pj4gLSAqLwo+Pj4gLSNkZWZpbmUgVUFSVF9FQVJMWV9CQVNFIDB4MDkwMDAwMDBVTAo+Pj4gLQo+
-Pj4gIHN0YXRpYyBzdHJ1Y3Qgc3BpbmxvY2sgdWFydF9sb2NrOwo+Pj4gLXN0YXRpYyB2b2xhdGls
-ZSB1OCAqdWFydDBfYmFzZSA9ICh1OCAqKVVBUlRfRUFSTFlfQkFTRTsKPj4+ICtzdGF0aWMgdm9s
-YXRpbGUgdTggKnVhcnQwX2Jhc2UgPSAodTggKikodW5zaWduZWQgbG9uZylVQVJUX0VBUkxZX0JB
-U0U7Cj4+Pgo+Pj4KPj4+Cj4+PiBUaGlzIGlzIGFsbCBhIGJpdCBvbiB0aGUgdWdseSBzaWRlLCBi
-dXQgSSBjYW4ndCB0aGluayBvZiBhbnl0aGluZwo+Pj4gYmV0dGVyLiAKPj4+Cj4+PiBUaGFua3Ms
-Cj4+PiBkcmV3Cj4+IEkndmUgYWxzbyB0cmllZCBkb2luZyBpdCBieSBnZW5lcmF0aW5nIGNvbmZp
-Zy5oIFRoaXMgaXMgd2hhdCBJIGNhbWUgdXAgd2l0aDoKPj4KPj4gZGlmZiAtLWdpdCBhL2NvbmZp
-Z3VyZSBiL2NvbmZpZ3VyZQo+PiBpbmRleCBkZjg1ODFlM2E5MDYuLmQ3N2I4YjBkODJmYSAxMDA3
-NTUKPj4gLS0tIGEvY29uZmlndXJlCj4+ICsrKyBiL2NvbmZpZ3VyZQo+PiBAQCAtMTYsNiArMTYs
-NyBAQCBlbmRpYW49IiIKPj4gwqBwcmV0dHlfcHJpbnRfc3RhY2tzPXllcwo+PiDCoGVudmlyb25f
-ZGVmYXVsdD15ZXMKPj4gwqB1MzJfbG9uZz0KPj4gK3ZtbT1xZW11Cj4+IMKgCj4+IMKgdXNhZ2Uo
-KSB7Cj4+IMKgwqDCoMKgIGNhdCA8PC1FT0YKPj4gQEAgLTIzLDYgKzI0LDggQEAgdXNhZ2UoKSB7
-Cj4+IMKgCj4+IMKgwqDCoMKgwqDCoMKgIE9wdGlvbnMgaW5jbHVkZToKPj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAtLWFyY2g9QVJDSMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYXJjaGl0ZWN0dXJl
-IHRvIGNvbXBpbGUgZm9yICgkYXJjaCkKPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgIC0tdm1tPVZN
-TcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZpcnR1YWwgbWFjaGluZSBtb25pdG9yIHRvIGNv
-bXBpbGUgZm9yIChxZW11Cj4+IG9yIGt2bXRvb2wsCj4gTG9uZyBsaW5lPwpJIHdpbGwgZml4IGl0
-Lgo+Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgYXJtL2FybTY0IG9ubHksIGRlZmF1bHQgaXMgcWVtdSkKPiBXaHkg
-YXJtL2FybTY0IG9ubHk/IE5vIHBsYW5zIHRvIHVzZSBrdm10b29sIGZvciB4ODYgdGVzdHM/ClRo
-ZSBwYXRjaGVzIHRhcmdldCBvbmx5IHRoZSBhcm0gYW5kIGFybTY0IGFyY2hpdGVjdHVyZXMuCj4K
-Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtLXByb2Nlc3Nvcj1QUk9DRVNTT1LCoCBwcm9jZXNz
-b3IgdG8gY29tcGlsZSBmb3IgKCRhcmNoKQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0tY3Jv
-c3MtcHJlZml4PVBSRUZJWMKgIGNyb3NzIGNvbXBpbGVyIHByZWZpeAo+PiDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIC0tY2M9Q0PCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYyBjb21waWxl
-ciB0byB1c2UgKCRjYykKPj4gQEAgLTcxLDYgKzc0LDkgQEAgd2hpbGUgW1sgIiQxIiA9IC0qIF1d
-OyBkbwo+PiDCoMKgwqDCoMKgwqDCoCAtLWxkKQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxk
-PSIkYXJnIgo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDs7Cj4+ICvCoMKgwqDCoMKgwqAgLS12
-bW0pCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoCB2bW09IiRhcmciCj4+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoCA7Owo+PiDCoMKgwqDCoMKgwqDCoCAtLWVuYWJsZS1wcmV0dHktcHJpbnQtc3RhY2tz
-KQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByZXR0eV9wcmludF9zdGFja3M9eWVzCj4+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgOzsKPj4gQEAgLTEwOCw2ICsxMTQsMTQgQEAgaWYgWyAiJGFy
-Y2giID0gImkzODYiIF0gfHwgWyAiJGFyY2giID0gIng4Nl82NCIgXTsgdGhlbgo+PiDCoMKgwqDC
-oCB0ZXN0ZGlyPXg4Ngo+PiDCoGVsaWYgWyAiJGFyY2giID0gImFybSIgXSB8fCBbICIkYXJjaCIg
-PSAiYXJtNjQiIF07IHRoZW4KPj4gwqDCoMKgwqAgdGVzdGRpcj1hcm0KPj4gK8KgwqDCoCBpZiBb
-ICIkdm1tIiA9ICJxZW11IiBdOyB0aGVuCj4+ICvCoMKgwqDCoMKgwqDCoCB1YXJ0X2Vhcmx5X2Jh
-c2U9MHgwOTAwMDAwMAo+PiArwqDCoMKgIGVsaWYgWyAiJHZtbSIgPSAia3ZtdG9vbCIgXTsgdGhl
-bgo+PiArwqDCoMKgwqDCoMKgwqAgdWFydF9lYXJseV9iYXNlPTB4M2Y4Cj4+ICvCoMKgwqAgZWxz
-ZQo+PiArwqDCoMKgwqDCoMKgwqAgZWNobyAnLS12bW0gbXVzdCBiZSBvbmUgb2YgInFlbXUiIG9y
-ICJrdm10b29sIicKPj4gK8KgwqDCoMKgwqDCoMKgIHVzYWdlCj4gQ2hlY2tpbmcgdGhlIHZtbSBp
-cyBxZW11IG9yIGt2bXRvb2wgY2FuIGJlIG1vdmVkIG91dCBvZiB0aGUgaWYtYXJtIGJsb2NrCj4g
-aWYgd2UgZGVjaWRlIGl0IGNhbiBiZSBmb3Igb3RoZXIgYXJjaGl0ZWN0dXJlcy4gSWYgdWFydF9l
-YXJseV9iYXNlIGlzIG9ubHkKPiBhbmQgYXJtIHRoaW5nLCB0aGVuICdhcm0nIHNob3VsZCBwcm9i
-YWJseSBiZSBpbiBpdHMgbmFtZS4gQ291bGQgYWxzbwo+IHJlbmFtZSAnYmFzZScgdG8gJ2FkZHIn
-IHRvIGFjY29tbW9kYXRlIGlvcG9ydHMuCkl0J3MgYXJtIG9ubHkgZm9yIG5vdywgSSB3aWxsIHJl
-bmFtZSB0aGUgdmFyaWFibGUuCj4KPgo+PiArwqDCoMKgIGZpCj4+IMKgZWxpZiBbICIkYXJjaCIg
-PSAicHBjNjQiIF07IHRoZW4KPj4gwqDCoMKgwqAgdGVzdGRpcj1wb3dlcnBjCj4+IMKgwqDCoMKg
-IGZpcm13YXJlPSIkdGVzdGRpci9ib290X3JvbS5iaW4iCj4+IEBAIC0xOTgsMyArMjEyLDE2IEBA
-IEVOVklST05fREVGQVVMVD0kZW52aXJvbl9kZWZhdWx0Cj4+IMKgRVJSQVRBVFhUPWVycmF0YS50
-eHQKPj4gwqBVMzJfTE9OR19GTVQ9JHUzMl9sb25nCj4+IMKgRU9GCj4+ICsKPj4gK2NhdCA8PEVP
-RiA+IGxpYi9jb25maWcuaAo+PiArI2lmbmRlZiBDT05GSUdfSAo+PiArI2RlZmluZSBDT05GSUdf
-SCAxCj4gU2hvdWxkIGFkZCBhIGhlYWRlciBzdGF0aW5nIHRoaXMgaXMgYSBnZW5lcmF0ZWQgZmls
-ZSBsaWtlCj4gbWFrZV9hc21fb2Zmc2V0cyBoYXMgaW4gc2NyaXB0cy9hc20tb2Zmc2V0cy5tYWsK
-SSB3aWxsIGRvIHRoYXQuCj4KPj4gK0VPRgo+PiAraWYgWyAiJGFyY2giID0gImFybSIgXSB8fCBb
-ICIkYXJjaCIgPSAiYXJtNjQiIF07IHRoZW4KPj4gK2NhdCA8PEVPRiA+PiBsaWIvY29uZmlnLmgK
-Pj4gKyNkZWZpbmUgVUFSVF9FQVJMWV9CQVNFICR7dWFydF9lYXJseV9iYXNlfVVMCj4gRHJvcCB0
-aGUgJ1VMJy4gSWYgc29tZWJvZHkgYXR0ZW1wdGVkIHRvIHN1cHBseSBpdCB0aGVtc2VsdmVzIGl0
-J2QgZW5kIHVwCj4gYmVpbmcgVUxVTC4gSnVzdCBhZGQgYW5vdGhlciBjYXN0IHRvIHdoZXJlIHRo
-ZSB2YWx1ZSBnZXRzIHVzZWQgdG8gaGFuZGxlCj4gdGhlIHR5cGUuCkdvb2QgcG9pbnQuCj4KPj4g
-K0VPRgo+PiArZmkKPj4gK2NhdCA8PEVPRiA+PiBsaWIvY29uZmlnLmgKPj4gKyNlbmRpZgo+PiAr
-RU9GCj4gVGhlIG9uZSBsaW5lIGFwcGVuZHMgY291bGQgdXNlICdlY2hvJyB0byB0YWtlIDIgbGVz
-cyBsaW5lcyBlYWNoLgpJIHdpbGwgY2hhbmdlIGl0IHRvIGFuIGVjaG8uCj4KPj4gZGlmZiAtLWdp
-dCBhL2xpYi9hcm0vaW8uYyBiL2xpYi9hcm0vaW8uYwo+PiBpbmRleCA5ZmU5YmQwYmY2NTkuLjBh
-M2U4ZjIzN2FiOCAxMDA2NDQKPj4gLS0tIGEvbGliL2FybS9pby5jCj4+ICsrKyBiL2xpYi9hcm0v
-aW8uYwo+PiBAQCAtMTEsNiArMTEsNyBAQAo+PiDCoCNpbmNsdWRlIDxsaWJjZmxhdC5oPgo+PiDC
-oCNpbmNsdWRlIDxkZXZpY2V0cmVlLmg+Cj4+IMKgI2luY2x1ZGUgPGNoci10ZXN0ZGV2Lmg+Cj4+
-ICsjaW5jbHVkZSA8Y29uZmlnLmg+Cj4+IMKgI2luY2x1ZGUgImFybS9hc20vcHNjaS5oIgo+PiDC
-oCNpbmNsdWRlIDxhc20vc3BpbmxvY2suaD4KPj4gwqAjaW5jbHVkZSA8YXNtL2lvLmg+Cj4+IEBA
-IC0yMSwxNSArMjIsNiBAQCBleHRlcm4gdm9pZCBoYWx0KGludCBjb2RlKTsKPj4gwqAKPj4gwqBz
-dGF0aWMgYm9vbCB0ZXN0ZGV2X2VuYWJsZWQ7Cj4+IMKgCj4+IC0vKgo+PiAtICogVXNlIHRoaXMg
-Z3Vlc3MgZm9yIHRoZSBwbDAxMSBiYXNlIGluIG9yZGVyIHRvIG1ha2UgYW4gYXR0ZW1wdCBhdAo+
-PiAtICogaGF2aW5nIGVhcmxpZXIgcHJpbnRmIHN1cHBvcnQuIFdlJ2xsIG92ZXJ3cml0ZSBpdCB3
-aXRoIHRoZSByZWFsCj4+IC0gKiBiYXNlIGFkZHJlc3MgdGhhdCB3ZSByZWFkIGZyb20gdGhlIGRl
-dmljZSB0cmVlIGxhdGVyLiBUaGlzIGlzCj4+IC0gKiB0aGUgYWRkcmVzcyB3ZSBleHBlY3QgUUVN
-VSdzIG1hY2gtdmlydCBtYWNoaW5lIHR5cGUgdG8gcHV0IGluCj4+IC0gKiBpdHMgZ2VuZXJhdGVk
-IGRldmljZSB0cmVlLgo+PiAtICovCj4+IC0jZGVmaW5lIFVBUlRfRUFSTFlfQkFTRSAweDA5MDAw
-MDAwVUwKPj4gLQo+PiDCoHN0YXRpYyBzdHJ1Y3Qgc3BpbmxvY2sgdWFydF9sb2NrOwo+PiDCoHN0
-YXRpYyB2b2xhdGlsZSB1OCAqdWFydDBfYmFzZSA9ICh1OCAqKVVBUlRfRUFSTFlfQkFTRTsKPj4K
-Pj4gUHV0dGluZyBjb25maWcuaCBpbiBsaWIgbWFrZXMgaXQgYXZhaWxhYmxlIGZvciBvdGhlciBh
-cmNoaXRlY3R1cmVzLCBpbiBjYXNlIHRoZXkKPj4gd2FudCB0byBpbXBsZW1lbnQgc29tZXRoaW5n
-IHNpbWlsYXIuIFBsZWFzZSBzdWdnZXN0IGFub3RoZXIgbG9jYXRpb24gaWYgdGhlcmUgaXMKPj4g
-YSBiZXR0ZXIgb25lLgo+Pgo+PiBJIHRoaW5rIHRoaXMgbG9va3MgYmV0dGVyIHRoYW4gdXNpbmcg
-YXJjaGl0ZWN0dXJlLXNwZWNpZmljIGNvbXBpbGUtdGltZSBkZWZpbmVzCj4+IGJ1cmllZCBpbiBh
-cm0vTWFrZWZpbGUuY29tbW9uLCB3aGF0IGRvIHlvdSB0aGluaz8KPj4KPiBZZXMsIEkgYWdyZWUg
-dGhpcyBsb29rcyBiZXR0ZXIuIFlvdSdsbCBwcm9iYWJseSB3YW50IHRvIGFkZCBhCj4gbGliLy5n
-aXRpZ25vcmUgZm9yIHRoZSBmaWxlIHRvbyBhbmQgYWxzbyByZW1vdmUgaXQgd2hlbgo+ICdtYWtl
-IGRpc3RjbGVhbicgaXMgcnVuLgo+Cj4gVGhhbmtzLAo+IGRyZXcKVGhhbmsgeW91IGZvciB0aGUg
-ZmVlZGJhY2ssIEkgd2lsbCBpbmNvcnBvcmF0ZSB0aGVzZSBjaGFuZ2VzIGludG8gdGhlIG5leHQK
-dmVyc2lvbiBvZiB0aGUgcGF0Y2hlcy4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+On Mon, Jan 28, 2019 at 08:19:56AM -0800, Sean Christopherson wrote:
+> On Mon, Jan 28, 2019 at 03:48:41PM +0100, Christoffer Dall wrote:
+> > We are currently duplicating the mmu memory cache functionality quite
+> > heavily between the architectures that support KVM.  As a first step,
+> > move the x86 implementation (which seems to have the most recently
+> > maintained version of the mmu memory cache) to common code.
+> > 
+> > We rename the functions and data types to have a kvm_ prefix for
+> > anything exported as a symbol to the rest of the kernel and take the
+> > chance to rename memory_cache to memcache to avoid overly long lines.
+> 
+> It'd be helpful to do the rename it a separate patch so that the move
+> really is a straight move of code.
+> 
+> > This is a bit tedious on the callsites but ends up looking more
+> > palatable.
+> > 
+> > We also introduce an arch-specific kvm_types.h which can be used to
+> > define the architecture-specific GFP flags for allocating memory to the
+> > memory cache, and to specify how many objects are required in the memory
+> > cache.  These are the two points where the current implementations
+> > diverge across architectures.  Since kvm_host.h defines structures with
+> > fields of the memcache object, we define the memcache structure in
+> > kvm_types.h, and we include the architecture-specific kvm_types.h to
+> > know the size of object in kvm_host.h.
+> > 
+> > This patch currently only defines the structure and requires valid
+> > defines in the architecture-specific kvm_types.h when KVM_NR_MEM_OBJS is
+> > defined.  As we move each architecture to the common implementation,
+> > this condition will eventually go away.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > ---
+> >  arch/arm/include/asm/kvm_types.h     |  5 ++
+> >  arch/arm64/include/asm/kvm_types.h   |  6 ++
+> >  arch/mips/include/asm/kvm_types.h    |  5 ++
+> >  arch/powerpc/include/asm/kvm_types.h |  5 ++
+> >  arch/s390/include/asm/kvm_types.h    |  5 ++
+> >  arch/x86/include/asm/kvm_host.h      | 17 +----
+> >  arch/x86/include/asm/kvm_types.h     | 10 +++
+> >  arch/x86/kvm/mmu.c                   | 97 ++++++----------------------
+> >  arch/x86/kvm/paging_tmpl.h           |  4 +-
+> >  include/linux/kvm_host.h             |  9 +++
+> >  include/linux/kvm_types.h            | 12 ++++
+> >  virt/kvm/kvm_main.c                  | 58 +++++++++++++++++
+> >  12 files changed, 139 insertions(+), 94 deletions(-)
+> >  create mode 100644 arch/arm/include/asm/kvm_types.h
+> >  create mode 100644 arch/arm64/include/asm/kvm_types.h
+> >  create mode 100644 arch/mips/include/asm/kvm_types.h
+> >  create mode 100644 arch/powerpc/include/asm/kvm_types.h
+> >  create mode 100644 arch/s390/include/asm/kvm_types.h
+> >  create mode 100644 arch/x86/include/asm/kvm_types.h
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_types.h b/arch/arm/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..bc389f82e88d
+> > --- /dev/null
+> > +++ b/arch/arm/include/asm/kvm_types.h
+> > @@ -0,0 +1,5 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_ARM_KVM_TYPES_H
+> > +#define _ASM_ARM_KVM_TYPES_H
+> > +
+> > +#endif /* _ASM_ARM_KVM_TYPES_H */
+> > diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..d0987007d581
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/kvm_types.h
+> > @@ -0,0 +1,6 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_ARM64_KVM_TYPES_H
+> > +#define _ASM_ARM64_KVM_TYPES_H
+> > +
+> > +#endif /* _ASM_ARM64_KVM_TYPES_H */
+> > +
+> > diff --git a/arch/mips/include/asm/kvm_types.h b/arch/mips/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..5efeb32a5926
+> > --- /dev/null
+> > +++ b/arch/mips/include/asm/kvm_types.h
+> > @@ -0,0 +1,5 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_MIPS_KVM_TYPES_H
+> > +#define _ASM_MIPS_KVM_TYPES_H
+> > +
+> > +#endif /* _ASM_MIPS_KVM_TYPES_H */
+> > diff --git a/arch/powerpc/include/asm/kvm_types.h b/arch/powerpc/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..f627eceaa314
+> > --- /dev/null
+> > +++ b/arch/powerpc/include/asm/kvm_types.h
+> > @@ -0,0 +1,5 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_POWERPC_KVM_TYPES_H
+> > +#define _ASM_POWERPC_KVM_TYPES_H
+> > +
+> > +#endif /* _ASM_POWERPC_KVM_TYPES_H */
+> > diff --git a/arch/s390/include/asm/kvm_types.h b/arch/s390/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..b66a81f8a354
+> > --- /dev/null
+> > +++ b/arch/s390/include/asm/kvm_types.h
+> > @@ -0,0 +1,5 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_S390_KVM_TYPES_H
+> > +#define _ASM_S390_KVM_TYPES_H
+> > +
+> > +#endif /* _ASM_S390_KVM_TYPES_H */
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 4660ce90de7f..5c12cba8c2b1 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -179,8 +179,6 @@ enum {
+> >  
+> >  #include <asm/kvm_emulate.h>
+> >  
+> > -#define KVM_NR_MEM_OBJS 40
+> > -
+> >  #define KVM_NR_DB_REGS	4
+> >  
+> >  #define DR6_BD		(1 << 13)
+> > @@ -238,15 +236,6 @@ enum {
+> >  
+> >  struct kvm_kernel_irq_routing_entry;
+> >  
+> > -/*
+> > - * We don't want allocation failures within the mmu code, so we preallocate
+> > - * enough memory for a single page fault in a cache.
+> > - */
+> > -struct kvm_mmu_memory_cache {
+> > -	int nobjs;
+> > -	void *objects[KVM_NR_MEM_OBJS];
+> > -};
+> > -
+> >  /*
+> >   * the pages used as guest page table on soft mmu are tracked by
+> >   * kvm_memory_slot.arch.gfn_track which is 16 bits, so the role bits used
+> > @@ -600,9 +589,9 @@ struct kvm_vcpu_arch {
+> >  	 */
+> >  	struct kvm_mmu *walk_mmu;
+> >  
+> > -	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
+> > -	struct kvm_mmu_memory_cache mmu_page_cache;
+> > -	struct kvm_mmu_memory_cache mmu_page_header_cache;
+> > +	struct kvm_mmu_memcache mmu_pte_list_desc_cache;
+> > +	struct kvm_mmu_memcache mmu_page_cache;
+> > +	struct kvm_mmu_memcache mmu_page_header_cache;
+> >  
+> >  	/*
+> >  	 * QEMU userspace and the guest each have their own FPU state.
+> > diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
+> > new file mode 100644
+> > index 000000000000..f71fe5556b6f
+> > --- /dev/null
+> > +++ b/arch/x86/include/asm/kvm_types.h
+> > @@ -0,0 +1,10 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _ASM_X86_KVM_TYPES_H
+> > +#define _ASM_X86_KVM_TYPES_H
+> > +
+> > +#define KVM_NR_MEM_OBJS 40
+> > +
+> > +#define KVM_MMU_CACHE_GFP	GFP_KERNEL
+> > +#define KVM_MMU_CACHE_PAGE_GFP	GFP_KERNEL_ACCOUNT
+> > +
+> > +#endif /* _ASM_X86_KVM_TYPES_H */
+> > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> > index ce770b446238..cf0024849404 100644
+> > --- a/arch/x86/kvm/mmu.c
+> > +++ b/arch/x86/kvm/mmu.c
+> > @@ -951,94 +951,35 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+> >  	local_irq_enable();
+> >  }
+> >  
+> > -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+> > -				  struct kmem_cache *base_cache, int min)
+> > -{
+> > -	void *obj;
+> > -
+> > -	if (cache->nobjs >= min)
+> > -		return 0;
+> > -	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> > -		obj = kmem_cache_zalloc(base_cache, GFP_KERNEL);
+> > -		if (!obj)
+> > -			return cache->nobjs >= min ? 0 : -ENOMEM;
+> > -		cache->objects[cache->nobjs++] = obj;
+> > -	}
+> > -	return 0;
+> > -}
+> > -
+> > -static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
+> > -{
+> > -	return cache->nobjs;
+> > -}
+> > -
+> > -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
+> > -				  struct kmem_cache *cache)
+> > -{
+> > -	while (mc->nobjs)
+> > -		kmem_cache_free(cache, mc->objects[--mc->nobjs]);
+> > -}
+> > -
+> > -static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
+> > -				       int min)
+> > -{
+> > -	void *page;
+> > -
+> > -	if (cache->nobjs >= min)
+> > -		return 0;
+> > -	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> > -		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+> > -		if (!page)
+> > -			return cache->nobjs >= min ? 0 : -ENOMEM;
+> > -		cache->objects[cache->nobjs++] = page;
+> > -	}
+> > -	return 0;
+> > -}
+> > -
+> > -static void mmu_free_memory_cache_page(struct kvm_mmu_memory_cache *mc)
+> > -{
+> > -	while (mc->nobjs)
+> > -		free_page((unsigned long)mc->objects[--mc->nobjs]);
+> > -}
+> > -
+> > -static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
+> > +static int mmu_topup_memcaches(struct kvm_vcpu *vcpu)
+> >  {
+> >  	int r;
+> >  
+> > -	r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> > +	r = kvm_mmu_topup_memcache(&vcpu->arch.mmu_pte_list_desc_cache,
+> >  				   pte_list_desc_cache, 8 + PTE_PREFETCH_NUM);
+> >  	if (r)
+> >  		goto out;
+> > -	r = mmu_topup_memory_cache_page(&vcpu->arch.mmu_page_cache, 8);
+> > +	r = kvm_mmu_topup_memcache_page(&vcpu->arch.mmu_page_cache, 8);
+> >  	if (r)
+> >  		goto out;
+> > -	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
+> > +	r = kvm_mmu_topup_memcache(&vcpu->arch.mmu_page_header_cache,
+> >  				   mmu_page_header_cache, 4);
+> >  out:
+> >  	return r;
+> >  }
+> >  
+> > -static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> > +static void mmu_free_memcaches(struct kvm_vcpu *vcpu)
+> >  {
+> > -	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> > +	kvm_mmu_free_memcache(&vcpu->arch.mmu_pte_list_desc_cache,
+> >  				pte_list_desc_cache);
+> > -	mmu_free_memory_cache_page(&vcpu->arch.mmu_page_cache);
+> > -	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache,
+> > +	kvm_mmu_free_memcache_page(&vcpu->arch.mmu_page_cache);
+> > +	kvm_mmu_free_memcache(&vcpu->arch.mmu_page_header_cache,
+> >  				mmu_page_header_cache);
+> >  }
+> >  
+> > -static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+> > -{
+> > -	void *p;
+> > -
+> > -	BUG_ON(!mc->nobjs);
+> > -	p = mc->objects[--mc->nobjs];
+> > -	return p;
+> > -}
+> > -
+> >  static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_vcpu *vcpu)
+> >  {
+> > -	return mmu_memory_cache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
+> > +	return kvm_mmu_memcache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
+> >  }
+> >  
+> >  static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
+> > @@ -1358,10 +1299,10 @@ static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
+> >  
+> >  static bool rmap_can_add(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct kvm_mmu_memory_cache *cache;
+> > +	struct kvm_mmu_memcache *cache;
+> >  
+> >  	cache = &vcpu->arch.mmu_pte_list_desc_cache;
+> > -	return mmu_memory_cache_free_objects(cache);
+> > +	return kvm_mmu_memcache_free_objects(cache);
+> >  }
+> >  
+> >  static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
+> > @@ -2044,10 +1985,10 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
+> >  {
+> >  	struct kvm_mmu_page *sp;
+> >  
+> > -	sp = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+> > -	sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
+> > +	sp = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_header_cache);
+> > +	sp->spt = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_cache);
+> >  	if (!direct)
+> > -		sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
+> > +		sp->gfns = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_cache);
+> >  	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> >  
+> >  	/*
+> > @@ -3961,7 +3902,7 @@ static int nonpaging_page_fault(struct kvm_vcpu *vcpu, gva_t gva,
+> >  	if (page_fault_handle_page_track(vcpu, error_code, gfn))
+> >  		return RET_PF_EMULATE;
+> >  
+> > -	r = mmu_topup_memory_caches(vcpu);
+> > +	r = mmu_topup_memcaches(vcpu);
+> >  	if (r)
+> >  		return r;
+> >  
+> > @@ -4090,7 +4031,7 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
+> >  	if (page_fault_handle_page_track(vcpu, error_code, gfn))
+> >  		return RET_PF_EMULATE;
+> >  
+> > -	r = mmu_topup_memory_caches(vcpu);
+> > +	r = mmu_topup_memcaches(vcpu);
+> >  	if (r)
+> >  		return r;
+> >  
+> > @@ -5062,7 +5003,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+> >  {
+> >  	int r;
+> >  
+> > -	r = mmu_topup_memory_caches(vcpu);
+> > +	r = mmu_topup_memcaches(vcpu);
+> >  	if (r)
+> >  		goto out;
+> >  	r = mmu_alloc_roots(vcpu);
+> > @@ -5240,7 +5181,7 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+> >  	 * or not since pte prefetch is skiped if it does not have
+> >  	 * enough objects in the cache.
+> >  	 */
+> > -	mmu_topup_memory_caches(vcpu);
+> > +	mmu_topup_memcaches(vcpu);
+> >  
+> >  	spin_lock(&vcpu->kvm->mmu_lock);
+> >  
+> > @@ -6052,7 +5993,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+> >  {
+> >  	kvm_mmu_unload(vcpu);
+> >  	free_mmu_pages(vcpu);
+> > -	mmu_free_memory_caches(vcpu);
+> > +	mmu_free_memcaches(vcpu);
+> >  }
+> >  
+> >  void kvm_mmu_module_exit(void)
+> > diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+> > index 6bdca39829bc..c32b603639a9 100644
+> > --- a/arch/x86/kvm/paging_tmpl.h
+> > +++ b/arch/x86/kvm/paging_tmpl.h
+> > @@ -747,7 +747,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gva_t addr, u32 error_code,
+> >  
+> >  	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
+> >  
+> > -	r = mmu_topup_memory_caches(vcpu);
+> > +	r = mmu_topup_memcaches(vcpu);
+> >  	if (r)
+> >  		return r;
+> >  
+> > @@ -870,7 +870,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+> >  	 * No need to check return value here, rmap_can_add() can
+> >  	 * help us to skip pte prefetch later.
+> >  	 */
+> > -	mmu_topup_memory_caches(vcpu);
+> > +	mmu_topup_memcaches(vcpu);
+> >  
+> >  	if (!VALID_PAGE(root_hpa)) {
+> >  		WARN_ON(1);
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index c38cc5eb7e73..f5768e5d33f7 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -739,6 +739,15 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
+> >  void kvm_flush_remote_tlbs(struct kvm *kvm);
+> >  void kvm_reload_remote_mmus(struct kvm *kvm);
+> >  
+> > +int kvm_mmu_topup_memcache(struct kvm_mmu_memcache *cache,
+> > +			   struct kmem_cache *base_cache, int min);
+> > +int kvm_mmu_memcache_free_objects(struct kvm_mmu_memcache *cache);
+> > +void kvm_mmu_free_memcache(struct kvm_mmu_memcache *mc,
+> > +			   struct kmem_cache *cache);
+> > +int kvm_mmu_topup_memcache_page(struct kvm_mmu_memcache *cache, int min);
+> > +void kvm_mmu_free_memcache_page(struct kvm_mmu_memcache *mc);
+> > +void *kvm_mmu_memcache_alloc(struct kvm_mmu_memcache *mc);
+> > +
+> >  bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+> >  				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
+> >  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
+> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> > index 8bf259dae9f6..a314f0f08e22 100644
+> > --- a/include/linux/kvm_types.h
+> > +++ b/include/linux/kvm_types.h
+> > @@ -32,6 +32,7 @@ struct kvm_memslots;
+> >  
+> >  enum kvm_mr_change;
+> >  
+> > +#include <asm/kvm_types.h>
+> >  #include <asm/types.h>
+> >  
+> >  /*
+> > @@ -63,4 +64,15 @@ struct gfn_to_hva_cache {
+> >  	struct kvm_memory_slot *memslot;
+> >  };
+> >  
+> > +#ifdef KVM_NR_MEM_OBJS
+> 
+> While you're renaming the functions, would it make sense to also rename
+> the define, e.g. KVM_MMU_NR_MEMCACHE_OBJS, or maybe something a little
+> less verbose.
+> 
+> > +/*
+> > + * We don't want allocation failures within the mmu code, so we preallocate
+> > + * enough memory for a single page fault in a cache.
+> > + */
+> > +struct kvm_mmu_memcache {
+> 
+> Wrapping the kvm_mmu_memcache definition in KVM_NR_MEM_OBJS will break
+> compilation on any arch that doesn't define KVM_NR_MEM_OBJS.
+> 
+
+Yes, this is obviously broken.
+
+I'll respin with your comments addressed.
+
+Thanks,
+
+    Christoffer
