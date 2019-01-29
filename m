@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v8 01/26] ACPI / APEI: Don't wait to serialise with oops
- messages when panic()ing
-Date: Tue, 29 Jan 2019 18:48:37 +0000
-Message-ID: <20190129184902.102850-2-james.morse@arm.com>
+Subject: [PATCH v8 03/26] ACPI / APEI: Switch estatus pool to use vmalloc
+ memory
+Date: Tue, 29 Jan 2019 18:48:39 +0000
+Message-ID: <20190129184902.102850-4-james.morse@arm.com>
 References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 818244A399
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:49:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8562F4A3BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:49:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wcrYDeCGJeLR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 13:49:42 -0500 (EST)
+ with ESMTP id Z+inlhHOhX5d for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 13:49:50 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C3F49E3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:49:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8754A39F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:49:47 -0500 (EST)
 In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,50 +32,84 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-oops_begin() exists to group printk() messages with the oops message
-printed by die(). To reach this caller we know that platform firmware
-took this error first, then notified the OS via NMI with a 'panic'
-severity.
+The ghes code is careful to parse and round firmware's advertised
+memory requirements for CPER records, up to a maximum of 64K.
+However when ghes_estatus_pool_expand() does its work, it splits
+the requested size into PAGE_SIZE granules.
 
-Don't wait for another CPU to release the die-lock before panic()ing,
-our only goal is to print this fatal error and panic().
+This means if firmware generates 5K of CPER records, and correctly
+describes this in the table, __process_error() will silently fail as it
+is unable to allocate more than PAGE_SIZE.
 
-This code is always called in_nmi(), and since commit 42a0bb3f7138
-("printk/nmi: generic solution for safe printk in NMI"), it has been
-safe to call printk() from this context. Messages are batched in a
-per-cpu buffer and printed via irq-work, or a call back from panic().
+Switch the estatus pool to vmalloc() memory. On x86 vmalloc() memory
+may fault and be fixed up by vmalloc_fault(). To prevent this call
+vmalloc_sync_all() before an NMI handler could discover the memory.
 
-Link: https://patchwork.kernel.org/patch/10313555/
-Acked-by: Borislav Petkov <bp@suse.de>
 Signed-off-by: James Morse <james.morse@arm.com>
-
+Reviewed-by: Borislav Petkov <bp@suse.de>
 ---
-Changes since v6:
- * Capitals in patch subject
- * Tinkered with the commit message.
----
- drivers/acpi/apei/ghes.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/acpi/apei/ghes.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index f008ba7c9ced..0c46b79e31b1 100644
+index f0a704aed040..ee9206d5e119 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -33,7 +33,6 @@
- #include <linux/interrupt.h>
- #include <linux/timer.h>
- #include <linux/cper.h>
--#include <linux/kdebug.h>
- #include <linux/platform_device.h>
- #include <linux/mutex.h>
- #include <linux/ratelimit.h>
-@@ -949,7 +948,6 @@ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
+@@ -170,40 +170,40 @@ static int ghes_estatus_pool_init(void)
+ 	return 0;
+ }
  
- 		sev = ghes_severity(ghes->estatus->error_severity);
- 		if (sev >= GHES_SEV_PANIC) {
--			oops_begin();
- 			ghes_print_queued_estatus();
- 			__ghes_panic(ghes);
- 		}
+-static void ghes_estatus_pool_free_chunk_page(struct gen_pool *pool,
++static void ghes_estatus_pool_free_chunk(struct gen_pool *pool,
+ 					      struct gen_pool_chunk *chunk,
+ 					      void *data)
+ {
+-	free_page(chunk->start_addr);
++	vfree((void *)chunk->start_addr);
+ }
+ 
+ static void ghes_estatus_pool_exit(void)
+ {
+ 	gen_pool_for_each_chunk(ghes_estatus_pool,
+-				ghes_estatus_pool_free_chunk_page, NULL);
++				ghes_estatus_pool_free_chunk, NULL);
+ 	gen_pool_destroy(ghes_estatus_pool);
+ }
+ 
+ static int ghes_estatus_pool_expand(unsigned long len)
+ {
+-	unsigned long i, pages, size, addr;
+-	int ret;
++	unsigned long size, addr;
+ 
+ 	ghes_estatus_pool_size_request += PAGE_ALIGN(len);
+ 	size = gen_pool_size(ghes_estatus_pool);
+ 	if (size >= ghes_estatus_pool_size_request)
+ 		return 0;
+-	pages = (ghes_estatus_pool_size_request - size) / PAGE_SIZE;
+-	for (i = 0; i < pages; i++) {
+-		addr = __get_free_page(GFP_KERNEL);
+-		if (!addr)
+-			return -ENOMEM;
+-		ret = gen_pool_add(ghes_estatus_pool, addr, PAGE_SIZE, -1);
+-		if (ret)
+-			return ret;
+-	}
+ 
+-	return 0;
++	addr = (unsigned long)vmalloc(PAGE_ALIGN(len));
++	if (!addr)
++		return -ENOMEM;
++
++	/*
++	 * New allocation must be visible in all pgd before it can be found by
++	 * an NMI allocating from the pool.
++	 */
++	vmalloc_sync_all();
++
++	return gen_pool_add(ghes_estatus_pool, addr, PAGE_ALIGN(len), -1);
+ }
+ 
+ static int map_gen_v2(struct ghes *ghes)
 -- 
 2.20.1
