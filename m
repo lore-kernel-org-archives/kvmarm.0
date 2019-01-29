@@ -1,249 +1,376 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
- firmware workaround state
-Date: Tue, 29 Jan 2019 21:32:23 +0000
-Message-ID: <20190129213223.GB3567@e103592.cambridge.arm.com>
-References: <20190107120537.184252-1-andre.przywara@arm.com>
- <20190107120537.184252-2-andre.przywara@arm.com>
- <20190122151714.GG3578@e103592.cambridge.arm.com>
- <20190125144657.3db91c91@donnerap.cambridge.arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC v3 02/21] iommu: Introduce cache_invalidate API
+Date: Tue, 29 Jan 2019 16:16:30 -0700
+Message-ID: <20190129161630.5668cf33@w520.home>
+References: <20190108102633.17482-1-eric.auger@redhat.com>
+        <20190108102633.17482-3-eric.auger@redhat.com>
+        <20190111143042.183a27a7@x1.home>
+        <66653430-514f-2b4b-3d93-348deb6cd490@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E7324A3A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 16:32:29 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x7Rrd5osiFEL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 16:32:27 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A44BC4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 16:32:27 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190125144657.3db91c91@donnerap.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <66653430-514f-2b4b-3d93-348deb6cd490@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 25, 2019 at 02:46:57PM +0000, Andre Przywara wrote:
-> On Tue, 22 Jan 2019 15:17:14 +0000
-> Dave Martin <Dave.Martin@arm.com> wrote:
+On Fri, 25 Jan 2019 17:49:20 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Alex,
 > 
-> Hi Dave,
+> On 1/11/19 10:30 PM, Alex Williamson wrote:
+> > On Tue,  8 Jan 2019 11:26:14 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+> >>
+> >> In any virtualization use case, when the first translation stage
+> >> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+> >> of caching structure updates unless the guest invalidation activities
+> >> are trapped by the virtualizer and passed down to the host.
+> >>
+> >> Since the invalidation data are obtained from user space and will be
+> >> written into physical IOMMU, we must allow security check at various
+> >> layers. Therefore, generic invalidation data format are proposed here,
+> >> model specific IOMMU drivers need to convert them into their own format.
+> >>
+> >> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> >> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> >> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> >> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >> v1 -> v2:
+> >> - add arch_id field
+> >> - renamed tlb_invalidate into cache_invalidate as this API allows
+> >>   to invalidate context caches on top of IOTLBs
+> >>
+> >> v1:
+> >> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+> >> header. Commit message reworded.
+> >> ---
+> >>  drivers/iommu/iommu.c      | 14 ++++++
+> >>  include/linux/iommu.h      | 14 ++++++
+> >>  include/uapi/linux/iommu.h | 95 ++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 123 insertions(+)
+> >>
+> >> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> >> index 0f2b7f1fc7c8..b2e248770508 100644
+> >> --- a/drivers/iommu/iommu.c
+> >> +++ b/drivers/iommu/iommu.c
+> >> @@ -1403,6 +1403,20 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
+> >>  
+> >> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+> >> +			   struct iommu_cache_invalidate_info *inv_info)
+> >> +{
+> >> +	int ret = 0;
+> >> +
+> >> +	if (unlikely(!domain->ops->cache_invalidate))
+> >> +		return -ENODEV;
+> >> +
+> >> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+> >> +
+> >> +	return ret;
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+> >> +
+> >>  static void __iommu_detach_device(struct iommu_domain *domain,
+> >>  				  struct device *dev)
+> >>  {
+> >> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> >> index 1da2a2357ea4..96d59886f230 100644
+> >> --- a/include/linux/iommu.h
+> >> +++ b/include/linux/iommu.h
+> >> @@ -186,6 +186,7 @@ struct iommu_resv_region {
+> >>   * @of_xlate: add OF master IDs to iommu grouping
+> >>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+> >>   * @set_pasid_table: set pasid table
+> >> + * @cache_invalidate: invalidate translation caches
+> >>   */
+> >>  struct iommu_ops {
+> >>  	bool (*capable)(enum iommu_cap);
+> >> @@ -231,6 +232,9 @@ struct iommu_ops {
+> >>  	int (*set_pasid_table)(struct iommu_domain *domain,
+> >>  			       struct iommu_pasid_table_config *cfg);
+> >>  
+> >> +	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
+> >> +				struct iommu_cache_invalidate_info *inv_info);
+> >> +
+> >>  	unsigned long pgsize_bitmap;
+> >>  };
+> >>  
+> >> @@ -294,6 +298,9 @@ extern void iommu_detach_device(struct iommu_domain *domain,
+> >>  				struct device *dev);
+> >>  extern int iommu_set_pasid_table(struct iommu_domain *domain,
+> >>  				 struct iommu_pasid_table_config *cfg);
+> >> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+> >> +				struct device *dev,
+> >> +				struct iommu_cache_invalidate_info *inv_info);
+> >>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+> >>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+> >>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> >> @@ -709,6 +716,13 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
+> >>  {
+> >>  	return -ENODEV;
+> >>  }
+> >> +static inline int
+> >> +iommu_cache_invalidate(struct iommu_domain *domain,
+> >> +		       struct device *dev,
+> >> +		       struct iommu_cache_invalidate_info *inv_info)
+> >> +{
+> >> +	return -ENODEV;
+> >> +}
+> >>  
+> >>  #endif /* CONFIG_IOMMU_API */
+> >>  
+> >> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> >> index 7a7cf7a3de7c..4605f5cfac84 100644
+> >> --- a/include/uapi/linux/iommu.h
+> >> +++ b/include/uapi/linux/iommu.h
+> >> @@ -47,4 +47,99 @@ struct iommu_pasid_table_config {
+> >>  	};
+> >>  };
+> >>  
+> >> +/**
+> >> + * enum iommu_inv_granularity - Generic invalidation granularity
+> >> + * @IOMMU_INV_GRANU_DOMAIN_ALL_PASID:	TLB entries or PASID caches of all
+> >> + *					PASIDs associated with a domain ID
+> >> + * @IOMMU_INV_GRANU_PASID_SEL:		TLB entries or PASID cache associated
+> >> + *					with a PASID and a domain
+> >> + * @IOMMU_INV_GRANU_PAGE_PASID:		TLB entries of selected page range
+> >> + *					within a PASID
+> >> + *
+> >> + * When an invalidation request is passed down to IOMMU to flush translation
+> >> + * caches, it may carry different granularity levels, which can be specific
+> >> + * to certain types of translation caches.
+> >> + * This enum is a collection of granularities for all types of translation
+> >> + * caches. The idea is to make it easy for IOMMU model specific driver to
+> >> + * convert from generic to model specific value. Each IOMMU driver
+> >> + * can enforce check based on its own conversion table. The conversion is
+> >> + * based on 2D look-up with inputs as follows:
+> >> + * - translation cache types
+> >> + * - granularity
+> >> + *
+> >> + *             type |   DTLB    |    TLB    |   PASID   |
+> >> + *  granule         |           |           |   cache   |
+> >> + * -----------------+-----------+-----------+-----------+
+> >> + *  DN_ALL_PASID    |   Y       |   Y       |   Y       |
+> >> + *  PASID_SEL       |   Y       |   Y       |   Y       |
+> >> + *  PAGE_PASID      |   Y       |   Y       |   N/A     |
+> >> + *
+> >> + */
+> >> +enum iommu_inv_granularity {
+> >> +	IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
+> >> +	IOMMU_INV_GRANU_PASID_SEL,
+> >> +	IOMMU_INV_GRANU_PAGE_PASID,
+> >> +	IOMMU_INV_NR_GRANU,
+> >> +};
+> >> +
+> >> +/**
+> >> + * enum iommu_inv_type - Generic translation cache types for invalidation
+> >> + *
+> >> + * @IOMMU_INV_TYPE_DTLB:	device IOTLB
+> >> + * @IOMMU_INV_TYPE_TLB:		IOMMU paging structure cache
+> >> + * @IOMMU_INV_TYPE_PASID:	PASID cache
+> >> + * Invalidation requests sent to IOMMU for a given device need to indicate
+> >> + * which type of translation cache to be operated on. Combined with enum
+> >> + * iommu_inv_granularity, model specific driver can do a simple lookup to
+> >> + * convert from generic to model specific value.
+> >> + */
+> >> +enum iommu_inv_type {
+> >> +	IOMMU_INV_TYPE_DTLB,
+> >> +	IOMMU_INV_TYPE_TLB,
+> >> +	IOMMU_INV_TYPE_PASID,
+> >> +	IOMMU_INV_NR_TYPE
+> >> +};
+> >> +
+> >> +/**
+> >> + * Translation cache invalidation header that contains mandatory meta data.
+> >> + * @version:	info format version, expecting future extesions
+> >> + * @type:	type of translation cache to be invalidated
+> >> + */
+> >> +struct iommu_cache_invalidate_hdr {
+> >> +	__u32 version;
+> >> +#define TLB_INV_HDR_VERSION_1 1
+> >> +	enum iommu_inv_type type;
+> >> +};
+> >> +
+> >> +/**
+> >> + * Translation cache invalidation information, contains generic IOMMU
+> >> + * data which can be parsed based on model ID by model specific drivers.
+> >> + * Since the invalidation of second level page tables are included in the
+> >> + * unmap operation, this info is only applicable to the first level
+> >> + * translation caches, i.e. DMA request with PASID.
+> >> + *
+> >> + * @granularity:	requested invalidation granularity, type dependent
+> >> + * @size:		2^size of 4K pages, 0 for 4k, 9 for 2MB, etc.  
+> > 
+> > Why is this a 4K page centric interface?  
+> This matches the vt-d Address Mask (AM) field of the IOTLB Invalidate
+> Descriptor. We can pass a log2size instead.
+
+Could some options not require a power of two size?
+
+> >> + * @nr_pages:		number of pages to invalidate
+> >> + * @pasid:		processor address space ID value per PCI spec.
+> >> + * @arch_id:		architecture dependent id characterizing a context
+> >> + *			and tagging the caches, ie. domain Identfier on VTD,
+> >> + *			asid on ARM SMMU
+> >> + * @addr:		page address to be invalidated
+> >> + * @flags		IOMMU_INVALIDATE_ADDR_LEAF: leaf paging entries
+> >> + *			IOMMU_INVALIDATE_GLOBAL_PAGE: global pages  
+> > 
+> > Shouldn't some of these be tied the the granularity of the
+> > invalidation?  It seems like this should be more similar to
+> > iommu_pasid_table_config where the granularity of the invalidation
+> > defines which entry within a union at the end of the structure is valid
+> > and populated.  Otherwise we have fields that don't make sense for
+> > certain invalidations.  
 > 
-> thanks for having a look!
+> I am a little bit embarrassed here as this API version is the outcome of
+> long discussions held by Jacob, jean-Philippe and many others. I don't
+> want to hijack that work as I am "simply" reusing this API. Nevertheless
+> I am willing to help on this. So following your recommendation above I
+> dare to propose an updated API:
 > 
-> > On Mon, Jan 07, 2019 at 12:05:36PM +0000, Andre Przywara wrote:
-> > > KVM implements the firmware interface for mitigating cache
-> > > speculation vulnerabilities. Guests may use this interface to
-> > > ensure mitigation is active.
-> > > If we want to migrate such a guest to a host with a different
-> > > support level for those workarounds, migration might need to fail,
-> > > to ensure that critical guests don't loose their protection.
-> > > 
-> > > Introduce a way for userland to save and restore the workarounds
-> > > state. On restoring we do checks that make sure we don't downgrade
-> > > our mitigation level.
-> > > 
-> > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > > ---
-> > >  arch/arm/include/asm/kvm_emulate.h   |  10 ++
-> > >  arch/arm/include/uapi/asm/kvm.h      |   9 ++
-> > >  arch/arm64/include/asm/kvm_emulate.h |  14 +++
-> > >  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
-> > >  virt/kvm/arm/psci.c                  | 138
-> > > ++++++++++++++++++++++++++- 5 files changed, 178 insertions(+), 2
-> > > deletions(-)
-> > > 
-> > > diff --git a/arch/arm/include/asm/kvm_emulate.h
-> > > b/arch/arm/include/asm/kvm_emulate.h index
-> > > 77121b713bef..2255c50debab 100644 ---
-> > > a/arch/arm/include/asm/kvm_emulate.h +++
-> > > b/arch/arm/include/asm/kvm_emulate.h @@ -275,6 +275,16 @@ static
-> > > inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
-> > > return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK; }
-> > >  
-> > > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct
-> > > kvm_vcpu *vcpu) +{
-> > > +	return false;
-> > > +}
-> > > +
-> > > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
-> > > kvm_vcpu *vcpu,
-> > > +						      bool flag)
-> > > +{
-> > > +}
-> > > +
-> > >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
-> > > diff --git a/arch/arm/include/uapi/asm/kvm.h
-> > > b/arch/arm/include/uapi/asm/kvm.h index 4602464ebdfb..02c93b1d8f6d
-> > > 100644 --- a/arch/arm/include/uapi/asm/kvm.h
-> > > +++ b/arch/arm/include/uapi/asm/kvm.h
-> > > @@ -214,6 +214,15 @@ struct kvm_vcpu_events {
-> > >  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM |
-> > > KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) & 0xffff))
-> > >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1
-> > > KVM_REG_ARM_FW_REG(1) +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4 
-> > >  /* Device Control API: ARM VGIC */
-> > >  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h
-> > > b/arch/arm64/include/asm/kvm_emulate.h index
-> > > 506386a3edde..a44f07f68da4 100644 ---
-> > > a/arch/arm64/include/asm/kvm_emulate.h +++
-> > > b/arch/arm64/include/asm/kvm_emulate.h @@ -336,6 +336,20 @@ static
-> > > inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
-> > > return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK; }
-> > >  
-> > > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct
-> > > kvm_vcpu *vcpu) +{
-> > > +	return vcpu->arch.workaround_flags &
-> > > VCPU_WORKAROUND_2_FLAG; +}
-> > > +
-> > > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
-> > > kvm_vcpu *vcpu,
-> > > +						      bool flag)
-> > > +{
-> > > +	if (flag)
-> > > +		vcpu->arch.workaround_flags |=
-> > > VCPU_WORKAROUND_2_FLAG;
-> > > +	else
-> > > +		vcpu->arch.workaround_flags &=
-> > > ~VCPU_WORKAROUND_2_FLAG; +}
-> > > +
-> > >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	if (vcpu_mode_is_32bit(vcpu)) {
-> > > diff --git a/arch/arm64/include/uapi/asm/kvm.h
-> > > b/arch/arm64/include/uapi/asm/kvm.h index
-> > > 97c3478ee6e7..4a19ef199a99 100644 ---
-> > > a/arch/arm64/include/uapi/asm/kvm.h +++
-> > > b/arch/arm64/include/uapi/asm/kvm.h @@ -225,6 +225,15 @@ struct
-> > > kvm_vcpu_events { #define KVM_REG_ARM_FW_REG(r)
-> > > (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) &
-> > > 0xffff)) #define KVM_REG_ARM_PSCI_VERSION
-> > > KVM_REG_ARM_FW_REG(0) +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
-> > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
-> > > KVM_REG_ARM_FW_REG(2) +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2 +#define
-> > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4  
-> > 
-> > If this is the first exposure of this information to userspace, I
-> > wonder if we can come up with some common semantics that avoid having
-> > to add new ad-hoc code (and bugs) every time a new
-> > vulnerability/workaround is defined.
-> > 
-> > We seem to have at least the two following independent properties
-> > for a vulnerability, with the listed values for each:
-> > 
-> >  * vulnerability (Vulnerable, Unknown, Not Vulnerable)
-> > 
-> >  * mitigation support (Not Requestable, Requestable)
-> > 
-> > Migrations must not move to the left in _either_ list for any
-> > vulnerability.
-> > 
-> > If we want to hedge out bets we could follow the style of the ID
-> > registers and allocate to each theoretical vulnerability a pair of
-> > signed 2- or (for more expansion room if we think we might need it)
-> > 4-bit fields.
-> > 
-> > We could perhaps allocate as follows:
-> > 
-> >  * -1=Vulnerable, 0=Unknown, 1=Not Vulnerable
-> >  *  0=Mitigation not requestable, 1=Mitigation requestable
+> struct iommu_device_iotlb_inv_info {
+>         __u32   version;
+> #define IOMMU_DEV_IOTLB_INV_GLOBAL   0
+> #define IOMMU_DEV_IOTLB_INV_SOURCEID (1 << 0)
+> #define IOMMU_DEV_IOTLB_INV_PASID    (1 << 1)
+>         __u8    granularity;
+>         __u64   addr;
+>         __u8    log2size;
+>         __u64   sourceid;
+>         __u64   pasid;
+>         __u8    padding[2];
+> };
 > 
-> So as discussed in person, that sounds quite neat. I implemented
-> that, but the sign extension and masking to n bits is not very pretty
-> and limits readability.
-> However the property of having a kind of "vulnerability scale", where a
-> simple comparison would determine compatibility, is a good thing to
-> have and drastically simplifies the checking code.
+> struct iommu_iotlb_inv_info {
+>         __u32   version;
+> #define IOMMU_IOTLB_INV_GLOBAL  0
+> #define IOMMU_IOTLB_INV_ARCHID  (1 << 0)
+> #define IOMMU_IOTLB_INV_PASID   (1 << 1)
+> #define IOMMU_IOTLB_INV_PAGE    (1 << 2)
+>         __u8    granularity;
+>         __u64   archid;
+>         __u64   pasid;
+>         __u64   addr;
+>         __u8    log2size;
+>         __u8    padding[2];
+> };
 > 
-> > Checking code wouldn't need to know which fields describe mitigation
-> > mechanisms and which describe vulnerabilities: we'd just do a strict
-> > >= comparison on each.
+> struct iommu_pasid_inv_info {
+>         __u32   version;
+> #define IOMMU_PASID_INV_GLOBAL     0
+> #define IOMMU_PASID_INV_ARCHID     (1 << 0)
+> #define IOMMU_PASID_INV_PASID      (1 << 1)
+> #define IOMMU_PASID_INV_SOURCEID   (1 << 2)
+>         __u8    granularity;
+>         __u64   archid;
+>         __u64   pasid;
+>         __u64   sourceid;
+>         __u8    padding[3];
+> };
+> /**
+>  * Translation cache invalidation information, contains generic IOMMU
+>  * data which can be parsed based on model ID by model specific drivers.
+>  * Since the invalidation of second level page tables are included in
+>  * the unmap operation, this info is only applicable to the first level
+>  * translation caches, i.e. DMA request with PASID.
+>  *
+>  */
+> struct iommu_cache_invalidate_info {
+> #define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+>         __u32 version;
+> #define IOMMU_INV_TYPE_IOTLB        1 /* IOMMU paging structure cache */
+> #define IOMMU_INV_TYPE_DEV_IOTLB    2 /* Device IOTLB */
+> #define IOMMU_INV_TYPE_PASID        3 /* PASID cache */
+>         __u8 type;
+>         union {
+>                 struct iommu_iotlb_invalidate_info iotlb_inv_info;
+>                 struct iommu_dev_iotlb_invalidate_info dev_iotlb_inv_info;
+>                 struct iommu_pasid_inv_info pasid_inv_info;
+>         };
+> };
+> 
+> At the moment I ignore the leaf bool parameter used on ARM for PASID
+> invalidation and TLB invalidation. Maybe we can just invalidate more
+> that the leaf cache structures at the moment?
+> 
+> on ARM the PASID table can be invalidated per streamid. On vt-d, as far
+> as I understand the sourceid does not tag the entries.
+> 
+> >   
+> >> + *
+> >> + */
+> >> +struct iommu_cache_invalidate_info {
+> >> +	struct iommu_cache_invalidate_hdr	hdr;
+> >> +	enum iommu_inv_granularity	granularity;  
 > > 
-> > Further, if a register is never written before the vcpu is first run,
-> > we should imply a write of 0 to it as part of KVM_RUN (so that if the
-> > destination node has a negative value anywhere, KVM_RUN barfs cleanly.
-> 
-> What I like about the signedness is this "0 means unknown", which is
-> magically forwards compatible. However I am not sure we can transfer
-> this semantic into every upcoming register that pops up in the future.
+> > A separate structure for hdr seems a little pointless.  
+> removed
+> >   
+> >> +	__u32		flags;
+> >> +#define IOMMU_INVALIDATE_ADDR_LEAF	(1 << 0)
+> >> +#define IOMMU_INVALIDATE_GLOBAL_PAGE	(1 << 1)
+> >> +	__u8		size;  
+> > 
+> > Really need some padding or packing here for any hope of having
+> > consistency with userspace.
+> >   
+> >> +	__u64		nr_pages;
+> >> +	__u32		pasid;  
+> > 
+> > Sub-optimal ordering for packing/padding.  Thanks,  
+> I introduced some padding above. Is that OK?
 
-I appreciate the concern, but can you give an example of how it might
-break?
+No, you're not taking field alignment into account, processors don't
+like unaligned data.  If we have:
 
-My idea is that you can check for compatibility by comparing fields
-without any need to know what they mean, but we wouldn't pre-assign
-meanings for the values of unallocated fields, just create a precedent
-that future fields can follow (where it works).
+struct foo {
+	uint32_t	a;
+	uint8_t		b;
+	uint64_t	c;
+	uint8_t		d;
+	uint64_t	e;
+};
 
-This is much like the CPU ID features scheme itself.  A "0" might
-mean that something is absent, but there's no way (or need) to know
-what.
+In memory on a 64 bit system, that would look like:
 
-> Actually we might not need this:
-> My understanding of how QEMU handles this in migration is that it reads
-> the f/w reg on the originating host A and writes this into the target
-> host B, without itself interpreting this in any way. It's up to the
-> target kernel (basically this code here) to check compatibility. So I am
-> not sure we actually need a stable scheme. If host A doesn't know about
+aaaab...ccccccccd.......eeeeeeee
 
-Nothing stops userspace from interpreting the data, so there's a risk
-people may grow to rely on it even if we don't want them to.
+While on a 32 bit system, it would look like:
 
-So we should try to have something that's forward-compatible if at all
-possible...
+aaaab...ccccccccd...eeeeeeee
 
-> a certain register, it won't appear in the result of the
-> KVM_GET_REG_LIST ioctl, so it won't be transferred to host B at all. In
-> the opposite case the receiving host would reject an unknown register,
-> which I believe is safer, although I see that it leaves the "unknown"
-> case on the table.
-> 
-> It would be good to have some opinion of how forward looking we want to
-> (and can) be here.
-> 
-> Meanwhile I am sending a v2 which implements the linear scale idea,
-> without using signed values, as this indeed simplifies the code.
-> I have the signed version still in a branch here, let me know if you
-> want to have a look.
+In this example we have 22 bytes of data (4 + 1 + 8 + 1 + 8), but the
+structure is 32 bytes when provided by a 64 bit userspace or 28 bytes
+when provided by a 32 bit userspace and the start address of the 'e'
+field changes.  A 64 bit kernel would process the latter structure
+incorrectly or fault trying to copy the expected length from userspace.
+Adding padding to the end doesn't solve this. If we instead reconstruct
+the structure as:
 
-Happy to take a look at it.
+struct foo {
+	uint32_t	a;
+	uint8_t		b;
+	uint8_t		d;
+	uint8_t		pad[2];
+	uint64_t	c;
+	uint64_t	e;
+};
 
-I was hoping that cpufeatures already had a helper for extracting a
-signed field, but I didn't go looking for it...
+Then we create a structure that looks the same from either a 32 bit or
+64 bit userspace, is only 24 bytes in memory, and works for any
+reasonable compiler, though we might choose to add a packed attribute to
+make sure the compiler doesn't do anything screwy if we were paranoid.
+Thanks,
 
-At the asm level this is just a sbfx, so it's hardly expensive.
-
-Cheers
----Dave
+Alex
