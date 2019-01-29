@@ -1,26 +1,26 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 3/5] KVM: arm/arm64: Require VCPU threads to turn them
- self off
-Date: Tue, 29 Jan 2019 17:16:44 +0100
-Message-ID: <20190129161644.v4ncrcgvukkd7d5w@kamzik.brq.redhat.com>
+Subject: Re: [PATCH 4/5] KVM: arm/arm64: Implement PSCI ON_PENDING when
+ turning on VCPUs
+Date: Tue, 29 Jan 2019 17:27:02 +0100
+Message-ID: <20190129162702.dyuy2qyg7p4zv7tj@kamzik.brq.redhat.com>
 References: <20190125094656.5026-1-christoffer.dall@arm.com>
- <20190125094656.5026-4-christoffer.dall@arm.com>
+ <20190125094656.5026-5-christoffer.dall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF97F4A2F8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:16:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B423A4A39B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:27:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1hjH0oXC9z3M for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 11:16:48 -0500 (EST)
+ with ESMTP id UeZNm18J+Ah3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 11:27:07 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 898E64A39B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:16:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E7254A2F8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 11:27:07 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190125094656.5026-4-christoffer.dall@arm.com>
+In-Reply-To: <20190125094656.5026-5-christoffer.dall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,129 +34,213 @@ To: Christoffer Dall <christoffer.dall@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Summary edit
-
-> KVM: arm/arm64: Require VCPU threads to turn them self off
-
-themselves
-
-On Fri, Jan 25, 2019 at 10:46:54AM +0100, Christoffer Dall wrote:
-> To avoid a race between turning VCPUs off and turning them on, make sure
-> that only the VCPU threat itself turns off the VCPU.  When other threads
-> want to turn of a VCPU, they now do this via a request.
+On Fri, Jan 25, 2019 at 10:46:55AM +0100, Christoffer Dall wrote:
+> We are currently not implementing the PSCI spec completely, as we do not
+> take handle the situation where two VCPUs are attempting to turn on a
+> third VCPU at the same time.  The PSCI implementation should make sure
+> that only one requesting VCPU wins the race and that the other receives
+> PSCI_RET_ON_PENDING.
+> 
+> Implement this by changing the VCPU power state to a tristate enum and
+> ensure only a single VCPU can turn on another VCPU at a given time using
+> a cmpxchg operation.
 > 
 > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/kvm_host.h   |  2 ++
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  virt/kvm/arm/arm.c                |  8 ++++++--
->  virt/kvm/arm/psci.c               | 11 ++---------
->  4 files changed, 12 insertions(+), 11 deletions(-)
+>  arch/arm/include/asm/kvm_host.h   | 10 ++++++++--
+>  arch/arm64/include/asm/kvm_host.h | 10 ++++++++--
+>  virt/kvm/arm/arm.c                | 24 +++++++++++++++---------
+>  virt/kvm/arm/psci.c               | 21 ++++++++++++++-------
+>  4 files changed, 45 insertions(+), 20 deletions(-)
 > 
 > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 50e89869178a..b1cfae222441 100644
+> index b1cfae222441..4dc47fea1ac8 100644
 > --- a/arch/arm/include/asm/kvm_host.h
 > +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -49,6 +49,8 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_VCPU_OFF \
-> +	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> @@ -157,6 +157,12 @@ struct vcpu_reset_state {
+>  	bool		reset;
+>  };
 >  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> +enum vcpu_power_state {
+> +	KVM_ARM_VCPU_OFF,
+> +	KVM_ARM_VCPU_ON_PENDING,
+> +	KVM_ARM_VCPU_ON,
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
 >  
+> @@ -184,8 +190,8 @@ struct kvm_vcpu_arch {
+>  	 * here.
+>  	 */
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* vcpu power state */
+> +	enum vcpu_power_state power_state;
+>  
+>  	 /* Don't run the guest (internal implementation need) */
+>  	bool pause;
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index da3fc7324d68..d43b13421987 100644
+> index d43b13421987..0647a409657b 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -49,6 +49,8 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_VCPU_OFF \
-> +	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> @@ -218,6 +218,12 @@ struct vcpu_reset_state {
+>  	bool		reset;
+>  };
 >  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> +enum vcpu_power_state {
+> +	KVM_ARM_VCPU_OFF,
+> +	KVM_ARM_VCPU_ON_PENDING,
+> +	KVM_ARM_VCPU_ON,
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
 >  
+> @@ -285,8 +291,8 @@ struct kvm_vcpu_arch {
+>  		u32	mdscr_el1;
+>  	} guest_debug_preserved;
+>  
+> -	/* vcpu power-off state */
+> -	bool power_off;
+> +	/* vcpu power state */
+> +	enum vcpu_power_state power_state;
+>  
+>  	/* Don't run the guest (internal implementation need) */
+>  	bool pause;
 > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 9c486fad3f9f..785076176814 100644
+> index 785076176814..1e3195155860 100644
 > --- a/virt/kvm/arm/arm.c
 > +++ b/virt/kvm/arm/arm.c
-> @@ -404,8 +404,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  
->  static void vcpu_power_off(struct kvm_vcpu *vcpu)
+> @@ -411,7 +411,7 @@ static void vcpu_power_off(struct kvm_vcpu *vcpu)
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>  				    struct kvm_mp_state *mp_state)
 >  {
-> -	vcpu->arch.power_off = true;
-> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> +	kvm_make_request(KVM_REQ_VCPU_OFF, vcpu);
->  	kvm_vcpu_kick(vcpu);
->  }
-
-I think we should leave this function alone. Otherwise if userspace sets
-the MP state to STOPPED and then queries the state before the vcpu
-has a chance to manage its vcpu requests, the state will still indicate
-RUNNBLE. The same goes for a query right after doing a vcpu init.
-
+> -	if (vcpu->arch.power_off)
+> +	if (vcpu->arch.power_state != KVM_ARM_VCPU_ON)
+>  		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+>  	else
+>  		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+> @@ -426,7 +426,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
 >  
-> @@ -646,6 +645,11 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.power_state = KVM_ARM_VCPU_ON;
+>  		break;
+>  	case KVM_MP_STATE_STOPPED:
+>  		vcpu_power_off(vcpu);
+> @@ -448,8 +448,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  {
+>  	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
+> -	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+> -		&& !v->arch.power_off && !v->arch.pause);
+> +	return (irq_lines || kvm_vgic_vcpu_pending_irq(v)) &&
+> +		v->arch.power_state == KVM_ARM_VCPU_ON &&
+> +		!v->arch.pause;
+>  }
+>  
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+> @@ -614,14 +615,19 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+>  	}
+>  }
+>  
+> +static bool vcpu_sleeping(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.power_state != KVM_ARM_VCPU_ON ||
+> +		vcpu->arch.pause;
+> +}
+> +
+>  static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  {
+>  	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
+>  
+> -	swait_event_interruptible_exclusive(*wq, ((!vcpu->arch.power_off) &&
+> -				       (!vcpu->arch.pause)));
+> +	swait_event_interruptible_exclusive(*wq, !vcpu_sleeping(vcpu));
+>  
+> -	if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +	if (vcpu_sleeping(vcpu)) {
+>  		/* Awaken to handle a signal, request we sleep again later. */
+>  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>  	}
+> @@ -646,7 +652,7 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
 >  			vcpu_req_sleep(vcpu);
 >  
-> +		if (kvm_check_request(KVM_REQ_VCPU_OFF, vcpu)) {
-> +			vcpu->arch.power_off = true;
-> +			vcpu_req_sleep(vcpu);
-> +		}
-> +
->  		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
->  			kvm_reset_vcpu(vcpu);
+>  		if (kvm_check_request(KVM_REQ_VCPU_OFF, vcpu)) {
+> -			vcpu->arch.power_off = true;
+> +			vcpu->arch.power_state = KVM_ARM_VCPU_OFF;
+>  			vcpu_req_sleep(vcpu);
+>  		}
 >  
+> @@ -1016,7 +1022,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+>  		vcpu_power_off(vcpu);
+>  	else
+> -		vcpu->arch.power_off = false;
+> +		vcpu->arch.power_state = KVM_ARM_VCPU_ON;
+>  
+>  	return 0;
+>  }
 > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> index b9cff1d4b06d..20255319e193 100644
+> index 20255319e193..5c2d9eeb810c 100644
 > --- a/virt/kvm/arm/psci.c
 > +++ b/virt/kvm/arm/psci.c
-> @@ -97,9 +97,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+> @@ -106,6 +106,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	struct kvm *kvm = source_vcpu->kvm;
+>  	struct kvm_vcpu *vcpu = NULL;
+>  	unsigned long cpu_id;
+> +	enum vcpu_power_state old_power_state;
 >  
->  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
->  {
-> -	vcpu->arch.power_off = true;
-> -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> -	kvm_vcpu_kick(vcpu);
-> +	kvm_make_request(KVM_REQ_VCPU_OFF, vcpu);
->  }
-
-This was currently fine since it implements CPU_OFF which only applies to
-the calling vcpu, but there's also no reason not to change it to be
-consistent with the below change
-
->  
->  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> @@ -198,9 +196,6 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->  
->  static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->  {
-> -	int i;
-> -	struct kvm_vcpu *tmp;
-> -
->  	/*
->  	 * The KVM ABI specifies that a system event exit may call KVM_RUN
->  	 * again and may perform shutdown/reboot at a later time that when the
-> @@ -210,9 +205,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->  	 * after this call is handled and before the VCPUs have been
->  	 * re-initialized.
+>  	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
+>  	if (vcpu_mode_is_32bit(source_vcpu))
+> @@ -119,12 +120,18 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 >  	 */
-> -	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-> -		tmp->arch.power_off = true;
-> -	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
-> +	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_VCPU_OFF);
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.power_off) {
+> -		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
+> -			return PSCI_RET_ALREADY_ON;
+> -		else
+> +	old_power_state = cmpxchg(&vcpu->arch.power_state,
+> +				  KVM_ARM_VCPU_OFF,
+> +				  KVM_ARM_VCPU_ON_PENDING);
+> +
+> +	if (old_power_state != KVM_ARM_VCPU_OFF &&
+> +	    kvm_psci_version(source_vcpu, kvm) == KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_INVALID_PARAMS;
+> -	}
+> +
+> +	if (old_power_state == KVM_ARM_VCPU_ON_PENDING)
+> +			return PSCI_RET_ON_PENDING;
+> +	else if (old_power_state == KVM_ARM_VCPU_ON)
+> +			return PSCI_RET_ALREADY_ON;
 >  
->  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
->  	vcpu->run->system_event.type = type;
+>  	reset_state = &vcpu->arch.reset_state;
+>  
+> @@ -148,7 +155,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	smp_wmb();
+>  
+> -	vcpu->arch.power_off = false;
+> +	vcpu->arch.power_state = KVM_ARM_VCPU_ON;
+>  	kvm_vcpu_wake_up(vcpu);
+>  
+>  	return PSCI_RET_SUCCESS;
+> @@ -183,7 +190,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if ((mpidr & target_affinity_mask) == target_affinity) {
+>  			matching_cpus++;
+> -			if (!tmp->arch.power_off)
+> +			if (tmp->arch.power_state == KVM_ARM_VCPU_ON)
+>  				return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
 > -- 
 > 2.18.0
 >
 
-Thanks,
-drew
+Reviewed-by: Andrew Jones <drjones@redhat.com>
