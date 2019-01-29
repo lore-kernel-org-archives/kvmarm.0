@@ -1,31 +1,27 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/7] lib: arm: Remove warning about
- uart0_base mismatch
-Date: Mon, 28 Jan 2019 17:58:54 +0000
-Message-ID: <20190128175854.2998c598@donnerap.cambridge.arm.com>
-References: <20190124111634.4727-1-alexandru.elisei@arm.com>
- <20190124111634.4727-3-alexandru.elisei@arm.com>
- <20190124115943.12296810@donnerap.cambridge.arm.com>
- <20190124123740.v52nkbcki5dp2hpq@kamzik.brq.redhat.com>
- <ffcc5f60-c5a0-c7f1-7fb1-658d8eea6fc4@arm.com>
- <20190125164751.cdfip3kv63uonl7n@kamzik.brq.redhat.com>
- <42b3a17b-088b-b9b7-4dac-34f07aa09c8a@arm.com>
- <20190128163101.dajq6ofgmpctg3ne@kamzik.brq.redhat.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm/arm64: support chained PMU counters
+Date: Tue, 29 Jan 2019 09:07:58 +0000
+Message-ID: <63d34a64-0a6a-d6fa-55b4-103fd4ca16e7@arm.com>
+References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+ <1548154197-5470-5-git-send-email-andrew.murray@arm.com>
+ <75737475-4013-65a5-dc80-af6ec35868f9@arm.com>
+ <20190128171331.GD16627@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BB3B4A32D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 12:59:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D224A321
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 04:08:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sctDMrAAGRF5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Jan 2019 12:59:02 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF79C4A369
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Jan 2019 12:59:01 -0500 (EST)
-In-Reply-To: <20190128163101.dajq6ofgmpctg3ne@kamzik.brq.redhat.com>
+ with ESMTP id RfOiQflvdlTE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 04:08:01 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CBF44A2BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 04:08:01 -0500 (EST)
+In-Reply-To: <20190128171331.GD16627@e119886-lin.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,144 +31,277 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCAyOCBKYW4gMjAxOSAxNzozMTowMSArMDEwMApBbmRyZXcgSm9uZXMgPGRyam9uZXNA
-cmVkaGF0LmNvbT4gd3JvdGU6Cgo+IE9uIE1vbiwgSmFuIDI4LCAyMDE5IGF0IDAyOjI0OjI5UE0g
-KzAwMDAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4gPiBPbiAxLzI1LzE5IDQ6NDcgUE0sIEFu
-ZHJldyBKb25lcyB3cm90ZTogIAo+ID4gPiBPbiBGcmksIEphbiAyNSwgMjAxOSBhdCAwNDozNjox
-M1BNICswMDAwLCBBbGV4YW5kcnUgRWxpc2VpCj4gPiA+IHdyb3RlOiAgCj4gPiA+PiBPbiAxLzI0
-LzE5IDEyOjM3IFBNLCBBbmRyZXcgSm9uZXMgd3JvdGU6ICAKPiA+ID4+PiBPbiBUaHUsIEphbiAy
-NCwgMjAxOSBhdCAxMTo1OTo0M0FNICswMDAwLCBBbmRyZSBQcnp5d2FyYQo+ID4gPj4+IHdyb3Rl
-OiAgCj4gPiA+Pj4+IE9uIFRodSwgMjQgSmFuIDIwMTkgMTE6MTY6MjkgKzAwMDAKPiA+ID4+Pj4g
-QWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPiB3cm90ZToKPiA+ID4+
-Pj4gIAo+ID4gPj4+Pj4gQSB3YXJuaW5nIGlzIGRpc3BsYXllZCBpZiB1YXJ0MF9iYXNlIGlzIGRp
-ZmZlcmVudCBmcm9tIHdoYXQKPiA+ID4+Pj4+IHRoZSBjb2RlIGV4cGVjdHMgcWVtdSB0byBnZW5l
-cmF0ZSBmb3IgdGhlIHBsMDExIFVBUlQgaW4gdGhlCj4gPiA+Pj4+PiBkZXZpY2UgdHJlZS4gSG93
-ZXZlciwgbm93IHdlIHN1cHBvcnQgdGhlIG5zMTY1NTBhIFVBUlQKPiA+ID4+Pj4+IGVtdWxhdGVk
-IGJ5IGt2bXRvb2wsIHdoaWNoIGhhcyBhIGRpZmZlcmVudCBhZGRyZXNzLiBUaGlzCj4gPiA+Pj4+
-PiBsZWFkcyB0byB0aGUgIHdhcm5pbmcgYmVpbmcgZGlzcGxheWVkIGV2ZW4gdGhvdWdoIHRoZSBV
-QVJUIGlzCj4gPiA+Pj4+PiBjb25maWd1cmVkIGFuZCB3b3JraW5nIGFzIGV4cGVjdGVkLgo+ID4g
-Pj4+Pj4KPiA+ID4+Pj4+IE5vdyB0aGF0IHdlIHN1cHBvcnQgbXVsdGlwbGUgVUFSVHMsIHRoZSB3
-YXJuaW5nIHNlcnZlcyBubwo+ID4gPj4+Pj4gcHVycG9zZSwgc28gcmVtb3ZlIGl0LiAgCj4gPiA+
-Pj4+IE1taCwgYnV0IHdlIHVzZSB0aGF0IGFkZHJlc3MgYmVmb3JlLCByaWdodD8gU28gZm9yIGFu
-eXRoaW5nIG5vdAo+ID4gPj4+PiBlbXVsYXRpbmcgYW4gVUFSVCBhdCB0aGlzIFFFTVUgc3BlY2lm
-aWMgYWRkcmVzcyB3ZSB3cml0ZSB0bwo+ID4gPj4+PiBzb21lIHJhbmRvbSAoZGV2aWNlKSBtZW1v
-cnk/Cj4gPiA+Pj4+Cj4gPiA+Pj4+IERyZXcsIGhvdyBpbXBvcnRhbnQgaXMgdGhpcyBlYXJseSBw
-cmludCBmZWF0dXJlIGZvcgo+ID4gPj4+PiBrdm0tdW5pdC10ZXN0cz8gIAo+ID4gPj4+IFRoZSBz
-ZXR1cCBjb2RlIHBhc3NlcyB0aHJvdWdoIHF1aXRlIGEgZmV3IGFzc2VydHMgYmVmb3JlCj4gPiA+
-Pj4gZ2V0dGluZyB0aHJvdWdoIGlvX2luaXQoKSAoaW5jbHVkaW5nIGluIHVhcnQwX2luaXQpLCBz
-byBJIHRoaW5rCj4gPiA+Pj4gdGhlcmUncyBzdGlsbCB2YWx1ZSBpbiBoYXZpbmcgYSBndWVzc2Vk
-IFVBUlQgYWRkcmVzcy4gTWF5YmUgd2UKPiA+ID4+PiBjYW4gcHJvdmlkZSBndWVzc2VzIGZvciBi
-b3RoIFFFTVUgYW5kIGt2bXRvb2wsIGFuZCBzb21lCj4gPiA+Pj4gc2VsZWN0aW9uIG1ldGhvZCwg
-dGhhdCB3b3VsZCBiZSB1c2VkIHVudGlsIHdlJ3ZlIHByb3Blcmx5Cj4gPiA+Pj4gYXNzaWduZWQg
-dWFydDBfYmFzZSBmcm9tIERUPyAKPiA+ID4+Pj4gQ2hlZXJzLAo+ID4gPj4+PiBBbmRyZS4KPiA+
-ID4+Pj4gIAo+ID4gPj4+Pj4gU2lnbmVkLW9mZi1ieTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFu
-ZHJ1LmVsaXNlaUBhcm0uY29tPgo+ID4gPj4+Pj4gLS0tCj4gPiA+Pj4+PiAgbGliL2FybS9pby5j
-IHwgNiAtLS0tLS0KPiA+ID4+Pj4+ICAxIGZpbGUgY2hhbmdlZCwgNiBkZWxldGlvbnMoLSkKPiA+
-ID4+Pj4+Cj4gPiA+Pj4+PiBkaWZmIC0tZ2l0IGEvbGliL2FybS9pby5jIGIvbGliL2FybS9pby5j
-Cj4gPiA+Pj4+PiBpbmRleCAzNWZjMDVhZWI0ZGIuLjg3NDM1MTUwZjczZSAxMDA2NDQKPiA+ID4+
-Pj4+IC0tLSBhL2xpYi9hcm0vaW8uYwo+ID4gPj4+Pj4gKysrIGIvbGliL2FybS9pby5jCj4gPiA+
-Pj4+PiBAQCAtNjEsMTIgKzYxLDYgQEAgc3RhdGljIHZvaWQgdWFydDBfaW5pdCh2b2lkKQo+ID4g
-Pj4+Pj4gIAl9Cj4gPiA+Pj4+PiAgCj4gPiA+Pj4+PiAgCXVhcnQwX2Jhc2UgPSBpb3JlbWFwKGJh
-c2UuYWRkciwgYmFzZS5zaXplKTsKPiA+ID4+Pj4+IC0KPiA+ID4+Pj4+IC0JaWYgKHVhcnQwX2Jh
-c2UgIT0gKHU4ICopVUFSVF9FQVJMWV9CQVNFKSB7Cj4gPiA+Pj4+PiAtCQlwcmludGYoIldBUk5J
-Tkc6IGVhcmx5IHByaW50IHN1cHBvcnQgbWF5IG5vdAo+ID4gPj4+Pj4gd29yay4gIgo+ID4gPj4+
-Pj4gLQkJICAgICAgICJGb3VuZCB1YXJ0IGF0ICVwLCBidXQgZWFybHkgYmFzZSBpcwo+ID4gPj4+
-Pj4gJXAuXG4iLAo+ID4gPj4+Pj4gLQkJCXVhcnQwX2Jhc2UsICh1OCAqKVVBUlRfRUFSTFlfQkFT
-RSk7Cj4gPiA+Pj4+PiAtCX0KPiA+ID4+Pj4+ICB9ICAKPiA+ID4+PiBUaGlzIHdhcm5pbmcgaXMg
-ZG9pbmcgd2hhdCBpdCBzaG91bGQsIHdoaWNoIGlzIHBvaW50aW5nIG91dAo+ID4gPj4+IHRoYXQg
-dGhlIFVBUlRfRUFSTFlfQkFTRSBndWVzcyBhcHBlYXJzIHRvIGJlIHdyb25nLiBJZiB3ZSBjYW4K
-PiA+ID4+PiBwcm92aWRlIGEgd2F5IHRvIHN1cHBvcnQgbW9yZSB0aGFuIG9uZSBndWVzcywgdGhl
-biB3ZSBzaG91bGQKPiA+ID4+PiBrZWVwIHRoaXMgd2FybmluZyBidXQgYWRqdXN0IGl0IHRvIG1h
-dGNoIG9uZSBvZiBhbnkgb2YgdGhlCj4gPiA+Pj4gZ3Vlc3Nlcy4KPiA+ID4+Pgo+ID4gPj4+IFRo
-YW5rcywKPiA+ID4+PiBkcmV3ICAKPiA+ID4+IEknbSBub3QgcmVhbGx5IHN1cmUgaG93IHRvIGlt
-cGxlbWVudCBhIHNlbGVjdGlvbiBtZXRob2QuIEkndmUKPiA+ID4+IGxvb2tlZCBhdCBzcGxpdHRp
-bmcgaW9faW5pdCgpIGludG8gdWFydDBfaW5pdCgpIGFuZAo+ID4gPj4gY2hyX3Rlc3RkZXZfaW5p
-dCgpIGFuZCBjYWxsaW5nIHVhcnQwX2luaXQoKSB2ZXJ5IGVhcmx5IGluIHRoZQo+ID4gPj4gc2V0
-dXAgcHJvY2VzcywgYnV0IHVhcnQwX2luaXQoKSBpdHNlbGYgdXNlcyBwcmludGYoKSBhbmQKPiA+
-ID4+IGFzc2VydCgpLgo+ID4gPj4KPiA+ID4+IEkndmUgYWxzbyB0aG91Z2h0IGFib3V0IGFkZGlu
-ZyBhbm90aGVyIGZ1bmN0aW9uLCBzb21ldGhpbmcgbGlrZQo+ID4gPj4gdWFydDBfZWFybHlfaW5p
-dCgpLCB0aGF0IGlzIGNhbGxlZCB2ZXJ5IGVhcmx5IGluIHNldHVwKCkgYW5kCj4gPiA+PiBnZXRz
-IHRoZSBiYXNlIGFkZHJlc3MgZnJvbSB0aGUgZHRiIGJvb3RhcmdzLiBCdXQgdGhhdCBtZWFucwo+
-ID4gPj4gY2FsbGluZyBkdF9pbml0KCkgYW5kIGR0X2dldF9ib290YXJncygpLCB3aGljaCBjYW4g
-ZmFpbC4KPiA+ID4+Cj4gPiA+PiBPbmUgb3RoZXIgb3B0aW9uIHRoYXQgY291bGQgd29yayBpcyB0
-byBtYWtlIGl0IGEgY29tcGlsZS10aW1lCj4gPiA+PiBjb25maWd1cmF0aW9uLgo+ID4gPj4KPiA+
-ID4+IFdoYXQgZG8geW91IHRoaW5rPwo+ID4gPj4gIAo+ID4gPiBDb21waWxlLXRpbWUgaXMgZmlu
-ZSwgd2hpY2ggSSBndWVzcyB3aWxsIHJlc3VsdCBpbiBhIG5ldwo+ID4gPiBjb25maWd1cmUgc2Ny
-aXB0IG9wdGlvbiBhcyB3ZWxsLiBJIHdvbmRlciBpZiB3ZSBzaG91bGRuJ3QKPiA+ID4gY29uc2lk
-ZXIgZ2VuZXJhdGluZyBhIGNvbmZpZy5oIGZpbGUgd2l0aCBzdHVmZiBsaWtlIHRoaXMgcmF0aGVy
-Cj4gPiA+IHRoYW4gYWRkaW5nIGFub3RoZXIgLUQgdG8gdGhlIGNvbXBpbGUgbGluZS4KPiA+ID4K
-PiA+ID4gZHJldyAgIAo+ID4gCj4gPiBJIHByb3Bvc2UgYSBuZXcgY29uZmlndXJhdGlvbiBvcHRp
-b24gY2FsbGVkIC0tdm1tLCB3aXRoIHBvc3NpYmxlCj4gPiB2YWx1ZXMgcWVtdSBhbmQga3ZtdG9v
-bCwgd2hpY2ggZGVmYXVsdHMgdG8gcWVtdSBpZiBub3Qgc2V0Lgo+ID4gCj4gPiBBbm90aGVyIHBv
-c3NpYmlsaXR5IHdvdWxkIGJlIHRvIGhhdmUgYW4gLS11YXJ0LWJhc2Ugb3B0aW9uLCBidXQKPiA+
-IHRoYXQgbWVhbnMgd2UgYXJlIGV4cGVjdGluZyB0aGUgdXNlciB0byBiZSBhd2FyZSBvZiB0aGUg
-dWFydCBiYXNlCj4gPiBhZGRyZXNzIGZvciB0aGUgdmlydHVhbCBtYWNoaW5lIG1hbmFnZXIsIHdo
-aWNoIG1pZ2h0IGJlCj4gPiB1bnJlYXNvbmFibGUuCj4gPiAKPiA+IFRoaXMgaXMgYSBxdWljayBw
-cm90b3R5cGUgb2YgaG93IHVzaW5nIC1EIGZvciBjb25kaXRpb25hbAo+ID4gY29tcGlsYXRpb24g
-d291bGQgbG9vayBsaWtlICh0aGUgY29uZmlndXJlIGNoYW5nZXMgYXJlIGluY2x1ZGVkCj4gPiB0
-b28pOgo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvY29uZmlndXJlIGIvY29uZmlndXJlCj4gPiBpbmRl
-eCBkZjg1ODFlM2E5MDYuLjdhNTZiYTQ3NzA3ZiAxMDA3NTUKPiA+IC0tLSBhL2NvbmZpZ3VyZQo+
-ID4gKysrIGIvY29uZmlndXJlCj4gPiBAQCAtNzAsNiArNzAsOSBAQCB3aGlsZSBbWyAiJDEiID0g
-LSogXV07IGRvCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDs7Cj4gPiDCoMKgwqDCoMKgwqDC
-oCAtLWxkKQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsZD0iJGFyZyIKPiA+ICvCoMKgwqDC
-oMKgwqDCoCA7Owo+ID4gK8KgwqDCoCAtLXZtbSkKPiA+ICvCoMKgwqDCoMKgwqDCoCB2bW09IiRh
-cmciCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDs7Cj4gPiDCoMKgwqDCoMKgwqDCoCAtLWVu
-YWJsZS1wcmV0dHktcHJpbnQtc3RhY2tzKQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwcmV0
-dHlfcHJpbnRfc3RhY2tzPXllcwo+ID4gQEAgLTEwOCw2ICsxMTEsMTQgQEAgaWYgWyAiJGFyY2gi
-ID0gImkzODYiIF0gfHwgWyAiJGFyY2giID0KPiA+ICJ4ODZfNjQiIF07IHRoZW4gdGVzdGRpcj14
-ODYKPiA+IMKgZWxpZiBbICIkYXJjaCIgPSAiYXJtIiBdIHx8IFsgIiRhcmNoIiA9ICJhcm02NCIg
-XTsgdGhlbgo+ID4gwqDCoMKgwqAgdGVzdGRpcj1hcm0KPiA+ICvCoMKgwqAgaWYgWyAteiAiJHZt
-bSIgXSB8fCBbICIkdm1tIiA9ICJxZW11IiBdOyB0aGVuCj4gPiArwqDCoMKgwqDCoMKgwqAgdWFy
-dF9lYXJseV9iYXNlPTB4MDkwMDAwMDBVTCAgCj4gCj4gWW91IGNhbiBkcm9wIHRoZSAnVUwnLgo+
-IAo+ID4gK8KgwqDCoCBlbGlmIFsgIiR2bW0iID0gImt2bXRvb2wiIF07IHRoZW4KPiA+ICvCoMKg
-wqDCoMKgwqDCoCB1YXJ0X2Vhcmx5X2Jhc2U9MHgzZjgKPiA+ICvCoMKgwqAgZWxzZQo+ID4gK8Kg
-wqDCoMKgwqDCoMKgIGVjaG8gJy0tdm1tIG11c3QgYmUgb25lIG9mICJxZW11IiBvciAia3ZtdG9v
-bCInCj4gPiArwqDCoMKgwqDCoMKgwqAgdXNhZ2UgIAo+IAo+IFlvdSdyZSBvdXRwdXR0aW5nIHVz
-YWdlIGhlcmUsIGJ1dCB5b3UgZGlkbid0IGFkZCB2bW0gdG8gdGhlIGhlbHAgdGV4dC4KPiAKPiA+
-ICvCoMKgwqAgZmkKPiA+IMKgZWxpZiBbICIkYXJjaCIgPSAicHBjNjQiIF07IHRoZW4KPiA+IMKg
-wqDCoMKgIHRlc3RkaXI9cG93ZXJwYwo+ID4gwqDCoMKgwqAgZmlybXdhcmU9IiR0ZXN0ZGlyL2Jv
-b3Rfcm9tLmJpbiIKPiA+IEBAIC0xOTcsNCArMjA4LDUgQEAgUFJFVFRZX1BSSU5UX1NUQUNLUz0k
-cHJldHR5X3ByaW50X3N0YWNrcwo+ID4gwqBFTlZJUk9OX0RFRkFVTFQ9JGVudmlyb25fZGVmYXVs
-dAo+ID4gwqBFUlJBVEFUWFQ9ZXJyYXRhLnR4dAo+ID4gwqBVMzJfTE9OR19GTVQ9JHUzMl9sb25n
-Cj4gPiArVUFSVF9FQVJMWV9CQVNFPSR1YXJ0X2Vhcmx5X2Jhc2UKPiA+IMKgRU9GCj4gPiBkaWZm
-IC0tZ2l0IGEvTWFrZWZpbGUgYi9NYWtlZmlsZQo+ID4gaW5kZXggZTlmMDIyNzJlMTU2Li4yMjVj
-MmE1MjVjZGYgMTAwNjQ0Cj4gPiAtLS0gYS9NYWtlZmlsZQo+ID4gKysrIGIvTWFrZWZpbGUKPiA+
-IEBAIC03Miw2ICs3MiwxMCBAQCBDT01NT05fQ0ZMQUdTICs9ICQoZm5vX3BpYykgJChub19waWUp
-Cj4gPiDCoENGTEFHUyArPSAkKENPTU1PTl9DRkxBR1MpCj4gPiDCoENGTEFHUyArPSAtV21pc3Np
-bmctcGFyYW1ldGVyLXR5cGUgLVdvbGQtc3R5bGUtZGVjbGFyYXRpb24KPiA+IC1Xb3ZlcnJpZGUt
-aW5pdCAKPiA+ICtpZm5lcSAoJChVQVJUX0VBUkxZX0JBU0UpLCkKPiA+ICtDRkxBR1MgKz0gLURV
-QVJUX0VBUkxZX0JBU0U9JChVQVJUX0VBUkxZX0JBU0UpCj4gPiArZW5kaWYgIAo+IAo+IFRoaXMg
-dHlwZSBvZiB0aGluZyBpcyB3aGF0IEkgd291bGQgbGlrZSB0byBhdm9pZCBieSBpbnRyb2R1Y2lu
-ZyBhCj4gY29uZmlnLmggZmlsZS4gSW4gdGhlIGxlYXN0IHdlIHNob3VsZG4ndCBhZGQgdGhpcyAt
-RCB0byBDRkxBR1MgZm9yCj4gYWxsIGFyY2hpdGVjdHVyZXMuIEl0IGNhbiBiZSBhZGRlZCB0byB0
-aGUgJS5lbGYgcnVsZSBpbgo+IGFybS9NYWtlZmlsZS5jb21tb24KPiAKPiA+ICsKPiA+IMKgQ1hY
-RkxBR1MgKz0gJChDT01NT05fQ0ZMQUdTKQo+ID4gwqAKPiA+IMKgYXV0b2RlcGVuZC1mbGFncyA9
-IC1NTUQgLU1GICQoZGlyICQqKS4kKG5vdGRpciAkKikuZAo+ID4gIAo+IAo+IFlvdSdsbCBhbHNv
-IHdhbnQgdG8gcGF0Y2ggbGliL2FybS9pby5jIHdpdGgKPiAgCj4gLS8qCj4gLSAqIFVzZSB0aGlz
-IGd1ZXNzIGZvciB0aGUgcGwwMTEgYmFzZSBpbiBvcmRlciB0byBtYWtlIGFuIGF0dGVtcHQgYXQK
-PiAtICogaGF2aW5nIGVhcmxpZXIgcHJpbnRmIHN1cHBvcnQuIFdlJ2xsIG92ZXJ3cml0ZSBpdCB3
-aXRoIHRoZSByZWFsCj4gLSAqIGJhc2UgYWRkcmVzcyB0aGF0IHdlIHJlYWQgZnJvbSB0aGUgZGV2
-aWNlIHRyZWUgbGF0ZXIuIFRoaXMgaXMKPiAtICogdGhlIGFkZHJlc3Mgd2UgZXhwZWN0IFFFTVUn
-cyBtYWNoLXZpcnQgbWFjaGluZSB0eXBlIHRvIHB1dCBpbgo+IC0gKiBpdHMgZ2VuZXJhdGVkIGRl
-dmljZSB0cmVlLgo+IC0gKi8KPiAtI2RlZmluZSBVQVJUX0VBUkxZX0JBU0UgMHgwOTAwMDAwMFVM
-Cj4gLQo+ICBzdGF0aWMgc3RydWN0IHNwaW5sb2NrIHVhcnRfbG9jazsKPiAtc3RhdGljIHZvbGF0
-aWxlIHU4ICp1YXJ0MF9iYXNlID0gKHU4ICopVUFSVF9FQVJMWV9CQVNFOwo+ICtzdGF0aWMgdm9s
-YXRpbGUgdTggKnVhcnQwX2Jhc2UgPSAodTggKikodW5zaWduZWQKPiBsb25nKVVBUlRfRUFSTFlf
-QkFTRTsKPiAKPiAKPiAKPiBUaGlzIGlzIGFsbCBhIGJpdCBvbiB0aGUgdWdseSBzaWRlLCBidXQg
-SSBjYW4ndCB0aGluayBvZiBhbnl0aGluZwo+IGJldHRlci4gCgpDaGVla3kgcXVlc3Rpb246IENh
-bid0IHdlIHRyeSB0byBzb21laG93IGF1dG8gZGV0ZWN0IHRoZSBWTU0/CkluIHRoZSBtb3N0IHNp
-bXBsZSBjYXNlIHdlIGNvdWxkIGxvb2sgYXQgb3VyIGxvYWQgYWRkcmVzcyAvIFBDIGFuZApkZWR1
-Y2UgUUVNVSB2cy4ga3ZtdG9vbCBmcm9tIHRoYXQuIFRoYXQncyBzdXJlbHkgc29tZXdoYXQgaGFj
-a3ksIGJ1dApzaG91bGQgYmUgbW9yZSByb2J1c3QgdGhhbiBhIGNvbXBpbGUgdGltZSB2ZXJzaW9u
-LgpUeXBpY2FsbHkgYSBnb29kIHdheSB0byBjb25maXJtIHNvbWUgaWRlYSBvZiBhIGN1cnJlbnQg
-cGxhdGZvcm0gaXMgdG8KcmVhZCBzb21lIHBlcmlwaGVyYWwgSUQgcmVnaXN0ZXJzIGFuZCBjaGVj
-ayB0aG9zZSwgdGhlIEdJQyBpcyB0eXBpY2FsbHkKYSBnb29kIGNhbmRpZGF0ZS4gQWx0aG91Z2gg
-SSBzZWUgdGhhdCBvdXIgZW11bGF0aW9uIGluIEtWTSBpcyBhIGJpdCB0aGluCm9uIHRoaXMgc2lk
-ZSAuLi4KCkNoZWVycywKQW5kcmUuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+
+
+On 28/01/2019 17:13, Andrew Murray wrote:
+> On Tue, Jan 22, 2019 at 02:59:48PM +0000, Julien Thierry wrote:
+>> Hi Andrew
+>>
+>> On 22/01/2019 10:49, Andrew Murray wrote:
+>>> Emulate chained PMU counters by creating a single 64 bit event counter
+>>> for a pair of chained KVM counters.
+>>>
+>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>>> ---
+>>>  include/kvm/arm_pmu.h |   2 +
+>>>  virt/kvm/arm/pmu.c    | 308 +++++++++++++++++++++++++++++++++++++++++---------
+>>>  2 files changed, 258 insertions(+), 52 deletions(-)
+>>>
+>>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>>> index f87fe20..d4f3b28 100644
+>>> --- a/include/kvm/arm_pmu.h
+>>> +++ b/include/kvm/arm_pmu.h
+>>> @@ -29,6 +29,8 @@ struct kvm_pmc {
+>>>  	u8 idx;	/* index into the pmu->pmc array */
+>>>  	struct perf_event *perf_event;
+>>>  	u64 bitmask;
+>>> +	u64 sample_period;
+>>> +	u64 left;
+>>>  };
+>>>  
+>>>  struct kvm_pmu {
+>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+>>> index 1921ca9..d111d5b 100644
+>>> --- a/virt/kvm/arm/pmu.c
+>>> +++ b/virt/kvm/arm/pmu.c
+>>> @@ -24,10 +24,26 @@
+>>>  #include <kvm/arm_pmu.h>
+>>>  #include <kvm/arm_vgic.h>
+>>>  
+>>> +#define ARMV8_PMUV3_PERFCTR_CHAIN 0x1E
+>>> +static void kvm_pmu_stop_release_perf_event_pair(struct kvm_vcpu *vcpu,
+>>> +					    u64 pair_low);
+>>> +static void kvm_pmu_stop_release_perf_event_single(struct kvm_vcpu *vcpu,
+>>> +					      u64 select_idx);
+>>> +static void kvm_pmu_reenable_enabled_pair(struct kvm_vcpu *vcpu, u64 pair_low);
+>>>  static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu, u64 pair);
+>>>  static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
+>>>  						      u64 select_idx);
+>>> -static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+>>> +
+>>> +/**
+>>> + * kvm_pmu_counter_is_high_word - is select_idx high counter of 64bit event
+>>> + * @pmc: The PMU counter pointer
+>>> + * @select_idx: The counter index
+>>> + */
+>>> +static inline bool kvm_pmu_counter_is_high_word(struct kvm_pmc *pmc)
+>>> +{
+>>> +	return ((pmc->perf_event->attr.config1 & 0x1)
+>>> +		&& (pmc->idx % 2));
+>>> +}
+>>>  
+>>>  /**
+>>>   * kvm_pmu_get_counter_value - get PMU counter value
+>>> @@ -36,7 +52,7 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+>>>   */
+>>>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>>>  {
+>>> -	u64 counter, reg, enabled, running;
+>>> +	u64 counter, reg, enabled, running, incr;
+>>>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>>>  	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>>>  
+>>> @@ -47,14 +63,53 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>>>  	/* The real counter value is equal to the value of counter register plus
+>>>  	 * the value perf event counts.
+>>>  	 */
+>>> -	if (pmc->perf_event)
+>>> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
+>>> +	if (pmc->perf_event) {
+>>> +		incr = perf_event_read_value(pmc->perf_event, &enabled,
+>>>  						 &running);
+>>>  
+>>> +		if (kvm_pmu_counter_is_high_word(pmc))
+>>> +			incr = upper_32_bits(incr);
+>>> +		counter += incr;
+>>> +	}
+>>> +
+>>>  	return counter & pmc->bitmask;
+>>>  }
+>>>  
+>>>  /**
+>>> + * kvm_pmu_counter_is_enabled - is a counter active
+>>> + * @vcpu: The vcpu pointer
+>>> + * @select_idx: The counter index
+>>> + */
+>>> +static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+>>> +{
+>>> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+>>> +
+>>> +	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
+>>> +	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask & BIT(select_idx));
+>>> +}
+>>> +
+>>> +/**
+>>> + * kvnm_pmu_event_is_chained - is a pair of counters chained and enabled
+>>> + * @vcpu: The vcpu pointer
+>>> + * @select_idx: The low counter index
+>>> + */
+>>> +static bool kvm_pmu_event_is_chained(struct kvm_vcpu *vcpu, u64 pair_low)
+>>> +{
+>>> +	u64 eventsel;
+>>> +
+>>> +	eventsel = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + pair_low + 1) &
+>>> +			ARMV8_PMU_EVTYPE_EVENT;
+>>> +	if (eventsel != ARMV8_PMUV3_PERFCTR_CHAIN)
+>>> +		return false;
+>>> +
+>>> +	if (kvm_pmu_counter_is_enabled(vcpu, pair_low) !=
+>>> +	    kvm_pmu_counter_is_enabled(vcpu, pair_low + 1))
+>>> +		return false;
+>>> +
+>>> +	return true;
+>>> +}
+>>> +
+>>> +/**
+>>>   * kvm_pmu_set_counter_value - set PMU counter value
+>>>   * @vcpu: The vcpu pointer
+>>>   * @select_idx: The counter index
+>>> @@ -62,29 +117,45 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>>>   */
+>>>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>>>  {
+>>> -	u64 reg;
+>>> -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>>> -	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>>> +	u64 reg, pair_low;
+>>>  
+>>>  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+>>>  	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+>>>  	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+>>>  
+>>> -	kvm_pmu_stop_counter(vcpu, pmc);
+>>> -	kvm_pmu_reenable_enabled_single(vcpu, select_idx);
+>>> +	pair_low = (select_idx % 2) ? select_idx - 1 : select_idx;
+>>
+>> Don't really know if it's better but you can write it as:
+>>
+>> 	pair_low = select_idx & ~(1ULL);
+>>
+>> But the compiler might already optimize it.
+>>
+> 
+> That's quite neat, though I'll leave it as it is, that seems clearer to me.
+> 
+>>> +
+>>> +	/* Recreate the perf event to reflect the updated sample_period */
+>>> +	if (kvm_pmu_event_is_chained(vcpu, pair_low)) {
+>>> +		kvm_pmu_stop_release_perf_event_pair(vcpu, pair_low);
+>>> +		kvm_pmu_reenable_enabled_pair(vcpu, pair_low);
+>>> +	} else {
+>>> +		kvm_pmu_stop_release_perf_event_single(vcpu, select_idx);
+>>> +		kvm_pmu_reenable_enabled_single(vcpu, select_idx);
+>>> +	}
+>>>  }
+>>>  
+>>>  /**
+>>>   * kvm_pmu_release_perf_event - remove the perf event
+>>>   * @pmc: The PMU counter pointer
+>>>   */
+>>> -static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>>> +static void kvm_pmu_release_perf_event(struct kvm_vcpu *vcpu,
+>>> +				       struct kvm_pmc *pmc)
+>>>  {
+>>> -	if (pmc->perf_event) {
+>>> -		perf_event_disable(pmc->perf_event);
+>>> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>>> +	struct kvm_pmc *pmc_alt;
+>>> +	u64 pair_alt;
+>>> +
+>>> +	pair_alt = (pmc->idx % 2) ? pmc->idx - 1 : pmc->idx + 1;
+>>> +	pmc_alt = &pmu->pmc[pair_alt];
+>>> +
+>>> +	if (pmc->perf_event)
+>>>  		perf_event_release_kernel(pmc->perf_event);
+>>> -		pmc->perf_event = NULL;
+>>> -	}
+>>> +
+>>> +	if (pmc->perf_event == pmc_alt->perf_event)
+>>> +		pmc_alt->perf_event = NULL;
+>>
+>> Shouldn't we release pmc_alt->perf_event before setting it to NULL?
+> 
+> No, becuase these are the same event, we don't want to free the same
+> event twice.
+> 
+
+Irrefutable logic, I don't know what I was thinking.
+
+>>
+>>> +
+>>> +	pmc->perf_event = NULL;
+>>>  }
+>>>  
+>>>  /**
+>>> @@ -92,22 +163,60 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>>>   * @vcpu: The vcpu pointer
+>>>   * @pmc: The PMU counter pointer
+>>>   *
+>>> - * If this counter has been configured to monitor some event, release it here.
+>>> + * If this counter has been configured to monitor some event, stop it here.
+>>>   */
+>>>  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>>>  {
+>>>  	u64 counter, reg;
+>>>  
+>>>  	if (pmc->perf_event) {
+>>> +		perf_event_disable(pmc->perf_event);
+>>>  		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+>>>  		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+>>>  		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+>>>  		__vcpu_sys_reg(vcpu, reg) = counter;
+>>> -		kvm_pmu_release_perf_event(pmc);
+>>>  	}
+>>>  }
+>>>  
+>>>  /**
+>>> + * kvm_pmu_stop_release_perf_event_pair - stop and release a pair of counters
+>>> + * @vcpu: The vcpu pointer
+>>> + * @pmc_low: The PMU counter pointer for lower word
+>>> + * @pmc_high: The PMU counter pointer for higher word
+>>> + *
+>>> + * As chained counters share the underlying perf event, we stop them
+>>> + * both first before discarding the underlying perf event
+>>> + */
+>>> +static void kvm_pmu_stop_release_perf_event_pair(struct kvm_vcpu *vcpu,
+>>> +					    u64 idx_low)
+>>> +{
+>>> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>>> +	struct kvm_pmc *pmc_low = &pmu->pmc[idx_low];
+>>> +	struct kvm_pmc *pmc_high = &pmu->pmc[idx_low + 1];
+>>> +
+>>> +	kvm_pmu_stop_counter(vcpu, pmc_low);
+>>> +	kvm_pmu_stop_counter(vcpu, pmc_high);
+>>> +
+>>> +	kvm_pmu_release_perf_event(vcpu, pmc_low);
+>>> +	kvm_pmu_release_perf_event(vcpu, pmc_high);
+>>
+>> Hmmm, I think there is some confusion between what this function and
+>> kvm_pmu_release_perf_event() should do, at this point
+>> pmc_high->perf_event == NULL and we can't release it.
+>>
+> 
+> Don't forget that for paired events, both pmc_{low,high} refer to the
+> same perf_event. (This is why we stop the counters individually before
+> releasing them - so that we can use the event information whilst working
+> out the counter value of pmc_high).
+> 
+> Or is there something I'm missing?
+>  
+
+No, I think I'm the one who got confused between chained registers and
+the fact that we try to enable counters two by two.
+
+It's probably best to ignore my comments concerning the release event
+stuff :) .
+
+Thanks for explaining.
+
+Cheers,
+
+-- 
+Julien Thierry
