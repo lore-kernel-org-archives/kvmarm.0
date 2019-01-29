@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v8 20/26] ACPI / APEI: Only use queued estatus entry during
- in_nmi_queue_one_entry()
-Date: Tue, 29 Jan 2019 18:48:56 +0000
-Message-ID: <20190129184902.102850-21-james.morse@arm.com>
+Subject: [PATCH v8 19/26] ACPI / APEI: Split ghes_read_estatus() to allow a
+ peek at the CPER length
+Date: Tue, 29 Jan 2019 18:48:55 +0000
+Message-ID: <20190129184902.102850-20-james.morse@arm.com>
 References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEB3A4A330
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1344A36D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0idvaxgXSV40 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 13:50:37 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 838244A319
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:37 -0500 (EST)
+ with ESMTP id f5tU3gv46KbX for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 13:50:35 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 914864A331
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:34 -0500 (EST)
 In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,127 +32,103 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Each struct ghes has an worst-case sized buffer for storing the
-estatus. If an error is being processed by ghes_proc() in process
-context this buffer will be in use. If the error source then triggers
-an NMI-like notification, the same buffer will be used by
-in_nmi_queue_one_entry() to stage the estatus data, before
-__process_error() copys it into a queued estatus entry.
+ghes_read_estatus() reads the record address, then the record's
+header, then performs some sanity checks before reading the
+records into the provided estatus buffer.
 
-Merge __process_error()s work into in_nmi_queue_one_entry() so that
-the queued estatus entry is used from the beginning. Use the new
-ghes_peek_estatus() to know how much memory to allocate from
-the ghes_estatus_pool before reading the records.
+To provide this estatus buffer the caller must know the size of the
+records in advance, or always provide a worst-case sized buffer as
+happens today for the non-NMI notifications.
 
-Reported-by: Borislav Petkov <bp@suse.de>
+Add a function to peek at the record's header to find the size. This
+will let the NMI path allocate the right amount of memory before reading
+the records, instead of using the worst-case size, and having to copy
+the records.
+
+Split ghes_read_estatus() to create __ghes_peek_estatus() which
+returns the address and size of the CPER records.
+
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Borislav Petkov <bp@suse.de>
 
-Change since v6:
- * Added a comment explaining the 'ack-error, then goto no_work'.
- * Added missing esatus-clearing, which is necessary after reading the GAS,
+Changes since v7:
+ * Grammar
+ * concistent argument ordering
+
+Changes since v6:
+ * Additional buf_addr = 0 error handling
+ * Moved checking out of peek-estatus
+ * Reworded an error message so we can tell them apart
 ---
- drivers/acpi/apei/ghes.c | 64 +++++++++++++++++++++++-----------------
- 1 file changed, 37 insertions(+), 27 deletions(-)
+ drivers/acpi/apei/ghes.c | 40 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 29 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index 12375a82fa03..957c1559ebf5 100644
+index 9391fff71344..12375a82fa03 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -862,57 +862,67 @@ static void ghes_print_queued_estatus(void)
- 	}
+@@ -317,12 +317,12 @@ int __ghes_check_estatus(struct ghes *ghes,
+ 	return 0;
  }
  
--/* Save estatus for further processing in IRQ context */
--static void __process_error(struct ghes *ghes,
--			    struct acpi_hest_generic_status *src_estatus)
-+static int ghes_in_nmi_queue_one_entry(struct ghes *ghes,
-+				       enum fixed_addresses fixmap_idx)
+-static int ghes_read_estatus(struct ghes *ghes,
+-			     struct acpi_hest_generic_status *estatus,
+-			     u64 *buf_paddr, enum fixed_addresses fixmap_idx)
++/* Read the CPER block, returning its address, and header in estatus. */
++static int __ghes_peek_estatus(struct ghes *ghes,
++			       struct acpi_hest_generic_status *estatus,
++			       u64 *buf_paddr, enum fixed_addresses fixmap_idx)
  {
--	u32 len, node_len;
-+	struct acpi_hest_generic_status *estatus, tmp_header;
- 	struct ghes_estatus_node *estatus_node;
--	struct acpi_hest_generic_status *estatus;
-+	u32 len, node_len;
-+	u64 buf_paddr;
-+	int sev, rc;
+ 	struct acpi_hest_generic *g = ghes->generic;
+-	u32 len;
+ 	int rc;
  
- 	if (!IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG))
--		return;
-+		return -EOPNOTSUPP;
- 
--	if (ghes_estatus_cached(src_estatus))
--		return;
-+	rc = __ghes_peek_estatus(ghes, &tmp_header, &buf_paddr, fixmap_idx);
-+	if (rc) {
-+		ghes_clear_estatus(ghes, &tmp_header, buf_paddr, fixmap_idx);
-+		return rc;
-+	}
- 
--	len = cper_estatus_len(src_estatus);
--	node_len = GHES_ESTATUS_NODE_LEN(len);
-+	rc = __ghes_check_estatus(ghes, &tmp_header);
-+	if (rc) {
-+		ghes_clear_estatus(ghes, &tmp_header, buf_paddr, fixmap_idx);
-+		return rc;
-+	}
- 
-+	len = cper_estatus_len(&tmp_header);
-+	node_len = GHES_ESTATUS_NODE_LEN(len);
- 	estatus_node = (void *)gen_pool_alloc(ghes_estatus_pool, node_len);
- 	if (!estatus_node)
--		return;
-+		return -ENOMEM;
- 
- 	estatus_node->ghes = ghes;
- 	estatus_node->generic = ghes->generic;
- 	estatus = GHES_ESTATUS_FROM_NODE(estatus_node);
--	memcpy(estatus, src_estatus, len);
--	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
--}
- 
--static int ghes_in_nmi_queue_one_entry(struct ghes *ghes,
--				       enum fixed_addresses fixmap_idx)
--{
--	struct acpi_hest_generic_status *estatus = ghes->estatus;
--	u64 buf_paddr;
--	int sev;
--
--	if (ghes_read_estatus(ghes, estatus, &buf_paddr, fixmap_idx)) {
-+	if (__ghes_read_estatus(estatus, buf_paddr, fixmap_idx, len)) {
- 		ghes_clear_estatus(ghes, estatus, buf_paddr, fixmap_idx);
--		return -ENOENT;
-+		rc = -ENOENT;
-+		goto no_work;
+ 	rc = apei_read(buf_paddr, &g->error_status_address);
+@@ -343,14 +343,14 @@ static int ghes_read_estatus(struct ghes *ghes,
+ 		return -ENOENT;
  	}
  
- 	sev = ghes_severity(estatus->error_severity);
- 	if (sev >= GHES_SEV_PANIC) {
- 		ghes_print_queued_estatus();
- 		__ghes_panic(ghes, estatus, buf_paddr, fixmap_idx);
--
- 	}
+-	rc = __ghes_check_estatus(ghes, estatus);
+-	if (rc)
+-		return rc;
++	return __ghes_check_estatus(ghes, estatus);
++}
  
--	__process_error(ghes, estatus);
--	ghes_clear_estatus(ghes, estatus, buf_paddr, fixmap_idx);
-+	ghes_clear_estatus(ghes, &tmp_header, buf_paddr, fixmap_idx);
- 
--	return 0;
-+	/* This error has been reported before, don't process it again. */
-+	if (ghes_estatus_cached(estatus))
-+		goto no_work;
-+
-+	llist_add(&estatus_node->llnode, &ghes_estatus_llist);
-+
-+	return rc;
-+
-+no_work:
-+	gen_pool_free(ghes_estatus_pool, (unsigned long)estatus_node,
-+		      node_len);
-+
-+	return rc;
+-	len = cper_estatus_len(estatus);
+-	ghes_copy_tofrom_phys(estatus + 1,
+-			      *buf_paddr + sizeof(*estatus),
+-			      len - sizeof(*estatus), 1, fixmap_idx);
++static int __ghes_read_estatus(struct acpi_hest_generic_status *estatus,
++			       u64 buf_paddr, enum fixed_addresses fixmap_idx,
++			       size_t buf_len)
++{
++	ghes_copy_tofrom_phys(estatus, buf_paddr, buf_len, 1, fixmap_idx);
+ 	if (cper_estatus_check(estatus)) {
+ 		pr_warn_ratelimited(FW_WARN GHES_PFX
+ 				    "Failed to read error status block!\n");
+@@ -360,6 +360,24 @@ static int ghes_read_estatus(struct ghes *ghes,
+ 	return 0;
  }
  
- static int ghes_in_nmi_spool_from_list(struct list_head *rcu_list,
++static int ghes_read_estatus(struct ghes *ghes,
++			     struct acpi_hest_generic_status *estatus,
++			     u64 *buf_paddr, enum fixed_addresses fixmap_idx)
++{
++	int rc;
++
++	rc = __ghes_peek_estatus(ghes, estatus, buf_paddr, fixmap_idx);
++	if (rc)
++		return rc;
++
++	rc = __ghes_check_estatus(ghes, estatus);
++	if (rc)
++		return rc;
++
++	return __ghes_read_estatus(estatus, *buf_paddr, fixmap_idx,
++				   cper_estatus_len(estatus));
++}
++
+ static void ghes_clear_estatus(struct ghes *ghes,
+ 			       struct acpi_hest_generic_status *estatus,
+ 			       u64 buf_paddr, enum fixed_addresses fixmap_idx)
 -- 
 2.20.1
