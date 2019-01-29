@@ -1,23 +1,23 @@
 From: James Morse <james.morse@arm.com>
-Subject: [PATCH v8 09/26] ACPI / APEI: Generalise the estatus queue's notify
- code
-Date: Tue, 29 Jan 2019 18:48:45 +0000
-Message-ID: <20190129184902.102850-10-james.morse@arm.com>
+Subject: [PATCH v8 11/26] ACPI / APEI: Move NOTIFY_SEA between the
+ estatus-queue and NOTIFY_NMI
+Date: Tue, 29 Jan 2019 18:48:47 +0000
+Message-ID: <20190129184902.102850-12-james.morse@arm.com>
 References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C8F4A2D3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF4E349E3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id viQv2oVmP06R for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 13:50:05 -0500 (EST)
+ with ESMTP id 7fcEQ+9Tybxy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 13:50:11 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590A949E3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4DC4A369
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 13:50:11 -0500 (EST)
 In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,124 +32,158 @@ To: linux-acpi@vger.kernel.org
 Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Refactor the estatus queue's pool notification routine from
-NOTIFY_NMI's handlers. This will allow another notification
-method to use the estatus queue without duplicating this code.
+The estatus-queue code is currently hidden by the NOTIFY_NMI #ifdefs.
+Once NOTIFY_SEA starts using the estatus-queue we can stop hiding
+it as each architecture has a user that can't be turned off.
 
-Add rcu_read_lock()/rcu_read_unlock() around the list
-list_for_each_entry_rcu() walker. These aren't strictly necessary as
-the whole nmi_enter/nmi_exit() window is a spooky RCU read-side
-critical section.
+Split the existing CONFIG_HAVE_ACPI_APEI_NMI block in two, and move
+the SEA code into the gap.
 
-in_nmi_queue_one_entry() is separate from the rcu-list walker for a
-later caller that doesn't need to walk a list.
+Move the code around ... and changes the stale comment describing
+why the status queue is necessary: printk() is no longer the issue,
+its the helpers like memory_failure_queue() that aren't nmi safe.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
-Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
-
 ---
-Changes since v7:
- * Moved err= onto a separate line to make this more readable
- * Dropped ghes_ prefix on new static functions
- * Renamed stuff, 'notify' has an overloaded meaning,
-
-Changes since v6:
- * Removed pool grow/remove code as this is no longer necessary.
-
-Changes since v3:
- * Removed duplicate or redundant paragraphs in commit message.
- * Fixed the style of a zero check.
-Changes since v1:
-   * Tidied up _in_nmi_notify_one().
----
- drivers/acpi/apei/ghes.c | 65 ++++++++++++++++++++++++++--------------
- 1 file changed, 43 insertions(+), 22 deletions(-)
+ drivers/acpi/apei/ghes.c | 113 ++++++++++++++++++++-------------------
+ 1 file changed, 59 insertions(+), 54 deletions(-)
 
 diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index af3c10f47f20..cb3d88de711f 100644
+index bd58749d31bb..576dce29159d 100644
 --- a/drivers/acpi/apei/ghes.c
 +++ b/drivers/acpi/apei/ghes.c
-@@ -912,37 +912,58 @@ static void __process_error(struct ghes *ghes)
- #endif
- }
+@@ -767,66 +767,21 @@ static struct notifier_block ghes_notifier_hed = {
+ 	.notifier_call = ghes_notify_hed,
+ };
  
--static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
-+static int ghes_in_nmi_queue_one_entry(struct ghes *ghes)
- {
- 	u64 buf_paddr;
+-#ifdef CONFIG_ACPI_APEI_SEA
+-static LIST_HEAD(ghes_sea);
+-
+-/*
+- * Return 0 only if one of the SEA error sources successfully reported an error
+- * record sent from the firmware.
+- */
+-int ghes_notify_sea(void)
+-{
 -	struct ghes *ghes;
--	int sev, ret = NMI_DONE;
-+	int sev;
+-	int ret = -ENOENT;
+-
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
+-		if (!ghes_proc(ghes))
+-			ret = 0;
+-	}
+-	rcu_read_unlock();
+-	return ret;
+-}
+-
+-static void ghes_sea_add(struct ghes *ghes)
+-{
+-	mutex_lock(&ghes_list_mutex);
+-	list_add_rcu(&ghes->list, &ghes_sea);
+-	mutex_unlock(&ghes_list_mutex);
+-}
+-
+-static void ghes_sea_remove(struct ghes *ghes)
+-{
+-	mutex_lock(&ghes_list_mutex);
+-	list_del_rcu(&ghes->list);
+-	mutex_unlock(&ghes_list_mutex);
+-	synchronize_rcu();
+-}
+-#else /* CONFIG_ACPI_APEI_SEA */
+-static inline void ghes_sea_add(struct ghes *ghes) { }
+-static inline void ghes_sea_remove(struct ghes *ghes) { }
+-#endif /* CONFIG_ACPI_APEI_SEA */
+-
+ #ifdef CONFIG_HAVE_ACPI_APEI_NMI
+ /*
+- * printk is not safe in NMI context.  So in NMI handler, we allocate
+- * required memory from lock-less memory allocator
+- * (ghes_estatus_pool), save estatus into it, put them into lock-less
+- * list (ghes_estatus_llist), then delay printk into IRQ context via
+- * irq_work (ghes_proc_irq_work).  ghes_estatus_size_request record
+- * required pool size by all NMI error source.
++ * Handlers for CPER records may not be NMI safe. For example,
++ * memory_failure_queue() takes spinlocks and calls schedule_work_on().
++ * In any NMI-like handler, memory from ghes_estatus_pool is used to save
++ * estatus, and added to the ghes_estatus_llist. irq_work_queue() causes
++ * ghes_proc_in_irq() to run in IRQ context where each estatus in
++ * ghes_estatus_llist is processed.
++ *
++ * Memory from the ghes_estatus_pool is also used with the ghes_estatus_cache
++ * to suppress frequent messages.
+  */
+ static struct llist_head ghes_estatus_llist;
+ static struct irq_work ghes_proc_irq_work;
  
--	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
--		return ret;
-+	if (ghes_read_estatus(ghes, &buf_paddr)) {
-+		ghes_clear_estatus(ghes, buf_paddr);
-+		return -ENOENT;
-+	}
+-/*
+- * NMI may be triggered on any CPU, so ghes_in_nmi is used for
+- * having only one concurrent reader.
+- */
+-static atomic_t ghes_in_nmi = ATOMIC_INIT(0);
+-
+-static LIST_HEAD(ghes_nmi);
+-
+ static void ghes_proc_in_irq(struct irq_work *irq_work)
+ {
+ 	struct llist_node *llnode, *next;
+@@ -949,6 +904,56 @@ static int ghes_in_nmi_spool_from_list(struct list_head *rcu_list)
  
--	list_for_each_entry_rcu(ghes, &ghes_nmi, list) {
--		if (ghes_read_estatus(ghes, &buf_paddr)) {
--			ghes_clear_estatus(ghes, buf_paddr);
--			continue;
--		} else {
--			ret = NMI_HANDLED;
--		}
-+	sev = ghes_severity(ghes->estatus->error_severity);
-+	if (sev >= GHES_SEV_PANIC) {
-+		ghes_print_queued_estatus();
-+		__ghes_panic(ghes, buf_paddr);
-+	}
- 
--		sev = ghes_severity(ghes->estatus->error_severity);
--		if (sev >= GHES_SEV_PANIC) {
--			ghes_print_queued_estatus();
--			__ghes_panic(ghes, buf_paddr);
--		}
-+	__process_error(ghes);
-+	ghes_clear_estatus(ghes, buf_paddr);
- 
--		__process_error(ghes);
--		ghes_clear_estatus(ghes, buf_paddr);
-+	return 0;
-+}
+ 	return ret;
+ }
++#endif /* CONFIG_HAVE_ACPI_APEI_NMI */
 +
-+static int ghes_in_nmi_spool_from_list(struct list_head *rcu_list)
++#ifdef CONFIG_ACPI_APEI_SEA
++static LIST_HEAD(ghes_sea);
++
++/*
++ * Return 0 only if one of the SEA error sources successfully reported an error
++ * record sent from the firmware.
++ */
++int ghes_notify_sea(void)
 +{
-+	int err, ret = -ENOENT;
 +	struct ghes *ghes;
++	int ret = -ENOENT;
 +
 +	rcu_read_lock();
-+	list_for_each_entry_rcu(ghes, rcu_list, list) {
-+		err = ghes_in_nmi_queue_one_entry(ghes);
-+		if (!err)
++	list_for_each_entry_rcu(ghes, &ghes_sea, list) {
++		if (!ghes_proc(ghes))
 +			ret = 0;
- 	}
++	}
 +	rcu_read_unlock();
- 
--#ifdef CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG
--	if (ret == NMI_HANDLED)
-+	if (IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) && !ret)
- 		irq_work_queue(&ghes_proc_irq_work);
--#endif
-+
 +	return ret;
 +}
 +
-+static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
++static void ghes_sea_add(struct ghes *ghes)
 +{
-+	int err, ret = NMI_DONE;
++	mutex_lock(&ghes_list_mutex);
++	list_add_rcu(&ghes->list, &ghes_sea);
++	mutex_unlock(&ghes_list_mutex);
++}
 +
-+	if (!atomic_add_unless(&ghes_in_nmi, 1, 1))
-+		return ret;
++static void ghes_sea_remove(struct ghes *ghes)
++{
++	mutex_lock(&ghes_list_mutex);
++	list_del_rcu(&ghes->list);
++	mutex_unlock(&ghes_list_mutex);
++	synchronize_rcu();
++}
++#else /* CONFIG_ACPI_APEI_SEA */
++static inline void ghes_sea_add(struct ghes *ghes) { }
++static inline void ghes_sea_remove(struct ghes *ghes) { }
++#endif /* CONFIG_ACPI_APEI_SEA */
 +
-+	err = ghes_in_nmi_spool_from_list(&ghes_nmi);
-+	if (!err)
-+		ret = NMI_HANDLED;
++#ifdef CONFIG_HAVE_ACPI_APEI_NMI
++/*
++ * NMI may be triggered on any CPU, so ghes_in_nmi is used for
++ * having only one concurrent reader.
++ */
++static atomic_t ghes_in_nmi = ATOMIC_INIT(0);
 +
- 	atomic_dec(&ghes_in_nmi);
- 	return ret;
- }
++static LIST_HEAD(ghes_nmi);
+ 
+ static int ghes_notify_nmi(unsigned int cmd, struct pt_regs *regs)
+ {
 -- 
 2.20.1
