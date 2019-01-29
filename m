@@ -1,25 +1,27 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Kernel boot regression with PAuth and aarch64-softmmu -cpu max and
- el2 enabled
-Date: Tue, 29 Jan 2019 11:08:19 +0000
-Message-ID: <87va27n2l8.fsf@linaro.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 3/4] KVM: arm/arm64: lazily create perf events on enable
+Date: Tue, 29 Jan 2019 11:11:29 +0000
+Message-ID: <51e6a06a-f6f0-866b-4eca-183e2f42cad8@arm.com>
+References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
+ <1548154197-5470-4-git-send-email-andrew.murray@arm.com>
+ <82bb5635-0bca-8326-03e1-084792dd939d@arm.com>
+ <20190128142838.GB16627@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9089E4A321
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:08:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A90194A321
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:11:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YZvodr0BMW1m for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 06:08:22 -0500 (EST)
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
- [209.85.221.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 716944A1FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:08:22 -0500 (EST)
-Received: by mail-wr1-f67.google.com with SMTP id q18so21539527wrx.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 03:08:22 -0800 (PST)
+ with ESMTP id xO-diTXueQI5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 06:11:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 531764A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:11:33 -0500 (EST)
+In-Reply-To: <20190128142838.GB16627@e119886-lin.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,70 +31,116 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-devel <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Richard Henderson <richard.henderson@linaro.org>
+To: andrew.murray@arm.com
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkhpLAoKRm9sbG93aW5nIHVwIG9uIHllc3RlcmRheSdzIGRpc2N1c3Npb24gb24gSVJDIEkgdGhv
-dWdodCBJJ2QgYmV0dGVyCnJlcG9ydCBvbiBteSBmaW5kaW5ncyBpbiB0aGUgcGVybWFuZW50IHJl
-Y29yZCBzbyB0aGluZ3MgZG9uJ3QgZ2V0IGxvc3QuCgpBcyBJIHRlbmQgdG8gcGVyaW9kaWNhbGx5
-IHJlYnVpbGQgbXkgdGVzdCBrZXJuZWxzIGZyb20gdGhlIGN1cnJlbnQKc3RhdGUgb2YgbGludXgu
-Z2l0IEkgb2NjYXNpb25hbGx5IHJ1biBpbnRvIHRoZXNlIHRoaW5ncy4gTXkgdGVzdAppbnZvY2F0
-aW9uIGlzOgoKICBxZW11LXN5c3RlbS1hYXJjaDY0IC1tYWNoaW5lIHR5cGU9dmlydCx2aXJ0dWFs
-aXphdGlvbj1vbiBcCiAgICAgICAgICAgICAgICAgICAgICAtZGlzcGxheSBub25lIC1tIDQwOTYg
-LXNlcmlhbCBtb246c3RkaW8gXAogICAgICAgICAgICAgICAgICAgICAgLWtlcm5lbCAuLi8uLi9r
-ZXJuZWwtdjgtcGxhaW4uYnVpbGQvYXJjaC9hcm02NC9ib290L0ltYWdlIFwKICAgICAgICAgICAg
-ICAgICAgICAgIC1hcHBlbmQgJ2NvbnNvbGU9dHR5QU1BMCBwYW5pYz0tMScgLW5vLXJlYm9vdCAt
-Y3B1IG1heAoKVGhlIGtlcm5lbCBpcyBlc3NlbnRpYWxseSBhIGRlZmNvbmZpZyBrZXJuZWwgd2l0
-aCBhIGJ1bmNoIG9mIHRoZSBWSVJUSU8KZGV2aWNlIGRyaXZlcnMgYnVpbHQtaW4gZm9yIHdoZW4g
-SSBhY3R1YWxseSBib290IGEgbW9yZSBjb21wbGV4IHNldHVwCndpdGggZGlza3MgYW5kIGRyaXZl
-cy4gSG93ZXZlciB0aGlzIGlzIGEgYm9vdCB0ZXN0IHNvIGRvZXNuJ3QgcmVhbGx5Cm1hdHRlci4K
-ClRoZSAtbWFjaGluZSB0eXBlPXZpcnQsdmlydHVhbGl6YXRpb249b24gZW5hYmxlcyBvdXIgdmly
-dCBtYWNoaW5lIG1vZGVsCndpdGggRUwyIHR1cm5lZCBvbi4gQXMgdGhlcmUgaXMgbm8gQklPUyBp
-bnZvbHZlZCB0aGUga2VybmVsIGlzIGludm9rZWQKZGlyZWN0bHkgYXQgRUwyLgoKVGhlIC1jcHUg
-bWF4IGVuYWJsZWQgYSBjb3J0ZXgtYTU3ICsgd2hhdGV2ZXIgZXh0cmEgZmVhdHVyZXMgd2UndmUK
-ZW5hYmxlZCBpbiBRRU1VIHNvIGZhci4gSXQgd29uJ3QgbWF0Y2ggYW55ICJyZWFsIiBDUFUgYnV0
-IGl0IHNob3VsZCBiZQphcmNoaXRlY3R1cmFsbHkgY29ycmVjdCBpbiBzbyBmYXIgd2UgaW1wbGVt
-ZW50IHByZXJlcXVpc2l0ZSBmZWF0dXJlcyBmb3IKYW55IGdpdmVuIGZlYXR1cmUuIFRoZSBjcHVp
-ZCBmZWF0dXJlIGJpdHMgc2hvdWxkIGFsc28gYmUgY29ycmVjdCBhcyB3ZQp0ZXN0IHRoZW0gaW50
-ZXJuYWxseSBpbiBRRU1VIHRvIGVuYWJsZSBmZWF0dXJlcy4KClRoZSBicmVha2FnZSBpcyB0aGUg
-a2VybmVsIG5ldmVyIGJvb3RzIChubyBvdXRwdXQgb24gc2VyaWFsIHBvcnQpIGFuZCBvbgphdHRh
-Y2hpbmcgd2l0aCBnZGIgSSBmb3VuZCBpdCBzdHVjayBpbjoKCiAgKGdkYikgYnQKICAjMCAgMHhm
-ZmZmZmY4MDEwYTllNDgwIGluIG92ZXJmbG93X3N0YWNrICgpCiAgQmFja3RyYWNlIHN0b3BwZWQ6
-IG5vdCBlbm91Z2ggcmVnaXN0ZXJzIG9yIG1lbW9yeSBhdmFpbGFibGUgdG8gdW53aW5kIGZ1cnRo
-ZXIKCklmIEkgdHVybiBvbiBleGNlcHRpb24gdHJhY2luZyBpdCBsb29rcyBsaWtlIHdlIGdvIGlu
-dG8gYW4gZXhjZXB0aW9uCmxvb3AuCgpPbiB0aGUgUUVNVSBzaWRlIHRoaXMgYnJlYWthZ2UgY29t
-ZXMgaW4gYXQ6CgogIGNvbW1pdCAxY2UzMmU0N2RiNTJlMzUxMTEzMmM3MTA0NzcwZWFlNjVkNDEy
-MTQ0IChIRUFELCByZWZzL2Jpc2VjdC9iYWQpCiAgQXV0aG9yOiBSaWNoYXJkIEhlbmRlcnNvbiA8
-cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4KICBEYXRlOiAgIE1vbiBKYW4gMjEgMTA6MjM6
-MTMgMjAxOSArMDAwMAoKICAgICAgdGFyZ2V0L2FybTogRW5hYmxlIFBBdXRoIGZvciAtY3B1IG1h
-eAoKICAgICAgUmV2aWV3ZWQtYnk6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZz4KICAgICAgU2lnbmVkLW9mZi1ieTogUmljaGFyZCBIZW5kZXJzb24gPHJpY2hhcmQuaGVu
-ZGVyc29uQGxpbmFyby5vcmc+CiAgICAgIE1lc3NhZ2UtaWQ6IDIwMTkwMTA4MjIzMTI5LjU1NzAt
-MzAtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwogICAgICBTaWduZWQtb2ZmLWJ5OiBQZXRl
-ciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+CgphbmQgYXMgeW91IHdvdWxkIGV4
-cGVjdCB0aGUgc3lzdGVtIGJvb3RzIGZpbmUgd2l0aCAtY3B1IGNvcnRleC1hNTcKCk9uIHRoZSBr
-ZXJuZWwgc2lkZSBpdCBicmVha3MgYXQ6CgogIGNvbW1pdCAwNGNhMzIwNGZhMDlmNWY1NWM4ZjEx
-M2IwMDcyMDA0YTdiMzY0ZmY0CiAgQXV0aG9yOiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBh
-cm0uY29tPgogIERhdGU6ICAgRnJpIERlYyA3IDE4OjM5OjMwIDIwMTggKzAwMDAKCiAgICAgIGFy
-bTY0OiBlbmFibGUgcG9pbnRlciBhdXRoZW50aWNhdGlvbgoKICAgICAgTm93IHRoYXQgYWxsIHRo
-ZSBuZWNlc3NhcnkgYml0cyBhcmUgaW4gcGxhY2UgZm9yIHVzZXJzcGFjZSwgYWRkIHRoZQogICAg
-ICBuZWNlc3NhcnkgS2NvbmZpZyBsb2dpYyB0byBhbGxvdyB0aGlzIHRvIGJlIGVuYWJsZWQuCgog
-ICAgICBTaWduZWQtb2ZmLWJ5OiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgog
-ICAgICBTaWduZWQtb2ZmLWJ5OiBLcmlzdGluYSBNYXJ0c2Vua28gPGtyaXN0aW5hLm1hcnRzZW5r
-b0Bhcm0uY29tPgogICAgICBDYzogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJt
-LmNvbT4KICAgICAgQ2M6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPgogICAgICBT
-aWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbC5kZWFjb25AYXJtLmNvbT4KClNvIHByZWRp
-Y3RhYmx5IHdlIGZhaWxlZCBhdCBlbmFibGluZyBQQXV0aCBzb21ld2hlcmUgYmV0d2VlbiB0aGUg
-a2VybmVsCmFuZCBRRU1VLgoKSSdtIGd1ZXNzaW5nIHRoZSBrZXJuZWwgc28gZmFyIGhhcyBiZWVu
-IHRlc3RlZCBvbiB0aGUgZmFzdCBtb2RlbCB3aXRoIGEKZnVsbCBjaGFpbiBvZiBURiwgVUVGSSBh
-bmQga2VybmVsPwoKSSB0aGluayBSaWNoYXJkJ3MgdGVzdHMgd2VyZSB3aXRob3V0IEVMMiBlbmFi
-bGVkLgoKU28gaW4gdGhlIGNhc2UgdGhhdCB0aGUga2VybmVsIGJvb3RzIGluIEVMMiBpcyBpdCBl
-eHBlY3RpbmcgYW55b25lIGVsc2UKdG8gZGVhbCB3aXRoIFBhdXRoIGV4Y2VwdGlvbnMgb3Igc2hv
-dWxkIGl0IGJlIGFibGUgdG8gY29wZSB3aXRoIGFuCmVuYWJsZWQgUGF1dGggYnV0IG5vIGZpcm13
-YXJlIHVuZGVybmVhdGggaXQ/CgpFaXRoZXIgd2UndmUgZ290IHNvbWV0aGluZyB3cm9uZyBvciB3
-ZSdsbCBuZWVkIHRvIHJldGhpbmsgd2hhdCBmZWF0dXJlcwp0aGUgdXNlciBjYW4gaGF2ZSBlbmFi
-bGVkIGJ5IC1jcHUgbWF4IG9uIGEgZGlyZWN0IGtlcm5lbCBib290LgoKLS0KQWxleCBCZW5uw6ll
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 28/01/2019 14:28, Andrew Murray wrote:
+> On Tue, Jan 22, 2019 at 10:12:22PM +0000, Suzuki K Poulose wrote:
+>> Hi Andrew,
+>>
+>> On 01/22/2019 10:49 AM, Andrew Murray wrote:
+>>> To prevent re-creating perf events everytime the counter registers
+>>> are changed, let's instead lazily create the event when the event
+>>> is first enabled and destroy it when it changes.
+>>>
+>>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>>
+>>
+>>> ---
+>>>    virt/kvm/arm/pmu.c | 114 ++++++++++++++++++++++++++++++++++++-----------------
+>>>    1 file changed, 78 insertions(+), 36 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+>>> index 4464899..1921ca9 100644
+>>> --- a/virt/kvm/arm/pmu.c
+>>> +++ b/virt/kvm/arm/pmu.c
+>>> @@ -24,8 +24,11 @@
+>>>    #include <kvm/arm_pmu.h>
+>>>    #include <kvm/arm_vgic.h>
+>>> -static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
+>>> -				      u64 select_idx);
+>>> +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu, u64 pair);
+>>
+>> I find the approach good. However the function names are a bit odd and
+>> it makes the code read a bit difficult.
+> 
+> Thanks - the odd naming probably came about as I started with a patch that
+> added chained PMU support and worked backward to split it into smaller patches
+> that each made individual sense. The _single suffix was the counterpart of
+> _pair.
+> 
+>>
+>> I think we could :
+>>
+>> 1) Rename the existing
+>>   kvm_pmu_{enable/disable}_counter => kvm_pmu_{enable/disable}_[mask or
+>> counters ]
+>> as they operate on a set of counters (as a mask) instead of a single
+>> counter.
+>> And then you may be able to drop "_single" from
+>> kvm_pmu_{enable/disable}_counter"_single() functions below, which makes
+>> better sense for what they do.
+> 
+> Thanks for this suggestion. I like this.
+> 
+>>
+>>> +static void kvm_pmu_counter_create_enabled_perf_event(struct kvm_vcpu *vcpu,
+>>> +						      u64 select_idx);
+>>
+>> Could we simply keep kvm_pmu_counter_create_event() and add a comment above
+>> the function explaining that the events are enabled as they are
+>> created lazily ?
+> 
+> OK.
+> 
+
+
+
+>>> + * kvm_pmu_reenable_enabled_single - reenable a counter if it should be enabled
+>>> + * @vcpu: The vcpu pointer
+>>> + * @select_idx: The counter index
+>>> + */
+>>> +static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu,
+>>> +					    u64 select_idx)
+>>> +{
+>>> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+>>> +	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+>>> +
+>>> +	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+>>> +		return;
+>>> +
+>>> +	if (set & BIT(select_idx))
+>>> +		kvm_pmu_enable_counter_single(vcpu, select_idx);
+>>
+>> Could we not reuse kvm_pmu_enable_counter() here :
+>> 	i.e,
+>> static inline void kvm_pmu_reenable_counter(struct kvm_vcpu *vcpu, u64
+>> 						select_idx)
+>> {
+>> 	kvm_pmu_enable_counter(vcpu, BIT(select_idx));
+>> }
+>>
+> 
+> Not quite - when we call kvm_pmu_reenable_enabled_single the individual
+> counter may or may not be enabled. We only want to recreate the perf event
+> if it was previously enabled.
+> 
+> But we can do better, e.g.
+> 
+> static void kvm_pmu_reenable_enabled_single(struct kvm_vcpu *vcpu,
+>                                              u64 select_idx)
+
+nit: could we use the name kvm_pmu_reenable_counter() ?
+
+> {
+>          u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> 
+>          if (set & BIT(select_idx))
+>                  kvm_pmu_enable_counter_mask(vcpu, BIT(select_idx));
+> }
+
+Yep, thats correct. Alternatively, you could move the CNTENSET check
+into the kvm_pmu_enable_counter_mask().
+
+Suzuki
