@@ -1,91 +1,98 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 2/4] KVM: arm/arm64: re-create event when setting counter
- value
-Date: Tue, 29 Jan 2019 10:56:02 +0000
-Message-ID: <4d05c50f-49c6-81fd-b41c-bf9460a5d9d6@arm.com>
-References: <1548154197-5470-1-git-send-email-andrew.murray@arm.com>
- <1548154197-5470-3-git-send-email-andrew.murray@arm.com>
- <46fc9476-cff2-fd93-f5bb-237e26a2adc6@arm.com>
- <20190128114714.GA16627@e119886-lin.cambridge.arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Kernel boot regression with PAuth and aarch64-softmmu -cpu max and
+ el2 enabled
+Date: Tue, 29 Jan 2019 11:08:19 +0000
+Message-ID: <87va27n2l8.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20190128114714.GA16627@e119886-lin.cambridge.arm.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: andrew.murray@arm.com
-Cc: marc.zyngier@arm.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9089E4A321
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:08:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id YZvodr0BMW1m for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 06:08:22 -0500 (EST)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 716944A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:08:22 -0500 (EST)
+Received: by mail-wr1-f67.google.com with SMTP id q18so21539527wrx.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 03:08:22 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: qemu-devel <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Richard Henderson <richard.henderson@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
-
-On 28/01/2019 11:47, Andrew Murray wrote:
-> On Tue, Jan 22, 2019 at 02:18:17PM +0000, Suzuki K Poulose wrote:
->> Hi Andrew
->>
->> On 01/22/2019 10:49 AM, Andrew Murray wrote:
->>> The perf event sample_period is currently set based upon the current
->>> counter value, when PMXEVTYPER is written to and the perf event is created.
->>> However the user may choose to write the type before the counter value in
->>> which case sample_period will be set incorrectly. Let's instead decouple
->>> event creation from PMXEVTYPER and (re)create the event in either
->>> suitation.
->>>
->>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
->>
->> The approach looks fine to me. However this patch seems to introduce a
->> memory leak, see below, which you may be addressing in a later patch in the
->> series. But this will affect bisecting issues.
-> 
-> See below, I don't think this is true.
-
-You're right. Sorry for the noise.
-
-> 
->>
->>> ---
->>>    virt/kvm/arm/pmu.c | 39 ++++++++++++++++++++++++++++++---------
->>>    1 file changed, 30 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->>> index 531d27f..4464899 100644
->>> --- a/virt/kvm/arm/pmu.c
->>> +++ b/virt/kvm/arm/pmu.c
->>> @@ -24,6 +24,8 @@
->>>    #include <kvm/arm_pmu.h>
->>>    #include <kvm/arm_vgic.h>
->>> +static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 data,
->>> +				      u64 select_idx);
->>
->> Could we just pass the counter index (i.e, select_idx) after updating
->> the event_type/counter value in the respective functions.
-> 
-> Unless I misunderstand we need the value of 'data' as it is used to
-> populate the function local perf_event_attr structure.
-
-Yes, we do program the "data" (which is the event code) in attr.config.
-So, since this is now a helper routine, so the name "data" doesn't make any
-sense.
-
-> 
-> However it is possible to instead read 'data' from __vcpu_sys_reg in
-> kvm_pmu_create_perf_event instead of the call site. However
-> kvm_pmu_set_counter_event_type would have to set the value of
-> __vcpu_sys_reg from its data argument (as __vcpu_sys_reg normally gets
-> set after kvm_pmu_set_counter_event_type returns). This is OK as we
-> do this in the next patch in this series anyway - so perhaps I can
-> bring that forward to this patch?
-
-Yes, please.
-
-Cheers
-Suzuki
+CkhpLAoKRm9sbG93aW5nIHVwIG9uIHllc3RlcmRheSdzIGRpc2N1c3Npb24gb24gSVJDIEkgdGhv
+dWdodCBJJ2QgYmV0dGVyCnJlcG9ydCBvbiBteSBmaW5kaW5ncyBpbiB0aGUgcGVybWFuZW50IHJl
+Y29yZCBzbyB0aGluZ3MgZG9uJ3QgZ2V0IGxvc3QuCgpBcyBJIHRlbmQgdG8gcGVyaW9kaWNhbGx5
+IHJlYnVpbGQgbXkgdGVzdCBrZXJuZWxzIGZyb20gdGhlIGN1cnJlbnQKc3RhdGUgb2YgbGludXgu
+Z2l0IEkgb2NjYXNpb25hbGx5IHJ1biBpbnRvIHRoZXNlIHRoaW5ncy4gTXkgdGVzdAppbnZvY2F0
+aW9uIGlzOgoKICBxZW11LXN5c3RlbS1hYXJjaDY0IC1tYWNoaW5lIHR5cGU9dmlydCx2aXJ0dWFs
+aXphdGlvbj1vbiBcCiAgICAgICAgICAgICAgICAgICAgICAtZGlzcGxheSBub25lIC1tIDQwOTYg
+LXNlcmlhbCBtb246c3RkaW8gXAogICAgICAgICAgICAgICAgICAgICAgLWtlcm5lbCAuLi8uLi9r
+ZXJuZWwtdjgtcGxhaW4uYnVpbGQvYXJjaC9hcm02NC9ib290L0ltYWdlIFwKICAgICAgICAgICAg
+ICAgICAgICAgIC1hcHBlbmQgJ2NvbnNvbGU9dHR5QU1BMCBwYW5pYz0tMScgLW5vLXJlYm9vdCAt
+Y3B1IG1heAoKVGhlIGtlcm5lbCBpcyBlc3NlbnRpYWxseSBhIGRlZmNvbmZpZyBrZXJuZWwgd2l0
+aCBhIGJ1bmNoIG9mIHRoZSBWSVJUSU8KZGV2aWNlIGRyaXZlcnMgYnVpbHQtaW4gZm9yIHdoZW4g
+SSBhY3R1YWxseSBib290IGEgbW9yZSBjb21wbGV4IHNldHVwCndpdGggZGlza3MgYW5kIGRyaXZl
+cy4gSG93ZXZlciB0aGlzIGlzIGEgYm9vdCB0ZXN0IHNvIGRvZXNuJ3QgcmVhbGx5Cm1hdHRlci4K
+ClRoZSAtbWFjaGluZSB0eXBlPXZpcnQsdmlydHVhbGl6YXRpb249b24gZW5hYmxlcyBvdXIgdmly
+dCBtYWNoaW5lIG1vZGVsCndpdGggRUwyIHR1cm5lZCBvbi4gQXMgdGhlcmUgaXMgbm8gQklPUyBp
+bnZvbHZlZCB0aGUga2VybmVsIGlzIGludm9rZWQKZGlyZWN0bHkgYXQgRUwyLgoKVGhlIC1jcHUg
+bWF4IGVuYWJsZWQgYSBjb3J0ZXgtYTU3ICsgd2hhdGV2ZXIgZXh0cmEgZmVhdHVyZXMgd2UndmUK
+ZW5hYmxlZCBpbiBRRU1VIHNvIGZhci4gSXQgd29uJ3QgbWF0Y2ggYW55ICJyZWFsIiBDUFUgYnV0
+IGl0IHNob3VsZCBiZQphcmNoaXRlY3R1cmFsbHkgY29ycmVjdCBpbiBzbyBmYXIgd2UgaW1wbGVt
+ZW50IHByZXJlcXVpc2l0ZSBmZWF0dXJlcyBmb3IKYW55IGdpdmVuIGZlYXR1cmUuIFRoZSBjcHVp
+ZCBmZWF0dXJlIGJpdHMgc2hvdWxkIGFsc28gYmUgY29ycmVjdCBhcyB3ZQp0ZXN0IHRoZW0gaW50
+ZXJuYWxseSBpbiBRRU1VIHRvIGVuYWJsZSBmZWF0dXJlcy4KClRoZSBicmVha2FnZSBpcyB0aGUg
+a2VybmVsIG5ldmVyIGJvb3RzIChubyBvdXRwdXQgb24gc2VyaWFsIHBvcnQpIGFuZCBvbgphdHRh
+Y2hpbmcgd2l0aCBnZGIgSSBmb3VuZCBpdCBzdHVjayBpbjoKCiAgKGdkYikgYnQKICAjMCAgMHhm
+ZmZmZmY4MDEwYTllNDgwIGluIG92ZXJmbG93X3N0YWNrICgpCiAgQmFja3RyYWNlIHN0b3BwZWQ6
+IG5vdCBlbm91Z2ggcmVnaXN0ZXJzIG9yIG1lbW9yeSBhdmFpbGFibGUgdG8gdW53aW5kIGZ1cnRo
+ZXIKCklmIEkgdHVybiBvbiBleGNlcHRpb24gdHJhY2luZyBpdCBsb29rcyBsaWtlIHdlIGdvIGlu
+dG8gYW4gZXhjZXB0aW9uCmxvb3AuCgpPbiB0aGUgUUVNVSBzaWRlIHRoaXMgYnJlYWthZ2UgY29t
+ZXMgaW4gYXQ6CgogIGNvbW1pdCAxY2UzMmU0N2RiNTJlMzUxMTEzMmM3MTA0NzcwZWFlNjVkNDEy
+MTQ0IChIRUFELCByZWZzL2Jpc2VjdC9iYWQpCiAgQXV0aG9yOiBSaWNoYXJkIEhlbmRlcnNvbiA8
+cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4KICBEYXRlOiAgIE1vbiBKYW4gMjEgMTA6MjM6
+MTMgMjAxOSArMDAwMAoKICAgICAgdGFyZ2V0L2FybTogRW5hYmxlIFBBdXRoIGZvciAtY3B1IG1h
+eAoKICAgICAgUmV2aWV3ZWQtYnk6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZz4KICAgICAgU2lnbmVkLW9mZi1ieTogUmljaGFyZCBIZW5kZXJzb24gPHJpY2hhcmQuaGVu
+ZGVyc29uQGxpbmFyby5vcmc+CiAgICAgIE1lc3NhZ2UtaWQ6IDIwMTkwMTA4MjIzMTI5LjU1NzAt
+MzAtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwogICAgICBTaWduZWQtb2ZmLWJ5OiBQZXRl
+ciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+CgphbmQgYXMgeW91IHdvdWxkIGV4
+cGVjdCB0aGUgc3lzdGVtIGJvb3RzIGZpbmUgd2l0aCAtY3B1IGNvcnRleC1hNTcKCk9uIHRoZSBr
+ZXJuZWwgc2lkZSBpdCBicmVha3MgYXQ6CgogIGNvbW1pdCAwNGNhMzIwNGZhMDlmNWY1NWM4ZjEx
+M2IwMDcyMDA0YTdiMzY0ZmY0CiAgQXV0aG9yOiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBh
+cm0uY29tPgogIERhdGU6ICAgRnJpIERlYyA3IDE4OjM5OjMwIDIwMTggKzAwMDAKCiAgICAgIGFy
+bTY0OiBlbmFibGUgcG9pbnRlciBhdXRoZW50aWNhdGlvbgoKICAgICAgTm93IHRoYXQgYWxsIHRo
+ZSBuZWNlc3NhcnkgYml0cyBhcmUgaW4gcGxhY2UgZm9yIHVzZXJzcGFjZSwgYWRkIHRoZQogICAg
+ICBuZWNlc3NhcnkgS2NvbmZpZyBsb2dpYyB0byBhbGxvdyB0aGlzIHRvIGJlIGVuYWJsZWQuCgog
+ICAgICBTaWduZWQtb2ZmLWJ5OiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgog
+ICAgICBTaWduZWQtb2ZmLWJ5OiBLcmlzdGluYSBNYXJ0c2Vua28gPGtyaXN0aW5hLm1hcnRzZW5r
+b0Bhcm0uY29tPgogICAgICBDYzogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJt
+LmNvbT4KICAgICAgQ2M6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPgogICAgICBT
+aWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbC5kZWFjb25AYXJtLmNvbT4KClNvIHByZWRp
+Y3RhYmx5IHdlIGZhaWxlZCBhdCBlbmFibGluZyBQQXV0aCBzb21ld2hlcmUgYmV0d2VlbiB0aGUg
+a2VybmVsCmFuZCBRRU1VLgoKSSdtIGd1ZXNzaW5nIHRoZSBrZXJuZWwgc28gZmFyIGhhcyBiZWVu
+IHRlc3RlZCBvbiB0aGUgZmFzdCBtb2RlbCB3aXRoIGEKZnVsbCBjaGFpbiBvZiBURiwgVUVGSSBh
+bmQga2VybmVsPwoKSSB0aGluayBSaWNoYXJkJ3MgdGVzdHMgd2VyZSB3aXRob3V0IEVMMiBlbmFi
+bGVkLgoKU28gaW4gdGhlIGNhc2UgdGhhdCB0aGUga2VybmVsIGJvb3RzIGluIEVMMiBpcyBpdCBl
+eHBlY3RpbmcgYW55b25lIGVsc2UKdG8gZGVhbCB3aXRoIFBhdXRoIGV4Y2VwdGlvbnMgb3Igc2hv
+dWxkIGl0IGJlIGFibGUgdG8gY29wZSB3aXRoIGFuCmVuYWJsZWQgUGF1dGggYnV0IG5vIGZpcm13
+YXJlIHVuZGVybmVhdGggaXQ/CgpFaXRoZXIgd2UndmUgZ290IHNvbWV0aGluZyB3cm9uZyBvciB3
+ZSdsbCBuZWVkIHRvIHJldGhpbmsgd2hhdCBmZWF0dXJlcwp0aGUgdXNlciBjYW4gaGF2ZSBlbmFi
+bGVkIGJ5IC1jcHUgbWF4IG9uIGEgZGlyZWN0IGtlcm5lbCBib290LgoKLS0KQWxleCBCZW5uw6ll
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
