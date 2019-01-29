@@ -1,25 +1,34 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: Kernel boot regression with PAuth and aarch64-softmmu -cpu max
- and el2 enabled
-Date: Tue, 29 Jan 2019 11:46:09 +0000
-Message-ID: <20190129114609.GA25983@lakrids.cambridge.arm.com>
-References: <87va27n2l8.fsf@linaro.org>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Tue, 29 Jan 2019 12:49:52 +0100
+Message-ID: <20190129114952.GA30613@zn.tnic>
+References: <20181203180613.228133-11-james.morse@arm.com>
+ <20181211183634.GO27375@zn.tnic>
+ <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+ <20190111174532.GI4729@zn.tnic>
+ <32025682-f85a-58ef-7386-7ee23296b944@arm.com>
+ <20190111195800.GA11723@zn.tnic>
+ <18138b57-51ba-c99c-5b8d-b263fb964714@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9864A2E4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:46:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7F194A330
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:50:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FlJEfrLZ9s6N for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Jan 2019 06:46:17 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6539D4A200
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:46:17 -0500 (EST)
+ with ESMTP id Ly582EzvHA-l for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Jan 2019 06:50:06 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61F194A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Jan 2019 06:50:06 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <87va27n2l8.fsf@linaro.org>
+In-Reply-To: <18138b57-51ba-c99c-5b8d-b263fb964714@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,94 +38,88 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Kristina Martsenko <kristina.martsenko@arm.com>, "open list:ARM" <qemu-arm@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Linux ACPI <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <baicar.tyler@gmail.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGksCgpbYWRkaW5nIEtyaXN0aW5hLCB3aG8gaXMgaW4gY2hhcmdlIG9mIExpbnV4IHBvaW50ZXIg
-YXV0aGVudGljYXRpb25dCgpPbiBUdWUsIEphbiAyOSwgMjAxOSBhdCAxMTowODoxOUFNICswMDAw
-LCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4gSGksCj4gCj4gRm9sbG93aW5nIHVwIG9uIHllc3RlcmRh
-eSdzIGRpc2N1c3Npb24gb24gSVJDIEkgdGhvdWdodCBJJ2QgYmV0dGVyCj4gcmVwb3J0IG9uIG15
-IGZpbmRpbmdzIGluIHRoZSBwZXJtYW5lbnQgcmVjb3JkIHNvIHRoaW5ncyBkb24ndCBnZXQgbG9z
-dC4KPiAKPiBBcyBJIHRlbmQgdG8gcGVyaW9kaWNhbGx5IHJlYnVpbGQgbXkgdGVzdCBrZXJuZWxz
-IGZyb20gdGhlIGN1cnJlbnQKPiBzdGF0ZSBvZiBsaW51eC5naXQgSSBvY2Nhc2lvbmFsbHkgcnVu
-IGludG8gdGhlc2UgdGhpbmdzLiBNeSB0ZXN0Cj4gaW52b2NhdGlvbiBpczoKPiAKPiAgIHFlbXUt
-c3lzdGVtLWFhcmNoNjQgLW1hY2hpbmUgdHlwZT12aXJ0LHZpcnR1YWxpemF0aW9uPW9uIFwKPiAg
-ICAgICAgICAgICAgICAgICAgICAgLWRpc3BsYXkgbm9uZSAtbSA0MDk2IC1zZXJpYWwgbW9uOnN0
-ZGlvIFwKPiAgICAgICAgICAgICAgICAgICAgICAgLWtlcm5lbCAuLi8uLi9rZXJuZWwtdjgtcGxh
-aW4uYnVpbGQvYXJjaC9hcm02NC9ib290L0ltYWdlIFwKPiAgICAgICAgICAgICAgICAgICAgICAg
-LWFwcGVuZCAnY29uc29sZT10dHlBTUEwIHBhbmljPS0xJyAtbm8tcmVib290IC1jcHUgbWF4Cj4K
-PiBUaGUga2VybmVsIGlzIGVzc2VudGlhbGx5IGEgZGVmY29uZmlnIGtlcm5lbCB3aXRoIGEgYnVu
-Y2ggb2YgdGhlIFZJUlRJTwo+IGRldmljZSBkcml2ZXJzIGJ1aWx0LWluIGZvciB3aGVuIEkgYWN0
-dWFsbHkgYm9vdCBhIG1vcmUgY29tcGxleCBzZXR1cAo+IHdpdGggZGlza3MgYW5kIGRyaXZlcy4g
-SG93ZXZlciB0aGlzIGlzIGEgYm9vdCB0ZXN0IHNvIGRvZXNuJ3QgcmVhbGx5Cj4gbWF0dGVyLgo+
-IAo+IFRoZSAtbWFjaGluZSB0eXBlPXZpcnQsdmlydHVhbGl6YXRpb249b24gZW5hYmxlcyBvdXIg
-dmlydCBtYWNoaW5lIG1vZGVsCj4gd2l0aCBFTDIgdHVybmVkIG9uLiBBcyB0aGVyZSBpcyBubyBC
-SU9TIGludm9sdmVkIHRoZSBrZXJuZWwgaXMgaW52b2tlZAo+IGRpcmVjdGx5IGF0IEVMMi4KPiAK
-PiBUaGUgLWNwdSBtYXggZW5hYmxlZCBhIGNvcnRleC1hNTcgKyB3aGF0ZXZlciBleHRyYSBmZWF0
-dXJlcyB3ZSd2ZQo+IGVuYWJsZWQgaW4gUUVNVSBzbyBmYXIuIEl0IHdvbid0IG1hdGNoIGFueSAi
-cmVhbCIgQ1BVIGJ1dCBpdCBzaG91bGQgYmUKPiBhcmNoaXRlY3R1cmFsbHkgY29ycmVjdCBpbiBz
-byBmYXIgd2UgaW1wbGVtZW50IHByZXJlcXVpc2l0ZSBmZWF0dXJlcyBmb3IKPiBhbnkgZ2l2ZW4g
-ZmVhdHVyZS4gVGhlIGNwdWlkIGZlYXR1cmUgYml0cyBzaG91bGQgYWxzbyBiZSBjb3JyZWN0IGFz
-IHdlCj4gdGVzdCB0aGVtIGludGVybmFsbHkgaW4gUUVNVSB0byBlbmFibGUgZmVhdHVyZXMuCgpK
-dXN0IHRvIGNoZWNrLCBkb2VzIHRoaXMgZW5hYmxlIFZIRT8KCj4gVGhlIGJyZWFrYWdlIGlzIHRo
-ZSBrZXJuZWwgbmV2ZXIgYm9vdHMgKG5vIG91dHB1dCBvbiBzZXJpYWwgcG9ydCkgYW5kIG9uCj4g
-YXR0YWNoaW5nIHdpdGggZ2RiIEkgZm91bmQgaXQgc3R1Y2sgaW46Cj4gCj4gICAoZ2RiKSBidAo+
-ICAgIzAgIDB4ZmZmZmZmODAxMGE5ZTQ4MCBpbiBvdmVyZmxvd19zdGFjayAoKQo+ICAgQmFja3Ry
-YWNlIHN0b3BwZWQ6IG5vdCBlbm91Z2ggcmVnaXN0ZXJzIG9yIG1lbW9yeSBhdmFpbGFibGUgdG8g
-dW53aW5kIGZ1cnRoZXIKPiAKPiBJZiBJIHR1cm4gb24gZXhjZXB0aW9uIHRyYWNpbmcgaXQgbG9v
-a3MgbGlrZSB3ZSBnbyBpbnRvIGFuIGV4Y2VwdGlvbgo+IGxvb3AuCgpBcyBtZW50aW9uZWQgb24g
-SVJDLCB0aGlzIGxvb2tzIHZlcnkgb2RkLCBzaW5jZSBvdmVyZmxvd19zdGFjayBpcyBhIGRhdGEK
-cG9pbnRlciwgbm90IGNvZGUuIEkgY2FuJ3QgcHJlc2VudGx5IHNlZSBob3cgd2UgY291bGQgYnJh
-bmNoIGhlcmUuCgpJZiB5b3UgcGFzcyB0aGUga2VybmVsICdlYXJseWNvbiBrZWVwX2Jvb3Rjb24n
-LCBkbyB5b3UgZ2V0IGFueSBvdXRwdXQ/Cgo+IE9uIHRoZSBRRU1VIHNpZGUgdGhpcyBicmVha2Fn
-ZSBjb21lcyBpbiBhdDoKPiAKPiAgIGNvbW1pdCAxY2UzMmU0N2RiNTJlMzUxMTEzMmM3MTA0Nzcw
-ZWFlNjVkNDEyMTQ0IChIRUFELCByZWZzL2Jpc2VjdC9iYWQpCj4gICBBdXRob3I6IFJpY2hhcmQg
-SGVuZGVyc29uIDxyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnPgo+ICAgRGF0ZTogICBNb24g
-SmFuIDIxIDEwOjIzOjEzIDIwMTkgKzAwMDAKPiAKPiAgICAgICB0YXJnZXQvYXJtOiBFbmFibGUg
-UEF1dGggZm9yIC1jcHUgbWF4Cj4gCj4gICAgICAgUmV2aWV3ZWQtYnk6IFBldGVyIE1heWRlbGwg
-PHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4KPiAgICAgICBTaWduZWQtb2ZmLWJ5OiBSaWNoYXJk
-IEhlbmRlcnNvbiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4KPiAgICAgICBNZXNzYWdl
-LWlkOiAyMDE5MDEwODIyMzEyOS41NTcwLTMwLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcK
-PiAgICAgICBTaWduZWQtb2ZmLWJ5OiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFy
-by5vcmc+Cj4gCj4gYW5kIGFzIHlvdSB3b3VsZCBleHBlY3QgdGhlIHN5c3RlbSBib290cyBmaW5l
-IHdpdGggLWNwdSBjb3J0ZXgtYTU3Cj4gCj4gT24gdGhlIGtlcm5lbCBzaWRlIGl0IGJyZWFrcyBh
-dDoKPiAKPiAgIGNvbW1pdCAwNGNhMzIwNGZhMDlmNWY1NWM4ZjExM2IwMDcyMDA0YTdiMzY0ZmY0
-Cj4gICBBdXRob3I6IE1hcmsgUnV0bGFuZCA8bWFyay5ydXRsYW5kQGFybS5jb20+Cj4gICBEYXRl
-OiAgIEZyaSBEZWMgNyAxODozOTozMCAyMDE4ICswMDAwCj4gCj4gICAgICAgYXJtNjQ6IGVuYWJs
-ZSBwb2ludGVyIGF1dGhlbnRpY2F0aW9uCj4gCj4gICAgICAgTm93IHRoYXQgYWxsIHRoZSBuZWNl
-c3NhcnkgYml0cyBhcmUgaW4gcGxhY2UgZm9yIHVzZXJzcGFjZSwgYWRkIHRoZQo+ICAgICAgIG5l
-Y2Vzc2FyeSBLY29uZmlnIGxvZ2ljIHRvIGFsbG93IHRoaXMgdG8gYmUgZW5hYmxlZC4KPiAKPiAg
-ICAgICBTaWduZWQtb2ZmLWJ5OiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBhcm0uY29tPgo+
-ICAgICAgIFNpZ25lZC1vZmYtYnk6IEtyaXN0aW5hIE1hcnRzZW5rbyA8a3Jpc3RpbmEubWFydHNl
-bmtvQGFybS5jb20+Cj4gICAgICAgQ2M6IENhdGFsaW4gTWFyaW5hcyA8Y2F0YWxpbi5tYXJpbmFz
-QGFybS5jb20+Cj4gICAgICAgQ2M6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPgo+
-ICAgICAgIFNpZ25lZC1vZmYtYnk6IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPgo+
-IAo+IFNvIHByZWRpY3RhYmx5IHdlIGZhaWxlZCBhdCBlbmFibGluZyBQQXV0aCBzb21ld2hlcmUg
-YmV0d2VlbiB0aGUga2VybmVsCj4gYW5kIFFFTVUuCj4gCj4gSSdtIGd1ZXNzaW5nIHRoZSBrZXJu
-ZWwgc28gZmFyIGhhcyBiZWVuIHRlc3RlZCBvbiB0aGUgZmFzdCBtb2RlbCB3aXRoIGEKPiBmdWxs
-IGNoYWluIG9mIFRGLCBVRUZJIGFuZCBrZXJuZWw/CgpUaGUga2VybmVsIGhhcyBiZWVuIHRlc3Rl
-ZCBvbiBhIGZhc3QgbW9kZWwgd2l0aCB0aGUgTGludXggYm9vdHdyYXBwZXI6CgpodHRwczovL2dp
-dC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9tYXJrL2xpbnV4LmdpdC8KCkty
-aXN0aW5hLCBjb3VsZCB5b3UgY29uZmlybSB3aGV0aGVyIG9yIG5vdCBpdCdzIGJlZW4gdGVzdGVk
-IHdpdGgKQVRGK1VFRkk/Cgo+IEkgdGhpbmsgUmljaGFyZCdzIHRlc3RzIHdlcmUgd2l0aG91dCBF
-TDIgZW5hYmxlZC4KPiAKPiBTbyBpbiB0aGUgY2FzZSB0aGF0IHRoZSBrZXJuZWwgYm9vdHMgaW4g
-RUwyIGlzIGl0IGV4cGVjdGluZyBhbnlvbmUgZWxzZQo+IHRvIGRlYWwgd2l0aCBQYXV0aCBleGNl
-cHRpb25zIG9yIHNob3VsZCBpdCBiZSBhYmxlIHRvIGNvcGUgd2l0aCBhbgo+IGVuYWJsZWQgUGF1
-dGggYnV0IG5vIGZpcm13YXJlIHVuZGVybmVhdGggaXQ/CgpTbyBsb25nIGFzIHRoZSBoaWdoZXN0
-IGltcGxlbWVudGVkIGV4Y2VwdGlvbiBsZXZlbCBpcyBFTDIsIHRoZSBrZXJuZWwKc2hvdWxkIGhh
-bmRsZSB0aGF0IGl0c2VsZi4gRHVyaW5nIGJvb3Qgd2UnbGwgY29uZmlndXJlIEhDUl9FTDIue0FQ
-SSxBUEt9CmluIGVsMl9zZXR1cCgpLgoKRnJvbSB0aGF0IHBvaW50IG9ud2FyZHMsIHRoZXJlIHNo
-b3VsZCBiZSBubyB0cmFwcyBmb3IgcG9pbnRlcgphdXRoZW50aWNhdGlvbiBmdW5jdGlvbmFsaXR5
-IGZyb20gRUwxLCBBRkFJQ1QuCgo+IEVpdGhlciB3ZSd2ZSBnb3Qgc29tZXRoaW5nIHdyb25nIG9y
-IHdlJ2xsIG5lZWQgdG8gcmV0aGluayB3aGF0IGZlYXR1cmVzCj4gdGhlIHVzZXIgY2FuIGhhdmUg
-ZW5hYmxlZCBieSAtY3B1IG1heCBvbiBhIGRpcmVjdCBrZXJuZWwgYm9vdC4KCkl0J3Mgbm90IGlt
-bWVkaWF0ZWx5IGNsZWFyIHRvIG1lIHdoZW4gcHJlY2lzZWx5IHRoaW5ncyBhcmUgZ29pbmcgd3Jv
-bmcsCnNvIEkgdGhpbmsgd2UgbmVlZCB0byBuYXJyb3cgdGhhdCBkb3duIGZpcnN0LiBGb3IgZXhh
-bXBsZSwgaXQncyBub3QKY2xlYXIgd2hldGhlciBhIHRyYXAgaXMgYmVpbmcgdGFrZW4sIG9yIHNv
-bWV0aGluZyBpcyB1bmV4cGVjdGVkbHkKYmVoYXZpbmcgaXMgVU5ERUYuCgpJcyBpdCBwb3NzaWJs
-ZSB0byB3YXRjaCB0aGUgZXhjZXB0aW9uIHZlY3RvcnMgdG8gc2VlIGlmL3doZW4gYW4KZXhjZXB0
-aW9uIGlzIHRha2VuLCBhbmQgZnJvbSB3aGVyZT8KClRoYW5rcywKTWFyay4KX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Wed, Jan 23, 2019 at 06:36:38PM +0000, James Morse wrote:
+> Do you consider ENOENT an error? We don't ack in that case as the
+> memory wasn't in use.
+
+So let's see:
+
+        if (!*buf_paddr)
+                return -ENOENT;
+
+can happen when apei_read() has returned 0 but it has managed to do
+
+	*val = 0;
+
+Now, that function returns error values which we should be checking
+but we're checking the buf_paddr pointed to value for being 0. Are
+we fearing that even if acpi_os_read_memory() or acpi_os_read_port()
+succeed, *buf_paddr could still be 0 ?
+
+Because if not, we should be checking whether rc == -EINVAL and then
+convert it to -ENOENT.
+
+But ghes_read_estatus() handles the error case first *and* *then* checks
+buf_paddr too, to make really really sure we won't be reading from
+address 0.
+
+> For the other cases its because the records are bogus, but we still
+> unconditionally tell firmware we're done with them.
+
+... to free the memory, yes, ok.
+
+> >> I think it is. 18.3.2.8 of ACPI v6.2 (search for Generic Hardware Error Source
+> >> version 2", then below the table):
+> >> * OSPM detects error (via interrupt/exception or polling the block status)
+> >> * OSPM copies the error status block
+> >> * OSPM clears the block status field of the error status block
+> >> * OSPM acknowledges the error via Read Ack register
+> >>
+> >> The ENOENT case is excluded by 'polling the block status'.
+> > 
+> > Ok, so we signal the absence of an error record with ENOENT.
+> > 
+> >         if (!buf_paddr)
+> >                 return -ENOENT;
+> > 
+> > Can that even happen?
+> 
+> Yes, for NOTIFY_POLLED its the norm. For the IRQ flavours that walk a list of
+> GHES, all but one of them will return ENOENT.
+
+Lemme get this straight: when we do
+
+	apei_read(&buf_paddr, &g->error_status_address);
+
+in the polled case, buf_paddr can be 0?
+
+> We could try it and see. It depends if firmware shares ack locations between
+> multiple GHES. We could ack an empty GHES, and it removes the records of one we
+> haven't looked at yet.
+
+Yeah, OTOH, we shouldn't be pushing our luck here, I guess.
+
+So let's sum up: we'll ack the GHES error in all but the -ENOENT cases
+in order to free the memory occupied by the error record.
+
+The slightly "pathological" -ENOENT case is I guess how the fw behaves
+when it is being polled and also for broken firmware which could report
+a 0 buf_paddr.
+
+Btw, that last thing I'm assuming because
+
+  d334a49113a4 ("ACPI, APEI, Generic Hardware Error Source memory error support")
+
+doesn't say what that check was needed for.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
