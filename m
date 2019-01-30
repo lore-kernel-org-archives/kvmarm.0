@@ -1,26 +1,24 @@
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH kvmtool v2 0/6] arm: Add support for firmware booting
-Date: Wed, 30 Jan 2019 18:19:59 +0000
-Message-ID: <20190130181959.GD18558@fuggles.cambridge.arm.com>
-References: <1547130046-14729-1-git-send-email-julien.thierry@arm.com>
- <20190122071024.GB10214@brain-police>
- <b5e4bd1c-8bb5-36ca-026e-59fd92a4486d@arm.com>
+Subject: Re: [PATCH kvmtool] arm: Allow command line for firmware
+Date: Wed, 30 Jan 2019 18:20:10 +0000
+Message-ID: <20190130182010.GE18558@fuggles.cambridge.arm.com>
+References: <20190125154308.185131-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D26924A2D3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 13:20:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 162BD4A2AC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 13:20:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id biDkAFZcf29H for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Jan 2019 13:20:03 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B0F3F4A2AC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 13:20:03 -0500 (EST)
+ with ESMTP id 8FnZbrmplBEI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Jan 2019 13:20:15 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F390F4A320
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 13:20:14 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <b5e4bd1c-8bb5-36ca-026e-59fd92a4486d@arm.com>
+In-Reply-To: <20190125154308.185131-1-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,38 +28,30 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: andre.przywara@arm.com, Sami.Mujawar@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 22, 2019 at 09:00:01AM +0000, Julien Thierry wrote:
-> On 22/01/2019 07:10, Will Deacon wrote:
-> > I've picked up the first four patches of this series, but I don't really
+On Fri, Jan 25, 2019 at 03:43:08PM +0000, Andre Przywara wrote:
+> When loading a firmware instead of a kernel, we can still pass on any
+> *user-provided* command line, as /chosen/bootargs is a generic device tree
+> feature. We just need to make sure to not pass our mangled-for-Linux
+> version.
 > 
-> Thanks!
+> This allows to run "firmware" images which make use of a command line,
+> still are not Linux kernels, like kvm-unit-tests.
 > 
-> > understand where you're going with the non-volatile memory part and whether
-> > it's nvram, flash or something completely different. Given that Linux
-> > doesn't support your binding, is this something that UEFI currently uses?
-> > 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Hi Will,
 > 
-> So the thing is that UEFI/EDK2 needs some kind of readable and writable
-> non-volatile memory (flash or nv-ram, not sure what's the difference) to
-> load/store its environment. For kvmtool, we can just provide memory
-> region where the environment is mapped and EDK2 can just directly read
-> from or write to it.
-> 
-> The thing is, when looking at the flash binding in Linux, each platform
-> seems to have its own binding of their flash device (Which I guess makes
-> sense since they don't necessarily work the same way). I couldn't find
-> any existing generic bindings that seemed to fit what I'm presenting to
-> EDK2 (which could also be used by another firmware if they needed a
-> binary blob in flash or something).
+> this goes on top of Julien's firmware series (which did not yet appear
+> on kernel.org?)
+> This fixes an issue with some kvm-unit-tests support. [1]
 
-We could probably abuse memreserve for this, which I think happens in the
-wild already for non-memory regions. However, if the non-volatile region is
-outside of ram, then why do we care at all? Is UEFI parsing the dts to
-locate it? If so, I'd have thought that they would need to get a binding
-sorted for that purpose, in which case we can just use that.
+Does kvm-unit-tests break if we pass the modified command line? I'm wary of
+passing something different depending on whether the payload is firmware or
+kernel, because there's a pretty fine line between the two (and the firmware
+may even just forward the thing on to the kernel it loads).
 
 Will
