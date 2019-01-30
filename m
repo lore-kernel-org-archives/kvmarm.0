@@ -1,386 +1,129 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [RFC v3 02/21] iommu: Introduce cache_invalidate API
-Date: Wed, 30 Jan 2019 09:48:59 +0100
-Message-ID: <62d81d02-667c-8213-4f75-38319a435ab6@redhat.com>
-References: <20190108102633.17482-1-eric.auger@redhat.com>
- <20190108102633.17482-3-eric.auger@redhat.com>
- <20190111143042.183a27a7@x1.home>
- <66653430-514f-2b4b-3d93-348deb6cd490@redhat.com>
- <20190129161630.5668cf33@w520.home>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v8 24/26] arm64: acpi: Make apei_claim_sea() synchronise
+ with APEI's irq work
+Date: Wed, 30 Jan 2019 08:56:59 +0000
+Message-ID: <858ac1d3-8b21-d3a7-d7dd-3d95294a9bea@arm.com>
+References: <20190129184902.102850-1-james.morse@arm.com>
+ <20190129184902.102850-25-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190129161630.5668cf33@w520.home>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190129184902.102850-25-james.morse@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>, linux-acpi@vger.kernel.org
+Cc: Tony Luck <tony.luck@intel.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Rafael Wysocki <rjw@rjwysocki.net>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
+Hi James,
 
-On 1/30/19 12:16 AM, Alex Williamson wrote:
-> On Fri, 25 Jan 2019 17:49:20 +0100
-> Auger Eric <eric.auger@redhat.com> wrote:
+On 29/01/2019 18:49, James Morse wrote:
+> APEI is unable to do all of its error handling work in nmi-context, so
+> it defers non-fatal work onto the irq_work queue. arch_irq_work_raise()
+> sends an IPI to the calling cpu, but this is not guaranteed to be taken
+> before returning to user-space.
 > 
->> Hi Alex,
->>
->> On 1/11/19 10:30 PM, Alex Williamson wrote:
->>> On Tue,  8 Jan 2019 11:26:14 +0100
->>> Eric Auger <eric.auger@redhat.com> wrote:
->>>   
->>>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
->>>>
->>>> In any virtualization use case, when the first translation stage
->>>> is "owned" by the guest OS, the host IOMMU driver has no knowledge
->>>> of caching structure updates unless the guest invalidation activities
->>>> are trapped by the virtualizer and passed down to the host.
->>>>
->>>> Since the invalidation data are obtained from user space and will be
->>>> written into physical IOMMU, we must allow security check at various
->>>> layers. Therefore, generic invalidation data format are proposed here,
->>>> model specific IOMMU drivers need to convert them into their own format.
->>>>
->>>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->>>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->>>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>> v1 -> v2:
->>>> - add arch_id field
->>>> - renamed tlb_invalidate into cache_invalidate as this API allows
->>>>   to invalidate context caches on top of IOTLBs
->>>>
->>>> v1:
->>>> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
->>>> header. Commit message reworded.
->>>> ---
->>>>  drivers/iommu/iommu.c      | 14 ++++++
->>>>  include/linux/iommu.h      | 14 ++++++
->>>>  include/uapi/linux/iommu.h | 95 ++++++++++++++++++++++++++++++++++++++
->>>>  3 files changed, 123 insertions(+)
->>>>
->>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->>>> index 0f2b7f1fc7c8..b2e248770508 100644
->>>> --- a/drivers/iommu/iommu.c
->>>> +++ b/drivers/iommu/iommu.c
->>>> @@ -1403,6 +1403,20 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
->>>>  }
->>>>  EXPORT_SYMBOL_GPL(iommu_set_pasid_table);
->>>>  
->>>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
->>>> +			   struct iommu_cache_invalidate_info *inv_info)
->>>> +{
->>>> +	int ret = 0;
->>>> +
->>>> +	if (unlikely(!domain->ops->cache_invalidate))
->>>> +		return -ENODEV;
->>>> +
->>>> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
->>>> +
->>>> +	return ret;
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
->>>> +
->>>>  static void __iommu_detach_device(struct iommu_domain *domain,
->>>>  				  struct device *dev)
->>>>  {
->>>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->>>> index 1da2a2357ea4..96d59886f230 100644
->>>> --- a/include/linux/iommu.h
->>>> +++ b/include/linux/iommu.h
->>>> @@ -186,6 +186,7 @@ struct iommu_resv_region {
->>>>   * @of_xlate: add OF master IDs to iommu grouping
->>>>   * @pgsize_bitmap: bitmap of all possible supported page sizes
->>>>   * @set_pasid_table: set pasid table
->>>> + * @cache_invalidate: invalidate translation caches
->>>>   */
->>>>  struct iommu_ops {
->>>>  	bool (*capable)(enum iommu_cap);
->>>> @@ -231,6 +232,9 @@ struct iommu_ops {
->>>>  	int (*set_pasid_table)(struct iommu_domain *domain,
->>>>  			       struct iommu_pasid_table_config *cfg);
->>>>  
->>>> +	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
->>>> +				struct iommu_cache_invalidate_info *inv_info);
->>>> +
->>>>  	unsigned long pgsize_bitmap;
->>>>  };
->>>>  
->>>> @@ -294,6 +298,9 @@ extern void iommu_detach_device(struct iommu_domain *domain,
->>>>  				struct device *dev);
->>>>  extern int iommu_set_pasid_table(struct iommu_domain *domain,
->>>>  				 struct iommu_pasid_table_config *cfg);
->>>> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
->>>> +				struct device *dev,
->>>> +				struct iommu_cache_invalidate_info *inv_info);
->>>>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
->>>>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
->>>>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
->>>> @@ -709,6 +716,13 @@ int iommu_set_pasid_table(struct iommu_domain *domain,
->>>>  {
->>>>  	return -ENODEV;
->>>>  }
->>>> +static inline int
->>>> +iommu_cache_invalidate(struct iommu_domain *domain,
->>>> +		       struct device *dev,
->>>> +		       struct iommu_cache_invalidate_info *inv_info)
->>>> +{
->>>> +	return -ENODEV;
->>>> +}
->>>>  
->>>>  #endif /* CONFIG_IOMMU_API */
->>>>  
->>>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->>>> index 7a7cf7a3de7c..4605f5cfac84 100644
->>>> --- a/include/uapi/linux/iommu.h
->>>> +++ b/include/uapi/linux/iommu.h
->>>> @@ -47,4 +47,99 @@ struct iommu_pasid_table_config {
->>>>  	};
->>>>  };
->>>>  
->>>> +/**
->>>> + * enum iommu_inv_granularity - Generic invalidation granularity
->>>> + * @IOMMU_INV_GRANU_DOMAIN_ALL_PASID:	TLB entries or PASID caches of all
->>>> + *					PASIDs associated with a domain ID
->>>> + * @IOMMU_INV_GRANU_PASID_SEL:		TLB entries or PASID cache associated
->>>> + *					with a PASID and a domain
->>>> + * @IOMMU_INV_GRANU_PAGE_PASID:		TLB entries of selected page range
->>>> + *					within a PASID
->>>> + *
->>>> + * When an invalidation request is passed down to IOMMU to flush translation
->>>> + * caches, it may carry different granularity levels, which can be specific
->>>> + * to certain types of translation caches.
->>>> + * This enum is a collection of granularities for all types of translation
->>>> + * caches. The idea is to make it easy for IOMMU model specific driver to
->>>> + * convert from generic to model specific value. Each IOMMU driver
->>>> + * can enforce check based on its own conversion table. The conversion is
->>>> + * based on 2D look-up with inputs as follows:
->>>> + * - translation cache types
->>>> + * - granularity
->>>> + *
->>>> + *             type |   DTLB    |    TLB    |   PASID   |
->>>> + *  granule         |           |           |   cache   |
->>>> + * -----------------+-----------+-----------+-----------+
->>>> + *  DN_ALL_PASID    |   Y       |   Y       |   Y       |
->>>> + *  PASID_SEL       |   Y       |   Y       |   Y       |
->>>> + *  PAGE_PASID      |   Y       |   Y       |   N/A     |
->>>> + *
->>>> + */
->>>> +enum iommu_inv_granularity {
->>>> +	IOMMU_INV_GRANU_DOMAIN_ALL_PASID,
->>>> +	IOMMU_INV_GRANU_PASID_SEL,
->>>> +	IOMMU_INV_GRANU_PAGE_PASID,
->>>> +	IOMMU_INV_NR_GRANU,
->>>> +};
->>>> +
->>>> +/**
->>>> + * enum iommu_inv_type - Generic translation cache types for invalidation
->>>> + *
->>>> + * @IOMMU_INV_TYPE_DTLB:	device IOTLB
->>>> + * @IOMMU_INV_TYPE_TLB:		IOMMU paging structure cache
->>>> + * @IOMMU_INV_TYPE_PASID:	PASID cache
->>>> + * Invalidation requests sent to IOMMU for a given device need to indicate
->>>> + * which type of translation cache to be operated on. Combined with enum
->>>> + * iommu_inv_granularity, model specific driver can do a simple lookup to
->>>> + * convert from generic to model specific value.
->>>> + */
->>>> +enum iommu_inv_type {
->>>> +	IOMMU_INV_TYPE_DTLB,
->>>> +	IOMMU_INV_TYPE_TLB,
->>>> +	IOMMU_INV_TYPE_PASID,
->>>> +	IOMMU_INV_NR_TYPE
->>>> +};
->>>> +
->>>> +/**
->>>> + * Translation cache invalidation header that contains mandatory meta data.
->>>> + * @version:	info format version, expecting future extesions
->>>> + * @type:	type of translation cache to be invalidated
->>>> + */
->>>> +struct iommu_cache_invalidate_hdr {
->>>> +	__u32 version;
->>>> +#define TLB_INV_HDR_VERSION_1 1
->>>> +	enum iommu_inv_type type;
->>>> +};
->>>> +
->>>> +/**
->>>> + * Translation cache invalidation information, contains generic IOMMU
->>>> + * data which can be parsed based on model ID by model specific drivers.
->>>> + * Since the invalidation of second level page tables are included in the
->>>> + * unmap operation, this info is only applicable to the first level
->>>> + * translation caches, i.e. DMA request with PASID.
->>>> + *
->>>> + * @granularity:	requested invalidation granularity, type dependent
->>>> + * @size:		2^size of 4K pages, 0 for 4k, 9 for 2MB, etc.  
->>>
->>> Why is this a 4K page centric interface?  
->> This matches the vt-d Address Mask (AM) field of the IOTLB Invalidate
->> Descriptor. We can pass a log2size instead.
+> Unless the exception interrupted a context with irqs-masked,
+> irq_work_run() can run immediately. Otherwise return -EINPROGRESS to
+> indicate ghes_notify_sea() found some work to do, but it hasn't
+> finished yet.
 > 
-> Could some options not require a power of two size?
+> With this apei_claim_sea() returning '0' means this external-abort was
+> also notification of a firmware-first RAS error, and that APEI has
+> processed the CPER records.
 > 
->>>> + * @nr_pages:		number of pages to invalidate
->>>> + * @pasid:		processor address space ID value per PCI spec.
->>>> + * @arch_id:		architecture dependent id characterizing a context
->>>> + *			and tagging the caches, ie. domain Identfier on VTD,
->>>> + *			asid on ARM SMMU
->>>> + * @addr:		page address to be invalidated
->>>> + * @flags		IOMMU_INVALIDATE_ADDR_LEAF: leaf paging entries
->>>> + *			IOMMU_INVALIDATE_GLOBAL_PAGE: global pages  
->>>
->>> Shouldn't some of these be tied the the granularity of the
->>> invalidation?  It seems like this should be more similar to
->>> iommu_pasid_table_config where the granularity of the invalidation
->>> defines which entry within a union at the end of the structure is valid
->>> and populated.  Otherwise we have fields that don't make sense for
->>> certain invalidations.  
->>
->> I am a little bit embarrassed here as this API version is the outcome of
->> long discussions held by Jacob, jean-Philippe and many others. I don't
->> want to hijack that work as I am "simply" reusing this API. Nevertheless
->> I am willing to help on this. So following your recommendation above I
->> dare to propose an updated API:
->>
->> struct iommu_device_iotlb_inv_info {
->>         __u32   version;
->> #define IOMMU_DEV_IOTLB_INV_GLOBAL   0
->> #define IOMMU_DEV_IOTLB_INV_SOURCEID (1 << 0)
->> #define IOMMU_DEV_IOTLB_INV_PASID    (1 << 1)
->>         __u8    granularity;
->>         __u64   addr;
->>         __u8    log2size;
->>         __u64   sourceid;
->>         __u64   pasid;
->>         __u8    padding[2];
->> };
->>
->> struct iommu_iotlb_inv_info {
->>         __u32   version;
->> #define IOMMU_IOTLB_INV_GLOBAL  0
->> #define IOMMU_IOTLB_INV_ARCHID  (1 << 0)
->> #define IOMMU_IOTLB_INV_PASID   (1 << 1)
->> #define IOMMU_IOTLB_INV_PAGE    (1 << 2)
->>         __u8    granularity;
->>         __u64   archid;
->>         __u64   pasid;
->>         __u64   addr;
->>         __u8    log2size;
->>         __u8    padding[2];
->> };
->>
->> struct iommu_pasid_inv_info {
->>         __u32   version;
->> #define IOMMU_PASID_INV_GLOBAL     0
->> #define IOMMU_PASID_INV_ARCHID     (1 << 0)
->> #define IOMMU_PASID_INV_PASID      (1 << 1)
->> #define IOMMU_PASID_INV_SOURCEID   (1 << 2)
->>         __u8    granularity;
->>         __u64   archid;
->>         __u64   pasid;
->>         __u64   sourceid;
->>         __u8    padding[3];
->> };
->> /**
->>  * Translation cache invalidation information, contains generic IOMMU
->>  * data which can be parsed based on model ID by model specific drivers.
->>  * Since the invalidation of second level page tables are included in
->>  * the unmap operation, this info is only applicable to the first level
->>  * translation caches, i.e. DMA request with PASID.
->>  *
->>  */
->> struct iommu_cache_invalidate_info {
->> #define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
->>         __u32 version;
->> #define IOMMU_INV_TYPE_IOTLB        1 /* IOMMU paging structure cache */
->> #define IOMMU_INV_TYPE_DEV_IOTLB    2 /* Device IOTLB */
->> #define IOMMU_INV_TYPE_PASID        3 /* PASID cache */
->>         __u8 type;
->>         union {
->>                 struct iommu_iotlb_invalidate_info iotlb_inv_info;
->>                 struct iommu_dev_iotlb_invalidate_info dev_iotlb_inv_info;
->>                 struct iommu_pasid_inv_info pasid_inv_info;
->>         };
->> };
->>
->> At the moment I ignore the leaf bool parameter used on ARM for PASID
->> invalidation and TLB invalidation. Maybe we can just invalidate more
->> that the leaf cache structures at the moment?
->>
->> on ARM the PASID table can be invalidated per streamid. On vt-d, as far
->> as I understand the sourceid does not tag the entries.
->>
->>>   
->>>> + *
->>>> + */
->>>> +struct iommu_cache_invalidate_info {
->>>> +	struct iommu_cache_invalidate_hdr	hdr;
->>>> +	enum iommu_inv_granularity	granularity;  
->>>
->>> A separate structure for hdr seems a little pointless.  
->> removed
->>>   
->>>> +	__u32		flags;
->>>> +#define IOMMU_INVALIDATE_ADDR_LEAF	(1 << 0)
->>>> +#define IOMMU_INVALIDATE_GLOBAL_PAGE	(1 << 1)
->>>> +	__u8		size;  
->>>
->>> Really need some padding or packing here for any hope of having
->>> consistency with userspace.
->>>   
->>>> +	__u64		nr_pages;
->>>> +	__u32		pasid;  
->>>
->>> Sub-optimal ordering for packing/padding.  Thanks,  
->> I introduced some padding above. Is that OK?
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Punit Agrawal <punit.agrawal@arm.com>
+> Tested-by: Tyler Baicar <tbaicar@codeaurora.org>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> CC: Xie XiuQi <xiexiuqi@huawei.com>
+> CC: gengdongjiu <gengdongjiu@huawei.com>
 > 
-> No, you're not taking field alignment into account, processors don't
-> like unaligned data.  If we have:
+> ---
+> Changes since v7:
+>  * Added Catalin's ack, then:
+>  * Added __irq_enter()/exit() calls so if we interrupted preemptible code, the
+>    preempt count matches what other irq-work expects.
+>  * Changed the 'if (!arch_irqs_disabled_flags(interrupted_flags))' test to be
+>    safe before/after Julien's PMR series.
 > 
-> struct foo {
-> 	uint32_t	a;
-> 	uint8_t		b;
-> 	uint64_t	c;
-> 	uint8_t		d;
-> 	uint64_t	e;
-> };
+> Changes since v6:
+>  * Added pr_warn() for the EINPROGRESS case so panic-tracebacks show
+>    'APEI was here'.
+>  * Tinkered with the commit message
 > 
-> In memory on a 64 bit system, that would look like:
+> Changes since v2:
+>  * Removed IS_ENABLED() check, done by the caller unless we have a dummy
+>    definition.
+> ---
+>  arch/arm64/kernel/acpi.c | 23 +++++++++++++++++++++++
+>  arch/arm64/mm/fault.c    |  9 ++++-----
+>  2 files changed, 27 insertions(+), 5 deletions(-)
 > 
-> aaaab...ccccccccd.......eeeeeeee
-> 
-> While on a 32 bit system, it would look like:
-> 
-> aaaab...ccccccccd...eeeeeeee
-> 
-> In this example we have 22 bytes of data (4 + 1 + 8 + 1 + 8), but the
-> structure is 32 bytes when provided by a 64 bit userspace or 28 bytes
-> when provided by a 32 bit userspace and the start address of the 'e'
-> field changes.  A 64 bit kernel would process the latter structure
-> incorrectly or fault trying to copy the expected length from userspace.
-> Adding padding to the end doesn't solve this. If we instead reconstruct
-> the structure as:
-> 
-> struct foo {
-> 	uint32_t	a;
-> 	uint8_t		b;
-> 	uint8_t		d;
-> 	uint8_t		pad[2];
-> 	uint64_t	c;
-> 	uint64_t	e;
-> };
-> 
-> Then we create a structure that looks the same from either a 32 bit or
-> 64 bit userspace, is only 24 bytes in memory, and works for any
-> reasonable compiler, though we might choose to add a packed attribute to
-> make sure the compiler doesn't do anything screwy if we were paranoid.
-> Thanks,
+> diff --git a/arch/arm64/kernel/acpi.c b/arch/arm64/kernel/acpi.c
+> index 803f0494dd3e..8288ae0c8f3b 100644
+> --- a/arch/arm64/kernel/acpi.c
+> +++ b/arch/arm64/kernel/acpi.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/init.h>
+>  #include <linux/irq.h>
+>  #include <linux/irqdomain.h>
+> +#include <linux/irq_work.h>
+>  #include <linux/memblock.h>
+>  #include <linux/of_fdt.h>
+>  #include <linux/smp.h>
+> @@ -268,12 +269,17 @@ pgprot_t __acpi_get_mem_attribute(phys_addr_t addr)
+>  int apei_claim_sea(struct pt_regs *regs)
+>  {
+>  	int err = -ENOENT;
+> +	bool return_to_irqs_enabled;
+>  	unsigned long current_flags;
+>  
+>  	if (!IS_ENABLED(CONFIG_ACPI_APEI_GHES))
+>  		return err;
+>  
+>  	current_flags = arch_local_save_flags();
+> +	return_to_irqs_enabled = !irqs_disabled_flags(current_flags);
+> +
+> +	if (regs)
+> +		return_to_irqs_enabled = interrupts_enabled(regs);
+>  
+>  	/*
+>  	 * SEA can interrupt SError, mask it and describe this as an NMI so
+> @@ -283,6 +289,23 @@ int apei_claim_sea(struct pt_regs *regs)
+>  	nmi_enter();
+>  	err = ghes_notify_sea();
+>  	nmi_exit();
+> +
+> +	/*
+> +	 * APEI NMI-like notifications are deferred to irq_work. Unless
+> +	 * we interrupted irqs-masked code, we can do that now.
+> +	 */
+> +	if (!err) {
+> +		if (return_to_irqs_enabled) {
+> +			local_daif_restore(DAIF_PROCCTX_NOIRQ);
+> +			__irq_enter();
+> +			irq_work_run();
+> +			__irq_exit();
+> +		} else {
+> +			pr_warn("APEI work queued but not completed");
+> +			err = -EINPROGRESS;
+> +		}
+> +	}
+> +
 
-Thank you very much for your time and explanations. That's understood now.
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-Eric
-> 
-> Alex
-> 
+Cheers,
+
+-- 
+Julien Thierry
