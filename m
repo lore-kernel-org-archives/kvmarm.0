@@ -1,88 +1,95 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 5/5] arm/arm64: KVM: Don't panic on failure to properly
- reset system registers
-Date: Wed, 30 Jan 2019 10:51:02 +0100
-Message-ID: <20190130095102.GG13482@e113682-lin.lund.arm.com>
-References: <20190125094656.5026-1-christoffer.dall@arm.com>
- <20190125094656.5026-6-christoffer.dall@arm.com>
- <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] kvm: arm64: Relax the restriction on using stage2 PUD
+ huge mapping
+Date: Wed, 30 Jan 2019 10:21:53 +0000
+Message-ID: <ddff61a6-bc43-564e-c1ee-ed2c2764fad6@arm.com>
+References: <1548789137-4446-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1548789137-4446-1-git-send-email-suzuki.poulose@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@kernel.org, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 29, 2019 at 05:33:37PM +0100, Andrew Jones wrote:
-> On Fri, Jan 25, 2019 at 10:46:56AM +0100, Christoffer Dall wrote:
-> > From: Marc Zyngier <marc.zyngier@arm.com>
-> > 
-> > Failing to properly reset system registers is pretty bad. But not
-> > quite as bad as bringing the whole machine down... So warn loudly,
-> > but slightly more gracefully.
-> > 
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-> > ---
-> >  arch/arm/kvm/coproc.c     | 4 ++--
-> >  arch/arm64/kvm/sys_regs.c | 4 ++--
-> >  2 files changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> > index 222c1635bc7a..e8bd288fd5be 100644
-> > --- a/arch/arm/kvm/coproc.c
-> > +++ b/arch/arm/kvm/coproc.c
-> > @@ -1450,6 +1450,6 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
-> >  	reset_coproc_regs(vcpu, table, num);
-> >  
-> >  	for (num = 1; num < NR_CP15_REGS; num++)
-> > -		if (vcpu_cp15(vcpu, num) == 0x42424242)
-> > -			panic("Didn't reset vcpu_cp15(vcpu, %zi)", num);
-> > +		WARN(vcpu_cp15(vcpu, num) == 0x42424242,
-> > +		     "Didn't reset vcpu_cp15(vcpu, %zi)", num);
-> >  }
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 86096774abcd..4f067545c7d2 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2609,6 +2609,6 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
-> >  	reset_sys_reg_descs(vcpu, table, num);
-> >  
-> >  	for (num = 1; num < NR_SYS_REGS; num++)
-> > -		if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
-> > -			panic("Didn't reset __vcpu_sys_reg(%zi)", num);
-> > +		WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
-> > +		     "Didn't reset __vcpu_sys_reg(%zi)\n", num);
-> >  }
-> > -- 
-> > 2.18.0
-> >
+On 29/01/2019 19:12, Suzuki K Poulose wrote:
+> We restrict mapping the PUD huge pages in stage2 to only when the
+> stage2 has 4 level page table, leaving the feature unused with
+> the default IPA size. But we could use it even with a 3
+> level page table, i.e, when the PUD level is folded into PGD,
+> just like the stage1. Relax the condition to allow using the
+> PUD huge page mappings at stage2 when it is possible.
 > 
-> If we only get halfway through resetting, then we'll get a warn splat,
-> complete with a backtrace, for each register. Should we do something
-> like the following instead?
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  virt/kvm/arm/mmu.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
->   for (num = 1; num < NR_SYS_REGS; num++)
->      if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
->         failed++;
->   WARN(failed, "Didn't reset %d system registers", failed);
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index fbdf3ac..30251e2 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1695,11 +1695,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  
+>  	vma_pagesize = vma_kernel_pagesize(vma);
+>  	/*
+> -	 * PUD level may not exist for a VM but PMD is guaranteed to
+> -	 * exist.
+> +	 * The stage2 has a minimum of 2 level table (For arm64 see
+> +	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+> +	 * use PMD_SIZE huge mappings (even when the PMD is folded into PGD).
+> +	 * As for PUD huge maps, we must make sure that we have at least
+> +	 * 3 levels, i.e, PMD is not folded.
+>  	 */
+>  	if ((vma_pagesize == PMD_SIZE ||
+> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pud(kvm))) &&
+> +	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
+>  	    !force_pte) {
+>  		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+>  	}
 > 
 
-I don't care stongly whichever way we do it, but when we actually saw
-this, it seemed useful to see which system register was not initialized.
+For the record, it took a 10 minute discussion with Suzuki  to
+understand that the above is actually correct, even if massively
+confusing. Why is it correct:
 
-Thanks for the review.
+- In a 4 level stage-2, each of PGD/PUD/PMD exists on its own, and start
+level is 0
+- In a 3 level stage-2, PGD and PUD are fused as the start level is 1,
+and PMD exists on its own
+- In a 2 level stage-2, both PGD, PUD and PMD are fused, and start level
+is 2.
 
-    Christoffer
+>From the above, we can extract that you can always have a block mapping
+at the PUD level if you have a standalone PMD, and that's the logic this
+patch is using.
+
+Now, the *real* reason is that you can map a given size in your S2PT,
+not that some level is fused or not. What we want is probably a helper
+that says:
+
+bool kvm_stage2_can_map_block_size(struct kvm *kvm, size_t sz)
+{
+	return sz >= PMD_SIZE && stage2_pgdir_size(kvm) >= sz);
+}
+
+and the above becomes:
+
+if (kvm_stage2_can_map_block_size(kvm, vma_pagesize)) && !force_pte)
+
+which I find much nicer.
+
+I guess I can still take the above as a fix if Christoffer is happy with
+it, but if you think my above hack is correct, I'd like things to be
+cleaned-up in the near future.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
