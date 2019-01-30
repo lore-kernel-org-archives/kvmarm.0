@@ -1,175 +1,88 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 3/5] KVM: arm/arm64: Require VCPU threads to turn them
- self off
-Date: Wed, 30 Jan 2019 10:49:09 +0100
-Message-ID: <20190130094909.GF13482@e113682-lin.lund.arm.com>
+Subject: Re: [PATCH 5/5] arm/arm64: KVM: Don't panic on failure to properly
+ reset system registers
+Date: Wed, 30 Jan 2019 10:51:02 +0100
+Message-ID: <20190130095102.GG13482@e113682-lin.lund.arm.com>
 References: <20190125094656.5026-1-christoffer.dall@arm.com>
- <20190125094656.5026-4-christoffer.dall@arm.com>
- <20190129161644.v4ncrcgvukkd7d5w@kamzik.brq.redhat.com>
+ <20190125094656.5026-6-christoffer.dall@arm.com>
+ <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 827A44A32D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 04:49:13 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EQ0PXkNLFTJg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Jan 2019 04:49:12 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01E234A2E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 04:49:11 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20190129161644.v4ncrcgvukkd7d5w@kamzik.brq.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 29, 2019 at 05:16:44PM +0100, Andrew Jones wrote:
-> 
-> Summary edit
-> 
-> > KVM: arm/arm64: Require VCPU threads to turn them self off
-> 
-> themselves
-> 
-> On Fri, Jan 25, 2019 at 10:46:54AM +0100, Christoffer Dall wrote:
-> > To avoid a race between turning VCPUs off and turning them on, make sure
-> > that only the VCPU threat itself turns off the VCPU.  When other threads
-> > want to turn of a VCPU, they now do this via a request.
+On Tue, Jan 29, 2019 at 05:33:37PM +0100, Andrew Jones wrote:
+> On Fri, Jan 25, 2019 at 10:46:56AM +0100, Christoffer Dall wrote:
+> > From: Marc Zyngier <marc.zyngier@arm.com>
 > > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> > Failing to properly reset system registers is pretty bad. But not
+> > quite as bad as bringing the whole machine down... So warn loudly,
+> > but slightly more gracefully.
+> > 
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 > > ---
-> >  arch/arm/include/asm/kvm_host.h   |  2 ++
-> >  arch/arm64/include/asm/kvm_host.h |  2 ++
-> >  virt/kvm/arm/arm.c                |  8 ++++++--
-> >  virt/kvm/arm/psci.c               | 11 ++---------
-> >  4 files changed, 12 insertions(+), 11 deletions(-)
+> >  arch/arm/kvm/coproc.c     | 4 ++--
+> >  arch/arm64/kvm/sys_regs.c | 4 ++--
+> >  2 files changed, 4 insertions(+), 4 deletions(-)
 > > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index 50e89869178a..b1cfae222441 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -49,6 +49,8 @@
-> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-> >  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> > +#define KVM_REQ_VCPU_OFF \
-> > +	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+> > index 222c1635bc7a..e8bd288fd5be 100644
+> > --- a/arch/arm/kvm/coproc.c
+> > +++ b/arch/arm/kvm/coproc.c
+> > @@ -1450,6 +1450,6 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
+> >  	reset_coproc_regs(vcpu, table, num);
 > >  
-> >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> >  
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index da3fc7324d68..d43b13421987 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -49,6 +49,8 @@
-> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-> >  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> > +#define KVM_REQ_VCPU_OFF \
-> > +	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >  
-> >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> >  
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 9c486fad3f9f..785076176814 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -404,8 +404,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> >  
-> >  static void vcpu_power_off(struct kvm_vcpu *vcpu)
-> >  {
-> > -	vcpu->arch.power_off = true;
-> > -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> > +	kvm_make_request(KVM_REQ_VCPU_OFF, vcpu);
-> >  	kvm_vcpu_kick(vcpu);
+> >  	for (num = 1; num < NR_CP15_REGS; num++)
+> > -		if (vcpu_cp15(vcpu, num) == 0x42424242)
+> > -			panic("Didn't reset vcpu_cp15(vcpu, %zi)", num);
+> > +		WARN(vcpu_cp15(vcpu, num) == 0x42424242,
+> > +		     "Didn't reset vcpu_cp15(vcpu, %zi)", num);
 > >  }
-> 
-> I think we should leave this function alone. Otherwise if userspace sets
-> the MP state to STOPPED and then queries the state before the vcpu
-> has a chance to manage its vcpu requests, the state will still indicate
-> RUNNBLE. The same goes for a query right after doing a vcpu init.
-> 
-
-We can't leave this alone, because that could lead to userspace racing
-with two PSCI_VCPU_ON requests which could then both enter the critical
-section gated only by the cmpxchg in kvm_psci_vcpu_on.
-
-But we could do something like this (completely untested):
-
-
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 1e3195155860..538b5eb9d920 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -404,6 +404,17 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 
- static void vcpu_power_off(struct kvm_vcpu *vcpu)
- {
-+	enum vcpu_power_state old_power_state;
-+
-+	/*
-+	 * Set power_state directly to reflect the power state back to user
-+	 * space even when the VCPU thread has not had a chance to run, but
-+	 * only if this doesn't accidentally allow interleaved PSCI_VCPU_ON
-+	 * requests.
-+	 */
-+	old_power_state = cmpxchg(&vcpu->arch.power_state,
-+				  KVM_ARM_VCPU_ON,
-+				  KVM_ARM_VCPU_OFF);
- 	kvm_make_request(KVM_REQ_VCPU_OFF, vcpu);
- 	kvm_vcpu_kick(vcpu);
- }
-
-
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 86096774abcd..4f067545c7d2 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2609,6 +2609,6 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+> >  	reset_sys_reg_descs(vcpu, table, num);
 > >  
-> > @@ -646,6 +645,11 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
-> >  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
-> >  			vcpu_req_sleep(vcpu);
-> >  
-> > +		if (kvm_check_request(KVM_REQ_VCPU_OFF, vcpu)) {
-> > +			vcpu->arch.power_off = true;
-> > +			vcpu_req_sleep(vcpu);
-> > +		}
-> > +
-> >  		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
-> >  			kvm_reset_vcpu(vcpu);
-> >  
-> > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-> > index b9cff1d4b06d..20255319e193 100644
-> > --- a/virt/kvm/arm/psci.c
-> > +++ b/virt/kvm/arm/psci.c
-> > @@ -97,9 +97,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
-> >  
-> >  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
-> >  {
-> > -	vcpu->arch.power_off = true;
-> > -	kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> > -	kvm_vcpu_kick(vcpu);
-> > +	kvm_make_request(KVM_REQ_VCPU_OFF, vcpu);
+> >  	for (num = 1; num < NR_SYS_REGS; num++)
+> > -		if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+> > -			panic("Didn't reset __vcpu_sys_reg(%zi)", num);
+> > +		WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
+> > +		     "Didn't reset __vcpu_sys_reg(%zi)\n", num);
 > >  }
+> > -- 
+> > 2.18.0
+> >
 > 
-> This was currently fine since it implements CPU_OFF which only applies to
-> the calling vcpu, but there's also no reason not to change it to be
-> consistent with the below change
+> If we only get halfway through resetting, then we'll get a warn splat,
+> complete with a backtrace, for each register. Should we do something
+> like the following instead?
+> 
+>   for (num = 1; num < NR_SYS_REGS; num++)
+>      if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+>         failed++;
+>   WARN(failed, "Didn't reset %d system registers", failed);
 > 
 
-Same problem as above, we don't want two VCPUs to be messing with a
-target VCPU state at the same time.
+I don't care stongly whichever way we do it, but when we actually saw
+this, it seemed useful to see which system register was not initialized.
 
-
-Thanks,
+Thanks for the review.
 
     Christoffer
