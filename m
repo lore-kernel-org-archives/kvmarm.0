@@ -1,101 +1,104 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] kvm: arm64: Relax the restriction on using stage2 PUD
- huge mapping
-Date: Wed, 30 Jan 2019 10:39:46 +0000
-Message-ID: <64c7a684-3e4b-381e-2223-f3db99963613@arm.com>
-References: <1548789137-4446-1-git-send-email-suzuki.poulose@arm.com>
- <ddff61a6-bc43-564e-c1ee-ed2c2764fad6@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 5/5] arm/arm64: KVM: Don't panic on failure to properly
+ reset system registers
+Date: Wed, 30 Jan 2019 10:56:19 +0000
+Message-ID: <b2c0fa37-37ad-3696-e862-5d0434496d1f@arm.com>
+References: <20190125094656.5026-1-christoffer.dall@arm.com>
+ <20190125094656.5026-6-christoffer.dall@arm.com>
+ <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <ddff61a6-bc43-564e-c1ee-ed2c2764fad6@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 997A24A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 05:56:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id efxfo+GfhDLJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Jan 2019 05:56:23 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 472A040217
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 05:56:23 -0500 (EST)
+In-Reply-To: <20190129163337.nbwivspcvlcmzrmo@kamzik.brq.redhat.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, cdall@kernel.org, christoffer.dall@arm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Marc,
-
-On 30/01/2019 10:21, Marc Zyngier wrote:
-> On 29/01/2019 19:12, Suzuki K Poulose wrote:
->> We restrict mapping the PUD huge pages in stage2 to only when the
->> stage2 has 4 level page table, leaving the feature unused with
->> the default IPA size. But we could use it even with a 3
->> level page table, i.e, when the PUD level is folded into PGD,
->> just like the stage1. Relax the condition to allow using the
->> PUD huge page mappings at stage2 when it is possible.
+On 29/01/2019 16:33, Andrew Jones wrote:
+> On Fri, Jan 25, 2019 at 10:46:56AM +0100, Christoffer Dall wrote:
+>> From: Marc Zyngier <marc.zyngier@arm.com>
 >>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Failing to properly reset system registers is pretty bad. But not
+>> quite as bad as bringing the whole machine down... So warn loudly,
+>> but slightly more gracefully.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 >> ---
->>   virt/kvm/arm/mmu.c | 9 ++++++---
->>   1 file changed, 6 insertions(+), 3 deletions(-)
+>>  arch/arm/kvm/coproc.c     | 4 ++--
+>>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>>  2 files changed, 4 insertions(+), 4 deletions(-)
 >>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index fbdf3ac..30251e2 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1695,11 +1695,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   
->>   	vma_pagesize = vma_kernel_pagesize(vma);
->>   	/*
->> -	 * PUD level may not exist for a VM but PMD is guaranteed to
->> -	 * exist.
->> +	 * The stage2 has a minimum of 2 level table (For arm64 see
->> +	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
->> +	 * use PMD_SIZE huge mappings (even when the PMD is folded into PGD).
->> +	 * As for PUD huge maps, we must make sure that we have at least
->> +	 * 3 levels, i.e, PMD is not folded.
->>   	 */
->>   	if ((vma_pagesize == PMD_SIZE ||
->> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pud(kvm))) &&
->> +	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->>   	    !force_pte) {
->>   		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->>   	}
+>> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+>> index 222c1635bc7a..e8bd288fd5be 100644
+>> --- a/arch/arm/kvm/coproc.c
+>> +++ b/arch/arm/kvm/coproc.c
+>> @@ -1450,6 +1450,6 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
+>>  	reset_coproc_regs(vcpu, table, num);
+>>  
+>>  	for (num = 1; num < NR_CP15_REGS; num++)
+>> -		if (vcpu_cp15(vcpu, num) == 0x42424242)
+>> -			panic("Didn't reset vcpu_cp15(vcpu, %zi)", num);
+>> +		WARN(vcpu_cp15(vcpu, num) == 0x42424242,
+>> +		     "Didn't reset vcpu_cp15(vcpu, %zi)", num);
+>>  }
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 86096774abcd..4f067545c7d2 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -2609,6 +2609,6 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>>  	reset_sys_reg_descs(vcpu, table, num);
+>>  
+>>  	for (num = 1; num < NR_SYS_REGS; num++)
+>> -		if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+>> -			panic("Didn't reset __vcpu_sys_reg(%zi)", num);
+>> +		WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
+>> +		     "Didn't reset __vcpu_sys_reg(%zi)\n", num);
+>>  }
+>> -- 
+>> 2.18.0
 >>
 > 
-> For the record, it took a 10 minute discussion with Suzuki  to
-> understand that the above is actually correct, even if massively
-> confusing. Why is it correct:
+> If we only get halfway through resetting, then we'll get a warn splat,
+> complete with a backtrace, for each register. Should we do something
+> like the following instead?
 > 
-> - In a 4 level stage-2, each of PGD/PUD/PMD exists on its own, and start
-> level is 0
-> - In a 3 level stage-2, PGD and PUD are fused as the start level is 1,
-> and PMD exists on its own
-> - In a 2 level stage-2, both PGD, PUD and PMD are fused, and start level
-> is 2.
-> 
->  From the above, we can extract that you can always have a block mapping
-> at the PUD level if you have a standalone PMD, and that's the logic this
-> patch is using.
+>   for (num = 1; num < NR_SYS_REGS; num++)
+>      if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+>         failed++;
+>   WARN(failed, "Didn't reset %d system registers", failed);
 
-Thanks for writing it up ! :-)
+And doing so we'd loose the important bit of information, which is the
+position in the table that doesn't get initialized.
 
-> 
-> Now, the *real* reason is that you can map a given size in your S2PT,
-> not that some level is fused or not. What we want is probably a helper
-> that says:
-> 
-> bool kvm_stage2_can_map_block_size(struct kvm *kvm, size_t sz)
-> {
-> 	return sz >= PMD_SIZE && stage2_pgdir_size(kvm) >= sz);
-> }
-> 
-> and the above becomes:
-> 
-> if (kvm_stage2_can_map_block_size(kvm, vma_pagesize)) && !force_pte)
-> 
-> which I find much nicer.
-> 
-> I guess I can still take the above as a fix if Christoffer is happy with
-> it, but if you think my above hack is correct, I'd like things to be
-> cleaned-up in the near future.
+The vcpu reset issue is rare enough that nobody noticed it yet (I only
+reproduced it twice), and having it to scream 200 times is not really a
+concern. What I want to catch is the case where someone has added a new
+sysreg in the table, and has failed to provide a working init function.
 
-Sure, as we discussed that makes it much simpler and generic. I could
-address that.
+Thanks,
 
-Suzuki
+	M.
+-- 
+Jazz is not dead. It just smells funny...
