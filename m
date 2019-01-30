@@ -1,26 +1,28 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH 09/14] KVM: arm64: Reuse sys_reg() macro when searching
- the trap table
-Date: Wed, 30 Jan 2019 08:57:29 +0000
-Message-ID: <2e9c6d4b-6645-e4e1-91cb-a50a26befec4@arm.com>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
- <20190124140032.8588-10-christoffer.dall@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/5] KVM: arm/arm64: Reset the VCPU without preemption
+ and vcpu state loaded
+Date: Wed, 30 Jan 2019 10:22:12 +0100
+Message-ID: <20190130092212.GD13482@e113682-lin.lund.arm.com>
+References: <20190125094656.5026-1-christoffer.dall@arm.com>
+ <20190125094656.5026-2-christoffer.dall@arm.com>
+ <20190129154858.docsos3ncoyuld7m@kamzik.brq.redhat.com>
+ <867eenv48q.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90F374A319
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 03:59:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F9E4A32D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 04:22:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kq2MMgitPcuM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Jan 2019 03:59:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 863284A2E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 03:59:10 -0500 (EST)
-In-Reply-To: <20190124140032.8588-10-christoffer.dall@arm.com>
-Content-Language: en-GB
+ with ESMTP id gwNg3MAZHQJb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Jan 2019 04:22:15 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B5F04A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Jan 2019 04:22:15 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <867eenv48q.wl-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,90 +32,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 24 Jan 2019 15:00:27 +0100
-Christoffer Dall <christoffer.dall@arm.com> wrote:
-
-Hi,
-
-> From: Marc Zyngier <marc.zyngier@arm.com>
+On Tue, Jan 29, 2019 at 04:05:25PM +0000, Marc Zyngier wrote:
+> Hi Drew,
 > 
-> Instead of having an open-coded macro, reuse the sys_reg() macro
-> that does the exact same thing.
-
-It's not the exact same thing, is it? It looks like being off by 5 bit
-to me. I think the patch is still fine, but maybe mention in the commit
-message that this difference is OK since it's only used as a key for
-comparing register indices?
-
-Cheers,
-Andre.
-
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 19 ++++++-------------
->  1 file changed, 6 insertions(+), 13 deletions(-)
+> On Tue, 29 Jan 2019 15:48:58 +0000,
+> Andrew Jones <drjones@redhat.com> wrote:
+> > 
+> > Hi Christoffer,
+> > 
+> > On Fri, Jan 25, 2019 at 10:46:52AM +0100, Christoffer Dall wrote:
+> > > Resetting the VCPU state modifies the system register state in memory,
+> > > but this may interact with vcpu_load/vcpu_put if running with preemption
+> > > disabled, which in turn may lead to corrupted system register state.
+> >   ^ enabled
+> > > 
+> > > Address this by disabling preemption and doing put/load if required
+> > > around the reset logic.
+> > 
+> > I'm having trouble understanding how disabling preemption helps here.
+> > There shouldn't be an issue with the KVM_ARM_VCPU_INIT case, since the
+> > target vcpu is guaranteed not to be loaded and therefore it doesn't
+> > have preempt notifiers registered either. Also, KVM_ARM_VCPU_INIT holds
+> > the vcpu mutex, so there's no chance for a load to occur until it's
+> > complete.
+> > 
+> > For the PSCI case it makes sense to force a vcpu load after the reset,
+> > otherwise the sleeping target vcpu won't have the correct state loaded.
+> > The initial put also makes sense in case we're not resetting everything.
+> > I don't understand how we're ensuring the target vcpu thread's preemption
+> > is disabled though. This modified kvm_reset_vcpu would need to be run
+> > from the target vcpu thread to work, but that's not how the PSCI code
+> > currently does it.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e3e37228ae4e..1a5bea4285e4 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -965,6 +965,10 @@ static bool access_pmuserenr(struct kvm_vcpu
-> *vcpu, struct sys_reg_params *p, return true;
->  }
->  
-> +#define
-> reg_to_encoding(x)						\
-> +	sys_reg((u32)(x)->Op0,
-> (u32)(x)->Op1,				\
-> +		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2);
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in
-> one go */ #define
-> DBG_BCR_BVR_WCR_WVR_EL1(n)					\
-> { SYS_DESC(SYS_DBGBVRn_EL1(n)),
-> \ @@ -1820,30 +1824,19 @@ static const struct sys_reg_desc
-> *get_target_table(unsigned target, } }
->  
-> -#define
-> reg_to_match_value(x)						\
-> -
-> ({								\
-> -		unsigned long
-> val;					\
-> -		val  = (x)->Op0 <<
-> 14;					\
-> -		val |= (x)->Op1 <<
-> 11;					\
-> -		val |= (x)->CRn <<
-> 7;					\
-> -		val |= (x)->CRm <<
-> 3;					\
-> -		val |=
-> (x)->Op2;					\
-> -
-> val;							\
-> -	 })
-> -
->  static int match_sys_reg(const void *key, const void *elt)
->  {
->  	const unsigned long pval = (unsigned long)key;
->  	const struct sys_reg_desc *r = elt;
->  
-> -	return pval - reg_to_match_value(r);
-> +	return pval - reg_to_encoding(r);
->  }
->  
->  static const struct sys_reg_desc *find_reg(const struct
-> sys_reg_params *params, const struct sys_reg_desc table[],
->  					 unsigned int num)
->  {
-> -	unsigned long pval = reg_to_match_value(params);
-> +	unsigned long pval = reg_to_encoding(params);
->  
->  	return bsearch((void *)pval, table, num, sizeof(table[0]),
-> match_sys_reg); }
+> And that's exactly where we're going with the following patch in the
+> series. Ultimately, we need a vcpu to reset itself, as we otherwise
+> have a window where a vcpu can be spuriously loaded whilst being
+> reset.
+> 
+FWIW, I think the confusion here comes from having re-ordered the
+patches compared to how the commit text was originally written.  We
+should probably explain in the commit message that this is in
+preparation for doing the reset from the VCPU itself.
+
+Thanks,
+
+    Christoffer
