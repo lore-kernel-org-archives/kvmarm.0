@@ -1,28 +1,25 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v7 20/25] ACPI / APEI: Use separate fixmap pages for
- arm64 NMI-like notifications
-Date: Thu, 31 Jan 2019 14:38:42 +0100
-Message-ID: <20190131133842.GK6749@zn.tnic>
-References: <20181203180613.228133-1-james.morse@arm.com>
- <20181203180613.228133-21-james.morse@arm.com>
- <20190121172743.GN29166@zn.tnic>
- <bee87ef4-60ae-d4a4-2855-159543072fc5@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH kvmtool] arm: Allow command line for firmware
+Date: Thu, 31 Jan 2019 13:40:26 +0000
+Message-ID: <1bdd0e8d-22fe-64d7-ac04-f8684a0e9eb3@arm.com>
+References: <20190125154308.185131-1-andre.przywara@arm.com>
+ <20190130182010.GE18558@fuggles.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F1C44A32D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:38:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75C7E4A2F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:40:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e0XD08Ngkr5J for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 08:38:48 -0500 (EST)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A525A4A2B6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:38:48 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <bee87ef4-60ae-d4a4-2855-159543072fc5@arm.com>
+ with ESMTP id XGD3o-m4I31q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Jan 2019 08:40:30 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 608D04A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:40:30 -0500 (EST)
+In-Reply-To: <20190130182010.GE18558@fuggles.cambridge.arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,41 +29,48 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+To: Will Deacon <will.deacon@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 23, 2019 at 06:33:02PM +0000, James Morse wrote:
-> Was the best I had, but this trips the BUILD_BUG() too early.
-> With it, x86 BUILD_BUG()s. With just the -1 the path gets pruned out, and there
-> are no 'sdei' symbols in the object file.
+
+
+On 30/01/2019 18:20, Will Deacon wrote:
+> On Fri, Jan 25, 2019 at 03:43:08PM +0000, Andre Przywara wrote:
+>> When loading a firmware instead of a kernel, we can still pass on any
+>> *user-provided* command line, as /chosen/bootargs is a generic device tree
+>> feature. We just need to make sure to not pass our mangled-for-Linux
+>> version.
+>>
+>> This allows to run "firmware" images which make use of a command line,
+>> still are not Linux kernels, like kvm-unit-tests.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>> Hi Will,
+>>
+>> this goes on top of Julien's firmware series (which did not yet appear
+>> on kernel.org?)
+>> This fixes an issue with some kvm-unit-tests support. [1]
 > 
-> ...at this point, I stopped caring!
-
-Yah, you said it: __end_of_fixed_addresses will practically give you the
-BUG behavior:
-
-        if (idx >= __end_of_fixed_addresses) {
-                BUG();
-                return;
-        }
-
-and ARM64 does the same.
-
-> We already skip registering notifiers if the kconfig option wasn't selected.
+> Does kvm-unit-tests break if we pass the modified command line? I'm wary of
+> passing something different depending on whether the payload is firmware or
+> kernel, because there's a pretty fine line between the two (and the firmware
+> may even just forward the thing on to the kernel it loads).
 > 
-> We can't catch this at compile time, as the dead-code elimination seems to
-> happen in multiple passes.
-> 
-> I'll switch the SDEI ones to __end_of_fixed_addresses, as both architectures
-> BUG() when they see this.
 
-Right.
+Yes, this is why I removed it initially for the firmware case.
 
-Thx.
+In the EFI case, the DT is just passed as is to Linux, however the Linux
+EFI stub retrieves the command line from EFI, and the command line in
+the DT is ignored. So to avoid confusion, I wanted to prevent passing a
+command line that just gets ignored.
+
+However the command line property of the chosen node is not linux
+specific and some other OS/firmware/bootloader could rely on it. So I'm
+not sure what's the best move here.
+
+Cheers,
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Julien Thierry
