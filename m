@@ -1,70 +1,51 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvmtool] arm: Allow command line for firmware
-Date: Thu, 31 Jan 2019 14:07:15 +0100
-Message-ID: <20190131130715.d7ctomqoxw5e262f@kamzik.brq.redhat.com>
-References: <20190125154308.185131-1-andre.przywara@arm.com>
- <20190130182010.GE18558@fuggles.cambridge.arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 0/2] arm64: kvm: cache ID register trapping
+Date: Thu, 31 Jan 2019 14:17:16 +0100
+Message-ID: <20190131131718.1627-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE3F4A331
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:07:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0VMNZryXselS for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 08:07:20 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55BAE4A32D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:07:20 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190130182010.GE18558@fuggles.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, christoffer.dall@arm.com, Suzuki.Poulose@arm.com, kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 30, 2019 at 06:20:10PM +0000, Will Deacon wrote:
-> On Fri, Jan 25, 2019 at 03:43:08PM +0000, Andre Przywara wrote:
-> > When loading a firmware instead of a kernel, we can still pass on any
-> > *user-provided* command line, as /chosen/bootargs is a generic device tree
-> > feature. We just need to make sure to not pass our mangled-for-Linux
-> > version.
-> > 
-> > This allows to run "firmware" images which make use of a command line,
-> > still are not Linux kernels, like kvm-unit-tests.
-> > 
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> > Hi Will,
-> > 
-> > this goes on top of Julien's firmware series (which did not yet appear
-> > on kernel.org?)
-> > This fixes an issue with some kvm-unit-tests support. [1]
-> 
-> Does kvm-unit-tests break if we pass the modified command line? I'm wary of
-> passing something different depending on whether the payload is firmware or
-> kernel, because there's a pretty fine line between the two (and the firmware
-> may even just forward the thing on to the kernel it loads).
->
+While looking into whether we could report the cache geometry as 1 set
+and 1 way so that the ARM kernel doesn't stall for 13 seconds at boot,
+I noticed that we don't expose the sanitised version of CTR_EL0 to guests,
+so I fixed that first (#1)
 
-kvm-unit-tests assumes the user or unit test run scripts completely
-control the kernel command line. The kernel command line is then
-turned into the command line of the test's main() function, plus the
-addition of the program name at argv[0]. The unit tests then parse
-these command line parameters to determine what to do when testing.
-If additional options are passed we need to teach the tests to ignore
-them, and there's also risk that something passed in might accidentally
-match a unit test parameter.
+Since that gives us most of the groundwork for overriding the cache
+geometry, it is a fairly trivial change (#2) to clear the set/way
+fields in the CCSIDR register so that it describes 1 set and 1 way.
 
-Thanks,
-drew
+Changes since v1:
+- fix incorrect mask value (#2)
+- make trapping conditional on whether either of the issues is being
+  worked around, and it disabled otherwise
+- add Christoffer's ack
+
+Cc: Suzuki.Poulose@arm.com
+Cc: marc.zyngier@arm.com
+Cc: christoffer.dall@arm.com
+
+Ard Biesheuvel (2):
+  arm64: kvm: expose sanitised cache type register to guest
+  arm64: kvm: describe data or unified caches as having 1 set and 1 way
+
+ arch/arm64/include/asm/kvm_emulate.h |  4 ++
+ arch/arm64/include/asm/sysreg.h      |  1 +
+ arch/arm64/kvm/sys_regs.c            | 74 +++++++++++++++++++-
+ 3 files changed, 77 insertions(+), 2 deletions(-)
+
+-- 
+2.20.1
