@@ -1,81 +1,127 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 2/6] arm: fdt: add stdout-path to /chosen node
-Date: Thu, 31 Jan 2019 14:57:11 +0000
-Message-ID: <20190131145711.6e6a4bcb@donnerap.cambridge.arm.com>
-References: <20190125180801.209910-1-andre.przywara@arm.com>
- <20190125180801.209910-3-andre.przywara@arm.com>
- <20190130182019.GF18558@fuggles.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D71E4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 09:57:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5PKYi6OOvDg0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 09:57:19 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD2094A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 09:57:19 -0500 (EST)
-In-Reply-To: <20190130182019.GF18558@fuggles.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v10 10/25] arm64: kvm: Unmask PMR before entering guest
+Date: Thu, 31 Jan 2019 14:58:48 +0000
+Message-ID: <1548946743-38979-11-git-send-email-julien.thierry@arm.com>
+References: <1548946743-38979-1-git-send-email-julien.thierry@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1548946743-38979-1-git-send-email-julien.thierry@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, daniel.thompson@linaro.org, joel@joelfernandes.org, marc.zyngier@arm.com, christoffer.dall@arm.com, james.morse@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com, Julien Thierry <julien.thierry@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 30 Jan 2019 18:20:19 +0000
-Will Deacon <will.deacon@arm.com> wrote:
+Interrupts masked by ICC_PMR_EL1 will not be signaled to the CPU. This
+means that hypervisor will not receive masked interrupts while running a
+guest.
 
-Hi,
+We need to make sure that all maskable interrupts are masked from the
+time we call local_irq_disable() in the main run loop, and remain so
+until we call local_irq_enable() after returning from the guest, and we
+need to ensure that we see no interrupts at all (including pseudo-NMIs)
+in the middle of the VM world-switch, while at the same time we need to
+ensure we exit the guest when there are interrupts for the host.
 
-> On Fri, Jan 25, 2019 at 06:07:57PM +0000, Andre Przywara wrote:
-> > The DT spec describes the stdout-path property in the /chosen node
-> > to contain the DT path for a default device usable for outputting
-> > characters. The Linux kernel uses this for earlycon (without
-> > further parameters), other DT users might rely on this as well.
-> > 
-> > Add a property containing the path to our emulated 8250 serial
-> > device.
-> > 
-> > Even when we use the virtio console, the serial console is still
-> > there and works, so we can expose this unconditionally. Putting the
-> > virtio console path in there will not work anyway.
-> > 
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm/fdt.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arm/fdt.c b/arm/fdt.c
-> > index 28ba1c2c..8cda3ded 100644
-> > --- a/arm/fdt.c
-> > +++ b/arm/fdt.c
-> > @@ -143,6 +143,7 @@ static int setup_fdt(struct kvm *kvm)
-> >  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
-> >  	_FDT(fdt_property_string(fdt, "bootargs",
-> > kvm->cfg.real_cmdline)); _FDT(fdt_property_u64(fdt, "kaslr-seed",
-> > kvm->cfg.arch.kaslr_seed));
-> > +	_FDT(fdt_property_string(fdt, "stdout-path",
-> > "/U6_16550A@3f8"));  
-> 
-> Since the last string here has to match the one in hw/serial.c, I
-> think we should be retrieving it from there rather than hardcoding it
-> here.
+We can accomplish this with pseudo-NMIs enabled by:
+  (1) local_irq_disable: set the priority mask
+  (2) enter guest: set PSTATE.I
+  (3)              clear the priority mask
+  (4) eret to guest
+  (5) exit guest:  set the priotiy mask
+                   clear PSTATE.I (and restore other host PSTATE bits)
+  (6) local_irq_enable: clear the priority mask.
 
-Are you thinking about something like setting a "char
-*primary_console_path" in hw/serial.c:serial8250_generate_fdt_node(),
-then using this here in arm/fdt.c?
-Or shall the generate function directly set the stdout-path?
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ arch/arm64/include/asm/kvm_host.h | 16 ++++++++++++++++
+ arch/arm64/kvm/hyp/switch.c       | 16 ++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-Cheers,
-Andre.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7732d0b..292c882 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -24,6 +24,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/daifflags.h>
+ #include <asm/fpsimd.h>
+@@ -474,10 +475,25 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ static inline void kvm_arm_vhe_guest_enter(void)
+ {
+ 	local_daif_mask();
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (system_uses_irq_prio_masking()) {
++		gic_write_pmr(GIC_PRIO_IRQON);
++		dsb(sy);
++	}
+ }
+ 
+ static inline void kvm_arm_vhe_guest_exit(void)
+ {
++	/*
++	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
++	 * and the GIC PMR if the host is using IRQ priorities.
++	 */
+ 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index b0b1478..6a4c2d6 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -22,6 +22,7 @@
+ 
+ #include <kvm/arm_psci.h>
+ 
++#include <asm/arch_gicv3.h>
+ #include <asm/cpufeature.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+@@ -521,6 +522,17 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
+ 
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (system_uses_irq_prio_masking()) {
++		gic_write_pmr(GIC_PRIO_IRQON);
++		dsb(sy);
++	}
++
+ 	vcpu = kern_hyp_va(vcpu);
+ 
+ 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+@@ -573,6 +585,10 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
++	/* Returning to host will clear PSR.I, remask PMR if needed */
++	if (system_uses_irq_prio_masking())
++		gic_write_pmr(GIC_PRIO_IRQOFF);
++
+ 	return exit_code;
+ }
+ 
+-- 
+1.9.1
