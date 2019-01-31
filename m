@@ -1,379 +1,461 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v2 3/4] KVM: arm/arm64: Move to common kvm_mmu_memcache
- infrastructure
-Date: Thu, 31 Jan 2019 10:52:43 +0100
-Message-ID: <20190131095244.7480-4-christoffer.dall@arm.com>
-References: <20190131095244.7480-1-christoffer.dall@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 2/5] arm/arm64: KVM: Allow a VCPU to fully reset itself
+Date: Thu, 31 Jan 2019 11:12:54 +0100
+Message-ID: <20190131101254.rh23ntvwxtq3yqsz@kamzik.brq.redhat.com>
+References: <20190125094656.5026-1-christoffer.dall@arm.com>
+ <20190125094656.5026-3-christoffer.dall@arm.com>
+ <20190129160347.fcbry76igwyatqzx@kamzik.brq.redhat.com>
+ <20190130093431.GE13482@e113682-lin.lund.arm.com>
+ <20190130152721.7fbiza3glifvzlqk@kamzik.brq.redhat.com>
+ <20190131074353.GI13482@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 742AE4A37D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 04:53:00 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e3NlX04D2whR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 04:52:58 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF9D44A3B2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 04:52:56 -0500 (EST)
-In-Reply-To: <20190131095244.7480-1-christoffer.dall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>, Anshuman Khandual <anshuman.khandual@arm.com>, Sean Christopherson <sean.j.christopherson@intel.com>, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20190131074353.GI13482@e113682-lin.lund.arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now when we have a common mmu mmemcache implementation, we can reuse
-this for arm and arm64.
+On Thu, Jan 31, 2019 at 08:43:53AM +0100, Christoffer Dall wrote:
+> On Wed, Jan 30, 2019 at 04:27:21PM +0100, Andrew Jones wrote:
+> > On Wed, Jan 30, 2019 at 10:34:31AM +0100, Christoffer Dall wrote:
+> > > On Tue, Jan 29, 2019 at 05:03:47PM +0100, Andrew Jones wrote:
+> > > > On Fri, Jan 25, 2019 at 10:46:53AM +0100, Christoffer Dall wrote:
+> > > > > From: Marc Zyngier <marc.zyngier@arm.com>
+> > > > > 
+> > > > > The current kvm_psci_vcpu_on implementation will directly try to
+> > > > > manipulate the state of the VCPU to reset it.  However, since this is
+> > > > > not done on the thread that runs the VCPU, we can end up in a strangely
+> > > > > corrupted state when the source and target VCPUs are running at the same
+> > > > > time.
+> > > > > 
+> > > > > Fix this by factoring out all reset logic from the PSCI implementation
+> > > > > and forwarding the required information along with a request to the
+> > > > > target VCPU.
+> > > > 
+> > > > The last patch makes more sense, now that I see this one. I guess their
+> > > > order should be swapped.
+> > > > 
+> > > > > 
+> > > > > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > > > > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > > > > ---
+> > > > >  arch/arm/include/asm/kvm_host.h   | 10 +++++++++
+> > > > >  arch/arm/kvm/reset.c              | 24 +++++++++++++++++++++
+> > > > >  arch/arm64/include/asm/kvm_host.h | 11 ++++++++++
+> > > > >  arch/arm64/kvm/reset.c            | 24 +++++++++++++++++++++
+> > > > >  virt/kvm/arm/arm.c                | 10 +++++++++
+> > > > >  virt/kvm/arm/psci.c               | 36 ++++++++++++++-----------------
+> > > > >  6 files changed, 95 insertions(+), 20 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > > > > index ca56537b61bc..50e89869178a 100644
+> > > > > --- a/arch/arm/include/asm/kvm_host.h
+> > > > > +++ b/arch/arm/include/asm/kvm_host.h
+> > > > > @@ -48,6 +48,7 @@
+> > > > >  #define KVM_REQ_SLEEP \
+> > > > >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > > > >  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> > > > > +#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+> > > > >  
+> > > > >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> > > > >  
+> > > > > @@ -147,6 +148,13 @@ struct kvm_cpu_context {
+> > > > >  
+> > > > >  typedef struct kvm_cpu_context kvm_cpu_context_t;
+> > > > >  
+> > > > > +struct vcpu_reset_state {
+> > > > > +	unsigned long	pc;
+> > > > > +	unsigned long	r0;
+> > > > > +	bool		be;
+> > > > > +	bool		reset;
+> > > > > +};
+> > > > > +
+> > > > >  struct kvm_vcpu_arch {
+> > > > >  	struct kvm_cpu_context ctxt;
+> > > > >  
+> > > > > @@ -186,6 +194,8 @@ struct kvm_vcpu_arch {
+> > > > >  	/* Cache some mmu pages needed inside spinlock regions */
+> > > > >  	struct kvm_mmu_memory_cache mmu_page_cache;
+> > > > >  
+> > > > > +	struct vcpu_reset_state reset_state;
+> > > > > +
+> > > > >  	/* Detect first run of a vcpu */
+> > > > >  	bool has_run_once;
+> > > > >  };
+> > > > > diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+> > > > > index 5ed0c3ee33d6..de41255eebcd 100644
+> > > > > --- a/arch/arm/kvm/reset.c
+> > > > > +++ b/arch/arm/kvm/reset.c
+> > > > > @@ -26,6 +26,7 @@
+> > > > >  #include <asm/cputype.h>
+> > > > >  #include <asm/kvm_arm.h>
+> > > > >  #include <asm/kvm_coproc.h>
+> > > > > +#include <asm/kvm_emulate.h>
+> > > > >  
+> > > > >  #include <kvm/arm_arch_timer.h>
+> > > > >  
+> > > > > @@ -69,6 +70,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> > > > >  	/* Reset CP15 registers */
+> > > > >  	kvm_reset_coprocs(vcpu);
+> > > > >  
+> > > > > +	/*
+> > > > > +	 * Additional reset state handling that PSCI may have imposed on us.
+> > > > > +	 * Must be done after all the sys_reg reset.
+> > > > > +	 */
+> > > > > +	if (vcpu->arch.reset_state.reset) {
+> > > > > +		unsigned long target_pc = vcpu->arch.reset_state.pc;
+> > > > > +
+> > > > > +		/* Gracefully handle Thumb2 entry point */
+> > > > > +		if (target_pc & 1) {
+> > > > > +			target_pc &= ~1UL;
+> > > > > +			vcpu_set_thumb(vcpu);
+> > > > > +		}
+> > > > > +
+> > > > > +		/* Propagate caller endianness */
+> > > > > +		if (vcpu->arch.reset_state.be)
+> > > > > +			kvm_vcpu_set_be(vcpu);
+> > > > > +
+> > > > > +		*vcpu_pc(vcpu) = target_pc;
+> > > > > +		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+> > > > > +
+> > > > > +		vcpu->arch.reset_state.reset = false;
+> > > > > +	}
+> > > > > +
+> > > > >  	/* Reset arch_timer context */
+> > > > >  	return kvm_timer_vcpu_reset(vcpu);
+> > > > >  }
+> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > > > index 7732d0ba4e60..da3fc7324d68 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > > @@ -48,6 +48,7 @@
+> > > > >  #define KVM_REQ_SLEEP \
+> > > > >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > > > >  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+> > > > > +#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+> > > > >  
+> > > > >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> > > > >  
+> > > > > @@ -208,6 +209,13 @@ struct kvm_cpu_context {
+> > > > >  
+> > > > >  typedef struct kvm_cpu_context kvm_cpu_context_t;
+> > > > >  
+> > > > > +struct vcpu_reset_state {
+> > > > > +	unsigned long	pc;
+> > > > > +	unsigned long	r0;
+> > > > > +	bool		be;
+> > > > > +	bool		reset;
+> > > > > +};
+> > > > > +
+> > > > >  struct kvm_vcpu_arch {
+> > > > >  	struct kvm_cpu_context ctxt;
+> > > > >  
+> > > > > @@ -297,6 +305,9 @@ struct kvm_vcpu_arch {
+> > > > >  	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
+> > > > >  	u64 vsesr_el2;
+> > > > >  
+> > > > > +	/* Additional reset state */
+> > > > > +	struct vcpu_reset_state	reset_state;
+> > > > > +
+> > > > >  	/* True when deferrable sysregs are loaded on the physical CPU,
+> > > > >  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
+> > > > >  	bool sysregs_loaded_on_cpu;
+> > > > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > > > > index f21a2a575939..f16a5f8ff2b4 100644
+> > > > > --- a/arch/arm64/kvm/reset.c
+> > > > > +++ b/arch/arm64/kvm/reset.c
+> > > > > @@ -32,6 +32,7 @@
+> > > > >  #include <asm/kvm_arm.h>
+> > > > >  #include <asm/kvm_asm.h>
+> > > > >  #include <asm/kvm_coproc.h>
+> > > > > +#include <asm/kvm_emulate.h>
+> > > > >  #include <asm/kvm_mmu.h>
+> > > > >  
+> > > > >  /* Maximum phys_shift supported for any VM on this host */
+> > > > > @@ -146,6 +147,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> > > > >  	/* Reset system registers */
+> > > > >  	kvm_reset_sys_regs(vcpu);
+> > > > >  
+> > > > > +	/*
+> > > > > +	 * Additional reset state handling that PSCI may have imposed on us.
+> > > > > +	 * Must be done after all the sys_reg reset.
+> > > > > +	 */
+> > > > > +	if (vcpu->arch.reset_state.reset) {
+> > > > > +		unsigned long target_pc = vcpu->arch.reset_state.pc;
+> > > > > +
+> > > > > +		/* Gracefully handle Thumb2 entry point */
+> > > > > +		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> > > > > +			target_pc &= ~1UL;
+> > > > > +			vcpu_set_thumb(vcpu);
+> > > > > +		}
+> > > > > +
+> > > > > +		/* Propagate caller endianness */
+> > > > > +		if (vcpu->arch.reset_state.be)
+> > > > > +			kvm_vcpu_set_be(vcpu);
+> > > > > +
+> > > > > +		*vcpu_pc(vcpu) = target_pc;
+> > > > > +		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
+> > > > > +
+> > > > > +		vcpu->arch.reset_state.reset = false;
+> > > > > +	}
+> > > > > +
+> > > > >  	/* Reset PMU */
+> > > > >  	kvm_pmu_vcpu_reset(vcpu);
+> > > > >  
+> > > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > > > index 9e350fd34504..9c486fad3f9f 100644
+> > > > > --- a/virt/kvm/arm/arm.c
+> > > > > +++ b/virt/kvm/arm/arm.c
+> > > > > @@ -626,6 +626,13 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+> > > > >  		/* Awaken to handle a signal, request we sleep again later. */
+> > > > >  		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+> > > > >  	}
+> > > > > +
+> > > > > +	/*
+> > > > > +	 * Make sure we will observe a potential reset request if we've
+> > > > > +	 * observed a change to the power state. Pairs with the smp_wmb() in
+> > > > > +	 * kvm_psci_vcpu_on().
+> > > > > +	 */
+> > > > > +	smp_rmb();
+> > > > 
+> > > > I don't believe this should be necessary, because...
+> > > > 
+> > > > >  }
+> > > > >  
+> > > > >  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> > > > > @@ -639,6 +646,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > > > >  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+> > > > >  			vcpu_req_sleep(vcpu);
+> > > > >  
+> > > > > +		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
+> > > > > +			kvm_reset_vcpu(vcpu);
+> > > > 
+> > > > ... we do kvm_check_request here before using the reset data, and we do...
+> > > > 
+> > > > > +
+> > > > >  		/*
+> > > > >  		 * Clear IRQ_PENDING requests that were made to guarantee
+> > > > >  		 * that a VCPU sees new virtual interrupts.
+> > > > > diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> > > > > index 9b73d3ad918a..b9cff1d4b06d 100644
+> > > > > --- a/virt/kvm/arm/psci.c
+> > > > > +++ b/virt/kvm/arm/psci.c
+> > > > > @@ -104,12 +104,10 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> > > > >  
+> > > > >  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > > > >  {
+> > > > > +	struct vcpu_reset_state *reset_state;
+> > > > >  	struct kvm *kvm = source_vcpu->kvm;
+> > > > >  	struct kvm_vcpu *vcpu = NULL;
+> > > > > -	struct swait_queue_head *wq;
+> > > > >  	unsigned long cpu_id;
+> > > > > -	unsigned long context_id;
+> > > > > -	phys_addr_t target_pc;
+> > > > >  
+> > > > >  	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
+> > > > >  	if (vcpu_mode_is_32bit(source_vcpu))
+> > > > > @@ -130,32 +128,30 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > > > >  			return PSCI_RET_INVALID_PARAMS;
+> > > > >  	}
+> > > > >  
+> > > > > -	target_pc = smccc_get_arg2(source_vcpu);
+> > > > > -	context_id = smccc_get_arg3(source_vcpu);
+> > > > > +	reset_state = &vcpu->arch.reset_state;
+> > > > >  
+> > > > > -	kvm_reset_vcpu(vcpu);
+> > > > > -
+> > > > > -	/* Gracefully handle Thumb2 entry point */
+> > > > > -	if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
+> > > > > -		target_pc &= ~((phys_addr_t) 1);
+> > > > > -		vcpu_set_thumb(vcpu);
+> > > > > -	}
+> > > > > +	reset_state->pc = smccc_get_arg2(source_vcpu);
+> > > > >  
+> > > > >  	/* Propagate caller endianness */
+> > > > > -	if (kvm_vcpu_is_be(source_vcpu))
+> > > > > -		kvm_vcpu_set_be(vcpu);
+> > > > > +	reset_state->be = kvm_vcpu_is_be(source_vcpu);
+> > > > >  
+> > > > > -	*vcpu_pc(vcpu) = target_pc;
+> > > > >  	/*
+> > > > >  	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
+> > > > >  	 * the general puspose registers are undefined upon CPU_ON.
+> > > > >  	 */
+> > > > > -	smccc_set_retval(vcpu, context_id, 0, 0, 0);
+> > > > > -	vcpu->arch.power_off = false;
+> > > > > -	smp_mb();		/* Make sure the above is visible */
+> > > > > +	reset_state->r0 = smccc_get_arg3(source_vcpu);
+> > > > > +
+> > > > > +	reset_state->reset = true;
+> > > > > +	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> > > > 
+> > > > ... this kvm_make_request() after writing the reset data. The
+> > > > kvm_make_request/kvm_check_request embeds the necessary barriers.
+> > > > 
+> > > > >  
+> > > > > -	wq = kvm_arch_vcpu_wq(vcpu);
+> > > > > -	swake_up_one(wq);
+> > > > > +	/*
+> > > > > +	 * Make sure the reset request is observed if the change to
+> > > > > +	 * power_state is observed.
+> > > > > +	 */
+> > > > > +	smp_wmb();
+> > > > > +
+> > > > > +	vcpu->arch.power_off = false;
+> > > > 
+> > > > Or you want to tie the reset data to the observability of the power_off
+> > > > state? Why not just tie it to the KVM_REQ_VCPU_RESET request?
+> > > > 
+> > > 
+> > > The barrier in kvm_make_request is *before* the write to vcpu->requests,
+> > > so doesn't enforce any ordering of stores occurring *after* that write.
+> > > 
+> > > We don't want to wake up the target VCPU thread, have it observe that it
+> > > is powered on, yet not observe the reset request (my comment above
+> > > inversed).
+> > > 
+> > > I wrote this Litmus test (which is probably so appalingly obvious to
+> > > memory ordering folks that it is unnecessary) to convince myself the
+> > > barrier is needed:
+> > > 
+> > > ----<8----
+> > > C vcpu-reset
+> > > 
+> > > {}
+> > > 
+> > > P0(int *power, int *reset)
+> > > {
+> > > 	smp_wmb(); // from kvm_make_request
+> > > 	WRITE_ONCE(*reset, 1); // kvm_psci_vcpu_on: kvm_make_request(KVM_REQ_RESET, vcpu);
+> > > 	smp_wmb();
+> > > 	WRITE_ONCE(*power, 1); // kvm_psci_vcpu_on: vcpu->arch.power_state = KVM_ARM_VCPU_ON;
+> > > }
+> > > 
+> > > P1(int *power, int *reset, spinlock_t *wqlock)
+> > > {
+> > > 	int r0;
+> > > 	int r1;
+> > > 
+> > > 	spin_lock(wqlock);
+> > > 	smp_mb(); // from prepare_to_wait -> set_current_state
+> > > 	spin_unlock(wqlock);
+> > > 	r0 = READ_ONCE(*power); // vcpu_req_sleep: if (vcpu_sleeping(vcpu))
+> > > 	smp_rmb();
+> > > 	r1 = READ_ONCE(*reset); // check_vcpu_requests: if (kvm_check_request(KVM_REQ_RESET, vcpu))
+> > > }
+> > > 
+> > > exists (1:r0=1 /\ 1:r1=0)
+> > > ----<8----
+> > > 
+> > > 
+> > > Hope this helps,
+> > 
+> > It certainly does, mostly because I didn't review closely enough and
+> > thought the pair we were interested in was vcpu_reset_state and the
+> > RESET vcpu request, which the vcpu request API handles. Now it's
+> > clear we're worried about the pair power_off and the RESET vcpu
+> > request. And we've reversed the usual "if we observe a request, then
+> > we can observe its accompanying data" to "if we observe a change in
+> > some data (power_off), then we need to also observe a request". I
+> > agree the barriers are necessary to ensure that in the direct
+> > sequence, but now I'm wondering if we need to care about the
+> > direct sequence.
+> > 
+> > If we remove the barriers then the vcpu could have these possible
+> > sequences
+> > 
+> > 1)
+> >   - wake up
+> >   - observe power_off is false
+> >   - observe the RESET vcpu request - do the reset
+> >   - enter guest
+> > 
+> > That's the one this patch ensures, so it's definitely correct.
+> > 
+> > 2)
+> >   - wake up
+> >   - the change to power_off not observed - the vcpu makes the
+> >     SLEEP vcpu request on itself
+> >   - observe the RESET vcpu request - do the reset
+> >   - observe the SLEEP vcpu request (with or without the need for
+> >     an IPI), attempt to sleep again, but now observe power_off
+> >     is false
+> >   - enter guest
+> > 
+> > I think that should be correct as well, even if less efficient.
+> > 
+> > 3)
+> >   - wake up
+> >   - observe power_off is false
+> >   - don't observe the RESET request yet, get closer to entering
+> >     the guest
+> >   - observe the RESET request a bit later (with or without the
+> >     need for an IPI) - do the reset
+> >   - enter guest
+> > 
+> > This is the same as (1), but we rely on the kvm_request_pending
+> > stuff to make sure the vcpu request is seen before entering the
+> > guest.
+> > 
+> > 4)
+> >   - wake up
+> >   - the change to power_off not observed - the vcpu makes the
+> >     SLEEP vcpu request on itself
+> >   - don't observe the RESET request yet, get closer to entering
+> >     the guest
+> >   - observe the SLEEP vcpu request (with or without the need for
+> >     an IPI), attempt to sleep again, but now observe power_off
+> >     is false
+> >   - observe the RESET request a bit later (with or without the
+> >     need for an IPI) - do the reset
+> >   - enter guest
+> > 
+> > The least efficient one, but should still be correct.
+> > 
+> > If you agree with this, then we get to remove the barriers,
+> > simplifying things, and also we don't introduce the ordering
+> > dependency in check_vcpu_requests(), where the vcpu_req_sleep()
+> > calls must now come before checking the RESET request.
+> > 
+> 
+> I'm sorry, I'm not following what you want to achieve here?
+> 
+> Somehow delivering a series of possible interleaved executions doesn't
+> exactly convey anything meaningful to me.
+>
 
-The common implementation has a slightly different behavior when
-allocating objects under high memory pressure; whereas the current
-arm/arm64 implementation will give up and return -ENOMEM if the full
-size of the cache cannot be allocated during topup, the common
-implementation is happy with any allocation between min and max.  There
-should be no architecture-specific requirement for doing it one way or
-the other and it's in fact better to enforce a cross-architecture KVM
-policy on this behavior.
+This patch introduces an unconventional use of vcpu requests, which is
+to ensure a change to vcpu->requests is observed if a change to
+arch.power_off is observed. That unconventional use requires additional
+barriers and an ordering requirement in check_vcpu_requests(), i.e.
+anything that calls vcpu_req_sleep() must come before the check for
+the RESET vcpu request. I'm stating, and attempting to prove with the
+list of possible executions, that those barriers and ordering requirements
+are not necessary.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- arch/arm/include/asm/kvm_host.h    | 13 +-----
- arch/arm/include/asm/kvm_mmu.h     |  2 +-
- arch/arm/include/asm/kvm_types.h   |  7 +++
- arch/arm64/include/asm/kvm_host.h  | 13 +-----
- arch/arm64/include/asm/kvm_mmu.h   |  2 +-
- arch/arm64/include/asm/kvm_types.h |  7 +++
- virt/kvm/arm/arm.c                 |  2 +-
- virt/kvm/arm/mmu.c                 | 68 ++++++++----------------------
- 8 files changed, 36 insertions(+), 78 deletions(-)
+Assuming the objective is to ensure a vcpu reset is done before entering
+guest mode after a vcpu power on, then the RESET vcpu request is
+sufficient by itself. vcpu requests are guaranteed to be seen by a vcpu
+before entering guest mode.
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index ca56537b61bc..bf6b6d027ff0 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -83,17 +83,6 @@ struct kvm_arch {
- 	u32 psci_version;
- };
- 
--#define KVM_NR_MEM_OBJS     40
--
--/*
-- * We don't want allocation failures within the mmu code, so we preallocate
-- * enough memory for a single page fault in a cache.
-- */
--struct kvm_mmu_memory_cache {
--	int nobjs;
--	void *objects[KVM_NR_MEM_OBJS];
--};
--
- struct kvm_vcpu_fault_info {
- 	u32 hsr;		/* Hyp Syndrome Register */
- 	u32 hxfar;		/* Hyp Data/Inst. Fault Address Register */
-@@ -184,7 +173,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_decode mmio_decode;
- 
- 	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	struct kvm_mmu_memcache mmu_page_cache;
- 
- 	/* Detect first run of a vcpu */
- 	bool has_run_once;
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 3a875fc1b63c..8877f53997c8 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -71,7 +71,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- 
--void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
-+void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
-diff --git a/arch/arm/include/asm/kvm_types.h b/arch/arm/include/asm/kvm_types.h
-index bc389f82e88d..51c9b0cb9718 100644
---- a/arch/arm/include/asm/kvm_types.h
-+++ b/arch/arm/include/asm/kvm_types.h
-@@ -2,4 +2,11 @@
- #ifndef _ASM_ARM_KVM_TYPES_H
- #define _ASM_ARM_KVM_TYPES_H
- 
-+#define KVM_ARCH_WANT_MMU_MEMCACHE
-+
-+#define KVM_MMU_NR_MEMCACHE_OBJS 40
-+
-+#define KVM_MMU_CACHE_GFP	GFP_KERNEL
-+#define KVM_MMU_CACHE_PAGE_GFP	(GFP_KERNEL | __GFP_ZERO)
-+
- #endif /* _ASM_ARM_KVM_TYPES_H */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7732d0ba4e60..1aa951de8338 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -82,17 +82,6 @@ struct kvm_arch {
- 	u32 psci_version;
- };
- 
--#define KVM_NR_MEM_OBJS     40
--
--/*
-- * We don't want allocation failures within the mmu code, so we preallocate
-- * enough memory for a single page fault in a cache.
-- */
--struct kvm_mmu_memory_cache {
--	int nobjs;
--	void *objects[KVM_NR_MEM_OBJS];
--};
--
- struct kvm_vcpu_fault_info {
- 	u32 esr_el2;		/* Hyp Syndrom Register */
- 	u64 far_el2;		/* Hyp Fault Address Register */
-@@ -285,7 +274,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_decode mmio_decode;
- 
- 	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	struct kvm_mmu_memcache mmu_page_cache;
- 
- 	/* Target CPU and feature flags */
- 	int target;
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 8af4b1befa42..dec55fa00e56 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -170,7 +170,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- 
--void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
-+void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
-diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-index d0987007d581..706f6cb6f9f3 100644
---- a/arch/arm64/include/asm/kvm_types.h
-+++ b/arch/arm64/include/asm/kvm_types.h
-@@ -2,5 +2,12 @@
- #ifndef _ASM_ARM64_KVM_TYPES_H
- #define _ASM_ARM64_KVM_TYPES_H
- 
-+#define KVM_ARCH_WANT_MMU_MEMCACHE
-+
-+#define KVM_MMU_NR_MEMCACHE_OBJS 40
-+
-+#define KVM_MMU_CACHE_GFP	GFP_KERNEL
-+#define KVM_MMU_CACHE_PAGE_GFP	(GFP_KERNEL | __GFP_ZERO)
-+
- #endif /* _ASM_ARM64_KVM_TYPES_H */
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 9e350fd34504..89c89a151373 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -317,7 +317,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		static_branch_dec(&userspace_irqchip_in_use);
- 
--	kvm_mmu_free_memory_caches(vcpu);
-+	kvm_mmu_free_memcaches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
- 	kvm_vcpu_uninit(vcpu);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index fbdf3ac2f001..da193b446261 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -134,38 +134,6 @@ static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
- 	put_page(virt_to_page(pudp));
- }
- 
--static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
--				  int min, int max)
--{
--	void *page;
--
--	BUG_ON(max > KVM_NR_MEM_OBJS);
--	if (cache->nobjs >= min)
--		return 0;
--	while (cache->nobjs < max) {
--		page = (void *)__get_free_page(PGALLOC_GFP);
--		if (!page)
--			return -ENOMEM;
--		cache->objects[cache->nobjs++] = page;
--	}
--	return 0;
--}
--
--static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
--{
--	while (mc->nobjs)
--		free_page((unsigned long)mc->objects[--mc->nobjs]);
--}
--
--static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
--{
--	void *p;
--
--	BUG_ON(!mc || !mc->nobjs);
--	p = mc->objects[--mc->nobjs];
--	return p;
--}
--
- static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
- {
- 	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, pgd, 0UL);
-@@ -1016,7 +984,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 		free_pages_exact(pgd, stage2_pgd_size(kvm));
- }
- 
--static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memcache *cache,
- 			     phys_addr_t addr)
- {
- 	pgd_t *pgd;
-@@ -1026,7 +994,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	if (stage2_pgd_none(kvm, *pgd)) {
- 		if (!cache)
- 			return NULL;
--		pud = mmu_memory_cache_alloc(cache);
-+		pud = kvm_mmu_memcache_alloc(cache);
- 		stage2_pgd_populate(kvm, pgd, pud);
- 		get_page(virt_to_page(pgd));
- 	}
-@@ -1034,7 +1002,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	return stage2_pud_offset(kvm, pgd, addr);
- }
- 
--static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memcache *cache,
- 			     phys_addr_t addr)
- {
- 	pud_t *pud;
-@@ -1047,7 +1015,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	if (stage2_pud_none(kvm, *pud)) {
- 		if (!cache)
- 			return NULL;
--		pmd = mmu_memory_cache_alloc(cache);
-+		pmd = kvm_mmu_memcache_alloc(cache);
- 		stage2_pud_populate(kvm, pud, pmd);
- 		get_page(virt_to_page(pud));
- 	}
-@@ -1055,7 +1023,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	return stage2_pmd_offset(kvm, pud, addr);
- }
- 
--static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
-+static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memcache
- 			       *cache, phys_addr_t addr, const pmd_t *new_pmd)
- {
- 	pmd_t *pmd, old_pmd;
-@@ -1102,7 +1070,7 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- 	return 0;
- }
- 
--static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memcache *cache,
- 			       phys_addr_t addr, const pud_t *new_pudp)
- {
- 	pud_t *pudp, old_pud;
-@@ -1194,7 +1162,7 @@ static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
- 		return kvm_s2pte_exec(ptep);
- }
- 
--static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-+static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memcache *cache,
- 			  phys_addr_t addr, const pte_t *new_pte,
- 			  unsigned long flags)
- {
-@@ -1226,7 +1194,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 	if (stage2_pud_none(kvm, *pud)) {
- 		if (!cache)
- 			return 0; /* ignore calls from kvm_set_spte_hva */
--		pmd = mmu_memory_cache_alloc(cache);
-+		pmd = kvm_mmu_memcache_alloc(cache);
- 		stage2_pud_populate(kvm, pud, pmd);
- 		get_page(virt_to_page(pud));
- 	}
-@@ -1251,7 +1219,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 	if (pmd_none(*pmd)) {
- 		if (!cache)
- 			return 0; /* ignore calls from kvm_set_spte_hva */
--		pte = mmu_memory_cache_alloc(cache);
-+		pte = kvm_mmu_memcache_alloc(cache);
- 		kvm_pmd_populate(pmd, pte);
- 		get_page(virt_to_page(pmd));
- 	}
-@@ -1318,7 +1286,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 	phys_addr_t addr, end;
- 	int ret = 0;
- 	unsigned long pfn;
--	struct kvm_mmu_memory_cache cache = { 0, };
-+	struct kvm_mmu_memcache cache = { 0, };
- 
- 	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
- 	pfn = __phys_to_pfn(pa);
-@@ -1329,9 +1297,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 		if (writable)
- 			pte = kvm_s2pte_mkwrite(pte);
- 
--		ret = mmu_topup_memory_cache(&cache,
--					     kvm_mmu_cache_min_pages(kvm),
--					     KVM_NR_MEM_OBJS);
-+		ret = kvm_mmu_topup_memcache_page(&cache,
-+						  kvm_mmu_cache_min_pages(kvm));
- 		if (ret)
- 			goto out;
- 		spin_lock(&kvm->mmu_lock);
-@@ -1345,7 +1312,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 	}
- 
- out:
--	mmu_free_memory_cache(&cache);
-+	kvm_mmu_free_memcache_page(&cache);
- 	return ret;
- }
- 
-@@ -1662,7 +1629,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	unsigned long mmu_seq;
- 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
- 	struct kvm *kvm = vcpu->kvm;
--	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-+	struct kvm_mmu_memcache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct vm_area_struct *vma;
- 	kvm_pfn_t pfn;
- 	pgprot_t mem_type = PAGE_S2;
-@@ -1706,8 +1673,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	up_read(&current->mm->mmap_sem);
- 
- 	/* We need minimum second+third level pages */
--	ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm),
--				     KVM_NR_MEM_OBJS);
-+	ret = kvm_mmu_topup_memcache_page(memcache, kvm_mmu_cache_min_pages(kvm));
- 	if (ret)
- 		return ret;
- 
-@@ -2123,9 +2089,9 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- 	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
- }
- 
--void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu)
-+void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu)
- {
--	mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	kvm_mmu_free_memcache_page(&vcpu->arch.mmu_page_cache);
- }
- 
- phys_addr_t kvm_mmu_get_httbr(void)
--- 
-2.18.0
+Additionally, I'm pretty sure that even leaving this patch as it is,
+all the above execution scenarios are possible except (3), depending on
+the timing of a signal delivery.
+
+Is there a problem with (3) that I'm missing? Or am I missing something
+else?
+
+Thanks,
+drew
