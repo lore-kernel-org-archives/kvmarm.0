@@ -1,178 +1,211 @@
 From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v5 2/5] arm64/kvm: preserve host HCR_EL2/MDCR_EL2 value
-Date: Thu, 31 Jan 2019 16:22:06 +0000
-Message-ID: <e773a26d-98d1-fc01-5c04-cd5a258d85ec@arm.com>
+Subject: Re: [PATCH v5 3/5] arm64/kvm: context-switch ptrauth register
+Date: Thu, 31 Jan 2019 16:25:15 +0000
+Message-ID: <d862316b-5b2e-8187-04e0-c0be350c1624@arm.com>
 References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
- <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
+ <1548658727-14271-4-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6A774A393
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 11:22:12 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WW3dOcZoFLiF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 11:22:11 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C83A4A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 11:22:11 -0500 (EST)
-In-Reply-To: <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1548658727-14271-4-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-GB
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Amit,
 
 On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
-> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
-> is a constant value. This works today, as the host HCR_EL2 value is
-> always the same, but this will get in the way of supporting extensions
-> that require HCR_EL2 bits to be set conditionally for the host.
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
 > 
-> To allow such features to work without KVM having to explicitly handle
-> every possible host feature combination, this patch has KVM save/restore
-> the host HCR when switching to/from a guest HCR. The saving of the
-> register is done once during cpu hypervisor initialization state and is
-> just restored after switch from guest.
+> Pointer authentication feature is only enabled when VHE is built
+> into the kernel and present into CPU implementation so only VHE code
+
+~s/into/in the/?
+
+> paths are modified.
 > 
-> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
-> kvm_call_hyp and is helpful in NHVE case.
+> When we schedule a vcpu, we disable guest usage of pointer
+> authentication instructions and accesses to the keys. While these are
+> disabled, we avoid context-switching the keys. When we trap the guest
+> trying to use pointer authentication functionality, we change to eagerly
+> context-switching the keys, and enable the feature. The next time the
+> vcpu is scheduled out/in, we start again.
 
-> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
-> to toggle the TGE bit with a RMW sequence, as we already do in
-> __tlb_switch_to_guest_vhe().
-
-
-> While at it, host MDCR_EL2 value is fetched in a similar way and restored
-> after every switch from host to guest. There should not be any change in
-> functionality due to this.
-
-Could this step be done as a separate subsequent patch? It would make review
-easier! The MDCR stuff would be a simplification if done second, done in one go
-like this its pretty noisy.
-
-There ought to be some justification for moving hcr/mdcr into the cpu_context in
-the commit message.
+> Pointer authentication consists of address authentication and generic
+> authentication, and CPUs in a system might have varied support for
+> either. Where support for either feature is not uniform, it is hidden
+> from guests via ID register emulation, as a result of the cpufeature
+> framework in the host.
 
 
-If you're keeping Mark's 'Signed-off-by' its would be normal to keep Mark as the
-author in git. This shows up a an extra 'From:' when you post the patch, and
-gets picked up when the maintainer runs git-am.
+> Unfortunately, address authentication and generic authentication cannot
+> be trapped separately, as the architecture provides a single EL2 trap
+> covering both. If we wish to expose one without the other, we cannot
+> prevent a (badly-written) guest from intermittently using a feature
+> which is not uniformly supported (when scheduled on a physical CPU which
+> supports the relevant feature). When the guest is scheduled on a
+> physical CPU lacking the feature, these attempts will result in an UNDEF
+> being taken by the guest.
 
-This patch has changed substantially from Mark's version:
-https://lkml.org/lkml/2017/11/27/675
-
-If you keep the signed-off-by, could you add a [note] in the signed-off area
-with a terse summary. Something like:
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-[ Move hcr to cpu_context, added __cpu_copy_hyp_conf()]
-> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-
-(9c06602b1b92 is a good picked-at-random example for both of these)
+This won't be fun. Can't KVM check that both are supported on all CPUs to avoid
+this? ...
 
 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index f5b79e9..2da6e43 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -80,6 +80,8 @@ extern void __vgic_v3_init_lrs(void);
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index dfcfba7..e1bf2a5 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -612,6 +612,11 @@ static inline bool system_supports_generic_auth(void)
+>  		 cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH_IMP_DEF));
+>  }
 >  
->  extern u32 __kvm_get_mdcr_el2(void);
->  
-> +extern u64 __kvm_get_hcr_el2(void);
-
-Do we need these in separate helpers? For non-vhe this means two separate trips
-to EL2. Something like kvm_populate_host_context(void), and an __ version for
-the bit at EL2?
-
-We don't need to pass the host-context to EL2 as once kvm is loaded we can
-access host per-cpu variables at EL2 using __hyp_this_cpu_read(). This will save
-passing the vcpu around.
-
-
-> @@ -458,6 +457,25 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  
->  static inline void __cpu_init_stage2(void) {}
->  
-> +/**
-> + * __cpu_copy_hyp_conf - copy the boot hyp configuration registers
-> + *
-> + * It is called once per-cpu during CPU hyp initialisation.
-> + */
-> +static inline void __cpu_copy_hyp_conf(void)
+> +static inline bool kvm_supports_ptrauth(void)
 > +{
-> +	kvm_cpu_context_t *host_cxt = this_cpu_ptr(&kvm_host_cpu_state);
-> +
-> +	host_cxt->hcr_el2 = kvm_call_hyp(__kvm_get_hcr_el2);
-> +
-> +	/*
-> +	 * Retrieve the initial value of mdcr_el2 so we can preserve
-> +	 * MDCR_EL2.HPMN which has presumably been set-up by some
-> +	 * knowledgeable bootcode.
-> +	 */
-> +	host_cxt->mdcr_el2 = kvm_call_hyp(__kvm_get_mdcr_el2);
+> +	return system_supports_address_auth() && system_supports_generic_auth();
 > +}
 
-Its strange to make this an inline in a header. kvm_arm_init_debug() is a
-static-inline for arch/arm, but a regular C function for arch/arm64. Can't we do
-the same?
+... oh you do check. Could you cover this in the commit message? (to avoid an
+UNDEF being taken by the guest we ... )
+
+cpufeature.h is a strange place to put this, there are no other kvm symbols in
+there. But there are users of system_supports_foo() in kvm_host.h.
 
 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 68d6f7c..22c854a 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -316,3 +316,14 @@ void __hyp_text __kvm_enable_ssbs(void)
->  	"msr	sctlr_el2, %0"
->  	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
->  }
-> +
-> +/**
-> + * __read_hyp_hcr_el2 - Returns hcr_el2 register value
+> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> new file mode 100644
+> index 0000000..0576c01
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * arch/arm64/kvm/hyp/ptrauth-sr.c: Guest/host ptrauth save/restore
 > + *
-> + * This function acts as a function handler parameter for kvm_call_hyp and
-> + * may be called from EL1 exception level to fetch the register value.
+> + * Copyright 2018 Arm Limited
+> + * Author: Mark Rutland <mark.rutland@arm.com>
+> + *         Amit Daniel Kachhap <amit.kachhap@arm.com>
 > + */
-> +u64 __hyp_text __kvm_get_hcr_el2(void)
+> +#include <linux/compiler.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/cpucaps.h>
+> +#include <asm/cpufeature.h>
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_hyp.h>
+> +#include <asm/pointer_auth.h>
+> +
+> +static __always_inline bool __hyp_text __ptrauth_is_enabled(struct kvm_vcpu *vcpu)
+
+Why __always_inline? Doesn't the compiler decide for 'static' symbols in C files?
+
+
 > +{
-> +	return read_sysreg(hcr_el2);
+> +	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
+> +			vcpu->arch.ctxt.hcr_el2 & (HCR_API | HCR_APK);
+> +}
+> +
+> +void __no_ptrauth __hyp_text __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
+> +					  struct kvm_cpu_context *host_ctxt,
+> +					  struct kvm_cpu_context *guest_ctxt)
+> +{
+> +	if (!__ptrauth_is_enabled(vcpu))
+> +		return;
+> +
+
+> +	ptrauth_keys_store((struct ptrauth_keys *) &host_ctxt->sys_regs[APIAKEYLO_EL1]);
+
+We can't cast part of an array to a structure like this. What happens if the
+compiler inserts padding in struct-ptrauth_keys, or the struct randomization
+thing gets hold of it: https://lwn.net/Articles/722293/
+
+If we want to use the helpers that take a struct-ptrauth_keys, we need to keep
+the keys in a struct-ptrauth_keys. To do this we'd need to provide accessors so
+that GET_ONE_REG() of APIAKEYLO_EL1 comes from the struct-ptrauth_keys, instead
+of the sys_reg array.
+
+
+Wouldn't the host keys be available somewhere else? (they must get transfer to
+secondary CPUs somehow). Can we skip the save step when switching from the host?
+
+
+> +	ptrauth_keys_switch((struct ptrauth_keys *) &guest_ctxt->sys_regs[APIAKEYLO_EL1]);
 > +}
 
-While I'm all in favour of kernel-doc comments for functions, it may be
-over-kill in this case!
-
-
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 9e350fd3..2d65ada 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1327,10 +1327,10 @@ static void cpu_hyp_reinit(void)
->  	else
->  		cpu_init_hyp_mode(NULL);
->  
-> -	kvm_arm_init_debug();
-> -
->  	if (vgic_present)
->  		kvm_vgic_init_cpu_hardware();
-> +
-> +	__cpu_copy_hyp_conf();
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1f2d237..c798d0c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -439,6 +451,18 @@ static inline bool kvm_arch_requires_vhe(void)
+>  	return false;
 >  }
+>
+> +void kvm_arm_vcpu_ptrauth_enable(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_ptrauth_disable(struct kvm_vcpu *vcpu);
+> +
+> +static inline void kvm_arm_vcpu_ptrauth_reset(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Disable ptrauth and use it in a lazy context via traps */
+> +	if (has_vhe() && kvm_supports_ptrauth())
+> +		kvm_arm_vcpu_ptrauth_disable(vcpu);
+> +}
 
-Was there a reason to make this call later than it originally was?
-(kvm_vgic_init_cpu_hardware() doesn't use any of those values, so its fine, just
-curious!)
+(Could you move 'has_vhe()' into kvm_supports_ptrauth()? It fits with testing
+the other cpufeatures, and makes this a little more readable when you add
+'allowed' to it later.)
+
+
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 03b36f1..301d332 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -483,6 +483,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> +	__ptrauth_switch_to_guest(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	__set_guest_arch_workaround_state(vcpu);
+>  
+>  	do {
+> @@ -494,6 +496,8 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  
+>  	__set_host_arch_workaround_state(vcpu);
+>  
+> +	__ptrauth_switch_to_host(vcpu, host_ctxt, guest_ctxt);
+> +
+>  	sysreg_save_guest_state_vhe(guest_ctxt);
+>  
+>  	__deactivate_traps(vcpu);
+
+...This makes me nervous...
+
+__guest_enter() is a function that (might) change the keys, then we change them
+again here. We can't have any signed return address between these two points. I
+don't trust the compiler not to generate any.
+
+~
+
+I had a chat with some friendly compiler folk... because there are two identical
+sequences in kvm_vcpu_run_vhe() and __kvm_vcpu_run_nvhe(), the compiler could
+move the common code to a function it then calls. Apparently this is called
+'function outlining'.
+
+If the compiler does this, and the guest changes the keys, I think we would fail
+the return address check.
+
+Painting the whole thing with no_prauth would solve this, but this code then
+becomes a target.
+Because the compiler can't anticipate the keys changing, we ought to treat them
+the same way we do the callee saved registers, stack-pointer etc, and
+save/restore them in the __guest_enter() assembly code.
+
+(we can still keep the save/restore in C, but call it from assembly so we know
+nothing new is going on the stack).
 
 
 Thanks,
