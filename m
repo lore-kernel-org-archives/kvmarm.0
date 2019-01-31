@@ -1,26 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 06/14] KVM: arm/arm64: Factor out VMID into struct kvm_vmid
-Date: Thu, 31 Jan 2019 13:01:30 +0000
-Message-ID: <3808c6df-5665-4606-ed06-0226e488e9f0@arm.com>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
- <20190124140032.8588-7-christoffer.dall@arm.com>
- <b0606f1e-b39a-0ec9-b706-f60832acaced@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH kvmtool] arm: Allow command line for firmware
+Date: Thu, 31 Jan 2019 14:07:15 +0100
+Message-ID: <20190131130715.d7ctomqoxw5e262f@kamzik.brq.redhat.com>
+References: <20190125154308.185131-1-andre.przywara@arm.com>
+ <20190130182010.GE18558@fuggles.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43D344A38A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:01:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE3F4A331
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:07:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Hk3Ry8a4P+d9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 08:01:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6FD4A37D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:01:33 -0500 (EST)
-In-Reply-To: <b0606f1e-b39a-0ec9-b706-f60832acaced@arm.com>
-Content-Language: en-US
+ with ESMTP id 0VMNZryXselS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Jan 2019 08:07:20 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55BAE4A32D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:07:20 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190130182010.GE18558@fuggles.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,90 +29,42 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/01/2019 11:05, Julien Thierry wrote:
-> Hi Christoffer,
+On Wed, Jan 30, 2019 at 06:20:10PM +0000, Will Deacon wrote:
+> On Fri, Jan 25, 2019 at 03:43:08PM +0000, Andre Przywara wrote:
+> > When loading a firmware instead of a kernel, we can still pass on any
+> > *user-provided* command line, as /chosen/bootargs is a generic device tree
+> > feature. We just need to make sure to not pass our mangled-for-Linux
+> > version.
+> > 
+> > This allows to run "firmware" images which make use of a command line,
+> > still are not Linux kernels, like kvm-unit-tests.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> > Hi Will,
+> > 
+> > this goes on top of Julien's firmware series (which did not yet appear
+> > on kernel.org?)
+> > This fixes an issue with some kvm-unit-tests support. [1]
 > 
-> On 24/01/2019 14:00, Christoffer Dall wrote:
->> In preparation for nested virtualization where we are going to have more
->> than a single VMID per VM, let's factor out the VMID data into a
->> separate VMID data structure and change the VMID allocator to operate on
->> this new structure instead of using a struct kvm.
->>
->> This also means that udate_vttbr now becomes update_vmid, and that the
->> vttbr itself is generated on the fly based on the stage 2 page table
->> base address and the vmid.
->>
->> We cache the physical address of the pgd when allocating the pgd to
->> avoid doing the calculation on every entry to the guest and to avoid
->> calling into potentially non-hyp-mapped code from hyp/EL2.
->>
->> If we wanted to merge the VMID allocator with the arm64 ASID allocator
->> at some point in the future, it should actually become easier to do that
->> after this patch.
->>
->> Note that to avoid mapping the kvm_vmid_bits variable into hyp, we
->> simply forego the masking of the vmid value in kvm_get_vttbr and rely on
->> update_vmid to always assign a valid vmid value (within the supported
->> range).
->>
->> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
->> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h   | 13 ++++---
->>  arch/arm/include/asm/kvm_mmu.h    | 11 ++++++
->>  arch/arm/kvm/hyp/switch.c         |  2 +-
->>  arch/arm/kvm/hyp/tlb.c            |  4 +--
->>  arch/arm64/include/asm/kvm_host.h |  9 +++--
->>  arch/arm64/include/asm/kvm_hyp.h  |  3 +-
->>  arch/arm64/include/asm/kvm_mmu.h  | 11 ++++++
->>  virt/kvm/arm/arm.c                | 57 +++++++++++--------------------
->>  virt/kvm/arm/mmu.c                |  2 ++
->>  9 files changed, 63 insertions(+), 49 deletions(-)
->>
-> 
-> [...]
-> 
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index 3a875fc1b63c..fadbd9ad3a90 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -426,6 +426,17 @@ static inline bool kvm_cpu_has_cnp(void)
->>  	return false;
->>  }
->>  
->> +static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
->> +{
->> +	struct kvm_vmid *vmid = &kvm->arch.vmid;
->> +	u64 vmid_field, baddr;
->> +	u64 cnp = kvm_cpu_has_cnp() ? VTTBR_CNP_BIT : 0;
->> +
-> 
-> Nit:
-> As James pointed out, we're not merging this one with the 64-bit
-> version. The question is, since we don't merge it, can't we simplify
-> this one by removing the CNP related code from it? (we know CNP is
-> always false for 32-bit ARM).
+> Does kvm-unit-tests break if we pass the modified command line? I'm wary of
+> passing something different depending on whether the payload is firmware or
+> kernel, because there's a pretty fine line between the two (and the firmware
+> may even just forward the thing on to the kernel it loads).
+>
 
-We certainly can.
-
-> 
->> +	baddr = kvm->arch.pgd_phys;
->> +	vmid_field = (u64)vmid->vmid << VTTBR_VMID_SHIFT;
->> +	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
->> +}
->> +
->>  #endif	/* !__ASSEMBLY__ */
-> 
-> Otherwise, things look good to me:
-> 
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+kvm-unit-tests assumes the user or unit test run scripts completely
+control the kernel command line. The kernel command line is then
+turned into the command line of the test's main() function, plus the
+addition of the program name at argv[0]. The unit tests then parse
+these command line parameters to determine what to do when testing.
+If additional options are passed we need to teach the tests to ignore
+them, and there's also risk that something passed in might accidentally
+match a unit test parameter.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+drew
