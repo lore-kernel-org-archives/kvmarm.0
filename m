@@ -1,187 +1,98 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 1/2] arm64: kvm: expose sanitised cache type register to
- guest
-Date: Thu, 31 Jan 2019 14:17:17 +0100
-Message-ID: <20190131131718.1627-2-ard.biesheuvel@linaro.org>
-References: <20190131131718.1627-1-ard.biesheuvel@linaro.org>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v7 10/25] ACPI / APEI: Tell firmware the estatus queue
+ consumed the records
+Date: Thu, 31 Jan 2019 14:29:58 +0100
+Message-ID: <20190131132958.GJ6749@zn.tnic>
+References: <56cfa16b-ece4-76e0-3799-58201f8a4ff1@arm.com>
+ <CABo9ajArdbYMOBGPRa185yo9MnKRb0pgS-pHqUNdNS9m+kKO-Q@mail.gmail.com>
+ <20190111120322.GD4729@zn.tnic>
+ <CABo9ajAk5XNBmNHRRfUb-dQzW7-UOs5826jPkrVz-8zrtMUYkg@mail.gmail.com>
+ <20190111174532.GI4729@zn.tnic>
+ <32025682-f85a-58ef-7386-7ee23296b944@arm.com>
+ <20190111195800.GA11723@zn.tnic>
+ <18138b57-51ba-c99c-5b8d-b263fb964714@arm.com>
+ <20190129114952.GA30613@zn.tnic>
+ <c17156e4-278b-7544-367e-50e928407a03@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6F464A3B2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:17:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XrEDC4i3J05F for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Jan 2019 08:17:30 -0500 (EST)
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
- [209.85.221.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A7194A331
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 08:17:30 -0500 (EST)
-Received: by mail-wr1-f66.google.com with SMTP id f7so3303923wrp.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Jan 2019 05:17:30 -0800 (PST)
-In-Reply-To: <20190131131718.1627-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <c17156e4-278b-7544-367e-50e928407a03@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, Fan Wu <wufan@codeaurora.org>, Xie XiuQi <xiexiuqi@huawei.com>, Linux ACPI <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Tyler Baicar <baicar.tyler@gmail.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-mm@kvack.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently permit CPUs in the same system to deviate in the exact
-topology of the caches, and we subsequently hide this fact from user
-space by exposing a sanitised value of the cache type register CTR_EL0.
+On Tue, Jan 29, 2019 at 06:48:33PM +0000, James Morse wrote:
+> If firmware has never generated CPER records, so it has never written to void
+> *error_status_address, yes.
 
-However, guests running under KVM see the bare value of CTR_EL0, which
-could potentially result in issues with, e.g., JITs or other pieces of
-code that are sensitive to misreported cache line sizes.
+I guess this is the bit of information I was missing.
 
-So let's start trapping cache ID instructions if there is a mismatch,
-and expose the sanitised version of CTR_EL0 to guests. Note that CTR_EL0
-is treated as an invariant to KVM user space, so update that part as well.
+> There seem to be two ways of doing this. This zero check implies an example
+> system could be:
+> | g->error_status_address == 0xf00d
+> | *(u64 *)0xf00d == 0
+> Firmware populates CPER records, then updates 0xf00d.
+> (0xf00d would have been pre-mapped by apei_map_generic_address() in ghes_new())
+> Reads of 0xf00d before CPER records are generated get 0.
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/sys_regs.c            | 59 +++++++++++++++++++-
- 3 files changed, 61 insertions(+), 2 deletions(-)
+Ok, this sounds like the polled case. FW better have a record ready
+before raising the NMI.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 506386a3edde..87f9c1b6387e 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -77,6 +77,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	 */
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID3;
-+
-+	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE))
-+		vcpu->arch.hcr_el2 |= HCR_TID2;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72dc4c011014..6726a4c98ce7 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -361,6 +361,7 @@
- 
- #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
- 
-+#define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
- #define SYS_CLIDR_EL1			sys_reg(3, 1, 0, 0, 1)
- #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e3e37228ae4e..1312aebf74e6 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1148,6 +1148,49 @@ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	return __set_id_reg(rd, uaddr, true);
- }
- 
-+static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	return true;
-+}
-+
-+static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			 const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	p->regval = read_sysreg(clidr_el1);
-+	return true;
-+}
-+
-+static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+	return true;
-+}
-+
-+static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	u32 csselr;
-+
-+	if (p->is_write)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
-+	p->regval = get_ccsidr(csselr);
-+	return true;
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	SYS_DESC(SYS_##name),			\
-@@ -1365,7 +1408,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
- 
--	{ SYS_DESC(SYS_CSSELR_EL1), NULL, reset_unknown, CSSELR_EL1 },
-+	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
-+	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
-+	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-+	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
- 
- 	{ SYS_DESC(SYS_PMCR_EL0), access_pmcr, reset_pmcr, },
- 	{ SYS_DESC(SYS_PMCNTENSET_EL0), access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
-@@ -1665,6 +1711,7 @@ static const struct sys_reg_desc cp14_64_regs[] = {
-  * register).
-  */
- static const struct sys_reg_desc cp15_regs[] = {
-+	{ Op1( 0), CRn( 0), CRm( 0), Op2( 1), access_ctr },
- 	{ Op1( 0), CRn( 1), CRm( 0), Op2( 0), access_vm_reg, NULL, c1_SCTLR },
- 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 0), access_vm_reg, NULL, c2_TTBR0 },
- 	{ Op1( 0), CRn( 2), CRm( 0), Op2( 1), access_vm_reg, NULL, c2_TTBR1 },
-@@ -1782,6 +1829,10 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	PMU_PMEVTYPER(30),
- 	/* PMCCFILTR */
- 	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_evtyper },
-+
-+	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
-+	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
-+	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, c0_CSSELR },
- };
- 
- static const struct sys_reg_desc cp15_64_regs[] = {
-@@ -2206,11 +2257,15 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 	}
- 
- FUNCTION_INVARIANT(midr_el1)
--FUNCTION_INVARIANT(ctr_el0)
- FUNCTION_INVARIANT(revidr_el1)
- FUNCTION_INVARIANT(clidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
- 
-+static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
-+{
-+	((struct sys_reg_desc *)r)->val = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+}
-+
- /* ->val is filled in by kvm_sys_reg_table_init() */
- static struct sys_reg_desc invariant_sys_regs[] = {
- 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
+> Once an error occurs, this system now looks like this:
+> | g->error_status_address == 0xf00d
+> | *(u64 *)0xf00d == 0xbeef
+> | *(u64 *)0xbeef == 0
+> 
+> For new errors, firmware populates CPER records, then updates 0xf00d.
+> Alternatively firmware could re-use the memory at 0xbeef, generating the CPER
+> records backwards, so that once 0xbeef is updated, the rest of the record is
+> visible. (firmware knows not to race with another CPU right?)
+
+Thanks for the comic relief. :-P
+
+> Firmware could equally point 0xf00d at 0xbeef at startup, so it has one fewer
+> values to write when an error occurs. I have an arm64 system with a HEST that
+> does this. (I'm pretty sure its ACPI support is a copy-and-paste from x86, it
+> even describes NOTIFY_NMI, who knows what that means on arm!)
+
+Oh the fun.
+
+> When linux processes an error, ghes_clear_estatus() NULLs the
+> estatus->block_status, (which in this example is at 0xbeef). This is the
+> documented sequence for GHESv2.
+> Elsewhere the spec talks of checking the block status which is part of the
+> records, (not the error_status_address, which is the pointer to the records).
+>
+> Linux can't NULL 0xf00d, because it doesn't know if firmware will write it again
+> next time it updates the records.
+> I can't find where in the spec it says the error status address is written to.
+> Linux works with both 'at boot' and 'on each error'.
+> If it were know to have a static value, ghes_copy_tofrom_phys() would not have
+> been necessary, but its been there since d334a49113a4.
+>
+> In the worst case, if there is a value at the error_status_address, we have to
+> map/unmap it every time we poll in case firmware wrote new records at that same
+> location.
+> 
+> I don't think we can change Linux's behaviour here, without interpreting zero as
+> CPER records or missing new errors.
+
+Nah, I was simply trying to figure out why we do that buf_paddr check.
+Thanks for the extensive clarification.
+
 -- 
-2.20.1
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
