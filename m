@@ -1,26 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Forbid kprobing of the VHE
- world-switch code
-Date: Fri, 1 Feb 2019 13:34:11 +0000
-Message-ID: <e0b2aac7-f5b0-52c7-b4de-2c31c9b9d19d@arm.com>
-References: <20190124163257.233929-1-james.morse@arm.com>
- <20190124163257.233929-2-james.morse@arm.com>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v8 09/26] ACPI / APEI: Generalise the estatus queue's
+ notify code
+Date: Fri, 1 Feb 2019 14:46:21 +0100
+Message-ID: <20190201134602.GI31854@zn.tnic>
+References: <20190129184902.102850-1-james.morse@arm.com>
+ <20190129184902.102850-10-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56E7F4A32D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 08:34:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F0F294A32D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 08:46:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V3V3oP1eedQL for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 08:34:17 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A10D4A320
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 08:34:17 -0500 (EST)
-In-Reply-To: <20190124163257.233929-2-james.morse@arm.com>
-Content-Language: en-US
+ with ESMTP id fokYKQYdtv-G for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 08:46:36 -0500 (EST)
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C6454A320
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 08:46:36 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190129184902.102850-10-james.morse@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,28 +30,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>
+Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/01/2019 16:32, James Morse wrote:
-> On systems with VHE the kernel and KVM's world-switch code run at the
-> same exception level. Code that is only used on a VHE system does not
-> need to be annotated as __hyp_text as it can reside anywhere in the
-> kernel text.
-> 
-> __hyp_text was also used to prevent kprobes from patching breakpoint
-> instructions into this region, as this code runs at a different
-> exception level. While this is no longer true with VHE, KVM still
-> switches VBAR_EL1, meaning a kprobe's breakpoint executed in the
-> world-switch code will cause a hyp-panic.
+On Tue, Jan 29, 2019 at 06:48:45PM +0000, James Morse wrote:
+> +static int ghes_in_nmi_spool_from_list(struct list_head *rcu_list)
+> +{
+> +	int err, ret = -ENOENT;
+> +	struct ghes *ghes;
+> +
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(ghes, rcu_list, list) {
+> +		err = ghes_in_nmi_queue_one_entry(ghes);
+> +		if (!err)
+> +			ret = 0;
 
-[...]
+Do I understand this correctly that we want to do "ret = 0" for at least
+one record which ghes_in_nmi_queue_one_entry() has succeeded queueing?
 
-For what it is worth, I've now queued this patch as a fix for 5.0.
+For those for which it has returned -ENOENT, estatus has been cleared,
+nothing has been queued so we don't have to do anything for that
+particular entry...
 
-Thanks,
+Btw, you don't really need the err variable:
 
-	M.
+		if (!ghes_in_nmi_queue_one_entry(ghes))
+			ret = 0;
+
 -- 
-Jazz is not dead. It just smells funny...
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
