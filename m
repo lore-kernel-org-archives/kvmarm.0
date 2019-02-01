@@ -1,67 +1,60 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v8 18/26] ACPI / APEI: Make GHES estatus header
- validation more user friendly
-Date: Fri, 1 Feb 2019 15:30:40 +0100
-Message-ID: <20190201143040.GJ31854@zn.tnic>
-References: <20190129184902.102850-1-james.morse@arm.com>
- <20190129184902.102850-19-james.morse@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA5554A332
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 09:30:52 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rx7uU1GdiXJC for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 09:30:51 -0500 (EST)
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEB1D4A319
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 09:30:51 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190129184902.102850-19-james.morse@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Rafael Wysocki <rjw@rjwysocki.net>, Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
+From: lantianyu1986@gmail.com
+Subject: [PATCH V2 00/10] X86/KVM/Hyper-V: Add HV ept tlb range list flush support in KVM
+Date: Fri,  1 Feb 2019 22:48:12 +0800
+Message-ID: <20190201144821.50409-1-Tianyu.Lan@microsoft.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com, christoffer.dall@arm.com, devel@linuxdriverproject.org, haiyangz@microsoft.com, hpa@zytor.com, jhogan@kernel.org, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, kys@microsoft.com, linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, marc.zyngier@arm.com, mingo@redhat.com, mpe@ellerman.id.au, paul.burton@mips.com, paulus@ozlabs.org, pbonzini@redhat.com, ralf@linux-mips.org, rkrcmar@redhat.com, sashal@kernel.org, sthemmin@microsoft.com, tglx@linutronix.de, will.deacon@arm.com, x86@kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jan 29, 2019 at 06:48:54PM +0000, James Morse wrote:
-> ghes_read_estatus() checks various lengths in the top-level header to
-> ensure the CPER records to be read aren't obviously corrupt.
-> 
-> Take the opportunity to make this more user-friendly, printing a
-> (ratelimited) message about the nature of the header format error.
-> 
-> Suggested-by: Borislav Petkov <bp@alien8.de>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  drivers/acpi/apei/ghes.c | 46 ++++++++++++++++++++++++++++------------
->  1 file changed, 32 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-> index f95db2398dd5..9391fff71344 100644
-> --- a/drivers/acpi/apei/ghes.c
-> +++ b/drivers/acpi/apei/ghes.c
-> @@ -293,6 +293,30 @@ static void ghes_copy_tofrom_phys(void *buffer, u64 paddr, u32 len,
->  	}
->  }
->  
-> +/* Check the top-level record header has an appropriate size. */
-> +int __ghes_check_estatus(struct ghes *ghes,
+From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-static.
+This patchset is to introduce hv ept tlb range list flush function
+support in the KVM MMU component. Flushing ept tlbs of several address
+range can be done via single hypercall and new list flush function is
+used in the kvm_mmu_commit_zap_page() and FNAME(sync_page). This patchset
+also adds more hv ept tlb range flush support in more KVM MMU function.
+
+Change since v1:
+       1) Make flush list as a hlist instead of list in order to 
+       keep struct kvm_mmu_page size.
+       2) Add last_level flag in the struct kvm_mmu_page instead
+       of spte pointer
+       3) Move tlb flush from kvm_mmu_notifier_clear_flush_young() to kvm_age_hva()
+       4) Use range flush in the kvm_vm_ioctl_get/clear_dirty_log()
+
+Lan Tianyu (10):
+  X86/Hyper-V: Add parameter offset for
+    hyperv_fill_flush_guest_mapping_list()
+  KVM/VMX: Fill range list in kvm_fill_hv_flush_list_func()
+  KVM/MMU: Add last_level in the struct mmu_spte_page
+  KVM/MMU: Introduce tlb flush with range list
+  KVM/MMU: Flush tlb with range list in sync_page()
+  KVM/MMU: Flush tlb directly in the kvm_mmu_slot_gfn_write_protect()
+  KVM: Add kvm_get_memslot() to get memslot via slot id
+  KVM: Use tlb range flush in the kvm_vm_ioctl_get/clear_dirty_log()
+  KVM: Add flush parameter for kvm_age_hva()
+  KVM/MMU: Use tlb range flush  in the kvm_age_hva()
+
+ arch/arm/include/asm/kvm_host.h     |  3 ++-
+ arch/arm64/include/asm/kvm_host.h   |  3 ++-
+ arch/mips/include/asm/kvm_host.h    |  3 ++-
+ arch/mips/kvm/mmu.c                 | 11 ++++++--
+ arch/powerpc/include/asm/kvm_host.h |  3 ++-
+ arch/powerpc/kvm/book3s.c           | 10 ++++++--
+ arch/powerpc/kvm/e500_mmu_host.c    |  3 ++-
+ arch/x86/hyperv/nested.c            |  4 +--
+ arch/x86/include/asm/kvm_host.h     | 11 +++++++-
+ arch/x86/include/asm/mshyperv.h     |  2 +-
+ arch/x86/kvm/mmu.c                  | 51 +++++++++++++++++++++++++++++--------
+ arch/x86/kvm/mmu.h                  |  7 +++++
+ arch/x86/kvm/paging_tmpl.h          | 15 ++++++++---
+ arch/x86/kvm/vmx/vmx.c              | 18 +++++++++++--
+ arch/x86/kvm/x86.c                  | 16 +++++++++---
+ include/linux/kvm_host.h            |  1 +
+ virt/kvm/arm/mmu.c                  | 13 ++++++++--
+ virt/kvm/kvm_main.c                 | 51 +++++++++++++++----------------------
+ 18 files changed, 160 insertions(+), 65 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.14.4
