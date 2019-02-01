@@ -1,26 +1,21 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2 3/4] arm64: hyp-stub: Forbid kprobing of the hyp-stub
-Date: Fri, 1 Feb 2019 12:02:08 +0000
-Message-ID: <195916cb-03ac-6d83-03a8-e09fec90b247@arm.com>
-References: <20190124163257.233929-1-james.morse@arm.com>
- <20190124163257.233929-4-james.morse@arm.com>
- <20190131080421.GJ13482@e113682-lin.lund.arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v2 0/4] Various convenience fixes
+Date: Fri,  1 Feb 2019 12:37:12 +0000
+Message-ID: <20190201123716.92901-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE274A32D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 07:02:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7484A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 07:37:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AETX6JZ1YgTI for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 07:02:12 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F3774A319
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 07:02:12 -0500 (EST)
-In-Reply-To: <20190131080421.GJ13482@e113682-lin.lund.arm.com>
-Content-Language: en-GB
+ with ESMTP id oqXMkKl8NLXc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 07:37:22 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D2764A32D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 07:37:22 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,54 +25,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+As I found myself using kvmtool more often in the last weeks, I got more
+and more annoyed by some smaller "ticks" that kvmtool shows.
 
-On 31/01/2019 08:04, Christoffer Dall wrote:
-> On Thu, Jan 24, 2019 at 04:32:56PM +0000, James Morse wrote:
->> The hyp-stub is loaded by the kernel's early startup code at EL2
->> during boot, before KVM takes ownership later. The hyp-stub's
->> text is part of the regular kernel text, meaning it can be kprobed.
->>
->> A breakpoint in the hyp-stub causes the CPU to spin in el2_sync_invalid.
->>
->> Add it to the __hyp_text.
+So this is an attempt to post various smaller fixes I gathered up over
+the years, but never found worth enough to send out.
+Version 2 drops the two patches that have been merged already, and
+amends the remaining ones.
 
->> This has been a problem since kprobes was merged, it should
->> probably have been covered in 888b3c8720e0.
->>
->> I'm not sure __hyp_text is the right place. Its not idmaped,
->> and as it contains a set of vectors, adding it to the host/hyp
->> idmap sections could grow them beyond a page... but it does
->> run with the MMU off, so does need to be cleaned to PoC when
->> anything wacky, like hibernate happens. With this patch,
->> hibernate should clean the __hyp_text to PoC too.
-> 
-> How did this code get cleaned before?
+The patches address:
+- add /chosen/stdout-path node in .dtb
+- honour make -s switch
+- remove pointless kvmtool version number
+- introduce autodetection of supported GIC type
 
-It didn't need to be cleaned as KVM executes it with the MMU on.
-KVM's MMU-off code lives in the hyp_idmap, which is cleaned. (as is the kernel's
-idmap).
+Changelog v1..v2:
+- stdout-path: Let hw/serial.c set the node path and use an alias
+- make -s: adapt to newest version from the Linux kernel
+- kvmtool "version" number: unchanged, but verified to be compatible
+  with the Debian package
+- GIC autodetection: ignore --force-pci, always try to have an MSI
+  controller
 
-The hibernate-cache-cleaning was trying to do the absolute minimum, but the
-hyp-stub got forgotten.
+Please have a look!
 
+Cheers,
+Andre.
 
-> Is there a problem you can identify with putting it in __hyp_text?
+Andre Przywara (4):
+  arm: fdt: add stdout-path to /chosen node
+  Makefile: support -s switch
+  Makefile: Remove echoing of kvmtools version file
+  arm: Auto-detect guest GIC type
 
-> Seems to me we should just stick it there if it has no negative
-> side-effects and otherwise we have to make up a separate section with a
-> specialized meaning.
+ Makefile                     |  6 +++++-
+ arm/fdt.c                    | 10 ++++++++++
+ arm/gic.c                    | 25 +++++++++++++++++++++++++
+ arm/include/arm-common/gic.h |  1 +
+ hw/serial.c                  |  9 +++++++++
+ include/kvm/fdt.h            |  2 ++
+ util/KVMTOOLS-VERSION-GEN    |  1 -
+ 7 files changed, 52 insertions(+), 2 deletions(-)
 
-Yup, there is no problem with the extra cache-maintenance.
-The hyp-stub is the odd one out, its runtime code that runs with the MMU off,
-but isn't idmaped. I wasn't sure if we wanted to create some special
-section.(having to name it is a good enough reason not to!)
-
-
-Thanks,
-
-James
+-- 
+2.17.1
