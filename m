@@ -1,28 +1,27 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Forbid kprobing of the VHE
- world-switch code
-Date: Fri, 1 Feb 2019 09:04:06 +0100
-Message-ID: <20190201080406.GR13482@e113682-lin.lund.arm.com>
-References: <20190124163257.233929-1-james.morse@arm.com>
- <20190124163257.233929-2-james.morse@arm.com>
- <20190131080841.GK13482@e113682-lin.lund.arm.com>
- <2711e333-bbe2-a207-604c-43c2c84cef38@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool 2/6] arm: fdt: add stdout-path to /chosen node
+Date: Fri, 1 Feb 2019 11:03:33 +0000
+Message-ID: <20190201110333.3660a1a7@donnerap.cambridge.arm.com>
+References: <20190125180801.209910-1-andre.przywara@arm.com>
+ <20190125180801.209910-3-andre.przywara@arm.com>
+ <20190130182019.GF18558@fuggles.cambridge.arm.com>
+ <20190131145711.6e6a4bcb@donnerap.cambridge.arm.com>
+ <20190201062654.GA4308@brain-police>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9604A393
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 03:04:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C36FA4A3BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:03:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q75Z8AKaFdjM for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 03:04:09 -0500 (EST)
+ with ESMTP id wCpQyPQNYXuV for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 06:03:38 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 656184A319
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 03:04:09 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <2711e333-bbe2-a207-604c-43c2c84cef38@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0CA4A39B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:03:38 -0500 (EST)
+In-Reply-To: <20190201062654.GA4308@brain-police>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,77 +31,77 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 31, 2019 at 06:53:06PM +0000, James Morse wrote:
-> Hey Christoffer,
-> 
-> On 31/01/2019 08:08, Christoffer Dall wrote:
-> > On Thu, Jan 24, 2019 at 04:32:54PM +0000, James Morse wrote:
-> >> On systems with VHE the kernel and KVM's world-switch code run at the
-> >> same exception level. Code that is only used on a VHE system does not
-> >> need to be annotated as __hyp_text as it can reside anywhere in the
-> >> kernel text.
-> >>
-> >> __hyp_text was also used to prevent kprobes from patching breakpoint
-> >> instructions into this region, as this code runs at a different
-> >> exception level. While this is no longer true with VHE, KVM still
-> >> switches VBAR_EL1, meaning a kprobe's breakpoint executed in the
-> >> world-switch code will cause a hyp-panic.
+On Fri, 1 Feb 2019 06:26:58 +0000
+Will Deacon <will.deacon@arm.com> wrote:
+
+Hi,
+
+> On Thu, Jan 31, 2019 at 02:57:11PM +0000, Andre Przywara wrote:
+> > On Wed, 30 Jan 2019 18:20:19 +0000
+> > Will Deacon <will.deacon@arm.com> wrote:  
+> > > On Fri, Jan 25, 2019 at 06:07:57PM +0000, Andre Przywara wrote:  
+> > > > The DT spec describes the stdout-path property in the /chosen
+> > > > node to contain the DT path for a default device usable for
+> > > > outputting characters. The Linux kernel uses this for earlycon
+> > > > (without further parameters), other DT users might rely on this
+> > > > as well.
+> > > > 
+> > > > Add a property containing the path to our emulated 8250 serial
+> > > > device.
+> > > > 
+> > > > Even when we use the virtio console, the serial console is still
+> > > > there and works, so we can expose this unconditionally. Putting
+> > > > the virtio console path in there will not work anyway.
+> > > > 
+> > > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > > > ---
+> > > >  arm/fdt.c | 1 +
+> > > >  1 file changed, 1 insertion(+)
+> > > > 
+> > > > diff --git a/arm/fdt.c b/arm/fdt.c
+> > > > index 28ba1c2c..8cda3ded 100644
+> > > > --- a/arm/fdt.c
+> > > > +++ b/arm/fdt.c
+> > > > @@ -143,6 +143,7 @@ static int setup_fdt(struct kvm *kvm)
+> > > >  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only",
+> > > > 1)); _FDT(fdt_property_string(fdt, "bootargs",
+> > > > kvm->cfg.real_cmdline)); _FDT(fdt_property_u64(fdt,
+> > > > "kaslr-seed", kvm->cfg.arch.kaslr_seed));
+> > > > +	_FDT(fdt_property_string(fdt, "stdout-path",
+> > > > "/U6_16550A@3f8"));    
+> > > 
+> > > Since the last string here has to match the one in hw/serial.c, I
+> > > think we should be retrieving it from there rather than
+> > > hardcoding it here.  
 > > 
-> > Forgive potentially very stupid questions here, but:
-> > 
-> >  (1) Would it make sense to move the save/restore VBAR_EL1 to the last
-> >      possible moment, and would that actually allow kprobes to work for
-> >      the world-switch code, or does that just result in other weird
-> >      problems?
+> > Are you thinking about something like setting a "char
+> > *primary_console_path" in
+> > hw/serial.c:serial8250_generate_fdt_node(), then using this here in
+> > arm/fdt.c? Or shall the generate function directly set the
+> > stdout-path?  
 > 
-> This would work for taking the debug exception. But next kprobes wants to
-> single-step the probed instruction in an out-of-line slot. I don't think we can
-> do this if we've already configured the debug hardware for the guest.
-> (If could at least turn single-step off when we return to guest-EL0, which
-> guest-EL1 was single-stepping)
-> 
-> 
+> It's probably a bit dodgy doing it from the generate function,
+> because I think we'd then be relying on the the /chosen node being
+> created before the serial node (which is true, but I wouldn't like to
+> rely on it).
 
-I suspected something like that, let's not go there.
+Agreed.
 
-> >  (2) Are we sure that this catches every call path of every non-inlined
-> >      function called after switchign VBAR_EL1?  Can kprobes only be
-> >      called on exported symbols, or can you (if you know the address
-> >      somehow) put a kprobe on a static function as well.  If there are
-> >      any concerns in this area, we might want to consider (1) more
-> >      closely.
-> 
-> Hmmm, good question. The blacklisting applies to whole symbols as seen by
-> kallsyms, the compiler has no idea what is going on.
-> 
-> If it chose not to inline something, it would be kprobe'able yes.
-> 
-> __kprobes uses a section function-attribute instead. The gcc manual[0] doesn't
-> say what happens when inline and the section attributes are used together. (or
-> at least I couldn't find it)
-> 
-> A quick experiment with gcc 8.2.0 shows adding __kprobes on the inlines gets
-> discarded when they are inlined. I'm not sure how to trick the compiler into
-> not-inlining it to see what happens, but adding 'noinline' to the header file
-> causes it to duplicate the function everywhere, but puts it in the __kprobes
-> section.
-> 
-> (For KVM we could use the 'flatten' attribute, but that does say 'if possible'.
-> Alternatively we can decorate all the inline helpers we know we use with
-> __kprobes as a safety net.)
-> 
-> I think this is a wider problem with kprobes.
-> 
+> So I think either have a way to register the primary console device,
+> or a way to squirrel the string away somewhere. Is there a variant of
+> stdout-path which uses a phandle instead of a string?  That might end
+> up being cleaner to implement.
 
-Sounds like it.  Probably in the "you did something crazy, and your
-kernel is going to suffer from it" category.
+stdout-path must be a string, so a phandle will not work. However that
+string can be an alias, so I now let stdout-path always be "serial0",
+then add an aliases node at the end of the FDT generation, assigning
+serial0 to the path of the first instantiated serial device.
 
-Let's stick to your approach.
+I will post a v2 with that.
 
-Thanks for the explanation.
-
-    Christoffer
+Cheers,
+Andre.
