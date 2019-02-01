@@ -1,33 +1,28 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 2/5] arm/arm64: KVM: Allow a VCPU to fully reset itself
-Date: Fri, 1 Feb 2019 08:58:34 +0100
-Message-ID: <20190201075834.GQ13482@e113682-lin.lund.arm.com>
-References: <20190125094656.5026-3-christoffer.dall@arm.com>
- <20190129160347.fcbry76igwyatqzx@kamzik.brq.redhat.com>
- <20190130093431.GE13482@e113682-lin.lund.arm.com>
- <20190130152721.7fbiza3glifvzlqk@kamzik.brq.redhat.com>
- <20190131074353.GI13482@e113682-lin.lund.arm.com>
- <20190131101254.rh23ntvwxtq3yqsz@kamzik.brq.redhat.com>
- <20190131115156.GP13482@e113682-lin.lund.arm.com>
- <20190131125712.pwupvf4favbqi6hu@kamzik.brq.redhat.com>
- <b356cded-fc12-d996-a860-1ef94b6a8ffb@arm.com>
- <20190131170609.3e7pvmyrcsm2xgq2@kamzik.brq.redhat.com>
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Forbid kprobing of the VHE
+ world-switch code
+Date: Fri, 1 Feb 2019 09:04:06 +0100
+Message-ID: <20190201080406.GR13482@e113682-lin.lund.arm.com>
+References: <20190124163257.233929-1-james.morse@arm.com>
+ <20190124163257.233929-2-james.morse@arm.com>
+ <20190131080841.GK13482@e113682-lin.lund.arm.com>
+ <2711e333-bbe2-a207-604c-43c2c84cef38@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3104A393
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 02:58:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9604A393
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 03:04:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1cLR0unKSOnJ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 02:58:38 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E44284A214
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 02:58:37 -0500 (EST)
+ with ESMTP id q75Z8AKaFdjM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 03:04:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 656184A319
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 03:04:09 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190131170609.3e7pvmyrcsm2xgq2@kamzik.brq.redhat.com>
+In-Reply-To: <2711e333-bbe2-a207-604c-43c2c84cef38@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,94 +32,77 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: James Morse <james.morse@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jan 31, 2019 at 06:06:09PM +0100, Andrew Jones wrote:
-> On Thu, Jan 31, 2019 at 02:52:11PM +0000, Marc Zyngier wrote:
-> > On 31/01/2019 12:57, Andrew Jones wrote:
-> > > On Thu, Jan 31, 2019 at 12:51:56PM +0100, Christoffer Dall wrote:
-> > 
-> > [...]
-> > 
-> > >> I don't think there's anything very unconventional here.
-> > > 
-> > > Normally if a thread observes a change to vcpu->requests, then we ensure a
-> > > change to some accompanying data is also observable. We're reversing that
-> > > here, which adds a need for additional barriers and a strict request
-> > > checking order.
-> > > 
-> > >>
-> > >> Let's try this:  If you have a better way of implementing this, how
-> > >> about you write a patch?
-> > > 
-> > > It would just be this patch minus the unnecessary barriers. I can send it
-> > > if you like, but I wouldn't want to change the authorship for such a small
-> > > change.
-> > 
-> > Having these barriers makes it explicit (at least to me) what data we
-> > expect to be visible in other threads and in which order. You keep
-> > saying that order doesn't matter and we disagree on this. Yes, you've
-> > listed cases where we can survive things coming in out of order, but
-> > that's not a proof that we don't need them.
-> > 
-> > So at the end of the day, and unless you can prove that the barriers are
-> > not necessary by providing the same form of validation tool, I'm
-> > inclined to go with the verified approach.
+On Thu, Jan 31, 2019 at 06:53:06PM +0000, James Morse wrote:
+> Hey Christoffer,
 > 
-> I don't know how to compile and run the litmus test, but I'd be happy to
-> try if given some pointers.
-
-You can look in tools/memory-model/README as a start.
-
-
-> If I did know how, I would add vcpu->mode to
-> the P1 inputs and some additional lines that look similar to what's in
-> "Ensuring Requests Are Seen" of Documentation/virtual/kvm/vcpu-requests.rst
-> Even without the litmus test please allow me to try again to describe why
-> I think the barriers may be removed.
+> On 31/01/2019 08:08, Christoffer Dall wrote:
+> > On Thu, Jan 24, 2019 at 04:32:54PM +0000, James Morse wrote:
+> >> On systems with VHE the kernel and KVM's world-switch code run at the
+> >> same exception level. Code that is only used on a VHE system does not
+> >> need to be annotated as __hyp_text as it can reside anywhere in the
+> >> kernel text.
+> >>
+> >> __hyp_text was also used to prevent kprobes from patching breakpoint
+> >> instructions into this region, as this code runs at a different
+> >> exception level. While this is no longer true with VHE, KVM still
+> >> switches VBAR_EL1, meaning a kprobe's breakpoint executed in the
+> >> world-switch code will cause a hyp-panic.
+> > 
+> > Forgive potentially very stupid questions here, but:
+> > 
+> >  (1) Would it make sense to move the save/restore VBAR_EL1 to the last
+> >      possible moment, and would that actually allow kprobes to work for
+> >      the world-switch code, or does that just result in other weird
+> >      problems?
 > 
-> Any vcpu we're attempting to power on must be on its way to sleep with a
-> SLEEP request, or already be sleeping. This means that it's outside guest
-> mode, or will be shortly. If the vcpu observes power_off=false in
-> vcpu_req_sleep(), whether it was awaken or never even got to sleep, we
-> know that observation is taking place with vcpu->mode != IN_GUEST_MODE.
+> This would work for taking the debug exception. But next kprobes wants to
+> single-step the probed instruction in an out-of-line slot. I don't think we can
+> do this if we've already configured the debug hardware for the guest.
+> (If could at least turn single-step off when we return to guest-EL0, which
+> guest-EL1 was single-stepping)
 > 
-> We now no longer need to be concerned with the relationship between
-> power_off and the RESET vcpu request. 
+> 
 
-I disagree.  That argument requires more explanation.
+I suspected something like that, let's not go there.
 
-If you set power_off = false before posting the reset
-request, then if the VCPU thread is awoken (for any reason) it can run
-the VCPU without observing the reset request and that's the problem.
+> >  (2) Are we sure that this catches every call path of every non-inlined
+> >      function called after switchign VBAR_EL1?  Can kprobes only be
+> >      called on exported symbols, or can you (if you know the address
+> >      somehow) put a kprobe on a static function as well.  If there are
+> >      any concerns in this area, we might want to consider (1) more
+> >      closely.
+> 
+> Hmmm, good question. The blacklisting applies to whole symbols as seen by
+> kallsyms, the compiler has no idea what is going on.
+> 
+> If it chose not to inline something, it would be kprobe'able yes.
+> 
+> __kprobes uses a section function-attribute instead. The gcc manual[0] doesn't
+> say what happens when inline and the section attributes are used together. (or
+> at least I couldn't find it)
+> 
+> A quick experiment with gcc 8.2.0 shows adding __kprobes on the inlines gets
+> discarded when they are inlined. I'm not sure how to trick the compiler into
+> not-inlining it to see what happens, but adding 'noinline' to the header file
+> causes it to duplicate the function everywhere, but puts it in the __kprobes
+> section.
+> 
+> (For KVM we could use the 'flatten' attribute, but that does say 'if possible'.
+> Alternatively we can decorate all the inline helpers we know we use with
+> __kprobes as a safety net.)
+> 
+> I think this is a wider problem with kprobes.
+> 
 
-If you are making assumptions about only being woken up as a result of a
-reset request, or the interaction with the pause flag, or setting the
-sleep request to prevent the guest from executing again, that is a more
-complex argument (which you haven't made yet!) and I add that it's a
-brittle construction.
+Sounds like it.  Probably in the "you did something crazy, and your
+kernel is going to suffer from it" category.
 
-What we have here are three pieces of state:
+Let's stick to your approach.
 
-  reset_state->reset
-  vcpu->requests
-  vcpu->arch.power_state
-
-They must be written to, and the writes must be observed, in that
-particular order without any additional assumptions.
-
-You keep arguing that you can enforce an ordering between these three
-states with a single barrier which is clearly not possible.
-
-So this boils down to you making additional assumptions (see above,
-brittle) without explaining what they are.  I suspect you want this to
-fit in your mental model of how vcpu requests solve the world, otherwise
-I'm not sure what your concern with this patch, which we all agree is
-correct, really is.
-
-
-Thanks,
+Thanks for the explanation.
 
     Christoffer
