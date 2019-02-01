@@ -1,27 +1,22 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 2/6] arm: fdt: add stdout-path to /chosen node
-Date: Fri, 1 Feb 2019 11:03:33 +0000
-Message-ID: <20190201110333.3660a1a7@donnerap.cambridge.arm.com>
-References: <20190125180801.209910-1-andre.przywara@arm.com>
- <20190125180801.209910-3-andre.przywara@arm.com>
- <20190130182019.GF18558@fuggles.cambridge.arm.com>
- <20190131145711.6e6a4bcb@donnerap.cambridge.arm.com>
- <20190201062654.GA4308@brain-police>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v2 0/5] arm/arm64: Add support for running
+ under kvmtool
+Date: Fri,  1 Feb 2019 11:16:36 +0000
+Message-ID: <20190201111641.8299-1-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C36FA4A3BE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:03:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F1E4A330
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:16:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wCpQyPQNYXuV for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 06:03:38 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0CA4A39B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:03:38 -0500 (EST)
-In-Reply-To: <20190201062654.GA4308@brain-police>
+ with ESMTP id xIIjB31R3jFL for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 06:16:54 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 790514A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 06:16:54 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,77 +26,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 1 Feb 2019 06:26:58 +0000
-Will Deacon <will.deacon@arm.com> wrote:
+kvm-unit-tests is designed to be run with QEMU as the virtual machine
+monitor. It relies on devices emulated by QEMU (like isa-debug-exit or
+testdev) and it makes certain assumptions based on the implicit QEMU
+virtual environment configuration (like the serial base address).
 
-Hi,
+kvmtool [1] is a lightweight virtual machine monitor for running KVM
+guests. kvmtool has reduced complexity compared to QEMU and is easily
+hackable.
 
-> On Thu, Jan 31, 2019 at 02:57:11PM +0000, Andre Przywara wrote:
-> > On Wed, 30 Jan 2019 18:20:19 +0000
-> > Will Deacon <will.deacon@arm.com> wrote:  
-> > > On Fri, Jan 25, 2019 at 06:07:57PM +0000, Andre Przywara wrote:  
-> > > > The DT spec describes the stdout-path property in the /chosen
-> > > > node to contain the DT path for a default device usable for
-> > > > outputting characters. The Linux kernel uses this for earlycon
-> > > > (without further parameters), other DT users might rely on this
-> > > > as well.
-> > > > 
-> > > > Add a property containing the path to our emulated 8250 serial
-> > > > device.
-> > > > 
-> > > > Even when we use the virtio console, the serial console is still
-> > > > there and works, so we can expose this unconditionally. Putting
-> > > > the virtio console path in there will not work anyway.
-> > > > 
-> > > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > > > ---
-> > > >  arm/fdt.c | 1 +
-> > > >  1 file changed, 1 insertion(+)
-> > > > 
-> > > > diff --git a/arm/fdt.c b/arm/fdt.c
-> > > > index 28ba1c2c..8cda3ded 100644
-> > > > --- a/arm/fdt.c
-> > > > +++ b/arm/fdt.c
-> > > > @@ -143,6 +143,7 @@ static int setup_fdt(struct kvm *kvm)
-> > > >  	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only",
-> > > > 1)); _FDT(fdt_property_string(fdt, "bootargs",
-> > > > kvm->cfg.real_cmdline)); _FDT(fdt_property_u64(fdt,
-> > > > "kaslr-seed", kvm->cfg.arch.kaslr_seed));
-> > > > +	_FDT(fdt_property_string(fdt, "stdout-path",
-> > > > "/U6_16550A@3f8"));    
-> > > 
-> > > Since the last string here has to match the one in hw/serial.c, I
-> > > think we should be retrieving it from there rather than
-> > > hardcoding it here.  
-> > 
-> > Are you thinking about something like setting a "char
-> > *primary_console_path" in
-> > hw/serial.c:serial8250_generate_fdt_node(), then using this here in
-> > arm/fdt.c? Or shall the generate function directly set the
-> > stdout-path?  
-> 
-> It's probably a bit dodgy doing it from the generate function,
-> because I think we'd then be relying on the the /chosen node being
-> created before the serial node (which is true, but I wouldn't like to
-> rely on it).
+This patch series aims to make it possible to run kvm-unit-tests using
+kvmtool on the arm and arm64 architectures, with two caveats:
 
-Agreed.
+(1) When terminating a test, the userspace process won't exit with an exit
+code that signals the success or failure of the test. Output from the test
+can still be parsed to determine the outcome of the test.
 
-> So I think either have a way to register the primary console device,
-> or a way to squirrel the string away somewhere. Is there a variant of
-> stdout-path which uses a phandle instead of a string?  That might end
-> up being cleaner to implement.
+(2) kvmtool has been designed to work with a linux guest and it
+automatically generates the command line arguments for a Linux kernel. This
+causes the arm/arm64 selftest and gic tests to fail because those tests are
+very specific with regards to the command line arguments that are provided
+by the virtual machine manager.
 
-stdout-path must be a string, so a phandle will not work. However that
-string can be an alias, so I now let stdout-path always be "serial0",
-then add an aliases node at the end of the FDT generation, assigning
-serial0 to the path of the first instantiated serial device.
+With regards to (2), a patch was posted that seeks too eliminate this
+behavior for kvmtool [2].
 
-I will post a v2 with that.
+The run scripts haven't been modified. To run a test under kvmtool, one
+needs to launch kvmtool manually. For example, to run the timer test the
+following command can be used:
 
-Cheers,
-Andre.
+lkvm run -c 1 --console=serial -k timer.flat.
+
+Changes in v2:
+* Generate lib/config.h when configuring kvm-unit-tests; arm/arm64 uses it
+  to get the UART address.
+* Added --vmm configure option for arm/arm64 which will set the UART
+  address in lib/config.h when the tests are run under QEMU or kvmtool.
+* Renamed psci_sys_reset() to psci_system_reset().
+* Dropped patches that allowed a test to ignore unexpected command line
+  arguments.
+
+Summary:
+* Patches 1, 2 and 3 add support for configuring kvm-unit-tests on arm and
+  arm64 to use the ns16550a UART emulated by kvmtool.
+* Patches 4 and 5 provide an alternative mechanism for terminating the
+  virtual machine by using PSCI.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
+[2] https://www.spinics.net/lists/kvm-arm/msg34352.html
+
+Alexandru Elisei (5):
+  lib: arm: Use UART address from generated config.h
+  configure: arm/arm64: Add --vmm option with no effect
+  lib: arm: Use ns16550a UART when --vmm=kvmtool
+  lib: arm: Implement PSCI SYSTEM_OFF in psci_system_off()
+  lib: arm: Fallback to psci_system_off() in exit()
+
+ configure          | 31 +++++++++++++++++++++++++++++++
+ Makefile           |  2 +-
+ lib/arm/asm/psci.h |  3 ++-
+ lib/arm/io.c       | 34 ++++++++++++++++++++++------------
+ lib/arm/psci.c     |  8 +++++++-
+ .gitignore         |  1 +
+ 6 files changed, 64 insertions(+), 15 deletions(-)
+
+-- 
+2.17.0
