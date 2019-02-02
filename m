@@ -1,98 +1,76 @@
 From: lantianyu1986@gmail.com
-Subject: [PATCH V2 4/10] KVM/MMU: Introduce tlb flush with range list
-Date: Sat,  2 Feb 2019 09:38:20 +0800
-Message-ID: <20190202013825.51261-5-Tianyu.Lan@microsoft.com>
+Subject: [PATCH V2 5/10] KVM/MMU: Flush tlb with range list in sync_page()
+Date: Sat,  2 Feb 2019 09:38:21 +0800
+Message-ID: <20190202013825.51261-6-Tianyu.Lan@microsoft.com>
 References: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 195E14A39C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 20:39:19 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r2SGZVTmPNuL for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Feb 2019 20:39:18 -0500 (EST)
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com
- [209.85.215.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42BDB4A39B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 20:39:18 -0500 (EST)
-Received: by mail-pg1-f194.google.com with SMTP id m1so3750063pgq.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Feb 2019 17:39:18 -0800 (PST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
+Sender: linux-kernel-owner@vger.kernel.org
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, kys@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to introduce tlb flush with range list interface and use
-struct kvm_mmu_page as list entry. Use flush list function in the
-kvm_mmu_commit_zap_page().
+This patch is to flush tlb via flush list function. Put
+page into flush list when return value of set_spte()
+includes flag SET_SPTE_NEED_REMOTE_TLB_FLUSH. kvm_flush_remote_
+tlbs_with_list() checks whether the flush list is empty
+or not. It also checks whether range tlb flush is available
+and go back to tradiion flush if not.
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- arch/x86/kvm/mmu.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+Change since v1:
+       Use check of list_empty in the kvm_flush_remote_tlbs_with_list()
+       to determine flush or not instead of checking set_spte_ret.
+ 
+arch/x86/kvm/paging_tmpl.h | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 70cafd3f95ab..d57574b49823 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -289,6 +289,20 @@ static void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
- 
- 	range.start_gfn = start_gfn;
- 	range.pages = pages;
-+	range.flush_list = NULL;
-+
-+	kvm_flush_remote_tlbs_with_range(kvm, &range);
-+}
-+
-+static void kvm_flush_remote_tlbs_with_list(struct kvm *kvm,
-+		struct hlist_head *flush_list)
-+{
-+	struct kvm_tlb_range range;
-+
-+	if (hlist_empty(flush_list))
-+		return;
-+
-+	range.flush_list = flush_list;
- 
- 	kvm_flush_remote_tlbs_with_range(kvm, &range);
- }
-@@ -2708,6 +2722,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 				    struct list_head *invalid_list)
- {
- 	struct kvm_mmu_page *sp, *nsp;
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 6bdca39829bc..d84486e75345 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -970,7 +970,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 	int i, nr_present = 0;
+ 	bool host_writable;
+ 	gpa_t first_pte_gpa;
+-	int set_spte_ret = 0;
 +	HLIST_HEAD(flush_list);
  
- 	if (list_empty(invalid_list))
- 		return;
-@@ -2721,7 +2736,15 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 	 * In addition, kvm_flush_remote_tlbs waits for all vcpus to exit
- 	 * guest mode and/or lockless shadow page table walks.
- 	 */
--	kvm_flush_remote_tlbs(kvm);
-+	if (kvm_available_flush_tlb_with_range()) {
-+		list_for_each_entry(sp, invalid_list, link)
-+			if (sp->last_level)
-+				hlist_add_head(&sp->flush_link, &flush_list);
-+
-+		kvm_flush_remote_tlbs_with_list(kvm, &flush_list);
-+	} else {
-+		kvm_flush_remote_tlbs(kvm);
-+	}
+ 	/* direct kvm_mmu_page can not be unsync. */
+ 	BUG_ON(sp->role.direct);
+@@ -978,6 +978,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
  
- 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
- 		WARN_ON(!sp->role.invalid || sp->root_count);
+ 	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
++		int set_spte_ret = 0;
+ 		unsigned pte_access;
+ 		pt_element_t gpte;
+ 		gpa_t pte_gpa;
+@@ -1027,14 +1028,20 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 
+ 		host_writable = sp->spt[i] & SPTE_HOST_WRITEABLE;
+ 
+-		set_spte_ret |= set_spte(vcpu, &sp->spt[i],
++		set_spte_ret = set_spte(vcpu, &sp->spt[i],
+ 					 pte_access, PT_PAGE_TABLE_LEVEL,
+ 					 gfn, spte_to_pfn(sp->spt[i]),
+ 					 true, false, host_writable);
++
++		if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH) {
++			struct kvm_mmu_page *leaf_sp = page_header(sp->spt[i]
++					& PT64_BASE_ADDR_MASK);
++			hlist_add_head(&leaf_sp->flush_link, &flush_list);
++		}
++
+ 	}
+ 
+-	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH)
+-		kvm_flush_remote_tlbs(vcpu->kvm);
++	kvm_flush_remote_tlbs_with_list(vcpu->kvm, &flush_list);
+ 
+ 	return nr_present;
+ }
 -- 
 2.14.4
