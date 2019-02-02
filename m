@@ -1,61 +1,72 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v3 1/3] KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a
- raw_spinlock
-Date: Fri, 1 Feb 2019 17:55:43 +0000
-Message-ID: <6eeb2d94-cdda-006b-f32f-7857b61b3eaa@arm.com>
-References: <1546873577-13895-1-git-send-email-julien.thierry@arm.com>
- <1546873577-13895-2-git-send-email-julien.thierry@arm.com>
- <fa628aae-68eb-7140-0533-367cafa26ed6@arm.com>
- <20190201173650.GC29111@jcartwri.amer.corp.natinst.com>
+From: lantianyu1986@gmail.com
+Subject: [PATCH V2 00/10] X86/KVM/Hyper-V: Add HV ept tlb range list flush
+ support in KVM
+Date: Sat,  2 Feb 2019 09:38:16 +0800
+Message-ID: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190201173650.GC29111@jcartwri.amer.corp.natinst.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julia Cartwright <julia@ni.com>
-Cc: Julien Thierry <julien.thierry@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-rt-users@vger.kernel.org" <linux-rt-users@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "bigeasy@linutronix.de" <bigeasy@linutronix.de>, "rostedt@goodmis.org" <rostedt@goodmis.org>, "tglx@linutronix.de" <tglx@linutronix.de>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Cc: kvm@vger.kernel.org, rkrcmar@redhat.com, benh@kernel.crashing.org, will.deacon@arm.com, christoffer.dall@arm.com, paulus@ozlabs.org, hpa@zytor.com, kvmarm@lists.cs.columbia.edu, sashal@kernel.org, sthemmin@microsoft.com, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, catalin.marinas@arm.com, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, pbonzini@redhat.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ralf@linux-mips.org, paul.burton@mips.com, devel@linuxdriverproject.org, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Julia,
+From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-On 01/02/2019 17:36, Julia Cartwright wrote:
-> On Fri, Feb 01, 2019 at 03:30:58PM +0000, Julien Grall wrote:
->> Hi Julien,
->>
->> On 07/01/2019 15:06, Julien Thierry wrote:
->>> vgic_irq->irq_lock must always be taken with interrupts disabled as
->>> it is used in interrupt context.
->>
->> I am a bit confused with the reason here. The code mention that ap_list_lock
->> could be taken from the timer interrupt handler interrupt. I assume it
->> speaks about the handler kvm_arch_timer_handler. Looking at the
->> configuration of the interrupt, the flag IRQF_NO_THREAD is not set, so the
->> interrupt should be threaded when CONFIG_PREEMPT_FULL is set. If my
->> understanding is correct, this means the interrupt thread would sleep if it
->> takes the spinlock.
->>
->> Did I miss anything? Do you have an exact path where the vGIC is actually
->> called from an interrupt context?
-> 
-> The part you're missing is that percpu interrupts are not force
-> threaded:
-> 
-> 	static int irq_setup_forced_threading(struct irqaction *new)
-> 	{
-> 		if (!force_irqthreads)
-> 			return 0;
-> 		if (new->flags & (IRQF_NO_THREAD | IRQF_PERCPU | IRQF_ONESHOT))
-> 			return 0;
-> 	
-> 		/* ...*/
-> 	}
+This patchset is to introduce hv ept tlb range list flush function
+support in the KVM MMU component. Flushing ept tlbs of several address
+range can be done via single hypercall and new list flush function is
+used in the kvm_mmu_commit_zap_page() and FNAME(sync_page). This patchset
+also adds more hv ept tlb range flush support in more KVM MMU function.
 
-Thank you for the pointer! I think it would be worth mentioning in the commit 
-message that per-cpu interrupts are not threaded.
+Change since v1:
+       1) Make flush list as a hlist instead of list in order to 
+       keep struct kvm_mmu_page size.
+       2) Add last_level flag in the struct kvm_mmu_page instead
+       of spte pointer
+       3) Move tlb flush from kvm_mmu_notifier_clear_flush_young() to kvm_age_hva()
+       4) Use range flush in the kvm_vm_ioctl_get/clear_dirty_log()
 
-Best regards,
+Lan Tianyu (10):
+  X86/Hyper-V: Add parameter offset for
+    hyperv_fill_flush_guest_mapping_list()
+  KVM/VMX: Fill range list in kvm_fill_hv_flush_list_func()
+  KVM/MMU: Add last_level in the struct mmu_spte_page
+  KVM/MMU: Introduce tlb flush with range list
+  KVM/MMU: Flush tlb with range list in sync_page()
+  KVM/MMU: Flush tlb directly in the kvm_mmu_slot_gfn_write_protect()
+  KVM: Add kvm_get_memslot() to get memslot via slot id
+  KVM: Use tlb range flush in the kvm_vm_ioctl_get/clear_dirty_log()
+  KVM: Add flush parameter for kvm_age_hva()
+  KVM/MMU: Use tlb range flush  in the kvm_age_hva()
+
+ arch/arm/include/asm/kvm_host.h     |  3 ++-
+ arch/arm64/include/asm/kvm_host.h   |  3 ++-
+ arch/mips/include/asm/kvm_host.h    |  3 ++-
+ arch/mips/kvm/mmu.c                 | 11 ++++++--
+ arch/powerpc/include/asm/kvm_host.h |  3 ++-
+ arch/powerpc/kvm/book3s.c           | 10 ++++++--
+ arch/powerpc/kvm/e500_mmu_host.c    |  3 ++-
+ arch/x86/hyperv/nested.c            |  4 +--
+ arch/x86/include/asm/kvm_host.h     | 11 +++++++-
+ arch/x86/include/asm/mshyperv.h     |  2 +-
+ arch/x86/kvm/mmu.c                  | 51 +++++++++++++++++++++++++++++--------
+ arch/x86/kvm/mmu.h                  |  7 +++++
+ arch/x86/kvm/paging_tmpl.h          | 15 ++++++++---
+ arch/x86/kvm/vmx/vmx.c              | 18 +++++++++++--
+ arch/x86/kvm/x86.c                  | 16 +++++++++---
+ include/linux/kvm_host.h            |  1 +
+ virt/kvm/arm/mmu.c                  | 13 ++++++++--
+ virt/kvm/kvm_main.c                 | 51 +++++++++++++++----------------------
+ 18 files changed, 160 insertions(+), 65 deletions(-)
 
 -- 
-Julien Grall
+2.14.4
