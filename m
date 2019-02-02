@@ -1,51 +1,98 @@
 From: lantianyu1986@gmail.com
-Subject: [PATCH V2 3/10] KVM/MMU: Add last_level in the struct mmu_spte_page
-Date: Sat,  2 Feb 2019 09:38:19 +0800
-Message-ID: <20190202013825.51261-4-Tianyu.Lan@microsoft.com>
+Subject: [PATCH V2 4/10] KVM/MMU: Introduce tlb flush with range list
+Date: Sat,  2 Feb 2019 09:38:20 +0800
+Message-ID: <20190202013825.51261-5-Tianyu.Lan@microsoft.com>
 References: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 195E14A39C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 20:39:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id r2SGZVTmPNuL for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Feb 2019 20:39:18 -0500 (EST)
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com
+ [209.85.215.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42BDB4A39B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Feb 2019 20:39:18 -0500 (EST)
+Received: by mail-pg1-f194.google.com with SMTP id m1so3750063pgq.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Feb 2019 17:39:18 -0800 (PST)
 In-Reply-To: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
-Sender: linux-kernel-owner@vger.kernel.org
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, michael.h.kelley@microsoft.com, kys@microsoft.com, vkuznets@redhat.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, paulus@ozlabs.org, hpa@zytor.com, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, mpe@ellerman.id.au, x86@kernel.org, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, mingo@redhat.com, benh@kernel.crashing.org, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ralf@linux-mips.org, paul.burton@mips.com, pbonzini@redhat.com, vkuznets@redhat.com, linuxppc-dev@lists.ozlabs.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to add last_level in the struct kvm_mmu_page. When build
-flush tlb range list, last_level will be used to identify whehter the
-page should be added into list.
+This patch is to introduce tlb flush with range list interface and use
+struct kvm_mmu_page as list entry. Use flush list function in the
+kvm_mmu_commit_zap_page().
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu.c              | 3 +++
- 2 files changed, 4 insertions(+)
+ arch/x86/kvm/mmu.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4a3d3e58fe0a..9d858d68c17a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -325,6 +325,7 @@ struct kvm_mmu_page {
- 	struct hlist_node flush_link;
- 	struct hlist_node hash_link;
- 	bool unsync;
-+	bool last_level;
- 
- 	/*
- 	 * The following two entries are used to key the shadow page in the
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index ce770b446238..70cafd3f95ab 100644
+index 70cafd3f95ab..d57574b49823 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -2918,6 +2918,9 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+@@ -289,6 +289,20 @@ static void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
  
- 	if (level > PT_PAGE_TABLE_LEVEL)
- 		spte |= PT_PAGE_SIZE_MASK;
+ 	range.start_gfn = start_gfn;
+ 	range.pages = pages;
++	range.flush_list = NULL;
 +
-+	sp->last_level = is_last_spte(spte, level);
++	kvm_flush_remote_tlbs_with_range(kvm, &range);
++}
 +
- 	if (tdp_enabled)
- 		spte |= kvm_x86_ops->get_mt_mask(vcpu, gfn,
- 			kvm_is_mmio_pfn(pfn));
++static void kvm_flush_remote_tlbs_with_list(struct kvm *kvm,
++		struct hlist_head *flush_list)
++{
++	struct kvm_tlb_range range;
++
++	if (hlist_empty(flush_list))
++		return;
++
++	range.flush_list = flush_list;
+ 
+ 	kvm_flush_remote_tlbs_with_range(kvm, &range);
+ }
+@@ -2708,6 +2722,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 				    struct list_head *invalid_list)
+ {
+ 	struct kvm_mmu_page *sp, *nsp;
++	HLIST_HEAD(flush_list);
+ 
+ 	if (list_empty(invalid_list))
+ 		return;
+@@ -2721,7 +2736,15 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 	 * In addition, kvm_flush_remote_tlbs waits for all vcpus to exit
+ 	 * guest mode and/or lockless shadow page table walks.
+ 	 */
+-	kvm_flush_remote_tlbs(kvm);
++	if (kvm_available_flush_tlb_with_range()) {
++		list_for_each_entry(sp, invalid_list, link)
++			if (sp->last_level)
++				hlist_add_head(&sp->flush_link, &flush_list);
++
++		kvm_flush_remote_tlbs_with_list(kvm, &flush_list);
++	} else {
++		kvm_flush_remote_tlbs(kvm);
++	}
+ 
+ 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
+ 		WARN_ON(!sp->role.invalid || sp->root_count);
 -- 
 2.14.4
