@@ -1,7 +1,7 @@
 From: lantianyu1986@gmail.com
-Subject: [PATCH V2 7/10] KVM: Add kvm_get_memslot() to get memslot via slot id
-Date: Sat,  2 Feb 2019 09:38:23 +0800
-Message-ID: <20190202013825.51261-8-Tianyu.Lan@microsoft.com>
+Subject: [PATCH V2 8/10] KVM: Use tlb range flush in the kvm_vm_ioctl_get/clear_dirty_log()
+Date: Sat,  2 Feb 2019 09:38:24 +0800
+Message-ID: <20190202013825.51261-9-Tianyu.Lan@microsoft.com>
 References: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
@@ -11,119 +11,96 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to add kvm_get_memslot() to get struct kvm_memory_slot
-via slot it and remove redundant codes. The function will also be used
-in the following changes.
+This patch is to use tlb range flush to flush memslot's in the
+kvm_vm_ioctl_get/clear_dirty_log() instead of flushing tlbs
+of entire ept page table when range flush is available.
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 45 +++++++++++++++++++--------------------------
- 2 files changed, 20 insertions(+), 26 deletions(-)
+ arch/x86/kvm/mmu.c |  8 +-------
+ arch/x86/kvm/mmu.h |  7 +++++++
+ arch/x86/kvm/x86.c | 16 ++++++++++++----
+ 3 files changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c38cc5eb7e73..aaa2b57eeb19 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -758,6 +758,7 @@ int kvm_get_dirty_log_protect(struct kvm *kvm,
- 			      struct kvm_dirty_log *log, bool *flush);
- int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 				struct kvm_clear_dirty_log *log, bool *flush);
-+struct kvm_memory_slot *kvm_get_memslot(struct kvm *kvm, u32 slot);
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 6b5e9bed6665..63b3e36530e3 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -264,12 +264,6 @@ static void mmu_spte_set(u64 *sptep, u64 spte);
+ static union kvm_mmu_page_role
+ kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
  
- void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 					struct kvm_memory_slot *slot,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7ebe36a13045..b2097fa4b618 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1095,22 +1095,30 @@ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
- 	return kvm_set_memory_region(kvm, mem);
+-
+-static inline bool kvm_available_flush_tlb_with_range(void)
+-{
+-	return kvm_x86_ops->tlb_remote_flush_with_range;
+-}
+-
+ static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
+ 		struct kvm_tlb_range *range)
+ {
+@@ -282,7 +276,7 @@ static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
+ 		kvm_flush_remote_tlbs(kvm);
  }
  
-+struct kvm_memory_slot *kvm_get_memslot(struct kvm *kvm, u32 slot)
+-static void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
++void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+ 		u64 start_gfn, u64 pages)
+ {
+ 	struct kvm_tlb_range range;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index c7b333147c4a..dddab78d8ed8 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -63,6 +63,13 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu);
+ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ 				u64 fault_address, char *insn, int insn_len);
++void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
++				u64 start_gfn, u64 pages);
++
++static inline bool kvm_available_flush_tlb_with_range(void)
 +{
-+	struct kvm_memslots *slots;
-+	int as_id, id;
-+
-+	as_id = slot >> 16;
-+	id = (u16)slot;
-+	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-+		return NULL;
-+
-+	slots = __kvm_memslots(kvm, as_id);
-+	return id_to_memslot(slots, id);
++	return kvm_x86_ops->tlb_remote_flush_with_range;
 +}
-+
- int kvm_get_dirty_log(struct kvm *kvm,
- 			struct kvm_dirty_log *log, int *is_dirty)
+ 
+ static inline unsigned int kvm_mmu_available_pages(struct kvm *kvm)
  {
--	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
--	int i, as_id, id;
- 	unsigned long n;
- 	unsigned long any = 0;
-+	int i;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3d32b8f5728d..0f70e07abfa1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4445,9 +4445,13 @@ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
+ 	 * kvm_mmu_slot_remove_write_access().
+ 	 */
+ 	lockdep_assert_held(&kvm->slots_lock);
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
++	if (flush) {
++		struct kvm_memory_slot *memslot = kvm_get_memslot(kvm,
++				log->slot);
  
--	as_id = log->slot >> 16;
--	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
--		return -EINVAL;
-+	memslot = kvm_get_memslot(kvm, log->slot);
++		kvm_flush_remote_tlbs_with_address(kvm, memslot->base_gfn,
++				memslot->npages);
++	}
+ 	mutex_unlock(&kvm->slots_lock);
+ 	return r;
+ }
+@@ -4472,9 +4476,13 @@ int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm, struct kvm_clear_dirty_log *lo
+ 	 * kvm_mmu_slot_remove_write_access().
+ 	 */
+ 	lockdep_assert_held(&kvm->slots_lock);
+-	if (flush)
+-		kvm_flush_remote_tlbs(kvm);
++	if (flush) {
++		struct kvm_memory_slot *memslot = kvm_get_memslot(kvm,
++				log->slot);
  
--	slots = __kvm_memslots(kvm, as_id);
--	memslot = id_to_memslot(slots, id);
- 	if (!memslot->dirty_bitmap)
- 		return -ENOENT;
- 
-@@ -1154,20 +1162,13 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
- int kvm_get_dirty_log_protect(struct kvm *kvm,
- 			struct kvm_dirty_log *log, bool *flush)
- {
--	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
--	int i, as_id, id;
- 	unsigned long n;
- 	unsigned long *dirty_bitmap;
- 	unsigned long *dirty_bitmap_buffer;
-+	int i;
- 
--	as_id = log->slot >> 16;
--	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
--		return -EINVAL;
--
--	slots = __kvm_memslots(kvm, as_id);
--	memslot = id_to_memslot(slots, id);
-+	memslot = kvm_get_memslot(kvm, log->slot);
- 
- 	dirty_bitmap = memslot->dirty_bitmap;
- 	if (!dirty_bitmap)
-@@ -1225,24 +1226,16 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log_protect);
- int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 				struct kvm_clear_dirty_log *log, bool *flush)
- {
--	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
--	int as_id, id;
- 	gfn_t offset;
- 	unsigned long i, n;
- 	unsigned long *dirty_bitmap;
- 	unsigned long *dirty_bitmap_buffer;
- 
--	as_id = log->slot >> 16;
--	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
--		return -EINVAL;
--
- 	if ((log->first_page & 63) || (log->num_pages & 63))
- 		return -EINVAL;
- 
--	slots = __kvm_memslots(kvm, as_id);
--	memslot = id_to_memslot(slots, id);
-+	memslot = kvm_get_memslot(kvm, log->slot);
- 
- 	dirty_bitmap = memslot->dirty_bitmap;
- 	if (!dirty_bitmap)
++		kvm_flush_remote_tlbs_with_address(kvm, memslot->base_gfn,
++				memslot->npages);
++	}
+ 	mutex_unlock(&kvm->slots_lock);
+ 	return r;
+ }
 -- 
 2.14.4
