@@ -1,21 +1,24 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v2 0/5] KVM: arm/arm64: add support for chained counters
-Date: Mon,  4 Feb 2019 16:53:33 +0000
-Message-ID: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v2 1/5] KVM: arm/arm64: rename
+ kvm_pmu_{enable/disable}_counter functions
+Date: Mon,  4 Feb 2019 16:53:34 +0000
+Message-ID: <1549299218-44714-2-git-send-email-andrew.murray@arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA8F34A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 11:53:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47CD44A330
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 11:53:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VqsbRYuQEXeY for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Feb 2019 11:53:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DB7D4A2E4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 11:53:45 -0500 (EST)
+ with ESMTP id Uhy9iTIgtftB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Feb 2019 11:53:47 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0234A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 11:53:47 -0500 (EST)
+In-Reply-To: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,55 +32,109 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARMv8 provides support for chained PMU counters, where an event type
-of 0x001E is set for odd-numbered counters, the event counter will
-increment by one for each overflow of the preceding even-numbered
-counter. Let's emulate this in KVM by creating a 64 bit perf counter
-when a user chains two emulated counters together.
+The kvm_pmu_{enable/disable}_counter functions can enabled/disable
+multiple counters at once as they operate on a bitmask. Let's
+make this clearer by renaming the function.
 
-Testing has been performed by hard-coding hwc->sample_period in
-__hw_perf_event_init (arm_pmu.c) to a small value, this results in
-regular overflows (for non sampling events). The following command
-was then used to measure chained and non-chained instruction cycles:
+Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c |  4 ++--
+ include/kvm/arm_pmu.h     |  8 ++++----
+ virt/kvm/arm/pmu.c        | 12 ++++++------
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-perf stat -e armv8_pmuv3/long=1,inst_retired/u \
-          -e armv8_pmuv3/long=0,inst_retired/u dd if=/dev/zero bs=1M \
-	  count=10 | gzip > /dev/null
-
-The reported values were identical (and for non-chained was in the
-same ballpark when running on a kernel without this patchset). Debug
-was added to verify that the guest received overflow interrupts for
-the chain counter.
-
-Changes since v1:
-
- - Rename kvm_pmu_{enable,disable}_counter to reflect that they can
-   operate on multiple counters at once and use these functions where
-   possible
-
- - Fix bugs with overflow handing, kvm_pmu_get_counter_value did not
-   take into consideration the perf counter value overflowing the low
-   counter
-
- - Ensure PMCCFILTR_EL0 is used when operating on the cycle counter
-
- - Rename kvm_pmu_reenable_enabled_{pair, single} and similar
-
- - Always create perf event disabled to simplify logic elsewhere
-
- - Move PMCNTENSET_EL0 test to kvm_pmu_enable_counter_mask
-
-Andrew Murray (5):
-  KVM: arm/arm64: rename kvm_pmu_{enable/disable}_counter functions
-  KVM: arm/arm64: extract duplicated code to own function
-  KVM: arm/arm64: re-create event when setting counter value
-  KVM: arm/arm64: lazily create perf events on enable
-  KVM: arm/arm64: support chained PMU counters
-
- arch/arm64/kvm/sys_regs.c |   4 +-
- include/kvm/arm_pmu.h     |   9 +-
- virt/kvm/arm/pmu.c        | 409 ++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 352 insertions(+), 70 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e3e3722..4a6fbac 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -857,11 +857,11 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		if (r->Op2 & 0x1) {
+ 			/* accessing PMCNTENSET_EL0 */
+ 			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
+-			kvm_pmu_enable_counter(vcpu, val);
++			kvm_pmu_enable_counter_mask(vcpu, val);
+ 		} else {
+ 			/* accessing PMCNTENCLR_EL0 */
+ 			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= ~val;
+-			kvm_pmu_disable_counter(vcpu, val);
++			kvm_pmu_disable_counter_mask(vcpu, val);
+ 		}
+ 	} else {
+ 		p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index f87fe20..b73f31b 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -46,8 +46,8 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
+-void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+-void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
++void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
++void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+ bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu);
+@@ -83,8 +83,8 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ }
+ static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+-static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
++static inline void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
++static inline void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+ static inline bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 1c5b76c..c5a722a 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -135,13 +135,13 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ }
+ 
+ /**
+- * kvm_pmu_enable_counter - enable selected PMU counter
++ * kvm_pmu_enable_counter_mask - enable selected PMU counters
+  * @vcpu: The vcpu pointer
+  * @val: the value guest writes to PMCNTENSET register
+  *
+  * Call perf_event_enable to start counting the perf event
+  */
+-void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
++void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ {
+ 	int i;
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+@@ -164,13 +164,13 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+ }
+ 
+ /**
+- * kvm_pmu_disable_counter - disable selected PMU counter
++ * kvm_pmu_disable_counter_mask - disable selected PMU counters
+  * @vcpu: The vcpu pointer
+  * @val: the value guest writes to PMCNTENCLR register
+  *
+  * Call perf_event_disable to stop counting the perf event
+  */
+-void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
++void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ {
+ 	int i;
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+@@ -347,10 +347,10 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 
+ 	mask = kvm_pmu_valid_counter_mask(vcpu);
+ 	if (val & ARMV8_PMU_PMCR_E) {
+-		kvm_pmu_enable_counter(vcpu,
++		kvm_pmu_enable_counter_mask(vcpu,
+ 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+ 	} else {
+-		kvm_pmu_disable_counter(vcpu, mask);
++		kvm_pmu_disable_counter_mask(vcpu, mask);
+ 	}
+ 
+ 	if (val & ARMV8_PMU_PMCR_C)
 -- 
 2.7.4
