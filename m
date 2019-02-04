@@ -1,23 +1,23 @@
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [kvm-unit-tests PATCH v3 4/5] lib: arm: Implement PSCI SYSTEM_OFF in
- psci_system_off()
-Date: Mon,  4 Feb 2019 13:44:11 +0000
-Message-ID: <20190204134412.47877-5-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v3 5/5] lib: arm: Fallback to psci_system_off()
+ in exit()
+Date: Mon,  4 Feb 2019 13:44:12 +0000
+Message-ID: <20190204134412.47877-6-alexandru.elisei@arm.com>
 References: <20190204134412.47877-1-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BD7F4A3FD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCD774A423
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q3qtuVcBfIoT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Feb 2019 08:44:33 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DF04A379
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:33 -0500 (EST)
+ with ESMTP id qOJvnC82cBdq for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Feb 2019 08:44:34 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C3EF24A415
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:34 -0500 (EST)
 In-Reply-To: <20190204134412.47877-1-alexandru.elisei@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,55 +32,49 @@ To: kvm@vger.kernel.org
 Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A new function, psci_system_off(), is added which implements the PSCI
-SYSTEM_OFF function. A call causes the hypervisor to terminate the virtual
+On arm and arm64, kvm-unit-tests uses the QEMU chr-testdev device to shut
+down the virtual machine at the end of a test. The function
+psci_system_off() provides another mechanism for terminating the virtual
 machine.
 
-We take this opportunity to rename psci_sys_reset() to psci_system_reset()
-to match the name of the PSCI function SYSTEM_RESET that it implements.
+chr-testdev is implemented on top of virtio console. If the virtual machine
+manager doesn't emulate a virtio console, then chr_testdev_exit() will
+fail. If this happens, try to use psci_system_off() to terminate the test.
 
-Consumers for the function will be added in a later patch.
+This patch makes it possible for a virtual machine manager which doesn't
+have support for chr-testdev, but has been configured not to emulate a
+virtio console, to gracefully terminate a virtual machine after a test has
+been completed.
+
+There is one limitation to using psci_system_off() to terminate a test:
+chr-testdev allows kvm-unit-tests to specify an exit code;
+psci_system_off() has no such mechanism.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/arm/asm/psci.h | 3 ++-
- lib/arm/psci.c     | 8 +++++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ lib/arm/io.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-index ed51708fd265..7b956bf5987d 100644
---- a/lib/arm/asm/psci.h
-+++ b/lib/arm/asm/psci.h
-@@ -6,8 +6,9 @@
- extern int psci_invoke(unsigned long function_id, unsigned long arg0,
- 		       unsigned long arg1, unsigned long arg2);
- extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
--extern void psci_sys_reset(void);
-+extern void psci_system_reset(void);
- extern int cpu_psci_cpu_boot(unsigned int cpu);
- extern void cpu_psci_cpu_die(void);
-+extern void psci_system_off(void);
+diff --git a/lib/arm/io.c b/lib/arm/io.c
+index e55b8b854869..8226b765bdc5 100644
+--- a/lib/arm/io.c
++++ b/lib/arm/io.c
+@@ -12,6 +12,7 @@
+ #include <devicetree.h>
+ #include <chr-testdev.h>
+ #include <config.h>
++#include <asm/psci.h>
+ #include <asm/spinlock.h>
+ #include <asm/io.h>
  
- #endif /* _ASMARM_PSCI_H_ */
-diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-index 119f74e57e91..c3d399064ae3 100644
---- a/lib/arm/psci.c
-+++ b/lib/arm/psci.c
-@@ -48,7 +48,13 @@ void cpu_psci_cpu_die(void)
- 	printf("CPU%d unable to power off (error = %d)\n", smp_processor_id(), err);
- }
- 
--void psci_sys_reset(void)
-+void psci_system_reset(void)
+@@ -91,6 +92,7 @@ void puts(const char *s)
+ void exit(int code)
  {
- 	psci_invoke(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
+ 	chr_testdev_exit(code);
++	psci_system_off();
+ 	halt(code);
+ 	__builtin_unreachable();
  }
-+
-+void psci_system_off(void)
-+{
-+	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
-+	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
-+}
 -- 
 2.17.0
