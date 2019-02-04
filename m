@@ -1,28 +1,22 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] configure: arm/arm64: Add --vmm
- option with no effect
-Date: Mon, 4 Feb 2019 11:32:16 +0100
-Message-ID: <20190204103216.ia5erbwcbsmgopiw@kamzik.brq.redhat.com>
-References: <20190201111641.8299-1-alexandru.elisei@arm.com>
- <20190201111641.8299-3-alexandru.elisei@arm.com>
- <20190202155100.gk4rnpgpdlbjpoh2@kamzik.brq.redhat.com>
- <62f7f56e-804b-1236-bc18-72b61d65e28f@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v3 0/5] arm/arm64: Add support for running
+ under kvmtool
+Date: Mon,  4 Feb 2019 13:44:07 +0000
+Message-ID: <20190204134412.47877-1-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CFD34A3B2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 05:39:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 108164A379
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g44A6HLn7UA8 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Feb 2019 05:39:58 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B9714A3A8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 05:39:58 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <62f7f56e-804b-1236-bc18-72b61d65e28f@arm.com>
+ with ESMTP id v9jUZBqfBVgu for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Feb 2019 08:44:28 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D344A36D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:28 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,79 +26,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexandru Elisei <Alexandru.Elisei@arm.com>
-Cc: Andre Przywara <Andre.Przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: kvm@vger.kernel.org
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 04, 2019 at 09:56:13AM +0000, Alexandru Elisei wrote:
-> On 2/2/19 3:51 PM, Andrew Jones wrote:
-> > On Fri, Feb 01, 2019 at 11:16:38AM +0000, Alexandru Elisei wrote:
-> >> Add configuration option --vmm to specify the virtual machine manager.
-> >> Valid choices are 'qemu' and 'kvmtool', the default being 'qemu'. This
-> >> option is only available for the arm and arm64 architectures and does
-> >> nothing for now.
-> >>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  configure | 10 ++++++++++
-> >>  1 file changed, 10 insertions(+)
-> >>
-> >> diff --git a/configure b/configure
-> >> index 44708b026422..0786e1604dba 100755
-> >> --- a/configure
-> >> +++ b/configure
-> >> @@ -16,6 +16,7 @@ endian=""
-> >>  pretty_print_stacks=yes
-> >>  environ_default=yes
-> >>  u32_long=
-> >> +vmm="qemu"
-> >>
-> >>  usage() {
-> >>      cat <<-EOF
-> >> @@ -24,6 +25,8 @@ usage() {
-> >>  Options include:
-> >>      --arch=ARCH            architecture to compile for ($arch)
-> >>      --processor=PROCESSOR  processor to compile for ($arch)
-> >> +    --vmm=VMM              virtual machine monitor to compile for (qemu
-> >> +                           or kvmtool, default is qemu) (arm/arm64 only)
-> >>      --cross-prefix=PREFIX  cross compiler prefix
-> >>      --cc=CC   c compiler to use ($cc)
-> >>      --cxx=CXX   c++ compiler to use ($cxx)
-> >> @@ -56,6 +59,9 @@ while [[ "$1" = -* ]]; do
-> >>          --processor)
-> >>      processor="$arg"
-> >>      ;;
-> >> +--vmm)
-> >> +    vmm="$arg"
-> >> +    ;;
-> >>  --cross-prefix)
-> >>      cross_prefix="$arg"
-> >>      ;;
-> >> @@ -108,6 +114,10 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-> >>      testdir=x86
-> >>  elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-> >>      testdir=arm
-> >> +    if [ "$vmm" != "qemu" ] && [ "$vmm" != "kvmtool" ]; then
-> >> +        echo '--vmm must be one of "qemu" or "kvmtool"!'
-> > nit: I'd drop the '!'
-> There are two error messages following this line, and both have an exclamation
-> mark. I would like to keep it as it is for consistency, if you're ok with it.
+kvm-unit-tests is designed to be run with QEMU as the virtual machine
+monitor. It relies on devices emulated by QEMU (like isa-debug-exit or
+testdev) and it makes certain assumptions based on the implicit QEMU
+virtual environment configuration (like the serial base address).
 
-Hmm, yeah, it looks like I added them too. We should drop those. I'll
-leave it up to you to either add this one or delete the other two.
+kvmtool [1] is a lightweight virtual machine monitor for running KVM
+guests. kvmtool has reduced complexity compared to QEMU and is easily
+hackable.
 
-Thanks,
-drew
+This patch series aims to make it possible to run kvm-unit-tests using
+kvmtool on the arm and arm64 architectures, with two caveats:
 
-> >
-> >> +        usage
-> >> +    fi
-> >>  elif [ "$arch" = "ppc64" ]; then
-> >>      testdir=powerpc
-> >>      firmware="$testdir/boot_rom.bin"
-> >> --
-> >> 2.17.0
-> >>
-> >
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+(1) When terminating a test, the userspace process won't exit with an exit
+code that signals the success or failure of the test. Output from the test
+can still be parsed to determine the outcome of the test.
+
+(2) kvmtool has been designed to work with a linux guest and it
+automatically generates the command line arguments for a Linux kernel. The
+arm/arm64 selftest and gic tests will fail if unexpected command line
+arguments are found. To get around this limitation, the test binary needs
+to be loaded using the --firmware option introduced by kvmtool in commit
+5e4b563d75b9 ("arm: Allow command line for firmware"). This option
+suppresses the automatic kernel command line and can be used to run all
+tests, not just the tests that require specific arguments.
+
+The run scripts haven't been modified. To run a test under kvmtool, one
+needs to launch kvmtool manually. For example, to run the timer test the
+following command can be used:
+
+lkvm run --cpus 1 --console serial --firmware timer.flat.
+
+To run the gicv3-ipi test:
+
+lkvm run --cpus 8 --console serial --params "ipi" --irqchip gicv3 \
+    --firmware gic.flat
+
+Changes in v3:
+* Updated cover letter with information about the kvmtool --firmware
+  option.
+* Gathered Reviewed-by tags.
+* Renamed the config.h define UART_EARLY_BASE to CONFIG_UART_EARLY_BASE and
+  made the necessary casts in lib/arm/io.c
+
+Changes in v2:
+* Generate lib/config.h when configuring kvm-unit-tests; arm/arm64 uses it
+  to get the UART address.
+* Added --vmm configure option for arm/arm64 which will set the UART
+  address in lib/config.h when the tests are run under QEMU or kvmtool.
+* Renamed psci_sys_reset() to psci_system_reset().
+* Dropped patches that allowed a test to ignore unexpected command line
+  arguments.
+
+Summary:
+* Patches 1, 2 and 3 add support for configuring kvm-unit-tests on arm and
+  arm64 to use the ns16550a UART emulated by kvmtool.
+* Patches 4 and 5 provide an alternative mechanism for terminating the
+  virtual machine by using PSCI.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
+[2] https://www.spinics.net/lists/kvm-arm/msg34352.html
+
+Alexandru Elisei (5):
+  lib: arm: Use UART address from generated config.h
+  configure: arm/arm64: Add --vmm option with no effect
+  lib: arm: Use ns16550a UART when --vmm=kvmtool
+  lib: arm: Implement PSCI SYSTEM_OFF in psci_system_off()
+  lib: arm: Fallback to psci_system_off() in exit()
+
+ configure          | 32 ++++++++++++++++++++++++++++++++
+ Makefile           |  2 +-
+ lib/arm/asm/psci.h |  3 ++-
+ lib/arm/io.c       | 41 ++++++++++++++++++++++++++---------------
+ lib/arm/psci.c     |  8 +++++++-
+ .gitignore         |  1 +
+ 6 files changed, 69 insertions(+), 18 deletions(-)
+
+-- 
+2.17.0
