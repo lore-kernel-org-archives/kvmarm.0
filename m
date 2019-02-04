@@ -1,22 +1,24 @@
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [kvm-unit-tests PATCH v3 0/5] arm/arm64: Add support for running
- under kvmtool
-Date: Mon,  4 Feb 2019 13:44:07 +0000
-Message-ID: <20190204134412.47877-1-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v3 1/5] lib: arm: Use UART address from
+ generated config.h
+Date: Mon,  4 Feb 2019 13:44:08 +0000
+Message-ID: <20190204134412.47877-2-alexandru.elisei@arm.com>
+References: <20190204134412.47877-1-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 108164A379
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A924A36D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v9jUZBqfBVgu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Feb 2019 08:44:28 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92D344A36D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:28 -0500 (EST)
+ with ESMTP id vSWEQ0VFsRYC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Feb 2019 08:44:30 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A1E44A3ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:30 -0500 (EST)
+In-Reply-To: <20190204134412.47877-1-alexandru.elisei@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,81 +32,114 @@ To: kvm@vger.kernel.org
 Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm-unit-tests is designed to be run with QEMU as the virtual machine
-monitor. It relies on devices emulated by QEMU (like isa-debug-exit or
-testdev) and it makes certain assumptions based on the implicit QEMU
-virtual environment configuration (like the serial base address).
+Generate lib/config.h when configuring kvm-unit-tests. The file is empty
+for all architectures except for arm and arm64, where it is used to store
+the UART base address. This removes the hardcoded address from lib/arm/io.c
+and provides a mechanism for using different UART addresses in the future.
 
-kvmtool [1] is a lightweight virtual machine monitor for running KVM
-guests. kvmtool has reduced complexity compared to QEMU and is easily
-hackable.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ configure    | 17 +++++++++++++++++
+ Makefile     |  2 +-
+ lib/arm/io.c | 12 ++++++------
+ .gitignore   |  1 +
+ 4 files changed, 25 insertions(+), 7 deletions(-)
 
-This patch series aims to make it possible to run kvm-unit-tests using
-kvmtool on the arm and arm64 architectures, with two caveats:
-
-(1) When terminating a test, the userspace process won't exit with an exit
-code that signals the success or failure of the test. Output from the test
-can still be parsed to determine the outcome of the test.
-
-(2) kvmtool has been designed to work with a linux guest and it
-automatically generates the command line arguments for a Linux kernel. The
-arm/arm64 selftest and gic tests will fail if unexpected command line
-arguments are found. To get around this limitation, the test binary needs
-to be loaded using the --firmware option introduced by kvmtool in commit
-5e4b563d75b9 ("arm: Allow command line for firmware"). This option
-suppresses the automatic kernel command line and can be used to run all
-tests, not just the tests that require specific arguments.
-
-The run scripts haven't been modified. To run a test under kvmtool, one
-needs to launch kvmtool manually. For example, to run the timer test the
-following command can be used:
-
-lkvm run --cpus 1 --console serial --firmware timer.flat.
-
-To run the gicv3-ipi test:
-
-lkvm run --cpus 8 --console serial --params "ipi" --irqchip gicv3 \
-    --firmware gic.flat
-
-Changes in v3:
-* Updated cover letter with information about the kvmtool --firmware
-  option.
-* Gathered Reviewed-by tags.
-* Renamed the config.h define UART_EARLY_BASE to CONFIG_UART_EARLY_BASE and
-  made the necessary casts in lib/arm/io.c
-
-Changes in v2:
-* Generate lib/config.h when configuring kvm-unit-tests; arm/arm64 uses it
-  to get the UART address.
-* Added --vmm configure option for arm/arm64 which will set the UART
-  address in lib/config.h when the tests are run under QEMU or kvmtool.
-* Renamed psci_sys_reset() to psci_system_reset().
-* Dropped patches that allowed a test to ignore unexpected command line
-  arguments.
-
-Summary:
-* Patches 1, 2 and 3 add support for configuring kvm-unit-tests on arm and
-  arm64 to use the ns16550a UART emulated by kvmtool.
-* Patches 4 and 5 provide an alternative mechanism for terminating the
-  virtual machine by using PSCI.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
-[2] https://www.spinics.net/lists/kvm-arm/msg34352.html
-
-Alexandru Elisei (5):
-  lib: arm: Use UART address from generated config.h
-  configure: arm/arm64: Add --vmm option with no effect
-  lib: arm: Use ns16550a UART when --vmm=kvmtool
-  lib: arm: Implement PSCI SYSTEM_OFF in psci_system_off()
-  lib: arm: Fallback to psci_system_off() in exit()
-
- configure          | 32 ++++++++++++++++++++++++++++++++
- Makefile           |  2 +-
- lib/arm/asm/psci.h |  3 ++-
- lib/arm/io.c       | 41 ++++++++++++++++++++++++++---------------
- lib/arm/psci.c     |  8 +++++++-
- .gitignore         |  1 +
- 6 files changed, 69 insertions(+), 18 deletions(-)
-
+diff --git a/configure b/configure
+index df8581e3a906..b4732c6c04e4 100755
+--- a/configure
++++ b/configure
+@@ -198,3 +198,20 @@ ENVIRON_DEFAULT=$environ_default
+ ERRATATXT=errata.txt
+ U32_LONG_FMT=$u32_long
+ EOF
++
++cat <<EOF > lib/config.h
++#ifndef CONFIG_H
++#define CONFIG_H 1
++/*
++ * Generated file. DO NOT MODIFY.
++ *
++ */
++EOF
++if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
++cat <<EOF >> lib/config.h
++
++#define CONFIG_UART_EARLY_BASE 0x09000000
++
++EOF
++fi
++echo "#endif" >> lib/config.h
+diff --git a/Makefile b/Makefile
+index e9f02272e156..643af05678ad 100644
+--- a/Makefile
++++ b/Makefile
+@@ -115,7 +115,7 @@ libfdt_clean:
+ 	$(LIBFDT_objdir)/.*.d
+ 
+ distclean: clean libfdt_clean
+-	$(RM) lib/asm config.mak $(TEST_DIR)-run msr.out cscope.* build-head
++	$(RM) lib/asm lib/config.h config.mak $(TEST_DIR)-run msr.out cscope.* build-head
+ 	$(RM) -r tests logs logs.old
+ 
+ cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/asm-generic
+diff --git a/lib/arm/io.c b/lib/arm/io.c
+index d2c1a07c19ee..e84a5c89fcb1 100644
+--- a/lib/arm/io.c
++++ b/lib/arm/io.c
+@@ -11,6 +11,7 @@
+ #include <libcflat.h>
+ #include <devicetree.h>
+ #include <chr-testdev.h>
++#include <config.h>
+ #include <asm/spinlock.h>
+ #include <asm/io.h>
+ 
+@@ -18,6 +19,7 @@
+ 
+ extern void halt(int code);
+ 
++static struct spinlock uart_lock;
+ /*
+  * Use this guess for the pl011 base in order to make an attempt at
+  * having earlier printf support. We'll overwrite it with the real
+@@ -25,10 +27,8 @@ extern void halt(int code);
+  * the address we expect QEMU's mach-virt machine type to put in
+  * its generated device tree.
+  */
+-#define UART_EARLY_BASE 0x09000000UL
+-
+-static struct spinlock uart_lock;
+-static volatile u8 *uart0_base = (u8 *)UART_EARLY_BASE;
++#define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
++static volatile u8 *uart0_base = UART_EARLY_BASE;
+ 
+ static void uart0_init(void)
+ {
+@@ -58,10 +58,10 @@ static void uart0_init(void)
+ 
+ 	uart0_base = ioremap(base.addr, base.size);
+ 
+-	if (uart0_base != (u8 *)UART_EARLY_BASE) {
++	if (uart0_base != UART_EARLY_BASE) {
+ 		printf("WARNING: early print support may not work. "
+ 		       "Found uart at %p, but early base is %p.\n",
+-			uart0_base, (u8 *)UART_EARLY_BASE);
++			uart0_base, UART_EARLY_BASE);
+ 	}
+ }
+ 
+diff --git a/.gitignore b/.gitignore
+index 2405a8087ae5..483f7c7a09ea 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -10,6 +10,7 @@ patches
+ cscope.*
+ *.swp
+ /lib/asm
++/lib/config.h
+ /config.mak
+ /*-run
+ /msr.out
 -- 
 2.17.0
