@@ -1,24 +1,26 @@
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [kvm-unit-tests PATCH v3 2/5] configure: arm/arm64: Add --vmm option
- with no effect
-Date: Mon,  4 Feb 2019 13:44:09 +0000
-Message-ID: <20190204134412.47877-3-alexandru.elisei@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 1/5] lib: arm: Use UART address from
+ generated config.h
+Date: Mon, 4 Feb 2019 15:00:01 +0100
+Message-ID: <20190204140001.tollipaxeiom2ug6@kamzik.brq.redhat.com>
 References: <20190204134412.47877-1-alexandru.elisei@arm.com>
+ <20190204134412.47877-2-alexandru.elisei@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29EA84A379
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36CEF4A39B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 09:00:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K4kYUQepSigy for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Feb 2019 08:44:32 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AAC64A3FC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 08:44:31 -0500 (EST)
-In-Reply-To: <20190204134412.47877-1-alexandru.elisei@arm.com>
+ with ESMTP id VL6BImjm1TNh for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Feb 2019 09:00:12 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 923044A42B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Feb 2019 09:00:06 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190204134412.47877-2-alexandru.elisei@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,65 +30,122 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add configuration option --vmm to specify the virtual machine manager.
-Valid choices are 'qemu' and 'kvmtool', the default being 'qemu'. This
-option is only available for the arm and arm64 architectures and does
-nothing for now.
+On Mon, Feb 04, 2019 at 01:44:08PM +0000, Alexandru Elisei wrote:
+> Generate lib/config.h when configuring kvm-unit-tests. The file is empty
+> for all architectures except for arm and arm64, where it is used to store
+> the UART base address. This removes the hardcoded address from lib/arm/io.c
+> and provides a mechanism for using different UART addresses in the future.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  configure    | 17 +++++++++++++++++
+>  Makefile     |  2 +-
+>  lib/arm/io.c | 12 ++++++------
+>  .gitignore   |  1 +
+>  4 files changed, 25 insertions(+), 7 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index df8581e3a906..b4732c6c04e4 100755
+> --- a/configure
+> +++ b/configure
+> @@ -198,3 +198,20 @@ ENVIRON_DEFAULT=$environ_default
+>  ERRATATXT=errata.txt
+>  U32_LONG_FMT=$u32_long
+>  EOF
+> +
+> +cat <<EOF > lib/config.h
+> +#ifndef CONFIG_H
+> +#define CONFIG_H 1
+> +/*
+> + * Generated file. DO NOT MODIFY.
+> + *
+> + */
+> +EOF
+> +if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+> +cat <<EOF >> lib/config.h
+> +
+> +#define CONFIG_UART_EARLY_BASE 0x09000000
+> +
+> +EOF
+> +fi
+> +echo "#endif" >> lib/config.h
+> diff --git a/Makefile b/Makefile
+> index e9f02272e156..643af05678ad 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -115,7 +115,7 @@ libfdt_clean:
+>  	$(LIBFDT_objdir)/.*.d
+>  
+>  distclean: clean libfdt_clean
+> -	$(RM) lib/asm config.mak $(TEST_DIR)-run msr.out cscope.* build-head
+> +	$(RM) lib/asm lib/config.h config.mak $(TEST_DIR)-run msr.out cscope.* build-head
+>  	$(RM) -r tests logs logs.old
+>  
+>  cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/asm-generic
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index d2c1a07c19ee..e84a5c89fcb1 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -11,6 +11,7 @@
+>  #include <libcflat.h>
+>  #include <devicetree.h>
+>  #include <chr-testdev.h>
+> +#include <config.h>
+>  #include <asm/spinlock.h>
+>  #include <asm/io.h>
+>  
+> @@ -18,6 +19,7 @@
+>  
+>  extern void halt(int code);
+>  
+> +static struct spinlock uart_lock;
+>  /*
+>   * Use this guess for the pl011 base in order to make an attempt at
+>   * having earlier printf support. We'll overwrite it with the real
+> @@ -25,10 +27,8 @@ extern void halt(int code);
+>   * the address we expect QEMU's mach-virt machine type to put in
+>   * its generated device tree.
+>   */
+> -#define UART_EARLY_BASE 0x09000000UL
+> -
+> -static struct spinlock uart_lock;
+> -static volatile u8 *uart0_base = (u8 *)UART_EARLY_BASE;
+> +#define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
+> +static volatile u8 *uart0_base = UART_EARLY_BASE;
+>  
+>  static void uart0_init(void)
+>  {
+> @@ -58,10 +58,10 @@ static void uart0_init(void)
+>  
+>  	uart0_base = ioremap(base.addr, base.size);
+>  
+> -	if (uart0_base != (u8 *)UART_EARLY_BASE) {
+> +	if (uart0_base != UART_EARLY_BASE) {
+>  		printf("WARNING: early print support may not work. "
+>  		       "Found uart at %p, but early base is %p.\n",
+> -			uart0_base, (u8 *)UART_EARLY_BASE);
+> +			uart0_base, UART_EARLY_BASE);
+>  	}
+>  }
+>  
+> diff --git a/.gitignore b/.gitignore
+> index 2405a8087ae5..483f7c7a09ea 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -10,6 +10,7 @@ patches
+>  cscope.*
+>  *.swp
+>  /lib/asm
+> +/lib/config.h
+>  /config.mak
+>  /*-run
+>  /msr.out
+> -- 
+> 2.17.0
+>
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
----
-I opted to keep the exclamation mark in the error messages because I think
-it makes them stand out.
-
- configure | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/configure b/configure
-index b4732c6c04e4..d1dd7d5830eb 100755
---- a/configure
-+++ b/configure
-@@ -16,6 +16,7 @@ endian=""
- pretty_print_stacks=yes
- environ_default=yes
- u32_long=
-+vmm="qemu"
- 
- usage() {
-     cat <<-EOF
-@@ -24,6 +25,8 @@ usage() {
- 	Options include:
- 	    --arch=ARCH            architecture to compile for ($arch)
- 	    --processor=PROCESSOR  processor to compile for ($arch)
-+	    --vmm=VMM              virtual machine monitor to compile for (qemu
-+	                           or kvmtool, default is qemu) (arm/arm64 only)
- 	    --cross-prefix=PREFIX  cross compiler prefix
- 	    --cc=CC		   c compiler to use ($cc)
- 	    --cxx=CXX		   c++ compiler to use ($cxx)
-@@ -56,6 +59,9 @@ while [[ "$1" = -* ]]; do
-         --processor)
- 	    processor="$arg"
- 	    ;;
-+	--vmm)
-+	    vmm="$arg"
-+	    ;;
- 	--cross-prefix)
- 	    cross_prefix="$arg"
- 	    ;;
-@@ -108,6 +114,10 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     testdir=arm
-+    if [ "$vmm" != "qemu" ] && [ "$vmm" != "kvmtool" ]; then
-+        echo '--vmm must be one of "qemu" or "kvmtool"!'
-+        usage
-+    fi
- elif [ "$arch" = "ppc64" ]; then
-     testdir=powerpc
-     firmware="$testdir/boot_rom.bin"
--- 
-2.17.0
