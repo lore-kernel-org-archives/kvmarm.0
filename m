@@ -1,521 +1,178 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm/arm64: support chained PMU counters
-Date: Tue, 5 Feb 2019 14:33:03 +0000
-Message-ID: <11a8c800-5c1d-08ce-9d85-402ca89727a3@arm.com>
-References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
- <1549299218-44714-6-git-send-email-andrew.murray@arm.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v2 00/27] KVM: x86/mmu: Remove fast invalidate mechanism
+Date: Tue,  5 Feb 2019 12:54:16 -0800
+Message-ID: <20190205205443.1059-1-sean.j.christopherson@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 070B64A2E4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 09:33:10 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QSJ5aIgbHUGe for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Feb 2019 09:33:08 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22BE74A2AC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 09:33:08 -0500 (EST)
-In-Reply-To: <1549299218-44714-6-git-send-email-andrew.murray@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andrew,
+...and clean up the MMIO spte generation code.
 
-On 04/02/2019 16:53, Andrew Murray wrote:
-> Emulate chained PMU counters by creating a single 64 bit event counter
-> for a pair of chained KVM counters.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> ---
->  include/kvm/arm_pmu.h |   1 +
->  virt/kvm/arm/pmu.c    | 321 +++++++++++++++++++++++++++++++++++++++++---------
->  2 files changed, 269 insertions(+), 53 deletions(-)
-> 
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index b73f31b..8e691ee 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -29,6 +29,7 @@ struct kvm_pmc {
->  	u8 idx;	/* index into the pmu->pmc array */
->  	struct perf_event *perf_event;
->  	u64 bitmask;
-> +	u64 overflow_count;
->  };
->  
->  struct kvm_pmu {
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index a64aeb2..9318130 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -24,9 +24,25 @@
->  #include <kvm/arm_pmu.h>
->  #include <kvm/arm_vgic.h>
->  
-> +#define ARMV8_PMUV3_PERFCTR_CHAIN 0x1E
+=== Non-x86 Folks ===
+Patch 01/27 (which you should also be cc'd on) changes the prototype for
+a function that is defined by all architectures but only actually used
+by x86.  Feel free to skip the rest of this cover letter.
 
-I find it a bit awkward to have this redefined here.
+=== x86 Folks ===
+Though not explicitly stated, for all intents and purposes the fast
+invalidate mechanism was added to speed up the scenario where removing
+a memslot, e.g. when accessing PCI ROM, caused KVM to flush all shadow
+entries[1].
 
-Maybe we could define a helper in kvm_host.h:
-bool kvm_pmu_typer_is_chain(u64 typer);
+The other use cases of "flush everything" are VM teardown and handling
+MMIO generation overflow, neither of which is a performance critial
+path (see "Other Uses" below).
 
-That would always return false for arm32?
+For the memslot case, zapping all shadow entries is overkill, i.e. KVM
+only needs to zap the entries associated with the memslot, but KVM has
+historically used a big hammer because if all you have is a hammer,
+everything looks like a nail.
 
-> +static void kvm_pmu_stop_release_perf_event_pair(struct kvm_vcpu *vcpu,
-> +					    u64 pair_low);
-> +static void kvm_pmu_stop_release_perf_event(struct kvm_vcpu *vcpu,
-> +					      u64 select_idx);
-> +static void kvm_pmu_sync_counter_enable_pair(struct kvm_vcpu *vcpu, u64 pair_low);
->  static void kvm_pmu_sync_counter_enable(struct kvm_vcpu *vcpu, u64 select_idx);
->  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
-> -static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
-> +
-> +/**
-> + * kvm_pmu_counter_is_high_word - is select_idx high counter of 64bit event
-> + * @pmc: The PMU counter pointer
-> + * @select_idx: The counter index
-> + */
-> +static inline bool kvm_pmu_counter_is_high_word(struct kvm_pmc *pmc)
-> +{
-> +	return ((pmc->perf_event->attr.config1 & 0x1)
-> +		&& (pmc->idx % 2));
-> +}
->  
->  /**
->   * kvm_pmu_get_counter_value - get PMU counter value
-> @@ -35,22 +51,70 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
->   */
->  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
-> -	u64 counter, reg, enabled, running;
-> +	u64 counter_idx, reg, enabled, running, incr;
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->  	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
->  
->  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
->  	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
-> -	counter = __vcpu_sys_reg(vcpu, reg);
-> +	counter_idx = __vcpu_sys_reg(vcpu, reg);
+Rather than zap all pages when removing a memslot, zap only the shadow
+entries associated with said memslot.  I see a performance improvement
+of ~5% when zapping only the pages for the deleted memslot when using a
+slightly modified version of the original benchmark[2][3][4] (I don't
+have easy access to a system with hundreds of gigs of memory).
 
-I'm not sure I understand the "_idx" suffix for this variable. This
-holds a counter value, not and index. Right?
+$ cat shell.sh
+        #!/bin/sh
+
+        echo 3 > /proc/sys/vm/drop_caches
+        ./mmtest -c 8 -m 2000 -e ./rom.sh
+
+I.e. running 8 threads and 2gb of memory per thread, time in milliseconds:
+
+Before: 89.117
+After:  84.768
 
 
->  
->  	/* The real counter value is equal to the value of counter register plus
->  	 * the value perf event counts.
->  	 */
-> -	if (pmc->perf_event)
-> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> +	if (pmc->perf_event) {
-> +		incr = perf_event_read_value(pmc->perf_event, &enabled,
->  						 &running);
->  
-> -	return counter & pmc->bitmask;
-> +		if (kvm_pmu_counter_is_high_word(pmc)) {
-> +			u64 counter_low, counter;
-> +
-> +			reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
-> +			      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx - 1;
-> +			counter_low = __vcpu_sys_reg(vcpu, reg);
-> +			counter = lower_32_bits(counter_low) | (counter_idx << 32);
-> +			counter_idx = upper_32_bits(counter + incr);
-> +		} else {
-> +			counter_idx += incr;
-> +		}
-> +	}
-> +
-> +	return counter_idx & pmc->bitmask;
-> +}
-> +
-> +/**
-> + * kvm_pmu_counter_is_enabled - is a counter active
-> + * @vcpu: The vcpu pointer
-> + * @select_idx: The counter index
-> + */
-> +static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
-> +{
-> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
-> +
-> +	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
-> +	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask & BIT(select_idx));
-> +}
-> +
-> +/**
-> + * kvnm_pmu_event_is_chained - is a pair of counters chained and enabled
-> + * @vcpu: The vcpu pointer
-> + * @select_idx: The low counter index
-> + */
-> +static bool kvm_pmu_event_is_chained(struct kvm_vcpu *vcpu, u64 pair_low)
-> +{
-> +	u64 eventsel, reg;
-> +
-> +	reg = (pair_low + 1 == ARMV8_PMU_CYCLE_IDX)
-> +	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pair_low + 1;
-> +	eventsel = __vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_EVENT;
-> +	if (eventsel != ARMV8_PMUV3_PERFCTR_CHAIN)
-> +		return false;
-> +
-> +	if (kvm_pmu_counter_is_enabled(vcpu, pair_low) !=
-> +	    kvm_pmu_counter_is_enabled(vcpu, pair_low + 1))
-> +		return false;
-> +
-> +	return true;
->  }
->  
->  /**
-> @@ -61,29 +125,45 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
->   */
->  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
->  {
-> -	u64 reg;
-> -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> -	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> +	u64 reg, pair_low;
->  
->  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
->  	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
->  	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
->  
-> -	kvm_pmu_stop_counter(vcpu, pmc);
-> -	kvm_pmu_sync_counter_enable(vcpu, select_idx);
-> +	pair_low = (select_idx % 2) ? select_idx - 1 : select_idx;
-> +
-> +	/* Recreate the perf event to reflect the updated sample_period */
-> +	if (kvm_pmu_event_is_chained(vcpu, pair_low)) {
-> +		kvm_pmu_stop_release_perf_event_pair(vcpu, pair_low);
-> +		kvm_pmu_sync_counter_enable_pair(vcpu, pair_low);
-> +	} else {
-> +		kvm_pmu_stop_release_perf_event(vcpu, select_idx);
-> +		kvm_pmu_sync_counter_enable(vcpu, select_idx);
-> +	}
->  }
->  
->  /**
->   * kvm_pmu_release_perf_event - remove the perf event
->   * @pmc: The PMU counter pointer
->   */
-> -static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
-> +static void kvm_pmu_release_perf_event(struct kvm_vcpu *vcpu,
-> +				       struct kvm_pmc *pmc)
->  {
-> -	if (pmc->perf_event) {
-> -		perf_event_disable(pmc->perf_event);
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc_alt;
-> +	u64 pair_alt;
-> +
-> +	pair_alt = (pmc->idx % 2) ? pmc->idx - 1 : pmc->idx + 1;
-> +	pmc_alt = &pmu->pmc[pair_alt];
-> +
-> +	if (pmc->perf_event)
->  		perf_event_release_kernel(pmc->perf_event);
-> -		pmc->perf_event = NULL;
-> -	}
-> +
-> +	if (pmc->perf_event == pmc_alt->perf_event)
-> +		pmc_alt->perf_event = NULL;
-> +
-> +	pmc->perf_event = NULL;
->  }
->  
->  /**
-> @@ -91,22 +171,65 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
->   * @vcpu: The vcpu pointer
->   * @pmc: The PMU counter pointer
->   *
-> - * If this counter has been configured to monitor some event, release it here.
-> + * If this counter has been configured to monitor some event, stop it here.
->   */
->  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
->  {
->  	u64 counter, reg;
->  
->  	if (pmc->perf_event) {
-> +		perf_event_disable(pmc->perf_event);
->  		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
->  		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
->  		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
->  		__vcpu_sys_reg(vcpu, reg) = counter;
-> -		kvm_pmu_release_perf_event(pmc);
->  	}
->  }
->  
->  /**
-> + * kvm_pmu_stop_release_perf_event_pair - stop and release a pair of counters
-> + * @vcpu: The vcpu pointer
-> + * @pmc_low: The PMU counter pointer for lower word
-> + * @pmc_high: The PMU counter pointer for higher word
-> + *
-> + * As chained counters share the underlying perf event, we stop them
-> + * both first before discarding the underlying perf event
-> + */
-> +static void kvm_pmu_stop_release_perf_event_pair(struct kvm_vcpu *vcpu,
-> +					    u64 idx_low)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc_low = &pmu->pmc[idx_low];
-> +	struct kvm_pmc *pmc_high = &pmu->pmc[idx_low + 1];
-> +
-> +	/* Stopping a counter involves adding the perf event value to the
-> +	 * vcpu sys register value prior to releasing the perf event. As
-> +	 * kvm_pmu_get_counter_value may depend on the low counter value we
-> +	 * must always stop the high counter first
-> +	 */
-> +	kvm_pmu_stop_counter(vcpu, pmc_high);
-> +	kvm_pmu_stop_counter(vcpu, pmc_low);
-> +
-> +	kvm_pmu_release_perf_event(vcpu, pmc_high);
-> +	kvm_pmu_release_perf_event(vcpu, pmc_low);
-> +}
-> +
-> +/**
-> + * kvm_pmu_stop_release_perf_event - stop and release a counter
-> + * @vcpu: The vcpu pointer
-> + * @select_idx: The counter index
-> + */
-> +static void kvm_pmu_stop_release_perf_event(struct kvm_vcpu *vcpu,
-> +					      u64 select_idx)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> +
-> +	kvm_pmu_stop_counter(vcpu, pmc);
-> +	kvm_pmu_release_perf_event(vcpu, pmc);
-> +}
-> +
-> +/**
->   * kvm_pmu_vcpu_reset - reset pmu state for cpu
->   * @vcpu: The vcpu pointer
->   *
-> @@ -117,7 +240,7 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->  
->  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-> -		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
-> +		kvm_pmu_stop_release_perf_event(vcpu, i);
->  		pmu->pmc[i].idx = i;
->  		pmu->pmc[i].bitmask = 0xffffffffUL;
->  	}
-> @@ -134,7 +257,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->  
->  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
-> -		kvm_pmu_release_perf_event(&pmu->pmc[i]);
-> +		kvm_pmu_release_perf_event(vcpu, &pmu->pmc[i]);
->  }
->  
->  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
-> @@ -167,53 +290,115 @@ static void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 select_idx)
->  }
->  
->  /**
-> + * kvm_pmu_sync_counter_enable - reenable a counter if it should be enabled
-> + * @vcpu: The vcpu pointer
-> + * @select_idx: The counter index
-> + */
-> +static void kvm_pmu_sync_counter_enable(struct kvm_vcpu *vcpu,
-> +					    u64 select_idx)
-> +{
-> +	kvm_pmu_enable_counter_mask(vcpu, BIT(select_idx));
-> +}
-> +
-> +/**
-> + * kvm_pmu_sync_counter_enable_pair - reenable a pair if they should be enabled
-> + * @vcpu: The vcpu pointer
-> + * @pair_low: The low counter index
-> + */
-> +static void kvm_pmu_sync_counter_enable_pair(struct kvm_vcpu *vcpu, u64 pair_low)
-> +{
-> +	kvm_pmu_enable_counter_mask(vcpu, BIT(pair_low) | BIT(pair_low + 1));
-> +}
-> +
-> +/**
-> + * kvm_pmu_enable_counter_pair - enable counters pair at a time
-> + * @vcpu: The vcpu pointer
-> + * @val: counters to enable
-> + * @pair_low: The low counter index
-> + */
-> +static void kvm_pmu_enable_counter_pair(struct kvm_vcpu *vcpu, u64 val,
-> +					u64 pair_low)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc_low = &pmu->pmc[pair_low];
-> +	struct kvm_pmc *pmc_high = &pmu->pmc[pair_low + 1];
-> +
-> +	if (kvm_pmu_event_is_chained(vcpu, pair_low)) {
-> +		if (pmc_low->perf_event != pmc_high->perf_event)
-> +			kvm_pmu_stop_release_perf_event_pair(vcpu, pair_low);
-> +	}
-> +
-> +	if (val & BIT(pair_low))
-> +		kvm_pmu_enable_counter(vcpu, pair_low);
-> +
-> +	if (val & BIT(pair_low+1))
+With the memslot use case gone, maintaining the fast invalidate path
+adds a moderate amount of complexity but provides little to no value.
+Furhtermore, its existence may give the impression that it's "ok" to zap
+all shadow pages.  Remove the fast invalidate mechanism to simplify the
+code and to discourage future code from zapping all pages as using such
+a big hammer should be a last resort.
 
-Style nit: I think there should be spaces around the '+', might be worth
-running checkpatch to check for other style stuff.
+Unfortunately, simply reverting the fast invalidate code re-introduces
+shortcomings in the previous code, notably that KVM may hold a spinlock
+and not schedule for an extended period of time.  Releasing the lock to
+voluntarily reschedule is perfectly doable, and for the VM teardown case
+of "zap everything" it can be added with no additional changes since KVM
+doesn't need to provide any ordering guarantees about sptes in that case.
 
-> +		kvm_pmu_enable_counter(vcpu, pair_low + 1);
-> +}
-> +
-> +/**
->   * kvm_pmu_enable_counter_mask - enable selected PMU counters
->   * @vcpu: The vcpu pointer
-> - * @val: the value guest writes to PMCNTENSET register
-> + * @val: the value guest writes to PMCNTENSET register or a subset
->   *
->   * Call perf_event_enable to start counting the perf event
->   */
->  void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
->  {
->  	int i;
-> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
-> +	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
->  
->  	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
->  		return;
->  
-> -	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-> -		if (!(val & BIT(i)))
-> -			continue;
-> -
-> -		kvm_pmu_enable_counter(vcpu, i);
-> -	}
-> +	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i += 2)
-> +		kvm_pmu_enable_counter_pair(vcpu, val & set, i);
->  }
->  
->  /**
-> - * kvm_pmu_sync_counter_enable - reenable a counter if it should be enabled
-> + * kvm_pmu_disable_counter - disable selected PMU counter
->   * @vcpu: The vcpu pointer
->   * @select_idx: The counter index
->   */
-> -static void kvm_pmu_sync_counter_enable(struct kvm_vcpu *vcpu,
-> -					    u64 select_idx)
-> +static void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
-> -	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
->  
-> -	if (set & BIT(select_idx))
-> -		kvm_pmu_enable_counter_mask(vcpu, BIT(select_idx));
-> +	if (pmc->perf_event) {
-> +		perf_event_disable(pmc->perf_event);
-> +		if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-> +			kvm_debug("fail to enable perf event\n");
-> +	}
->  }
->  
->  /**
-> - * kvm_pmu_disable_counter - disable selected PMU counter
-> - * @vcpu: The vcpu pointer
-> - * @pmc: The counter to disable
-> + * kvm_pmu_disable_counter_pair - disable counters pair at a time
-> + * @val: counters to disable
-> + * @pair_low: The low counter index
->   */
-> -static void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 select_idx)
-> +static void kvm_pmu_disable_counter_pair(struct kvm_vcpu *vcpu, u64 val,
-> +					 u64 pair_low)
->  {
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> -	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> +	struct kvm_pmc *pmc_low = &pmu->pmc[pair_low];
-> +	struct kvm_pmc *pmc_high = &pmu->pmc[pair_low + 1];
-> +
-> +	if (!kvm_pmu_event_is_chained(vcpu, pair_low)) {
-> +		if (pmc_low->perf_event == pmc_high->perf_event) {
-> +			if (pmc_low->perf_event) {
-> +				kvm_pmu_stop_release_perf_event_pair(vcpu,
-> +								pair_low);
-> +				kvm_pmu_sync_counter_enable_pair(vcpu, pair_low);
-> +			}
-> +		}
-> +	}
->  
-> -	if (pmc->perf_event)
-> -		perf_event_disable(pmc->perf_event);
-> +	if (val & BIT(pair_low))
-> +		kvm_pmu_disable_counter(vcpu, pair_low);
-> +
-> +	if (val & BIT(pair_low + 1))
-> +		kvm_pmu_disable_counter(vcpu, pair_low + 1);
->  }
->  
->  /**
-> @@ -230,12 +415,8 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
->  	if (!val)
->  		return;
->  
-> -	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-> -		if (!(val & BIT(i)))
-> -			continue;
-> -
-> -		kvm_pmu_disable_counter(vcpu, i);
-> -	}
-> +	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i += 2)
-> +		kvm_pmu_disable_counter_pair(vcpu, val, i);
->  }
->  
->  static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
-> @@ -346,6 +527,17 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
->  
->  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
->  
-> +	if (kvm_pmu_event_is_chained(vcpu, idx)) {
-> +		struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +		struct kvm_pmc *pmc_high = &pmu->pmc[idx + 1];
-> +
-> +		if (!(--pmc_high->overflow_count)) {
-> +			__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx + 1);
-> +			pmc_high->overflow_count = U32_MAX + 1UL;
-> +		}
-> +
-> +	}
-> +
->  	if (kvm_pmu_overflow_status(vcpu)) {
->  		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  		kvm_vcpu_kick(vcpu);
-> @@ -440,6 +632,10 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  	    select_idx != ARMV8_PMU_CYCLE_IDX)
->  		return;
->  
-> +	/* Handled by even event */
-> +	if (eventsel == ARMV8_PMUV3_PERFCTR_CHAIN)
-> +		return;
-> +
->  	memset(&attr, 0, sizeof(struct perf_event_attr));
->  	attr.type = PERF_TYPE_RAW;
->  	attr.size = sizeof(attr);
-> @@ -452,6 +648,9 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
->  		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
->  
-> +	if (kvm_pmu_event_is_chained(vcpu, select_idx))
-> +		attr.config1 |= 0x1;
+For the MMIO case, KVM needs to prevent vCPUs from consuming stale sptes
+created with an old generation number.  This should be a non-issue as
+KVM is supposed to prevent consuming stale MMIO sptes regardless of the
+zapping mechanism employed, releasing mmu_lock while zapping simply
+makes it much more likely to hit any bug leading to stale spte usage.
+As luck would have it, there are a number of corner cases in the MMIO
+spte invalidation flow that could theoretically result in reusing stale
+sptes.  So before reworking memslot zapping and reverting to the slow
+invalidate mechanism, fix a number of bugs related to MMIO generations
+and opportunistically clean up the memslots/MMIO generation code.
 
-I'm not very familiar with the usage of perf attributes configs, but is
-there any chance we could name this flag? Even if only for the local
-file? Something like PERF_ATTR_CFG1_KVM_PMU_CHAINED (unless there is an
-existing naming convention for event attributes).
 
-Thanks,
+=== History ===
+Flushing of shadow pages when removing a memslot was originally added
+by commit 34d4cb8fca1f ("KVM: MMU: nuke shadowed pgtable pages and ptes
+on memslot destruction"), and obviously emphasized functionality over
+performance.  Commit 2df72e9bc4c5 ("KVM: split kvm_arch_flush_shadow")
+added a path to allow flushing only the removed slot's shadow pages,
+but x86 just redirected to the "zap all" flow.
+
+Eventually, it became evident that zapping everything is slow, and so
+x86 developed a more efficient hammer in the form of the fast invalidate
+mechanism.
+
+=== Other Uses ===
+When a VM is being destroyed, either there are no active vcpus, i.e.
+there's no lock contention, or the VM has ungracefully terminated, in
+which case we want to reclaim its pages as quickly as possible, i.e.
+not release the MMU lock if there are still CPUs executing in the VM.
+
+The MMIO generation scenario is almost literally a one-in-a-million
+occurrence, i.e. is not a performance sensitive scenario.
+
+It's worth noting that prior to the "fast invalidate" series being
+applied, there was actually another use case of kvm_mmu_zap_all() in
+emulator_fix_hypercall() whose existence may have contributed to
+improving the performance of "zap all" instead of avoiding it altogether.
+But that usage was removed by the series itself in commit 758ccc89b83c
+("KVM: x86: drop calling kvm_mmu_zap_all in emulator_fix_hypercall").
+
+[1] https://lkml.kernel.org/r/1369960590-14138-1-git-send-email-xiaoguangrong@linux.vnet.ibm.com
+[2] https://lkml.kernel.org/r/1368706673-8530-1-git-send-email-xiaoguangrong@linux.vnet.ibm.com
+[3] http://lkml.iu.edu/hypermail/linux/kernel/1305.2/00277.html
+[4] http://lkml.iu.edu/hypermail/linux/kernel/1305.2/00277/mmtest.tar.bz2
+
+v1: https://patchwork.kernel.org/cover/10756579/
+v2:
+  - Fix a zap vs flush priority bug in kvm_mmu_remote_flush_or_zap() [me]
+  - Voluntarily reschedule and/or drop mmu_lock as needed when zapping
+    all sptes or all MMIO sptes [Paolo]
+  - Add patches to clean up the memslots/MMIO generation code and fix
+    a variety of theoretically corner case bugs
+
+
+Sean Christopherson (27):
+  KVM: Call kvm_arch_memslots_updated() before updating memslots
+  KVM: x86/mmu: Detect MMIO generation wrap in any address space
+  KVM: x86/mmu: Do not cache MMIO accesses while memslots are in flux
+  KVM: Explicitly define the "memslot update in-progress" bit
+  KVM: x86: Use a u64 when passing the MMIO gen around
+  KVM: x86: Refactor the MMIO SPTE generation handling
+  KVM: Remove the hack to trigger memslot generation wraparound
+  KVM: Move the memslot update in-progress flag to bit 63
+  KVM: x86/mmu: Move slot_level_*() helper functions up a few lines
+  KVM: x86/mmu: Split remote_flush+zap case out of
+    kvm_mmu_flush_or_zap()
+  KVM: x86/mmu: Zap only the relevant pages when removing a memslot
+  Revert "KVM: MMU: document fast invalidate all pages"
+  Revert "KVM: MMU: drop kvm_mmu_zap_mmio_sptes"
+  KVM: x86/mmu: Voluntarily reschedule as needed when zapping MMIO sptes
+  KVM: x86/mmu: Remove is_obsolete() call
+  Revert "KVM: MMU: reclaim the zapped-obsolete page first"
+  Revert "KVM: MMU: collapse TLB flushes when zap all pages"
+  Revert "KVM: MMU: zap pages in batch"
+  Revert "KVM: MMU: add tracepoint for kvm_mmu_invalidate_all_pages"
+  Revert "KVM: MMU: show mmu_valid_gen in shadow page related
+    tracepoints"
+  Revert "KVM: x86: use the fast way to invalidate all pages"
+  KVM: x86/mmu: skip over invalid root pages when zapping all sptes
+  KVM: x86/mmu: Voluntarily reschedule as needed when zapping all sptes
+  Revert "KVM: MMU: fast invalidate all pages"
+  KVM: x86/mmu: Differentiate between nr zapped and list unstable
+  KVM: x86/mmu: WARN if zapping a MMIO spte results in zapping children
+  KVM: x86/mmu: Consolidate kvm_mmu_zap_all() and
+    kvm_mmu_zap_mmio_sptes()
+
+ Documentation/virtual/kvm/mmu.txt   |  41 +--
+ arch/mips/include/asm/kvm_host.h    |   2 +-
+ arch/powerpc/include/asm/kvm_host.h |   2 +-
+ arch/s390/include/asm/kvm_host.h    |   2 +-
+ arch/x86/include/asm/kvm_host.h     |   9 +-
+ arch/x86/kvm/mmu.c                  | 442 +++++++++++++---------------
+ arch/x86/kvm/mmu.h                  |   1 -
+ arch/x86/kvm/mmutrace.h             |  42 +--
+ arch/x86/kvm/x86.c                  |   7 +-
+ arch/x86/kvm/x86.h                  |   7 +-
+ include/linux/kvm_host.h            |  23 +-
+ virt/kvm/arm/mmu.c                  |   2 +-
+ virt/kvm/kvm_main.c                 |  39 ++-
+ 13 files changed, 286 insertions(+), 333 deletions(-)
 
 -- 
-Julien Thierry
+2.20.1
