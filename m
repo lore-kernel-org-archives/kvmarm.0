@@ -1,25 +1,25 @@
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 0/5] arm/arm64: Add support for running
- under kvmtool
-Date: Tue, 5 Feb 2019 12:05:35 +0000
-Message-ID: <059b5122-2d02-f417-9980-8ef5ceba5379@arm.com>
-References: <20190204134412.47877-1-alexandru.elisei@arm.com>
- <20190204143926.sfnfgqruevqtnao5@kamzik.brq.redhat.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v2 1/5] KVM: arm/arm64: rename
+ kvm_pmu_{enable/disable}_counter functions
+Date: Tue, 5 Feb 2019 12:21:00 +0000
+Message-ID: <73b4e485-bc5f-d89f-6b01-fd0bc9a22989@arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+ <1549299218-44714-2-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D3C64A2BE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 07:05:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D37A4A37D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 07:21:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vZ8D9kGKPgqV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Feb 2019 07:05:44 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B18BB4A214
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 07:05:44 -0500 (EST)
-In-Reply-To: <20190204143926.sfnfgqruevqtnao5@kamzik.brq.redhat.com>
+ with ESMTP id gjyVvHke2qLX for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Feb 2019 07:21:04 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A9E84A214
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Feb 2019 07:21:04 -0500 (EST)
+In-Reply-To: <1549299218-44714-2-git-send-email-andrew.murray@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,133 +30,121 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andrew Murray <andrew.murray@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2/4/19 2:39 PM, Andrew Jones wrote:
-> On Mon, Feb 04, 2019 at 01:44:07PM +0000, Alexandru Elisei wrote:
->> kvm-unit-tests is designed to be run with QEMU as the virtual machine
->> monitor. It relies on devices emulated by QEMU (like isa-debug-exit or
->> testdev) and it makes certain assumptions based on the implicit QEMU
->> virtual environment configuration (like the serial base address).
->>
->> kvmtool [1] is a lightweight virtual machine monitor for running KVM
->> guests. kvmtool has reduced complexity compared to QEMU and is easily
->> hackable.
->>
->> This patch series aims to make it possible to run kvm-unit-tests using
->> kvmtool on the arm and arm64 architectures, with two caveats:
->>
->> (1) When terminating a test, the userspace process won't exit with an exit
->> code that signals the success or failure of the test. Output from the test
->> can still be parsed to determine the outcome of the test.
->>
->> (2) kvmtool has been designed to work with a linux guest and it
->> automatically generates the command line arguments for a Linux kernel. The
->> arm/arm64 selftest and gic tests will fail if unexpected command line
->> arguments are found. To get around this limitation, the test binary needs
->> to be loaded using the --firmware option introduced by kvmtool in commit
->> 5e4b563d75b9 ("arm: Allow command line for firmware"). This option
->> suppresses the automatic kernel command line and can be used to run all
->> tests, not just the tests that require specific arguments.
->>
->> The run scripts haven't been modified. To run a test under kvmtool, one
->> needs to launch kvmtool manually. For example, to run the timer test the
->> following command can be used:
->>
->> lkvm run --cpus 1 --console serial --firmware timer.flat.
->>
->> To run the gicv3-ipi test:
->>
->> lkvm run --cpus 8 --console serial --params "ipi" --irqchip gicv3 \
->>     --firmware gic.flat
-> This looks good to me. I tested with lkvm and saw that all tests were able
-> to run and pass, except pci-test since lkvm doesn't have pci-testdev. The
-> only other issue was selftest.vectors-user which ends in user mode and
-> thus can't make the PSCI call to exit. The following patch can get that
-> to work if lkvm users want it
->
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index ea5101ef7217..7ba3f02a9b9d 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -272,10 +272,18 @@ static bool check_svc(void)
+
+
+On 04/02/2019 16:53, Andrew Murray wrote:
+> The kvm_pmu_{enable/disable}_counter functions can enabled/disable
+> multiple counters at once as they operate on a bitmask. Let's
+> make this clearer by renaming the function.
+>> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+
+
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+> ---
+>  arch/arm64/kvm/sys_regs.c |  4 ++--
+>  include/kvm/arm_pmu.h     |  8 ++++----
+>  virt/kvm/arm/pmu.c        | 12 ++++++------
+>  3 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e3e3722..4a6fbac 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -857,11 +857,11 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  		if (r->Op2 & 0x1) {
+>  			/* accessing PMCNTENSET_EL0 */
+>  			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
+> -			kvm_pmu_enable_counter(vcpu, val);
+> +			kvm_pmu_enable_counter_mask(vcpu, val);
+>  		} else {
+>  			/* accessing PMCNTENCLR_EL0 */
+>  			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= ~val;
+> -			kvm_pmu_disable_counter(vcpu, val);
+> +			kvm_pmu_disable_counter_mask(vcpu, val);
+>  		}
+>  	} else {
+>  		p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index f87fe20..b73f31b 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -46,8 +46,8 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+>  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
+> -void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+> -void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
+> +void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
+> +void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+>  bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu);
+> @@ -83,8 +83,8 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
 >  }
->  #endif
+>  static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+> -static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+> +static inline void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
+> +static inline void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+>  static inline bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcpu)
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 1c5b76c..c5a722a 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -135,13 +135,13 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>  }
 >  
-> +static void user_psci_off(struct pt_regs *regs, unsigned int esr)
-> +{
-> +       psci_system_off();
-I was wondering if it's worth checking that the cause for the unknown exception
-was actually the instruction hvc #0 from user space. Getting the function id
-from x0/r0 is trivial, and we could also check the opcode from the memory
-location pointed to by the pc.
-> +       halt();
-> +}
-> +
->  static void check_vectors(void *arg __unused)
+>  /**
+> - * kvm_pmu_enable_counter - enable selected PMU counter
+> + * kvm_pmu_enable_counter_mask - enable selected PMU counters
+>   * @vcpu: The vcpu pointer
+>   * @val: the value guest writes to PMCNTENSET register
+>   *
+>   * Call perf_event_enable to start counting the perf event
+>   */
+> -void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
+> +void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
 >  {
->         report("und", check_und());
->         report("svc", check_svc());
-> +       if (is_user())
-> +               install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN, user_psci_off);
->         exit(report_summary());
+>  	int i;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> @@ -164,13 +164,13 @@ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
 >  }
+>  
+>  /**
+> - * kvm_pmu_disable_counter - disable selected PMU counter
+> + * kvm_pmu_disable_counter_mask - disable selected PMU counters
+>   * @vcpu: The vcpu pointer
+>   * @val: the value guest writes to PMCNTENCLR register
+>   *
+>   * Call perf_event_disable to stop counting the perf event
+>   */
+> -void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
+> +void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  {
+>  	int i;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> @@ -347,10 +347,10 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  
+>  	mask = kvm_pmu_valid_counter_mask(vcpu);
+>  	if (val & ARMV8_PMU_PMCR_E) {
+> -		kvm_pmu_enable_counter(vcpu,
+> +		kvm_pmu_enable_counter_mask(vcpu,
+>  		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+>  	} else {
+> -		kvm_pmu_disable_counter(vcpu, mask);
+> +		kvm_pmu_disable_counter_mask(vcpu, mask);
+>  	}
+>  
+>  	if (val & ARMV8_PMU_PMCR_C)
+> 
 
-Thank you for posting this, when I started playing with kvm-unit-tests I noticed
-that selftest-vectors-user isn't working, but I totally forgot about it. I am
-interested in the patch, do you want to write the patch yourself? If not, I can
-pick it up and submit it.
-
->
->
-> Anyway, thanks for submitting these patches to enable another user of
-> kvm-unit-tests.
->
-> drew
->
->
->> Changes in v3:
->> * Updated cover letter with information about the kvmtool --firmware
->>   option.
->> * Gathered Reviewed-by tags.
->> * Renamed the config.h define UART_EARLY_BASE to CONFIG_UART_EARLY_BASE and
->>   made the necessary casts in lib/arm/io.c
->>
->> Changes in v2:
->> * Generate lib/config.h when configuring kvm-unit-tests; arm/arm64 uses it
->>   to get the UART address.
->> * Added --vmm configure option for arm/arm64 which will set the UART
->>   address in lib/config.h when the tests are run under QEMU or kvmtool.
->> * Renamed psci_sys_reset() to psci_system_reset().
->> * Dropped patches that allowed a test to ignore unexpected command line
->>   arguments.
->>
->> Summary:
->> * Patches 1, 2 and 3 add support for configuring kvm-unit-tests on arm and
->>   arm64 to use the ns16550a UART emulated by kvmtool.
->> * Patches 4 and 5 provide an alternative mechanism for terminating the
->>   virtual machine by using PSCI.
->>
->> [1] https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/
->> [2] https://www.spinics.net/lists/kvm-arm/msg34352.html
->>
->> Alexandru Elisei (5):
->>   lib: arm: Use UART address from generated config.h
->>   configure: arm/arm64: Add --vmm option with no effect
->>   lib: arm: Use ns16550a UART when --vmm=kvmtool
->>   lib: arm: Implement PSCI SYSTEM_OFF in psci_system_off()
->>   lib: arm: Fallback to psci_system_off() in exit()
->>
->>  configure          | 32 ++++++++++++++++++++++++++++++++
->>  Makefile           |  2 +-
->>  lib/arm/asm/psci.h |  3 ++-
->>  lib/arm/io.c       | 41 ++++++++++++++++++++++++++---------------
->>  lib/arm/psci.c     |  8 +++++++-
->>  .gitignore         |  1 +
->>  6 files changed, 69 insertions(+), 18 deletions(-)
->>
->> -- 
->> 2.17.0
->>
+-- 
+Julien Thierry
