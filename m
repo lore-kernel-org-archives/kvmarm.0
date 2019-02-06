@@ -1,24 +1,25 @@
-From: Publicity Chair ESORICS 2019 <esorics19.publicitychair@gmail.com>
-Subject: [Deadline Approaching - Call for Workshop Proposals]: 24th European
- Symposium on Research in Computer Security (ESORICS 2019)
-Date: Wed, 6 Feb 2019 09:59:45 +0100
-Message-ID: <CANaQFR3h5efCQ8_-3nS2acjhu9NPFs04tEpkgd+OQM760OamGg@mail.gmail.com>
+From: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 01/27] KVM: Call kvm_arch_memslots_updated() before
+ updating memslots
+Date: Wed, 6 Feb 2019 10:12:11 +0100
+Message-ID: <20190206101211.253cfbd9.cohuck@redhat.com>
+References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
+ <20190205205443.1059-2-sean.j.christopherson@intel.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============5890310169439567296=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC16B4A3F9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 03:59:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA55F4A427
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 04:12:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FK1Dqas+0rfq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Feb 2019 03:59:57 -0500 (EST)
-Received: from mail-vk1-f194.google.com (mail-vk1-f194.google.com
- [209.85.221.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8FB74A3E0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 03:59:57 -0500 (EST)
-Received: by mail-vk1-f194.google.com with SMTP id 197so1452875vkf.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Feb 2019 00:59:57 -0800 (PST)
+ with ESMTP id rH+NZPWdgINN for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Feb 2019 04:12:25 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF2924A380
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 04:12:24 -0500 (EST)
+In-Reply-To: <20190205205443.1059-2-sean.j.christopherson@intel.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,180 +29,45 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============5890310169439567296==
-Content-Type: multipart/alternative; boundary="000000000000207654058135f3c9"
+On Tue,  5 Feb 2019 12:54:17 -0800
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
---000000000000207654058135f3c9
-Content-Type: text/plain; charset="UTF-8"
+> kvm_arch_memslots_updated() is at this point in time an x86-specific
+> hook for handling MMIO generation wraparound.  x86 stashes 19 bits of
+> the memslots generation number in its MMIO sptes in order to avoid
+> full page fault walks for repeat faults on emulated MMIO addresses.
+> Because only 19 bits are used, wrapping the MMIO generation number is
+> possible, if unlikely.  kvm_arch_memslots_updated() alerts x86 that
+> the generation has changed so that it can invalidate all MMIO sptes in
+> case the effective MMIO generation has wrapped so as to avoid using a
+> stale spte, e.g. a (very) old spte that was created with generation==0.
+> 
+> Given that the purpose of kvm_arch_memslots_updated() is to prevent
+> consuming stale entries, it needs to be called before the new generation
+> is propagated to memslots.  Invalidating the MMIO sptes after updating
+> memslots means that there is a window where a vCPU could dereference
+> the new memslots generation, e.g. 0, and incorrectly reuse an old MMIO
+> spte that was created with (pre-wrap) generation==0.
+> 
+> Fixes: e59dbe09f8e6 ("KVM: Introduce kvm_arch_memslots_updated()")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/mips/include/asm/kvm_host.h    | 2 +-
+>  arch/powerpc/include/asm/kvm_host.h | 2 +-
+>  arch/s390/include/asm/kvm_host.h    | 2 +-
+>  arch/x86/include/asm/kvm_host.h     | 2 +-
+>  arch/x86/kvm/mmu.c                  | 4 ++--
+>  arch/x86/kvm/x86.c                  | 4 ++--
+>  include/linux/kvm_host.h            | 2 +-
+>  virt/kvm/arm/mmu.c                  | 2 +-
+>  virt/kvm/kvm_main.c                 | 7 +++++--
+>  9 files changed, 15 insertions(+), 12 deletions(-)
 
-[apologies for cross-posting]
+Not an x86 person, but I think that makes sense.
 
-======================================================================
-CALL for WORKSHOP PROPOSALS: ESORICS 2019
-24th European Symposium on Research in Computer Security
-University of Luxembourg, Luxembourg, September 23-27, 2019
-
-Website: https://esorics2019.uni.lu/workshops/
-======================================================================
-
-Overview
-------------------------------------
-ESORICS is the annual European research event in Computer Security.
-The Symposium started in 1990 and has been held in several European
-countries, attracting a wide international audience from both the
-academic and industrial communities.
-
-Proposals are solicited for Workshops to be held in conjunction with
-ESORICS 2019. A Workshop should aim at providing a forum on emerging
-topics of high interest to the security and privacy community.
-
-In the Workshop selection, particular consideration will be paid to:
-    * Its potential interest for the security and privacy community
-    * Its novelty with respect to other forums, especially with
-      respect to other ESORICS workshops.
-    * Its likely impact on the target community, including likely
-      high participation.
-
-A workshop can be either one day or two days in length.
-
-
-Important Dates
-------------------------------------
-    * Workshop proposals due: February 8, 2019
-    * Notification of decision: March 15, 2019
-
-
-Submitting a Workshop Proposal
-------------------------------------
-To submit a proposal send an email to the Workshop Chair with
-with the information requested in the application form:
-    * Joaquin Garcia-Alfaro (jgalfaro@ieee.org)
-
-The following application form should be used.
-(also available in Word format at http://j.mp/ESORICS19wsh)
-
-
-======================================================================
-ESORICS 2019 - WORKSHOP APPLICATION FORM:
-
-    - Title of the Workshop:
-
-    - Duration (maximum 2 days):
-
-    - Draft "Call for Papers", articulating the workshop's scope
-      and topics:
-
-    - Brief summary and justification for the workshop, including
-      anticipated benefits to the ESORICS community:
-
-    - Planned activities:
-
-    - Expected number of participants:
-
-    - Workshop organizers:
-        * PC Chair(s):
-        * General Chair(s):
-
-    - Workshop deadlines:
-        * Submission deadline:
-        * Notification to authors:
-        * Camera-ready versions:
-
-    - Planned publication of Workshop proceedings:
-
-    - Data of last three years for the workshop (if applicable):
-        * Number of submissions:
-        * Number of accepted papers:
-        * Number of participants:
-        * Publication of proceedings:
-        * Venue (co-location):
-======================================================================
-
---000000000000207654058135f3c9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div>[apologies for cross-posting]</div><=
-div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D</div><div>CALL for WORKSHOP PROPOSALS: ESORICS 2019</div><div>24th E=
-uropean Symposium on Research in Computer Security</div><div>University of =
-Luxembourg, Luxembourg, September 23-27, 2019</div><div><br></div><div>Webs=
-ite: <a href=3D"https://esorics2019.uni.lu/workshops/">https://esorics2019.=
-uni.lu/workshops/</a></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D</div><div><br></div><div>Overview</div><div>------------=
-------------------------</div><div>ESORICS is the annual European research =
-event in Computer Security.</div><div>The Symposium started in 1990 and has=
- been held in several European</div><div>countries, attracting a wide inter=
-national audience from both the</div><div>academic and industrial communiti=
-es.</div><div><br></div><div>Proposals are solicited for Workshops to be he=
-ld in conjunction with</div><div>ESORICS 2019. A Workshop should aim at pro=
-viding a forum on emerging</div><div>topics of high interest to the securit=
-y and privacy community.</div><div><br></div><div>In the Workshop selection=
-, particular consideration will be paid to:</div><div>=C2=A0 =C2=A0 * Its p=
-otential interest for the security and privacy community</div><div>=C2=A0 =
-=C2=A0 * Its novelty with respect to other forums, especially with</div><di=
-v>=C2=A0 =C2=A0 =C2=A0 respect to other ESORICS workshops.</div><div>=C2=A0=
- =C2=A0 * Its likely impact on the target community, including likely</div>=
-<div>=C2=A0 =C2=A0 =C2=A0 high participation.</div><div><br></div><div>A wo=
-rkshop can be either one day or two days in length.</div><div><br></div><di=
-v><br></div><div>Important Dates</div><div>--------------------------------=
-----</div><div>=C2=A0 =C2=A0 * Workshop proposals due: February 8, 2019</di=
-v><div>=C2=A0 =C2=A0 * Notification of decision: March 15, 2019</div><div><=
-br></div><div><br></div><div>Submitting a Workshop Proposal</div><div>-----=
--------------------------------</div><div>To submit a proposal send an emai=
-l to the Workshop Chair with</div><div>with the information requested in th=
-e application form:</div><div>=C2=A0 =C2=A0 * Joaquin Garcia-Alfaro (<a hre=
-f=3D"mailto:jgalfaro@ieee.org">jgalfaro@ieee.org</a>)</div><div><br></div><=
-div>The following application form should be used.</div><div>(also availabl=
-e in Word format at <a href=3D"http://j.mp/ESORICS19wsh">http://j.mp/ESORIC=
-S19wsh</a>)</div><div><br></div><div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div>ESORICS 2019 - WORKSHOP A=
-PPLICATION FORM:</div><div><br></div><div>=C2=A0 =C2=A0 - Title of the Work=
-shop:</div><div><br></div><div>=C2=A0 =C2=A0 - Duration (maximum 2 days):</=
-div><div><br></div><div>=C2=A0 =C2=A0 - Draft &quot;Call for Papers&quot;, =
-articulating the workshop&#39;s scope</div><div>=C2=A0 =C2=A0 =C2=A0 and to=
-pics:</div><div><br></div><div>=C2=A0 =C2=A0 - Brief summary and justificat=
-ion for the workshop, including</div><div>=C2=A0 =C2=A0 =C2=A0 anticipated =
-benefits to the ESORICS community:</div><div><br></div><div>=C2=A0 =C2=A0 -=
- Planned activities:</div><div><br></div><div>=C2=A0 =C2=A0 - Expected numb=
-er of participants:</div><div><br></div><div>=C2=A0 =C2=A0 - Workshop organ=
-izers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * PC Chair(s):</div><div>=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 * General Chair(s):</div><div><br></div><div>=C2=
-=A0 =C2=A0 - Workshop deadlines:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Su=
-bmission deadline:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Notification to =
-authors:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Camera-ready versions:</di=
-v><div><br></div><div>=C2=A0 =C2=A0 - Planned publication of Workshop proce=
-edings:</div><div><br></div><div>=C2=A0 =C2=A0 - Data of last three years f=
-or the workshop (if applicable):</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Nu=
-mber of submissions:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of acce=
-pted papers:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Number of participants=
-:</div><div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Publication of proceedings:</div>=
-<div>=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Venue (co-location):</div><div>=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div><br></div></d=
-iv></div>
-
---000000000000207654058135f3c9--
-
---===============5890310169439567296==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============5890310169439567296==--
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
