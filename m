@@ -1,202 +1,460 @@
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v2 01/27] KVM: Call kvm_arch_memslots_updated() before
- updating memslots
-Date: Tue,  5 Feb 2019 12:54:17 -0800
-Message-ID: <20190205205443.1059-2-sean.j.christopherson@intel.com>
-References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
+From: Publicity Chair ESORICS 2019 <esorics19.publicitychair@gmail.com>
+Subject: CFP: The 24th European Symposium on Research in Computer Security
+ (ESORICS 2019)
+Date: Wed, 6 Feb 2019 07:59:39 +0100
+Message-ID: <CANaQFR1ogg-HK+KPMKXvwLN4PAN218o8+-j6-yoNvu6f=wBzfQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20190205205443.1059-1-sean.j.christopherson@intel.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: multipart/mixed; boundary="===============5582879426181028752=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B51E4A382
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 01:59:53 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5u0ztMLd4PGc for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Feb 2019 01:59:51 -0500 (EST)
+Received: from mail-vs1-f65.google.com (mail-vs1-f65.google.com
+ [209.85.217.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECB954A381
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 01:59:50 -0500 (EST)
+Received: by mail-vs1-f65.google.com with SMTP id t17so3778761vsc.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Feb 2019 22:59:50 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_arch_memslots_updated() is at this point in time an x86-specific
-hook for handling MMIO generation wraparound.  x86 stashes 19 bits of
-the memslots generation number in its MMIO sptes in order to avoid
-full page fault walks for repeat faults on emulated MMIO addresses.
-Because only 19 bits are used, wrapping the MMIO generation number is
-possible, if unlikely.  kvm_arch_memslots_updated() alerts x86 that
-the generation has changed so that it can invalidate all MMIO sptes in
-case the effective MMIO generation has wrapped so as to avoid using a
-stale spte, e.g. a (very) old spte that was created with generation==0.
+--===============5582879426181028752==
+Content-Type: multipart/alternative; boundary="000000000000a0d38d0581344594"
 
-Given that the purpose of kvm_arch_memslots_updated() is to prevent
-consuming stale entries, it needs to be called before the new generation
-is propagated to memslots.  Invalidating the MMIO sptes after updating
-memslots means that there is a window where a vCPU could dereference
-the new memslots generation, e.g. 0, and incorrectly reuse an old MMIO
-spte that was created with (pre-wrap) generation==0.
+--000000000000a0d38d0581344594
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: e59dbe09f8e6 ("KVM: Introduce kvm_arch_memslots_updated()")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/mips/include/asm/kvm_host.h    | 2 +-
- arch/powerpc/include/asm/kvm_host.h | 2 +-
- arch/s390/include/asm/kvm_host.h    | 2 +-
- arch/x86/include/asm/kvm_host.h     | 2 +-
- arch/x86/kvm/mmu.c                  | 4 ++--
- arch/x86/kvm/x86.c                  | 4 ++--
- include/linux/kvm_host.h            | 2 +-
- virt/kvm/arm/mmu.c                  | 2 +-
- virt/kvm/kvm_main.c                 | 7 +++++--
- 9 files changed, 15 insertions(+), 12 deletions(-)
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+*** Apologies for multiple copies ***
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 71c3f21d80d5..f764a2de68e2 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -1131,7 +1131,7 @@ static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *free, struct kvm_memory_slot *dont) {}
--static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots) {}
-+static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 0f98f00da2ea..19693b8add93 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -837,7 +837,7 @@ struct kvm_vcpu_arch {
- static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
--static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots) {}
-+static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_exit(void) {}
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index d5d24889c3bc..c2b8c8c6c9be 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -878,7 +878,7 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *free, struct kvm_memory_slot *dont) {}
--static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots) {}
-+static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *slot) {}
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4660ce90de7f..1c7f726e3ad5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1253,7 +1253,7 @@ void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot,
- 				   gfn_t gfn_offset, unsigned long mask);
- void kvm_mmu_zap_all(struct kvm *kvm);
--void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, struct kvm_memslots *slots);
-+void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- unsigned int kvm_mmu_calculate_mmu_pages(struct kvm *kvm);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned int kvm_nr_mmu_pages);
- 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index ce770b446238..fb040ea42454 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5890,13 +5890,13 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
- 	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
- }
- 
--void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, struct kvm_memslots *slots)
-+void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
- {
- 	/*
- 	 * The very rare case: if the generation-number is round,
- 	 * zap all shadow pages.
- 	 */
--	if (unlikely((slots->generation & MMIO_GEN_MASK) == 0)) {
-+	if (unlikely((gen & MMIO_GEN_MASK) == 0)) {
- 		kvm_debug_ratelimited("kvm: zapping shadow pages for mmio generation wraparound\n");
- 		kvm_mmu_invalidate_zap_all_pages(kvm);
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9ce1b8e2d3b9..4d05fca04fe1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9337,13 +9337,13 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	return -ENOMEM;
- }
- 
--void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots)
-+void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- {
- 	/*
- 	 * memslots->generation has been incremented.
- 	 * mmio generation may have reached its maximum value.
- 	 */
--	kvm_mmu_invalidate_mmio_sptes(kvm, slots);
-+	kvm_mmu_invalidate_mmio_sptes(kvm, gen);
- }
- 
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c38cc5eb7e73..cf761ff58224 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -634,7 +634,7 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
- 			   struct kvm_memory_slot *dont);
- int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			    unsigned long npages);
--void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots);
-+void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
- int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				struct kvm_memory_slot *memslot,
- 				const struct kvm_userspace_memory_region *mem,
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 3053bf2584f8..3ab0daee3fea 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -2350,7 +2350,7 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	return 0;
- }
- 
--void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslots *slots)
-+void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- {
- }
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf7cc0554094..df5dc7224f02 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -878,6 +878,7 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
- 		int as_id, struct kvm_memslots *slots)
- {
- 	struct kvm_memslots *old_memslots = __kvm_memslots(kvm, as_id);
-+	u64 gen;
- 
- 	/*
- 	 * Set the low bit in the generation, which disables SPTE caching
-@@ -900,9 +901,11 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
- 	 * space 0 will use generations 0, 4, 8, ... while * address space 1 will
- 	 * use generations 2, 6, 10, 14, ...
- 	 */
--	slots->generation += KVM_ADDRESS_SPACE_NUM * 2 - 1;
-+	gen = slots->generation + KVM_ADDRESS_SPACE_NUM * 2 - 1;
- 
--	kvm_arch_memslots_updated(kvm, slots);
-+	kvm_arch_memslots_updated(kvm, gen);
-+
-+	slots->generation = gen;
- 
- 	return old_memslots;
- }
--- 
-2.20.1
+C a l l     F o r     P a p e r s
+
+Twenty-fourth European Symposium on Research in Computer Security (ESORICS
+2019)
+
+Luxembourg -- September  23-27, 2019
+
+WWW: https://esorics2019.uni.lu
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+
+Overview
+---------
+ESORICS is the annual European research event in Computer Security. The
+Symposium started in 1990 and has been held in several European countries,
+attracting a wide international audience from both the academic and
+industrial communities. Papers offering novel research contributions in
+computer security are solicited for submission to the 2019 Symposium, to be
+held in Luxembourg. The primary focus is on original, high quality,
+unpublished research and implementation experiences. We encourage
+submissions of papers discussing industrial research and development.
+
+Important Dates
+----------------
+* Title and Abstract deadline: April 22, 2019 (11:59 p.m. American Samoa
+time, UTC-11)
+* Paper submission deadline: April 29, 2019 (11:59 p.m. American Samoa
+time, UTC-11)
+* Notification to authors: June 21, 2019
+* Camera ready due: July 9, 2019
+
+Topics of Interest
+-------------------
+Topics of interest include, but are not limited to:
+* access control
+* accountability
+* ad hoc networks
+* anonymity
+* applied cryptography
+* authentication
+* biometrics
+* blockchain and finance security
+* data and computation integrity
+* database security
+* data protection
+* deep learning for attack and defense
+* digital content protection
+* digital forensics
+* distributed systems security
+* embedded systems security
+* inference control
+* information hiding
+* identity management
+* information flow control
+* information security governance and management
+* intrusion detection
+* formal security methods
+* language-based security
+* network security
+* phishing and spam prevention
+* privacy
+* privacy preserving data mining
+* risk analysis and management
+* secure electronic voting
+* security architectures
+* security economics
+* security metrics
+* security models
+* security and privacy for big data
+* security and privacy in cloud scenarios
+* security and privacy in complex systems
+* security and privacy in content centric networking
+* security and privacy in crowdsourcing
+* security and privacy in the IoT
+* security and privacy in location services
+* security and privacy for mobile code
+* security and privacy in pervasive / ubiquitous computing
+* security and privacy policies
+* security and privacy in social networks
+* security and privacy in web services
+* security and privacy in cyber-physical systems
+* security, privacy and resilience in critical infrastructures
+* security verification
+* software security
+* systems security
+* trust models and management
+* trustworthy user devices
+* usable security and privacy
+* web security
+* wireless security
+
+
+Paper Submission Guidelines
+----------------------------
+Submissions must be made through EasyChair at:
+https://easychair.org/conferences/?conf=3Desorics19
+
+Submitted papers must not substantially overlap with papers that have been
+published or that are simultaneously submitted to a journal or a
+conference/workshop with proceedings. The symposium proceedings will be
+published by Springer in the Lecture Notes in Computer Science series
+(LNCS).
+
+All submissions should follow the LNCS template ( available from
+http://www.springer.de/comp/lncs/authors.html ) from the time they are
+submitted. Submitted papers should be at most 16 pages (using 10-point
+font), excluding the bibliography and well-marked appendices, and at most
+20 pages total. Committee members are not required to read the appendices,
+so the paper should be intelligible without them. All submissions must be
+written in English.
+
+Submissions are to be made to the submission web site. Only pdf files will
+be accepted. Submissions not meeting these guidelines risk rejection
+without consideration of their merits. Authors of accepted papers must
+agree with Springer LNCS copyright and guarantee that their papers will be
+presented at the conference.
+
+Papers must be received by the aforementioned dates, 11:59 p.m. American
+Samoa time (UTC-11).
+
+Organisation Committee
+-----------------------
+General Chair:
+
+* Peter Y A Ryan, University of Luxembourg, Luxembourg
+
+Organization Chair:
+
+* Peter B Roenne, University of Luxembourg, Luxembourg
+
+Workshop Chair:
+
+* Joaquin Garcia-Alfaro,Telecom SudParis, France
+
+Program Committee Chairs:
+
+* Kazue Sako, NEC Japan
+* Steve Schneider, University of Surrey, UK
+
+Program Committee:
+
+Cristina Alcaraz, University of Malaga, Spain
+Elli Androulaki, IBM, Switzerland
+Frederik Armknecht, University of Mannheim, Germany
+Vijay Atluri, Rutgers University, USA
+Marina Blanton, University of Notre Dame, USA
+Carlo Blundo, Universita` degli Studi di Salerno, Italy
+Christian Cachin, University of Bern, Switzerland
+Alvaro Cardenas, University of Texas at Dallas, USA
+Aldar Chan, University of Hong Kong, HK
+Yan Chen, Northwestern University, USA
+Sherman S. M. Chow, Chinese University of Hong Kong, HK
+Mauro Conti, University of Padua, Italy
+Jorge Cuellar, Siemens A.G., Germany
+Frederic Cuppens, TELECOM Bretagne, France
+Nora Cuppens-Boulahia, TELECOM Bretagne, France
+Marc Dacier, EURECOM, France
+Sabrina De Capitani di Vimercati, Universit=C3=A0 degli studi di Milano, It=
+aly
+Herv=C3=A9 Debar, T=C3=A9l=C3=A9com SudParis, France
+St=C3=A9phanie Delaune, IRISA, France
+Roberto Di Pietro, Hamad Bin Khalifa University (HBKU), Qatar
+Josep Domingo-Ferrer, University Rovira-Virgili, Spain
+Haixin Duan, Tsinghua University, China
+Francois Dupressoir, University of Surrey, UK
+Jose Fernandez, Polytechnique Montreal, Canada
+Jose-Luis Ferrer-Gomila, UIB, Spain
+Simone Fischer-H=C3=BCbner, Karlstad University, Sweden
+Simon Foley, IMT Atlantique, France
+Sara Foresti, Universit=C3=A0 degli studi di Milano, Italy
+David Galindo, University of Birmingham, UK
+Debin Gao, SMU, Singapore
+Dieter Gollmann, Hamburg University of Technology, Germany
+Stefanos Gritzalis, University of the Aegean, Greece
+Guofei Gu, Texas A&M University, USA
+Juan Hernandez, UPC, Spain
+Xinyi Huang, Fujian Normal University, China
+Ghassan Karame, NEC Labs Europe, Germany
+Vasilios Katos, Bournemouth University, UK
+Sokratis Katsikas, NTNU, Norway
+Stefan Katzenbeisser TU Darmstadt, Germany
+Steve Kremer, INRIA Nancy-Grand Est, France
+Marina Krotofil, FireEye, USA
+Costas Lambrinoudakis, University of Piraeus, Greece
+Yingjiu Li, SMU, Singapore
+Kaitai Liang, University of Surrey, UK
+Hoon Wei Lim, SingTel, Singapore
+Joseph Liu, Monash University, Australia
+Peng Liu, Pennsylvania State University, USA
+Xiapu Luo, Hong Kong Polytechnic University, HK
+Konstantinos Markantonakis, RHUL, UK
+Fabio Martinelli, IIT-CNR, Italy
+Ivan Martinovic, University of Oxford, UK
+Sjouke Mauw, University of Luxembourg, Luxembourg
+Catherine Meadows, Naval Research Laboratory, USA
+Weizhi Meng, DTU, Denmark
+Chris Mitchell, RHUL, UK
+John C. Mitchell, Stanford University, USA
+Tatsuya Mori, Waseda University, Japan
+Haris Mouratidis, University of Brighton, UK
+David Naccache, Ecole Normale Suprieure, France
+Satoshi Obana, Hosei University, Japan
+Martin Ochoa, SUTD, Singapore
+Rolf Oppliger, eSECURITY Technologies, Switzerland
+Andrew Paverd, Microsoft Research Cambridge, UK
+Olivier Pereira, UCL, Belgium
+G=C3=BCnther Pernul, Universit=C3=A4t Regensburg, Germany
+Christina Popper, New York University, US
+Joachim Posegga, University of Passau, Germany
+Bart Preneel, Katholieke Universiteit Leuven, Belgium
+Indrajiti Ray, Colorado State University, USA
+Giovanni Russello, University of Auckland, New Zealand
+Mark Ryan, University of Birmingham, UK
+Rei Safavi-Naini, University of Calgary, Canada
+Kazue Sako, NEC, Japan
+Pierangela Samarati, Universit=C3=A1 degli studi di Milano, Italy
+Damien Sauveron, XLIM, France
+Steve Schneider, University of Surrey, UK
+Einar Snekkenes, Gjovik University College, Norway
+Pawel Szalachowski, SUTD, Singapore
+Willy Susilo, University of Wollongong, Australia
+Qiang Tang, LIST, Luxembourg
+Juan Tapiador, Universidad Carlos III de Madrid, Spain
+Nils Ole Tippenhauer, SUTD, Singapore
+Helen Treharne, University of Surrey, UK
+Aggeliki Tsohou, Ionian University, Greece
+Jaideep Vaidya, Rutgers University, USA
+Luca Vigan=C3=B2, King=E2=80=99s College London, UK
+Michael Waidner, Fraunhofer SIT, Germany
+Cong Wang, City University of Hong Kong, HK
+Lingyu Wang, Concordia University, Canada
+Edgar Weippl, SBA Research, Austria
+Christos Xenakis, University of Piraeus, Greece
+Zhe Xia, Wuhan University of Technology, China
+Kehuan Zhang, Chinese University of Hong Kong, HK
+Sencun Zhu, Pennsylvania State University, USA
+
+--000000000000a0d38d0581344594
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div>*** Apolog=
+ies for multiple copies ***</div><div>=C2=A0</div><div>C a l l =C2=A0 =C2=
+=A0 F o r =C2=A0 =C2=A0 P a p e r s</div><div><br></div><div>Twenty-fourth =
+European Symposium on Research in Computer Security (ESORICS 2019)</div><di=
+v><br></div><div>Luxembourg -- September =C2=A023-27, 2019</div><div><br></=
+div><div>WWW: <a href=3D"https://esorics2019.uni.lu">https://esorics2019.un=
+i.lu</a>=C2=A0</div><div><br></div><div>=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D</div><div><br></d=
+iv><div>Overview</div><div>---------</div><div>ESORICS is the annual Europe=
+an research event in Computer Security. The Symposium started in 1990 and h=
+as been held in several European countries, attracting a wide international=
+ audience from both the academic and industrial communities. Papers offerin=
+g novel research contributions in computer security are solicited for submi=
+ssion to the 2019 Symposium, to be held in Luxembourg. The primary focus is=
+ on original, high quality, unpublished research and implementation experie=
+nces. We encourage submissions of papers discussing industrial research and=
+ development.</div><div><br></div><div>Important Dates</div><div>----------=
+------</div><div>* Title and Abstract deadline: April 22, 2019 (11:59 p.m. =
+American Samoa time, UTC-11)=C2=A0</div><div>* Paper submission deadline: A=
+pril 29, 2019 (11:59 p.m. American Samoa time, UTC-11)</div><div>* Notifica=
+tion to authors: June 21, 2019</div><div>* Camera ready due: July 9, 2019</=
+div><div><br></div><div>Topics of Interest</div><div>-------------------</d=
+iv><div>Topics of interest include, but are not limited to:</div><div>* acc=
+ess control</div><div>* accountability</div><div>* ad hoc networks</div><di=
+v>* anonymity</div><div>* applied cryptography</div><div>* authentication</=
+div><div>* biometrics</div><div>* blockchain and finance security</div><div=
+>* data and computation integrity</div><div>* database security</div><div>*=
+ data protection</div><div>* deep learning for attack and defense</div><div=
+>* digital content protection</div><div>* digital forensics</div><div>* dis=
+tributed systems security</div><div>* embedded systems security</div><div>*=
+ inference control</div><div>* information hiding</div><div>* identity mana=
+gement</div><div>* information flow control</div><div>* information securit=
+y governance and management</div><div>* intrusion detection</div><div>* for=
+mal security methods</div><div>* language-based security</div><div>* networ=
+k security</div><div>* phishing and spam prevention</div><div>* privacy</di=
+v><div>* privacy preserving data mining</div><div>* risk analysis and manag=
+ement</div><div>* secure electronic voting</div><div>* security architectur=
+es</div><div>* security economics</div><div>* security metrics</div><div>* =
+security models</div><div>* security and privacy for big data</div><div>* s=
+ecurity and privacy in cloud scenarios</div><div>* security and privacy in =
+complex systems</div><div>* security and privacy in content centric network=
+ing</div><div>* security and privacy in crowdsourcing</div><div>* security =
+and privacy in the IoT</div><div>* security and privacy in location service=
+s</div><div>* security and privacy for mobile code</div><div>* security and=
+ privacy in pervasive / ubiquitous computing</div><div>* security and priva=
+cy policies</div><div>* security and privacy in social networks</div><div>*=
+ security and privacy in web services</div><div>* security and privacy in c=
+yber-physical systems</div><div>* security, privacy and resilience in criti=
+cal infrastructures</div><div>* security verification</div><div>* software =
+security</div><div>* systems security</div><div>* trust models and manageme=
+nt</div><div>* trustworthy user devices</div><div>* usable security and pri=
+vacy</div><div>* web security</div><div>* wireless security</div><div><br><=
+/div><div><br></div><div>Paper Submission Guidelines</div><div>------------=
+----------------</div><div>Submissions must be made through EasyChair at:</=
+div><div><a href=3D"https://easychair.org/conferences/?conf=3Desorics19">ht=
+tps://easychair.org/conferences/?conf=3Desorics19</a></div><div><br></div><=
+div>Submitted papers must not substantially overlap with papers that have b=
+een published or that are simultaneously submitted to a journal or a confer=
+ence/workshop with proceedings. The symposium proceedings will be published=
+ by Springer in the Lecture Notes in Computer Science series (LNCS).=C2=A0<=
+/div><div><br></div><div>All submissions should follow the LNCS template ( =
+available from <a href=3D"http://www.springer.de/comp/lncs/authors.html">ht=
+tp://www.springer.de/comp/lncs/authors.html</a> ) from the time they are su=
+bmitted. Submitted papers should be at most 16 pages (using 10-point font),=
+ excluding the bibliography and well-marked appendices, and at most 20 page=
+s total. Committee members are not required to read the appendices, so the =
+paper should be intelligible without them. All submissions must be written =
+in English.=C2=A0</div><div><br></div><div>Submissions are to be made to th=
+e submission web site. Only pdf files will be accepted. Submissions not mee=
+ting these guidelines risk rejection without consideration of their merits.=
+ Authors of accepted papers must agree with Springer LNCS copyright and gua=
+rantee that their papers will be presented at the conference.</div><div><br=
+></div><div>Papers must be received by the aforementioned dates, 11:59 p.m.=
+ American Samoa time (UTC-11).</div><div><br></div><div>Organisation Commit=
+tee</div><div>-----------------------</div><div>General Chair:</div><div><b=
+r></div><div>* Peter Y A Ryan, University of Luxembourg, Luxembourg</div><d=
+iv><br></div><div>Organization Chair:</div><div><br></div><div>* Peter B Ro=
+enne, University of Luxembourg, Luxembourg</div><div><br></div><div>Worksho=
+p Chair:</div><div><br></div><div>* Joaquin Garcia-Alfaro,Telecom SudParis,=
+ France</div><div><br></div><div>Program Committee Chairs:</div><div><br></=
+div><div>* Kazue Sako, NEC Japan=C2=A0</div><div>* Steve Schneider, Univers=
+ity of Surrey, UK</div><div><br></div><div>Program Committee:=C2=A0</div><d=
+iv><br></div><div>Cristina Alcaraz, University of Malaga, Spain</div><div>E=
+lli Androulaki, IBM, Switzerland</div><div>Frederik Armknecht, University o=
+f Mannheim, Germany</div><div>Vijay Atluri, Rutgers University, USA</div><d=
+iv>Marina Blanton, University of Notre Dame, USA</div><div>Carlo Blundo, Un=
+iversita` degli Studi di Salerno, Italy</div><div>Christian Cachin, Univers=
+ity of Bern, Switzerland</div><div>Alvaro Cardenas, University of Texas at =
+Dallas, USA</div><div>Aldar Chan, University of Hong Kong, HK</div><div>Yan=
+ Chen, Northwestern University, USA</div><div>Sherman S. M. Chow, Chinese U=
+niversity of Hong Kong, HK</div><div>Mauro Conti, University of Padua, Ital=
+y</div><div>Jorge Cuellar, Siemens A.G., Germany</div><div>Frederic Cuppens=
+, TELECOM Bretagne, France</div><div>Nora Cuppens-Boulahia, TELECOM Bretagn=
+e, France</div><div>Marc Dacier, EURECOM, France</div><div>Sabrina De Capit=
+ani di Vimercati, Universit=C3=A0 degli studi di Milano, Italy</div><div>He=
+rv=C3=A9 Debar, T=C3=A9l=C3=A9com SudParis, France</div><div>St=C3=A9phanie=
+ Delaune, IRISA, France</div><div>Roberto Di Pietro, Hamad Bin Khalifa Univ=
+ersity (HBKU), Qatar</div><div>Josep Domingo-Ferrer, University Rovira-Virg=
+ili, Spain</div><div>Haixin Duan, Tsinghua University, China</div><div>Fran=
+cois Dupressoir, University of Surrey, UK</div><div>Jose Fernandez, Polytec=
+hnique Montreal, Canada</div><div>Jose-Luis Ferrer-Gomila, UIB, Spain</div>=
+<div>Simone Fischer-H=C3=BCbner, Karlstad University, Sweden</div><div>Simo=
+n Foley, IMT Atlantique, France</div><div>Sara Foresti, Universit=C3=A0 deg=
+li studi di Milano, Italy</div><div>David Galindo, University of Birmingham=
+, UK</div><div>Debin Gao, SMU, Singapore</div><div>Dieter Gollmann, Hamburg=
+ University of Technology, Germany</div><div>Stefanos Gritzalis, University=
+ of the Aegean, Greece</div><div>Guofei Gu, Texas A&amp;M University, USA</=
+div><div>Juan Hernandez, UPC, Spain</div><div>Xinyi Huang, Fujian Normal Un=
+iversity, China</div><div>Ghassan Karame, NEC Labs Europe, Germany</div><di=
+v>Vasilios Katos, Bournemouth University, UK</div><div>Sokratis Katsikas, N=
+TNU, Norway</div><div>Stefan Katzenbeisser TU Darmstadt, Germany</div><div>=
+Steve Kremer, INRIA Nancy-Grand Est, France</div><div>Marina Krotofil, Fire=
+Eye, USA</div><div>Costas Lambrinoudakis, University of Piraeus, Greece</di=
+v><div>Yingjiu Li, SMU, Singapore</div><div>Kaitai Liang, University of Sur=
+rey, UK</div><div>Hoon Wei Lim, SingTel, Singapore</div><div>Joseph Liu, Mo=
+nash University, Australia</div><div>Peng Liu, Pennsylvania State Universit=
+y, USA</div><div>Xiapu Luo, Hong Kong Polytechnic University, HK</div><div>=
+Konstantinos Markantonakis, RHUL, UK</div><div>Fabio Martinelli, IIT-CNR, I=
+taly</div><div>Ivan Martinovic, University of Oxford, UK</div><div>Sjouke M=
+auw, University of Luxembourg, Luxembourg</div><div>Catherine Meadows, Nava=
+l Research Laboratory, USA</div><div>Weizhi Meng, DTU, Denmark</div><div>Ch=
+ris Mitchell, RHUL, UK</div><div>John C. Mitchell, Stanford University, USA=
+</div><div>Tatsuya Mori, Waseda University, Japan</div><div>Haris Mouratidi=
+s, University of Brighton, UK</div><div>David Naccache, Ecole Normale Supri=
+eure, France</div><div>Satoshi Obana, Hosei University, Japan</div><div>Mar=
+tin Ochoa, SUTD, Singapore</div><div>Rolf Oppliger, eSECURITY Technologies,=
+ Switzerland</div><div>Andrew Paverd, Microsoft Research Cambridge, UK</div=
+><div>Olivier Pereira, UCL, Belgium</div><div>G=C3=BCnther Pernul, Universi=
+t=C3=A4t Regensburg, Germany</div><div>Christina Popper, New York Universit=
+y, US</div><div>Joachim Posegga, University of Passau, Germany</div><div>Ba=
+rt Preneel, Katholieke Universiteit Leuven, Belgium</div><div>Indrajiti Ray=
+, Colorado State University, USA</div><div>Giovanni Russello, University of=
+ Auckland, New Zealand</div><div>Mark Ryan, University of Birmingham, UK</d=
+iv><div>Rei Safavi-Naini, University of Calgary, Canada</div><div>Kazue Sak=
+o, NEC, Japan</div><div>Pierangela Samarati, Universit=C3=A1 degli studi di=
+ Milano, Italy</div><div>Damien Sauveron, XLIM, France</div><div>Steve Schn=
+eider, University of Surrey, UK</div><div>Einar Snekkenes, Gjovik Universit=
+y College, Norway</div><div>Pawel Szalachowski, SUTD, Singapore</div><div>W=
+illy Susilo, University of Wollongong, Australia</div><div>Qiang Tang, LIST=
+, Luxembourg</div><div>Juan Tapiador, Universidad Carlos III de Madrid, Spa=
+in</div><div>Nils Ole Tippenhauer, SUTD, Singapore</div><div>Helen Treharne=
+, University of Surrey, UK</div><div>Aggeliki Tsohou, Ionian University, Gr=
+eece</div><div>Jaideep Vaidya, Rutgers University, USA</div><div>Luca Vigan=
+=C3=B2, King=E2=80=99s College London, UK</div><div>Michael Waidner, Fraunh=
+ofer SIT, Germany</div><div>Cong Wang, City University of Hong Kong, HK</di=
+v><div>Lingyu Wang, Concordia University, Canada</div><div>Edgar Weippl, SB=
+A Research, Austria</div><div>Christos Xenakis, University of Piraeus, Gree=
+ce</div><div>Zhe Xia, Wuhan University of Technology, China</div><div>Kehua=
+n Zhang, Chinese University of Hong Kong, HK</div><div>Sencun Zhu, Pennsylv=
+ania State University, USA</div></div></div>
+
+--000000000000a0d38d0581344594--
+
+--===============5582879426181028752==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5582879426181028752==--
