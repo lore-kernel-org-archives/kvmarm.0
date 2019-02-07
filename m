@@ -1,73 +1,99 @@
-From: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v2 01/27] KVM: Call kvm_arch_memslots_updated() before
- updating memslots
-Date: Wed, 6 Feb 2019 10:12:11 +0100
-Message-ID: <20190206101211.253cfbd9.cohuck@redhat.com>
-References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
- <20190205205443.1059-2-sean.j.christopherson@intel.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [GIT PULL] KVM/ARM updates for 5.0-rc6
+Date: Thu,  7 Feb 2019 13:18:32 +0000
+Message-ID: <20190207131843.157210-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA55F4A427
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 04:12:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rH+NZPWdgINN for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Feb 2019 04:12:25 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF2924A380
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Feb 2019 04:12:24 -0500 (EST)
-In-Reply-To: <20190205205443.1059-2-sean.j.christopherson@intel.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Xiao Guangrong <guangrong.xiao@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Richard Henderson <richard.henderson@linaro.org>, Christoffer Dall <christoffer.dall@arm.com>, James Morse <james.morse@arm.com>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue,  5 Feb 2019 12:54:17 -0800
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Paolo, Radim,
 
-> kvm_arch_memslots_updated() is at this point in time an x86-specific
-> hook for handling MMIO generation wraparound.  x86 stashes 19 bits of
-> the memslots generation number in its MMIO sptes in order to avoid
-> full page fault walks for repeat faults on emulated MMIO addresses.
-> Because only 19 bits are used, wrapping the MMIO generation number is
-> possible, if unlikely.  kvm_arch_memslots_updated() alerts x86 that
-> the generation has changed so that it can invalidate all MMIO sptes in
-> case the effective MMIO generation has wrapped so as to avoid using a
-> stale spte, e.g. a (very) old spte that was created with generation==0.
-> 
-> Given that the purpose of kvm_arch_memslots_updated() is to prevent
-> consuming stale entries, it needs to be called before the new generation
-> is propagated to memslots.  Invalidating the MMIO sptes after updating
-> memslots means that there is a window where a vCPU could dereference
-> the new memslots generation, e.g. 0, and incorrectly reuse an old MMIO
-> spte that was created with (pre-wrap) generation==0.
-> 
-> Fixes: e59dbe09f8e6 ("KVM: Introduce kvm_arch_memslots_updated()")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/mips/include/asm/kvm_host.h    | 2 +-
->  arch/powerpc/include/asm/kvm_host.h | 2 +-
->  arch/s390/include/asm/kvm_host.h    | 2 +-
->  arch/x86/include/asm/kvm_host.h     | 2 +-
->  arch/x86/kvm/mmu.c                  | 4 ++--
->  arch/x86/kvm/x86.c                  | 4 ++--
->  include/linux/kvm_host.h            | 2 +-
->  virt/kvm/arm/mmu.c                  | 2 +-
->  virt/kvm/kvm_main.c                 | 7 +++++--
->  9 files changed, 15 insertions(+), 12 deletions(-)
+This is hopefully the last drop of KVM/ARM patches for 5.0. We have
+fixes to the vcpu reset code, a fix for a corner case of the VGIC
+init, better LORegion handling compliance, more configurations where
+we allow PUD mappings, a set of kprobe exclusions, and the required
+fixes to be able to run KVM with PREEMPT_RT.
 
-Not an x86 person, but I think that makes sense.
+Please pull,
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+	M.
+
+The following changes since commit 49a57857aeea06ca831043acbb0fa5e0f50602fd:
+
+  Linux 5.0-rc3 (2019-01-21 13:14:44 +1300)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-5.0
+
+for you to fetch changes up to 7d82602909ed9c73b34ad26f05d10db4850a4f8c:
+
+  KVM: arm64: Forbid kprobing of the VHE world-switch code (2019-02-07 11:44:47 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for 5.0:
+
+- Fix the way we reset vcpus, plugging the race that could happen on VHE
+- Fix potentially inconsistent group setting for private interrupts
+- Don't generate UNDEF when LORegion feature is present
+- Relax the restriction on using stage2 PUD huge mapping
+- Turn some spinlocks into raw_spinlocks to help RT compliance
+
+----------------------------------------------------------------
+Christoffer Dall (2):
+      KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded
+      KVM: arm/arm64: vgic: Always initialize the group of private IRQs
+
+James Morse (1):
+      KVM: arm64: Forbid kprobing of the VHE world-switch code
+
+Julien Thierry (3):
+      KVM: arm/arm64: vgic: Make vgic_irq->irq_lock a raw_spinlock
+      KVM: arm/arm64: vgic: Make vgic_dist->lpi_list_lock a raw_spinlock
+      KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a raw_spinlock
+
+Marc Zyngier (4):
+      arm64: KVM: Don't generate UNDEF when LORegion feature is present
+      arm/arm64: KVM: Allow a VCPU to fully reset itself
+      arm/arm64: KVM: Don't panic on failure to properly reset system registers
+      arm: KVM: Add missing kvm_stage2_has_pmd() helper
+
+Suzuki K Poulose (1):
+      KVM: arm64: Relax the restriction on using stage2 PUD huge mapping
+
+ arch/arm/include/asm/kvm_host.h       |  10 +++
+ arch/arm/include/asm/stage2_pgtable.h |   5 ++
+ arch/arm/kvm/coproc.c                 |   4 +-
+ arch/arm/kvm/reset.c                  |  24 +++++++
+ arch/arm64/include/asm/kvm_host.h     |  11 ++++
+ arch/arm64/kvm/hyp/switch.c           |   5 ++
+ arch/arm64/kvm/hyp/sysreg-sr.c        |   5 ++
+ arch/arm64/kvm/reset.c                |  50 +++++++++++++-
+ arch/arm64/kvm/sys_regs.c             |  50 ++++++++------
+ include/kvm/arm_vgic.h                |   6 +-
+ virt/kvm/arm/arm.c                    |  10 +++
+ virt/kvm/arm/mmu.c                    |   9 ++-
+ virt/kvm/arm/psci.c                   |  36 +++++------
+ virt/kvm/arm/vgic/vgic-debug.c        |   4 +-
+ virt/kvm/arm/vgic/vgic-init.c         |  30 +++++----
+ virt/kvm/arm/vgic/vgic-its.c          |  22 +++----
+ virt/kvm/arm/vgic/vgic-mmio-v2.c      |  14 ++--
+ virt/kvm/arm/vgic/vgic-mmio-v3.c      |  12 ++--
+ virt/kvm/arm/vgic/vgic-mmio.c         |  34 +++++-----
+ virt/kvm/arm/vgic/vgic-v2.c           |   4 +-
+ virt/kvm/arm/vgic/vgic-v3.c           |   8 +--
+ virt/kvm/arm/vgic/vgic.c              | 118 +++++++++++++++++-----------------
+ 22 files changed, 303 insertions(+), 168 deletions(-)
