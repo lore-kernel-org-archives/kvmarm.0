@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 04/11] arm64: KVM: Don't generate UNDEF when LORegion feature
- is present
-Date: Thu,  7 Feb 2019 13:18:36 +0000
-Message-ID: <20190207131843.157210-5-marc.zyngier@arm.com>
+Subject: [PATCH 05/11] KVM: arm/arm64: Reset the VCPU without preemption and
+ vcpu state loaded
+Date: Thu,  7 Feb 2019 13:18:37 +0000
+Message-ID: <20190207131843.157210-6-marc.zyngier@arm.com>
 References: <20190207131843.157210-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A5E04A44B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62F4C4A45F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gclpmNOoAt3Z for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Feb 2019 08:19:09 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAF894A464
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:08 -0500 (EST)
+ with ESMTP id r8r5cPcdgfki for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Feb 2019 08:19:11 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BEBC4A44D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:11 -0500 (EST)
 In-Reply-To: <20190207131843.157210-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,95 +32,84 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently hide the LORegion feature, and generate an UNDEF
-if the guest dares using the corresponding registers. This is
-a bit extreme, as ARMv8.1 guarantees the feature to be present.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-The guest should check the feature register before doing anything,
-but we could also give the guest some slack (read "allow the
-guest to be a bit stupid").
+We have two ways to reset a vcpu:
+- either through VCPU_INIT
+- or through a PSCI_ON call
 
-So instead of unconditionnaly deliver an exception, let's
-only do it when the host doesn't support LORegion at all (or
-when the feature has been sanitized out), and treat the registers
-as RAZ/WI otherwise (with the exception of LORID_EL1 being RO).
+The first one is easy to reason about. The second one is implemented
+in a more bizarre way, as it is the vcpu that handles PSCI_ON that
+resets the vcpu that is being powered-on. As we need to turn the logic
+around and have the target vcpu to reset itself, we must take some
+preliminary steps.
 
-Fixes: cc33c4e20185 ("arm64/kvm: Prohibit guest LOR accesses")
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Resetting the VCPU state modifies the system register state in memory,
+but this may interact with vcpu_load/vcpu_put if running with preemption
+disabled, which in turn may lead to corrupted system register state.
+
+Address this by disabling preemption and doing put/load if required
+around the reset logic.
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 42 +++++++++++++++++++++++++--------------
- 1 file changed, 27 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/reset.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e3e37228ae4e..86096774abcd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -314,12 +314,29 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
- }
- 
--static bool trap_undef(struct kvm_vcpu *vcpu,
--		       struct sys_reg_params *p,
--		       const struct sys_reg_desc *r)
-+/*
-+ * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-+ * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-+ * system, these registers should UNDEF. LORID_EL1 being a RO register, we
-+ * treat it separately.
-+ */
-+static bool trap_loregion(struct kvm_vcpu *vcpu,
-+			  struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b72a3dd56204..f21a2a575939 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -105,16 +105,33 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+  * This function finds the right table above and sets the registers on
+  * the virtual CPU struct to their architecturally defined reset
+  * values.
++ *
++ * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
++ * ioctl or as part of handling a request issued by another VCPU in the PSCI
++ * handling code.  In the first case, the VCPU will not be loaded, and in the
++ * second case the VCPU will be loaded.  Because this function operates purely
++ * on the memory-backed valus of system registers, we want to do a full put if
++ * we were loaded (handling a request) and load the values back at the end of
++ * the function.  Otherwise we leave the state alone.  In both cases, we
++ * disable preemption around the vcpu reset as we would otherwise race with
++ * preempt notifiers which also call put/load.
+  */
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
  {
--	kvm_inject_undefined(vcpu);
--	return false;
-+	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-+	u32 sr = sys_reg((u32)r->Op0, (u32)r->Op1,
-+			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+ 	const struct kvm_regs *cpu_reset;
++	int ret = -EINVAL;
++	bool loaded;
 +
-+	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	if (p->is_write && sr == SYS_LORID_EL1)
-+		return write_to_read_only(vcpu, p, r);
-+
-+	return trap_raz_wi(vcpu, p, r);
++	preempt_disable();
++	loaded = (vcpu->cpu != -1);
++	if (loaded)
++		kvm_arch_vcpu_put(vcpu);
+ 
+ 	switch (vcpu->arch.target) {
+ 	default:
+ 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+ 			if (!cpu_has_32bit_el1())
+-				return -EINVAL;
++				goto out;
+ 			cpu_reset = &default_regs_reset32;
+ 		} else {
+ 			cpu_reset = &default_regs_reset;
+@@ -137,7 +154,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+ 
+ 	/* Reset timer */
+-	return kvm_timer_vcpu_reset(vcpu);
++	ret = kvm_timer_vcpu_reset(vcpu);
++out:
++	if (loaded)
++		kvm_arch_vcpu_load(vcpu, smp_processor_id());
++	preempt_enable();
++	return ret;
  }
  
- static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
-@@ -1048,11 +1065,6 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
- 		if (val & ptrauth_mask)
- 			kvm_debug("ptrauth unsupported for guests, suppressing\n");
- 		val &= ~ptrauth_mask;
--	} else if (id == SYS_ID_AA64MMFR1_EL1) {
--		if (val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))
--			kvm_debug("LORegions unsupported for guests, suppressing\n");
--
--		val &= ~(0xfUL << ID_AA64MMFR1_LOR_SHIFT);
- 	}
- 
- 	return val;
-@@ -1338,11 +1350,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
- 
--	{ SYS_DESC(SYS_LORSA_EL1), trap_undef },
--	{ SYS_DESC(SYS_LOREA_EL1), trap_undef },
--	{ SYS_DESC(SYS_LORN_EL1), trap_undef },
--	{ SYS_DESC(SYS_LORC_EL1), trap_undef },
--	{ SYS_DESC(SYS_LORID_EL1), trap_undef },
-+	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-+	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
-+	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
-+	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
-+	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
- 
- 	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ void kvm_set_ipa_limit(void)
 -- 
 2.20.1
