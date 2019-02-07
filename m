@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 06/11] arm/arm64: KVM: Allow a VCPU to fully reset itself
-Date: Thu,  7 Feb 2019 13:18:38 +0000
-Message-ID: <20190207131843.157210-7-marc.zyngier@arm.com>
+Subject: [PATCH 03/11] KVM: arm/arm64: vgic: Make vgic_cpu->ap_list_lock a
+ raw_spinlock
+Date: Thu,  7 Feb 2019 13:18:35 +0000
+Message-ID: <20190207131843.157210-4-marc.zyngier@arm.com>
 References: <20190207131843.157210-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D8AB4A423
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E5874A44B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 15oFJoq+G2fB for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Feb 2019 08:19:13 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 977AF4A475
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:13 -0500 (EST)
+ with ESMTP id L2NWrgvCHsAa for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Feb 2019 08:19:09 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 423804A469
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:06 -0500 (EST)
 In-Reply-To: <20190207131843.157210-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,276 +32,177 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current kvm_psci_vcpu_on implementation will directly try to
-manipulate the state of the VCPU to reset it.  However, since this is
-not done on the thread that runs the VCPU, we can end up in a strangely
-corrupted state when the source and target VCPUs are running at the same
-time.
+From: Julien Thierry <julien.thierry@arm.com>
 
-Fix this by factoring out all reset logic from the PSCI implementation
-and forwarding the required information along with a request to the
-target VCPU.
+vgic_cpu->ap_list_lock must always be taken with interrupts disabled as
+it is used in interrupt context.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+For configurations such as PREEMPT_RT_FULL, this means that it should
+be a raw_spinlock since RT spinlocks are interruptible.
+
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 10 +++++++++
- arch/arm/kvm/reset.c              | 24 +++++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h | 11 ++++++++++
- arch/arm64/kvm/reset.c            | 24 +++++++++++++++++++++
- virt/kvm/arm/arm.c                | 10 +++++++++
- virt/kvm/arm/psci.c               | 36 ++++++++++++++-----------------
- 6 files changed, 95 insertions(+), 20 deletions(-)
+ include/kvm/arm_vgic.h        |  2 +-
+ virt/kvm/arm/vgic/vgic-init.c |  2 +-
+ virt/kvm/arm/vgic/vgic.c      | 37 ++++++++++++++++++-----------------
+ 3 files changed, 21 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index ca56537b61bc..50e89869178a 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -48,6 +48,7 @@
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-+#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 32954e115796..c36c86f1ec9a 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -307,7 +307,7 @@ struct vgic_cpu {
+ 	unsigned int used_lrs;
+ 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
  
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+-	spinlock_t ap_list_lock;	/* Protects the ap_list */
++	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
  
-@@ -147,6 +148,13 @@ struct kvm_cpu_context {
- 
- typedef struct kvm_cpu_context kvm_cpu_context_t;
- 
-+struct vcpu_reset_state {
-+	unsigned long	pc;
-+	unsigned long	r0;
-+	bool		be;
-+	bool		reset;
-+};
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
-@@ -186,6 +194,8 @@ struct kvm_vcpu_arch {
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
- 
-+	struct vcpu_reset_state reset_state;
-+
- 	/* Detect first run of a vcpu */
- 	bool has_run_once;
- };
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index 5ed0c3ee33d6..e53327912adc 100644
---- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -26,6 +26,7 @@
- #include <asm/cputype.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_emulate.h>
- 
- #include <kvm/arm_arch_timer.h>
- 
-@@ -69,6 +70,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset CP15 registers */
- 	kvm_reset_coprocs(vcpu);
- 
-+	/*
-+	 * Additional reset state handling that PSCI may have imposed on us.
-+	 * Must be done after all the sys_reg reset.
-+	 */
-+	if (READ_ONCE(vcpu->arch.reset_state.reset)) {
-+		unsigned long target_pc = vcpu->arch.reset_state.pc;
-+
-+		/* Gracefully handle Thumb2 entry point */
-+		if (target_pc & 1) {
-+			target_pc &= ~1UL;
-+			vcpu_set_thumb(vcpu);
-+		}
-+
-+		/* Propagate caller endianness */
-+		if (vcpu->arch.reset_state.be)
-+			kvm_vcpu_set_be(vcpu);
-+
-+		*vcpu_pc(vcpu) = target_pc;
-+		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-+
-+		vcpu->arch.reset_state.reset = false;
-+	}
-+
- 	/* Reset arch_timer context */
- 	return kvm_timer_vcpu_reset(vcpu);
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7732d0ba4e60..da3fc7324d68 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -48,6 +48,7 @@
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-+#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-@@ -208,6 +209,13 @@ struct kvm_cpu_context {
- 
- typedef struct kvm_cpu_context kvm_cpu_context_t;
- 
-+struct vcpu_reset_state {
-+	unsigned long	pc;
-+	unsigned long	r0;
-+	bool		be;
-+	bool		reset;
-+};
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
-@@ -297,6 +305,9 @@ struct kvm_vcpu_arch {
- 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
- 	u64 vsesr_el2;
- 
-+	/* Additional reset state */
-+	struct vcpu_reset_state	reset_state;
-+
- 	/* True when deferrable sysregs are loaded on the physical CPU,
- 	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
- 	bool sysregs_loaded_on_cpu;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f21a2a575939..f16a5f8ff2b4 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -32,6 +32,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- 
- /* Maximum phys_shift supported for any VM on this host */
-@@ -146,6 +147,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset system registers */
- 	kvm_reset_sys_regs(vcpu);
- 
-+	/*
-+	 * Additional reset state handling that PSCI may have imposed on us.
-+	 * Must be done after all the sys_reg reset.
-+	 */
-+	if (vcpu->arch.reset_state.reset) {
-+		unsigned long target_pc = vcpu->arch.reset_state.pc;
-+
-+		/* Gracefully handle Thumb2 entry point */
-+		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
-+			target_pc &= ~1UL;
-+			vcpu_set_thumb(vcpu);
-+		}
-+
-+		/* Propagate caller endianness */
-+		if (vcpu->arch.reset_state.be)
-+			kvm_vcpu_set_be(vcpu);
-+
-+		*vcpu_pc(vcpu) = target_pc;
-+		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-+
-+		vcpu->arch.reset_state.reset = false;
-+	}
-+
- 	/* Reset PMU */
- 	kvm_pmu_vcpu_reset(vcpu);
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 9e350fd34504..9c486fad3f9f 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -626,6 +626,13 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
- 		/* Awaken to handle a signal, request we sleep again later. */
- 		kvm_make_request(KVM_REQ_SLEEP, vcpu);
- 	}
-+
-+	/*
-+	 * Make sure we will observe a potential reset request if we've
-+	 * observed a change to the power state. Pairs with the smp_wmb() in
-+	 * kvm_psci_vcpu_on().
-+	 */
-+	smp_rmb();
- }
- 
- static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-@@ -639,6 +646,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
- 			vcpu_req_sleep(vcpu);
- 
-+		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
-+			kvm_reset_vcpu(vcpu);
-+
- 		/*
- 		 * Clear IRQ_PENDING requests that were made to guarantee
- 		 * that a VCPU sees new virtual interrupts.
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 9b73d3ad918a..34d08ee63747 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -104,12 +104,10 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
- 
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- {
-+	struct vcpu_reset_state *reset_state;
- 	struct kvm *kvm = source_vcpu->kvm;
- 	struct kvm_vcpu *vcpu = NULL;
--	struct swait_queue_head *wq;
- 	unsigned long cpu_id;
--	unsigned long context_id;
--	phys_addr_t target_pc;
- 
- 	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
- 	if (vcpu_mode_is_32bit(source_vcpu))
-@@ -130,32 +128,30 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 			return PSCI_RET_INVALID_PARAMS;
- 	}
- 
--	target_pc = smccc_get_arg2(source_vcpu);
--	context_id = smccc_get_arg3(source_vcpu);
-+	reset_state = &vcpu->arch.reset_state;
- 
--	kvm_reset_vcpu(vcpu);
--
--	/* Gracefully handle Thumb2 entry point */
--	if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
--		target_pc &= ~((phys_addr_t) 1);
--		vcpu_set_thumb(vcpu);
--	}
-+	reset_state->pc = smccc_get_arg2(source_vcpu);
- 
- 	/* Propagate caller endianness */
--	if (kvm_vcpu_is_be(source_vcpu))
--		kvm_vcpu_set_be(vcpu);
-+	reset_state->be = kvm_vcpu_is_be(source_vcpu);
- 
--	*vcpu_pc(vcpu) = target_pc;
  	/*
- 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
- 	 * the general puspose registers are undefined upon CPU_ON.
- 	 */
--	smccc_set_retval(vcpu, context_id, 0, 0, 0);
--	vcpu->arch.power_off = false;
--	smp_mb();		/* Make sure the above is visible */
-+	reset_state->r0 = smccc_get_arg3(source_vcpu);
-+
-+	WRITE_ONCE(reset_state->reset, true);
-+	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+ 	 * List of IRQs that this VCPU should consider because they are either
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 330c1ada7326..dfbfcb1fe933 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -206,7 +206,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
  
--	wq = kvm_arch_vcpu_wq(vcpu);
--	swake_up_one(wq);
-+	/*
-+	 * Make sure the reset request is observed if the change to
-+	 * power_state is observed.
-+	 */
-+	smp_wmb();
-+
-+	vcpu->arch.power_off = false;
-+	kvm_vcpu_wake_up(vcpu);
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+-	spin_lock_init(&vgic_cpu->ap_list_lock);
++	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
  
- 	return PSCI_RET_SUCCESS;
+ 	/*
+ 	 * Enable and configure all SGIs to be edge-triggered and
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index ea54a1923c4f..abd9c7352677 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -54,11 +54,11 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * When taking more than one ap_list_lock at the same time, always take the
+  * lowest numbered VCPU's ap_list_lock first, so:
+  *   vcpuX->vcpu_id < vcpuY->vcpu_id:
+- *     spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
+- *     spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
++ *     raw_spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
++ *     raw_spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
+  *
+  * Since the VGIC must support injecting virtual interrupts from ISRs, we have
+- * to use the spin_lock_irqsave/spin_unlock_irqrestore versions of outer
++ * to use the raw_spin_lock_irqsave/raw_spin_unlock_irqrestore versions of outer
+  * spinlocks for any lock that may be taken while injecting an interrupt.
+  */
+ 
+@@ -351,7 +351,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 
+ 	/* someone can do stuff here, which we re-check below */
+ 
+-	spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+ 	raw_spin_lock(&irq->irq_lock);
+ 
+ 	/*
+@@ -368,7 +368,8 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 
+ 	if (unlikely(irq->vcpu || vcpu != vgic_target_oracle(irq))) {
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++		raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock,
++					   flags);
+ 
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 		goto retry;
+@@ -383,7 +384,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 	irq->vcpu = vcpu;
+ 
+ 	raw_spin_unlock(&irq->irq_lock);
+-	spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+ 
+ 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+@@ -597,7 +598,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+ retry:
+-	spin_lock(&vgic_cpu->ap_list_lock);
++	raw_spin_lock(&vgic_cpu->ap_list_lock);
+ 
+ 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+ 		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
+@@ -638,7 +639,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		/* This interrupt looks like it has to be migrated. */
+ 
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock(&vgic_cpu->ap_list_lock);
++		raw_spin_unlock(&vgic_cpu->ap_list_lock);
+ 
+ 		/*
+ 		 * Ensure locking order by always locking the smallest
+@@ -652,9 +653,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 			vcpuB = vcpu;
+ 		}
+ 
+-		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
+-		spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
+-				 SINGLE_DEPTH_NESTING);
++		raw_spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
++		raw_spin_lock_nested(&vcpuB->arch.vgic_cpu.ap_list_lock,
++				      SINGLE_DEPTH_NESTING);
+ 		raw_spin_lock(&irq->irq_lock);
+ 
+ 		/*
+@@ -676,8 +677,8 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		}
+ 
+ 		raw_spin_unlock(&irq->irq_lock);
+-		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
+-		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
++		raw_spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
++		raw_spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
+ 
+ 		if (target_vcpu_needs_kick) {
+ 			kvm_make_request(KVM_REQ_IRQ_PENDING, target_vcpu);
+@@ -687,7 +688,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 		goto retry;
+ 	}
+ 
+-	spin_unlock(&vgic_cpu->ap_list_lock);
++	raw_spin_unlock(&vgic_cpu->ap_list_lock);
+ }
+ 
+ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+@@ -872,9 +873,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+-	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 	vgic_flush_lr_state(vcpu);
+-	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ 
+ 	if (can_access_vgic_from_kernel())
+ 		vgic_restore_state(vcpu);
+@@ -918,7 +919,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 
+ 	vgic_get_vmcr(vcpu, &vmcr);
+ 
+-	spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
++	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		raw_spin_lock(&irq->irq_lock);
+@@ -931,7 +932,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ 			break;
+ 	}
+ 
+-	spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
++	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
+ 
+ 	return pending;
  }
 -- 
 2.20.1
