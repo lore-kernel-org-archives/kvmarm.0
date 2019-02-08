@@ -1,187 +1,185 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 11/11] KVM: arm64: Forbid kprobing of the VHE world-switch code
-Date: Thu,  7 Feb 2019 13:18:43 +0000
-Message-ID: <20190207131843.157210-12-marc.zyngier@arm.com>
-References: <20190207131843.157210-1-marc.zyngier@arm.com>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [PATCH v8 00/26] APEI in_nmi() rework and SDEI wire-up
+Date: Fri, 08 Feb 2019 12:40:07 +0100
+Message-ID: <15200237.N8Ro7ITLGE@aspire.rjw.lan>
+References: <20190129184902.102850-1-james.morse@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6B84A45F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:27 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TWVE0W1I8ZNB for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Feb 2019 08:19:26 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D624A4A489
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Feb 2019 08:19:25 -0500 (EST)
-In-Reply-To: <20190207131843.157210-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190129184902.102850-1-james.morse@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Tony Luck <tony.luck@intel.com>, linux-mm@kvack.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Xie XiuQi <xiexiuqi@huawei.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, linux-acpi@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: James Morse <james.morse@arm.com>
+On Tuesday, January 29, 2019 7:48:36 PM CET James Morse wrote:
+> Changes since v7?
+>  * Removed the memory allocation in the task_work stuff.
+>  * More user-friendly and easier on the eye,
+>  * Switched the irq-mask testing in the arch code to be safe before&after
+>    Julien's GIC PMR series.
+> Specific changes are noted in each patch.
+> 
+> 
+> This series aims to wire-up arm64's fancy new software-NMI notifications
+> for firmware-first RAS. These need to use the estatus-queue, which is
+> also needed for notifications via emulated-SError. All of these
+> things take the 'in_nmi()' path through ghes_copy_tofrom_phys(), and
+> so will deadlock if they can interact, which they might.
+> 
+> To that end, this series removes the in_nmi() stuff from ghes.c.
+> Locks are pushed out to the notification helpers, and fixmap entries
+> are passed in to the code that needs them. This means the estatus-queue
+> users can interrupt each other however they like.
+> 
+> While doing this there is a fair amount of cleanup, which is (now) at the
+> beginning of the series. NMIlike notifications interrupting
+> ghes_probe() can go wrong for three different reasons. CPER record
+> blocks greater than PAGE_SIZE dont' work.
+> The estatus-pool allocation is simplified and the silent-flag/oops-begin
+> is removed.
+> 
+> Nothing in this series is intended as fixes, as its all cleanup or
+> never-worked.
+> 
+> ----------%<----------
+> The earlier boiler-plate:
+> 
+> What's SDEI? Its ARM's "Software Delegated Exception Interface" [0]. It's
+> used by firmware to tell the OS about firmware-first RAS events.
+> 
+> These Software exceptions can interrupt anything, so I describe them as
+> NMI-like. They aren't the only NMI-like way to notify the OS about
+> firmware-first RAS events, the ACPI spec also defines 'NOTFIY_SEA' and
+> 'NOTIFY_SEI'.
+> 
+> (Acronyms: SEA, Synchronous External Abort. The CPU requested some memory,
+> but the owner of that memory said no. These are always synchronous with the
+> instruction that caused them. SEI, System-Error Interrupt, commonly called
+> SError. This is an asynchronous external abort, the memory-owner didn't say no
+> at the right point. Collectively these things are called external-aborts
+> How is firmware involved? It traps these and re-injects them into the kernel
+> once its written the CPER records).
+> 
+> APEI's GHES code only expects one source of NMI. If a platform implements
+> more than one of these mechanisms, APEI needs to handle the interaction.
+> 'SEA' and 'SEI' can interact as 'SEI' is asynchronous. SDEI can interact
+> with itself: its exceptions can be 'normal' or 'critical', and firmware
+> could use both types for RAS. (errors using normal, 'panic-now' using
+> critical).
+> ----------%<----------
+> 
+> This series is base on v5.0-rc1, and can be retrieved from:
+> git://linux-arm.org/linux-jm.git -b apei_ioremap_rework/v8
+> 
+> 
+> Known issues:
+>  * ghes_copy_tofrom_phys() already takes a lock in NMI context, this
+>    series moves that around, and makes sure we never try to take the
+>    same lock from different NMIlike notifications. Since the switch to
+>    queued spinlocks it looks like the kernel can only be 4 context's
+>    deep in spinlock, which arm64 could exceed as it doesn't have a
+>    single architected NMI. This would be fixed by dropping back to
+>    test-and-set when the nesting gets too deep:
+>  lore.kernel.org/r/1548215351-18896-1-git-send-email-longman@redhat.com
+> 
+> * Taking an NMI from a KVM guest on arm64 with VHE leaves HCR_EL2.TGE
+>   clear, meaning AT and TLBI point at the guest, and PAN/UAO are squiffy.
+>   Only TLBI matters for APEI, and this is fixed by Julien's patch:
+>  http://lore.kernel.org/r/1548084825-8803-2-git-send-email-julien.thierry@arm.com
+> 
+> * Linux ignores the physical address mask, meaning it doesn't call
+>   memory_failure() on all the affected pages if firmware or hypervisor
+>   believe in a different page size. Easy to hit on arm64, (easy to fix too,
+>   it just conflicts with this series)
+> 
+> 
+> [v7] https://lore.kernel.org/linux-arm-kernel/20181203180613.228133-1-james.morse@arm.com/
+> [v6] https://www.spinics.net/lists/linux-acpi/msg84228.html
+> [v5] https://www.spinics.net/lists/linux-acpi/msg82993.html
+> [v4] https://www.spinics.net/lists/arm-kernel/msg653078.html
+> [v3] https://www.spinics.net/lists/arm-kernel/msg649230.html
+> 
+> [0] https://static.docs.arm.com/den0054/a/ARM_DEN0054A_Software_Delegated_Exception_Interface.pdf
+> 
+> 
+> James Morse (26):
+>   ACPI / APEI: Don't wait to serialise with oops messages when
+>     panic()ing
+>   ACPI / APEI: Remove silent flag from ghes_read_estatus()
+>   ACPI / APEI: Switch estatus pool to use vmalloc memory
+>   ACPI / APEI: Make hest.c manage the estatus memory pool
+>   ACPI / APEI: Make estatus pool allocation a static size
+>   ACPI / APEI: Don't store CPER records physical address in struct ghes
+>   ACPI / APEI: Remove spurious GHES_TO_CLEAR check
+>   ACPI / APEI: Don't update struct ghes' flags in read/clear estatus
+>   ACPI / APEI: Generalise the estatus queue's notify code
+>   ACPI / APEI: Don't allow ghes_ack_error() to mask earlier errors
+>   ACPI / APEI: Move NOTIFY_SEA between the estatus-queue and NOTIFY_NMI
+>   ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+>   KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+>   arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+>   ACPI / APEI: Move locking to the notification helper
+>   ACPI / APEI: Let the notification helper specify the fixmap slot
+>   ACPI / APEI: Pass ghes and estatus separately to avoid a later copy
+>   ACPI / APEI: Make GHES estatus header validation more user friendly
+>   ACPI / APEI: Split ghes_read_estatus() to allow a peek at the CPER
+>     length
+>   ACPI / APEI: Only use queued estatus entry during
+>     in_nmi_queue_one_entry()
+>   ACPI / APEI: Use separate fixmap pages for arm64 NMI-like
+>     notifications
+>   mm/memory-failure: Add memory_failure_queue_kick()
+>   ACPI / APEI: Kick the memory_failure() queue for synchronous errors
+>   arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+>   firmware: arm_sdei: Add ACPI GHES registration helper
+>   ACPI / APEI: Add support for the SDEI GHES Notification type
+> 
+>  arch/arm/include/asm/kvm_ras.h       |  14 +
+>  arch/arm/include/asm/system_misc.h   |   5 -
+>  arch/arm64/include/asm/acpi.h        |   4 +-
+>  arch/arm64/include/asm/daifflags.h   |   1 +
+>  arch/arm64/include/asm/fixmap.h      |   6 +-
+>  arch/arm64/include/asm/kvm_ras.h     |  25 +
+>  arch/arm64/include/asm/system_misc.h |   2 -
+>  arch/arm64/kernel/acpi.c             |  54 ++
+>  arch/arm64/mm/fault.c                |  25 +-
+>  drivers/acpi/apei/Kconfig            |  12 +-
+>  drivers/acpi/apei/ghes.c             | 725 ++++++++++++++++-----------
+>  drivers/acpi/apei/hest.c             |  10 +-
+>  drivers/firmware/arm_sdei.c          |  68 +++
+>  include/acpi/ghes.h                  |   7 +-
+>  include/linux/arm_sdei.h             |   9 +
+>  include/linux/mm.h                   |   1 +
+>  mm/memory-failure.c                  |  15 +-
+>  virt/kvm/arm/mmu.c                   |   4 +-
+>  18 files changed, 646 insertions(+), 341 deletions(-)
+>  create mode 100644 arch/arm/include/asm/kvm_ras.h
+>  create mode 100644 arch/arm64/include/asm/kvm_ras.h
 
-On systems with VHE the kernel and KVM's world-switch code run at the
-same exception level. Code that is only used on a VHE system does not
-need to be annotated as __hyp_text as it can reside anywhere in the
-kernel text.
+I can apply patches in this series up to and including patch [21/26].
 
-__hyp_text was also used to prevent kprobes from patching breakpoint
-instructions into this region, as this code runs at a different
-exception level. While this is no longer true with VHE, KVM still
-switches VBAR_EL1, meaning a kprobe's breakpoint executed in the
-world-switch code will cause a hyp-panic.
+Do you want me to do that?
 
-echo "p:weasel sysreg_save_guest_state_vhe" > /sys/kernel/debug/tracing/kprobe_events
-echo 1 > /sys/kernel/debug/tracing/events/kprobes/weasel/enable
-lkvm run -k /boot/Image --console serial -p "console=ttyS0 earlycon=uart,mmio,0x3f8"
+Patch [22/26] requires an ACK from mm people.
 
-  # lkvm run -k /boot/Image -m 384 -c 3 --name guest-1474
-  Info: Placing fdt at 0x8fe00000 - 0x8fffffff
-  Info: virtio-mmio.devices=0x200@0x10000:36
+Patch [23/26] has a problem that randconfig can generate a configuration
+in which memory_failure_queue_kick() is not present, so it is necessary
+to add a CONFIG_MEMORY_FAILURE dependency somewhere for things to
+work (or define an empty stub for that function in case the symbol is
+not set).
 
-  Info: virtio-mmio.devices=0x200@0x10200:37
+If patches [24-26/26] don't depend on the previous two, I can try to
+apply them either, so please let me know.
 
-  Info: virtio-mmio.devices=0x200@0x10400:38
-
-[  614.178186] Kernel panic - not syncing: HYP panic:
-[  614.178186] PS:404003c9 PC:ffff0000100d70e0 ESR:f2000004
-[  614.178186] FAR:0000000080080000 HPFAR:0000000000800800 PAR:1d00007edbadc0de
-[  614.178186] VCPU:00000000f8de32f1
-[  614.178383] CPU: 2 PID: 1482 Comm: kvm-vcpu-0 Not tainted 5.0.0-rc2 #10799
-[  614.178446] Call trace:
-[  614.178480]  dump_backtrace+0x0/0x148
-[  614.178567]  show_stack+0x24/0x30
-[  614.178658]  dump_stack+0x90/0xb4
-[  614.178710]  panic+0x13c/0x2d8
-[  614.178793]  hyp_panic+0xac/0xd8
-[  614.178880]  kvm_vcpu_run_vhe+0x9c/0xe0
-[  614.178958]  kvm_arch_vcpu_ioctl_run+0x454/0x798
-[  614.179038]  kvm_vcpu_ioctl+0x360/0x898
-[  614.179087]  do_vfs_ioctl+0xc4/0x858
-[  614.179174]  ksys_ioctl+0x84/0xb8
-[  614.179261]  __arm64_sys_ioctl+0x28/0x38
-[  614.179348]  el0_svc_common+0x94/0x108
-[  614.179401]  el0_svc_handler+0x38/0x78
-[  614.179487]  el0_svc+0x8/0xc
-[  614.179558] SMP: stopping secondary CPUs
-[  614.179661] Kernel Offset: disabled
-[  614.179695] CPU features: 0x003,2a80aa38
-[  614.179758] Memory Limit: none
-[  614.179858] ---[ end Kernel panic - not syncing: HYP panic:
-[  614.179858] PS:404003c9 PC:ffff0000100d70e0 ESR:f2000004
-[  614.179858] FAR:0000000080080000 HPFAR:0000000000800800 PAR:1d00007edbadc0de
-[  614.179858] VCPU:00000000f8de32f1 ]---
-
-Annotate the VHE world-switch functions that aren't marked
-__hyp_text using NOKPROBE_SYMBOL().
-
-Signed-off-by: James Morse <james.morse@arm.com>
-Fixes: 3f5c90b890ac ("KVM: arm64: Introduce VHE-specific kvm_vcpu_run")
-Acked-by: Masami Hiramatsu <mhiramat@kernel.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/hyp/switch.c    | 5 +++++
- arch/arm64/kvm/hyp/sysreg-sr.c | 5 +++++
- 2 files changed, 10 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b0b1478094b4..421ebf6f7086 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -23,6 +23,7 @@
- #include <kvm/arm_psci.h>
- 
- #include <asm/cpufeature.h>
-+#include <asm/kprobes.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
-@@ -107,6 +108,7 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
- 
- 	write_sysreg(kvm_get_hyp_vector(), vbar_el1);
- }
-+NOKPROBE_SYMBOL(activate_traps_vhe);
- 
- static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- {
-@@ -154,6 +156,7 @@ static void deactivate_traps_vhe(void)
- 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
- 	write_sysreg(vectors, vbar_el1);
- }
-+NOKPROBE_SYMBOL(deactivate_traps_vhe);
- 
- static void __hyp_text __deactivate_traps_nvhe(void)
- {
-@@ -513,6 +516,7 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 
- 	return exit_code;
- }
-+NOKPROBE_SYMBOL(kvm_vcpu_run_vhe);
- 
- /* Switch to the guest for legacy non-VHE systems */
- int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
-@@ -620,6 +624,7 @@ static void __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par,
- 	      read_sysreg_el2(esr),   read_sysreg_el2(far),
- 	      read_sysreg(hpfar_el2), par, vcpu);
- }
-+NOKPROBE_SYMBOL(__hyp_call_panic_vhe);
- 
- void __hyp_text __noreturn hyp_panic(struct kvm_cpu_context *host_ctxt)
- {
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 68d6f7c3b237..b426e2cf973c 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -18,6 +18,7 @@
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/kprobes.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-@@ -98,12 +99,14 @@ void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_save_common_state(ctxt);
- }
-+NOKPROBE_SYMBOL(sysreg_save_host_state_vhe);
- 
- void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_save_common_state(ctxt);
- 	__sysreg_save_el2_return_state(ctxt);
- }
-+NOKPROBE_SYMBOL(sysreg_save_guest_state_vhe);
- 
- static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
-@@ -188,12 +191,14 @@ void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_common_state(ctxt);
- }
-+NOKPROBE_SYMBOL(sysreg_restore_host_state_vhe);
- 
- void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- {
- 	__sysreg_restore_common_state(ctxt);
- 	__sysreg_restore_el2_return_state(ctxt);
- }
-+NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
- 
- void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
--- 
-2.20.1
+Thanks,
+Rafael
