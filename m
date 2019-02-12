@@ -1,24 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Update MAINTAINERS entries
-Date: Tue, 12 Feb 2019 12:47:29 +0000
-Message-ID: <99e6c03b-2170-9926-1d40-687cf233b850@arm.com>
-References: <20190212110648.177490-1-marc.zyngier@arm.com>
- <20cd8297-3d5a-531a-56e9-75d0df57a555@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: arch_timer: Mark physical interrupt
+ active when a virtual interrupt is pending
+Date: Tue, 12 Feb 2019 16:17:11 +0000
+Message-ID: <e64905da-3ea2-0ad3-ab02-ecc6dd0999bd@arm.com>
+References: <20190208144300.75299-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 427E74A214
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 07:47:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B256B4A369
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:17:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ESH8cJVJUOBN for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Feb 2019 07:47:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 177E149E3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 07:47:33 -0500 (EST)
-In-Reply-To: <20cd8297-3d5a-531a-56e9-75d0df57a555@arm.com>
+ with ESMTP id WiRogMZiaEjz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Feb 2019 11:17:16 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 034AA49F94
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:17:15 -0500 (EST)
+In-Reply-To: <20190208144300.75299-1-marc.zyngier@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,58 +29,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/02/2019 12:11, Suzuki K Poulose wrote:
-> Hi Marc,
-> 
-> On 12/02/2019 11:06, Marc Zyngier wrote:
->> For historical reasons, KVM/arm and KVM/arm64 have had different
->> entries in the MAINTAINER file. This makes little sense, as they are
->> maintained together.
->>
->> On top of that, we have a bunch of talented people helping with
->> the reviewing, and they deserve to be mentionned in the consolidated
->> entry.
-> 
-> Thanks for the recognition !
-> 
->>
->> Acked-by: Christoffer Dall <christoffer.dall@arm.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>   MAINTAINERS | 18 +++++++-----------
->>   1 file changed, 7 insertions(+), 11 deletions(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 51029a425dbe..91ec0682443b 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -8297,29 +8297,25 @@ S:	Maintained
->>   F:	arch/x86/include/asm/svm.h
->>   F:	arch/x86/kvm/svm.c
->>   
->> -KERNEL VIRTUAL MACHINE FOR ARM (KVM/arm)
->> +KERNEL VIRTUAL MACHINE FOR ARM/ARM64 (KVM/arm, KVM/arm64)
->>   M:	Christoffer Dall <christoffer.dall@arm.com>
->>   M:	Marc Zyngier <marc.zyngier@arm.com>
->> +R:	James Morse <james.morse@arm.com>
->> +R:	Julien Thierry <julien.thierry@arm.com>
-> 
->> +R:	Suzuki Pouloze <suzuki.poulose@arm.com>
-> 
-> Please note that it is: "Suzuki K Poulose"
+Hi Marc,
 
-Arghhh! Now fixed. Sorry about that.
-
+On 08/02/2019 14:43, Marc Zyngier wrote:
+> When a guest gets scheduled, KVM performs a "load" operation,
+> which for the timer includes evaluating the virtual "active" state
+> of the interrupt, and replicating it on the physical side. This
+> ensures that the deactivation in the guest will also take place
+> in the physical GIC distributor.
 > 
-> With that:
+> If the interrupt is not yet active, we flag it as inactive on the
+> physical side.  This means that on restoring the timer registers,
+> if the timer has expired, we'll immediately take an interrupt.
+> That's absolutely fine, as the interrupt will then be flagged as
+> active on the physical side. What this assumes though is that we'll
+> enter the guest right after having taken the interrupt, and that
+> the guest will quickly ACK the interrupt, making it active at on
+
+Nit: "at on" -> pick one
+
+> the virtual side.
 > 
-> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> It turns out that quite often, this assumption doesn't really hold.
+> The guest may be preempted on the back on this interrupt, either
 
-Thanks,
+on the back of*
 
-	M.
+> from kernel space or whilst running at EL1 when a host interrupt
+> fires. When this happens, we repeat the whole sequence on the
+> next load (interrupt marked as inactive, timer registers restored,
+> interrupt fires). And if it takes a really long time for a guest
+> to activate the interrupt (as it does with nested virt), we end-up
+> with many such events in quick succession, leading to the guest only
+> making very slow progress.
+> 
+> This can also be seen with the number of virtual timer interrupt on the
+> host being far greater than the same number in the guest.
+> 
+> An easy way to fix this is to evaluate the timer state when performing
+> the "load" operation, just like we do when the interrupt actually fires.
+> If the timer has a pending virtual interrupt at this stage, then we
+> can safely flag the physical interrupt as being active, which prevents
+> spurious exits.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Otherwise, I think the change makes sense:
+
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+
+Cheers,
+
+> ---
+>  virt/kvm/arm/arch_timer.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 7449651ae2e5..70c18479ccd5 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -487,12 +487,21 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
+>  static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+>  {
+>  	struct kvm_vcpu *vcpu = ctx->vcpu;
+> -	bool phys_active;
+> +	bool phys_active = false;
+> +
+> +	/*
+> +	 * Update the timer output so that it is likely to match the
+> +	 * state we're about to restore. If the timer expires between
+> +	 * this point and the register restoration, we'll take the
+> +	 * interrupt anyway.
+> +	 */
+> +	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
+>  
+>  	if (irqchip_in_kernel(vcpu->kvm))
+>  		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
+> -	else
+> -		phys_active = ctx->irq.level;
+> +
+> +	phys_active |= ctx->irq.level;
+> +
+>  	set_timer_irq_phys_active(ctx, phys_active);
+>  }
+>  
+> 
+
 -- 
-Jazz is not dead. It just smells funny...
+Julien Thierry
