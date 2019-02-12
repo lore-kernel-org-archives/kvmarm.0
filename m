@@ -1,25 +1,25 @@
-From: Julien Thierry <julien.thierry@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
 Subject: Re: [PATCH] KVM: arm/arm64: arch_timer: Mark physical interrupt
  active when a virtual interrupt is pending
-Date: Tue, 12 Feb 2019 16:17:11 +0000
-Message-ID: <e64905da-3ea2-0ad3-ab02-ecc6dd0999bd@arm.com>
+Date: Tue, 12 Feb 2019 17:41:38 +0100
+Message-ID: <20190212164138.GB4530@e113682-lin.lund.arm.com>
 References: <20190208144300.75299-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B256B4A369
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:17:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBAE949F94
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:41:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WiRogMZiaEjz for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Feb 2019 11:17:16 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 034AA49F94
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:17:15 -0500 (EST)
+ with ESMTP id QxK0ahfhoXx4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Feb 2019 11:41:41 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 851F240A52
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:41:41 -0500 (EST)
+Content-Disposition: inline
 In-Reply-To: <20190208144300.75299-1-marc.zyngier@arm.com>
-Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,12 +29,11 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 08/02/2019 14:43, Marc Zyngier wrote:
+On Fri, Feb 08, 2019 at 02:43:00PM +0000, Marc Zyngier wrote:
 > When a guest gets scheduled, KVM performs a "load" operation,
 > which for the timer includes evaluating the virtual "active" state
 > of the interrupt, and replicating it on the physical side. This
@@ -48,16 +47,10 @@ On 08/02/2019 14:43, Marc Zyngier wrote:
 > active on the physical side. What this assumes though is that we'll
 > enter the guest right after having taken the interrupt, and that
 > the guest will quickly ACK the interrupt, making it active at on
-
-Nit: "at on" -> pick one
-
 > the virtual side.
 > 
 > It turns out that quite often, this assumption doesn't really hold.
 > The guest may be preempted on the back on this interrupt, either
-
-on the back of*
-
 > from kernel space or whilst running at EL1 when a host interrupt
 > fires. When this happens, we repeat the whole sequence on the
 > next load (interrupt marked as inactive, timer registers restored,
@@ -76,13 +69,6 @@ on the back of*
 > spurious exits.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Otherwise, I think the change makes sense:
-
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-
-Cheers,
-
 > ---
 >  virt/kvm/arm/arch_timer.c | 15 ++++++++++++---
 >  1 file changed, 12 insertions(+), 3 deletions(-)
@@ -116,7 +102,7 @@ Cheers,
 >  	set_timer_irq_phys_active(ctx, phys_active);
 >  }
 >  
+> -- 
+> 2.20.1
 > 
-
--- 
-Julien Thierry
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
