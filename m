@@ -1,108 +1,134 @@
-From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: arch_timer: Mark physical interrupt
- active when a virtual interrupt is pending
-Date: Tue, 12 Feb 2019 17:41:38 +0100
-Message-ID: <20190212164138.GB4530@e113682-lin.lund.arm.com>
-References: <20190208144300.75299-1-marc.zyngier@arm.com>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [PATCH v8 00/26] APEI in_nmi() rework and SDEI wire-up
+Date: Tue, 12 Feb 2019 23:14:18 +0100
+Message-ID: <2507221.Jg8xd6amJ7@aspire.rjw.lan>
+References: <20190129184902.102850-1-james.morse@arm.com>
+ <CAJZ5v0ibUO7F=+_GBbhEz4nc0jtC=UaK+cOcLCBrXd2pfc0iLg@mail.gmail.com>
+ <f561e55c-3560-6a5a-bd23-5d687227e257@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBAE949F94
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:41:42 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QxK0ahfhoXx4 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Feb 2019 11:41:41 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 851F240A52
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Feb 2019 11:41:41 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190208144300.75299-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <f561e55c-3560-6a5a-bd23-5d687227e257@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: James Morse <james.morse@arm.com>
+Cc: Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, ACPI Devel Maling List <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux Memory Management List <linux-mm@kvack.org>, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 08, 2019 at 02:43:00PM +0000, Marc Zyngier wrote:
-> When a guest gets scheduled, KVM performs a "load" operation,
-> which for the timer includes evaluating the virtual "active" state
-> of the interrupt, and replicating it on the physical side. This
-> ensures that the deactivation in the guest will also take place
-> in the physical GIC distributor.
+On Monday, February 11, 2019 7:35:03 PM CET James Morse wrote:
+> Hi Rafael,
 > 
-> If the interrupt is not yet active, we flag it as inactive on the
-> physical side.  This means that on restoring the timer registers,
-> if the timer has expired, we'll immediately take an interrupt.
-> That's absolutely fine, as the interrupt will then be flagged as
-> active on the physical side. What this assumes though is that we'll
-> enter the guest right after having taken the interrupt, and that
-> the guest will quickly ACK the interrupt, making it active at on
-> the virtual side.
+> On 11/02/2019 11:05, Rafael J. Wysocki wrote:
+> > On Fri, Feb 8, 2019 at 3:13 PM James Morse <james.morse@arm.com> wrote:
+> >> On 08/02/2019 11:40, Rafael J. Wysocki wrote:
+> >>> On Tuesday, January 29, 2019 7:48:36 PM CET James Morse wrote:
+> >>>> This series aims to wire-up arm64's fancy new software-NMI notifications
+> >>>> for firmware-first RAS. These need to use the estatus-queue, which is
+> >>>> also needed for notifications via emulated-SError. All of these
+> >>>> things take the 'in_nmi()' path through ghes_copy_tofrom_phys(), and
+> >>>> so will deadlock if they can interact, which they might.
+> >>
+> >>>> Known issues:
+> >>>>  * ghes_copy_tofrom_phys() already takes a lock in NMI context, this
+> >>>>    series moves that around, and makes sure we never try to take the
+> >>>>    same lock from different NMIlike notifications. Since the switch to
+> >>>>    queued spinlocks it looks like the kernel can only be 4 context's
+> >>>>    deep in spinlock, which arm64 could exceed as it doesn't have a
+> >>>>    single architected NMI. This would be fixed by dropping back to
+> >>>>    test-and-set when the nesting gets too deep:
+> >>>>  lore.kernel.org/r/1548215351-18896-1-git-send-email-longman@redhat.com
+> >>>>
+> >>>> * Taking an NMI from a KVM guest on arm64 with VHE leaves HCR_EL2.TGE
+> >>>>   clear, meaning AT and TLBI point at the guest, and PAN/UAO are squiffy.
+> >>>>   Only TLBI matters for APEI, and this is fixed by Julien's patch:
+> >>>>  http://lore.kernel.org/r/1548084825-8803-2-git-send-email-julien.thierry@arm.com
+> >>>>
+> >>>> * Linux ignores the physical address mask, meaning it doesn't call
+> >>>>   memory_failure() on all the affected pages if firmware or hypervisor
+> >>>>   believe in a different page size. Easy to hit on arm64, (easy to fix too,
+> >>>>   it just conflicts with this series)
+> >>
+> >>
+> >>>> James Morse (26):
+> >>>>   ACPI / APEI: Don't wait to serialise with oops messages when
+> >>>>     panic()ing
+> >>>>   ACPI / APEI: Remove silent flag from ghes_read_estatus()
+> >>>>   ACPI / APEI: Switch estatus pool to use vmalloc memory
+> >>>>   ACPI / APEI: Make hest.c manage the estatus memory pool
+> >>>>   ACPI / APEI: Make estatus pool allocation a static size
+> >>>>   ACPI / APEI: Don't store CPER records physical address in struct ghes
+> >>>>   ACPI / APEI: Remove spurious GHES_TO_CLEAR check
+> >>>>   ACPI / APEI: Don't update struct ghes' flags in read/clear estatus
+> >>>>   ACPI / APEI: Generalise the estatus queue's notify code
+> >>>>   ACPI / APEI: Don't allow ghes_ack_error() to mask earlier errors
+> >>>>   ACPI / APEI: Move NOTIFY_SEA between the estatus-queue and NOTIFY_NMI
+> >>>>   ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
+> >>>>   KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
+> >>>>   arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
+> >>>>   ACPI / APEI: Move locking to the notification helper
+> >>>>   ACPI / APEI: Let the notification helper specify the fixmap slot
+> >>>>   ACPI / APEI: Pass ghes and estatus separately to avoid a later copy
+> >>>>   ACPI / APEI: Make GHES estatus header validation more user friendly
+> >>>>   ACPI / APEI: Split ghes_read_estatus() to allow a peek at the CPER
+> >>>>     length
+> >>>>   ACPI / APEI: Only use queued estatus entry during
+> >>>>     in_nmi_queue_one_entry()
+> >>>>   ACPI / APEI: Use separate fixmap pages for arm64 NMI-like
+> >>>>     notifications
+> >>>>   mm/memory-failure: Add memory_failure_queue_kick()
+> >>>>   ACPI / APEI: Kick the memory_failure() queue for synchronous errors
+> >>>>   arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
+> >>>>   firmware: arm_sdei: Add ACPI GHES registration helper
+> >>>>   ACPI / APEI: Add support for the SDEI GHES Notification type
+> >>
+> >>
+> >>> I can apply patches in this series up to and including patch [21/26].
+> >>>
+> >>> Do you want me to do that?
+> >>
+> >> 9-12, 17-19, 21 are missing any review/ack tags, so I wouldn't ask, but as
+> >> you're offering, yes please!
+> >>
+> >>
+> >>> Patch [22/26] requires an ACK from mm people.
+> >>>
+> >>> Patch [23/26] has a problem that randconfig can generate a configuration
+> >>> in which memory_failure_queue_kick() is not present, so it is necessary
+> >>> to add a CONFIG_MEMORY_FAILURE dependency somewhere for things to
+> >>> work (or define an empty stub for that function in case the symbol is
+> >>> not set).
+> >>
+> >> Damn-it! Thanks, I was just trying to work that report out...
+> >>
+> >>
+> >>> If patches [24-26/26] don't depend on the previous two, I can try to
+> >>> apply them either, so please let me know.
+> >>
+> >> 22-24 depend on each other. Merging 24 without the other two is no-improvement,
+> >> so I'd like them to be kept together.
+> >>
+> >> 25-26 don't depend on 22-24, but came later so that they weren't affected by the
+> >> same race.
+> >> (note to self: describe that in the cover letter next time.)
+> >>
+> >>
+> >> If I apply the tag's and Boris' changes and post a tested v9 as 1-21, 25-26, is
+> >> that easier, or does it cause extra work?
+> > 
+> > Actually, I went ahead and applied them, since I had the 1-21 ready anyway.
 > 
-> It turns out that quite often, this assumption doesn't really hold.
-> The guest may be preempted on the back on this interrupt, either
-> from kernel space or whilst running at EL1 when a host interrupt
-> fires. When this happens, we repeat the whole sequence on the
-> next load (interrupt marked as inactive, timer registers restored,
-> interrupt fires). And if it takes a really long time for a guest
-> to activate the interrupt (as it does with nested virt), we end-up
-> with many such events in quick succession, leading to the guest only
-> making very slow progress.
+> > I applied the Boris' fixups manually which led to a bit of rebasing,
+> > so please check my linux-next branch.
 > 
-> This can also be seen with the number of virtual timer interrupt on the
-> host being far greater than the same number in the guest.
-> 
-> An easy way to fix this is to evaluate the timer state when performing
-> the "load" operation, just like we do when the interrupt actually fires.
-> If the timer has a pending virtual interrupt at this stage, then we
-> can safely flag the physical interrupt as being active, which prevents
-> spurious exits.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/arch_timer.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 7449651ae2e5..70c18479ccd5 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -487,12 +487,21 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
->  static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
->  {
->  	struct kvm_vcpu *vcpu = ctx->vcpu;
-> -	bool phys_active;
-> +	bool phys_active = false;
-> +
-> +	/*
-> +	 * Update the timer output so that it is likely to match the
-> +	 * state we're about to restore. If the timer expires between
-> +	 * this point and the register restoration, we'll take the
-> +	 * interrupt anyway.
-> +	 */
-> +	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
->  
->  	if (irqchip_in_kernel(vcpu->kvm))
->  		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
-> -	else
-> -		phys_active = ctx->irq.level;
-> +
-> +	phys_active |= ctx->irq.level;
-> +
->  	set_timer_irq_phys_active(ctx, phys_active);
->  }
->  
-> -- 
-> 2.20.1
-> 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+> Looks okay to me, and I ran your branch through the POLL/SEA/SDEI tests I've
+> been doing for each version so far.
+
+Thanks for the confirmation!
