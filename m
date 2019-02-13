@@ -1,15 +1,16 @@
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Subject: Re: [PATCH v8 00/26] APEI in_nmi() rework and SDEI wire-up
-Date: Tue, 12 Feb 2019 23:14:18 +0100
-Message-ID: <2507221.Jg8xd6amJ7@aspire.rjw.lan>
-References: <20190129184902.102850-1-james.morse@arm.com>
- <CAJZ5v0ibUO7F=+_GBbhEz4nc0jtC=UaK+cOcLCBrXd2pfc0iLg@mail.gmail.com>
- <f561e55c-3560-6a5a-bd23-5d687227e257@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 3/5] KVM: arm/arm64: re-create event when setting
+ counter value
+Date: Wed, 13 Feb 2019 14:28:51 +0000
+Message-ID: <3adc7d31-9d5a-d66b-21ee-9b4da986d24f@arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+ <1549299218-44714-4-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <f561e55c-3560-6a5a-bd23-5d687227e257@arm.com>
+In-Reply-To: <1549299218-44714-4-git-send-email-andrew.murray@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -19,116 +20,71 @@ List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
 Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: James Morse <james.morse@arm.com>
-Cc: Tony Luck <tony.luck@intel.com>, Xie XiuQi <xiexiuqi@huawei.com>, ACPI Devel Maling List <linux-acpi@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Dongjiu Geng <gengdongjiu@huawei.com>, Linux Memory Management List <linux-mm@kvack.org>, Borislav Petkov <bp@alien8.de>, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>, kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>, Len Brown <lenb@kernel.org>
+To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, julien.thierry@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Monday, February 11, 2019 7:35:03 PM CET James Morse wrote:
-> Hi Rafael,
-> 
-> On 11/02/2019 11:05, Rafael J. Wysocki wrote:
-> > On Fri, Feb 8, 2019 at 3:13 PM James Morse <james.morse@arm.com> wrote:
-> >> On 08/02/2019 11:40, Rafael J. Wysocki wrote:
-> >>> On Tuesday, January 29, 2019 7:48:36 PM CET James Morse wrote:
-> >>>> This series aims to wire-up arm64's fancy new software-NMI notifications
-> >>>> for firmware-first RAS. These need to use the estatus-queue, which is
-> >>>> also needed for notifications via emulated-SError. All of these
-> >>>> things take the 'in_nmi()' path through ghes_copy_tofrom_phys(), and
-> >>>> so will deadlock if they can interact, which they might.
-> >>
-> >>>> Known issues:
-> >>>>  * ghes_copy_tofrom_phys() already takes a lock in NMI context, this
-> >>>>    series moves that around, and makes sure we never try to take the
-> >>>>    same lock from different NMIlike notifications. Since the switch to
-> >>>>    queued spinlocks it looks like the kernel can only be 4 context's
-> >>>>    deep in spinlock, which arm64 could exceed as it doesn't have a
-> >>>>    single architected NMI. This would be fixed by dropping back to
-> >>>>    test-and-set when the nesting gets too deep:
-> >>>>  lore.kernel.org/r/1548215351-18896-1-git-send-email-longman@redhat.com
-> >>>>
-> >>>> * Taking an NMI from a KVM guest on arm64 with VHE leaves HCR_EL2.TGE
-> >>>>   clear, meaning AT and TLBI point at the guest, and PAN/UAO are squiffy.
-> >>>>   Only TLBI matters for APEI, and this is fixed by Julien's patch:
-> >>>>  http://lore.kernel.org/r/1548084825-8803-2-git-send-email-julien.thierry@arm.com
-> >>>>
-> >>>> * Linux ignores the physical address mask, meaning it doesn't call
-> >>>>   memory_failure() on all the affected pages if firmware or hypervisor
-> >>>>   believe in a different page size. Easy to hit on arm64, (easy to fix too,
-> >>>>   it just conflicts with this series)
-> >>
-> >>
-> >>>> James Morse (26):
-> >>>>   ACPI / APEI: Don't wait to serialise with oops messages when
-> >>>>     panic()ing
-> >>>>   ACPI / APEI: Remove silent flag from ghes_read_estatus()
-> >>>>   ACPI / APEI: Switch estatus pool to use vmalloc memory
-> >>>>   ACPI / APEI: Make hest.c manage the estatus memory pool
-> >>>>   ACPI / APEI: Make estatus pool allocation a static size
-> >>>>   ACPI / APEI: Don't store CPER records physical address in struct ghes
-> >>>>   ACPI / APEI: Remove spurious GHES_TO_CLEAR check
-> >>>>   ACPI / APEI: Don't update struct ghes' flags in read/clear estatus
-> >>>>   ACPI / APEI: Generalise the estatus queue's notify code
-> >>>>   ACPI / APEI: Don't allow ghes_ack_error() to mask earlier errors
-> >>>>   ACPI / APEI: Move NOTIFY_SEA between the estatus-queue and NOTIFY_NMI
-> >>>>   ACPI / APEI: Switch NOTIFY_SEA to use the estatus queue
-> >>>>   KVM: arm/arm64: Add kvm_ras.h to collect kvm specific RAS plumbing
-> >>>>   arm64: KVM/mm: Move SEA handling behind a single 'claim' interface
-> >>>>   ACPI / APEI: Move locking to the notification helper
-> >>>>   ACPI / APEI: Let the notification helper specify the fixmap slot
-> >>>>   ACPI / APEI: Pass ghes and estatus separately to avoid a later copy
-> >>>>   ACPI / APEI: Make GHES estatus header validation more user friendly
-> >>>>   ACPI / APEI: Split ghes_read_estatus() to allow a peek at the CPER
-> >>>>     length
-> >>>>   ACPI / APEI: Only use queued estatus entry during
-> >>>>     in_nmi_queue_one_entry()
-> >>>>   ACPI / APEI: Use separate fixmap pages for arm64 NMI-like
-> >>>>     notifications
-> >>>>   mm/memory-failure: Add memory_failure_queue_kick()
-> >>>>   ACPI / APEI: Kick the memory_failure() queue for synchronous errors
-> >>>>   arm64: acpi: Make apei_claim_sea() synchronise with APEI's irq work
-> >>>>   firmware: arm_sdei: Add ACPI GHES registration helper
-> >>>>   ACPI / APEI: Add support for the SDEI GHES Notification type
-> >>
-> >>
-> >>> I can apply patches in this series up to and including patch [21/26].
-> >>>
-> >>> Do you want me to do that?
-> >>
-> >> 9-12, 17-19, 21 are missing any review/ack tags, so I wouldn't ask, but as
-> >> you're offering, yes please!
-> >>
-> >>
-> >>> Patch [22/26] requires an ACK from mm people.
-> >>>
-> >>> Patch [23/26] has a problem that randconfig can generate a configuration
-> >>> in which memory_failure_queue_kick() is not present, so it is necessary
-> >>> to add a CONFIG_MEMORY_FAILURE dependency somewhere for things to
-> >>> work (or define an empty stub for that function in case the symbol is
-> >>> not set).
-> >>
-> >> Damn-it! Thanks, I was just trying to work that report out...
-> >>
-> >>
-> >>> If patches [24-26/26] don't depend on the previous two, I can try to
-> >>> apply them either, so please let me know.
-> >>
-> >> 22-24 depend on each other. Merging 24 without the other two is no-improvement,
-> >> so I'd like them to be kept together.
-> >>
-> >> 25-26 don't depend on 22-24, but came later so that they weren't affected by the
-> >> same race.
-> >> (note to self: describe that in the cover letter next time.)
-> >>
-> >>
-> >> If I apply the tag's and Boris' changes and post a tested v9 as 1-21, 25-26, is
-> >> that easier, or does it cause extra work?
-> > 
-> > Actually, I went ahead and applied them, since I had the 1-21 ready anyway.
-> 
-> > I applied the Boris' fixups manually which led to a bit of rebasing,
-> > so please check my linux-next branch.
-> 
-> Looks okay to me, and I ran your branch through the POLL/SEA/SDEI tests I've
-> been doing for each version so far.
+Hi Andrew,
 
-Thanks for the confirmation!
+On 04/02/2019 16:53, Andrew Murray wrote:
+> The perf event sample_period is currently set based upon the current
+> counter value, when PMXEVTYPER is written to and the perf event is created.
+> However the user may choose to write the type before the counter value in
+> which case sample_period will be set incorrectly. Let's instead decouple
+> event creation from PMXEVTYPER and (re)create the event in either
+> suitation.
+> 
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>   virt/kvm/arm/pmu.c | 40 +++++++++++++++++++++++++++++++---------
+>   1 file changed, 31 insertions(+), 9 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 6e7c179..95d74ec 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -24,6 +24,7 @@
+>   #include <kvm/arm_pmu.h>
+>   #include <kvm/arm_vgic.h>
+>   
+> +static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+>   /**
+>    * kvm_pmu_get_counter_value - get PMU counter value
+>    * @vcpu: The vcpu pointer
+> @@ -62,6 +63,9 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>   	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+>   	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+>   	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+> +
+> +	/* Recreate the perf event to reflect the updated sample_period */
+> +	kvm_pmu_create_perf_event(vcpu, select_idx);
+>   }
+>   
+>   /**
+> @@ -378,23 +382,22 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+>   }
+>   
+>   /**
+> - * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+> + * kvm_pmu_create_perf_event - create a perf event for a counter
+>    * @vcpu: The vcpu pointer
+> - * @data: The data guest writes to PMXEVTYPER_EL0
+> + * @data: Type of event as per PMXEVTYPER_EL0 format
+>    * @select_idx: The number of selected counter
+
+nit: data no longer exists.
+
+
+> - *
+> - * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
+> - * event with given hardware event number. Here we call perf_event API to
+> - * emulate this action and create a kernel perf event for it.
+>    */
+> -void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> -				    u64 select_idx)
+> +static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>   {
+
+With the comment from Julien addressed,
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulse@arm.com>
