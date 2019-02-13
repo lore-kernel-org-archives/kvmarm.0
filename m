@@ -1,68 +1,45 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: Re: [PATCH v5 1/5] arm64: Add utilities to save restore pointer
- authentication keys
-Date: Wed, 13 Feb 2019 17:32:37 +0000
-Message-ID: <adbeb25c-fa88-41fd-7819-5f412a762b64@arm.com>
+Subject: Re: [PATCH v5 2/5] arm64/kvm: preserve host HCR_EL2/MDCR_EL2 value
+Date: Wed, 13 Feb 2019 17:34:18 +0000
+Message-ID: <8de32a89-4aa1-bffb-78dd-45feddc9216e@arm.com>
 References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
- <1548658727-14271-2-git-send-email-amit.kachhap@arm.com>
- <88ccd568-f027-6cdf-b4f1-6709d76102c1@arm.com>
+ <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <88ccd568-f027-6cdf-b4f1-6709d76102c1@arm.com>
+In-Reply-To: <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 31/01/2019 16:20, James Morse wrote:
-> Hi Amit,
+On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
+> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+> is a constant value. This works today, as the host HCR_EL2 value is
+> always the same, but this will get in the way of supporting extensions
+> that require HCR_EL2 bits to be set conditionally for the host.
 > 
-> On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
->> The keys can be switched either inside an assembly or such
->> functions which do not have pointer authentication checks, so a GCC
->> attribute is added to enable it.
->>
->> A function ptrauth_keys_store is added which is similar to existing
->> function ptrauth_keys_switch but saves the key values in memory.
->> This may be useful for save/restore scenarios when CPU changes
->> privilege levels, suspend/resume etc.
-> 
-> 
->> diff --git a/arch/arm64/include/asm/pointer_auth.h b/arch/arm64/include/asm/pointer_auth.h
->> index 15d4951..98441ce 100644
->> --- a/arch/arm64/include/asm/pointer_auth.h
->> +++ b/arch/arm64/include/asm/pointer_auth.h
->> @@ -11,6 +11,13 @@
->>  
->>  #ifdef CONFIG_ARM64_PTR_AUTH
->>  /*
->> + * Compile the function without pointer authentication instructions. This
->> + * allows pointer authentication to be enabled/disabled within the function
->> + * (but leaves the function unprotected by pointer authentication).
->> + */
->> +#define __no_ptrauth	__attribute__((target("sign-return-address=none")))
-> 
-> The documentation[0] for this says 'none' is the default. Will this only
-> take-effect once the kernel supports pointer-auth for the host? (Is this just
-> documentation until then?)
+> To allow such features to work without KVM having to explicitly handle
+> every possible host feature combination, this patch has KVM save/restore
+> the host HCR when switching to/from a guest HCR. The saving of the
+> register is done once during cpu hypervisor initialization state and is
+> just restored after switch from guest.
 
-Yes, I don't think this should be in this series, since we're not
-building the kernel with pointer auth yet.
+Why is this patch needed? I couldn't find anything in this series that
+sets HCR_EL2 conditionally for the host. It seems like the kernel still
+always sets it to HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS.
 
-> 
-> ('noptrauth' would fit with 'notrace' slightly better)
+Looking back at v2 of the userspace pointer auth series, it seems that
+the API/APK bits were set conditionally [1], so this patch would have
+been needed to preserve HCR_EL2. But as of v3 of that series, the bits
+have been set unconditionally through HCR_HOST_NVHE_FLAGS [2].
 
-(But worse with e.g. __noreturn, __notrace_funcgraph, __init,
-__always_inline, __exception. Not sure what the pattern is. Would
-__noptrauth be better?)
+Is there something else I've missed?
 
 Thanks,
 Kristina
 
-> 
-> [0]
-> https://gcc.gnu.org/onlinedocs/gcc/AArch64-Function-Attributes.html#AArch64-Function-Attributes
-> 
+[1] https://lore.kernel.org/linux-arm-kernel/20171127163806.31435-6-mark.rutland@arm.com/
+[2] https://lore.kernel.org/linux-arm-kernel/20180417183735.56985-5-mark.rutland@arm.com/
