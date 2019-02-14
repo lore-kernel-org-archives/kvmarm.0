@@ -1,24 +1,21 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/ARM updates for 5.0-rc6
-Date: Wed, 13 Feb 2019 19:39:28 +0100
-Message-ID: <01b31a1c-9a98-2d95-0c24-6806135d9111@redhat.com>
-References: <20190207131843.157210-1-marc.zyngier@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] kvm: arm64: Fix comment for KVM_PHYS_SHIFT
+Date: Thu, 14 Feb 2019 01:45:46 +0000
+Message-ID: <1550108746-14704-1-git-send-email-yuzenghui@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F7949E3E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Feb 2019 13:39:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 288434A2D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Feb 2019 20:46:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LzFz8TGfu0Hn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Feb 2019 13:39:38 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C5EF40493
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Feb 2019 13:39:38 -0500 (EST)
-In-Reply-To: <20190207131843.157210-1-marc.zyngier@arm.com>
-Content-Language: en-US
+ with ESMTP id U3NkYVmyrWo2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Feb 2019 20:46:38 -0500 (EST)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC40540493
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Feb 2019 20:46:37 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,13 +25,33 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: christoffer.dall@arm.com, marc.zyngier@arm.com
+Cc: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/02/19 14:18, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-for-5.0
+Since Suzuki K Poulose's work on Dynamic IPA support, KVM_PHYS_SHIFT will
+be used only when machine_type's bits[7:0] equal to 0 (by default). Thus
+the outdated comment should be fixed.
 
-Pulled, thanks.
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ arch/arm64/include/asm/kvm_mmu.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-paolo
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 8af4b1b..a12bf48 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -138,7 +138,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+ 	})
+ 
+ /*
+- * We currently only support a 40bit IPA.
++ * We currently support using a VM-specified IPA size. For backward
++ * compatibility, the default IPA size is fixed to 40bits.
+  */
+ #define KVM_PHYS_SHIFT	(40)
+ 
+-- 
+1.8.3.1
