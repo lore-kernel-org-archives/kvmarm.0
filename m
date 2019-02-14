@@ -1,173 +1,221 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v5 3/5] arm64/kvm: context-switch ptrauth registers
-Date: Thu, 14 Feb 2019 16:36:27 +0530
-Message-ID: <ee8669f7-5c3d-ada3-49f2-0c9b37559553@arm.com>
-References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
- <1548658727-14271-4-git-send-email-amit.kachhap@arm.com>
- <0a2df488-a80d-ef08-6241-7f4695f2a578@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 4/5] KVM: arm/arm64: lazily create perf events on enable
+Date: Thu, 14 Feb 2019 11:36:02 +0000
+Message-ID: <bd21facb-4245-f583-e4a0-23399017579d@arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+ <1549299218-44714-5-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <0a2df488-a80d-ef08-6241-7f4695f2a578@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F9A34A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Feb 2019 06:36:09 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jGGI3n+GdMlq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Feb 2019 06:36:07 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9BF40217
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Feb 2019 06:36:07 -0500 (EST)
+In-Reply-To: <1549299218-44714-5-git-send-email-andrew.murray@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Andrew,
 
-On 2/13/19 11:04 PM, Kristina Martsenko wrote:
-> Hi Amit,
+On 04/02/2019 16:53, Andrew Murray wrote:
+> To prevent re-creating perf events everytime the counter registers
+> are changed, let's instead lazily create the event when the event
+> is first enabled and destroy it when it changes.
 > 
-> (Please always Cc: everyone who commented on previous versions of the
-> series.)
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>   virt/kvm/arm/pmu.c | 96 ++++++++++++++++++++++++++++++++++++++----------------
+>   1 file changed, 68 insertions(+), 28 deletions(-)
 > 
-> On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
->> When pointer authentication is supported, a guest may wish to use it.
->> This patch adds the necessary KVM infrastructure for this to work, with
->> a semi-lazy context switch of the pointer auth state.
->>
->> Pointer authentication feature is only enabled when VHE is built
->> into the kernel and present into CPU implementation so only VHE code
->> paths are modified.
->>
->> When we schedule a vcpu, we disable guest usage of pointer
->> authentication instructions and accesses to the keys. While these are
->> disabled, we avoid context-switching the keys. When we trap the guest
->> trying to use pointer authentication functionality, we change to eagerly
->> context-switching the keys, and enable the feature. The next time the
->> vcpu is scheduled out/in, we start again.
->>
->> Pointer authentication consists of address authentication and generic
->> authentication, and CPUs in a system might have varied support for
->> either. Where support for either feature is not uniform, it is hidden
->> from guests via ID register emulation, as a result of the cpufeature
->> framework in the host.
->>
->> Unfortunately, address authentication and generic authentication cannot
->> be trapped separately, as the architecture provides a single EL2 trap
->> covering both. If we wish to expose one without the other, we cannot
->> prevent a (badly-written) guest from intermittently using a feature
->> which is not uniformly supported (when scheduled on a physical CPU which
->> supports the relevant feature). When the guest is scheduled on a
->> physical CPU lacking the feature, these attempts will result in an UNDEF
->> being taken by the guest.
-> 
-> [...]
-> 
->>   /*
->> + * Handle the guest trying to use a ptrauth instruction, or trying to access a
->> + * ptrauth register.
->> + */
->> +void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
->> +{
->> +	if (has_vhe() && kvm_supports_ptrauth())
->> +		kvm_arm_vcpu_ptrauth_enable(vcpu);
->> +	else
->> +		kvm_inject_undefined(vcpu);
->> +}
->> +
->> +/*
->>    * Guest usage of a ptrauth instruction (which the guest EL1 did not turn into
->> - * a NOP).
->> + * a NOP), or guest EL1 access to a ptrauth register.
-> 
-> Doesn't guest EL1 access of ptrauth registers go through trap_ptrauth
-> instead?
-Yes you are right.
-> 
->>    */
->>   static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>   {
->> -	/*
->> -	 * We don't currently support ptrauth in a guest, and we mask the ID
->> -	 * registers to prevent well-behaved guests from trying to make use of
->> -	 * it.
->> -	 *
->> -	 * Inject an UNDEF, as if the feature really isn't present.
->> -	 */
->> -	kvm_inject_undefined(vcpu);
->> +	kvm_arm_vcpu_ptrauth_trap(vcpu);
->>   	return 1;
->>   }
->>   
-> 
-> [...]
-> 
->> +static __always_inline bool __hyp_text __ptrauth_is_enabled(struct kvm_vcpu *vcpu)
->> +{
->> +	return IS_ENABLED(CONFIG_ARM64_PTR_AUTH) &&
->> +			vcpu->arch.ctxt.hcr_el2 & (HCR_API | HCR_APK);
->> +}
->> +
->> +void __no_ptrauth __hyp_text __ptrauth_switch_to_guest(struct kvm_vcpu *vcpu,
->> +					  struct kvm_cpu_context *host_ctxt,
->> +					  struct kvm_cpu_context *guest_ctxt)
->> +{
->> +	if (!__ptrauth_is_enabled(vcpu))
->> +		return;
->> +
->> +	ptrauth_keys_store((struct ptrauth_keys *) &host_ctxt->sys_regs[APIAKEYLO_EL1]);
->> +	ptrauth_keys_switch((struct ptrauth_keys *) &guest_ctxt->sys_regs[APIAKEYLO_EL1]);
->> +}
->> +
->> +void __no_ptrauth __hyp_text __ptrauth_switch_to_host(struct kvm_vcpu *vcpu,
-> 
-> We don't call this code in the !VHE case anymore, so are the __hyp_text
-> annotations still needed?
-Yes they can be removed.
-> 
->> +					 struct kvm_cpu_context *host_ctxt,
->> +					 struct kvm_cpu_context *guest_ctxt)
->> +{
->> +	if (!__ptrauth_is_enabled(vcpu))
->> +		return;
->> +
->> +	ptrauth_keys_store((struct ptrauth_keys *) &guest_ctxt->sys_regs[APIAKEYLO_EL1]);
->> +	ptrauth_keys_switch((struct ptrauth_keys *) &host_ctxt->sys_regs[APIAKEYLO_EL1]);
->> +}
-> 
-> [...]
-> 
->> @@ -1040,14 +1066,6 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
->>   			kvm_debug("SVE unsupported for guests, suppressing\n");
->>   
->>   		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
->> -	} else if (id == SYS_ID_AA64ISAR1_EL1) {
->> -		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
->> -					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
->> -					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
->> -					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
->> -		if (val & ptrauth_mask)
->> -			kvm_debug("ptrauth unsupported for guests, suppressing\n");
->> -		val &= ~ptrauth_mask;
-> 
-> If all CPUs support address authentication, but no CPUs support generic
-> authentication, then I think the guest will still see address auth in
-> the ID register and try to use it, but since kvm_supports_ptrauth() ==
-> false, then kvm will enable trapping and inject an undef. So I think we
-> still need to zero the ID register bits here if !kvm_supports_ptrauth().
-Yes even James Morse suggested same thing.
-> 
-> In the following patch, I think we also need to zero the bits if
-> !kvm_arm_vcpu_ptrauth_allowed(), as done in v4 [1], because otherwise
-> the guest will see that ptrauth is available, but will receive an undef
-> when it tries to use it.
-ok.
-> 
-> Regarding the patch in v4, most of the work is passing the vcpu down to
-> read_id_reg(). Dave has a similar patch in his SVE series [2]. I think
-> it might make sense to rebase onto that patch and mention that patch as
-> a dependency in the cover letter.
-Yes it is helpful. Will check it.
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 95d74ec..a64aeb2 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -24,7 +24,10 @@
+>   #include <kvm/arm_pmu.h>
+>   #include <kvm/arm_vgic.h>
+>   
+> +static void kvm_pmu_sync_counter_enable(struct kvm_vcpu *vcpu, u64 select_idx);
+>   static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+> +static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> +
+>   /**
+>    * kvm_pmu_get_counter_value - get PMU counter value
+>    * @vcpu: The vcpu pointer
+> @@ -59,13 +62,15 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>   void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>   {
+>   	u64 reg;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>   
+>   	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+>   	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+>   	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+>   
+> -	/* Recreate the perf event to reflect the updated sample_period */
+> -	kvm_pmu_create_perf_event(vcpu, select_idx);
+> +	kvm_pmu_stop_counter(vcpu, pmc);
+> +	kvm_pmu_sync_counter_enable(vcpu, select_idx);
+>   }
+>   
+>   /**
+> @@ -83,6 +88,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>   
+>   /**
+>    * kvm_pmu_stop_counter - stop PMU counter
+> + * @vcpu: The vcpu pointer
+>    * @pmc: The PMU counter pointer
+>    *
+>    * If this counter has been configured to monitor some event, release it here.
+> @@ -143,6 +149,24 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>   }
+>   
+>   /**
+> + * kvm_pmu_enable_counter - create/enable a counter
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +static void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (!pmc->perf_event)
+> +		kvm_pmu_create_perf_event(vcpu, select_idx);
+> +
+> +	perf_event_enable(pmc->perf_event);
+> +	if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> +		kvm_debug("failed to enable perf event\n");
+> +}
+> +
+> +/**
+>    * kvm_pmu_enable_counter_mask - enable selected PMU counters
+>    * @vcpu: The vcpu pointer
+>    * @val: the value guest writes to PMCNTENSET register
+> @@ -152,8 +176,6 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>   void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>   {
+>   	int i;
+> -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -	struct kvm_pmc *pmc;
+>   
+>   	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
+>   		return;
+> @@ -162,16 +184,39 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>   		if (!(val & BIT(i)))
+>   			continue;
+>   
+> -		pmc = &pmu->pmc[i];
+> -		if (pmc->perf_event) {
+> -			perf_event_enable(pmc->perf_event);
+> -			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> -				kvm_debug("fail to enable perf event\n");
+> -		}
+> +		kvm_pmu_enable_counter(vcpu, i);
+>   	}
+>   }
+>   
+>   /**
+> + * kvm_pmu_sync_counter_enable - reenable a counter if it should be enabled
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +static void kvm_pmu_sync_counter_enable(struct kvm_vcpu *vcpu,
+> +					    u64 select_idx)
+> +{
+> +	u64 set = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> +
+> +	if (set & BIT(select_idx))
+> +		kvm_pmu_enable_counter_mask(vcpu, BIT(select_idx));
 
-//Amit D
-> 
-> [1] https://lore.kernel.org/linux-arm-kernel/1545119810-12182-5-git-send-email-amit.kachhap@arm.com/
-> [2] https://lore.kernel.org/linux-arm-kernel/1547757219-19439-11-git-send-email-Dave.Martin@arm.com/
-> 
-> Thanks,
-> Kristina
-> 
+I think there is a problem here. We could be creating an event for a
+counter beyond what is supported by the CPU. i.e, we don't
+seem to validate that the mask we are creating is within the
+kvm_pmu_valid_counter_mask(). The other callers seem to verify this.
+I guess it may be better to add a check for this in the
+kvm_pmu_enable_counter_mask().
+
+minor nit: Feel free to ignore. If we move the check for PMCNTENSET_EL0 to
+pmu_enable_counter_mask() we could get rid of the above function. Anyways,
+we should only be enabling the counters set in PMCNTENSET_EL0.
+
+
+> +}
+> +
+> +/**
+> + * kvm_pmu_disable_counter - disable selected PMU counter
+> + * @vcpu: The vcpu pointer
+> + * @pmc: The counter to disable
+> + */
+> +static void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (pmc->perf_event)
+> +		perf_event_disable(pmc->perf_event);
+> +}
+> +
+> +/**
+>    * kvm_pmu_disable_counter_mask - disable selected PMU counters
+>    * @vcpu: The vcpu pointer
+>    * @val: the value guest writes to PMCNTENCLR register
+> @@ -181,8 +226,6 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>   void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>   {
+>   	int i;
+> -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -	struct kvm_pmc *pmc;
+>   
+>   	if (!val)
+>   		return;
+> @@ -191,9 +234,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>   		if (!(val & BIT(i)))
+>   			continue;
+>   
+> -		pmc = &pmu->pmc[i];
+> -		if (pmc->perf_event)
+> -			perf_event_disable(pmc->perf_event);
+> +		kvm_pmu_disable_counter(vcpu, i);
+>   	}
+>   }
+>   
+> @@ -375,16 +416,9 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>   	}
+>   }
+>   
+> -static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+> -{
+> -	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
+> -	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(select_idx));
+> -}
+> -
+>   /**
+> - * kvm_pmu_create_perf_event - create a perf event for a counter
+> + * kvm_pmu_counter_create_enabled_perf_event - create a perf event for a counter
+
+nit: Name hasn't changed. Also, please could update that, the events are always
+created disabled and they are only enabled lazily.
+
+Reset looks fines.
+
+Suzuki
