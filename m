@@ -1,160 +1,396 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v5 5/5] arm64/kvm: control accessibility of ptrauth key
- registers
-Date: Fri, 15 Feb 2019 10:27:44 +0530
-Message-ID: <0c22684d-3101-f90c-83d8-d649bb1c799e@arm.com>
-References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
- <1548658727-14271-6-git-send-email-amit.kachhap@arm.com>
- <6ddfa9ae-5c98-540e-b4aa-8149c8515c9e@arm.com>
- <20190213175428.GR32634@e103592.cambridge.arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
+Date: Fri, 15 Feb 2019 09:58:57 +0000
+Message-ID: <20190215095857.2fd7e0fb@donnerap.cambridge.arm.com>
+References: <20190107120537.184252-1-andre.przywara@arm.com>
+ <20190107120537.184252-2-andre.przywara@arm.com>
+ <20190122151714.GG3578@e103592.cambridge.arm.com>
+ <20190125144657.3db91c91@donnerap.cambridge.arm.com>
+ <20190129213223.GB3567@e103592.cambridge.arm.com>
+ <20190130113900.10089070@donnerap.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190213175428.GR32634@e103592.cambridge.arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dave P Martin <Dave.Martin@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Christoffer Dall <Christoffer.Dall@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Mark Rutland <Mark.Rutland@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E0B4A319
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 04:59:05 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 91L44IHzsZ1p for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Feb 2019 04:59:03 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FDFD40493
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 04:59:03 -0500 (EST)
+In-Reply-To: <20190130113900.10089070@donnerap.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <Christoffer.Dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Wed, 30 Jan 2019 11:39:00 +0000
+Andre Przywara <andre.przywara@arm.com> wrote:
 
-On 2/13/19 11:24 PM, Dave P Martin wrote:
-> On Wed, Feb 13, 2019 at 05:35:46PM +0000, Kristina Martsenko wrote:
->> On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
->>> According to userspace settings, ptrauth key registers are conditionally
->>> present in guest system register list based on user specified flag
->>> KVM_ARM_VCPU_PTRAUTH.
->>>
->>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->>> Cc: Mark Rutland <mark.rutland@arm.com>
->>> Cc: Christoffer Dall <christoffer.dall@arm.com>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Kristina Martsenko <kristina.martsenko@arm.com>
->>> Cc: kvmarm@lists.cs.columbia.edu
->>> Cc: Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>
->>> Cc: Will Deacon <will.deacon@arm.com>
->>> ---
->>>   Documentation/arm64/pointer-authentication.txt |  3 ++
->>>   arch/arm64/kvm/sys_regs.c                      | 42 +++++++++++++++++++-------
->>>   2 files changed, 34 insertions(+), 11 deletions(-)
->>>
-> 
-> [...]
-> 
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> 
-> [...]
-> 
->>> @@ -2487,18 +2493,22 @@ static int walk_one_sys_reg(const struct sys_reg_desc *rd,
->>>   }
->>>   
->>>   /* Assumed ordered tables, see kvm_sys_reg_table_init. */
->>> -static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->>> +static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind,
->>> +			const struct sys_reg_desc *desc, unsigned int len)
->>>   {
->>>   	const struct sys_reg_desc *i1, *i2, *end1, *end2;
->>>   	unsigned int total = 0;
->>>   	size_t num;
->>>   	int err;
->>>   
->>> +	if (desc == ptrauth_reg_descs && !kvm_arm_vcpu_ptrauth_allowed(vcpu))
->>> +		return total;
->>> +
->>>   	/* We check for duplicates here, to allow arch-specific overrides. */
->>>   	i1 = get_target_table(vcpu->arch.target, true, &num);
->>>   	end1 = i1 + num;
->>> -	i2 = sys_reg_descs;
->>> -	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
->>> +	i2 = desc;
->>> +	end2 = desc + len;
->>>   
->>>   	BUG_ON(i1 == end1 || i2 == end2);
->>>   
->>> @@ -2526,7 +2536,10 @@ unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
->>>   {
->>>   	return ARRAY_SIZE(invariant_sys_regs)
->>>   		+ num_demux_regs()
->>> -		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
->>> +		+ walk_sys_regs(vcpu, (u64 __user *)NULL, sys_reg_descs,
->>> +				ARRAY_SIZE(sys_reg_descs))
->>> +		+ walk_sys_regs(vcpu, (u64 __user *)NULL, ptrauth_reg_descs,
->>> +				ARRAY_SIZE(ptrauth_reg_descs));
->>>   }
->>>   
->>>   int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>> @@ -2541,7 +2554,12 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>>   		uindices++;
->>>   	}
->>>   
->>> -	err = walk_sys_regs(vcpu, uindices);
->>> +	err = walk_sys_regs(vcpu, uindices, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->>> +	if (err < 0)
->>> +		return err;
->>> +	uindices += err;
->>> +
->>> +	err = walk_sys_regs(vcpu, uindices, ptrauth_reg_descs, ARRAY_SIZE(ptrauth_reg_descs));
->>>   	if (err < 0)
->>>   		return err;
->>>   	uindices += err;
->>> @@ -2575,6 +2593,7 @@ void kvm_sys_reg_table_init(void)
->>>   	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
->>>   	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs)));
->>>   	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs)));
->>> +	BUG_ON(check_sysreg_table(ptrauth_reg_descs, ARRAY_SIZE(ptrauth_reg_descs)));
->>>   
->>>   	/* We abuse the reset function to overwrite the table itself. */
->>>   	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
->>> @@ -2616,6 +2635,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->>>   
->>>   	/* Generic chip reset first (so target could override). */
->>>   	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->>> +	reset_sys_reg_descs(vcpu, ptrauth_reg_descs, ARRAY_SIZE(ptrauth_reg_descs));
->>>   
->>>   	table = get_target_table(vcpu->arch.target, true, &num);
->>>   	reset_sys_reg_descs(vcpu, table, num);
->>
->> This isn't very scalable, since we'd need to duplicate all the above
->> code every time we add new system registers that are conditionally
->> accessible.
-> 
-> Agreed, putting feature-specific checks in walk_sys_regs() is probably
-> best avoided.  Over time we would likely accumulate a fair number of
-> these checks.
-> 
->> It seems that the SVE patches [1] solved this problem by adding a
->> check_present() callback into struct sys_reg_desc. It probably makes
->> sense to rebase onto that patch and just implement the callback for the
->> ptrauth key registers as well.
->>
->> [1] https://lore.kernel.org/linux-arm-kernel/1547757219-19439-13-git-send-email-Dave.Martin@arm.com/
-> 
-> Note, I'm currently refactoring this so that enumeration through
-> KVM_GET_REG_LIST can be disabled independently of access to the
-> register.  This may not be the best approach, but for SVE I have a
-> feature-specific ID register to handle too (ID_AA64ZFR0_EL1), which
-> needs to be hidden from the enumeration but still accessible with
-> read-as-zero behaviour.
-> 
-> This changes the API a bit: I move to a .restrictions() callback which
-> returns flags to say what is disabled, and this callback is used in the
-> common code so that you don't have repeat your "feature present" check
-> in every accessor, as is currently the case.
-> 
-> I'm aiming to post a respun series in the next day or two.  The code
-> may of course change again after it gets reviewed...
-> 
-> 
-> Basing on [1] is probably a reasonable starting point, though.
+Peter, Marc, Christoffer,
 
-Thanks Kristina and Dave for this pointer. I will rebase my next 
-iteration based on it.
+can we have an opinion on whether it's useful to introduce some common scheme for firmware workaround system registers (parts of KVM_REG_ARM_FW_REG(x)), which would allow checking them for compatibility between two kernels without specifically knowing about them?
+Dave suggested to introduce some kind of signed encoding in the 4 LSBs for all those registers (including future ones), where 0 means UNKNOWN and greater values are better. So without knowing about the particular register, one could judge whether it's safe to migrate.
+I am just not sure how useful this is, given that QEMU seems to ask the receiving kernel about any sysreg, and doesn't particularly care about the meaning of those registers. And I am not sure we really want to introduce some kind of forward looking scheme in the kernel here, short of a working crystal ball. I think the kernel policy was always to be as strict as possible about those things.
 
-Thanks,
-Amit
+Any opinions would be welcome, so that we can proceed on those patches.
+
+More context below.
+
+Many Thanks,
+Andre.
+
+> On Tue, 29 Jan 2019 21:32:23 +0000
+> Dave Martin <Dave.Martin@arm.com> wrote:
 > 
-> Cheers
-> ---Dave
+> Hi Dave,
+> 
+> > On Fri, Jan 25, 2019 at 02:46:57PM +0000, Andre Przywara wrote:  
+> > > On Tue, 22 Jan 2019 15:17:14 +0000
+> > > Dave Martin <Dave.Martin@arm.com> wrote:
+> > > 
+> > > Hi Dave,
+> > > 
+> > > thanks for having a look!
+> > >     
+> > > > On Mon, Jan 07, 2019 at 12:05:36PM +0000, Andre Przywara wrote:    
+> > > > > KVM implements the firmware interface for mitigating cache
+> > > > > speculation vulnerabilities. Guests may use this interface to
+> > > > > ensure mitigation is active.
+> > > > > If we want to migrate such a guest to a host with a different
+> > > > > support level for those workarounds, migration might need to
+> > > > > fail, to ensure that critical guests don't loose their
+> > > > > protection.
+> > > > > 
+> > > > > Introduce a way for userland to save and restore the workarounds
+> > > > > state. On restoring we do checks that make sure we don't
+> > > > > downgrade our mitigation level.
+> > > > > 
+> > > > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > > > > ---
+> > > > >  arch/arm/include/asm/kvm_emulate.h   |  10 ++
+> > > > >  arch/arm/include/uapi/asm/kvm.h      |   9 ++
+> > > > >  arch/arm64/include/asm/kvm_emulate.h |  14 +++
+> > > > >  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
+> > > > >  virt/kvm/arm/psci.c                  | 138
+> > > > > ++++++++++++++++++++++++++- 5 files changed, 178 insertions(+),
+> > > > > 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/arm/include/asm/kvm_emulate.h
+> > > > > b/arch/arm/include/asm/kvm_emulate.h index
+> > > > > 77121b713bef..2255c50debab 100644 ---
+> > > > > a/arch/arm/include/asm/kvm_emulate.h +++
+> > > > > b/arch/arm/include/asm/kvm_emulate.h @@ -275,6 +275,16 @@ static
+> > > > > inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu
+> > > > > *vcpu) return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK; }
+> > > > >  
+> > > > > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct
+> > > > > kvm_vcpu *vcpu) +{
+> > > > > +	return false;
+> > > > > +}
+> > > > > +
+> > > > > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
+> > > > > kvm_vcpu *vcpu,
+> > > > > +						      bool
+> > > > > flag) +{
+> > > > > +}
+> > > > > +
+> > > > >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> > > > >  {
+> > > > >  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+> > > > > diff --git a/arch/arm/include/uapi/asm/kvm.h
+> > > > > b/arch/arm/include/uapi/asm/kvm.h index
+> > > > > 4602464ebdfb..02c93b1d8f6d 100644 ---
+> > > > > a/arch/arm/include/uapi/asm/kvm.h +++
+> > > > > b/arch/arm/include/uapi/asm/kvm.h @@ -214,6 +214,15 @@ struct
+> > > > > kvm_vcpu_events { #define KVM_REG_ARM_FW_REG(r)
+> > > > > (KVM_REG_ARM | KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) &
+> > > > > 0xffff)) #define KVM_REG_ARM_PSCI_VERSION
+> > > > > KVM_REG_ARM_FW_REG(0) +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1 KVM_REG_ARM_FW_REG(1)
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
+> > > > > KVM_REG_ARM_FW_REG(2) +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED
+> > > > > 4 /* Device Control API: ARM VGIC */ #define
+> > > > > KVM_DEV_ARM_VGIC_GRP_ADDR	0 diff --git
+> > > > > a/arch/arm64/include/asm/kvm_emulate.h
+> > > > > b/arch/arm64/include/asm/kvm_emulate.h index
+> > > > > 506386a3edde..a44f07f68da4 100644 ---
+> > > > > a/arch/arm64/include/asm/kvm_emulate.h +++
+> > > > > b/arch/arm64/include/asm/kvm_emulate.h @@ -336,6 +336,20 @@
+> > > > > static inline unsigned long kvm_vcpu_get_mpidr_aff(struct
+> > > > > kvm_vcpu *vcpu) return vcpu_read_sys_reg(vcpu, MPIDR_EL1) &
+> > > > > MPIDR_HWID_BITMASK; } +static inline bool
+> > > > > kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu) +{
+> > > > > +	return vcpu->arch.workaround_flags &
+> > > > > VCPU_WORKAROUND_2_FLAG; +}
+> > > > > +
+> > > > > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct
+> > > > > kvm_vcpu *vcpu,
+> > > > > +						      bool
+> > > > > flag) +{
+> > > > > +	if (flag)
+> > > > > +		vcpu->arch.workaround_flags |=
+> > > > > VCPU_WORKAROUND_2_FLAG;
+> > > > > +	else
+> > > > > +		vcpu->arch.workaround_flags &=
+> > > > > ~VCPU_WORKAROUND_2_FLAG; +}
+> > > > > +
+> > > > >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> > > > >  {
+> > > > >  	if (vcpu_mode_is_32bit(vcpu)) {
+> > > > > diff --git a/arch/arm64/include/uapi/asm/kvm.h
+> > > > > b/arch/arm64/include/uapi/asm/kvm.h index
+> > > > > 97c3478ee6e7..4a19ef199a99 100644 ---
+> > > > > a/arch/arm64/include/uapi/asm/kvm.h +++
+> > > > > b/arch/arm64/include/uapi/asm/kvm.h @@ -225,6 +225,15 @@ struct
+> > > > > kvm_vcpu_events { #define KVM_REG_ARM_FW_REG(r)
+> > > > > (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \ KVM_REG_ARM_FW | ((r) &
+> > > > > 0xffff)) #define KVM_REG_ARM_PSCI_VERSION
+> > > > > KVM_REG_ARM_FW_REG(0) +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+> > > > > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2
+> > > > > KVM_REG_ARM_FW_REG(2) +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2 +#define
+> > > > > KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4      
+> > > > 
+> > > > If this is the first exposure of this information to userspace, I
+> > > > wonder if we can come up with some common semantics that avoid
+> > > > having to add new ad-hoc code (and bugs) every time a new
+> > > > vulnerability/workaround is defined.
+> > > > 
+> > > > We seem to have at least the two following independent properties
+> > > > for a vulnerability, with the listed values for each:
+> > > > 
+> > > >  * vulnerability (Vulnerable, Unknown, Not Vulnerable)
+> > > > 
+> > > >  * mitigation support (Not Requestable, Requestable)
+> > > > 
+> > > > Migrations must not move to the left in _either_ list for any
+> > > > vulnerability.
+> > > > 
+> > > > If we want to hedge out bets we could follow the style of the ID
+> > > > registers and allocate to each theoretical vulnerability a pair of
+> > > > signed 2- or (for more expansion room if we think we might need
+> > > > it) 4-bit fields.
+> > > > 
+> > > > We could perhaps allocate as follows:
+> > > > 
+> > > >  * -1=Vulnerable, 0=Unknown, 1=Not Vulnerable
+> > > >  *  0=Mitigation not requestable, 1=Mitigation requestable    
+> > > 
+> > > So as discussed in person, that sounds quite neat. I implemented
+> > > that, but the sign extension and masking to n bits is not very
+> > > pretty and limits readability.
+> > > However the property of having a kind of "vulnerability scale",
+> > > where a simple comparison would determine compatibility, is a good
+> > > thing to have and drastically simplifies the checking code.
+> > >     
+> > > > Checking code wouldn't need to know which fields describe
+> > > > mitigation mechanisms and which describe vulnerabilities: we'd
+> > > > just do a strict    
+> > > > >= comparison on each.    
+> > > > 
+> > > > Further, if a register is never written before the vcpu is first
+> > > > run, we should imply a write of 0 to it as part of KVM_RUN (so
+> > > > that if the destination node has a negative value anywhere,
+> > > > KVM_RUN barfs cleanly.    
+> > > 
+> > > What I like about the signedness is this "0 means unknown", which is
+> > > magically forwards compatible. However I am not sure we can transfer
+> > > this semantic into every upcoming register that pops up in the
+> > > future.    
+> > 
+> > I appreciate the concern, but can you give an example of how it might
+> > break?  
+> 
+> The general problem is that we don't know how future firmware registers
+> would need to look like and whether they are actually for workarounds.
+> Take for instance KVM_REG_ARM_FW_REG(0), which holds the PSCI version.
+> So at the very least we would need to reserve a region of the 64K
+> firmware registers to use this scheme, yet don't know how many we would
+> need.
+>  
+> > My idea is that you can check for compatibility by comparing fields
+> > without any need to know what they mean, but we wouldn't pre-assign
+> > meanings for the values of unallocated fields, just create a precedent
+> > that future fields can follow (where it works).  
+> 
+> For clarity, what do you mean with "... you can check ...", exactly? I
+> think this "you" would be the receiving kernel, which is very strict
+> about unknown registers (-EINVAL), because we don't take any chances.
+> From what I understand how QEMU works, is that it just takes the list
+> of registers from the originating kernel and asks the receiving kernel
+> about them. It doesn't try to interpret most registers in any way.
+> 
+> Now QEMU *could* ignore the -EINVAL return and proceed anyway, if it
+> would be very sure about the implications or the admin told it so.
+> But I believe this should be done on a per register basis, and in QEMU,
+> relying on some forward looking scheme sounds a bit fragile to me.
+> It is my understanding that QEMU does not want to gamble with migration.
+> 
+> > This is much like the CPU ID features scheme itself.  A "0" might
+> > mean that something is absent, but there's no way (or need) to know
+> > what.  
+> 
+> So I think we don't disagree about that this is possible or even would
+> be nice, but it's just not how it's used today. I am not sure we want
+> to introduce something like this, given that we don't know if there will
+> be any future workaround registers at all. Sounds a bit over-engineered
+> and fragile to me.
+> 
+> Peter, can you give your opinion about whether having some generic class
+> of firmware workaround registers which could be checked in a generic way
+> is something we want?
+> 
+> > > Actually we might not need this:
+> > > My understanding of how QEMU handles this in migration is that it
+> > > reads the f/w reg on the originating host A and writes this into
+> > > the target host B, without itself interpreting this in any way.
+> > > It's up to the target kernel (basically this code here) to check
+> > > compatibility. So I am not sure we actually need a stable scheme.
+> > > If host A doesn't know about    
+> > 
+> > Nothing stops userspace from interpreting the data, so there's a risk
+> > people may grow to rely on it even if we don't want them to.  
+> 
+> Well, but userland would not interpret unknown registers, under the
+> current scheme, would it?
+> So it can surely tinker with KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+> because it knows about its meaning. But I would be very careful judging
+> about anything else.
+> The moment we introduce some scheme, we would have to stick with it
+> forever. I am just not sure that's worth it. At the end of the day you
+> could always update QEMU to ignore an -EINVAL on a new firmware w/a
+> register.
+>  
+> > So we should try to have something that's forward-compatible if at all
+> > possible...  
+> > > a certain register, it won't appear in the result of the
+> > > KVM_GET_REG_LIST ioctl, so it won't be transferred to host B at
+> > > all. In the opposite case the receiving host would reject an
+> > > unknown register, which I believe is safer, although I see that it
+> > > leaves the "unknown" case on the table.
+> > > 
+> > > It would be good to have some opinion of how forward looking we
+> > > want to (and can) be here.
+> > > 
+> > > Meanwhile I am sending a v2 which implements the linear scale idea,
+> > > without using signed values, as this indeed simplifies the code.
+> > > I have the signed version still in a branch here, let me know if you
+> > > want to have a look.    
+> > 
+> > Happy to take a look at it.  
+> 
+> See below.
+> 
+> > I was hoping that cpufeatures already had a helper for extracting a
+> > signed field, but I didn't go looking for it...
+> > 
+> > At the asm level this is just a sbfx, so it's hardly expensive.  
+> 
+> The length of the code or the "performance" is hardly an issue (we are
+> talking about migration here, which is mostly limited by the speed of
+> the network). And yes, we have sign_extend32() and (i & 0xf) to
+> convert, it just looks a bit odd in the code and in the API
+> documentation.
+> 
+> Cheers,
+> Andre
+> 
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 6c6757c9571b..a7b10d835ce7 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -218,10 +218,10 @@ struct kvm_vcpu_events {
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	(-1 & 0xf)
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	0
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	(1U << 4)
+>  
+>  /* Device Control API: ARM VGIC */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 367e96fe654e..7d03f8339100 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -229,10 +229,10 @@ struct kvm_vcpu_events {
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
+> -#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	(-1 & 0xf)
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	0
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1
+> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
+>  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     (1U << 4)
+>  
+>  /* Device Control API: ARM VGIC */
+> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> index fb6af5ca259e..cfb1519b9a11 100644
+> --- a/virt/kvm/arm/psci.c
+> +++ b/virt/kvm/arm/psci.c
+> @@ -498,7 +498,8 @@ static int get_kernel_wa_level(u64 regid)
+>  	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+>  		switch (fake_kvm_arm_have_ssbd()) {
+>  		case KVM_SSBD_FORCE_DISABLE:
+> -			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> +			return sign_extend32(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL,
+> +					     KVM_REG_FEATURE_LEVEL_WIDTH - 1);
+>  		case KVM_SSBD_KERNEL:
+>  			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL;
+>  		case KVM_SSBD_FORCE_ENABLE:
+> @@ -574,7 +575,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	}
+>  
+>  	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> -		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
+> +		wa_level = sign_extend32(val, KVM_REG_FEATURE_LEVEL_WIDTH - 1);
+>  
+>  		if (get_kernel_wa_level(reg->id) < wa_level)
+>  			return -EINVAL;
+> @@ -582,7 +583,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  		return 0;
+>  
+>  	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> -		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
+> +		wa_level = sign_extend32(val, KVM_REG_FEATURE_LEVEL_WIDTH - 1);
+>  
+>  		if (get_kernel_wa_level(reg->id) < wa_level)
+>  			return -EINVAL;
+> 
 > 
