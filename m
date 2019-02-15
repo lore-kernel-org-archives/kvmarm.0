@@ -1,75 +1,97 @@
-From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: Re: [PATCH v5 2/5] arm64/kvm: preserve host HCR_EL2/MDCR_EL2 value
-Date: Fri, 15 Feb 2019 15:50:21 +0000
-Message-ID: <7ec2f950-7587-5ecd-6caa-c2fd091ad22c@arm.com>
-References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
- <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
- <8de32a89-4aa1-bffb-78dd-45feddc9216e@arm.com>
- <1a2534b9-6d3b-caac-ff05-7795b7a2d725@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
+Date: Fri, 15 Feb 2019 17:26:02 +0000
+Message-ID: <20190215172558.GO3567@e103592.cambridge.arm.com>
+References: <20190107120537.184252-1-andre.przywara@arm.com>
+ <20190107120537.184252-2-andre.przywara@arm.com>
+ <20190122151714.GG3578@e103592.cambridge.arm.com>
+ <20190125144657.3db91c91@donnerap.cambridge.arm.com>
+ <20190129213223.GB3567@e103592.cambridge.arm.com>
+ <20190130113900.10089070@donnerap.cambridge.arm.com>
+ <20190215095857.2fd7e0fb@donnerap.cambridge.arm.com>
+ <864l95s2fw.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1a2534b9-6d3b-caac-ff05-7795b7a2d725@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B4DD49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 12:26:08 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BJDUl1VxKbuz for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Feb 2019 12:26:06 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB9D340493
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 12:26:06 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <864l95s2fw.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/02/2019 11:03, Amit Daniel Kachhap wrote:
-> Hi,
+On Fri, Feb 15, 2019 at 11:42:27AM +0000, Marc Zyngier wrote:
+> On Fri, 15 Feb 2019 09:58:57 +0000,
+> Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> > On Wed, 30 Jan 2019 11:39:00 +0000
+> > Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> > Peter, Marc, Christoffer,
+> > 
+> > can we have an opinion on whether it's useful to introduce some
+> > common scheme for firmware workaround system registers (parts of
+> > KVM_REG_ARM_FW_REG(x)), which would allow checking them for
+> > compatibility between two kernels without specifically knowing about
+> > them?
+> > Dave suggested to introduce some kind of signed encoding in the 4
+> > LSBs for all those registers (including future ones), where 0 means
+> > UNKNOWN and greater values are better. So without knowing about the
+> > particular register, one could judge whether it's safe to migrate.
+> > I am just not sure how useful this is, given that QEMU seems to ask
+> > the receiving kernel about any sysreg, and doesn't particularly care
+> > about the meaning of those registers. And I am not sure we really
+> > want to introduce some kind of forward looking scheme in the kernel
+> > here, short of a working crystal ball. I think the kernel policy was
+> > always to be as strict as possible about those things.
 > 
-> On 2/13/19 11:04 PM, Kristina Martsenko wrote:
->> On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
->>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
->>> is a constant value. This works today, as the host HCR_EL2 value is
->>> always the same, but this will get in the way of supporting extensions
->>> that require HCR_EL2 bits to be set conditionally for the host.
->>>
->>> To allow such features to work without KVM having to explicitly handle
->>> every possible host feature combination, this patch has KVM save/restore
->>> the host HCR when switching to/from a guest HCR. The saving of the
->>> register is done once during cpu hypervisor initialization state and is
->>> just restored after switch from guest.
->>
->> Why is this patch needed? I couldn't find anything in this series that
->> sets HCR_EL2 conditionally for the host. It seems like the kernel still
->> always sets it to HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS.
+> I honestly don't understand how userspace can decide whether a given
+> configuration is migratable or not solely based on the value of such a
+> register. In my experience, the target system has a role to play, and
+> is the only place where we can find out about whether migration is
+> actually possible.
+
+Both origin and target system need to be taken into account.  I don't
+think that's anything new.
+
+> As you said, userspace doesn't interpret the data, nor should it. It
+> is only on the receiving end that compatibility is assessed and
+> whether some level of compatibility can be safely ensured.
 > 
-> This patch is not directly related to pointer authentication but just a
-> helper to optimize save/restore. In this way save may be avoided for
-> each switch and only restore is done. Patch 3 does sets HCR_EL2 in VHE_RUN.
+> So to sum it up, I don't believe in this approach as a general way of
+> describing the handling or errata.
 
-Patch 3 sets the HCR_EL2.{API,APK} bits for the *guest*, not the host.
-This patch here adds saving/restoring for the *host* HCR_EL2. As far as
-I can tell, the value of the host HCR_EL2 never changes.
+For context, my idea attempted to put KVM, not userspace, in charge of
+the decision: userspace applies fixed comparison rules determined ahead
+of time, but KVM supplies the values compared (and hence determines the
+result).
 
-Regarding save/restore, currently the kernel never saves the host
-HCR_EL2, because it always restores HCR_EL2 to HCR_HOST_{,N}VHE_FLAGS (a
-constant value!) when returning to the host. With this patch, we
-effectively just save HCR_HOST_{,N}VHE_FLAGS into kvm_host_cpu_state,
-and restore it from there when returning to the host.
+My worry was that otherwise we may end up with a wild-west tangle of
+arbitrary properties that userspace needs specific knowledge about.
 
-Unless we actually change the host HCR_EL2 value to something other than
-HCR_HOST_{,N}VHE_FLAGS somewhere in this series, this patch is unnecessary.
+We can tolerate a few though.  If we accumulate a significant number
+of errata/vulnerability properties that need to be reported to
+userspace, this may be worth revisiting.  If not, it doesn't matter.
 
->>
->> Looking back at v2 of the userspace pointer auth series, it seems that
->> the API/APK bits were set conditionally [1], so this patch would have
->> been needed to preserve HCR_EL2. But as of v3 of that series, the bits
->> have been set unconditionally through HCR_HOST_NVHE_FLAGS [2].
->>
->> Is there something else I've missed?
-> Now HCR_EL2 is modified during switch time and NHVE doesnt support
-> ptrauth so [2] doesn't makes sense.
-
-In case of NVHE, we do support pointer auth in the *host* userspace, so
-the patch [2] is necessary. In case of NVHE we do not support pointer
-auth for KVM *guests*.
-
-Thanks,
-Kristina
-
->> [1] https://lore.kernel.org/linux-arm-kernel/20171127163806.31435-6-mark.rutland@arm.com/
->> [2] https://lore.kernel.org/linux-arm-kernel/20180417183735.56985-5-mark.rutland@arm.com/
+Cheers
+---Dave
