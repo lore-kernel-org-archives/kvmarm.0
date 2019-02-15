@@ -1,55 +1,75 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH V2 3/10] KVM/MMU: Add last_level in the struct
- mmu_spte_page
-Date: Fri, 15 Feb 2019 16:22:43 +0100
-Message-ID: <d9043bc8-d006-bf64-2047-79a9b6f98183@redhat.com>
-References: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
- <20190202013825.51261-4-Tianyu.Lan@microsoft.com>
- <572a6ce3-23f6-7b16-a070-4d4a81ee4335@redhat.com>
- <CAOLK0pzXnvk=FsfjH07jUyRJGpeiNG7-9vR9Vo0mLJtdPnt_7Q@mail.gmail.com>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+Subject: Re: [PATCH v5 2/5] arm64/kvm: preserve host HCR_EL2/MDCR_EL2 value
+Date: Fri, 15 Feb 2019 15:50:21 +0000
+Message-ID: <7ec2f950-7587-5ecd-6caa-c2fd091ad22c@arm.com>
+References: <1548658727-14271-1-git-send-email-amit.kachhap@arm.com>
+ <1548658727-14271-3-git-send-email-amit.kachhap@arm.com>
+ <8de32a89-4aa1-bffb-78dd-45feddc9216e@arm.com>
+ <1a2534b9-6d3b-caac-ff05-7795b7a2d725@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BEA74A0CC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 10:23:03 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OrmwHfYQ4ShZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Feb 2019 10:23:02 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42D2A40493
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Feb 2019 10:23:02 -0500 (EST)
-In-Reply-To: <CAOLK0pzXnvk=FsfjH07jUyRJGpeiNG7-9vR9Vo0mLJtdPnt_7Q@mail.gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1a2534b9-6d3b-caac-ff05-7795b7a2d725@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tianyu Lan <lantianyu1986@gmail.com>
-Cc: kvm <kvm@vger.kernel.org>, catalin.marinas@arm.com, will.deacon@arm.com, paulus@ozlabs.org, "H. Peter Anvin" <hpa@zytor.com>, kys@microsoft.com, kvmarm@lists.cs.columbia.edu, mpe@ellerman.id.au, the arch/x86 maintainers <x86@kernel.org>, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, Ingo Molnar <mingo@redhat.com>, benh@kernel.crashing.org, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, kvm-ppc@vger.kernel.org, bp@alien8.de, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, ralf@linux-mips.org, paul.burton@mips.com, Vitaly Kuznetsov <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/02/19 16:05, Tianyu Lan wrote:
-> Yes, you are right. Thanks to point out and will fix. The last_level
-> flag is to avoid adding middle page node(e.g, PGD, PMD)
-> into flush list. The address range will be duplicated if adding both
-> leaf, node and middle node into flush list.
+On 14/02/2019 11:03, Amit Daniel Kachhap wrote:
+> Hi,
+> 
+> On 2/13/19 11:04 PM, Kristina Martsenko wrote:
+>> On 28/01/2019 06:58, Amit Daniel Kachhap wrote:
+>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>>> is a constant value. This works today, as the host HCR_EL2 value is
+>>> always the same, but this will get in the way of supporting extensions
+>>> that require HCR_EL2 bits to be set conditionally for the host.
+>>>
+>>> To allow such features to work without KVM having to explicitly handle
+>>> every possible host feature combination, this patch has KVM save/restore
+>>> the host HCR when switching to/from a guest HCR. The saving of the
+>>> register is done once during cpu hypervisor initialization state and is
+>>> just restored after switch from guest.
+>>
+>> Why is this patch needed? I couldn't find anything in this series that
+>> sets HCR_EL2 conditionally for the host. It seems like the kernel still
+>> always sets it to HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS.
+> 
+> This patch is not directly related to pointer authentication but just a
+> helper to optimize save/restore. In this way save may be avoided for
+> each switch and only restore is done. Patch 3 does sets HCR_EL2 in VHE_RUN.
 
-Hmm, that's not easy to track.  One kvm_mmu_page could include both leaf
-and non-leaf page (for example a huge page for 0 to 2 MB and a page
-table for 2 MB to 4 MB).
+Patch 3 sets the HCR_EL2.{API,APK} bits for the *guest*, not the host.
+This patch here adds saving/restoring for the *host* HCR_EL2. As far as
+I can tell, the value of the host HCR_EL2 never changes.
 
-Is this really needed?  First, your benchmarks so far have been done
-with sp->last_level always set to true.  Second, you would only
-encounter this optimization in kvm_mmu_commit_zap_page when zapping a 1
-GB region (which then would be invalidated twice, at both the PMD and
-PGD level) or bigger.
+Regarding save/restore, currently the kernel never saves the host
+HCR_EL2, because it always restores HCR_EL2 to HCR_HOST_{,N}VHE_FLAGS (a
+constant value!) when returning to the host. With this patch, we
+effectively just save HCR_HOST_{,N}VHE_FLAGS into kvm_host_cpu_state,
+and restore it from there when returning to the host.
 
-Paolo
+Unless we actually change the host HCR_EL2 value to something other than
+HCR_HOST_{,N}VHE_FLAGS somewhere in this series, this patch is unnecessary.
+
+>>
+>> Looking back at v2 of the userspace pointer auth series, it seems that
+>> the API/APK bits were set conditionally [1], so this patch would have
+>> been needed to preserve HCR_EL2. But as of v3 of that series, the bits
+>> have been set unconditionally through HCR_HOST_NVHE_FLAGS [2].
+>>
+>> Is there something else I've missed?
+> Now HCR_EL2 is modified during switch time and NHVE doesnt support
+> ptrauth so [2] doesn't makes sense.
+
+In case of NVHE, we do support pointer auth in the *host* userspace, so
+the patch [2] is necessary. In case of NVHE we do not support pointer
+auth for KVM *guests*.
+
+Thanks,
+Kristina
+
+>> [1] https://lore.kernel.org/linux-arm-kernel/20171127163806.31435-6-mark.rutland@arm.com/
+>> [2] https://lore.kernel.org/linux-arm-kernel/20180417183735.56985-5-mark.rutland@arm.com/
