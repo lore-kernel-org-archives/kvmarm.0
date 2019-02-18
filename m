@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 03/26] KVM: arm64: Delete orphaned declaration for
- __fpsimd_enabled()
-Date: Mon, 18 Feb 2019 19:52:16 +0000
-Message-ID: <1550519559-15915-4-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 11/26] KVM: arm64: Extend reset_unknown() to handle mixed
+ RES0/UNKNOWN registers
+Date: Mon, 18 Feb 2019 19:52:24 +0000
+Message-ID: <1550519559-15915-12-git-send-email-Dave.Martin@arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E027D4A42E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06AD34A450
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oyf4dE-cxy5Z for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id j6pGolDVM4m4 for <kvmarm@lists.cs.columbia.edu>;
  Mon, 18 Feb 2019 14:54:26 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD8AF4A42D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:19 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B19864A43D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:23 -0500 (EST)
 In-Reply-To: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,21 +32,62 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-X19mcHNpbWRfZW5hYmxlZCgpIG5vIGxvbmdlciBleGlzdHMsIGJ1dCBhIGRhbmdsaW5nIGRlY2xh
-cmF0aW9uIGhhcwpzdXJ2aXZlZCBpbiBrdm1faHlwLmguCgpUaGlzIHBhdGNoIGdldHMgcmlkIG9m
-IGl0LgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+ClJl
-dmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Ci0tLQogYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmggfCAxIC0KIDEgZmlsZSBjaGFuZ2VkLCAxIGRl
-bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmgg
-Yi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAppbmRleCBhODBhN2VmLi5iZDdhMDU1
-IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAorKysgYi9hcmNo
-L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaApAQCAtMTQ4LDcgKzE0OCw2IEBAIHZvaWQgX19k
-ZWJ1Z19zd2l0Y2hfdG9faG9zdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogCiB2b2lkIF9fZnBz
-aW1kX3NhdmVfc3RhdGUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpmcF9yZWdzKTsKIHZvaWQg
-X19mcHNpbWRfcmVzdG9yZV9zdGF0ZShzdHJ1Y3QgdXNlcl9mcHNpbWRfc3RhdGUgKmZwX3JlZ3Mp
-OwotYm9vbCBfX2Zwc2ltZF9lbmFibGVkKHZvaWQpOwogCiB2b2lkIGFjdGl2YXRlX3RyYXBzX3Zo
-ZV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB2b2lkIGRlYWN0aXZhdGVfdHJhcHNfdmhl
-X3B1dCh2b2lkKTsKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+The reset_unknown() system register helper initialises a guest
+register to a distinctive junk value on vcpu reset, to help expose
+and debug deficient register initialisation within the guest.
+
+Some registers such as the SVE control register ZCR_EL1 contain a
+mixture of UNKNOWN fields and RES0 bits.  For these,
+reset_unknown() does not work at present, since it sets all bits to
+junk values instead of just the wanted bits.
+
+There is no need to craft another special helper just for that,
+since reset_unknown() almost does the appropriate thing anyway.
+This patch takes advantage of the unused val field in struct
+sys_reg_desc to specify a mask of bits that should be initialised
+to zero instead of junk.
+
+All existing users of reset_unknown() do not (and should not)
+define a value for val, so they will implicitly set it to zero,
+resulting in all bits being made UNKNOWN by this function: thus,
+this patch makes no functional change for currently defined
+registers.
+
+Future patches will make use of non-zero val.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+ arch/arm64/kvm/sys_regs.h | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 3b1bc7f..174ffc0 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -56,7 +56,12 @@ struct sys_reg_desc {
+ 	/* Index into sys_reg[], or 0 if we don't need to save it. */
+ 	int reg;
+ 
+-	/* Value (usually reset value) */
++	/*
++	 * Value (usually reset value)
++	 * For reset_unknown, each bit set to 1 in val is treated as
++	 * RES0 in the register: the corresponding register bit is
++	 * reset to 0 instead of "unknown".
++	 */
+ 	u64 val;
+ 
+ 	/* Custom get/set_user functions, fallback to generic if NULL */
+@@ -92,7 +97,9 @@ static inline void reset_unknown(struct kvm_vcpu *vcpu,
+ {
+ 	BUG_ON(!r->reg);
+ 	BUG_ON(r->reg >= NR_SYS_REGS);
+-	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL;
++
++	/* If non-zero, r->val specifies which register bits are RES0: */
++	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL & ~r->val;
+ }
+ 
+ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-- 
+2.1.4
