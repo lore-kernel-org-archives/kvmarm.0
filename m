@@ -1,32 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
- firmware workaround state
-Date: Mon, 18 Feb 2019 09:07:31 +0000
-Message-ID: <20190218090731.3d313d81@why.wild-wind.fr.eu.org>
-References: <20190107120537.184252-1-andre.przywara@arm.com>
- <20190107120537.184252-2-andre.przywara@arm.com>
- <20190122151714.GG3578@e103592.cambridge.arm.com>
- <20190125144657.3db91c91@donnerap.cambridge.arm.com>
- <20190129213223.GB3567@e103592.cambridge.arm.com>
- <20190130113900.10089070@donnerap.cambridge.arm.com>
- <20190215095857.2fd7e0fb@donnerap.cambridge.arm.com>
- <864l95s2fw.wl-marc.zyngier@arm.com>
- <20190215172558.GO3567@e103592.cambridge.arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v2 3/5] KVM: arm/arm64: re-create event when setting
+ counter value
+Date: Mon, 18 Feb 2019 09:39:44 +0000
+Message-ID: <20190218093944.GE54124@e119886-lin.cambridge.arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+ <1549299218-44714-4-git-send-email-andrew.murray@arm.com>
+ <3adc7d31-9d5a-d66b-21ee-9b4da986d24f@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0F84A200
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 04:07:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FDD4A331
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 04:39:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lzCws2TthGRK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 04:07:38 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14F5B49E3E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 04:07:38 -0500 (EST)
-In-Reply-To: <20190215172558.GO3567@e103592.cambridge.arm.com>
+ with ESMTP id 5rtoL26f5CSa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 04:39:47 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBDC840A52
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 04:39:47 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <3adc7d31-9d5a-d66b-21ee-9b4da986d24f@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,89 +31,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, Andre Przywara <andre.przywara@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 15 Feb 2019 17:26:02 +0000
-Dave Martin <Dave.Martin@arm.com> wrote:
-
-> On Fri, Feb 15, 2019 at 11:42:27AM +0000, Marc Zyngier wrote:
-> > On Fri, 15 Feb 2019 09:58:57 +0000,
-> > Andre Przywara <andre.przywara@arm.com> wrote:  
-> > > 
-> > > On Wed, 30 Jan 2019 11:39:00 +0000
-> > > Andre Przywara <andre.przywara@arm.com> wrote:
-> > > 
-> > > Peter, Marc, Christoffer,
-> > > 
-> > > can we have an opinion on whether it's useful to introduce some
-> > > common scheme for firmware workaround system registers (parts of
-> > > KVM_REG_ARM_FW_REG(x)), which would allow checking them for
-> > > compatibility between two kernels without specifically knowing about
-> > > them?
-> > > Dave suggested to introduce some kind of signed encoding in the 4
-> > > LSBs for all those registers (including future ones), where 0 means
-> > > UNKNOWN and greater values are better. So without knowing about the
-> > > particular register, one could judge whether it's safe to migrate.
-> > > I am just not sure how useful this is, given that QEMU seems to ask
-> > > the receiving kernel about any sysreg, and doesn't particularly care
-> > > about the meaning of those registers. And I am not sure we really
-> > > want to introduce some kind of forward looking scheme in the kernel
-> > > here, short of a working crystal ball. I think the kernel policy was
-> > > always to be as strict as possible about those things.  
+On Wed, Feb 13, 2019 at 02:28:51PM +0000, Suzuki K Poulose wrote:
+> Hi Andrew,
+> 
+> On 04/02/2019 16:53, Andrew Murray wrote:
+> > The perf event sample_period is currently set based upon the current
+> > counter value, when PMXEVTYPER is written to and the perf event is created.
+> > However the user may choose to write the type before the counter value in
+> > which case sample_period will be set incorrectly. Let's instead decouple
+> > event creation from PMXEVTYPER and (re)create the event in either
+> > suitation.
 > > 
-> > I honestly don't understand how userspace can decide whether a given
-> > configuration is migratable or not solely based on the value of such a
-> > register. In my experience, the target system has a role to play, and
-> > is the only place where we can find out about whether migration is
-> > actually possible.  
-> 
-> Both origin and target system need to be taken into account.  I don't
-> think that's anything new.
-
-Well, that was what I understood from Andre's question.
-
-> 
-> > As you said, userspace doesn't interpret the data, nor should it. It
-> > is only on the receiving end that compatibility is assessed and
-> > whether some level of compatibility can be safely ensured.
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >   virt/kvm/arm/pmu.c | 40 +++++++++++++++++++++++++++++++---------
+> >   1 file changed, 31 insertions(+), 9 deletions(-)
 > > 
-> > So to sum it up, I don't believe in this approach as a general way of
-> > describing the handling or errata.  
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 6e7c179..95d74ec 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -24,6 +24,7 @@
+> >   #include <kvm/arm_pmu.h>
+> >   #include <kvm/arm_vgic.h>
+> > +static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+> >   /**
+> >    * kvm_pmu_get_counter_value - get PMU counter value
+> >    * @vcpu: The vcpu pointer
+> > @@ -62,6 +63,9 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+> >   	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> >   	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+> >   	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+> > +
+> > +	/* Recreate the perf event to reflect the updated sample_period */
+> > +	kvm_pmu_create_perf_event(vcpu, select_idx);
+> >   }
+> >   /**
+> > @@ -378,23 +382,22 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+> >   }
+> >   /**
+> > - * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+> > + * kvm_pmu_create_perf_event - create a perf event for a counter
+> >    * @vcpu: The vcpu pointer
+> > - * @data: The data guest writes to PMXEVTYPER_EL0
+> > + * @data: Type of event as per PMXEVTYPER_EL0 format
+> >    * @select_idx: The number of selected counter
 > 
-> For context, my idea attempted to put KVM, not userspace, in charge of
-> the decision: userspace applies fixed comparison rules determined ahead
-> of time, but KVM supplies the values compared (and hence determines the
-> result).
+> nit: data no longer exists.
 > 
-> My worry was that otherwise we may end up with a wild-west tangle of
-> arbitrary properties that userspace needs specific knowledge about.
 
-And this is where our understanding differs. I do not think userspace
-has to care at all. All it has to do is to provide the saved register
-values to the target system, and let KVM accept or refuse these
-settings. I can't see what providing a set of predefined values back to
-userspace gains us.
+Thanks for the review,
 
-An unknown register on the target system fails the restore phase:
-that's absolutely fine, as we don't want to run on a system that
-doesn't know about the mitigation.
+Andrew Murray
 
-An incompatible value fails the restore as well, as KVM itself finds
-that this is a service it cannot safely provide.
-
-No userspace involvement, no QEMU upgrade required. Only the kernel
-knows about it.
-
-> We can tolerate a few though.  If we accumulate a significant number
-> of errata/vulnerability properties that need to be reported to
-> userspace, this may be worth revisiting.  If not, it doesn't matter.
-
-Andre: if you want this to make it into 5.1, the time is now.
-
-Thanks,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> > - *
+> > - * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
+> > - * event with given hardware event number. Here we call perf_event API to
+> > - * emulate this action and create a kernel perf event for it.
+> >    */
+> > -void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> > -				    u64 select_idx)
+> > +static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >   {
+> 
+> With the comment from Julien addressed,
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulse@arm.com>
