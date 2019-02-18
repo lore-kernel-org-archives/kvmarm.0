@@ -1,149 +1,366 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
- firmware workaround state
-Date: Mon, 18 Feb 2019 14:15:45 +0000
-Message-ID: <20190218141545.2d677718@why.wild-wind.fr.eu.org>
-References: <20190107120537.184252-1-andre.przywara@arm.com>
- <20190107120537.184252-2-andre.przywara@arm.com>
- <20190122151714.GG3578@e103592.cambridge.arm.com>
- <20190125144657.3db91c91@donnerap.cambridge.arm.com>
- <20190129213223.GB3567@e103592.cambridge.arm.com>
- <20190130113900.10089070@donnerap.cambridge.arm.com>
- <20190215095857.2fd7e0fb@donnerap.cambridge.arm.com>
- <864l95s2fw.wl-marc.zyngier@arm.com>
- <20190215172558.GO3567@e103592.cambridge.arm.com>
- <20190218090731.3d313d81@why.wild-wind.fr.eu.org>
- <24383efc-795c-163b-0346-315f88f3774f@arm.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [PATCH 11/14] KVM: arm/arm64: timer: Rework data structures for
+ multiple timers
+Date: Mon, 18 Feb 2019 15:10:16 +0000
+Message-ID: <d44bd102-5ad6-6e08-5e47-8a8386a139c6@arm.com>
+References: <20190124140032.8588-1-christoffer.dall@arm.com>
+ <20190124140032.8588-12-christoffer.dall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8E940493
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 09:16:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1Ka5QJZhLCnR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 09:16:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE134005D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 09:16:08 -0500 (EST)
-In-Reply-To: <24383efc-795c-163b-0346-315f88f3774f@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QW5kcsOp?= Przywara <andre.przywara@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Dave Martin <Dave.Martin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190124140032.8588-12-christoffer.dall@arm.com>
+Content-Language: en-GB
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCAxOCBGZWIgMjAxOSAxMToyOTo1NyArMDAwMApBbmRyw6kgUHJ6eXdhcmEgPGFuZHJl
-LnByenl3YXJhQGFybS5jb20+IHdyb3RlOgoKPiBPbiAxOC8wMi8yMDE5IDA5OjA3LCBNYXJjIFp5
-bmdpZXIgd3JvdGU6Cj4gPiBPbiBGcmksIDE1IEZlYiAyMDE5IDE3OjI2OjAyICswMDAwCj4gPiBE
-YXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4gd3JvdGU6ICAKPiAKPiBIaSwKPiAKPiA+
-ICAgCj4gPj4gT24gRnJpLCBGZWIgMTUsIDIwMTkgYXQgMTE6NDI6MjdBTSArMDAwMCwgTWFyYyBa
-eW5naWVyIHdyb3RlOiAgCj4gPj4+IE9uIEZyaSwgMTUgRmViIDIwMTkgMDk6NTg6NTcgKzAwMDAs
-Cj4gPj4+IEFuZHJlIFByenl3YXJhIDxhbmRyZS5wcnp5d2FyYUBhcm0uY29tPiB3cm90ZTogICAg
-Cj4gPj4+Pgo+ID4+Pj4gT24gV2VkLCAzMCBKYW4gMjAxOSAxMTozOTowMCArMDAwMAo+ID4+Pj4g
-QW5kcmUgUHJ6eXdhcmEgPGFuZHJlLnByenl3YXJhQGFybS5jb20+IHdyb3RlOgo+ID4+Pj4KPiA+
-Pj4+IFBldGVyLCBNYXJjLCBDaHJpc3RvZmZlciwKPiA+Pj4+Cj4gPj4+PiBjYW4gd2UgaGF2ZSBh
-biBvcGluaW9uIG9uIHdoZXRoZXIgaXQncyB1c2VmdWwgdG8gaW50cm9kdWNlIHNvbWUKPiA+Pj4+
-IGNvbW1vbiBzY2hlbWUgZm9yIGZpcm13YXJlIHdvcmthcm91bmQgc3lzdGVtIHJlZ2lzdGVycyAo
-cGFydHMgb2YKPiA+Pj4+IEtWTV9SRUdfQVJNX0ZXX1JFRyh4KSksIHdoaWNoIHdvdWxkIGFsbG93
-IGNoZWNraW5nIHRoZW0gZm9yCj4gPj4+PiBjb21wYXRpYmlsaXR5IGJldHdlZW4gdHdvIGtlcm5l
-bHMgd2l0aG91dCBzcGVjaWZpY2FsbHkga25vd2luZyBhYm91dAo+ID4+Pj4gdGhlbT8KPiA+Pj4+
-IERhdmUgc3VnZ2VzdGVkIHRvIGludHJvZHVjZSBzb21lIGtpbmQgb2Ygc2lnbmVkIGVuY29kaW5n
-IGluIHRoZSA0Cj4gPj4+PiBMU0JzIGZvciBhbGwgdGhvc2UgcmVnaXN0ZXJzIChpbmNsdWRpbmcg
-ZnV0dXJlIG9uZXMpLCB3aGVyZSAwIG1lYW5zCj4gPj4+PiBVTktOT1dOIGFuZCBncmVhdGVyIHZh
-bHVlcyBhcmUgYmV0dGVyLiBTbyB3aXRob3V0IGtub3dpbmcgYWJvdXQgdGhlCj4gPj4+PiBwYXJ0
-aWN1bGFyIHJlZ2lzdGVyLCBvbmUgY291bGQganVkZ2Ugd2hldGhlciBpdCdzIHNhZmUgdG8gbWln
-cmF0ZS4KPiA+Pj4+IEkgYW0ganVzdCBub3Qgc3VyZSBob3cgdXNlZnVsIHRoaXMgaXMsIGdpdmVu
-IHRoYXQgUUVNVSBzZWVtcyB0byBhc2sKPiA+Pj4+IHRoZSByZWNlaXZpbmcga2VybmVsIGFib3V0
-IGFueSBzeXNyZWcsIGFuZCBkb2Vzbid0IHBhcnRpY3VsYXJseSBjYXJlCj4gPj4+PiBhYm91dCB0
-aGUgbWVhbmluZyBvZiB0aG9zZSByZWdpc3RlcnMuIEFuZCBJIGFtIG5vdCBzdXJlIHdlIHJlYWxs
-eQo+ID4+Pj4gd2FudCB0byBpbnRyb2R1Y2Ugc29tZSBraW5kIG9mIGZvcndhcmQgbG9va2luZyBz
-Y2hlbWUgaW4gdGhlIGtlcm5lbAo+ID4+Pj4gaGVyZSwgc2hvcnQgb2YgYSB3b3JraW5nIGNyeXN0
-YWwgYmFsbC4gSSB0aGluayB0aGUga2VybmVsIHBvbGljeSB3YXMKPiA+Pj4+IGFsd2F5cyB0byBi
-ZSBhcyBzdHJpY3QgYXMgcG9zc2libGUgYWJvdXQgdGhvc2UgdGhpbmdzLiAgICAKPiA+Pj4KPiA+
-Pj4gSSBob25lc3RseSBkb24ndCB1bmRlcnN0YW5kIGhvdyB1c2Vyc3BhY2UgY2FuIGRlY2lkZSB3
-aGV0aGVyIGEgZ2l2ZW4KPiA+Pj4gY29uZmlndXJhdGlvbiBpcyBtaWdyYXRhYmxlIG9yIG5vdCBz
-b2xlbHkgYmFzZWQgb24gdGhlIHZhbHVlIG9mIHN1Y2ggYQo+ID4+PiByZWdpc3Rlci4gSW4gbXkg
-ZXhwZXJpZW5jZSwgdGhlIHRhcmdldCBzeXN0ZW0gaGFzIGEgcm9sZSB0byBwbGF5LCBhbmQKPiA+
-Pj4gaXMgdGhlIG9ubHkgcGxhY2Ugd2hlcmUgd2UgY2FuIGZpbmQgb3V0IGFib3V0IHdoZXRoZXIg
-bWlncmF0aW9uIGlzCj4gPj4+IGFjdHVhbGx5IHBvc3NpYmxlLiAgICAKPiA+Pgo+ID4+IEJvdGgg
-b3JpZ2luIGFuZCB0YXJnZXQgc3lzdGVtIG5lZWQgdG8gYmUgdGFrZW4gaW50byBhY2NvdW50LiAg
-SSBkb24ndAo+ID4+IHRoaW5rIHRoYXQncyBhbnl0aGluZyBuZXcuICAKPiA+IAo+ID4gV2VsbCwg
-dGhhdCB3YXMgd2hhdCBJIHVuZGVyc3Rvb2QgZnJvbSBBbmRyZSdzIHF1ZXN0aW9uLgo+ID4gICAK
-PiA+PiAgCj4gPj4+IEFzIHlvdSBzYWlkLCB1c2Vyc3BhY2UgZG9lc24ndCBpbnRlcnByZXQgdGhl
-IGRhdGEsIG5vciBzaG91bGQgaXQuIEl0Cj4gPj4+IGlzIG9ubHkgb24gdGhlIHJlY2VpdmluZyBl
-bmQgdGhhdCBjb21wYXRpYmlsaXR5IGlzIGFzc2Vzc2VkIGFuZAo+ID4+PiB3aGV0aGVyIHNvbWUg
-bGV2ZWwgb2YgY29tcGF0aWJpbGl0eSBjYW4gYmUgc2FmZWx5IGVuc3VyZWQuCj4gPj4+Cj4gPj4+
-IFNvIHRvIHN1bSBpdCB1cCwgSSBkb24ndCBiZWxpZXZlIGluIHRoaXMgYXBwcm9hY2ggYXMgYSBn
-ZW5lcmFsIHdheSBvZgo+ID4+PiBkZXNjcmliaW5nIHRoZSBoYW5kbGluZyBvciBlcnJhdGEuICAg
-IAo+ID4+Cj4gPj4gRm9yIGNvbnRleHQsIG15IGlkZWEgYXR0ZW1wdGVkIHRvIHB1dCBLVk0sIG5v
-dCB1c2Vyc3BhY2UsIGluIGNoYXJnZSBvZgo+ID4+IHRoZSBkZWNpc2lvbjogdXNlcnNwYWNlIGFw
-cGxpZXMgZml4ZWQgY29tcGFyaXNvbiBydWxlcyBkZXRlcm1pbmVkIGFoZWFkCj4gPj4gb2YgdGlt
-ZSwgYnV0IEtWTSBzdXBwbGllcyB0aGUgdmFsdWVzIGNvbXBhcmVkIChhbmQgaGVuY2UgZGV0ZXJt
-aW5lcyB0aGUKPiA+PiByZXN1bHQpLgo+ID4+Cj4gPj4gTXkgd29ycnkgd2FzIHRoYXQgb3RoZXJ3
-aXNlIHdlIG1heSBlbmQgdXAgd2l0aCBhIHdpbGQtd2VzdCB0YW5nbGUgb2YKPiA+PiBhcmJpdHJh
-cnkgcHJvcGVydGllcyB0aGF0IHVzZXJzcGFjZSBuZWVkcyBzcGVjaWZpYyBrbm93bGVkZ2UgYWJv
-dXQuICAKPiA+IAo+ID4gQW5kIHRoaXMgaXMgd2hlcmUgb3VyIHVuZGVyc3RhbmRpbmcgZGlmZmVy
-cy4gSSBkbyBub3QgdGhpbmsgdXNlcnNwYWNlCj4gPiBoYXMgdG8gY2FyZSBhdCBhbGwuIEFsbCBp
-dCBoYXMgdG8gZG8gaXMgdG8gcHJvdmlkZSB0aGUgc2F2ZWQgcmVnaXN0ZXIKPiA+IHZhbHVlcyB0
-byB0aGUgdGFyZ2V0IHN5c3RlbSwgYW5kIGxldCBLVk0gYWNjZXB0IG9yIHJlZnVzZSB0aGVzZQo+
-ID4gc2V0dGluZ3MuIEkgY2FuJ3Qgc2VlIHdoYXQgcHJvdmlkaW5nIGEgc2V0IG9mIHByZWRlZmlu
-ZWQgdmFsdWVzIGJhY2sgdG8KPiA+IHVzZXJzcGFjZSBnYWlucyB1cy4KPiA+IAo+ID4gQW4gdW5r
-bm93biByZWdpc3RlciBvbiB0aGUgdGFyZ2V0IHN5c3RlbSBmYWlscyB0aGUgcmVzdG9yZSBwaGFz
-ZToKPiA+IHRoYXQncyBhYnNvbHV0ZWx5IGZpbmUsIGFzIHdlIGRvbid0IHdhbnQgdG8gcnVuIG9u
-IGEgc3lzdGVtIHRoYXQKPiA+IGRvZXNuJ3Qga25vdyBhYm91dCB0aGUgbWl0aWdhdGlvbi4KPiA+
-IAo+ID4gQW4gaW5jb21wYXRpYmxlIHZhbHVlIGZhaWxzIHRoZSByZXN0b3JlIGFzIHdlbGwsIGFz
-IEtWTSBpdHNlbGYgZmluZHMKPiA+IHRoYXQgdGhpcyBpcyBhIHNlcnZpY2UgaXQgY2Fubm90IHNh
-ZmVseSBwcm92aWRlLgo+ID4gCj4gPiBObyB1c2Vyc3BhY2UgaW52b2x2ZW1lbnQsIG5vIFFFTVUg
-dXBncmFkZSByZXF1aXJlZC4gT25seSB0aGUga2VybmVsCj4gPiBrbm93cyBhYm91dCBpdC4gIAo+
-IAo+IFllcywgdGhpcyBpcyB3aGF0IEkgdW5kZXJzdGFuZCBhcyB3ZWxsLiBGcm9tIGV4cGVyaWVu
-Y2UsIG1hbnkgdGltZXMgd2hlbgo+IHdlIHdlcmUgbm90IHN0cmljdCBlbm91Z2ggYWJvdXQgc29t
-ZSB1c2VybGFuZCBpbnRlcmZhY2UsIGl0IGJhY2tmaXJlZC4KPiAKPiBUaGUgb25seSBjYXNlIHdo
-ZXJlIHN1Y2ggYSBmb3J3YXJkLWxvb2tpbmcgc2NoZW1lIHdvdWxkIG1ha2Ugc2Vuc2UgaXMKPiB0
-aGUgY2FzZSB3aGVyZSB0aGUgc291cmNlIHN5c3RlbSBoYXMgYSBuZXcga2VybmVsLCBhZHZlcnRp
-c2luZyBhIG5ldwo+IGZpcm13YXJlIHdvcmthcm91bmQgcmVnaXN0ZXIsIGluIGFuIHVua25vd24g
-b3IgbWlzc2luZyBzdGF0ZSAoMCBvciAtMSkuCj4gQW4gb2xkZXIga2VybmVsIG9uIHRoZSB0YXJn
-ZXQgc3lzdGVtIG1pZ2h0IG5vdCBrbm93IGFib3V0IHRoaXMgcmVnaXN0ZXIuCj4gVGhhdCB3b3Vs
-ZCB0cmFuc2xhdGUgaW50byAidW5rbm93biIsIHdoaWNoIGlzIGNvbXBhdGlibGUgd2l0aCAwIG9y
-IC0xCj4gZnJvbSB0aGUgc291cmNlLiBTbyBtaWdyYXRpb24gd291bGQgYmUgZmluZSwgYnV0IHdl
-IGRlbnkgaXQgYmVjYXVzZSB0aGUKPiBuZXcga2VybmVsIHJldHVybnMgLUVJTlZBTC4KPiAKPiBC
-dXQgSSBhbSBub3Qgc3VyZSB0aGlzIGNvbnN0cnVjdCBpcyB3b3J0aCBpbXBsZW1lbnRpbmcgaW4g
-dGhlIGtlcm5lbC4gSWYKPiBwZW9wbGUgY2FyZSBhYm91dCB0aGlzIGNhc2UsIHRoZXkgY291bGQg
-aW1wbGVtZW50IGEgd29ya2Fyb3VuZCBpbgo+IHVzZXJsYW5kIGluc3RlYWQuIE9yIGp1c3QgdXBn
-cmFkZSB0aGUgdGFyZ2V0IGtlcm5lbCBiZWZvcmUgbWlncmF0aW9uLgoKVXBncmFkaW5nIHRoZSB0
-YXJnZXQgbWF5IG5vdCBiZSBjb252ZW5pZW50LiBCdXQgbW9yZSBpbXBvcnRhbnRseSwgSQpkb24n
-dCB0aGluayB3ZSBleHBlY3QgZG93bmdyYWRlcyB0byBiZSBzdXBwb3J0ZWQuIFRoaXMgY2FuIGJy
-ZWFrIGZvciBhbgppbmZpbml0eSBvZiByZWFzb25zLCBzdWNoIGFzIHRoZSBmZWF0dXJlIHNldCBp
-bXBsZW1lbnRlZCBvbiB0aGUgc291cmNlCm5vdCBiZWluZyB0aGVyZSBvbiB0aGUgdGFyZ2V0LgoK
-QXMgeW91IHNhaWQsIGlmIHVzZXJzcGFjZSB3YW50cyB0byBieXBhc3MgdGhlc2UgcmVzdHJpY3Rp
-b25zLCBpdCBjYW4KYWx0ZXIgdGhlIGRhdGEgYmVmb3JlIHJlc3RvcmluZy4KCj4gCj4gPj4gV2Ug
-Y2FuIHRvbGVyYXRlIGEgZmV3IHRob3VnaC4gIElmIHdlIGFjY3VtdWxhdGUgYSBzaWduaWZpY2Fu
-dCBudW1iZXIKPiA+PiBvZiBlcnJhdGEvdnVsbmVyYWJpbGl0eSBwcm9wZXJ0aWVzIHRoYXQgbmVl
-ZCB0byBiZSByZXBvcnRlZCB0bwo+ID4+IHVzZXJzcGFjZSwgdGhpcyBtYXkgYmUgd29ydGggcmV2
-aXNpdGluZy4gIElmIG5vdCwgaXQgZG9lc24ndCBtYXR0ZXIuICAKPiA+IAo+ID4gQW5kcmU6IGlm
-IHlvdSB3YW50IHRoaXMgdG8gbWFrZSBpdCBpbnRvIDUuMSwgdGhlIHRpbWUgaXMgbm93LiAgCj4g
-Cj4gT0suIFNvIGlzIHYyIFsxXSBmaW5lIHRoZW4/IFRoaXMgaW1wbGVtZW50cyB0aGUgbXVjaCBl
-YXNpZXIgImJpZ2dlciBpcwo+IGJldHRlciIgc2NoZW1lLCBidXQgYmVpbmcgMCBiYXNlZCBpbnN0
-ZWFkIG9mIHVzaW5nIGEgNC1iaXQgc2lnbmVkIGVuY29kaW5nLgo+IExldCBtZSBrbm93IGlmIHRo
-ZXJlIGlzIHNvbWV0aGluZyB0byByZXdvcmsgaW4gdGhlcmUuCj4gCj4gQ2hlZXJzLAo+IEFuZHJl
-Lgo+IAo+IFsxXQo+IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1h
-cm0ta2VybmVsLzIwMTktSmFudWFyeS82Mjc3MzkuaHRtbAoKU29ycnksIEkndmUgbG9zdCB0cmFj
-ayBvZiB3aGljaCBpcyB3aGljaC4gUGxlYXNlIHBvc3Qgc29tZXRoaW5nIHRoYXQgaXMKY29uc2lz
-dGVudCwgIGFuZCBhZGRyZXNzZXMgU3RldmUncyBjb25jZXJucyBpZiB0aGVyZSBpcyBzdGlsbCBh
-bnkuIE1ha2UKc3VyZSBpdCBhcHBsaWVzIG9uIHRvcCBvZiB0aGUgY3VycmVudCBrdm1hcm0vbmV4
-dCwgYW5kIHByb3ZpZGUKZXZpZGVuY2VzIHRoYXQgeW91J3ZlIHRlc3RlZCBtaWdyYXRpb24gb24g
-dGhlIGV4cGVjdGVkIHdvcmtpbmcgYW5kCmV4cGVjdGVkIGZhaWxpbmcgY29uZmlndXJhdGlvbnMu
-CgpUaGFua3MsCgoJTS4KLS0gCldpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dy
-ZXNzIGlzIG5vdCBwb3NzaWJsZS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+On Thu, 24 Jan 2019 15:00:29 +0100
+Christoffer Dall <christoffer.dall@arm.com> wrote:
+
+Hi,
+
+I already looked at most of these patches earlier, without finding
+serious issues, but figured I would give those without any Reviewed-by:
+or Acked-by: tags a closer look.
+(This patch just carries a S-o-b: tag from Marc in the kvm-arm git repo.)
+
+> Prepare for having 4 timer data structures (2 for now).
+> 
+> Change loaded to an enum so that we know not just whether *some* state
+> is loaded on the CPU, but also *which* state is loaded.
+> 
+> Move loaded to the cpu data structure and not the individual timer
+> structure, in preparation for assigning the EL1 phys timer as well.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  include/kvm/arm_arch_timer.h | 44 ++++++++++++++-------------
+>  virt/kvm/arm/arch_timer.c    | 58 +++++++++++++++++++-----------------
+>  2 files changed, 54 insertions(+), 48 deletions(-)
+> 
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index d26b7fde9935..d40fe57a2d0d 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -36,6 +36,8 @@ enum kvm_arch_timer_regs {
+>  };
+>  
+>  struct arch_timer_context {
+> +	struct kvm_vcpu			*vcpu;
+> +
+>  	/* Registers: control register, timer value */
+>  	u32				cnt_ctl;
+>  	u64				cnt_cval;
+> @@ -43,32 +45,34 @@ struct arch_timer_context {
+>  	/* Timer IRQ */
+>  	struct kvm_irq_level		irq;
+>  
+> -	/*
+> -	 * We have multiple paths which can save/restore the timer state
+> -	 * onto the hardware, so we need some way of keeping track of
+> -	 * where the latest state is.
+> -	 *
+> -	 * loaded == true:  State is loaded on the hardware registers.
+> -	 * loaded == false: State is stored in memory.
+> -	 */
+> -	bool			loaded;
+> -
+>  	/* Virtual offset */
+> -	u64			cntvoff;
+> +	u64				cntvoff;
+> +
+> +	/* Emulated Timer (may be unused) */
+> +	struct hrtimer			hrtimer;
+> +};
+> +
+> +enum loaded_timer_state {
+> +	TIMER_NOT_LOADED,
+> +	TIMER_EL1_LOADED,
+
+So this gets reverted in PATCH 13/14, and I don't see it reappearing in
+the nv series later on.
+Is that just needed for assigning the phys timer in the next patch, and
+gets obsolete with the timer_map?
+Or is this a rebase artefact and we don't actually need this?
+
+The rest of the patch looks like valid transformations to me.
+
+Cheers,
+Andre.
+
+>  };
+>  
+>  struct arch_timer_cpu {
+> -	struct arch_timer_context	vtimer;
+> -	struct arch_timer_context	ptimer;
+> +	struct arch_timer_context timers[NR_KVM_TIMERS];
+>  
+>  	/* Background timer used when the guest is not running */
+>  	struct hrtimer			bg_timer;
+>  
+> -	/* Physical timer emulation */
+> -	struct hrtimer			phys_timer;
+> -
+>  	/* Is the timer enabled */
+>  	bool			enabled;
+> +
+> +	/*
+> +	 * We have multiple paths which can save/restore the timer state
+> +	 * onto the hardware, and for nested virt the EL1 hardware timers can
+> +	 * contain state from either the VM's EL1 timers or EL2 timers, so we
+> +	 * need some way of keeping track of where the latest state is.
+> +	 */
+> +	enum loaded_timer_state loaded;
+>  };
+>  
+>  int kvm_timer_hyp_init(bool);
+> @@ -98,10 +102,10 @@ void kvm_timer_init_vhe(void);
+>  
+>  bool kvm_arch_timer_get_input_level(int vintid);
+>  
+> -#define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.vtimer)
+> -#define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.ptimer)
+> -#define vcpu_get_timer(v,t)					\
+> -	(t == TIMER_VTIMER ? vcpu_vtimer(v) : vcpu_ptimer(v))
+> +#define vcpu_timer(v)	(&(v)->arch.timer_cpu)
+> +#define vcpu_get_timer(v,t)	(&vcpu_timer(v)->timers[(t)])
+> +#define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_VTIMER])
+> +#define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_PTIMER])
+>  
+>  u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+>  			      enum kvm_arch_timers tmr,
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 9502bb91776b..8b0eca5fbad1 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -184,13 +184,11 @@ static enum hrtimer_restart kvm_bg_timer_expire(struct hrtimer *hrt)
+>  static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
+>  {
+>  	struct arch_timer_context *ptimer;
+> -	struct arch_timer_cpu *timer;
+>  	struct kvm_vcpu *vcpu;
+>  	u64 ns;
+>  
+> -	timer = container_of(hrt, struct arch_timer_cpu, phys_timer);
+> -	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
+> -	ptimer = vcpu_ptimer(vcpu);
+> +	ptimer = container_of(hrt, struct arch_timer_context, hrtimer);
+> +	vcpu = ptimer->vcpu;
+>  
+>  	/*
+>  	 * Check that the timer has really expired from the guest's
+> @@ -209,9 +207,10 @@ static enum hrtimer_restart kvm_phys_timer_expire(struct hrtimer *hrt)
+>  
+>  static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  {
+> +	struct arch_timer_cpu *timer = vcpu_timer(timer_ctx->vcpu);
+>  	u64 cval, now;
+>  
+> -	if (timer_ctx->loaded) {
+> +	if (timer->loaded == TIMER_EL1_LOADED) {
+>  		u32 cnt_ctl;
+>  
+>  		/* Only the virtual timer can be loaded so far */
+> @@ -280,7 +279,6 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  /* Schedule the background timer for the emulated timer. */
+>  static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+>  	/*
+> @@ -289,11 +287,11 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+>  	 * then we also don't need a soft timer.
+>  	 */
+>  	if (kvm_timer_should_fire(ptimer) || !kvm_timer_irq_can_fire(ptimer)) {
+> -		soft_timer_cancel(&timer->phys_timer);
+> +		soft_timer_cancel(&ptimer->hrtimer);
+>  		return;
+>  	}
+>  
+> -	soft_timer_start(&timer->phys_timer, kvm_timer_compute_delta(ptimer));
+> +	soft_timer_start(&ptimer->hrtimer, kvm_timer_compute_delta(ptimer));
+>  }
+>  
+>  /*
+> @@ -303,7 +301,7 @@ static void phys_timer_emulate(struct kvm_vcpu *vcpu)
+>   */
+>  static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  	bool level;
+> @@ -329,13 +327,13 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  
+>  static void vtimer_save_state(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	unsigned long flags;
+>  
+>  	local_irq_save(flags);
+>  
+> -	if (!vtimer->loaded)
+> +	if (timer->loaded == TIMER_NOT_LOADED)
+>  		goto out;
+>  
+>  	if (timer->enabled) {
+> @@ -347,7 +345,7 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+>  	write_sysreg_el0(0, cntv_ctl);
+>  	isb();
+>  
+> -	vtimer->loaded = false;
+> +	timer->loaded = TIMER_NOT_LOADED;
+>  out:
+>  	local_irq_restore(flags);
+>  }
+> @@ -359,7 +357,7 @@ static void vtimer_save_state(struct kvm_vcpu *vcpu)
+>   */
+>  static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> @@ -379,20 +377,20 @@ static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
+>  
+>  static void kvm_timer_unblocking(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  
+>  	soft_timer_cancel(&timer->bg_timer);
+>  }
+>  
+>  static void vtimer_restore_state(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	unsigned long flags;
+>  
+>  	local_irq_save(flags);
+>  
+> -	if (vtimer->loaded)
+> +	if (timer->loaded == TIMER_EL1_LOADED)
+>  		goto out;
+>  
+>  	if (timer->enabled) {
+> @@ -401,7 +399,7 @@ static void vtimer_restore_state(struct kvm_vcpu *vcpu)
+>  		write_sysreg_el0(vtimer->cnt_ctl, cntv_ctl);
+>  	}
+>  
+> -	vtimer->loaded = true;
+> +	timer->loaded = TIMER_EL1_LOADED;
+>  out:
+>  	local_irq_restore(flags);
+>  }
+> @@ -462,7 +460,7 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> @@ -507,7 +505,8 @@ bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+>  	if (unlikely(!timer->enabled))
+>  		return;
+> @@ -523,7 +522,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  	 * In any case, we re-schedule the hrtimer for the physical timer when
+>  	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
+>  	 */
+> -	soft_timer_cancel(&timer->phys_timer);
+> +	soft_timer_cancel(&ptimer->hrtimer);
+>  
+>  	if (swait_active(kvm_arch_vcpu_wq(vcpu)))
+>  		kvm_timer_blocking(vcpu);
+> @@ -559,7 +558,7 @@ static void unmask_vtimer_irq_user(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  
+>  	if (unlikely(!timer->enabled))
+>  		return;
+> @@ -570,7 +569,7 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>  
+>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+> @@ -611,22 +610,25 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>  
+>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  
+>  	/* Synchronize cntvoff across all vtimers of a VM. */
+>  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+> -	vcpu_ptimer(vcpu)->cntvoff = 0;
+> +	ptimer->cntvoff = 0;
+>  
+>  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+>  
+> -	hrtimer_init(&timer->phys_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> -	timer->phys_timer.function = kvm_phys_timer_expire;
+> +	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> +	ptimer->hrtimer.function = kvm_phys_timer_expire;
+>  
+>  	vtimer->irq.irq = default_vtimer_irq.irq;
+>  	ptimer->irq.irq = default_ptimer_irq.irq;
+> +
+> +	vtimer->vcpu = vcpu;
+> +	ptimer->vcpu = vcpu;
+>  }
+>  
+>  static void kvm_timer_init_interrupt(void *info)
+> @@ -859,7 +861,7 @@ int kvm_timer_hyp_init(bool has_gic)
+>  
+>  void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  
+>  	soft_timer_cancel(&timer->bg_timer);
+>  }
+> @@ -903,7 +905,7 @@ bool kvm_arch_timer_get_input_level(int vintid)
+>  
+>  int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>  {
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	int ret;
+>  
