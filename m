@@ -1,34 +1,27 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for firmware
- workaround state
-Date: Mon, 18 Feb 2019 11:29:57 +0000
-Message-ID: <24383efc-795c-163b-0346-315f88f3774f@arm.com>
-References: <20190107120537.184252-1-andre.przywara@arm.com>
- <20190107120537.184252-2-andre.przywara@arm.com>
- <20190122151714.GG3578@e103592.cambridge.arm.com>
- <20190125144657.3db91c91@donnerap.cambridge.arm.com>
- <20190129213223.GB3567@e103592.cambridge.arm.com>
- <20190130113900.10089070@donnerap.cambridge.arm.com>
- <20190215095857.2fd7e0fb@donnerap.cambridge.arm.com>
- <864l95s2fw.wl-marc.zyngier@arm.com>
- <20190215172558.GO3567@e103592.cambridge.arm.com>
- <20190218090731.3d313d81@why.wild-wind.fr.eu.org>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm/arm64: support chained PMU counters
+Date: Mon, 18 Feb 2019 12:03:05 +0000
+Message-ID: <20190218120305.GH54124@e119886-lin.cambridge.arm.com>
+References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
+ <1549299218-44714-6-git-send-email-andrew.murray@arm.com>
+ <11a8c800-5c1d-08ce-9d85-402ca89727a3@arm.com>
+ <236797c3-9f3a-91d4-c859-e8eb4d3eb3ee@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 857624A369
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 06:31:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9791F49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:03:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4NWB0bQ4onsU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 06:31:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26FA140A52
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 06:31:53 -0500 (EST)
-In-Reply-To: <20190218090731.3d313d81@why.wild-wind.fr.eu.org>
-Content-Language: en-GB
+ with ESMTP id 554fDnTgOW2v for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 07:03:27 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8262940493
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:03:23 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <236797c3-9f3a-91d4-c859-e8eb4d3eb3ee@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,112 +31,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18/02/2019 09:07, Marc Zyngier wrote:
-> On Fri, 15 Feb 2019 17:26:02 +0000
-> Dave Martin <Dave.Martin@arm.com> wrote:
+On Thu, Feb 14, 2019 at 11:42:15AM +0000, Suzuki K Poulose wrote:
+> 
+> 
+> On 05/02/2019 14:33, Julien Thierry wrote:
+> > Hi Andrew,
+> > 
+> > On 04/02/2019 16:53, Andrew Murray wrote:
+> > > Emulate chained PMU counters by creating a single 64 bit event counter
+> > > for a pair of chained KVM counters.
+> > > 
+> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > ---
+> > >   include/kvm/arm_pmu.h |   1 +
+> > >   virt/kvm/arm/pmu.c    | 321 +++++++++++++++++++++++++++++++++++++++++---------
+> > >   2 files changed, 269 insertions(+), 53 deletions(-)
+> > > 
+> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> > > index b73f31b..8e691ee 100644
+> > > --- a/include/kvm/arm_pmu.h
+> > > +++ b/include/kvm/arm_pmu.h
+> > > @@ -29,6 +29,7 @@ struct kvm_pmc {
+> > >   	u8 idx;	/* index into the pmu->pmc array */
+> > >   	struct perf_event *perf_event;
+> > >   	u64 bitmask;
+> > > +	u64 overflow_count;
+> > >   };
+> > >   struct kvm_pmu {
+> > > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > > index a64aeb2..9318130 100644
+> > > --- a/virt/kvm/arm/pmu.c
+> > > +++ b/virt/kvm/arm/pmu.c
+> > > @@ -24,9 +24,25 @@
+> > >   #include <kvm/arm_pmu.h>
+> > >   #include <kvm/arm_vgic.h>
+> > > +#define ARMV8_PMUV3_PERFCTR_CHAIN 0x1E
+> > 
+> > I find it a bit awkward to have this redefined here.
+> > 
+> > Maybe we could define a helper in kvm_host.h:
+> > bool kvm_pmu_typer_is_chain(u64 typer);
+> > 
+> > That would always return false for arm32?
+> 
+> We don't support ARMv7 host, so that doesn't matter. But
+> it is a good idea to wrap it in a function here.
 
-Hi,
+I'm not sure kvm_host.h is the right place for this as this really relates
+to the ARM PMU drivers. Seeing that armv8pmu_filter_match in
+arch/arm64/kernel/perf_event.c would also benefit from this new function I'll
+add it to arch/arm64/include/asm/perf_event.h and stub it out in arm_pmu.c
+for the ARM32 case.
 
 > 
->> On Fri, Feb 15, 2019 at 11:42:27AM +0000, Marc Zyngier wrote:
->>> On Fri, 15 Feb 2019 09:58:57 +0000,
->>> Andre Przywara <andre.przywara@arm.com> wrote:  
->>>>
->>>> On Wed, 30 Jan 2019 11:39:00 +0000
->>>> Andre Przywara <andre.przywara@arm.com> wrote:
->>>>
->>>> Peter, Marc, Christoffer,
->>>>
->>>> can we have an opinion on whether it's useful to introduce some
->>>> common scheme for firmware workaround system registers (parts of
->>>> KVM_REG_ARM_FW_REG(x)), which would allow checking them for
->>>> compatibility between two kernels without specifically knowing about
->>>> them?
->>>> Dave suggested to introduce some kind of signed encoding in the 4
->>>> LSBs for all those registers (including future ones), where 0 means
->>>> UNKNOWN and greater values are better. So without knowing about the
->>>> particular register, one could judge whether it's safe to migrate.
->>>> I am just not sure how useful this is, given that QEMU seems to ask
->>>> the receiving kernel about any sysreg, and doesn't particularly care
->>>> about the meaning of those registers. And I am not sure we really
->>>> want to introduce some kind of forward looking scheme in the kernel
->>>> here, short of a working crystal ball. I think the kernel policy was
->>>> always to be as strict as possible about those things.  
->>>
->>> I honestly don't understand how userspace can decide whether a given
->>> configuration is migratable or not solely based on the value of such a
->>> register. In my experience, the target system has a role to play, and
->>> is the only place where we can find out about whether migration is
->>> actually possible.  
->>
->> Both origin and target system need to be taken into account.  I don't
->> think that's anything new.
+> > >   		kvm_vcpu_kick(vcpu);
+> > > @@ -440,6 +632,10 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >   	    select_idx != ARMV8_PMU_CYCLE_IDX)
+> > >   		return;
+> > > +	/* Handled by even event */
+> > > +	if (eventsel == ARMV8_PMUV3_PERFCTR_CHAIN)
+> > > +		return;
+> > > +
+> > >   	memset(&attr, 0, sizeof(struct perf_event_attr));
+> > >   	attr.type = PERF_TYPE_RAW;
+> > >   	attr.size = sizeof(attr);
+> > > @@ -452,6 +648,9 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >   	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
+> > >   		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+> > > +	if (kvm_pmu_event_is_chained(vcpu, select_idx))
+> > > +		attr.config1 |= 0x1;
+> > 
+> > I'm not very familiar with the usage of perf attributes configs, but is
+> > there any chance we could name this flag? Even if only for the local
+> > file? Something like PERF_ATTR_CFG1_KVM_PMU_CHAINED (unless there is an
+> > existing naming convention for event attributes).
 > 
-> Well, that was what I understood from Andre's question.
+> There is ARPMU_EVT_64BIT in "linux/perf/arm_pmu.h". But in general we don't
+> specify where the Bit goes in (i.e, CFG1 etc).
+
+I'll add PERF_ATTR_CFG1_KVM_PMU_CHAINED to this file as you suggest.
+
+Thanks,
+
+Andrew Murray
+
 > 
->>
->>> As you said, userspace doesn't interpret the data, nor should it. It
->>> is only on the receiving end that compatibility is assessed and
->>> whether some level of compatibility can be safely ensured.
->>>
->>> So to sum it up, I don't believe in this approach as a general way of
->>> describing the handling or errata.  
->>
->> For context, my idea attempted to put KVM, not userspace, in charge of
->> the decision: userspace applies fixed comparison rules determined ahead
->> of time, but KVM supplies the values compared (and hence determines the
->> result).
->>
->> My worry was that otherwise we may end up with a wild-west tangle of
->> arbitrary properties that userspace needs specific knowledge about.
-> 
-> And this is where our understanding differs. I do not think userspace
-> has to care at all. All it has to do is to provide the saved register
-> values to the target system, and let KVM accept or refuse these
-> settings. I can't see what providing a set of predefined values back to
-> userspace gains us.
-> 
-> An unknown register on the target system fails the restore phase:
-> that's absolutely fine, as we don't want to run on a system that
-> doesn't know about the mitigation.
-> 
-> An incompatible value fails the restore as well, as KVM itself finds
-> that this is a service it cannot safely provide.
-> 
-> No userspace involvement, no QEMU upgrade required. Only the kernel
-> knows about it.
-
-Yes, this is what I understand as well. From experience, many times when
-we were not strict enough about some userland interface, it backfired.
-
-The only case where such a forward-looking scheme would make sense is
-the case where the source system has a new kernel, advertising a new
-firmware workaround register, in an unknown or missing state (0 or -1).
-An older kernel on the target system might not know about this register.
-That would translate into "unknown", which is compatible with 0 or -1
-from the source. So migration would be fine, but we deny it because the
-new kernel returns -EINVAL.
-
-But I am not sure this construct is worth implementing in the kernel. If
-people care about this case, they could implement a workaround in
-userland instead. Or just upgrade the target kernel before migration.
-
->> We can tolerate a few though.  If we accumulate a significant number
->> of errata/vulnerability properties that need to be reported to
->> userspace, this may be worth revisiting.  If not, it doesn't matter.
-> 
-> Andre: if you want this to make it into 5.1, the time is now.
-
-OK. So is v2 [1] fine then? This implements the much easier "bigger is
-better" scheme, but being 0 based instead of using a 4-bit signed encoding.
-Let me know if there is something to rework in there.
-
-Cheers,
-Andre.
-
-[1]
-http://lists.infradead.org/pipermail/linux-arm-kernel/2019-January/627739.html
+> Cheers
+> Suzuki
