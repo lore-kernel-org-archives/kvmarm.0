@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 20/22] vfio_pci: Allow to mmap the fault queue
-Date: Mon, 18 Feb 2019 14:55:01 +0100
-Message-ID: <20190218135504.25048-21-eric.auger@redhat.com>
+Subject: [PATCH v4 21/22] vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
+Date: Mon, 18 Feb 2019 14:55:02 +0100
+Message-ID: <20190218135504.25048-22-eric.auger@redhat.com>
 References: <20190218135504.25048-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54C144A36B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:58:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 796B24A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:58:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 59G62nkKEtzS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 08:58:25 -0500 (EST)
+ with ESMTP id LtQByYv5hixX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 08:58:29 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71D454A3BE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:58:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E9F74A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:58:29 -0500 (EST)
 In-Reply-To: <20190218135504.25048-1-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,109 +31,86 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundatio
 Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The Producer Fault region contains the fault queue in the second page.
-There is benefit to let the userspace mmap this area. So let's expose
-this mmappable area through a sparse mmap entry and implement the mmap
-operation.
+Add a new VFIO_PCI_DMA_FAULT_IRQ_INDEX index. This allows to
+set/unset an eventfd that will be triggered when DMA translation
+faults are detected at physical level when the nested mode is used.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/vfio/pci/vfio_pci.c | 61 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 59 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci.c       |  3 +++
+ drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
+ include/uapi/linux/vfio.h         |  1 +
+ 3 files changed, 23 insertions(+)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 019c9fd380a5..3aaa14eb5518 100644
+index 3aaa14eb5518..0886d427f403 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -223,15 +223,70 @@ static const struct vfio_pci_fault_abi fault_abi_versions[] = {
+@@ -698,6 +698,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
+ 			return 1;
+ 	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
+ 		return 1;
++	} else if (irq_type == VFIO_PCI_DMA_FAULT_IRQ_INDEX) {
++		return 1;
+ 	}
  
- #define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)
- 
-+static int vfio_pci_fault_mmap(struct vfio_pci_device *vdev,
-+			       struct vfio_pci_region *region,
-+			       struct vm_area_struct *vma)
-+{
-+	u64 phys_len, req_len, pgoff, req_start;
-+	unsigned long long addr;
-+	unsigned int index, ret;
-+
-+	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-+
-+	phys_len = region->size;
-+
-+	req_len = vma->vm_end - vma->vm_start;
-+	pgoff = vma->vm_pgoff &
-+		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-+	req_start = pgoff << PAGE_SHIFT;
-+
-+	/* only the second page of the producer fault region is mmappable */
-+	if (req_start < PAGE_SIZE)
-+		return -EINVAL;
-+
-+	if (req_start + req_len > phys_len)
-+		return -EINVAL;
-+
-+	addr = virt_to_phys(vdev->fault_pages);
-+	vma->vm_private_data = vdev;
-+	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
-+
-+	ret = remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-+			      req_len, vma->vm_page_prot);
-+	return ret;
-+}
-+
- static int vfio_pci_fault_prod_add_capability(struct vfio_pci_device *vdev,
- 		struct vfio_pci_region *region, struct vfio_info_cap *caps)
- {
-+	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
- 	struct vfio_region_info_cap_fault cap = {
- 		.header.id = VFIO_REGION_INFO_CAP_PRODUCER_FAULT,
- 		.header.version = 1,
- 		.version = NR_FAULT_ABIS,
- 	};
--	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
-+	size_t size = sizeof(*sparse) + sizeof(*sparse->areas);
-+	int ret;
-+
-+	ret = vfio_info_add_capability(caps, &cap.header, sizeof(cap));
-+	if (ret)
-+		return ret;
-+
-+	sparse = kzalloc(size, GFP_KERNEL);
-+	if (!sparse)
-+		return -ENOMEM;
-+
-+	sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
-+	sparse->header.version = 1;
-+	sparse->nr_areas = 1;
-+	sparse->areas[0].offset = PAGE_SIZE;
-+	sparse->areas[0].size = PAGE_SIZE;
-+
-+	ret = vfio_info_add_capability(caps, &sparse->header, size);
-+	if (ret)
-+		kfree(sparse);
-+
-+	return ret;
+ 	return 0;
+@@ -1025,6 +1027,7 @@ static long vfio_pci_ioctl(void *device_data,
+ 		switch (info.index) {
+ 		case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
+ 		case VFIO_PCI_REQ_IRQ_INDEX:
++		case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
+ 			break;
+ 		case VFIO_PCI_ERR_IRQ_INDEX:
+ 			if (pci_is_pcie(vdev->pdev))
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1c46045b0e7f..28a96117daf3 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -622,6 +622,18 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+ 					       count, flags, data);
  }
  
- static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
-@@ -242,6 +297,7 @@ static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
- static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
- 	.rw		= vfio_pci_fault_prod_rw,
- 	.release	= vfio_pci_fault_release,
-+	.mmap		= vfio_pci_fault_mmap,
- 	.add_capability = vfio_pci_fault_prod_add_capability,
- };
++static int vfio_pci_set_dma_fault_trigger(struct vfio_pci_device *vdev,
++					  unsigned index, unsigned start,
++					  unsigned count, uint32_t flags,
++					  void *data)
++{
++	if (index != VFIO_PCI_DMA_FAULT_IRQ_INDEX || start != 0 || count > 1)
++		return -EINVAL;
++
++	return vfio_pci_set_ctx_trigger_single(&vdev->dma_fault_trigger,
++					       count, flags, data);
++}
++
+ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data)
+@@ -671,6 +683,13 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+ 			break;
+ 		}
+ 		break;
++	case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			func = vfio_pci_set_dma_fault_trigger;
++			break;
++		}
++		break;
+ 	}
  
-@@ -300,7 +356,8 @@ static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
- 		VFIO_REGION_TYPE_NESTED,
- 		VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD,
- 		&vfio_pci_fault_prod_regops, 2 * PAGE_SIZE,
--		VFIO_REGION_INFO_FLAG_READ, vdev->fault_pages);
-+		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP,
-+		vdev->fault_pages);
- 	if (ret)
- 		goto out;
+ 	if (!func)
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 40b7aec8fefa..b47f65df5b86 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -555,6 +555,7 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
++	VFIO_PCI_DMA_FAULT_IRQ_INDEX,
+ 	VFIO_PCI_NUM_IRQS
+ };
  
 -- 
 2.20.1
