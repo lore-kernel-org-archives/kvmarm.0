@@ -1,47 +1,71 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: fix spelling mistake: "auxilary" ->
- "auxiliary"
-Date: Mon, 18 Feb 2019 08:39:53 +0000
-Message-ID: <20190218083953.2e8e6ed4@why.wild-wind.fr.eu.org>
-References: <20190217223626.16686-1-colin.king@canonical.com>
+Subject: Re: [PATCH] kvm: arm64: Fix comment for KVM_PHYS_SHIFT
+Date: Mon, 18 Feb 2019 08:47:36 +0000
+Message-ID: <20190218084736.651291a9@why.wild-wind.fr.eu.org>
+References: <1550108746-14704-1-git-send-email-yuzenghui@huawei.com>
+ <f14b90b1-ca81-e57e-9c42-6c8a4608cf72@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190217223626.16686-1-colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBC124A0CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 03:47:42 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id urcTw7qjxomg for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 03:47:41 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE2740493
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 03:47:41 -0500 (EST)
+In-Reply-To: <f14b90b1-ca81-e57e-9c42-6c8a4608cf72@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, 17 Feb 2019 22:36:26 +0000
-Colin King <colin.king@canonical.com> wrote:
+On Thu, 14 Feb 2019 10:11:38 +0000
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 
-> From: Colin Ian King <colin.king@canonical.com>
+> Hi
 > 
-> There is a spelling mistake in a kvm_err error message. Fix it.
+> On 14/02/2019 01:45, Zenghui Yu wrote:
+> > Since Suzuki K Poulose's work on Dynamic IPA support, KVM_PHYS_SHIFT will
+> > be used only when machine_type's bits[7:0] equal to 0 (by default). Thus
+> > the outdated comment should be fixed.  
+> > > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>  
+> > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_mmu.h | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)  
+> > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h  
+> > index 8af4b1b..a12bf48 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -138,7 +138,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+> >   	})  
+> >   >   /*  
+> > - * We currently only support a 40bit IPA.
+> > + * We currently support using a VM-specified IPA size. For backward
+> > + * compatibility, the default IPA size is fixed to 40bits.
+> >    */
+> >   #define KVM_PHYS_SHIFT	(40)  
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  virt/kvm/arm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Thanks for the fix.
 > 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 7fcc1c8c4020..99c37384ba7b 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1563,7 +1563,7 @@ static int init_hyp_mode(void)
->  
->  	err = hyp_map_aux_data();
->  	if (err)
-> -		kvm_err("Cannot map host auxilary data: %d\n", err);
-> +		kvm_err("Cannot map host auxiliary data: %d\n", err);
->  
->  	return 0;
->  
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
 Applied, thanks.
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
