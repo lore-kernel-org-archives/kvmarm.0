@@ -1,27 +1,25 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm/arm64: support chained PMU counters
-Date: Mon, 18 Feb 2019 12:03:05 +0000
-Message-ID: <20190218120305.GH54124@e119886-lin.cambridge.arm.com>
+Subject: Re: [PATCH v2 0/5] KVM: arm/arm64: add support for chained counters
+Date: Mon, 18 Feb 2019 12:10:26 +0000
+Message-ID: <20190218121026.GI54124@e119886-lin.cambridge.arm.com>
 References: <1549299218-44714-1-git-send-email-andrew.murray@arm.com>
- <1549299218-44714-6-git-send-email-andrew.murray@arm.com>
- <11a8c800-5c1d-08ce-9d85-402ca89727a3@arm.com>
- <236797c3-9f3a-91d4-c859-e8eb4d3eb3ee@arm.com>
+ <20190218085217.4c4ff56f@why.wild-wind.fr.eu.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9791F49E3E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:03:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A58DE4A369
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:10:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 554fDnTgOW2v for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 07:03:27 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8262940493
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:03:23 -0500 (EST)
+ with ESMTP id EFiA3vqFJ824 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 07:10:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CD8149E3E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 07:10:29 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <236797c3-9f3a-91d4-c859-e8eb4d3eb3ee@arm.com>
+In-Reply-To: <20190218085217.4c4ff56f@why.wild-wind.fr.eu.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,94 +29,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 14, 2019 at 11:42:15AM +0000, Suzuki K Poulose wrote:
+On Mon, Feb 18, 2019 at 08:52:17AM +0000, Marc Zyngier wrote:
+> On Mon, 4 Feb 2019 16:53:33 +0000
+> Andrew Murray <andrew.murray@arm.com> wrote:
 > 
+> > ARMv8 provides support for chained PMU counters, where an event type
+> > of 0x001E is set for odd-numbered counters, the event counter will
+> > increment by one for each overflow of the preceding even-numbered
+> > counter. Let's emulate this in KVM by creating a 64 bit perf counter
+> > when a user chains two emulated counters together.
+> > 
+> > Testing has been performed by hard-coding hwc->sample_period in
+> > __hw_perf_event_init (arm_pmu.c) to a small value, this results in
+> > regular overflows (for non sampling events). The following command
+> > was then used to measure chained and non-chained instruction cycles:
+> > 
+> > perf stat -e armv8_pmuv3/long=1,inst_retired/u \
+> >           -e armv8_pmuv3/long=0,inst_retired/u dd if=/dev/zero bs=1M \
+> > 	  count=10 | gzip > /dev/null
+> > 
+> > The reported values were identical (and for non-chained was in the
+> > same ballpark when running on a kernel without this patchset). Debug
+> > was added to verify that the guest received overflow interrupts for
+> > the chain counter.
 > 
-> On 05/02/2019 14:33, Julien Thierry wrote:
-> > Hi Andrew,
-> > 
-> > On 04/02/2019 16:53, Andrew Murray wrote:
-> > > Emulate chained PMU counters by creating a single 64 bit event counter
-> > > for a pair of chained KVM counters.
-> > > 
-> > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > > ---
-> > >   include/kvm/arm_pmu.h |   1 +
-> > >   virt/kvm/arm/pmu.c    | 321 +++++++++++++++++++++++++++++++++++++++++---------
-> > >   2 files changed, 269 insertions(+), 53 deletions(-)
-> > > 
-> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > > index b73f31b..8e691ee 100644
-> > > --- a/include/kvm/arm_pmu.h
-> > > +++ b/include/kvm/arm_pmu.h
-> > > @@ -29,6 +29,7 @@ struct kvm_pmc {
-> > >   	u8 idx;	/* index into the pmu->pmc array */
-> > >   	struct perf_event *perf_event;
-> > >   	u64 bitmask;
-> > > +	u64 overflow_count;
-> > >   };
-> > >   struct kvm_pmu {
-> > > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > > index a64aeb2..9318130 100644
-> > > --- a/virt/kvm/arm/pmu.c
-> > > +++ b/virt/kvm/arm/pmu.c
-> > > @@ -24,9 +24,25 @@
-> > >   #include <kvm/arm_pmu.h>
-> > >   #include <kvm/arm_vgic.h>
-> > > +#define ARMV8_PMUV3_PERFCTR_CHAIN 0x1E
-> > 
-> > I find it a bit awkward to have this redefined here.
-> > 
-> > Maybe we could define a helper in kvm_host.h:
-> > bool kvm_pmu_typer_is_chain(u64 typer);
-> > 
-> > That would always return false for arm32?
+> Hi Andrew,
 > 
-> We don't support ARMv7 host, so that doesn't matter. But
-> it is a good idea to wrap it in a function here.
+> We're getting quite close to the merge window, and I need to wrap up the
+> pull request pretty soon. If you want this to make it into 5.1, you'll
+> have to respin it pretty quickly (right now, basically...), addressing
+> the comments Suzuki and Julien raised.
+> 
 
-I'm not sure kvm_host.h is the right place for this as this really relates
-to the ARM PMU drivers. Seeing that armv8pmu_filter_match in
-arch/arm64/kernel/perf_event.c would also benefit from this new function I'll
-add it to arch/arm64/include/asm/perf_event.h and stub it out in arm_pmu.c
-for the ARM32 case.
-
-> 
-> > >   		kvm_vcpu_kick(vcpu);
-> > > @@ -440,6 +632,10 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >   	    select_idx != ARMV8_PMU_CYCLE_IDX)
-> > >   		return;
-> > > +	/* Handled by even event */
-> > > +	if (eventsel == ARMV8_PMUV3_PERFCTR_CHAIN)
-> > > +		return;
-> > > +
-> > >   	memset(&attr, 0, sizeof(struct perf_event_attr));
-> > >   	attr.type = PERF_TYPE_RAW;
-> > >   	attr.size = sizeof(attr);
-> > > @@ -452,6 +648,9 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >   	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
-> > >   		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
-> > > +	if (kvm_pmu_event_is_chained(vcpu, select_idx))
-> > > +		attr.config1 |= 0x1;
-> > 
-> > I'm not very familiar with the usage of perf attributes configs, but is
-> > there any chance we could name this flag? Even if only for the local
-> > file? Something like PERF_ATTR_CFG1_KVM_PMU_CHAINED (unless there is an
-> > existing naming convention for event attributes).
-> 
-> There is ARPMU_EVT_64BIT in "linux/perf/arm_pmu.h". But in general we don't
-> specify where the Bit goes in (i.e, CFG1 etc).
-
-I'll add PERF_ATTR_CFG1_KVM_PMU_CHAINED to this file as you suggest.
+Thanks for the prompt, I'll send this out very shortly.
 
 Thanks,
 
 Andrew Murray
 
+> Thanks,
 > 
-> Cheers
-> Suzuki
+> 	M.
+> -- 
+> Without deviation from the norm, progress is not possible.
