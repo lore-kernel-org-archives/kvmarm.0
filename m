@@ -1,22 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 11/26] KVM: arm64: Extend reset_unknown() to handle mixed
- RES0/UNKNOWN registers
-Date: Mon, 18 Feb 2019 19:52:24 +0000
-Message-ID: <1550519559-15915-12-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 21/26] KVM: arm/arm64: Add hook to finalize the vcpu
+ configuration
+Date: Mon, 18 Feb 2019 19:52:34 +0000
+Message-ID: <1550519559-15915-22-git-send-email-Dave.Martin@arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06AD34A450
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13F794A200
  for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j6pGolDVM4m4 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 19S6WUROLKAK for <kvmarm@lists.cs.columbia.edu>;
  Mon, 18 Feb 2019 14:54:26 -0500 (EST)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B19864A43D
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C37D94A426
  for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:23 -0500 (EST)
 In-Reply-To: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,62 +32,80 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The reset_unknown() system register helper initialises a guest
-register to a distinctive junk value on vcpu reset, to help expose
-and debug deficient register initialisation within the guest.
+Some aspects of vcpu configuration can't be completed inside
+KVM_VCPU_INIT, but still change API behaviour visible to userspace.
 
-Some registers such as the SVE control register ZCR_EL1 contain a
-mixture of UNKNOWN fields and RES0 bits.  For these,
-reset_unknown() does not work at present, since it sets all bits to
-junk values instead of just the wanted bits.
+Where such configuration choices affect the register list visible
+to userspace, we will need to track whether we have made a
+commitment to userspace regarding the list of vcpu registers.
 
-There is no need to craft another special helper just for that,
-since reset_unknown() almost does the appropriate thing anyway.
-This patch takes advantage of the unused val field in struct
-sys_reg_desc to specify a mask of bits that should be initialised
-to zero instead of junk.
+This patch adds a new hook kvm_arm_vcpu_finalize() to capture this
+commitment, along with a corresponding check
+kvm_arm_vcpu_finalized().  We commit to the register list when
+userspace reads it via KVM_GET_REG_LIST, or when the vcpu is fired
+up via KVM_RUN.
 
-All existing users of reset_unknown() do not (and should not)
-define a value for val, so they will implicitly set it to zero,
-resulting in all bits being made UNKNOWN by this function: thus,
-this patch makes no functional change for currently defined
-registers.
-
-Future patches will make use of non-zero val.
+kvm_arm_vcpu_finalize() is currently a no-op, but future patches
+will amend this to handle SVE on arm64.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/kvm/sys_regs.h | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 4 ++++
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ virt/kvm/arm/arm.c                | 8 ++++++++
+ 3 files changed, 16 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 3b1bc7f..174ffc0 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -56,7 +56,12 @@ struct sys_reg_desc {
- 	/* Index into sys_reg[], or 0 if we don't need to save it. */
- 	int reg;
- 
--	/* Value (usually reset value) */
-+	/*
-+	 * Value (usually reset value)
-+	 * For reset_unknown, each bit set to 1 in val is treated as
-+	 * RES0 in the register: the corresponding register bit is
-+	 * reset to 0 instead of "unknown".
-+	 */
- 	u64 val;
- 
- 	/* Custom get/set_user functions, fallback to generic if NULL */
-@@ -92,7 +97,9 @@ static inline void reset_unknown(struct kvm_vcpu *vcpu,
- {
- 	BUG_ON(!r->reg);
- 	BUG_ON(r->reg >= NR_SYS_REGS);
--	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL;
-+
-+	/* If non-zero, r->val specifies which register bits are RES0: */
-+	__vcpu_sys_reg(vcpu, r->reg) = 0x1de7ec7edbadc0deULL & ~r->val;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index ca56537..ab7c76b 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -360,4 +360,8 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ 	return 0;
  }
  
- static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++/* Commit to the set of vcpu registers currently configured: */
++static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu) { return 0; }
++#define kvm_arm_vcpu_finalized(vcpu) true
++
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d233855..015c2578 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -553,4 +553,8 @@ void kvm_arch_free_vm(struct kvm *kvm);
+ 
+ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+ 
++/* Commit to the set of vcpu registers currently configured: */
++static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu) { return 0; }
++#define kvm_arm_vcpu_finalized(vcpu) true
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 9e350fd3..12f9dc2 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -560,6 +560,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	if (likely(vcpu->arch.has_run_once))
+ 		return 0;
+ 
++	ret = kvm_arm_vcpu_finalize(vcpu);
++	if (ret)
++		return ret;
++
+ 	vcpu->arch.has_run_once = true;
+ 
+ 	if (likely(irqchip_in_kernel(kvm))) {
+@@ -1121,6 +1125,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		if (unlikely(!kvm_vcpu_initialized(vcpu)))
+ 			break;
+ 
++		r = kvm_arm_vcpu_finalize(vcpu);
++		if (r)
++			break;
++
+ 		r = -EFAULT;
+ 		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
+ 			break;
 -- 
 2.1.4
