@@ -1,22 +1,22 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v4 06/22] iommu: Introduce bind/unbind_guest_msi
-Date: Mon, 18 Feb 2019 14:54:47 +0100
-Message-ID: <20190218135504.25048-7-eric.auger@redhat.com>
+Subject: [PATCH v4 08/22] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Date: Mon, 18 Feb 2019 14:54:49 +0100
+Message-ID: <20190218135504.25048-9-eric.auger@redhat.com>
 References: <20190218135504.25048-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F29004A2AC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:56:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C70B4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:56:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fiBeZH8XhWJB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Feb 2019 08:56:20 -0500 (EST)
+ with ESMTP id PIqHb1Es-v39 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Feb 2019 08:56:34 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 730494A0CC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:56:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94C3C40A52
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:56:34 -0500 (EST)
 In-Reply-To: <20190218135504.25048-1-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,144 +31,128 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundatio
 Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARM, MSI are translated by the SMMU. An IOVA is allocated
-for each MSI doorbell. If both the host and the guest are exposed
-with SMMUs, we end up with 2 different IOVAs allocated by each.
-guest allocates an IOVA (gIOVA) to map onto the guest MSI
-doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
-onto the physical doorbell (hDB).
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-So we end up with 2 untied mappings:
-         S1            S2
-gIOVA    ->    gDB
-              hIOVA    ->    hDB
+When the guest "owns" the stage 1 translation structures,  the host
+IOMMU driver has no knowledge of caching structure updates unless
+the guest invalidation requests are trapped and passed down to the
+host.
 
-Currently the PCI device is programmed by the host with hIOVA
-as MSI doorbell. So this does not work.
+This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
+at propagating guest stage1 IOMMU cache invalidations to the host.
 
-This patch introduces an API to pass gIOVA/gDB to the host so
-that gIOVA can be reused by the host instead of re-allocating
-a new IOVA. So the goal is to create the following nested mapping:
-
-         S1            S2
-gIOVA    ->    gDB     ->    hDB
-
-and program the PCI device with gIOVA MSI doorbell.
-
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v3 -> v4:
-- add unbind
 
 v2 -> v3:
-- add a struct device handle
----
- drivers/iommu/iommu.c | 34 ++++++++++++++++++++++++++++++++++
- include/linux/iommu.h | 25 +++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
+- introduce vfio_iommu_for_each_dev back in this patch
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index bcb8eb15426c..c9a06608496d 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1592,6 +1592,40 @@ static void __iommu_detach_device(struct iommu_domain *domain,
- 	trace_detach_device_from_domain(dev);
+v1 -> v2:
+- s/TLB/CACHE
+- remove vfio_iommu_task usage
+- commit message rewording
+---
+ drivers/vfio/vfio_iommu_type1.c | 47 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 13 +++++++++
+ 2 files changed, 60 insertions(+)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 222e9199edbf..12a40b9db6aa 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -113,6 +113,26 @@ struct vfio_regions {
+ #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+ 					(!list_empty(&iommu->domain_list))
+ 
++/* iommu->lock must be held */
++static int
++vfio_iommu_for_each_dev(struct vfio_iommu *iommu, void *data,
++			int (*fn)(struct device *, void *))
++{
++	struct vfio_domain *d;
++	struct vfio_group *g;
++	int ret = 0;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		list_for_each_entry(g, &d->group_list, next) {
++			ret = iommu_group_for_each_dev(g->iommu_group,
++						       data, fn);
++			if (ret)
++				break;
++		}
++	}
++	return ret;
++}
++
+ static int put_pfn(unsigned long pfn, int prot);
+ 
+ /*
+@@ -1681,6 +1701,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
+ 	return ret;
  }
+ 
++static int vfio_cache_inv_fn(struct device *dev, void *data)
++{
++	struct vfio_iommu_type1_cache_invalidate *ustruct =
++		(struct vfio_iommu_type1_cache_invalidate *)data;
++	struct iommu_domain *d = iommu_get_domain_for_dev(dev);
++
++	return iommu_cache_invalidate(d, dev, &ustruct->info);
++}
++
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -1767,6 +1796,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+ 		vfio_detach_pasid_table(iommu);
+ 		return 0;
++	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
++		struct vfio_iommu_type1_cache_invalidate ustruct;
++		int ret;
++
++		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
++				    info);
++
++		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (ustruct.argsz < minsz || ustruct.flags)
++			return -EINVAL;
++
++		mutex_lock(&iommu->lock);
++		ret = vfio_iommu_for_each_dev(iommu, &ustruct,
++					      vfio_cache_inv_fn);
++		mutex_unlock(&iommu->lock);
++		return ret;
+ 	}
+ 
+ 	return -ENOTTY;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 329d378565d9..29f0ef2d805d 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -776,6 +776,19 @@ struct vfio_iommu_type1_attach_pasid_table {
+ #define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
+ #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
  
 +/**
-+ * iommu_bind_guest_msi - Passes the stage1 GIOVA/GPA mapping of the
-+ * virtual doorbell used by the assigned device @dev.
++ * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
++ *			struct vfio_iommu_type1_cache_invalidate)
 + *
-+ * @domain: iommu domain the stage 1 mapping will be attached to
-+ * @dev: assigned device which uses this stage1 mapping
-+ * @iova: iova llocated by the guest
-+ * @gpa: guest physical address of the virtual doorbell
-+ * @size: granule size used for the mapping
-+ *
-+ * The associated IOVA can be reused by the host to create a nested
-+ * stage2 binding mapping onto the physical doorbell used by @dev
++ * Propagate guest IOMMU cache invalidation to the host.
 + */
++struct vfio_iommu_type1_cache_invalidate {
++	__u32   argsz;
++	__u32   flags;
++	struct iommu_cache_invalidate_info info;
++};
++#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
 +
-+int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size)
-+{
-+	if (unlikely(!domain->ops->bind_guest_msi))
-+		return -ENODEV;
-+
-+	return domain->ops->bind_guest_msi(domain, dev, giova, gpa, size);
-+}
-+EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
-+
-+void iommu_unbind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			    dma_addr_t iova)
-+{
-+	if (unlikely(!domain->ops->unbind_guest_msi))
-+		return;
-+
-+	domain->ops->unbind_guest_msi(domain, dev, iova);
-+}
-+EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
-+
- void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
- {
- 	struct iommu_group *group;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index a3b879d0753c..1b685db845f8 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -190,6 +190,8 @@ struct iommu_resv_region {
-  * @attach_pasid_table: attach a pasid table
-  * @detach_pasid_table: detach the pasid table
-  * @cache_invalidate: invalidate translation caches
-+ * @bind_guest_msi: provides a stage1 giova/gpa MSI doorbell mapping
-+ * @unbind_guest_msi: withdraw a stage1 giova/gpa MSI doorbell mapping
-  */
- struct iommu_ops {
- 	bool (*capable)(enum iommu_cap);
-@@ -239,6 +241,11 @@ struct iommu_ops {
- 	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
- 				struct iommu_cache_invalidate_info *inv_info);
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
-+	int (*bind_guest_msi)(struct iommu_domain *domain, struct device *dev,
-+			      dma_addr_t giova, phys_addr_t gpa, size_t size);
-+	void (*unbind_guest_msi)(struct iommu_domain *domain,
-+				 struct device *dev, dma_addr_t giova);
-+
- 	unsigned long pgsize_bitmap;
- };
- 
-@@ -355,6 +362,11 @@ extern void iommu_detach_pasid_table(struct iommu_domain *domain);
- extern int iommu_cache_invalidate(struct iommu_domain *domain,
- 				  struct device *dev,
- 				  struct iommu_cache_invalidate_info *inv_info);
-+extern int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+				dma_addr_t giova, phys_addr_t gpa, size_t size);
-+extern void iommu_unbind_guest_msi(struct iommu_domain *domain,
-+				   struct device *dev, dma_addr_t giova);
-+
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -813,6 +825,19 @@ iommu_cache_invalidate(struct iommu_domain *domain,
- 	return -ENODEV;
- }
- 
-+static inline
-+int iommu_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size);
-+{
-+	return -ENODEV;
-+}
-+static inline
-+int iommu_unbind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			   dma_addr_t giova);
-+{
-+	return -ENODEV;
-+}
-+
- #endif /* CONFIG_IOMMU_API */
- 
- #ifdef CONFIG_IOMMU_DEBUGFS
+ /*
 -- 
 2.20.1
