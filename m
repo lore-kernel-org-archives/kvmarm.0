@@ -1,22 +1,22 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v3 2/6] KVM: arm/arm64: extract duplicated code to own function
-Date: Mon, 18 Feb 2019 13:48:00 +0000
-Message-ID: <1550497684-26046-3-git-send-email-andrew.murray@arm.com>
+Subject: [PATCH v3 5/6] arm64: perf: extract chain helper into header
+Date: Mon, 18 Feb 2019 13:48:03 +0000
+Message-ID: <1550497684-26046-6-git-send-email-andrew.murray@arm.com>
 References: <1550497684-26046-1-git-send-email-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 224B14A3F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:49:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 226824A426
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:49:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vMHxHJKiIAZw for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id VNqsUWth629X for <kvmarm@lists.cs.columbia.edu>;
  Mon, 18 Feb 2019 08:49:02 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7634D4A419
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:49:01 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 147744A3EF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 08:49:02 -0500 (EST)
 In-Reply-To: <1550497684-26046-1-git-send-email-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,67 +31,46 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Let's reduce code duplication by extracting common code to its own
-function.
+The ARMv8 Performance Monitors Extension includes an architectural
+event type named CHAIN which allows for chaining counters together.
+
+Let's extract the test for this event into a header file such that
+other users, such as KVM (for PMU emulation) can make use of.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/pmu.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ arch/arm64/include/asm/perf_event.h | 5 +++++
+ arch/arm64/kernel/perf_event.c      | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index c5a722a..6e7c179 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -65,6 +65,19 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- }
+diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+index c593761..cd13f3f 100644
+--- a/arch/arm64/include/asm/perf_event.h
++++ b/arch/arm64/include/asm/perf_event.h
+@@ -219,6 +219,11 @@
+ #define ARMV8_PMU_USERENR_CR	(1 << 2) /* Cycle counter can be read at EL0 */
+ #define ARMV8_PMU_USERENR_ER	(1 << 3) /* Event counter can be read at EL0 */
  
- /**
-+ * kvm_pmu_release_perf_event - remove the perf event
-+ * @pmc: The PMU counter pointer
-+ */
-+static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
++static inline bool armv8pmu_evtype_is_chain(u64 evtype)
 +{
-+	if (pmc->perf_event) {
-+		perf_event_disable(pmc->perf_event);
-+		perf_event_release_kernel(pmc->perf_event);
-+		pmc->perf_event = NULL;
-+	}
++	return (evtype == ARMV8_PMUV3_PERFCTR_CHAIN);
 +}
 +
-+/**
-  * kvm_pmu_stop_counter - stop PMU counter
-  * @pmc: The PMU counter pointer
-  *
-@@ -79,9 +92,7 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
- 		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
- 		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
- 		__vcpu_sys_reg(vcpu, reg) = counter;
--		perf_event_disable(pmc->perf_event);
--		perf_event_release_kernel(pmc->perf_event);
--		pmc->perf_event = NULL;
-+		kvm_pmu_release_perf_event(pmc);
- 	}
+ #ifdef CONFIG_PERF_EVENTS
+ struct pt_regs;
+ extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+index 1620a37..4cd1f7a 100644
+--- a/arch/arm64/kernel/perf_event.c
++++ b/arch/arm64/kernel/perf_event.c
+@@ -850,7 +850,7 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+ static int armv8pmu_filter_match(struct perf_event *event)
+ {
+ 	unsigned long evtype = event->hw.config_base & ARMV8_PMU_EVTYPE_EVENT;
+-	return evtype != ARMV8_PMUV3_PERFCTR_CHAIN;
++	return !armv8pmu_evtype_is_chain(evtype);
  }
  
-@@ -112,15 +123,8 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	int i;
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 
--	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
--		struct kvm_pmc *pmc = &pmu->pmc[i];
--
--		if (pmc->perf_event) {
--			perf_event_disable(pmc->perf_event);
--			perf_event_release_kernel(pmc->perf_event);
--			pmc->perf_event = NULL;
--		}
--	}
-+	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
-+		kvm_pmu_release_perf_event(&pmu->pmc[i]);
- }
- 
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ static void armv8pmu_reset(void *info)
 -- 
 2.7.4
