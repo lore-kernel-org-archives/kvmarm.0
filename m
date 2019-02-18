@@ -1,22 +1,21 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v5 02/26] arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on
- task state flush
-Date: Mon, 18 Feb 2019 19:52:15 +0000
-Message-ID: <1550519559-15915-3-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v5 06/26] arm64/sve: Check SVE virtualisability
+Date: Mon, 18 Feb 2019 19:52:19 +0000
+Message-ID: <1550519559-15915-7-git-send-email-Dave.Martin@arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0936D4A42F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F50640493
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XDw57bLUtjyp for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id bN2c8muXDxFL for <kvmarm@lists.cs.columbia.edu>;
  Mon, 18 Feb 2019 14:54:13 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD46C4A414
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D574A330
  for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Feb 2019 14:54:11 -0500 (EST)
 In-Reply-To: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,84 +31,219 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBwYXRjaCB1cGRhdGVzIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgdG8gbWlycm9yIHRo
-ZSBuZXcKc2VtYW50aWNzIG9mIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUoKSBpbnRyb2R1Y2VkIGJ5
-IGNvbW1pdApkOGFkNzFmYTM4YTkgKCJhcm02NDogZnBzaW1kOiBGaXggVElGX0ZPUkVJR05fRlBT
-VEFURSBhZnRlcgppbnZhbGlkYXRpbmcgY3B1IHJlZ3MiKS4gIEJvdGggZnVuY3Rpb25zIG5vdyBp
-bXBsaWNpdGx5IHNldApUSUZfRk9SRUlHTl9GUFNUQVRFIHRvIGluZGljYXRlIHRoYXQgdGhlIHRh
-c2sncyBGUFNJTUQgc3RhdGUgaXMgbm90CmxvYWRlZCBpbnRvIHRoZSBjcHUuCgpBcyBhIHNpZGUt
-ZWZmZWN0LCBmcHNpbWRfZmx1c2hfdGFza19zdGF0ZSgpIG5vdyBzZXRzClRJRl9GT1JFSUdOX0ZQ
-U1RBVEUgZXZlbiBmb3Igbm9uLXJ1bm5pbmcgdGFza3MuICBJbiB0aGUgY2FzZSBvZgpub24tcnVu
-bmluZyB0YXNrcyB0aGlzIGlzIG5vdCB1c2VmdWwgYnV0IGFsc28gaGFybWxlc3MsIGJlY2F1c2Ug
-dGhlCmZsYWcgaXMgbGl2ZSBvbmx5IHdoaWxlIHRoZSBjb3JyZXNwb25kaW5nIHRhc2sgaXMgcnVu
-bmluZy4gIFRoaXMKZnVuY3Rpb24gaXMgbm90IGNhbGxlZCBmcm9tIGZhc3QgcGF0aHMsIHNvIHNw
-ZWNpYWwtY2FzaW5nIHRoaXMgZm9yCnRoZSB0YXNrID09IGN1cnJlbnQgY2FzZSBpcyBub3QgcmVh
-bGx5IHdvcnRoIGl0LgoKQ29tcGlsZXIgYmFycmllcnMgcHJldmlvdXNseSBwcmVzZW50IGluIHJl
-c3RvcmVfc3ZlX2Zwc2ltZF9jb250ZXh0KCkKYXJlIHB1bGxlZCBpbnRvIGZwc2ltZF9mbHVzaF90
-YXNrX3N0YXRlKCkgc28gdGhhdCBpdCBjYW4gYmUgc2FmZWx5CmNhbGxlZCB3aXRoIHByZWVtcHRp
-b24gZW5hYmxlZCBpZiBuZWNlc3NhcnkuCgpFeHBsaWNpdCBjYWxscyB0byBzZXQgVElGX0ZPUkVJ
-R05fRlBTVEFURSB0aGF0IGFjY29tcGFueQpmcHNpbWRfZmx1c2hfdGFza19zdGF0ZSgpIGNhbGxz
-IGFuZCBhcmUgbm93IHJlZHVuZGFudCBhcmUgcmVtb3ZlZAphcyBhcHByb3ByaWF0ZS4KCmZwc2lt
-ZF9mbHVzaF90YXNrX3N0YXRlKCkgaXMgdXNlZCB0byBnZXQgZXhjbHVzaXZlIGFjY2VzcyB0byB0
-aGUKcmVwcmVzZW50YXRpb24gb2YgdGhlIHRhc2sncyBzdGF0ZSB2aWEgdGFza19zdHJ1Y3QsIGZv
-ciB0aGUgcHVycG9zZQpvZiByZXBsYWNpbmcgdGhlIHN0YXRlLiAgVGh1cywgdGhlIGNhbGwgdG8g
-dGhpcyBmdW5jdGlvbiBzaG91bGQKaGFwcGVuIGJlZm9yZSBtYW5pcHVsYXRpbmcgZnBzaW1kX3N0
-YXRlIG9yIHN2ZV9zdGF0ZSBldGMuIGluCnRhc2tfc3RydWN0LiAgQW5vbWFsb3VzIGNhc2VzIGFy
-ZSByZW9yZGVyZWQgYXBwcm9wcmlhdGVseSBpbiBvcmRlcgp0byBtYWtlIHRoZSBjb2RlIG1vcmUg
-Y29uc2lzdGVudCwgYWx0aG91Z2ggdGhlcmUgc2hvdWxkIGJlIG5vCmZ1bmN0aW9uYWwgZGlmZmVy
-ZW5jZSBzaW5jZSB0aGVzZSBjYXNlcyBhcmUgcHJvdGVjdGVkIGJ5CmxvY2FsX2JoX2Rpc2FibGUo
-KSBhbnl3YXkuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNv
-bT4KUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KLS0t
-CiBhcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyB8IDI1ICsrKysrKysrKysrKysrKysrKystLS0t
-LS0KIGFyY2gvYXJtNjQva2VybmVsL3NpZ25hbC5jIHwgIDUgLS0tLS0KIDIgZmlsZXMgY2hhbmdl
-ZCwgMTkgaW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm02NC9rZXJuZWwvZnBzaW1kLmMgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwppbmRleCA1
-ZWJlNzNiLi42MmMzN2YwIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwor
-KysgYi9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYwpAQCAtNTUwLDcgKzU1MCw2IEBAIGludCBz
-dmVfc2V0X3ZlY3Rvcl9sZW5ndGgoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrLAogCQlsb2NhbF9i
-aF9kaXNhYmxlKCk7CiAKIAkJZnBzaW1kX3NhdmUoKTsKLQkJc2V0X3RocmVhZF9mbGFnKFRJRl9G
-T1JFSUdOX0ZQU1RBVEUpOwogCX0KIAogCWZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKHRhc2spOwpA
-QCAtODE2LDEyICs4MTUsMTEgQEAgYXNtbGlua2FnZSB2b2lkIGRvX3N2ZV9hY2ModW5zaWduZWQg
-aW50IGVzciwgc3RydWN0IHB0X3JlZ3MgKnJlZ3MpCiAJbG9jYWxfYmhfZGlzYWJsZSgpOwogCiAJ
-ZnBzaW1kX3NhdmUoKTsKLQlmcHNpbWRfdG9fc3ZlKGN1cnJlbnQpOwogCiAJLyogRm9yY2UgcmV0
-X3RvX3VzZXIgdG8gcmVsb2FkIHRoZSByZWdpc3RlcnM6ICovCiAJZnBzaW1kX2ZsdXNoX3Rhc2tf
-c3RhdGUoY3VycmVudCk7Ci0Jc2V0X3RocmVhZF9mbGFnKFRJRl9GT1JFSUdOX0ZQU1RBVEUpOwog
-CisJZnBzaW1kX3RvX3N2ZShjdXJyZW50KTsKIAlpZiAodGVzdF9hbmRfc2V0X3RocmVhZF9mbGFn
-KFRJRl9TVkUpKQogCQlXQVJOX09OKDEpOyAvKiBTVkUgYWNjZXNzIHNob3VsZG4ndCBoYXZlIHRy
-YXBwZWQgKi8KIApAQCAtODk0LDkgKzg5Miw5IEBAIHZvaWQgZnBzaW1kX2ZsdXNoX3RocmVhZCh2
-b2lkKQogCiAJbG9jYWxfYmhfZGlzYWJsZSgpOwogCisJZnBzaW1kX2ZsdXNoX3Rhc2tfc3RhdGUo
-Y3VycmVudCk7CiAJbWVtc2V0KCZjdXJyZW50LT50aHJlYWQudXcuZnBzaW1kX3N0YXRlLCAwLAog
-CSAgICAgICBzaXplb2YoY3VycmVudC0+dGhyZWFkLnV3LmZwc2ltZF9zdGF0ZSkpOwotCWZwc2lt
-ZF9mbHVzaF90YXNrX3N0YXRlKGN1cnJlbnQpOwogCiAJaWYgKHN5c3RlbV9zdXBwb3J0c19zdmUo
-KSkgewogCQljbGVhcl90aHJlYWRfZmxhZyhUSUZfU1ZFKTsKQEAgLTkzMyw4ICs5MzEsNiBAQCB2
-b2lkIGZwc2ltZF9mbHVzaF90aHJlYWQodm9pZCkKIAkJCWN1cnJlbnQtPnRocmVhZC5zdmVfdmxf
-b25leGVjID0gMDsKIAl9CiAKLQlzZXRfdGhyZWFkX2ZsYWcoVElGX0ZPUkVJR05fRlBTVEFURSk7
-Ci0KIAlsb2NhbF9iaF9lbmFibGUoKTsKIH0KIApAQCAtMTA0MywxMiArMTAzOSwyOSBAQCB2b2lk
-IGZwc2ltZF91cGRhdGVfY3VycmVudF9zdGF0ZShzdHJ1Y3QgdXNlcl9mcHNpbWRfc3RhdGUgY29u
-c3QgKnN0YXRlKQogCiAvKgogICogSW52YWxpZGF0ZSBsaXZlIENQVSBjb3BpZXMgb2YgdGFzayB0
-J3MgRlBTSU1EIHN0YXRlCisgKgorICogVGhpcyBmdW5jdGlvbiBtYXkgYmUgY2FsbGVkIHdpdGgg
-cHJlZW1wdGlvbiBlbmFibGVkLiAgVGhlIGJhcnJpZXIoKQorICogZW5zdXJlcyB0aGF0IHRoZSBh
-c3NpZ25tZW50IHRvIGZwc2ltZF9jcHUgaXMgdmlzaWJsZSB0byBhbnkKKyAqIHByZWVtcHRpb24v
-c29mdGlycSB0aGF0IGNvdWxkIHJhY2Ugd2l0aCBzZXRfdHNrX3RocmVhZF9mbGFnKCksIHNvCisg
-KiB0aGF0IFRJRl9GT1JFSUdOX0ZQU1RBVEUgY2Fubm90IGJlIHNwdXJpb3VzbHkgcmUtY2xlYXJl
-ZC4KKyAqCisgKiBUaGUgZmluYWwgYmFycmllciBlbnN1cmVzIHRoYXQgVElGX0ZPUkVJR05fRlBT
-VEFURSBpcyBzZWVuIHNldCBieSBhbnkKKyAqIHN1YnNlcXVlbnQgY29kZS4KICAqLwogdm9pZCBm
-cHNpbWRfZmx1c2hfdGFza19zdGF0ZShzdHJ1Y3QgdGFza19zdHJ1Y3QgKnQpCiB7CiAJdC0+dGhy
-ZWFkLmZwc2ltZF9jcHUgPSBOUl9DUFVTOworCisJYmFycmllcigpOworCXNldF90c2tfdGhyZWFk
-X2ZsYWcodCwgVElGX0ZPUkVJR05fRlBTVEFURSk7CisKKwliYXJyaWVyKCk7CiB9CiAKKy8qCisg
-KiBJbnZhbGlkYXRlIGFueSB0YXNrJ3MgRlBTSU1EIHN0YXRlIHRoYXQgaXMgcHJlc2VudCBvbiB0
-aGlzIGNwdS4KKyAqIFRoaXMgZnVuY3Rpb24gbXVzdCBiZSBjYWxsZWQgd2l0aCBzb2Z0aXJxcyBk
-aXNhYmxlZC4KKyAqLwogdm9pZCBmcHNpbWRfZmx1c2hfY3B1X3N0YXRlKHZvaWQpCiB7CiAJX190
-aGlzX2NwdV93cml0ZShmcHNpbWRfbGFzdF9zdGF0ZS5zdCwgTlVMTCk7CmRpZmYgLS1naXQgYS9h
-cmNoL2FybTY0L2tlcm5lbC9zaWduYWwuYyBiL2FyY2gvYXJtNjQva2VybmVsL3NpZ25hbC5jCmlu
-ZGV4IDg2N2E3Y2UuLmE5YjA0ODUgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva2VybmVsL3NpZ25h
-bC5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL3NpZ25hbC5jCkBAIC0yOTYsMTEgKzI5Niw2IEBA
-IHN0YXRpYyBpbnQgcmVzdG9yZV9zdmVfZnBzaW1kX2NvbnRleHQoc3RydWN0IHVzZXJfY3R4cyAq
-dXNlcikKIAkgKi8KIAogCWZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKGN1cnJlbnQpOwotCWJhcnJp
-ZXIoKTsKLQkvKiBGcm9tIG5vdywgZnBzaW1kX3RocmVhZF9zd2l0Y2goKSB3b24ndCBjbGVhciBU
-SUZfRk9SRUlHTl9GUFNUQVRFICovCi0KLQlzZXRfdGhyZWFkX2ZsYWcoVElGX0ZPUkVJR05fRlBT
-VEFURSk7Ci0JYmFycmllcigpOwogCS8qIEZyb20gbm93LCBmcHNpbWRfdGhyZWFkX3N3aXRjaCgp
-IHdvbid0IHRvdWNoIHRocmVhZC5zdmVfc3RhdGUgKi8KIAogCXN2ZV9hbGxvYyhjdXJyZW50KTsK
-LS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Due to the way the effective SVE vector length is controlled and
+trapped at different exception levels, certain mismatches in the
+sets of vector lengths supported by different physical CPUs in the
+system may prevent straightforward virtualisation of SVE at parity
+with the host.
+
+This patch analyses the extent to which SVE can be virtualised
+safely without interfering with migration of vcpus between physical
+CPUs, and rejects late secondary CPUs that would erode the
+situation further.
+
+It is left up to KVM to decide what to do with this information.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+ arch/arm64/include/asm/fpsimd.h |  1 +
+ arch/arm64/kernel/cpufeature.c  |  2 +-
+ arch/arm64/kernel/fpsimd.c      | 86 ++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 73 insertions(+), 16 deletions(-)
+
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index dd1ad39..964adc9 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -87,6 +87,7 @@ extern void sve_kernel_enable(const struct arm64_cpu_capabilities *__unused);
+ extern u64 read_zcr_features(void);
+ 
+ extern int __ro_after_init sve_max_vl;
++extern int __ro_after_init sve_max_virtualisable_vl;
+ 
+ #ifdef CONFIG_ARM64_SVE
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index f6d84e2..5eaacb4 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1825,7 +1825,7 @@ static void verify_sve_features(void)
+ 	unsigned int len = zcr & ZCR_ELx_LEN_MASK;
+ 
+ 	if (len < safe_len || sve_verify_vq_map()) {
+-		pr_crit("CPU%d: SVE: required vector length(s) missing\n",
++		pr_crit("CPU%d: SVE: vector length support mismatch\n",
+ 			smp_processor_id());
+ 		cpu_die_early();
+ 	}
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 62c37f0..64729e2 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include <linux/bitmap.h>
++#include <linux/bitops.h>
+ #include <linux/bottom_half.h>
+ #include <linux/bug.h>
+ #include <linux/cache.h>
+@@ -48,6 +49,7 @@
+ #include <asm/sigcontext.h>
+ #include <asm/sysreg.h>
+ #include <asm/traps.h>
++#include <asm/virt.h>
+ 
+ #define FPEXC_IOF	(1 << 0)
+ #define FPEXC_DZF	(1 << 1)
+@@ -130,14 +132,18 @@ static int sve_default_vl = -1;
+ 
+ /* Maximum supported vector length across all CPUs (initially poisoned) */
+ int __ro_after_init sve_max_vl = SVE_VL_MIN;
++int __ro_after_init sve_max_virtualisable_vl = SVE_VL_MIN;
+ /* Set of available vector lengths, as vq_to_bit(vq): */
+ static __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++/* Set of vector lengths present on at least one cpu: */
++static __ro_after_init DECLARE_BITMAP(sve_vq_partial_map, SVE_VQ_MAX);
+ static void __percpu *efi_sve_state;
+ 
+ #else /* ! CONFIG_ARM64_SVE */
+ 
+ /* Dummy declaration for code that will be optimised out: */
+ extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++extern __ro_after_init DECLARE_BITMAP(sve_vq_partial_map, SVE_VQ_MAX);
+ extern void __percpu *efi_sve_state;
+ 
+ #endif /* ! CONFIG_ARM64_SVE */
+@@ -623,12 +629,6 @@ int sve_get_current_vl(void)
+ 	return sve_prctl_status(0);
+ }
+ 
+-/*
+- * Bitmap for temporary storage of the per-CPU set of supported vector lengths
+- * during secondary boot.
+- */
+-static DECLARE_BITMAP(sve_secondary_vq_map, SVE_VQ_MAX);
+-
+ static void sve_probe_vqs(DECLARE_BITMAP(map, SVE_VQ_MAX))
+ {
+ 	unsigned int vq, vl;
+@@ -650,6 +650,7 @@ static void sve_probe_vqs(DECLARE_BITMAP(map, SVE_VQ_MAX))
+ void __init sve_init_vq_map(void)
+ {
+ 	sve_probe_vqs(sve_vq_map);
++	bitmap_copy(sve_vq_partial_map, sve_vq_map, SVE_VQ_MAX);
+ }
+ 
+ /*
+@@ -658,25 +659,58 @@ void __init sve_init_vq_map(void)
+  */
+ void sve_update_vq_map(void)
+ {
+-	sve_probe_vqs(sve_secondary_vq_map);
+-	bitmap_and(sve_vq_map, sve_vq_map, sve_secondary_vq_map, SVE_VQ_MAX);
++	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
++
++	sve_probe_vqs(tmp_map);
++	bitmap_and(sve_vq_map, sve_vq_map, tmp_map, SVE_VQ_MAX);
++	bitmap_or(sve_vq_partial_map, sve_vq_partial_map, tmp_map, SVE_VQ_MAX);
+ }
+ 
+ /* Check whether the current CPU supports all VQs in the committed set */
+ int sve_verify_vq_map(void)
+ {
+-	int ret = 0;
++	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
++	unsigned long b;
+ 
+-	sve_probe_vqs(sve_secondary_vq_map);
+-	bitmap_andnot(sve_secondary_vq_map, sve_vq_map, sve_secondary_vq_map,
+-		      SVE_VQ_MAX);
+-	if (!bitmap_empty(sve_secondary_vq_map, SVE_VQ_MAX)) {
++	sve_probe_vqs(tmp_map);
++
++	bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
++	if (bitmap_intersects(tmp_map, sve_vq_map, SVE_VQ_MAX)) {
+ 		pr_warn("SVE: cpu%d: Required vector length(s) missing\n",
+ 			smp_processor_id());
+-		ret = -EINVAL;
++		return -EINVAL;
+ 	}
+ 
+-	return ret;
++	if (!IS_ENABLED(CONFIG_KVM) || !is_hyp_mode_available())
++		return 0;
++
++	/*
++	 * For KVM, it is necessary to ensure that this CPU doesn't
++	 * support any vector length that guests may have probed as
++	 * unsupported.
++	 */
++
++	/* Recover the set of supported VQs: */
++	bitmap_complement(tmp_map, tmp_map, SVE_VQ_MAX);
++	/* Find VQs supported that are not globally supported: */
++	bitmap_andnot(tmp_map, tmp_map, sve_vq_map, SVE_VQ_MAX);
++
++	/* Find the lowest such VQ, if any: */
++	b = find_last_bit(tmp_map, SVE_VQ_MAX);
++	if (b >= SVE_VQ_MAX)
++		return 0; /* no mismatches */
++
++	/*
++	 * Mismatches above sve_max_virtualisable_vl are fine, since
++	 * no guest is allowed to configure ZCR_EL2.LEN to exceed this:
++	 */
++	if (sve_vl_from_vq(bit_to_vq(b)) <= sve_max_virtualisable_vl) {
++		pr_warn("SVE: cpu%d: Unsupported vector length(s) present\n",
++			smp_processor_id());
++		return -EINVAL;
++	}
++
++	return 0;
+ }
+ 
+ static void __init sve_efi_setup(void)
+@@ -743,6 +777,8 @@ u64 read_zcr_features(void)
+ void __init sve_setup(void)
+ {
+ 	u64 zcr;
++	DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
++	unsigned long b;
+ 
+ 	if (!system_supports_sve())
+ 		return;
+@@ -771,11 +807,31 @@ void __init sve_setup(void)
+ 	 */
+ 	sve_default_vl = find_supported_vector_length(64);
+ 
++	bitmap_andnot(tmp_map, sve_vq_partial_map, sve_vq_map,
++		      SVE_VQ_MAX);
++
++	b = find_last_bit(tmp_map, SVE_VQ_MAX);
++	if (b >= SVE_VQ_MAX)
++		/* No non-virtualisable VLs found */
++		sve_max_virtualisable_vl = SVE_VQ_MAX;
++	else if (WARN_ON(b == SVE_VQ_MAX - 1))
++		/* No virtualisable VLs?  This is architecturally forbidden. */
++		sve_max_virtualisable_vl = SVE_VQ_MIN;
++	else /* b + 1 < SVE_VQ_MAX */
++		sve_max_virtualisable_vl = sve_vl_from_vq(bit_to_vq(b + 1));
++
++	if (sve_max_virtualisable_vl > sve_max_vl)
++		sve_max_virtualisable_vl = sve_max_vl;
++
+ 	pr_info("SVE: maximum available vector length %u bytes per vector\n",
+ 		sve_max_vl);
+ 	pr_info("SVE: default vector length %u bytes per vector\n",
+ 		sve_default_vl);
+ 
++	/* KVM decides whether to support mismatched systems. Just warn here: */
++	if (sve_max_virtualisable_vl < sve_max_vl)
++		pr_info("SVE: unvirtualisable vector lengths present\n");
++
+ 	sve_efi_setup();
+ }
+ 
+-- 
+2.1.4
