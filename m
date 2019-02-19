@@ -1,139 +1,66 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: [kvmtool PATCH v6 6/6] arm/kvm: arm64: Add a vcpu feature for pointer
- authentication
-Date: Tue, 19 Feb 2019 14:54:31 +0530
-Message-ID: <1550568271-5319-7-git-send-email-amit.kachhap@arm.com>
+Subject: [PATCH v6 5/6] arm64/kvm: control accessibility of ptrauth key registers
+Date: Tue, 19 Feb 2019 14:54:30 +0530
+Message-ID: <1550568271-5319-6-git-send-email-amit.kachhap@arm.com>
 References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B504A0CC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Feb 2019 04:25:27 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nqdr97J-yF96 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Feb 2019 04:25:25 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6546C4A2E4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Feb 2019 04:25:25 -0500 (EST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This is a runtime capabality for KVM tool to enable Armv8.3 Pointer
-Authentication in guest kernel. A command line option --ptrauth is
-required for this.
+According to userspace settings, ptrauth key registers are conditionally
+present in guest system register list based on user specified flag
+KVM_ARM_VCPU_PTRAUTH.
+
+Reset routines still sets these registers to default values but they are
+left like that as they are conditionally accessible (set/get).
 
 Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 ---
- arm/aarch32/include/kvm/kvm-cpu-arch.h    | 1 +
- arm/aarch64/include/asm/kvm.h             | 1 +
- arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    | 1 +
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- arm/kvm-cpu.c                             | 6 ++++++
- include/linux/kvm.h                       | 1 +
- 7 files changed, 14 insertions(+), 1 deletion(-)
+This patch needs patch [1] by Dave Martin and adds feature to manage accessibility in a scalable way.
 
-diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index d28ea67..520ea76 100644
---- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -13,4 +13,5 @@
- #define ARM_CPU_ID		0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
- 
-+#define ARM_VCPU_PTRAUTH_FEATURE	0
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 97c3478..1068fd1 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_PTRAUTH		4 /* CPU uses pointer authentication */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..2074684 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,7 +8,9 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_BOOLEAN('\0', "ptrauth", &(cfg)->has_ptrauth,		\
-+			"Enable address authentication"),
- 
- #include "arm-common/kvm-config-arch.h"
- 
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563..496ece8 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -17,4 +17,5 @@
- #define ARM_CPU_CTRL		3, 0, 1, 0
- #define ARM_CPU_CTRL_SCTLR_EL1	0
- 
-+#define ARM_VCPU_PTRAUTH_FEATURE	(1UL << KVM_ARM_VCPU_PTRAUTH)
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46..5badcbd 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -10,6 +10,7 @@ struct kvm_config_arch {
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
- 	u64		kaslr_seed;
-+	bool		has_ptrauth;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
- };
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 7780251..4ac80f8 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -68,6 +68,12 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
- 	}
- 
-+	/* Set KVM_ARM_VCPU_PTRAUTH if available */
-+	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH)) {
-+		if (kvm->cfg.arch.has_ptrauth)
-+			vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
-+	}
+[1]: https://lore.kernel.org/linux-arm-kernel/1547757219-19439-13-git-send-email-Dave.Martin@arm.com/ 
+
+ Documentation/arm64/pointer-authentication.txt | 4 ++++
+ arch/arm64/kvm/sys_regs.c                      | 7 ++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
+index 0529a7d..996e435 100644
+--- a/Documentation/arm64/pointer-authentication.txt
++++ b/Documentation/arm64/pointer-authentication.txt
+@@ -87,3 +87,7 @@ created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
+ to be enabled. Without this flag, pointer authentication is not enabled
+ in KVM guests and attempted use of the feature will result in an UNDEFINED
+ exception being injected into the guest.
 +
- 	/*
- 	 * If the preferred target ioctl is successful then
- 	 * use preferred target else try each and every target type
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 6d4ea4b..a553477 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_VM_IPA_SIZE 165
- #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
- #define KVM_CAP_HYPERV_CPUID 167
-+#define KVM_CAP_ARM_PTRAUTH 168
++Additionally, when KVM_ARM_VCPU_PTRAUTH is not set then KVM will filter
++out the Pointer Authentication system key registers from KVM_GET/SET_REG_*
++ioctls.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f7bcc60..c2f4974 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1005,8 +1005,13 @@ static bool trap_ptrauth(struct kvm_vcpu *vcpu,
+ 	return false;
+ }
  
- #ifdef KVM_CAP_IRQ_ROUTING
++static bool check_ptrauth(const struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
++{
++	return kvm_arm_vcpu_ptrauth_allowed(vcpu);
++}
++
+ #define __PTRAUTH_KEY(k)						\
+-	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k }
++	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k , .check_present = check_ptrauth}
  
+ #define PTRAUTH_KEY(k)							\
+ 	__PTRAUTH_KEY(k ## KEYLO_EL1),					\
 -- 
 2.7.4
