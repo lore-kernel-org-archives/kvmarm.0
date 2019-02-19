@@ -1,7 +1,7 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: [PATCH v6 2/6] arm64/kvm: preserve host MDCR_EL2 value
-Date: Tue, 19 Feb 2019 14:54:27 +0530
-Message-ID: <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
+Subject: [PATCH v6 4/6] arm64/kvm: add a userspace option to enable pointer authentication
+Date: Tue, 19 Feb 2019 14:54:29 +0530
+Message-ID: <1550568271-5319-5-git-send-email-amit.kachhap@arm.com>
 References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
@@ -10,220 +10,257 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Save host MDCR_EL2 value during kvm HYP initialisation and restore
-after every switch from host to guest. There should not be any
-change in functionality due to this.
+This feature will allow the KVM guest to allow the handling of
+pointer authentication instructions or to treat them as undefined
+if not set. It uses the existing vcpu API KVM_ARM_VCPU_INIT to
+supply this parameter instead of creating a new API.
 
-The value of mdcr_el2 is now stored in struct kvm_cpu_context as
-both host and guest can now use this field in a common way.
+A new register is not created to pass this parameter via
+SET/GET_ONE_REG interface as just a flag (KVM_ARM_VCPU_PTRAUTH)
+supplied is enough to enable this feature.
 
 Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu
 ---
- arch/arm/include/asm/kvm_host.h   |  1 -
- arch/arm64/include/asm/kvm_host.h |  6 ++----
- arch/arm64/kvm/debug.c            | 28 ++++++----------------------
- arch/arm64/kvm/hyp/switch.c       | 17 ++++-------------
- arch/arm64/kvm/hyp/sysreg-sr.c    |  6 ++++++
- virt/kvm/arm/arm.c                |  1 -
- 6 files changed, 18 insertions(+), 41 deletions(-)
+ Documentation/arm64/pointer-authentication.txt |  9 +++++----
+ Documentation/virtual/kvm/api.txt              |  4 ++++
+ arch/arm64/include/asm/kvm_host.h              |  3 ++-
+ arch/arm64/include/uapi/asm/kvm.h              |  1 +
+ arch/arm64/kvm/handle_exit.c                   |  2 +-
+ arch/arm64/kvm/hyp/ptrauth-sr.c                | 16 +++++++++++++++-
+ arch/arm64/kvm/reset.c                         |  3 +++
+ arch/arm64/kvm/sys_regs.c                      | 26 +++++++++++++-------------
+ include/uapi/linux/kvm.h                       |  1 +
+ 9 files changed, 45 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 05706b4..704667e 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -294,7 +294,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
+index a25cd21..0529a7d 100644
+--- a/Documentation/arm64/pointer-authentication.txt
++++ b/Documentation/arm64/pointer-authentication.txt
+@@ -82,7 +82,8 @@ pointers).
+ Virtualization
+ --------------
  
--static inline void kvm_arm_init_debug(void) {}
- static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+-Pointer authentication is not currently supported in KVM guests. KVM
+-will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
+-the feature will result in an UNDEFINED exception being injected into
+-the guest.
++Pointer authentication is enabled in KVM guest when virtual machine is
++created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
++to be enabled. Without this flag, pointer authentication is not enabled
++in KVM guests and attempted use of the feature will result in an UNDEFINED
++exception being injected into the guest.
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 356156f..1e646fb 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2642,6 +2642,10 @@ Possible features:
+ 	  Depends on KVM_CAP_ARM_PSCI_0_2.
+ 	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+ 	  Depends on KVM_CAP_ARM_PMU_V3.
++	- KVM_ARM_VCPU_PTRAUTH: Emulate Pointer authentication for the CPU.
++	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
++	  set, then the KVM guest allows the execution of pointer authentication
++	  instructions. Otherwise, KVM treats these instructions as undefined.
+ 
+ 
+ 4.83 KVM_ARM_PREFERRED_TARGET
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1b2e05b..2f1bb86 100644
+index 1bacf78..2768a53 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -205,6 +205,8 @@ struct kvm_cpu_context {
+@@ -43,7 +43,7 @@
  
- 	/* HYP host/guest configuration */
- 	u64 hcr_el2;
-+	u32 mdcr_el2;
-+
- 	struct kvm_vcpu *__hyp_running_vcpu;
- };
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
  
-@@ -213,9 +215,6 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
+-#define KVM_VCPU_MAX_FEATURES 4
++#define KVM_VCPU_MAX_FEATURES 5
  
--	/* HYP configuration */
--	u32 mdcr_el2;
--
- 	/* Exception Information */
- 	struct kvm_vcpu_fault_info fault;
- 
-@@ -446,7 +445,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
--void kvm_arm_init_debug(void);
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index f39801e..99dc0a4 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -32,8 +32,6 @@
- 				DBG_MDSCR_KDE | \
- 				DBG_MDSCR_MDE)
- 
--static DEFINE_PER_CPU(u32, mdcr_el2);
--
- /**
-  * save/restore_guest_debug_regs
-  *
-@@ -65,21 +63,6 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+@@ -451,6 +451,7 @@ static inline bool kvm_arch_requires_vhe(void)
+ 	return false;
  }
  
- /**
-- * kvm_arm_init_debug - grab what we need for debug
-- *
-- * Currently the sole task of this function is to retrieve the initial
-- * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
-- * presumably been set-up by some knowledgeable bootcode.
-- *
-- * It is called once per-cpu during CPU hyp initialisation.
-- */
--
--void kvm_arm_init_debug(void)
--{
--	__this_cpu_write(mdcr_el2, kvm_call_hyp(__kvm_get_mdcr_el2));
--}
--
--/**
-  * kvm_arm_reset_debug_ptr - reset the debug ptr to point to the vcpu state
++bool kvm_arm_vcpu_ptrauth_allowed(const struct kvm_vcpu *vcpu);
+ static inline bool kvm_supports_ptrauth(void)
+ {
+ 	return has_vhe() && system_supports_address_auth() &&
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 97c3478..5f82ca1 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -102,6 +102,7 @@ struct kvm_regs {
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+ #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
+ #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
++#define KVM_ARM_VCPU_PTRAUTH		4 /* VCPU uses address authentication */
+ 
+ struct kvm_vcpu_init {
+ 	__u32 target;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 7622ab3..d9f583b 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -179,7 +179,7 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
   */
- 
-@@ -111,6 +94,7 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
- 
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
  {
-+	kvm_cpu_context_t *host_cxt = this_cpu_ptr(&kvm_host_cpu_state);
- 	bool trap_debug = !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY);
- 	unsigned long mdscr;
- 
-@@ -120,8 +104,8 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 	 * This also clears MDCR_EL2_E2PB_MASK to disable guest access
- 	 * to the profiling buffer.
- 	 */
--	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
--	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-+	vcpu->arch.ctxt.mdcr_el2 = host_cxt->mdcr_el2 & MDCR_EL2_HPMN_MASK;
-+	vcpu->arch.ctxt.mdcr_el2 |= (MDCR_EL2_TPM |
- 				MDCR_EL2_TPMS |
- 				MDCR_EL2_TPMCR |
- 				MDCR_EL2_TDRA |
-@@ -130,7 +114,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 	/* Is Guest debugging in effect? */
- 	if (vcpu->guest_debug) {
- 		/* Route all software debug exceptions to EL2 */
--		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDE;
-+		vcpu->arch.ctxt.mdcr_el2 |= MDCR_EL2_TDE;
- 
- 		/* Save guest debug state */
- 		save_guest_debug_regs(vcpu);
-@@ -202,13 +186,13 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
- 
- 	/* Trap debug register access */
- 	if (trap_debug)
--		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
-+		vcpu->arch.ctxt.mdcr_el2 |= MDCR_EL2_TDA;
- 
- 	/* If KDE or MDE are set, perform a full save/restore cycle. */
- 	if (vcpu_read_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
- 		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
- 
--	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
-+	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.ctxt.mdcr_el2);
- 	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_read_sys_reg(vcpu, MDSCR_EL1));
- }
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 006bd33..03b36f1 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -82,7 +82,7 @@ static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
- 	 */
- 	write_sysreg(0, pmselr_el0);
- 	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
--	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+	write_sysreg(vcpu->arch.ctxt.mdcr_el2, mdcr_el2);
- }
- 
- static void __hyp_text __deactivate_traps_common(void)
-@@ -157,14 +157,9 @@ static void deactivate_traps_vhe(struct kvm_cpu_context *host_ctxt)
- 
- static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
- {
--	u64 mdcr_el2 = read_sysreg(mdcr_el2);
--
- 	__deactivate_traps_common();
- 
--	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
--	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
--
--	write_sysreg(mdcr_el2, mdcr_el2);
-+	write_sysreg(host_ctxt->mdcr_el2, mdcr_el2);
- 	write_sysreg(host_ctxt->hcr_el2, hcr_el2);
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
-@@ -196,13 +191,9 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- 
- void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- {
--	u64 mdcr_el2 = read_sysreg(mdcr_el2);
--
--	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
--		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
--		    MDCR_EL2_TPMS;
-+	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 
--	write_sysreg(mdcr_el2, mdcr_el2);
-+	write_sysreg(host_ctxt->mdcr_el2, mdcr_el2);
- 
- 	__deactivate_traps_common();
- }
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 68ddc0f..42ec50f 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -334,4 +334,10 @@ void __hyp_text __kvm_populate_host_regs(void)
- 		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
- 
- 	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
-+	/*
-+	 * Retrieve the initial value of mdcr_el2 so we can preserve
-+	 * MDCR_EL2.HPMN which has presumably been set-up by some
-+	 * knowledgeable bootcode.
-+	 */
-+	host_ctxt->mdcr_el2 = read_sysreg(mdcr_el2);
- }
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 8e18f7f..2032a66 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1327,7 +1327,6 @@ static void cpu_hyp_reinit(void)
+-	if (kvm_supports_ptrauth())
++	if (kvm_arm_vcpu_ptrauth_allowed(vcpu))
+ 		kvm_arm_vcpu_ptrauth_enable(vcpu);
  	else
- 		cpu_init_hyp_mode(NULL);
+ 		kvm_inject_undefined(vcpu);
+diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
+index 528ee6e..6846a23 100644
+--- a/arch/arm64/kvm/hyp/ptrauth-sr.c
++++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
+@@ -93,9 +93,23 @@ void kvm_arm_vcpu_ptrauth_reset(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
  
--	kvm_arm_init_debug();
- 	__cpu_copy_hyp_conf();
+-	if (kvm_supports_ptrauth()) {
++	if (kvm_arm_vcpu_ptrauth_allowed(vcpu)) {
+ 		kvm_arm_vcpu_ptrauth_disable(vcpu);
+ 		host_ctxt = vcpu->arch.host_cpu_context;
+ 		__ptrauth_save_state(host_ctxt);
+ 	}
+ }
++
++/**
++ * kvm_arm_vcpu_ptrauth_allowed - checks if ptrauth feature is allowed by user
++ *
++ * @vcpu: The VCPU pointer
++ *
++ * This function will be used to check userspace option to have ptrauth or not
++ * in the guest kernel.
++ */
++bool kvm_arm_vcpu_ptrauth_allowed(const struct kvm_vcpu *vcpu)
++{
++	return kvm_supports_ptrauth() &&
++		test_bit(KVM_ARM_VCPU_PTRAUTH, vcpu->arch.features);
++}
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b72a3dd..987e0c3c 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -91,6 +91,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_VM_IPA_SIZE:
+ 		r = kvm_ipa_limit;
+ 		break;
++	case KVM_CAP_ARM_PTRAUTH:
++		r = kvm_supports_ptrauth();
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 12529df..f7bcc60 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1055,7 +1055,7 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
+ }
  
- 	if (vgic_present)
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+-static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
++static u64 read_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_desc const *r, bool raz)
+ {
+ 	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+@@ -1071,7 +1071,7 @@ static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
+ 					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+ 					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+ 					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
+-		if (!kvm_supports_ptrauth()) {
++		if (!kvm_arm_vcpu_ptrauth_allowed(vcpu)) {
+ 			kvm_debug("ptrauth unsupported for guests, suppressing\n");
+ 			val &= ~ptrauth_mask;
+ 		}
+@@ -1095,7 +1095,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+ 	if (p->is_write)
+ 		return write_to_read_only(vcpu, p, r);
+ 
+-	p->regval = read_id_reg(r, raz);
++	p->regval = read_id_reg(vcpu, r, raz);
+ 	return true;
+ }
+ 
+@@ -1124,17 +1124,17 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+  * are stored, and for set_id_reg() we don't allow the effective value
+  * to be changed.
+  */
+-static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+-			bool raz)
++static int __get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			void __user *uaddr, bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+-	const u64 val = read_id_reg(rd, raz);
++	const u64 val = read_id_reg(vcpu, rd, raz);
+ 
+ 	return reg_to_user(uaddr, &val, id);
+ }
+ 
+-static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+-			bool raz)
++static int __set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++			void __user *uaddr, bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+ 	int err;
+@@ -1145,7 +1145,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ 		return err;
+ 
+ 	/* This is what we mean by invariant: you can't change it. */
+-	if (val != read_id_reg(rd, raz))
++	if (val != read_id_reg(vcpu, rd, raz))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -1154,25 +1154,25 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, false);
++	return __get_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, false);
++	return __set_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, true);
++	return __get_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, true);
++	return __set_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 6d4ea4b..a553477 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_VM_IPA_SIZE 165
+ #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
+ #define KVM_CAP_HYPERV_CPUID 167
++#define KVM_CAP_ARM_PTRAUTH 168
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.7.4
