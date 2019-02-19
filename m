@@ -1,365 +1,191 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
-Date: Tue, 19 Feb 2019 14:54:26 +0530
-Message-ID: <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
-References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH v6 0/6] Add ARMv8.3 pointer authentication for kvm guest
+Date: Tue, 19 Feb 2019 14:54:25 +0530
+Message-ID: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E574F4A331
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Feb 2019 04:25:05 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id G8HJuoLEGnSH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Feb 2019 04:25:02 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1AC64A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Feb 2019 04:25:02 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+Hi,
 
-When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
-is a constant value. This works today, as the host HCR_EL2 value is
-always the same, but this will get in the way of supporting extensions
-that require HCR_EL2 bits to be set conditionally for the host.
+This patch series adds pointer authentication support for KVM guest and
+is based on top of Linux 5.0-rc6. The basic patches in this series was
+originally posted by Mark Rutland earlier[1,2] and contains some history
+of this work.
 
-To allow such features to work without KVM having to explicitly handle
-every possible host feature combination, this patch has KVM save/restore
-for the host HCR when switching to/from a guest HCR. The saving of the
-register is done once during cpu hypervisor initialization state and is
-just restored after switch from guest.
+Extension Overview:
+=============================================
 
-For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
-kvm_call_hyp and is helpful in NHVE case.
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder.
 
-For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
-to toggle the TGE bit with a RMW sequence, as we already do in
-__tlb_switch_to_guest_vhe().
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
 
-The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
-and guest can now use this field in a common way.
+New instructions are added which can be used to:
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-[Added __cpu_copy_hyp_conf, hcr_el2 field in struct kvm_cpu_context]
-Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- arch/arm/include/asm/kvm_host.h      |  2 ++
- arch/arm64/include/asm/kvm_asm.h     |  2 ++
- arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++-----------
- arch/arm64/include/asm/kvm_host.h    | 13 ++++++++++++-
- arch/arm64/include/asm/kvm_hyp.h     |  2 +-
- arch/arm64/kvm/guest.c               |  2 +-
- arch/arm64/kvm/hyp/switch.c          | 23 +++++++++++++----------
- arch/arm64/kvm/hyp/sysreg-sr.c       | 21 ++++++++++++++++++++-
- arch/arm64/kvm/hyp/tlb.c             |  6 +++++-
- virt/kvm/arm/arm.c                   |  1 +
- 10 files changed, 68 insertions(+), 26 deletions(-)
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate and strip a PAC from a pointer
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index ca56537..05706b4 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
- 	kvm_call_hyp(__init_stage2_translation);
- }
- 
-+static inline void __cpu_copy_hyp_conf(void) {}
-+
- static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	return 0;
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index f5b79e9..8acd73f 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -80,6 +80,8 @@ extern void __vgic_v3_init_lrs(void);
- 
- extern u32 __kvm_get_mdcr_el2(void);
- 
-+extern void __kvm_populate_host_regs(void);
-+
- /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
- #define __hyp_this_cpu_ptr(sym)						\
- 	({								\
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 506386a..0dbe795 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -50,25 +50,25 @@ void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
- 
- static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
--	return !(vcpu->arch.hcr_el2 & HCR_RW);
-+	return !(vcpu->arch.ctxt.hcr_el2 & HCR_RW);
- }
- 
- static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-+	vcpu->arch.ctxt.hcr_el2 = HCR_GUEST_FLAGS;
- 	if (is_kernel_in_hyp_mode())
--		vcpu->arch.hcr_el2 |= HCR_E2H;
-+		vcpu->arch.ctxt.hcr_el2 |= HCR_E2H;
- 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
- 		/* route synchronous external abort exceptions to EL2 */
--		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		vcpu->arch.ctxt.hcr_el2 |= HCR_TEA;
- 		/* trap error record accesses */
--		vcpu->arch.hcr_el2 |= HCR_TERR;
-+		vcpu->arch.ctxt.hcr_el2 |= HCR_TERR;
- 	}
- 	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
--		vcpu->arch.hcr_el2 |= HCR_FWB;
-+		vcpu->arch.ctxt.hcr_el2 |= HCR_FWB;
- 
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
--		vcpu->arch.hcr_el2 &= ~HCR_RW;
-+		vcpu->arch.ctxt.hcr_el2 &= ~HCR_RW;
- 
- 	/*
- 	 * TID3: trap feature register accesses that we virtualise.
-@@ -76,22 +76,22 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	 * are currently virtualised.
- 	 */
- 	if (!vcpu_el1_is_32bit(vcpu))
--		vcpu->arch.hcr_el2 |= HCR_TID3;
-+		vcpu->arch.ctxt.hcr_el2 |= HCR_TID3;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- {
--	return (unsigned long *)&vcpu->arch.hcr_el2;
-+	return (unsigned long *)&vcpu->arch.ctxt.hcr_el2;
- }
- 
- static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+	vcpu->arch.ctxt.hcr_el2 &= ~HCR_TWE;
- }
- 
- static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.hcr_el2 |= HCR_TWE;
-+	vcpu->arch.ctxt.hcr_el2 |= HCR_TWE;
- }
- 
- static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7732d0b..1b2e05b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -203,6 +203,8 @@ struct kvm_cpu_context {
- 		u32 copro[NR_COPRO_REGS];
- 	};
- 
-+	/* HYP host/guest configuration */
-+	u64 hcr_el2;
- 	struct kvm_vcpu *__hyp_running_vcpu;
- };
- 
-@@ -212,7 +214,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
- 	/* HYP configuration */
--	u64 hcr_el2;
- 	u32 mdcr_el2;
- 
- 	/* Exception Information */
-@@ -458,6 +459,16 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 
- static inline void __cpu_init_stage2(void) {}
- 
-+/**
-+ * __cpu_copy_hyp_conf - copy the boot hyp configuration registers
-+ *
-+ * It is called once per-cpu during CPU hyp initialisation.
-+ */
-+static inline void __cpu_copy_hyp_conf(void)
-+{
-+	kvm_call_hyp(__kvm_populate_host_regs);
-+}
-+
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index a80a7ef..6e65cad 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -151,7 +151,7 @@ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- bool __fpsimd_enabled(void);
- 
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
--void deactivate_traps_vhe_put(void);
-+void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
- 
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dd436a5..e2f0268 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -345,7 +345,7 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events)
- {
--	events->exception.serror_pending = !!(vcpu->arch.hcr_el2 & HCR_VSE);
-+	events->exception.serror_pending = !!(vcpu->arch.ctxt.hcr_el2 & HCR_VSE);
- 	events->exception.serror_has_esr = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
- 
- 	if (events->exception.serror_pending && events->exception.serror_has_esr)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b0b1478..006bd33 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -126,7 +126,7 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
- 
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
--	u64 hcr = vcpu->arch.hcr_el2;
-+	u64 hcr = vcpu->arch.ctxt.hcr_el2;
- 
- 	write_sysreg(hcr, hcr_el2);
- 
-@@ -139,10 +139,10 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_nvhe(vcpu);
- }
- 
--static void deactivate_traps_vhe(void)
-+static void deactivate_traps_vhe(struct kvm_cpu_context *host_ctxt)
- {
- 	extern char vectors[];	/* kernel exception vectors */
--	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	write_sysreg(host_ctxt->hcr_el2, hcr_el2);
- 
- 	/*
- 	 * ARM erratum 1165522 requires the actual execution of the above
-@@ -155,7 +155,7 @@ static void deactivate_traps_vhe(void)
- 	write_sysreg(vectors, vbar_el1);
- }
- 
--static void __hyp_text __deactivate_traps_nvhe(void)
-+static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
- {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
-@@ -165,25 +165,28 @@ static void __hyp_text __deactivate_traps_nvhe(void)
- 	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
- 
- 	write_sysreg(mdcr_el2, mdcr_el2);
--	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
-+	write_sysreg(host_ctxt->hcr_el2, hcr_el2);
- 	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
- 
- static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_cpu_context *host_ctxt;
-+
-+	host_ctxt = vcpu->arch.host_cpu_context;
- 	/*
- 	 * If we pended a virtual abort, preserve it until it gets
- 	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
- 	 * the crucial bit is "On taking a vSError interrupt,
- 	 * HCR_EL2.VSE is cleared to 0."
- 	 */
--	if (vcpu->arch.hcr_el2 & HCR_VSE)
--		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
-+	if (vcpu->arch.ctxt.hcr_el2 & HCR_VSE)
-+		vcpu->arch.ctxt.hcr_el2 = read_sysreg(hcr_el2);
- 
- 	if (has_vhe())
--		deactivate_traps_vhe();
-+		deactivate_traps_vhe(host_ctxt);
- 	else
--		__deactivate_traps_nvhe();
-+		__deactivate_traps_nvhe(host_ctxt);
- }
- 
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
-@@ -191,7 +194,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- 	__activate_traps_common(vcpu);
- }
- 
--void deactivate_traps_vhe_put(void)
-+void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- {
- 	u64 mdcr_el2 = read_sysreg(mdcr_el2);
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 68d6f7c..68ddc0f 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -21,6 +21,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- /*
-  * Non-VHE: Both host and guest must save everything.
-@@ -294,7 +295,7 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- 	if (!has_vhe())
- 		return;
- 
--	deactivate_traps_vhe_put();
-+	deactivate_traps_vhe_put(vcpu);
- 
- 	__sysreg_save_el1_state(guest_ctxt);
- 	__sysreg_save_user_state(guest_ctxt);
-@@ -316,3 +317,21 @@ void __hyp_text __kvm_enable_ssbs(void)
- 	"msr	sctlr_el2, %0"
- 	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
- }
-+
-+/**
-+ * __kvm_populate_host_regs - Stores host register values
-+ *
-+ * This function acts as a function handler parameter for kvm_call_hyp and
-+ * may be called from EL1 exception level to fetch the register value.
-+ */
-+void __hyp_text __kvm_populate_host_regs(void)
-+{
-+	struct kvm_cpu_context *host_ctxt;
-+
-+	if (has_vhe())
-+		host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
-+	else
-+		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
-+
-+	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
-+}
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 76c3086..c5e7144 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -86,12 +86,16 @@ static hyp_alternate_select(__tlb_switch_to_guest,
- static void __hyp_text __tlb_switch_to_host_vhe(struct kvm *kvm,
- 						struct tlb_inv_context *cxt)
- {
-+	u64 val;
-+
- 	/*
- 	 * We're done with the TLB operation, let's restore the host's
- 	 * view of HCR_EL2.
- 	 */
- 	write_sysreg(0, vttbr_el2);
--	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	val = read_sysreg(hcr_el2);
-+	val |= HCR_TGE;
-+	write_sysreg(val, hcr_el2);
- 	isb();
- 
- 	if (cpus_have_const_cap(ARM64_WORKAROUND_1165522)) {
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 9e350fd3..8e18f7f 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1328,6 +1328,7 @@ static void cpu_hyp_reinit(void)
- 		cpu_init_hyp_mode(NULL);
- 
- 	kvm_arm_init_debug();
-+	__cpu_copy_hyp_conf();
- 
- 	if (vgic_present)
- 		kvm_vgic_init_cpu_hardware();
+The detailed description of ARMv8.3 pointer authentication support in
+userspace/kernel and can be found in Kristina's generic pointer authentication
+patch series[3].
+
+KVM guest work:
+==============================================
+
+If pointer authentication is enabled for KVM guests then the new PAC instructions
+will not trap to EL2. If not then they may be ignored if in HINT region or trapped
+in EL2 as illegal instruction. Since KVM guest vcpu runs as a thread so they have
+a key initialized which will be used by PAC. When world switch happens between
+host and guest then this key is exchanged.
+
+There were some review comments by Christoffer Dall in the original series [1,2,3]
+and this patch series tries to implement them.
+
+The current v6 patch series contains most of the suggestions by James Morse,
+Kristina, Julien and Dave.
+
+This patch series is based on just a single patch from Dave Martin [8] which add
+control checks for accessing sys registers. 
+
+Changes since v5 [7]: Major changes are listed below.
+
+* Split hcr_el2 and mdcr_el2 save/restore in two patches.
+* Reverted back save/restore of sys-reg keys as done in V4 [5]. There was
+  suggestion by James Morse to use ptrauth utilities in a single place
+  in arm core and use them from kvm. However this change deviates from the
+  existing sys-reg implementations and is not scalable.
+* Invoked the key switch C functions from __guest_enter/__guest_exit assembly.
+* Host key save is now done inside vcpu_load.
+* Reverted back masking of cpufeature ID registers for ptrauth when disabled
+  from userpace.
+* Reset of ptrauth key registers not done conditionally.
+* Code and Documentation cleanup.
+
+Changes since v4 [6]: Several suggestions from James Morse
+* Move host registers to be saved/restored inside struct kvm_cpu_context.
+* Similar to hcr_el2, save/restore mdcr_el2 register also.
+* Added save routines for ptrauth keys in generic arm core and
+  use them during KVM context switch.
+* Defined a GCC attribute __no_ptrauth which discards generating
+  ptrauth instructions in a function. This is taken from Kristina's
+  earlier kernel pointer authentication support patches [4].
+* Dropped a patch to mask cpufeature when not enabled from userspace and
+  now only key registers are masked from register list.
+
+Changes since v3 [5]:
+* Use pointer authentication only when VHE is present as ARM8.3 implies ARM8.1
+  features to be present.
+* Added lazy context handling of ptrauth instructions from V2 version again. 
+* Added more details in Documentation.
+
+Changes since v2 [1,2]:
+* Allow host and guest to have different HCR_EL2 settings and not just constant
+  value HCR_HOST_VHE_FLAGS or HCR_HOST_NVHE_FLAGS.
+* Optimise the reading of HCR_EL2 in host/guest switch by fetching it once
+  during KVM initialisation state and using it later.
+* Context switch pointer authentication keys when switching between guest
+  and host. Pointer authentication was enabled in a lazy context earlier[2] and
+  is removed now to make it simple. However it can be revisited later if there
+  is significant performance issue.
+* Added a userspace option to choose pointer authentication.
+* Based on the userspace option, ptrauth cpufeature will be visible.
+* Based on the userspace option, ptrauth key registers will be accessible.
+* A small document is added on how to enable pointer authentication from
+  userspace KVM API.
+
+Looking for feedback and comments.
+
+Thanks,
+Amit
+
+[1]: https://lore.kernel.org/lkml/20171127163806.31435-11-mark.rutland@arm.com/
+[2]: https://lore.kernel.org/lkml/20171127163806.31435-10-mark.rutland@arm.com/
+[3]: https://lkml.org/lkml/2018/12/7/666
+[4]: https://lore.kernel.org/lkml/20181005084754.20950-1-kristina.martsenko@arm.com/
+[5]: https://lkml.org/lkml/2018/10/17/594
+[6]: https://lkml.org/lkml/2018/12/18/80
+[7]: https://lkml.org/lkml/2019/1/28/49
+[8]: https://lore.kernel.org/linux-arm-kernel/1547757219-19439-13-git-send-email-Dave.Martin@arm.com/
+
+
+Linux (5.0-rc6 based):
+
+Amit Daniel Kachhap (5):
+  arm64/kvm: preserve host HCR_EL2 value
+  arm64/kvm: preserve host MDCR_EL2 value
+  arm64/kvm: context-switch ptrauth registers
+  arm64/kvm: add a userspace option to enable pointer authentication
+  arm64/kvm: control accessibility of ptrauth key registers
+
+ Documentation/arm64/pointer-authentication.txt |  13 ++-
+ Documentation/virtual/kvm/api.txt              |   4 +
+ arch/arm/include/asm/kvm_host.h                |   4 +-
+ arch/arm64/include/asm/kvm_asm.h               |   2 +
+ arch/arm64/include/asm/kvm_emulate.h           |  22 ++---
+ arch/arm64/include/asm/kvm_host.h              |  45 ++++++++--
+ arch/arm64/include/asm/kvm_hyp.h               |   9 +-
+ arch/arm64/include/uapi/asm/kvm.h              |   1 +
+ arch/arm64/kernel/traps.c                      |   1 +
+ arch/arm64/kvm/debug.c                         |  28 ++----
+ arch/arm64/kvm/guest.c                         |   2 +-
+ arch/arm64/kvm/handle_exit.c                   |  21 +++--
+ arch/arm64/kvm/hyp/Makefile                    |   1 +
+ arch/arm64/kvm/hyp/entry.S                     |  17 ++++
+ arch/arm64/kvm/hyp/ptrauth-sr.c                | 115 +++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/switch.c                    |  40 ++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c                 |  27 +++++-
+ arch/arm64/kvm/hyp/tlb.c                       |   6 +-
+ arch/arm64/kvm/reset.c                         |   3 +
+ arch/arm64/kvm/sys_regs.c                      |  66 +++++++++++---
+ include/uapi/linux/kvm.h                       |   1 +
+ virt/kvm/arm/arm.c                             |   4 +-
+ 22 files changed, 338 insertions(+), 94 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/ptrauth-sr.c
+
+kvmtool:
+
+Repo: git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
+
+Amit Daniel Kachhap (1):
+  arm/kvm: arm64: Add a vcpu feature for pointer authentication
+
+ arm/aarch32/include/kvm/kvm-cpu-arch.h    | 1 +
+ arm/aarch64/include/asm/kvm.h             | 1 +
+ arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    | 1 +
+ arm/include/arm-common/kvm-config-arch.h  | 1 +
+ arm/kvm-cpu.c                             | 6 ++++++
+ include/linux/kvm.h                       | 1 +
+ 7 files changed, 14 insertions(+), 1 deletion(-)
+
 -- 
 2.7.4
