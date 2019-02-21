@@ -1,62 +1,54 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH] KVM: arm64: Fix architecturally invalid reset value for FPEXC32_EL2
-Date: Thu, 21 Feb 2019 11:42:32 +0000
-Message-ID: <1550749352-2315-1-git-send-email-Dave.Martin@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, Julien Thierry <julien.thierry@arm.com>, James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, stable@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v5 01/26] KVM: Documentation: Document arm64 core
+ registers in detail
+Date: Thu, 21 Feb 2019 11:48:30 +0000
+Message-ID: <4086adbf-0a3f-bb44-5ec4-d6f92ed66a42@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-2-git-send-email-Dave.Martin@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C55414A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:48:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IWV9Xi1KwdQ3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Feb 2019 06:48:35 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FDB74A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:48:35 -0500 (EST)
+In-Reply-To: <1550519559-15915-2-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Due to what looks like a typo dating back to the original addition
-of FPEXC32_EL2 handling, KVM currently initialises this register to
-an architecturally invalid value.
+Hi Dave,
 
-As a result, the VECITR field (RES1) in bits [10:8] is initialised
-with 0, and the two reserved (RES0) bits [6:5] are initialised with
-1.  (In the Common VFP Subarchitecture as specified by ARMv7-A,
-these two bits were IMP DEF.  ARMv8-A removes them.)
+On 18/02/2019 19:52, Dave Martin wrote:
+> Since the the sizes of individual members of the core arm64
+> registers vary, the list of register encodings that make sense is
+> not a simple linear sequence.
+> 
+> To clarify which encodings to use, this patch adds a brief list
+> to the documentation.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-This patch changes the reset value from 0x70 to 0x700, which
-reflects the architectural constraints and is presumably what was
-originally intended.
+Reviewed-by: Julien Grall <julien.grall@arm.com>
 
-Cc: <stable@vger.kernel.org> # 4.12.x-
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Fixes: 62a89c44954f ("arm64: KVM: 32bit handling of coprocessor traps")
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Cheers,
 
----
-
-For AArch32 the situation is more complicated.  FPEXC[29:0] is
-subarchitecture-defined, so the reset value may need to be per-CPU-
-implementation.  The machinery for this is incomplete today In fact, I
-haven't currently found any reset logic for the VFP registers in
-arch/arm/kvm.
-
-Currently I don't attempt to address this, but if anyone has ideas
-about the best way to address it, please shout.
-
-I'll try to figure out something in the meantime, but it's not my top
-priority.  We have no evidence I'm aware of that this is causing
-problems for anybody today.
----
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c936aa4..b6dac3a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1476,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
- 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
--	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x70 },
-+	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
- };
- 
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
 -- 
-2.1.4
+Julien Grall
