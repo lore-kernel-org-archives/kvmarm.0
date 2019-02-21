@@ -1,28 +1,25 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 01/26] KVM: Documentation: Document arm64 core
- registers in detail
-Date: Thu, 21 Feb 2019 11:57:19 +0000
-Message-ID: <CAFEAcA-mydDP1GN+ODL0eUYqOrxYZgzW5oxnpa2Ss9v0wfk1HA@mail.gmail.com>
-References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-2-git-send-email-Dave.Martin@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v6 2/6] arm64/kvm: preserve host MDCR_EL2 value
+Date: Thu, 21 Feb 2019 11:57:45 +0000
+Message-ID: <20190221115745.GB33673@lakrids.cambridge.arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 207C14A331
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:57:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7ED4A331
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:57:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Tex64isfu82h for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Feb 2019 06:57:31 -0500 (EST)
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com
- [209.85.167.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4AC24A1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:57:31 -0500 (EST)
-Received: by mail-oi1-f196.google.com with SMTP id q81so1160400oic.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 03:57:31 -0800 (PST)
-In-Reply-To: <1550519559-15915-2-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id D3V4Z5lSkW7t for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Feb 2019 06:57:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD8E4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:57:51 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,71 +29,234 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 18 Feb 2019 at 19:54, Dave Martin <Dave.Martin@arm.com> wrote:
->
-> Since the the sizes of individual members of the core arm64
-> registers vary, the list of register encodings that make sense is
-> not a simple linear sequence.
->
-> To clarify which encodings to use, this patch adds a brief list
-> to the documentation.
->
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+On Tue, Feb 19, 2019 at 02:54:27PM +0530, Amit Daniel Kachhap wrote:
+> Save host MDCR_EL2 value during kvm HYP initialisation and restore
+> after every switch from host to guest. There should not be any
+> change in functionality due to this.
+> 
+> The value of mdcr_el2 is now stored in struct kvm_cpu_context as
+> both host and guest can now use this field in a common way.
+> 
+> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
 > ---
->  Documentation/virtual/kvm/api.txt | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 356156f..097b8ba 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2090,6 +2090,30 @@ contains elements ranging from 32 to 128 bits. The index is a 32bit
->  value in the kvm_regs structure seen as a 32bit array.
->    0x60x0 0000 0010 <index into the kvm_regs struct:16>
->
-> +Specifically:
-> +    Encoding            Register  Bits  kvm_regs member
-> +----------------------------------------------------------------
-> +  0x6030 0000 0010 0000 X0          64  regs.regs[0]
-> +  0x6030 0000 0010 0002 X1          64  regs.regs[1]
-> +    ...
-> +  0x6030 0000 0010 003c X30         64  regs.regs[30]
-> +  0x6030 0000 0010 003e SP          64  regs.sp
-> +  0x6030 0000 0010 0040 PC          64  regs.pc
-> +  0x6030 0000 0010 0042 PSTATE      64  regs.pstate
-> +  0x6030 0000 0010 0044 SP_EL1      64  sp_el1
-> +  0x6030 0000 0010 0046 ELR_EL1     64  elr_el1
-> +  0x6030 0000 0010 0048 SPSR_EL1    64  spsr[KVM_SPSR_EL1] (alias SPSR_SVC)
-> +  0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
-> +  0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
-> +  0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
-> +  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-> +  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]
-> +  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]
-> +    ...
-> +  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]
-> +  0x6020 0000 0010 00d4 FPSR        32  fp_regs.fpsr
-> +  0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
+>  arch/arm/include/asm/kvm_host.h   |  1 -
+>  arch/arm64/include/asm/kvm_host.h |  6 ++----
+>  arch/arm64/kvm/debug.c            | 28 ++++++----------------------
+>  arch/arm64/kvm/hyp/switch.c       | 17 ++++-------------
+>  arch/arm64/kvm/hyp/sysreg-sr.c    |  6 ++++++
+>  virt/kvm/arm/arm.c                |  1 -
+>  6 files changed, 18 insertions(+), 41 deletions(-)
+
+This looks like a nice cleanup! FWIW:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Thanks,
+Mark.
+
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 05706b4..704667e 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -294,7 +294,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+> -static inline void kvm_arm_init_debug(void) {}
+>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1b2e05b..2f1bb86 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -205,6 +205,8 @@ struct kvm_cpu_context {
+>  
+>  	/* HYP host/guest configuration */
+>  	u64 hcr_el2;
+> +	u32 mdcr_el2;
 > +
->  arm64 CCSIDR registers are demultiplexed by CSSELR value:
->    0x6020 0000 0011 00 <csselr:8>
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-It is weird that we document these in terms of apparently
-arbitrary hex digits in the encoding, but the headers
-exposed to userspace define helpful #defines for the various
-subfields. So nobody really wants to use these hex
-digits and they need to then go hunting in the headers
-to confirm that if they use KVM_REG_ARM64 | KVM_REG_SIZE_U32 |
-KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.fpsr)
-they are getting the officially approved working encoding.
-But it is how we're documenting everything else in this
-section, so that's a separate issue.
-
-thanks
--- PMM
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+>  };
+>  
+> @@ -213,9 +215,6 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+>  
+> -	/* HYP configuration */
+> -	u32 mdcr_el2;
+> -
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> @@ -446,7 +445,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>  
+> -void kvm_arm_init_debug(void);
+>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index f39801e..99dc0a4 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -32,8 +32,6 @@
+>  				DBG_MDSCR_KDE | \
+>  				DBG_MDSCR_MDE)
+>  
+> -static DEFINE_PER_CPU(u32, mdcr_el2);
+> -
+>  /**
+>   * save/restore_guest_debug_regs
+>   *
+> @@ -65,21 +63,6 @@ static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  /**
+> - * kvm_arm_init_debug - grab what we need for debug
+> - *
+> - * Currently the sole task of this function is to retrieve the initial
+> - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
+> - * presumably been set-up by some knowledgeable bootcode.
+> - *
+> - * It is called once per-cpu during CPU hyp initialisation.
+> - */
+> -
+> -void kvm_arm_init_debug(void)
+> -{
+> -	__this_cpu_write(mdcr_el2, kvm_call_hyp(__kvm_get_mdcr_el2));
+> -}
+> -
+> -/**
+>   * kvm_arm_reset_debug_ptr - reset the debug ptr to point to the vcpu state
+>   */
+>  
+> @@ -111,6 +94,7 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  {
+> +	kvm_cpu_context_t *host_cxt = this_cpu_ptr(&kvm_host_cpu_state);
+>  	bool trap_debug = !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY);
+>  	unsigned long mdscr;
+>  
+> @@ -120,8 +104,8 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  	 * This also clears MDCR_EL2_E2PB_MASK to disable guest access
+>  	 * to the profiling buffer.
+>  	 */
+> -	vcpu->arch.mdcr_el2 = __this_cpu_read(mdcr_el2) & MDCR_EL2_HPMN_MASK;
+> -	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
+> +	vcpu->arch.ctxt.mdcr_el2 = host_cxt->mdcr_el2 & MDCR_EL2_HPMN_MASK;
+> +	vcpu->arch.ctxt.mdcr_el2 |= (MDCR_EL2_TPM |
+>  				MDCR_EL2_TPMS |
+>  				MDCR_EL2_TPMCR |
+>  				MDCR_EL2_TDRA |
+> @@ -130,7 +114,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  	/* Is Guest debugging in effect? */
+>  	if (vcpu->guest_debug) {
+>  		/* Route all software debug exceptions to EL2 */
+> -		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDE;
+> +		vcpu->arch.ctxt.mdcr_el2 |= MDCR_EL2_TDE;
+>  
+>  		/* Save guest debug state */
+>  		save_guest_debug_regs(vcpu);
+> @@ -202,13 +186,13 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  
+>  	/* Trap debug register access */
+>  	if (trap_debug)
+> -		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> +		vcpu->arch.ctxt.mdcr_el2 |= MDCR_EL2_TDA;
+>  
+>  	/* If KDE or MDE are set, perform a full save/restore cycle. */
+>  	if (vcpu_read_sys_reg(vcpu, MDSCR_EL1) & (DBG_MDSCR_KDE | DBG_MDSCR_MDE))
+>  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+>  
+> -	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+> +	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.ctxt.mdcr_el2);
+>  	trace_kvm_arm_set_dreg32("MDSCR_EL1", vcpu_read_sys_reg(vcpu, MDSCR_EL1));
+>  }
+>  
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 006bd33..03b36f1 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -82,7 +82,7 @@ static void __hyp_text __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	 */
+>  	write_sysreg(0, pmselr_el0);
+>  	write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> -	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> +	write_sysreg(vcpu->arch.ctxt.mdcr_el2, mdcr_el2);
+>  }
+>  
+>  static void __hyp_text __deactivate_traps_common(void)
+> @@ -157,14 +157,9 @@ static void deactivate_traps_vhe(struct kvm_cpu_context *host_ctxt)
+>  
+>  static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
+>  {
+> -	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> -
+>  	__deactivate_traps_common();
+>  
+> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+> -	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> -
+> -	write_sysreg(mdcr_el2, mdcr_el2);
+> +	write_sysreg(host_ctxt->mdcr_el2, mdcr_el2);
+>  	write_sysreg(host_ctxt->hcr_el2, hcr_el2);
+>  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+>  }
+> @@ -196,13 +191,9 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+>  
+>  void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> -
+> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
+> -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> -		    MDCR_EL2_TPMS;
+> +	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+>  
+> -	write_sysreg(mdcr_el2, mdcr_el2);
+> +	write_sysreg(host_ctxt->mdcr_el2, mdcr_el2);
+>  
+>  	__deactivate_traps_common();
+>  }
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 68ddc0f..42ec50f 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -334,4 +334,10 @@ void __hyp_text __kvm_populate_host_regs(void)
+>  		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
+>  
+>  	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
+> +	/*
+> +	 * Retrieve the initial value of mdcr_el2 so we can preserve
+> +	 * MDCR_EL2.HPMN which has presumably been set-up by some
+> +	 * knowledgeable bootcode.
+> +	 */
+> +	host_ctxt->mdcr_el2 = read_sysreg(mdcr_el2);
+>  }
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 8e18f7f..2032a66 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1327,7 +1327,6 @@ static void cpu_hyp_reinit(void)
+>  	else
+>  		cpu_init_hyp_mode(NULL);
+>  
+> -	kvm_arm_init_debug();
+>  	__cpu_copy_hyp_conf();
+>  
+>  	if (vgic_present)
+> -- 
+> 2.7.4
+> 
