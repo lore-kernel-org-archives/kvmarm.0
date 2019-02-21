@@ -1,293 +1,138 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v5 18/26] KVM: arm64/sve: Add SVE support to register
- access ioctl interface
-Date: Thu, 21 Feb 2019 15:23:37 +0000
-Message-ID: <f6d9f731-e9f8-a54d-1165-2b188e22b4df@arm.com>
-References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-19-git-send-email-Dave.Martin@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
+Date: Thu, 21 Feb 2019 15:49:35 +0000
+Message-ID: <20190221154935.GU3567@e103592.cambridge.arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E54954A3B2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 10:23:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yGi1dL49I+gq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Feb 2019 10:23:46 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B53CE4A200
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 10:23:46 -0500 (EST)
-In-Reply-To: <1550519559-15915-19-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
+On Tue, Feb 19, 2019 at 02:54:26PM +0530, Amit Daniel Kachhap wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
+> 
+> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+> is a constant value. This works today, as the host HCR_EL2 value is
+> always the same, but this will get in the way of supporting extensions
+> that require HCR_EL2 bits to be set conditionally for the host.
+> 
+> To allow such features to work without KVM having to explicitly handle
+> every possible host feature combination, this patch has KVM save/restore
+> for the host HCR when switching to/from a guest HCR. The saving of the
+> register is done once during cpu hypervisor initialization state and is
+> just restored after switch from guest.
+> 
+> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+> kvm_call_hyp and is helpful in NHVE case.
 
-On 18/02/2019 19:52, Dave Martin wrote:
-> This patch adds the following registers for access via the
-> KVM_{GET,SET}_ONE_REG interface:
+Minor nit: NVHE misspelled.  This looks a bit like it's naming an arch
+feature rather than a kernel implementation detail though.  Maybe write
+"non-VHE".
+
+> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+> to toggle the TGE bit with a RMW sequence, as we already do in
+> __tlb_switch_to_guest_vhe().
 > 
->  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
->  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
->  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
+> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+> and guest can now use this field in a common way.
 > 
-> In order to adapt gracefully to future architectural extensions,
-> the registers are logically divided up into slices as noted above:
-> the i parameter denotes the slice index.
-> 
-> This allows us to reserve space in the ABI for future expansion of
-> these registers.  However, as of today the architecture does not
-> permit registers to be larger than a single slice, so no code is
-> needed in the kernel to expose additional slices, for now.  The
-> code can be extended later as needed to expose them up to a maximum
-> of 32 slices (as carved out in the architecture itself) if they
-> really exist someday.
-> 
-> The registers are only visible for vcpus that have SVE enabled.
-> They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
-> have SVE.
-> 
-> Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
-> allowed for SVE-enabled vcpus: SVE-aware userspace can use the
-> KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
-> register state.  This avoids some complex and pointless emulation
-> in the kernel to convert between the two views of these aliased
-> registers.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> [Added __cpu_copy_hyp_conf, hcr_el2 field in struct kvm_cpu_context]
+> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
 > ---
+>  arch/arm/include/asm/kvm_host.h      |  2 ++
+>  arch/arm64/include/asm/kvm_asm.h     |  2 ++
+>  arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++-----------
+>  arch/arm64/include/asm/kvm_host.h    | 13 ++++++++++++-
+>  arch/arm64/include/asm/kvm_hyp.h     |  2 +-
+>  arch/arm64/kvm/guest.c               |  2 +-
+>  arch/arm64/kvm/hyp/switch.c          | 23 +++++++++++++----------
+>  arch/arm64/kvm/hyp/sysreg-sr.c       | 21 ++++++++++++++++++++-
+>  arch/arm64/kvm/hyp/tlb.c             |  6 +++++-
+>  virt/kvm/arm/arm.c                   |  1 +
+>  10 files changed, 68 insertions(+), 26 deletions(-)
 > 
-> Changes since v4:
-> 
->  * Add "BASE" #defines for the Z-reg and P-reg ranges in the KVM
->    register ID space, to make the 0x400 magic number a little less
->    cryptic.
-> 
->  * Pull KVM_SVE_{Z,P}REG_SIZE defines from "KVM: arm64: Enumerate SVE
->    register indices for KVM_GET_REG_LIST", since we now use them here.
-> 
->  * Simplify sve_reg_region(), and give up on the attempt to make
->    kreg_region a general thing: nothing else will use it for now,
->    anyway, so let's keep it as simple as possible.
-> 
->  * Drop support for multiple slices per register.  This functionality
->    can be added back in later if needed, without ABI breaks.
-> 
->  * Pull vcpu_sve_state_size() into kvm_host.h, from "KVM: arm64/sve:
->    Allow userspace to enable SVE for vcpus".  This is needed for use
->    with array_index_nospec() to determine the applicable buffer bounds.
->    To avoid circular header deependency issues, the function is also
->    converted into a macro, but is otherwise equivalent to the original
->    version.
-> 
->  * Guard sve_state base offset in kernel memory with
->    array_index_nospec(), since it is generated from user data that can
->    put it out of range.
-> 
->    (sve_state will get allocated with the corresponding size later in
->    the series.  For now, this code is dormant since no means is
->    provided for userspace to create SVE-enabled vcpus yet.)
-> ---
->  arch/arm64/include/asm/kvm_host.h |  14 ++++
->  arch/arm64/include/uapi/asm/kvm.h |  17 +++++
->  arch/arm64/kvm/guest.c            | 138 ++++++++++++++++++++++++++++++++++----
->  3 files changed, 157 insertions(+), 12 deletions(-)
-> 
-
-[...]
-
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index f491456..8cfa889 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-
-[...]
-
-> @@ -211,6 +217,114 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return err;
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index ca56537..05706b4 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
+>  	kvm_call_hyp(__init_stage2_translation);
 >  }
 >  
-> +#define SVE_REG_SLICE_SHIFT	0
-> +#define SVE_REG_SLICE_BITS	5
-> +#define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-> +#define SVE_REG_ID_BITS		5
+> +static inline void __cpu_copy_hyp_conf(void) {}
 > +
-> +#define SVE_REG_SLICE_MASK					\
-> +	GENMASK(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS - 1,	\
-> +		SVE_REG_SLICE_SHIFT)
-> +#define SVE_REG_ID_MASK							\
-> +	GENMASK(SVE_REG_ID_SHIFT + SVE_REG_ID_BITS - 1, SVE_REG_ID_SHIFT)
-> +
-> +#define SVE_NUM_SLICES (1 << SVE_REG_SLICE_BITS)
-> +
-> +#define KVM_SVE_ZREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0))
-> +#define KVM_SVE_PREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0))
-> +
-> +struct sve_state_region {
-
-This sve_state_region feels a bit too generic too me.
-
-So far it is only used to access a single (slice of a) register at a
-time. Is there a plan to use it for more?
-
-Otherwise I'd suggest at least naming it something like sve_reg_region,
-sve_reg_mem_region or sve_reg_mem_desc.
-
-
-> +	unsigned int koffset;	/* offset into sve_state in kernel memory */
-> +	unsigned int klen;	/* length in kernel memory */
-> +	unsigned int upad;	/* extra trailing padding in user memory */
-> +};
-> +
-> +/* Get sanitised bounds for user/kernel SVE register copy */
-> +static int sve_reg_region(struct sve_state_region *region,
-
-I feel that sve_reg_to_region or sve_reg_get_region would be a clearer name.
-
-Cheers,
-
-Julien
-
-> +			  struct kvm_vcpu *vcpu,
-> +			  const struct kvm_one_reg *reg)
-> +{
-> +	/* reg ID ranges for Z- registers */
-> +	const u64 zreg_id_min = KVM_REG_ARM64_SVE_ZREG(0, 0);
-> +	const u64 zreg_id_max = KVM_REG_ARM64_SVE_ZREG(SVE_NUM_ZREGS - 1,
-> +						       SVE_NUM_SLICES - 1);
-> +
-> +	/* reg ID ranges for P- registers and FFR (which are contiguous) */
-> +	const u64 preg_id_min = KVM_REG_ARM64_SVE_PREG(0, 0);
-> +	const u64 preg_id_max = KVM_REG_ARM64_SVE_FFR(SVE_NUM_SLICES - 1);
-> +
-> +	unsigned int vq;
-> +	unsigned int reg_num;
-> +
-> +	unsigned int reqoffset, reqlen; /* User-requested offset and length */
-> +	unsigned int maxlen; /* Maxmimum permitted length */
-> +
-> +	size_t sve_state_size;
-> +
-> +	/* Only the first slice ever exists, for now: */
-> +	if ((reg->id & SVE_REG_SLICE_MASK) != 0)
-> +		return -ENOENT;
-> +
-> +	vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
-> +
-> +	reg_num = (reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
-> +
-> +	if (reg->id >= zreg_id_min && reg->id <= zreg_id_max) {
-> +		reqoffset = SVE_SIG_ZREG_OFFSET(vq, reg_num) -
-> +				SVE_SIG_REGS_OFFSET;
-> +		reqlen = KVM_SVE_ZREG_SIZE;
-> +		maxlen = SVE_SIG_ZREG_SIZE(vq);
-> +	} else if (reg->id >= preg_id_min && reg->id <= preg_id_max) {
-> +		reqoffset = SVE_SIG_PREG_OFFSET(vq, reg_num) -
-> +				SVE_SIG_REGS_OFFSET;
-> +		reqlen = KVM_SVE_PREG_SIZE;
-> +		maxlen = SVE_SIG_PREG_SIZE(vq);
-> +	} else {
-> +		return -ENOENT;
-> +	}
-> +
-> +	sve_state_size = vcpu_sve_state_size(vcpu);
-> +	if (!sve_state_size)
-> +		return -EINVAL;
-> +
-> +	region->koffset = array_index_nospec(reqoffset, sve_state_size);
-> +	region->klen = min(maxlen, reqlen);
-> +	region->upad = reqlen - region->klen;
-> +
-> +	return 0;
-> +}
-> +
-> +static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	struct sve_state_region region;
-> +	char __user *uptr = (char __user *)reg->addr;
-> +
-> +	if (!vcpu_has_sve(vcpu) || sve_reg_region(&region, vcpu, reg))
-> +		return -ENOENT;
-> +
-> +	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
-> +			 region.klen) ||
-> +	    clear_user(uptr + region.klen, region.upad))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	struct sve_state_region region;
-> +	const char __user *uptr = (const char __user *)reg->addr;
-> +
-> +	if (!vcpu_has_sve(vcpu) || sve_reg_region(&region, vcpu, reg))
-> +		return -ENOENT;
-> +
-> +	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
-> +			   region.klen))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
->  int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>  static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 >  {
->  	return -EINVAL;
-> @@ -371,12 +485,12 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
->  		return -EINVAL;
+>  	return 0;
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index f5b79e9..8acd73f 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -80,6 +80,8 @@ extern void __vgic_v3_init_lrs(void);
 >  
-> -	/* Register group 16 means we want a core register. */
-> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
-> -		return get_core_reg(vcpu, reg);
-> -
-> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
-> -		return kvm_arm_get_fw_reg(vcpu, reg);
-> +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> +	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
-> +	case KVM_REG_ARM_FW:	return kvm_arm_get_fw_reg(vcpu, reg);
-> +	case KVM_REG_ARM64_SVE:	return get_sve_reg(vcpu, reg);
-> +	default: break; /* fall through */
-> +	}
+>  extern u32 __kvm_get_mdcr_el2(void);
 >  
->  	if (is_timer_reg(reg->id))
->  		return get_timer_reg(vcpu, reg);
-> @@ -390,12 +504,12 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
->  		return -EINVAL;
+> +extern void __kvm_populate_host_regs(void);
+> +
+>  /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
+>  #define __hyp_this_cpu_ptr(sym)						\
+>  	({								\
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 506386a..0dbe795 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -50,25 +50,25 @@ void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
 >  
-> -	/* Register group 16 means we set a core register. */
-> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
-> -		return set_core_reg(vcpu, reg);
-> -
-> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
-> -		return kvm_arm_set_fw_reg(vcpu, reg);
-> +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
-> +	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
-> +	case KVM_REG_ARM_FW:	return kvm_arm_set_fw_reg(vcpu, reg);
-> +	case KVM_REG_ARM64_SVE:	return set_sve_reg(vcpu, reg);
-> +	default: break; /* fall through */
-> +	}
->  
->  	if (is_timer_reg(reg->id))
->  		return set_timer_reg(vcpu, reg);
-> 
+>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  {
+> -	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> +	return !(vcpu->arch.ctxt.hcr_el2 & HCR_RW);
 
--- 
-Julien Thierry
+Putting hcr_el2 into struct kvm_cpu_context creates a lot of splatter
+here, and I'm wondering whether it's really necessary.  Otherwise,
+we could just put the per-vcpu guest HCR_EL2 value in struct
+kvm_vcpu_arch.
+
+Is the *host* hcr_el2 value really different per-vcpu?  That looks
+odd.  I would have thought this is fixed across the system at KVM
+startup time.
+
+Having a single global host hcr_el2 would also avoid the need for
+__kvm_populate_host_regs(): instead, we just decide what HCR_EL2 is to
+be ahead of time and set a global variable that we map into Hyp.
+
+
+Or does the host HCR_EL2 need to vary at runtime for some reason I've
+missed?
+
+[...]
+
++void __hyp_text __kvm_populate_host_regs(void)
++{
++       struct kvm_cpu_context *host_ctxt;
++
++       if (has_vhe())
++               host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
++       else
++               host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
+
+According to the comment by the definition of __hyp_this_cpu_ptr(), this
+always works at Hyp.  I also see other calls with no fallback
+this_cpu_ptr() call like we have here.
+
+So, can we simply always call __hyp_this_cpu_ptr() here?
+
+(I'm not familiar with this, myself.)
+
+Cheers
+---Dave
