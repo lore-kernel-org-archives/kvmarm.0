@@ -1,371 +1,134 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v5 22/26] KVM: arm64/sve: Add pseudo-register for the
- guest's vector lengths
-Date: Thu, 21 Feb 2019 17:48:59 +0000
-Message-ID: <34b7691f-7acb-c9aa-6e53-2857e429f148@arm.com>
-References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-23-git-send-email-Dave.Martin@arm.com>
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
+Date: Thu, 21 Feb 2019 18:57:17 -0300
+Message-ID: <87a7ioby9u.fsf@morokweng.localdomain>
+References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
+ <20190118103235-mutt-send-email-mst@kernel.org>
+ <0ba215f5-e856-bf31-8dd9-a85710714a7a@arm.com>
+ <20190129135345-mutt-send-email-mst@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB9974A200
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 12:49:10 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 21RufahAwJTg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Feb 2019 12:49:09 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF6A4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 12:49:08 -0500 (EST)
-In-Reply-To: <1550519559-15915-23-git-send-email-Dave.Martin@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-reply-to: <20190129135345-mutt-send-email-mst@kernel.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: mark.rutland@arm.com, devicetree@vger.kernel.org, kevin.tian@intel.com, tnowicki@caviumnetworks.com, virtio-dev@lists.oasis-open.org, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, linux-pci@vger.kernel.org, jasowang@redhat.com, linuxppc-dev@lists.ozlabs.org, will.deacon@arm.com, frowand.list@gmail.com, virtualization@lists.linux-foundation.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robh+dt@kernel.org, bhelgaas@google.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
 
-On 18/02/2019 19:52, Dave Martin wrote:
-> This patch adds a new pseudo-register KVM_REG_ARM64_SVE_VLS to
-> allow userspace to set and query the set of vector lengths visible
-> to the guest, along with corresponding storage in struct
-> kvm_vcpu_arch.
-> 
-> In the future, multiple register slices per SVE register may be
-> visible through the ioctl interface.  Once the set of slices has
-> been determined we would not be able to allow the vector length set
-> to be changed any more, in order to avoid userspace seeing
-> inconsistent sets of registers.  For this reason, this patch adds
-> support to track vcpu finalization explicitly, and enforce proper
-> sequencing of ioctls.
-> 
-> The new pseudo-register is not exposed yet.  Subsequent patches
-> will allow SVE to be turned on for guest vcpus, making it visible.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> 
-> ---
-> 
-> Changes since v4:
-> 
->  * Add a UAPI header comment indicating the pseudo-register status of
->    KVM_REG_ARM64_SVE_VLS.
-> 
->  * Get rid of the sve_vqs[] array from struct kvm_vcpu_arch.  This
->    array is pointless, because its contents must match the host's
->    internal sve_vq_map anyway, up to vcpu->arch.sve_max_vl.
-> 
->    The ioctl register accessors are slow-path code, so we can decode
->    or reconstruct sve_vqs[] on demand instead, for exchange with
->    userspace.
-> 
->  * For compatibility with potential future architecture extensions,
->    enabling vector lengths above 256 bytes for the guest is explicitly
->    disallowed now (because the code for exposing additional bits
->    through ioctl is currently missing).  This can be addressed later
->    if/when needed.
-> 
-> Note:
-> 
->  * I defensively pass an array by pointer here, to help avoid
->    accidentally breaking assumptions during future maintenance.
-> 
->    Due to (over?)zealous constification, this causes the following
->    sparse warning.  I think this is sparse getting confused: I am not
->    relying on any kernel-specific semantics here, and GCC generates no
->    warning.
-> 
-> +arch/arm64/kvm/guest.c:33: warning: incorrect type in argument 1 (different modifiers)
-> +arch/arm64/kvm/guest.c:33:    expected unsigned long long const [usertype] ( *const vqs )[8]
-> +arch/arm64/kvm/guest.c:33:    got unsigned long long [usertype] ( * )[8]
-> 
-> ---
->  arch/arm64/include/asm/kvm_host.h |   7 ++-
->  arch/arm64/include/uapi/asm/kvm.h |   4 ++
->  arch/arm64/kvm/guest.c            | 124 ++++++++++++++++++++++++++++++++++++--
->  arch/arm64/kvm/reset.c            |   9 +++
->  4 files changed, 136 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 015c2578..e53119a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -24,6 +24,7 @@
->  
->  #include <linux/bitmap.h>
->  #include <linux/types.h>
-> +#include <linux/kernel.h>
->  #include <linux/kvm_types.h>
->  #include <asm/cpufeature.h>
->  #include <asm/daifflags.h>
-> @@ -331,6 +332,7 @@ struct kvm_vcpu_arch {
->  #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
->  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
->  #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
-> +#define KVM_ARM64_VCPU_FINALIZED	(1 << 6) /* vcpu config completed */
->  
->  #define vcpu_has_sve(vcpu) (system_supports_sve() && \
->  			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
-> @@ -554,7 +556,8 @@ void kvm_arch_free_vm(struct kvm *kvm);
->  int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
->  
->  /* Commit to the set of vcpu registers currently configured: */
-> -static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu) { return 0; }
-> -#define kvm_arm_vcpu_finalized(vcpu) true
-> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu);
-> +#define kvm_arm_vcpu_finalized(vcpu) \
-> +	((vcpu)->arch.flags & KVM_ARM64_VCPU_FINALIZED)
->  
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index ced760c..7ff1bd4 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -243,6 +243,10 @@ struct kvm_vcpu_events {
->  					 ((n) << 5) | (i))
->  #define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
->  
-> +/* Vector lengths pseudo-register: */
-> +#define KVM_REG_ARM64_SVE_VLS		(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-> +					 KVM_REG_SIZE_U512 | 0xffff)
-> +
->  /* Device Control API: ARM VGIC */
->  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
->  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 4a2ad60..5f48c17 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -217,6 +217,81 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return err;
->  }
->  
-> +#define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-> +#define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> +
-> +static bool vq_present(
-> +	const u64 (*const vqs)[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)],
-> +	unsigned int vq)
-> +{
-> +	return (*vqs)[vq_word(vq)] & vq_mask(vq);
-> +}
-> +
-> +static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	unsigned int max_vq, vq;
-> +	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> +
-> +	if (WARN_ON(!sve_vl_valid(vcpu->arch.sve_max_vl)))
-> +		return -EINVAL;
-> +
-> +	memset(vqs, 0, sizeof(vqs));
-> +
-> +	max_vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
-> +	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> +		if (sve_vq_available(vq))
-> +			vqs[vq_word(vq)] |= vq_mask(vq);
-> +
-> +	BUILD_BUG_ON(sizeof(vqs) != KVM_REG_SIZE(reg->id));
+Michael S. Tsirkin <mst@redhat.com> writes:
 
-reg->id is not know at build time. From my understanding of
-BUILD_BUG_ON(), things actually ends up evaluated at runtime but I'm not
-sure what happens when doing sizeof(char[1- 2*0]) at runtime.
+> On Mon, Jan 21, 2019 at 11:29:05AM +0000, Jean-Philippe Brucker wrote:
+>> Hi,
+>>
+>> On 18/01/2019 15:51, Michael S. Tsirkin wrote:
+>> >
+>> > On Tue, Jan 15, 2019 at 12:19:52PM +0000, Jean-Philippe Brucker wrote:
+>> >> Implement the virtio-iommu driver, following specification v0.9 [1].
+>> >>
+>> >> This is a simple rebase onto Linux v5.0-rc2. We now use the
+>> >> dev_iommu_fwspec_get() helper introduced in v5.0 instead of accessing
+>> >> dev->iommu_fwspec, but there aren't any functional change from v6 [2].
+>> >>
+>> >> Our current goal for virtio-iommu is to get a paravirtual IOMMU working
+>> >> on Arm, and enable device assignment to guest userspace. In this
+>> >> use-case the mappings are static, and don't require optimal performance,
+>> >> so this series tries to keep things simple. However there is plenty more
+>> >> to do for features and optimizations, and having this base in v5.1 would
+>> >> be good. Given that most of the changes are to drivers/iommu, I believe
+>> >> the driver and future changes should go via the IOMMU tree.
+>> >>
+>> >> You can find Linux driver and kvmtool device on v0.9.2 branches [3],
+>> >> module and x86 support on virtio-iommu/devel. Also tested with Eric's
+>> >> QEMU device [4]. Please note that the series depends on Robin's
+>> >> probe-deferral fix [5], which will hopefully land in v5.0.
+>> >>
+>> >> [1] Virtio-iommu specification v0.9, sources and pdf
+>> >>     git://linux-arm.org/virtio-iommu.git virtio-iommu/v0.9
+>> >>     http://jpbrucker.net/virtio-iommu/spec/v0.9/virtio-iommu-v0.9.pdf
+>> >>
+>> >> [2] [PATCH v6 0/7] Add virtio-iommu driver
+>> >>     https://lists.linuxfoundation.org/pipermail/iommu/2018-December/032127.html
+>> >>
+>> >> [3] git://linux-arm.org/linux-jpb.git virtio-iommu/v0.9.2
+>> >>     git://linux-arm.org/kvmtool-jpb.git virtio-iommu/v0.9.2
+>> >>
+>> >> [4] [RFC v9 00/17] VIRTIO-IOMMU device
+>> >>     https://www.mail-archive.com/qemu-devel@nongnu.org/msg575578.html
+>> >>
+>> >> [5] [PATCH] iommu/of: Fix probe-deferral
+>> >>     https://www.spinics.net/lists/arm-kernel/msg698371.html
+>> >
+>> > Thanks for the work!
+>> > So really my only issue with this is that there's no
+>> > way for the IOMMU to describe the devices that it
+>> > covers.
+>> >
+>> > As a result that is then done in a platform-specific way.
+>> >
+>> > And this means that for example it does not solve the problem that e.g.
+>> > some power people have in that their platform simply does not have a way
+>> > to specify which devices are covered by the IOMMU.
+>>
+>> Isn't power using device tree? I haven't looked much at power because I
+>> was told a while ago that they already paravirtualize their IOMMU and
+>> don't need virtio-iommu, except perhaps for some legacy platforms. Or
+>> something along those lines. But I would certainly be interested in
+>> enabling the IOMMU for more architectures.
+>
+> I have CC'd the relevant ppc developers, let's see what do they think.
 
-Anyway, I don't think this is intended.
+I'm far from being an expert, but what could be very useful for us is to
+have a way for the guest to request IOMMU bypass for a device.
 
-> +	if (copy_to_user((void __user *)reg->addr, vqs, sizeof(vqs)))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +	unsigned int max_vq, vq;
-> +	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> +
-> +	if (kvm_arm_vcpu_finalized(vcpu))
-> +		return -EPERM; /* too late! */
-> +
-> +	if (WARN_ON(vcpu->arch.sve_state))
-> +		return -EINVAL;
-> +
-> +	BUILD_BUG_ON(sizeof(vqs) != KVM_REG_SIZE(reg->id));
+>From what I understand, the pSeries platform used by POWER guests always
+puts devices behind an IOMMU, so at least for current systems a
+description of which devices are covered by the IOMMU would always say
+"all of them".
 
-Same as above.
+>> As for the enumeration problem, I still don't think we can get much
+>> better than DT and ACPI as solutions (and IMO they are necessary to make
+>> this device portable). But I believe that getting DT and ACPI support is
+>> just a one-off inconvenience. That is, once the required bindings are
+>> accepted, any future extension can then be done at the virtio level with
+>> feature bits and probe requests, without having to update ACPI or DT.
 
-> +	if (copy_from_user(vqs, (const void __user *)reg->addr, sizeof(vqs)))
-> +		return -EFAULT;
-> +
-> +	max_vq = 0;
-> +	for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
-> +		if (vq_present(&vqs, vq))
-> +			max_vq = vq;
-> +
-> +	/*
-> +	 * The get_sve_reg()/set_sve_reg() ioctl interface will need
-> +	 * to be extended with multiple register slice support in
-> +	 * order to support vector lengths greater than
-> +	 * SVE_VL_ARCH_MAX:
-> +	 */
-> +	if (WARN_ONCE(sve_vl_from_vq(max_vq) > SVE_VL_ARCH_MAX,
-> +		      "KVM: Requested vector length not supported yet\n"))
-> +		return -EINVAL;
-> +
-> +	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> +		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-> +			return -EINVAL;
-> +
-> +	/* Can't run with no vector lengths at all: */
-> +	if (max_vq < SVE_VQ_MIN)
-> +		return -EINVAL;
-> +
-> +	vcpu->arch.sve_max_vl = sve_vl_from_vq(max_vq);
-> +
-> +	return 0;
-> +}
-> +
->  #define SVE_REG_SLICE_SHIFT	0
->  #define SVE_REG_SLICE_BITS	5
->  #define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-> @@ -297,9 +372,21 @@ static int sve_reg_region(struct sve_state_region *region,
->  static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
->  	struct sve_state_region region;
-> +	int ret;
->  	char __user *uptr = (char __user *)reg->addr;
->  
-> -	if (!vcpu_has_sve(vcpu) || sve_reg_region(&region, vcpu, reg))
-> +	if (!vcpu_has_sve(vcpu))
-> +		return -ENOENT;
-> +
-> +	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-> +		return get_sve_vls(vcpu, reg);
-> +
-> +	/* Finalize the number of slices per SVE register: */
-> +	ret = kvm_arm_vcpu_finalize(vcpu);
+There is a device tree binding that can specify devices connected to a
+given IOMMU in Documentation/devicetree/bindings/iommu/iommu.txt.
+I don't believe POWER machines use it though.
 
-Having this here feels a bit random...
+>> Thanks,
+>> Jean
+>>
+>> > Solving that problem would make me much more excited about
+>> > this device.
+>> >
+>> > On the other hand I can see that while there have been some
+>> > developments most of the code has been stable for quite a while now.
+>> >
+>> > So what I am trying to do right about now, is making a small module that
+>> > loads early and pokes at the IOMMU sufficiently to get the data about
+>> > which devices use the IOMMU out of it using standard virtio config
+>> > space.  IIUC it's claimed to be impossible without messy changes to the
+>> > boot sequence.
+>> >
+>> > If I succeed at least on some platforms I'll ask that this design is
+>> > worked into this device, minimizing info that goes through DT/ACPI.  If
+>> > I see I can't make it in time to meet the next merge window, I plan
+>> > merging the existing patches using DT (barring surprises).
+>> >
+>> > As I only have a very small amount of time to spend on this attempt, If
+>> > someone else wants to try doing that in parallel, that would be great!
 
-I'd suggest considering the pseudo-register outside of the SVE co-proc,
-as part of a set of registers that do not finalize a vcpu when accessed.
-All other registers (even non-sve ones) would finalize the vcpu when
-accessed from userland.
-
-Does that make sense?
-
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (sve_reg_region(&region, vcpu, reg))
->  		return -ENOENT;
->  
->  	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
-> @@ -313,9 +400,21 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
->  	struct sve_state_region region;
-> +	int ret;
->  	const char __user *uptr = (const char __user *)reg->addr;
->  
-> -	if (!vcpu_has_sve(vcpu) || sve_reg_region(&region, vcpu, reg))
-> +	if (!vcpu_has_sve(vcpu))
-> +		return -ENOENT;
-> +
-> +	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-> +		return set_sve_vls(vcpu, reg);
-> +
-> +	/* Finalize the number of slices per SVE register: */
-> +	ret = kvm_arm_vcpu_finalize(vcpu);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (sve_reg_region(&region, vcpu, reg))
->  		return -ENOENT;
->  
->  	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
-> @@ -452,30 +551,43 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
->  	if (!vcpu_has_sve(vcpu))
->  		return 0;
->  
-> -	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */);
-> +	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */)
-> +		+ 1; /* KVM_REG_ARM64_SVE_VLS */
->  }
->  
->  static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu, u64 __user **uind)
->  {
->  	/* Only the first slice ever exists, for now */
->  	const unsigned int slices = 1;
-> +	u64 reg;
->  	unsigned int i, n;
->  
->  	if (!vcpu_has_sve(vcpu))
->  		return 0;
->  
-> +	/*
-> +	 * Enumerate this first, so that userspace can save/restore in
-> +	 * the order reported by KVM_GET_REG_LIST:
-> +	 */
-> +	reg = KVM_REG_ARM64_SVE_VLS;
-> +	if (put_user(reg, (*uind)++))
-> +		return -EFAULT;
-> +
->  	for (i = 0; i < slices; i++) {
->  		for (n = 0; n < SVE_NUM_ZREGS; n++) {
-> -			if (put_user(KVM_REG_ARM64_SVE_ZREG(n, i), (*uind)++))
-> +			reg = KVM_REG_ARM64_SVE_ZREG(n, i);
-> +			if (put_user(reg, (*uind)++))
->  				return -EFAULT;
->  		}
->  
->  		for (n = 0; n < SVE_NUM_PREGS; n++) {
-> -			if (put_user(KVM_REG_ARM64_SVE_PREG(n, i), (*uind)++))
-> +			reg = KVM_REG_ARM64_SVE_PREG(n, i);
-> +			if (put_user(reg, (*uind)++))
->  				return -EFAULT;
->  		}
->  
-> -		if (put_user(KVM_REG_ARM64_SVE_FFR(i), (*uind)++))
-> +		reg = KVM_REG_ARM64_SVE_FFR(i);
-> +		if (put_user(reg, (*uind)++))
->  			return -EFAULT;
->  	}
->  
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index b72a3dd..1379fb2 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -98,6 +98,15 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	return r;
->  }
->  
-> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu)
-> +{
-> +	if (likely(kvm_arm_vcpu_finalized(vcpu)))
-> +		return 0;
-> +
-> +	vcpu->arch.flags |= KVM_ARM64_VCPU_FINALIZED;
-> +	return 0;
-> +}
-> +
-
-I think that the introduction of this flag and setting it should be part
-of the previous patch.
-
-Cheers,
-
--- 
-Julien Thierry
+--
+Thiago Jung Bauermann
+IBM Linux Technology Center
