@@ -1,69 +1,62 @@
-From: Julien Grall <Julien.Grall@arm.com>
-Subject: Re: [PATCH 06/14] KVM: arm/arm64: Factor out VMID into struct kvm_vmid
-Date: Thu, 21 Feb 2019 11:02:56 +0000
-Message-ID: <1978ee57-c7bd-e55a-4e77-ad0b4b62d1d1@arm.com>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
- <20190124140032.8588-7-christoffer.dall@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 900D64A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:03:03 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0DK8auabTwnu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Feb 2019 06:03:00 -0500 (EST)
-Received: from EUR02-VE1-obe.outbound.protection.outlook.com
- (mail-eopbgr20049.outbound.protection.outlook.com [40.107.2.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4DB84A200
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 06:02:59 -0500 (EST)
-In-Reply-To: <20190124140032.8588-7-christoffer.dall@arm.com>
-Content-Language: en-US
-Content-ID: <7E8DC60B4CA826488988D8D2B3C89E0B@eurprd08.prod.outlook.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <Christoffer.Dall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, nd <nd@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH] KVM: arm64: Fix architecturally invalid reset value for FPEXC32_EL2
+Date: Thu, 21 Feb 2019 11:42:32 +0000
+Message-ID: <1550749352-2315-1-git-send-email-Dave.Martin@arm.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, Julien Thierry <julien.thierry@arm.com>, James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, stable@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+Due to what looks like a typo dating back to the original addition
+of FPEXC32_EL2 handling, KVM currently initialises this register to
+an architecturally invalid value.
 
-On 24/01/2019 14:00, Christoffer Dall wrote:
-> Note that to avoid mapping the kvm_vmid_bits variable into hyp, we
-> simply forego the masking of the vmid value in kvm_get_vttbr and rely on
-> update_vmid to always assign a valid vmid value (within the supported
-> range).
+As a result, the VECITR field (RES1) in bits [10:8] is initialised
+with 0, and the two reserved (RES0) bits [6:5] are initialised with
+1.  (In the Common VFP Subarchitecture as specified by ARMv7-A,
+these two bits were IMP DEF.  ARMv8-A removes them.)
 
-[...]
+This patch changes the reset value from 0x70 to 0x700, which
+reflects the architectural constraints and is presumably what was
+originally intended.
 
-> -	kvm->arch.vmid = kvm_next_vmid;
-> +	vmid->vmid = kvm_next_vmid;
->   	kvm_next_vmid++;
-> -	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
-> -
-> -	/* update vttbr to be used with the new vmid */
-> -	pgd_phys = virt_to_phys(kvm->arch.pgd);
-> -	BUG_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm));
-> -	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
-> -	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid | cnp;
-> +	kvm_next_vmid &= (1 << kvm_get_vmid_bits()) - 1;
+Cc: <stable@vger.kernel.org> # 4.12.x-
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Fixes: 62a89c44954f ("arm64: KVM: 32bit handling of coprocessor traps")
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-The arm64 version of kvm_get_vmid_bits does not look cheap. Indeed it required 
-to read the sanitized value of SYS_ID_AA64MMFR1_EL1 that is implemented using 
-the function bsearch.
+---
 
-So wouldn't it be better to keep kvm_vmid_bits variable for use in update_vttbr()?
+For AArch32 the situation is more complicated.  FPEXC[29:0] is
+subarchitecture-defined, so the reset value may need to be per-CPU-
+implementation.  The machinery for this is incomplete today In fact, I
+haven't currently found any reset logic for the VFP registers in
+arch/arm/kvm.
 
-Cheers,
+Currently I don't attempt to address this, but if anyone has ideas
+about the best way to address it, please shout.
 
+I'll try to figure out something in the meantime, but it's not my top
+priority.  We have no evidence I'm aware of that this is causing
+problems for anybody today.
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c936aa4..b6dac3a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1476,7 +1476,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+ 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+-	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x70 },
++	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+ };
+ 
+ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
 -- 
-Julien Grall
+2.1.4
