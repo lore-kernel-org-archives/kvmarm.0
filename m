@@ -1,83 +1,63 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v6 4/6] arm64/kvm: add a userspace option to enable
- pointer authentication
-Date: Thu, 21 Feb 2019 12:34:16 +0000
-Message-ID: <20190221123416.GD33673@lakrids.cambridge.arm.com>
-References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-5-git-send-email-amit.kachhap@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v5 02/26] arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on
+ task state flush
+Date: Thu, 21 Feb 2019 12:39:39 +0000
+Message-ID: <7e358d11-4896-1f09-0496-70a78eb60736@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-3-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1550568271-5319-5-git-send-email-amit.kachhap@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1550519559-15915-3-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Peter Maydell <peter.maydell@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 19, 2019 at 02:54:29PM +0530, Amit Daniel Kachhap wrote:
-> This feature will allow the KVM guest to allow the handling of
-> pointer authentication instructions or to treat them as undefined
-> if not set. It uses the existing vcpu API KVM_ARM_VCPU_INIT to
-> supply this parameter instead of creating a new API.
-> 
-> A new register is not created to pass this parameter via
-> SET/GET_ONE_REG interface as just a flag (KVM_ARM_VCPU_PTRAUTH)
-> supplied is enough to enable this feature.
-> 
-> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  Documentation/arm64/pointer-authentication.txt |  9 +++++----
->  Documentation/virtual/kvm/api.txt              |  4 ++++
->  arch/arm64/include/asm/kvm_host.h              |  3 ++-
->  arch/arm64/include/uapi/asm/kvm.h              |  1 +
->  arch/arm64/kvm/handle_exit.c                   |  2 +-
->  arch/arm64/kvm/hyp/ptrauth-sr.c                | 16 +++++++++++++++-
->  arch/arm64/kvm/reset.c                         |  3 +++
->  arch/arm64/kvm/sys_regs.c                      | 26 +++++++++++++-------------
->  include/uapi/linux/kvm.h                       |  1 +
->  9 files changed, 45 insertions(+), 20 deletions(-)
-> 
-> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-> index a25cd21..0529a7d 100644
-> --- a/Documentation/arm64/pointer-authentication.txt
-> +++ b/Documentation/arm64/pointer-authentication.txt
-> @@ -82,7 +82,8 @@ pointers).
->  Virtualization
->  --------------
->  
-> -Pointer authentication is not currently supported in KVM guests. KVM
-> -will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-> -the feature will result in an UNDEFINED exception being injected into
-> -the guest.
-> +Pointer authentication is enabled in KVM guest when virtual machine is
-> +created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
-> +to be enabled. Without this flag, pointer authentication is not enabled
-> +in KVM guests and attempted use of the feature will result in an UNDEFINED
-> +exception being injected into the guest.
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 356156f..1e646fb 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2642,6 +2642,10 @@ Possible features:
->  	  Depends on KVM_CAP_ARM_PSCI_0_2.
->  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
->  	  Depends on KVM_CAP_ARM_PMU_V3.
-> +	- KVM_ARM_VCPU_PTRAUTH: Emulate Pointer authentication for the CPU.
-> +	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
-> +	  set, then the KVM guest allows the execution of pointer authentication
-> +	  instructions. Otherwise, KVM treats these instructions as undefined.
-
-I think that we should have separate flags for address auth and generic
-auth, to match the ID register split.
-
-For now, we can have KVM only support the case where both are set, but
-it gives us freedom to support either in isolation if we have to in
-future, without an ABI break.
-
-Thanks,
-Mark.
+SGkgRGF2ZSwKCk9uIDE4LzAyLzIwMTkgMTk6NTIsIERhdmUgTWFydGluIHdyb3RlOgo+IFRoaXMg
+cGF0Y2ggdXBkYXRlcyBmcHNpbWRfZmx1c2hfdGFza19zdGF0ZSgpIHRvIG1pcnJvciB0aGUgbmV3
+Cj4gc2VtYW50aWNzIG9mIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUoKSBpbnRyb2R1Y2VkIGJ5IGNv
+bW1pdAo+IGQ4YWQ3MWZhMzhhOSAoImFybTY0OiBmcHNpbWQ6IEZpeCBUSUZfRk9SRUlHTl9GUFNU
+QVRFIGFmdGVyCj4gaW52YWxpZGF0aW5nIGNwdSByZWdzIikuICBCb3RoIGZ1bmN0aW9ucyBub3cg
+aW1wbGljaXRseSBzZXQKCk5JVDogRG91YmxlLXNwYWNlIGJlZm9yZSAiQm90aCIKCj4gVElGX0ZP
+UkVJR05fRlBTVEFURSB0byBpbmRpY2F0ZSB0aGF0IHRoZSB0YXNrJ3MgRlBTSU1EIHN0YXRlIGlz
+IG5vdAo+IGxvYWRlZCBpbnRvIHRoZSBjcHUuCj4gCj4gQXMgYSBzaWRlLWVmZmVjdCwgZnBzaW1k
+X2ZsdXNoX3Rhc2tfc3RhdGUoKSBub3cgc2V0cwo+IFRJRl9GT1JFSUdOX0ZQU1RBVEUgZXZlbiBm
+b3Igbm9uLXJ1bm5pbmcgdGFza3MuICBJbiB0aGUgY2FzZSBvZgoKTklUOiBEb3VibGUgc3BwYWNl
+IGJlZm9yZSAiSW4iLgoKPiBub24tcnVubmluZyB0YXNrcyB0aGlzIGlzIG5vdCB1c2VmdWwgYnV0
+IGFsc28gaGFybWxlc3MsIGJlY2F1c2UgdGhlCj4gZmxhZyBpcyBsaXZlIG9ubHkgd2hpbGUgdGhl
+IGNvcnJlc3BvbmRpbmcgdGFzayBpcyBydW5uaW5nLiAgVGhpcwo+IGZ1bmN0aW9uIGlzIG5vdCBj
+YWxsZWQgZnJvbSBmYXN0IHBhdGhzLCBzbyBzcGVjaWFsLWNhc2luZyB0aGlzIGZvcgo+IHRoZSB0
+YXNrID09IGN1cnJlbnQgY2FzZSBpcyBub3QgcmVhbGx5IHdvcnRoIGl0Lgo+IAo+IENvbXBpbGVy
+IGJhcnJpZXJzIHByZXZpb3VzbHkgcHJlc2VudCBpbiByZXN0b3JlX3N2ZV9mcHNpbWRfY29udGV4
+dCgpCj4gYXJlIHB1bGxlZCBpbnRvIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgc28gdGhhdCBp
+dCBjYW4gYmUgc2FmZWx5Cj4gY2FsbGVkIHdpdGggcHJlZW1wdGlvbiBlbmFibGVkIGlmIG5lY2Vz
+c2FyeS4KPiAKPiBFeHBsaWNpdCBjYWxscyB0byBzZXQgVElGX0ZPUkVJR05fRlBTVEFURSB0aGF0
+IGFjY29tcGFueQo+IGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgY2FsbHMgYW5kIGFyZSBub3cg
+cmVkdW5kYW50IGFyZSByZW1vdmVkCj4gYXMgYXBwcm9wcmlhdGUuCj4gCj4gZnBzaW1kX2ZsdXNo
+X3Rhc2tfc3RhdGUoKSBpcyB1c2VkIHRvIGdldCBleGNsdXNpdmUgYWNjZXNzIHRvIHRoZQo+IHJl
+cHJlc2VudGF0aW9uIG9mIHRoZSB0YXNrJ3Mgc3RhdGUgdmlhIHRhc2tfc3RydWN0LCBmb3IgdGhl
+IHB1cnBvc2UKPiBvZiByZXBsYWNpbmcgdGhlIHN0YXRlLiAgVGh1cywgdGhlIGNhbGwgdG8gdGhp
+cyBmdW5jdGlvbiBzaG91bGQKCk5JVDogRG91YmxlLXNwYWNlIGJlZm9yZSAiVGh1cyIuCgo+IGhh
+cHBlbiBiZWZvcmUgbWFuaXB1bGF0aW5nIGZwc2ltZF9zdGF0ZSBvciBzdmVfc3RhdGUgZXRjLiBp
+bgo+IHRhc2tfc3RydWN0LiAgQW5vbWFsb3VzIGNhc2VzIGFyZSByZW9yZGVyZWQgYXBwcm9wcmlh
+dGVseSBpbiBvcmRlcgoKTklUOiBEb3VibGUtc3BhY2UgYmVmb3JlICJBbm9tYWxvdXMiLgoKPiB0
+byBtYWtlIHRoZSBjb2RlIG1vcmUgY29uc2lzdGVudCwgYWx0aG91Z2ggdGhlcmUgc2hvdWxkIGJl
+IG5vCj4gZnVuY3Rpb25hbCBkaWZmZXJlbmNlIHNpbmNlIHRoZXNlIGNhc2VzIGFyZSBwcm90ZWN0
+ZWQgYnkKPiBsb2NhbF9iaF9kaXNhYmxlKCkgYW55d2F5Lgo+IAo+IFNpZ25lZC1vZmYtYnk6IERh
+dmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBBbGV4IEJlbm7D
+qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgpSZXZpZXdlZC1ieTogSnVsaWVuIEdyYWxsIDxq
+dWxpZW4uZ3JhbGxAYXJtLmNvbT4KCkNoZWVycywKCi0tIApKdWxpZW4gR3JhbGwKCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwg
+bWFpbGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8v
+bGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
