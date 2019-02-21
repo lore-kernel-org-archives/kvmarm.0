@@ -1,82 +1,120 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v6 2/6] arm64/kvm: preserve host MDCR_EL2 value
-Date: Thu, 21 Feb 2019 15:51:01 +0000
-Message-ID: <20190221155101.GV3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v6 3/6] arm64/kvm: context-switch ptrauth registers
+Date: Thu, 21 Feb 2019 15:51:16 +0000
+Message-ID: <20190221155116.GW3567@e103592.cambridge.arm.com>
 References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-4-git-send-email-amit.kachhap@arm.com>
+ <20190221122942.GC33673@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <20190221122942.GC33673@lakrids.cambridge.arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 19, 2019 at 02:54:27PM +0530, Amit Daniel Kachhap wrote:
-> Save host MDCR_EL2 value during kvm HYP initialisation and restore
-> after every switch from host to guest. There should not be any
-> change in functionality due to this.
+On Thu, Feb 21, 2019 at 12:29:42PM +0000, Mark Rutland wrote:
+> On Tue, Feb 19, 2019 at 02:54:28PM +0530, Amit Daniel Kachhap wrote:
+> > From: Mark Rutland <mark.rutland@arm.com>
+> > 
+> > When pointer authentication is supported, a guest may wish to use it.
+> > This patch adds the necessary KVM infrastructure for this to work, with
+> > a semi-lazy context switch of the pointer auth state.
+> > 
+> > Pointer authentication feature is only enabled when VHE is built
+> > in the kernel and present into CPU implementation so only VHE code
+> > paths are modified.
 > 
-> The value of mdcr_el2 is now stored in struct kvm_cpu_context as
-> both host and guest can now use this field in a common way.
-
-Is MDCR_EL2 somehow relevant to pointer auth?
-
-It's not entirely clear why this patch is here.
-
-If this is a cleanup to align the handling of this register with
-how HCR_EL2 is handled, it would be good to explain that in the commit
-message.
-
-> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  arch/arm/include/asm/kvm_host.h   |  1 -
->  arch/arm64/include/asm/kvm_host.h |  6 ++----
->  arch/arm64/kvm/debug.c            | 28 ++++++----------------------
->  arch/arm64/kvm/hyp/switch.c       | 17 ++++-------------
->  arch/arm64/kvm/hyp/sysreg-sr.c    |  6 ++++++
->  virt/kvm/arm/arm.c                |  1 -
->  6 files changed, 18 insertions(+), 41 deletions(-)
+> Nit: s/into/in the/
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 05706b4..704667e 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -294,7 +294,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->  static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
->  
-> -static inline void kvm_arm_init_debug(void) {}
->  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1b2e05b..2f1bb86 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -205,6 +205,8 @@ struct kvm_cpu_context {
->  
->  	/* HYP host/guest configuration */
->  	u64 hcr_el2;
-> +	u32 mdcr_el2;
-> +
-
-ARMv8-A says MDCR_EL2 is a 64-bit register.
-
-Bits [63:20] are currently RES0, so this is probably not a big deal.
-But it would be better to make this 64-bit to prevent future accidents.
-It may be better to make that change in a separate patch.
-
-This is probably non-urgent, since this is clearly not causing problems
-for anyone today.
+> > 
+> > When we schedule a vcpu, we disable guest usage of pointer
+> > authentication instructions and accesses to the keys. While these are
+> > disabled, we avoid context-switching the keys. When we trap the guest
+> > trying to use pointer authentication functionality, we change to eagerly
+> > context-switching the keys, and enable the feature. The next time the
+> > vcpu is scheduled out/in, we start again. However the host key registers
+> > are saved in vcpu load stage as they remain constant for each vcpu
+> > schedule.
+> > 
+> > Pointer authentication consists of address authentication and generic
+> > authentication, and CPUs in a system might have varied support for
+> > either. Where support for either feature is not uniform, it is hidden
+> > from guests via ID register emulation, as a result of the cpufeature
+> > framework in the host.
+> > 
+> > Unfortunately, address authentication and generic authentication cannot
+> > be trapped separately, as the architecture provides a single EL2 trap
+> > covering both. If we wish to expose one without the other, we cannot
+> > prevent a (badly-written) guest from intermittently using a feature
+> > which is not uniformly supported (when scheduled on a physical CPU which
+> > supports the relevant feature). Hence, this patch expects both type of
+> > authentication to be present in a cpu.
+> > 
+> > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> > [Only VHE, key switch from from assembly, kvm_supports_ptrauth
+> > checks, save host key in vcpu_load]
+> 
+> Hmm, why do we need to do the key switch in assembly, given it's not
+> used in-kernel right now?
+> 
+> Is that in preparation for in-kernel pointer auth usage? If so, please
+> call that out in the commit message.
 
 [...]
+
+> Huh, so we're actually doing the switch in C code...
+> 
+> >  # KVM code is run at a different exception code with a different map, so
+> >  # compiler instrumentation that inserts callbacks or checks into the code may
+> > diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> > index 675fdc1..b78cc15 100644
+> > --- a/arch/arm64/kvm/hyp/entry.S
+> > +++ b/arch/arm64/kvm/hyp/entry.S
+> > @@ -64,6 +64,12 @@ ENTRY(__guest_enter)
+> >  
+> >  	add	x18, x0, #VCPU_CONTEXT
+> >  
+> > +#ifdef	CONFIG_ARM64_PTR_AUTH
+> > +	// Prepare parameter for __ptrauth_switch_to_guest(vcpu, host, guest).
+> > +	mov	x2, x18
+> > +	bl	__ptrauth_switch_to_guest
+> > +#endif
+> 
+> ... and conditionally *calling* that switch code from assembly ...
+> 
+> > +
+> >  	// Restore guest regs x0-x17
+> >  	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+> >  	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+> > @@ -118,6 +124,17 @@ ENTRY(__guest_exit)
+> >  
+> >  	get_host_ctxt	x2, x3
+> >  
+> > +#ifdef	CONFIG_ARM64_PTR_AUTH
+> > +	// Prepare parameter for __ptrauth_switch_to_host(vcpu, guest, host).
+> > +	// Save x0, x2 which are used later in callee saved registers.
+> > +	mov	x19, x0
+> > +	mov	x20, x2
+> > +	sub	x0, x1, #VCPU_CONTEXT
+> > +	ldr	x29, [x2, #CPU_XREG_OFFSET(29)]
+> > +	bl	__ptrauth_switch_to_host
+> > +	mov	x0, x19
+> > +	mov	x2, x20
+> > +#endif
+> 
+> ... which adds a load of boilerplate for no immediate gain.
+> 
+> Do we really need to do this in assembly today?
+
+If we will need to move this to assembly when we add in-kernel ptrauth
+support, it may be best to have it in assembly from the start, to reduce
+unnecessary churn.
+
+But having a mix of C and assembly is likely to make things more
+complicated: we should go with one or the other IMHO.
 
 Cheers
 ---Dave
