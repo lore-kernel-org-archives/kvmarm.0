@@ -1,63 +1,52 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v5 02/26] arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on
- task state flush
-Date: Thu, 21 Feb 2019 12:39:39 +0000
-Message-ID: <7e358d11-4896-1f09-0496-70a78eb60736@arm.com>
+Subject: Re: [PATCH v5 06/26] arm64/sve: Check SVE virtualisability
+Date: Thu, 21 Feb 2019 13:36:26 +0000
+Message-ID: <ea9a0255-5829-883c-d28c-0c34716bbbdb@arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-3-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-7-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1550519559-15915-3-git-send-email-Dave.Martin@arm.com>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62C4F4A200
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 08:36:32 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id T5e0JY8FDzPM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Feb 2019 08:36:31 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1C2C4A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Feb 2019 08:36:30 -0500 (EST)
+In-Reply-To: <1550519559-15915-7-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Peter Maydell <peter.maydell@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, linux-arm-kernel@lists.infradead.org
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgRGF2ZSwKCk9uIDE4LzAyLzIwMTkgMTk6NTIsIERhdmUgTWFydGluIHdyb3RlOgo+IFRoaXMg
-cGF0Y2ggdXBkYXRlcyBmcHNpbWRfZmx1c2hfdGFza19zdGF0ZSgpIHRvIG1pcnJvciB0aGUgbmV3
-Cj4gc2VtYW50aWNzIG9mIGZwc2ltZF9mbHVzaF9jcHVfc3RhdGUoKSBpbnRyb2R1Y2VkIGJ5IGNv
-bW1pdAo+IGQ4YWQ3MWZhMzhhOSAoImFybTY0OiBmcHNpbWQ6IEZpeCBUSUZfRk9SRUlHTl9GUFNU
-QVRFIGFmdGVyCj4gaW52YWxpZGF0aW5nIGNwdSByZWdzIikuICBCb3RoIGZ1bmN0aW9ucyBub3cg
-aW1wbGljaXRseSBzZXQKCk5JVDogRG91YmxlLXNwYWNlIGJlZm9yZSAiQm90aCIKCj4gVElGX0ZP
-UkVJR05fRlBTVEFURSB0byBpbmRpY2F0ZSB0aGF0IHRoZSB0YXNrJ3MgRlBTSU1EIHN0YXRlIGlz
-IG5vdAo+IGxvYWRlZCBpbnRvIHRoZSBjcHUuCj4gCj4gQXMgYSBzaWRlLWVmZmVjdCwgZnBzaW1k
-X2ZsdXNoX3Rhc2tfc3RhdGUoKSBub3cgc2V0cwo+IFRJRl9GT1JFSUdOX0ZQU1RBVEUgZXZlbiBm
-b3Igbm9uLXJ1bm5pbmcgdGFza3MuICBJbiB0aGUgY2FzZSBvZgoKTklUOiBEb3VibGUgc3BwYWNl
-IGJlZm9yZSAiSW4iLgoKPiBub24tcnVubmluZyB0YXNrcyB0aGlzIGlzIG5vdCB1c2VmdWwgYnV0
-IGFsc28gaGFybWxlc3MsIGJlY2F1c2UgdGhlCj4gZmxhZyBpcyBsaXZlIG9ubHkgd2hpbGUgdGhl
-IGNvcnJlc3BvbmRpbmcgdGFzayBpcyBydW5uaW5nLiAgVGhpcwo+IGZ1bmN0aW9uIGlzIG5vdCBj
-YWxsZWQgZnJvbSBmYXN0IHBhdGhzLCBzbyBzcGVjaWFsLWNhc2luZyB0aGlzIGZvcgo+IHRoZSB0
-YXNrID09IGN1cnJlbnQgY2FzZSBpcyBub3QgcmVhbGx5IHdvcnRoIGl0Lgo+IAo+IENvbXBpbGVy
-IGJhcnJpZXJzIHByZXZpb3VzbHkgcHJlc2VudCBpbiByZXN0b3JlX3N2ZV9mcHNpbWRfY29udGV4
-dCgpCj4gYXJlIHB1bGxlZCBpbnRvIGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgc28gdGhhdCBp
-dCBjYW4gYmUgc2FmZWx5Cj4gY2FsbGVkIHdpdGggcHJlZW1wdGlvbiBlbmFibGVkIGlmIG5lY2Vz
-c2FyeS4KPiAKPiBFeHBsaWNpdCBjYWxscyB0byBzZXQgVElGX0ZPUkVJR05fRlBTVEFURSB0aGF0
-IGFjY29tcGFueQo+IGZwc2ltZF9mbHVzaF90YXNrX3N0YXRlKCkgY2FsbHMgYW5kIGFyZSBub3cg
-cmVkdW5kYW50IGFyZSByZW1vdmVkCj4gYXMgYXBwcm9wcmlhdGUuCj4gCj4gZnBzaW1kX2ZsdXNo
-X3Rhc2tfc3RhdGUoKSBpcyB1c2VkIHRvIGdldCBleGNsdXNpdmUgYWNjZXNzIHRvIHRoZQo+IHJl
-cHJlc2VudGF0aW9uIG9mIHRoZSB0YXNrJ3Mgc3RhdGUgdmlhIHRhc2tfc3RydWN0LCBmb3IgdGhl
-IHB1cnBvc2UKPiBvZiByZXBsYWNpbmcgdGhlIHN0YXRlLiAgVGh1cywgdGhlIGNhbGwgdG8gdGhp
-cyBmdW5jdGlvbiBzaG91bGQKCk5JVDogRG91YmxlLXNwYWNlIGJlZm9yZSAiVGh1cyIuCgo+IGhh
-cHBlbiBiZWZvcmUgbWFuaXB1bGF0aW5nIGZwc2ltZF9zdGF0ZSBvciBzdmVfc3RhdGUgZXRjLiBp
-bgo+IHRhc2tfc3RydWN0LiAgQW5vbWFsb3VzIGNhc2VzIGFyZSByZW9yZGVyZWQgYXBwcm9wcmlh
-dGVseSBpbiBvcmRlcgoKTklUOiBEb3VibGUtc3BhY2UgYmVmb3JlICJBbm9tYWxvdXMiLgoKPiB0
-byBtYWtlIHRoZSBjb2RlIG1vcmUgY29uc2lzdGVudCwgYWx0aG91Z2ggdGhlcmUgc2hvdWxkIGJl
-IG5vCj4gZnVuY3Rpb25hbCBkaWZmZXJlbmNlIHNpbmNlIHRoZXNlIGNhc2VzIGFyZSBwcm90ZWN0
-ZWQgYnkKPiBsb2NhbF9iaF9kaXNhYmxlKCkgYW55d2F5Lgo+IAo+IFNpZ25lZC1vZmYtYnk6IERh
-dmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+IFJldmlld2VkLWJ5OiBBbGV4IEJlbm7D
-qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgpSZXZpZXdlZC1ieTogSnVsaWVuIEdyYWxsIDxq
-dWxpZW4uZ3JhbGxAYXJtLmNvbT4KCkNoZWVycywKCi0tIApKdWxpZW4gR3JhbGwKCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwg
-bWFpbGluZyBsaXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8v
-bGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+Hi Dave,
+
+On 18/02/2019 19:52, Dave Martin wrote:
+> +	/*
+> +	 * Mismatches above sve_max_virtualisable_vl are fine, since
+> +	 * no guest is allowed to configure ZCR_EL2.LEN to exceed this:
+> +	 */
+> +	if (sve_vl_from_vq(bit_to_vq(b)) <= sve_max_virtualisable_vl) {
+> +		pr_warn("SVE: cpu%d: Unsupported vector length(s) present\n",
+> +			smp_processor_id());
+
+Would it be worth to print the unsupported vector length?
+
+Cheers,
+
+-- 
+Julien Grall
