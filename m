@@ -1,90 +1,68 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on
- kvm_vgic_inject_irq
-Date: Fri, 22 Feb 2019 20:49:06 +0800
-Message-ID: <20190222124906.GB845@leoy-ThinkPad-X240s>
-References: <20190222082327.3312-1-leo.yan@linaro.org>
- <20190222082327.3312-3-leo.yan@linaro.org>
- <20190222083756.359523ca@why.wild-wind.fr.eu.org>
- <20190222085439.GA845@leoy-ThinkPad-X240s>
- <20190222093923.09e36583@why.wild-wind.fr.eu.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: lantianyu1986@gmail.com
+Subject: [PATCH V3 00/10] X86/KVM/Hyper-V: Add HV ept tlb range list flush support in KVM
+Date: Fri, 22 Feb 2019 23:06:27 +0800
+Message-ID: <20190222150637.2337-1-Tianyu.Lan@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20190222093923.09e36583@why.wild-wind.fr.eu.org>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Andre Przywara <andre.przywara@arm.com>, Jun Yao <yaojun8558363@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, benh@kernel.crashing.org, bp@alien8.de, catalin.marinas@arm.com, christoffer.dall@arm.com, devel@linuxdriverproject.org, haiyangz@microsoft.com, hpa@zytor.com, jhogan@kernel.org, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, kys@microsoft.com, linux-arm-kernel@lists.infradead.org, linux@armlinux.org.uk, linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, marc.zyngier@arm.com, mingo@redhat.com, mpe@ellerman.id.au, paul.burton@mips.com, paulus@ozlabs.org, pbonzini@redhat.com, ralf@linux-mips.org, rkrcmar@redhat.com, sashal@kernel.org, sthemmin@microsoft.com, tglx@linutronix.de, will.deacon@arm.com, x86@kernel.org, michael.h.kelley@microsoft.com, vkuznets@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 22, 2019 at 09:39:23AM +0000, Marc Zyngier wrote:
+From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-[...]
+This patchset is to introduce hv ept tlb range list flush function
+support in the KVM MMU component. Flushing ept tlbs of several address
+range can be done via single hypercall and new list flush function is
+used in the kvm_mmu_commit_zap_page() and FNAME(sync_page). This patchset
+also adds more hv ept tlb range flush support in more KVM MMU function.
 
-> > > > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > > > index 7cfdfbc910e0..79fe64c15051 100644
-> > > > --- a/virt/kvm/arm/vgic/vgic.c
-> > > > +++ b/virt/kvm/arm/vgic/vgic.c
-> > > > @@ -394,7 +394,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
-> > > >  /**
-> > > >   * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-> > > >   * @kvm:     The VM structure pointer
-> > > > - * @cpuid:   The CPU for PPIs
-> > > > + * @cpuid:   The CPU for PPIs and SPIs
-> > > >   * @intid:   The INTID to inject a new state to.
-> > > >   * @level:   Edge-triggered:  true:  to trigger the interrupt
-> > > >   *			      false: to ignore the call  
-> > > 
-> > > What does the CPU mean for SPIs? By definition, the routing of an SPI
-> > > is defined by the distributor configuration.  
-> > 
-> > In the code, KVM injects PPIs by specifying CPU id, so that every PPI
-> > is bound to specific target CPU.  But for SPIs, it always pass '0' for
-> > cpuid, from my understanding this means VM will set interrupt affinity
-> > to VCPU0 by default; in theory we also can set different cpuid for
-> > SPIs so that the SPIs also can be handled by other secondary VCPUs;
-> > this is why I think @cpuid also can be used by SPIs.
-> 
-> SPIs are not hardcoded to vcpu0. This would be a gross violation of the
-> architecture. To convince yourself of this, just run a guest:
-> 
-> root@unassigned-hostname:~# cat /proc/interrupts 
->            CPU0       CPU1       
->   2:       7315       7353     GIC-0  27 Level     arch_timer
->   4:        158          0     GIC-0  33 Level     uart-pl011
->  42:          0          0     GIC-0  23 Level     arm-pmu
->  43:          0          0     pl061   3 Edge      ACPI:Event
->  44:          0          0       MSI 32768 Edge      virtio1-config
->  45:      10476          0       MSI 32769 Edge      virtio1-req.0
->  46:          0          0       MSI 16384 Edge      virtio0-config
->  47:          3         10       MSI 16385 Edge      virtio0-input.0
-> [...]
-> 
-> On this last line, you can see an SPI being routed to both of these
-> vcpus.
-> 
-> I urge you to read the code further, and understand that for any other
-> interrupt class, the cpuid parameter is *ignored*. Yes, we pass zero in
-> that case. We could also pass an approximation of PI with the same
-> effect.
+This patchset is based on the fix patch "x86/Hyper-V: Fix definition HV_MAX_FLUSH_REP_COUNT".
+(https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1939455.html)
 
-Very appreciate for the elaborated example; will read the code
-furthermore.
+Change since v2:
+	1) Fix calculation of flush pages in the kvm_fill_hv_flush_list_func()
+	2) Change the logic of setting/clearing last_level flag
 
-> The interrupt affinity is either defined by the distributor
-> configuration (SPIs) or the ITS configuration (LPIs).
+Change since v1:
+	1) Make flush list as a hlist instead of list in order to 
+	keep struct kvm_mmu_page size.
+	2) Add last_level flag in the struct kvm_mmu_page instead
+	of spte pointer
+	3) Move tlb flush from kvm_mmu_notifier_clear_flush_young() to kvm_age_hva()
+	4) Use range flush in the kvm_vm_ioctl_get/clear_dirty_log()
 
-Given to the up example, I am struggling to understand how you can set
-the interrupt affinity for virtio device.
 
-Do you set the physical interrupt affinity to CPU0/1 in host OS and
-forward it to guest OS?  Or set interrupt affinity in guest OS (I
-tried on Juno board to set irq affinity in guest OS from
-'/proc/irq/xxx/smp_affinity' but failed)?   Or this is accomplished by
-user space tool (lkvm or qemu)?
+Lan Tianyu (10):
+  X86/Hyper-V: Add parameter offset for
+    hyperv_fill_flush_guest_mapping_list()
+  KVM/VMX: Fill range list in kvm_fill_hv_flush_list_func()
+  KVM/MMU: Introduce tlb flush with range list
+  KVM/MMU: Use range flush in sync_page()
+  KVM/MMU: Flush tlb directly in the kvm_mmu_slot_gfn_write_protect()
+  KVM: Add kvm_get_memslot() to get memslot via slot id
+  KVM: Use tlb range flush in the kvm_vm_ioctl_get/clear_dirty_log()
+  KVM: Add flush parameter for kvm_age_hva()
+  KVM/MMU: Use tlb range flush in the kvm_age_hva()
+  KVM/MMU: Add last_level flag in the struct mmu_spte_page
 
-Sorry if I am asking a stupid question :)
+ arch/arm/include/asm/kvm_host.h     |  3 +-
+ arch/arm64/include/asm/kvm_host.h   |  3 +-
+ arch/mips/include/asm/kvm_host.h    |  3 +-
+ arch/mips/kvm/mmu.c                 | 11 ++++++--
+ arch/powerpc/include/asm/kvm_host.h |  3 +-
+ arch/powerpc/kvm/book3s.c           | 10 +++++--
+ arch/powerpc/kvm/e500_mmu_host.c    |  3 +-
+ arch/x86/hyperv/nested.c            |  4 +--
+ arch/x86/include/asm/kvm_host.h     | 11 +++++++-
+ arch/x86/include/asm/mshyperv.h     |  2 +-
+ arch/x86/kvm/mmu.c                  | 55 ++++++++++++++++++++++++++++++-------
+ arch/x86/kvm/mmu.h                  |  7 +++++
+ arch/x86/kvm/paging_tmpl.h          |  5 ++--
+ arch/x86/kvm/vmx/vmx.c              | 18 ++++++++++--
+ arch/x86/kvm/x86.c                  | 16 ++++++++---
+ include/linux/kvm_host.h            |  1 +
+ virt/kvm/arm/mmu.c                  | 13 +++++++--
+ virt/kvm/kvm_main.c                 | 51 ++++++++++++++--------------------
+ 18 files changed, 156 insertions(+), 63 deletions(-)
 
-Thanks,
-Leo Yan
+-- 
+2.14.4
