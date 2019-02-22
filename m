@@ -1,7 +1,7 @@
 From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on kvm_vgic_inject_irq
-Date: Fri, 22 Feb 2019 16:23:24 +0800
-Message-ID: <20190222082327.3312-3-leo.yan@linaro.org>
+Subject: [PATCH v1 3/4] KVM: arm/arm64: Define TCR_EL2_T0SZ_MASK as TCR_T0SZ_MASK
+Date: Fri, 22 Feb 2019 16:23:25 +0800
+Message-ID: <20190222082327.3312-4-leo.yan@linaro.org>
 References: <20190222082327.3312-1-leo.yan@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190222082327.3312-1-leo.yan@linaro.org>
@@ -10,27 +10,26 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The function kvm_vgic_inject_irq() is not only used by PPIs but also can
-be used to inject interrupt for SPIs; this patch improves comment for
-argument @cpuid to reflect support SPIs as well.
+Define macro TCR_EL2_T0SZ_MASK as TCR_T0SZ_MASK, so can remove the hard
+number 0x3f.
 
 Signed-off-by: Leo Yan <leo.yan@linaro.org>
 ---
- virt/kvm/arm/vgic/vgic.c | 2 +-
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 7cfdfbc910e0..79fe64c15051 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -394,7 +394,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- /**
-  * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-  * @kvm:     The VM structure pointer
-- * @cpuid:   The CPU for PPIs
-+ * @cpuid:   The CPU for PPIs and SPIs
-  * @intid:   The INTID to inject a new state to.
-  * @level:   Edge-triggered:  true:  to trigger the interrupt
-  *			      false: to ignore the call
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 6f602af5263c..d945a787f36e 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -99,7 +99,7 @@
+ #define TCR_EL2_SH0_MASK	TCR_SH0_MASK
+ #define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
+ #define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
+-#define TCR_EL2_T0SZ_MASK	0x3f
++#define TCR_EL2_T0SZ_MASK	TCR_T0SZ_MASK
+ #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
+ 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
+ 
 -- 
 2.17.1
