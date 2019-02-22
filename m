@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 24/27] KVM: arm64: Fix comment for KVM_PHYS_SHIFT
-Date: Fri, 22 Feb 2019 16:26:02 +0000
-Message-ID: <20190222162605.5054-25-marc.zyngier@arm.com>
+Subject: [PATCH 25/27] KVM: arm/arm64: Remove unused gpa_end variable
+Date: Fri, 22 Feb 2019 16:26:03 +0000
+Message-ID: <20190222162605.5054-26-marc.zyngier@arm.com>
 References: <20190222162605.5054-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6096F4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:29:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB3334A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:29:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XGbw-W3TAbKT for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 11:29:02 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 008C84A3BE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:29:01 -0500 (EST)
+ with ESMTP id eufVmFuG6Ksu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 11:29:06 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8DD4A3FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:29:06 -0500 (EST)
 In-Reply-To: <20190222162605.5054-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,32 +31,36 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>, kvmarm@lists.cs.columbia.edu, Shaokun Zhang <zhangshaokun@hisilicon.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel@lists.infradead.org, Zenghui Yu <yuzenghui@huawei.com>, Colin Ian King <colin.king@canonical.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+From: Shaokun Zhang <zhangshaokun@hisilicon.com>
 
-Since Suzuki K Poulose's work on Dynamic IPA support, KVM_PHYS_SHIFT will
-be used only when machine_type's bits[7:0] equal to 0 (by default). Thus
-the outdated comment should be fixed.
+The 'gpa_end' local variable is never used and let's remove it.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/mmu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index c423c8c4fc39..b0742a16c6c9 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -138,7 +138,8 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
- 	})
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index e3e5a26b4845..aae68da2717f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1597,14 +1597,13 @@ static void kvm_send_hwpoison_signal(unsigned long address,
+ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+ 					       unsigned long hva)
+ {
+-	gpa_t gpa_start, gpa_end;
++	gpa_t gpa_start;
+ 	hva_t uaddr_start, uaddr_end;
+ 	size_t size;
  
- /*
-- * We currently only support a 40bit IPA.
-+ * We currently support using a VM-specified IPA size. For backward
-+ * compatibility, the default IPA size is fixed to 40bits.
-  */
- #define KVM_PHYS_SHIFT	(40)
+ 	size = memslot->npages * PAGE_SIZE;
  
+ 	gpa_start = memslot->base_gfn << PAGE_SHIFT;
+-	gpa_end = gpa_start + size;
+ 
+ 	uaddr_start = memslot->userspace_addr;
+ 	uaddr_end = uaddr_start + size;
 -- 
 2.20.1
