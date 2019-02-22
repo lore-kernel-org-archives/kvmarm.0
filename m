@@ -1,27 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 06/14] KVM: arm/arm64: Factor out VMID into struct kvm_vmid
-Date: Fri, 22 Feb 2019 12:14:16 +0000
-Message-ID: <20190222121416.6ec76543@why.wild-wind.fr.eu.org>
-References: <20190124140032.8588-1-christoffer.dall@arm.com>
- <20190124140032.8588-7-christoffer.dall@arm.com>
- <1978ee57-c7bd-e55a-4e77-ad0b4b62d1d1@arm.com>
- <20190222091848.21f7f8e6@why.wild-wind.fr.eu.org>
- <44bd2df6-8011-c77f-a83a-95c3529287c0@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v3 0/2] KVM: arm/arm64: Add VCPU workarounds firmware register
+Date: Fri, 22 Feb 2019 12:18:16 +0000
+Message-ID: <20190222121818.30164-1-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C3C24A32E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:14:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 918B64A3B3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:18:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ODLj24mtxhlx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 07:14:23 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE4774A2B6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:14:22 -0500 (EST)
-In-Reply-To: <44bd2df6-8011-c77f-a83a-95c3529287c0@arm.com>
+ with ESMTP id yD-o3Z1yJygx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 07:18:28 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D36F64A200
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:18:28 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,74 +25,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Dave Martin <dave.martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 22 Feb 2019 11:42:46 +0000
-Julien Grall <julien.grall@arm.com> wrote:
+Hi,
 
-> Hi Marc,
-> 
-> On 22/02/2019 09:18, Marc Zyngier wrote:
-> > On Thu, 21 Feb 2019 11:02:56 +0000
-> > Julien Grall <Julien.Grall@arm.com> wrote:
-> > 
-> > Hi Julien,
-> >   
-> >> Hi Christoffer,
-> >>
-> >> On 24/01/2019 14:00, Christoffer Dall wrote:  
-> >>> Note that to avoid mapping the kvm_vmid_bits variable into hyp, we
-> >>> simply forego the masking of the vmid value in kvm_get_vttbr and rely on
-> >>> update_vmid to always assign a valid vmid value (within the supported
-> >>> range).  
-> >>
-> >> [...]
-> >>  
-> >>> -	kvm->arch.vmid = kvm_next_vmid;
-> >>> +	vmid->vmid = kvm_next_vmid;
-> >>>    	kvm_next_vmid++;
-> >>> -	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
-> >>> -
-> >>> -	/* update vttbr to be used with the new vmid */
-> >>> -	pgd_phys = virt_to_phys(kvm->arch.pgd);
-> >>> -	BUG_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm));
-> >>> -	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
-> >>> -	kvm->arch.vttbr = kvm_phys_to_vttbr(pgd_phys) | vmid | cnp;
-> >>> +	kvm_next_vmid &= (1 << kvm_get_vmid_bits()) - 1;  
-> >>
-> >> The arm64 version of kvm_get_vmid_bits does not look cheap. Indeed it required
-> >> to read the sanitized value of SYS_ID_AA64MMFR1_EL1 that is implemented using
-> >> the function bsearch.
-> >>
-> >> So wouldn't it be better to keep kvm_vmid_bits variable for use in update_vttbr()?  
-> > 
-> > How often does this happen? Can you measure this overhead at all?
-> > 
-> > My understanding is that we hit this path on rollover only, having IPIed
-> > all CPUs and invalidated all TLBs. I seriously doubt you can observe
-> > any sort of overhead at all, given that it is so incredibly rare. But
-> > feel free to prove me wrong!  
-> 
-> That would happen on roll-over and the first time you allocate VMID for the VM.
-> 
-> I am planning to run some test with 3-bit VMIDs and provide them next week.
+Aside from a rebase against kvm-arm/next, this update introduces a new
+UNAFFECTED value for WORKAROUND_1, which is not used at the moment, but
+will become useful with some patches extending the host kernel workaround
+code [1]. We add the value to the ABI already.
+Also we now require an exact match for the two WORKAROUND_1 levels, as
+we can't allow a guest to migrate from a system with an effectively
+unknown workaround state to a system which requires an active guest
+workaround.
+Now tested with actual migration, see below.
 
-Sure, but who implements 3 bit VMIDs? I'm only interested in
-performance on real HW, and the minimal implementation allowed is
-8bits.
+Cheers,
+Andre
 
-So don't bother testing this with such contrived conditions. Test it
-for real, on a system that can run enough stuff concurrently to quickly
-exhaust its VMID space and provoke rollovers.
+-----------------------------
+Workarounds for Spectre variant 2 or 4 vulnerabilities require some help
+from the firmware, so KVM implements an interface to provide that for
+guests. When such a guest is migrated, we want to make sure we don't
+loose the protection the guest relies on.
 
-Alternatively, measure the time it takes to create a single VM that
-exits immediately. On its own, that'd be a useful unit test for
-extremely short-lived VMs.
+This introduces two new firmware registers in KVM's GET/SET_ONE_REG
+interface, so userland can save the level of protection implemented by
+the hypervisor and used by the guest. Upon restoring these registers,
+we make sure we don't downgrade and reject any values that would mean
+weaker protection.
+The protection level is encoding in the lower 4 bits, with smaller
+values indicating weaker protection.
 
-Thanks,
+Patch 1 implements the two firmware registers, patch 2 adds the
+documentation.
 
-	M.
+ARM(32) is a bit of a pain (again), as the firmware register interface
+is shared, but 32-bit does not implement all the workarounds.
+For now I stuffed two wrappers into kvm_emulate.h, which doesn't sound
+like the best solution. Happy to hear about better solutions.
+
+This has been tested with migration between two Juno systems. Out of the
+box they advertise identical workaround levels, and migration succeeds.
+However when disabling the A57 cluster on one system, WORKAROUND_1 is
+not needed and the host kernel disables this. Migration between the two
+now fails, as expected.
+
+Please have a look and comment!
+
+Cheers,
+Andre
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-January/627791.html
+
+Changelog:
+v1 .. v2:
+- complete rework of WORKAROUND_2 presentation to use a linear scale,
+  dropping the complicated comparison routine
+
+v2 .. v3:
+- rebase against latest kvm-arm/next
+- introduce UNAFFECTED value for WORKAROUND_1
+- require exact match for WORKAROUND_1 levels
+
+Andre Przywara (2):
+  KVM: arm/arm64: Add save/restore support for firmware workaround state
+  KVM: doc: add API documentation on the KVM_REG_ARM_WORKAROUNDS
+    register
+
+ Documentation/virtual/kvm/arm/psci.txt |  24 +++++
+ arch/arm/include/asm/kvm_emulate.h     |  10 +++
+ arch/arm/include/uapi/asm/kvm.h        |  10 +++
+ arch/arm64/include/asm/kvm_emulate.h   |  14 +++
+ arch/arm64/include/uapi/asm/kvm.h      |   9 ++
+ virt/kvm/arm/psci.c                    | 119 +++++++++++++++++++++----
+ 6 files changed, 170 insertions(+), 16 deletions(-)
+
 -- 
-Without deviation from the norm, progress is not possible.
+2.17.1
