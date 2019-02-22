@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/27] KVM: arm64: Fix ICH_ELRSR_EL2 sysreg naming
-Date: Fri, 22 Feb 2019 16:25:47 +0000
-Message-ID: <20190222162605.5054-10-marc.zyngier@arm.com>
+Subject: [PATCH 10/27] KVM: arm64: Reuse sys_reg() macro when searching the
+ trap table
+Date: Fri, 22 Feb 2019 16:25:48 +0000
+Message-ID: <20190222162605.5054-11-marc.zyngier@arm.com>
 References: <20190222162605.5054-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5024A1FA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:27:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C799A4A3BD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:27:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TPGdE3yq0-I0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 11:27:44 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E722A4A409
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:27:43 -0500 (EST)
+ with ESMTP id K17xCMKcasFx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 11:27:49 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F4CD4A415
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:27:49 -0500 (EST)
 In-Reply-To: <20190222162605.5054-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,63 +32,64 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>, kvmarm@lists.cs.columbia.edu, Shaokun Zhang <zhangshaokun@hisilicon.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel@lists.infradead.org, Zenghui Yu <yuzenghui@huawei.com>, Colin Ian King <colin.king@canonical.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We previously incorrectly named the define for this system register.
+Instead of having an open-coded macro, reuse the sys_reg() macro
+that does the exact same thing (the encoding is slightly different,
+but the ordering property is the same).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/arm/include/asm/arch_gicv3.h | 4 ++--
- arch/arm64/include/asm/sysreg.h   | 2 +-
- virt/kvm/arm/hyp/vgic-v3-sr.c     | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/include/asm/arch_gicv3.h b/arch/arm/include/asm/arch_gicv3.h
-index 0bd530702118..bdc87700def2 100644
---- a/arch/arm/include/asm/arch_gicv3.h
-+++ b/arch/arm/include/asm/arch_gicv3.h
-@@ -54,7 +54,7 @@
- #define ICH_VTR				__ACCESS_CP15(c12, 4, c11, 1)
- #define ICH_MISR			__ACCESS_CP15(c12, 4, c11, 2)
- #define ICH_EISR			__ACCESS_CP15(c12, 4, c11, 3)
--#define ICH_ELSR			__ACCESS_CP15(c12, 4, c11, 5)
-+#define ICH_ELRSR			__ACCESS_CP15(c12, 4, c11, 5)
- #define ICH_VMCR			__ACCESS_CP15(c12, 4, c11, 7)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e3e37228ae4e..1a5bea4285e4 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -965,6 +965,10 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
  
- #define __LR0(x)			__ACCESS_CP15(c12, 4, c12, x)
-@@ -151,7 +151,7 @@ CPUIF_MAP(ICH_HCR, ICH_HCR_EL2)
- CPUIF_MAP(ICH_VTR, ICH_VTR_EL2)
- CPUIF_MAP(ICH_MISR, ICH_MISR_EL2)
- CPUIF_MAP(ICH_EISR, ICH_EISR_EL2)
--CPUIF_MAP(ICH_ELSR, ICH_ELSR_EL2)
-+CPUIF_MAP(ICH_ELRSR, ICH_ELRSR_EL2)
- CPUIF_MAP(ICH_VMCR, ICH_VMCR_EL2)
- CPUIF_MAP(ICH_AP0R3, ICH_AP0R3_EL2)
- CPUIF_MAP(ICH_AP0R2, ICH_AP0R2_EL2)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72dc4c011014..3e5650903d6d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -426,7 +426,7 @@
- #define SYS_ICH_VTR_EL2			sys_reg(3, 4, 12, 11, 1)
- #define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
- #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
--#define SYS_ICH_ELSR_EL2		sys_reg(3, 4, 12, 11, 5)
-+#define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
- #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
++#define reg_to_encoding(x)						\
++	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
++		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2);
++
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+@@ -1820,30 +1824,19 @@ static const struct sys_reg_desc *get_target_table(unsigned target,
+ 	}
+ }
  
- #define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 9652c453480f..264d92da3240 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -226,7 +226,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 		int i;
- 		u32 elrsr;
+-#define reg_to_match_value(x)						\
+-	({								\
+-		unsigned long val;					\
+-		val  = (x)->Op0 << 14;					\
+-		val |= (x)->Op1 << 11;					\
+-		val |= (x)->CRn << 7;					\
+-		val |= (x)->CRm << 3;					\
+-		val |= (x)->Op2;					\
+-		val;							\
+-	 })
+-
+ static int match_sys_reg(const void *key, const void *elt)
+ {
+ 	const unsigned long pval = (unsigned long)key;
+ 	const struct sys_reg_desc *r = elt;
  
--		elrsr = read_gicreg(ICH_ELSR_EL2);
-+		elrsr = read_gicreg(ICH_ELRSR_EL2);
+-	return pval - reg_to_match_value(r);
++	return pval - reg_to_encoding(r);
+ }
  
- 		write_gicreg(cpu_if->vgic_hcr & ~ICH_HCR_EN, ICH_HCR_EL2);
+ static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
+ 					 const struct sys_reg_desc table[],
+ 					 unsigned int num)
+ {
+-	unsigned long pval = reg_to_match_value(params);
++	unsigned long pval = reg_to_encoding(params);
  
+ 	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+ }
 -- 
 2.20.1
