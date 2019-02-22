@@ -1,134 +1,181 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-Date: Fri, 22 Feb 2019 12:18:17 +0000
-Message-ID: <76121ff1-0777-085a-5b38-d38b2c6cb25f@arm.com>
-References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
- <20190123083435.x3svwqp472mdgglw@8bytes.org>
- <a6315ab3-bffb-7470-365d-b26df6524bda@arm.com>
- <878sy8bx9o.fsf@morokweng.localdomain>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
+Date: Fri, 22 Feb 2019 12:26:24 +0000
+Message-ID: <20190222122624.507d7a9f@donnerap.cambridge.arm.com>
+References: <20190107120537.184252-1-andre.przywara@arm.com>
+ <20190107120537.184252-2-andre.przywara@arm.com>
+ <2b794331-cebe-92f1-7adc-58b041bbe1d6@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <virtio-dev-return-5505-gcvd-virtio-dev=m.gmane.org@lists.oasis-open.org>
-Sender: <virtio-dev@lists.oasis-open.org>
-List-Post: <mailto:virtio-dev@lists.oasis-open.org>
-List-Help: <mailto:virtio-dev-help@lists.oasis-open.org>
-List-Unsubscribe: <mailto:virtio-dev-unsubscribe@lists.oasis-open.org>
-List-Subscribe: <mailto:virtio-dev-subscribe@lists.oasis-open.org>
-In-Reply-To: <878sy8bx9o.fsf@morokweng.localdomain>
-Content-Language: en-US
-To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Mark Rutland <Mark.Rutland@arm.com>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>, "mst@redhat.com" <mst@redhat.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>, "frowand.list@gmail.com" <frowand.list@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, devicetree@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03B8F4A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:26:35 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ENU09nInaWDo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 07:26:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF0F40217
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 07:26:33 -0500 (EST)
+In-Reply-To: <2b794331-cebe-92f1-7adc-58b041bbe1d6@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Thiago,
+On Mon, 7 Jan 2019 13:17:37 +0000
+Steven Price <steven.price@arm.com> wrote:
 
-On 21/02/2019 22:18, Thiago Jung Bauermann wrote:
+Hi,
+
+> On 07/01/2019 12:05, Andre Przywara wrote:
+> > KVM implements the firmware interface for mitigating cache speculation
+> > vulnerabilities. Guests may use this interface to ensure mitigation is
+> > active.
+> > If we want to migrate such a guest to a host with a different support
+> > level for those workarounds, migration might need to fail, to ensure that
+> > critical guests don't loose their protection.
+> > 
+> > Introduce a way for userland to save and restore the workarounds state.
+> > On restoring we do checks that make sure we don't downgrade our
+> > mitigation level.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arch/arm/include/asm/kvm_emulate.h   |  10 ++
+> >  arch/arm/include/uapi/asm/kvm.h      |   9 ++
+> >  arch/arm64/include/asm/kvm_emulate.h |  14 +++
+> >  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
+> >  virt/kvm/arm/psci.c                  | 138 ++++++++++++++++++++++++++-
+> >  5 files changed, 178 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> > index 77121b713bef..2255c50debab 100644
+> > --- a/arch/arm/include/asm/kvm_emulate.h
+> > +++ b/arch/arm/include/asm/kvm_emulate.h
+> > @@ -275,6 +275,16 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> >  	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
+> >  }
+> >  
+> > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return false;
+> > +}
+> > +
+> > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
+> > +						      bool flag)
+> > +{
+> > +}
+> > +
+> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  {
+> >  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+> > diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> > index 4602464ebdfb..02c93b1d8f6d 100644
+> > --- a/arch/arm/include/uapi/asm/kvm.h
+> > +++ b/arch/arm/include/uapi/asm/kvm.h
+> > @@ -214,6 +214,15 @@ struct kvm_vcpu_events {
+> >  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM | KVM_REG_SIZE_U64 | \
+> >  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_MASK	0x3
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	1
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	2
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	4
+> >  
+> >  /* Device Control API: ARM VGIC */
+> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 506386a3edde..a44f07f68da4 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -336,6 +336,20 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> >  	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+> >  }
+> >  
+> > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG;
+> > +}
+> > +
+> > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
+> > +						      bool flag)
+> > +{
+> > +	if (flag)
+> > +		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+> > +	else
+> > +		vcpu->arch.workaround_flags &= ~VCPU_WORKAROUND_2_FLAG;
+> > +}
+> > +
+> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  {
+> >  	if (vcpu_mode_is_32bit(vcpu)) {
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 97c3478ee6e7..4a19ef199a99 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -225,6 +225,15 @@ struct kvm_vcpu_events {
+> >  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+> >  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1  
 > 
-> Hello Jean-Philippe,
+> I can't help feeling we need more than one bit to deal with all the
+> possible states. The host can support/not-support the workaround (i.e
+> the HVC) and the guest can be using/not using the workaround.
 > 
-> Jean-Philippe Brucker <jean-philippe.brucker@arm.com> writes:
->> Makes sense, though I think other virtio devices have been developed a
->> little more organically: device and driver code got upstreamed first,
->> and then the specification describing their interface got merged into
->> the standard. For example I believe that code for crypto, input and GPU
->> devices were upstreamed long before the specification was merged. Once
->> an implementation is upstream, the interface is expected to be
->> backward-compatible (all subsequent changes are introduced using feature
->> bits).
->>
->> So I've been working with this process in mind, also described by Jens
->> at KVM forum 2017 [3]:
->> (1) Reserve a device ID, and get that merged into virtio (ID 23 for
->> virtio-iommu was reserved last year)
->> (2) Open-source an implementation (this driver and Eric's device)
->> (3) Formalize and upstream the device specification
->>
->> But I get that some overlap between (2) and (3) would have been better.
->> So far the spec document has been reviewed mainly from the IOMMU point
->> of view, and might require more changes to be in line with the other
->> virtio devices -- hopefully just wording changes. I'll kick off step
->> (3), but I think the virtio folks are a bit busy with finalizing the 1.1
->> spec so I expect it to take a while.
+> In particular I can imagine the following situation:
 > 
-> I read v0.9 of the spec and have some minor comments, hope this is a
-> good place to send them:
-
-Thanks a lot, I'll fix them in my next posting. Note that I recently
-sent v0.10 to virtio-comment, to request inclusion into the standard [1]
-but your comments still apply to v0.10.
-
-[1]
-https://lists.oasis-open.org/archives/virtio-comment/201901/msg00016.html
-
-> 1. In section 2.6.2, one reads
+> * Guest starts on a host (host A) without the workaround HVC (so
+> configures not to use it). Assuming the host doesn't need the workaround
+> the guest is therefore not vulnerable.
 > 
->     If the VIRTIO_IOMMU_F_INPUT_RANGE feature is offered and the range
->     described by fields virt_start and virt_end doesn’t fit in the range
->     described by input_range, the device MAY set status to VIRTIO_-
->     IOMMU_S_RANGE and ignore the request.
+> * Migrated to a new host (host B) with the workaround HVC (this is
+> accepted), the guest is potentially vulnerable.
 > 
-> Shouldn't int say "If the VIRTIO_IOMMU_F_INPUT_RANGE feature is
-> negotiated" instead?
-
-Yes, that seems clearer and more consistent with other devices, I'll
-change it. In this case "offered" is equivalent to "negotiated", because
-the driver SHOULD accept the feature or else the device may refuse to
-set FEATURES_OK. A valid input_range field generally indicates that the
-device is incapable of creating mappings outside this range, and it's
-important that the driver acknowledges it.
-
-> 2. There's a typo at the end of section 2.6.5:
+> * Migration back to the original host (host A) is then rejected, even
+> though the guest isn't using the HVC.
 > 
->     The VIRTIO_IOMMU_MAP_F_MMIO flag is a memory type rather than a
->     protection lag.
+> I can see two options here:
 > 
-> s/lag/flag/
-
-Fixed in v0.10
-
-> 3. In section 3.1.2.1.1, the viommu compatible field says "virtio,mmio".
-> Shouldn't it say "virtio,mmio-iommu" instead, to be consistent with
-> "virtio,pci-iommu"?
-
-"virtio,mmio" already exists, and allows the virtio-mmio driver to pick
-up any virtio device. The device type is then discovered while probing,
-and doesn't need to be in the compatible string.
-
-"virtio,pci-iommu" is something I introduced specifically for the
-virtio-iommu, since it's the only virtio-pci device that requires a
-device tree node - to describe the IOMMU topology earlier than the PCI
-probe. If we want symmetry I'd rather replace "virtio,pci-iommu" with
-"virtio,pci", but it wouldn't be used by other virtio device types. And
-I have to admit I'm reluctant to change this binding now, given that it
-has been reviewed (patch 2/7) and is ready to go.
-
-> 4. There's a typo in section 3.3:
+> * Reject the migration to host B as the guest may be vulnerable after
+> the migration. I.e. the workaround availability cannot change (either
+> way) during a migration
 > 
->     A host bridge may limit the input address space – transaction
->     accessing some addresses won’t reach the physical IOMMU.
+> * Store an extra bit of information which is whether a particular guest
+> has the HVC exposed to it. Ideally the HVC handling for the workaround
+> would also get disabled when running on a host which supports the HVC
+> but was migrated from a host which doesn't. This prevents problems with
+> a guest which is e.g. migrated during boot and may do feature detection
+> after the migration.
 > 
-> s/transaction/transactions/
+> Since this is a new ABI it would be good to get the register values
+> sorted even if we don't have a complete implementation of it.
 
-I'll fix it, thanks
+So I thought about this a bit more and now implemented something like a combination of your two options above:
+- There is a new UNAFFECTED state, which is currently unused. As mentioned before, the current NOT_AVAIL does not mean not needed, but actually translates as "unknown". At the moment this is our best guess on this matter. There are patches on the list which extend the host workaround code, so we can then actually differentiate between "unknown" and "always mitigated". Once they have landed, we can then communicate this new state to userland.
+- For now we are very strict and allow only migration if the workaround levels are identical. Since the guest may have detected either one state during its boot, we don't have much
+of a choice here. When we later gain the UNAFFECTED state, we can additionally allow migration from "NOT_AVAIL" to "UNAFFECTED".
 
-> I also have one last comment which you may freely ignore, considering
-> it's clearly just personal opinion and also considering that the
-> specification is mature at this point: it specifies memory ranges by
-> specifying start and end addresses. My experience has been that this is
-> error prone, leading to confusion and bugs regarding whether the end
-> address is inclusive or exclusive. I tend to prefer expressing memory
-> ranges by specifying a start address and a length, which eliminates
-> ambiguity.
+I hope this covers your concerns.
 
-While the initial versions had start and length, I changed it because it
-cannot express the whole 64-bit range. If the guest wants to do
-unmap-all (and the input range is 64-bit), then it can send a single
-UNMAP request with start=0, end=~0ULL, which wouldn't be possible with
-start and length. Arguably a very rare use-case, but one I've tried to
-implement at least twice with VFIO :) I'll see if I can make it more
-obvious that end is inclusive, since the word doesn't appear at all in
-the current draft.
-
-Thanks,
-Jean
+Cheers,
+Andre.
