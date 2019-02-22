@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/27] KVM: arm/arm64: arch_timer: Mark physical interrupt
- active when a virtual interrupt is pending
-Date: Fri, 22 Feb 2019 16:25:56 +0000
-Message-ID: <20190222162605.5054-19-marc.zyngier@arm.com>
+Subject: [PATCH 19/27] KVM: arm/arm64: Fix TRACE_INCLUDE_PATH
+Date: Fri, 22 Feb 2019 16:25:57 +0000
+Message-ID: <20190222162605.5054-20-marc.zyngier@arm.com>
 References: <20190222162605.5054-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21F174A1FA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5A44A3C2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id URGdyjiPnIZY for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 11:28:32 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D4054A320
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:32 -0500 (EST)
+ with ESMTP id Gq0qcxYtFjUg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 11:28:37 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B05C54A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:37 -0500 (EST)
 In-Reply-To: <20190222162605.5054-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,73 +31,36 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>, kvmarm@lists.cs.columbia.edu, Shaokun Zhang <zhangshaokun@hisilicon.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel@lists.infradead.org, Zenghui Yu <yuzenghui@huawei.com>, Colin Ian King <colin.king@canonical.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a guest gets scheduled, KVM performs a "load" operation,
-which for the timer includes evaluating the virtual "active" state
-of the interrupt, and replicating it on the physical side. This
-ensures that the deactivation in the guest will also take place
-in the physical GIC distributor.
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-If the interrupt is not yet active, we flag it as inactive on the
-physical side.  This means that on restoring the timer registers,
-if the timer has expired, we'll immediately take an interrupt.
-That's absolutely fine, as the interrupt will then be flagged as
-active on the physical side. What this assumes though is that we'll
-enter the guest right after having taken the interrupt, and that
-the guest will quickly ACK the interrupt, making it active at on
-the virtual side.
+As the comment block in include/trace/define_trace.h says,
+TRACE_INCLUDE_PATH should be a relative path to the define_trace.h
 
-It turns out that quite often, this assumption doesn't really hold.
-The guest may be preempted on the back on this interrupt, either
-from kernel space or whilst running at EL1 when a host interrupt
-fires. When this happens, we repeat the whole sequence on the
-next load (interrupt marked as inactive, timer registers restored,
-interrupt fires). And if it takes a really long time for a guest
-to activate the interrupt (as it does with nested virt), we end-up
-with many such events in quick succession, leading to the guest only
-making very slow progress.
+../../virt/kvm/arm is the correct relative path.
 
-This can also be seen with the number of virtual timer interrupt on the
-host being far greater than the same number in the guest.
+../../../virt/kvm/arm is working by coincidence because the top
+Makefile adds -I$(srctree)/arch/$(SRCARCH)/include as a header
+search path, but we should not rely on it.
 
-An easy way to fix this is to evaluate the timer state when performing
-the "load" operation, just like we do when the interrupt actually fires.
-If the timer has a pending virtual interrupt at this stage, then we
-can safely flag the physical interrupt as being active, which prevents
-spurious exits.
-
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/arch_timer.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ virt/kvm/arm/trace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 17f9de73cc8a..af8f2f1d01cc 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -487,12 +487,21 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
- static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
- {
- 	struct kvm_vcpu *vcpu = ctx->vcpu;
--	bool phys_active;
-+	bool phys_active = false;
-+
-+	/*
-+	 * Update the timer output so that it is likely to match the
-+	 * state we're about to restore. If the timer expires between
-+	 * this point and the register restoration, we'll take the
-+	 * interrupt anyway.
-+	 */
-+	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
+diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+index 54bb059243b9..204d210d01c2 100644
+--- a/virt/kvm/arm/trace.h
++++ b/virt/kvm/arm/trace.h
+@@ -370,7 +370,7 @@ TRACE_EVENT(kvm_timer_emulate,
+ #endif /* _TRACE_KVM_H */
  
- 	if (irqchip_in_kernel(vcpu->kvm))
- 		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
--	else
--		phys_active = ctx->irq.level;
-+
-+	phys_active |= ctx->irq.level;
-+
- 	set_timer_irq_phys_active(ctx, phys_active);
- }
+ #undef TRACE_INCLUDE_PATH
+-#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm
++#define TRACE_INCLUDE_PATH ../../virt/kvm/arm
+ #undef TRACE_INCLUDE_FILE
+ #define TRACE_INCLUDE_FILE trace
  
 -- 
 2.20.1
