@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 17/27] arm64: KVM: Describe data or unified caches as having 1
- set and 1 way
-Date: Fri, 22 Feb 2019 16:25:55 +0000
-Message-ID: <20190222162605.5054-18-marc.zyngier@arm.com>
+Subject: [PATCH 18/27] KVM: arm/arm64: arch_timer: Mark physical interrupt
+ active when a virtual interrupt is pending
+Date: Fri, 22 Feb 2019 16:25:56 +0000
+Message-ID: <20190222162605.5054-19-marc.zyngier@arm.com>
 References: <20190222162605.5054-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52F2F4A320
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21F174A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cFSXvZBUCDao for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 11:28:27 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92AA54A2E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:27 -0500 (EST)
+ with ESMTP id URGdyjiPnIZY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 11:28:32 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D4054A320
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:32 -0500 (EST)
 In-Reply-To: <20190222162605.5054-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,67 +32,72 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>, kvmarm@lists.cs.columbia.edu, Shaokun Zhang <zhangshaokun@hisilicon.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-arm-kernel@lists.infradead.org, Zenghui Yu <yuzenghui@huawei.com>, Colin Ian King <colin.king@canonical.com>, Dave Martin <Dave.Martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+When a guest gets scheduled, KVM performs a "load" operation,
+which for the timer includes evaluating the virtual "active" state
+of the interrupt, and replicating it on the physical side. This
+ensures that the deactivation in the guest will also take place
+in the physical GIC distributor.
 
-On SMP ARM systems, cache maintenance by set/way should only ever be
-done in the context of onlining or offlining CPUs, which is typically
-done by bare metal firmware and never in a virtual machine. For this
-reason, we trap set/way cache maintenance operations and replace them
-with conditional flushing of the entire guest address space.
+If the interrupt is not yet active, we flag it as inactive on the
+physical side.  This means that on restoring the timer registers,
+if the timer has expired, we'll immediately take an interrupt.
+That's absolutely fine, as the interrupt will then be flagged as
+active on the physical side. What this assumes though is that we'll
+enter the guest right after having taken the interrupt, and that
+the guest will quickly ACK the interrupt, making it active at on
+the virtual side.
 
-Due to this trapping, the set/way arguments passed into the set/way
-ops are completely ignored, and thus irrelevant. This also means that
-the set/way geometry is equally irrelevant, and we can simply report
-it as 1 set and 1 way, so that legacy 32-bit ARM system software (i.e.,
-the kind that only receives odd fixes) doesn't take a performance hit
-due to the trapping when iterating over the cachelines.
+It turns out that quite often, this assumption doesn't really hold.
+The guest may be preempted on the back on this interrupt, either
+from kernel space or whilst running at EL1 when a host interrupt
+fires. When this happens, we repeat the whole sequence on the
+next load (interrupt marked as inactive, timer registers restored,
+interrupt fires). And if it takes a really long time for a guest
+to activate the interrupt (as it does with nested virt), we end-up
+with many such events in quick succession, leading to the guest only
+making very slow progress.
 
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+This can also be seen with the number of virtual timer interrupt on the
+host being far greater than the same number in the guest.
+
+An easy way to fix this is to evaluate the timer state when performing
+the "load" operation, just like we do when the interrupt actually fires.
+If the timer has a pending virtual interrupt at this stage, then we
+can safely flag the physical interrupt as being active, which prevents
+spurious exits.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  3 ++-
- arch/arm64/kvm/sys_regs.c            | 15 +++++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ virt/kvm/arm/arch_timer.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 9acccb1e3746..d3842791e1c4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -78,7 +78,8 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID3;
- 
--	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE))
-+	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
-+	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
- }
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 45a07cfc57ed..81a342679e60 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1186,6 +1186,21 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
- 	p->regval = get_ccsidr(csselr);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 17f9de73cc8a..af8f2f1d01cc 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -487,12 +487,21 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
+ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ {
+ 	struct kvm_vcpu *vcpu = ctx->vcpu;
+-	bool phys_active;
++	bool phys_active = false;
 +
 +	/*
-+	 * Guests should not be doing cache operations by set/way at all, and
-+	 * for this reason, we trap them and attempt to infer the intent, so
-+	 * that we can flush the entire guest's address space at the appropriate
-+	 * time.
-+	 * To prevent this trapping from causing performance problems, let's
-+	 * expose the geometry of all data and unified caches (which are
-+	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
-+	 * [If guests should attempt to infer aliasing properties from the
-+	 * geometry (which is not permitted by the architecture), they would
-+	 * only do so for virtually indexed caches.]
++	 * Update the timer output so that it is likely to match the
++	 * state we're about to restore. If the timer expires between
++	 * this point and the register restoration, we'll take the
++	 * interrupt anyway.
 +	 */
-+	if (!(csselr & 1)) // data or unified cache
-+		p->regval &= ~GENMASK(27, 3);
- 	return true;
++	kvm_timer_update_irq(ctx->vcpu, kvm_timer_should_fire(ctx), ctx);
+ 
+ 	if (irqchip_in_kernel(vcpu->kvm))
+ 		phys_active = kvm_vgic_map_is_active(vcpu, ctx->irq.irq);
+-	else
+-		phys_active = ctx->irq.level;
++
++	phys_active |= ctx->irq.level;
++
+ 	set_timer_irq_phys_active(ctx, phys_active);
  }
  
 -- 
