@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/27] KVM: arm/arm64: Fix TRACE_INCLUDE_PATH
-Date: Fri, 22 Feb 2019 16:25:57 +0000
-Message-ID: <20190222162605.5054-20-marc.zyngier@arm.com>
+Subject: [PATCH 20/27] KVM: arm/arm64: Remove -I. header search paths
+Date: Fri, 22 Feb 2019 16:25:58 +0000
+Message-ID: <20190222162605.5054-21-marc.zyngier@arm.com>
 References: <20190222162605.5054-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5A44A3C2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3F484A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gq0qcxYtFjUg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 11:28:37 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B05C54A1FA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:37 -0500 (EST)
+ with ESMTP id oFMUhzo4cVFu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 11:28:42 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 262DE4A36B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 11:28:42 -0500 (EST)
 In-Reply-To: <20190222162605.5054-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,34 +33,46 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-As the comment block in include/trace/define_trace.h says,
-TRACE_INCLUDE_PATH should be a relative path to the define_trace.h
+The header search path -I. in kernel Makefiles is very suspicious;
+it allows the compiler to search for headers in the top of $(srctree),
+where obviously no header file exists.
 
-../../virt/kvm/arm is the correct relative path.
-
-../../../virt/kvm/arm is working by coincidence because the top
-Makefile adds -I$(srctree)/arch/$(SRCARCH)/include as a header
-search path, but we should not rely on it.
+I was able to build without these extra header search paths.
 
 Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/kvm/Makefile   | 3 +--
+ arch/arm64/kvm/Makefile | 2 --
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-index 54bb059243b9..204d210d01c2 100644
---- a/virt/kvm/arm/trace.h
-+++ b/virt/kvm/arm/trace.h
-@@ -370,7 +370,7 @@ TRACE_EVENT(kvm_timer_emulate,
- #endif /* _TRACE_KVM_H */
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index 48de846f2246..bca775e222c3 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -9,8 +9,7 @@ ifeq ($(plus_virt),+virt)
+ endif
  
- #undef TRACE_INCLUDE_PATH
--#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm
-+#define TRACE_INCLUDE_PATH ../../virt/kvm/arm
- #undef TRACE_INCLUDE_FILE
- #define TRACE_INCLUDE_FILE trace
+ ccflags-y += -Iarch/arm/kvm -Ivirt/kvm/arm/vgic
+-CFLAGS_arm.o := -I. $(plus_virt_def)
+-CFLAGS_mmu.o := -I.
++CFLAGS_arm.o := $(plus_virt_def)
+ 
+ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
+ AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 0f2a135ba15b..3089b3159135 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -4,8 +4,6 @@
+ #
+ 
+ ccflags-y += -Iarch/arm64/kvm -Ivirt/kvm/arm/vgic
+-CFLAGS_arm.o := -I.
+-CFLAGS_mmu.o := -I.
+ 
+ KVM=../../../virt/kvm
  
 -- 
 2.20.1
