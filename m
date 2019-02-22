@@ -1,78 +1,56 @@
-From: Thiago Jung Bauermann <bauerman-tEXmvtCZX7AybS5Ee8rs3A@public.gmane.org>
-Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-Date: Thu, 21 Feb 2019 19:18:59 -0300
-Message-ID: <878sy8bx9o.fsf@morokweng.localdomain>
-References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
-	<20190123083435.x3svwqp472mdgglw@8bytes.org>
-	<a6315ab3-bffb-7470-365d-b26df6524bda@arm.com>
+From: Shaokun Zhang <zhangshaokun@hisilicon.com>
+Subject: [PATCH -next] KVM: arm/arm64: Remove unused timer variable
+Date: Fri, 22 Feb 2019 14:34:29 +0800
+Message-ID: <1550817269-57405-1-git-send-email-zhangshaokun@hisilicon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-reply-to: <a6315ab3-bffb-7470-365d-b26df6524bda-5wv7dgnIgG8@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
-Cc: Mark Rutland <Mark.Rutland-5wv7dgnIgG8@public.gmane.org>, "virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org" <virtio-dev-sDuHXQ4OtrM4h7I2RyI4rWD2FQJk+8+b@public.gmane.org>, "kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, "tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org" <tnowicki-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, "frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <frowand.list-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org" <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org" <bhelgaas-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, Robin Murphy <Robin.Murphy-5wv7dgnIgG8@public.gmane.org>, "jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Shaokun Zhang <zhangshaokun@hisilicon.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkhlbGxvIEplYW4tUGhpbGlwcGUsCgpKZWFuLVBoaWxpcHBlIEJydWNrZXIgPGplYW4tcGhpbGlw
-cGUuYnJ1Y2tlckBhcm0uY29tPiB3cml0ZXM6Cj4gTWFrZXMgc2Vuc2UsIHRob3VnaCBJIHRoaW5r
-IG90aGVyIHZpcnRpbyBkZXZpY2VzIGhhdmUgYmVlbiBkZXZlbG9wZWQgYQo+IGxpdHRsZSBtb3Jl
-IG9yZ2FuaWNhbGx5OiBkZXZpY2UgYW5kIGRyaXZlciBjb2RlIGdvdCB1cHN0cmVhbWVkIGZpcnN0
-LAo+IGFuZCB0aGVuIHRoZSBzcGVjaWZpY2F0aW9uIGRlc2NyaWJpbmcgdGhlaXIgaW50ZXJmYWNl
-IGdvdCBtZXJnZWQgaW50bwo+IHRoZSBzdGFuZGFyZC4gRm9yIGV4YW1wbGUgSSBiZWxpZXZlIHRo
-YXQgY29kZSBmb3IgY3J5cHRvLCBpbnB1dCBhbmQgR1BVCj4gZGV2aWNlcyB3ZXJlIHVwc3RyZWFt
-ZWQgbG9uZyBiZWZvcmUgdGhlIHNwZWNpZmljYXRpb24gd2FzIG1lcmdlZC4gT25jZQo+IGFuIGlt
-cGxlbWVudGF0aW9uIGlzIHVwc3RyZWFtLCB0aGUgaW50ZXJmYWNlIGlzIGV4cGVjdGVkIHRvIGJl
-Cj4gYmFja3dhcmQtY29tcGF0aWJsZSAoYWxsIHN1YnNlcXVlbnQgY2hhbmdlcyBhcmUgaW50cm9k
-dWNlZCB1c2luZyBmZWF0dXJlCj4gYml0cykuCj4KPiBTbyBJJ3ZlIGJlZW4gd29ya2luZyB3aXRo
-IHRoaXMgcHJvY2VzcyBpbiBtaW5kLCBhbHNvIGRlc2NyaWJlZCBieSBKZW5zCj4gYXQgS1ZNIGZv
-cnVtIDIwMTcgWzNdOgo+ICgxKSBSZXNlcnZlIGEgZGV2aWNlIElELCBhbmQgZ2V0IHRoYXQgbWVy
-Z2VkIGludG8gdmlydGlvIChJRCAyMyBmb3IKPiB2aXJ0aW8taW9tbXUgd2FzIHJlc2VydmVkIGxh
-c3QgeWVhcikKPiAoMikgT3Blbi1zb3VyY2UgYW4gaW1wbGVtZW50YXRpb24gKHRoaXMgZHJpdmVy
-IGFuZCBFcmljJ3MgZGV2aWNlKQo+ICgzKSBGb3JtYWxpemUgYW5kIHVwc3RyZWFtIHRoZSBkZXZp
-Y2Ugc3BlY2lmaWNhdGlvbgo+Cj4gQnV0IEkgZ2V0IHRoYXQgc29tZSBvdmVybGFwIGJldHdlZW4g
-KDIpIGFuZCAoMykgd291bGQgaGF2ZSBiZWVuIGJldHRlci4KPiBTbyBmYXIgdGhlIHNwZWMgZG9j
-dW1lbnQgaGFzIGJlZW4gcmV2aWV3ZWQgbWFpbmx5IGZyb20gdGhlIElPTU1VIHBvaW50Cj4gb2Yg
-dmlldywgYW5kIG1pZ2h0IHJlcXVpcmUgbW9yZSBjaGFuZ2VzIHRvIGJlIGluIGxpbmUgd2l0aCB0
-aGUgb3RoZXIKPiB2aXJ0aW8gZGV2aWNlcyAtLSBob3BlZnVsbHkganVzdCB3b3JkaW5nIGNoYW5n
-ZXMuIEknbGwga2ljayBvZmYgc3RlcAo+ICgzKSwgYnV0IEkgdGhpbmsgdGhlIHZpcnRpbyBmb2xr
-cyBhcmUgYSBiaXQgYnVzeSB3aXRoIGZpbmFsaXppbmcgdGhlIDEuMQo+IHNwZWMgc28gSSBleHBl
-Y3QgaXQgdG8gdGFrZSBhIHdoaWxlLgoKSSByZWFkIHYwLjkgb2YgdGhlIHNwZWMgYW5kIGhhdmUg
-c29tZSBtaW5vciBjb21tZW50cywgaG9wZSB0aGlzIGlzIGEKZ29vZCBwbGFjZSB0byBzZW5kIHRo
-ZW06CgoxLiBJbiBzZWN0aW9uIDIuNi4yLCBvbmUgcmVhZHMKCiAgICBJZiB0aGUgVklSVElPX0lP
-TU1VX0ZfSU5QVVRfUkFOR0UgZmVhdHVyZSBpcyBvZmZlcmVkIGFuZCB0aGUgcmFuZ2UKICAgIGRl
-c2NyaWJlZCBieSBmaWVsZHMgdmlydF9zdGFydCBhbmQgdmlydF9lbmQgZG9lc27igJl0IGZpdCBp
-biB0aGUgcmFuZ2UKICAgIGRlc2NyaWJlZCBieSBpbnB1dF9yYW5nZSwgdGhlIGRldmljZSBNQVkg
-c2V0IHN0YXR1cyB0byBWSVJUSU9fLQogICAgSU9NTVVfU19SQU5HRSBhbmQgaWdub3JlIHRoZSBy
-ZXF1ZXN0LgoKU2hvdWxkbid0IGludCBzYXkgIklmIHRoZSBWSVJUSU9fSU9NTVVfRl9JTlBVVF9S
-QU5HRSBmZWF0dXJlIGlzCm5lZ290aWF0ZWQiIGluc3RlYWQ/CgoyLiBUaGVyZSdzIGEgdHlwbyBh
-dCB0aGUgZW5kIG9mIHNlY3Rpb24gMi42LjU6CgogICAgVGhlIFZJUlRJT19JT01NVV9NQVBfRl9N
-TUlPIGZsYWcgaXMgYSBtZW1vcnkgdHlwZSByYXRoZXIgdGhhbiBhCiAgICBwcm90ZWN0aW9uIGxh
-Zy4KCnMvbGFnL2ZsYWcvCgozLiBJbiBzZWN0aW9uIDMuMS4yLjEuMSwgdGhlIHZpb21tdSBjb21w
-YXRpYmxlIGZpZWxkIHNheXMgInZpcnRpbyxtbWlvIi4KU2hvdWxkbid0IGl0IHNheSAidmlydGlv
-LG1taW8taW9tbXUiIGluc3RlYWQsIHRvIGJlIGNvbnNpc3RlbnQgd2l0aAoidmlydGlvLHBjaS1p
-b21tdSI/Cgo0LiBUaGVyZSdzIGEgdHlwbyBpbiBzZWN0aW9uIDMuMzoKCiAgICBBIGhvc3QgYnJp
-ZGdlIG1heSBsaW1pdCB0aGUgaW5wdXQgYWRkcmVzcyBzcGFjZSDigJMgdHJhbnNhY3Rpb24KICAg
-IGFjY2Vzc2luZyBzb21lIGFkZHJlc3NlcyB3b27igJl0IHJlYWNoIHRoZSBwaHlzaWNhbCBJT01N
-VS4KCnMvdHJhbnNhY3Rpb24vdHJhbnNhY3Rpb25zLwoKSSBhbHNvIGhhdmUgb25lIGxhc3QgY29t
-bWVudCB3aGljaCB5b3UgbWF5IGZyZWVseSBpZ25vcmUsIGNvbnNpZGVyaW5nCml0J3MgY2xlYXJs
-eSBqdXN0IHBlcnNvbmFsIG9waW5pb24gYW5kIGFsc28gY29uc2lkZXJpbmcgdGhhdCB0aGUKc3Bl
-Y2lmaWNhdGlvbiBpcyBtYXR1cmUgYXQgdGhpcyBwb2ludDogaXQgc3BlY2lmaWVzIG1lbW9yeSBy
-YW5nZXMgYnkKc3BlY2lmeWluZyBzdGFydCBhbmQgZW5kIGFkZHJlc3Nlcy4gTXkgZXhwZXJpZW5j
-ZSBoYXMgYmVlbiB0aGF0IHRoaXMgaXMKZXJyb3IgcHJvbmUsIGxlYWRpbmcgdG8gY29uZnVzaW9u
-IGFuZCBidWdzIHJlZ2FyZGluZyB3aGV0aGVyIHRoZSBlbmQKYWRkcmVzcyBpcyBpbmNsdXNpdmUg
-b3IgZXhjbHVzaXZlLiBJIHRlbmQgdG8gcHJlZmVyIGV4cHJlc3NpbmcgbWVtb3J5CnJhbmdlcyBi
-eSBzcGVjaWZ5aW5nIGEgc3RhcnQgYWRkcmVzcyBhbmQgYSBsZW5ndGgsIHdoaWNoIGVsaW1pbmF0
-ZXMKYW1iaWd1aXR5LgoKLS0KVGhpYWdvIEp1bmcgQmF1ZXJtYW5uCklCTSBMaW51eCBUZWNobm9s
-b2d5IENlbnRlcgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18KaW9tbXUgbWFpbGluZyBsaXN0CmlvbW11QGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnCmh0
-dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2lvbW11
+The 'timer' local variable became unused after commit bee038a67487
+("KVM: arm/arm64: Rework the timer code to use a timer_map").
+Remove it to avoid [-Wunused-but-set-variable] warning.
+
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Julien Thierry <julien.thierry@arm.com>
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
+---
+ virt/kvm/arm/arch_timer.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index af8f2f1d01cc..3417f2dbc366 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -236,14 +236,12 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
+ 
+ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+ {
+-	struct arch_timer_cpu *timer;
+ 	enum kvm_arch_timers index;
+ 	u64 cval, now;
+ 
+ 	if (!timer_ctx)
+ 		return false;
+ 
+-	timer = vcpu_timer(timer_ctx->vcpu);
+ 	index = arch_timer_ctx_index(timer_ctx);
+ 
+ 	if (timer_ctx->loaded) {
+-- 
+2.7.4
