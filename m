@@ -1,26 +1,26 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v3 2/2] KVM: doc: add API documentation on the
- KVM_REG_ARM_WORKAROUNDS register
-Date: Fri, 22 Feb 2019 17:27:44 +0000
-Message-ID: <20190222172743.GD3567@e103592.cambridge.arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
+Date: Fri, 22 Feb 2019 17:36:02 +0000
+Message-ID: <20190222173602.05f34343@donnerap.cambridge.arm.com>
 References: <20190222121818.30164-1-andre.przywara@arm.com>
- <20190222121818.30164-3-andre.przywara@arm.com>
+ <20190222121818.30164-2-andre.przywara@arm.com>
+ <c3dba11e-7f17-d49a-4eac-f3309f836d66@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD60A4A369
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 12:27:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B73824A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 12:36:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cXw0jYPWB8Fa for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Feb 2019 12:27:48 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C49C24A200
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 12:27:48 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20190222121818.30164-3-andre.przywara@arm.com>
+ with ESMTP id M-c-6jlw-KX7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 12:36:07 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EA014A200
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 12:36:07 -0500 (EST)
+In-Reply-To: <c3dba11e-7f17-d49a-4eac-f3309f836d66@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,67 +30,76 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 22, 2019 at 12:18:18PM +0000, Andre Przywara wrote:
-> Add documentation for the newly defined firmware registers to save and
-> restore any vulnerability migitation status.
+On Fri, 22 Feb 2019 17:16:12 +0000
+Steven Price <steven.price@arm.com> wrote:
+
+> On 22/02/2019 12:18, Andre Przywara wrote:
+> > KVM implements the firmware interface for mitigating cache speculation
+> > vulnerabilities. Guests may use this interface to ensure mitigation is
+> > active.
+> > If we want to migrate such a guest to a host with a different support
+> > level for those workarounds, migration might need to fail, to ensure that
+> > critical guests don't loose their protection.
+> > 
+> > Introduce a way for userland to save and restore the workarounds state.
+> > On restoring we do checks that make sure we don't downgrade our
+> > mitigation level.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arch/arm/include/asm/kvm_emulate.h   |  10 +++
+> >  arch/arm/include/uapi/asm/kvm.h      |  10 +++
+> >  arch/arm64/include/asm/kvm_emulate.h |  14 ++++
+> >  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
+> >  virt/kvm/arm/psci.c                  | 119 +++++++++++++++++++++++----
+> >  5 files changed, 146 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> > index 8927cae7c966..663a02d7e6f4 100644
+> > --- a/arch/arm/include/asm/kvm_emulate.h
+> > +++ b/arch/arm/include/asm/kvm_emulate.h
+> > @@ -283,6 +283,16 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+> >  	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
+> >  }
+> >  
+> > +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return false;
+> > +}
+> > +
+> > +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
+> > +						      bool flag)
+> > +{
+> > +}
+> > +
+> >  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+> >  {
+> >  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+> > diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> > index 4602464ebdfb..ba4d2afe65e3 100644
+> > --- a/arch/arm/include/uapi/asm/kvm.h
+> > +++ b/arch/arm/include/uapi/asm/kvm.h
+> > @@ -214,6 +214,16 @@ struct kvm_vcpu_events {
+> >  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM | KVM_REG_SIZE_U64 | \
+> >  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+> >  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+> > +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED	2  
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  Documentation/virtual/kvm/arm/psci.txt | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/Documentation/virtual/kvm/arm/psci.txt b/Documentation/virtual/kvm/arm/psci.txt
-> index aafdab887b04..fe8930765cc7 100644
-> --- a/Documentation/virtual/kvm/arm/psci.txt
-> +++ b/Documentation/virtual/kvm/arm/psci.txt
-> @@ -28,3 +28,27 @@ The following register is defined:
->    - Allows any PSCI version implemented by KVM and compatible with
->      v0.2 to be set with SET_ONE_REG
->    - Affects the whole VM (even if the register view is per-vcpu)
+> Thanks for adding the UNAFFECTED state for WORKAROUND_1 - this means the
+> ABI at least can deal with migration to a host which supports but
+> doesn't need the workaround. I'm happy for the actual support for this
+> to be added later if/when it's needed.
 
-Doh, ignore my comments about undescribed semantics in the last patch.
+Thanks. Actually we *can't* do anything right now, because the host kernel only provides this "requires w/a or not" state, so for the current kernel we will never see UNAFFECTED. If QEMU wants to set UNAFFECTED because the source kernel had it, we naturally deny it, as future code would do as well. So I think this solution is forward compatible.
+ 
+> Reviewed-by: Steven Price <steven.price@arm.com>
 
-> +
-> +* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-> +  Holds the state of the firmware controlled workaround to mitigate
-> +  CVE-2017-5715, as described under SMCCC_ARCH_WORKAROUND_1 in [1].
-> +  Accepted values are:
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL: Workaround not available.
-> +      The mitigation status for the guest is unknown.
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL: Workaround active for the guest.
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED: The workaround is not
-> +      available and not needed.
-> +
-> +* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-> +  Holds the state of the firmware controlled workaround to mitigate
-> +  CVE-2018-3639, as described under SMCCC_ARCH_WORKAROUND_2 in [1].
-> +  Accepted values are:
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL: Workaround not available.
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN: Workaround state unknown.
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL: Workaround available, and can
-> +      be disabled by a vCPU. If KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED is
-> +      set, it is active for this vCPU.
-
-Ah, so this is really not supposed to be set except for _AVAIL?
-
-> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED: Workaround always active
-> +      or not needed.
-
-But is the workaround available (i.e., SMCCC interface implemented?)
-
-The code assumes it is, IIUC -- i.e., it will happily upgrade _AVAIL
-to _UNAFFECTED.  That's bad if it means the SMCCC call disappears under
-the guest's feet.
-
-(Not saying it does, just that I'm not sure.)
-
-
-For KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, we apply an == check, avoiding
-this subtlety.
-
-Cheers
----Dave
+Thanks for that!
+Andre.
