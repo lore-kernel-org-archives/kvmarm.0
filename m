@@ -1,50 +1,60 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
-Subject: Re: [PATCH V2 3/10] KVM/MMU: Add last_level in the struct mmu_spte_page
-Date: Fri, 22 Feb 2019 23:16:35 +0800
-Message-ID: <CAOLK0pyGhbd43rVPZE7waaStUkGVYVgakG2VgqtME4PxNTOY0w@mail.gmail.com>
-References: <20190202013825.51261-1-Tianyu.Lan@microsoft.com>
- <20190202013825.51261-4-Tianyu.Lan@microsoft.com> <572a6ce3-23f6-7b16-a070-4d4a81ee4335@redhat.com>
- <CAOLK0pzXnvk=FsfjH07jUyRJGpeiNG7-9vR9Vo0mLJtdPnt_7Q@mail.gmail.com> <d9043bc8-d006-bf64-2047-79a9b6f98183@redhat.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v5 08/26] arm64/sve: Enable SVE state tracking for
+ non-task contexts
+Date: Fri, 22 Feb 2019 15:26:51 +0000
+Message-ID: <dc379691-ab3a-79a6-b760-59a02aa40717@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-9-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <d9043bc8-d006-bf64-2047-79a9b6f98183@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Lan Tianyu <Tianyu.Lan@microsoft.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, jhogan@kernel.org, ralf@linux-mips.org, paul.burton@mips.com, paulus@ozlabs.org, benh@kernel.crashing.org, mpe@ellerman.id.au, Radim Krcmar <rkrcmar@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, bp@alien8.de, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm <kvm@vger.kernel.org>, michael.h.kelley@microsoft.com, kys@microsoft.com, Vi
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1550519559-15915-9-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Peter Maydell <peter.maydell@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 15, 2019 at 11:23 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 15/02/19 16:05, Tianyu Lan wrote:
-> > Yes, you are right. Thanks to point out and will fix. The last_level
-> > flag is to avoid adding middle page node(e.g, PGD, PMD)
-> > into flush list. The address range will be duplicated if adding both
-> > leaf, node and middle node into flush list.
->
-> Hmm, that's not easy to track.  One kvm_mmu_page could include both leaf
-> and non-leaf page (for example a huge page for 0 to 2 MB and a page
-> table for 2 MB to 4 MB).
->
-> Is this really needed?  First, your benchmarks so far have been done
-> with sp->last_level always set to true.  Second, you would only
-> encounter this optimization in kvm_mmu_commit_zap_page when zapping a 1
-> GB region (which then would be invalidated twice, at both the PMD and
-> PGD level) or bigger.
->
-> Paolo
+Hi Dave,
 
-Hi Paolo:
-             Sorry for later response and I tried to figure out a bug
-lead by defining wrong
-max flush count. I just sent out V3. I still put the last_level flag
-patch in the end of patchset.
-Detail please see the change log. Just like you said this was an
-optimization and wasn't 100%
-required. If you still have some concerns, you can ignore it and other
-patches in this patchset
-should be good. Thanks.
+On 18/02/2019 19:52, Dave Martin wrote:
+> The current FPSIMD/SVE context handling support for non-task (i.e.,
+> KVM vcpu) contexts does not take SVE into account.  This means that
+
+NIT: Double-space before "This".
+
+> only task contexts can safely use SVE at present.
+> 
+> In preparation for enabling KVM guests to use SVE, it is necessary
+> to keep track of SVE state for non-task contexts too.
+> 
+> This patch adds the necessary support, removing assumptions from
+> the context switch code about the location of the SVE context
+> storage.
+> 
+> When binding a vcpu context, its vector length is arbitrarily
+> specified as SVE_VL_MIN for now.  In any case, because TIF_SVE is
+
+NIT: Double-space before "In".
+
+> presently cleared at vcpu context bind time, the specified vector
+> length will not be used for anything yet.  In later patches TIF_SVE
+
+NIT: Double-space before "In".
+
+> will be set here as appropriate, and the appropriate maximum vector
+> length for the vcpu will be passed when binding.
+
+Cheers,
 
 -- 
-Best regards
-Tianyu Lan
+Julien Grall
