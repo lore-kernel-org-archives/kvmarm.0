@@ -1,51 +1,80 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on
- kvm_vgic_inject_irq
-Date: Fri, 22 Feb 2019 08:37:56 +0000
-Message-ID: <20190222083756.359523ca@why.wild-wind.fr.eu.org>
-References: <20190222082327.3312-1-leo.yan@linaro.org>
-        <20190222082327.3312-3-leo.yan@linaro.org>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH -next] KVM: arm/arm64: Remove unused timer variable
+Date: Fri, 22 Feb 2019 08:49:42 +0000
+Message-ID: <ea7693de-e800-1279-92ae-9844ff9cbf23@arm.com>
+References: <1550817269-57405-1-git-send-email-zhangshaokun@hisilicon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190222082327.3312-3-leo.yan@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Leo Yan <leo.yan@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Andre Przywara <andre.przywara@arm.com>, Jun Yao <yaojun8558363@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3876C4A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 03:49:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id niogIwX0Evlj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 03:49:52 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94B9B4A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 03:49:52 -0500 (EST)
+In-Reply-To: <1550817269-57405-1-git-send-email-zhangshaokun@hisilicon.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Shaokun Zhang <zhangshaokun@hisilicon.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 22 Feb 2019 16:23:24 +0800
-Leo Yan <leo.yan@linaro.org> wrote:
+Hi Shaokun,
 
-> The function kvm_vgic_inject_irq() is not only used by PPIs but also can
-> be used to inject interrupt for SPIs; this patch improves comment for
-> argument @cpuid to reflect support SPIs as well.
+On 22/02/2019 06:34, Shaokun Zhang wrote:
+> The 'timer' local variable became unused after commit bee038a67487
+> ("KVM: arm/arm64: Rework the timer code to use a timer_map").
+> Remove it to avoid [-Wunused-but-set-variable] warning.
 > 
-> Signed-off-by: Leo Yan <leo.yan@linaro.org>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Julien Thierry <julien.thierry@arm.com>
+> Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+> Signed-off-by: Shaokun Zhang <zhangshaokun@hisilicon.com>
 > ---
->  virt/kvm/arm/vgic/vgic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  virt/kvm/arm/arch_timer.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 7cfdfbc910e0..79fe64c15051 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -394,7 +394,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
->  /**
->   * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
->   * @kvm:     The VM structure pointer
-> - * @cpuid:   The CPU for PPIs
-> + * @cpuid:   The CPU for PPIs and SPIs
->   * @intid:   The INTID to inject a new state to.
->   * @level:   Edge-triggered:  true:  to trigger the interrupt
->   *			      false: to ignore the call
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index af8f2f1d01cc..3417f2dbc366 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -236,14 +236,12 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
+>  
+>  static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  {
+> -	struct arch_timer_cpu *timer;
+>  	enum kvm_arch_timers index;
+>  	u64 cval, now;
+>  
+>  	if (!timer_ctx)
+>  		return false;
+>  
+> -	timer = vcpu_timer(timer_ctx->vcpu);
+>  	index = arch_timer_ctx_index(timer_ctx);
+>  
+>  	if (timer_ctx->loaded) {
 
-What does the CPU mean for SPIs? By definition, the routing of an SPI
-is defined by the distributor configuration. And what about LPIs? SGIs?
+This seems to be a consequence of moving the loaded state from
+arch_timer_cpu to arch_timer_context. Thanks for fixing it.
 
-I'm afraid you've misunderstood what cpuid is for.
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-	M.
+Cheers,
+
 -- 
-Without deviation from the norm, progress is not possible.
+Julien Thierry
