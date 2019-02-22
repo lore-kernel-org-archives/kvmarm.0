@@ -1,7 +1,7 @@
 From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH v1 3/4] KVM: arm/arm64: Define TCR_EL2_T0SZ_MASK as TCR_T0SZ_MASK
-Date: Fri, 22 Feb 2019 16:23:25 +0800
-Message-ID: <20190222082327.3312-4-leo.yan@linaro.org>
+Subject: [PATCH v1 4/4] KVM: arm/arm64: Fix comment on create_hyp_mappings()
+Date: Fri, 22 Feb 2019 16:23:26 +0800
+Message-ID: <20190222082327.3312-5-leo.yan@linaro.org>
 References: <20190222082327.3312-1-leo.yan@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190222082327.3312-1-leo.yan@linaro.org>
@@ -10,26 +10,30 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Define macro TCR_EL2_T0SZ_MASK as TCR_T0SZ_MASK, so can remove the hard
-number 0x3f.
+Since commit f7bec68d2fae ("arm/arm64: KVM: Prune unused #defines"), the
+macro HYP_PAGE_OFFSET has been removed, but it's kept in the comment for
+the function create_hyp_mappings().
+
+This patch uses PAGE_OFFSET to replace HYP_PAGE_OFFSET and this is
+consistent with what is doing in the function.
 
 Signed-off-by: Leo Yan <leo.yan@linaro.org>
 ---
- arch/arm64/include/asm/kvm_arm.h | 2 +-
+ virt/kvm/arm/mmu.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 6f602af5263c..d945a787f36e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -99,7 +99,7 @@
- #define TCR_EL2_SH0_MASK	TCR_SH0_MASK
- #define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
- #define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
--#define TCR_EL2_T0SZ_MASK	0x3f
-+#define TCR_EL2_T0SZ_MASK	TCR_T0SZ_MASK
- #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
- 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
- 
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 5eca48bdb1a6..9634f47c2c8b 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -734,7 +734,7 @@ static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
+  * @prot:	The protection to be applied to this range
+  *
+  * The same virtual address as the kernel virtual address is also used
+- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
++ * in Hyp-mode mapping (modulo PAGE_OFFSET) to the same underlying
+  * physical pages.
+  */
+ int create_hyp_mappings(void *from, void *to, pgprot_t prot)
 -- 
 2.17.1
