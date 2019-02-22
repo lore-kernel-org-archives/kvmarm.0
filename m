@@ -1,7 +1,7 @@
 From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH v1 1/4] KVM: arm64: Use macro to replace hard number
-Date: Fri, 22 Feb 2019 16:23:23 +0800
-Message-ID: <20190222082327.3312-2-leo.yan@linaro.org>
+Subject: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on kvm_vgic_inject_irq
+Date: Fri, 22 Feb 2019 16:23:24 +0800
+Message-ID: <20190222082327.3312-3-leo.yan@linaro.org>
 References: <20190222082327.3312-1-leo.yan@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190222082327.3312-1-leo.yan@linaro.org>
@@ -10,25 +10,27 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Use macro for ID_AA64MMFR1_EL1.VH bits shift instead of 8 directly.
+The function kvm_vgic_inject_irq() is not only used by PPIs but also can
+be used to inject interrupt for SPIs; this patch improves comment for
+argument @cpuid to reflect support SPIs as well.
 
 Signed-off-by: Leo Yan <leo.yan@linaro.org>
 ---
- arch/arm64/kernel/head.S | 2 +-
+ virt/kvm/arm/vgic/vgic.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 4471f570a295..3ac377e9fd28 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -490,7 +490,7 @@ ENTRY(el2_setup)
- 	 * kernel is intended to run at EL2.
- 	 */
- 	mrs	x2, id_aa64mmfr1_el1
--	ubfx	x2, x2, #8, #4
-+	ubfx	x2, x2, #ID_AA64MMFR1_VHE_SHIFT, #4
- #else
- 	mov	x2, xzr
- #endif
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 7cfdfbc910e0..79fe64c15051 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -394,7 +394,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ /**
+  * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
+  * @kvm:     The VM structure pointer
+- * @cpuid:   The CPU for PPIs
++ * @cpuid:   The CPU for PPIs and SPIs
+  * @intid:   The INTID to inject a new state to.
+  * @level:   Edge-triggered:  true:  to trigger the interrupt
+  *			      false: to ignore the call
 -- 
 2.17.1
