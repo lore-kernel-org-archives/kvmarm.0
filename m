@@ -1,70 +1,166 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on
- kvm_vgic_inject_irq
-Date: Fri, 22 Feb 2019 16:54:39 +0800
-Message-ID: <20190222085439.GA845@leoy-ThinkPad-X240s>
-References: <20190222082327.3312-1-leo.yan@linaro.org>
- <20190222082327.3312-3-leo.yan@linaro.org>
- <20190222083756.359523ca@why.wild-wind.fr.eu.org>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v5 23/26] KVM: arm64/sve: Allow userspace to enable SVE
+ for vcpus
+Date: Fri, 22 Feb 2019 09:05:16 +0000
+Message-ID: <88f7a00d-019a-5ed3-5a80-6032775dc5c5@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-24-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20190222083756.359523ca@why.wild-wind.fr.eu.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Andre Przywara <andre.przywara@arm.com>, Jun Yao <yaojun8558363@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 111194A321
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 04:05:23 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CxW1UgMZQ2Jq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Feb 2019 04:05:21 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65D804A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Feb 2019 04:05:21 -0500 (EST)
+In-Reply-To: <1550519559-15915-24-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Dave,
 
-On Fri, Feb 22, 2019 at 08:37:56AM +0000, Marc Zyngier wrote:
-> On Fri, 22 Feb 2019 16:23:24 +0800
-> Leo Yan <leo.yan@linaro.org> wrote:
+On 18/02/2019 19:52, Dave Martin wrote:
+> Now that all the pieces are in place, this patch offers a new flag
+> KVM_ARM_VCPU_SVE that userspace can pass to KVM_ARM_VCPU_INIT to
+> turn on SVE for the guest, on a per-vcpu basis.
 > 
-> > The function kvm_vgic_inject_irq() is not only used by PPIs but also can
-> > be used to inject interrupt for SPIs; this patch improves comment for
-> > argument @cpuid to reflect support SPIs as well.
-> > 
-> > Signed-off-by: Leo Yan <leo.yan@linaro.org>
-> > ---
-> >  virt/kvm/arm/vgic/vgic.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> > index 7cfdfbc910e0..79fe64c15051 100644
-> > --- a/virt/kvm/arm/vgic/vgic.c
-> > +++ b/virt/kvm/arm/vgic/vgic.c
-> > @@ -394,7 +394,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
-> >  /**
-> >   * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-> >   * @kvm:     The VM structure pointer
-> > - * @cpuid:   The CPU for PPIs
-> > + * @cpuid:   The CPU for PPIs and SPIs
-> >   * @intid:   The INTID to inject a new state to.
-> >   * @level:   Edge-triggered:  true:  to trigger the interrupt
-> >   *			      false: to ignore the call
+> As part of this, support for initialisation and reset of the SVE
+> vector length set and registers is added in the appropriate places.
+> Allocation SVE registers is deferred until kvm_arm_vcpu_finalize(),
+> by which time the size of the registers is known.
 > 
-> What does the CPU mean for SPIs? By definition, the routing of an SPI
-> is defined by the distributor configuration.
+> Setting the vector lengths supported by the vcpu is considered
+> configuration of the emulated hardware rather than runtime
+> configuration, so no support is offered for changing the vector
+> lengths of an existing vcpu across reset.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> 
+> ---
+> 
+> Changes since v4:
+> 
+>  * Pull out vcpu_sve_state_size(), for use earlier in the series.
+> 
+>  * Remove unnecessary vcpu->arch.sve_vqs[], and clamp maximum guest
+>    vector length to 256 bytes for forwards compatibility.
+> 
+>    (See "KVM: arm64/sve: Add pseudo-register for the guest's vector
+>    lengths".)
+> 
+>  * Minor tidyups to make some checks less verbose.
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/include/uapi/asm/kvm.h |  1 +
+>  arch/arm64/kvm/reset.c            | 70 ++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 71 insertions(+), 2 deletions(-)
+> 
 
-In the code, KVM injects PPIs by specifying CPU id, so that every PPI
-is bound to specific target CPU.  But for SPIs, it always pass '0' for
-cpuid, from my understanding this means VM will set interrupt affinity
-to VCPU0 by default; in theory we also can set different cpuid for
-SPIs so that the SPIs also can be handled by other secondary VCPUs;
-this is why I think @cpuid also can be used by SPIs.
+[...]
 
-> And what about LPIs? SGIs?
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 7ff1bd4..6963b7e 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -102,6 +102,7 @@ struct kvm_regs {
+>  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+>  #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
+>  #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
+> +#define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+>  
+>  struct kvm_vcpu_init {
+>  	__u32 target;
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 1379fb2..e67cd2e 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
 
-TBH, I don't know LPIs and didn't use it before.
+[...]
 
-For SGIs, I read the code, it uses different path to handle SGI in KVM
-so kvm_vgic_inject_irq() is not used for SGIs.
+> @@ -98,11 +100,69 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	return r;
+>  }
+>  
+> +static int kvm_reset_sve(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!system_supports_sve())
+> +		return -EINVAL;
+> +
+> +	/* If resetting an already-configured vcpu, just zero the SVE regs: */
+> +	if (vcpu->arch.sve_state) {
+> +		size_t size = vcpu_sve_state_size(vcpu);
+> +
+> +		if (!size || WARN_ON(!vcpu_has_sve(vcpu)))
+> +			return -EINVAL;
+> +
+> +		memset(vcpu->arch.sve_state, 0, size);
+> +		return 0;
+> +	}
+> +
+> +	if (WARN_ON(!sve_vl_valid(sve_max_vl)))
+> +		return -EINVAL;
+> +
+> +	/* If the full set of host vector lengths cannot be used, give up: */
+> +	if (sve_max_virtualisable_vl < sve_max_vl)
+> +		return -EINVAL;
+> +
+> +	/* Default to the set of vector lengths supported by the host */
+> +	vcpu->arch.sve_max_vl = sve_max_vl;
+> +
+> +	/*
+> +	 * The get_sve_reg()/set_sve_reg() ioctl interface will need
+> +	 * to be extended with multiple register slice support in
+> +	 * order to support vector lengths greater than
+> +	 * SVE_VL_ARCH_MAX:
+> +	 */
+> +	if (WARN_ONCE(vcpu->arch.sve_max_vl > SVE_VL_ARCH_MAX,
+> +		      "KVM: SVE vector length for guests limited to %d bytes\n",
+> +		      SVE_VL_ARCH_MAX))
+> +		vcpu->arch.sve_max_vl = SVE_VL_ARCH_MAX;
+> +
+> +	/*
+> +	 * Userspace can still customize the vector lengths by writing
+> +	 * KVM_REG_ARM64_SVE_VLS.  Allocation is deferred until
+> +	 * kvm_arm_vcpu_finalize(), which freezes the configuration.
+> +	 */
+> +	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_SVE;
+> +
+> +	return 0;
+> +}
+> +
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu)
+>  {
+>  	if (likely(kvm_arm_vcpu_finalized(vcpu)))
+>  		return 0;
+>  
+> +	if (vcpu_has_sve(vcpu)) {
+> +		size_t size = vcpu_sve_state_size(vcpu);
+> +
+> +		if (!size)
+> +			return -EINVAL;
+> +
+> +		vcpu->arch.sve_state = kzalloc(size, GFP_KERNEL);
 
-> I'm afraid you've misunderstood what cpuid is for.
+We should probably free this in kvm_arch_vcpu_free().
 
-Thanks for guidance.
+Cheers,
 
-Thanks,
-Leo Yan
+-- 
+Julien Thierry
