@@ -1,7 +1,7 @@
 From: lantianyu1986@gmail.com
-Subject: [PATCH V3 3/10] KVM/MMU: Introduce tlb flush with range list
-Date: Fri, 22 Feb 2019 23:06:30 +0800
-Message-ID: <20190222150637.2337-4-Tianyu.Lan@microsoft.com>
+Subject: [PATCH V3 4/10] KVM/MMU: Use range flush in sync_page()
+Date: Fri, 22 Feb 2019 23:06:31 +0800
+Message-ID: <20190222150637.2337-5-Tianyu.Lan@microsoft.com>
 References: <20190222150637.2337-1-Tianyu.Lan@microsoft.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190222150637.2337-1-Tianyu.Lan@microsoft.com>
@@ -11,63 +11,30 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Lan Tianyu <Tianyu.Lan@microsoft.com>
 
-This patch is to introduce tlb flush with range list interface and use
-struct kvm_mmu_page as list entry. Use flush list function in the
-kvm_mmu_commit_zap_page().
+This patch is to use range flush to flush tlbs of input struct
+kvm_mmu_page in the sync_page(). If range flush is not available,
+kvm_flush_remote_tlbs_with_address() will call kvm_flush_remote_tlbs().
 
 Signed-off-by: Lan Tianyu <Tianyu.Lan@microsoft.com>
 ---
- arch/x86/kvm/mmu.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ arch/x86/kvm/paging_tmpl.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 8d43b7c0f56f..7a862c56b954 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -291,6 +291,20 @@ static void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 6bdca39829bc..768c5c64e3f8 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -1033,8 +1033,9 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 					 true, false, host_writable);
+ 	}
  
- 	range.start_gfn = start_gfn;
- 	range.pages = pages;
-+	range.flush_list = NULL;
+-	if (set_spte_ret & SET_SPTE_NEED_REMOTE_TLB_FLUSH)
+-		kvm_flush_remote_tlbs(vcpu->kvm);
 +
-+	kvm_flush_remote_tlbs_with_range(kvm, &range);
-+}
-+
-+static void kvm_flush_remote_tlbs_with_list(struct kvm *kvm,
-+		struct hlist_head *flush_list)
-+{
-+	struct kvm_tlb_range range;
-+
-+	if (hlist_empty(flush_list))
-+		return;
-+
-+	range.flush_list = flush_list;
++	kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
++			KVM_PAGES_PER_HPAGE(sp->role.level + 1));
  
- 	kvm_flush_remote_tlbs_with_range(kvm, &range);
+ 	return nr_present;
  }
-@@ -2719,6 +2733,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 				    struct list_head *invalid_list)
- {
- 	struct kvm_mmu_page *sp, *nsp;
-+	HLIST_HEAD(flush_list);
- 
- 	if (list_empty(invalid_list))
- 		return;
-@@ -2732,7 +2747,14 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 	 * In addition, kvm_flush_remote_tlbs waits for all vcpus to exit
- 	 * guest mode and/or lockless shadow page table walks.
- 	 */
--	kvm_flush_remote_tlbs(kvm);
-+	if (kvm_available_flush_tlb_with_range()) {
-+		list_for_each_entry(sp, invalid_list, link)
-+				hlist_add_head(&sp->flush_link, &flush_list);
-+
-+		kvm_flush_remote_tlbs_with_list(kvm, &flush_list);
-+	} else {
-+		kvm_flush_remote_tlbs(kvm);
-+	}
- 
- 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
- 		WARN_ON(!sp->role.invalid || sp->root_count);
 -- 
 2.14.4
