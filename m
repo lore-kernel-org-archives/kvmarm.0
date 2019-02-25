@@ -1,47 +1,64 @@
-From: Tianyu Lan <lantianyu1986@gmail.com>
-Subject: Re: [PATCH V3 00/10] X86/KVM/Hyper-V: Add HV ept tlb range list flush
- support in KVM
-Date: Sat, 23 Feb 2019 22:37:53 +0800
-Message-ID: <CAOLK0pzvtO6Aj0T7uKwOHdNcsnM_Fq_wPL1VUTwF347fYA5Vdw@mail.gmail.com>
-References: <20190222150637.2337-1-Tianyu.Lan@microsoft.com>
- <75e9238a-f168-b90d-e1f1-89938e6df57a@redhat.com>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH v1 2/4] KVM: arm/arm64: vgic: Improve comment on
+ kvm_vgic_inject_irq
+Date: Mon, 25 Feb 2019 08:09:17 +0800
+Message-ID: <20190225000917.GA4001@leoy-ThinkPad-X240s>
+References: <20190222082327.3312-1-leo.yan@linaro.org>
+ <20190222082327.3312-3-leo.yan@linaro.org>
+ <20190222083756.359523ca@why.wild-wind.fr.eu.org>
+ <20190222085439.GA845@leoy-ThinkPad-X240s>
+ <20190222093923.09e36583@why.wild-wind.fr.eu.org>
+ <20190222124906.GB845@leoy-ThinkPad-X240s>
+ <86r2bzrful.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <75e9238a-f168-b90d-e1f1-89938e6df57a@redhat.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>, benh@kernel.crashing.org, will.deacon@arm.com, christoffer.dall@arm.com, paulus@ozlabs.org, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, Sasha Levin <sashal@kernel.org>, sthemmin@microsoft.com, mpe@ellerman.id.au, the arch/x86 maintainers <x86@kernel.org>, linux@armlinux.org.uk, michael.h.kelley@microsoft.com, Ingo Molnar <mingo@redhat.com>, catalin.marinas@arm.com, jhogan@kernel.org, linux-mips@vger.kernel.org, Lan Tianyu <Tianyu.Lan@microsoft.com>, marc.zyngier@arm.com, haiyangz@microsoft.com, kvm-ppc@vger.kernel.org, bp@alien8.de, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>, ralf@linux-mips.org, paul.burton@mips.com, devel@linuxdriverproject.org, Vitaly Kuznetsov <vkuznets@redhat.com>, linuxppc-d
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <86r2bzrful.wl-marc.zyngier@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org, Jun Yao <yaojun8558363@gmail.com>, James Morse <james.morse@arm.com>, Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Feb 23, 2019 at 2:26 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 22/02/19 16:06, lantianyu1986@gmail.com wrote:
-> > From: Lan Tianyu <Tianyu.Lan@microsoft.com>
-> >
-> > This patchset is to introduce hv ept tlb range list flush function
-> > support in the KVM MMU component. Flushing ept tlbs of several address
-> > range can be done via single hypercall and new list flush function is
-> > used in the kvm_mmu_commit_zap_page() and FNAME(sync_page). This patchset
-> > also adds more hv ept tlb range flush support in more KVM MMU function.
-> >
-> > This patchset is based on the fix patch "x86/Hyper-V: Fix definition HV_MAX_FLUSH_REP_COUNT".
-> > (https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1939455.html)
->
-> Note that this won't make it in 5.1 unless Linus releases an -rc8.
-> Otherwise, I'll get to it next week.
-Hi Paolo:
-      Sure. Thanks for your review.
+On Fri, Feb 22, 2019 at 03:40:50PM +0000, Marc Zyngier wrote:
 
--- 
-Best regards
-Tianyu Lan
+[...]
+
+> > > The interrupt affinity is either defined by the distributor
+> > > configuration (SPIs) or the ITS configuration (LPIs).
+> > 
+> > Given to the up example, I am struggling to understand how you can set
+> > the interrupt affinity for virtio device.
+> > 
+> > Do you set the physical interrupt affinity to CPU0/1 in host OS and
+> > forward it to guest OS?  Or set interrupt affinity in guest OS (I
+> > tried on Juno board to set irq affinity in guest OS from
+> > '/proc/irq/xxx/smp_affinity' but failed)?   Or this is accomplished by
+> > user space tool (lkvm or qemu)?
+> 
+> virtio interrupts are purely virtual, and the host plays no part in
+> their routing (nor does userspace). As for their affinity, that
+> depends on the virtio driver. Some virtio devices allow their affinity
+> to be changed, some don't. Here, this is a virtio-net device, which is
+> perfectly happy to see its queue interrupts moved to a different vcpu.
+> 
+> I tend to run irqbalance in my guests so that it actually exercises
+> the affinity setting in the background.
+> 
+> > Sorry if I am asking a stupid question :)
+> 
+> It's not stupid. You're simply confusing multiple independent layers.
+
+Thanks a lot for explaination, Marc.
+
+Thanks,
+Leo Yan
