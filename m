@@ -1,112 +1,233 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 19/22] vfio-pci: Register an iommu fault handler
-Date: Mon, 25 Feb 2019 18:30:45 +0100
-Message-ID: <6e33eab2-2afe-29e5-1c9a-3b8343cdc8ac@redhat.com>
-References: <20190218135504.25048-1-eric.auger@redhat.com>
- <20190218135504.25048-20-eric.auger@redhat.com>
- <20190225142209.GC23257@debian>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
+Date: Mon, 25 Feb 2019 17:39:58 +0000
+Message-ID: <ba023672-92f5-41dd-1194-4ab4f647b204@arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190225142209.GC23257@debian>
-Content-Language: en-US
+In-Reply-To: <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
-To: =?UTF-8?Q?Vincent_Stehl=c3=a9?= <vincent.stehle@arm.com>
-Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Vincent,
+Hi Amit,
 
-On 2/25/19 3:22 PM, Vincent Stehlé wrote:
-> Hi Eric,
+On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
 > 
-> On Mon, Feb 18, 2019 at 02:55:00PM +0100, Eric Auger wrote:
->> This patch registers a fault handler which records faults in
->> a circular buffer and then signals an eventfd. This buffer is
->> exposed within the fault region.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/vfio/pci/vfio_pci.c         | 49 +++++++++++++++++++++++++++++
->>  drivers/vfio/pci/vfio_pci_private.h |  1 +
->>  2 files changed, 50 insertions(+)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index aaf63e5ca2b6..019c9fd380a5 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
-> (..)
->>  static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
->>  {
->>  	struct vfio_region_fault_prod *header;
->> @@ -276,6 +317,13 @@ static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
->>  	header = (struct vfio_region_fault_prod *)vdev->fault_pages;
->>  	header->version = -1;
->>  	header->offset = PAGE_SIZE;
->> +
->> +	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
->> +					vfio_pci_iommu_dev_fault_handler,
->> +					vdev);
->> +	if (ret)
->> +		goto out;
->> +
->>  	return 0;
->>  out:
->>  	kfree(vdev->fault_pages);
+> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+> is a constant value. This works today, as the host HCR_EL2 value is
+> always the same, but this will get in the way of supporting extensions
+> that require HCR_EL2 bits to be set conditionally for the host.
 > 
-> This patch calls iommu_register_device_fault_handler from
-> vfio_pci_init_fault_region, leading to the following call stack:
+> To allow such features to work without KVM having to explicitly handle
+> every possible host feature combination, this patch has KVM save/restore
+> for the host HCR when switching to/from a guest HCR. The saving of the
+> register is done once during cpu hypervisor initialization state and is
+> just restored after switch from guest.
 > 
-> iommu_register_device_fault_handler
-> vfio_pci_init_fault_region
-> vfio_pci_enable
-> vfio_pci_open
-> vfio_group_get_device_fd
+> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+> kvm_call_hyp and is helpful in NHVE case.
 > 
->> @@ -1420,6 +1468,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
->>  	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
->>  	kfree(vdev->region);
->>  	kfree(vdev->fault_pages);
->> +	iommu_unregister_device_fault_handler(&pdev->dev);
->>  	mutex_destroy(&vdev->ioeventfds_lock);
->>  	kfree(vdev);
+> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+> to toggle the TGE bit with a RMW sequence, as we already do in
+> __tlb_switch_to_guest_vhe().
 > 
-> And then this patch calls iommu_unregister_device_fault_handler from
-> vfio_pci_remove, and not from vfio_pci_release.
+> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+> and guest can now use this field in a common way.
 
-Yes you're fully right. Thank you for the time spent debugging the
-issue. this is a left-over from the previous version and indeed the
-unregistration should be called from the release ops.
 
-By the way, I will package a qemu version for testing this week. Sorry
-for the delay.
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index ca56537..05706b4 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
+>  	kvm_call_hyp(__init_stage2_translation);
+>  }
+>  
+> +static inline void __cpu_copy_hyp_conf(void) {}
+> +
 
-Thanks
+I agree Mark's suggestion of adding 'host_ctxt' in here makes it clearer what it is.
 
-Eric
+
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 506386a..0dbe795 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+
+Hmmm, there is still a fair amount of churn due to moving the struct definition, but its
+easy enough to ignore as its mechanical. A preparatory patch that switched as may as
+possible to '*vcpu_hcr() = ' would cut the churn down some more, but I don't think its
+worth the extra effort.
+
+
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index a80a7ef..6e65cad 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -151,7 +151,7 @@ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+>  bool __fpsimd_enabled(void);
+>  
+>  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+> -void deactivate_traps_vhe_put(void);
+> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+
+I've forgotten why this is needed. You don't add a user of vcpu to
+deactivate_traps_vhe_put() in this patch.
+
+
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index b0b1478..006bd33 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -191,7 +194,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+
+> -void deactivate_traps_vhe_put(void)
+> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+>  
+
+Why does deactivate_traps_vhe_put() need the vcpu?
+
+
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7732d0b..1b2e05b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -458,6 +459,16 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>
+>  static inline void __cpu_init_stage2(void) {}
+>
+> +/**
+> + * __cpu_copy_hyp_conf - copy the boot hyp configuration registers
+> + *
+> + * It is called once per-cpu during CPU hyp initialisation.
+> + */
+
+Is it just the boot cpu?
+
+
+> +static inline void __cpu_copy_hyp_conf(void)
+> +{
+> +	kvm_call_hyp(__kvm_populate_host_regs);
+> +}
+> +
+
+
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 68d6f7c..68ddc0f 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+> +#include <asm/kvm_mmu.h>
+
+... what's kvm_mmu.h needed for?
+The __hyp_this_cpu_ptr() you add comes from kvm_asm.h.
+
+/me tries it.
+
+Heh, hyp_symbol_addr(). kvm_asm.h should include this, but can't because the
+kvm_ksym_ref() dependency is the other-way round. This is just going to bite us somewhere
+else later!
+If we want to fix it now, moving hyp_symbol_addr() to kvm_asm.h would fix it. It's
+generating adrp/add so the 'asm' label is fair, and it really should live with its EL1
+counterpart kvm_ksym_ref().
+
+
+> @@ -294,7 +295,7 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+>  	if (!has_vhe())
+>  		return;
+>  
+> -	deactivate_traps_vhe_put();
+> +	deactivate_traps_vhe_put(vcpu);
+>  
+>  	__sysreg_save_el1_state(guest_ctxt);
+>  	__sysreg_save_user_state(guest_ctxt);
+> @@ -316,3 +317,21 @@ void __hyp_text __kvm_enable_ssbs(void)
+>  	"msr	sctlr_el2, %0"
+>  	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
+>  }
+> +
+> +/**
+> + * __kvm_populate_host_regs - Stores host register values
+> + *
+> + * This function acts as a function handler parameter for kvm_call_hyp and
+> + * may be called from EL1 exception level to fetch the register value.
+> + */
+> +void __hyp_text __kvm_populate_host_regs(void)
+> +{
+> +	struct kvm_cpu_context *host_ctxt;
+
+
+> +	if (has_vhe())
+> +		host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
+> +	else
+> +		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
+
+You can use __hyp_this_cpu_ptr() here, even on VHE.
+
+For VHE the guts are the same and its simpler to use the same version in both cases.
+
+
+__hyp_this_cpu_ptr(sym) == hyp_symbol_addr(sym) + tpidr_el2;
+
+hyp_symbol_addr() here is just to guarantee the address is generated based on where we're
+executing from, not loaded from a literal pool which would give us the link-time address.
+(or whenever kaslr applied the relocations). This matters for non-VHE because the compiler
+can't know the code has an EL2 address as well as its link-time address.
+
+This doesn't matter for VHE, as there is no additional different address.
+
+(the other trickery is on non-VHE the tpidr_el2 value isn't actually the same as the
+hosts.. but on VHE it is)
+
+
+> +	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
+> +}
+
+
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 9e350fd3..8e18f7f 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1328,6 +1328,7 @@ static void cpu_hyp_reinit(void)
+>  		cpu_init_hyp_mode(NULL);
+>  
+>  	kvm_arm_init_debug();
+> +	__cpu_copy_hyp_conf();
+
+Your commit message says:
+| The saving of the register is done once during cpu hypervisor initialization state
+
+But cpu_hyp_reinit() is called each time secondary CPUs come online. Its also called as
+part of the cpu-idle mechanism via hyp_init_cpu_pm_notifier(). cpu-idle can ask the
+firmware to power-off the CPU until an interrupt becomes pending for it. KVM's EL2 state
+disappears when this happens, these calls take care of setting it back up again. On Juno,
+this can happen tens of times a second, and this adds an extra call to EL2.
+
+init_subsystems() would be the alternative place for this, but it wouldn't catch CPUs that
+came online after booting. I think you need something in cpu_hyp_reinit() or
+__cpu_copy_hyp_conf() to ensure it only happens once per CPU.
+
+I think you can test whether the HCR_EL2 value is zero, assuming zero means uninitialised.
+A VHE system would always set E2H, and a non-VHE system has to set RW.
+
+
+>  	if (vgic_present)
+>  		kvm_vgic_init_cpu_hardware();
 > 
-> I think this means a device cannot be used twice in a row without unloading the
-> module.
-> 
-> Here is an example sequence:
-> 
-> 1. modprobe vfio-pci
-> 2. Userspace uses VFIO, calls ioctl(VFIO_GROUP_GET_DEVICE_FD)
->     2.1. iommu_register_device_fault_handler is called
-> 3. Userspace exits
->     3.1. vfio_pci_release is called,
->          but iommu_unregister_device_fault_handler is not called
-> 4. Userspace uses VFIO agin, calls ioctl(VFIO_GROUP_GET_DEVICE_FD) again
->     4.1. iommu_register_device_fault_handler is called again,
->          notices a fault handler is already there,
->          returns -EBUSY
-> 
-> Unloading the vfio-pci module will call vfio_pci_remove.
-> 
-> Maybe iommu_unregister_device_fault_handler should be called from
-> vfio_pci_release instead of vfio_pci_remove?
-> 
-> Best regards,
-> Vincent.
-> 
+
+
+Thanks,
+
+James
