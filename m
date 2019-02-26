@@ -1,56 +1,39 @@
 From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH 1/5] KVM: arm/arm64: Reset the VCPU without preemption
  and vcpu state loaded
-Date: Tue, 26 Feb 2019 13:53:52 +0000
-Message-ID: <20190226135352.GX3567@e103592.cambridge.arm.com>
+Date: Tue, 26 Feb 2019 14:00:55 +0000
+Message-ID: <20190226140055.GY3567@e103592.cambridge.arm.com>
 References: <20190125094656.5026-1-christoffer.dall@arm.com>
  <20190125094656.5026-2-christoffer.dall@arm.com>
  <20190220191450.GT3567@e103592.cambridge.arm.com>
- <20190220194143.2e1a7d2c@why.wild-wind.fr.eu.org>
+ <20190226123449.GA551@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5A134A36D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 08:53:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l0uTqij5W1g8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Feb 2019 08:53:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D0A4A2BE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 08:53:57 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20190220194143.2e1a7d2c@why.wild-wind.fr.eu.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190226123449.GA551@e113682-lin.lund.arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 20, 2019 at 07:41:43PM +0000, Marc Zyngier wrote:
-> On Wed, 20 Feb 2019 19:14:53 +0000
-> Dave Martin <Dave.Martin@arm.com> wrote:
-> 
+On Tue, Feb 26, 2019 at 01:34:49PM +0100, Christoffer Dall wrote:
+> On Wed, Feb 20, 2019 at 07:14:53PM +0000, Dave Martin wrote:
 > > On Fri, Jan 25, 2019 at 10:46:52AM +0100, Christoffer Dall wrote:
 > > > Resetting the VCPU state modifies the system register state in memory,
 > > > but this may interact with vcpu_load/vcpu_put if running with preemption
-> > > disabled, which in turn may lead to corrupted system register state.  
+> > > disabled, which in turn may lead to corrupted system register state.
 > > 
 > > Should this be "enabled"?
-> 
-> Yup. Never mind. The patches are firmly in mainline now.
-
-Understood.  Just wanted to check my intuition.
-
 > > 
 > > Too late now, but I want to make sure I understand this right for
 > > patches that will go on top.
@@ -116,63 +99,87 @@ Understood.  Just wanted to check my intuition.
 > > > +	return ret;
 > > >  }
 > > >  
-> > >  void kvm_set_ipa_limit(void)  
+> > >  void kvm_set_ipa_limit(void)
 > > 
 > > I was really confused by this: as far as I can see, we don't really need
 > > to disable preemption here once kvm_arch_vcpu_put() is complete -- at
 > > least not for the purpose of avoiding corruption of the reg state.  But
 > > we _do_ need to disable the preempt notifier so that it doesn't fire
 > > before we are ready.
-> 
-> Just reading this patch alone won't help. You need to read it in
-> conjunction with the following patch, which resets the vcpu from a
-> preemptible section.
-> 
+> > 
 > > It actually seems a bit surprising for a powered-off CPU to sit with the
 > > VM regs live and preempt notifier armed, when the vcpu thread is
 > > heading to interruptible sleep anyway until someone turns it on.
-> 
-> All it takes is a signal for that vcpu to wake up, power-off or not.
-
-Sure, but the vcpu was scheduled out in the meantim, so we may end up
-having to do all the loading twice:  not a problem, because this is a
-rare, slow path.  But I wanted to make sure I wasn't more confused than
-necessary.
-
 > > Perhaps an alternative approach would be to nobble the preempt notifier
 > > and stick an explicit vcpu_put()...vcpu_load() around the
 > > swait_event_interruptible_exclusive() call in vcpu_req_sleep().  This
 > > is not fast path.
+> > 
+> > 
 > 
-> What does it buy us? The problem we're solving here is a powered-off,
-> spuriously woken-up vcpu racing against the reset performed from
-> another vcpu. I don't see what adding more put/load would solve.
-
-Not a lot.  Changes in this area would allow some code to move outside
-preempt_disable(), but only at the expense of extra cost elsewhere...
-
-> > Any, with the code as-is, it looks like the SVE regs resetting should
-> > go in the preempt_disable() region, after the kvm_arch_vcpu_put() call.
+> I think you've understood the problem correctly, and the thing here is
+> that we (sort-of) "abuse" disabling preemption as a way to disable
+> preempt notifiers, which I don't think we have.  So we could add that,
+> and do something like:
 > 
-> All resets must go there. This is the only safe location.
+>   preempt_disable();
+>   vcpu_put(vcpu);
+>   disable_preempt_notifiers(vcpu);
+>   preempt_disable();
+>   funky_stuff();
+>   vcpu_load();
+>   preempt_enable();
 
-OK, that's what I wanted to be sure of.
+Did you mean
 
-> > Does it sound like I've understood that right?
+	preempt_disable();
+	disable_preempt_notifiers(vcpu);
+	vcpu_put(vcpu);
+	preempt_enable();
+
+	funky_stuff();
+
+	preempt_disable();
+	vcpu_load(vcpu);
+	enable_preempt_notifiers(vcpu);
+	preempt_enable();
+
+> But I think that's additional complexity to get a slightly shorter
+> section with disabled preemption.
+
+Agreed.
+
+disable/enable_preempt_notifiers() may do little more than toggle a flag
+that the preempt notifiers check, but I totally agree that it's unlikely
+to be worth it just to be preemptible in this small region.
+
+> We could also re-architect a lot of the vcpu_load/vpcu_put functionality
+> more drastically, but that is difficult and requires understanding of
+> how the other architectures work, so at the end of the day we just use
+> this pattern in multiple places, which is:
 > 
-> I'm not sure. Your analysis of what we're trying to achieve with this
-> series seems a bit off. Or I'm completely misunderstanding what you're
-> suggesting, which is the most likely explanation.
+>   preempt_disable();
+>   vcpu_put();
 
-I'm not trying to achieve anything except rebase the SVE series
-correctly on top of this patch (which I've now done -- thanks for
-your confirmation above of where the extra resetting should go).
+We still have the anomaly that we save all the state we're about to
+reset here.
 
-My suggestions above were only intended as thought experiments to check
-my understanding of what's going on, *not* proposals for changing the
-code.  I guess I didn't make that very clear.
+(i.e., we have no pure "invalidate" operation for the loaded CPU regs;
+vcpu_put() is more "clean and invalidate", but we may not care much
+about the "clean" part in this particular sequence).
 
-[...]
+Again, this only makes a difference to a rare slow path, so I don't
+see it as a problem.
+
+>   modify_vcpu_state_in_memory();
+>   vcpu_load();
+>   preempt_enable();
+> 
+> Does that help?
+
+Yes, I think I've understood correctly what's going on here now.
+
+The code is fine as it is.
 
 Cheers
 ---Dave
