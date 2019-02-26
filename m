@@ -1,44 +1,32 @@
 From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH v5 12/26] KVM: arm64: Support runtime sysreg visibility
  filtering
-Date: Tue, 26 Feb 2019 12:07:52 +0000
-Message-ID: <20190226120752.GN3567@e103592.cambridge.arm.com>
+Date: Tue, 26 Feb 2019 12:12:47 +0000
+Message-ID: <20190226121247.GO3567@e103592.cambridge.arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
  <1550519559-15915-13-git-send-email-Dave.Martin@arm.com>
- <2819c91f-3a28-b878-0ea1-d20afcf05895@arm.com>
+ <20190220153726.GF4763@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0FA4A3BB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:08:03 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9MzV2lctl-YR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Feb 2019 07:07:57 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22A6F4A36C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:07:57 -0500 (EST)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <2819c91f-3a28-b878-0ea1-d20afcf05895@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
+In-Reply-To: <20190220153726.GF4763@lakrids.cambridge.arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 20, 2019 at 02:33:44PM +0000, Julien Thierry wrote:
-> 
-> 
-> On 18/02/2019 19:52, Dave Martin wrote:
+On Wed, Feb 20, 2019 at 03:37:26PM +0000, Mark Rutland wrote:
+> On Mon, Feb 18, 2019 at 07:52:25PM +0000, Dave Martin wrote:
 > > Some optional features of the Arm architecture add new system
 > > registers that are not present in the base architecture.
 > > 
@@ -66,8 +54,59 @@ On Wed, Feb 20, 2019 at 02:33:44PM +0000, Julien Thierry wrote:
 > > hiding register where appropriate.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > 
+> > ---
+> > 
+> > Changes since v4:
+> > 
+> >  * Move from a boolean sysreg property that just suppresses register
+> >    enumeration via KVM_GET_REG_LIST, to a multi-flag property that
+> >    allows independent runtime control of MRS/MSR and user ioctl access.
+> > 
+> >    This allows registers to be either hidden completely, or to have
+> >    hybrid behaviours (such as the not-enumerated, RAZ, WAZ behaviour of
+> >    "non-present" CPU ID regs).
 > 
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> Sorry for bikeshedding...
+> 
+> > +	/* Check for regs disabled by runtime config */
+> > +	if (restrictions(vcpu, r) & REG_NO_GUEST) {
+> 
+> Maybe it's worth wrapping this as something like
+> 
+> 	reg_runtime_hidden_from_guest(vcpu, r)
+> 
+> ... and avoid exposing the raw flags to all the places we have to check?
+> 
+> [...]
+> 
+> > +#define REG_NO_USER	(1 << 0) /* hidden from userspace ioctl interface */
+> > +#define REG_NO_GUEST	(1 << 1) /* hidden from guest */
+> 
+> Perhaps REG_USER_HIDDEN and REG_GUEST_HIDDEN?
 
-Thanks
+I'm not attached to any particular naming, so I'm not opposed to making
+changes similar to those you suggest.
+
+There are some anomalies right now:
+
+1) Currently, we can express REG_NO_GUEST by itself, which is a of an
+odd thing to have.  I'm not sure whether that's a problem or not.
+Keeping the flags as-is at least keeps the code simple.
+
+2) These flags do not quite have the obvious semantics: these are
+overrides rather than determining precisely when a reg is/isn't
+accessible.
+
+So, REG_NO_USER means "don't even call this reg's get/set_user(): forbid
+user access unconditionally", whereas lack of this flag means "call the
+appropriate get/set_user() function to find out what to do, which may
+or may not result in forbidding the access".
+
+Maybe this subtlety is just a question of clear commenting.  I can't
+think of obviously-correct names that won't be stupidly verbose...
+
+Thoughts?
+
+Cheers
 ---Dave
