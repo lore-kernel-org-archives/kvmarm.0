@@ -1,27 +1,27 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 23/26] KVM: arm64/sve: Allow userspace to enable SVE
- for vcpus
-Date: Tue, 26 Feb 2019 12:13:55 +0000
-Message-ID: <20190226121355.GU3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v5 24/26] KVM: arm64: Add a capabillity to advertise SVE
+ support
+Date: Tue, 26 Feb 2019 12:14:11 +0000
+Message-ID: <20190226121411.GV3567@e103592.cambridge.arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-24-git-send-email-Dave.Martin@arm.com>
- <88f7a00d-019a-5ed3-5a80-6032775dc5c5@arm.com>
+ <1550519559-15915-25-git-send-email-Dave.Martin@arm.com>
+ <e1e048ff-dbe0-34fe-3318-d9c9ecbccf0e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F344A1DF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:14:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3673C4A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:14:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aT+M076f8yr8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Feb 2019 07:13:59 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D66FE49E3E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:13:59 -0500 (EST)
+ with ESMTP id LlPqEubP0N0y for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Feb 2019 07:14:16 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E97BA4A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:14:15 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <88f7a00d-019a-5ed3-5a80-6032775dc5c5@arm.com>
+In-Reply-To: <e1e048ff-dbe0-34fe-3318-d9c9ecbccf0e@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,69 +35,82 @@ To: Julien Thierry <julien.thierry@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 22, 2019 at 09:05:16AM +0000, Julien Thierry wrote:
+On Fri, Feb 22, 2019 at 09:10:46AM +0000, Julien Thierry wrote:
 > Hi Dave,
 > 
 > On 18/02/2019 19:52, Dave Martin wrote:
-> > Now that all the pieces are in place, this patch offers a new flag
-> > KVM_ARM_VCPU_SVE that userspace can pass to KVM_ARM_VCPU_INIT to
-> > turn on SVE for the guest, on a per-vcpu basis.
-> > 
-> > As part of this, support for initialisation and reset of the SVE
-> > vector length set and registers is added in the appropriate places.
-> > Allocation SVE registers is deferred until kvm_arm_vcpu_finalize(),
-> > by which time the size of the registers is known.
-> > 
-> > Setting the vector lengths supported by the vcpu is considered
-> > configuration of the emulated hardware rather than runtime
-> > configuration, so no support is offered for changing the vector
-> > lengths of an existing vcpu across reset.
+> > To provide a uniform way to check for KVM SVE support amongst other
+> > features, this patch adds a suitable capability KVM_CAP_ARM_SVE,
+> > and reports it as present when SVE is available.
 > > 
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > 
 > > ---
+> >  arch/arm64/kvm/reset.c   | 8 ++++++++
+> >  include/uapi/linux/kvm.h | 1 +
+> >  2 files changed, 9 insertions(+)
 > > 
-> > Changes since v4:
-> > 
-> >  * Pull out vcpu_sve_state_size(), for use earlier in the series.
-> > 
-> >  * Remove unnecessary vcpu->arch.sve_vqs[], and clamp maximum guest
-> >    vector length to 256 bytes for forwards compatibility.
-> > 
-> >    (See "KVM: arm64/sve: Add pseudo-register for the guest's vector
-> >    lengths".)
-> > 
-> >  * Minor tidyups to make some checks less verbose.
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 +-
-> >  arch/arm64/include/uapi/asm/kvm.h |  1 +
-> >  arch/arm64/kvm/reset.c            | 70 ++++++++++++++++++++++++++++++++++++++-
-> >  3 files changed, 71 insertions(+), 2 deletions(-)
-
-[...]
-
 > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-
-[...]
-
-> >  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu)
-> >  {
-> >  	if (likely(kvm_arm_vcpu_finalized(vcpu)))
-> >  		return 0;
+> > index e67cd2e..f636b34 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -35,6 +35,7 @@
+> >  #include <asm/kvm_asm.h>
+> >  #include <asm/kvm_coproc.h>
+> >  #include <asm/kvm_mmu.h>
+> > +#include <asm/virt.h>
 > >  
-> > +	if (vcpu_has_sve(vcpu)) {
-> > +		size_t size = vcpu_sve_state_size(vcpu);
-> > +
-> > +		if (!size)
-> > +			return -EINVAL;
-> > +
-> > +		vcpu->arch.sve_state = kzalloc(size, GFP_KERNEL);
+> >  /* Maximum phys_shift supported for any VM on this host */
+> >  static u32 kvm_ipa_limit;
+> > @@ -93,6 +94,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  	case KVM_CAP_ARM_VM_IPA_SIZE:
+> >  		r = kvm_ipa_limit;
+> >  		break;
+> > +	case KVM_CAP_ARM_SVE:
+> > +		r = system_supports_sve();
+> > +		break;
+> >  	default:
+> >  		r = 0;
+> >  	}
+> > @@ -105,6 +109,10 @@ static int kvm_reset_sve(struct kvm_vcpu *vcpu)
+> >  	if (!system_supports_sve())
+> >  		return -EINVAL;
+> >  
+> > +	/* Verify that KVM startup enforced this when SVE was detected: */
+> > +	if (WARN_ON(!has_vhe()))
+> > +		return -EINVAL;
 > 
-> We should probably free this in kvm_arch_vcpu_free().
+> I'm wondering, wouldn't it make more sense to check for this when
+> userland tries to set KVM_ARM_VCPU_SVE?
+> 
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-Hmmm, good spot!
+I have a vague memory of these being some sort of reason for this, but
+looking at the code now I can't see why the check can't be moved to
+kvm_reset_vcpu().
 
-Looks like I lost that during a previous rebase.
+How does the following look?  The effective is no different, but the
+code arrangement may be a bit less surprising this way:
+
+int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+{
+[...]
+        if (test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
+		if (!system_supports_sve())
+			return -EINVAL;
+
+		if (WARN_ON(!has_vhe()))
+			return -EINVAL;
+
+		/* KVM statup should enforce this on SVE hardware: */
+                ret = kvm_reset_sve(vcpu);
+                if (ret)
+                        return ret;
+        }
+
+
+This function is bascially the arch backend for KVM_ARM_VCPU_INIT, so I
+don't see a better place to do this right now.  Adding an extra hook
+just for this kind of thing feels like overkill...
 
 Cheers
 ---Dave
