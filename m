@@ -1,156 +1,77 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 13/26] KVM: arm64/sve: System register context switch
- and access support
-Date: Tue, 26 Feb 2019 17:01:05 +0000
-Message-ID: <20190226170105.GB3567@e103592.cambridge.arm.com>
-References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-14-git-send-email-Dave.Martin@arm.com>
- <8a0e6089-b77b-151b-eacd-34ad13f39ac6@arm.com>
+From: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v6 0/6] Add ARMv8.3 pointer authentication for kvm guest
+Date: Tue, 26 Feb 2019 18:03:56 +0000
+Message-ID: <7dac868e-c0dc-ce20-a183-b42f694ffb12@arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 112F74A414
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 12:01:12 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cb3rBp2xNX9g for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Feb 2019 12:01:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B57764A2E4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 12:01:10 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <8a0e6089-b77b-151b-eacd-34ad13f39ac6@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+Content-Language: en-GB
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 26, 2019 at 04:32:30PM +0000, Julien Grall wrote:
-> Hi Dave,
+Hi Amit,
+
+On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
+> This patch series adds pointer authentication support for KVM guest and
+> is based on top of Linux 5.0-rc6. The basic patches in this series was
+> originally posted by Mark Rutland earlier[1,2] and contains some history
+> of this work.
 > 
-> On 18/02/2019 19:52, Dave Martin wrote:
-> >@@ -1091,6 +1088,95 @@ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
-> >  static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
-> >  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-> >+static unsigned int sve_restrictions(const struct kvm_vcpu *vcpu,
-> >+				     const struct sys_reg_desc *rd)
-> >+{
-> >+	return vcpu_has_sve(vcpu) ? 0 : REG_NO_USER | REG_NO_GUEST;
-> >+}
-> >+
-> >+static unsigned int sve_id_restrictions(const struct kvm_vcpu *vcpu,
-> >+					const struct sys_reg_desc *rd)
-> >+{
-> >+	return vcpu_has_sve(vcpu) ? 0 : REG_NO_USER;
-> >+}
-> >+
-> >+static int get_zcr_el1(struct kvm_vcpu *vcpu,
-> >+		       const struct sys_reg_desc *rd,
-> >+		       const struct kvm_one_reg *reg, void __user *uaddr)
-> >+{
-> >+	if (WARN_ON(!vcpu_has_sve(vcpu)))
-> >+		return -ENOENT;
-> >+
-> >+	return reg_to_user(uaddr, &vcpu->arch.ctxt.sys_regs[ZCR_EL1],
-> >+			   reg->id);
-> >+}
-> >+
-> >+static int set_zcr_el1(struct kvm_vcpu *vcpu,
-> >+		       const struct sys_reg_desc *rd,
-> >+		       const struct kvm_one_reg *reg, void __user *uaddr)
-> >+{
-> >+	if (WARN_ON(!vcpu_has_sve(vcpu)))
-> >+		return -ENOENT;
-> >+
-> >+	return reg_from_user(&vcpu->arch.ctxt.sys_regs[ZCR_EL1], uaddr,
-> >+			     reg->id);
-> >+}
-> >+
-> >+/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
-> >+static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
-> >+{
-> >+	if (!vcpu_has_sve(vcpu))
-> >+		return 0;
-> >+
-> >+	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
-> >+}
-> >+
-> >+static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> >+				   struct sys_reg_params *p,
-> >+				   const struct sys_reg_desc *rd)
-> >+{
-> >+	if (p->is_write)
-> >+		return write_to_read_only(vcpu, p, rd);
-> >+
-> >+	p->regval = guest_id_aa64zfr0_el1(vcpu);
-> >+	return true;
-> >+}
-> >+
-> >+static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> >+		const struct sys_reg_desc *rd,
-> >+		const struct kvm_one_reg *reg, void __user *uaddr)
-> >+{
-> >+	u64 val;
-> >+
-> >+	if (!vcpu_has_sve(vcpu))
-> >+		return -ENOENT;
-> >+
-> >+	val = guest_id_aa64zfr0_el1(vcpu);
-> >+	return reg_to_user(uaddr, &val, reg->id);
-> >+}
-> >+
-> >+static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
-> >+		const struct sys_reg_desc *rd,
-> >+		const struct kvm_one_reg *reg, void __user *uaddr)
-> >+{
-> >+	const u64 id = sys_reg_to_index(rd);
-> >+	int err;
-> >+	u64 val;
-> >+
-> >+	if (!vcpu_has_sve(vcpu))
-> >+		return -ENOENT;
-> >+
-> >+	err = reg_from_user(&val, uaddr, id);
-> >+	if (err)
-> >+		return err;
-> >+
-> >+	/* This is what we mean by invariant: you can't change it. */
-> >+	if (val != guest_id_aa64zfr0_el1(vcpu))
-> >+		return -EINVAL;
-> >+
-> >+	return 0;
-> >+}
+> Extension Overview:
+> =============================================
 > 
-> We seem to already have code for handling invariant registers as well as
-> reading ID register. I guess the only reason you can't use them is because
-> of the check the vcpu is using SVE.
+> The ARMv8.3 pointer authentication extension adds functionality to detect
+> modification of pointer values, mitigating certain classes of attack such as
+> stack smashing, and making return oriented programming attacks harder.
 > 
-> However, AFAICT the restrictions callback would prevent you to enter the
-> {get, set}_id if the vCPU does not support SVE. So the check should not be
-> reachable.
+> The extension introduces the concept of a pointer authentication code (PAC),
+> which is stored in some upper bits of pointers. Each PAC is derived from the
+> original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+> 128-bit key.
+> 
+> New instructions are added which can be used to:
+> 
+> * Insert a PAC into a pointer
+> * Strip a PAC from a pointer
+> * Authenticate and strip a PAC from a pointer
+> 
+> The detailed description of ARMv8.3 pointer authentication support in
+> userspace/kernel and can be found in Kristina's generic pointer authentication
+> patch series[3].
 
-Hmmm, those checks were inherited from before this refactoring.
 
-You're right: the checks are now done a common place, so the checks in
-the actual accessors should be redundant.
+> This patch series is based on just a single patch from Dave Martin [8] which add
+> control checks for accessing sys registers. 
 
-I could demote them to WARN(), but it may make sense simply to delete
-them.
+Ooeer, If you miss this patch, (like I did) the series still applies to rc6, it just
+doesn't build. If you depend on extra patches like this, please re-post them as part of
+the series. (you need to add your Signed-off-by if picked the patch up from the list).
 
-The access_id_aa64zfr0_el1() should still be reachable, since we don't
-have REG_NO_GUEST for this.
+This lets people apply the series from the list (everyone has a script to to do this),
+without having to go and find the dependencies.
 
-Does that make sense?
 
-Cheers
----Dave
+> [8]: https://lore.kernel.org/linux-arm-kernel/1547757219-19439-13-git-send-email-Dave.Martin@arm.com/
+
+This is v4 of Dave's patch. He changed the subject and posted a v5 here:
+https://lore.kernel.org/linux-arm-kernel/1550519559-15915-13-git-send-email-Dave.Martin@arm.com/
+
+Re-posting the patch you tested with would avoid someone accidentally pickup v5, then
+trying to work out how its supposed to work with your series. (check_present() was
+replaced by a restrictions() bitmask).
+
+
+As we can't have both, and v5 of that patch has been reviewed, could you rebase onto it?
+You'll need to pick up any tags and make any changes reviewers asked for. If you could
+note 'this v7 patch is Dave's v5 with $changes', then it makes it clear what is going on.
+
+
+
+Thanks,
+
+James
