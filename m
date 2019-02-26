@@ -1,112 +1,104 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 12/26] KVM: arm64: Support runtime sysreg visibility
- filtering
-Date: Tue, 26 Feb 2019 12:12:47 +0000
-Message-ID: <20190226121247.GO3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v5 14/26] KVM: arm64/sve: Context switch the SVE registers
+Date: Tue, 26 Feb 2019 12:13:12 +0000
+Message-ID: <20190226121312.GP3567@e103592.cambridge.arm.com>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-13-git-send-email-Dave.Martin@arm.com>
- <20190220153726.GF4763@lakrids.cambridge.arm.com>
+ <1550519559-15915-15-git-send-email-Dave.Martin@arm.com>
+ <20190220161917.GG4763@lakrids.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFFA14A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:13:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id U3WyQA3Tgn-J for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Feb 2019 07:13:17 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68C9649E3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Feb 2019 07:13:17 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190220153726.GF4763@lakrids.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20190220161917.GG4763@lakrids.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Mark Rutland <mark.rutland@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 20, 2019 at 03:37:26PM +0000, Mark Rutland wrote:
-> On Mon, Feb 18, 2019 at 07:52:25PM +0000, Dave Martin wrote:
-> > Some optional features of the Arm architecture add new system
-> > registers that are not present in the base architecture.
-> > 
-> > Where these features are optional for the guest, the visibility of
-> > these registers may need to depend on some runtime configuration,
-> > such as a flag passed to KVM_ARM_VCPU_INIT.
-> > 
-> > For example, ZCR_EL1 and ID_AA64ZFR0_EL1 need to be hidden if SVE
-> > is not enabled for the guest, even though these registers may be
-> > present in the hardware and visible to the host at EL2.
-> > 
-> > Adding special-case checks all over the place for individual
-> > registers is going to get messy as the number of conditionally-
-> > visible registers grows.
-> > 
-> > In order to help solve this problem, this patch adds a new sysreg
-> > method restrictions() that can be used to hook in any needed
-> > runtime visibility checks.  This method can currently return
-> > REG_NO_USER to inhibit enumeration and ioctl access to the register
-> > for userspace, and REG_NO_GUEST to inhibit runtime access by the
-> > guest using MSR/MRS.
-> > 
-> > This allows a conditionally modified view of individual system
-> > registers such as the CPU ID registers, in addition to completely
-> > hiding register where appropriate.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > 
-> > ---
-> > 
-> > Changes since v4:
-> > 
-> >  * Move from a boolean sysreg property that just suppresses register
-> >    enumeration via KVM_GET_REG_LIST, to a multi-flag property that
-> >    allows independent runtime control of MRS/MSR and user ioctl access.
-> > 
-> >    This allows registers to be either hidden completely, or to have
-> >    hybrid behaviours (such as the not-enumerated, RAZ, WAZ behaviour of
-> >    "non-present" CPU ID regs).
+On Wed, Feb 20, 2019 at 04:19:18PM +0000, Mark Rutland wrote:
+> On Mon, Feb 18, 2019 at 07:52:27PM +0000, Dave Martin wrote:
+> > -static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> > +/* Check for an FPSIMD/SVE trap and handle as appropriate */
+> > +static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
+> > +	bool vhe, sve_guest, sve_host;
+> > +	u8 trap_class;
 > 
-> Sorry for bikeshedding...
+> Nit: elsewhere in kvm, this gets called hsr_ec. Can we use the same name
+> here?
+
+Done.
+
+(This name is not used in hyp/switch.c yet, and I was sort of trying to
+conform to the naming of kvm_vcpu_trap_get_class().  But hsr_ec is used
+elsewhere, and more self-describing, so it makes sense.)
+
 > 
-> > +	/* Check for regs disabled by runtime config */
-> > +	if (restrictions(vcpu, r) & REG_NO_GUEST) {
+> >  
+> > -	if (has_vhe())
+> > -		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
+> > -			     cpacr_el1);
+> > -	else
+> > +	if (!system_supports_fpsimd())
+> > +		return false;
+> > +
+> > +	if (system_supports_sve()) {
+> > +		sve_guest = vcpu_has_sve(vcpu);
+> > +		sve_host = vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE;
+> > +		vhe = true;
+> > +	} else {
+> > +		sve_guest = false;
+> > +		sve_host = false;
+> > +		vhe = has_vhe();
+> > +	}
+> > +
+> > +	trap_class = kvm_vcpu_trap_get_class(vcpu);
+> > +	if (trap_class != ESR_ELx_EC_FP_ASIMD &&
+> > +	    (!sve_guest || trap_class != ESR_ELx_EC_SVE))
+> > +		return false;
 > 
-> Maybe it's worth wrapping this as something like
+> This is somewhat painful to decipher, but I couldn't come up with
+> something that was both succint and legible.
 > 
-> 	reg_runtime_hidden_from_guest(vcpu, r)
+> Maybe it's worth duplicating the SVE check, i.e.
 > 
-> ... and avoid exposing the raw flags to all the places we have to check?
+> 	if (hsr_ec != ESR_ELx_EC_FP_ASIMD &&
+> 	    hsr_ec != ESR_ELx_EC_SVE)
+> 		return false;
 > 
-> [...]
+> 	if (!sve_guest && hsr_ec == ESR_ELx_EC_SVE)
+> 		return false;
 > 
-> > +#define REG_NO_USER	(1 << 0) /* hidden from userspace ioctl interface */
-> > +#define REG_NO_GUEST	(1 << 1) /* hidden from guest */
-> 
-> Perhaps REG_USER_HIDDEN and REG_GUEST_HIDDEN?
+> ... ?
 
-I'm not attached to any particular naming, so I'm not opposed to making
-changes similar to those you suggest.
+There were previously some static_key checks in here that I didn't want
+to duplicate, which is part of the reason for trying to merge related
+if-conditions together explicitly.
 
-There are some anomalies right now:
+This is no longer relevant now that the static_key checks have been
+hoisted out explicitly.  Something along the lines of your version
+would definitely be clearer.  gcc also seems to merge the conditions
+competently, so I'll pick up your suggestion for now.
 
-1) Currently, we can express REG_NO_GUEST by itself, which is a of an
-odd thing to have.  I'm not sure whether that's a problem or not.
-Keeping the flags as-is at least keeps the code simple.
-
-2) These flags do not quite have the obvious semantics: these are
-overrides rather than determining precisely when a reg is/isn't
-accessible.
-
-So, REG_NO_USER means "don't even call this reg's get/set_user(): forbid
-user access unconditionally", whereas lack of this flag means "call the
-appropriate get/set_user() function to find out what to do, which may
-or may not result in forbidding the access".
-
-Maybe this subtlety is just a question of clear commenting.  I can't
-think of obviously-correct names that won't be stupidly verbose...
-
-Thoughts?
-
-Cheers
+Thanks
 ---Dave
