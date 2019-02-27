@@ -1,86 +1,77 @@
-From: James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v6 5/6] arm64/kvm: control accessibility of ptrauth key
- registers
-Date: Tue, 26 Feb 2019 18:34:39 +0000
-Message-ID: <fb401da1-63cb-fde1-67e4-e15f58940ae9@arm.com>
-References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-6-git-send-email-amit.kachhap@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v5 13/26] KVM: arm64/sve: System register context switch
+ and access support
+Date: Wed, 27 Feb 2019 12:02:46 +0000
+Message-ID: <5a7dc2f4-a6e7-28bb-64d7-4f64424eb5c2@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-14-git-send-email-Dave.Martin@arm.com>
+ <8a0e6089-b77b-151b-eacd-34ad13f39ac6@arm.com>
+ <20190226170105.GB3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1550568271-5319-6-git-send-email-amit.kachhap@arm.com>
-Content-Language: en-GB
-Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 852B24A3B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 07:02:53 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iENNSCm2AagI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Feb 2019 07:02:52 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 443544A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 07:02:52 -0500 (EST)
+In-Reply-To: <20190226170105.GB3567@e103592.cambridge.arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Amit,
+Hi Dave,
 
-On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
-> According to userspace settings, ptrauth key registers are conditionally
-> present in guest system register list based on user specified flag
-> KVM_ARM_VCPU_PTRAUTH.
+On 2/26/19 5:01 PM, Dave Martin wrote:
+> On Tue, Feb 26, 2019 at 04:32:30PM +0000, Julien Grall wrote:
+>> On 18/02/2019 19:52, Dave Martin wrote:
+>> We seem to already have code for handling invariant registers as well as
+>> reading ID register. I guess the only reason you can't use them is because
+>> of the check the vcpu is using SVE.
+>>
+>> However, AFAICT the restrictions callback would prevent you to enter the
+>> {get, set}_id if the vCPU does not support SVE. So the check should not be
+>> reachable.
 > 
-> Reset routines still sets these registers to default values but they are
-> left like that as they are conditionally accessible (set/get).
-
-What problem is this patch solving?
-
-I think it's that now we have ptrauth support, we have a glut of new registers visible to
-user-space. This breaks migration and save/resume if the target machine doesn't have
-pointer-auth configured, even if the guest wasn't using it.
-Because we've got a VCPU bit, we can be smarter about this, and only expose the registers
-if user-space was able to enable ptrauth.
-
-
-> ---
-> This patch needs patch [1] by Dave Martin and adds feature to manage accessibility in a scalable way.
+> Hmmm, those checks were inherited from before this refactoring.
 > 
-> [1]: https://lore.kernel.org/linux-arm-kernel/1547757219-19439-13-git-send-email-Dave.Martin@arm.com/ 
+> You're right: the checks are now done a common place, so the checks in
+> the actual accessors should be redundant.
+> 
+> I could demote them to WARN(), but it may make sense simply to delete
+> them.
 
-This is v4. Shortly before you posted this there was a v5 (but the subject changed, easily
-missed). V5 has subsequently been reviewed. As we can't have both, could you rebase onto
-that v5 so that there is one way of doing this?
+I think removing the WARN() would be best as it would avoid to introduce 
+most of the wrappers for the registers.
 
-(in general if you could re-post the version you develop/tested with then it makes it
-clear what is going on)
+> 
+> The access_id_aa64zfr0_el1() should still be reachable, since we don't
+> have REG_NO_GUEST for this.
 
+__access_id_reg is taking a boolean to tell whether the register is RAZ 
+or not. So you probably could re-use it passing !vcpu_has_sve(vcpu).
 
-> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-> index 0529a7d..996e435 100644
-> --- a/Documentation/arm64/pointer-authentication.txt
-> +++ b/Documentation/arm64/pointer-authentication.txt
-> @@ -87,3 +87,7 @@ created by passing a flag (KVM_ARM_VCPU_PTRAUTH) requesting this feature
->  to be enabled. Without this flag, pointer authentication is not enabled
->  in KVM guests and attempted use of the feature will result in an UNDEFINED
->  exception being injected into the guest.
-> +
-> +Additionally, when KVM_ARM_VCPU_PTRAUTH is not set then KVM will filter
-> +out the Pointer Authentication system key registers from KVM_GET/SET_REG_*
-> +ioctls.
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f7bcc60..c2f4974 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1005,8 +1005,13 @@ static bool trap_ptrauth(struct kvm_vcpu *vcpu,
->  	return false;
->  }
->  
-> +static bool check_ptrauth(const struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
-> +{
-> +	return kvm_arm_vcpu_ptrauth_allowed(vcpu);
-> +}
-> +
->  #define __PTRAUTH_KEY(k)						\
-> -	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k }
-> +	{ SYS_DESC(SYS_## k), trap_ptrauth, reset_unknown, k , .check_present = check_ptrauth}
+It feels to me we would introduce a new restriction to tell whether the 
+register should be RAZ. Anyway, the new restriction is probably for a 
+follow-up patch.
 
+Cheers,
 
-Looks good. I'm pretty sure the changes due to Dave's v5 map neatly.
-
-
-Thanks,
-
-James
+-- 
+Julien Grall
