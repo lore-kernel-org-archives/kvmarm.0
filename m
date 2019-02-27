@@ -1,29 +1,28 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH 1/5] KVM: arm/arm64: Reset the VCPU without preemption
- and vcpu state loaded
-Date: Wed, 27 Feb 2019 12:05:29 +0000
-Message-ID: <20190227120527.GC3567@e103592.cambridge.arm.com>
-References: <20190125094656.5026-1-christoffer.dall@arm.com>
- <20190125094656.5026-2-christoffer.dall@arm.com>
- <20190220191450.GT3567@e103592.cambridge.arm.com>
- <20190220194143.2e1a7d2c@why.wild-wind.fr.eu.org>
- <20190226135352.GX3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v5 14/26] KVM: arm64/sve: Context switch the SVE registers
+Date: Wed, 27 Feb 2019 13:37:52 +0000
+Message-ID: <20190227133751.GD3567@e103592.cambridge.arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-15-git-send-email-Dave.Martin@arm.com>
+ <83fa5587-24a0-5bbb-c113-cddc74571ea2@arm.com>
+ <20190226121321.GQ3567@e103592.cambridge.arm.com>
+ <82b7b947-7e92-15df-5c71-6d562141264e@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B80C14A44F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 07:05:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D7414A41B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 08:37:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eV9LE9PA8ESK for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Feb 2019 07:05:33 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97ABD4A3B2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 07:05:33 -0500 (EST)
+ with ESMTP id sipOibTt9eMt for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Feb 2019 08:37:58 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A58B49E3E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Feb 2019 08:37:58 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <20190226135352.GX3567@e103592.cambridge.arm.com>
+In-Reply-To: <82b7b947-7e92-15df-5c71-6d562141264e@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,55 +32,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Julien Grall <julien.grall@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 26, 2019 at 01:53:52PM +0000, Dave Martin wrote:
-> On Wed, Feb 20, 2019 at 07:41:43PM +0000, Marc Zyngier wrote:
-> > On Wed, 20 Feb 2019 19:14:53 +0000
-> > Dave Martin <Dave.Martin@arm.com> wrote:
-
-[...]
-
-> > > Perhaps an alternative approach would be to nobble the preempt notifier
-> > > and stick an explicit vcpu_put()...vcpu_load() around the
-> > > swait_event_interruptible_exclusive() call in vcpu_req_sleep().  This
-> > > is not fast path.
-> > 
-> > What does it buy us? The problem we're solving here is a powered-off,
-> > spuriously woken-up vcpu racing against the reset performed from
-> > another vcpu. I don't see what adding more put/load would solve.
+On Tue, Feb 26, 2019 at 04:56:36PM +0000, Julien Grall wrote:
+> Hi Dave,
 > 
-> Not a lot.  Changes in this area would allow some code to move outside
-> preempt_disable(), but only at the expense of extra cost elsewhere...
-> 
-> > > Any, with the code as-is, it looks like the SVE regs resetting should
-> > > go in the preempt_disable() region, after the kvm_arch_vcpu_put() call.
-> > 
-> > All resets must go there. This is the only safe location.
-> 
-> OK, that's what I wanted to be sure of.
+> On 26/02/2019 12:13, Dave Martin wrote:
+> >On Wed, Feb 20, 2019 at 04:46:57PM +0000, Julien Thierry wrote:
+> >>
+> >>
+> >>On 18/02/2019 19:52, Dave Martin wrote:
+> >>>In order to give each vcpu its own view of the SVE registers, this
+> >>>patch adds context storage via a new sve_state pointer in struct
+> >>>vcpu_arch.  An additional member sve_max_vl is also added for each
+> >>>vcpu, to determine the maximum vector length visible to the guest
+> >>>and thus the value to be configured in ZCR_EL2.LEN while the is
+> >>
+> >>"While the <guest> is active"?
+> >
+> >Hmmm, yes.  Thanks for deciphering that.  Done.
+> I think it would be more consistent if you use "vcpu" over "guest". After
+> all ZCR_EL2.LEN is per vCPU.
 
-Hmmm, it turns out this is no good because we may need to kzalloc()
-the vcpu->arch.sve_state storage here in the new-vcpu case.
-
-Rather than create additional mess in this code, I will move that
-allocation to be done more eagerly rather than deferred until the last
-possible moment.
-
-With the current API flow, this may mean krealloc()'ing the buffer if
-the set of vector lengths for the vcpu is modified from the default
-before the vcpu is run, via a user write to KVM_REG_ARM64_SVE_VLS --
-though we would anyway get away with not doing it, since the default
-buffer size will be the maximum that the hardware could possibly
-require anyway.  We could waste a few K per vcpu, but that's almost not
-worth caring about.
-
-I'd rather not churn the API at this point, but I'll experiment to see
-which approach under the hood looks cleanest.
-
-Thoughts?
+Yes, that makes sense.  Done.
 
 Cheers
 ---Dave
