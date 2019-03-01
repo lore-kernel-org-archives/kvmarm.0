@@ -1,110 +1,129 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v6 2/6] arm64/kvm: preserve host MDCR_EL2 value
-Date: Fri, 1 Mar 2019 11:40:25 +0530
-Message-ID: <4f97aeda-492b-acd2-8a41-340e8bb47240@arm.com>
+Subject: Re: [PATCH v6 3/6] arm64/kvm: context-switch ptrauth registers
+Date: Fri, 1 Mar 2019 11:47:27 +0530
+Message-ID: <c3bdf37b-72be-448f-335c-c575788cd1b4@arm.com>
 References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-3-git-send-email-amit.kachhap@arm.com>
- <20190221155101.GV3567@e103592.cambridge.arm.com>
+ <1550568271-5319-4-git-send-email-amit.kachhap@arm.com>
+ <20190221122942.GC33673@lakrids.cambridge.arm.com>
+ <20190221155116.GW3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A34F84A414
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Mar 2019 01:10:32 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EwYAStCbX+Yd for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Mar 2019 01:10:31 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B40B4A3BE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Mar 2019 01:10:31 -0500 (EST)
-In-Reply-To: <20190221155101.GV3567@e103592.cambridge.arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190221155116.GW3567@e103592.cambridge.arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: linux-kernel@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+
 
 On 2/21/19 9:21 PM, Dave Martin wrote:
-> On Tue, Feb 19, 2019 at 02:54:27PM +0530, Amit Daniel Kachhap wrote:
->> Save host MDCR_EL2 value during kvm HYP initialisation and restore
->> after every switch from host to guest. There should not be any
->> change in functionality due to this.
+> On Thu, Feb 21, 2019 at 12:29:42PM +0000, Mark Rutland wrote:
+>> On Tue, Feb 19, 2019 at 02:54:28PM +0530, Amit Daniel Kachhap wrote:
+>>> From: Mark Rutland <mark.rutland@arm.com>
+>>>
+>>> When pointer authentication is supported, a guest may wish to use it.
+>>> This patch adds the necessary KVM infrastructure for this to work, with
+>>> a semi-lazy context switch of the pointer auth state.
+>>>
+>>> Pointer authentication feature is only enabled when VHE is built
+>>> in the kernel and present into CPU implementation so only VHE code
+>>> paths are modified.
 >>
->> The value of mdcr_el2 is now stored in struct kvm_cpu_context as
->> both host and guest can now use this field in a common way.
-> 
-> Is MDCR_EL2 somehow relevant to pointer auth?
-> 
-> It's not entirely clear why this patch is here.
-> 
-> If this is a cleanup to align the handling of this register with
-> how HCR_EL2 is handled, it would be good to explain that in the commit
-> message.
-Agreed I will more information in commit message.
-> 
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> ---
->>   arch/arm/include/asm/kvm_host.h   |  1 -
->>   arch/arm64/include/asm/kvm_host.h |  6 ++----
->>   arch/arm64/kvm/debug.c            | 28 ++++++----------------------
->>   arch/arm64/kvm/hyp/switch.c       | 17 ++++-------------
->>   arch/arm64/kvm/hyp/sysreg-sr.c    |  6 ++++++
->>   virt/kvm/arm/arm.c                |  1 -
->>   6 files changed, 18 insertions(+), 41 deletions(-)
+>> Nit: s/into/in the/
 >>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 05706b4..704667e 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -294,7 +294,6 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->>   static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->>   static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
->>   
->> -static inline void kvm_arm_init_debug(void) {}
->>   static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->>   static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
->>   static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 1b2e05b..2f1bb86 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -205,6 +205,8 @@ struct kvm_cpu_context {
->>   
->>   	/* HYP host/guest configuration */
->>   	u64 hcr_el2;
->> +	u32 mdcr_el2;
->> +
+>>>
+>>> When we schedule a vcpu, we disable guest usage of pointer
+>>> authentication instructions and accesses to the keys. While these are
+>>> disabled, we avoid context-switching the keys. When we trap the guest
+>>> trying to use pointer authentication functionality, we change to eagerly
+>>> context-switching the keys, and enable the feature. The next time the
+>>> vcpu is scheduled out/in, we start again. However the host key registers
+>>> are saved in vcpu load stage as they remain constant for each vcpu
+>>> schedule.
+>>>
+>>> Pointer authentication consists of address authentication and generic
+>>> authentication, and CPUs in a system might have varied support for
+>>> either. Where support for either feature is not uniform, it is hidden
+>>> from guests via ID register emulation, as a result of the cpufeature
+>>> framework in the host.
+>>>
+>>> Unfortunately, address authentication and generic authentication cannot
+>>> be trapped separately, as the architecture provides a single EL2 trap
+>>> covering both. If we wish to expose one without the other, we cannot
+>>> prevent a (badly-written) guest from intermittently using a feature
+>>> which is not uniformly supported (when scheduled on a physical CPU which
+>>> supports the relevant feature). Hence, this patch expects both type of
+>>> authentication to be present in a cpu.
+>>>
+>>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>>> [Only VHE, key switch from from assembly, kvm_supports_ptrauth
+>>> checks, save host key in vcpu_load]
+>>
+>> Hmm, why do we need to do the key switch in assembly, given it's not
+>> used in-kernel right now?
+>>
+>> Is that in preparation for in-kernel pointer auth usage? If so, please
+>> call that out in the commit message.
 > 
-> ARMv8-A says MDCR_EL2 is a 64-bit register.
+> [...]
 > 
-> Bits [63:20] are currently RES0, so this is probably not a big deal.
-> But it would be better to make this 64-bit to prevent future accidents.
-> It may be better to make that change in a separate patch.
-Yes this a potential issue. I will fix it in a separate patch.
+>> Huh, so we're actually doing the switch in C code...
+>>
+>>>   # KVM code is run at a different exception code with a different map, so
+>>>   # compiler instrumentation that inserts callbacks or checks into the code may
+>>> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+>>> index 675fdc1..b78cc15 100644
+>>> --- a/arch/arm64/kvm/hyp/entry.S
+>>> +++ b/arch/arm64/kvm/hyp/entry.S
+>>> @@ -64,6 +64,12 @@ ENTRY(__guest_enter)
+>>>   
+>>>   	add	x18, x0, #VCPU_CONTEXT
+>>>   
+>>> +#ifdef	CONFIG_ARM64_PTR_AUTH
+>>> +	// Prepare parameter for __ptrauth_switch_to_guest(vcpu, host, guest).
+>>> +	mov	x2, x18
+>>> +	bl	__ptrauth_switch_to_guest
+>>> +#endif
+>>
+>> ... and conditionally *calling* that switch code from assembly ...
+>>
+>>> +
+>>>   	// Restore guest regs x0-x17
+>>>   	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+>>>   	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+>>> @@ -118,6 +124,17 @@ ENTRY(__guest_exit)
+>>>   
+>>>   	get_host_ctxt	x2, x3
+>>>   
+>>> +#ifdef	CONFIG_ARM64_PTR_AUTH
+>>> +	// Prepare parameter for __ptrauth_switch_to_host(vcpu, guest, host).
+>>> +	// Save x0, x2 which are used later in callee saved registers.
+>>> +	mov	x19, x0
+>>> +	mov	x20, x2
+>>> +	sub	x0, x1, #VCPU_CONTEXT
+>>> +	ldr	x29, [x2, #CPU_XREG_OFFSET(29)]
+>>> +	bl	__ptrauth_switch_to_host
+>>> +	mov	x0, x19
+>>> +	mov	x2, x20
+>>> +#endif
+>>
+>> ... which adds a load of boilerplate for no immediate gain.
+>>
+>> Do we really need to do this in assembly today?
+> 
+> If we will need to move this to assembly when we add in-kernel ptrauth
+> support, it may be best to have it in assembly from the start, to reduce
+> unnecessary churn.
+> 
+> But having a mix of C and assembly is likely to make things more
+> complicated: we should go with one or the other IMHO.
+ok, I will check on this.
 
 Thanks,
 Amit D
-> 
-> This is probably non-urgent, since this is clearly not causing problems
-> for anyone today.
-> 
-> [...]
 > 
 > Cheers
 > ---Dave
