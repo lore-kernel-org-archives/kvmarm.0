@@ -1,309 +1,162 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 1/2] KVM: arm/arm64: Add save/restore support for firmware
- workaround state
-Date: Thu, 28 Feb 2019 17:43:33 -0600
-Message-ID: <20190228234334.20456-2-andre.przywara@arm.com>
-References: <20190228234334.20456-1-andre.przywara@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
+Date: Fri, 1 Mar 2019 11:26:05 +0530
+Message-ID: <d3975fbf-1d3a-48ff-dd47-e1aa61eea623@arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
+ <20190221154935.GU3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B365C4A465
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Feb 2019 18:43:45 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z4wBhmB3oSKh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Feb 2019 18:43:43 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C49E4A419
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Feb 2019 18:43:43 -0500 (EST)
-In-Reply-To: <20190228234334.20456-1-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Dave Martin <dave.martin@arm.com>, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190221154935.GU3567@e103592.cambridge.arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM implements the firmware interface for mitigating cache speculation
-vulnerabilities. Guests may use this interface to ensure mitigation is
-active.
-If we want to migrate such a guest to a host with a different support
-level for those workarounds, migration might need to fail, to ensure that
-critical guests don't loose their protection.
+Hi,
 
-Introduce a way for userland to save and restore the workarounds state.
-On restoring we do checks that make sure we don't downgrade our
-mitigation level.
+On 2/21/19 9:19 PM, Dave Martin wrote:
+> On Tue, Feb 19, 2019 at 02:54:26PM +0530, Amit Daniel Kachhap wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>> is a constant value. This works today, as the host HCR_EL2 value is
+>> always the same, but this will get in the way of supporting extensions
+>> that require HCR_EL2 bits to be set conditionally for the host.
+>>
+>> To allow such features to work without KVM having to explicitly handle
+>> every possible host feature combination, this patch has KVM save/restore
+>> for the host HCR when switching to/from a guest HCR. The saving of the
+>> register is done once during cpu hypervisor initialization state and is
+>> just restored after switch from guest.
+>>
+>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>> kvm_call_hyp and is helpful in NHVE case.
+> 
+> Minor nit: NVHE misspelled.  This looks a bit like it's naming an arch
+> feature rather than a kernel implementation detail though.  Maybe write
+> "non-VHE".
+yes.
+> 
+>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>> to toggle the TGE bit with a RMW sequence, as we already do in
+>> __tlb_switch_to_guest_vhe().
+>>
+>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>> and guest can now use this field in a common way.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> [Added __cpu_copy_hyp_conf, hcr_el2 field in struct kvm_cpu_context]
+>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> ---
+>>   arch/arm/include/asm/kvm_host.h      |  2 ++
+>>   arch/arm64/include/asm/kvm_asm.h     |  2 ++
+>>   arch/arm64/include/asm/kvm_emulate.h | 22 +++++++++++-----------
+>>   arch/arm64/include/asm/kvm_host.h    | 13 ++++++++++++-
+>>   arch/arm64/include/asm/kvm_hyp.h     |  2 +-
+>>   arch/arm64/kvm/guest.c               |  2 +-
+>>   arch/arm64/kvm/hyp/switch.c          | 23 +++++++++++++----------
+>>   arch/arm64/kvm/hyp/sysreg-sr.c       | 21 ++++++++++++++++++++-
+>>   arch/arm64/kvm/hyp/tlb.c             |  6 +++++-
+>>   virt/kvm/arm/arm.c                   |  1 +
+>>   10 files changed, 68 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index ca56537..05706b4 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
+>>   	kvm_call_hyp(__init_stage2_translation);
+>>   }
+>>   
+>> +static inline void __cpu_copy_hyp_conf(void) {}
+>> +
+>>   static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>   {
+>>   	return 0;
+>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>> index f5b79e9..8acd73f 100644
+>> --- a/arch/arm64/include/asm/kvm_asm.h
+>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>> @@ -80,6 +80,8 @@ extern void __vgic_v3_init_lrs(void);
+>>   
+>>   extern u32 __kvm_get_mdcr_el2(void);
+>>   
+>> +extern void __kvm_populate_host_regs(void);
+>> +
+>>   /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
+>>   #define __hyp_this_cpu_ptr(sym)						\
+>>   	({								\
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index 506386a..0dbe795 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -50,25 +50,25 @@ void kvm_inject_pabt32(struct kvm_vcpu *vcpu, unsigned long addr);
+>>   
+>>   static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>>   {
+>> -	return !(vcpu->arch.hcr_el2 & HCR_RW);
+>> +	return !(vcpu->arch.ctxt.hcr_el2 & HCR_RW);
+> 
+> Putting hcr_el2 into struct kvm_cpu_context creates a lot of splatter
+> here, and I'm wondering whether it's really necessary.  Otherwise,
+> we could just put the per-vcpu guest HCR_EL2 value in struct
+> kvm_vcpu_arch.
+I did like that in V4 version [1] but comments were raised that this was 
+repetition of hcr_el2 field in 2 places and may be avoided.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arch/arm/include/asm/kvm_emulate.h   |  10 +++
- arch/arm/include/uapi/asm/kvm.h      |  10 +++
- arch/arm64/include/asm/kvm_emulate.h |  14 +++
- arch/arm64/include/uapi/asm/kvm.h    |   9 ++
- virt/kvm/arm/psci.c                  | 128 +++++++++++++++++++++++----
- 5 files changed, 155 insertions(+), 16 deletions(-)
+[1]: https://lkml.org/lkml/2019/1/4/433
+> 
+> Is the *host* hcr_el2 value really different per-vcpu?  That looks
+> odd.  I would have thought this is fixed across the system at KVM
+> startup time.
+> 
+> Having a single global host hcr_el2 would also avoid the need for
+> __kvm_populate_host_regs(): instead, we just decide what HCR_EL2 is to
+> be ahead of time and set a global variable that we map into Hyp.
+> 
+> 
+> Or does the host HCR_EL2 need to vary at runtime for some reason I've
+> missed?
+This patch basically makes host hcr_el2 not to use fixed values like 
+HCR_HOST_NVHE_FLAGS/HCR_HOST_VHE_FLAGS during context switch and hence 
+saves those values at boot time. This patch is just preparation to 
+configure host hcr_el2 dynamically. However currently it is same for all 
+cpus.
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 8927cae7c966..663a02d7e6f4 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -283,6 +283,16 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- 	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
- }
- 
-+static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
-+static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
-+						      bool flag)
-+{
-+}
-+
- static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
- {
- 	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 4602464ebdfb..ba4d2afe65e3 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -214,6 +214,16 @@ struct kvm_vcpu_events {
- #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM | KVM_REG_SIZE_U64 | \
- 					 KVM_REG_ARM_FW | ((r) & 0xffff))
- #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED	2
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	(1U << 4)
- 
- /* Device Control API: ARM VGIC */
- #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d3842791e1c4..c00c17c9adb6 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -348,6 +348,20 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
- 	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
- }
- 
-+static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG;
-+}
-+
-+static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
-+						      bool flag)
-+{
-+	if (flag)
-+		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
-+	else
-+		vcpu->arch.workaround_flags &= ~VCPU_WORKAROUND_2_FLAG;
-+}
-+
- static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_mode_is_32bit(vcpu)) {
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 97c3478ee6e7..367e96fe654e 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -225,6 +225,15 @@ struct kvm_vcpu_events {
- #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
- 					 KVM_REG_ARM_FW | ((r) & 0xffff))
- #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
-+#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     (1U << 4)
- 
- /* Device Control API: ARM VGIC */
- #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 9b73d3ad918a..e65664c09b12 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -445,42 +445,97 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
--	return 1;		/* PSCI version */
-+	return 3;		/* PSCI version and two workaround registers */
- }
- 
- int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
--	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices))
-+	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
-+		return -EFAULT;
-+
-+	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
-+		return -EFAULT;
-+
-+	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
- 		return -EFAULT;
- 
- 	return 0;
- }
- 
-+#define KVM_REG_FEATURE_LEVEL_WIDTH	4
-+#define KVM_REG_FEATURE_LEVEL_MASK	(BIT(KVM_REG_FEATURE_LEVEL_WIDTH) - 1)
-+
-+/*
-+ * Convert the workaround level into an easy-to-compare number, where higher
-+ * values mean better protection.
-+ */
-+static int get_kernel_wa_level(u64 regid)
-+{
-+	switch (regid) {
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-+		if (kvm_arm_harden_branch_predictor())
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
-+		else
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-+		switch (kvm_arm_have_ssbd()) {
-+		case KVM_SSBD_FORCE_DISABLE:
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
-+		case KVM_SSBD_KERNEL:
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL;
-+		case KVM_SSBD_FORCE_ENABLE:
-+		case KVM_SSBD_MITIGATED:
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED;
-+		case KVM_SSBD_UNKNOWN:
-+		default:
-+			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
--	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
--		void __user *uaddr = (void __user *)(long)reg->addr;
--		u64 val;
-+	void __user *uaddr = (void __user *)(long)reg->addr;
-+	u64 val;
- 
-+	switch (reg->id) {
-+	case KVM_REG_ARM_PSCI_VERSION:
- 		val = kvm_psci_version(vcpu, vcpu->kvm);
--		if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
--			return -EFAULT;
--
--		return 0;
-+		break;
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-+		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-+		break;
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-+		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
-+		if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL &&
-+		    kvm_arm_get_vcpu_workaround_2_flag(vcpu))
-+			val |= KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED;
-+		break;
-+	default:
-+		return -ENOENT;
- 	}
- 
--	return -EINVAL;
-+	if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
- }
- 
- int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
--	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
--		void __user *uaddr = (void __user *)(long)reg->addr;
--		bool wants_02;
--		u64 val;
-+	void __user *uaddr = (void __user *)(long)reg->addr;
-+	u64 val;
-+	int wa_level;
-+
-+	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
- 
--		if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
--			return -EFAULT;
-+	switch (reg->id) {
-+	case KVM_REG_ARM_PSCI_VERSION:
-+	{
-+		bool wants_02;
- 
- 		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
- 
-@@ -497,6 +552,47 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 			vcpu->kvm->arch.psci_version = val;
- 			return 0;
- 		}
-+		break;
-+	}
-+
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-+		if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
-+			return -EINVAL;
-+
-+		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
-+
-+		/* For now we only accept the very same workaround level. */
-+		if (get_kernel_wa_level(reg->id) != wa_level)
-+			return -EINVAL;
-+
-+		return 0;
-+
-+	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-+		if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
-+			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
-+			return -EINVAL;
-+
-+		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
-+
-+		if (get_kernel_wa_level(reg->id) < wa_level)
-+			return -EINVAL;
-+
-+		if (kvm_arm_have_ssbd() != KVM_SSBD_KERNEL)
-+			return 0;
-+
-+		switch (wa_level) {
-+		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
-+			kvm_arm_set_vcpu_workaround_2_flag(vcpu,
-+			    val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED);
-+			break;
-+		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED:
-+			kvm_arm_set_vcpu_workaround_2_flag(vcpu, true);
-+			break;
-+		}
-+
-+		return 0;
-+	default:
-+		return -ENOENT;
- 	}
- 
- 	return -EINVAL;
--- 
-2.17.1
+I suppose it is better to have host hcr_el2 as percpu to take care of 
+heterogeneous systems. Currently even host mdcr_el2 is stored on percpu 
+basis(arch/arm64/kvm/debug.c).
+> 
+> [...]
+> 
+> +void __hyp_text __kvm_populate_host_regs(void)
+> +{
+> +       struct kvm_cpu_context *host_ctxt;
+> +
+> +       if (has_vhe())
+> +               host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
+> +       else
+> +               host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
+> 
+> According to the comment by the definition of __hyp_this_cpu_ptr(), this
+> always works at Hyp.  I also see other calls with no fallback
+> this_cpu_ptr() call like we have here.
+> 
+> So, can we simply always call __hyp_this_cpu_ptr() here?
+Yes i missed this.
+
+Thanks,
+Amit D
+> 
+> (I'm not familiar with this, myself.)
+> 
+> Cheers
+> ---Dave
+> 
