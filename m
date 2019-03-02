@@ -1,52 +1,267 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: [RFC PATCH] KVM: arm64: Force a PTE mapping when logging is enabled
-Date: Sat, 2 Mar 2019 03:35:28 +0000
-Message-ID: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
+Date: Sat, 2 Mar 2019 16:39:12 +0530
+Message-ID: <4727a328-e131-dfff-f1da-46af685386ec@arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
+ <ba023672-92f5-41dd-1194-4ab4f647b204@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@arm.com, marc.zyngier@arm.com
-Cc: james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, Punit Agrawal <punit.agrawal@arm.com>
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1754A432
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  2 Mar 2019 06:09:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oUCvk-HB7RGo for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  2 Mar 2019 06:09:19 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A073B4A429
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  2 Mar 2019 06:09:19 -0500 (EST)
+In-Reply-To: <ba023672-92f5-41dd-1194-4ab4f647b204@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The idea behind this is: we don't want to keep tracking of huge pages when
-logging_active is true, which will result in performance degradation.  We
-still need to set vma_pagesize to PAGE_SIZE, so that we can make use of it
-to force a PTE mapping.
+Hi,
 
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Punit Agrawal <punit.agrawal@arm.com>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+On 2/25/19 11:09 PM, James Morse wrote:
+> Hi Amit,
+> 
+> On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>> is a constant value. This works today, as the host HCR_EL2 value is
+>> always the same, but this will get in the way of supporting extensions
+>> that require HCR_EL2 bits to be set conditionally for the host.
+>>
+>> To allow such features to work without KVM having to explicitly handle
+>> every possible host feature combination, this patch has KVM save/restore
+>> for the host HCR when switching to/from a guest HCR. The saving of the
+>> register is done once during cpu hypervisor initialization state and is
+>> just restored after switch from guest.
+>>
+>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>> kvm_call_hyp and is helpful in NHVE case.
+>>
+>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>> to toggle the TGE bit with a RMW sequence, as we already do in
+>> __tlb_switch_to_guest_vhe().
+>>
+>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>> and guest can now use this field in a common way.
+> 
+> 
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index ca56537..05706b4 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
+>>   	kvm_call_hyp(__init_stage2_translation);
+>>   }
+>>   
+>> +static inline void __cpu_copy_hyp_conf(void) {}
+>> +
+> 
+> I agree Mark's suggestion of adding 'host_ctxt' in here makes it clearer what it is.
+ok.
+> 
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index 506386a..0dbe795 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> 
+> Hmmm, there is still a fair amount of churn due to moving the struct definition, but its
+> easy enough to ignore as its mechanical. A preparatory patch that switched as may as
+> possible to '*vcpu_hcr() = ' would cut the churn down some more, but I don't think its
+> worth the extra effort.
+> 
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+>> index a80a7ef..6e65cad 100644
+>> --- a/arch/arm64/include/asm/kvm_hyp.h
+>> +++ b/arch/arm64/include/asm/kvm_hyp.h
+>> @@ -151,7 +151,7 @@ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+>>   bool __fpsimd_enabled(void);
+>>   
+>>   void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+>> -void deactivate_traps_vhe_put(void);
+>> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+> 
+> I've forgotten why this is needed. You don't add a user of vcpu to
+> deactivate_traps_vhe_put() in this patch.
+> 
+> 
+>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>> index b0b1478..006bd33 100644
+>> --- a/arch/arm64/kvm/hyp/switch.c
+>> +++ b/arch/arm64/kvm/hyp/switch.c
+>> @@ -191,7 +194,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+> 
+>> -void deactivate_traps_vhe_put(void)
+>> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+>>   {
+>>   	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+>>   
+> 
+> Why does deactivate_traps_vhe_put() need the vcpu?
+vcpu is needed for the next patch which saves/restore mdcr_el2. I will 
+add this in that patch.
+> 
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 7732d0b..1b2e05b 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -458,6 +459,16 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>>
+>>   static inline void __cpu_init_stage2(void) {}
+>>
+>> +/**
+>> + * __cpu_copy_hyp_conf - copy the boot hyp configuration registers
+>> + *
+>> + * It is called once per-cpu during CPU hyp initialisation.
+>> + */
+> 
+> Is it just the boot cpu?
+> 
+> 
+>> +static inline void __cpu_copy_hyp_conf(void)
+>> +{
+>> +	kvm_call_hyp(__kvm_populate_host_regs);
+>> +}
+>> +
+> 
+> 
+>> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+>> index 68d6f7c..68ddc0f 100644
+>> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+>> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+>> @@ -21,6 +21,7 @@
+>>   #include <asm/kvm_asm.h>
+>>   #include <asm/kvm_emulate.h>
+>>   #include <asm/kvm_hyp.h>
+>> +#include <asm/kvm_mmu.h>
+> 
+> ... what's kvm_mmu.h needed for?
+> The __hyp_this_cpu_ptr() you add comes from kvm_asm.h.
+> 
+> /me tries it.
+> 
+> Heh, hyp_symbol_addr(). kvm_asm.h should include this, but can't because the
+> kvm_ksym_ref() dependency is the other-way round. This is just going to bite us somewhere
+> else later!
+> If we want to fix it now, moving hyp_symbol_addr() to kvm_asm.h would fix it. It's
+> generating adrp/add so the 'asm' label is fair, and it really should live with its EL1
+> counterpart kvm_ksym_ref().
+> 
+Yes moving hyp_symbol_addr() fixes the dependency error.
+> 
+>> @@ -294,7 +295,7 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+>>   	if (!has_vhe())
+>>   		return;
+>>   
+>> -	deactivate_traps_vhe_put();
+>> +	deactivate_traps_vhe_put(vcpu);
+>>   
+>>   	__sysreg_save_el1_state(guest_ctxt);
+>>   	__sysreg_save_user_state(guest_ctxt);
+>> @@ -316,3 +317,21 @@ void __hyp_text __kvm_enable_ssbs(void)
+>>   	"msr	sctlr_el2, %0"
+>>   	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
+>>   }
+>> +
+>> +/**
+>> + * __kvm_populate_host_regs - Stores host register values
+>> + *
+>> + * This function acts as a function handler parameter for kvm_call_hyp and
+>> + * may be called from EL1 exception level to fetch the register value.
+>> + */
+>> +void __hyp_text __kvm_populate_host_regs(void)
+>> +{
+>> +	struct kvm_cpu_context *host_ctxt;
+> 
+> 
+>> +	if (has_vhe())
+>> +		host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
+>> +	else
+>> +		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
+> 
+> You can use __hyp_this_cpu_ptr() here, even on VHE.
+> 
+> For VHE the guts are the same and its simpler to use the same version in both cases.
+> 
+> 
+> __hyp_this_cpu_ptr(sym) == hyp_symbol_addr(sym) + tpidr_el2;
+> 
+> hyp_symbol_addr() here is just to guarantee the address is generated based on where we're
+> executing from, not loaded from a literal pool which would give us the link-time address.
+> (or whenever kaslr applied the relocations). This matters for non-VHE because the compiler
+> can't know the code has an EL2 address as well as its link-time address.
+> 
+> This doesn't matter for VHE, as there is no additional different address.
+> 
+> (the other trickery is on non-VHE the tpidr_el2 value isn't actually the same as the
+> hosts.. but on VHE it is)
+> 
+> 
+Thanks for the details.
 
----
-Atfer looking into https://patchwork.codeaurora.org/patch/647985/ , the
-"vma_pagesize = PAGE_SIZE" logic was not intended to be deleted. As far
-as I can tell, we used to have "hugetlb" to force the PTE mapping, but
-we have "vma_pagesize" currently instead. We should set it properly for
-performance reasons (e.g, in VM migration). Did I miss something important?
+>> +	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
+>> +}
+> 
+> 
+>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>> index 9e350fd3..8e18f7f 100644
+>> --- a/virt/kvm/arm/arm.c
+>> +++ b/virt/kvm/arm/arm.c
+>> @@ -1328,6 +1328,7 @@ static void cpu_hyp_reinit(void)
+>>   		cpu_init_hyp_mode(NULL);
+>>   
+>>   	kvm_arm_init_debug();
+>> +	__cpu_copy_hyp_conf();
+> 
+> Your commit message says:
+> | The saving of the register is done once during cpu hypervisor initialization state
+> 
+> But cpu_hyp_reinit() is called each time secondary CPUs come online. Its also called as
+> part of the cpu-idle mechanism via hyp_init_cpu_pm_notifier(). cpu-idle can ask the
+> firmware to power-off the CPU until an interrupt becomes pending for it. KVM's EL2 state
+> disappears when this happens, these calls take care of setting it back up again. On Juno,
+> this can happen tens of times a second, and this adds an extra call to EL2.
+> 
+> init_subsystems() would be the alternative place for this, but it wouldn't catch CPUs that
+> came online after booting. I think you need something in cpu_hyp_reinit() or
+> __cpu_copy_hyp_conf() to ensure it only happens once per CPU.
+ok i will check on it.
+> 
+> I think you can test whether the HCR_EL2 value is zero, assuming zero means uninitialised.
+> A VHE system would always set E2H, and a non-VHE system has to set RW.
+It is not zero and is set to initial values.
 
----
- virt/kvm/arm/mmu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 30251e2..7d41b16 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1705,6 +1705,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
- 	    !force_pte) {
- 		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
-+	} else {
-+		/*
-+		 * Fallback to PTE if it's not one of the stage2
-+		 * supported hugepage sizes or the corresponding level
-+		 * doesn't exist, or logging is enabled.
-+		 */
-+		vma_pagesize = PAGE_SIZE;
- 	}
- 	up_read(&current->mm->mmap_sem);
- 
--- 
-1.8.3.1
+Thanks,
+Amit D
+> 
+> 
+>>   	if (vgic_present)
+>>   		kvm_vgic_init_cpu_hardware();
+>>
+> 
+> 
+> Thanks,
+> 
+> James
+> 
