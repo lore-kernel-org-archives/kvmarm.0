@@ -1,267 +1,204 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v6 1/6] arm64/kvm: preserve host HCR_EL2 value
-Date: Sat, 2 Mar 2019 16:39:12 +0530
-Message-ID: <4727a328-e131-dfff-f1da-46af685386ec@arm.com>
-References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-2-git-send-email-amit.kachhap@arm.com>
- <ba023672-92f5-41dd-1194-4ab4f647b204@arm.com>
+From: "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+Subject: RE: [PATCH v5 00/26] KVM: arm64: SVE guest support
+Date: Sun, 3 Mar 2019 02:40:57 +0000
+Message-ID: <8898674D84E3B24BA3A2D289B872026A6A33657E@G01JPEXMBKW03>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1754A432
- for <kvmarm@lists.cs.columbia.edu>; Sat,  2 Mar 2019 06:09:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oUCvk-HB7RGo for <kvmarm@lists.cs.columbia.edu>;
- Sat,  2 Mar 2019 06:09:19 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A073B4A429
- for <kvmarm@lists.cs.columbia.edu>; Sat,  2 Mar 2019 06:09:19 -0500 (EST)
-In-Reply-To: <ba023672-92f5-41dd-1194-4ab4f647b204@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Content-Type: multipart/mixed; boundary="===============2377758045105102922=="
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+Content-Language: ja-JP
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: 'Dave Martin' <Dave.Martin@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Okamoto,
+ Takayuki" <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Julien Grall <julien.grall@arm.com>, =?gb2312?B?QWxleCBCZW5uqKZl?= <alex.bennee@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+--===============2377758045105102922==
+Content-Language: ja-JP
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 
-On 2/25/19 11:09 PM, James Morse wrote:
-> Hi Amit,
-> 
-> On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
->> From: Mark Rutland <mark.rutland@arm.com>
->>
->> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
->> is a constant value. This works today, as the host HCR_EL2 value is
->> always the same, but this will get in the way of supporting extensions
->> that require HCR_EL2 bits to be set conditionally for the host.
->>
->> To allow such features to work without KVM having to explicitly handle
->> every possible host feature combination, this patch has KVM save/restore
->> for the host HCR when switching to/from a guest HCR. The saving of the
->> register is done once during cpu hypervisor initialization state and is
->> just restored after switch from guest.
->>
->> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
->> kvm_call_hyp and is helpful in NHVE case.
->>
->> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
->> to toggle the TGE bit with a RMW sequence, as we already do in
->> __tlb_switch_to_guest_vhe().
->>
->> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
->> and guest can now use this field in a common way.
-> 
-> 
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index ca56537..05706b4 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -273,6 +273,8 @@ static inline void __cpu_init_stage2(void)
->>   	kvm_call_hyp(__init_stage2_translation);
->>   }
->>   
->> +static inline void __cpu_copy_hyp_conf(void) {}
->> +
-> 
-> I agree Mark's suggestion of adding 'host_ctxt' in here makes it clearer what it is.
-ok.
-> 
-> 
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 506386a..0dbe795 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> 
-> Hmmm, there is still a fair amount of churn due to moving the struct definition, but its
-> easy enough to ignore as its mechanical. A preparatory patch that switched as may as
-> possible to '*vcpu_hcr() = ' would cut the churn down some more, but I don't think its
-> worth the extra effort.
-> 
-> 
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
->> index a80a7ef..6e65cad 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -151,7 +151,7 @@ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
->>   bool __fpsimd_enabled(void);
->>   
->>   void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
->> -void deactivate_traps_vhe_put(void);
->> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
-> 
-> I've forgotten why this is needed. You don't add a user of vcpu to
-> deactivate_traps_vhe_put() in this patch.
-> 
-> 
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index b0b1478..006bd33 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -191,7 +194,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
-> 
->> -void deactivate_traps_vhe_put(void)
->> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
->>   {
->>   	u64 mdcr_el2 = read_sysreg(mdcr_el2);
->>   
-> 
-> Why does deactivate_traps_vhe_put() need the vcpu?
-vcpu is needed for the next patch which saves/restore mdcr_el2. I will 
-add this in that patch.
-> 
-> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 7732d0b..1b2e05b 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -458,6 +459,16 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->>
->>   static inline void __cpu_init_stage2(void) {}
->>
->> +/**
->> + * __cpu_copy_hyp_conf - copy the boot hyp configuration registers
->> + *
->> + * It is called once per-cpu during CPU hyp initialisation.
->> + */
-> 
-> Is it just the boot cpu?
-> 
-> 
->> +static inline void __cpu_copy_hyp_conf(void)
->> +{
->> +	kvm_call_hyp(__kvm_populate_host_regs);
->> +}
->> +
-> 
-> 
->> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
->> index 68d6f7c..68ddc0f 100644
->> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
->> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
->> @@ -21,6 +21,7 @@
->>   #include <asm/kvm_asm.h>
->>   #include <asm/kvm_emulate.h>
->>   #include <asm/kvm_hyp.h>
->> +#include <asm/kvm_mmu.h>
-> 
-> ... what's kvm_mmu.h needed for?
-> The __hyp_this_cpu_ptr() you add comes from kvm_asm.h.
-> 
-> /me tries it.
-> 
-> Heh, hyp_symbol_addr(). kvm_asm.h should include this, but can't because the
-> kvm_ksym_ref() dependency is the other-way round. This is just going to bite us somewhere
-> else later!
-> If we want to fix it now, moving hyp_symbol_addr() to kvm_asm.h would fix it. It's
-> generating adrp/add so the 'asm' label is fair, and it really should live with its EL1
-> counterpart kvm_ksym_ref().
-> 
-Yes moving hyp_symbol_addr() fixes the dependency error.
-> 
->> @@ -294,7 +295,7 @@ void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
->>   	if (!has_vhe())
->>   		return;
->>   
->> -	deactivate_traps_vhe_put();
->> +	deactivate_traps_vhe_put(vcpu);
->>   
->>   	__sysreg_save_el1_state(guest_ctxt);
->>   	__sysreg_save_user_state(guest_ctxt);
->> @@ -316,3 +317,21 @@ void __hyp_text __kvm_enable_ssbs(void)
->>   	"msr	sctlr_el2, %0"
->>   	: "=&r" (tmp) : "L" (SCTLR_ELx_DSSBS));
->>   }
->> +
->> +/**
->> + * __kvm_populate_host_regs - Stores host register values
->> + *
->> + * This function acts as a function handler parameter for kvm_call_hyp and
->> + * may be called from EL1 exception level to fetch the register value.
->> + */
->> +void __hyp_text __kvm_populate_host_regs(void)
->> +{
->> +	struct kvm_cpu_context *host_ctxt;
-> 
-> 
->> +	if (has_vhe())
->> +		host_ctxt = this_cpu_ptr(&kvm_host_cpu_state);
->> +	else
->> +		host_ctxt = __hyp_this_cpu_ptr(kvm_host_cpu_state);
-> 
-> You can use __hyp_this_cpu_ptr() here, even on VHE.
-> 
-> For VHE the guts are the same and its simpler to use the same version in both cases.
-> 
-> 
-> __hyp_this_cpu_ptr(sym) == hyp_symbol_addr(sym) + tpidr_el2;
-> 
-> hyp_symbol_addr() here is just to guarantee the address is generated based on where we're
-> executing from, not loaded from a literal pool which would give us the link-time address.
-> (or whenever kaslr applied the relocations). This matters for non-VHE because the compiler
-> can't know the code has an EL2 address as well as its link-time address.
-> 
-> This doesn't matter for VHE, as there is no additional different address.
-> 
-> (the other trickery is on non-VHE the tpidr_el2 value isn't actually the same as the
-> hosts.. but on VHE it is)
-> 
-> 
-Thanks for the details.
+SGkgRGF2ZSwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBG
+cm9tOiBsaW51eC1hcm0ta2VybmVsIDxsaW51eC1hcm0ta2VybmVsLWJvdW5j
+ZXNAbGlzdHMuaW5mcmFkZWFkLm9yZz4gT24NCj4gQmVoYWxmIE9mIERhdmUg
+TWFydGluDQo+IFNlbnQ6IFR1ZXNkYXksIEZlYnJ1YXJ5IDE5LCAyMDE5IDQ6
+NTIgQU0NCj4gVG86IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUNCj4g
+Q2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47
+IE9rYW1vdG8sIFRha2F5dWtpL4z5sb4guN/Q0g0KPiA8dG9rYW1vdG9AanAu
+ZnVqaXRzdS5jb20+OyBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBrZXJuZWwu
+b3JnPjsgQXJkDQo+IEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFy
+by5vcmc+OyBNYXJjIFp5bmdpZXINCj4gPG1hcmMuenluZ2llckBhcm0uY29t
+PjsgQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJtLmNvbT47
+IFdpbGwNCj4gRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPjsgWmhhbmcs
+IExlaS+PiCDA1w0KPiA8emhhbmcubGVpQGpwLmZ1aml0c3UuY29tPjsgSnVs
+aWVuIEdyYWxsIDxqdWxpZW4uZ3JhbGxAYXJtLmNvbT47IEFsZXggQmVubqim
+ZQ0KPiA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz47IGxpbnV4LWFybS1rZXJu
+ZWxAbGlzdHMuaW5mcmFkZWFkLm9yZw0KPiBTdWJqZWN0OiBbUEFUQ0ggdjUg
+MDAvMjZdIEtWTTogYXJtNjQ6IFNWRSBndWVzdCBzdXBwb3J0DQo+IA0KPiBU
+aGlzIHNlcmllcyBpbXBsZW1lbnRzIHN1cHBvcnQgZm9yIGFsbG93aW5nIEtW
+TSBndWVzdHMgdG8gdXNlIHRoZSBBcm0NCj4gU2NhbGFibGUgVmVjdG9yIEV4
+dGVuc2lvbiAoU1ZFKSwgc3VwZXJzZWRpbmcgdGhlIHByZXZpb3VzIHY0IHNl
+cmllcyBbMV0uDQo+IA0KPiBUaGUgcGF0Y2hlcyBhcmUgYWxzbyBhdmFpbGFi
+bGUgb24gYSBicmFuY2ggZm9yIHJldmlld2VyIGNvbnZlbmllbmNlLiBbMl0N
+Cj4gDQo+IFRoZSBwYXRjaGVzIGFyZSBiYXNlZCBvbiB2NS4wLXJjNi4NCj4g
+DQo+IFRoZXkgZGVwZW5kIG9uIGFub3RoZXIgc21hbGwgc2VyaWVzIGN1cnJl
+bnRseSB1bmRlciByZXZpZXcgWzNdIHRoYXQgZG9lcyBhIGJpdA0KPiBvZiBy
+ZWxldmFudCByZWZhY3RvcmluZyAoYXMgd2VsbCBhcyBmaXhpbmcgYW4gYW5v
+bWFseSBub3QgZGlyZWN0bHkgcmVsYXRlZCB0byB0aGlzDQo+IHNlcmllcyku
+ICBBIGJhc2UgYnJhbmNoIFs0XSBpcyBwcm92aWRlZCBzbyB0aGF0IHJldmll
+d2VycyBkb24ndCBuZWVkIHRvIGh1bnQNCj4gZG93biBib3RoIHNlcmllcyBp
+bmRlcGVuZGVudGx5Lg0KWz5dIA0KSSB0ZXN0ZWQgdGhlIHBhdGNoIG9uIEE2
+NEZYIGNoaXAgd2hpY2ggU1ZFIGZlYXR1cmUgaGFkIGJlZW4gaW1wbGVtZW50
+ZWQuDQpBbGwgb2YgdGVzdHMgaGF2ZSBiZWVuIHBhc3NlZC4NClBsZWFzZSBh
+ZGQgZm9sbG93cyA6DQpUZXN0ZWQtYnk6IHpoYW5nLmxlaSA8emhhbmcubGVp
+QGpwLmZ1aml0c3UuY29tPg0KDQo+IA0KPiBUaGlzIHNlcmllcyBjb250YWlu
+cyBubyBtYWpvciB1cGRhdGUgZXhjZXB0IGZvciB0aGUgcmVtb3ZhbCBvZiBt
+dWx0aXBsZSByZWdpc3Rlcg0KPiBzbGljZSBzdXBwb3J0IGluIHRoZSB1c2Vy
+IHJlZ2lzdGVyIGFjY2VzcyBpb2N0bHMuICBUaGUgQUJJIGlzIGtlcHQgYXMt
+aXMgc28gdGhhdA0KPiB0aGlzIGZ1bmN0aW9uYWxpdHkgY2FuIGJlIGFkZGVk
+IGJhY2sgaW4gbGF0ZXIgb24gaWYvd2hlbiBuZWVkZWQuICBpb2N0bCBhY2Nl
+c3MNCj4gdG8gbm9uZXhpc3RlbnQgc2xpY2VzIG5vdyB5aWVsZHMgRU5PRU5U
+LCB3aGljaCBpcyBtb3JlIGNvbnNpc3RlbnQgd2l0aCB0aGUNCj4gbm90aW9u
+IG9mIGFuIGFic2VudCByZWdpc3Rlci4NCj4gDQo+IEZvciBhIGRlc2NyaXB0
+aW9uIG9mIG1pbm9yIHVwZGF0ZXMsIHNlZSB0aGUgaW5kaXZpZHVhbCBwYXRj
+aGVzLg0KPiANCj4gDQo+IEZ1bmN0aW9uYWxpdHkgdGVzdGluZyBhbmQgc3Ry
+ZXNzLXRlc3RpbmcgaGFzIGJlZW4gZG9uZSwgdXNpbmcgYSBoYWNrZWQtdXAN
+Cj4ga3ZtdG9vbCBbNV06DQo+IA0KPiAgKiBBcm0gRmFzdCBNb2RlbDogZnVs
+bCB0ZXN0aW5nIG9mIGFybTY0IGRlZmNvbmZpZywgaW5jbHVkaW5nIHJ1bm5p
+bmcNCj4gICAgbm9uLVNWRSBhbmQgU1ZFIGd1ZXN0cyB3aXRoIG1peHR1cmVz
+IG9mIHZlY3RvciBsZW5ndGhzLiAgbGltaXRlZA0KPiAgICB0ZXN0aW5nIG9m
+IG90aGVyIGNvbmZpZ3VyYXRpb25zLg0KPiANCj4gICogVGh1bmRlclgyOiBi
+YXNpYyB0ZXN0aW5nIG9mIGFybTY0IGRlZmNvbmZpZywgaW5jbHVkaW5nIGJv
+b3RpbmcgZ3Vlc3RzDQo+ICAgIChubyBTVkUgc3VwcG9ydCBvbiB0aGlzIGhh
+cmR3YXJlKS4NCj4gDQo+ICAqIEZ1bGwgYnVpbGQtYmlzZWN0IHRlc3Rpbmcg
+YW5kIHNwYXJzZSB0ZXN0aW5nIG9mIGV2ZXJ5IGNvbW1pdCBkb25lDQo+ICAg
+IGZvciBhcm02NCAoZGVmY29uZmlnLCBDT05GSUdfQVJNNjRfU1ZFPW4sIENP
+TkZJR19LVk09bikgYW5kIGFybQ0KPiAgICAobXVsdGlfdjdfZGVmY29uZmln
+LCBDT05GSUdfS1ZNPXkpLiAgT25lIG5ldyBzcGFyc2Ugd2FybmluZywNCj4g
+ICAgcHJvYmFibHkgc3B1cmlvdXMgKHNlZSBub3RlIGluIHBhdGNoIDIyKS4N
+Cj4gDQo+IA0KPiBBQXJjaDMyIGhvc3QgdGVzdGluZyBpcyBwZW5kaW5nLiAg
+SSB3aWxsIHBpbmcgdGhpcyBzZXJpZXMgd2l0aCBhIHJlcGx5IHRvIHRoZSBj
+b3Zlcg0KPiBsZXR0ZXIgd2hlbiB0aGF0IHRlc3RpbmcgaGFzIGJlZW4gY29t
+cGxldGVkLg0KPiANCj4gDQo+IEtub3duIGlzc3VlczoNCj4gDQo+ICAqICoq
+UG9zc2libGUgYnVnKioNCj4gDQo+ICAgIFNWRSBzdGF0ZSBjb3JydXB0aW9u
+IGhhcyBiZWVuIGluIHRoZSBob3N0IHdoZW4gcnVubmluZyBvbiB0aGUgQXJt
+DQo+ICAgIEZhc3QgTW9kZWwuDQo+IA0KPiAgICBBZnRlciBzb21lIGludmVz
+dGlnYXRpb24gd2l0aCB0aGUgbW9kZWwgZW5naW5lZXJzLCBpdCBhcHBlYXJz
+IHRoYXQNCj4gICAgdGhlcmUgbWF5IGJlIGEgbW9kZWwgYnVnIGluIHRoaXMg
+YXJlYS4gIEkgaGF2ZSBhbHNvIG9idGFpbmVkIGRldGFpbGVkDQo+ICAgIHRy
+YWNlIG9mIGZhaWx1cmUgY2FzZXMsIHdoaWNoIGlzIGFsc28gc3VnZ2VzdGl2
+ZSBvZiBhIG1vZGVsIGJ1Zy4gIE5vDQo+ICAgIGNsZWFyIGV2aWRlbmNlIGhh
+cyBiZWVuIG9idGFpbmVkIHRvIHNob3cgdGhhdCB0aGVyZSBpcyBhIGJ1ZyBp
+bg0KPiAgICBMaW51eCwgc28gZmFyLg0KPiANCj4gICAgQWxsIGF2YWlsYWJs
+ZSBldmlkZW5jZSBzdWdnZXN0cyB0aGF0IHRoaXMgYnVnIHdpbGwgbm90IGFm
+ZmVjdCBub24tU1ZFDQo+ICAgIGhhcmR3YXJlOiB0aGUgc3ltcHRvbSBpcyB1
+bmV4cGVjdGVkIHplcm9pbmcgb2YgYml0cyAxMjggYW5kIGFib3ZlIG9mDQo+
+ICAgIHRoZSB2ZWN0b3IgcmVnaXN0ZXJzICh3aGljaCBkb24ndCBleGlzdCBw
+cmlvciB0byBTVkUpLg0KPiANCj4gICoga3ZtdG9vbCBzdXBwb3J0IGlzIG5v
+dCBtYXR1cmUNCj4gDQo+IA0KPiBbMV0gW1JGQyBQQVRDSCB2NCAwMC8yNF0g
+S1ZNOiBhcm02NDogU1ZFIGd1ZXN0IHN1cHBvcnQNCj4gaHR0cHM6Ly9saXN0
+cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJtYWlsL2t2bWFybS8yMDE5LUphbnVh
+cnkvMDM0MTM0Lmh0bWwNCj4gDQo+IFsyXSBUaGlzIHNlcmllcyBpbiBnaXQ6
+DQo+IGh0dHA6Ly9saW51eC1hcm0ub3JnL2dpdD9wPWxpbnV4LWRtLmdpdDth
+PXNob3J0bG9nO2g9cmVmcy9oZWFkcy9zdmUta3ZtL3Y1DQo+IC9oZWFkDQo+
+IGdpdDovL2xpbnV4LWFybS5vcmcvbGludXgtZG0uZ2l0IHN2ZS1rdm0vdjUv
+aGVhZA0KPiANCj4gWzNdIFtQQVRDSCB2MiAwLzJdIEZpeCBLVk1fR0VUX1JF
+R19MSVNUIGludmFsaWQgcmVnaXN0ZXIgSUQgcmVncmVzc2lvbg0KPiBodHRw
+czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9waXBlcm1haWwva3ZtYXJtLzIw
+MTgtRGVjZW1iZXIvMDMzODEwLmh0bQ0KPiBsDQo+IA0KPiBbNF0gQmFzZSBv
+ZiB0aGlzIHNlcmllcyBpbiBnaXQ6DQo+IGh0dHA6Ly9saW51eC1hcm0ub3Jn
+L2dpdD9wPWxpbnV4LWRtLmdpdDthPXNob3J0bG9nO2g9cmVmcy9oZWFkcy9z
+dmUta3ZtL3Y1DQo+IC9iYXNlDQo+IGdpdDovL2xpbnV4LWFybS5vcmcvbGlu
+dXgtZG0uZ2l0IHN2ZS1rdm0vdjUvYmFzZQ0KPiANCj4gWzVdIFtSRkMgUEFU
+Q0ggMDAvMTJdIGFybTY0OiBTVkUgZ3Vlc3Qgc3VwcG9ydCB0ZXN0IGhhY2tz
+DQo+IGh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L3BpcGVybWFpbC9r
+dm1hcm0vMjAxOS1KYW51YXJ5LzAzNDE2Mi5odG1sDQo+IA0KPiANCj4gRGF2
+ZSBNYXJ0aW4gKDI2KToNCj4gICBLVk06IERvY3VtZW50YXRpb246IERvY3Vt
+ZW50IGFybTY0IGNvcmUgcmVnaXN0ZXJzIGluIGRldGFpbA0KPiAgIGFybTY0
+OiBmcHNpbWQ6IEFsd2F5cyBzZXQgVElGX0ZPUkVJR05fRlBTVEFURSBvbiB0
+YXNrIHN0YXRlIGZsdXNoDQo+ICAgS1ZNOiBhcm02NDogRGVsZXRlIG9ycGhh
+bmVkIGRlY2xhcmF0aW9uIGZvciBfX2Zwc2ltZF9lbmFibGVkKCkNCj4gICBL
+Vk06IGFybTY0OiBSZWZhY3RvciBrdm1fYXJtX251bV9yZWdzKCkgZm9yIGVh
+c2llciBtYWludGVuYW5jZQ0KPiAgIEtWTTogYXJtNjQ6IEFkZCBtaXNzaW5n
+ICNpbmNsdWRlIG9mIDxsaW51eC9iaXRtYXAuaD4gdG8ga3ZtX2hvc3QuaA0K
+PiAgIGFybTY0L3N2ZTogQ2hlY2sgU1ZFIHZpcnR1YWxpc2FiaWxpdHkNCj4g
+ICBhcm02NC9zdmU6IENsYXJpZnkgcm9sZSBvZiB0aGUgVlEgbWFwIG1haW50
+ZW5hbmNlIGZ1bmN0aW9ucw0KPiAgIGFybTY0L3N2ZTogRW5hYmxlIFNWRSBz
+dGF0ZSB0cmFja2luZyBmb3Igbm9uLXRhc2sgY29udGV4dHMNCj4gICBLVk06
+IGFybTY0OiBBZGQgYSB2Y3B1IGZsYWcgdG8gY29udHJvbCBTVkUgdmlzaWJp
+bGl0eSBmb3IgdGhlIGd1ZXN0DQo+ICAgS1ZNOiBhcm02NDogUHJvcGFnYXRl
+IHZjcHUgaW50byByZWFkX2lkX3JlZygpDQo+ICAgS1ZNOiBhcm02NDogRXh0
+ZW5kIHJlc2V0X3Vua25vd24oKSB0byBoYW5kbGUgbWl4ZWQgUkVTMC9VTktO
+T1dODQo+ICAgICByZWdpc3RlcnMNCj4gICBLVk06IGFybTY0OiBTdXBwb3J0
+IHJ1bnRpbWUgc3lzcmVnIHZpc2liaWxpdHkgZmlsdGVyaW5nDQo+ICAgS1ZN
+OiBhcm02NC9zdmU6IFN5c3RlbSByZWdpc3RlciBjb250ZXh0IHN3aXRjaCBh
+bmQgYWNjZXNzIHN1cHBvcnQNCj4gICBLVk06IGFybTY0L3N2ZTogQ29udGV4
+dCBzd2l0Y2ggdGhlIFNWRSByZWdpc3RlcnMNCj4gICBLVk06IEFsbG93IDIw
+NDgtYml0IHJlZ2lzdGVyIGFjY2VzcyB2aWEgaW9jdGwgaW50ZXJmYWNlDQo+
+ICAgS1ZNOiBhcm02NDogQWRkIG1pc3NpbmcgI2luY2x1ZGUgb2YgPGxpbnV4
+L3N0cmluZy5oPiBpbiBndWVzdC5jDQo+ICAgS1ZNOiBhcm02NDogUmVqZWN0
+IGlvY3RsIGFjY2VzcyB0byBGUFNJTUQgVi1yZWdzIG9uIFNWRSB2Y3B1cw0K
+PiAgIEtWTTogYXJtNjQvc3ZlOiBBZGQgU1ZFIHN1cHBvcnQgdG8gcmVnaXN0
+ZXIgYWNjZXNzIGlvY3RsIGludGVyZmFjZQ0KPiAgIEtWTTogYXJtNjQ6IEVu
+dW1lcmF0ZSBTVkUgcmVnaXN0ZXIgaW5kaWNlcyBmb3IgS1ZNX0dFVF9SRUdf
+TElTVA0KPiAgIGFybTY0L3N2ZTogSW4ta2VybmVsIHZlY3RvciBsZW5ndGgg
+YXZhaWxhYmlsaXR5IHF1ZXJ5IGludGVyZmFjZQ0KPiAgIEtWTTogYXJtL2Fy
+bTY0OiBBZGQgaG9vayB0byBmaW5hbGl6ZSB0aGUgdmNwdSBjb25maWd1cmF0
+aW9uDQo+ICAgS1ZNOiBhcm02NC9zdmU6IEFkZCBwc2V1ZG8tcmVnaXN0ZXIg
+Zm9yIHRoZSBndWVzdCdzIHZlY3RvciBsZW5ndGhzDQo+ICAgS1ZNOiBhcm02
+NC9zdmU6IEFsbG93IHVzZXJzcGFjZSB0byBlbmFibGUgU1ZFIGZvciB2Y3B1
+cw0KPiAgIEtWTTogYXJtNjQ6IEFkZCBhIGNhcGFiaWxsaXR5IHRvIGFkdmVy
+dGlzZSBTVkUgc3VwcG9ydA0KPiAgIEtWTTogRG9jdW1lbnQgZXJyb3JzIGZv
+ciBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRfT05FX1JFRw0KPiAgIEtW
+TTogYXJtNjQvc3ZlOiBEb2N1bWVudCBLVk0gQVBJIGV4dGVuc2lvbnMgZm9y
+IFNWRQ0KPiANCj4gIERvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4
+dCB8ICA5MyArKysrKysrKysrDQo+ICBhcmNoL2FybS9pbmNsdWRlL2FzbS9r
+dm1faG9zdC5oICAgfCAgIDQgKw0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2Fz
+bS9mcHNpbWQuaCAgIHwgIDMzICsrKy0NCj4gIGFyY2gvYXJtNjQvaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaCB8ICAzNSArKystDQo+ICBhcmNoL2FybTY0L2lu
+Y2x1ZGUvYXNtL2t2bV9oeXAuaCAgfCAgIDEgLQ0KPiAgYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9zeXNyZWcuaCAgIHwgICAzICsNCj4gIGFyY2gvYXJtNjQv
+aW5jbHVkZS91YXBpL2FzbS9rdm0uaCB8ICAyMiArKysNCj4gIGFyY2gvYXJt
+NjQva2VybmVsL2NwdWZlYXR1cmUuYyAgICB8ICAgMiArLQ0KPiAgYXJjaC9h
+cm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICAgIHwgMTcyICsrKysrKysrKysr
+KystLS0tLS0NCj4gIGFyY2gvYXJtNjQva2VybmVsL3NpZ25hbC5jICAgICAg
+ICB8ICAgNSAtDQo+ICBhcmNoL2FybTY0L2t2bS9mcHNpbWQuYyAgICAgICAg
+ICAgfCAgMTcgKy0NCj4gIGFyY2gvYXJtNjQva3ZtL2d1ZXN0LmMgICAgICAg
+ICAgICB8IDM0OA0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKy0tLQ0KPiAgYXJjaC9hcm02NC9rdm0vaHlwL3N3aXRjaC5jICAgICAg
+IHwgIDY5ICsrKysrKy0tDQo+ICBhcmNoL2FybTY0L2t2bS9yZXNldC5jICAg
+ICAgICAgICAgfCAgODcgKysrKysrKysrLQ0KPiAgYXJjaC9hcm02NC9rdm0v
+c3lzX3JlZ3MuYyAgICAgICAgIHwgMTQ0ICsrKysrKysrKysrKysrLS0NCj4g
+IGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmggICAgICAgICB8ICAyNCArKy0N
+Cj4gIGluY2x1ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAgICB8ICAgMiAr
+DQo+ICB2aXJ0L2t2bS9hcm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgIDgg
+Kw0KPiAgMTggZmlsZXMgY2hhbmdlZCwgOTQ0IGluc2VydGlvbnMoKyksIDEy
+NSBkZWxldGlvbnMoLSkNCj4gDQo+IC0tDQo+IDIuMS40DQo+IA0KPiANCj4g
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18NCj4gbGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QNCj4gbGludXgt
+YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnDQo+IGh0dHA6Ly9saXN0
+cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtl
+cm5lbA0KDQoNClRoYW5rcywNClpoYW5nIExlaQ0K
 
->> +	host_ctxt->hcr_el2 = read_sysreg(hcr_el2);
->> +}
-> 
-> 
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 9e350fd3..8e18f7f 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -1328,6 +1328,7 @@ static void cpu_hyp_reinit(void)
->>   		cpu_init_hyp_mode(NULL);
->>   
->>   	kvm_arm_init_debug();
->> +	__cpu_copy_hyp_conf();
-> 
-> Your commit message says:
-> | The saving of the register is done once during cpu hypervisor initialization state
-> 
-> But cpu_hyp_reinit() is called each time secondary CPUs come online. Its also called as
-> part of the cpu-idle mechanism via hyp_init_cpu_pm_notifier(). cpu-idle can ask the
-> firmware to power-off the CPU until an interrupt becomes pending for it. KVM's EL2 state
-> disappears when this happens, these calls take care of setting it back up again. On Juno,
-> this can happen tens of times a second, and this adds an extra call to EL2.
-> 
-> init_subsystems() would be the alternative place for this, but it wouldn't catch CPUs that
-> came online after booting. I think you need something in cpu_hyp_reinit() or
-> __cpu_copy_hyp_conf() to ensure it only happens once per CPU.
-ok i will check on it.
-> 
-> I think you can test whether the HCR_EL2 value is zero, assuming zero means uninitialised.
-> A VHE system would always set E2H, and a non-VHE system has to set RW.
-It is not zero and is set to initial values.
 
-Thanks,
-Amit D
-> 
-> 
->>   	if (vgic_present)
->>   		kvm_vgic_init_cpu_hardware();
->>
-> 
-> 
-> Thanks,
-> 
-> James
-> 
+--===============2377758045105102922==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+linux-arm-kernel mailing list
+linux-arm-kernel@lists.infradead.org
+http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+--===============2377758045105102922==--
