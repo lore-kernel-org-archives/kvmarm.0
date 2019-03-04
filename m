@@ -1,27 +1,26 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH 05/11] KVM: arm/arm64: Reset the VCPU without preemption
- and vcpu state loaded
-Date: Mon, 4 Mar 2019 17:31:22 +0000
-Message-ID: <0325e384-7677-8757-dfc3-4f20eb11442f@arm.com>
-References: <20190207131843.157210-1-marc.zyngier@arm.com>
- <20190207131843.157210-6-marc.zyngier@arm.com>
- <f6928433-8ae6-6cae-d86d-b392f5b4fea6@arm.com>
- <ec205905-6b7b-2a6d-f70f-9bca574dd593@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm64: Force a PTE mapping when logging is
+ enabled
+Date: Mon, 4 Mar 2019 17:34:10 +0000
+Message-ID: <32f302eb-ef89-7de4-36b4-3c3df907c732@arm.com>
+References: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
+ <CAKcZhuWa4UcsoFPRkZg=M3WeUJibX8T0_R+JHS3=cyd51N9cgQ@mail.gmail.com>
+ <20190304171320.GA3984@en101>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0E9C4A36D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 12:31:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A3D34A36D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 12:34:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fW-q3nvtl3yf for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Mar 2019 12:31:26 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6DD549F94
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 12:31:26 -0500 (EST)
-In-Reply-To: <ec205905-6b7b-2a6d-f70f-9bca574dd593@arm.com>
+ with ESMTP id bUbmhFYkzsfB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Mar 2019 12:34:14 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1191C49F94
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 12:34:14 -0500 (EST)
+In-Reply-To: <20190304171320.GA3984@en101>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,68 +31,122 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>, Masami Hiramatsu <mhiramat@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>, Zenghui Yu <zenghuiyu96@gmail.com>
+Cc: Punit Agrawal <punit.agrawal@arm.com>, LKML <linux-kernel@vger.kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Zenghui, Suzuki,
 
-On 04/03/2019 17:06, Marc Zyngier wrote:
-> On 04/03/2019 16:30, Julien Grall wrote:
->> Hi,
->>
->> I noticed some issues with this patch when rebooting a guest after using perf.
->>
->> [  577.513447] BUG: sleeping function called from invalid context at
->> kernel/locking/mutex.c:908
->> [  577.521926] in_atomic(): 1, irqs_disabled(): 0, pid: 2323, name: qemu-system aar
->> [  577.529354] 1 lock held by qemu-system-aar/2323:
->> [  577.533998]  #0: 00000000f4f96804 (&vcpu->mutex){+.+.}, at:
->> kvm_vcpu_ioctl+0x74/0xac0
->> [  577.541865] Preemption disabled at:
->> [  577.541871] [<ffff0000100cc82c>] kvm_reset_vcpu+0x1c/0x1d0
->> [  577.550882] CPU: 6 PID: 2323 Comm: qemu-system-aar Tainted: G        W  5.0.0
->> #1277
->> [  577.559137] Hardware name: AMD Seattle (Rev.B0) Development Board (Overdrive)
->> (DT)
->> [  577.566698] Call trace:
->> [  577.569138]  dump_backtrace+0x0/0x140
->> [  577.572793]  show_stack+0x14/0x20
->> [  577.576103]  dump_stack+0xa0/0xd4
->> [  577.579412]  ___might_sleep+0x1e4/0x2b0
->> [  577.583241]  __might_sleep+0x60/0xb8
->> [  577.586810]  __mutex_lock+0x58/0x860
->> [  577.590378]  mutex_lock_nested+0x1c/0x28
->> [  577.594294]  perf_event_ctx_lock_nested+0xf4/0x238
->> [  577.599078]  perf_event_read_value+0x24/0x60
->> [  577.603341]  kvm_pmu_get_counter_value+0x80/0xe8
->> [  577.607950]  kvm_pmu_stop_counter+0x2c/0x98
->> [  577.612126]  kvm_pmu_vcpu_reset+0x58/0xd0
->> [  577.616128]  kvm_reset_vcpu+0xec/0x1d0
->> [  577.619869]  kvm_arch_vcpu_ioctl+0x6b0/0x860
->> [  577.624131]  kvm_vcpu_ioctl+0xe0/0xac0
->> [  577.627876]  do_vfs_ioctl+0xbc/0x910
->> [  577.631443]  ksys_ioctl+0x78/0xa8
->> [  577.634751]  __arm64_sys_ioctl+0x1c/0x28
->> [  577.638667]  el0_svc_common+0x90/0x118
->> [  577.642408]  el0_svc_handler+0x2c/0x80
->> [  577.646150]  el0_svc+0x8/0xc
->>
->> This is happening because the vCPU reset code is now running with preemption
->> disable. However, the perf code cannot be called with preemption disabled as it
->> is using mutex.
->>
->> Do you have any suggestion on the way to fix this potential issue?
+On 04/03/2019 17:13, Suzuki K Poulose wrote:
+> Hi Zenghui,
 > 
-> Given that the PMU is entirely emulated, it never has any state loaded
-> on the CPU. It thus doesn't need to be part of the non-preemptible section.
+> On Sun, Mar 03, 2019 at 11:14:38PM +0800, Zenghui Yu wrote:
+>> I think there're still some problems in this patch... Details below.
+>>
+>> On Sat, Mar 2, 2019 at 11:39 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>>
+>>> The idea behind this is: we don't want to keep tracking of huge pages when
+>>> logging_active is true, which will result in performance degradation.  We
+>>> still need to set vma_pagesize to PAGE_SIZE, so that we can make use of it
+>>> to force a PTE mapping.
 > 
-> Can you please give this (untested) patchlet one a go? It's not exactly
-> pretty, but I believe it will do the trick.
+> Yes, you're right. We are indeed ignoring the force_pte flag.
+> 
+>>>
+>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Cc: Punit Agrawal <punit.agrawal@arm.com>
+>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>>>
+>>> ---
+>>> Atfer looking into https://patchwork.codeaurora.org/patch/647985/ , the
+>>> "vma_pagesize = PAGE_SIZE" logic was not intended to be deleted. As far
+>>> as I can tell, we used to have "hugetlb" to force the PTE mapping, but
+>>> we have "vma_pagesize" currently instead. We should set it properly for
+>>> performance reasons (e.g, in VM migration). Did I miss something important?
+>>>
+>>> ---
+>>>  virt/kvm/arm/mmu.c | 7 +++++++
+>>>  1 file changed, 7 insertions(+)
+>>>
+>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>> index 30251e2..7d41b16 100644
+>>> --- a/virt/kvm/arm/mmu.c
+>>> +++ b/virt/kvm/arm/mmu.c
+>>> @@ -1705,6 +1705,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>              (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
+>>>             !force_pte) {
+>>>                 gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+>>> +       } else {
+>>> +               /*
+>>> +                * Fallback to PTE if it's not one of the stage2
+>>> +                * supported hugepage sizes or the corresponding level
+>>> +                * doesn't exist, or logging is enabled.
+>>
+>> First, Instead of "logging is enabled", it should be "force_pte is true",
+>> since "force_pte" will be true when:
+>>
+>>         1) fault_supports_stage2_pmd_mappings() return false; or
+>>         2) "logging is enabled" (e.g, in VM migration).
+>>
+>> Second, fallback some unsupported hugepage sizes (e.g, 64K hugepage with
+>> 4K pages) to PTE is somewhat strange. And it will then _unexpectedly_
+>> reach transparent_hugepage_adjust(), though no real adjustment will happen
+>> since commit fd2ef358282c ("KVM: arm/arm64: Ensure only THP is candidate
+>> for adjustment"). Keeping "vma_pagesize" there as it is will be better,
+>> right?
+>>
+>> So I'd just simplify the logic like:
+> 
+> We could fix this right in the beginning. See patch below:
+> 
+>>
+>>         } else if (force_pte) {
+>>                 vma_pagesize = PAGE_SIZE;
+>>         }
+>>
+>>
+>> Will send a V2 later and waiting for your comments :)
+> 
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 30251e2..529331e 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1693,7 +1693,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	vma_pagesize = vma_kernel_pagesize(vma);
+> +	/* If we are forced to map at page granularity, force the pagesize here */
+> +	vma_pagesize = force_pte ? PAGE_SIZE : vma_kernel_pagesize(vma);
+> +
+>  	/*
+>  	 * The stage2 has a minimum of 2 level table (For arm64 see
+>  	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+> @@ -1701,11 +1703,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * As for PUD huge maps, we must make sure that we have at least
+>  	 * 3 levels, i.e, PMD is not folded.
+>  	 */
+> -	if ((vma_pagesize == PMD_SIZE ||
+> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
+> -	    !force_pte) {
+> +	if (vma_pagesize == PMD_SIZE ||
+> +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+>  		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+> -	}
+> +
+>  	up_read(&current->mm->mmap_sem);
+>  
+>  	/* We need minimum second+third level pages */
+That's pretty interesting, because this is almost what we already have
+in the NV code:
 
-It does the trick. Are you going to submit the patch?
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/virt/kvm/arm/mmu.c?h=kvm-arm64/nv-wip-v5.0-rc7#n1752
 
-Cheers,
+(note that force_pte is gone in that branch).
 
+Thanks,
+
+	M.
 -- 
-Julien Grall
+Jazz is not dead. It just smells funny...
