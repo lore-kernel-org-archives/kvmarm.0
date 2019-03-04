@@ -1,136 +1,107 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v6 4/6] arm64/kvm: add a userspace option to enable
+Subject: Re: [kvmtool PATCH v6 6/6] arm/kvm: arm64: Add a vcpu feature for
  pointer authentication
-Date: Mon, 4 Mar 2019 16:26:34 +0530
-Message-ID: <4e485492-50ef-3162-af3c-7af80b4a17cc@arm.com>
+Date: Mon, 4 Mar 2019 16:38:18 +0530
+Message-ID: <b21de5ed-197d-3ea7-021c-b3bca312e70c@arm.com>
 References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
- <1550568271-5319-5-git-send-email-amit.kachhap@arm.com>
- <f7e4156e-c9aa-0356-d9a4-6b01ff23c5c0@arm.com>
+ <1550568271-5319-7-git-send-email-amit.kachhap@arm.com>
+ <20190221155409.GA3567@e103592.cambridge.arm.com>
+ <048f772a-1faf-5fa3-d82c-25212a5104af@arm.com>
+ <20190301112452.GS16031@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f7e4156e-c9aa-0356-d9a4-6b01ff23c5c0@arm.com>
+In-Reply-To: <20190301112452.GS16031@e103592.cambridge.arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
+To: Dave P Martin <Dave.Martin@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi James,
 
-On 2/27/19 12:03 AM, James Morse wrote:
-> Hi Amit,
-> 
-> On 19/02/2019 09:24, Amit Daniel Kachhap wrote:
->> This feature will allow the KVM guest to allow the handling of
->> pointer authentication instructions or to treat them as undefined
->> if not set. It uses the existing vcpu API KVM_ARM_VCPU_INIT to
->> supply this parameter instead of creating a new API.
+Hi Dave,
+
+On 3/1/19 4:54 PM, Dave P Martin wrote:
+> On Fri, Mar 01, 2019 at 10:37:54AM +0000, Amit Daniel Kachhap wrote:
+>> Hi,
 >>
->> A new register is not created to pass this parameter via
->> SET/GET_ONE_REG interface as just a flag (KVM_ARM_VCPU_PTRAUTH)
->> supplied is enough to enable this feature.
+>> On 2/21/19 9:24 PM, Dave Martin wrote:
+>>> On Tue, Feb 19, 2019 at 02:54:31PM +0530, Amit Daniel Kachhap wrote:
 > 
-> and an attempt to restore the id register with the other version would fail.
+> [...]
 > 
+>>>> diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>> index 04be43d..2074684 100644
+>>>> --- a/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>> +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+>>>> @@ -8,7 +8,9 @@
+>>>>    			"Create PMUv3 device"),				\
+>>>>    	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+>>>>    			"Specify random seed for Kernel Address Space "	\
+>>>> -			"Layout Randomization (KASLR)"),
+>>>> +			"Layout Randomization (KASLR)"),		\
+>>>> +	OPT_BOOLEAN('\0', "ptrauth", &(cfg)->has_ptrauth,		\
+>>>> +			"Enable address authentication"),
+>>>
+>>> Nit: doesn't this enable address *and* generic authentication?  The
+>>> discussion on what capababilities and enables the ABI exposes probably
+>>> needs to conclude before we can finalise this here.
+>> ok.
+>>>
+>>> However, I would recommend that we provide a single option here that
+>>> turns both address authentication and generic authentication on, even
+>>> if the ABI treats them independently.  This is expected to be the common
+>>> case by far.
+>> ok
+>>>
+>>> We can always add more fine-grained options later if it turns out to be
+>>> necessary.
+>> Mark suggested to provide 2 flags [1] for Address and Generic
+>> authentication so I was thinking of adding 2 features like,
+>>
+>> +#define KVM_ARM_VCPU_PTRAUTH_ADDR		4 /* CPU uses pointer address
+>> authentication */
+>> +#define KVM_ARM_VCPU_PTRAUTH_GENERIC		5 /* CPU uses pointer generic
+>> authentication */
+>>
+>> And supply both of them concatenated in VCPU_INIT stage. Kernel KVM
+>> would expect both feature requested together.
 > 
->> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
->> index a25cd21..0529a7d 100644
->> --- a/Documentation/arm64/pointer-authentication.txt
->> +++ b/Documentation/arm64/pointer-authentication.txt
->> @@ -82,7 +82,8 @@ pointers).
->>   Virtualization
->>   --------------
->>   
->> -Pointer authentication is not currently supported in KVM guests. KVM
->> -will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
->> -the feature will result in an UNDEFINED exception being injected into
->> -the guest.
-> 
->> +Pointer authentication is enabled in KVM guest when virtual machine is
->> +created by passing a flag (KVM_ARM_VCPU_PTRAUTH)
-> 
-> (This is still mixing VM and VCPU)
-> 
-> 
->> + requesting this feature to be enabled.
-> 
-> .. on each vcpu?
-> 
-> 
->> +Without this flag, pointer authentication is not enabled
->> +in KVM guests and attempted use of the feature will result in an UNDEFINED
->> +exception being injected into the guest.
-> 
-> 'guests' here suggests its a VM property. If you set it on some VCPU but not others KVM
-> will generate undefs instead of enabling the feature. (which is the right thing to do)
-> 
-> I think it needs to be clear this is a per-vcpu property.
-ok.
-> 
-> 
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index 97c3478..5f82ca1 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -102,6 +102,7 @@ struct kvm_regs {
->>   #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
->>   #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
->>   #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-> 
->> +#define KVM_ARM_VCPU_PTRAUTH		4 /* VCPU uses address authentication */
-> 
-> Just address authentication? I agree with Mark we should have two bits to match what gets
-> exposed to EL0. One would then be address, the other generic.
-ok.
-> 
-> 
->> diff --git a/arch/arm64/kvm/hyp/ptrauth-sr.c b/arch/arm64/kvm/hyp/ptrauth-sr.c
->> index 528ee6e..6846a23 100644
->> --- a/arch/arm64/kvm/hyp/ptrauth-sr.c
->> +++ b/arch/arm64/kvm/hyp/ptrauth-sr.c
->> @@ -93,9 +93,23 @@ void kvm_arm_vcpu_ptrauth_reset(struct kvm_vcpu *vcpu)
-> 
->> +/**
->> + * kvm_arm_vcpu_ptrauth_allowed - checks if ptrauth feature is allowed by user
->> + *
->> + * @vcpu: The VCPU pointer
->> + *
->> + * This function will be used to check userspace option to have ptrauth or not
->> + * in the guest kernel.
->> + */
->> +bool kvm_arm_vcpu_ptrauth_allowed(const struct kvm_vcpu *vcpu)
->> +{
->> +	return kvm_supports_ptrauth() &&
->> +		test_bit(KVM_ARM_VCPU_PTRAUTH, vcpu->arch.features);
->> +}
-> 
-> This isn't used from world-switch, could it be moved to guest.c?
-yes sure.
-> 
-> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 12529df..f7bcc60 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1055,7 +1055,7 @@ static bool access_cntp_cval(struct kvm_vcpu *vcpu,
->>   }
->>   
->>   /* Read a sanitised cpufeature ID register by sys_reg_desc */
->> -static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
->> +static u64 read_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_desc const *r, bool raz)
-> 
-> (It might be easier on the reviewer to move these mechanical changes to an earlier patch)
-Yes with including some of Dave SVE patches this wont be required.
+> Seems reasonable.  Do you mean the kernel would treat it as an error if
+> only one of these flags is passed to KVM_ARM_VCPU_INIT, or would KVM
+> simply treat them as independent?
+If both flags are passed together then only start using ptrauth 
+otherwise keep ptrauth disabled. This is just to finalize the user side 
+abi as of now and KVM can be updated later.
 
 Thanks,
 Amit D
 > 
+> [...]
 > 
-> Looks good,
+>>>> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+>>>> index 7780251..4ac80f8 100644
+>>>> --- a/arm/kvm-cpu.c
+>>>> +++ b/arm/kvm-cpu.c
+>>>> @@ -68,6 +68,12 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+>>>>    		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
+>>>>    	}
+>>>>    
+>>>> +	/* Set KVM_ARM_VCPU_PTRAUTH if available */
+>>>> +	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH)) {
+>>>> +		if (kvm->cfg.arch.has_ptrauth)
+>>>> +			vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
+>>>> +	}
+>>>> +
+>>>
+>>> I'm not too keen on requiring a dummy #define for AArch32 here.  How do
+>>> we handle other subarch-specific feature flags?  Is there something we
+>>> can reuse?
+>> I will check it.
 > 
-> Thanks,
+> OK
 > 
-> James
+> Cheers
+> ---Dave
 > 
