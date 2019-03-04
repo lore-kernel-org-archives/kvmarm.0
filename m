@@ -1,104 +1,197 @@
-From: Zenghui Yu <zenghuiyu96@gmail.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Force a PTE mapping when logging is
- enabled
-Date: Sun, 3 Mar 2019 23:14:38 +0800
-Message-ID: <CAKcZhuWa4UcsoFPRkZg=M3WeUJibX8T0_R+JHS3=cyd51N9cgQ@mail.gmail.com>
-References: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: Re: [PATCH v10 5/5] arm64: KVM: Enable support for :G/:H perf event
+ modifiers
+Date: Mon, 4 Mar 2019 09:40:57 +0000
+Message-ID: <20190301105410.GB40984@e119886-lin.cambridge.arm.com>
+References: <1547482308-29839-1-git-send-email-andrew.murray@arm.com>
+ <1547482308-29839-6-git-send-email-andrew.murray@arm.com>
+ <20190218220019.GB28113@e113682-lin.lund.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: christoffer.dall@arm.com, marc.zyngier@arm.com
-Cc: julien.thierry@arm.com, Punit Agrawal <punit.agrawal@arm.com>, LKML <linux-kernel@vger.kernel.org>, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, Zenghui Yu <yuzenghui@huawei.com>, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F5064A37D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 04:41:02 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2X7H94cjgoiY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Mar 2019 04:41:01 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D73434A32E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Mar 2019 04:41:00 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190218220019.GB28113@e113682-lin.lund.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I think there're still some problems in this patch... Details below.
+On Mon, Feb 18, 2019 at 11:00:19PM +0100, Christoffer Dall wrote:
+> On Mon, Jan 14, 2019 at 04:11:48PM +0000, Andrew Murray wrote:
+> > Enable/disable event counters as appropriate when entering and exiting
+> > the guest to enable support for guest or host only event counting.
+> > 
+> > For both VHE and non-VHE we switch the counters between host/guest at
+> > EL2. EL2 is filtered out by the PMU when we are using the :G modifier.
+> 
+> I don't think the last part is strictly true as per the former patch on
+> a non-vhe system if you have the :h modifier, so maybe just leave that
+> out of the commit message.
 
-On Sat, Mar 2, 2019 at 11:39 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->
-> The idea behind this is: we don't want to keep tracking of huge pages when
-> logging_active is true, which will result in performance degradation.  We
-> still need to set vma_pagesize to PAGE_SIZE, so that we can make use of it
-> to force a PTE mapping.
->
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Punit Agrawal <punit.agrawal@arm.com>
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->
-> ---
-> Atfer looking into https://patchwork.codeaurora.org/patch/647985/ , the
-> "vma_pagesize = PAGE_SIZE" logic was not intended to be deleted. As far
-> as I can tell, we used to have "hugetlb" to force the PTE mapping, but
-> we have "vma_pagesize" currently instead. We should set it properly for
-> performance reasons (e.g, in VM migration). Did I miss something important?
->
-> ---
->  virt/kvm/arm/mmu.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 30251e2..7d41b16 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1705,6 +1705,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->              (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->             !force_pte) {
->                 gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
-> +       } else {
-> +               /*
-> +                * Fallback to PTE if it's not one of the stage2
-> +                * supported hugepage sizes or the corresponding level
-> +                * doesn't exist, or logging is enabled.
+OK I'll remove that.
 
-First, Instead of "logging is enabled", it should be "force_pte is true",
-since "force_pte" will be true when:
+> 
+> > 
+> > The PMU may be on when we change which counters are enabled however
+> > we avoid adding an isb as we instead rely on existing context
+> > synchronisation events: the isb in kvm_arm_vhe_guest_exit for VHE and
+> > the eret from the hvc in kvm_call_hyp.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > ---
+> >  arch/arm64/kvm/hyp/switch.c | 60 +++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 60 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index b0b1478..9018fb3 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -357,6 +357,54 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+> >  	return true;
+> >  }
+> >  
+> > +static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	struct kvm_host_data *host;
+> > +	struct kvm_pmu_events *pmu;
+> > +	u32 clr, set;
+> > +
+> > +	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> > +	pmu = &host->pmu_events;
+> > +
+> > +	/* We can potentially avoid a sysreg write by only changing bits that
+> > +	 * differ between the guest/host. E.g. where events are enabled in
+> > +	 * both guest and host
+> > +	 */
+> 
+> super nit: kernel coding style requires 'wings' on both side of a
+> multi-line comment.  Only if you respin anyhow.
 
-        1) fault_supports_stage2_pmd_mappings() return false; or
-        2) "logging is enabled" (e.g, in VM migration).
+Ah I didn't notice that, I'll fix this up.
 
-Second, fallback some unsupported hugepage sizes (e.g, 64K hugepage with
-4K pages) to PTE is somewhat strange. And it will then _unexpectedly_
-reach transparent_hugepage_adjust(), though no real adjustment will happen
-since commit fd2ef358282c ("KVM: arm/arm64: Ensure only THP is candidate
-for adjustment"). Keeping "vma_pagesize" there as it is will be better,
-right?
+Thanks for the review.
 
-So I'd just simplify the logic like:
+Andrew Murray
 
-        } else if (force_pte) {
-                vma_pagesize = PAGE_SIZE;
-        }
-
-
-Will send a V2 later and waiting for your comments :)
-
-
-thanks,
-
-zenghui
-
-
-> +                */
-> +               vma_pagesize = PAGE_SIZE;
->         }
->         up_read(&current->mm->mmap_sem);
->
-> --
-> 1.8.3.1
->
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+> > +	clr = pmu->events_host & ~pmu->events_guest;
+> > +	set = pmu->events_guest & ~pmu->events_host;
+> > +
+> > +	if (clr)
+> > +		write_sysreg(clr, pmcntenclr_el0);
+> > +
+> > +	if (set)
+> > +		write_sysreg(set, pmcntenset_el0);
+> > +
+> > +	return (clr || set);
+> > +}
+> > +
+> > +static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +	struct kvm_host_data *host;
+> > +	struct kvm_pmu_events *pmu;
+> > +	u32 clr, set;
+> > +
+> > +	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> > +	pmu = &host->pmu_events;
+> > +
+> > +	/* We can potentially avoid a sysreg write by only changing bits that
+> > +	 * differ between the guest/host. E.g. where events are enabled in
+> > +	 * both guest and host
+> > +	 */
+> 
+> ditto
+> 
+> > +	clr = pmu->events_guest & ~pmu->events_host;
+> > +	set = pmu->events_host & ~pmu->events_guest;
+> > +
+> > +	if (clr)
+> > +		write_sysreg(clr, pmcntenclr_el0);
+> > +
+> > +	if (set)
+> > +		write_sysreg(set, pmcntenset_el0);
+> > +}
+> > +
+> >  /*
+> >   * Return true when we were able to fixup the guest exit and should return to
+> >   * the guest, false when we should restore the host state and return to the
+> > @@ -464,12 +512,15 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm_cpu_context *host_ctxt;
+> >  	struct kvm_cpu_context *guest_ctxt;
+> > +	bool pmu_switch_needed;
+> >  	u64 exit_code;
+> >  
+> >  	host_ctxt = vcpu->arch.host_cpu_context;
+> >  	host_ctxt->__hyp_running_vcpu = vcpu;
+> >  	guest_ctxt = &vcpu->arch.ctxt;
+> >  
+> > +	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+> > +
+> >  	sysreg_save_host_state_vhe(host_ctxt);
+> >  
+> >  	/*
+> > @@ -511,6 +562,9 @@ int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+> >  
+> >  	__debug_switch_to_host(vcpu);
+> >  
+> > +	if (pmu_switch_needed)
+> > +		__pmu_switch_to_host(host_ctxt);
+> > +
+> >  	return exit_code;
+> >  }
+> >  
+> > @@ -519,6 +573,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct kvm_cpu_context *host_ctxt;
+> >  	struct kvm_cpu_context *guest_ctxt;
+> > +	bool pmu_switch_needed;
+> >  	u64 exit_code;
+> >  
+> >  	vcpu = kern_hyp_va(vcpu);
+> > @@ -527,6 +582,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+> >  	host_ctxt->__hyp_running_vcpu = vcpu;
+> >  	guest_ctxt = &vcpu->arch.ctxt;
+> >  
+> > +	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+> > +
+> >  	__sysreg_save_state_nvhe(host_ctxt);
+> >  
+> >  	__activate_vm(kern_hyp_va(vcpu->kvm));
+> > @@ -573,6 +630,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+> >  	 */
+> >  	__debug_switch_to_host(vcpu);
+> >  
+> > +	if (pmu_switch_needed)
+> > +		__pmu_switch_to_host(host_ctxt);
+> > +
+> >  	return exit_code;
+> >  }
+> >  
+> > -- 
+> > 2.7.4
+> > 
+> 
+> Thanks,
+> 
+>     Christoffer
