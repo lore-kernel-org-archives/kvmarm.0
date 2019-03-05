@@ -1,155 +1,294 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Force a PTE mapping when logging is
- enabled
-Date: Tue, 5 Mar 2019 11:51:12 +0000
-Message-ID: <30821cab-7a8c-e65a-4ea4-15c0b808e874@arm.com>
-References: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
- <CAKcZhuWa4UcsoFPRkZg=M3WeUJibX8T0_R+JHS3=cyd51N9cgQ@mail.gmail.com>
- <20190304171320.GA3984@en101> <32f302eb-ef89-7de4-36b4-3c3df907c732@arm.com>
- <865b8b0b-e42e-fe03-e3b4-ae2cc5b1b424@huawei.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v4 02/22] iommu: introduce device fault data
+Date: Tue, 5 Mar 2019 14:56:50 +0000
+Message-ID: <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
+References: <20190218135504.25048-1-eric.auger@redhat.com>
+ <20190218135504.25048-3-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <865b8b0b-e42e-fe03-e3b4-ae2cc5b1b424@huawei.com>
+In-Reply-To: <20190218135504.25048-3-eric.auger@redhat.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Zenghui Yu <zenghuiyu96@gmail.com>
-Cc: christoffer.dall@arm.com, Punit Agrawal <punit.agrawal@arm.com>, julien.thierry@arm.com, LKML <linux-kernel@vger.kernel.org>, james.morse@arm.com, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/03/2019 11:09, Zenghui Yu wrote:
-> Hi Marc, Suzuki,
+On 18/02/2019 13:54, Eric Auger wrote:
+> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > 
-> On 2019/3/5 1:34, Marc Zyngier wrote:
->> Hi Zenghui, Suzuki,
->>
->> On 04/03/2019 17:13, Suzuki K Poulose wrote:
->>> Hi Zenghui,
->>>
->>> On Sun, Mar 03, 2019 at 11:14:38PM +0800, Zenghui Yu wrote:
->>>> I think there're still some problems in this patch... Details below.
->>>>
->>>> On Sat, Mar 2, 2019 at 11:39 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->>>>>
->>>>> The idea behind this is: we don't want to keep tracking of huge pages when
->>>>> logging_active is true, which will result in performance degradation.  We
->>>>> still need to set vma_pagesize to PAGE_SIZE, so that we can make use of it
->>>>> to force a PTE mapping.
->>>
->>> Yes, you're right. We are indeed ignoring the force_pte flag.
->>>
->>>>>
->>>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>> Cc: Punit Agrawal <punit.agrawal@arm.com>
->>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>>
->>>>> ---
->>>>> Atfer looking into https://patchwork.codeaurora.org/patch/647985/ , the
->>>>> "vma_pagesize = PAGE_SIZE" logic was not intended to be deleted. As far
->>>>> as I can tell, we used to have "hugetlb" to force the PTE mapping, but
->>>>> we have "vma_pagesize" currently instead. We should set it properly for
->>>>> performance reasons (e.g, in VM migration). Did I miss something important?
->>>>>
->>>>> ---
->>>>>   virt/kvm/arm/mmu.c | 7 +++++++
->>>>>   1 file changed, 7 insertions(+)
->>>>>
->>>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>>>> index 30251e2..7d41b16 100644
->>>>> --- a/virt/kvm/arm/mmu.c
->>>>> +++ b/virt/kvm/arm/mmu.c
->>>>> @@ -1705,6 +1705,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>>               (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->>>>>              !force_pte) {
->>>>>                  gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->>>>> +       } else {
->>>>> +               /*
->>>>> +                * Fallback to PTE if it's not one of the stage2
->>>>> +                * supported hugepage sizes or the corresponding level
->>>>> +                * doesn't exist, or logging is enabled.
->>>>
->>>> First, Instead of "logging is enabled", it should be "force_pte is true",
->>>> since "force_pte" will be true when:
->>>>
->>>>          1) fault_supports_stage2_pmd_mappings() return false; or
->>>>          2) "logging is enabled" (e.g, in VM migration).
->>>>
->>>> Second, fallback some unsupported hugepage sizes (e.g, 64K hugepage with
->>>> 4K pages) to PTE is somewhat strange. And it will then _unexpectedly_
->>>> reach transparent_hugepage_adjust(), though no real adjustment will happen
->>>> since commit fd2ef358282c ("KVM: arm/arm64: Ensure only THP is candidate
->>>> for adjustment"). Keeping "vma_pagesize" there as it is will be better,
->>>> right?
->>>>
->>>> So I'd just simplify the logic like:
->>>
->>> We could fix this right in the beginning. See patch below:
->>>
->>>>
->>>>          } else if (force_pte) {
->>>>                  vma_pagesize = PAGE_SIZE;
->>>>          }
->>>>
->>>>
->>>> Will send a V2 later and waiting for your comments :)
->>>
->>>
->>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>> index 30251e2..529331e 100644
->>> --- a/virt/kvm/arm/mmu.c
->>> +++ b/virt/kvm/arm/mmu.c
->>> @@ -1693,7 +1693,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>   		return -EFAULT;
->>>   	}
->>>   
->>> -	vma_pagesize = vma_kernel_pagesize(vma);
->>> +	/* If we are forced to map at page granularity, force the pagesize here */
->>> +	vma_pagesize = force_pte ? PAGE_SIZE : vma_kernel_pagesize(vma);
->>> +
->>>   	/*
->>>   	 * The stage2 has a minimum of 2 level table (For arm64 see
->>>   	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
->>> @@ -1701,11 +1703,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>   	 * As for PUD huge maps, we must make sure that we have at least
->>>   	 * 3 levels, i.e, PMD is not folded.
->>>   	 */
->>> -	if ((vma_pagesize == PMD_SIZE ||
->>> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->>> -	    !force_pte) {
->>> +	if (vma_pagesize == PMD_SIZE ||
->>> +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
->>>   		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->>> -	}
->>> +
->>>   	up_read(&current->mm->mmap_sem);
->>>   
->>>   	/* We need minimum second+third level pages */
+> Device faults detected by IOMMU can be reported outside the IOMMU
+> subsystem for further processing. This patch introduces
+> a generic device fault data structure.
 > 
-> A nicer implementation and easier to understand, thanks!
+> The fault can be either an unrecoverable fault or a page request,
+> also referred to as a recoverable fault.
 > 
->> That's pretty interesting, because this is almost what we already have
->> in the NV code:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/virt/kvm/arm/mmu.c?h=kvm-arm64/nv-wip-v5.0-rc7#n1752
->>
->> (note that force_pte is gone in that branch).
+> We only care about non internal faults that are likely to be reported
+> to an external subsystem.
 > 
-> haha :-) sorry about that. I haven't looked into the NV code yet, so ...
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> But I'm still wondering: should we fix this wrong mapping size problem 
-> before NV is introduced? Since this problem has not much to do with NV, 
-> and 5.0 has already been released with this problem (and 5.1 will 
-> without fix ...).
+> ---
 > 
-> Just a personal idea, ignore it if unnecessary.
+> v3 -> v4:
+> - use a union containing aither an unrecoverable fault or a page
+>   request message. Move the device private data in the page request
+>   structure. Reshuffle the fields and use flags.
+> - move fault perm attributes to the uapi
+> - remove a bunch of iommu_fault_reason enum values that were related
+>   to internal errors
+> ---
+>  include/linux/iommu.h      |  47 +++++++++++++++
+>  include/uapi/linux/iommu.h | 115 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 162 insertions(+)
+>  create mode 100644 include/uapi/linux/iommu.h
+> 
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index e90da6b6f3d1..032d33894723 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -25,6 +25,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+>  #include <linux/of.h>
+> +#include <uapi/linux/iommu.h>
+>  
+>  #define IOMMU_READ	(1 << 0)
+>  #define IOMMU_WRITE	(1 << 1)
+> @@ -48,6 +49,7 @@ struct bus_type;
+>  struct device;
+>  struct iommu_domain;
+>  struct notifier_block;
+> +struct iommu_fault_event;
+>  
+>  /* iommu fault flags */
+>  #define IOMMU_FAULT_READ	0x0
+> @@ -55,6 +57,7 @@ struct notifier_block;
+>  
+>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+>  			struct device *, unsigned long, int, void *);
+> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *, void *);
+>  
+>  struct iommu_domain_geometry {
+>  	dma_addr_t aperture_start; /* First address that can be mapped    */
+> @@ -243,6 +246,49 @@ struct iommu_device {
+>  	struct device *dev;
+>  };
+>  
+> +/**
+> + * struct iommu_fault_event - Generic per device fault data
+> + *
+> + * - PCI and non-PCI devices
+> + * - Recoverable faults (e.g. page request), information based on PCI ATS
+> + *   and PASID spec.
 
-We definitely want to fix it now, and have the fix backported to older
-versions. I can always rebase the NV branch on top of the current state
-of mainline.
+"for example information based on PCI PRI and PASID extensions"? ATS+PRI
+have been integrated into the main spec, and only PRI is relevant here.
+
+> + * - Un-recoverable faults of device interest
+
+"of interest to device drivers"?
+
+> + * - DMA remapping and IRQ remapping faults
+> + *
+> + * @fault: fault descriptor
+> + * @iommu_private: used by the IOMMU driver for storing fault-specific
+> + *                 data. Users should not modify this field before
+> + *                 sending the fault response.
+> + */
+> +struct iommu_fault_event {
+> +	struct iommu_fault fault;
+> +	u64 iommu_private;
+> +};
+> +
+> +/**
+> + * struct iommu_fault_param - per-device IOMMU fault data
+> + * @dev_fault_handler: Callback function to handle IOMMU faults at device level
+> + * @data: handler private data
+> + *
+> + */
+> +struct iommu_fault_param {
+> +	iommu_dev_fault_handler_t handler;
+> +	void *data;
+> +};
+> +
+> +/**
+> + * struct iommu_param - collection of per-device IOMMU data
+> + *
+> + * @fault_param: IOMMU detected device fault reporting data
+> + *
+> + * TODO: migrate other per device data pointers under iommu_dev_data, e.g.
+> + *	struct iommu_group	*iommu_group;
+> + *	struct iommu_fwspec	*iommu_fwspec;
+> + */
+> +struct iommu_param {
+> +	struct iommu_fault_param *fault_param;
+> +};
+> +
+>  int  iommu_device_register(struct iommu_device *iommu);
+>  void iommu_device_unregister(struct iommu_device *iommu);
+>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
+> @@ -418,6 +464,7 @@ struct iommu_ops {};
+>  struct iommu_group {};
+>  struct iommu_fwspec {};
+>  struct iommu_device {};
+> +struct iommu_fault_param {};
+>  
+>  static inline bool iommu_present(struct bus_type *bus)
+>  {
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> new file mode 100644
+> index 000000000000..7ebf23ed6ccb
+> --- /dev/null
+> +++ b/include/uapi/linux/iommu.h
+> @@ -0,0 +1,115 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * IOMMU user API definitions
+> + */
+> +
+> +#ifndef _UAPI_IOMMU_H
+> +#define _UAPI_IOMMU_H
+> +
+> +#include <linux/types.h>
+> +
+> +/*  Generic fault types, can be expanded IRQ remapping fault */
+> +enum iommu_fault_type {
+> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
+> +	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
+> +};
+> +
+> +enum iommu_fault_reason {
+> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
+> +
+> +	/* Could not access the PASID table (fetch caused external abort) */
+> +	IOMMU_FAULT_REASON_PASID_FETCH,
+> +
+> +	/* pasid entry is invalid or has configuration errors */
+> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
+> +
+> +	/*
+> +	 * PASID is out of range (e.g. exceeds the maximum PASID
+> +	 * supported by the IOMMU) or disabled.
+> +	 */
+> +	IOMMU_FAULT_REASON_PASID_INVALID,
+> +
+> +	/*
+> +	 * An external abort occurred fetching (or updating) a translation
+> +	 * table descriptor
+> +	 */
+> +	IOMMU_FAULT_REASON_WALK_EABT,
+> +
+> +	/*
+> +	 * Could not access the page table entry (Bad address),
+> +	 * actual translation fault
+> +	 */
+> +	IOMMU_FAULT_REASON_PTE_FETCH,
+> +
+> +	/* Protection flag check failed */
+> +	IOMMU_FAULT_REASON_PERMISSION,
+> +
+> +	/* access flag check failed */
+> +	IOMMU_FAULT_REASON_ACCESS,
+> +
+> +	/* Output address of a translation stage caused Address Size fault */
+> +	IOMMU_FAULT_REASON_OOR_ADDRESS,
+> +};
+> +
+> +/**
+> + * Unrecoverable fault data
+> + * @reason: reason of the fault
+> + * @addr: offending page address
+> + * @fetch_addr: address that caused a fetch abort, if any
+> + * @pasid: contains process address space ID, used in shared virtual memory
+> + * @perm: Requested permission access using by the incoming transaction
+> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+
+Stale comment
+
+> + */
+> +struct iommu_fault_unrecoverable {
+> +	__u32	reason; /* enum iommu_fault_reason */
+> +#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
+> +#define IOMMU_FAULT_UNRECOV_PERM_VALID		(1 << 1)
+
+Not needed, since @perm is already a bitfield
+
+> +#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 2)
+> +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 3)
+> +	__u32	flags;
+> +	__u32	pasid;
+> +#define IOMMU_FAULT_PERM_WRITE	(1 << 0) /* write */
+> +#define IOMMU_FAULT_PERM_EXEC	(1 << 1) /* exec */
+> +#define IOMMU_FAULT_PERM_PRIV	(1 << 2) /* priviledged */
+
+typo "privileged"
+
+> +#define IOMMU_FAULT_PERM_INST	(1 << 3) /* instruction */
+
+Could you move these outside the struct definition? They are shared with
+the other struct. And it would be less confusing, from the device driver
+point of view, to merge those with the existing IOMMU_FAULT_* defines
+(but moving them to UAPI and making them bits)
+
+> +	__u32	perm;
+> +	__u64	addr;
+> +	__u64	fetch_addr;
+> +};
+> +
+> +/*
+> + * Page Request data (aka. recoverable fault data)
+> + * @flags : encodes whether the pasid is valid and whether this
+> + * is the last page in group
+> + * @pasid: pasid
+> + * @grpid: page request group index
+> + * @perm: requested page permissions
+> + * @addr: page address
+> + */
+> +struct iommu_fault_page_request {
+> +#define IOMMU_FAULT_PAGE_REQUEST_PASID_PRESENT	(1 << 0)
+
+PASID_VALID, to be consistent with the other set of flags?
+
+> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
+> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
+> +	__u32   flags;
+> +	__u32	pasid;
+> +	__u32	grpid;
+> +	__u32	perm;
+> +	__u64	addr;
+
+Given that we'll be reporting stall faults using this struct, it would
+be good to have the fetch_addr field and flag here as well.
+
+> +	__u64	private_data[2];
+> +};
+> +
+> +/**
+> + * struct iommu_fault - Generic fault data
+> + *
+> + * @type contains fault type
+> + */
+> +
+> +struct iommu_fault {
+> +	__u32	type;   /* enum iommu_fault_type */
+> +	__u32	reserved;
+> +	union {
+> +		struct iommu_fault_unrecoverable event;
+> +		struct iommu_fault_page_request prm;
+
+What's the 'm' in "prm"? Maybe just "pr"?
 
 Thanks,
+Jean
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> +	};
+> +};
+> +#endif /* _UAPI_IOMMU_H */
+> 
