@@ -1,153 +1,243 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 00/22] SMMUv3 Nested Stage Setup
-Date: Tue, 5 Mar 2019 17:42:32 +0100
-Message-ID: <b7990ab6-e286-0aee-b15c-4a05fe4eed78@redhat.com>
+Subject: Re: [PATCH v4 05/22] iommu: Introduce cache_invalidate API
+Date: Tue, 5 Mar 2019 19:14:42 +0100
+Message-ID: <0e041735-98e8-1d8c-c866-ad23e6cc1db5@redhat.com>
 References: <20190218135504.25048-1-eric.auger@redhat.com>
+ <20190218135504.25048-6-eric.auger@redhat.com>
+ <0762b4da-aff0-4e9f-f257-e2ab294bf235@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190218135504.25048-1-eric.auger@redhat.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C4714A3BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 13:14:58 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1LXfKVlPSeur for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Mar 2019 13:14:56 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B43FA4A1DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 13:14:56 -0500 (EST)
+In-Reply-To: <0762b4da-aff0-4e9f-f257-e2ab294bf235@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Kevin, Yi,
 
-On 2/18/19 2:54 PM, Eric Auger wrote:
-> This series allows a virtualizer to program the nested stage mode.
-> This is useful when both the host and the guest are exposed with
-> an SMMUv3 and a PCI device is assigned to the guest using VFIO.
+On 3/5/19 4:28 PM, Jean-Philippe Brucker wrote:
+> On 18/02/2019 13:54, Eric Auger wrote:
+>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+>>
+>> In any virtualization use case, when the first translation stage
+>> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+>> of caching structure updates unless the guest invalidation activities
+>> are trapped by the virtualizer and passed down to the host.
+>>
+>> Since the invalidation data are obtained from user space and will be
+>> written into physical IOMMU, we must allow security check at various
+>> layers. Therefore, generic invalidation data format are proposed here,
+>> model specific IOMMU drivers need to convert them into their own format.
+>>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v3 -> v4:
+>> - full reshape of the API following Alex' comments
+>>
+>> v1 -> v2:
+>> - add arch_id field
+>> - renamed tlb_invalidate into cache_invalidate as this API allows
+>>   to invalidate context caches on top of IOTLBs
+>>
+>> v1:
+>> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+>> header. Commit message reworded.
+>> ---
+>>  drivers/iommu/iommu.c      | 14 ++++++++
+>>  include/linux/iommu.h      | 14 ++++++++
+>>  include/uapi/linux/iommu.h | 71 ++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 99 insertions(+)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index b3adb77cb14c..bcb8eb15426c 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1564,6 +1564,20 @@ void iommu_detach_pasid_table(struct iommu_domain *domain)
+>>  }
+>>  EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+>>  
+>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+>> +			   struct iommu_cache_invalidate_info *inv_info)
+>> +{
+>> +	int ret = 0;
+>> +
+>> +	if (unlikely(!domain->ops->cache_invalidate))
+>> +		return -ENODEV;
+>> +
+>> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+>> +
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+>> +
+>>  static void __iommu_detach_device(struct iommu_domain *domain,
+>>  				  struct device *dev)
+>>  {
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 7045e26f3a7d..a3b879d0753c 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -189,6 +189,7 @@ struct iommu_resv_region {
+>>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>>   * @attach_pasid_table: attach a pasid table
+>>   * @detach_pasid_table: detach the pasid table
+>> + * @cache_invalidate: invalidate translation caches
+>>   */
+>>  struct iommu_ops {
+>>  	bool (*capable)(enum iommu_cap);
+>> @@ -235,6 +236,9 @@ struct iommu_ops {
+>>  				  struct iommu_pasid_table_config *cfg);
+>>  	void (*detach_pasid_table)(struct iommu_domain *domain);
+>>  
+>> +	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
+>> +				struct iommu_cache_invalidate_info *inv_info);
+>> +
+>>  	unsigned long pgsize_bitmap;
+>>  };
+>>  
+>> @@ -348,6 +352,9 @@ extern void iommu_detach_device(struct iommu_domain *domain,
+>>  extern int iommu_attach_pasid_table(struct iommu_domain *domain,
+>>  				    struct iommu_pasid_table_config *cfg);
+>>  extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+>> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+>> +				  struct device *dev,
+>> +				  struct iommu_cache_invalidate_info *inv_info);
+>>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
+>>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>> @@ -798,6 +805,13 @@ void iommu_detach_pasid_table(struct iommu_domain *domain)
+>>  {
+>>  	return -ENODEV;
+>>  }
+>> +static inline int
+>> +iommu_cache_invalidate(struct iommu_domain *domain,
+>> +		       struct device *dev,
+>> +		       struct iommu_cache_invalidate_info *inv_info)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>>  
+>>  #endif /* CONFIG_IOMMU_API */
+>>  
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> index e9065bfa5b24..ae41385b0a7e 100644
+>> --- a/include/uapi/linux/iommu.h
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
+>>  	};
+>>  };
+>>  
+>> +/* defines the granularity of the invalidation */
+>> +enum iommu_inv_granularity {
+>> +	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
+>> +	IOMMU_INV_GRANU_PASID,	/* pasid-selective invalidation */
+>> +	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
+>> +};
+>> +
+>> +/**
+>> + * Address Selective Invalidation Structure
+>> + *
+>> + * @flags indicates the granularity of the address-selective invalidation
+>> + * - if PASID bit is set, @pasid field is populated and the invalidation
+>> + *   relates to cache entries tagged with this PASID and matching the
+>> + *   address range.
+>> + * - if ARCHID bit is set, @archid is populated and the invalidation relates
+>> + *   to cache entries tagged with this architecture specific id and matching
+>> + *   the address range.
+>> + * - Both PASID and ARCHID can be set as they may tag different caches.
+>> + * - if neither PASID or ARCHID is set, global addr invalidation applies
+>> + * - LEAF flag indicates whether only the leaf PTE caching needs to be
+>> + *   invalidated and other paging structure caches can be preserved.
+>> + * @pasid: process address space id
+>> + * @archid: architecture-specific id
+>> + * @addr: first stage/level input address
+>> + * @granule_size: page/block size of the mapping in bytes
+>> + * @nb_granules: number of contiguous granules to be invalidated
+>> + */
+>> +struct iommu_inv_addr_info {
+>> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
+>> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
+>> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
+>> +	__u32	flags;
+>> +	__u32	archid;
+>> +	__u64	pasid;
+>> +	__u64	addr;
+>> +	__u64	granule_size;
+>> +	__u64	nb_granules;
+>> +};
 > 
-> In this mode, the physical IOMMU must be programmed to translate
-> the two stages: the one set up by the guest (IOVA -> GPA) and the
-> one set up by the host VFIO driver as part of the assignment process
-> (GPA -> HPA).
-> 
-> On Intel, this is traditionnaly achieved by combining the 2 stages
-> into a single physical stage. However this relies on the capability
-> to trap on each guest translation structure update. This is possible
-> by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
-> not offer a similar mechanism.
-> 
-> However, the ARM SMMUv3 architecture supports 2 physical stages! Those
-> were devised exactly with that use case in mind. Assuming the HW
-> implements both stages (optional), the guest now can use stage 1
-> while the host uses stage 2.
-> 
-> This assumes the virtualizer has means to propagate guest settings
-> to the host SMMUv3 driver. This series brings this VFIO/IOMMU
-> infrastructure.  Those services are:
-> - bind the guest stage 1 configuration to the stream table entry
-> - propagate guest TLB invalidations
-> - bind MSI IOVAs
-> - propagate faults collected at physical level up to the virtualizer
-> 
-> This series largely reuses the user API and infrastructure originally
-> devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
-> [1-2] and Jean-Philippe [3-4].
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/linux/tree/v5.0-rc7-2stage-v4
-For those interested in testing this kernel branch, you can use the
-following qemu branch:
-
-https://github.com/eauger/qemu/tree/v3.1.0-2stage-prev3-for-patchv4-testing
-
-I will send an official QEMU RFCv3 asap.
+> Some fields don't need that many bytes, but I'm not sure it matters and
+> I'd like to see if this version works for the x86 folks before bothering
+> with such details. Looks good to me, from the SMMU perspective.
+Does it fit your needs? - Thanks Jean for your feedback -
 
 Thanks
 
 Eric
+
 > 
-> References:
-> [1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
->     Address (SVA)
->     https://lwn.net/Articles/754331/
-> [2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
->     (VFIO part)
->     https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
-> [3] [v2,00/40] Shared Virtual Addressing for the IOMMU
->     https://patchwork.ozlabs.org/cover/912129/
-> [4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
->     https://patchwork.kernel.org/cover/10608299/
+> Thanks,
+> Jean
 > 
-> History:
-> v3 -> v4:
-> - took into account Alex, jean-Philippe and Robin's comments on v3
-> - rework of the smmuv3 driver integration
-> - add tear down ops for msi binding and PASID table binding
-> - fix S1 fault propagation
-> - put fault reporting patches at the beginning of the series following
->   Jean-Philippe's request
-> - update of the cache invalidate and fault API uapis
-> - VFIO fault reporting rework with 2 separate regions and one mmappable
->   segment for the fault queue
-> - moved to PATCH
-> 
-> v2 -> v3:
-> - When registering the S1 MSI binding we now store the device handle. This
->   addresses Robin's comment about discimination of devices beonging to
->   different S1 groups and using different physical MSI doorbells.
-> - Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
->   set the eventfd and expose the faults through an mmappable fault region
-> 
-> v1 -> v2:
-> - Added the fault reporting capability
-> - asid properly passed on invalidation (fix assignment of multiple
->   devices)
-> - see individual change logs for more info
-> 
-> Eric Auger (13):
->   iommu: Introduce bind/unbind_guest_msi
->   vfio: VFIO_IOMMU_BIND/UNBIND_MSI
->   iommu/smmuv3: Get prepared for nested stage support
->   iommu/smmuv3: Implement attach/detach_pasid_table
->   iommu/smmuv3: Implement cache_invalidate
->   dma-iommu: Implement NESTED_MSI cookie
->   iommu/smmuv3: Implement bind/unbind_guest_msi
->   iommu/smmuv3: Report non recoverable faults
->   vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
->   vfio-pci: Register an iommu fault handler
->   vfio_pci: Allow to mmap the fault queue
->   vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
->   vfio: Document nested stage control
-> 
-> Jacob Pan (4):
->   driver core: add per device iommu param
->   iommu: introduce device fault data
->   iommu: introduce device fault report API
->   iommu: Introduce attach/detach_pasid_table API
-> 
-> Jean-Philippe Brucker (2):
->   iommu/arm-smmu-v3: Link domains and devices
->   iommu/arm-smmu-v3: Maintain a SID->device structure
-> 
-> Liu, Yi L (3):
->   iommu: Introduce cache_invalidate API
->   vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
->   vfio: VFIO_IOMMU_CACHE_INVALIDATE
-> 
->  Documentation/vfio.txt              |  83 ++++
->  drivers/iommu/arm-smmu-v3.c         | 580 ++++++++++++++++++++++++++--
->  drivers/iommu/dma-iommu.c           | 145 ++++++-
->  drivers/iommu/iommu.c               | 221 ++++++++++-
->  drivers/vfio/pci/vfio_pci.c         | 214 ++++++++++
->  drivers/vfio/pci/vfio_pci_intrs.c   |  19 +
->  drivers/vfio/pci/vfio_pci_private.h |  20 +
->  drivers/vfio/pci/vfio_pci_rdwr.c    |  73 ++++
->  drivers/vfio/vfio_iommu_type1.c     | 158 ++++++++
->  include/linux/device.h              |   3 +
->  include/linux/dma-iommu.h           |  18 +
->  include/linux/iommu.h               | 142 +++++++
->  include/uapi/linux/iommu.h          | 233 +++++++++++
->  include/uapi/linux/vfio.h           | 102 +++++
->  14 files changed, 1977 insertions(+), 34 deletions(-)
->  create mode 100644 include/uapi/linux/iommu.h
+>> +
+>> +/**
+>> + * First level/stage invalidation information
+>> + * @cache: bitfield that allows to select which caches to invalidate
+>> + * @granularity: defines the lowest granularity used for the invalidation:
+>> + *     domain > pasid > addr
+>> + *
+>> + * Not all the combinations of cache/granularity make sense:
+>> + *
+>> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
+>> + * granularity	|		|		|      cache	|
+>> + * -------------+---------------+---------------+---------------+
+>> + * DOMAIN	|	N/A	|       Y	|	Y	|
+>> + * PASID	|	Y	|       Y	|	Y	|
+>> + * ADDR		|       Y	|       Y	|	N/A	|
+>> + */
+>> +struct iommu_cache_invalidate_info {
+>> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+>> +	__u32	version;
+>> +/* IOMMU paging structure cache */
+>> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
+>> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
+>> +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
+>> +	__u8	cache;
+>> +	__u8	granularity;
+>> +	__u8	padding[2];
+>> +	union {
+>> +		__u64	pasid;
+>> +		struct iommu_inv_addr_info addr_info;
+>> +	};
+>> +};
+>> +
+>> +
+>>  #endif /* _UAPI_IOMMU_H */
+>>
 > 
