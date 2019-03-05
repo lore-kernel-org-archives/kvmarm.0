@@ -1,166 +1,84 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Force a PTE mapping when logging is
- enabled
-Date: Tue, 5 Mar 2019 19:09:45 +0800
-Message-ID: <865b8b0b-e42e-fe03-e3b4-ae2cc5b1b424@huawei.com>
-References: <1551497728-12576-1-git-send-email-yuzenghui@huawei.com>
- <CAKcZhuWa4UcsoFPRkZg=M3WeUJibX8T0_R+JHS3=cyd51N9cgQ@mail.gmail.com>
- <20190304171320.GA3984@en101> <32f302eb-ef89-7de4-36b4-3c3df907c732@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [kvmtool PATCH v6 6/6] arm/kvm: arm64: Add a vcpu feature for
+ pointer authentication
+Date: Tue, 5 Mar 2019 11:11:51 +0000
+Message-ID: <20190305111149.GK3567@e103592.cambridge.arm.com>
+References: <1550568271-5319-1-git-send-email-amit.kachhap@arm.com>
+ <1550568271-5319-7-git-send-email-amit.kachhap@arm.com>
+ <20190221155409.GA3567@e103592.cambridge.arm.com>
+ <048f772a-1faf-5fa3-d82c-25212a5104af@arm.com>
+ <20190301112452.GS16031@e103592.cambridge.arm.com>
+ <b21de5ed-197d-3ea7-021c-b3bca312e70c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC7A4A319
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 06:11:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7U2mjHe88Ax0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Mar 2019 06:11:34 -0500 (EST)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E36149E3E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 06:11:34 -0500 (EST)
-In-Reply-To: <32f302eb-ef89-7de4-36b4-3c3df907c732@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Zenghui Yu <zenghuiyu96@gmail.com>
-Cc: Punit Agrawal <punit.agrawal@arm.com>, LKML <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <b21de5ed-197d-3ea7-021c-b3bca312e70c@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Suzuki,
-
-On 2019/3/5 1:34, Marc Zyngier wrote:
-> Hi Zenghui, Suzuki,
+On Mon, Mar 04, 2019 at 04:38:18PM +0530, Amit Daniel Kachhap wrote:
 > 
-> On 04/03/2019 17:13, Suzuki K Poulose wrote:
->> Hi Zenghui,
->>
->> On Sun, Mar 03, 2019 at 11:14:38PM +0800, Zenghui Yu wrote:
->>> I think there're still some problems in this patch... Details below.
->>>
->>> On Sat, Mar 2, 2019 at 11:39 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->>>>
->>>> The idea behind this is: we don't want to keep tracking of huge pages when
->>>> logging_active is true, which will result in performance degradation.  We
->>>> still need to set vma_pagesize to PAGE_SIZE, so that we can make use of it
->>>> to force a PTE mapping.
->>
->> Yes, you're right. We are indeed ignoring the force_pte flag.
->>
->>>>
->>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Cc: Punit Agrawal <punit.agrawal@arm.com>
->>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>
->>>> ---
->>>> Atfer looking into https://patchwork.codeaurora.org/patch/647985/ , the
->>>> "vma_pagesize = PAGE_SIZE" logic was not intended to be deleted. As far
->>>> as I can tell, we used to have "hugetlb" to force the PTE mapping, but
->>>> we have "vma_pagesize" currently instead. We should set it properly for
->>>> performance reasons (e.g, in VM migration). Did I miss something important?
->>>>
->>>> ---
->>>>   virt/kvm/arm/mmu.c | 7 +++++++
->>>>   1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>>> index 30251e2..7d41b16 100644
->>>> --- a/virt/kvm/arm/mmu.c
->>>> +++ b/virt/kvm/arm/mmu.c
->>>> @@ -1705,6 +1705,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>               (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->>>>              !force_pte) {
->>>>                  gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->>>> +       } else {
->>>> +               /*
->>>> +                * Fallback to PTE if it's not one of the stage2
->>>> +                * supported hugepage sizes or the corresponding level
->>>> +                * doesn't exist, or logging is enabled.
->>>
->>> First, Instead of "logging is enabled", it should be "force_pte is true",
->>> since "force_pte" will be true when:
->>>
->>>          1) fault_supports_stage2_pmd_mappings() return false; or
->>>          2) "logging is enabled" (e.g, in VM migration).
->>>
->>> Second, fallback some unsupported hugepage sizes (e.g, 64K hugepage with
->>> 4K pages) to PTE is somewhat strange. And it will then _unexpectedly_
->>> reach transparent_hugepage_adjust(), though no real adjustment will happen
->>> since commit fd2ef358282c ("KVM: arm/arm64: Ensure only THP is candidate
->>> for adjustment"). Keeping "vma_pagesize" there as it is will be better,
->>> right?
->>>
->>> So I'd just simplify the logic like:
->>
->> We could fix this right in the beginning. See patch below:
->>
->>>
->>>          } else if (force_pte) {
->>>                  vma_pagesize = PAGE_SIZE;
->>>          }
->>>
->>>
->>> Will send a V2 later and waiting for your comments :)
->>
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 30251e2..529331e 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1693,7 +1693,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   		return -EFAULT;
->>   	}
->>   
->> -	vma_pagesize = vma_kernel_pagesize(vma);
->> +	/* If we are forced to map at page granularity, force the pagesize here */
->> +	vma_pagesize = force_pte ? PAGE_SIZE : vma_kernel_pagesize(vma);
->> +
->>   	/*
->>   	 * The stage2 has a minimum of 2 level table (For arm64 see
->>   	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
->> @@ -1701,11 +1703,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>   	 * As for PUD huge maps, we must make sure that we have at least
->>   	 * 3 levels, i.e, PMD is not folded.
->>   	 */
->> -	if ((vma_pagesize == PMD_SIZE ||
->> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
->> -	    !force_pte) {
->> +	if (vma_pagesize == PMD_SIZE ||
->> +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
->>   		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->> -	}
->> +
->>   	up_read(&current->mm->mmap_sem);
->>   
->>   	/* We need minimum second+third level pages */
-
-A nicer implementation and easier to understand, thanks!
-
-> That's pretty interesting, because this is almost what we already have
-> in the NV code:
+> Hi Dave,
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/tree/virt/kvm/arm/mmu.c?h=kvm-arm64/nv-wip-v5.0-rc7#n1752
-> 
-> (note that force_pte is gone in that branch).
+> On 3/1/19 4:54 PM, Dave P Martin wrote:
+> >On Fri, Mar 01, 2019 at 10:37:54AM +0000, Amit Daniel Kachhap wrote:
+> >>Hi,
+> >>
+> >>On 2/21/19 9:24 PM, Dave Martin wrote:
+> >>>On Tue, Feb 19, 2019 at 02:54:31PM +0530, Amit Daniel Kachhap wrote:
+> >
+> >[...]
+> >
+> >>>>diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>index 04be43d..2074684 100644
+> >>>>--- a/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+> >>>>@@ -8,7 +8,9 @@
+> >>>>   			"Create PMUv3 device"),				\
+> >>>>   	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+> >>>>   			"Specify random seed for Kernel Address Space "	\
+> >>>>-			"Layout Randomization (KASLR)"),
+> >>>>+			"Layout Randomization (KASLR)"),		\
+> >>>>+	OPT_BOOLEAN('\0', "ptrauth", &(cfg)->has_ptrauth,		\
+> >>>>+			"Enable address authentication"),
+> >>>
+> >>>Nit: doesn't this enable address *and* generic authentication?  The
+> >>>discussion on what capababilities and enables the ABI exposes probably
+> >>>needs to conclude before we can finalise this here.
+> >>ok.
+> >>>
+> >>>However, I would recommend that we provide a single option here that
+> >>>turns both address authentication and generic authentication on, even
+> >>>if the ABI treats them independently.  This is expected to be the common
+> >>>case by far.
+> >>ok
+> >>>
+> >>>We can always add more fine-grained options later if it turns out to be
+> >>>necessary.
+> >>Mark suggested to provide 2 flags [1] for Address and Generic
+> >>authentication so I was thinking of adding 2 features like,
+> >>
+> >>+#define KVM_ARM_VCPU_PTRAUTH_ADDR		4 /* CPU uses pointer address
+> >>authentication */
+> >>+#define KVM_ARM_VCPU_PTRAUTH_GENERIC		5 /* CPU uses pointer generic
+> >>authentication */
+> >>
+> >>And supply both of them concatenated in VCPU_INIT stage. Kernel KVM
+> >>would expect both feature requested together.
+> >
+> >Seems reasonable.  Do you mean the kernel would treat it as an error if
+> >only one of these flags is passed to KVM_ARM_VCPU_INIT, or would KVM
+> >simply treat them as independent?
+> If both flags are passed together then only start using ptrauth otherwise
+> keep ptrauth disabled. This is just to finalize the user side abi as of now
+> and KVM can be updated later.
 
-haha :-) sorry about that. I haven't looked into the NV code yet, so ...
+If just flag is passed, I think KVM_ARM_VCPU_INIT should just fail.
+Otherwise we risk userspace becoming accidentally reliant on behaviour
+that may change in the future.
 
-But I'm still wondering: should we fix this wrong mapping size problem 
-before NV is introduced? Since this problem has not much to do with NV, 
-and 5.0 has already been released with this problem (and 5.1 will 
-without fix ...).
-
-Just a personal idea, ignore it if unnecessary.
-
-
-thanks,
-
-zenghui
+Cheers
+---Dave
