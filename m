@@ -1,68 +1,53 @@
-From: Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH] KVM: arm: VGIC: properly initialise private IRQ affinity
-Date: Wed, 6 Mar 2019 12:42:21 +0100
-Message-ID: <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
+Date: Wed, 6 Mar 2019 11:51:32 +0000
+Message-ID: <3f7da1ae-817d-a9fa-8e4b-d4b29ba9b873@arm.com>
 References: <20190306104008.69414-1-andre.przywara@arm.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+ <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20190306104008.69414-1-andre.przywara@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E90584A486
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 06:51:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zKWDWyLRxOqT for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Mar 2019 06:51:35 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE9434A409
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 06:51:35 -0500 (EST)
+In-Reply-To: <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christophe de Dinechin <christophe.de.dinechin@gmail.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Cgo+IE9uIDYgTWFyIDIwMTksIGF0IDExOjQwLCBBbmRyZSBQcnp5d2FyYSA8YW5kcmUucHJ6eXdh
-cmFAYXJtLmNvbT4gd3JvdGU6Cj4gCj4gQXQgdGhlIG1vbWVudCB3ZSBpbml0aWFsaXNlIHRoZSB0
-YXJnZXQgKm1hc2sqIG9mIGEgdmlydHVhbCBJUlEgdG8gdGhlCj4gVkNQVSBpdCBiZWxvbmdzIHRv
-LCBldmVuIHRob3VnaCB0aGlzIG1hc2sgaXMgb25seSBkZWZpbmVkIGZvciBHSUN2MiBhbmQKPiBx
-dWlja2x5IHJ1bnMgb3V0IG9mIGJpdHMgZm9yIG1hbnkgR0lDdjMgZ3Vlc3RzLgoKSnVzdCBmb3Ig
-bXkgZWR1Y2F0aW9uLCDigJx0YXJnZXRz4oCdIHNlZW1zIGRlZmluZWQgYXMgYW4gdTgsCnNvIGl0
-IGxvb2tzIGxpa2UgeW91IHdlcmUgc2lsZW50bHkgcnVubmluZyBvdXQgb2YgYml0cyBiZWZvcmUs
-IG5vPwoKPiBUaGlzIGJlaGF2aW91ciB0cmlnZ2VycyBhbiBVQlNBTiBjb21wbGFpbnQgZm9yIG1v
-cmUgdGhhbiAzMiBWQ1BVczoKPiAtLS0tLS0KPiBbIDU2NTkuNDYyMzc3XSBVQlNBTjogVW5kZWZp
-bmVkIGJlaGF2aW91ciBpbiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYzoyMjM6MjEKPiBb
-IDU2NTkuNDcxNjg5XSBzaGlmdCBleHBvbmVudCAzMiBpcyB0b28gbGFyZ2UgZm9yIDMyLWJpdCB0
-eXBlICd1bnNpZ25lZCBpbnQnCj4gLS0tLS0tCj4gQWxzbyBmb3IgR0lDdjMgZ3Vlc3RzIHRoZSBy
-ZXBvcnRpbmcgb2YgVEFSR0VUIGluIHRoZSAidmdpYy1zdGF0ZSIgZGVidWdmcwo+IGR1bXAgaXMg
-d3JvbmcsIGR1ZSB0byB0aGlzIHZlcnkgc2FtZSBwcm9ibGVtLgo+IAo+IEZpeCBib3RoIGlzc3Vl
-cyBieSBvbmx5IGluaXRpYWxpc2luZyB2Z2ljX2lycS0+dGFyZ2V0cyBmb3IgYSB2R0lDdjIgZ3Vl
-c3QsCj4gYW5kIGJ5IGluaXRpYWxpc2luZyB2Z2ljX2lycS0+bXBkaXIgZm9yIHZHSUN2MyBndWVz
-dHMgaW5zdGVhZC4gV2UgY2FuJ3QKPiB1c2UgdGhlIGFjdHVhbCBNUElEUiBmb3IgdGhhdCwgYXMg
-dGhlIFZDUFUncyBzeXN0ZW0gcmVnaXN0ZXIgaXMgbm90Cj4gaW5pdGlhbGlzZWQgYXQgdGhpcyBw
-b2ludCB5ZXQuIFRoaXMgaXMgbm90IHJlYWxseSBhbiBpc3N1ZSwgYXMgLT5tcGlkcgo+IGlzIGp1
-c3QgdXNlZCBmb3IgdGhlIGRlYnVnZnMgb3V0cHV0IGFuZCB0aGUgSVJPVVRFUiBNTUlPIHJlZ2lz
-dGVyLCB3aGljaAo+IGRvZXMgbm90IGV4aXN0IGluIHJlZGlzdHJpYnV0b3JzIChkZWFsaW5nIHdp
-dGggU0dJcyBhbmQgUFBJcykuCj4gCj4gU2lnbmVkLW9mZi1ieTogQW5kcmUgUHJ6eXdhcmEgPGFu
-ZHJlLnByenl3YXJhQGFybS5jb20+Cj4gUmVwb3J0ZWQtYnk6IERhdmUgTWFydGluIDxkYXZlLm1h
-cnRpbkBhcm0uY29tPgo+IC0tLQo+IHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaW5pdC5jIHwgOSAr
-KysrKystLS0KPiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygt
-KQo+IAo+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYyBiL3ZpcnQv
-a3ZtL2FybS92Z2ljL3ZnaWMtaW5pdC5jCj4gaW5kZXggM2JkYjMxZWFlZDY0Li4zMTcyYjJjOTE2
-ZjEgMTAwNjQ0Cj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMKPiArKysgYi92
-aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYwo+IEBAIC0yMjAsNyArMjIwLDYgQEAgaW50IGt2
-bV92Z2ljX3ZjcHVfaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gCQlpcnEtPmludGlkID0g
-aTsKPiAJCWlycS0+dmNwdSA9IE5VTEw7Cj4gCQlpcnEtPnRhcmdldF92Y3B1ID0gdmNwdTsKPiAt
-CQlpcnEtPnRhcmdldHMgPSAxVSA8PCB2Y3B1LT52Y3B1X2lkOwo+IAkJa3JlZl9pbml0KCZpcnEt
-PnJlZmNvdW50KTsKPiAJCWlmICh2Z2ljX2lycV9pc19zZ2koaSkpIHsKPiAJCQkvKiBTR0lzICov
-Cj4gQEAgLTIzMSwxMCArMjMwLDE0IEBAIGludCBrdm1fdmdpY192Y3B1X2luaXQoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQo+IAkJCWlycS0+Y29uZmlnID0gVkdJQ19DT05GSUdfTEVWRUw7Cj4gCQl9
-Cj4gCj4gLQkJaWYgKGRpc3QtPnZnaWNfbW9kZWwgPT0gS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1Yz
-KQo+ICsJCWlmIChkaXN0LT52Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykg
-ewo+IAkJCWlycS0+Z3JvdXAgPSAxOwo+IC0JCWVsc2UKPiArCQkJLyogVGhlIGFjdHVhbCBNUElE
-UiBpcyBub3QgaW5pdGlhbGlzZWQgYXQgdGhpcyBwb2ludC4gKi8KPiArCQkJaXJxLT5tcGlkciA9
-IDA7Cj4gKwkJfSBlbHNlIHsKPiAJCQlpcnEtPmdyb3VwID0gMDsKPiArCQkJaXJxLT50YXJnZXRz
-ID0gMVUgPDwgdmNwdS0+dmNwdV9pZDsKPiArCQl9Cj4gCX0KPiAKPiAJaWYgKCFpcnFjaGlwX2lu
-X2tlcm5lbCh2Y3B1LT5rdm0pKQo+IC0tIAo+IDIuMTcuMQo+IAoKCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBs
-aXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5m
-cmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
+T24gMDYvMDMvMjAxOSAxMTo0MiwgQ2hyaXN0b3BoZSBkZSBEaW5lY2hpbiB3cm90ZToKPiAKPiAK
+Pj4gT24gNiBNYXIgMjAxOSwgYXQgMTE6NDAsIEFuZHJlIFByenl3YXJhIDxhbmRyZS5wcnp5d2Fy
+YUBhcm0uY29tPiB3cm90ZToKPj4KPj4gQXQgdGhlIG1vbWVudCB3ZSBpbml0aWFsaXNlIHRoZSB0
+YXJnZXQgKm1hc2sqIG9mIGEgdmlydHVhbCBJUlEgdG8gdGhlCj4+IFZDUFUgaXQgYmVsb25ncyB0
+bywgZXZlbiB0aG91Z2ggdGhpcyBtYXNrIGlzIG9ubHkgZGVmaW5lZCBmb3IgR0lDdjIgYW5kCj4+
+IHF1aWNrbHkgcnVucyBvdXQgb2YgYml0cyBmb3IgbWFueSBHSUN2MyBndWVzdHMuCj4gCj4gSnVz
+dCBmb3IgbXkgZWR1Y2F0aW9uLCDigJx0YXJnZXRz4oCdIHNlZW1zIGRlZmluZWQgYXMgYW4gdTgs
+Cj4gc28gaXQgbG9va3MgbGlrZSB5b3Ugd2VyZSBzaWxlbnRseSBydW5uaW5nIG91dCBvZiBiaXRz
+IGJlZm9yZSwgbm8/CgpZZXMgYW5kIG5vLiBGb3IgYSBHSUN2MyBndWVzdCwgdGhpcyBmaWVsZCBp
+cyBuZXZlciBldmFsdWF0ZWQgYXMgYSB1OCwKYnV0IGFzIHRoZSB1MzIgaXQgaXMgYXNzb2NpYXRl
+ZCB3aXRoIChzZWUgYXJtX3ZnaWMuaCkuIFBhc3QgdGhlIDh0aAp2Y3B1LCB3ZSdkIGluZGVlZCBl
+bmQtdXAgc2V0dGluZyB0aGlzIGZpZWxkIHRvIHplcm8uCgpCdXQgUFBJcyBhcmUgcGVyIENQVSBh
+bnl3YXksIGFuZCB3ZSBuZXZlciBldmFsdWF0ZSB0aGUgbXBpZHIgZmllbGQgZm9yCnRob3NlLiBT
+byB5ZXMsIHN0dXBpZCBidWcsIGJ1dCBhIGZhaXJseSBoYXJtbGVzcyBvbmUuCgpUaGFua3MsCgoJ
+TS4KLS0gCkphenogaXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
+c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
+LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
