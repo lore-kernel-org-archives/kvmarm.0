@@ -1,94 +1,115 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH] KVM: arm: VGIC: properly initialise private IRQ affinity
-Date: Wed, 6 Mar 2019 11:52:32 +0000
-Message-ID: <20190306115232.50e4d6bd@donnerap.cambridge.arm.com>
-References: <20190306104008.69414-1-andre.przywara@arm.com>
- <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v4 02/22] iommu: introduce device fault data
+Date: Wed, 6 Mar 2019 12:08:03 +0000
+Message-ID: <27abc9b6-f914-8f69-a232-c3345563277c@arm.com>
+References: <20190218135504.25048-1-eric.auger@redhat.com>
+ <20190218135504.25048-3-eric.auger@redhat.com>
+ <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
+ <43c5c3be-a609-62e1-efaa-c5571bb762c6@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 593CE4A489
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 06:52:38 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fRVxe5bcTsOD for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Mar 2019 06:52:37 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 185BD4A488
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 06:52:37 -0500 (EST)
-In-Reply-To: <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <43c5c3be-a609-62e1-efaa-c5571bb762c6@redhat.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, Christoffer Dall <Christoffer.Dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCA2IE1hciAyMDE5IDEyOjQyOjIxICswMTAwCkNocmlzdG9waGUgZGUgRGluZWNoaW4g
-PGNocmlzdG9waGUuZGUuZGluZWNoaW5AZ21haWwuY29tPiB3cm90ZToKCj4gPiBPbiA2IE1hciAy
-MDE5LCBhdCAxMTo0MCwgQW5kcmUgUHJ6eXdhcmEgPGFuZHJlLnByenl3YXJhQGFybS5jb20+IHdy
-b3RlOgo+ID4gCj4gPiBBdCB0aGUgbW9tZW50IHdlIGluaXRpYWxpc2UgdGhlIHRhcmdldCAqbWFz
-ayogb2YgYSB2aXJ0dWFsIElSUSB0byB0aGUKPiA+IFZDUFUgaXQgYmVsb25ncyB0bywgZXZlbiB0
-aG91Z2ggdGhpcyBtYXNrIGlzIG9ubHkgZGVmaW5lZCBmb3IgR0lDdjIgYW5kCj4gPiBxdWlja2x5
-IHJ1bnMgb3V0IG9mIGJpdHMgZm9yIG1hbnkgR0lDdjMgZ3Vlc3RzLiAgCj4gCj4gSnVzdCBmb3Ig
-bXkgZWR1Y2F0aW9uLCDigJx0YXJnZXRz4oCdIHNlZW1zIGRlZmluZWQgYXMgYW4gdTgsCj4gc28g
-aXQgbG9va3MgbGlrZSB5b3Ugd2VyZSBzaWxlbnRseSBydW5uaW5nIG91dCBvZiBiaXRzIGJlZm9y
-ZSwgbm8/CgpZZXMsIGJ1dCBVQlNBTiBvbmx5IGNvbXBsYWluZWQgYWJvdXQgdGhlIHNoaWZ0ID49
-MzIuCklmIHlvdSBsb29rIGF0IC9zeXMva2VybmVsL2RlYnVnL2t2bS88cGlkLXZjcHVzPi92Z2lj
-LXN0YXRlLCB5b3Ugd2lsbCBzZWUKdGhhdCB0aGUgdGFyZ2V0cyBtYXNrIGZvciBhIFZDUFUgSUQg
-PiA3IGlzIHJlcHJlc2VudGVkIGFzIDAgZHVlIHRvIHRoZSB1OAp0eXBlOgpWQ1BVICAwOiAgMQpW
-Q1BVICAxOiAgMgpWQ1BVICAyOiAgNApWQ1BVICAzOiAgOApWQ1BVICA0OiAxMApWQ1BVICA1OiAy
-MApWQ1BVICA2OiA0MApWQ1BVICA3OiA4MApWQ1BVICA4OiAgMApWQ1BVICA5OiAgMApWQ1BVIDEw
-OiAgMAouLi4KVkNQVSAzMjogIDAKVkNQVSAzMzogIDEKVkNQVSAzNDogIDIKClNvIHRoaXMgaXMg
-cXVpdGUgYm9ndXMgYXQgdGhlIG1vbWVudC4gVGhpcyBwYXRjaCBzaG91bGQgZml4IHRoZSBVQlNB
-TgpzcGxhdCBhbmQgYXQgbGVhc3QgYXZvaWRzIHRoZSB3ZWlyZCByZXByZXNlbnRhdGlvbiwgYnkg
-bWFraW5nIHRhcmdldCAiMCIKZm9yIGFsbCBwcml2YXRlIElSUXMgb24gYSB2R0lDdjMuIE5vdCBz
-dXJlIGlmIHRoZXJlIGlzIGFuIGVhc3kgd2F5IHRvIHB1dAppbiB0aGUgYWN0dWFsIHZpcnR1YWwg
-TVBJRFIgdGhlcmUuCgpDaGVlcnMsCkFuZHJlLgoKPiA+IFRoaXMgYmVoYXZpb3VyIHRyaWdnZXJz
-IGFuIFVCU0FOIGNvbXBsYWludCBmb3IgbW9yZSB0aGFuIDMyIFZDUFVzOgo+ID4gLS0tLS0tCj4g
-PiBbIDU2NTkuNDYyMzc3XSBVQlNBTjogVW5kZWZpbmVkIGJlaGF2aW91ciBpbiB2aXJ0L2t2bS9h
-cm0vdmdpYy92Z2ljLWluaXQuYzoyMjM6MjEKPiA+IFsgNTY1OS40NzE2ODldIHNoaWZ0IGV4cG9u
-ZW50IDMyIGlzIHRvbyBsYXJnZSBmb3IgMzItYml0IHR5cGUgJ3Vuc2lnbmVkIGludCcKPiA+IC0t
-LS0tLQo+ID4gQWxzbyBmb3IgR0lDdjMgZ3Vlc3RzIHRoZSByZXBvcnRpbmcgb2YgVEFSR0VUIGlu
-IHRoZSAidmdpYy1zdGF0ZSIgZGVidWdmcwo+ID4gZHVtcCBpcyB3cm9uZywgZHVlIHRvIHRoaXMg
-dmVyeSBzYW1lIHByb2JsZW0uCj4gPiAKPiA+IEZpeCBib3RoIGlzc3VlcyBieSBvbmx5IGluaXRp
-YWxpc2luZyB2Z2ljX2lycS0+dGFyZ2V0cyBmb3IgYSB2R0lDdjIgZ3Vlc3QsCj4gPiBhbmQgYnkg
-aW5pdGlhbGlzaW5nIHZnaWNfaXJxLT5tcGRpciBmb3IgdkdJQ3YzIGd1ZXN0cyBpbnN0ZWFkLiBX
-ZSBjYW4ndAo+ID4gdXNlIHRoZSBhY3R1YWwgTVBJRFIgZm9yIHRoYXQsIGFzIHRoZSBWQ1BVJ3Mg
-c3lzdGVtIHJlZ2lzdGVyIGlzIG5vdAo+ID4gaW5pdGlhbGlzZWQgYXQgdGhpcyBwb2ludCB5ZXQu
-IFRoaXMgaXMgbm90IHJlYWxseSBhbiBpc3N1ZSwgYXMgLT5tcGlkcgo+ID4gaXMganVzdCB1c2Vk
-IGZvciB0aGUgZGVidWdmcyBvdXRwdXQgYW5kIHRoZSBJUk9VVEVSIE1NSU8gcmVnaXN0ZXIsIHdo
-aWNoCj4gPiBkb2VzIG5vdCBleGlzdCBpbiByZWRpc3RyaWJ1dG9ycyAoZGVhbGluZyB3aXRoIFNH
-SXMgYW5kIFBQSXMpLgo+ID4gCj4gPiBTaWduZWQtb2ZmLWJ5OiBBbmRyZSBQcnp5d2FyYSA8YW5k
-cmUucHJ6eXdhcmFAYXJtLmNvbT4KPiA+IFJlcG9ydGVkLWJ5OiBEYXZlIE1hcnRpbiA8ZGF2ZS5t
-YXJ0aW5AYXJtLmNvbT4KPiA+IC0tLQo+ID4gdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMg
-fCA5ICsrKysrKy0tLQo+ID4gMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaW5p
-dC5jIGIvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMKPiA+IGluZGV4IDNiZGIzMWVhZWQ2
-NC4uMzE3MmIyYzkxNmYxIDEwMDY0NAo+ID4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1p
-bml0LmMKPiA+ICsrKyBiL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaW5pdC5jCj4gPiBAQCAtMjIw
-LDcgKzIyMCw2IEBAIGludCBrdm1fdmdpY192Y3B1X2luaXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-KQo+ID4gCQlpcnEtPmludGlkID0gaTsKPiA+IAkJaXJxLT52Y3B1ID0gTlVMTDsKPiA+IAkJaXJx
-LT50YXJnZXRfdmNwdSA9IHZjcHU7Cj4gPiAtCQlpcnEtPnRhcmdldHMgPSAxVSA8PCB2Y3B1LT52
-Y3B1X2lkOwo+ID4gCQlrcmVmX2luaXQoJmlycS0+cmVmY291bnQpOwo+ID4gCQlpZiAodmdpY19p
-cnFfaXNfc2dpKGkpKSB7Cj4gPiAJCQkvKiBTR0lzICovCj4gPiBAQCAtMjMxLDEwICsyMzAsMTQg
-QEAgaW50IGt2bV92Z2ljX3ZjcHVfaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gPiAJCQlp
-cnEtPmNvbmZpZyA9IFZHSUNfQ09ORklHX0xFVkVMOwo+ID4gCQl9Cj4gPiAKPiA+IC0JCWlmIChk
-aXN0LT52Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykKPiA+ICsJCWlmIChk
-aXN0LT52Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykgewo+ID4gCQkJaXJx
-LT5ncm91cCA9IDE7Cj4gPiAtCQllbHNlCj4gPiArCQkJLyogVGhlIGFjdHVhbCBNUElEUiBpcyBu
-b3QgaW5pdGlhbGlzZWQgYXQgdGhpcyBwb2ludC4gKi8KPiA+ICsJCQlpcnEtPm1waWRyID0gMDsK
-PiA+ICsJCX0gZWxzZSB7Cj4gPiAJCQlpcnEtPmdyb3VwID0gMDsKPiA+ICsJCQlpcnEtPnRhcmdl
-dHMgPSAxVSA8PCB2Y3B1LT52Y3B1X2lkOwo+ID4gKwkJfQo+ID4gCX0KPiA+IAo+ID4gCWlmICgh
-aXJxY2hpcF9pbl9rZXJuZWwodmNwdS0+a3ZtKSkKPiA+IC0tIAo+ID4gMi4xNy4xCj4gPiAgIAo+
-IAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
-IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On 06/03/2019 09:38, Auger Eric wrote:
+>>> +struct iommu_fault_unrecoverable {
+>>> +    __u32   reason; /* enum iommu_fault_reason */
+>>> +#define IOMMU_FAULT_UNRECOV_PASID_VALID             (1 << 0)
+>>> +#define IOMMU_FAULT_UNRECOV_PERM_VALID              (1 << 1)
+>> 
+>> Not needed, since @perm is already a bitfield
+> not exactly, READ is encoded as 0. We need to differentiate read fault
+> from no perm provided. However if I follow your recommendation below and
+> transform the READ FAULT into a set bit this makes sense.
+
+Ah yes, seeing four defines I assumed read was in there. No need for
+INST I think, it's already described by EXEC
+
+>>> +#define IOMMU_FAULT_UNRECOV_ADDR_VALID              (1 << 2)
+>>> +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID        (1 << 3)
+>>> +    __u32   flags;
+>>> +    __u32   pasid;
+>>> +#define IOMMU_FAULT_PERM_WRITE      (1 << 0) /* write */
+>>> +#define IOMMU_FAULT_PERM_EXEC       (1 << 1) /* exec */
+>>> +#define IOMMU_FAULT_PERM_PRIV       (1 << 2) /* priviledged */
+>> 
+>> typo "privileged"
+> OK
+>> 
+>>> +#define IOMMU_FAULT_PERM_INST       (1 << 3) /* instruction */
+>> 
+>> Could you move these outside the struct definition? They are shared with
+>> the other struct. And it would be less confusing, from the device driver
+>> point of view, to merge those with the existing IOMMU_FAULT_* defines
+>> (but moving them to UAPI and making them bits)
+> ok I will look at this. Need to check if the read fault value is not
+> hardcoded anywhere.
+
+Oh right, looks like a couple of IOMMU drivers do. Hard to say if they
+mean READ or just "don't care", at first glance. I guess we can keep the
+FAULT_PERM variant until we actually unify the fault reporting API (not
+overly complicated since there are three users. I have patches for that
+buried somewhere)
+
+>> 
+>>> +    __u32   perm;
+>>> +    __u64   addr;
+>>> +    __u64   fetch_addr;
+>>> +};
+>>> +
+>>> +/*
+>>> + * Page Request data (aka. recoverable fault data)
+>>> + * @flags : encodes whether the pasid is valid and whether this
+>>> + * is the last page in group
+>>> + * @pasid: pasid
+>>> + * @grpid: page request group index
+>>> + * @perm: requested page permissions
+>>> + * @addr: page address
+>>> + */
+>>> +struct iommu_fault_page_request {
+>>> +#define IOMMU_FAULT_PAGE_REQUEST_PASID_PRESENT      (1 << 0)
+>> 
+>> PASID_VALID, to be consistent with the other set of flags?
+> OK
+>> 
+>>> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE  (1 << 1)
+>>> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA  (1 << 2)
+>>> +    __u32   flags;
+>>> +    __u32   pasid;
+>>> +    __u32   grpid;
+>>> +    __u32   perm;
+>>> +    __u64   addr;
+>> 
+>> Given that we'll be reporting stall faults using this struct, it would
+>> be good to have the fetch_addr field and flag here as well.
+> OK
+>> 
+>>> +    __u64   private_data[2];
+>>> +};
+>>> +
+>>> +/**
+>>> + * struct iommu_fault - Generic fault data
+>>> + *
+>>> + * @type contains fault type
+>>> + */
+>>> +
+>>> +struct iommu_fault {
+>>> +    __u32   type;   /* enum iommu_fault_type */
+>>> +    __u32   reserved;
+>>> +    union {
+>>> +            struct iommu_fault_unrecoverable event;
+>>> +            struct iommu_fault_page_request prm;
+>> 
+>> What's the 'm' in "prm"? Maybe just "pr"?
+> This stands for page request message, I think this is the Intel's naming?
+
+Looks like it's the PCI naming, let's stick with it then
+
+Thanks,
+Jean
