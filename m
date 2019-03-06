@@ -1,309 +1,68 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 02/22] iommu: introduce device fault data
-Date: Wed, 6 Mar 2019 12:03:50 +0100
-Message-ID: <c97b6fdd-e987-a9dc-536a-24f68a50dd14@redhat.com>
-References: <20190218135504.25048-1-eric.auger@redhat.com>
- <20190218135504.25048-3-eric.auger@redhat.com>
- <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
+From: Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+Subject: Re: [PATCH] KVM: arm: VGIC: properly initialise private IRQ affinity
+Date: Wed, 6 Mar 2019 12:42:21 +0100
+Message-ID: <6382036B-1901-4437-AB57-AC5DE0146377@dinechin.org>
+References: <20190306104008.69414-1-andre.przywara@arm.com>
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190306104008.69414-1-andre.przywara@arm.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, Dave Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
-
-On 3/5/19 3:56 PM, Jean-Philippe Brucker wrote:
-> On 18/02/2019 13:54, Eric Auger wrote:
->> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>
->> Device faults detected by IOMMU can be reported outside the IOMMU
->> subsystem for further processing. This patch introduces
->> a generic device fault data structure.
->>
->> The fault can be either an unrecoverable fault or a page request,
->> also referred to as a recoverable fault.
->>
->> We only care about non internal faults that are likely to be reported
->> to an external subsystem.
->>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v3 -> v4:
->> - use a union containing aither an unrecoverable fault or a page
->>   request message. Move the device private data in the page request
->>   structure. Reshuffle the fields and use flags.
->> - move fault perm attributes to the uapi
->> - remove a bunch of iommu_fault_reason enum values that were related
->>   to internal errors
->> ---
->>  include/linux/iommu.h      |  47 +++++++++++++++
->>  include/uapi/linux/iommu.h | 115 +++++++++++++++++++++++++++++++++++++
->>  2 files changed, 162 insertions(+)
->>  create mode 100644 include/uapi/linux/iommu.h
->>
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index e90da6b6f3d1..032d33894723 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -25,6 +25,7 @@
->>  #include <linux/errno.h>
->>  #include <linux/err.h>
->>  #include <linux/of.h>
->> +#include <uapi/linux/iommu.h>
->>  
->>  #define IOMMU_READ	(1 << 0)
->>  #define IOMMU_WRITE	(1 << 1)
->> @@ -48,6 +49,7 @@ struct bus_type;
->>  struct device;
->>  struct iommu_domain;
->>  struct notifier_block;
->> +struct iommu_fault_event;
->>  
->>  /* iommu fault flags */
->>  #define IOMMU_FAULT_READ	0x0
->> @@ -55,6 +57,7 @@ struct notifier_block;
->>  
->>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
->>  			struct device *, unsigned long, int, void *);
->> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *, void *);
->>  
->>  struct iommu_domain_geometry {
->>  	dma_addr_t aperture_start; /* First address that can be mapped    */
->> @@ -243,6 +246,49 @@ struct iommu_device {
->>  	struct device *dev;
->>  };
->>  
->> +/**
->> + * struct iommu_fault_event - Generic per device fault data
->> + *
->> + * - PCI and non-PCI devices
->> + * - Recoverable faults (e.g. page request), information based on PCI ATS
->> + *   and PASID spec.
-> 
-> "for example information based on PCI PRI and PASID extensions"? ATS+PRI
-> have been integrated into the main spec, and only PRI is relevant here.
-> 
->> + * - Un-recoverable faults of device interest
-> 
-> "of interest to device drivers"?
-> 
->> + * - DMA remapping and IRQ remapping faults
->> + *
->> + * @fault: fault descriptor
->> + * @iommu_private: used by the IOMMU driver for storing fault-specific
->> + *                 data. Users should not modify this field before
->> + *                 sending the fault response.
->> + */
->> +struct iommu_fault_event {
->> +	struct iommu_fault fault;
->> +	u64 iommu_private;
->> +};
->> +
->> +/**
->> + * struct iommu_fault_param - per-device IOMMU fault data
->> + * @dev_fault_handler: Callback function to handle IOMMU faults at device level
->> + * @data: handler private data
->> + *
->> + */
->> +struct iommu_fault_param {
->> +	iommu_dev_fault_handler_t handler;
->> +	void *data;
->> +};
->> +
->> +/**
->> + * struct iommu_param - collection of per-device IOMMU data
->> + *
->> + * @fault_param: IOMMU detected device fault reporting data
->> + *
->> + * TODO: migrate other per device data pointers under iommu_dev_data, e.g.
->> + *	struct iommu_group	*iommu_group;
->> + *	struct iommu_fwspec	*iommu_fwspec;
->> + */
->> +struct iommu_param {
->> +	struct iommu_fault_param *fault_param;
->> +};
->> +
->>  int  iommu_device_register(struct iommu_device *iommu);
->>  void iommu_device_unregister(struct iommu_device *iommu);
->>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
->> @@ -418,6 +464,7 @@ struct iommu_ops {};
->>  struct iommu_group {};
->>  struct iommu_fwspec {};
->>  struct iommu_device {};
->> +struct iommu_fault_param {};
->>  
->>  static inline bool iommu_present(struct bus_type *bus)
->>  {
->> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->> new file mode 100644
->> index 000000000000..7ebf23ed6ccb
->> --- /dev/null
->> +++ b/include/uapi/linux/iommu.h
->> @@ -0,0 +1,115 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/*
->> + * IOMMU user API definitions
->> + */
->> +
->> +#ifndef _UAPI_IOMMU_H
->> +#define _UAPI_IOMMU_H
->> +
->> +#include <linux/types.h>
->> +
->> +/*  Generic fault types, can be expanded IRQ remapping fault */
->> +enum iommu_fault_type {
->> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
->> +	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
->> +};
->> +
->> +enum iommu_fault_reason {
->> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
->> +
->> +	/* Could not access the PASID table (fetch caused external abort) */
->> +	IOMMU_FAULT_REASON_PASID_FETCH,
->> +
->> +	/* pasid entry is invalid or has configuration errors */
->> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
->> +
->> +	/*
->> +	 * PASID is out of range (e.g. exceeds the maximum PASID
->> +	 * supported by the IOMMU) or disabled.
->> +	 */
->> +	IOMMU_FAULT_REASON_PASID_INVALID,
->> +
->> +	/*
->> +	 * An external abort occurred fetching (or updating) a translation
->> +	 * table descriptor
->> +	 */
->> +	IOMMU_FAULT_REASON_WALK_EABT,
->> +
->> +	/*
->> +	 * Could not access the page table entry (Bad address),
->> +	 * actual translation fault
->> +	 */
->> +	IOMMU_FAULT_REASON_PTE_FETCH,
->> +
->> +	/* Protection flag check failed */
->> +	IOMMU_FAULT_REASON_PERMISSION,
->> +
->> +	/* access flag check failed */
->> +	IOMMU_FAULT_REASON_ACCESS,
->> +
->> +	/* Output address of a translation stage caused Address Size fault */
->> +	IOMMU_FAULT_REASON_OOR_ADDRESS,
->> +};
->> +
->> +/**
->> + * Unrecoverable fault data
->> + * @reason: reason of the fault
->> + * @addr: offending page address
->> + * @fetch_addr: address that caused a fetch abort, if any
->> + * @pasid: contains process address space ID, used in shared virtual memory
->> + * @perm: Requested permission access using by the incoming transaction
->> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
-> 
-> Stale comment
-> 
->> + */
->> +struct iommu_fault_unrecoverable {
->> +	__u32	reason; /* enum iommu_fault_reason */
->> +#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
->> +#define IOMMU_FAULT_UNRECOV_PERM_VALID		(1 << 1)
-> 
-> Not needed, since @perm is already a bitfield
-> 
->> +#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 2)
->> +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 3)
->> +	__u32	flags;
->> +	__u32	pasid;
->> +#define IOMMU_FAULT_PERM_WRITE	(1 << 0) /* write */
->> +#define IOMMU_FAULT_PERM_EXEC	(1 << 1) /* exec */
->> +#define IOMMU_FAULT_PERM_PRIV	(1 << 2) /* priviledged */
-> 
-> typo "privileged"
-> 
->> +#define IOMMU_FAULT_PERM_INST	(1 << 3) /* instruction */
-> 
-> Could you move these outside the struct definition? They are shared with
-> the other struct. And it would be less confusing, from the device driver
-> point of view, to merge those with the existing IOMMU_FAULT_* defines
-> (but moving them to UAPI and making them bits)
-Eventually I have a mixed opinion about this. Changing the existing flag
-value impacts several iommu driver and handlers in different subsystems
-(0 hardcoded value is used, flags values are exposed in existing error
-logs). Also above flags are permission flags and nothing prevents from
-extending report_iommu_fault flag values with values that do not relate
-to perm.
-
-Thanks
-
-Eric
-> 
->> +	__u32	perm;
->> +	__u64	addr;
->> +	__u64	fetch_addr;
->> +};
->> +
->> +/*
->> + * Page Request data (aka. recoverable fault data)
->> + * @flags : encodes whether the pasid is valid and whether this
->> + * is the last page in group
->> + * @pasid: pasid
->> + * @grpid: page request group index
->> + * @perm: requested page permissions
->> + * @addr: page address
->> + */
->> +struct iommu_fault_page_request {
->> +#define IOMMU_FAULT_PAGE_REQUEST_PASID_PRESENT	(1 << 0)
-> 
-> PASID_VALID, to be consistent with the other set of flags?
-> 
->> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
->> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
->> +	__u32   flags;
->> +	__u32	pasid;
->> +	__u32	grpid;
->> +	__u32	perm;
->> +	__u64	addr;
-> 
-> Given that we'll be reporting stall faults using this struct, it would
-> be good to have the fetch_addr field and flag here as well.
-> 
->> +	__u64	private_data[2];
->> +};
->> +
->> +/**
->> + * struct iommu_fault - Generic fault data
->> + *
->> + * @type contains fault type
->> + */
->> +
->> +struct iommu_fault {
->> +	__u32	type;   /* enum iommu_fault_type */
->> +	__u32	reserved;
->> +	union {
->> +		struct iommu_fault_unrecoverable event;
->> +		struct iommu_fault_page_request prm;
-> 
-> What's the 'm' in "prm"? Maybe just "pr"?
-> 
-> Thanks,
-> Jean
-> 
->> +	};
->> +};
->> +#endif /* _UAPI_IOMMU_H */
->>
-> 
+Cgo+IE9uIDYgTWFyIDIwMTksIGF0IDExOjQwLCBBbmRyZSBQcnp5d2FyYSA8YW5kcmUucHJ6eXdh
+cmFAYXJtLmNvbT4gd3JvdGU6Cj4gCj4gQXQgdGhlIG1vbWVudCB3ZSBpbml0aWFsaXNlIHRoZSB0
+YXJnZXQgKm1hc2sqIG9mIGEgdmlydHVhbCBJUlEgdG8gdGhlCj4gVkNQVSBpdCBiZWxvbmdzIHRv
+LCBldmVuIHRob3VnaCB0aGlzIG1hc2sgaXMgb25seSBkZWZpbmVkIGZvciBHSUN2MiBhbmQKPiBx
+dWlja2x5IHJ1bnMgb3V0IG9mIGJpdHMgZm9yIG1hbnkgR0lDdjMgZ3Vlc3RzLgoKSnVzdCBmb3Ig
+bXkgZWR1Y2F0aW9uLCDigJx0YXJnZXRz4oCdIHNlZW1zIGRlZmluZWQgYXMgYW4gdTgsCnNvIGl0
+IGxvb2tzIGxpa2UgeW91IHdlcmUgc2lsZW50bHkgcnVubmluZyBvdXQgb2YgYml0cyBiZWZvcmUs
+IG5vPwoKPiBUaGlzIGJlaGF2aW91ciB0cmlnZ2VycyBhbiBVQlNBTiBjb21wbGFpbnQgZm9yIG1v
+cmUgdGhhbiAzMiBWQ1BVczoKPiAtLS0tLS0KPiBbIDU2NTkuNDYyMzc3XSBVQlNBTjogVW5kZWZp
+bmVkIGJlaGF2aW91ciBpbiB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYzoyMjM6MjEKPiBb
+IDU2NTkuNDcxNjg5XSBzaGlmdCBleHBvbmVudCAzMiBpcyB0b28gbGFyZ2UgZm9yIDMyLWJpdCB0
+eXBlICd1bnNpZ25lZCBpbnQnCj4gLS0tLS0tCj4gQWxzbyBmb3IgR0lDdjMgZ3Vlc3RzIHRoZSBy
+ZXBvcnRpbmcgb2YgVEFSR0VUIGluIHRoZSAidmdpYy1zdGF0ZSIgZGVidWdmcwo+IGR1bXAgaXMg
+d3JvbmcsIGR1ZSB0byB0aGlzIHZlcnkgc2FtZSBwcm9ibGVtLgo+IAo+IEZpeCBib3RoIGlzc3Vl
+cyBieSBvbmx5IGluaXRpYWxpc2luZyB2Z2ljX2lycS0+dGFyZ2V0cyBmb3IgYSB2R0lDdjIgZ3Vl
+c3QsCj4gYW5kIGJ5IGluaXRpYWxpc2luZyB2Z2ljX2lycS0+bXBkaXIgZm9yIHZHSUN2MyBndWVz
+dHMgaW5zdGVhZC4gV2UgY2FuJ3QKPiB1c2UgdGhlIGFjdHVhbCBNUElEUiBmb3IgdGhhdCwgYXMg
+dGhlIFZDUFUncyBzeXN0ZW0gcmVnaXN0ZXIgaXMgbm90Cj4gaW5pdGlhbGlzZWQgYXQgdGhpcyBw
+b2ludCB5ZXQuIFRoaXMgaXMgbm90IHJlYWxseSBhbiBpc3N1ZSwgYXMgLT5tcGlkcgo+IGlzIGp1
+c3QgdXNlZCBmb3IgdGhlIGRlYnVnZnMgb3V0cHV0IGFuZCB0aGUgSVJPVVRFUiBNTUlPIHJlZ2lz
+dGVyLCB3aGljaAo+IGRvZXMgbm90IGV4aXN0IGluIHJlZGlzdHJpYnV0b3JzIChkZWFsaW5nIHdp
+dGggU0dJcyBhbmQgUFBJcykuCj4gCj4gU2lnbmVkLW9mZi1ieTogQW5kcmUgUHJ6eXdhcmEgPGFu
+ZHJlLnByenl3YXJhQGFybS5jb20+Cj4gUmVwb3J0ZWQtYnk6IERhdmUgTWFydGluIDxkYXZlLm1h
+cnRpbkBhcm0uY29tPgo+IC0tLQo+IHZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaW5pdC5jIHwgOSAr
+KysrKystLS0KPiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygt
+KQo+IAo+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYyBiL3ZpcnQv
+a3ZtL2FybS92Z2ljL3ZnaWMtaW5pdC5jCj4gaW5kZXggM2JkYjMxZWFlZDY0Li4zMTcyYjJjOTE2
+ZjEgMTAwNjQ0Cj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pbml0LmMKPiArKysgYi92
+aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWluaXQuYwo+IEBAIC0yMjAsNyArMjIwLDYgQEAgaW50IGt2
+bV92Z2ljX3ZjcHVfaW5pdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gCQlpcnEtPmludGlkID0g
+aTsKPiAJCWlycS0+dmNwdSA9IE5VTEw7Cj4gCQlpcnEtPnRhcmdldF92Y3B1ID0gdmNwdTsKPiAt
+CQlpcnEtPnRhcmdldHMgPSAxVSA8PCB2Y3B1LT52Y3B1X2lkOwo+IAkJa3JlZl9pbml0KCZpcnEt
+PnJlZmNvdW50KTsKPiAJCWlmICh2Z2ljX2lycV9pc19zZ2koaSkpIHsKPiAJCQkvKiBTR0lzICov
+Cj4gQEAgLTIzMSwxMCArMjMwLDE0IEBAIGludCBrdm1fdmdpY192Y3B1X2luaXQoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1KQo+IAkJCWlycS0+Y29uZmlnID0gVkdJQ19DT05GSUdfTEVWRUw7Cj4gCQl9
+Cj4gCj4gLQkJaWYgKGRpc3QtPnZnaWNfbW9kZWwgPT0gS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1Yz
+KQo+ICsJCWlmIChkaXN0LT52Z2ljX21vZGVsID09IEtWTV9ERVZfVFlQRV9BUk1fVkdJQ19WMykg
+ewo+IAkJCWlycS0+Z3JvdXAgPSAxOwo+IC0JCWVsc2UKPiArCQkJLyogVGhlIGFjdHVhbCBNUElE
+UiBpcyBub3QgaW5pdGlhbGlzZWQgYXQgdGhpcyBwb2ludC4gKi8KPiArCQkJaXJxLT5tcGlkciA9
+IDA7Cj4gKwkJfSBlbHNlIHsKPiAJCQlpcnEtPmdyb3VwID0gMDsKPiArCQkJaXJxLT50YXJnZXRz
+ID0gMVUgPDwgdmNwdS0+dmNwdV9pZDsKPiArCQl9Cj4gCX0KPiAKPiAJaWYgKCFpcnFjaGlwX2lu
+X2tlcm5lbCh2Y3B1LT5rdm0pKQo+IC0tIAo+IDIuMTcuMQo+IAoKCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmxpbnV4LWFybS1rZXJuZWwgbWFpbGluZyBs
+aXN0CmxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZwpodHRwOi8vbGlzdHMuaW5m
+cmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2xpbnV4LWFybS1rZXJuZWwK
