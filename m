@@ -1,72 +1,277 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 02/22] iommu: introduce device fault data
-Date: Wed, 6 Mar 2019 18:32:54 +0100
-Message-ID: <0268700f-4b9e-0804-870b-37eb1818ab64@redhat.com>
+From: Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: Re: [PATCH v4 05/22] iommu: Introduce cache_invalidate API
+Date: Wed, 6 Mar 2019 13:59:10 -0800
+Message-ID: <20190306135910.0ef1eb0d@jacob-builder>
 References: <20190218135504.25048-1-eric.auger@redhat.com>
- <20190218135504.25048-3-eric.auger@redhat.com>
- <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
- <742a6ce1-0182-ad56-fccf-65967d9bf280@redhat.com>
- <4d9b1f13-4fa4-c209-0645-71c1b4b2f646@arm.com>
+	<20190218135504.25048-6-eric.auger@redhat.com>
+	<0762b4da-aff0-4e9f-f257-e2ab294bf235@arm.com>
+	<0e041735-98e8-1d8c-c866-ad23e6cc1db5@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4d9b1f13-4fa4-c209-0645-71c1b4b2f646@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <0e041735-98e8-1d8c-c866-ad23e6cc1db5-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
-On 3/6/19 5:07 PM, Jean-Philippe Brucker wrote:
-> On 06/03/2019 14:30, Auger Eric wrote:
->>>> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
->>>> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
->>>> +	__u32   flags;
->>>> +	__u32	pasid;
->>>> +	__u32	grpid;
->>>> +	__u32	perm;
->>>> +	__u64	addr;
->>>
->>> Given that we'll be reporting stall faults using this struct, it would
->>> be good to have the fetch_addr field and flag here as well.
->> As the stall model looks really ARM specific shouldn't we introduce a
->> dedicated struct and iommu_fault_type enum value?
-> 
-> There is no reason for the generic page fault handler to differentiate
-> between stall and PRI, they are page requests. For a stall we write STAG
-> into grpid and set LAST_PAGE=1. Then the SMMU driver writes the page
-> response either as a PRI_RESP or a RESUME depending on the device type.
+On Tue, 5 Mar 2019 19:14:42 +0100
+Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-OK. After reading the spec I thought STALL faults could have a larger
-scope than just PRI.
+> Hi Kevin, Yi,
 > 
->> Also for stall faults don't we need to expose the stall tag (STAG) that,
->> as far as I understand is going to be used by the guest we it wants to
->> retry or terminate the faulted transaction. In practice doesn't the
->> stall fault have the same fields of the unrecoverable fault + STAG? I am
->> afraid adding the fetch_addr in the page request struct may "pollute"
->> the PRI struct that can be understood by both aarch64 and x86 parties atm.
-> 
-> Let's leave out the fetch_addr field then, I was suggesting it for
-> completeness but I don't need it immediately, at least not for host SVA.
-> For dual-stage SVA (where both stage-1 and stage-2 are shared with the
-> CPU) we'll need the IPA field, but that's still a long way away.
-OK So I don't add fetch_addr at the moment.
-> 
->> Also couldn't we envision to put this STALL struct in a new revision of
->> the fault ABI.
-> As said above, generic code doesn't have to know the difference until we
-> start implementing nested SVA. Also, we need stall support in the fault
-> handler soon, since there is hardware supporting it.
+> On 3/5/19 4:28 PM, Jean-Philippe Brucker wrote:
+> > On 18/02/2019 13:54, Eric Auger wrote:  
+> >> From: "Liu, Yi L" <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> >>
+> >> In any virtualization use case, when the first translation stage
+> >> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+> >> of caching structure updates unless the guest invalidation
+> >> activities are trapped by the virtualizer and passed down to the
+> >> host.
+> >>
+> >> Since the invalidation data are obtained from user space and will
+> >> be written into physical IOMMU, we must allow security check at
+> >> various layers. Therefore, generic invalidation data format are
+> >> proposed here, model specific IOMMU drivers need to convert them
+> >> into their own format.
+> >>
+> >> Signed-off-by: Liu, Yi L <yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+> >> Signed-off-by: Jean-Philippe Brucker
+> >> <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org> Signed-off-by: Jacob Pan
+> >> <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org> Signed-off-by: Ashok Raj
+> >> <ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> Signed-off-by: Eric Auger
+> >> <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >>
+> >> ---
+> >> v3 -> v4:
+> >> - full reshape of the API following Alex' comments
+> >>
+> >> v1 -> v2:
+> >> - add arch_id field
+> >> - renamed tlb_invalidate into cache_invalidate as this API allows
+> >>   to invalidate context caches on top of IOTLBs
+> >>
+> >> v1:
+> >> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+> >> header. Commit message reworded.
+> >> ---
+> >>  drivers/iommu/iommu.c      | 14 ++++++++
+> >>  include/linux/iommu.h      | 14 ++++++++
+> >>  include/uapi/linux/iommu.h | 71
+> >> ++++++++++++++++++++++++++++++++++++++ 3 files changed, 99
+> >> insertions(+)
+> >>
+> >> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> >> index b3adb77cb14c..bcb8eb15426c 100644
+> >> --- a/drivers/iommu/iommu.c
+> >> +++ b/drivers/iommu/iommu.c
+> >> @@ -1564,6 +1564,20 @@ void iommu_detach_pasid_table(struct
+> >> iommu_domain *domain) }
+> >>  EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+> >>  
+> >> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
+> >> device *dev,
+> >> +			   struct iommu_cache_invalidate_info
+> >> *inv_info) +{
+> >> +	int ret = 0;
+> >> +
+> >> +	if (unlikely(!domain->ops->cache_invalidate))
+> >> +		return -ENODEV;
+> >> +
+> >> +	ret = domain->ops->cache_invalidate(domain, dev,
+> >> inv_info); +
+> >> +	return ret;
+> >> +}
+> >> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+> >> +
+> >>  static void __iommu_detach_device(struct iommu_domain *domain,
+> >>  				  struct device *dev)
+> >>  {
+> >> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> >> index 7045e26f3a7d..a3b879d0753c 100644
+> >> --- a/include/linux/iommu.h
+> >> +++ b/include/linux/iommu.h
+> >> @@ -189,6 +189,7 @@ struct iommu_resv_region {
+> >>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+> >>   * @attach_pasid_table: attach a pasid table
+> >>   * @detach_pasid_table: detach the pasid table
+> >> + * @cache_invalidate: invalidate translation caches
+> >>   */
+> >>  struct iommu_ops {
+> >>  	bool (*capable)(enum iommu_cap);
+> >> @@ -235,6 +236,9 @@ struct iommu_ops {
+> >>  				  struct iommu_pasid_table_config
+> >> *cfg); void (*detach_pasid_table)(struct iommu_domain *domain);
+> >>  
+> >> +	int (*cache_invalidate)(struct iommu_domain *domain,
+> >> struct device *dev,
+> >> +				struct
+> >> iommu_cache_invalidate_info *inv_info); +
+> >>  	unsigned long pgsize_bitmap;
+> >>  };
+> >>  
+> >> @@ -348,6 +352,9 @@ extern void iommu_detach_device(struct
+> >> iommu_domain *domain, extern int iommu_attach_pasid_table(struct
+> >> iommu_domain *domain, struct iommu_pasid_table_config *cfg);
+> >>  extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+> >> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+> >> +				  struct device *dev,
+> >> +				  struct
+> >> iommu_cache_invalidate_info *inv_info); extern struct iommu_domain
+> >> *iommu_get_domain_for_dev(struct device *dev); extern struct
+> >> iommu_domain *iommu_get_dma_domain(struct device *dev); extern int
+> >> iommu_map(struct iommu_domain *domain, unsigned long iova, @@
+> >> -798,6 +805,13 @@ void iommu_detach_pasid_table(struct
+> >> iommu_domain *domain) { return -ENODEV;
+> >>  }
+> >> +static inline int
+> >> +iommu_cache_invalidate(struct iommu_domain *domain,
+> >> +		       struct device *dev,
+> >> +		       struct iommu_cache_invalidate_info
+> >> *inv_info) +{
+> >> +	return -ENODEV;
+> >> +}
+> >>  
+> >>  #endif /* CONFIG_IOMMU_API */
+> >>  
+> >> diff --git a/include/uapi/linux/iommu.h
+> >> b/include/uapi/linux/iommu.h index e9065bfa5b24..ae41385b0a7e
+> >> 100644 --- a/include/uapi/linux/iommu.h
+> >> +++ b/include/uapi/linux/iommu.h
+> >> @@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
+> >>  	};
+> >>  };
+> >>  
+> >> +/* defines the granularity of the invalidation */
+> >> +enum iommu_inv_granularity {
+> >> +	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective
+> >> invalidation */
+> >> +	IOMMU_INV_GRANU_PASID,	/* pasid-selective
+> >> invalidation */
+> >> +	IOMMU_INV_GRANU_ADDR,	/* page-selective
+> >> invalidation */ +};
+> >> +
+> >> +/**
+> >> + * Address Selective Invalidation Structure
+> >> + *
+> >> + * @flags indicates the granularity of the address-selective
+> >> invalidation
+> >> + * - if PASID bit is set, @pasid field is populated and the
+> >> invalidation
+> >> + *   relates to cache entries tagged with this PASID and matching
+> >> the
+> >> + *   address range.
+> >> + * - if ARCHID bit is set, @archid is populated and the
+> >> invalidation relates
+> >> + *   to cache entries tagged with this architecture specific id
+> >> and matching
+> >> + *   the address range.
+> >> + * - Both PASID and ARCHID can be set as they may tag different
+> >> caches.
+> >> + * - if neither PASID or ARCHID is set, global addr invalidation
+> >> applies
+> >> + * - LEAF flag indicates whether only the leaf PTE caching needs
+> >> to be
+> >> + *   invalidated and other paging structure caches can be
+> >> preserved.
+> >> + * @pasid: process address space id
+> >> + * @archid: architecture-specific id
+> >> + * @addr: first stage/level input address
+> >> + * @granule_size: page/block size of the mapping in bytes
+> >> + * @nb_granules: number of contiguous granules to be invalidated
+> >> + */
+> >> +struct iommu_inv_addr_info {
+> >> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
+> >> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
+> >> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
+> >> +	__u32	flags;
+> >> +	__u32	archid;
+> >> +	__u64	pasid;
+> >> +	__u64	addr;
+> >> +	__u64	granule_size;
+> >> +	__u64	nb_granules;
+> >> +};  
+> > 
+> > Some fields don't need that many bytes, but I'm not sure it matters
+> > and I'd like to see if this version works for the x86 folks before
+> > bothering with such details. Looks good to me, from the SMMU
+> > perspective.  
+> Does it fit your needs? - Thanks Jean for your feedback -
+Yes, it should fit VT-d's needs.
+We will do some conversion for granularity based on .cache
+and .granularity.
 
-OK so we will use page request structs.
+Fill in the 4K size for granule_size, then use nb_granules for size of
+iotlb invalidation. We probably dont need arch ID. We also dont need
+the global page flags as you have removed it. So we should be good.
 
-Thanks
+We will use this for my next patchset.
 
-Eric
+Thanks,
+
+Jacob
+
 > 
-> Thanks,
-> Jean
+> Thanks
 > 
+> Eric
+> 
+> > 
+> > Thanks,
+> > Jean
+> >   
+> >> +
+> >> +/**
+> >> + * First level/stage invalidation information
+> >> + * @cache: bitfield that allows to select which caches to
+> >> invalidate
+> >> + * @granularity: defines the lowest granularity used for the
+> >> invalidation:
+> >> + *     domain > pasid > addr
+> >> + *
+> >> + * Not all the combinations of cache/granularity make sense:
+> >> + *
+> >> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
+> >> + * granularity	|		|		|
+> >> cache	|
+> >> + * -------------+---------------+---------------+---------------+
+> >> + * DOMAIN	|	N/A	|       Y	|
+> >> Y	|
+> >> + * PASID	|	Y	|       Y	|
+> >> Y	|
+> >> + * ADDR		|       Y	|       Y	|
+> >> N/A	|
+> >> + */
+> >> +struct iommu_cache_invalidate_info {
+> >> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+> >> +	__u32	version;
+> >> +/* IOMMU paging structure cache */
+> >> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB
+> >> */ +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /*
+> >> Device IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 <<
+> >> 2) /* PASID cache */
+> >> +	__u8	cache;
+> >> +	__u8	granularity;
+> >> +	__u8	padding[2];
+> >> +	union {
+> >> +		__u64	pasid;
+> >> +		struct iommu_inv_addr_info addr_info;
+> >> +	};
+> >> +};
+> >> +
+> >> +
+> >>  #endif /* _UAPI_IOMMU_H */
+> >>  
+> >   
+
+[Jacob Pan]
