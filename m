@@ -1,26 +1,31 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 04/22] iommu: Introduce attach/detach_pasid_table API
-Date: Tue, 5 Mar 2019 19:15:02 +0100
-Message-ID: <65e7e722-61b4-be70-8b8b-0a5047ced1f5@redhat.com>
-References: <20190218135504.25048-1-eric.auger@redhat.com>
- <20190218135504.25048-5-eric.auger@redhat.com>
- <17894c69-7d64-b85a-be91-0755aeb08ca3@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v10 4/5] arm64: arm_pmu: Add support for
+ exclude_host/exclude_guest attributes
+Date: Wed, 6 Mar 2019 09:42:59 +0100
+Message-ID: <20190306084259.GE551@e113682-lin.lund.arm.com>
+References: <1547482308-29839-1-git-send-email-andrew.murray@arm.com>
+ <1547482308-29839-5-git-send-email-andrew.murray@arm.com>
+ <20190218215307.GA28113@e113682-lin.lund.arm.com>
+ <20190220161539.GA2055@e119886-lin.cambridge.arm.com>
+ <20190226124459.GB551@e113682-lin.lund.arm.com>
+ <20190304111424.GC40984@e119886-lin.cambridge.arm.com>
+ <20190305114551.GG40984@e119886-lin.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7B1F4A1DF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 13:15:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8821F4A432
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 03:43:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GXLsypxhhj-V for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Mar 2019 13:15:14 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 703474A3BB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Mar 2019 13:15:14 -0500 (EST)
-In-Reply-To: <17894c69-7d64-b85a-be91-0755aeb08ca3@arm.com>
-Content-Language: en-US
+ with ESMTP id kmYYWfBRKROY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Mar 2019 03:43:02 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 194DD4A41A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 03:43:02 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20190305114551.GG40984@e119886-lin.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,220 +35,120 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: marc.zyngier@arm.com, kevin.tian@intel.com, ashok.raj@intel.com
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean,
+On Tue, Mar 05, 2019 at 11:45:52AM +0000, Andrew Murray wrote:
+> On Mon, Mar 04, 2019 at 11:14:24AM +0000, Andrew Murray wrote:
+> > On Tue, Feb 26, 2019 at 01:44:59PM +0100, Christoffer Dall wrote:
+> > > On Wed, Feb 20, 2019 at 04:15:40PM +0000, Andrew Murray wrote:
+> > > > On Mon, Feb 18, 2019 at 10:53:07PM +0100, Christoffer Dall wrote:
+> > > > > On Mon, Jan 14, 2019 at 04:11:47PM +0000, Andrew Murray wrote:
+> > > > > > Add support for the :G and :H attributes in perf by handling the
+> > > > > > exclude_host/exclude_guest event attributes.
+> > > > > > 
+> > > > > > We notify KVM of counters that we wish to be enabled or disabled on
+> > > > > > guest entry/exit and thus defer from starting or stopping :G events
+> > > > > > as per the events exclude_host attribute.
+> > > > > > 
+> > > > > > With both VHE and non-VHE we switch the counters between host/guest
+> > > > > > at EL2. We are able to eliminate counters counting host events on
+> > > > > > the boundaries of guest entry/exit when using :G by filtering out
+> > > > > > EL2 for exclude_host. However when using :H unless exclude_hv is set
+> > > > > > on non-VHE then there is a small blackout window at the guest
+> > > > > > entry/exit where host events are not captured.
+> > > > > > 
+> > > > > > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > > > > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > > ---
+> 
+> > > > > 
+> > > > > Let me see if I get this right:
+> > > > > 
+> > > > > 	exclude_user:	VHE: Don't count EL0
+> > > > > 			Non-VHE: Don't count EL0
+> > > > > 
+> > > > > 	exclude_kernel: VHE: Don't count EL2 and don't count EL1
+> > > > > 			Non-VHE: Don't count EL1
+> > > > > 
+> > > > > 	exclude_hv:	VHE: No effect
+> > > > > 			Non-VHE: Don't count EL2
+> > > > > 
+> > > > > 	exclude_host:	VHE: Don't count EL2 + enable/disable on guest entry/exit
+> > > > > 			Non-VHE: disable on guest entry/disable on guest entry/exit
+> > > > > 
+> > > > > And the logic I extract is that _user applies across both guest and
+> > > > > host, as does _kernel (regardless of the mode the kernel on the current
+> > > > > system runs in, might be only EL1, might be EL1 and EL2), and _hv is
+> > > > > specific to non-VHE systems to measure events in a specific piece of KVM
+> > > > > code that runs at EL2.
+> > > > > 
+> > > > > As I expressed before, that doesn't seem to be the intent behind the
+> > > > > exclude_hv flag, but I'm not sure how other architectures actually
+> > > > > implement things today, and even if it's a curiosity of the Arm
+> > > > > architecture and has value to non-VHE hypervisor hackers, and we don't
+> > > > > really have to care about uniformity with the other architectures, then
+> > > > > fine.
+> > > > > 
+> > > > > It has taken me a while to make sense of this code change, so I really
+> > > > > wish we can find a suitable place to document the semantics clearly for
+> > > > > perf users on arm64.
+> > > > > 
+> > > > > Now, another thing comes to mind:  Do we really need to enable and
+> > > > > disable anything on a VHE system on entry/exit to/from a guest?  Can we
+> > > > > instead do the following:
+> > > > > 
+> > > > > 	exclude_host:	Disable EL2 counting
+> > > > > 		     	Disable EL0 counting
+> > > > > 		     	Enable EL0 counting on vcpu_load
+> > > > > 		     	  (unless exclude_user is also set)
+> > > > > 		     	Disable EL0 counting on vcpu_put
+> > > > > 
+> > > > > 	exclude_guest:	Disable EL1 counting
+> > > > > 		      	Disable EL0 counting on vcpu_load
+> > > > > 		      	Enable EL0 counting on vcpu_put
+> > > > > 			  (unless exclude_user is also set)
+> > > > > 
+> > > > > If that works, we can avoid the overhead in the critical path on VHE
+> > > > > systems and actually have slightly more accurate counting, leaving the
+> > > > > entry/exit operations to be specific to non-VHE.
+> > > > 
+> > > > This all makes sense.
+> > > > 
+> > > > At present on VHE, for host only events, there is a small blackout window
+> > > > at the guest entry/exit - this is where we turn off/on host counting before
+> > > > entering/exiting the guest. (This blackout window also exists on !VHE unless
+> > > > exclude_hv is set).
+> > > > 
+> > > > To mitigate against this the PMU switching code was brought as close to the
+> > > > guest entry/exit as possible - but as you point out at this point in
+> > > > kvm_arch_vcpu_ioctl_run we're running without interrupts/preemption and so
+> > > > on the critical path. I believe we add about 11 instructions when there are
+> > > > no PMU counters enabled and about 23 when they are enabled. I suppose it
+> > > > would be possible to use static keys to reduce the overhead when counters
+> > > > are not enabled...
+> > > > 
+> > > > Your suggestion provides an optimal solution, however it adds some
+> > > > complexity - here is a rough attempt at implementing it...
+> > > > 
+> 
+> > > > 
+> > > > Do you think this is worth developing further?
+> > > > 
+> > > 
+> > > Yes, I think it's worth going to fairly great lengths to keep the
+> > > critical path on VHE systems lean, and I suspect if we take the easy way
+> > > to add functionality first, it will only be harder to factor things out
+> > > later.
+> 
+> It looks like we can also apply this same approach on !VHE. For the sole
+> use-case where a user wishes to count only for a host or guest EL0, then we
+> switch the counter at EL1 in vcpu_load instead of the switch code.
+> 
 
-On 3/5/19 4:23 PM, Jean-Philippe Brucker wrote:
-> On 18/02/2019 13:54, Eric Auger wrote:
->> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>
->> In virtualization use case, when a guest is assigned
->> a PCI host device, protected by a virtual IOMMU on the guest,
->> the physical IOMMU must be programmed to be consistent with
->> the guest mappings. If the physical IOMMU supports two
->> translation stages it makes sense to program guest mappings
->> onto the first stage/level (ARM/Intel terminology) while the host
->> owns the stage/level 2.
->>
->> In that case, it is mandated to trap on guest configuration
->> settings and pass those to the physical iommu driver.
->>
->> This patch adds a new API to the iommu subsystem that allows
->> to set/unset the pasid table information.
->>
->> A generic iommu_pasid_table_config struct is introduced in
->> a new iommu.h uapi header. This is going to be used by the VFIO
->> user API.
->>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> This patch generalizes the API introduced by Jacob & co-authors in
->> https://lwn.net/Articles/754331/
->>
->> v3 -> v4:
->> - s/set_pasid_table/attach_pasid_table
->> - restore detach_pasid_table. Detach can be used on unwind path.
->> - add padding
->> - remove @abort
->> - signature used for config and format
->> - add comments for fields in the SMMU struct
->>
->> v2 -> v3:
->> - replace unbind/bind by set_pasid_table
->> - move table pointer and pasid bits in the generic part of the struct
->>
->> v1 -> v2:
->> - restore the original pasid table name
->> - remove the struct device * parameter in the API
->> - reworked iommu_pasid_smmuv3
->> ---
->>  drivers/iommu/iommu.c      | 19 +++++++++++++++
->>  include/linux/iommu.h      | 22 ++++++++++++++++++
->>  include/uapi/linux/iommu.h | 47 ++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 88 insertions(+)
->>
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index c297cdcf7f89..b3adb77cb14c 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -1545,6 +1545,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
->>  }
->>  EXPORT_SYMBOL_GPL(iommu_attach_device);
->>  
->> +int iommu_attach_pasid_table(struct iommu_domain *domain,
->> +			     struct iommu_pasid_table_config *cfg)
->> +{
->> +	if (unlikely(!domain->ops->attach_pasid_table))
->> +		return -ENODEV;
->> +
->> +	return domain->ops->attach_pasid_table(domain, cfg);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_attach_pasid_table);
->> +
->> +void iommu_detach_pasid_table(struct iommu_domain *domain)
->> +{
->> +	if (unlikely(!domain->ops->detach_pasid_table))
->> +		return;
->> +
->> +	domain->ops->detach_pasid_table(domain);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
->> +
->>  static void __iommu_detach_device(struct iommu_domain *domain,
->>  				  struct device *dev)
->>  {
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index b38e0c100940..7045e26f3a7d 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -187,6 +187,8 @@ struct iommu_resv_region {
->>   * @domain_window_disable: Disable a particular window for a domain
->>   * @of_xlate: add OF master IDs to iommu grouping
->>   * @pgsize_bitmap: bitmap of all possible supported page sizes
->> + * @attach_pasid_table: attach a pasid table
->> + * @detach_pasid_table: detach the pasid table
-> 
-> Should go before pgsize_bitmap
-sure
-> 
->>   */
->>  struct iommu_ops {
->>  	bool (*capable)(enum iommu_cap);
->> @@ -229,6 +231,10 @@ struct iommu_ops {
->>  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
->>  	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
->>  
->> +	int (*attach_pasid_table)(struct iommu_domain *domain,
->> +				  struct iommu_pasid_table_config *cfg);
->> +	void (*detach_pasid_table)(struct iommu_domain *domain);
->> +
->>  	unsigned long pgsize_bitmap;
->>  };
->>  
->> @@ -339,6 +345,9 @@ extern int iommu_attach_device(struct iommu_domain *domain,
->>  			       struct device *dev);
->>  extern void iommu_detach_device(struct iommu_domain *domain,
->>  				struct device *dev);
->> +extern int iommu_attach_pasid_table(struct iommu_domain *domain,
->> +				    struct iommu_pasid_table_config *cfg);
->> +extern void iommu_detach_pasid_table(struct iommu_domain *domain);
->>  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
->>  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
->>  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
->> @@ -777,6 +786,19 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
->>  	return NULL;
->>  }
->>  
->> +static inline
->> +int iommu_attach_pasid_table(struct iommu_domain *domain,
->> +			     struct iommu_pasid_table_config *cfg)
->> +{
->> +	return -ENODEV;
->> +}
->> +
->> +static inline
->> +void iommu_detach_pasid_table(struct iommu_domain *domain)
->> +{
->> +	return -ENODEV;
-> 
-> No return here. With that fixed:
-oups
-> 
-> Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Thanks!
+ok, even better then.  Looking forward to seeing the patches.
 
-Eric
+Thanks,
 
-> 
->> +}
->> +
->>  #endif /* CONFIG_IOMMU_API */
->>  
->>  #ifdef CONFIG_IOMMU_DEBUGFS
->> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->> index 7ebf23ed6ccb..e9065bfa5b24 100644
->> --- a/include/uapi/linux/iommu.h
->> +++ b/include/uapi/linux/iommu.h
->> @@ -112,4 +112,51 @@ struct iommu_fault {
->>  		struct iommu_fault_page_request prm;
->>  	};
->>  };
->> +
->> +/**
->> + * SMMUv3 Stream Table Entry stage 1 related information
->> + * The PASID table is referred to as the context descriptor (CD) table.
->> + *
->> + * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
->> +   or 2-level table)
->> + * @s1dss: STE s1dss (specifies the behavior when pasid_bits != 0
->> +   and no pasid is passed along with the incoming transaction)
->> + * Please refer to the smmu 3.x spec (ARM IHI 0070A) for full details
->> + */
->> +struct iommu_pasid_smmuv3 {
->> +#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
->> +	__u32	version;
->> +	__u8 s1fmt;
->> +	__u8 s1dss;
->> +	__u8 padding[2];
->> +};
->> +
->> +/**
->> + * PASID table data used to bind guest PASID table to the host IOMMU
->> + * Note PASID table corresponds to the Context Table on ARM SMMUv3.
->> + *
->> + * @version: API version to prepare for future extensions
->> + * @format: format of the PASID table
->> + * @base_ptr: guest physical address of the PASID table
->> + * @pasid_bits: number of PASID bits used in the PASID table
->> + * @config: indicates whether the guest translation stage must
->> + * be translated, bypassed or aborted.
->> + */
->> +struct iommu_pasid_table_config {
->> +#define PASID_TABLE_CFG_VERSION_1 1
->> +	__u32	version;
->> +#define IOMMU_PASID_FORMAT_SMMUV3	1
->> +	__u32	format;
->> +	__u64	base_ptr;
->> +	__u8	pasid_bits;
->> +#define IOMMU_PASID_CONFIG_TRANSLATE	1
->> +#define IOMMU_PASID_CONFIG_BYPASS	2
->> +#define IOMMU_PASID_CONFIG_ABORT	3
->> +	__u8	config;
->> +	__u8    padding[6];
->> +	union {
->> +		struct iommu_pasid_smmuv3 smmuv3;
->> +	};
->> +};
->> +
->>  #endif /* _UAPI_IOMMU_H */
->>
-> 
+    Christoffer
