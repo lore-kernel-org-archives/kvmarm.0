@@ -1,86 +1,309 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH] KVM: arm: VGIC: properly initialise private IRQ affinity
-Date: Wed,  6 Mar 2019 10:40:08 +0000
-Message-ID: <20190306104008.69414-1-andre.przywara@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 02/22] iommu: introduce device fault data
+Date: Wed, 6 Mar 2019 12:03:50 +0100
+Message-ID: <c97b6fdd-e987-a9dc-536a-24f68a50dd14@redhat.com>
+References: <20190218135504.25048-1-eric.auger@redhat.com>
+ <20190218135504.25048-3-eric.auger@redhat.com>
+ <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 117464A497
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 05:40:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 72k1MUmyA1tq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Mar 2019 05:40:15 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D08CD4A496
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Mar 2019 05:40:15 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Dave Martin <dave.martin@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <c9adfbda-b78a-405a-a691-9f99d7dc2a26@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment we initialise the target *mask* of a virtual IRQ to the
-VCPU it belongs to, even though this mask is only defined for GICv2 and
-quickly runs out of bits for many GICv3 guests.
-This behaviour triggers an UBSAN complaint for more than 32 VCPUs:
-------
-[ 5659.462377] UBSAN: Undefined behaviour in virt/kvm/arm/vgic/vgic-init.c:223:21
-[ 5659.471689] shift exponent 32 is too large for 32-bit type 'unsigned int'
-------
-Also for GICv3 guests the reporting of TARGET in the "vgic-state" debugfs
-dump is wrong, due to this very same problem.
+Hi Jean,
 
-Fix both issues by only initialising vgic_irq->targets for a vGICv2 guest,
-and by initialising vgic_irq->mpdir for vGICv3 guests instead. We can't
-use the actual MPIDR for that, as the VCPU's system register is not
-initialised at this point yet. This is not really an issue, as ->mpidr
-is just used for the debugfs output and the IROUTER MMIO register, which
-does not exist in redistributors (dealing with SGIs and PPIs).
+On 3/5/19 3:56 PM, Jean-Philippe Brucker wrote:
+> On 18/02/2019 13:54, Eric Auger wrote:
+>> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>
+>> Device faults detected by IOMMU can be reported outside the IOMMU
+>> subsystem for further processing. This patch introduces
+>> a generic device fault data structure.
+>>
+>> The fault can be either an unrecoverable fault or a page request,
+>> also referred to as a recoverable fault.
+>>
+>> We only care about non internal faults that are likely to be reported
+>> to an external subsystem.
+>>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v3 -> v4:
+>> - use a union containing aither an unrecoverable fault or a page
+>>   request message. Move the device private data in the page request
+>>   structure. Reshuffle the fields and use flags.
+>> - move fault perm attributes to the uapi
+>> - remove a bunch of iommu_fault_reason enum values that were related
+>>   to internal errors
+>> ---
+>>  include/linux/iommu.h      |  47 +++++++++++++++
+>>  include/uapi/linux/iommu.h | 115 +++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 162 insertions(+)
+>>  create mode 100644 include/uapi/linux/iommu.h
+>>
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index e90da6b6f3d1..032d33894723 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -25,6 +25,7 @@
+>>  #include <linux/errno.h>
+>>  #include <linux/err.h>
+>>  #include <linux/of.h>
+>> +#include <uapi/linux/iommu.h>
+>>  
+>>  #define IOMMU_READ	(1 << 0)
+>>  #define IOMMU_WRITE	(1 << 1)
+>> @@ -48,6 +49,7 @@ struct bus_type;
+>>  struct device;
+>>  struct iommu_domain;
+>>  struct notifier_block;
+>> +struct iommu_fault_event;
+>>  
+>>  /* iommu fault flags */
+>>  #define IOMMU_FAULT_READ	0x0
+>> @@ -55,6 +57,7 @@ struct notifier_block;
+>>  
+>>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
+>>  			struct device *, unsigned long, int, void *);
+>> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *, void *);
+>>  
+>>  struct iommu_domain_geometry {
+>>  	dma_addr_t aperture_start; /* First address that can be mapped    */
+>> @@ -243,6 +246,49 @@ struct iommu_device {
+>>  	struct device *dev;
+>>  };
+>>  
+>> +/**
+>> + * struct iommu_fault_event - Generic per device fault data
+>> + *
+>> + * - PCI and non-PCI devices
+>> + * - Recoverable faults (e.g. page request), information based on PCI ATS
+>> + *   and PASID spec.
+> 
+> "for example information based on PCI PRI and PASID extensions"? ATS+PRI
+> have been integrated into the main spec, and only PRI is relevant here.
+> 
+>> + * - Un-recoverable faults of device interest
+> 
+> "of interest to device drivers"?
+> 
+>> + * - DMA remapping and IRQ remapping faults
+>> + *
+>> + * @fault: fault descriptor
+>> + * @iommu_private: used by the IOMMU driver for storing fault-specific
+>> + *                 data. Users should not modify this field before
+>> + *                 sending the fault response.
+>> + */
+>> +struct iommu_fault_event {
+>> +	struct iommu_fault fault;
+>> +	u64 iommu_private;
+>> +};
+>> +
+>> +/**
+>> + * struct iommu_fault_param - per-device IOMMU fault data
+>> + * @dev_fault_handler: Callback function to handle IOMMU faults at device level
+>> + * @data: handler private data
+>> + *
+>> + */
+>> +struct iommu_fault_param {
+>> +	iommu_dev_fault_handler_t handler;
+>> +	void *data;
+>> +};
+>> +
+>> +/**
+>> + * struct iommu_param - collection of per-device IOMMU data
+>> + *
+>> + * @fault_param: IOMMU detected device fault reporting data
+>> + *
+>> + * TODO: migrate other per device data pointers under iommu_dev_data, e.g.
+>> + *	struct iommu_group	*iommu_group;
+>> + *	struct iommu_fwspec	*iommu_fwspec;
+>> + */
+>> +struct iommu_param {
+>> +	struct iommu_fault_param *fault_param;
+>> +};
+>> +
+>>  int  iommu_device_register(struct iommu_device *iommu);
+>>  void iommu_device_unregister(struct iommu_device *iommu);
+>>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
+>> @@ -418,6 +464,7 @@ struct iommu_ops {};
+>>  struct iommu_group {};
+>>  struct iommu_fwspec {};
+>>  struct iommu_device {};
+>> +struct iommu_fault_param {};
+>>  
+>>  static inline bool iommu_present(struct bus_type *bus)
+>>  {
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> new file mode 100644
+>> index 000000000000..7ebf23ed6ccb
+>> --- /dev/null
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -0,0 +1,115 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * IOMMU user API definitions
+>> + */
+>> +
+>> +#ifndef _UAPI_IOMMU_H
+>> +#define _UAPI_IOMMU_H
+>> +
+>> +#include <linux/types.h>
+>> +
+>> +/*  Generic fault types, can be expanded IRQ remapping fault */
+>> +enum iommu_fault_type {
+>> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
+>> +	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
+>> +};
+>> +
+>> +enum iommu_fault_reason {
+>> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
+>> +
+>> +	/* Could not access the PASID table (fetch caused external abort) */
+>> +	IOMMU_FAULT_REASON_PASID_FETCH,
+>> +
+>> +	/* pasid entry is invalid or has configuration errors */
+>> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
+>> +
+>> +	/*
+>> +	 * PASID is out of range (e.g. exceeds the maximum PASID
+>> +	 * supported by the IOMMU) or disabled.
+>> +	 */
+>> +	IOMMU_FAULT_REASON_PASID_INVALID,
+>> +
+>> +	/*
+>> +	 * An external abort occurred fetching (or updating) a translation
+>> +	 * table descriptor
+>> +	 */
+>> +	IOMMU_FAULT_REASON_WALK_EABT,
+>> +
+>> +	/*
+>> +	 * Could not access the page table entry (Bad address),
+>> +	 * actual translation fault
+>> +	 */
+>> +	IOMMU_FAULT_REASON_PTE_FETCH,
+>> +
+>> +	/* Protection flag check failed */
+>> +	IOMMU_FAULT_REASON_PERMISSION,
+>> +
+>> +	/* access flag check failed */
+>> +	IOMMU_FAULT_REASON_ACCESS,
+>> +
+>> +	/* Output address of a translation stage caused Address Size fault */
+>> +	IOMMU_FAULT_REASON_OOR_ADDRESS,
+>> +};
+>> +
+>> +/**
+>> + * Unrecoverable fault data
+>> + * @reason: reason of the fault
+>> + * @addr: offending page address
+>> + * @fetch_addr: address that caused a fetch abort, if any
+>> + * @pasid: contains process address space ID, used in shared virtual memory
+>> + * @perm: Requested permission access using by the incoming transaction
+>> + *	IOMMU_FAULT_READ, IOMMU_FAULT_WRITE
+> 
+> Stale comment
+> 
+>> + */
+>> +struct iommu_fault_unrecoverable {
+>> +	__u32	reason; /* enum iommu_fault_reason */
+>> +#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
+>> +#define IOMMU_FAULT_UNRECOV_PERM_VALID		(1 << 1)
+> 
+> Not needed, since @perm is already a bitfield
+> 
+>> +#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 2)
+>> +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 3)
+>> +	__u32	flags;
+>> +	__u32	pasid;
+>> +#define IOMMU_FAULT_PERM_WRITE	(1 << 0) /* write */
+>> +#define IOMMU_FAULT_PERM_EXEC	(1 << 1) /* exec */
+>> +#define IOMMU_FAULT_PERM_PRIV	(1 << 2) /* priviledged */
+> 
+> typo "privileged"
+> 
+>> +#define IOMMU_FAULT_PERM_INST	(1 << 3) /* instruction */
+> 
+> Could you move these outside the struct definition? They are shared with
+> the other struct. And it would be less confusing, from the device driver
+> point of view, to merge those with the existing IOMMU_FAULT_* defines
+> (but moving them to UAPI and making them bits)
+Eventually I have a mixed opinion about this. Changing the existing flag
+value impacts several iommu driver and handlers in different subsystems
+(0 hardcoded value is used, flags values are exposed in existing error
+logs). Also above flags are permission flags and nothing prevents from
+extending report_iommu_fault flag values with values that do not relate
+to perm.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reported-by: Dave Martin <dave.martin@arm.com>
----
- virt/kvm/arm/vgic/vgic-init.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Thanks
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 3bdb31eaed64..3172b2c916f1 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -220,7 +220,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 		irq->intid = i;
- 		irq->vcpu = NULL;
- 		irq->target_vcpu = vcpu;
--		irq->targets = 1U << vcpu->vcpu_id;
- 		kref_init(&irq->refcount);
- 		if (vgic_irq_is_sgi(i)) {
- 			/* SGIs */
-@@ -231,10 +230,14 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 			irq->config = VGIC_CONFIG_LEVEL;
- 		}
- 
--		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
- 			irq->group = 1;
--		else
-+			/* The actual MPIDR is not initialised at this point. */
-+			irq->mpidr = 0;
-+		} else {
- 			irq->group = 0;
-+			irq->targets = 1U << vcpu->vcpu_id;
-+		}
- 	}
- 
- 	if (!irqchip_in_kernel(vcpu->kvm))
--- 
-2.17.1
+Eric
+> 
+>> +	__u32	perm;
+>> +	__u64	addr;
+>> +	__u64	fetch_addr;
+>> +};
+>> +
+>> +/*
+>> + * Page Request data (aka. recoverable fault data)
+>> + * @flags : encodes whether the pasid is valid and whether this
+>> + * is the last page in group
+>> + * @pasid: pasid
+>> + * @grpid: page request group index
+>> + * @perm: requested page permissions
+>> + * @addr: page address
+>> + */
+>> +struct iommu_fault_page_request {
+>> +#define IOMMU_FAULT_PAGE_REQUEST_PASID_PRESENT	(1 << 0)
+> 
+> PASID_VALID, to be consistent with the other set of flags?
+> 
+>> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
+>> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
+>> +	__u32   flags;
+>> +	__u32	pasid;
+>> +	__u32	grpid;
+>> +	__u32	perm;
+>> +	__u64	addr;
+> 
+> Given that we'll be reporting stall faults using this struct, it would
+> be good to have the fetch_addr field and flag here as well.
+> 
+>> +	__u64	private_data[2];
+>> +};
+>> +
+>> +/**
+>> + * struct iommu_fault - Generic fault data
+>> + *
+>> + * @type contains fault type
+>> + */
+>> +
+>> +struct iommu_fault {
+>> +	__u32	type;   /* enum iommu_fault_type */
+>> +	__u32	reserved;
+>> +	union {
+>> +		struct iommu_fault_unrecoverable event;
+>> +		struct iommu_fault_page_request prm;
+> 
+> What's the 'm' in "prm"? Maybe just "pr"?
+> 
+> Thanks,
+> Jean
+> 
+>> +	};
+>> +};
+>> +#endif /* _UAPI_IOMMU_H */
+>>
+> 
