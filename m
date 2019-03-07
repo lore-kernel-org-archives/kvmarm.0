@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 04/16] pci: Fix BAR resource sizing arbitration
-Date: Thu,  7 Mar 2019 08:36:05 +0000
-Message-ID: <1551947777-13044-5-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 07/16] arm/pci: Fix PCI IO region
+Date: Thu,  7 Mar 2019 08:36:08 +0000
+Message-ID: <1551947777-13044-8-git-send-email-julien.thierry@arm.com>
 References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B62E4A4C1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B8A14A48E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g9DKzgWoIivU for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Mar 2019 03:36:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E077F4A4B0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:30 -0500 (EST)
+ with ESMTP id zvq-HS67pKn7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Mar 2019 03:36:35 -0500 (EST)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 185464A4C1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:35 -0500 (EST)
 In-Reply-To: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,110 +28,105 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: Andre.Przywara@arm.com, Sami Mujawar <sami.mujawar@arm.com>, will.deacon@arm.com, kvm@vger.kernel.org
+Cc: Andre.Przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Sami Mujawar <sami.mujawar@arm.com>
+Current PCI IO region that is exposed through the DT contains ports that
+are reserved by non-PCI devices.
 
-According to the 'PCI Local Bus Specification, Revision 3.0,
-February 3, 2004, Section 6.2.5.1, Implementation Notes, page 227'
+Use the proper PCI IO start so that the region exposed through DT can
+actually be used to reassign device BARs.
 
-    "Software saves the original value of the Base Address register,
-    writes 0 FFFF FFFFh to the register, then reads it back. Size
-    calculation can be done from the 32-bit value read by first
-    clearing encoding information bits (bit 0 for I/O, bits 0-3 for
-    memory), inverting all 32 bits (logical NOT), then incrementing
-    by 1. The resultant 32-bit value is the memory/I/O range size
-    decoded by the register. Note that the upper 16 bits of the result
-    is ignored if the Base Address register is for I/O and bits 16-31
-    returned zero upon read."
-
-kvmtool was returning the actual BAR resource size which would be
-incorrect as the software software drivers would invert all 32 bits
-(logical NOT), then incrementing by 1. This ends up with a very large
-resource size (in some cases more than 4GB) due to which drivers
-assert/fail to work.
-
-e.g if the BAR resource size was 0x1000, kvmtool would return 0x1000
-instead of 0xFFFFF00x.
-
-Fixed pci__config_wr() to return the size of the BAR in accordance with
-the PCI Local Bus specification, Implementation Notes.
-
-Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- pci.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 48 insertions(+), 3 deletions(-)
+ arm/include/arm-common/pci.h |  1 +
+ arm/kvm.c                    |  3 +++
+ arm/pci.c                    | 21 ++++++++++++++++++---
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/pci.c b/pci.c
-index 689869c..9edefa5 100644
---- a/pci.c
-+++ b/pci.c
-@@ -8,6 +8,9 @@
- #include <linux/err.h>
- #include <assert.h>
+diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+index 9008a0e..aea42b8 100644
+--- a/arm/include/arm-common/pci.h
++++ b/arm/include/arm-common/pci.h
+@@ -1,6 +1,7 @@
+ #ifndef ARM_COMMON__PCI_H
+ #define ARM_COMMON__PCI_H
  
-+/* Macro to check that a value is a power of 2 */
-+#define power_of_2(pow) (((pow) != 0) && (((pow) & ((pow) - 1)) == 0))
-+
- static u32 pci_config_address_bits;
++void pci__arm_init(struct kvm *kvm);
+ void pci__generate_fdt_nodes(void *fdt);
  
- /* This is within our PCI gap - in an unused area.
-@@ -173,9 +176,51 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
- 	 * BAR there next time it reads from it. When the kernel got the size it
- 	 * would write the address back.
- 	 */
--	if (bar < 6 && ioport__read32(data) == 0xFFFFFFFF) {
--		u32 sz = pci_hdr->bar_size[bar];
--		memcpy(base + offset, &sz, sizeof(sz));
-+	if (bar < 6) {
-+		/*
-+		 * According to the PCI local bus specification REV 3.0:
-+		 * The number of upper bits that a device actually implements
-+		 * depends on how much of the address space the device will
-+		 * respond to. A device that wants a 1 MB memory address space
-+		 * (using a 32-bit base address register) would build the top
-+		 * 12 bits of the address register, hardwiring the other bits
-+		 * to 0.
-+		 * Furthermore software can determine how much address space the
-+		 * device requires by writing a value of all 1's to the register
-+		 * and then reading the value back. The device will return 0's in
-+		 * all don't-care address bits, effectively specifying the address
-+		 * space required.
-+		 *
-+		 * The following code emulates this by storing the value written
-+		 * to the BAR, applying the size mask to clear the lower bits,
-+		 * restoring the information bits and then updating the BAR value.
-+		 */
-+		u32 bar_value;
-+		/* Get the size mask */
-+		u32 sz = ~(pci_hdr->bar_size[bar] - 1);
-+		/* Extract the info bits */
-+		u32 info = pci_hdr->bar[bar] & 0xF;
+ #endif /* ARM_COMMON__PCI_H */
+diff --git a/arm/kvm.c b/arm/kvm.c
+index b824f63..44d7796 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -6,6 +6,7 @@
+ #include "kvm/fdt.h"
+ 
+ #include "arm-common/gic.h"
++#include "arm-common/pci.h"
+ 
+ #include <linux/kernel.h>
+ #include <linux/kvm.h>
+@@ -86,6 +87,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+ 	/* Create the virtual GIC. */
+ 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+ 		die("Failed to create virtual GIC");
 +
-+		/* Store the value written by software */
-+		memcpy(base + offset, data, size);
++	pci__arm_init(kvm);
+ }
+ 
+ #define FDT_ALIGN	SZ_2M
+diff --git a/arm/pci.c b/arm/pci.c
+index 557cfa9..83238ca 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -1,3 +1,5 @@
++#include "linux/sizes.h"
 +
-+		/* Apply the size mask to the bar value to clear the lower bits */
-+		bar_value = pci_hdr->bar[bar] & sz;
+ #include "kvm/devices.h"
+ #include "kvm/fdt.h"
+ #include "kvm/kvm.h"
+@@ -7,6 +9,11 @@
+ 
+ #include "arm-common/pci.h"
+ 
++#define ARM_PCI_IO_START ALIGN(PCI_IOPORT_START, SZ_4K)
 +
-+		/* Warn if the bar size is not a power of 2 */
-+		WARN_ON(!power_of_2(pci_hdr->bar_size[bar]));
++/* Must be a multiple of 4k */
++#define ARM_PCI_IO_SIZE ((ARM_MMIO_AREA - ARM_PCI_IO_START) & ~(SZ_4K - 1))
 +
-+		/* Restore the info bits */
-+		if ((info & 0x1) == 0x1) {
-+			/* BAR for I/O */
-+			bar_value = ((bar_value & ~0x3) | 0x1);
-+		} else {
-+			/* BAR for Memory */
-+			bar_value = ((bar_value & ~0xF) | info);
-+		}
+ /*
+  * An entry in the interrupt-map table looks like:
+  * <pci unit address> <pci interrupt pin> <gic phandle> <gic interrupt>
+@@ -24,6 +31,14 @@ struct of_interrupt_map_entry {
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
+ 
++void pci__arm_init(struct kvm *kvm)
++{
++	u32 align_pad = ARM_PCI_IO_START - PCI_IOPORT_START;
 +
-+		/* Store the final BAR value */
-+		pci_hdr->bar[bar] = bar_value;
- 	} else {
- 		memcpy(base + offset, data, size);
- 	}
++	/* Make PCI port allocation start at a properly aligned address */
++	pci_get_io_space_block(align_pad);
++}
++
+ void pci__generate_fdt_nodes(void *fdt)
+ {
+ 	struct device_header *dev_hdr;
+@@ -40,10 +55,10 @@ void pci__generate_fdt_nodes(void *fdt)
+ 			.pci_addr = {
+ 				.hi	= cpu_to_fdt32(of_pci_b_ss(OF_PCI_SS_IO)),
+ 				.mid	= 0,
+-				.lo	= 0,
++				.lo	= cpu_to_fdt32(ARM_PCI_IO_START),
+ 			},
+-			.cpu_addr	= cpu_to_fdt64(KVM_IOPORT_AREA),
+-			.length		= cpu_to_fdt64(ARM_IOPORT_SIZE),
++			.cpu_addr	= cpu_to_fdt64(ARM_PCI_IO_START),
++			.length		= cpu_to_fdt64(ARM_PCI_IO_SIZE),
+ 		},
+ 		{
+ 			.pci_addr = {
 -- 
 1.9.1
