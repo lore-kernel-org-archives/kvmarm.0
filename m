@@ -1,22 +1,22 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH kvmtool 03/16] brlock: fix build with KVM_BRLOCK_DEBUG
-Date: Thu,  7 Mar 2019 08:36:04 +0000
-Message-ID: <1551947777-13044-4-git-send-email-julien.thierry@arm.com>
+Subject: [PATCH kvmtool 06/16] pci: Fix ioport allocation size
+Date: Thu,  7 Mar 2019 08:36:07 +0000
+Message-ID: <1551947777-13044-7-git-send-email-julien.thierry@arm.com>
 References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 015524A4C1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8276A4A4B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EauAOiAOamQq for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Mar 2019 03:36:29 -0500 (EST)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 167FB4A49D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:29 -0500 (EST)
+ with ESMTP id zck-eaOfwCLd for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Mar 2019 03:36:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 941D84A4C4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:33 -0500 (EST)
 In-Reply-To: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +31,121 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Andre.Przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Build breaks when using KVM_BRLOCK_DEBUG because the header was seamingly
-conceived to be included in a single .c file...
+The PCI Local Bus Specification, Rev. 3.0,
+Section 6.2.5.1. "Address Maps" states:
+"Devices that map control functions into I/O Space must not consume more
+than 256 bytes per I/O Base Address register."
 
-Fix this by moving the definition of the read/write lock into the kvm
-struct.
+Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
+
+Fix this by having PCI devices use 256 bytes ports for IO BARs.
 
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 ---
- include/kvm/brlock.h | 10 ++++------
- include/kvm/kvm.h    |  4 ++++
- kvm.c                |  4 ++++
- 3 files changed, 12 insertions(+), 6 deletions(-)
+ hw/pci-shmem.c       |  4 ++--
+ hw/vesa.c            |  4 ++--
+ include/kvm/ioport.h |  1 -
+ pci.c                |  2 +-
+ virtio/pci.c         | 14 +++++++-------
+ 5 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/include/kvm/brlock.h b/include/kvm/brlock.h
-index 29f72e0..1862210 100644
---- a/include/kvm/brlock.h
-+++ b/include/kvm/brlock.h
-@@ -21,13 +21,11 @@
+diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+index a0c5ba8..2e1474b 100644
+--- a/hw/pci-shmem.c
++++ b/hw/pci-shmem.c
+@@ -357,8 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
+ 		return 0;
  
- #include "kvm/rwsem.h"
+ 	/* Register MMIO space for MSI-X */
+-	r = pci_get_io_port_block(IOPORT_SIZE);
+-	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
++	r = pci_get_io_port_block(PCI_IO_SIZE);
++	r = ioport__register(kvm, r, &shmem_pci__io_ops, PCI_IO_SIZE, NULL);
+ 	if (r < 0)
+ 		return r;
+ 	ivshmem_registers = (u16)r;
+diff --git a/hw/vesa.c b/hw/vesa.c
+index 404a8a3..71935d5 100644
+--- a/hw/vesa.c
++++ b/hw/vesa.c
+@@ -60,8 +60,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
  
--DECLARE_RWSEM(brlock_sem);
-+#define br_read_lock(kvm)	down_read(&(kvm)->brlock_sem);
-+#define br_read_unlock(kvm)	up_read(&(kvm)->brlock_sem);
+ 	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+ 		return NULL;
+-	r = pci_get_io_space_block(IOPORT_SIZE);
+-	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
++	r = pci_get_io_space_block(PCI_IO_SIZE);
++	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
+ 	if (r < 0)
+ 		return ERR_PTR(r);
  
--#define br_read_lock(kvm)	down_read(&brlock_sem);
--#define br_read_unlock(kvm)	up_read(&brlock_sem);
--
--#define br_write_lock(kvm)	down_write(&brlock_sem);
--#define br_write_unlock(kvm)	up_write(&brlock_sem);
-+#define br_write_lock(kvm)	down_write(&(kvm)->brlock_sem);
-+#define br_write_unlock(kvm)	up_write(&(kvm)->brlock_sem);
+diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+index b10fcd5..8c86b71 100644
+--- a/include/kvm/ioport.h
++++ b/include/kvm/ioport.h
+@@ -14,7 +14,6 @@
  
- #else
+ /* some ports we reserve for own use */
+ #define IOPORT_DBG			0xe0
+-#define IOPORT_SIZE			0x400
  
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 1edacfd..7a73818 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -81,6 +81,10 @@ struct kvm {
- 	int                     nr_disks;
+ struct kvm;
  
- 	int			vm_state;
-+
-+#ifdef KVM_BRLOCK_DEBUG
-+	pthread_rwlock_t	brlock_sem;
-+#endif
- };
+diff --git a/pci.c b/pci.c
+index cd749db..228a628 100644
+--- a/pci.c
++++ b/pci.c
+@@ -23,7 +23,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
  
- void kvm__set_dir(const char *fmt, ...);
-diff --git a/kvm.c b/kvm.c
-index d5249a0..57c4ff9 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -160,6 +160,10 @@ struct kvm *kvm__new(void)
- 	kvm->sys_fd = -1;
- 	kvm->vm_fd = -1;
- 
-+#ifdef KVM_BRLOCK_DEBUG
-+	kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
-+#endif
-+
- 	return kvm;
+ u16 pci_get_io_port_block(u32 size)
+ {
+-	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
++	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
+ 	io_port_blocks = port + size;
+ 	return port;
  }
+diff --git a/virtio/pci.c b/virtio/pci.c
+index c8e16dd..5a6c0d0 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -406,7 +406,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+ {
+ 	struct virtio_pci *vpci = ptr;
+ 	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+-	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
++	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
+ 
+ 	kvm__emulate_io(vcpu, port, data, direction, len, 1);
+ }
+@@ -420,14 +420,14 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 	vpci->kvm = kvm;
+ 	vpci->dev = dev;
+ 
+-	r = pci_get_io_port_block(IOPORT_SIZE);
+-	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
++	r = pci_get_io_port_block(PCI_IO_SIZE);
++	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
+ 	if (r < 0)
+ 		return r;
+ 	vpci->port_addr = (u16)r;
+ 
+-	vpci->mmio_addr = pci_get_io_space_block(IOPORT_SIZE);
+-	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
++	vpci->mmio_addr = pci_get_io_space_block(PCI_IO_SIZE);
++	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
+ 			       virtio_pci__io_mmio_callback, vpci);
+ 	if (r < 0)
+ 		goto free_ioport;
+@@ -457,8 +457,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 							| PCI_BASE_ADDRESS_SPACE_MEMORY),
+ 		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
+ 		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+-		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
+-		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
++		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
++		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+ 		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+ 	};
  
 -- 
 1.9.1
