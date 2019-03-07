@@ -1,124 +1,94 @@
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [PATCH v4 03/22] iommu: introduce device fault report API
-Date: Wed, 6 Mar 2019 15:46:16 -0800
-Message-ID: <20190306154616.648e2523@jacob-builder>
-References: <20190218135504.25048-1-eric.auger@redhat.com>
-        <20190218135504.25048-4-eric.auger@redhat.com>
-        <fb5f84e6-812f-978d-3be1-673b3e9717ad@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH kvmtool 00/16] Support PCI BAR configuration
+Date: Thu,  7 Mar 2019 08:36:01 +0000
+Message-ID: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <fb5f84e6-812f-978d-3be1-673b3e9717ad@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, yi.l.liu@linux.intel.com, will.deacon@arm.com, robin.murphy@arm.com, marc.zyngier@arm.com, peter.maydell@linaro.org, kevin.tian@intel.com, ashok.raj@intel.com, christoffer.dall@arm.com, jacob.jun.pan@linux.intel.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76BB14A499
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SES-5qw7VsCX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Mar 2019 03:36:25 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AA474A455
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 03:36:25 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Andre.Przywara@arm.com, Sami.Mujawar@arm.com, will.deacon@arm.com, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, 5 Mar 2019 15:03:41 +0000
-Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+Hi,
 
-> On 18/02/2019 13:54, Eric Auger wrote:
-> [...]> +/**
-> > + * iommu_register_device_fault_handler() - Register a device fault
-> > handler
-> > + * @dev: the device
-> > + * @handler: the fault handler
-> > + * @data: private data passed as argument to the handler
-> > + *
-> > + * When an IOMMU fault event is received, call this handler with
-> > the fault event
-> > + * and data as argument. The handler should return 0 on success.
-> > If the fault is
-> > + * recoverable (IOMMU_FAULT_PAGE_REQ), the handler can also
-> > complete
-> > + * the fault by calling iommu_page_response() with one of the
-> > following
-> > + * response code:
-> > + * - IOMMU_PAGE_RESP_SUCCESS: retry the translation
-> > + * - IOMMU_PAGE_RESP_INVALID: terminate the fault
-> > + * - IOMMU_PAGE_RESP_FAILURE: terminate the fault and stop
-> > reporting
-> > + *   page faults if possible.  
-> 
-> The comment refers to function and values that haven't been defined
-> yet. Either the page_response() patch should come before, or we need
-> to split this patch.
-> 
-> Something I missed before: if the handler fails (returns != 0) it
-> should complete the fault by calling iommu_page_response(), if we're
-> not doing it in iommu_report_device_fault(). It should be indicated
-> in this comment. It's safe for the handler to call page_response()
-> since we're not holding fault_param->lock when calling the handler.
-> 
-If the page request fault is to be reported to a guest, the report
-function cannot wait for the completion status. As long as the fault is
-injected into the guest, the handler should complete with success. If
-the PRQ report fails, IMHO, the caller of iommu_report_device_fault()
-should send page_response, perhaps after clean up all partial response
-of the group too.
+This series add support for guests writting to PCI BARs. Edk2 does this
+and is not aware of the "linux,pci-probe-only" property in the chosen node.
 
-> > + *
-> > + * Return 0 if the fault handler was installed successfully, or an
-> > error.
-> > + */  
-> [...]
-> > +/**
-> > + * iommu_report_device_fault() - Report fault event to device
-> > + * @dev: the device
-> > + * @evt: fault event data
-> > + *
-> > + * Called by IOMMU model specific drivers when fault is detected,
-> > typically
-> > + * in a threaded IRQ handler.
-> > + *
-> > + * Return 0 on success, or an error.
-> > + */
-> > +int iommu_report_device_fault(struct device *dev, struct
-> > iommu_fault_event *evt) +{
-> > +	int ret = 0;
-> > +	struct iommu_fault_event *evt_pending;
-> > +	struct iommu_fault_param *fparam;
-> > +
-> > +	/* iommu_param is allocated when device is added to group
-> > */
-> > +	if (!dev->iommu_param | !evt)  
-> 
-> Typo: ||
-> 
-> Thanks,
-> Jean
-> 
-> > +		return -EINVAL;
-> > +	/* we only report device fault if there is a handler
-> > registered */
-> > +	mutex_lock(&dev->iommu_param->lock);
-> > +	if (!dev->iommu_param->fault_param ||
-> > +		!dev->iommu_param->fault_param->handler) {
-> > +		ret = -EINVAL;
-> > +		goto done_unlock;
-> > +	}
-> > +	fparam = dev->iommu_param->fault_param;
-> > +	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
-> > +	    evt->fault.prm.flags &
-> > IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE) {
-> > +		evt_pending = kmemdup(evt, sizeof(struct
-> > iommu_fault_event),
-> > +				GFP_KERNEL);
-> > +		if (!evt_pending) {
-> > +			ret = -ENOMEM;
-> > +			goto done_unlock;
-> > +		}
-> > +		mutex_lock(&fparam->lock);
-> > +		list_add_tail(&evt_pending->list, &fparam->faults);
-> > +		mutex_unlock(&fparam->lock);
-> > +	}
-> > +	ret = fparam->handler(evt, fparam->data);
-> > +done_unlock:
-> > +	mutex_unlock(&dev->iommu_param->lock);
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL_GPL(iommu_report_device_fault);  
-> [...]
+- Patches 1 to 3 do miscelaneous fixes
+- Patch 4 fixes the way we deal with BAR sizing
+- Patches 5 to 8 fixes the allocation/assignment of PCI IO BARs
+- Patches 9 to 12 make it possible to remap ioport and mmio regions
+  from vcpu threads, without pausing the entire VM
+- Patches 13 to 16 adds the support for writting to BARs
 
-[Jacob Pan]
+Cheers,
+
+Julien
+
+-->
+
+Julien Thierry (15):
+  Makefile: Only compile vesa for archs that need it
+  brlock: Always pass argument to br_read_lock/unlock
+  brlock: fix build with KVM_BRLOCK_DEBUG
+  ioport: pci: Move port allocations to PCI devices
+  pci: Fix ioport allocation size
+  arm/pci: Fix PCI IO region
+  arm/pci: Do not use first PCI IO space bytes for devices
+  brlock: Use rwlock instead of pause
+  ref_cnt: Add simple ref counting API
+  mmio: Allow mmio callbacks to be called without locking
+  ioport: Allow ioport callbacks to be called without locking
+  vfio: Add support for BAR configuration
+  virtio/pci: Make memory and IO BARs independent
+  virtio/pci: update virtio mapping when PCI BARs are reconfigured
+  arm/fdt: Remove PCI probe only property
+
+Sami Mujawar (1):
+  pci: Fix BAR resource sizing arbitration
+
+ Makefile                     |   3 +-
+ arm/fdt.c                    |   1 -
+ arm/include/arm-common/pci.h |   1 +
+ arm/kvm.c                    |   3 +
+ arm/pci.c                    |  24 ++++-
+ hw/pci-shmem.c               |   3 +-
+ hw/vesa.c                    |   4 +-
+ include/kvm/brlock.h         |  21 +---
+ include/kvm/ioport.h         |   5 -
+ include/kvm/kvm.h            |   2 +
+ include/kvm/pci.h            |   2 +
+ include/kvm/ref_cnt.h        |  53 ++++++++++
+ include/kvm/virtio-pci.h     |   1 +
+ ioport.c                     |  80 ++++++++--------
+ kvm.c                        |   4 +
+ mmio.c                       |  30 ++++--
+ pci.c                        |  59 +++++++++++-
+ vfio/core.c                  |   6 +-
+ vfio/pci.c                   |  82 +++++++++++++++-
+ virtio/pci.c                 | 223 ++++++++++++++++++++++++++++++++++++-------
+ 20 files changed, 491 insertions(+), 116 deletions(-)
+ create mode 100644 include/kvm/ref_cnt.h
+
+--
+1.9.1
