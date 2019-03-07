@@ -1,108 +1,144 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v4 03/22] iommu: introduce device fault report API
-Date: Thu, 7 Mar 2019 11:42:59 +0000
-Message-ID: <1500594f-d7ea-94f2-01aa-0dc0e08b391b@arm.com>
-References: <20190218135504.25048-1-eric.auger@redhat.com>
- <20190218135504.25048-4-eric.auger@redhat.com>
- <fb5f84e6-812f-978d-3be1-673b3e9717ad@arm.com>
- <20190306154616.648e2523@jacob-builder>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v5 22/26] KVM: arm64/sve: Add pseudo-register for the
+ guest's vector lengths
+Date: Thu, 7 Mar 2019 13:47:09 +0000
+Message-ID: <5a3fda6d-5da8-8aa9-9b0e-36d6bcd7441b@arm.com>
+References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
+ <1550519559-15915-23-git-send-email-Dave.Martin@arm.com>
+ <34b7691f-7acb-c9aa-6e53-2857e429f148@arm.com>
+ <20190226121347.GT3567@e103592.cambridge.arm.com>
+ <a8082d89-84bd-06fa-5781-96e11376bb66@arm.com>
+ <20190301145503.GI3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190306154616.648e2523@jacob-builder>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D8574A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 08:47:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZAlR7K4HV8N1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Mar 2019 08:47:14 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E63A74A455
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 08:47:13 -0500 (EST)
+In-Reply-To: <20190301145503.GI3567@e103592.cambridge.arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, Christoffer Dall <Christoffer.Dall@a>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/03/2019 23:46, Jacob Pan wrote:
-> On Tue, 5 Mar 2019 15:03:41 +0000
-> Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+Hi Dave,
+
+On 01/03/2019 14:55, Dave Martin wrote:
+> [FYI Peter, your views on the proposal outlined torward the end of the
+> mail would be appreciated.]
 > 
->> On 18/02/2019 13:54, Eric Auger wrote:
->> [...]> +/**
->> > + * iommu_register_device_fault_handler() - Register a device fault
->> > handler
->> > + * @dev: the device
->> > + * @handler: the fault handler
->> > + * @data: private data passed as argument to the handler
->> > + *
->> > + * When an IOMMU fault event is received, call this handler with
->> > the fault event
->> > + * and data as argument. The handler should return 0 on success.
->> > If the fault is
->> > + * recoverable (IOMMU_FAULT_PAGE_REQ), the handler can also
->> > complete
->> > + * the fault by calling iommu_page_response() with one of the
->> > following
->> > + * response code:
->> > + * - IOMMU_PAGE_RESP_SUCCESS: retry the translation
->> > + * - IOMMU_PAGE_RESP_INVALID: terminate the fault
->> > + * - IOMMU_PAGE_RESP_FAILURE: terminate the fault and stop
->> > reporting
->> > + *   page faults if possible.  
->> 
->> The comment refers to function and values that haven't been defined
->> yet. Either the page_response() patch should come before, or we need
->> to split this patch.
->> 
->> Something I missed before: if the handler fails (returns != 0) it
->> should complete the fault by calling iommu_page_response(), if we're
->> not doing it in iommu_report_device_fault(). It should be indicated
->> in this comment. It's safe for the handler to call page_response()
->> since we're not holding fault_param->lock when calling the handler.
->> 
-> If the page request fault is to be reported to a guest, the report
-> function cannot wait for the completion status. As long as the fault is
-> injected into the guest, the handler should complete with success. If
-> the PRQ report fails, IMHO, the caller of iommu_report_device_fault()
-> should send page_response, perhaps after clean up all partial response
-> of the group too.
+> On Fri, Mar 01, 2019 at 01:28:19PM +0000, Julien Thierry wrote:
 
-Ok, the caller (IOMMU driver) sending the page_response if
-iommu_report_device_fault() fails does make more sense. Agreed on the
-partial cleanup as well, we don't keep track of them here, but I need to
-add that to the io-pgfault layer. However some cleanup should probably
-happen in here...
+[...]
 
->> > +   /* we only report device fault if there is a handler
->> > registered */
->> > +   mutex_lock(&dev->iommu_param->lock);
->> > +   if (!dev->iommu_param->fault_param ||
->> > +           !dev->iommu_param->fault_param->handler) {
->> > +           ret = -EINVAL;
->> > +           goto done_unlock;
->> > +   }
->> > +   fparam = dev->iommu_param->fault_param;
->> > +   if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
->> > +       evt->fault.prm.flags &
->> > IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE) {
->> > +           evt_pending = kmemdup(evt, sizeof(struct
->> > iommu_fault_event),
->> > +                           GFP_KERNEL);
->> > +           if (!evt_pending) {
->> > +                   ret = -ENOMEM;
->> > +                   goto done_unlock;
->> > +           }
->> > +           mutex_lock(&fparam->lock);
->> > +           list_add_tail(&evt_pending->list, &fparam->faults);
->> > +           mutex_unlock(&fparam->lock);
->> > +   }
->> > +   ret = fparam->handler(evt, fparam->data);
+>> I might be over-thinking it, but if there is a way to move that
+>> finalization call I'd prefer that.
+> 
+> I know what you mean, but there's not really another clear place to put
+> it either, right now.  Making finalization a side-effect of only KVM_RUN
+> and KVM_GET_REG_LIST would mean that if userspace is squirting in the
+> state of a migrated vcpu, a dummy KVM_GET_REG_LIST call would need to be
+> inserted between setting KVM_REG_ARM64_SVE_VLS and setting the other SVE
+> regs.
+> 
+> One thing we could to is get rid of the implicit finalization behaviour
+> completely, and require an explicit ioctl KVM_ARM_VCPU_FINALIZE to do
 
-... if ret != 0, removing and freeing the pending event seems more
-appropriate here than asking our caller to do it
++1. In the past, implicit finalization has been a major pain, and the
+"implicit GICv2 configuration" has been an absolute disaster.
+
+> this.  This makes a clear barrier between reg writes that manipulate the
+> "physical" configuration of the vcpu, and reg reads/writes that merely
+> manipulate the vcpu's runtime state.  Say:
+> 
+> 	KVM_ARM_VCPU_INIT(features[] = KVM_ARM_VCPU_SVE) -> ok
+> 	KVM_RUN -> -EPERM (too early)
+> 	KVM_GET_REG_LIST -> -EPERM (too early)
+> 	...
+> 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_VLS) -> ok
+> 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_ZREG(0, 0)) -> -EPERM (too early)
+> 	...
+> 	KVM_RUN -> -EPERM (too early)
+> 	...
+> 	KVM_ARM_VCPU_FINALIZE -> ok
+> 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
+> 	...
+> 	KVM_REG_REG_LIST -> ok
+> 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_VLS) -> -EPERM (too late)
+> 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_ZREG(0, 0)) -> ok
+> 	KVM_RUN -> ok
+> 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
+> 
+> This would change all existing kvm_arm_vcpu_finalize() calls to
+> 
+> 	if (!kvm_arm_vcpu_finalized())
+> 		return -EPERM;
+> 
+> (or similar).
+
+I find this rather compelling, assuming we can easily map features that
+are associated to finalization.
+
+> 	
+> Without an affected vcpu feature enabled, for backwards compatibility
+> we would not require the KVM_ARM_VCPU_FINALIZE call (or perhaps even
+> forbid it, since userspace that wants to backwards compatible cannot
+> use the new ioctl anyway.  I'm in two minds about this.  Either way,
+> calling _FINALIZE on an old kvm is harmless, so long as userspace knows
+> to ignore this failure case.)
+> 
+> The backwards-compatible flow would be:
+> 
+> 	KVM_ARM_VCPU_INIT(features[] = 0) -> ok
+> 	...
+> 	KVM_ARM_VCPU_FINALIZE -> ok (or -EPERM)
+> 	...
+> 	KVM_RUN -> ok
+> 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
+> 
+> 
+> Thoughts?
+
+This goes back to the above question: how do we ensure that userspace
+knows which features are subject to being finalized. As it is currently
+described, KVM_ARM_VCPU_FINALIZE isn't qualified by a feature set, nor
+can the kernel report what feature flags requires being finalized. It is
+also unclear to me whether all "finalizable" features would have the
+same init cycle.
+
+So either we take the simplest approach and make KVM_ARM_VCPU_FINALIZE
+strictly SVE specific (renaming it in the process), or it takes some
+argument that allow specifying the feature set it applies to. Maybe we
+can get away with the kernel not reporting which features require to be
+finalized as long that it is clearly documented.
+
+> I may not have time to rework this for -rc1, and being a late ABI
+> change I'd like to get others' views on it before heading too far into
+> the tunnel.
+
+Please do your best to have something as close as possible to the final
+version for -rc1. From that point on, I'd expect changes to be mostly
+cosmetic.
 
 Thanks,
-Jean
 
->> > +done_unlock:
->> > +   mutex_unlock(&dev->iommu_param->lock);
->> > +   return ret;
->> > +}
->> > +EXPORT_SYMBOL_GPL(iommu_report_device_fault);  
->> [...]
-> 
-> [Jacob Pan]
+	M.
+-- 
+Jazz is not dead. It just smells funny...
