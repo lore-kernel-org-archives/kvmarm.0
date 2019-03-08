@@ -1,31 +1,30 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v5 22/26] KVM: arm64/sve: Add pseudo-register for the
- guest's vector lengths
-Date: Thu, 7 Mar 2019 15:30:45 +0000
-Message-ID: <20190307153042.GL3567@e103592.cambridge.arm.com>
+From: "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+Subject: RE: [PATCH v5 00/26] KVM: arm64: SVE guest support
+Date: Fri, 8 Mar 2019 07:06:54 +0000
+Message-ID: <8898674D84E3B24BA3A2D289B872026A6A33E3BC@G01JPEXMBKW03>
 References: <1550519559-15915-1-git-send-email-Dave.Martin@arm.com>
- <1550519559-15915-23-git-send-email-Dave.Martin@arm.com>
- <34b7691f-7acb-c9aa-6e53-2857e429f148@arm.com>
- <20190226121347.GT3567@e103592.cambridge.arm.com>
- <a8082d89-84bd-06fa-5781-96e11376bb66@arm.com>
- <20190301145503.GI3567@e103592.cambridge.arm.com>
- <5a3fda6d-5da8-8aa9-9b0e-36d6bcd7441b@arm.com>
+ <8898674D84E3B24BA3A2D289B872026A6A33657E@G01JPEXMBKW03>
+ <20190305094747.GJ3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E865D4A4B0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 10:30:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59AE04A49E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Mar 2019 02:07:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XZcluNHk95Gq for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Mar 2019 10:30:50 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E08F4A4AB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Mar 2019 10:30:50 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <5a3fda6d-5da8-8aa9-9b0e-36d6bcd7441b@arm.com>
+ with ESMTP id zpo5l399fnN6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Mar 2019 02:07:03 -0500 (EST)
+Received: from mgwkm01.jp.fujitsu.com (mgwkm01.jp.fujitsu.com [202.219.69.168])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A74954A495
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Mar 2019 02:07:02 -0500 (EST)
+Received: from g01jpfmpwkw01.exch.g01.fujitsu.local
+ (g01jpfmpwkw01.exch.g01.fujitsu.local [10.0.193.38])
+ by kw-mxoi2.gw.nic.fujitsu.com (Postfix) with ESMTP id 5E96CAC00F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Mar 2019 16:06:57 +0900 (JST)
+In-Reply-To: <20190305094747.GJ3567@e103592.cambridge.arm.com>
+Content-Language: ja-JP
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,155 +34,57 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: 'Dave Martin' <Dave.Martin@arm.com>
+Cc: "Okamoto, Takayuki" <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Julien Grall <julien.grall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 07, 2019 at 01:47:09PM +0000, Marc Zyngier wrote:
-> Hi Dave,
-> 
-> On 01/03/2019 14:55, Dave Martin wrote:
-> > [FYI Peter, your views on the proposal outlined torward the end of the
-> > mail would be appreciated.]
-> > 
-> > On Fri, Mar 01, 2019 at 01:28:19PM +0000, Julien Thierry wrote:
-> 
-> [...]
-> 
-> >> I might be over-thinking it, but if there is a way to move that
-> >> finalization call I'd prefer that.
-> > 
-> > I know what you mean, but there's not really another clear place to put
-> > it either, right now.  Making finalization a side-effect of only KVM_RUN
-> > and KVM_GET_REG_LIST would mean that if userspace is squirting in the
-> > state of a migrated vcpu, a dummy KVM_GET_REG_LIST call would need to be
-> > inserted between setting KVM_REG_ARM64_SVE_VLS and setting the other SVE
-> > regs.
-> > 
-> > One thing we could to is get rid of the implicit finalization behaviour
-> > completely, and require an explicit ioctl KVM_ARM_VCPU_FINALIZE to do
-> 
-> +1. In the past, implicit finalization has been a major pain, and the
-> "implicit GICv2 configuration" has been an absolute disaster.
-> 
-> > this.  This makes a clear barrier between reg writes that manipulate the
-> > "physical" configuration of the vcpu, and reg reads/writes that merely
-> > manipulate the vcpu's runtime state.  Say:
-> > 
-> > 	KVM_ARM_VCPU_INIT(features[] = KVM_ARM_VCPU_SVE) -> ok
-> > 	KVM_RUN -> -EPERM (too early)
-> > 	KVM_GET_REG_LIST -> -EPERM (too early)
-> > 	...
-> > 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_VLS) -> ok
-> > 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_ZREG(0, 0)) -> -EPERM (too early)
-> > 	...
-> > 	KVM_RUN -> -EPERM (too early)
-> > 	...
-> > 	KVM_ARM_VCPU_FINALIZE -> ok
-> > 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
-> > 	...
-> > 	KVM_REG_REG_LIST -> ok
-> > 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_VLS) -> -EPERM (too late)
-> > 	KVM_SET_ONE_REG(KVM_REG_ARM64_SVE_ZREG(0, 0)) -> ok
-> > 	KVM_RUN -> ok
-> > 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
-> > 
-> > This would change all existing kvm_arm_vcpu_finalize() calls to
-> > 
-> > 	if (!kvm_arm_vcpu_finalized())
-> > 		return -EPERM;
-> > 
-> > (or similar).
-> 
-> I find this rather compelling, assuming we can easily map features that
-> are associated to finalization.
-
-OK ... thanks for taking a look.
-
-> > Without an affected vcpu feature enabled, for backwards compatibility
-> > we would not require the KVM_ARM_VCPU_FINALIZE call (or perhaps even
-> > forbid it, since userspace that wants to backwards compatible cannot
-> > use the new ioctl anyway.  I'm in two minds about this.  Either way,
-> > calling _FINALIZE on an old kvm is harmless, so long as userspace knows
-> > to ignore this failure case.)
-> > 
-> > The backwards-compatible flow would be:
-> > 
-> > 	KVM_ARM_VCPU_INIT(features[] = 0) -> ok
-> > 	...
-> > 	KVM_ARM_VCPU_FINALIZE -> ok (or -EPERM)
-> > 	...
-> > 	KVM_RUN -> ok
-> > 	KVM_ARM_VCPU_FINALIZE -> -EPERM (too late)
-> > 
-> > 
-> > Thoughts?
-> 
-> This goes back to the above question: how do we ensure that userspace
-> knows which features are subject to being finalized. As it is currently
-> described, KVM_ARM_VCPU_FINALIZE isn't qualified by a feature set, nor
-> can the kernel report what feature flags requires being finalized. It is
-> also unclear to me whether all "finalizable" features would have the
-> same init cycle.
-
-So, it's not clear whether any other features will ever need
-finalization, and even if they do there's a fair chance they won't be
-interdependent with SVE in such a way as to require multiple
-finalization steps.
-
-For now, it's seems reasonable to make the finalization call a no-op
-when no finalization is required.
-
-Where finalization is required, KVM_ARM_VCPU_FINALIZE becomes mandatory,
-but the requirement is a) strictly opt-in, and b) userspace will quickly
-discover if it gets this wrong.
-
-For this reason I'd rather not have any explicit reporting of whether
-finalization is needed or not (or why): we just document and enforce at
-run-time.
-
-> So either we take the simplest approach and make KVM_ARM_VCPU_FINALIZE
-> strictly SVE specific (renaming it in the process), or it takes some
-> argument that allow specifying the feature set it applies to. Maybe we
-> can get away with the kernel not reporting which features require to be
-> finalized as long that it is clearly documented.
-
-OK, what about:
-
- * Userspace treats KVM_ARM_VCPU_FINALIZE() -> EINVAL as no error
-   (so that userspace can simply insert this into its init sequence,
-   even on old kernels).
-
- * We add an argument, so that KVM_ARM_VCPU_FINALIZE(0) means
-   "finalize default stuff, including SVE".  We can add explicit flags
-   later if needed to finalize individual features separately.
-
-   I don't know whether any features ever will have interdependent
-   finalization requirements, but this should help get us off the
-   hook if so.
-
-
-Question:
-
- * KVM_REG_ARM64_SVE_VLS is a weird register because of its special
-   sequencing requirements.
-
-   The main reason for this is to make it easier to detect migration
-   to a mismatched destination node.  But userspace needs some explicit
-   code to make all this work anyway, so should we just have a couple
-   of ioctls to get/set it instead?
-
-   If there's no strong view either way, I'll leave it as-is, to
-   minimise churn.
-
-[...]
-
-> Please do your best to have something as close as possible to the final
-> version for -rc1. From that point on, I'd expect changes to be mostly
-> cosmetic.
-
-This ought to be feasible.  The changes being discussed so far are non-
-invasive.
-
-Cheers
----Dave
+SGkgRGF2ZSwNCg0KcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2ZSBNYXJ0aW4gPERh
+dmUuTWFydGluQGFybS5jb20+DQo+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDA1LCAyMDE5IDY6NDgg
+UE0NCj4gVG86IFpoYW5nLCBMZWkv5by1IOmbtyA8emhhbmcubGVpQGpwLmZ1aml0c3UuY29tPg0K
+PiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdTsgUGV0ZXIgTWF5ZGVsbA0KPiA8cGV0
+ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsgT2thbW90bywgVGFrYXl1a2kv5bKh5pysIOmrmOW5uA0K
+PiA8dG9rYW1vdG9AanAuZnVqaXRzdS5jb20+OyBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBrZXJu
+ZWwub3JnPjsgQXJkDQo+IEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+OyBN
+YXJjIFp5bmdpZXINCj4gPG1hcmMuenluZ2llckBhcm0uY29tPjsgQ2F0YWxpbiBNYXJpbmFzIDxj
+YXRhbGluLm1hcmluYXNAYXJtLmNvbT47IFdpbGwNCj4gRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0u
+Y29tPjsgSnVsaWVuIEdyYWxsIDxqdWxpZW4uZ3JhbGxAYXJtLmNvbT47IEFsZXgNCj4gQmVubsOp
+ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz47IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFk
+ZWFkLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY1IDAwLzI2XSBLVk06IGFybTY0OiBTVkUg
+Z3Vlc3Qgc3VwcG9ydA0KPiANCj4gT24gU3VuLCBNYXIgMDMsIDIwMTkgYXQgMDI6NDA6NTdBTSAr
+MDAwMCwgWmhhbmcsIExlaSB3cm90ZToNCj4gPiBIaSBEYXZlLA0KPiA+DQo+ID4gPiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogbGludXgtYXJtLWtlcm5lbA0KPiA+ID4g
+PGxpbnV4LWFybS1rZXJuZWwtYm91bmNlc0BsaXN0cy5pbmZyYWRlYWQub3JnPiBPbiBCZWhhbGYg
+T2YgRGF2ZQ0KPiA+ID4gTWFydGluDQo+ID4gPiBTZW50OiBUdWVzZGF5LCBGZWJydWFyeSAxOSwg
+MjAxOSA0OjUyIEFNDQo+ID4gPiBUbzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQ0KPiA+
+ID4gQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47IE9rYW1vdG8s
+IFRha2F5dWtpL+WyoeacrA0KPiA+ID4g6auY5bm4DQo+ID4gPiA8dG9rYW1vdG9AanAuZnVqaXRz
+dS5jb20+OyBDaHJpc3RvZmZlciBEYWxsIDxjZGFsbEBrZXJuZWwub3JnPjsgQXJkDQo+ID4gPiBC
+aWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPjsgTWFyYyBaeW5naWVyDQo+ID4g
+PiA8bWFyYy56eW5naWVyQGFybS5jb20+OyBDYXRhbGluIE1hcmluYXMgPGNhdGFsaW4ubWFyaW5h
+c0Bhcm0uY29tPjsNCj4gPiA+IFdpbGwgRGVhY29uIDx3aWxsLmRlYWNvbkBhcm0uY29tPjsgWmhh
+bmcsIExlaS/lvLUg6Zu3DQo+ID4gPiA8emhhbmcubGVpQGpwLmZ1aml0c3UuY29tPjsgSnVsaWVu
+IEdyYWxsIDxqdWxpZW4uZ3JhbGxAYXJtLmNvbT47DQo+ID4gPiBBbGV4IEJlbm7DqWUgPGFsZXgu
+YmVubmVlQGxpbmFyby5vcmc+Ow0KPiA+ID4gbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRl
+YWQub3JnDQo+ID4gPiBTdWJqZWN0OiBbUEFUQ0ggdjUgMDAvMjZdIEtWTTogYXJtNjQ6IFNWRSBn
+dWVzdCBzdXBwb3J0DQo+ID4gPg0KPiA+ID4gVGhpcyBzZXJpZXMgaW1wbGVtZW50cyBzdXBwb3J0
+IGZvciBhbGxvd2luZyBLVk0gZ3Vlc3RzIHRvIHVzZSB0aGUNCj4gPiA+IEFybSBTY2FsYWJsZSBW
+ZWN0b3IgRXh0ZW5zaW9uIChTVkUpLCBzdXBlcnNlZGluZyB0aGUgcHJldmlvdXMgdjQgc2VyaWVz
+DQo+IFsxXS4NCj4gPiA+DQo+ID4gPiBUaGUgcGF0Y2hlcyBhcmUgYWxzbyBhdmFpbGFibGUgb24g
+YSBicmFuY2ggZm9yIHJldmlld2VyIGNvbnZlbmllbmNlLg0KPiA+ID4gWzJdDQo+ID4gPg0KPiA+
+ID4gVGhlIHBhdGNoZXMgYXJlIGJhc2VkIG9uIHY1LjAtcmM2Lg0KPiA+ID4NCj4gPiA+IFRoZXkg
+ZGVwZW5kIG9uIGFub3RoZXIgc21hbGwgc2VyaWVzIGN1cnJlbnRseSB1bmRlciByZXZpZXcgWzNd
+IHRoYXQNCj4gPiA+IGRvZXMgYSBiaXQgb2YgcmVsZXZhbnQgcmVmYWN0b3JpbmcgKGFzIHdlbGwg
+YXMgZml4aW5nIGFuIGFub21hbHkgbm90DQo+ID4gPiBkaXJlY3RseSByZWxhdGVkIHRvIHRoaXMg
+c2VyaWVzKS4gIEEgYmFzZSBicmFuY2ggWzRdIGlzIHByb3ZpZGVkIHNvDQo+ID4gPiB0aGF0IHJl
+dmlld2VycyBkb24ndCBuZWVkIHRvIGh1bnQgZG93biBib3RoIHNlcmllcyBpbmRlcGVuZGVudGx5
+Lg0KPiA+IFs+XQ0KPiA+IEkgdGVzdGVkIHRoZSBwYXRjaCBvbiBBNjRGWCBjaGlwIHdoaWNoIFNW
+RSBmZWF0dXJlIGhhZCBiZWVuIGltcGxlbWVudGVkLg0KPiA+IEFsbCBvZiB0ZXN0cyBoYXZlIGJl
+ZW4gcGFzc2VkLg0KPiA+IFBsZWFzZSBhZGQgZm9sbG93cyA6DQo+ID4gVGVzdGVkLWJ5OiB6aGFu
+Zy5sZWkgPHpoYW5nLmxlaUBqcC5mdWppdHN1LmNvbT4NCj4gDQo+IFRoYW5rcyBmb3IgdGhpcyEN
+Cj4gDQo+IFRoZXJlIHdpbGwgYmUgYXQgbGVhc3Qgb25lIG1vcmUgaXRlcmF0aW9uIG9mIHRoaXMg
+c2VyaWVzIGJlZm9yZSBpdCBpcyBmaW5hbCwgc28gaXQNCj4gd291bGQgYmUgZ29vZCBpZiB5b3Ug
+Y2FuIHRlc3QgYWdhaW4gd2hlbiBJIHJlcG9zdC4NCls+XSANCk9mIGNvdXJzZSBJIHdpbGwgZG8g
+dGhlIHRlc3Qgb24gQTY0RlgsIHdoZW4geW91IHJlcG9zdCBwYXRjaC4NCg0KQmVzdCBSZWFnYXJk
+cywNClpoYW5nIExlaQ0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
