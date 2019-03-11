@@ -1,7 +1,7 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.20 07/52] KVM: arm/arm64: vgic: Make vgic_dist->lpi_list_lock a raw_spinlock
-Date: Mon, 11 Mar 2019 15:54:31 -0400
-Message-ID: <20190311195516.137772-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 18/52] KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded
+Date: Mon, 11 Mar 2019 15:54:42 -0400
+Message-ID: <20190311195516.137772-18-sashal@kernel.org>
 References: <20190311195516.137772-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -9,137 +9,90 @@ Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Julien Thierry <julien.thierry@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-[ Upstream commit fc3bc475231e12e9c0142f60100cf84d077c79e1 ]
+[ Upstream commit e761a927bc9a7ee6ceb7c4f63d5922dbced87f0d ]
 
-vgic_dist->lpi_list_lock must always be taken with interrupts disabled as
-it is used in interrupt context.
+We have two ways to reset a vcpu:
+- either through VCPU_INIT
+- or through a PSCI_ON call
 
-For configurations such as PREEMPT_RT_FULL, this means that it should
-be a raw_spinlock since RT spinlocks are interruptible.
+The first one is easy to reason about. The second one is implemented
+in a more bizarre way, as it is the vcpu that handles PSCI_ON that
+resets the vcpu that is being powered-on. As we need to turn the logic
+around and have the target vcpu to reset itself, we must take some
+preliminary steps.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Resetting the VCPU state modifies the system register state in memory,
+but this may interact with vcpu_load/vcpu_put if running with preemption
+disabled, which in turn may lead to corrupted system register state.
+
+Address this by disabling preemption and doing put/load if required
+around the reset logic.
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/kvm/arm_vgic.h        |  2 +-
- virt/kvm/arm/vgic/vgic-init.c |  2 +-
- virt/kvm/arm/vgic/vgic-its.c  |  8 ++++----
- virt/kvm/arm/vgic/vgic.c      | 10 +++++-----
- 4 files changed, 11 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/reset.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4f31f96bbfab..90ac450745f1 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -256,7 +256,7 @@ struct vgic_dist {
- 	u64			propbaser;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b72a3dd56204..f21a2a575939 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -105,16 +105,33 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+  * This function finds the right table above and sets the registers on
+  * the virtual CPU struct to their architecturally defined reset
+  * values.
++ *
++ * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
++ * ioctl or as part of handling a request issued by another VCPU in the PSCI
++ * handling code.  In the first case, the VCPU will not be loaded, and in the
++ * second case the VCPU will be loaded.  Because this function operates purely
++ * on the memory-backed valus of system registers, we want to do a full put if
++ * we were loaded (handling a request) and load the values back at the end of
++ * the function.  Otherwise we leave the state alone.  In both cases, we
++ * disable preemption around the vcpu reset as we would otherwise race with
++ * preempt notifiers which also call put/load.
+  */
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	const struct kvm_regs *cpu_reset;
++	int ret = -EINVAL;
++	bool loaded;
++
++	preempt_disable();
++	loaded = (vcpu->cpu != -1);
++	if (loaded)
++		kvm_arch_vcpu_put(vcpu);
  
- 	/* Protects the lpi_list and the count value below. */
--	spinlock_t		lpi_list_lock;
-+	raw_spinlock_t		lpi_list_lock;
- 	struct list_head	lpi_list_head;
- 	int			lpi_list_count;
+ 	switch (vcpu->arch.target) {
+ 	default:
+ 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+ 			if (!cpu_has_32bit_el1())
+-				return -EINVAL;
++				goto out;
+ 			cpu_reset = &default_regs_reset32;
+ 		} else {
+ 			cpu_reset = &default_regs_reset;
+@@ -137,7 +154,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
  
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index c0c0b88af1d5..33e7ee814f7b 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -64,7 +64,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
- 	INIT_LIST_HEAD(&dist->lpi_list_head);
--	spin_lock_init(&dist->lpi_list_lock);
-+	raw_spin_lock_init(&dist->lpi_list_lock);
+ 	/* Reset timer */
+-	return kvm_timer_vcpu_reset(vcpu);
++	ret = kvm_timer_vcpu_reset(vcpu);
++out:
++	if (loaded)
++		kvm_arch_vcpu_load(vcpu, smp_processor_id());
++	preempt_enable();
++	return ret;
  }
  
- /* CREATION */
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index eb2a390a6c86..e99fb31582fb 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -73,7 +73,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	irq->target_vcpu = vcpu;
- 	irq->group = 1;
- 
--	spin_lock_irqsave(&dist->lpi_list_lock, flags);
-+	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 
- 	/*
- 	 * There could be a race with another vgic_add_lpi(), so we need to
-@@ -101,7 +101,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	dist->lpi_list_count++;
- 
- out_unlock:
--	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 
- 	/*
- 	 * We "cache" the configuration table entries in our struct vgic_irq's.
-@@ -332,7 +332,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
- 	if (!intids)
- 		return -ENOMEM;
- 
--	spin_lock_irqsave(&dist->lpi_list_lock, flags);
-+	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
- 		if (i == irq_count)
- 			break;
-@@ -341,7 +341,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
- 			continue;
- 		intids[i++] = irq->intid;
- 	}
--	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 
- 	*intid_ptr = intids;
- 	return i;
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index f884a54b2601..c5165e3b80cb 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -72,7 +72,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- 	struct vgic_irq *irq = NULL;
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&dist->lpi_list_lock, flags);
-+	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 
- 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
- 		if (irq->intid != intid)
-@@ -88,7 +88,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- 	irq = NULL;
- 
- out_unlock:
--	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 
- 	return irq;
- }
-@@ -138,15 +138,15 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	if (irq->intid < VGIC_MIN_LPI)
- 		return;
- 
--	spin_lock_irqsave(&dist->lpi_list_lock, flags);
-+	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 	if (!kref_put(&irq->refcount, vgic_irq_release)) {
--		spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+		raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 		return;
- 	};
- 
- 	list_del(&irq->lpi_list);
- 	dist->lpi_list_count--;
--	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 
- 	kfree(irq);
- }
+ void kvm_set_ipa_limit(void)
 -- 
 2.19.1
