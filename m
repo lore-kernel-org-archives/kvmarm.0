@@ -1,85 +1,145 @@
-From: Zheng Xiang <zhengxiang9@huawei.com>
-Subject: [RFC] Question about TLB flush while set Stage-2 huge pages
-Date: Tue, 12 Mar 2019 00:31:10 +0800
-Message-ID: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 07/52] KVM: arm/arm64: vgic: Make vgic_dist->lpi_list_lock a raw_spinlock
+Date: Mon, 11 Mar 2019 15:54:31 -0400
+Message-ID: <20190311195516.137772-7-sashal@kernel.org>
+References: <20190311195516.137772-1-sashal@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA4294A3FE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 12:31:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9OYbyGkz6HbU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Mar 2019 12:31:39 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82E554A321
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 12:31:39 -0400 (EDT)
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, suzuki.poulose@arm.com, james.morse@arm.com
-Cc: lishuo1@hisilicon.com, linux-kernel@vger.kernel.org, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, lious.lilei@hisilicon.com
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Julien Thierry <julien.thierry@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi all,
+From: Julien Thierry <julien.thierry@arm.com>
 
-While a page is merged into a transparent huge page, KVM will invalidate Stage-2 for
-the base address of the huge page and the whole of Stage-1.
-However, this just only invalidates the first page within the huge page and the other
-pages are not invalidated, see bellow:
+[ Upstream commit fc3bc475231e12e9c0142f60100cf84d077c79e1 ]
 
-    +---------------+--------------+
-    |abcde       2MB-Page          |
-    +---------------+--------------+
+vgic_dist->lpi_list_lock must always be taken with interrupts disabled as
+it is used in interrupt context.
 
-    TLB before setting new pmd:
-    +---------------+--------------+
-    |      VA       |    PAGESIZE  |
-    +---------------+--------------+
-    |      a        |      4KB     |
-    +---------------+--------------+
-    |      b        |      4KB     |
-    +---------------+--------------+
-    |      c        |      4KB     |
-    +---------------+--------------+
-    |      d        |      4KB     |
-    +---------------+--------------+
+For configurations such as PREEMPT_RT_FULL, this means that it should
+be a raw_spinlock since RT spinlocks are interruptible.
 
-    TLB after setting new pmd:
-    +---------------+--------------+
-    |      VA       |    PAGESIZE  |
-    +---------------+--------------+
-    |      a        |      2MB     |
-    +---------------+--------------+
-    |      b        |      4KB     |
-    +---------------+--------------+
-    |      c        |      4KB     |
-    +---------------+--------------+
-    |      d        |      4KB     |
-    +---------------+--------------+
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ include/kvm/arm_vgic.h        |  2 +-
+ virt/kvm/arm/vgic/vgic-init.c |  2 +-
+ virt/kvm/arm/vgic/vgic-its.c  |  8 ++++----
+ virt/kvm/arm/vgic/vgic.c      | 10 +++++-----
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
-When VM access *b* address, it will hit the TLB and result in TLB conflict aborts or other potential exceptions.
-
-For example, we need to keep tracking of the VM memory dirty pages when VM is in live migration.
-KVM will set the memslot READONLY and split the huge pages.
-After live migration is canceled and abort, the pages will be merged into THP.
-The later access to these pages which are READONLY will cause level-3 Permission Fault until they are invalidated.
-
-So should we invalidate the tlb entries for all relative pages(e.g a,b,c,d), like __flush_tlb_range()?
-Or we can call __kvm_tlb_flush_vmid() to invalidate all tlb entries.
-
-
-
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4f31f96bbfab..90ac450745f1 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -256,7 +256,7 @@ struct vgic_dist {
+ 	u64			propbaser;
+ 
+ 	/* Protects the lpi_list and the count value below. */
+-	spinlock_t		lpi_list_lock;
++	raw_spinlock_t		lpi_list_lock;
+ 	struct list_head	lpi_list_head;
+ 	int			lpi_list_count;
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index c0c0b88af1d5..33e7ee814f7b 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -64,7 +64,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+ 	INIT_LIST_HEAD(&dist->lpi_list_head);
+-	spin_lock_init(&dist->lpi_list_lock);
++	raw_spin_lock_init(&dist->lpi_list_lock);
+ }
+ 
+ /* CREATION */
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index eb2a390a6c86..e99fb31582fb 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -73,7 +73,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	irq->target_vcpu = vcpu;
+ 	irq->group = 1;
+ 
+-	spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	/*
+ 	 * There could be a race with another vgic_add_lpi(), so we need to
+@@ -101,7 +101,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	dist->lpi_list_count++;
+ 
+ out_unlock:
+-	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	/*
+ 	 * We "cache" the configuration table entries in our struct vgic_irq's.
+@@ -332,7 +332,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 	if (!intids)
+ 		return -ENOMEM;
+ 
+-	spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (i == irq_count)
+ 			break;
+@@ -341,7 +341,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 			continue;
+ 		intids[i++] = irq->intid;
+ 	}
+-	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	*intid_ptr = intids;
+ 	return i;
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index f884a54b2601..c5165e3b80cb 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -72,7 +72,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ 	struct vgic_irq *irq = NULL;
+ 	unsigned long flags;
+ 
+-	spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		if (irq->intid != intid)
+@@ -88,7 +88,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
+ 	irq = NULL;
+ 
+ out_unlock:
+-	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	return irq;
+ }
+@@ -138,15 +138,15 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	if (irq->intid < VGIC_MIN_LPI)
+ 		return;
+ 
+-	spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 	if (!kref_put(&irq->refcount, vgic_irq_release)) {
+-		spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++		raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 		return;
+ 	};
+ 
+ 	list_del(&irq->lpi_list);
+ 	dist->lpi_list_count--;
+-	spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	kfree(irq);
+ }
 -- 
-
-Thanks,
-Xiang
+2.19.1
