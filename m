@@ -1,98 +1,82 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.20 18/52] KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded
-Date: Mon, 11 Mar 2019 15:54:42 -0400
-Message-ID: <20190311195516.137772-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 20/52] arm/arm64: KVM: Don't panic on failure to
+ properly reset system registers
+Date: Mon, 11 Mar 2019 15:54:44 -0400
+Message-ID: <20190311195516.137772-20-sashal@kernel.org>
 References: <20190311195516.137772-1-sashal@kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 416844A331
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:55:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id K0swRfxwGVwo for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Mar 2019 15:55:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 803A74A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:55:56 -0400 (EDT)
 In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-[ Upstream commit e761a927bc9a7ee6ceb7c4f63d5922dbced87f0d ]
+[ Upstream commit 20589c8cc47dce5854c8bf1b44a9fc63d798d26d ]
 
-We have two ways to reset a vcpu:
-- either through VCPU_INIT
-- or through a PSCI_ON call
+Failing to properly reset system registers is pretty bad. But not
+quite as bad as bringing the whole machine down... So warn loudly,
+but slightly more gracefully.
 
-The first one is easy to reason about. The second one is implemented
-in a more bizarre way, as it is the vcpu that handles PSCI_ON that
-resets the vcpu that is being powered-on. As we need to turn the logic
-around and have the target vcpu to reset itself, we must take some
-preliminary steps.
-
-Resetting the VCPU state modifies the system register state in memory,
-but this may interact with vcpu_load/vcpu_put if running with preemption
-disabled, which in turn may lead to corrupted system register state.
-
-Address this by disabling preemption and doing put/load if required
-around the reset logic.
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/arm64/kvm/reset.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ arch/arm/kvm/coproc.c     | 4 ++--
+ arch/arm64/kvm/sys_regs.c | 8 +++++---
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b72a3dd56204..f21a2a575939 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -105,16 +105,33 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-  * This function finds the right table above and sets the registers on
-  * the virtual CPU struct to their architecturally defined reset
-  * values.
-+ *
-+ * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
-+ * ioctl or as part of handling a request issued by another VCPU in the PSCI
-+ * handling code.  In the first case, the VCPU will not be loaded, and in the
-+ * second case the VCPU will be loaded.  Because this function operates purely
-+ * on the memory-backed valus of system registers, we want to do a full put if
-+ * we were loaded (handling a request) and load the values back at the end of
-+ * the function.  Otherwise we leave the state alone.  In both cases, we
-+ * disable preemption around the vcpu reset as we would otherwise race with
-+ * preempt notifiers which also call put/load.
-  */
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
- 	const struct kvm_regs *cpu_reset;
-+	int ret = -EINVAL;
-+	bool loaded;
-+
-+	preempt_disable();
-+	loaded = (vcpu->cpu != -1);
-+	if (loaded)
-+		kvm_arch_vcpu_put(vcpu);
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index cb094e55dc5f..fd6cde23bb5d 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -1450,6 +1450,6 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
+ 	reset_coproc_regs(vcpu, table, num);
  
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
- 			if (!cpu_has_32bit_el1())
--				return -EINVAL;
-+				goto out;
- 			cpu_reset = &default_regs_reset32;
- 		} else {
- 			cpu_reset = &default_regs_reset;
-@@ -137,7 +154,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
- 
- 	/* Reset timer */
--	return kvm_timer_vcpu_reset(vcpu);
-+	ret = kvm_timer_vcpu_reset(vcpu);
-+out:
-+	if (loaded)
-+		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+	preempt_enable();
-+	return ret;
+ 	for (num = 1; num < NR_CP15_REGS; num++)
+-		if (vcpu_cp15(vcpu, num) == 0x42424242)
+-			panic("Didn't reset vcpu_cp15(vcpu, %zi)", num);
++		WARN(vcpu_cp15(vcpu, num) == 0x42424242,
++		     "Didn't reset vcpu_cp15(vcpu, %zi)", num);
  }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 22fbbdbece3c..fe18e68f9a20 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2586,7 +2586,9 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ 	table = get_target_table(vcpu->arch.target, true, &num);
+ 	reset_sys_reg_descs(vcpu, table, num);
  
- void kvm_set_ipa_limit(void)
+-	for (num = 1; num < NR_SYS_REGS; num++)
+-		if (__vcpu_sys_reg(vcpu, num) == 0x4242424242424242)
+-			panic("Didn't reset __vcpu_sys_reg(%zi)", num);
++	for (num = 1; num < NR_SYS_REGS; num++) {
++		if (WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
++			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
++			break;
++	}
+ }
 -- 
 2.19.1
