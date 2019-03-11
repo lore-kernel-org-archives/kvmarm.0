@@ -1,23 +1,23 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.20 19/52] arm/arm64: KVM: Allow a VCPU to fully
- reset itself
-Date: Mon, 11 Mar 2019 15:54:43 -0400
-Message-ID: <20190311195516.137772-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 21/52] KVM: arm/arm64: vgic: Always initialize
+ the group of private IRQs
+Date: Mon, 11 Mar 2019 15:54:45 -0400
+Message-ID: <20190311195516.137772-21-sashal@kernel.org>
 References: <20190311195516.137772-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C52874A332
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:55:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9CDF4A42B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:56:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5JxkuyymFJJM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Mar 2019 15:55:55 -0400 (EDT)
+ with ESMTP id V09-d4++zBZn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Mar 2019 15:56:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D4704A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:55:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A91244A438
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:55:58 -0400 (EDT)
 In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,281 +32,81 @@ To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-[ Upstream commit 358b28f09f0ab074d781df72b8a671edb1547789 ]
+[ Upstream commit ab2d5eb03dbb7b37a1c6356686fb48626ab0c93e ]
 
-The current kvm_psci_vcpu_on implementation will directly try to
-manipulate the state of the VCPU to reset it.  However, since this is
-not done on the thread that runs the VCPU, we can end up in a strangely
-corrupted state when the source and target VCPUs are running at the same
-time.
+We currently initialize the group of private IRQs during
+kvm_vgic_vcpu_init, and the value of the group depends on the GIC model
+we are emulating.  However, CPUs created before creating (and
+initializing) the VGIC might end up with the wrong group if the VGIC
+is created as GICv3 later.
 
-Fix this by factoring out all reset logic from the PSCI implementation
-and forwarding the required information along with a request to the
-target VCPU.
+Since we have no enforced ordering of creating the VGIC and creating
+VCPUs, we can end up with part the VCPUs being properly intialized and
+the remaining incorrectly initialized.  That also means that we have no
+single place to do the per-cpu data structure initialization which
+depends on knowing the emulated GIC model (which is only the group
+field).
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+This patch removes the incorrect comment from kvm_vgic_vcpu_init and
+initializes the group of all previously created VCPUs's private
+interrupts in vgic_init in addition to the existing initialization in
+kvm_vgic_vcpu_init.
+
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/arm/include/asm/kvm_host.h   | 10 +++++++++
- arch/arm/kvm/reset.c              | 24 +++++++++++++++++++++
- arch/arm64/include/asm/kvm_host.h | 11 ++++++++++
- arch/arm64/kvm/reset.c            | 24 +++++++++++++++++++++
- virt/kvm/arm/arm.c                | 10 +++++++++
- virt/kvm/arm/psci.c               | 36 ++++++++++++++-----------------
- 6 files changed, 95 insertions(+), 20 deletions(-)
+ virt/kvm/arm/vgic/vgic-init.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 5ca5d9af0c26..4ecd426e9b1c 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -48,6 +48,7 @@
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-+#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 33e7ee814f7b..8196e4f8731f 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -231,13 +231,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 			irq->config = VGIC_CONFIG_LEVEL;
+ 		}
  
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-@@ -147,6 +148,13 @@ struct kvm_cpu_context {
- 
- typedef struct kvm_cpu_context kvm_cpu_context_t;
- 
-+struct vcpu_reset_state {
-+	unsigned long	pc;
-+	unsigned long	r0;
-+	bool		be;
-+	bool		reset;
-+};
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
-@@ -186,6 +194,8 @@ struct kvm_vcpu_arch {
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
- 
-+	struct vcpu_reset_state reset_state;
-+
- 	/* Detect first run of a vcpu */
- 	bool has_run_once;
- };
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index 5ed0c3ee33d6..e53327912adc 100644
---- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -26,6 +26,7 @@
- #include <asm/cputype.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_emulate.h>
- 
- #include <kvm/arm_arch_timer.h>
- 
-@@ -69,6 +70,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset CP15 registers */
- 	kvm_reset_coprocs(vcpu);
- 
-+	/*
-+	 * Additional reset state handling that PSCI may have imposed on us.
-+	 * Must be done after all the sys_reg reset.
-+	 */
-+	if (READ_ONCE(vcpu->arch.reset_state.reset)) {
-+		unsigned long target_pc = vcpu->arch.reset_state.pc;
-+
-+		/* Gracefully handle Thumb2 entry point */
-+		if (target_pc & 1) {
-+			target_pc &= ~1UL;
-+			vcpu_set_thumb(vcpu);
-+		}
-+
-+		/* Propagate caller endianness */
-+		if (vcpu->arch.reset_state.be)
-+			kvm_vcpu_set_be(vcpu);
-+
-+		*vcpu_pc(vcpu) = target_pc;
-+		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-+
-+		vcpu->arch.reset_state.reset = false;
-+	}
-+
- 	/* Reset arch_timer context */
- 	return kvm_timer_vcpu_reset(vcpu);
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 52fbc823ff8c..4fc7c8f0b717 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -48,6 +48,7 @@
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
-+#define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-@@ -208,6 +209,13 @@ struct kvm_cpu_context {
- 
- typedef struct kvm_cpu_context kvm_cpu_context_t;
- 
-+struct vcpu_reset_state {
-+	unsigned long	pc;
-+	unsigned long	r0;
-+	bool		be;
-+	bool		reset;
-+};
-+
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
-@@ -297,6 +305,9 @@ struct kvm_vcpu_arch {
- 	/* Virtual SError ESR to restore when HCR_EL2.VSE is set */
- 	u64 vsesr_el2;
- 
-+	/* Additional reset state */
-+	struct vcpu_reset_state	reset_state;
-+
- 	/* True when deferrable sysregs are loaded on the physical CPU,
- 	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
- 	bool sysregs_loaded_on_cpu;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f21a2a575939..f16a5f8ff2b4 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -32,6 +32,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_coproc.h>
-+#include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- 
- /* Maximum phys_shift supported for any VM on this host */
-@@ -146,6 +147,29 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	/* Reset system registers */
- 	kvm_reset_sys_regs(vcpu);
- 
-+	/*
-+	 * Additional reset state handling that PSCI may have imposed on us.
-+	 * Must be done after all the sys_reg reset.
-+	 */
-+	if (vcpu->arch.reset_state.reset) {
-+		unsigned long target_pc = vcpu->arch.reset_state.pc;
-+
-+		/* Gracefully handle Thumb2 entry point */
-+		if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
-+			target_pc &= ~1UL;
-+			vcpu_set_thumb(vcpu);
-+		}
-+
-+		/* Propagate caller endianness */
-+		if (vcpu->arch.reset_state.be)
-+			kvm_vcpu_set_be(vcpu);
-+
-+		*vcpu_pc(vcpu) = target_pc;
-+		vcpu_set_reg(vcpu, 0, vcpu->arch.reset_state.r0);
-+
-+		vcpu->arch.reset_state.reset = false;
-+	}
-+
- 	/* Reset PMU */
- 	kvm_pmu_vcpu_reset(vcpu);
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index abcd29db2d7a..e914e585fa8c 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -626,6 +626,13 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
- 		/* Awaken to handle a signal, request we sleep again later. */
- 		kvm_make_request(KVM_REQ_SLEEP, vcpu);
- 	}
-+
-+	/*
-+	 * Make sure we will observe a potential reset request if we've
-+	 * observed a change to the power state. Pairs with the smp_wmb() in
-+	 * kvm_psci_vcpu_on().
-+	 */
-+	smp_rmb();
- }
- 
- static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-@@ -639,6 +646,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
- 			vcpu_req_sleep(vcpu);
- 
-+		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
-+			kvm_reset_vcpu(vcpu);
-+
- 		/*
- 		 * Clear IRQ_PENDING requests that were made to guarantee
- 		 * that a VCPU sees new virtual interrupts.
-diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
-index 9b73d3ad918a..34d08ee63747 100644
---- a/virt/kvm/arm/psci.c
-+++ b/virt/kvm/arm/psci.c
-@@ -104,12 +104,10 @@ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
- 
- static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+-		/*
+-		 * GICv3 can only be created via the KVM_DEVICE_CREATE API and
+-		 * so we always know the emulation type at this point as it's
+-		 * either explicitly configured as GICv3, or explicitly
+-		 * configured as GICv2, or not configured yet which also
+-		 * implies GICv2.
+-		 */
+ 		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+ 			irq->group = 1;
+ 		else
+@@ -281,7 +274,7 @@ int vgic_init(struct kvm *kvm)
  {
-+	struct vcpu_reset_state *reset_state;
- 	struct kvm *kvm = source_vcpu->kvm;
- 	struct kvm_vcpu *vcpu = NULL;
--	struct swait_queue_head *wq;
- 	unsigned long cpu_id;
--	unsigned long context_id;
--	phys_addr_t target_pc;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct kvm_vcpu *vcpu;
+-	int ret = 0, i;
++	int ret = 0, i, idx;
  
- 	cpu_id = smccc_get_arg1(source_vcpu) & MPIDR_HWID_BITMASK;
- 	if (vcpu_mode_is_32bit(source_vcpu))
-@@ -130,32 +128,30 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 			return PSCI_RET_INVALID_PARAMS;
- 	}
+ 	if (vgic_initialized(kvm))
+ 		return 0;
+@@ -298,6 +291,19 @@ int vgic_init(struct kvm *kvm)
+ 	if (ret)
+ 		goto out;
  
--	target_pc = smccc_get_arg2(source_vcpu);
--	context_id = smccc_get_arg3(source_vcpu);
-+	reset_state = &vcpu->arch.reset_state;
- 
--	kvm_reset_vcpu(vcpu);
--
--	/* Gracefully handle Thumb2 entry point */
--	if (vcpu_mode_is_32bit(vcpu) && (target_pc & 1)) {
--		target_pc &= ~((phys_addr_t) 1);
--		vcpu_set_thumb(vcpu);
--	}
-+	reset_state->pc = smccc_get_arg2(source_vcpu);
- 
- 	/* Propagate caller endianness */
--	if (kvm_vcpu_is_be(source_vcpu))
--		kvm_vcpu_set_be(vcpu);
-+	reset_state->be = kvm_vcpu_is_be(source_vcpu);
- 
--	*vcpu_pc(vcpu) = target_pc;
- 	/*
- 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
- 	 * the general puspose registers are undefined upon CPU_ON.
- 	 */
--	smccc_set_retval(vcpu, context_id, 0, 0, 0);
--	vcpu->arch.power_off = false;
--	smp_mb();		/* Make sure the above is visible */
-+	reset_state->r0 = smccc_get_arg3(source_vcpu);
++	/* Initialize groups on CPUs created before the VGIC type was known */
++	kvm_for_each_vcpu(idx, vcpu, kvm) {
++		struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
 +
-+	WRITE_ONCE(reset_state->reset, true);
-+	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
- 
--	wq = kvm_arch_vcpu_wq(vcpu);
--	swake_up_one(wq);
-+	/*
-+	 * Make sure the reset request is observed if the change to
-+	 * power_state is observed.
-+	 */
-+	smp_wmb();
++		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
++			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
++			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++				irq->group = 1;
++			else
++				irq->group = 0;
++		}
++	}
 +
-+	vcpu->arch.power_off = false;
-+	kvm_vcpu_wake_up(vcpu);
- 
- 	return PSCI_RET_SUCCESS;
- }
+ 	if (vgic_has_its(kvm)) {
+ 		ret = vgic_v4_init(kvm);
+ 		if (ret)
 -- 
 2.19.1
