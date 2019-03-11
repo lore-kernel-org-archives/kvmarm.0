@@ -1,248 +1,180 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v11 6/8] arm64: KVM: Enable VHE support for :G/:H perf
- event modifiers
-Date: Mon, 11 Mar 2019 12:16:22 +0000
-Message-ID: <20190311121622.GH10637@e119886-lin.cambridge.arm.com>
-References: <20190308120746.56897-1-andrew.murray@arm.com>
- <20190308120746.56897-7-andrew.murray@arm.com>
- <465b5efe-a54d-29ff-cb2e-2a2460c02974@arm.com>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
+Date: Mon, 11 Mar 2019 22:35:01 +0800
+Message-ID: <20190311143501.GH13422@leoy-ThinkPad-X240s>
+References: <20190311064248.GC13422@leoy-ThinkPad-X240s>
+ <f6f56743-677c-61ff-1746-1c86eab054a4@redhat.com>
+ <20190311093958.GF13422@leoy-ThinkPad-X240s>
+ <762d54fb-b146-e591-d544-676cb5606837@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 452E54A408
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 10:35:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 456XfU62eZ+e for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Mar 2019 10:35:09 -0400 (EDT)
+Received: from mail-yw1-f68.google.com (mail-yw1-f68.google.com
+ [209.85.161.68])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 307124A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 10:35:09 -0400 (EDT)
+Received: by mail-yw1-f68.google.com with SMTP id j189so4006676ywd.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 07:35:09 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <465b5efe-a54d-29ff-cb2e-2a2460c02974@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <762d54fb-b146-e591-d544-676cb5606837@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Auger Eric <eric.auger@redhat.com>, Mark Rutland <mark.rutland@arm.com>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 11, 2019 at 09:39:19AM +0000, Julien Thierry wrote:
-> Hi Andrew,
-> 
-> On 08/03/2019 12:07, Andrew Murray wrote:
-> > With VHE different exception levels are used between the host (EL2) and
-> > guest (EL1) with a shared exception level for userpace (EL0). We can take
-> > advantage of this and use the PMU's exception level filtering to avoid
-> > enabling/disabling counters in the world-switch code. Instead we just
-> > modify the counter type to include or exclude EL0 at vcpu_{load,put} time.
-> > 
-> > We also ensure that trapped PMU system register writes do not re-enable
-> > EL0 when reconfiguring the backing perf events.
-> > 
-> > This approach completely avoids blackout windows seen with !VHE.
-> > 
-> > Suggested-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  arch/arm/include/asm/kvm_host.h   |  3 ++
-> >  arch/arm64/include/asm/kvm_host.h |  5 +-
-> >  arch/arm64/kernel/perf_event.c    |  6 ++-
-> >  arch/arm64/kvm/pmu.c              | 87 ++++++++++++++++++++++++++++++-
-> >  arch/arm64/kvm/sys_regs.c         |  3 ++
-> >  virt/kvm/arm/arm.c                |  2 +
-> >  6 files changed, 102 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index a358cb15bb0d..3ce429954306 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -326,6 +326,9 @@ static inline void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu) {}
-> >  static inline void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu) {}
-> >  static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
-> >  
-> > +static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
-> > +static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
-> > +
-> >  static inline void kvm_arm_vhe_guest_enter(void) {}
-> >  static inline void kvm_arm_vhe_guest_exit(void) {}
-> >  
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 7ca4e094626d..d631528898b5 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -487,7 +487,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
-> >  
-> >  static inline bool kvm_pmu_counter_defered(struct perf_event_attr *attr)
-> >  {
-> > -	return attr->exclude_host;
-> > +	return (!has_vhe() && attr->exclude_host);
-> >  }
-> >  
-> >  #ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
-> > @@ -501,6 +501,9 @@ void kvm_clr_pmu_events(u32 clr);
-> >  
-> >  void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt);
-> >  bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt);
-> > +
-> > +void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
-> > +void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> >  #else
-> >  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
-> >  static inline void kvm_clr_pmu_events(u32 clr) {}
-> > diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> > index 64f02a9fd7cd..a121a82fc54c 100644
-> > --- a/arch/arm64/kernel/perf_event.c
-> > +++ b/arch/arm64/kernel/perf_event.c
-> > @@ -847,8 +847,12 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
-> >  	 * with other architectures (x86 and Power).
-> >  	 */
-> >  	if (is_kernel_in_hyp_mode()) {
-> > -		if (!attr->exclude_kernel)
-> > +		if (!attr->exclude_kernel && !attr->exclude_host)
-> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> > +		if (attr->exclude_guest)
-> > +			config_base |= ARMV8_PMU_EXCLUDE_EL1;
-> > +		if (attr->exclude_host)
-> > +			config_base |= ARMV8_PMU_EXCLUDE_EL0;
-> >  	} else {
-> >  		if (!attr->exclude_hv && !attr->exclude_host)
-> >  			config_base |= ARMV8_PMU_INCLUDE_EL2;
-> > diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> > index a1cee7919953..a0830c70ece5 100644
-> > --- a/arch/arm64/kvm/pmu.c
-> > +++ b/arch/arm64/kvm/pmu.c
-> > @@ -12,11 +12,19 @@
-> >  DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
-> >  
-> >  /*
-> > - * Given the exclude_{host,guest} attributes, determine if we are going
-> > - * to need to switch counters at guest entry/exit.
-> > + * Given the perf event attributes and system type, determine
-> > + * if we are going to need to switch counters at guest entry/exit.
-> >   */
-> >  static bool kvm_pmu_switch_needed(struct perf_event_attr *attr)
-> >  {
-> > +	/**
-> > +	 * With VHE the guest kernel runs at EL1 and the host at EL2,
-> > +	 * where user (EL0) is excluded then we have no reason to switch
-> > +	 * counters.
-> > +	 */
-> > +	if (has_vhe() && attr->exclude_user)
-> > +		return false;
-> > +
-> >  	/* Only switch if attributes are different */
-> >  	return (attr->exclude_host ^ attr->exclude_guest);
-> >  }
-> > @@ -87,3 +95,78 @@ void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> >  		write_sysreg(pmu->events_host, pmcntenset_el0);
-> >  }
-> >  
-> > +/*
-> > + * Modify ARMv8 PMU events to include EL0 counting
-> > + */
-> > +static void kvm_vcpu_pmu_enable_el0(unsigned long events)
-> > +{
-> > +	u64 typer;
-> > +	u32 counter;
-> > +
-> > +	for_each_set_bit(counter, &events, 32) {
-> > +		write_sysreg(counter, pmselr_el0);
-> > +		isb();
-> > +		typer = read_sysreg(pmxevtyper_el0) & ~ARMV8_PMU_EXCLUDE_EL0;
-> > +		write_sysreg(typer, pmxevtyper_el0);
-> > +		isb();
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * Modify ARMv8 PMU events to exclude EL0 counting
-> > + */
-> > +static void kvm_vcpu_pmu_disable_el0(unsigned long events)
-> > +{
-> > +	u64 typer;
-> > +	u32 counter;
-> > +
-> > +	for_each_set_bit(counter, &events, 32) {
-> > +		write_sysreg(counter, pmselr_el0);
-> > +		isb();
-> > +		typer = read_sysreg(pmxevtyper_el0) | ARMV8_PMU_EXCLUDE_EL0;
-> > +		write_sysreg(typer, pmxevtyper_el0);
-> > +		isb();
-> > +	}
-> > +}
-> > +
-> > +/*
-> > + * On VHE ensure that only guest events have EL0 counting enabled
-> > + */
-> > +void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_cpu_context *host_ctxt;
-> > +	struct kvm_host_data *host;
-> > +	u32 events_guest, events_host;
-> > +
-> > +	if (!has_vhe())
-> > +		return;
-> > +
-> > +	host_ctxt = vcpu->arch.host_cpu_context;
-> > +	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-> > +	events_guest = host->pmu_events.events_guest;
-> > +	events_host = host->pmu_events.events_host;
-> > +
-> > +	kvm_vcpu_pmu_enable_el0(events_guest);
-> > +	kvm_vcpu_pmu_disable_el0(events_host);
-> 
-> So, we load a vcpu, and all events common to the guest and the host
-> (events_guest & events_host) get the EXCLUDE_EL0 flag set.
-> 
-> I don't see anything that will remove that flag before running the
-> guest. Am I missing something? Should these lines be as follows?
-> 
-> 	kvm_vcpu_pmu_enable_el0(events_guest & events_host);
-> 	kvm_vcpu_pmu_enable_el0(events_guest ^ events_host);
-> 
+Hi Eric,
 
-For VHE and !exclude_user, where an event is common to both guest and
-host (i.e.  exclude_kernel = exclude_host = 0) then:
+[ + Mark Rutland ]
 
- - The event is never deferred (so we always start counting)
- - When we set the event filter at start of day (armv8pmu_set_event_filter)
-   we don't exclude EL0.
- - Also we don't add this event to pmu_events due to kvm_pmu_switch_needed
-   in kvm_set_pmu_events - so we don't actually do anything here.
+On Mon, Mar 11, 2019 at 10:47:22AM +0100, Auger Eric wrote:
 
-I think the logic you were expecting is moved to start of day when the
-counter is first created, thus reducing the effort here.
+[...]
+
+> >>> P.s. I also checked the sysfs node and found it doesn't contain node
+> >>> 'iommu_group':
+> >>>
+> >>> # ls /sys/bus/pci/devices/0000\:08\:00.0/iommu_group
+> >>> ls: cannot access '/sys/bus/pci/devices/0000:08:00.0/iommu_group': No
+> >>> such file or directory
+> >>
+> >> please can you give the output of the following command:
+> >> find /sys/kernel/iommu_groups/
+> > 
+> > I get below result on Juno board:
+> > 
+> > root@debian:~# find /sys/kernel/iommu_groups/
+> > /sys/kernel/iommu_groups/
+> > /sys/kernel/iommu_groups/1
+> > /sys/kernel/iommu_groups/1/devices
+> > /sys/kernel/iommu_groups/1/devices/20070000.etr
+> > /sys/kernel/iommu_groups/1/type
+> > /sys/kernel/iommu_groups/1/reserved_regions
+> > /sys/kernel/iommu_groups/0
+> > /sys/kernel/iommu_groups/0/devices
+> > /sys/kernel/iommu_groups/0/devices/7ffb0000.ohci
+> > /sys/kernel/iommu_groups/0/devices/7ffc0000.ehci
+> > /sys/kernel/iommu_groups/0/type
+> > /sys/kernel/iommu_groups/0/reserved_regions
+> > 
+> > So the 'iommu_groups' is not created for pci-e devices, right?
+> 
+> Yes that's correct.
+
+Juno's pci-e devices without 'iommu_groups' is caused by dt binding, in
+dts file [1] it sets 'status = "disabled"' for 'smmu_pcie' node.  Thus
+the SMMU device will not be enabled for pci-e devices.
+
+@Mark Rutland, could you have chance to confirm this should be fixed in
+juno-base.dtsi or juno-r1.dts/juno-r2.dts?
+
+> > Will debug into dt binding and related code and keep posted at here.OK
+
+So now I made some progress and can see the networking card is
+pass-through to guest OS, though the networking card reports errors
+now.  Below is detailed steps and info:
+
+- Bind devices in the same IOMMU group to vfio driver:
+
+  echo 0000:03:00.0 > /sys/bus/pci/devices/0000\:03\:00.0/driver/unbind
+  echo 1095 3132 > /sys/bus/pci/drivers/vfio-pci/new_id
+
+  echo 0000:08:00.0 > /sys/bus/pci/devices/0000\:08\:00.0/driver/unbind
+  echo 11ab 4380 > /sys/bus/pci/drivers/vfio-pci/new_id
+
+- Enable 'allow_unsafe_interrupts=1' for module vfio_iommu_type1;
+
+- Use qemu to launch guest OS:
+
+  qemu-system-aarch64 \
+        -cpu host -M virt,accel=kvm -m 4096 -nographic \
+        -kernel /root/virt/Image -append root=/dev/vda2 \
+        -net none -device vfio-pci,host=08:00.0 \
+        -drive if=virtio,file=/root/virt/qemu/debian.img \
+        -append 'loglevel=8 root=/dev/vda2 rw console=ttyAMA0 earlyprintk ip=dhcp'
+
+- Host log:
+
+[  188.329861] vfio-pci 0000:08:00.0: enabling device (0000 -> 0003)
+
+- Below is guest log, from log though the driver has been registered but
+  it reports PCI hardware failure and the timeout for the interrupt.
+
+  So is this caused by very 'slow' forward interrupt handling?  Juno
+  board uses GICv2 (I think it has GICv2m extension).
+
+[...]
+
+[    1.024483] sky2 0000:00:01.0 eth0: enabling interface
+[    1.026822] sky2 0000:00:01.0: error interrupt status=0x80000000
+[    1.029155] sky2 0000:00:01.0: PCI hardware error (0x1010)
+[    4.000699] sky2 0000:00:01.0 eth0: Link is up at 1000 Mbps, full duplex, flow control both
+[    4.026116] Sending DHCP requests .
+[    4.026201] sky2 0000:00:01.0: error interrupt status=0x80000000
+[    4.030043] sky2 0000:00:01.0: PCI hardware error (0x1010)
+[    6.546111] ..
+[   14.118106] ------------[ cut here ]------------
+[   14.120672] NETDEV WATCHDOG: eth0 (sky2): transmit queue 0 timed out
+[   14.123555] WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:461 dev_watchdog+0x2b4/0x2c0
+[   14.127082] Modules linked in:
+[   14.128631] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.0.0-rc8-00061-ga98f9a047756-dirty #
+[   14.132800] Hardware name: linux,dummy-virt (DT)
+[   14.135082] pstate: 60000005 (nZCv daif -PAN -UAO)
+[   14.137459] pc : dev_watchdog+0x2b4/0x2c0
+[   14.139457] lr : dev_watchdog+0x2b4/0x2c0
+[   14.141351] sp : ffff000010003d70
+[   14.142924] x29: ffff000010003d70 x28: ffff0000112f60c0
+[   14.145433] x27: 0000000000000140 x26: ffff8000fa6eb3b8
+[   14.147936] x25: 00000000ffffffff x24: ffff8000fa7a7c80
+[   14.150428] x23: ffff8000fa6eb39c x22: ffff8000fa6eafb8
+[   14.152934] x21: ffff8000fa6eb000 x20: ffff0000112f7000
+[   14.155437] x19: 0000000000000000 x18: ffffffffffffffff
+[   14.157929] x17: 0000000000000000 x16: 0000000000000000
+[   14.160432] x15: ffff0000112fd6c8 x14: ffff000090003a97
+[   14.162927] x13: ffff000010003aa5 x12: ffff000011315878
+[   14.165428] x11: ffff000011315000 x10: 0000000005f5e0ff
+[   14.167935] x9 : 00000000ffffffd0 x8 : 64656d6974203020
+[   14.170430] x7 : 6575657571207469 x6 : 00000000000000e3
+[   14.172935] x5 : 0000000000000000 x4 : 0000000000000000
+[   14.175443] x3 : 00000000ffffffff x2 : ffff0000113158a8
+[   14.177938] x1 : f2db9128b1f08600 x0 : 0000000000000000
+[   14.180443] Call trace:
+[   14.181625]  dev_watchdog+0x2b4/0x2c0
+[   14.183377]  call_timer_fn+0x20/0x78
+[   14.185078]  expire_timers+0xa4/0xb0
+[   14.186777]  run_timer_softirq+0xa0/0x190
+[   14.188687]  __do_softirq+0x108/0x234
+[   14.190428]  irq_exit+0xcc/0xd8
+[   14.191941]  __handle_domain_irq+0x60/0xb8
+[   14.193877]  gic_handle_irq+0x58/0xb0
+[   14.195630]  el1_irq+0xb0/0x128
+[   14.197132]  arch_cpu_idle+0x10/0x18
+[   14.198835]  do_idle+0x1cc/0x288
+[   14.200389]  cpu_startup_entry+0x24/0x28
+[   14.202251]  rest_init+0xd4/0xe0
+[   14.203804]  arch_call_rest_init+0xc/0x14
+[   14.205702]  start_kernel+0x3d8/0x404
+[   14.207449] ---[ end trace 65449acd5c054609 ]---
+[   14.209630] sky2 0000:00:01.0 eth0: tx timeout
+[   14.211655] sky2 0000:00:01.0 eth0: transmit ring 0 .. 3 report=0 done=0
+[   17.906956] sky2 0000:00:01.0 eth0: Link is up at 1000 Mbps, full duplex, flow control both
 
 Thanks,
+Leo Yan
 
-Andrew Murray 
-
-
-> > +}
-> > +
-> > +/*
-> > + * On VHE ensure that only guest host have EL0 counting enabled
-> > + */
-> > +void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_cpu_context *host_ctxt;
-> > +	struct kvm_host_data *host;
-> > +	u32 events_guest, events_host;
-> > +
-> > +	if (!has_vhe())
-> > +		return;
-> > +
-> > +	host_ctxt = vcpu->arch.host_cpu_context;
-> > +	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-> > +	events_guest = host->pmu_events.events_guest;
-> > +	events_host = host->pmu_events.events_host;
-> > +
-> > +	kvm_vcpu_pmu_enable_el0(events_host);
-> > +	kvm_vcpu_pmu_disable_el0(events_guest);
-> 
-> Same question as above, after vcpu_put, it seems we've disabled at EL0
-> host events that are common to the guest and the host.
-> 
-> Thanks,
-> 
-> -- 
-> Julien Thierry
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm64/boot/dts/arm/juno-base.dtsi?h=v5.0#n46
