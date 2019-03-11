@@ -1,27 +1,24 @@
-From: Leo Yan <leo.yan@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
 Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
-Date: Mon, 11 Mar 2019 14:57:32 +0800
-Message-ID: <20190311065732.GD13422@leoy-ThinkPad-X240s>
+Date: Mon, 11 Mar 2019 09:23:20 +0100
+Message-ID: <f6f56743-677c-61ff-1746-1c86eab054a4@redhat.com>
 References: <20190311064248.GC13422@leoy-ThinkPad-X240s>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0A5D4A447
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 02:57:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 642C44A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 04:23:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KOejHYQE8Rkz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Mar 2019 02:57:38 -0400 (EDT)
-Received: from mail-yw1-f68.google.com (mail-yw1-f68.google.com
- [209.85.161.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC7CD4A41E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 02:57:38 -0400 (EDT)
-Received: by mail-yw1-f68.google.com with SMTP id a199so2106504ywa.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Mar 2019 23:57:38 -0700 (PDT)
-Content-Disposition: inline
+ with ESMTP id kHrAx06Zcr3K for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Mar 2019 04:23:25 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D3F04005D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 04:23:25 -0400 (EDT)
 In-Reply-To: <20190311064248.GC13422@leoy-ThinkPad-X240s>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,36 +28,95 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com
+To: Leo Yan <leo.yan@linaro.org>, kvmarm@lists.cs.columbia.edu
 Cc: Daniel Thompson <daniel.thompson@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 11, 2019 at 02:42:48PM +0800, Leo Yan wrote:
+Hi Leo,
+
+On 3/11/19 7:42 AM, Leo Yan wrote:
 > Hi all,
 > 
 > I am trying to enable PCI-e device pass-through mode with KVM, since
 > Juno-r2 board has PCI-e bus so I firstly try to use vfio to
 > passthrough the network card on PCI-e bus.
+> 
+> According to Juno-r2 board TRM [1], there has a CoreLink MMU-401 (SMMU)
+> between PCI-e devices and CCI bus; IIUC, PCI-e device and the SMMU can
+> be used for vfio for address isolation and from hardware pespective it
+> is sufficient for support pass-through mode.
+> 
+> I followed Eric's blog [2] for 'VFIO-PCI driver binding', so I
+> executed blow commands on Juno-r2 board:
+> 
+>   echo vfio-pci > /sys/bus/pci/devices/0000\:08\:00.0/driver_override
+>   echo 0000:08:00.0 > /sys/bus/pci/drivers/sky2/unbind
+>   echo 0000:08:00.0 > /sys/bus/pci/drivers_probe
+> 
+> But at the last command for vifo probing, it reports failure as below:
+> 
+> [   21.553889] sky2 0000:08:00.0 enp8s0: disabling interface
+> [   21.616720] vfio-pci: probe of 0000:08:00.0 failed with error -22
+> 
+> I looked into for the code, though 'dev->bus->iommu_ops' points to the
+> data structure 'arm_smmu_ops', but 'dev->iommu_group' is NULL thus the
+> probe function returns failure with below flow:
+> 
+>   vfio_pci_probe()
+>     `-> vfio_iommu_group_get()
+>           `-> iommu_group_get()
+>                 `-> return NULL;
+> 
+> Alternatively, if enable the kconfig CONFIG_VFIO_NOIOMMU & set global
+> variable 'noiommu' = true, the probe function still returns error; since
+> the function iommu_present(dev->bus) return back 'arm_smmu_ops' so you
+> could see the code will run into below logic:
+> 
+> vfio_iommu_group_get()
+> {
+> 	group = iommu_group_get(dev);
+> 
+> #ifdef CONFIG_VFIO_NOIOMMU
+> 
+> 	/*
+> 	 * With noiommu enabled, an IOMMU group will be created for a device
+> 	 * that doesn't already have one and doesn't have an iommu_ops on their
+> 	 * bus.  We set iommudata simply to be able to identify these groups
+> 	 * as special use and for reclamation later.
+> 	 */
+> 	if (group || !noiommu || iommu_present(dev->bus))
+> 		return group;    ==> return 'group' and 'group' is NULL
+> 
+> 	[...]
+> }
+> 
+> So either using SMMU or with kernel config CONFIG_VFIO_NOIOMMU, both cannot
+> bind vifo driver for network card device on Juno-r2 board.
+> 
+> P.s. I also checked the sysfs node and found it doesn't contain node
+> 'iommu_group':
+> 
+> # ls /sys/bus/pci/devices/0000\:08\:00.0/iommu_group
+> ls: cannot access '/sys/bus/pci/devices/0000:08:00.0/iommu_group': No
+> such file or directory
 
-Sorry for spamming, just want to add info for Linux kernel version.
+please can you give the output of the following command:
+find /sys/kernel/iommu_groups/
 
-I am using Linux mainline kernel 5.0-rc7 with the latest commit:
+when booting your host without noiommu=true
 
-commit a215ce8f0e00c2d707080236f1aafec337371043 (origin/master, origin/HEAD)
-Merge: 2d28e01dca1a cffaaf0c8162
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri Mar 1 09:13:04 2019 -0800
+At first sight I would say you have trouble with your iommu groups.
 
-    Merge tag 'iommu-fix-v5.0-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu
+Thanks
 
-    Pull IOMMU fix from Joerg Roedel:
-     "One important fix for a memory corruption issue in the Intel VT-d
-      driver that triggers on hardware with deep PCI hierarchies"
-
-    * tag 'iommu-fix-v5.0-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu:
-      iommu/dmar: Fix buffer overflow during PCI bus notification
-
-[...]
-
-Thanks,
-Leo Yan
+Eric
+> 
+> Could you give some suggestions for this so that I can proceed?  Very
+> appreciate for any comment.
+> 
+> Thanks,
+> Leo Yan
+> 
+> [1] http://infocenter.arm.com/help/topic/com.arm.doc.ddi0515f/DDI0515F_juno_arm_development_platform_soc_trm.pdf
+> [2] https://www.linaro.org/blog/kvm-pciemsi-passthrough-armarm64/
+> 
