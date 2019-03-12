@@ -1,116 +1,34 @@
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.14 11/27] KVM: arm/arm64: Reset the VCPU without
- preemption and vcpu state loaded
-Date: Mon, 11 Mar 2019 15:58:08 -0400
-Message-ID: <20190311195824.139043-11-sashal@kernel.org>
-References: <20190311195824.139043-1-sashal@kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDE124A319
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:58:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QRBudmKc7nXs for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Mar 2019 15:58:41 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C105140217
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Mar 2019 15:58:41 -0400 (EDT)
-In-Reply-To: <20190311195824.139043-1-sashal@kernel.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
+From: John Gong <johngong0791@gmail.com>
+Subject: [PATCH] KVM: arm64: fix potential bug
+Date: Tue, 12 Mar 2019 08:32:41 +0800
+Message-ID: <20190312003243.6712-1-johngong0791@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: christoffer.dall@arm.com
+Cc: Shengmin Gong <shengmin.gong@gmail.com>, Marc Zyngier <marc.zyngier@arm.com>, Julien Thierry <julien.thierry@arm.com>, Jia He <hejianet@gmail.com>, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Since intid always >= VGIC_NR_PRIVATE_IRQS, so then even vcpu == NULL,
+it never return -EINVAL.
 
-[ Upstream commit e761a927bc9a7ee6ceb7c4f63d5922dbced87f0d ]
-
-We have two ways to reset a vcpu:
-- either through VCPU_INIT
-- or through a PSCI_ON call
-
-The first one is easy to reason about. The second one is implemented
-in a more bizarre way, as it is the vcpu that handles PSCI_ON that
-resets the vcpu that is being powered-on. As we need to turn the logic
-around and have the target vcpu to reset itself, we must take some
-preliminary steps.
-
-Resetting the VCPU state modifies the system register state in memory,
-but this may interact with vcpu_load/vcpu_put if running with preemption
-disabled, which in turn may lead to corrupted system register state.
-
-Address this by disabling preemption and doing put/load if required
-around the reset logic.
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Shengmin Gong <shengmin.gong@gmail.com>
+Signed-off-by: John Gong <johngong0791@gmail.com>
 ---
- arch/arm64/kvm/reset.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index a74311beda35..c1c5a57249d2 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -95,16 +95,33 @@ int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-  * This function finds the right table above and sets the registers on
-  * the virtual CPU struct to their architecturally defined reset
-  * values.
-+ *
-+ * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
-+ * ioctl or as part of handling a request issued by another VCPU in the PSCI
-+ * handling code.  In the first case, the VCPU will not be loaded, and in the
-+ * second case the VCPU will be loaded.  Because this function operates purely
-+ * on the memory-backed valus of system registers, we want to do a full put if
-+ * we were loaded (handling a request) and load the values back at the end of
-+ * the function.  Otherwise we leave the state alone.  In both cases, we
-+ * disable preemption around the vcpu reset as we would otherwise race with
-+ * preempt notifiers which also call put/load.
-  */
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
- 	const struct kvm_regs *cpu_reset;
-+	int ret = -EINVAL;
-+	bool loaded;
-+
-+	preempt_disable();
-+	loaded = (vcpu->cpu != -1);
-+	if (loaded)
-+		kvm_arch_vcpu_put(vcpu);
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index abd9c7352677..d3cb1ce880e2 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -424,7 +424,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 		return ret;
  
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
- 			if (!cpu_has_32bit_el1())
--				return -EINVAL;
-+				goto out;
- 			cpu_reset = &default_regs_reset32;
- 		} else {
- 			cpu_reset = &default_regs_reset;
-@@ -127,5 +144,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+ 	vcpu = kvm_get_vcpu(kvm, cpuid);
+-	if (!vcpu && intid < VGIC_NR_PRIVATE_IRQS)
++	if (!vcpu)
+ 		return -EINVAL;
  
- 	/* Reset timer */
--	return kvm_timer_vcpu_reset(vcpu);
-+	ret = kvm_timer_vcpu_reset(vcpu);
-+out:
-+	if (loaded)
-+		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+	preempt_enable();
-+	return ret;
- }
+ 	irq = vgic_get_irq(kvm, vcpu, intid);
 -- 
-2.19.1
+2.17.1
