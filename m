@@ -1,158 +1,191 @@
-From: Zheng Xiang <zhengxiang9@huawei.com>
-Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
-Date: Tue, 12 Mar 2019 23:30:23 +0800
-Message-ID: <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
-References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
- <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Set ICH_HCR_EN in guest anyway when using
+ gicv4
+Date: Tue, 12 Mar 2019 15:48:35 +0000
+Message-ID: <3993685d-a78f-2e73-e22a-8ade3b6a6279@arm.com>
+References: <F348A9E21A573744858FF7E5D32E29D81FEFA462@DGGEMI529-MBX.china.huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB3004A32E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Mar 2019 11:31:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D5oRZnWeB-tZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Mar 2019 11:31:14 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A51954A2BE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Mar 2019 11:31:14 -0400 (EDT)
-In-Reply-To: <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <F348A9E21A573744858FF7E5D32E29D81FEFA462@DGGEMI529-MBX.china.huawei.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, suzuki.poulose@arm.com, james.morse@arm.com
-Cc: lishuo1@hisilicon.com, linux-kernel@vger.kernel.org, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, lious.lilei@hisilicon.com
+Sender: linux-kernel-owner@vger.kernel.org
+To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "keescook@chromium.org" <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
+Nianyao,
 
-On 2019/3/12 19:32, Marc Zyngier wrote:
-> Hi Zheng,
+Please do not send patches as HTML. Or any email as HTML. Please make
+sure that you only send plain text emails on any mailing list (see point
+#6 in Documentation/process/submitting-patches.rst).
+
+On 12/03/2019 12:22, Tangnianyao (ICT) wrote:
+> In gicv4, direct vlpi may be forward to PE without using LR or ap_list. If
 > 
-> On 11/03/2019 16:31, Zheng Xiang wrote:
->> Hi all,
->>
->> While a page is merged into a transparent huge page, KVM will invalidate Stage-2 for
->> the base address of the huge page and the whole of Stage-1.
->> However, this just only invalidates the first page within the huge page and the other
->> pages are not invalidated, see bellow:
->>
->>     +---------------+--------------+
->>     |abcde       2MB-Page          |
->>     +---------------+--------------+
->>
->>     TLB before setting new pmd:
->>     +---------------+--------------+
->>     |      VA       |    PAGESIZE  |
->>     +---------------+--------------+
->>     |      a        |      4KB     |
->>     +---------------+--------------+
->>     |      b        |      4KB     |
->>     +---------------+--------------+
->>     |      c        |      4KB     |
->>     +---------------+--------------+
->>     |      d        |      4KB     |
->>     +---------------+--------------+
->>
->>     TLB after setting new pmd:
->>     +---------------+--------------+
->>     |      VA       |    PAGESIZE  |
->>     +---------------+--------------+
->>     |      a        |      2MB     |
->>     +---------------+--------------+
->>     |      b        |      4KB     |
->>     +---------------+--------------+
->>     |      c        |      4KB     |
->>     +---------------+--------------+
->>     |      d        |      4KB     |
->>     +---------------+--------------+
->>
->> When VM access *b* address, it will hit the TLB and result in TLB conflict aborts or other potential exceptions.
+> ICH_HCR_EL2.En is 0 in guest, direct vlpi cannot be accepted by PE.
 > 
-> That's really bad. I can only imagine two scenarios:
+> It will take long time for direct vlpi to be forwarded in some cases.
 > 
-> 1) We fail to unmap a,b,c,d (and potentially another 508 PTEs), loosing
-> the PTE table in the process, and place the PMD instead. I can't see
-> this happening.
+> Direct vlpi has to wait for ICH_HCR_EL2.En=1 where some other interrupts
 > 
-> 2) We fail to invalidate on unmap, and that slightly less bad (but still
-> quite bad).
+> using LR need to be forwarded, because in kvm_vgic_flush_hwstate,
 > 
-> Which of the two cases are you seeing?
+> if ap_list is empty, it will return quickly not setting ICH_HCR_EL2.En.
 > 
->> For example, we need to keep tracking of the VM memory dirty pages when VM is in live migration.
->> KVM will set the memslot READONLY and split the huge pages.
->> After live migration is canceled and abort, the pages will be merged into THP.
->> The later access to these pages which are READONLY will cause level-3 Permission Fault until they are invalidated.
->>
->> So should we invalidate the tlb entries for all relative pages(e.g a,b,c,d), like __flush_tlb_range()?
->> Or we can call __kvm_tlb_flush_vmid() to invalidate all tlb entries.
+> To fix this, set ICH_HCR_EL2.En to 1 before returning to guest when
 > 
-> We should perform an invalidate on each unmap. unmap_stage2_range seems
-> to do the right thing. __flush_tlb_range only caters for Stage1
-> mappings, and __kvm_tlb_flush_vmid() is too big a hammer, as it nukes
-> TLBs for the whole VM.
+> using GICv4.
 > 
-> I'd really like to understand what you're seeing, and how to reproduce
-> it. Do you have a minimal example I could run on my own HW?
+>  
+> 
+> Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
+> 
+> ---
+> 
+> arch/arm64/include/asm/kvm_asm.h |  1 +
+> 
+> virt/kvm/arm/hyp/vgic-v3-sr.c    | 10 ++++++++++
+> 
+> virt/kvm/arm/vgic/vgic-v4.c      |  8 ++++++++
+> 
+> 3 files changed, 19 insertions(+)
+> 
+>  
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h
+> b/arch/arm64/include/asm/kvm_asm.h
+> 
+> index f5b79e9..0581c4d 100644
+> 
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> 
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> 
+> @@ -79,6 +79,7 @@
+> 
+> extern void __vgic_v3_init_lrs(void);
+> 
+>  extern u32 __kvm_get_mdcr_el2(void);
+> 
+> +extern void __vgic_v3_write_hcr(u32 vmcr);
+> 
+>  /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
+> 
+> #define
+> __hyp_this_cpu_ptr(sym)                                                       
+> \
+> 
+> diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> 
+> index 264d92d..12027af 100644
+> 
+> --- a/virt/kvm/arm/hyp/vgic-v3-sr.c
+> 
+> +++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+> 
+> @@ -434,6 +434,16 @@ void __hyp_text __vgic_v3_write_vmcr(u32 vmcr)
+> 
+>        write_gicreg(vmcr, ICH_VMCR_EL2);
+> 
+> }
+> 
+> +u64 __hyp_text __vgic_v3_read_hcr(void)
+> 
+> +{
+> 
+> +       return read_gicreg(ICH_HCR_EL2);
+> 
+> +}
+> 
+> +
+> 
+> +void __hyp_text __vgic_v3_write_hcr(u32 vmcr)
+> 
+> +{
+> 
+> +       write_gicreg(vmcr, ICH_HCR_EL2);
+> 
+> +}
 
-When I start the live migration for a VM, qemu then begins to log and count dirty pages.
-During the live migration, KVM set the pages READONLY so that we can count how many pages
-would be wrote afterwards.
+This is HYP code...
 
-Anything is OK until I cancel the live migration and qemu stop logging. Later the VM gets hang.
-The trace log shows repeatedly level-3 permission fault caused by a write on a same IPA. After
-analyzing the source code, I find KVM always return from the bellow *if* statement in
-stage2_set_pmd_huge() even if we only have a single VCPU:
+> 
+> +
+> 
+> #ifdef CONFIG_ARM64
+> 
+>  static int __hyp_text __vgic_v3_bpr_min(void)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> 
+> index 1ed5f22..515171a 100644
+> 
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> 
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> 
+> @@ -208,6 +208,8 @@ int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
+> 
+>        if (!vgic_supports_direct_msis(vcpu->kvm))
+> 
+>                 return 0;
+> 
+> +       __vgic_v3_write_hcr(vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr &
+> ~ICH_HCR_EN);
 
-        /*
-         * Multiple vcpus faulting on the same PMD entry, can
-         * lead to them sequentially updating the PMD with the
-         * same value. Following the break-before-make
-         * (pmd_clear() followed by tlb_flush()) process can
-         * hinder forward progress due to refaults generated
-         * on missing translations.
-         *
-         * Skip updating the page table if the entry is
-         * unchanged.
-         */
-        if (pmd_val(old_pmd) == pmd_val(*new_pmd))
-            return 0;
+And you've now crashed your non-VHE system by branching directly to code
+that cannot be executed at EL1.
 
-The PMD has already set the PMD_S2_RDWR bit. I doubt kvm_tlb_flush_vmid_ipa() does not invalidate
-Stage-2 for the subpages of the PMD(except the first PTE of this PMD). Finally I add some debug
-code to flush tlb for all subpages of the PMD, as shown bellow:
+> 
+> +
+> 
+>        return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
+> 
+> }
+> 
+> @@ -220,6 +222,12 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+> 
+>                 return 0;
+> 
+>         /*
+> 
+> +       * Enable ICH_HCR_EL.En so that guest can accpet and handle direct
+> 
+> +       * vlpi.
+> 
+> +       */
+> 
+> +       __vgic_v3_write_hcr(vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr);
+> 
+> +
+> 
+> +       /*
+> 
+>         * Before making the VPE resident, make sure the redistributor
+> 
+>         * corresponding to our current CPU expects us here. See the
+> 
+>         * doc in drivers/irqchip/irq-gic-v4.c to understand how this
+> 
+> -- 
+> 
+> 1.9.1
+> 
+>  
+> 
+>  
+> 
 
-        /*
-         * Mapping in huge pages should only happen through a
-         * fault.  If a page is merged into a transparent huge
-         * page, the individual subpages of that huge page
-         * should be unmapped through MMU notifiers before we
-         * get here.
-         *
-         * Merging of CompoundPages is not supported; they
-         * should become splitting first, unmapped, merged,
-         * and mapped back in on-demand.
-         */
-        VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+Overall, this looks like the wrong approach. It is not the GICv4 code's
+job to do this, but the low-level code (either the load/put code for VHE
+or the save/restore code for non-VHE).
 
-        pmd_clear(pmd);
-        for (cnt = 0; cnt < 512; cnt++)
-            kvm_tlb_flush_vmid_ipa(kvm, addr + cnt*PAGE_SIZE);
-
-Then the problem no longer reproduce.
-
-
--- 
+It would certainly help if you could describe which context you're in
+(VHE, non-VHE). I suppose the former...
 
 Thanks,
-Xiang
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
