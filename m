@@ -1,7 +1,7 @@
 From: Leo Yan <leo.yan@linaro.org>
 Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
-Date: Wed, 13 Mar 2019 19:35:49 +0800
-Message-ID: <20190313113549.GK13422@leoy-ThinkPad-X240s>
+Date: Wed, 13 Mar 2019 19:52:30 +0800
+Message-ID: <20190313115230.GL13422@leoy-ThinkPad-X240s>
 References: <20190311064248.GC13422@leoy-ThinkPad-X240s>
  <f6f56743-677c-61ff-1746-1c86eab054a4@redhat.com>
  <20190311093958.GF13422@leoy-ThinkPad-X240s>
@@ -9,25 +9,26 @@ References: <20190311064248.GC13422@leoy-ThinkPad-X240s>
  <20190311143501.GH13422@leoy-ThinkPad-X240s>
  <20190313080048.GI13422@leoy-ThinkPad-X240s>
  <35c22d0c-7da5-4e68-effb-05c8571d8b63@redhat.com>
+ <e98d267e-db97-8680-62e4-f0788c00cea8@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ECED4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 07:35:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 152A04A321
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 07:52:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qnmevZiljsev for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Mar 2019 07:35:56 -0400 (EDT)
-Received: from mail-yw1-f52.google.com (mail-yw1-f52.google.com
- [209.85.161.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 918E249F94
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 07:35:56 -0400 (EDT)
-Received: by mail-yw1-f52.google.com with SMTP id m207so1133349ywd.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 04:35:56 -0700 (PDT)
+ with ESMTP id 43xgVSHN1qV4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Mar 2019 07:52:37 -0400 (EDT)
+Received: from mail-yw1-f41.google.com (mail-yw1-f41.google.com
+ [209.85.161.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4327D49F94
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 07:52:37 -0400 (EDT)
+Received: by mail-yw1-f41.google.com with SMTP id a199so1188620ywa.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 04:52:37 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <35c22d0c-7da5-4e68-effb-05c8571d8b63@redhat.com>
+In-Reply-To: <e98d267e-db97-8680-62e4-f0788c00cea8@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -41,94 +42,71 @@ To: Auger Eric <eric.auger@redhat.com>
 Cc: Daniel Thompson <daniel.thompson@linaro.org>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
-On Wed, Mar 13, 2019 at 11:01:33AM +0100, Auger Eric wrote:
+On Wed, Mar 13, 2019 at 11:24:25AM +0100, Auger Eric wrote:
 
 [...]
 
-> >   I want to confirm, if this is the recommended mode for
-> >   passthrough PCI-e device to use msi both in host OS and geust OS?
-> >   Or it's will be fine for host OS using msi and guest OS using
-> >   INTx mode?
-> 
-> If the NIC supports MSIs they logically are used. This can be easily
-> checked on host by issuing "cat /proc/interrupts | grep vfio". Can you
-> check whether the guest received any interrupt? I remember that Robin
-> said in the past that on Juno, the MSI doorbell was in the PCI host
-> bridge window and possibly transactions towards the doorbell could not
-> reach it since considered as peer to peer. Using GICv2M should not bring
-> any performance issue. I tested that in the past with Seattle board.
-
-I can see below info on host with launching KVM:
-
-root@debian:~# cat /proc/interrupts | grep vfio
- 46:          0          0          0          0          0          0       MSI 4194304 Edge      vfio-msi[0](0000:08:00.0)
-
-And below is interrupts in guest:
-
-# cat /proc/interrupts
-           CPU0       CPU1       CPU2       CPU3       CPU4       CPU5
-  3:        506        400        281        403        298        330     GIC-0  27 Level     arch_timer
-  5:        768          0          0          0          0          0     GIC-0 101 Edge      virtio0
-  6:        246          0          0          0          0          0     GIC-0 102 Edge      virtio1
-  7:          2          0          0          0          0          0     GIC-0 103 Edge      virtio2
-  8:        210          0          0          0          0          0     GIC-0  97 Level     ttyS0
- 13:          0          0          0          0          0          0       MSI   0 Edge      eth1
-
-> > - The second question is for GICv2m.  If I understand correctly, when
-> >   passthrough PCI-e device to guest OS, in the guest OS we should
-> >   create below data path for PCI-e devices:
-> >                                                             +--------+
-> >                                                          -> | Memory |
-> >     +-----------+    +------------------+    +-------+  /   +--------+
-> >     | Net card  | -> | PCI-e controller | -> | IOMMU | -
-> >     +-----------+    +------------------+    +-------+  \   +--------+
-> >                                                          -> | MSI    |
-> >                                                             | frame  |
-> >                                                             +--------+
+> >> I am stucking at the network card cannot receive interrupts in guest
+> >> OS.  So took time to look into the code and added some printed info to
+> >> help me to understand the detailed flow, below are two main questions
+> >> I am confused with them and need some guidance:
+> >>
+> >> - The first question is about the msi usage in network card driver;
+> >>   when review the sky2 network card driver [1], it has function
+> >>   sky2_test_msi() which is used to decide if can use msi or not.
+> >>
+> >>   The interesting thing is this function will firstly request irq for
+> >>   the interrupt and based on the interrupt handler to read back
+> >>   register and then can make decision if msi is avalible or not.
+> >>
+> >>   This can work well for host OS, but if we want to passthrough this
+> >>   device to guest OS, since the KVM doesn't prepare the interrupt for
+> >>   sky2 drivers (no injection or forwarding) thus at this point the
+> >>   interrupt handle will not be invorked.  At the end the driver will
+> >>   not set flag 'hw->flags |= SKY2_HW_USE_MSI' and this results to not
+> >>   use msi in guest OS and rollback to INTx mode.
+> >>
+> >>   My first impression is if we passthrough the devices to guest OS in
+> >>   KVM, the PCI-e device can directly use msi;  I tweaked a bit for the
+> >>   code to check status value after timeout, so both host OS and guest
+> >>   OS can set the flag for msi.
+> >>
+> >>   I want to confirm, if this is the recommended mode for
+> >>   passthrough PCI-e device to use msi both in host OS and geust OS?
+> >>   Or it's will be fine for host OS using msi and guest OS using
+> >>   INTx mode?
 > > 
-> >   Since now the master is network card/PCI-e controller but not CPU,
-> >   thus there have no 2 stages for memory accessing (VA->IPA->PA).  In
-> >   this case, if we configure IOMMU (SMMU) for guest OS for address
-> >   translation before switch from host to guest, right?  Or SMMU also
-> >   have two stages memory mapping?
+> > If the NIC supports MSIs they logically are used. This can be easily
+> > checked on host by issuing "cat /proc/interrupts | grep vfio". Can you
+> > check whether the guest received any interrupt? I remember that Robin
+> > said in the past that on Juno, the MSI doorbell was in the PCI host
+> > bridge window and possibly transactions towards the doorbell could not
+> > reach it since considered as peer to peer.
 > 
-> in your use case you don't have any virtual IOMMU. So the guest programs
-> the assigned device with guest physical device and the virtualizer uses
-> the physical IOMMU to translate this GPA into host physical address
-> backing the guest RAM and the MSI frame. A single stage of the physical
-> IOMMU is used (stage1).
-
-Thanks a lot for the explaination.
-
-> >   Another thing confuses me is I can see the MSI frame is mapped to
-> >   GIC's physical address in host OS, thus the PCI-e device can send
-> >   message correctly to msi frame.  But for guest OS, the MSI frame is
-> >   mapped to one IPA memory region, and this region is use to emulate
-> >   GICv2 msi frame rather than the hardware msi frame; thus will any
-> >   access from PCI-e to this region will trap to hypervisor in CPU
-> >   side so KVM hyperviso can help emulate (and inject) the interrupt
-> >   for guest OS?
+> I found back Robin's explanation. It was not related to MSI IOVA being
+> within the PCI host bridge window but RAM GPA colliding with host PCI
+> config space?
 > 
-> when the device sends an MSI it uses a host allocated IOVA for the
-> physical MSI doorbell. This gets translated by the physical IOMMU,
-> reaches the physical doorbell. The physical GICv2m triggers the
-> associated physical SPI -> kvm irqfd -> virtual IRQ
-> With GICv2M we have direct GSI mapping on guest.
+> "MSI doorbells integral to PCIe root complexes (and thus untranslatable)
+> typically have a programmable address, so could be anywhere. In the more
+> general category of "special hardware addresses", QEMU's default ARM
+> guest memory map puts RAM starting at 0x40000000; on the ARM Juno
+> platform, that happens to be where PCI config space starts; as Juno's
+> PCIe doesn't support ACS, peer-to-peer or anything clever, if you assign
+> the PCI bus to a guest (all of it, given the lack of ACS), the root
+> complex just sees the guest's attempts to DMA to "memory" as the device
+> attempting to access config space and aborts them."
 
-Just want to confirm, in your elaborated flow the virtual IRQ will be
-injected by qemu (or kvmtool) for every time but it's not needed to
-interfere with IRQ's deactivation, right?
+Thanks a lot for the info, Eric.
 
-> >   Essentially, I want to check what's the expected behaviour for GICv2
-> >   msi frame working mode when we want to passthrough one PCI-e device
-> >   to guest OS and the PCI-e device has one static msi frame for it.
-> 
-> Your config was tested in the past with Seattle (not with sky2 NIC
-> though). Adding Robin for the peer to peer potential concern.
+Seems to me, this issue can be bypassed by using other memory address
+rather than 0x40000000 for kernel IPA thus can avoid colliding with
+host PCI config space.
 
-Very appreciate for your help.
+Robin, just curious have you tried to change guest memory start address
+for bypassing this issue?  Or tried kvmtool for on Juno-r2 board (e.g.
+kvmtool uses 0x4000000 for AXI bus and 0x80000000 for RAM, we can do
+some quickly shrinking thus can don't touch 0x40000000 region?)
 
 Thanks,
 Leo Yan
