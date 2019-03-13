@@ -1,202 +1,190 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
-Date: Wed, 13 Mar 2019 16:00:48 +0800
-Message-ID: <20190313080048.GI13422@leoy-ThinkPad-X240s>
-References: <20190311064248.GC13422@leoy-ThinkPad-X240s>
- <f6f56743-677c-61ff-1746-1c86eab054a4@redhat.com>
- <20190311093958.GF13422@leoy-ThinkPad-X240s>
- <762d54fb-b146-e591-d544-676cb5606837@redhat.com>
- <20190311143501.GH13422@leoy-ThinkPad-X240s>
+From: Zheng Xiang <zhengxiang9@huawei.com>
+Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
+Date: Wed, 13 Mar 2019 17:45:31 +0800
+Message-ID: <348d0b3b-c74b-7b39-ec30-85905c077c38@huawei.com>
+References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
+ <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
+ <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
+ <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8AC4A36B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 04:01:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sicgp-vRynog for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Mar 2019 04:00:55 -0400 (EDT)
-Received: from mail-yw1-f66.google.com (mail-yw1-f66.google.com
- [209.85.161.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 433774A2F8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 04:00:55 -0400 (EDT)
-Received: by mail-yw1-f66.google.com with SMTP id e76so684392ywa.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Mar 2019 01:00:55 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20190311143501.GH13422@leoy-ThinkPad-X240s>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Auger Eric <eric.auger@redhat.com>, Mark Rutland <mark.rutland@arm.com>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, christoffer.dall@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, suzuki.poulose@arm.com, james.morse@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Wang Haibin <wanghaibin.wang@huawei.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, lious.lilei@hisilicon.com, lishuo1@hisilicon.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric & all,
 
-On Mon, Mar 11, 2019 at 10:35:01PM +0800, Leo Yan wrote:
 
-[...]
-
-> So now I made some progress and can see the networking card is
-> pass-through to guest OS, though the networking card reports errors
-> now.  Below is detailed steps and info:
+On 2019/3/13 2:18, Marc Zyngier wrote:
+> Hi Zheng,
 > 
-> - Bind devices in the same IOMMU group to vfio driver:
+> On 12/03/2019 15:30, Zheng Xiang wrote:
+>> Hi Marc,
+>>
+>> On 2019/3/12 19:32, Marc Zyngier wrote:
+>>> Hi Zheng,
+>>>
+>>> On 11/03/2019 16:31, Zheng Xiang wrote:
+>>>> Hi all,
+>>>>
+>>>> While a page is merged into a transparent huge page, KVM will invalidate Stage-2 for
+>>>> the base address of the huge page and the whole of Stage-1.
+>>>> However, this just only invalidates the first page within the huge page and the other
+>>>> pages are not invalidated, see bellow:
+>>>>
+>>>>     +---------------+--------------+
+>>>>     |abcde       2MB-Page          |
+>>>>     +---------------+--------------+
+>>>>
+>>>>     TLB before setting new pmd:
+>>>>     +---------------+--------------+
+>>>>     |      VA       |    PAGESIZE  |
+>>>>     +---------------+--------------+
+>>>>     |      a        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>     |      b        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>     |      c        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>     |      d        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>
+>>>>     TLB after setting new pmd:
+>>>>     +---------------+--------------+
+>>>>     |      VA       |    PAGESIZE  |
+>>>>     +---------------+--------------+
+>>>>     |      a        |      2MB     |
+>>>>     +---------------+--------------+
+>>>>     |      b        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>     |      c        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>     |      d        |      4KB     |
+>>>>     +---------------+--------------+
+>>>>
+>>>> When VM access *b* address, it will hit the TLB and result in TLB conflict aborts or other potential exceptions.
+>>>
+>>> That's really bad. I can only imagine two scenarios:
+>>>
+>>> 1) We fail to unmap a,b,c,d (and potentially another 508 PTEs), loosing
+>>> the PTE table in the process, and place the PMD instead. I can't see
+>>> this happening.
+>>>
+>>> 2) We fail to invalidate on unmap, and that slightly less bad (but still
+>>> quite bad).
+>>>
+>>> Which of the two cases are you seeing?
+>>>
+>>>> For example, we need to keep tracking of the VM memory dirty pages when VM is in live migration.
+>>>> KVM will set the memslot READONLY and split the huge pages.
+>>>> After live migration is canceled and abort, the pages will be merged into THP.
+>>>> The later access to these pages which are READONLY will cause level-3 Permission Fault until they are invalidated.
+>>>>
+>>>> So should we invalidate the tlb entries for all relative pages(e.g a,b,c,d), like __flush_tlb_range()?
+>>>> Or we can call __kvm_tlb_flush_vmid() to invalidate all tlb entries.
+>>>
+>>> We should perform an invalidate on each unmap. unmap_stage2_range seems
+>>> to do the right thing. __flush_tlb_range only caters for Stage1
+>>> mappings, and __kvm_tlb_flush_vmid() is too big a hammer, as it nukes
+>>> TLBs for the whole VM.
+>>>
+>>> I'd really like to understand what you're seeing, and how to reproduce
+>>> it. Do you have a minimal example I could run on my own HW?
+>>
+>> When I start the live migration for a VM, qemu then begins to log and count dirty pages.
+>> During the live migration, KVM set the pages READONLY so that we can count how many pages
+>> would be wrote afterwards.
+>>
+>> Anything is OK until I cancel the live migration and qemu stop logging. Later the VM gets hang.
+>> The trace log shows repeatedly level-3 permission fault caused by a write on a same IPA. After
+>> analyzing the source code, I find KVM always return from the bellow *if* statement in
+>> stage2_set_pmd_huge() even if we only have a single VCPU:
+>>
+>>         /*
+>>          * Multiple vcpus faulting on the same PMD entry, can
+>>          * lead to them sequentially updating the PMD with the
+>>          * same value. Following the break-before-make
+>>          * (pmd_clear() followed by tlb_flush()) process can
+>>          * hinder forward progress due to refaults generated
+>>          * on missing translations.
+>>          *
+>>          * Skip updating the page table if the entry is
+>>          * unchanged.
+>>          */
+>>         if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+>>             return 0;
+>>
+>> The PMD has already set the PMD_S2_RDWR bit. I doubt kvm_tlb_flush_vmid_ipa() does not invalidate
+>> Stage-2 for the subpages of the PMD(except the first PTE of this PMD). Finally I add some debug
+>> code to flush tlb for all subpages of the PMD, as shown bellow:
+>>
+>>         /*
+>>          * Mapping in huge pages should only happen through a
+>>          * fault.  If a page is merged into a transparent huge
+>>          * page, the individual subpages of that huge page
+>>          * should be unmapped through MMU notifiers before we
+>>          * get here.
+>>          *
+>>          * Merging of CompoundPages is not supported; they
+>>          * should become splitting first, unmapped, merged,
+>>          * and mapped back in on-demand.
+>>          */
+>>         VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+>>
+>>         pmd_clear(pmd);
+>>         for (cnt = 0; cnt < 512; cnt++)
+>>             kvm_tlb_flush_vmid_ipa(kvm, addr + cnt*PAGE_SIZE);
+>>
+>> Then the problem no longer reproduce.
 > 
->   echo 0000:03:00.0 > /sys/bus/pci/devices/0000\:03\:00.0/driver/unbind
->   echo 1095 3132 > /sys/bus/pci/drivers/vfio-pci/new_id
-> 
->   echo 0000:08:00.0 > /sys/bus/pci/devices/0000\:08\:00.0/driver/unbind
->   echo 11ab 4380 > /sys/bus/pci/drivers/vfio-pci/new_id
-> 
-> - Enable 'allow_unsafe_interrupts=1' for module vfio_iommu_type1;
-> 
-> - Use qemu to launch guest OS:
-> 
->   qemu-system-aarch64 \
->         -cpu host -M virt,accel=kvm -m 4096 -nographic \
->         -kernel /root/virt/Image -append root=/dev/vda2 \
->         -net none -device vfio-pci,host=08:00.0 \
->         -drive if=virtio,file=/root/virt/qemu/debian.img \
->         -append 'loglevel=8 root=/dev/vda2 rw console=ttyAMA0 earlyprintk ip=dhcp'
-> 
-> - Host log:
-> 
-> [  188.329861] vfio-pci 0000:08:00.0: enabling device (0000 -> 0003)
-> 
-> - Below is guest log, from log though the driver has been registered but
->   it reports PCI hardware failure and the timeout for the interrupt.
-> 
->   So is this caused by very 'slow' forward interrupt handling?  Juno
->   board uses GICv2 (I think it has GICv2m extension).
-> 
-> [...]
-> 
-> [    1.024483] sky2 0000:00:01.0 eth0: enabling interface
-> [    1.026822] sky2 0000:00:01.0: error interrupt status=0x80000000
-> [    1.029155] sky2 0000:00:01.0: PCI hardware error (0x1010)
-> [    4.000699] sky2 0000:00:01.0 eth0: Link is up at 1000 Mbps, full duplex, flow control both
-> [    4.026116] Sending DHCP requests .
-> [    4.026201] sky2 0000:00:01.0: error interrupt status=0x80000000
-> [    4.030043] sky2 0000:00:01.0: PCI hardware error (0x1010)
-> [    6.546111] ..
-> [   14.118106] ------------[ cut here ]------------
-> [   14.120672] NETDEV WATCHDOG: eth0 (sky2): transmit queue 0 timed out
-> [   14.123555] WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:461 dev_watchdog+0x2b4/0x2c0
-> [   14.127082] Modules linked in:
-> [   14.128631] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.0.0-rc8-00061-ga98f9a047756-dirty #
-> [   14.132800] Hardware name: linux,dummy-virt (DT)
-> [   14.135082] pstate: 60000005 (nZCv daif -PAN -UAO)
-> [   14.137459] pc : dev_watchdog+0x2b4/0x2c0
-> [   14.139457] lr : dev_watchdog+0x2b4/0x2c0
-> [   14.141351] sp : ffff000010003d70
-> [   14.142924] x29: ffff000010003d70 x28: ffff0000112f60c0
-> [   14.145433] x27: 0000000000000140 x26: ffff8000fa6eb3b8
-> [   14.147936] x25: 00000000ffffffff x24: ffff8000fa7a7c80
-> [   14.150428] x23: ffff8000fa6eb39c x22: ffff8000fa6eafb8
-> [   14.152934] x21: ffff8000fa6eb000 x20: ffff0000112f7000
-> [   14.155437] x19: 0000000000000000 x18: ffffffffffffffff
-> [   14.157929] x17: 0000000000000000 x16: 0000000000000000
-> [   14.160432] x15: ffff0000112fd6c8 x14: ffff000090003a97
-> [   14.162927] x13: ffff000010003aa5 x12: ffff000011315878
-> [   14.165428] x11: ffff000011315000 x10: 0000000005f5e0ff
-> [   14.167935] x9 : 00000000ffffffd0 x8 : 64656d6974203020
-> [   14.170430] x7 : 6575657571207469 x6 : 00000000000000e3
-> [   14.172935] x5 : 0000000000000000 x4 : 0000000000000000
-> [   14.175443] x3 : 00000000ffffffff x2 : ffff0000113158a8
-> [   14.177938] x1 : f2db9128b1f08600 x0 : 0000000000000000
-> [   14.180443] Call trace:
-> [   14.181625]  dev_watchdog+0x2b4/0x2c0
-> [   14.183377]  call_timer_fn+0x20/0x78
-> [   14.185078]  expire_timers+0xa4/0xb0
-> [   14.186777]  run_timer_softirq+0xa0/0x190
-> [   14.188687]  __do_softirq+0x108/0x234
-> [   14.190428]  irq_exit+0xcc/0xd8
-> [   14.191941]  __handle_domain_irq+0x60/0xb8
-> [   14.193877]  gic_handle_irq+0x58/0xb0
-> [   14.195630]  el1_irq+0xb0/0x128
-> [   14.197132]  arch_cpu_idle+0x10/0x18
-> [   14.198835]  do_idle+0x1cc/0x288
-> [   14.200389]  cpu_startup_entry+0x24/0x28
-> [   14.202251]  rest_init+0xd4/0xe0
-> [   14.203804]  arch_call_rest_init+0xc/0x14
-> [   14.205702]  start_kernel+0x3d8/0x404
-> [   14.207449] ---[ end trace 65449acd5c054609 ]---
-> [   14.209630] sky2 0000:00:01.0 eth0: tx timeout
-> [   14.211655] sky2 0000:00:01.0 eth0: transmit ring 0 .. 3 report=0 done=0
-> [   17.906956] sky2 0000:00:01.0 eth0: Link is up at 1000 Mbps, full duplex, flow control both
+> This makes very little sense. We shouldn't be able to enter this path
+> for anything else but a permission update, otherwise the VM_BUG_ON
+> should fire.
 
-I am stucking at the network card cannot receive interrupts in guest
-OS.  So took time to look into the code and added some printed info to
-help me to understand the detailed flow, below are two main questions
-I am confused with them and need some guidance:
+Hmm, I think I didn't describe it very clearly.
+Look at the following sequence:
 
-- The first question is about the msi usage in network card driver;
-  when review the sky2 network card driver [1], it has function
-  sky2_test_msi() which is used to decide if can use msi or not.
+1) Set a PMD READONLY and logging_active.
 
-  The interesting thing is this function will firstly request irq for
-  the interrupt and based on the interrupt handler to read back
-  register and then can make decision if msi is avalible or not.
+2) KVM handles permission fault caused by writing a subpage(assumpt *b*) within this huge PMD.
 
-  This can work well for host OS, but if we want to passthrough this
-  device to guest OS, since the KVM doesn't prepare the interrupt for
-  sky2 drivers (no injection or forwarding) thus at this point the
-  interrupt handle will not be invorked.  At the end the driver will
-  not set flag 'hw->flags |= SKY2_HW_USE_MSI' and this results to not
-  use msi in guest OS and rollback to INTx mode.
+3) KVM dissolves PMD and invalidates TLB for this PMD. Then set a writable PTE.
 
-  My first impression is if we passthrough the devices to guest OS in
-  KVM, the PCI-e device can directly use msi;  I tweaked a bit for the
-  code to check status value after timeout, so both host OS and guest
-  OS can set the flag for msi.
+4) Read another 511 PTEs and setup Stage-2 PTE table.
 
-  I want to confirm, if this is the recommended mode for
-  passthrough PCI-e device to use msi both in host OS and geust OS?
-  Or it's will be fine for host OS using msi and guest OS using
-  INTx mode?
+5) Now remove logging_active and keep another 511 PTEs READONLY.
 
-- The second question is for GICv2m.  If I understand correctly, when
-  passthrough PCI-e device to guest OS, in the guest OS we should
-  create below data path for PCI-e devices:
-                                                            +--------+
-                                                         -> | Memory |
-    +-----------+    +------------------+    +-------+  /   +--------+
-    | Net card  | -> | PCI-e controller | -> | IOMMU | -
-    +-----------+    +------------------+    +-------+  \   +--------+
-                                                         -> | MSI    |
-                                                            | frame  |
-                                                            +--------+
+6) VM continues to write a subpage(assumpt *c*) and cause permission fault.
 
-  Since now the master is network card/PCI-e controller but not CPU,
-  thus there have no 2 stages for memory accessing (VA->IPA->PA).  In
-  this case, if we configure IOMMU (SMMU) for guest OS for address
-  translation before switch from host to guest, right?  Or SMMU also
-  have two stages memory mapping?
+7) KVM handles this new fault and makes a new writable PMD after transparent_hugepage_adjust().
 
-  Another thing confuses me is I can see the MSI frame is mapped to
-  GIC's physical address in host OS, thus the PCI-e device can send
-  message correctly to msi frame.  But for guest OS, the MSI frame is
-  mapped to one IPA memory region, and this region is use to emulate
-  GICv2 msi frame rather than the hardware msi frame; thus will any
-  access from PCI-e to this region will trap to hypervisor in CPU
-  side so KVM hyperviso can help emulate (and inject) the interrupt
-  for guest OS?
+8) KVM invalidates TLB for the first page(*a*) of the PMD.
+   Here another 511 RO PTEs entries still stay in TLB, especially *c* which will be wrote later.
 
-  Essentially, I want to check what's the expected behaviour for GICv2
-  msi frame working mode when we want to passthrough one PCI-e device
-  to guest OS and the PCI-e device has one static msi frame for it.
+9) KVM then set this new writable PMD.
+   Step 8-9 is what stage2_set_pmd_huge() does.
 
-I will continue to look into the code and post at here.  Thanks a lot
-for any comment and suggestion!
-Leo Yan
+10) VM continues to write *c*, but this time it hits the RO PTE entry in TLB and causes permission fault again.
+   Sometimes it can also cause TLB conflict aborts.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/marvell/sky2.c#n4859
+11) KVM repeats step 6 and goes to the following statement and return 0:
+
+         * Skip updating the page table if the entry is
+         * unchanged.
+         */
+        if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+            return 0;
+
+12) Then it will repeat step 10-11 until the PTE entry is invalidated.
+
+I think there is something abnormal in step 8.
+Should I blame my hardware? Or is it a kernel bug?
+
+-- 
+
+Thanks,
+Xiang
