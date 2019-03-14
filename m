@@ -1,55 +1,59 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Set ICH_HCR_EN in guest anyway when using
- gicv4
-Date: Wed, 13 Mar 2019 16:31:05 +0000
-Message-ID: <09a615e5-9dce-d194-6290-b8897abd5d12@arm.com>
+From: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
+Subject: RE: [PATCH] KVM: arm/arm64: Set ICH_HCR_EN in guest anyway when
+ using gicv4
+Date: Thu, 14 Mar 2019 08:05:24 +0000
+Message-ID: <F348A9E21A573744858FF7E5D32E29D81FEFC965@DGGEMI529-MBX.china.huawei.com>
 References: <F348A9E21A573744858FF7E5D32E29D81FEFA462@DGGEMI529-MBX.china.huawei.com>
  <3993685d-a78f-2e73-e22a-8ade3b6a6279@arm.com>
  <d97bd073-8775-f0cf-637a-ea1b04afbd8f@arm.com>
  <5FC3163CFD30C246ABAA99954A238FA839311C4F@lhreml524-mbs.china.huawei.com>
+ <09a615e5-9dce-d194-6290-b8897abd5d12@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA839311C4F@lhreml524-mbs.china.huawei.com>
-Content-Language: en-US
+In-Reply-To: <09a615e5-9dce-d194-6290-b8897abd5d12@arm.com>
+Content-Language: zh-CN
 Sender: linux-kernel-owner@vger.kernel.org
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, "Tangnianyao (ICT)" <tangnianyao@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "keescook@chromium.org" <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.colum>
-Cc: Linuxarm <linuxarm@huawei.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, "james.morse@arm.com" <james.morse@arm.com>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, "mark.rutland@arm.com" <mark.rutland@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>, Zhangshaokun <zhangshaokun@hisilicon.com>, "keescook@chromium.org" <keescook@chromium.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.colum>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/03/2019 15:59, Shameerali Kolothum Thodi wrote:
-
-Hi Shameer,
-
->> Can you please give the following patch a go? I can't test it, but hopefully
->> you can.
-> 
-> Thanks for your quick response. I just did a quick test on one of our platforms
-> with VHE+GICv4 and it seems to fix the performance issue we were seeing
-> when GICv4 is enabled.
-> 
-> Test setup:
-> 
-> Host connected to a PC over a 10G port.
-> Launch Guest with an assigned vf dev.
-> Run iperf from Guest,
-> 
-> 5.0 kernel:
-> [ ID]  Interval       Transfer     Bandwidth
-> [  3]  0.0-10.0 sec  1.30 GBytes  1.12 Gbits/sec
-> 
-> +Patch:
-> 
-> [ ID] 	Interval       Transfer     Bandwidth
-> [  3]  0.0-10.0 sec  10.9 GBytes  9.39 Gbits/sec
-
-Ah, that looks much better! I'll try to write it properly, as I think
-what we have today is slightly bizarre (we write ICH_HCR_EL2 from too
-many paths, and I need to remember how the whole thing works).
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+SGksIE1hcmMsIFNoYW1lZXINCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
+OiBNYXJjIFp5bmdpZXIgW21haWx0bzptYXJjLnp5bmdpZXJAYXJtLmNvbV0NCj4gU2VudDogVGh1
+cnNkYXksIE1hcmNoIDE0LCAyMDE5IDEyOjMxIEFNDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVt
+IFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiBUYW5nbmlh
+bnlhbyAoSUNUKSA8dGFuZ25pYW55YW9AaHVhd2VpLmNvbT47IENocmlzdG9mZmVyIERhbGwNCj4g
+PGNocmlzdG9mZmVyLmRhbGxAYXJtLmNvbT47IGphbWVzLm1vcnNlQGFybS5jb207IGp1bGllbi50
+aGllcnJ5QGFybS5jb207DQo+IHN1enVraS5wb3Vsb3NlQGFybS5jb207IGNhdGFsaW4ubWFyaW5h
+c0Bhcm0uY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tOw0KPiBhbGV4LmJlbm5lZUBsaW5hcm8ub3Jn
+OyBtYXJrLnJ1dGxhbmRAYXJtLmNvbTsgYW5kcmUucHJ6eXdhcmFAYXJtLmNvbTsNCj4gWmhhbmdz
+aGFva3VuIDx6aGFuZ3NoYW9rdW5AaGlzaWxpY29uLmNvbT47IGtlZXNjb29rQGNocm9taXVtLm9y
+ZzsNCj4gbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBrdm1hcm1AbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1Ow0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+IENjOiBM
+aW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gS1ZN
+OiBhcm0vYXJtNjQ6IFNldCBJQ0hfSENSX0VOIGluIGd1ZXN0IGFueXdheSB3aGVuDQo+IHVzaW5n
+IGdpY3Y0DQo+IA0KPiBPbiAxMy8wMy8yMDE5IDE1OjU5LCBTaGFtZWVyYWxpIEtvbG90aHVtIFRo
+b2RpIHdyb3RlOg0KPiANCj4gSGkgU2hhbWVlciwNCj4gDQo+ID4+IENhbiB5b3UgcGxlYXNlIGdp
+dmUgdGhlIGZvbGxvd2luZyBwYXRjaCBhIGdvPyBJIGNhbid0IHRlc3QgaXQsIGJ1dA0KPiA+PiBo
+b3BlZnVsbHkgeW91IGNhbi4NCj4gPg0KPiA+IFRoYW5rcyBmb3IgeW91ciBxdWljayByZXNwb25z
+ZS4gSSBqdXN0IGRpZCBhIHF1aWNrIHRlc3Qgb24gb25lIG9mIG91cg0KPiA+IHBsYXRmb3JtcyB3
+aXRoIFZIRStHSUN2NCBhbmQgaXQgc2VlbXMgdG8gZml4IHRoZSBwZXJmb3JtYW5jZSBpc3N1ZSB3
+ZQ0KPiA+IHdlcmUgc2VlaW5nIHdoZW4gR0lDdjQgaXMgZW5hYmxlZC4NCj4gPg0KPiA+IFRlc3Qg
+c2V0dXA6DQo+ID4NCj4gPiBIb3N0IGNvbm5lY3RlZCB0byBhIFBDIG92ZXIgYSAxMEcgcG9ydC4N
+Cj4gPiBMYXVuY2ggR3Vlc3Qgd2l0aCBhbiBhc3NpZ25lZCB2ZiBkZXYuDQo+ID4gUnVuIGlwZXJm
+IGZyb20gR3Vlc3QsDQo+ID4NCj4gPiA1LjAga2VybmVsOg0KPiA+IFsgSURdICBJbnRlcnZhbCAg
+ICAgICBUcmFuc2ZlciAgICAgQmFuZHdpZHRoDQo+ID4gWyAgM10gIDAuMC0xMC4wIHNlYyAgMS4z
+MCBHQnl0ZXMgIDEuMTIgR2JpdHMvc2VjDQo+ID4NCj4gPiArUGF0Y2g6DQo+ID4NCj4gPiBbIElE
+XSAJSW50ZXJ2YWwgICAgICAgVHJhbnNmZXIgICAgIEJhbmR3aWR0aA0KPiA+IFsgIDNdICAwLjAt
+MTAuMCBzZWMgIDEwLjkgR0J5dGVzICA5LjM5IEdiaXRzL3NlYw0KPiANCj4gQWgsIHRoYXQgbG9v
+a3MgbXVjaCBiZXR0ZXIhIEknbGwgdHJ5IHRvIHdyaXRlIGl0IHByb3Blcmx5LCBhcyBJIHRoaW5r
+IHdoYXQgd2UgaGF2ZQ0KPiB0b2RheSBpcyBzbGlnaHRseSBiaXphcnJlICh3ZSB3cml0ZSBJQ0hf
+SENSX0VMMiBmcm9tIHRvbyBtYW55IHBhdGhzLCBhbmQgSQ0KPiBuZWVkIHRvIHJlbWVtYmVyIGhv
+dyB0aGUgd2hvbGUgdGhpbmcgd29ya3MpLg0KPiANCj4gVGhhbmtzLA0KPiANCj4gCU0uDQo+IC0t
+DQo+IEphenogaXMgbm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uDQoNClRlc3Qgc2V0
+dXA6DQpWSEUgZW5hYmxlLiANCkNvbm5lY3RlZCB0byBhbiBpbnRlbCA4MTgwIHNlcnZlciBvdmVy
+IDEwRyBwb3J0Lg0KTGF1bmNoIGd1ZXN0IHdpdGggYW4gYXNzaWduZWQgdmYgZGV2Lg0KSW50ZWwg
+c2VydmVyIGFzIHNlcnZlci4gQXJtIGd1ZXN0IHZtIGFzIGNsaWVudC4NClJ1biBuZXRwZXJmIGlu
+IGd1ZXN0LCBwYWNrYWdlIGxlbmd0aCA1MTJieXRlOg0KDQo1LjAuMC1yYzMga2VybmVsOg0Kd2l0
+aG91dCBwYXRjaDoNCjI2MDAgTWJpdHMvcw0Kd2l0aCBwYXRjaDoNCjU4MDAgTWJpdHMvcw0KDQoN
+ClRoYW5rcywNCi1OaWFueWFvIFRhbmcNCg==
