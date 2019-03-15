@@ -1,25 +1,24 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH kvmtool v1 1/2] vfio-pci: Release INTx's guest to host eventfd
- properly
-Date: Fri, 15 Mar 2019 16:33:14 +0800
-Message-ID: <20190315083315.19221-1-leo.yan@linaro.org>
+From: Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: Kick cpu when WFI in single-threaded kvm integration
+Date: Fri, 15 Mar 2019 09:43:11 +0100
+Message-ID: <20190315084311.GA10950@e113682-lin.lund.arm.com>
+References: <93B846538060DA46A9945E98A2E521E901425BA9@DE02WEMBXB.internal.synopsys.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 752794A452
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEBAD4A430
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:43:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qVJ1acdDRgCW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Mar 2019 04:33:29 -0400 (EDT)
-Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com
- [209.85.167.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 580B54A389
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:29 -0400 (EDT)
-Received: by mail-oi1-f195.google.com with SMTP id a15so6676864oid.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 01:33:29 -0700 (PDT)
+ with ESMTP id mLNDsxSpVnH2 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Mar 2019 04:43:14 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD2C4A382
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:43:14 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <93B846538060DA46A9945E98A2E521E901425BA9@DE02WEMBXB.internal.synopsys.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,77 +28,87 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: Leo Yan <leo.yan@linaro.org>
+To: Jan Bolke <jan.bolke@synopsys.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The PCI device INTx uses event fd 'unmask_fd' to signal the deassertion
-of the line from guest to host; but this eventfd isn't released properly
-when disable INTx.
+Hi Jan,
 
-When disable INTx this patch firstly unbinds interrupt signal by calling
-ioctl VFIO_DEVICE_SET_IRQS and then it uses the new added field
-'unmask_fd' in struct vfio_pci_device to close event fd.
+On Thu, Mar 14, 2019 at 12:19:02PM +0000, Jan Bolke wrote:
+> Hi all,
+> 
+> Currently I am working on a SystemC integration of kvm on arm.
+> Therefore, I use the kvm api and of course SystemC (library to simulate hardware platforms with C++).
+> 
+> As I need the virtual cpu to interrupt its execution loop from time to time to let the rest of the SystemC simulation execute,
+> I use a perf_event and let the kernel send a signal on overflow to the simulation thread which kicks the virtual cpu (suggested by this mailing list, thanks again).
+> Thus I am able to simulate a quantum mechanism for the virtual cpu.
+> 
+> As I am running benchmarks (e.g. Coremark) on my virtual platform this works fine.
+> 
+> I also get to boot Linux until it spawns the terminal and then wait for interrupts from my virtual uart.
+> Here comes the problem:
+> The perf event counting mechanism does increment its counted instructions very very slowly when the virtual cpu executes wfi.
+> Thus my whole simulation starts to hang.
+> As my simulation is single threaded I need the signal from the kernel to kick my cpu to let the virtual uart deliver its interrupt to react to my input.
+> I tried to use the request_interrupt_window flag but this does not seem to work.
+> 
+> Is there a way to kick the virtual cpu when it is waiting for interrupts? Or do I have to patch my kvm code?
+> 
 
-Signed-off-by: Leo Yan <leo.yan@linaro.org>
----
- include/kvm/vfio.h |  1 +
- vfio/pci.c         | 15 ++++++++++++---
- 2 files changed, 13 insertions(+), 3 deletions(-)
+Let me see if I understand your question properly; you are running a KVM
+virtual CPU which executes WFI in the guest, and then you are not
+receiving interrupts in the guest nor getting events back from KVM which
+you somehow use to run a backend simulation in userspace?
 
-diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
-index 60e6c54..28223cf 100644
---- a/include/kvm/vfio.h
-+++ b/include/kvm/vfio.h
-@@ -74,6 +74,7 @@ struct vfio_pci_device {
- 
- 	unsigned long			irq_modes;
- 	int				intx_fd;
-+	int				unmask_fd;
- 	unsigned int			intx_gsi;
- 	struct vfio_pci_msi_common	msi;
- 	struct vfio_pci_msi_common	msix;
-diff --git a/vfio/pci.c b/vfio/pci.c
-index 03de3c1..c0683f6 100644
---- a/vfio/pci.c
-+++ b/vfio/pci.c
-@@ -996,18 +996,26 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
- {
- 	struct vfio_pci_device *pdev = &vdev->pci;
- 	int gsi = pdev->intx_gsi;
--	struct vfio_irq_set irq_set = {
--		.argsz	= sizeof(irq_set),
-+	struct vfio_irq_set trigger_irq = {
-+		.argsz	= sizeof(trigger_irq),
- 		.flags	= VFIO_IRQ_SET_DATA_NONE | VFIO_IRQ_SET_ACTION_TRIGGER,
- 		.index	= VFIO_PCI_INTX_IRQ_INDEX,
- 	};
- 
-+	struct vfio_irq_set unmask_irq = {
-+		.argsz	= sizeof(unmask_irq),
-+		.flags	= VFIO_IRQ_SET_DATA_NONE | VFIO_IRQ_SET_ACTION_UNMASK,
-+		.index	= VFIO_PCI_INTX_IRQ_INDEX,
-+	};
-+
- 	pr_debug("user requested MSI, disabling INTx %d", gsi);
- 
--	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
-+	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &trigger_irq);
-+	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &unmask_irq);
- 	irq__del_irqfd(kvm, gsi, pdev->intx_fd);
- 
- 	close(pdev->intx_fd);
-+	close(pdev->unmask_fd);
- }
- 
- static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
-@@ -1095,6 +1103,7 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 	}
- 
- 	pdev->intx_fd = trigger_fd;
-+	pdev->unmask_fd = unmask_fd;
- 	/* Guest is going to ovewrite our irq_line... */
- 	pdev->intx_gsi = gsi;
- 
--- 
-2.19.1
+KVM/Arm can do two things for WFI:
+
+ 1. Let the guest directly execute it without trapping to the hypervisor
+    (the physical CPU will NOT exit the guest until there's a physical
+    interrupt on the CPU).
+
+ 2. Trap WFI to KVM.  KVM asks Linux to schedule another process until
+    there's a virtual interrupt for the VCPU.  This is what mainline
+    KVM/Arm does.
+
+
+I suspect what's happening is that you are using a normal kernel
+configured as (2), and therefore you only count cycles for the perf
+event while the guest runs the timer ISR which obviously is much much
+less than if you had a constant running VCPU.  Am I on the right track?
+
+If so, there are a couple of things you could try.
+
+First, you can try disabling the trap on WFI (note that this changes
+pretty fundamental behavior of KVM, and this is not recommended for
+production use or for systems level performance investigations where
+more than one workload contends for a single physical CPU):
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 7f9d2bfcf82e..b38a5a134fef 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -84,7 +84,7 @@
+  * FMO:		Override CPSR.F and enable signaling with VF
+  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
+  */
+-#define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
++#define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_VM | \
+ 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO)
+
+
+Note that I'm not sure how the performance counter counts on your
+particular platform when the CPU is in WFI, so this may not help at all.
+
+
+Second, and possibly preferred, you can hook up your simulation event to
+a timer event in the case of trapping on a WFI.  See kvm_handle_wfx() in
+arch/arm64/kvm/handle_exit.c and follow kvm_vcpu_block() from there to
+see how KVM/Arm handles this event.
+
+
+Hope this helps,
+
+    Christoffer
