@@ -1,27 +1,25 @@
 From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH kvmtool v1 2/2] vfio-pci: Fallback to INTx mode when disable
- MSI/MSIX
-Date: Fri, 15 Mar 2019 16:33:15 +0800
-Message-ID: <20190315083315.19221-2-leo.yan@linaro.org>
-References: <20190315083315.19221-1-leo.yan@linaro.org>
+Subject: [PATCH kvmtool v1 1/2] vfio-pci: Release INTx's guest to host eventfd
+ properly
+Date: Fri, 15 Mar 2019 16:33:14 +0800
+Message-ID: <20190315083315.19221-1-leo.yan@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4750F4A389
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 752794A452
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vWYxhopru5f9 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Mar 2019 04:33:32 -0400 (EDT)
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com
- [209.85.210.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F16464A497
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:31 -0400 (EDT)
-Received: by mail-ot1-f66.google.com with SMTP id e80so2526593ote.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 01:33:31 -0700 (PDT)
-In-Reply-To: <20190315083315.19221-1-leo.yan@linaro.org>
+ with ESMTP id qVJ1acdDRgCW for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Mar 2019 04:33:29 -0400 (EDT)
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com
+ [209.85.167.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 580B54A389
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:33:29 -0400 (EDT)
+Received: by mail-oi1-f195.google.com with SMTP id a15so6676864oid.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 01:33:29 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,80 +33,73 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@
 Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since PCI forbids enabling INTx, MSI or MSIX at the same time, it's by
-default to disable INTx mode when enable MSI/MSIX mode; but this logic is
-easily broken if the guest PCI driver detects the MSI/MSIX cannot work as
-expected and tries to rollback to use INTx mode.  The INTx mode has been
-disabled and it has no chance to be enabled again, thus both INTx mode
-and MSI/MSIX mode will not be enabled in vfio for this case.
+The PCI device INTx uses event fd 'unmask_fd' to signal the deassertion
+of the line from guest to host; but this eventfd isn't released properly
+when disable INTx.
 
-Below shows the detailed flow for introducing this issue:
-
-  vfio_pci_configure_dev_irqs()
-    `-> vfio_pci_enable_intx()
-
-  vfio_pci_enable_msis()
-    `-> vfio_pci_disable_intx()
-
-  vfio_pci_disable_msis()   => Guest PCI driver disables MSI
-
-To fix this issue, when disable MSI/MSIX we need to check if INTx mode
-is available for this device or not; if the device can support INTx then
-we need to re-enable it so the device can fallback to use it.
+When disable INTx this patch firstly unbinds interrupt signal by calling
+ioctl VFIO_DEVICE_SET_IRQS and then it uses the new added field
+'unmask_fd' in struct vfio_pci_device to close event fd.
 
 Signed-off-by: Leo Yan <leo.yan@linaro.org>
 ---
- vfio/pci.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ include/kvm/vfio.h |  1 +
+ vfio/pci.c         | 15 ++++++++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
+diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
+index 60e6c54..28223cf 100644
+--- a/include/kvm/vfio.h
++++ b/include/kvm/vfio.h
+@@ -74,6 +74,7 @@ struct vfio_pci_device {
+ 
+ 	unsigned long			irq_modes;
+ 	int				intx_fd;
++	int				unmask_fd;
+ 	unsigned int			intx_gsi;
+ 	struct vfio_pci_msi_common	msi;
+ 	struct vfio_pci_msi_common	msix;
 diff --git a/vfio/pci.c b/vfio/pci.c
-index c0683f6..44727bb 100644
+index 03de3c1..c0683f6 100644
 --- a/vfio/pci.c
 +++ b/vfio/pci.c
-@@ -28,6 +28,7 @@ struct vfio_irq_eventfd {
- 	msi_update_state(state, val, VFIO_PCI_MSI_STATE_EMPTY)
+@@ -996,18 +996,26 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
+ {
+ 	struct vfio_pci_device *pdev = &vdev->pci;
+ 	int gsi = pdev->intx_gsi;
+-	struct vfio_irq_set irq_set = {
+-		.argsz	= sizeof(irq_set),
++	struct vfio_irq_set trigger_irq = {
++		.argsz	= sizeof(trigger_irq),
+ 		.flags	= VFIO_IRQ_SET_DATA_NONE | VFIO_IRQ_SET_ACTION_TRIGGER,
+ 		.index	= VFIO_PCI_INTX_IRQ_INDEX,
+ 	};
  
- static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev);
-+static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev);
- 
- static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 				bool msix)
-@@ -50,7 +51,7 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 	if (!msi_is_enabled(msis->virt_state))
- 		return 0;
- 
--	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX) {
-+	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
- 		/*
- 		 * PCI (and VFIO) forbids enabling INTx, MSI or MSIX at the same
- 		 * time. Since INTx has to be enabled from the start (we don't
-@@ -58,9 +59,6 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 		 * disable it now.
- 		 */
- 		vfio_pci_disable_intx(kvm, vdev);
--		/* Permanently disable INTx */
--		pdev->irq_modes &= ~VFIO_PCI_IRQ_MODE_INTX;
--	}
- 
- 	eventfds = (void *)msis->irq_set + sizeof(struct vfio_irq_set);
- 
-@@ -162,7 +160,16 @@ static int vfio_pci_disable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 	msi_set_enabled(msis->phys_state, false);
- 	msi_set_empty(msis->phys_state, true);
- 
--	return 0;
-+	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
-+		/*
-+		 * When MSI or MSIX is disabled, this might be called when
-+		 * PCI driver detects the MSI interrupt failure and wants to
-+		 * rollback to INTx mode.  Thus enable INTx if the device
-+		 * supports INTx mode in this case.
-+		 */
-+		ret = vfio_pci_enable_intx(kvm, vdev);
++	struct vfio_irq_set unmask_irq = {
++		.argsz	= sizeof(unmask_irq),
++		.flags	= VFIO_IRQ_SET_DATA_NONE | VFIO_IRQ_SET_ACTION_UNMASK,
++		.index	= VFIO_PCI_INTX_IRQ_INDEX,
++	};
 +
-+	return ret >= 0 ? 0 : ret;
+ 	pr_debug("user requested MSI, disabling INTx %d", gsi);
+ 
+-	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
++	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &trigger_irq);
++	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &unmask_irq);
+ 	irq__del_irqfd(kvm, gsi, pdev->intx_fd);
+ 
+ 	close(pdev->intx_fd);
++	close(pdev->unmask_fd);
  }
  
- static int vfio_pci_update_msi_entry(struct kvm *kvm, struct vfio_device *vdev,
+ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
+@@ -1095,6 +1103,7 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
+ 	}
+ 
+ 	pdev->intx_fd = trigger_fd;
++	pdev->unmask_fd = unmask_fd;
+ 	/* Guest is going to ovewrite our irq_line... */
+ 	pdev->intx_gsi = gsi;
+ 
 -- 
 2.19.1
