@@ -1,100 +1,239 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 0/3] KVM: Unify mmu_memory_cache functionality across
- architectures
-Date: Fri, 15 Mar 2019 18:37:00 +0100
-Message-ID: <5e57d972-5f7c-0c44-286d-fe401a3594c1@redhat.com>
-References: <20190131095244.7480-1-christoffer.dall@arm.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [PATCH v5 05/22] iommu: Introduce cache_invalidate API
+Date: Fri, 15 Mar 2019 11:37:02 -0700
+Message-ID: <20190315113702.1184d162@jacob-builder>
+References: <20190315160906.12900-1-eric.auger@redhat.com>
+        <20190315160906.12900-6-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E84504A481
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 13:37:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SubuIEzfoqmL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Mar 2019 13:37:07 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 035164A430
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 13:37:07 -0400 (EDT)
-In-Reply-To: <20190131095244.7480-1-christoffer.dall@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@arm.com>, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>, Anshuman Khandual <anshuman.khandual@arm.com>, Sean Christopherson <sean.j.christopherson@intel.com>, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190315160906.12900-6-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com, jacob.jun.pan@linux.intel.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 31/01/19 10:52, Christoffer Dall wrote:
-> We currently have duplicated functionality for the mmu_memory_cache used
-> to pre-allocate memory for the page table manipulation code which cannot
-> allocate memory while holding spinlocks.  This functionality is
-> duplicated across x86, arm/arm64, and mips.
+On Fri, 15 Mar 2019 17:08:49 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 > 
-> There were recently a debate of modifying the arm code to be more in
-> line with the x86 code and some discussions around changing the page
-> flags used for allocation.  This series should make it easier to take a
-> uniform approach across architectures.
+> In any virtualization use case, when the first translation stage
+> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+> of caching structure updates unless the guest invalidation activities
+> are trapped by the virtualizer and passed down to the host.
 > 
-> While there's not a huge amount of code sharing, we come out with a net
-> gain.
+> Since the invalidation data are obtained from user space and will be
+> written into physical IOMMU, we must allow security check at various
+> layers. Therefore, generic invalidation data format are proposed here,
+> model specific IOMMU drivers need to convert them into their own
+> format.
 > 
-> Only tested on arm/arm64, and only compile-tested on x86 and mips.
-> 
-> Changes since v1:
->  - Split out rename from initial x86 patch to have separate patches to
->    move the logic to common code and to rename.
->  - Introduce KVM_ARCH_WANT_MMU_MEMCACHE to avoid compile breakage on
->    architectures that don't use this functionality.
->  - Rename KVM_NR_MEM_OBJS to KVM_MMU_NR_MEMCACHE_OBJS
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
 > ---
+> v3 -> v4:
+> - full reshape of the API following Alex' comments
 > 
-> Christoffer Dall (4):
->   KVM: x86: Move mmu_memory_cache functions to common code
->   KVM: x86: Rename mmu_memory_cache to kvm_mmu_memcache
->   KVM: arm/arm64: Move to common kvm_mmu_memcache infrastructure
->   KVM: mips: Move to common kvm_mmu_memcache infrastructure
+> v1 -> v2:
+> - add arch_id field
+> - renamed tlb_invalidate into cache_invalidate as this API allows
+>   to invalidate context caches on top of IOTLBs
 > 
->  arch/arm/include/asm/kvm_host.h      | 13 +---
->  arch/arm/include/asm/kvm_mmu.h       |  2 +-
->  arch/arm/include/asm/kvm_types.h     | 12 ++++
->  arch/arm64/include/asm/kvm_host.h    | 13 +---
->  arch/arm64/include/asm/kvm_mmu.h     |  2 +-
->  arch/arm64/include/asm/kvm_types.h   | 13 ++++
->  arch/mips/include/asm/kvm_host.h     | 15 +----
->  arch/mips/include/asm/kvm_types.h    | 12 ++++
->  arch/mips/kvm/mips.c                 |  2 +-
->  arch/mips/kvm/mmu.c                  | 54 +++-------------
->  arch/powerpc/include/asm/kvm_types.h |  5 ++
->  arch/s390/include/asm/kvm_types.h    |  5 ++
->  arch/x86/include/asm/kvm_host.h      | 17 +----
->  arch/x86/include/asm/kvm_types.h     | 12 ++++
->  arch/x86/kvm/mmu.c                   | 97 ++++++----------------------
->  arch/x86/kvm/paging_tmpl.h           |  4 +-
->  include/linux/kvm_host.h             | 11 ++++
->  include/linux/kvm_types.h            | 13 ++++
->  virt/kvm/arm/arm.c                   |  2 +-
->  virt/kvm/arm/mmu.c                   | 68 +++++--------------
->  virt/kvm/kvm_main.c                  | 60 +++++++++++++++++
->  21 files changed, 202 insertions(+), 230 deletions(-)
->  create mode 100644 arch/arm/include/asm/kvm_types.h
->  create mode 100644 arch/arm64/include/asm/kvm_types.h
->  create mode 100644 arch/mips/include/asm/kvm_types.h
->  create mode 100644 arch/powerpc/include/asm/kvm_types.h
->  create mode 100644 arch/s390/include/asm/kvm_types.h
->  create mode 100644 arch/x86/include/asm/kvm_types.h
+> v1:
+> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+> header. Commit message reworded.
+> ---
+>  drivers/iommu/iommu.c      | 14 ++++++++
+>  include/linux/iommu.h      | 21 +++++++++++
+>  include/uapi/linux/iommu.h | 71
+> ++++++++++++++++++++++++++++++++++++++ 3 files changed, 106
+> insertions(+)
 > 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 7d9285cea100..b72e326ddd41 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1544,6 +1544,20 @@ void iommu_detach_pasid_table(struct
+> iommu_domain *domain) }
+>  EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+>  
+> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
+> device *dev,
+> +			   struct iommu_cache_invalidate_info
+> *inv_info) +{
+> +	int ret = 0;
+> +
+> +	if (unlikely(!domain->ops->cache_invalidate))
+> +		return -ENODEV;
+> +
+> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index fb9b7a8de25f..3d8e48876162 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -191,6 +191,7 @@ struct iommu_resv_region {
+>   *                      driver init to device driver init (default
+> no)
+>   * @attach_pasid_table: attach a pasid table
+>   * @detach_pasid_table: detach the pasid table
+> + * @cache_invalidate: invalidate translation caches
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>   */
+>  struct iommu_ops {
+> @@ -239,6 +240,9 @@ struct iommu_ops {
+>  				  struct iommu_pasid_table_config
+> *cfg); void (*detach_pasid_table)(struct iommu_domain *domain);
+>  
+> +	int (*cache_invalidate)(struct iommu_domain *domain, struct
+> device *dev,
+> +				struct iommu_cache_invalidate_info
+> *inv_info); +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -349,6 +353,9 @@ extern void iommu_detach_device(struct
+> iommu_domain *domain, extern int iommu_attach_pasid_table(struct
+> iommu_domain *domain, struct iommu_pasid_table_config *cfg);
+>  extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+> +				  struct device *dev,
+> +				  struct iommu_cache_invalidate_info
+> *inv_info); extern struct iommu_domain
+> *iommu_get_domain_for_dev(struct device *dev); extern struct
+> iommu_domain *iommu_get_dma_domain(struct device *dev); extern int
+> iommu_map(struct iommu_domain *domain, unsigned long iova, @@ -795,7
+> +802,21 @@ int iommu_attach_pasid_table(struct iommu_domain *domain, }
+>  
+>  static inline
+> +<<<<<<< HEAD
+>  void iommu_detach_pasid_table(struct iommu_domain *domain) {}
+> +=======
+> +void iommu_detach_pasid_table(struct iommu_domain *domain)
+> +{
+> +	return -ENODEV;
+> +}
+> +static inline int
+> +iommu_cache_invalidate(struct iommu_domain *domain,
+> +		       struct device *dev,
+> +		       struct iommu_cache_invalidate_info *inv_info)
+> +{
+> +	return -ENODEV;
+> +}
+> +>>>>>>> 56df871916e5... iommu: Introduce cache_invalidate API  
+forgot to merge :)
+>  
+>  #endif /* CONFIG_IOMMU_API */
+>  
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index 532a64075f23..e4c6a447e85a 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
+>  	};
+>  };
+>  
+> +/* defines the granularity of the invalidation */
+> +enum iommu_inv_granularity {
+> +	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective
+> invalidation */
+> +	IOMMU_INV_GRANU_PASID,	/* pasid-selective
+> invalidation */
+> +	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation
+> */ +};
+> +
+> +/**
+> + * Address Selective Invalidation Structure
+> + *
+> + * @flags indicates the granularity of the address-selective
+> invalidation
+> + * - if PASID bit is set, @pasid field is populated and the
+> invalidation
+> + *   relates to cache entries tagged with this PASID and matching the
+> + *   address range.
+> + * - if ARCHID bit is set, @archid is populated and the invalidation
+> relates
+> + *   to cache entries tagged with this architecture specific id and
+> matching
+> + *   the address range.
+> + * - Both PASID and ARCHID can be set as they may tag different
+> caches.
+> + * - if neither PASID or ARCHID is set, global addr invalidation
+> applies
+> + * - LEAF flag indicates whether only the leaf PTE caching needs to
+> be
+> + *   invalidated and other paging structure caches can be preserved.
+> + * @pasid: process address space id
+> + * @archid: architecture-specific id
+> + * @addr: first stage/level input address
+> + * @granule_size: page/block size of the mapping in bytes
+> + * @nb_granules: number of contiguous granules to be invalidated
+> + */
+> +struct iommu_inv_addr_info {
+> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
+> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
+> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
+> +	__u32	flags;
+> +	__u32	archid;
+> +	__u64	pasid;
+> +	__u64	addr;
+> +	__u64	granule_size;
+> +	__u64	nb_granules;
+> +};
+> +
+> +/**
+> + * First level/stage invalidation information
+> + * @cache: bitfield that allows to select which caches to invalidate
+> + * @granularity: defines the lowest granularity used for the
+> invalidation:
+> + *     domain > pasid > addr
+> + *
+> + * Not all the combinations of cache/granularity make sense:
+> + *
+> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
+> + * granularity	|		|		|
+> cache	|
+> + * -------------+---------------+---------------+---------------+
+> + * DOMAIN	|	N/A	|       Y	|
+> Y	|
+> + * PASID	|	Y	|       Y	|
+> Y	|
+> + * ADDR		|       Y	|       Y	|
+> N/A	|
+> + */
+> +struct iommu_cache_invalidate_info {
+> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+> +	__u32	version;
+> +/* IOMMU paging structure cache */
+> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
+> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device
+> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID
+> cache */
+> +	__u8	cache;
+> +	__u8	granularity;
+> +	__u8	padding[2];
+> +	union {
+> +		__u64	pasid;
+just realized there is already a pasid field in the addr_info, do we
+still need this?
+> +		struct iommu_inv_addr_info addr_info;
+> +	};
+> +};
+> +
+> +
+>  #endif /* _UAPI_IOMMU_H */
 
-Sorry for the belated review, this is a good idea and I would like to
-include it at the beginning of the 5.2 cycle.
-
-Paolo
+[Jacob Pan]
