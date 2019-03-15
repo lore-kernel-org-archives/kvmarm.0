@@ -1,127 +1,114 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH kvmtool v1 2/2] vfio-pci: Fallback to INTx mode when
- disable MSI/MSIX
-Date: Fri, 15 Mar 2019 14:20:07 +0000
-Message-ID: <0f3ab1a0-b993-ca9d-3a02-3f56ff7967f8@arm.com>
-References: <20190315083315.19221-1-leo.yan@linaro.org>
- <20190315083315.19221-2-leo.yan@linaro.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
+Date: Fri, 15 Mar 2019 14:56:45 +0000
+Message-ID: <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
+References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
+ <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
+ <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
+ <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
+ <348d0b3b-c74b-7b39-ec30-85905c077c38@huawei.com>
+ <20190314105537.GA15323@en101>
+ <368bd218-ac1d-19b2-6e92-960b91afee8b@huawei.com>
+ <d322e126-4da2-6dfd-a86d-088dfb3bf0f4@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21EAC4A440
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 10:20:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WyE1-JJx3+e2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Mar 2019 10:20:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0CBD4A429
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 10:20:25 -0400 (EDT)
-In-Reply-To: <20190315083315.19221-2-leo.yan@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <d322e126-4da2-6dfd-a86d-088dfb3bf0f4@huawei.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Leo Yan <leo.yan@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Will Deacon <Will.Deacon@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: zhengxiang9@huawei.com, yuzenghui@huawei.com
+Cc: marc.zyngier@arm.com, christoffer.dall@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com, lious.lilei@hisilicon.com, lishuo1@hisilicon.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/03/2019 08:33, Leo Yan wrote:
-> Since PCI forbids enabling INTx, MSI or MSIX at the same time, it's by
-> default to disable INTx mode when enable MSI/MSIX mode; but this logic is
-> easily broken if the guest PCI driver detects the MSI/MSIX cannot work as
-> expected and tries to rollback to use INTx mode.  The INTx mode has been
-> disabled and it has no chance to be enabled again, thus both INTx mode
-> and MSI/MSIX mode will not be enabled in vfio for this case.
-> 
-> Below shows the detailed flow for introducing this issue:
-> 
->   vfio_pci_configure_dev_irqs()
->     `-> vfio_pci_enable_intx()
-> 
->   vfio_pci_enable_msis()
->     `-> vfio_pci_disable_intx()
-> 
->   vfio_pci_disable_msis()   => Guest PCI driver disables MSI
-> 
-> To fix this issue, when disable MSI/MSIX we need to check if INTx mode
-> is available for this device or not; if the device can support INTx then
-> we need to re-enable it so the device can fallback to use it.
-> 
-> Signed-off-by: Leo Yan <leo.yan@linaro.org>
-> ---
->  vfio/pci.c | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
-> 
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index c0683f6..44727bb 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -28,6 +28,7 @@ struct vfio_irq_eventfd {
->  	msi_update_state(state, val, VFIO_PCI_MSI_STATE_EMPTY)
->  
->  static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev);
-> +static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev);
->  
->  static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  				bool msix)
-> @@ -50,7 +51,7 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  	if (!msi_is_enabled(msis->virt_state))
->  		return 0;
->  
-> -	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX) {
-> +	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
->  		/*
->  		 * PCI (and VFIO) forbids enabling INTx, MSI or MSIX at the same
->  		 * time. Since INTx has to be enabled from the start (we don't
-> @@ -58,9 +59,6 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  		 * disable it now.
->  		 */
->  		vfio_pci_disable_intx(kvm, vdev);
-> -		/* Permanently disable INTx */
-> -		pdev->irq_modes &= ~VFIO_PCI_IRQ_MODE_INTX;
+Hi Zhengui,
 
-As a result vfio_pci_disable_intx() may be called multiple times (each
-time the guest enables one MSI vector). Could you make
-vfio_pci_disable_intx() safe against that (maybe use intx_fd == -1 to
-denote the INTx state)?
-
-> -	}
->  
->  	eventfds = (void *)msis->irq_set + sizeof(struct vfio_irq_set);
->  
-> @@ -162,7 +160,16 @@ static int vfio_pci_disable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  	msi_set_enabled(msis->phys_state, false);
->  	msi_set_empty(msis->phys_state, true);
->  
-> -	return 0;
-> +	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
-> +		/*
-> +		 * When MSI or MSIX is disabled, this might be called when
-> +		 * PCI driver detects the MSI interrupt failure and wants to
-> +		 * rollback to INTx mode.  Thus enable INTx if the device
-> +		 * supports INTx mode in this case.
-> +		 */
-> +		ret = vfio_pci_enable_intx(kvm, vdev);
-
-Let's remove vfio_pci_reserve_irq_fds(2) from vfio_pci_enable_intx(), it
-should only called once per run, and isn't particularly useful here
-since INTx only uses 2 fds. It's used to bump the fd rlimit when a
-device needs ~2048 file descriptors for MSI-X.
-
-Thanks,
-Jean
-
-> +
-> +	return ret >= 0 ? 0 : ret;
->  }
->  
->  static int vfio_pci_update_msi_entry(struct kvm *kvm, struct vfio_device *vdev,
+On 15/03/2019 08:21, Zheng Xiang wrote:
+> Hi Suzuki,
 > 
+> I have tested this patch, VM doesn't hang and we get expected WARNING log:
+
+Thanks for the quick testing !
+
+> However, we also get the following unexpected log:
+> 
+> [  908.329900] BUG: Bad page state in process qemu-kvm  pfn:a2fb41cf
+> [  908.339415] page:ffff7e28bed073c0 count:-4 mapcount:0 mapping:0000000000000000 index:0x0
+> [  908.339416] flags: 0x4ffffe0000000000()
+> [  908.339418] raw: 4ffffe0000000000 dead000000000100 dead000000000200 0000000000000000
+> [  908.339419] raw: 0000000000000000 0000000000000000 fffffffcffffffff 0000000000000000
+> [  908.339420] page dumped because: nonzero _refcount
+> [  908.339437] CPU: 32 PID: 72599 Comm: qemu-kvm Kdump: loaded Tainted: G    B  W        5.0.0+ #1
+> [  908.339438] Call trace:
+> [  908.339439]  dump_backtrace+0x0/0x188
+> [  908.339441]  show_stack+0x24/0x30
+> [  908.339442]  dump_stack+0xa8/0xcc
+> [  908.339443]  bad_page+0xf0/0x150
+> [  908.339445]  free_pages_check_bad+0x84/0xa0
+> [  908.339446]  free_pcppages_bulk+0x4b8/0x750
+> [  908.339448]  free_unref_page_commit+0x13c/0x198
+> [  908.339449]  free_unref_page+0x84/0xa0
+> [  908.339451]  __free_pages+0x58/0x68
+> [  908.339452]  zap_huge_pmd+0x290/0x2d8
+> [  908.339454]  unmap_page_range+0x2b4/0x470
+> [  908.339455]  unmap_single_vma+0x94/0xe8
+> [  908.339457]  unmap_vmas+0x8c/0x108
+> [  908.339458]  exit_mmap+0xd4/0x178
+> [  908.339459]  mmput+0x74/0x180
+> [  908.339460]  do_exit+0x2b4/0x5b0
+> [  908.339462]  do_group_exit+0x3c/0xe0
+> [  908.339463]  __arm64_sys_exit_group+0x24/0x28
+> [  908.339465]  el0_svc_common+0xa0/0x180
+> [  908.339466]  el0_svc_handler+0x38/0x78
+> [  908.339467]  el0_svc+0x8/0xc
+
+Thats bad, we seem to be making upto 4 unbalanced put_page().
+
+>>> ---
+>>>    virt/kvm/arm/mmu.c | 51 +++++++++++++++++++++++++++++++++++----------------
+>>>    1 file changed, 35 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>> index 66e0fbb5..04b0f9b 100644
+>>> --- a/virt/kvm/arm/mmu.c
+>>> +++ b/virt/kvm/arm/mmu.c
+>>> @@ -1076,24 +1076,38 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+>>>             * Skip updating the page table if the entry is
+>>>             * unchanged.
+>>>             */
+>>> -        if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+>>> +        if (pmd_val(old_pmd) == pmd_val(*new_pmd)) {
+>>>                return 0;
+>>> -
+>>> +        } else if (WARN_ON_ONCE(!pmd_thp_or_huge(old_pmd))) {
+>>>            /*
+>>> -         * Mapping in huge pages should only happen through a
+>>> -         * fault.  If a page is merged into a transparent huge
+>>> -         * page, the individual subpages of that huge page
+>>> -         * should be unmapped through MMU notifiers before we
+>>> -         * get here.
+>>> -         *
+>>> -         * Merging of CompoundPages is not supported; they
+>>> -         * should become splitting first, unmapped, merged,
+>>> -         * and mapped back in on-demand.
+>>> +         * If we have PTE level mapping for this block,
+>>> +         * we must unmap it to avoid inconsistent TLB
+>>> +         * state. We could end up in this situation if
+>>> +         * the memory slot was marked for dirty logging
+>>> +         * and was reverted, leaving PTE level mappings
+>>> +         * for the pages accessed during the period.
+>>> +         * Normal THP split/merge follows mmu_notifier
+>>> +         * callbacks and do get handled accordingly.
+>>>             */
+>>> -        VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+>>> +            unmap_stage2_range(kvm, (addr & S2_PMD_MASK), S2_PMD_SIZE);
+> 
+> It seems that kvm decreases the _refcount of the page twice in transparent_hugepage_adjust()
+> and unmap_stage2_range().
+
+But I thought we should be doing that on the head_page already, as this is THP.
+I will take a look and get back to you on this. Btw, is it possible for you
+to turn on CONFIG_DEBUG_VM and re-run with the above patch ?
+
+Kind regards
+Suzuki
