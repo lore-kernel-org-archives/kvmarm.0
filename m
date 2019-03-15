@@ -1,124 +1,139 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 19/22] vfio-pci: Register an iommu fault handler
-Date: Fri, 15 Mar 2019 17:09:03 +0100
-Message-ID: <20190315160906.12900-20-eric.auger@redhat.com>
+Subject: [PATCH v5 20/22] vfio_pci: Allow to mmap the fault queue
+Date: Fri, 15 Mar 2019 17:09:04 +0100
+Message-ID: <20190315160906.12900-21-eric.auger@redhat.com>
 References: <20190315160906.12900-1-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 519274A440
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 12:11:52 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sHMmyaekWThX for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Mar 2019 12:11:51 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 670914A42E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 12:11:51 -0400 (EDT)
 In-Reply-To: <20190315160906.12900-1-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch registers a fault handler which records faults in
-a circular buffer and then signals an eventfd. This buffer is
-exposed within the fault region.
+The Producer Fault region contains the fault queue in the second page.
+There is benefit to let the userspace mmap this area. So let's expose
+this mmappable area through a sparse mmap entry and implement the mmap
+operation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-v3 -> v4:
-- move iommu_unregister_device_fault_handler to vfio_pci_release
----
- drivers/vfio/pci/vfio_pci.c         | 49 +++++++++++++++++++++++++++++
- drivers/vfio/pci/vfio_pci_private.h |  1 +
- 2 files changed, 50 insertions(+)
+ drivers/vfio/pci/vfio_pci.c | 61 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 59 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 01b1b4cb8349..cf12204486c3 100644
+index cf12204486c3..8c895ece4750 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -29,6 +29,7 @@
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
- #include <linux/nospec.h>
-+#include <linux/circ_buf.h>
+@@ -274,15 +274,70 @@ static const struct vfio_pci_fault_abi fault_abi_versions[] = {
  
- #include "vfio_pci_private.h"
+ #define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)
  
-@@ -295,6 +296,46 @@ static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
++static int vfio_pci_fault_mmap(struct vfio_pci_device *vdev,
++			       struct vfio_pci_region *region,
++			       struct vm_area_struct *vma)
++{
++	u64 phys_len, req_len, pgoff, req_start;
++	unsigned long long addr;
++	unsigned int index, ret;
++
++	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
++
++	phys_len = region->size;
++
++	req_len = vma->vm_end - vma->vm_start;
++	pgoff = vma->vm_pgoff &
++		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	req_start = pgoff << PAGE_SHIFT;
++
++	/* only the second page of the producer fault region is mmappable */
++	if (req_start < PAGE_SIZE)
++		return -EINVAL;
++
++	if (req_start + req_len > phys_len)
++		return -EINVAL;
++
++	addr = virt_to_phys(vdev->fault_pages);
++	vma->vm_private_data = vdev;
++	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
++
++	ret = remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
++			      req_len, vma->vm_page_prot);
++	return ret;
++}
++
+ static int vfio_pci_fault_prod_add_capability(struct vfio_pci_device *vdev,
+ 		struct vfio_pci_region *region, struct vfio_info_cap *caps)
+ {
++	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+ 	struct vfio_region_info_cap_fault cap = {
+ 		.header.id = VFIO_REGION_INFO_CAP_PRODUCER_FAULT,
+ 		.header.version = 1,
+ 		.version = NR_FAULT_ABIS,
+ 	};
+-	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++	size_t size = sizeof(*sparse) + sizeof(*sparse->areas);
++	int ret;
++
++	ret = vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++	if (ret)
++		return ret;
++
++	sparse = kzalloc(size, GFP_KERNEL);
++	if (!sparse)
++		return -ENOMEM;
++
++	sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
++	sparse->header.version = 1;
++	sparse->nr_areas = 1;
++	sparse->areas[0].offset = PAGE_SIZE;
++	sparse->areas[0].size = PAGE_SIZE;
++
++	ret = vfio_info_add_capability(caps, &sparse->header, size);
++	if (ret)
++		kfree(sparse);
++
++	return ret;
+ }
+ 
+ static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
+@@ -293,6 +348,7 @@ static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
+ static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
+ 	.rw		= vfio_pci_fault_prod_rw,
+ 	.release	= vfio_pci_fault_release,
++	.mmap		= vfio_pci_fault_mmap,
  	.add_capability = vfio_pci_fault_prod_add_capability,
  };
  
-+int vfio_pci_iommu_dev_fault_handler(struct iommu_fault_event *evt, void *data)
-+{
-+	struct vfio_pci_device *vdev = (struct vfio_pci_device *) data;
-+	struct vfio_region_fault_prod *prod_region =
-+		(struct vfio_region_fault_prod *)vdev->fault_pages;
-+	struct vfio_region_fault_cons *cons_region =
-+		(struct vfio_region_fault_cons *)(vdev->fault_pages + 2 * PAGE_SIZE);
-+	struct iommu_fault *new =
-+		(struct iommu_fault *)(vdev->fault_pages + prod_region->offset +
-+			prod_region->prod * prod_region->entry_size);
-+	int prod, cons, size;
-+
-+	mutex_lock(&vdev->fault_queue_lock);
-+
-+	if (!vdev->fault_abi)
-+		goto unlock;
-+
-+	prod = prod_region->prod;
-+	cons = cons_region->cons;
-+	size = prod_region->nb_entries;
-+
-+	if (CIRC_SPACE(prod, cons, size) < 1)
-+		goto unlock;
-+
-+	*new = evt->fault;
-+	prod = (prod + 1) % size;
-+	prod_region->prod = prod;
-+	mutex_unlock(&vdev->fault_queue_lock);
-+
-+	mutex_lock(&vdev->igate);
-+	if (vdev->dma_fault_trigger)
-+		eventfd_signal(vdev->dma_fault_trigger, 1);
-+	mutex_unlock(&vdev->igate);
-+	return 0;
-+
-+unlock:
-+	mutex_unlock(&vdev->fault_queue_lock);
-+	return -EINVAL;
-+}
-+
- static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
- {
- 	struct vfio_region_fault_prod *header;
-@@ -327,6 +368,13 @@ static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
- 	header = (struct vfio_region_fault_prod *)vdev->fault_pages;
- 	header->version = -1;
- 	header->offset = PAGE_SIZE;
-+
-+	ret = iommu_register_device_fault_handler(&vdev->pdev->dev,
-+					vfio_pci_iommu_dev_fault_handler,
-+					vdev);
-+	if (ret)
-+		goto out;
-+
- 	return 0;
- out:
- 	kfree(vdev->fault_pages);
-@@ -574,6 +622,7 @@ static void vfio_pci_release(void *device_data)
- 	if (!(--vdev->refcnt)) {
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		iommu_unregister_device_fault_handler(&vdev->pdev->dev);
- 	}
+@@ -351,7 +407,8 @@ static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
+ 		VFIO_REGION_TYPE_NESTED,
+ 		VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD,
+ 		&vfio_pci_fault_prod_regops, 2 * PAGE_SIZE,
+-		VFIO_REGION_INFO_FLAG_READ, vdev->fault_pages);
++		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_MMAP,
++		vdev->fault_pages);
+ 	if (ret)
+ 		goto out;
  
- 	mutex_unlock(&vdev->reflck->lock);
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index 8e0a55682d3f..a9276926f008 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -122,6 +122,7 @@ struct vfio_pci_device {
- 	int			ioeventfds_nr;
- 	struct eventfd_ctx	*err_trigger;
- 	struct eventfd_ctx	*req_trigger;
-+	struct eventfd_ctx	*dma_fault_trigger;
- 	struct mutex		fault_queue_lock;
- 	int			fault_abi;
- 	struct list_head	dummy_resources_list;
 -- 
 2.20.1
