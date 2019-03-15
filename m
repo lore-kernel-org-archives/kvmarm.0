@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v5 17/22] iommu/smmuv3: Report non recoverable faults
-Date: Fri, 15 Mar 2019 17:09:01 +0100
-Message-ID: <20190315160906.12900-18-eric.auger@redhat.com>
+Subject: [PATCH v5 18/22] vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
+Date: Fri, 15 Mar 2019 17:09:02 +0100
+Message-ID: <20190315160906.12900-19-eric.auger@redhat.com>
 References: <20190315160906.12900-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -12,234 +12,374 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundatio
 Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When a stage 1 related fault event is read from the event queue,
-let's propagate it to potential external fault listeners, ie. users
-who registered a fault handler.
+This patch adds two new regions aiming to handle nested mode
+translation faults.
+
+The first region (two host kernel pages) is read-only from the
+user-space perspective. The first page contains an header
+that provides information about the circular buffer located in the
+second page. The circular buffer is put in a different page in
+the prospect to be mmappable.
+
+The max user API version supported by the kernel is returned
+through a dedicated fault region capability.
+
+The prod header contains
+- the user API version in use (potentially inferior to the one
+  returned in the capability),
+- the offset of the queue within the region,
+- the producer index relative to the start of the queue
+- the max number of fault records,
+- the size of each record.
+
+The second region is write-only from the user perspective. It
+contains the version of the requested fault ABI and the consumer
+index that is updated by the userspace each time this latter has
+consumed fault records.
+
+The natural order of operation for the userspace is:
+- retrieve the highest supported fault ABI version
+- set the requested fault ABI version in the consumer region
+
+Until the ABI version is not set by the userspace, the kernel
+cannot return a comprehensive set of information inside the
+prod header (entry size and number of entries in the fault queue).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v4 -> v5:
-- s/IOMMU_FAULT_PERM_INST/IOMMU_FAULT_PERM_EXEC
----
- drivers/iommu/arm-smmu-v3.c | 169 +++++++++++++++++++++++++++++++++---
- 1 file changed, 158 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index a4b82c520647..8b2160788c9b 100644
---- a/drivers/iommu/arm-smmu-v3.c
-+++ b/drivers/iommu/arm-smmu-v3.c
-@@ -167,6 +167,26 @@
- #define ARM_SMMU_PRIQ_IRQ_CFG1		0xd8
- #define ARM_SMMU_PRIQ_IRQ_CFG2		0xdc
+v4 -> v5
+- check cons is not null in vfio_pci_check_cons_fault
+
+v3 -> v4:
+- use 2 separate regions, respectively in read and write modes
+- add the version capability
+---
+ drivers/vfio/pci/vfio_pci.c         | 105 ++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_private.h |  17 +++++
+ drivers/vfio/pci/vfio_pci_rdwr.c    |  73 +++++++++++++++++++
+ include/uapi/linux/vfio.h           |  42 +++++++++++
+ 4 files changed, 237 insertions(+)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index a25659b5a5d1..01b1b4cb8349 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -260,6 +260,106 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
+ 	return ret;
+ }
  
-+/* Events */
-+#define ARM_SMMU_EVT_F_UUT		0x01
-+#define ARM_SMMU_EVT_C_BAD_STREAMID	0x02
-+#define ARM_SMMU_EVT_F_STE_FETCH	0x03
-+#define ARM_SMMU_EVT_C_BAD_STE		0x04
-+#define ARM_SMMU_EVT_F_BAD_ATS_TREQ	0x05
-+#define ARM_SMMU_EVT_F_STREAM_DISABLED	0x06
-+#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN	0x07
-+#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID	0x08
-+#define ARM_SMMU_EVT_F_CD_FETCH		0x09
-+#define ARM_SMMU_EVT_C_BAD_CD		0x0a
-+#define ARM_SMMU_EVT_F_WALK_EABT	0x0b
-+#define ARM_SMMU_EVT_F_TRANSLATION	0x10
-+#define ARM_SMMU_EVT_F_ADDR_SIZE	0x11
-+#define ARM_SMMU_EVT_F_ACCESS		0x12
-+#define ARM_SMMU_EVT_F_PERMISSION	0x13
-+#define ARM_SMMU_EVT_F_TLB_CONFLICT	0x20
-+#define ARM_SMMU_EVT_F_CFG_CONFLICT	0x21
-+#define ARM_SMMU_EVT_E_PAGE_REQUEST	0x24
++void vfio_pci_fault_release(struct vfio_pci_device *vdev,
++			    struct vfio_pci_region *region)
++{
++}
 +
- /* Common MSI config fields */
- #define MSI_CFG0_ADDR_MASK		GENMASK_ULL(51, 2)
- #define MSI_CFG2_SH			GENMASK(5, 4)
-@@ -332,6 +352,15 @@
- #define EVTQ_MAX_SZ_SHIFT		7
++static const struct vfio_pci_fault_abi fault_abi_versions[] = {
++	[0] = {
++		.entry_size = sizeof(struct iommu_fault),
++	},
++};
++
++#define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)
++
++static int vfio_pci_fault_prod_add_capability(struct vfio_pci_device *vdev,
++		struct vfio_pci_region *region, struct vfio_info_cap *caps)
++{
++	struct vfio_region_info_cap_fault cap = {
++		.header.id = VFIO_REGION_INFO_CAP_PRODUCER_FAULT,
++		.header.version = 1,
++		.version = NR_FAULT_ABIS,
++	};
++	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++}
++
++static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
++	.rw		= vfio_pci_fault_cons_rw,
++	.release	= vfio_pci_fault_release,
++};
++
++static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
++	.rw		= vfio_pci_fault_prod_rw,
++	.release	= vfio_pci_fault_release,
++	.add_capability = vfio_pci_fault_prod_add_capability,
++};
++
++static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
++{
++	struct vfio_region_fault_prod *header;
++	int ret;
++
++	mutex_init(&vdev->fault_queue_lock);
++
++	vdev->fault_pages = kzalloc(3 * PAGE_SIZE, GFP_KERNEL);
++	if (!vdev->fault_pages)
++		return -ENOMEM;
++
++	ret = vfio_pci_register_dev_region(vdev,
++		VFIO_REGION_TYPE_NESTED,
++		VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD,
++		&vfio_pci_fault_prod_regops, 2 * PAGE_SIZE,
++		VFIO_REGION_INFO_FLAG_READ, vdev->fault_pages);
++	if (ret)
++		goto out;
++
++	ret = vfio_pci_register_dev_region(vdev,
++		VFIO_REGION_TYPE_NESTED,
++		VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS,
++		&vfio_pci_fault_cons_regops,
++		sizeof(struct vfio_region_fault_cons),
++		VFIO_REGION_INFO_FLAG_WRITE,
++		vdev->fault_pages + 2 * PAGE_SIZE);
++	if (ret)
++		goto out;
++
++	header = (struct vfio_region_fault_prod *)vdev->fault_pages;
++	header->version = -1;
++	header->offset = PAGE_SIZE;
++	return 0;
++out:
++	kfree(vdev->fault_pages);
++	return ret;
++}
++
++int vfio_pci_check_cons_fault(struct vfio_pci_device *vdev,
++			     struct vfio_region_fault_cons *cons_header)
++{
++	struct vfio_region_fault_prod *prod_header =
++		(struct vfio_region_fault_prod *)vdev->fault_pages;
++
++	if (cons_header->version > NR_FAULT_ABIS)
++		return -EINVAL;
++
++	if (!vdev->fault_abi) {
++		vdev->fault_abi = cons_header->version;
++		prod_header->entry_size =
++			fault_abi_versions[vdev->fault_abi - 1].entry_size;
++		prod_header->nb_entries = PAGE_SIZE / prod_header->entry_size;
++		return 0;
++	}
++
++	/* Fault ABI is set */
++	if (cons_header->version != vdev->fault_abi)
++		return -EINVAL;
++
++	if (cons_header->cons && cons_header->cons >= prod_header->nb_entries)
++		return -EINVAL;
++
++	return 0;
++}
++
+ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+@@ -362,6 +462,10 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+ 		}
+ 	}
  
- #define EVTQ_0_ID			GENMASK_ULL(7, 0)
-+#define EVTQ_0_SSV			GENMASK_ULL(11, 11)
-+#define EVTQ_0_SUBSTREAMID		GENMASK_ULL(31, 12)
-+#define EVTQ_0_STREAMID			GENMASK_ULL(63, 32)
-+#define EVTQ_1_PNU			GENMASK_ULL(33, 33)
-+#define EVTQ_1_IND			GENMASK_ULL(34, 34)
-+#define EVTQ_1_RNW			GENMASK_ULL(35, 35)
-+#define EVTQ_1_S2			GENMASK_ULL(39, 39)
-+#define EVTQ_1_CLASS			GENMASK_ULL(40, 41)
-+#define EVTQ_3_FETCH_ADDR		GENMASK_ULL(51, 3)
++	ret = vfio_pci_init_fault_region(vdev);
++	if (ret)
++		goto disable_exit;
++
+ 	vfio_pci_probe_mmaps(vdev);
  
- /* PRI queue */
- #define PRIQ_ENT_DWORDS			2
-@@ -639,6 +668,64 @@ struct arm_smmu_domain {
- 	spinlock_t			devices_lock;
+ 	return 0;
+@@ -1377,6 +1481,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+ 
+ 	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
+ 	kfree(vdev->region);
++	kfree(vdev->fault_pages);
+ 	mutex_destroy(&vdev->ioeventfds_lock);
+ 
+ 	if (!disable_idle_d3)
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index 1812cf22fc4f..8e0a55682d3f 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -122,9 +122,12 @@ struct vfio_pci_device {
+ 	int			ioeventfds_nr;
+ 	struct eventfd_ctx	*err_trigger;
+ 	struct eventfd_ctx	*req_trigger;
++	struct mutex		fault_queue_lock;
++	int			fault_abi;
+ 	struct list_head	dummy_resources_list;
+ 	struct mutex		ioeventfds_lock;
+ 	struct list_head	ioeventfds_list;
++	u8			*fault_pages;
  };
  
-+/* fault propagation */
+ #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+@@ -153,6 +156,18 @@ extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+ extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+ 			       uint64_t data, int count, int fd);
+ 
++struct vfio_pci_fault_abi {
++	u32 entry_size;
++};
 +
-+#define IOMMU_FAULT_F_FIELDS	(IOMMU_FAULT_UNRECOV_PASID_VALID | \
-+				 IOMMU_FAULT_UNRECOV_PERM_VALID | \
-+				 IOMMU_FAULT_UNRECOV_ADDR_VALID)
++extern size_t vfio_pci_fault_cons_rw(struct vfio_pci_device *vdev,
++				     char __user *buf, size_t count,
++				     loff_t *ppos, bool iswrite);
 +
-+struct arm_smmu_fault_propagation_data {
-+	enum iommu_fault_reason reason;
-+	bool s1_check;
-+	u32 fields; /* IOMMU_FAULT_UNRECOV_*_VALID bits */
++extern size_t vfio_pci_fault_prod_rw(struct vfio_pci_device *vdev,
++				     char __user *buf, size_t count,
++				     loff_t *ppos, bool iswrite);
++
+ extern int vfio_pci_init_perm_bits(void);
+ extern void vfio_pci_uninit_perm_bits(void);
+ 
+@@ -166,6 +181,8 @@ extern int vfio_pci_register_dev_region(struct vfio_pci_device *vdev,
+ 
+ extern int vfio_pci_set_power_state(struct vfio_pci_device *vdev,
+ 				    pci_power_t state);
++extern int vfio_pci_check_cons_fault(struct vfio_pci_device *vdev,
++				     struct vfio_region_fault_cons *header);
+ 
+ #ifdef CONFIG_VFIO_PCI_IGD
+ extern int vfio_pci_igd_init(struct vfio_pci_device *vdev);
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index a6029d0a5524..67cd9363f4e7 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -277,6 +277,79 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	return done;
+ }
+ 
++/* Read-only region */
++size_t vfio_pci_fault_prod_rw(struct vfio_pci_device *vdev, char __user *buf,
++			      size_t count, loff_t *ppos, bool iswrite)
++{
++	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
++	void *base = vdev->region[i].data;
++	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
++	int ret = 0;
++
++	if (iswrite)
++		return 0;
++
++	if (!vdev->fault_abi)
++		return -EINVAL;
++
++	if (pos >= vdev->region[i].size)
++		return -EINVAL;
++
++	count = min(count, (size_t)(vdev->region[i].size - pos));
++
++	mutex_lock(&vdev->fault_queue_lock);
++
++	if (copy_to_user(buf, base + pos, count)) {
++		ret = -EFAULT;
++		goto unlock;
++	}
++	*ppos += count;
++	ret = count;
++unlock:
++	mutex_unlock(&vdev->fault_queue_lock);
++	return ret;
++}
++
++
++/* write only */
++size_t vfio_pci_fault_cons_rw(struct vfio_pci_device *vdev, char __user *buf,
++			      size_t count, loff_t *ppos, bool iswrite)
++{
++	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
++	void *base = vdev->region[i].data;
++	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
++	struct vfio_region_fault_cons *header;
++	struct vfio_region_fault_cons orig_header =
++		*(struct vfio_region_fault_cons *)base;
++	int ret = 0;
++
++	if (!iswrite)
++		return 0;
++
++	if (pos >= vdev->region[i].size)
++		return -EINVAL;
++
++	count = min(count, (size_t)(vdev->region[i].size - pos));
++
++	mutex_lock(&vdev->fault_queue_lock);
++
++	if (copy_from_user(base + pos, buf, count)) {
++		ret = -EFAULT;
++		goto unlock;
++	}
++	header = (struct vfio_region_fault_cons *)base;
++	ret = vfio_pci_check_cons_fault(vdev, header);
++	if (ret) {
++		*header = orig_header;
++		goto unlock;
++	}
++	*ppos += count;
++	ret = count;
++unlock:
++	mutex_unlock(&vdev->fault_queue_lock);
++	return ret;
++}
++
+ static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
+ {
+ 	struct vfio_pci_ioeventfd *ioeventfd = opaque;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 6763389b6adc..40b7aec8fefa 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -307,6 +307,10 @@ struct vfio_region_info_cap_type {
+ #define VFIO_REGION_TYPE_GFX                    (1)
+ #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+ 
++#define VFIO_REGION_TYPE_NESTED			(2)
++#define VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD	(1)
++#define VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS	(2)
++
+ /**
+  * struct vfio_region_gfx_edid - EDID region layout.
+  *
+@@ -697,6 +701,44 @@ struct vfio_device_ioeventfd {
+ 
+ #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++
++/*
++ * Capability exposed by the Producer Fault Region
++ * @version: max fault ABI version supported by the kernel
++ */
++#define VFIO_REGION_INFO_CAP_PRODUCER_FAULT	6
++
++struct vfio_region_info_cap_fault {
++	struct vfio_info_cap_header header;
++	__u32 version;
 +};
 +
 +/*
-+ * Describes how SMMU faults translate into generic IOMMU faults
-+ * and if they need to be reported externally
++ * Producer Fault Region (Read-Only from user space perspective)
++ * Contains the fault circular buffer and the producer index
++ * @version: version of the fault record uapi
++ * @entry_size: size of each fault record
++ * @offset: offset of the start of the queue
++ * @prod: producer index relative to the start of the queue
 + */
-+static const struct arm_smmu_fault_propagation_data fault_propagation[] = {
-+[ARM_SMMU_EVT_F_UUT]			= { },
-+[ARM_SMMU_EVT_C_BAD_STREAMID]		= { },
-+[ARM_SMMU_EVT_F_STE_FETCH]		= { },
-+[ARM_SMMU_EVT_C_BAD_STE]		= { },
-+[ARM_SMMU_EVT_F_BAD_ATS_TREQ]		= { },
-+[ARM_SMMU_EVT_F_STREAM_DISABLED]	= { },
-+[ARM_SMMU_EVT_F_TRANSL_FORBIDDEN]	= { },
-+[ARM_SMMU_EVT_C_BAD_SUBSTREAMID]	= {IOMMU_FAULT_REASON_PASID_INVALID,
-+					   false,
-+					   IOMMU_FAULT_UNRECOV_PASID_VALID
-+					  },
-+[ARM_SMMU_EVT_F_CD_FETCH]		= {IOMMU_FAULT_REASON_PASID_FETCH,
-+					   false,
-+					   IOMMU_FAULT_UNRECOV_PASID_VALID |
-+					   IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_C_BAD_CD]			= {IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
-+					   false,
-+					   IOMMU_FAULT_UNRECOV_PASID_VALID
-+					  },
-+[ARM_SMMU_EVT_F_WALK_EABT]		= {IOMMU_FAULT_REASON_WALK_EABT, true,
-+					   IOMMU_FAULT_F_FIELDS |
-+					   IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
-+					  },
-+[ARM_SMMU_EVT_F_TRANSLATION]		= {IOMMU_FAULT_REASON_PTE_FETCH, true,
-+					   IOMMU_FAULT_F_FIELDS
-+					  },
-+[ARM_SMMU_EVT_F_ADDR_SIZE]		= {IOMMU_FAULT_REASON_OOR_ADDRESS, true,
-+					   IOMMU_FAULT_F_FIELDS
-+					  },
-+[ARM_SMMU_EVT_F_ACCESS]			= {IOMMU_FAULT_REASON_ACCESS, true,
-+					   IOMMU_FAULT_F_FIELDS
-+					  },
-+[ARM_SMMU_EVT_F_PERMISSION]		= {IOMMU_FAULT_REASON_PERMISSION, true,
-+					   IOMMU_FAULT_F_FIELDS
-+					  },
-+[ARM_SMMU_EVT_F_TLB_CONFLICT]		= { },
-+[ARM_SMMU_EVT_F_CFG_CONFLICT]		= { },
-+[ARM_SMMU_EVT_E_PAGE_REQUEST]		= { },
++struct vfio_region_fault_prod {
++	__u32   version;
++	__u32	nb_entries;
++	__u32   entry_size;
++	__u32	offset;
++	__u32   prod;
 +};
 +
- struct arm_smmu_option_prop {
- 	u32 opt;
- 	const char *prop;
-@@ -1258,7 +1345,6 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
- 	return 0;
- }
++/*
++ * Consumer Fault Region (Write-Only from the user space perspective)
++ * @version: ABI version requested by the userspace
++ * @cons: consumer index relative to the start of the queue
++ */
++struct vfio_region_fault_cons {
++	__u32 version;
++	__u32 cons;
++};
++
+ /* -------- API for Type1 VFIO IOMMU -------- */
  
--__maybe_unused
- static struct arm_smmu_master_data *
- arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
- {
-@@ -1284,24 +1370,85 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
- 	return master;
- }
- 
-+/* Populates the record fields according to the input SMMU event */
-+static bool arm_smmu_transcode_fault(u64 *evt, u8 type,
-+				     struct iommu_fault_unrecoverable *record)
-+{
-+	const struct arm_smmu_fault_propagation_data *data;
-+	u32 fields;
-+
-+	if (type >= ARRAY_SIZE(fault_propagation))
-+		return false;
-+
-+	data = &fault_propagation[type];
-+	if (!data->reason)
-+		return false;
-+
-+	fields = data->fields;
-+
-+	if (data->s1_check & FIELD_GET(EVTQ_1_S2, evt[1]))
-+		return false; /* S2 related fault, don't propagate */
-+
-+	if (fields & IOMMU_FAULT_UNRECOV_PASID_VALID) {
-+		if (FIELD_GET(EVTQ_0_SSV, evt[0]))
-+			record->pasid = FIELD_GET(EVTQ_0_SUBSTREAMID, evt[0]);
-+		else
-+			fields &= ~IOMMU_FAULT_UNRECOV_PASID_VALID;
-+	}
-+	if (fields & IOMMU_FAULT_UNRECOV_PERM_VALID) {
-+		if (!FIELD_GET(EVTQ_1_RNW, evt[1]))
-+			record->perm |= IOMMU_FAULT_PERM_WRITE;
-+		if (FIELD_GET(EVTQ_1_PNU, evt[1]))
-+			record->perm |= IOMMU_FAULT_PERM_PRIV;
-+		if (FIELD_GET(EVTQ_1_IND, evt[1]))
-+			record->perm |= IOMMU_FAULT_PERM_EXEC;
-+	}
-+	if (fields & IOMMU_FAULT_UNRECOV_ADDR_VALID)
-+		record->addr = evt[2];
-+
-+	if (fields & IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID)
-+		record->fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
-+
-+	record->flags = fields;
-+	return true;
-+}
-+
-+static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64 *evt)
-+{
-+	u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
-+	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
-+	struct arm_smmu_master_data *master;
-+	struct iommu_fault_event event = {};
-+	int i;
-+
-+	master = arm_smmu_find_master(smmu, sid);
-+	if (WARN_ON(!master))
-+		return;
-+
-+	event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
-+
-+	if (arm_smmu_transcode_fault(evt, type, &event.fault.event)) {
-+		iommu_report_device_fault(master->dev, &event);
-+		return;
-+	}
-+
-+	dev_info(smmu->dev, "event 0x%02x received:\n", type);
-+	for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
-+		dev_info(smmu->dev, "\t0x%016llx\n",
-+			 (unsigned long long)evt[i]);
-+	}
-+}
-+
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
- {
--	int i;
- 	struct arm_smmu_device *smmu = dev;
- 	struct arm_smmu_queue *q = &smmu->evtq.q;
- 	u64 evt[EVTQ_ENT_DWORDS];
- 
- 	do {
--		while (!queue_remove_raw(q, evt)) {
--			u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
--
--			dev_info(smmu->dev, "event 0x%02x received:\n", id);
--			for (i = 0; i < ARRAY_SIZE(evt); ++i)
--				dev_info(smmu->dev, "\t0x%016llx\n",
--					 (unsigned long long)evt[i]);
--
--		}
-+		while (!queue_remove_raw(q, evt))
-+			arm_smmu_report_event(smmu, evt);
- 
- 		/*
- 		 * Not much we can do on overflow, so scream and pretend we're
+ /**
 -- 
 2.20.1
