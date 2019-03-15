@@ -1,24 +1,27 @@
 From: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: Kick cpu when WFI in single-threaded kvm integration
-Date: Fri, 15 Mar 2019 09:43:11 +0100
-Message-ID: <20190315084311.GA10950@e113682-lin.lund.arm.com>
-References: <93B846538060DA46A9945E98A2E521E901425BA9@DE02WEMBXB.internal.synopsys.com>
+Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
+Date: Fri, 15 Mar 2019 09:59:48 +0100
+Message-ID: <20190315085948.GB10950@e113682-lin.lund.arm.com>
+References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
+ <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
+ <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
+ <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEBAD4A430
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:43:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C42FA4A44D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:59:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mLNDsxSpVnH2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Mar 2019 04:43:14 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD2C4A382
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:43:14 -0400 (EDT)
+ with ESMTP id Cjk8WPYLuytT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Mar 2019 04:59:51 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A444E4A431
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Mar 2019 04:59:51 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <93B846538060DA46A9945E98A2E521E901425BA9@DE02WEMBXB.internal.synopsys.com>
+In-Reply-To: <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,87 +31,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jan Bolke <jan.bolke@synopsys.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Steven Price <steven.price@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jan,
+Hi Steve,
 
-On Thu, Mar 14, 2019 at 12:19:02PM +0000, Jan Bolke wrote:
-> Hi all,
+On Wed, Mar 13, 2019 at 10:11:30AM +0000, Steven Price wrote:
 > 
-> Currently I am working on a SystemC integration of kvm on arm.
-> Therefore, I use the kvm api and of course SystemC (library to simulate hardware platforms with C++).
+> Personally I think what we need is:
 > 
-> As I need the virtual cpu to interrupt its execution loop from time to time to let the rest of the SystemC simulation execute,
-> I use a perf_event and let the kernel send a signal on overflow to the simulation thread which kicks the virtual cpu (suggested by this mailing list, thanks again).
-> Thus I am able to simulate a quantum mechanism for the virtual cpu.
+> * Either a patch like the one from Heyi Guo (save/restore CNTVCT_EL0) or
+> alternatively hooking up KVM_KVMCLOCK_CTRL to prevent the watchdog
+> firing when user space explicitly stops scheduling the guest for a while.
+
+If we save/restore CNTVCT_EL0 and the warning goes away, does the guest
+wall clock timekeeping get all confused and does it figure this out
+automagically somehow?
+
+Does KVM_KVMCLOCK_CTRL solve that problem?
+
 > 
-> As I am running benchmarks (e.g. Coremark) on my virtual platform this works fine.
+> * KVM itself saving/restoring CNTVCT_EL0 during suspend/resume so the
+> guest doesn't see time pass during a suspend.
+
+This smells like policy to me so I'd much prefer keeping as much
+functionality in user space as possible.  If we already have the APIs we
+need from KVM, let's use them.
+
 > 
-> I also get to boot Linux until it spawns the terminal and then wait for interrupts from my virtual uart.
-> Here comes the problem:
-> The perf event counting mechanism does increment its counted instructions very very slowly when the virtual cpu executes wfi.
-> Thus my whole simulation starts to hang.
-> As my simulation is single threaded I need the signal from the kernel to kick my cpu to let the virtual uart deliver its interrupt to react to my input.
-> I tried to use the request_interrupt_window flag but this does not seem to work.
-> 
-> Is there a way to kick the virtual cpu when it is waiting for interrupts? Or do I have to patch my kvm code?
+> * Something equivalent to MSR_KVM_WALL_CLOCK_NEW for arm which allows
+> the guest to query the wall clock time from the host and provides an
+> offset between CNTVCT_EL0 to wall clock time which the KVM can update
+> during suspend/resume. This means that during a suspend/resume the guest
+> can observe that wall clock time has passed, without having to be
+> bothered about CNTVCT_EL0 jumping forwards.
 > 
 
-Let me see if I understand your question properly; you are running a KVM
-virtual CPU which executes WFI in the guest, and then you are not
-receiving interrupts in the guest nor getting events back from KVM which
-you somehow use to run a backend simulation in userspace?
+Isn't the proper Arm architectural solution for this to read the
+physical counter for wall clock time keeping ?
 
-KVM/Arm can do two things for WFI:
-
- 1. Let the guest directly execute it without trapping to the hypervisor
-    (the physical CPU will NOT exit the guest until there's a physical
-    interrupt on the CPU).
-
- 2. Trap WFI to KVM.  KVM asks Linux to schedule another process until
-    there's a virtual interrupt for the VCPU.  This is what mainline
-    KVM/Arm does.
+(Yes that will require a trap on physical counter reads after migration
+on current systems, but migration sucks in terms of timekeeping
+already.)
 
 
-I suspect what's happening is that you are using a normal kernel
-configured as (2), and therefore you only count cycles for the perf
-event while the guest runs the timer ISR which obviously is much much
-less than if you had a constant running VCPU.  Am I on the right track?
-
-If so, there are a couple of things you could try.
-
-First, you can try disabling the trap on WFI (note that this changes
-pretty fundamental behavior of KVM, and this is not recommended for
-production use or for systems level performance investigations where
-more than one workload contends for a single physical CPU):
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 7f9d2bfcf82e..b38a5a134fef 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -84,7 +84,7 @@
-  * FMO:		Override CPSR.F and enable signaling with VF
-  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
-  */
--#define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
-+#define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_VM | \
- 			 HCR_TVM | HCR_BSU_IS | HCR_FB | HCR_TAC | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
-
-
-Note that I'm not sure how the performance counter counts on your
-particular platform when the CPU is in WFI, so this may not help at all.
-
-
-Second, and possibly preferred, you can hook up your simulation event to
-a timer event in the case of trapping on a WFI.  See kvm_handle_wfx() in
-arch/arm64/kvm/handle_exit.c and follow kvm_vcpu_block() from there to
-see how KVM/Arm handles this event.
-
-
-Hope this helps,
+Thanks,
 
     Christoffer
