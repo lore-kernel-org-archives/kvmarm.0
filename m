@@ -1,127 +1,137 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 22/22] vfio: Document nested stage control
-Date: Sun, 17 Mar 2019 18:22:32 +0100
-Message-ID: <20190317172232.1068-23-eric.auger@redhat.com>
-References: <20190317172232.1068-1-eric.auger@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
+Date: Sun, 17 Mar 2019 19:05:10 +0100
+Message-ID: <f53253f1-aa5e-3731-a1cd-bd14fb0509a8@redhat.com>
+References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+ <1552834226.19343.1.camel@amazon.de>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190317172232.1068-1-eric.auger@redhat.com>
+In-Reply-To: <1552834226.19343.1.camel@amazon.de>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+To: "Raslan, KarimAllah" <karahmed@amazon.de>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "james.morse@arm.com" <james.morse@arm.com>, "mst@redhat.com" <mst@redhat.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-New iotcls were introduced to pass information about guest stage1
-to the host through VFIO. Let's document the nested stage control.
+Hi,
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On 3/17/19 3:50 PM, Raslan, KarimAllah wrote:
+> On Sun, 2019-03-17 at 14:36 +0000, Zenghui Yu wrote:
+>> Currently, IRQFD on arm still uses the deferred workqueue mechanism
+>> to inject interrupts into guest, which will likely lead to a busy
+>> context-switching from/to the kworker thread. This overhead is for
+>> no purpose (only in my view ...) and will result in an interrupt
+>> performance degradation.
+>>
+>> Implement kvm_arch_set_irq_inatomic() for arm/arm64 to support direct
+>> irqfd MSI injection, by which we can get rid of the annoying latency.
+>> As a result, irqfd MSI intensive scenarios (e.g., DPDK with high packet
+>> processing workloads) will benefit from it.
+>>
+>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>> ---
+>>
+>> It seems that only MSI will follow the IRQFD path, did I miss something?
+>>
+>> This patch is still under test and sent out for early feedback. If I have
+>> any mis-understanding, please fix me up and let me know. Thanks!
+>>
+>> ---
+>>  virt/kvm/arm/vgic/trace.h      | 22 ++++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic-irqfd.c | 21 +++++++++++++++++++++
+>>  2 files changed, 43 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
+>> index 55fed77..bc1f4db 100644
+>> --- a/virt/kvm/arm/vgic/trace.h
+>> +++ b/virt/kvm/arm/vgic/trace.h
+>> @@ -27,6 +27,28 @@
+>>  		  __entry->vcpu_id, __entry->irq, __entry->level)
+>>  );
+>>  
+>> +TRACE_EVENT(kvm_arch_set_irq_inatomic,
+>> +	TP_PROTO(u32 gsi, u32 type, int level, int irq_source_id),
+>> +	TP_ARGS(gsi, type, level, irq_source_id),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(	u32,	gsi		)
+>> +		__field(	u32,	type		)
+>> +		__field(	int,	level		)
+>> +		__field(	int,	irq_source_id	)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->gsi		= gsi;
+>> +		__entry->type		= type;
+>> +		__entry->level		= level;
+>> +		__entry->irq_source_id	= irq_source_id;
+>> +	),
+>> +
+>> +	TP_printk("gsi %u type %u level %d source %d", __entry->gsi,
+>> +		  __entry->type, __entry->level, __entry->irq_source_id)
+>> +);
+>> +
+>>  #endif /* _TRACE_VGIC_H */
+>>  
+>>  #undef TRACE_INCLUDE_PATH
+>> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+>> index 99e026d..4cfc3f4 100644
+>> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+>> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+>> @@ -19,6 +19,7 @@
+>>  #include <trace/events/kvm.h>
+>>  #include <kvm/arm_vgic.h>
+>>  #include "vgic.h"
+>> +#include "trace.h"
+>>  
+>>  /**
+>>   * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+>> @@ -105,6 +106,26 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>>  	return vgic_its_inject_msi(kvm, &msi);
+>>  }
+>>  
+>> +/**
+>> + * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+>> + *
+>> + * Currently only direct MSI injecton is supported.
+>> + */
+>> +int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>> +			      struct kvm *kvm, int irq_source_id, int level,
+>> +			      bool line_status)
+>> +{
+>> +	int ret;
+>> +
+>> +	trace_kvm_arch_set_irq_inatomic(e->gsi, e->type, level, irq_source_id);
+>> +
+>> +	if (unlikely(e->type != KVM_IRQ_ROUTING_MSI))
+>> +		return -EWOULDBLOCK;
+>> +
+>> +	ret = kvm_set_msi(e, kvm, irq_source_id, level, line_status);
+> 
+> The implementation of kvm_set_msi is not atomic. There is a mutex held in one
+> of the execution paths. That is why it can not be used directly in this atomic 
+> context.
+Yep, vgic_its_trigger_msi call is protected by the its->its_lock.
 
----
+Thanks
 
-v2 -> v3:
-- document the new fault API
-
-v1 -> v2:
-- use the new ioctl names
-- add doc related to fault handling
----
- Documentation/vfio.txt | 83 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
-
-diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
-index f1a4d3c3ba0b..aab59ddf5ebd 100644
---- a/Documentation/vfio.txt
-+++ b/Documentation/vfio.txt
-@@ -239,6 +239,89 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
- 
-+IOMMU Dual Stage Control
-+------------------------
-+
-+Some IOMMUs support 2 stages/levels of translation. "Stage" corresponds to
-+the ARM terminology while "level" corresponds to Intel's VTD terminology. In
-+the following text we use either without distinction.
-+
-+This is useful when the guest is exposed with a virtual IOMMU and some
-+devices are assigned to the guest through VFIO. Then the guest OS can use
-+stage 1 (IOVA -> GPA), while the hypervisor uses stage 2 for VM isolation
-+(GPA -> HPA).
-+
-+The guest gets ownership of the stage 1 page tables and also owns stage 1
-+configuration structures. The hypervisor owns the root configuration structure
-+(for security reason), including stage 2 configuration. This works as long
-+configuration structures and page table format are compatible between the
-+virtual IOMMU and the physical IOMMU.
-+
-+Assuming the HW supports it, this nested mode is selected by choosing the
-+VFIO_TYPE1_NESTING_IOMMU type through:
-+
-+ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
-+
-+This forces the hypervisor to use the stage 2, leaving stage 1 available for
-+guest usage.
-+
-+Once groups are attached to the container, the guest stage 1 translation
-+configuration data can be passed to VFIO by using
-+
-+ioctl(container, VFIO_IOMMU_BIND_PASID_TABLE, &pasid_table_info);
-+
-+This allows to combine guest stage 1 configuration structure along with
-+hypervisor stage 2 configuration structure. stage 1 configuration structures
-+are dependent on the IOMMU type.
-+
-+As the stage 1 translation is fully delegated to the HW, physical events that
-+may occur (especially translation faults), need to be propagated up to
-+the virtualizer and re-injected into the guest.
-+
-+The userspace must be prepared to receive faults. The VFIO-PCI device
-+exposes 2 regions dedicated to HW faults: one read-only "producer" fault
-+region (kernel is the producer and writes into this region) and one
-+write-only "consumer" fault region, type/subtype respectively:
-+- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD
-+- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS
-+
-+The producer fault region exposes a VFIO_REGION_INFO_CAP_PRODUCER_FAULT
-+region capability that allows the userspace to retrieve the max fault
-+ABI version supported by the kernel.
-+
-+The ABI version can be negotiated: the userspace writes the version it
-+wants in the consumer region (greater or equal than 1). Once set, the
-+ABI version cannot be changed.
-+
-+Then by using VFIO_DEVICE_SET_IRQS along with the VFIO_PCI_DMA_FAULT_IRQ_INDEX
-+index, the virtualizer can register an eventfd signalled whenever a fault is
-+observed at physical level.
-+
-+The kernel writes the fault records formatted according to the negotiated
-+ABI version in the producer region fault queue. This part of the producer
-+fault region can be mmapped (see VFIO_REGION_INFO_CAP_SPARSE_MMAP result).
-+
-+When the userspace consumes a fault in the queue, it should increment
-+the consumer index to allow new fault records to replace the used ones.
-+The queue size and the entry size can be retrieved in the producer region.
-+The consumer index should never overshoot the producer index as in any
-+other circular buffer scheme. Also it must be less than the queue size
-+otherwise the change is ignored by the kernel.
-+
-+When the guest invalidates stage 1 related caches, invalidations must be
-+forwarded to the host through
-+ioctl(container, VFIO_IOMMU_CACHE_INVALIDATE, &inv_data);
-+Those invalidations can happen at various granularity levels, page, context, ...
-+
-+The ARM SMMU specification introduces another challenge: MSIs are translated by
-+both the virtual SMMU and the physical SMMU. To build a nested mapping for the
-+IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
-+doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
-+binding eventually translating into the physical MSI doorbell.
-+
-+This is achieved by
-+ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
-+
- VFIO User API
- -------------------------------------------------------------------------------
- 
--- 
-2.20.1
+Eric
+> 
+>> +	return ret;
+>> +}
+>> +
+>>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
+>>  {
+>>  	struct kvm_irq_routing_entry *entries;
+> 
+> 
+> 
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
+> Ust-ID: DE 289 237 879
+> Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
+> 
