@@ -1,158 +1,129 @@
 From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
-Date: Sun, 17 Mar 2019 21:55:12 +0800
-Message-ID: <0fce42bd-1295-45a4-46b6-81b128ee343e@huawei.com>
-References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
- <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
- <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
- <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
- <348d0b3b-c74b-7b39-ec30-85905c077c38@huawei.com>
- <20190314105537.GA15323@en101>
- <368bd218-ac1d-19b2-6e92-960b91afee8b@huawei.com>
- <d322e126-4da2-6dfd-a86d-088dfb3bf0f4@huawei.com>
- <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
+Subject: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
+Date: Sun, 17 Mar 2019 14:36:13 +0000
+Message-ID: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, zhengxiang9@huawei.com
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, christoffer.dall@arm.com, linux-kernel@vger.kernel.org, james.morse@arm.com, lishuo1@hisilicon.com, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, lious.lilei@hisilicon.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CA1C4A41B
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 10:41:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bQmx+Py6Uckg for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Mar 2019 10:41:45 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E00A4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 10:41:45 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, christoffer.dall@arm.com, eric.auger@redhat.com, andre.przywara@arm.com
+Cc: kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgU3V6dWtpLAoKT24gMjAxOS8zLzE1IDIyOjU2LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+
-IEhpIFpoZW5ndWksCj4gCj4gT24gMTUvMDMvMjAxOSAwODoyMSwgWmhlbmcgWGlhbmcgd3JvdGU6
-Cj4+IEhpIFN1enVraSwKPj4KPj4gSSBoYXZlIHRlc3RlZCB0aGlzIHBhdGNoLCBWTSBkb2Vzbid0
-IGhhbmcgYW5kIHdlIGdldCBleHBlY3RlZCBXQVJOSU5HIAo+PiBsb2c6Cj4gCj4gVGhhbmtzIGZv
-ciB0aGUgcXVpY2sgdGVzdGluZyAhCj4gCj4+IEhvd2V2ZXIsIHdlIGFsc28gZ2V0IHRoZSBmb2xs
-b3dpbmcgdW5leHBlY3RlZCBsb2c6Cj4+Cj4+IFvCoCA5MDguMzI5OTAwXSBCVUc6IEJhZCBwYWdl
-IHN0YXRlIGluIHByb2Nlc3MgcWVtdS1rdm3CoCBwZm46YTJmYjQxY2YKPj4gW8KgIDkwOC4zMzk0
-MTVdIHBhZ2U6ZmZmZjdlMjhiZWQwNzNjMCBjb3VudDotNCBtYXBjb3VudDowIAo+PiBtYXBwaW5n
-OjAwMDAwMDAwMDAwMDAwMDAgaW5kZXg6MHgwCj4+IFvCoCA5MDguMzM5NDE2XSBmbGFnczogMHg0
-ZmZmZmUwMDAwMDAwMDAwKCkKPj4gW8KgIDkwOC4zMzk0MThdIHJhdzogNGZmZmZlMDAwMDAwMDAw
-MCBkZWFkMDAwMDAwMDAwMTAwIGRlYWQwMDAwMDAwMDAyMDAgCj4+IDAwMDAwMDAwMDAwMDAwMDAK
-Pj4gW8KgIDkwOC4zMzk0MTldIHJhdzogMDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDAwMDAw
-IGZmZmZmZmZjZmZmZmZmZmYgCj4+IDAwMDAwMDAwMDAwMDAwMDAKPj4gW8KgIDkwOC4zMzk0MjBd
-IHBhZ2UgZHVtcGVkIGJlY2F1c2U6IG5vbnplcm8gX3JlZmNvdW50Cj4+IFvCoCA5MDguMzM5NDM3
-XSBDUFU6IDMyIFBJRDogNzI1OTkgQ29tbTogcWVtdS1rdm0gS2R1bXA6IGxvYWRlZCAKPj4gVGFp
-bnRlZDogR8KgwqDCoCBCwqAgV8KgwqDCoMKgwqDCoMKgIDUuMC4wKyAjMQo+PiBbwqAgOTA4LjMz
-OTQzOF0gQ2FsbCB0cmFjZToKPj4gW8KgIDkwOC4zMzk0MzldwqAgZHVtcF9iYWNrdHJhY2UrMHgw
-LzB4MTg4Cj4+IFvCoCA5MDguMzM5NDQxXcKgIHNob3dfc3RhY2srMHgyNC8weDMwCj4+IFvCoCA5
-MDguMzM5NDQyXcKgIGR1bXBfc3RhY2srMHhhOC8weGNjCj4+IFvCoCA5MDguMzM5NDQzXcKgIGJh
-ZF9wYWdlKzB4ZjAvMHgxNTAKPj4gW8KgIDkwOC4zMzk0NDVdwqAgZnJlZV9wYWdlc19jaGVja19i
-YWQrMHg4NC8weGEwCj4+IFvCoCA5MDguMzM5NDQ2XcKgIGZyZWVfcGNwcGFnZXNfYnVsaysweDRi
-OC8weDc1MAo+PiBbwqAgOTA4LjMzOTQ0OF3CoCBmcmVlX3VucmVmX3BhZ2VfY29tbWl0KzB4MTNj
-LzB4MTk4Cj4+IFvCoCA5MDguMzM5NDQ5XcKgIGZyZWVfdW5yZWZfcGFnZSsweDg0LzB4YTAKPj4g
-W8KgIDkwOC4zMzk0NTFdwqAgX19mcmVlX3BhZ2VzKzB4NTgvMHg2OAo+PiBbwqAgOTA4LjMzOTQ1
-Ml3CoCB6YXBfaHVnZV9wbWQrMHgyOTAvMHgyZDgKPj4gW8KgIDkwOC4zMzk0NTRdwqAgdW5tYXBf
-cGFnZV9yYW5nZSsweDJiNC8weDQ3MAo+PiBbwqAgOTA4LjMzOTQ1NV3CoCB1bm1hcF9zaW5nbGVf
-dm1hKzB4OTQvMHhlOAo+PiBbwqAgOTA4LjMzOTQ1N13CoCB1bm1hcF92bWFzKzB4OGMvMHgxMDgK
-Pj4gW8KgIDkwOC4zMzk0NThdwqAgZXhpdF9tbWFwKzB4ZDQvMHgxNzgKPj4gW8KgIDkwOC4zMzk0
-NTldwqAgbW1wdXQrMHg3NC8weDE4MAo+PiBbwqAgOTA4LjMzOTQ2MF3CoCBkb19leGl0KzB4MmI0
-LzB4NWIwCj4+IFvCoCA5MDguMzM5NDYyXcKgIGRvX2dyb3VwX2V4aXQrMHgzYy8weGUwCj4+IFvC
-oCA5MDguMzM5NDYzXcKgIF9fYXJtNjRfc3lzX2V4aXRfZ3JvdXArMHgyNC8weDI4Cj4+IFvCoCA5
-MDguMzM5NDY1XcKgIGVsMF9zdmNfY29tbW9uKzB4YTAvMHgxODAKPj4gW8KgIDkwOC4zMzk0NjZd
-wqAgZWwwX3N2Y19oYW5kbGVyKzB4MzgvMHg3OAo+PiBbwqAgOTA4LjMzOTQ2N13CoCBlbDBfc3Zj
-KzB4OC8weGMKPiAKPiBUaGF0cyBiYWQsIHdlIHNlZW0gdG8gYmUgbWFraW5nIHVwdG8gNCB1bmJh
-bGFuY2VkIHB1dF9wYWdlKCkuCj4gCj4+Pj4gLS0tCj4+Pj4gwqDCoCB2aXJ0L2t2bS9hcm0vbW11
-LmMgfCA1MSAKPj4+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tLS0tLS0KPj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCAzNSBpbnNlcnRpb25zKCspLCAxNiBk
-ZWxldGlvbnMoLSkKPj4+Pgo+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92
-aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiBpbmRleCA2NmUwZmJiNS4uMDRiMGY5YiAxMDA2NDQKPj4+
-PiAtLS0gYS92aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiArKysgYi92aXJ0L2t2bS9hcm0vbW11LmMK
-Pj4+PiBAQCAtMTA3NiwyNCArMTA3NiwzOCBAQCBzdGF0aWMgaW50IHN0YWdlMl9zZXRfcG1kX2h1
-Z2Uoc3RydWN0IGt2bSAKPj4+PiAqa3ZtLCBzdHJ1Y3Qga3ZtX21tdV9tZW1vcnlfY2FjaGUKPj4+
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogU2tpcCB1cGRhdGluZyB0aGUgcGFnZSB0YWJsZSBp
-ZiB0aGUgZW50cnkgaXMKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogdW5jaGFuZ2VkLgo+
-Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiAtwqDCoMKgwqDCoMKgwqAgaWYgKHBt
-ZF92YWwob2xkX3BtZCkgPT0gcG1kX3ZhbCgqbmV3X3BtZCkpCj4+Pj4gK8KgwqDCoMKgwqDCoMKg
-IGlmIChwbWRfdmFsKG9sZF9wbWQpID09IHBtZF92YWwoKm5ld19wbWQpKSB7Cj4+Pj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKPj4+PiAtCj4+Pj4gK8KgwqDCoMKgwqDC
-oMKgIH0gZWxzZSBpZiAoV0FSTl9PTl9PTkNFKCFwbWRfdGhwX29yX2h1Z2Uob2xkX3BtZCkpKSB7
-Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyoKPj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIE1h
-cHBpbmcgaW4gaHVnZSBwYWdlcyBzaG91bGQgb25seSBoYXBwZW4gdGhyb3VnaCBhCj4+Pj4gLcKg
-wqDCoMKgwqDCoMKgwqAgKiBmYXVsdC7CoCBJZiBhIHBhZ2UgaXMgbWVyZ2VkIGludG8gYSB0cmFu
-c3BhcmVudCBodWdlCj4+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKiBwYWdlLCB0aGUgaW5kaXZpZHVh
-bCBzdWJwYWdlcyBvZiB0aGF0IGh1Z2UgcGFnZQo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgICogc2hv
-dWxkIGJlIHVubWFwcGVkIHRocm91Z2ggTU1VIG5vdGlmaWVycyBiZWZvcmUgd2UKPj4+PiAtwqDC
-oMKgwqDCoMKgwqDCoCAqIGdldCBoZXJlLgo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgICoKPj4+PiAt
-wqDCoMKgwqDCoMKgwqDCoCAqIE1lcmdpbmcgb2YgQ29tcG91bmRQYWdlcyBpcyBub3Qgc3VwcG9y
-dGVkOyB0aGV5Cj4+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKiBzaG91bGQgYmVjb21lIHNwbGl0dGlu
-ZyBmaXJzdCwgdW5tYXBwZWQsIG1lcmdlZCwKPj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIGFuZCBt
-YXBwZWQgYmFjayBpbiBvbi1kZW1hbmQuCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqAgKiBJZiB3ZSBo
-YXZlIFBURSBsZXZlbCBtYXBwaW5nIGZvciB0aGlzIGJsb2NrLAo+Pj4+ICvCoMKgwqDCoMKgwqDC
-oMKgICogd2UgbXVzdCB1bm1hcCBpdCB0byBhdm9pZCBpbmNvbnNpc3RlbnQgVExCCj4+Pj4gK8Kg
-wqDCoMKgwqDCoMKgwqAgKiBzdGF0ZS4gV2UgY291bGQgZW5kIHVwIGluIHRoaXMgc2l0dWF0aW9u
-IGlmCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqAgKiB0aGUgbWVtb3J5IHNsb3Qgd2FzIG1hcmtlZCBm
-b3IgZGlydHkgbG9nZ2luZwo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogYW5kIHdhcyByZXZlcnRl
-ZCwgbGVhdmluZyBQVEUgbGV2ZWwgbWFwcGluZ3MKPj4+PiArwqDCoMKgwqDCoMKgwqDCoCAqIGZv
-ciB0aGUgcGFnZXMgYWNjZXNzZWQgZHVyaW5nIHRoZSBwZXJpb2QuCj4+Pj4gK8KgwqDCoMKgwqDC
-oMKgwqAgKiBOb3JtYWwgVEhQIHNwbGl0L21lcmdlIGZvbGxvd3MgbW11X25vdGlmaWVyCj4+Pj4g
-K8KgwqDCoMKgwqDCoMKgwqAgKiBjYWxsYmFja3MgYW5kIGRvIGdldCBoYW5kbGVkIGFjY29yZGlu
-Z2x5Lgo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiAtwqDCoMKgwqDCoMKgwqAg
-Vk1fQlVHX09OKHBtZF9wZm4ob2xkX3BtZCkgIT0gcG1kX3BmbigqbmV3X3BtZCkpOwo+Pj4+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHVubWFwX3N0YWdlMl9yYW5nZShrdm0sIChhZGRyICYgUzJf
-UE1EX01BU0spLCAKPj4+PiBTMl9QTURfU0laRSk7Cj4+Cj4+IEl0IHNlZW1zIHRoYXQga3ZtIGRl
-Y3JlYXNlcyB0aGUgX3JlZmNvdW50IG9mIHRoZSBwYWdlIHR3aWNlIGluIAo+PiB0cmFuc3BhcmVu
-dF9odWdlcGFnZV9hZGp1c3QoKQo+PiBhbmQgdW5tYXBfc3RhZ2UyX3JhbmdlKCkuCj4gCj4gQnV0
-IEkgdGhvdWdodCB3ZSBzaG91bGQgYmUgZG9pbmcgdGhhdCBvbiB0aGUgaGVhZF9wYWdlIGFscmVh
-ZHksIGFzIHRoaXMgCj4gaXMgVEhQLgo+IEkgd2lsbCB0YWtlIGEgbG9vayBhbmQgZ2V0IGJhY2sg
-dG8geW91IG9uIHRoaXMuIEJ0dywgaXMgaXQgcG9zc2libGUgZm9yIHlvdQo+IHRvIHR1cm4gb24g
-Q09ORklHX0RFQlVHX1ZNIGFuZCByZS1ydW4gd2l0aCB0aGUgYWJvdmUgcGF0Y2ggPwoKQW5kIGZv
-ciBkZXRhaWxlZCBkZWJ1Z2dpbmcgaW5mbzoKCkkndmUgdHVybmVkIG9uIENPTkZJR19ERUJVR19W
-TSBhbmQgcmUtcnVuIHdpdGggeW91ciBwYXRjaCAtLSBSdW4gYSBndWVzdAp3aXRoIHN0YWdlMiBQ
-VUQgaHVnZXBhZ2UsIGVuYWJsZSB0aGVuIGRpc2FibGUgdGhlIGRpcnR5IGxvZ2dpbmcsIGFuZAp0
-aGVuIHNodXRkb3duIHRoaXMgZ3Vlc3QuIFRoZSByZXN1bHQgaXM6IEhvc3QgaGl0IGEga2VybmVs
-IEJVRyB3aXRoIHRoZQpiZWxvdyBsb2cgKHdoZW4gc2h1dGRvd24taW5nIGd1ZXN0KToKCgpbICA0
-ODYuOTk3NjQwXSBrZXJuZWwgQlVHIGF0IC4vaW5jbHVkZS9saW51eC9tbS5oOjU0NyEKWyAgNDg3
-LjAwNTUyNF0gSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSBCVUc6IDAgWyMxXSBTTVAKWyAgNDg3LjAx
-MzQ1NV0gTW9kdWxlcyBsaW5rZWQgaW46IC4uLgpbICA0ODcuMTA0MDcyXSBDUFU6IDE0IFBJRDog
-NjA3NDcgQ29tbTogcWVtdS1rdm0gS2R1bXA6IGxvYWRlZCBUYWludGVkOiAKRyAgICAgICAgVyAg
-ICAgICAgIDUuMC4wKyAjMgpbICA0ODcuMTE3MTUwXSAuLi4KWyAgNDg3LjEzNTQzM10gcHN0YXRl
-OiA0MDQwMDAwOSAoblpjdiBkYWlmICtQQU4gLVVBTykKWyAgNDg3LjE0NDg0OV0gcGMgOiB1bm1h
-cF9zdGFnZTJfcHVkcysweDQ4MC8weDZlMApbICA0ODcuMTUzNzU2XSBsciA6IHVubWFwX3N0YWdl
-Ml9wdWRzKzB4NDgwLzB4NmUwClsgIDQ4Ny4xNjI1MDddIHNwIDogZmZmZjAwMDAyYzcyYmIxMApb
-ICA0ODcuMTc5NjMwXSB4Mjc6IDAwMDAwMDAwNDFhMDAwMDAgeDI2OiBmZmZmODAyN2JiYjU2MDYw
-ClsgIDQ4Ny4xODM0NjVdIG9wZW52c3dpdGNoOiBuZXRsaW5rOiBUdW5uZWwgYXR0ciA1IGhhcyB1
-bmV4cGVjdGVkIGxlbiAxIApleHBlY3RlZCAwClsgIDQ4Ny4xODkxODRdIHgyNTogZmZmZjgwMjc2
-OWNiZTAwOCB4MjQ6IGZmZmY3ZTAwMDAwMDAwMDAKWyAgNDg3LjE4OTE4NV0geDIzOiBmZmZmODAy
-NzY5Y2JlMDA4IHgyMjogZmZmZjAwMDA0YjBhZjAwMApbICA0ODcuMTg5MTg2XSB4MjE6IGZmZmY4
-MDI3OWRhMDYwNjAgeDIwOiAwMDQwMDAyNzMzMjAwN2ZkClsgIDQ4Ny4xODkxODhdIHgxOTogMDAw
-MDAwMDA4MDAwMDAwMCB4MTg6IDAwMDAwMDAwMDAwMDAwMTAKWyAgNDg3LjE4OTE4OV0geDE3OiAw
-MDAwMDAwMDAwMDAwMDAwIHgxNjogMDAwMDAwMDAwMDAwMDAwMApbICA0ODcuMTg5MTkwXSB4MTU6
-IGZmZmYwMDAwMTE4MmQ3MDggeDE0OiAzMDMwMzAzMDMwMzAzMDMwClsgIDQ4Ny4xODkxOTFdIHgx
-MzogMzAzMDMwMzAzMDMwMjA2NiB4MTI6IGZmZmYwMDAwMTE4NTcwMDAKWyAgNDg3LjE4OTE5Ml0g
-eDExOiAwMDAwMDAwMDAwMDAwMDAwIHgxMDogZmZmZjAwMDAxMWE0ODAwMApbICA0ODcuMTg5MTkz
-XSB4OSA6IDAwMDAwMDAwMDAwMDAwMDAgeDggOiAwMDAwMDAwMDAwMDAwMDAzClsgIDQ4Ny4xODkx
-OTRdIHg3IDogMDAwMDAwMDAwMDAwMDk1YiB4NiA6IDAwMDAwMDAyMTI1NTc1NjAKWyAgNDg3LjE4
-OTE5Nl0geDMgOiBmZmZmODAyZmMwYjA4MjYwIHgyIDogYjI1MTNhZGMzNTY4ZjgwMApbICA0ODcu
-MTg5MTk3XSB4MSA6IDAwMDAwMDAwMDAwMDAwMDAgeDAgOiAwMDAwMDAwMDAwMDAwMDNlClsgIDQ4
-Ny4xODkyMDBdIFByb2Nlc3MgcWVtdS1rdm0gKHBpZDogNjA3NDcsIHN0YWNrIGxpbWl0ID0gCjB4
-MDAwMDAwMDA0MzQyYjI5OCkKWyAgNDg3LjE4OTIwMV0gQ2FsbCB0cmFjZToKWyAgNDg3LjE4OTIw
-M10gIHVubWFwX3N0YWdlMl9wdWRzKzB4NDgwLzB4NmUwClsgIDQ4Ny4xODkyMDVdICB1bm1hcF9z
-dGFnZTJfcmFuZ2UrMHhhNC8weDE5MApbICA0ODcuMTg5MjA4XSAga3ZtX2ZyZWVfc3RhZ2UyX3Bn
-ZCsweDY0LzB4MTAwClsgIDQ4Ny4zNjM4OTddICBrdm1fYXJjaF9mbHVzaF9zaGFkb3dfYWxsKzB4
-MjAvMHgzMApbICA0ODcuMzcyMDk1XSAga3ZtX21tdV9ub3RpZmllcl9yZWxlYXNlKzB4M2MvMHg4
-MApbICA0ODcuMzgwMDkyXSAgX19tbXVfbm90aWZpZXJfcmVsZWFzZSsweDUwLzB4MTAwClsgIDQ4
-Ny4zODc5MTRdICBleGl0X21tYXArMHgxNzAvMHgxNzgKWyAgNDg3LjM5NDU2N10gIG1tcHV0KzB4
-NzAvMHgxODAKWyAgNDg3LjQwMDY1M10gIGRvX2V4aXQrMHgyYjQvMHg1YzgKWyAgNDg3LjQwNjg0
-OV0gIGRvX2dyb3VwX2V4aXQrMHgzYy8weGUwCi0tWyBlbmQgdHJhY2UgNTVjNDE0YTMyOWM4MGI2
-MyBdLS0tClsgIDQ4Ny40NTQxNzRdIEtlcm5lbCBwYW5pYyAtIG5vdCBzeW5jaW5nOiBGYXRhbCBl
-eGNlcHRpb24KWyAgNDg3LjQ2MTk2N10gU01QOiBzdG9wcGluZyBzZWNvbmRhcnkgQ1BVcwpbICA0
-ODcuNDY4NDczXSBLZXJuZWwgT2Zmc2V0OiBkaXNhYmxlZApbICA0ODcuNDc0NTIwXSBDUFUgZmVh
-dHVyZXM6IDB4MDAyLDIyMjA4YTM4ClsgIDQ4Ny40ODEwMDhdIE1lbW9yeSBMaW1pdDogbm9uZQpb
-ICA0ODcuNDg5MDk1XSBTdGFydGluZyBjcmFzaGR1bXAga2VybmVsLi4uClsgIDQ4Ny40OTU0NTdd
-IEJ5ZSEKCgo+IAo+IEtpbmQgcmVnYXJkcwo+IFN1enVraQo+IAo+IAo+IAo+IC4KCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVs
-IG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDov
-L2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+Currently, IRQFD on arm still uses the deferred workqueue mechanism
+to inject interrupts into guest, which will likely lead to a busy
+context-switching from/to the kworker thread. This overhead is for
+no purpose (only in my view ...) and will result in an interrupt
+performance degradation.
+
+Implement kvm_arch_set_irq_inatomic() for arm/arm64 to support direct
+irqfd MSI injection, by which we can get rid of the annoying latency.
+As a result, irqfd MSI intensive scenarios (e.g., DPDK with high packet
+processing workloads) will benefit from it.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+
+It seems that only MSI will follow the IRQFD path, did I miss something?
+
+This patch is still under test and sent out for early feedback. If I have
+any mis-understanding, please fix me up and let me know. Thanks!
+
+---
+ virt/kvm/arm/vgic/trace.h      | 22 ++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-irqfd.c | 21 +++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+
+diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
+index 55fed77..bc1f4db 100644
+--- a/virt/kvm/arm/vgic/trace.h
++++ b/virt/kvm/arm/vgic/trace.h
+@@ -27,6 +27,28 @@
+ 		  __entry->vcpu_id, __entry->irq, __entry->level)
+ );
+ 
++TRACE_EVENT(kvm_arch_set_irq_inatomic,
++	TP_PROTO(u32 gsi, u32 type, int level, int irq_source_id),
++	TP_ARGS(gsi, type, level, irq_source_id),
++
++	TP_STRUCT__entry(
++		__field(	u32,	gsi		)
++		__field(	u32,	type		)
++		__field(	int,	level		)
++		__field(	int,	irq_source_id	)
++	),
++
++	TP_fast_assign(
++		__entry->gsi		= gsi;
++		__entry->type		= type;
++		__entry->level		= level;
++		__entry->irq_source_id	= irq_source_id;
++	),
++
++	TP_printk("gsi %u type %u level %d source %d", __entry->gsi,
++		  __entry->type, __entry->level, __entry->irq_source_id)
++);
++
+ #endif /* _TRACE_VGIC_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+index 99e026d..4cfc3f4 100644
+--- a/virt/kvm/arm/vgic/vgic-irqfd.c
++++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+@@ -19,6 +19,7 @@
+ #include <trace/events/kvm.h>
+ #include <kvm/arm_vgic.h>
+ #include "vgic.h"
++#include "trace.h"
+ 
+ /**
+  * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+@@ -105,6 +106,26 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 	return vgic_its_inject_msi(kvm, &msi);
+ }
+ 
++/**
++ * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
++ *
++ * Currently only direct MSI injecton is supported.
++ */
++int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
++			      struct kvm *kvm, int irq_source_id, int level,
++			      bool line_status)
++{
++	int ret;
++
++	trace_kvm_arch_set_irq_inatomic(e->gsi, e->type, level, irq_source_id);
++
++	if (unlikely(e->type != KVM_IRQ_ROUTING_MSI))
++		return -EWOULDBLOCK;
++
++	ret = kvm_set_msi(e, kvm, irq_source_id, level, line_status);
++	return ret;
++}
++
+ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
+ {
+ 	struct kvm_irq_routing_entry *entries;
+-- 
+1.8.3.1
