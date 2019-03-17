@@ -1,82 +1,272 @@
-From: "Raslan, KarimAllah" <karahmed@amazon.de>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
-Date: Sun, 17 Mar 2019 14:50:26 +0000
-Message-ID: <1552834226.19343.1.camel@amazon.de>
-References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 05/22] iommu: Introduce cache_invalidate API
+Date: Sun, 17 Mar 2019 17:43:12 +0100
+Message-ID: <281167f1-c046-3077-e954-d1f510c27d61@redhat.com>
+References: <20190315160906.12900-1-eric.auger@redhat.com>
+ <20190315160906.12900-6-eric.auger@redhat.com>
+ <20190315113702.1184d162@jacob-builder>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE4B4A3B3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 12:43:24 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UwzyqS4CBTqk for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Mar 2019 12:43:23 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8DB840A52
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 12:43:22 -0400 (EDT)
+In-Reply-To: <20190315113702.1184d162@jacob-builder>
 Content-Language: en-US
-Content-ID: <F4C6E606D93F984399786467A9281A74@amazon.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: "eric.auger@redhat.com" <eric.auger@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "christoffer.dall@arm.com" <christoffer.dall@arm.com>, "andre.przywara@arm.com" <andre.przywara@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "james.morse@arm.com" <james.morse@arm.com>, "mst@redhat.com" <mst@redhat.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "julien.thierry@arm.com" <julien.thierry@arm.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, alex.williamson@redhat.com, ashok.raj@intel.com, kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gU3VuLCAyMDE5LTAzLTE3IGF0IDE0OjM2ICswMDAwLCBaZW5naHVpIFl1IHdyb3RlOg0KPiBD
-dXJyZW50bHksIElSUUZEIG9uIGFybSBzdGlsbCB1c2VzIHRoZSBkZWZlcnJlZCB3b3JrcXVldWUg
-bWVjaGFuaXNtDQo+IHRvIGluamVjdCBpbnRlcnJ1cHRzIGludG8gZ3Vlc3QsIHdoaWNoIHdpbGwg
-bGlrZWx5IGxlYWQgdG8gYSBidXN5DQo+IGNvbnRleHQtc3dpdGNoaW5nIGZyb20vdG8gdGhlIGt3
-b3JrZXIgdGhyZWFkLiBUaGlzIG92ZXJoZWFkIGlzIGZvcg0KPiBubyBwdXJwb3NlIChvbmx5IGlu
-IG15IHZpZXcgLi4uKSBhbmQgd2lsbCByZXN1bHQgaW4gYW4gaW50ZXJydXB0DQo+IHBlcmZvcm1h
-bmNlIGRlZ3JhZGF0aW9uLg0KPiANCj4gSW1wbGVtZW50IGt2bV9hcmNoX3NldF9pcnFfaW5hdG9t
-aWMoKSBmb3IgYXJtL2FybTY0IHRvIHN1cHBvcnQgZGlyZWN0DQo+IGlycWZkIE1TSSBpbmplY3Rp
-b24sIGJ5IHdoaWNoIHdlIGNhbiBnZXQgcmlkIG9mIHRoZSBhbm5veWluZyBsYXRlbmN5Lg0KPiBB
-cyBhIHJlc3VsdCwgaXJxZmQgTVNJIGludGVuc2l2ZSBzY2VuYXJpb3MgKGUuZy4sIERQREsgd2l0
-aCBoaWdoIHBhY2tldA0KPiBwcm9jZXNzaW5nIHdvcmtsb2Fkcykgd2lsbCBiZW5lZml0IGZyb20g
-aXQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBaZW5naHVpIFl1IDx5dXplbmdodWlAaHVhd2VpLmNv
-bT4NCj4gLS0tDQo+IA0KPiBJdCBzZWVtcyB0aGF0IG9ubHkgTVNJIHdpbGwgZm9sbG93IHRoZSBJ
-UlFGRCBwYXRoLCBkaWQgSSBtaXNzIHNvbWV0aGluZz8NCj4gDQo+IFRoaXMgcGF0Y2ggaXMgc3Rp
-bGwgdW5kZXIgdGVzdCBhbmQgc2VudCBvdXQgZm9yIGVhcmx5IGZlZWRiYWNrLiBJZiBJIGhhdmUN
-Cj4gYW55IG1pcy11bmRlcnN0YW5kaW5nLCBwbGVhc2UgZml4IG1lIHVwIGFuZCBsZXQgbWUga25v
-dy4gVGhhbmtzIQ0KPiANCj4gLS0tDQo+ICB2aXJ0L2t2bS9hcm0vdmdpYy90cmFjZS5oICAgICAg
-fCAyMiArKysrKysrKysrKysrKysrKysrKysrDQo+ICB2aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWly
-cWZkLmMgfCAyMSArKysrKysrKysrKysrKysrKysrKysNCj4gIDIgZmlsZXMgY2hhbmdlZCwgNDMg
-aW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS92Z2ljL3RyYWNl
-LmggYi92aXJ0L2t2bS9hcm0vdmdpYy90cmFjZS5oDQo+IGluZGV4IDU1ZmVkNzcuLmJjMWY0ZGIg
-MTAwNjQ0DQo+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljL3RyYWNlLmgNCj4gKysrIGIvdmlydC9r
-dm0vYXJtL3ZnaWMvdHJhY2UuaA0KPiBAQCAtMjcsNiArMjcsMjggQEANCj4gIAkJICBfX2VudHJ5
-LT52Y3B1X2lkLCBfX2VudHJ5LT5pcnEsIF9fZW50cnktPmxldmVsKQ0KPiAgKTsNCj4gIA0KPiAr
-VFJBQ0VfRVZFTlQoa3ZtX2FyY2hfc2V0X2lycV9pbmF0b21pYywNCj4gKwlUUF9QUk9UTyh1MzIg
-Z3NpLCB1MzIgdHlwZSwgaW50IGxldmVsLCBpbnQgaXJxX3NvdXJjZV9pZCksDQo+ICsJVFBfQVJH
-Uyhnc2ksIHR5cGUsIGxldmVsLCBpcnFfc291cmNlX2lkKSwNCj4gKw0KPiArCVRQX1NUUlVDVF9f
-ZW50cnkoDQo+ICsJCV9fZmllbGQoCXUzMiwJZ3NpCQkpDQo+ICsJCV9fZmllbGQoCXUzMiwJdHlw
-ZQkJKQ0KPiArCQlfX2ZpZWxkKAlpbnQsCWxldmVsCQkpDQo+ICsJCV9fZmllbGQoCWludCwJaXJx
-X3NvdXJjZV9pZAkpDQo+ICsJKSwNCj4gKw0KPiArCVRQX2Zhc3RfYXNzaWduKA0KPiArCQlfX2Vu
-dHJ5LT5nc2kJCT0gZ3NpOw0KPiArCQlfX2VudHJ5LT50eXBlCQk9IHR5cGU7DQo+ICsJCV9fZW50
-cnktPmxldmVsCQk9IGxldmVsOw0KPiArCQlfX2VudHJ5LT5pcnFfc291cmNlX2lkCT0gaXJxX3Nv
-dXJjZV9pZDsNCj4gKwkpLA0KPiArDQo+ICsJVFBfcHJpbnRrKCJnc2kgJXUgdHlwZSAldSBsZXZl
-bCAlZCBzb3VyY2UgJWQiLCBfX2VudHJ5LT5nc2ksDQo+ICsJCSAgX19lbnRyeS0+dHlwZSwgX19l
-bnRyeS0+bGV2ZWwsIF9fZW50cnktPmlycV9zb3VyY2VfaWQpDQo+ICspOw0KPiArDQo+ICAjZW5k
-aWYgLyogX1RSQUNFX1ZHSUNfSCAqLw0KPiAgDQo+ICAjdW5kZWYgVFJBQ0VfSU5DTFVERV9QQVRI
-DQo+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWlycWZkLmMgYi92aXJ0L2t2
-bS9hcm0vdmdpYy92Z2ljLWlycWZkLmMNCj4gaW5kZXggOTllMDI2ZC4uNGNmYzNmNCAxMDA2NDQN
-Cj4gLS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMvdmdpYy1pcnFmZC5jDQo+ICsrKyBiL3ZpcnQva3Zt
-L2FybS92Z2ljL3ZnaWMtaXJxZmQuYw0KPiBAQCAtMTksNiArMTksNyBAQA0KPiAgI2luY2x1ZGUg
-PHRyYWNlL2V2ZW50cy9rdm0uaD4NCj4gICNpbmNsdWRlIDxrdm0vYXJtX3ZnaWMuaD4NCj4gICNp
-bmNsdWRlICJ2Z2ljLmgiDQo+ICsjaW5jbHVkZSAidHJhY2UuaCINCj4gIA0KPiAgLyoqDQo+ICAg
-KiB2Z2ljX2lycWZkX3NldF9pcnE6IGluamVjdCB0aGUgSVJRIGNvcnJlc3BvbmRpbmcgdG8gdGhl
-DQo+IEBAIC0xMDUsNiArMTA2LDI2IEBAIGludCBrdm1fc2V0X21zaShzdHJ1Y3Qga3ZtX2tlcm5l
-bF9pcnFfcm91dGluZ19lbnRyeSAqZSwNCj4gIAlyZXR1cm4gdmdpY19pdHNfaW5qZWN0X21zaShr
-dm0sICZtc2kpOw0KPiAgfQ0KPiAgDQo+ICsvKioNCj4gKyAqIGt2bV9hcmNoX3NldF9pcnFfaW5h
-dG9taWM6IGZhc3QtcGF0aCBmb3IgaXJxZmQgaW5qZWN0aW9uDQo+ICsgKg0KPiArICogQ3VycmVu
-dGx5IG9ubHkgZGlyZWN0IE1TSSBpbmplY3RvbiBpcyBzdXBwb3J0ZWQuDQo+ICsgKi8NCj4gK2lu
-dCBrdm1fYXJjaF9zZXRfaXJxX2luYXRvbWljKHN0cnVjdCBrdm1fa2VybmVsX2lycV9yb3V0aW5n
-X2VudHJ5ICplLA0KPiArCQkJICAgICAgc3RydWN0IGt2bSAqa3ZtLCBpbnQgaXJxX3NvdXJjZV9p
-ZCwgaW50IGxldmVsLA0KPiArCQkJICAgICAgYm9vbCBsaW5lX3N0YXR1cykNCj4gK3sNCj4gKwlp
-bnQgcmV0Ow0KPiArDQo+ICsJdHJhY2Vfa3ZtX2FyY2hfc2V0X2lycV9pbmF0b21pYyhlLT5nc2ks
-IGUtPnR5cGUsIGxldmVsLCBpcnFfc291cmNlX2lkKTsNCj4gKw0KPiArCWlmICh1bmxpa2VseShl
-LT50eXBlICE9IEtWTV9JUlFfUk9VVElOR19NU0kpKQ0KPiArCQlyZXR1cm4gLUVXT1VMREJMT0NL
-Ow0KPiArDQo+ICsJcmV0ID0ga3ZtX3NldF9tc2koZSwga3ZtLCBpcnFfc291cmNlX2lkLCBsZXZl
-bCwgbGluZV9zdGF0dXMpOw0KDQpUaGUgaW1wbGVtZW50YXRpb24gb2bCoGt2bV9zZXRfbXNpIGlz
-IG5vdCBhdG9taWMuIFRoZXJlIGlzIGEgbXV0ZXggaGVsZCBpbiBvbmUNCm9mIHRoZSBleGVjdXRp
-b24gcGF0aHMuIFRoYXQgaXMgd2h5IGl0IGNhbiBub3QgYmUgdXNlZCBkaXJlY3RseSBpbiB0aGlz
-IGF0b21pY8KgDQpjb250ZXh0Lg0KDQo+ICsJcmV0dXJuIHJldDsNCj4gK30NCj4gKw0KPiAgaW50
-IGt2bV92Z2ljX3NldHVwX2RlZmF1bHRfaXJxX3JvdXRpbmcoc3RydWN0IGt2bSAqa3ZtKQ0KPiAg
-ew0KPiAgCXN0cnVjdCBrdm1faXJxX3JvdXRpbmdfZW50cnkgKmVudHJpZXM7DQoKCgpBbWF6b24g
-RGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJs
-aW4KR2VzY2hhZWZ0c2Z1ZWhyZXI6IENocmlzdGlhbiBTY2hsYWVnZXIsIFJhbGYgSGVyYnJpY2gK
-VXN0LUlEOiBERSAyODkgMjM3IDg3OQpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90
-dGVuYnVyZyBIUkIgMTQ5MTczIEIKCg==
+Hi Jacob,
+
+On 3/15/19 7:37 PM, Jacob Pan wrote:
+> On Fri, 15 Mar 2019 17:08:49 +0100
+> Eric Auger <eric.auger@redhat.com> wrote:
+> 
+>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+>>
+>> In any virtualization use case, when the first translation stage
+>> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+>> of caching structure updates unless the guest invalidation activities
+>> are trapped by the virtualizer and passed down to the host.
+>>
+>> Since the invalidation data are obtained from user space and will be
+>> written into physical IOMMU, we must allow security check at various
+>> layers. Therefore, generic invalidation data format are proposed here,
+>> model specific IOMMU drivers need to convert them into their own
+>> format.
+>>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v3 -> v4:
+>> - full reshape of the API following Alex' comments
+>>
+>> v1 -> v2:
+>> - add arch_id field
+>> - renamed tlb_invalidate into cache_invalidate as this API allows
+>>   to invalidate context caches on top of IOTLBs
+>>
+>> v1:
+>> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+>> header. Commit message reworded.
+>> ---
+>>  drivers/iommu/iommu.c      | 14 ++++++++
+>>  include/linux/iommu.h      | 21 +++++++++++
+>>  include/uapi/linux/iommu.h | 71
+>> ++++++++++++++++++++++++++++++++++++++ 3 files changed, 106
+>> insertions(+)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 7d9285cea100..b72e326ddd41 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1544,6 +1544,20 @@ void iommu_detach_pasid_table(struct
+>> iommu_domain *domain) }
+>>  EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+>>  
+>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
+>> device *dev,
+>> +			   struct iommu_cache_invalidate_info
+>> *inv_info) +{
+>> +	int ret = 0;
+>> +
+>> +	if (unlikely(!domain->ops->cache_invalidate))
+>> +		return -ENODEV;
+>> +
+>> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+>> +
+>> +	return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+>> +
+>>  static void __iommu_detach_device(struct iommu_domain *domain,
+>>  				  struct device *dev)
+>>  {
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index fb9b7a8de25f..3d8e48876162 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -191,6 +191,7 @@ struct iommu_resv_region {
+>>   *                      driver init to device driver init (default
+>> no)
+>>   * @attach_pasid_table: attach a pasid table
+>>   * @detach_pasid_table: detach the pasid table
+>> + * @cache_invalidate: invalidate translation caches
+>>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>>   */
+>>  struct iommu_ops {
+>> @@ -239,6 +240,9 @@ struct iommu_ops {
+>>  				  struct iommu_pasid_table_config
+>> *cfg); void (*detach_pasid_table)(struct iommu_domain *domain);
+>>  
+>> +	int (*cache_invalidate)(struct iommu_domain *domain, struct
+>> device *dev,
+>> +				struct iommu_cache_invalidate_info
+>> *inv_info); +
+>>  	unsigned long pgsize_bitmap;
+>>  };
+>>  
+>> @@ -349,6 +353,9 @@ extern void iommu_detach_device(struct
+>> iommu_domain *domain, extern int iommu_attach_pasid_table(struct
+>> iommu_domain *domain, struct iommu_pasid_table_config *cfg);
+>>  extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+>> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+>> +				  struct device *dev,
+>> +				  struct iommu_cache_invalidate_info
+>> *inv_info); extern struct iommu_domain
+>> *iommu_get_domain_for_dev(struct device *dev); extern struct
+>> iommu_domain *iommu_get_dma_domain(struct device *dev); extern int
+>> iommu_map(struct iommu_domain *domain, unsigned long iova, @@ -795,7
+>> +802,21 @@ int iommu_attach_pasid_table(struct iommu_domain *domain, }
+>>  
+>>  static inline
+>> +<<<<<<< HEAD
+>>  void iommu_detach_pasid_table(struct iommu_domain *domain) {}
+>> +=======
+>> +void iommu_detach_pasid_table(struct iommu_domain *domain)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +static inline int
+>> +iommu_cache_invalidate(struct iommu_domain *domain,
+>> +		       struct device *dev,
+>> +		       struct iommu_cache_invalidate_info *inv_info)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +>>>>>>> 56df871916e5... iommu: Introduce cache_invalidate API 
+ouch :-(
+
+> forgot to merge :)
+>>  
+>>  #endif /* CONFIG_IOMMU_API */
+>>  
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> index 532a64075f23..e4c6a447e85a 100644
+>> --- a/include/uapi/linux/iommu.h
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
+>>  	};
+>>  };
+>>  
+>> +/* defines the granularity of the invalidation */
+>> +enum iommu_inv_granularity {
+>> +	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective
+>> invalidation */
+>> +	IOMMU_INV_GRANU_PASID,	/* pasid-selective
+>> invalidation */
+>> +	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation
+>> */ +};
+>> +
+>> +/**
+>> + * Address Selective Invalidation Structure
+>> + *
+>> + * @flags indicates the granularity of the address-selective
+>> invalidation
+>> + * - if PASID bit is set, @pasid field is populated and the
+>> invalidation
+>> + *   relates to cache entries tagged with this PASID and matching the
+>> + *   address range.
+>> + * - if ARCHID bit is set, @archid is populated and the invalidation
+>> relates
+>> + *   to cache entries tagged with this architecture specific id and
+>> matching
+>> + *   the address range.
+>> + * - Both PASID and ARCHID can be set as they may tag different
+>> caches.
+>> + * - if neither PASID or ARCHID is set, global addr invalidation
+>> applies
+>> + * - LEAF flag indicates whether only the leaf PTE caching needs to
+>> be
+>> + *   invalidated and other paging structure caches can be preserved.
+>> + * @pasid: process address space id
+>> + * @archid: architecture-specific id
+>> + * @addr: first stage/level input address
+>> + * @granule_size: page/block size of the mapping in bytes
+>> + * @nb_granules: number of contiguous granules to be invalidated
+>> + */
+>> +struct iommu_inv_addr_info {
+>> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
+>> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
+>> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
+>> +	__u32	flags;
+>> +	__u32	archid;
+>> +	__u64	pasid;
+>> +	__u64	addr;
+>> +	__u64	granule_size;
+>> +	__u64	nb_granules;
+>> +};
+>> +
+>> +/**
+>> + * First level/stage invalidation information
+>> + * @cache: bitfield that allows to select which caches to invalidate
+>> + * @granularity: defines the lowest granularity used for the
+>> invalidation:
+>> + *     domain > pasid > addr
+>> + *
+>> + * Not all the combinations of cache/granularity make sense:
+>> + *
+>> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
+>> + * granularity	|		|		|
+>> cache	|
+>> + * -------------+---------------+---------------+---------------+
+>> + * DOMAIN	|	N/A	|       Y	|
+>> Y	|
+>> + * PASID	|	Y	|       Y	|
+>> Y	|
+>> + * ADDR		|       Y	|       Y	|
+>> N/A	|
+>> + */
+>> +struct iommu_cache_invalidate_info {
+>> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+>> +	__u32	version;
+>> +/* IOMMU paging structure cache */
+>> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
+>> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device
+>> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID
+>> cache */
+>> +	__u8	cache;
+>> +	__u8	granularity;
+>> +	__u8	padding[2];
+>> +	union {
+>> +		__u64	pasid;
+> just realized there is already a pasid field in the addr_info, do we
+> still need this?
+I think so. Either you do a PASID based invalidation and you directly
+use the pasid field or you do an address based invalidation and you use
+the addr_info where the pasid may or not be passed.
+
+Thanks
+
+Eric
+>> +		struct iommu_inv_addr_info addr_info;
+>> +	};
+>> +};
+>> +
+>> +
+>>  #endif /* _UAPI_IOMMU_H */
+> 
+> [Jacob Pan]
+> 
