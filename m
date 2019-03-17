@@ -1,23 +1,31 @@
 From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] kvm: arm: Enforce PTE mappings at stage2 when needed
-Date: Sun, 17 Mar 2019 20:33:28 +0800
-Message-ID: <902e339c-fcbd-b44d-6549-9770b15e050a@huawei.com>
-References: <1552384371-10772-1-git-send-email-suzuki.poulose@arm.com>
+Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
+Date: Sun, 17 Mar 2019 21:34:11 +0800
+Message-ID: <f6639daa-cfba-c65a-7320-c9dcc1ef8377@huawei.com>
+References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
+ <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
+ <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
+ <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
+ <348d0b3b-c74b-7b39-ec30-85905c077c38@huawei.com>
+ <20190314105537.GA15323@en101>
+ <368bd218-ac1d-19b2-6e92-960b91afee8b@huawei.com>
+ <d322e126-4da2-6dfd-a86d-088dfb3bf0f4@huawei.com>
+ <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E95BD4A494
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 08:34:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58B8F4A475
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 09:38:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kp-4Gweyl9Jj for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Mar 2019 08:34:54 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E67C14A41E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 08:34:53 -0400 (EDT)
-In-Reply-To: <1552384371-10772-1-git-send-email-suzuki.poulose@arm.com>
+ with ESMTP id rXVTZpk8b501 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Mar 2019 09:38:04 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E2274A41F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 09:38:03 -0400 (EDT)
+In-Reply-To: <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,146 +36,136 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, zhengxiang9@huawei.com
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, lishuo1@hisilicon.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, lious.lilei@hisilicon.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
-
-On 2019/3/12 17:52, Suzuki K Poulose wrote:
-> commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
-> made the checks to skip huge mappings, stricter. However it introduced
-> a bug where we still use huge mappings, ignoring the flag to
-> use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
-> 
-> Also, the checks do not cover the PUD huge pages, that was
-> under review during the same period. This patch fixes both
-> the issues.
-> 
-> Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
-
-Thanks for Cc-ing me. It works fine now!
-
-
-zenghui
-
->   virt/kvm/arm/mmu.c | 43 +++++++++++++++++++++----------------------
->   1 file changed, 21 insertions(+), 22 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 30251e2..66e0fbb5 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1595,8 +1595,9 @@ static void kvm_send_hwpoison_signal(unsigned long address,
->   	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
->   }
->   
-> -static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
-> -					       unsigned long hva)
-> +static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-> +					       unsigned long hva,
-> +					       unsigned long map_size)
->   {
->   	gpa_t gpa_start, gpa_end;
->   	hva_t uaddr_start, uaddr_end;
-> @@ -1612,34 +1613,34 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
->   
->   	/*
->   	 * Pages belonging to memslots that don't have the same alignment
-> -	 * within a PMD for userspace and IPA cannot be mapped with stage-2
-> -	 * PMD entries, because we'll end up mapping the wrong pages.
-> +	 * within a PMD/PUD for userspace and IPA cannot be mapped with stage-2
-> +	 * PMD/PUD entries, because we'll end up mapping the wrong pages.
->   	 *
->   	 * Consider a layout like the following:
->   	 *
->   	 *    memslot->userspace_addr:
->   	 *    +-----+--------------------+--------------------+---+
-> -	 *    |abcde|fgh  Stage-1 PMD    |    Stage-1 PMD   tv|xyz|
-> +	 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
->   	 *    +-----+--------------------+--------------------+---+
->   	 *
->   	 *    memslot->base_gfn << PAGE_SIZE:
->   	 *      +---+--------------------+--------------------+-----+
-> -	 *      |abc|def  Stage-2 PMD    |    Stage-2 PMD     |tvxyz|
-> +	 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
->   	 *      +---+--------------------+--------------------+-----+
->   	 *
-> -	 * If we create those stage-2 PMDs, we'll end up with this incorrect
-> +	 * If we create those stage-2 blocks, we'll end up with this incorrect
->   	 * mapping:
->   	 *   d -> f
->   	 *   e -> g
->   	 *   f -> h
->   	 */
-> -	if ((gpa_start & ~S2_PMD_MASK) != (uaddr_start & ~S2_PMD_MASK))
-> +	if ((gpa_start & (map_size - 1)) != (uaddr_start & (map_size - 1)))
->   		return false;
->   
->   	/*
->   	 * Next, let's make sure we're not trying to map anything not covered
-> -	 * by the memslot. This means we have to prohibit PMD size mappings
-> -	 * for the beginning and end of a non-PMD aligned and non-PMD sized
-> +	 * by the memslot. This means we have to prohibit block size mappings
-> +	 * for the beginning and end of a non-block aligned and non-block sized
->   	 * memory slot (illustrated by the head and tail parts of the
->   	 * userspace view above containing pages 'abcde' and 'xyz',
->   	 * respectively).
-> @@ -1648,8 +1649,8 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
->   	 * userspace_addr or the base_gfn, as both are equally aligned (per
->   	 * the check above) and equally sized.
->   	 */
-> -	return (hva & S2_PMD_MASK) >= uaddr_start &&
-> -	       (hva & S2_PMD_MASK) + S2_PMD_SIZE <= uaddr_end;
-> +	return (hva & ~(map_size - 1)) >= uaddr_start &&
-> +	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
->   }
->   
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> @@ -1678,12 +1679,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   		return -EFAULT;
->   	}
->   
-> -	if (!fault_supports_stage2_pmd_mappings(memslot, hva))
-> -		force_pte = true;
-> -
-> -	if (logging_active)
-> -		force_pte = true;
-> -
->   	/* Let's check if we will get back a huge page backed by hugetlbfs */
->   	down_read(&current->mm->mmap_sem);
->   	vma = find_vma_intersection(current->mm, hva, hva + 1);
-> @@ -1694,6 +1689,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	}
->   
->   	vma_pagesize = vma_kernel_pagesize(vma);
-> +	if (logging_active ||
-> +	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
-> +		force_pte = true;
-> +		vma_pagesize = PAGE_SIZE;
-> +	}
-> +
->   	/*
->   	 * The stage2 has a minimum of 2 level table (For arm64 see
->   	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
-> @@ -1701,11 +1702,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	 * As for PUD huge maps, we must make sure that we have at least
->   	 * 3 levels, i.e, PMD is not folded.
->   	 */
-> -	if ((vma_pagesize == PMD_SIZE ||
-> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
-> -	    !force_pte) {
-> +	if (vma_pagesize == PMD_SIZE ||
-> +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
->   		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
-> -	}
->   	up_read(&current->mm->mmap_sem);
->   
->   	/* We need minimum second+third level pages */
-> 
+SGkgU3V6dWtpLAoKT24gMjAxOS8zLzE1IDIyOjU2LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+
+IEhpIFpoZW5ndWksCgpzL1poZW5ndWkvWmhlbmcvCgooSSB0aGluayB5b3UgbXVzdCB3YW50ZWQg
+dG8gc2F5ICJIaSIgdG8gWmhlbmcgOi0pICkKCgpJIGhhdmUgbG9va2VkIGludG8geW91ciBwYXRj
+aCBhbmQgdGhlIGtlcm5lbCBsb2csIGFuZCBJIGJlbGlldmUgdGhhdAp5b3VyIHBhdGNoIGhhZCBh
+bHJlYWR5IGFkZHJlc3NlZCB0aGlzIGlzc3VlLiBCdXQgSSB0aGluayB3ZSBjYW4gZG8gaXQKYSBs
+aXR0bGUgYmV0dGVyIC0gdHdvIG1vcmUgcG9pbnRzIG5lZWQgdG8gYmUgaGFuZGxlZCB3aXRoIGNh
+dXRpb24uCgpUYWtlIFBNRCBodWdlcGFnZSAoUE1EX1NJWkUgPT0gMk0pIGZvciBleGFtcGxlOgoK
+PiAKPiBPbiAxNS8wMy8yMDE5IDA4OjIxLCBaaGVuZyBYaWFuZyB3cm90ZToKPj4gSGkgU3V6dWtp
+LAo+Pgo+PiBJIGhhdmUgdGVzdGVkIHRoaXMgcGF0Y2gsIFZNIGRvZXNuJ3QgaGFuZyBhbmQgd2Ug
+Z2V0IGV4cGVjdGVkIFdBUk5JTkcgCj4+IGxvZzoKPiAKPiBUaGFua3MgZm9yIHRoZSBxdWljayB0
+ZXN0aW5nICEKPiAKPj4gSG93ZXZlciwgd2UgYWxzbyBnZXQgdGhlIGZvbGxvd2luZyB1bmV4cGVj
+dGVkIGxvZzoKPj4KPj4gW8KgIDkwOC4zMjk5MDBdIEJVRzogQmFkIHBhZ2Ugc3RhdGUgaW4gcHJv
+Y2VzcyBxZW11LWt2bcKgIHBmbjphMmZiNDFjZgo+PiBbwqAgOTA4LjMzOTQxNV0gcGFnZTpmZmZm
+N2UyOGJlZDA3M2MwIGNvdW50Oi00IG1hcGNvdW50OjAgCj4+IG1hcHBpbmc6MDAwMDAwMDAwMDAw
+MDAwMCBpbmRleDoweDAKPj4gW8KgIDkwOC4zMzk0MTZdIGZsYWdzOiAweDRmZmZmZTAwMDAwMDAw
+MDAoKQo+PiBbwqAgOTA4LjMzOTQxOF0gcmF3OiA0ZmZmZmUwMDAwMDAwMDAwIGRlYWQwMDAwMDAw
+MDAxMDAgZGVhZDAwMDAwMDAwMDIwMCAKPj4gMDAwMDAwMDAwMDAwMDAwMAo+PiBbwqAgOTA4LjMz
+OTQxOV0gcmF3OiAwMDAwMDAwMDAwMDAwMDAwIDAwMDAwMDAwMDAwMDAwMDAgZmZmZmZmZmNmZmZm
+ZmZmZiAKPj4gMDAwMDAwMDAwMDAwMDAwMAo+PiBbwqAgOTA4LjMzOTQyMF0gcGFnZSBkdW1wZWQg
+YmVjYXVzZTogbm9uemVybyBfcmVmY291bnQKPj4gW8KgIDkwOC4zMzk0MzddIENQVTogMzIgUElE
+OiA3MjU5OSBDb21tOiBxZW11LWt2bSBLZHVtcDogbG9hZGVkIAo+PiBUYWludGVkOiBHwqDCoMKg
+IELCoCBXwqDCoMKgwqDCoMKgwqAgNS4wLjArICMxCj4+IFvCoCA5MDguMzM5NDM4XSBDYWxsIHRy
+YWNlOgo+PiBbwqAgOTA4LjMzOTQzOV3CoCBkdW1wX2JhY2t0cmFjZSsweDAvMHgxODgKPj4gW8Kg
+IDkwOC4zMzk0NDFdwqAgc2hvd19zdGFjaysweDI0LzB4MzAKPj4gW8KgIDkwOC4zMzk0NDJdwqAg
+ZHVtcF9zdGFjaysweGE4LzB4Y2MKPj4gW8KgIDkwOC4zMzk0NDNdwqAgYmFkX3BhZ2UrMHhmMC8w
+eDE1MAo+PiBbwqAgOTA4LjMzOTQ0NV3CoCBmcmVlX3BhZ2VzX2NoZWNrX2JhZCsweDg0LzB4YTAK
+Pj4gW8KgIDkwOC4zMzk0NDZdwqAgZnJlZV9wY3BwYWdlc19idWxrKzB4NGI4LzB4NzUwCj4+IFvC
+oCA5MDguMzM5NDQ4XcKgIGZyZWVfdW5yZWZfcGFnZV9jb21taXQrMHgxM2MvMHgxOTgKPj4gW8Kg
+IDkwOC4zMzk0NDldwqAgZnJlZV91bnJlZl9wYWdlKzB4ODQvMHhhMAo+PiBbwqAgOTA4LjMzOTQ1
+MV3CoCBfX2ZyZWVfcGFnZXMrMHg1OC8weDY4Cj4+IFvCoCA5MDguMzM5NDUyXcKgIHphcF9odWdl
+X3BtZCsweDI5MC8weDJkOAo+PiBbwqAgOTA4LjMzOTQ1NF3CoCB1bm1hcF9wYWdlX3JhbmdlKzB4
+MmI0LzB4NDcwCj4+IFvCoCA5MDguMzM5NDU1XcKgIHVubWFwX3NpbmdsZV92bWErMHg5NC8weGU4
+Cj4+IFvCoCA5MDguMzM5NDU3XcKgIHVubWFwX3ZtYXMrMHg4Yy8weDEwOAo+PiBbwqAgOTA4LjMz
+OTQ1OF3CoCBleGl0X21tYXArMHhkNC8weDE3OAo+PiBbwqAgOTA4LjMzOTQ1OV3CoCBtbXB1dCsw
+eDc0LzB4MTgwCj4+IFvCoCA5MDguMzM5NDYwXcKgIGRvX2V4aXQrMHgyYjQvMHg1YjAKPj4gW8Kg
+IDkwOC4zMzk0NjJdwqAgZG9fZ3JvdXBfZXhpdCsweDNjLzB4ZTAKPj4gW8KgIDkwOC4zMzk0NjNd
+wqAgX19hcm02NF9zeXNfZXhpdF9ncm91cCsweDI0LzB4MjgKPj4gW8KgIDkwOC4zMzk0NjVdwqAg
+ZWwwX3N2Y19jb21tb24rMHhhMC8weDE4MAo+PiBbwqAgOTA4LjMzOTQ2Nl3CoCBlbDBfc3ZjX2hh
+bmRsZXIrMHgzOC8weDc4Cj4+IFvCoCA5MDguMzM5NDY3XcKgIGVsMF9zdmMrMHg4LzB4Ywo+IAo+
+IFRoYXRzIGJhZCwgd2Ugc2VlbSB0byBiZSBtYWtpbmcgdXB0byA0IHVuYmFsYW5jZWQgcHV0X3Bh
+Z2UoKS4KPiAKPj4+PiAtLS0KPj4+PiDCoMKgIHZpcnQva3ZtL2FybS9tbXUuYyB8IDUxIAo+Pj4+
+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQo+Pj4+
+IMKgwqAgMSBmaWxlIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDE2IGRlbGV0aW9ucygtKQo+
+Pj4+Cj4+Pj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9tbXUuYyBiL3ZpcnQva3ZtL2FybS9t
+bXUuYwo+Pj4+IGluZGV4IDY2ZTBmYmI1Li4wNGIwZjliIDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQv
+a3ZtL2FybS9tbXUuYwo+Pj4+ICsrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+IEBAIC0xMDc2
+LDI0ICsxMDc2LDM4IEBAIHN0YXRpYyBpbnQgc3RhZ2UyX3NldF9wbWRfaHVnZShzdHJ1Y3Qga3Zt
+IAo+Pj4+ICprdm0sIHN0cnVjdCBrdm1fbW11X21lbW9yeV9jYWNoZQo+Pj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgKiBTa2lwIHVwZGF0aW5nIHRoZSBwYWdlIHRhYmxlIGlmIHRoZSBlbnRyeSBp
+cwo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiB1bmNoYW5nZWQuCj4+Pj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCAqLwo+Pj4+IC3CoMKgwqDCoMKgwqDCoCBpZiAocG1kX3ZhbChvbGRfcG1k
+KSA9PSBwbWRfdmFsKCpuZXdfcG1kKSkKPj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKHBtZF92YWwo
+b2xkX3BtZCkgPT0gcG1kX3ZhbCgqbmV3X3BtZCkpIHsKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHJldHVybiAwOwo+Pj4+IC0KPj4+PiArwqDCoMKgwqDCoMKgwqAgfSBlbHNlIGlm
+IChXQVJOX09OX09OQ0UoIXBtZF90aHBfb3JfaHVnZShvbGRfcG1kKSkpIHsKPj4+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCAvKgo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgICogTWFwcGluZyBpbiBodWdl
+IHBhZ2VzIHNob3VsZCBvbmx5IGhhcHBlbiB0aHJvdWdoIGEKPj4+PiAtwqDCoMKgwqDCoMKgwqDC
+oCAqIGZhdWx0LsKgIElmIGEgcGFnZSBpcyBtZXJnZWQgaW50byBhIHRyYW5zcGFyZW50IGh1Z2UK
+Pj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIHBhZ2UsIHRoZSBpbmRpdmlkdWFsIHN1YnBhZ2VzIG9m
+IHRoYXQgaHVnZSBwYWdlCj4+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKiBzaG91bGQgYmUgdW5tYXBw
+ZWQgdGhyb3VnaCBNTVUgbm90aWZpZXJzIGJlZm9yZSB3ZQo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKg
+ICogZ2V0IGhlcmUuCj4+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKgo+Pj4+IC3CoMKgwqDCoMKgwqDC
+oMKgICogTWVyZ2luZyBvZiBDb21wb3VuZFBhZ2VzIGlzIG5vdCBzdXBwb3J0ZWQ7IHRoZXkKPj4+
+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIHNob3VsZCBiZWNvbWUgc3BsaXR0aW5nIGZpcnN0LCB1bm1h
+cHBlZCwgbWVyZ2VkLAo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgICogYW5kIG1hcHBlZCBiYWNrIGlu
+IG9uLWRlbWFuZC4KPj4+PiArwqDCoMKgwqDCoMKgwqDCoCAqIElmIHdlIGhhdmUgUFRFIGxldmVs
+IG1hcHBpbmcgZm9yIHRoaXMgYmxvY2ssCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqAgKiB3ZSBtdXN0
+IHVubWFwIGl0IHRvIGF2b2lkIGluY29uc2lzdGVudCBUTEIKPj4+PiArwqDCoMKgwqDCoMKgwqDC
+oCAqIHN0YXRlLiBXZSBjb3VsZCBlbmQgdXAgaW4gdGhpcyBzaXR1YXRpb24gaWYKPj4+PiArwqDC
+oMKgwqDCoMKgwqDCoCAqIHRoZSBtZW1vcnkgc2xvdCB3YXMgbWFya2VkIGZvciBkaXJ0eSBsb2dn
+aW5nCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqAgKiBhbmQgd2FzIHJldmVydGVkLCBsZWF2aW5nIFBU
+RSBsZXZlbCBtYXBwaW5ncwo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogZm9yIHRoZSBwYWdlcyBh
+Y2Nlc3NlZCBkdXJpbmcgdGhlIHBlcmlvZC4KPj4+PiArwqDCoMKgwqDCoMKgwqDCoCAqIE5vcm1h
+bCBUSFAgc3BsaXQvbWVyZ2UgZm9sbG93cyBtbXVfbm90aWZpZXIKPj4+PiArwqDCoMKgwqDCoMKg
+wqDCoCAqIGNhbGxiYWNrcyBhbmQgZG8gZ2V0IGhhbmRsZWQgYWNjb3JkaW5nbHkuCj4+Pj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+Pj4+IC3CoMKgwqDCoMKgwqDCoCBWTV9CVUdfT04ocG1k
+X3BmbihvbGRfcG1kKSAhPSBwbWRfcGZuKCpuZXdfcG1kKSk7Cj4+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgdW5tYXBfc3RhZ2UyX3JhbmdlKGt2bSwgKGFkZHIgJiBTMl9QTURfTUFTSyksIAo+
+Pj4+IFMyX1BNRF9TSVpFKTsKCkZpcnN0LCB1c2luZyB1bm1hcF9zdGFnZTJfcmFuZ2UoKSBoZXJl
+IGlzIG5vdCBxdWl0ZSBhcHByb3ByaWF0ZS4gU3VwcG9zZQp3ZSd2ZSBvbmx5IGFjY2Vzc2VkIG9u
+ZSAyTSBwYWdlIGluIEhQQSBbeCwgeCsxXUdpYiByYW5nZSwgd2l0aCBvdGhlcgpwYWdlcyB1bmFj
+Y2Vzc2VkLiAgV2hhdCB3aWxsIGhhcHBlbiBpZiB1bm1hcF9zdGFnZTJfcmFuZ2UodGhpc18yTV9w
+YWdlKT8KV2UnbGwgdW5leHBlY3RlZGx5IHJlYWNoIGNsZWFyX3N0YWdlMl9wdWRfZW50cnkoKSwg
+YW5kIHRoaW5ncyBhcmUgZ29pbmcKdG8gZ2V0IHJlYWxseSBiYWQuICBTbyB3ZSdkIGJldHRlciB1
+c2UgdW5tYXBfc3RhZ2UyX3B0ZXMoKSBoZXJlIHNpbmNlIHdlCm9ubHkgd2FudCB0byB1bm1hcCBh
+IDJNIHJhbmdlLgoKClNlY29uZCwgY29uc2lkZXIgYmVsb3cgZnVuY3Rpb24gc3RhY2s6CgogICB1
+bm1hcF9zdGFnZTJfcHRlcygpCiAgICAgY2xlYXJfc3RhZ2UyX3BtZF9lbnRyeSgpCiAgICAgICBw
+dXRfcGFnZSh2aXJ0X3RvX3BhZ2UocG1kKSkKCkl0IHNlZW1zIHRoYXQgd2UgaGF2ZSBvbmUgInJl
+ZHVuZGFudCIgcHV0X3BhZ2UoKSBoZXJlLCAodGh1cyBjb21lcyB0aGUKYmFkIGtlcm5lbCBsb2cg
+Li4uICwpIGJ1dCBhY3R1YWxseSB3ZSBkbyBub3QuICBCeSBzdGFnZTJfc2V0X3BtZF9odWdlKCks
+CnRoZSBQTUQgdGFibGUgZW50cnkgd2lsbCB0aGVuIHBvaW50IHRvIGEgMk0gYmxvY2sgKG9yaWdp
+bmFsbHkgcG9pbnRlZAp0byBhIFBURSB0YWJsZSksIHRoZSBfcmVmY291bnQgb2YgdGhpcyBQTUQt
+bGV2ZWwgdGFibGUgcGFnZSBzaG91bGQgX25vdF8KY2hhbmdlIGFmdGVyIHVubWFwX3N0YWdlMl9w
+dGVzKCkuICBTbyB3aGF0IHdlIHJlYWxseSBzaG91bGQgZG8gaXMgYWRkaW5nCmEgZ2V0X3BhZ2Uo
+KSBhZnRlciB1bm1hcHBpbmcgdG8ga2VlcCB0aGUgX3JlZmNvdW50IGEgYmFsYW5jZSEKCgp0aG91
+Z2h0cyA/IEEgc2ltcGxlIHBhdGNoIGJlbG93IChiYXNlZCBvbiB5b3VycykgZm9yIGRldGFpbHMu
+CgoKdGhhbmtzLAoKemVuZ2h1aQoKCj4+Cj4+IEl0IHNlZW1zIHRoYXQga3ZtIGRlY3JlYXNlcyB0
+aGUgX3JlZmNvdW50IG9mIHRoZSBwYWdlIHR3aWNlIGluIAo+PiB0cmFuc3BhcmVudF9odWdlcGFn
+ZV9hZGp1c3QoKQo+PiBhbmQgdW5tYXBfc3RhZ2UyX3JhbmdlKCkuCj4gCj4gQnV0IEkgdGhvdWdo
+dCB3ZSBzaG91bGQgYmUgZG9pbmcgdGhhdCBvbiB0aGUgaGVhZF9wYWdlIGFscmVhZHksIGFzIHRo
+aXMgCj4gaXMgVEhQLgo+IEkgd2lsbCB0YWtlIGEgbG9vayBhbmQgZ2V0IGJhY2sgdG8geW91IG9u
+IHRoaXMuIEJ0dywgaXMgaXQgcG9zc2libGUgZm9yIHlvdQo+IHRvIHR1cm4gb24gQ09ORklHX0RF
+QlVHX1ZNIGFuZCByZS1ydW4gd2l0aCB0aGUgYWJvdmUgcGF0Y2ggPwo+IAo+IEtpbmQgcmVnYXJk
+cwo+IFN1enVraQo+IAoKLS0tODwtLS0KCnRlc3Q6IGt2bTogYXJtOiBNYXliZSB0d28gbW9yZSBm
+aXhlcwoKQXBwbGllZCBiYXNlZCBvbiBTdXp1a2kncyBwYXRjaC4KClNpZ25lZC1vZmYtYnk6IFpl
+bmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgotLS0KICB2aXJ0L2t2bS9hcm0vbW11LmMg
+fCA4ICsrKysrKy0tCiAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
+bnMoLSkKCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11
+LmMKaW5kZXggMDU3NjVkZi4uY2NkNWQ1ZCAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL21tdS5j
+CisrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwpAQCAtMTA4OSw3ICsxMDg5LDkgQEAgc3RhdGljIGlu
+dCBzdGFnZTJfc2V0X3BtZF9odWdlKHN0cnVjdCBrdm0gKmt2bSwgCnN0cnVjdCBrdm1fbW11X21l
+bW9yeV9jYWNoZQogIAkJICogTm9ybWFsIFRIUCBzcGxpdC9tZXJnZSBmb2xsb3dzIG1tdV9ub3Rp
+ZmllcgogIAkJICogY2FsbGJhY2tzIGFuZCBkbyBnZXQgaGFuZGxlZCBhY2NvcmRpbmdseS4KICAJ
+CSAqLwotCQkJdW5tYXBfc3RhZ2UyX3JhbmdlKGt2bSwgKGFkZHIgJiBTMl9QTURfTUFTSyksIFMy
+X1BNRF9TSVpFKTsKKwkJCWFkZHIgJj0gUzJfUE1EX01BU0s7CisJCQl1bm1hcF9zdGFnZTJfcHRl
+cyhrdm0sIHBtZCwgYWRkciwgYWRkciArIFMyX1BNRF9TSVpFKTsKKwkJCWdldF9wYWdlKHZpcnRf
+dG9fcGFnZShwbWQpKTsKICAJCX0gZWxzZSB7CgogIAkJCS8qCkBAIC0xMTM4LDcgKzExNDAsOSBA
+QCBzdGF0aWMgaW50IHN0YWdlMl9zZXRfcHVkX2h1Z2Uoc3RydWN0IGt2bSAqa3ZtLCAKc3RydWN0
+IGt2bV9tbXVfbWVtb3J5X2NhY2hlICpjYWMKICAJaWYgKHN0YWdlMl9wdWRfcHJlc2VudChrdm0s
+IG9sZF9wdWQpKSB7CiAgCQkvKiBJZiB3ZSBoYXZlIFBURSBsZXZlbCBtYXBwaW5nLCB1bm1hcCB0
+aGUgZW50aXJlIHJhbmdlICovCiAgCQlpZiAoV0FSTl9PTl9PTkNFKCFzdGFnZTJfcHVkX2h1Z2Uo
+a3ZtLCBvbGRfcHVkKSkpIHsKLQkJCXVubWFwX3N0YWdlMl9yYW5nZShrdm0sIGFkZHIgJiBTMl9Q
+VURfTUFTSywgUzJfUFVEX1NJWkUpOworCQkJYWRkciAmPSBTMl9QVURfTUFTSzsKKwkJCXVubWFw
+X3N0YWdlMl9wbWRzKGt2bSwgcHVkcCwgYWRkciwgYWRkciArIFMyX1BVRF9TSVpFKTsKKwkJCWdl
+dF9wYWdlKHZpcnRfdG9fcGFnZShwdWRwKSk7CiAgCQl9IGVsc2UgewogIAkJCXN0YWdlMl9wdWRf
+Y2xlYXIoa3ZtLCBwdWRwKTsKICAJCQlrdm1fdGxiX2ZsdXNoX3ZtaWRfaXBhKGt2bSwgYWRkcik7
+Ci0tIAoxLjguMy4xCgoKCgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
