@@ -1,211 +1,225 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v6 04/22] iommu: Introduce attach/detach_pasid_table API
-Date: Sun, 17 Mar 2019 18:22:14 +0100
-Message-ID: <20190317172232.1068-5-eric.auger@redhat.com>
+Subject: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
+Date: Sun, 17 Mar 2019 18:22:15 +0100
+Message-ID: <20190317172232.1068-6-eric.auger@redhat.com>
 References: <20190317172232.1068-1-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDDA94A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 13:23:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 30AEoQOpszj9 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Mar 2019 13:23:15 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDCC74A460
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Mar 2019 13:23:14 -0400 (EDT)
 In-Reply-To: <20190317172232.1068-1-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-In virtualization use case, when a guest is assigned
-a PCI host device, protected by a virtual IOMMU on the guest,
-the physical IOMMU must be programmed to be consistent with
-the guest mappings. If the physical IOMMU supports two
-translation stages it makes sense to program guest mappings
-onto the first stage/level (ARM/Intel terminology) while the host
-owns the stage/level 2.
+In any virtualization use case, when the first translation stage
+is "owned" by the guest OS, the host IOMMU driver has no knowledge
+of caching structure updates unless the guest invalidation activities
+are trapped by the virtualizer and passed down to the host.
 
-In that case, it is mandated to trap on guest configuration
-settings and pass those to the physical iommu driver.
+Since the invalidation data are obtained from user space and will be
+written into physical IOMMU, we must allow security check at various
+layers. Therefore, generic invalidation data format are proposed here,
+model specific IOMMU drivers need to convert them into their own format.
 
-This patch adds a new API to the iommu subsystem that allows
-to set/unset the pasid table information.
-
-A generic iommu_pasid_table_config struct is introduced in
-a new iommu.h uapi header. This is going to be used by the VFIO
-user API.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Signed-off-by: Ashok Raj <ashok.raj@intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 
 ---
-
-This patch generalizes the API introduced by Jacob & co-authors in
-https://lwn.net/Articles/754331/
-
-v4 -> v5:
-- no returned valued for dummy definition of iommu_detach_pasid_table
-- fix order in comment
-- added Jean's R-b
+v5 -> v6:
+- fix merge issue
 
 v3 -> v4:
-- s/set_pasid_table/attach_pasid_table
-- restore detach_pasid_table. Detach can be used on unwind path.
-- add padding
-- remove @abort
-- signature used for config and format
-- add comments for fields in the SMMU struct
-
-v2 -> v3:
-- replace unbind/bind by set_pasid_table
-- move table pointer and pasid bits in the generic part of the struct
+- full reshape of the API following Alex' comments
 
 v1 -> v2:
-- restore the original pasid table name
-- remove the struct device * parameter in the API
-- reworked iommu_pasid_smmuv3
+- add arch_id field
+- renamed tlb_invalidate into cache_invalidate as this API allows
+  to invalidate context caches on top of IOTLBs
+
+v1:
+renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+header. Commit message reworded.
 ---
- drivers/iommu/iommu.c      | 19 +++++++++++++++
- include/linux/iommu.h      | 19 +++++++++++++++
- include/uapi/linux/iommu.h | 47 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 85 insertions(+)
+ drivers/iommu/iommu.c      | 14 ++++++++
+ include/linux/iommu.h      | 15 ++++++++
+ include/uapi/linux/iommu.h | 71 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 100 insertions(+)
 
 diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 56d5bf68de53..7d9285cea100 100644
+index 7d9285cea100..b72e326ddd41 100644
 --- a/drivers/iommu/iommu.c
 +++ b/drivers/iommu/iommu.c
-@@ -1525,6 +1525,25 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+@@ -1544,6 +1544,20 @@ void iommu_detach_pasid_table(struct iommu_domain *domain)
  }
- EXPORT_SYMBOL_GPL(iommu_attach_device);
+ EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
  
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
++int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
++			   struct iommu_cache_invalidate_info *inv_info)
 +{
-+	if (unlikely(!domain->ops->attach_pasid_table))
++	int ret = 0;
++
++	if (unlikely(!domain->ops->cache_invalidate))
 +		return -ENODEV;
 +
-+	return domain->ops->attach_pasid_table(domain, cfg);
-+}
-+EXPORT_SYMBOL_GPL(iommu_attach_pasid_table);
++	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
 +
-+void iommu_detach_pasid_table(struct iommu_domain *domain)
-+{
-+	if (unlikely(!domain->ops->detach_pasid_table))
-+		return;
-+
-+	domain->ops->detach_pasid_table(domain);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
++EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
 +
  static void __iommu_detach_device(struct iommu_domain *domain,
  				  struct device *dev)
  {
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index aeb4b615cb44..fb9b7a8de25f 100644
+index fb9b7a8de25f..7c7c6bad1420 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -189,6 +189,8 @@ struct iommu_resv_region {
-  * @of_xlate: add OF master IDs to iommu grouping
-  * @is_attach_deferred: Check if domain attach should be deferred from iommu
+@@ -191,6 +191,7 @@ struct iommu_resv_region {
   *                      driver init to device driver init (default no)
-+ * @attach_pasid_table: attach a pasid table
-+ * @detach_pasid_table: detach the pasid table
+  * @attach_pasid_table: attach a pasid table
+  * @detach_pasid_table: detach the pasid table
++ * @cache_invalidate: invalidate translation caches
   * @pgsize_bitmap: bitmap of all possible supported page sizes
   */
  struct iommu_ops {
-@@ -233,6 +235,10 @@ struct iommu_ops {
- 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
- 	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
+@@ -239,6 +240,9 @@ struct iommu_ops {
+ 				  struct iommu_pasid_table_config *cfg);
+ 	void (*detach_pasid_table)(struct iommu_domain *domain);
  
-+	int (*attach_pasid_table)(struct iommu_domain *domain,
-+				  struct iommu_pasid_table_config *cfg);
-+	void (*detach_pasid_table)(struct iommu_domain *domain);
++	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
++				struct iommu_cache_invalidate_info *inv_info);
 +
  	unsigned long pgsize_bitmap;
  };
  
-@@ -340,6 +346,9 @@ extern int iommu_attach_device(struct iommu_domain *domain,
- 			       struct device *dev);
- extern void iommu_detach_device(struct iommu_domain *domain,
- 				struct device *dev);
-+extern int iommu_attach_pasid_table(struct iommu_domain *domain,
-+				    struct iommu_pasid_table_config *cfg);
-+extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+@@ -349,6 +353,9 @@ extern void iommu_detach_device(struct iommu_domain *domain,
+ extern int iommu_attach_pasid_table(struct iommu_domain *domain,
+ 				    struct iommu_pasid_table_config *cfg);
+ extern void iommu_detach_pasid_table(struct iommu_domain *domain);
++extern int iommu_cache_invalidate(struct iommu_domain *domain,
++				  struct device *dev,
++				  struct iommu_cache_invalidate_info *inv_info);
  extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
  extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
  extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -778,6 +787,16 @@ const struct iommu_ops *iommu_ops_from_fwnode(struct fwnode_handle *fwnode)
- 	return NULL;
- }
+@@ -797,6 +804,14 @@ int iommu_attach_pasid_table(struct iommu_domain *domain,
+ static inline
+ void iommu_detach_pasid_table(struct iommu_domain *domain) {}
  
-+static inline
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
++static inline int
++iommu_cache_invalidate(struct iommu_domain *domain,
++		       struct device *dev,
++		       struct iommu_cache_invalidate_info *inv_info)
 +{
 +	return -ENODEV;
 +}
-+
-+static inline
-+void iommu_detach_pasid_table(struct iommu_domain *domain) {}
 +
  #endif /* CONFIG_IOMMU_API */
  
  #ifdef CONFIG_IOMMU_DEBUGFS
 diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index edcc0dda7993..532a64075f23 100644
+index 532a64075f23..e4c6a447e85a 100644
 --- a/include/uapi/linux/iommu.h
 +++ b/include/uapi/linux/iommu.h
-@@ -112,4 +112,51 @@ struct iommu_fault {
- 		struct iommu_fault_page_request prm;
+@@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
  	};
  };
-+
-+/**
-+ * SMMUv3 Stream Table Entry stage 1 related information
-+ * The PASID table is referred to as the context descriptor (CD) table.
-+ *
-+ * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
-+   or 2-level table)
-+ * @s1dss: STE s1dss (specifies the behavior when pasid_bits != 0
-+   and no pasid is passed along with the incoming transaction)
-+ * Please refer to the smmu 3.x spec (ARM IHI 0070A) for full details
-+ */
-+struct iommu_pasid_smmuv3 {
-+#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
-+	__u32	version;
-+	__u8 s1fmt;
-+	__u8 s1dss;
-+	__u8 padding[2];
+ 
++/* defines the granularity of the invalidation */
++enum iommu_inv_granularity {
++	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
++	IOMMU_INV_GRANU_PASID,	/* pasid-selective invalidation */
++	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
 +};
 +
 +/**
-+ * PASID table data used to bind guest PASID table to the host IOMMU
-+ * Note PASID table corresponds to the Context Table on ARM SMMUv3.
++ * Address Selective Invalidation Structure
 + *
-+ * @version: API version to prepare for future extensions
-+ * @format: format of the PASID table
-+ * @base_ptr: guest physical address of the PASID table
-+ * @pasid_bits: number of PASID bits used in the PASID table
-+ * @config: indicates whether the guest translation stage must
-+ * be translated, bypassed or aborted.
++ * @flags indicates the granularity of the address-selective invalidation
++ * - if PASID bit is set, @pasid field is populated and the invalidation
++ *   relates to cache entries tagged with this PASID and matching the
++ *   address range.
++ * - if ARCHID bit is set, @archid is populated and the invalidation relates
++ *   to cache entries tagged with this architecture specific id and matching
++ *   the address range.
++ * - Both PASID and ARCHID can be set as they may tag different caches.
++ * - if neither PASID or ARCHID is set, global addr invalidation applies
++ * - LEAF flag indicates whether only the leaf PTE caching needs to be
++ *   invalidated and other paging structure caches can be preserved.
++ * @pasid: process address space id
++ * @archid: architecture-specific id
++ * @addr: first stage/level input address
++ * @granule_size: page/block size of the mapping in bytes
++ * @nb_granules: number of contiguous granules to be invalidated
 + */
-+struct iommu_pasid_table_config {
-+#define PASID_TABLE_CFG_VERSION_1 1
++struct iommu_inv_addr_info {
++#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
++#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
++#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
++	__u32	flags;
++	__u32	archid;
++	__u64	pasid;
++	__u64	addr;
++	__u64	granule_size;
++	__u64	nb_granules;
++};
++
++/**
++ * First level/stage invalidation information
++ * @cache: bitfield that allows to select which caches to invalidate
++ * @granularity: defines the lowest granularity used for the invalidation:
++ *     domain > pasid > addr
++ *
++ * Not all the combinations of cache/granularity make sense:
++ *
++ *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
++ * granularity	|		|		|      cache	|
++ * -------------+---------------+---------------+---------------+
++ * DOMAIN	|	N/A	|       Y	|	Y	|
++ * PASID	|	Y	|       Y	|	Y	|
++ * ADDR		|       Y	|       Y	|	N/A	|
++ */
++struct iommu_cache_invalidate_info {
++#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
 +	__u32	version;
-+#define IOMMU_PASID_FORMAT_SMMUV3	1
-+	__u32	format;
-+	__u64	base_ptr;
-+	__u8	pasid_bits;
-+#define IOMMU_PASID_CONFIG_TRANSLATE	1
-+#define IOMMU_PASID_CONFIG_BYPASS	2
-+#define IOMMU_PASID_CONFIG_ABORT	3
-+	__u8	config;
-+	__u8    padding[6];
++/* IOMMU paging structure cache */
++#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
++#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
++#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
++	__u8	cache;
++	__u8	granularity;
++	__u8	padding[2];
 +	union {
-+		struct iommu_pasid_smmuv3 smmuv3;
++		__u64	pasid;
++		struct iommu_inv_addr_info addr_info;
 +	};
 +};
++
 +
  #endif /* _UAPI_IOMMU_H */
 -- 
