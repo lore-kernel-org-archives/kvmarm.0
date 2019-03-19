@@ -1,22 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 10/27] KVM: arm64: Propagate vcpu into read_id_reg()
-Date: Tue, 19 Mar 2019 17:52:01 +0000
-Message-ID: <1553017938-710-11-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 13/27] KVM: arm64/sve: Context switch the SVE registers
+Date: Tue, 19 Mar 2019 17:52:04 +0000
+Message-ID: <1553017938-710-14-git-send-email-Dave.Martin@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C605D4A48E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3EE54A4BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yxZF76L4SXmA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Mar 2019 13:53:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFA754A4F0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:27 -0400 (EDT)
+ with ESMTP id 53LdQqtQ3ypI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Mar 2019 13:53:35 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9614A4DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:34 -0400 (EDT)
 In-Reply-To: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +31,212 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QXJjaGl0ZWN0dXJlIGZlYXR1cmVzIHRoYXQgYXJlIGNvbmRpdGlvbmFsbHkgdmlzaWJsZSB0byB0
-aGUgZ3Vlc3QKd2lsbCByZXF1aXJlIHJ1bi10aW1lIGNoZWNrcyBpbiB0aGUgSUQgcmVnaXN0ZXIg
-YWNjZXNzb3IgZnVuY3Rpb25zLgpJbiBwYXJ0aWN1bGFyLCByZWFkX2lkX3JlZygpIHdpbGwgbmVl
-ZCB0byBwZXJmb3JtIGNoZWNrcyBpbiBvcmRlcgp0byBnZW5lcmF0ZSB0aGUgY29ycmVjdCBlbXVs
-YXRlZCB2YWx1ZSBmb3IgY2VydGFpbiBJRCByZWdpc3RlcgpmaWVsZHMgc3VjaCBhcyBJRF9BQTY0
-UEZSMF9FTDEuU1ZFIGZvciBleGFtcGxlLgoKVGhpcyBwYXRjaCBwcm9wYWdhdGVzIHZjcHUgaW50
-byByZWFkX2lkX3JlZygpIHNvIHRoYXQgZnV0dXJlCnBhdGNoZXMgY2FuIGFkZCBydW4tdGltZSBj
-aGVja3Mgb24gdGhlIGd1ZXN0IGNvbmZpZ3VyYXRpb24gaGVyZS4KCkZvciBub3csIHRoZXJlIGlz
-IG5vIGZ1bmN0aW9uYWwgY2hhbmdlLgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUu
-TWFydGluQGFybS5jb20+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxp
-bmFyby5vcmc+Ci0tLQogYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyB8IDIzICsrKysrKysrKysr
-KystLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRp
-b25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJt
-NjQva3ZtL3N5c19yZWdzLmMKaW5kZXggNTM5ZmVlYy4uYTVkMTRiNSAxMDA2NDQKLS0tIGEvYXJj
-aC9hcm02NC9rdm0vc3lzX3JlZ3MuYworKysgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCkBA
-IC0xMDQ0LDcgKzEwNDQsOCBAQCBzdGF0aWMgYm9vbCBhY2Nlc3NfYXJjaF90aW1lcihzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsCiB9CiAKIC8qIFJlYWQgYSBzYW5pdGlzZWQgY3B1ZmVhdHVyZSBJRCBy
-ZWdpc3RlciBieSBzeXNfcmVnX2Rlc2MgKi8KLXN0YXRpYyB1NjQgcmVhZF9pZF9yZWcoc3RydWN0
-IHN5c19yZWdfZGVzYyBjb25zdCAqciwgYm9vbCByYXopCitzdGF0aWMgdTY0IHJlYWRfaWRfcmVn
-KGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJc3RydWN0IHN5c19yZWdfZGVzYyBjb25z
-dCAqciwgYm9vbCByYXopCiB7CiAJdTMyIGlkID0gc3lzX3JlZygodTMyKXItPk9wMCwgKHUzMily
-LT5PcDEsCiAJCQkgKHUzMilyLT5DUm4sICh1MzIpci0+Q1JtLCAodTMyKXItPk9wMik7CkBAIC0x
-MDc4LDcgKzEwNzksNyBAQCBzdGF0aWMgYm9vbCBfX2FjY2Vzc19pZF9yZWcoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LAogCWlmIChwLT5pc193cml0ZSkKIAkJcmV0dXJuIHdyaXRlX3RvX3JlYWRfb25s
-eSh2Y3B1LCBwLCByKTsKIAotCXAtPnJlZ3ZhbCA9IHJlYWRfaWRfcmVnKHIsIHJheik7CisJcC0+
-cmVndmFsID0gcmVhZF9pZF9yZWcodmNwdSwgciwgcmF6KTsKIAlyZXR1cm4gdHJ1ZTsKIH0KIApA
-QCAtMTEwNywxNiArMTEwOCwxOCBAQCBzdGF0aWMgdTY0IHN5c19yZWdfdG9faW5kZXgoY29uc3Qg
-c3RydWN0IHN5c19yZWdfZGVzYyAqcmVnKTsKICAqIGFyZSBzdG9yZWQsIGFuZCBmb3Igc2V0X2lk
-X3JlZygpIHdlIGRvbid0IGFsbG93IHRoZSBlZmZlY3RpdmUgdmFsdWUKICAqIHRvIGJlIGNoYW5n
-ZWQuCiAgKi8KLXN0YXRpYyBpbnQgX19nZXRfaWRfcmVnKGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rl
-c2MgKnJkLCB2b2lkIF9fdXNlciAqdWFkZHIsCitzdGF0aWMgaW50IF9fZ2V0X2lkX3JlZyhjb25z
-dCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCisJCQljb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpy
-ZCwgdm9pZCBfX3VzZXIgKnVhZGRyLAogCQkJYm9vbCByYXopCiB7CiAJY29uc3QgdTY0IGlkID0g
-c3lzX3JlZ190b19pbmRleChyZCk7Ci0JY29uc3QgdTY0IHZhbCA9IHJlYWRfaWRfcmVnKHJkLCBy
-YXopOworCWNvbnN0IHU2NCB2YWwgPSByZWFkX2lkX3JlZyh2Y3B1LCByZCwgcmF6KTsKIAogCXJl
-dHVybiByZWdfdG9fdXNlcih1YWRkciwgJnZhbCwgaWQpOwogfQogCi1zdGF0aWMgaW50IF9fc2V0
-X2lkX3JlZyhjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIgKnVhZGRy
-LAorc3RhdGljIGludCBfX3NldF9pZF9yZWcoY29uc3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAor
-CQkJY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKIAkJ
-CWJvb2wgcmF6KQogewogCWNvbnN0IHU2NCBpZCA9IHN5c19yZWdfdG9faW5kZXgocmQpOwpAQCAt
-MTEyOCw3ICsxMTMxLDcgQEAgc3RhdGljIGludCBfX3NldF9pZF9yZWcoY29uc3Qgc3RydWN0IHN5
-c19yZWdfZGVzYyAqcmQsIHZvaWQgX191c2VyICp1YWRkciwKIAkJcmV0dXJuIGVycjsKIAogCS8q
-IFRoaXMgaXMgd2hhdCB3ZSBtZWFuIGJ5IGludmFyaWFudDogeW91IGNhbid0IGNoYW5nZSBpdC4g
-Ki8KLQlpZiAodmFsICE9IHJlYWRfaWRfcmVnKHJkLCByYXopKQorCWlmICh2YWwgIT0gcmVhZF9p
-ZF9yZWcodmNwdSwgcmQsIHJheikpCiAJCXJldHVybiAtRUlOVkFMOwogCiAJcmV0dXJuIDA7CkBA
-IC0xMTM3LDI1ICsxMTQwLDI1IEBAIHN0YXRpYyBpbnQgX19zZXRfaWRfcmVnKGNvbnN0IHN0cnVj
-dCBzeXNfcmVnX2Rlc2MgKnJkLCB2b2lkIF9fdXNlciAqdWFkZHIsCiBzdGF0aWMgaW50IGdldF9p
-ZF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpy
-ZCwKIAkJICAgICAgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcsIHZvaWQgX191c2VyICp1
-YWRkcikKIHsKLQlyZXR1cm4gX19nZXRfaWRfcmVnKHJkLCB1YWRkciwgZmFsc2UpOworCXJldHVy
-biBfX2dldF9pZF9yZWcodmNwdSwgcmQsIHVhZGRyLCBmYWxzZSk7CiB9CiAKIHN0YXRpYyBpbnQg
-c2V0X2lkX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rl
-c2MgKnJkLAogCQkgICAgICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9pZCBfX3Vz
-ZXIgKnVhZGRyKQogewotCXJldHVybiBfX3NldF9pZF9yZWcocmQsIHVhZGRyLCBmYWxzZSk7CisJ
-cmV0dXJuIF9fc2V0X2lkX3JlZyh2Y3B1LCByZCwgdWFkZHIsIGZhbHNlKTsKIH0KIAogc3RhdGlj
-IGludCBnZXRfcmF6X2lkX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBz
-eXNfcmVnX2Rlc2MgKnJkLAogCQkJICBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZywgdm9p
-ZCBfX3VzZXIgKnVhZGRyKQogewotCXJldHVybiBfX2dldF9pZF9yZWcocmQsIHVhZGRyLCB0cnVl
-KTsKKwlyZXR1cm4gX19nZXRfaWRfcmVnKHZjcHUsIHJkLCB1YWRkciwgdHJ1ZSk7CiB9CiAKIHN0
-YXRpYyBpbnQgc2V0X3Jhel9pZF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1
-Y3Qgc3lzX3JlZ19kZXNjICpyZCwKIAkJCSAgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcs
-IHZvaWQgX191c2VyICp1YWRkcikKIHsKLQlyZXR1cm4gX19zZXRfaWRfcmVnKHJkLCB1YWRkciwg
-dHJ1ZSk7CisJcmV0dXJuIF9fc2V0X2lkX3JlZyh2Y3B1LCByZCwgdWFkZHIsIHRydWUpOwogfQog
-CiBzdGF0aWMgYm9vbCBhY2Nlc3NfY3RyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IHN5
-c19yZWdfcGFyYW1zICpwLAotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
-bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
-L2t2bWFybQo=
+In order to give each vcpu its own view of the SVE registers, this
+patch adds context storage via a new sve_state pointer in struct
+vcpu_arch.  An additional member sve_max_vl is also added for each
+vcpu, to determine the maximum vector length visible to the guest
+and thus the value to be configured in ZCR_EL2.LEN while the vcpu
+is active.  This also determines the layout and size of the storage
+in sve_state, which is read and written by the same backend
+functions that are used for context-switching the SVE state for
+host tasks.
+
+On SVE-enabled vcpus, SVE access traps are now handled by switching
+in the vcpu's SVE context and disabling the trap before returning
+to the guest.  On other vcpus, the trap is not handled and an exit
+back to the host occurs, where the handle_sve() fallback path
+reflects an undefined instruction exception back to the guest,
+consistently with the behaviour of non-SVE-capable hardware (as was
+done unconditionally prior to this patch).
+
+No SVE handling is added on non-VHE-only paths, since VHE is an
+architectural and Kconfig prerequisite of SVE.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+
+---
+
+Changes since v5:
+
+ * [Julien Thierry, Julien Grall] Commit message typo fixes
+
+ * [Mark Rutland] Rename trap_class to hsr_ec, for consistency with
+   existing code.
+
+ * [Mark Rutland] Simplify condition for refusing to handle an
+   FPSIMD/SVE trap, using multiple if () statements for clarity.  The
+   previous condition was a bit tortuous, and how that the static_key
+   checks have been hoisted out, it makes little difference to the
+   compiler how we express the condition here.
+---
+ arch/arm64/include/asm/kvm_host.h |  6 ++++
+ arch/arm64/kvm/fpsimd.c           |  5 +--
+ arch/arm64/kvm/hyp/switch.c       | 75 +++++++++++++++++++++++++++++----------
+ 3 files changed, 66 insertions(+), 20 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 22cf484..4fabfd2 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -228,6 +228,8 @@ struct vcpu_reset_state {
+ 
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
++	void *sve_state;
++	unsigned int sve_max_vl;
+ 
+ 	/* HYP configuration */
+ 	u64 hcr_el2;
+@@ -323,6 +325,10 @@ struct kvm_vcpu_arch {
+ 	bool sysregs_loaded_on_cpu;
+ };
+ 
++/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
++#define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
++				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
++
+ /* vcpu_arch flags field values: */
+ #define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
+ #define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 7053bf4..6e3c9c8 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -87,10 +87,11 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+ 
+ 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+ 		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.gp_regs.fp_regs,
+-					 NULL, SVE_VL_MIN);
++					 vcpu->arch.sve_state,
++					 vcpu->arch.sve_max_vl);
+ 
+ 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
+-		clear_thread_flag(TIF_SVE);
++		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
+ 	}
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 9d46066..5444b9c 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -100,7 +100,10 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_EL1_TTA;
+ 	val &= ~CPACR_EL1_ZEN;
+-	if (!update_fp_enabled(vcpu)) {
++	if (update_fp_enabled(vcpu)) {
++		if (vcpu_has_sve(vcpu))
++			val |= CPACR_EL1_ZEN;
++	} else {
+ 		val &= ~CPACR_EL1_FPEN;
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
+@@ -317,16 +320,48 @@ static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
+-static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
++/* Check for an FPSIMD/SVE trap and handle as appropriate */
++static bool __hyp_text __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ {
+-	struct user_fpsimd_state *host_fpsimd = vcpu->arch.host_fpsimd_state;
++	bool vhe, sve_guest, sve_host;
++	u8 hsr_ec;
+ 
+-	if (has_vhe())
+-		write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_FPEN,
+-			     cpacr_el1);
+-	else
++	if (!system_supports_fpsimd())
++		return false;
++
++	if (system_supports_sve()) {
++		sve_guest = vcpu_has_sve(vcpu);
++		sve_host = vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE;
++		vhe = true;
++	} else {
++		sve_guest = false;
++		sve_host = false;
++		vhe = has_vhe();
++	}
++
++	hsr_ec = kvm_vcpu_trap_get_class(vcpu);
++	if (hsr_ec != ESR_ELx_EC_FP_ASIMD &&
++	    hsr_ec != ESR_ELx_EC_SVE)
++		return false;
++
++	/* Don't handle SVE traps for non-SVE vcpus here: */
++	if (!sve_guest)
++		if (hsr_ec != ESR_ELx_EC_FP_ASIMD)
++			return false;
++
++	/* Valid trap.  Switch the context: */
++
++	if (vhe) {
++		u64 reg = read_sysreg(cpacr_el1) | CPACR_EL1_FPEN;
++
++		if (sve_guest)
++			reg |= CPACR_EL1_ZEN;
++
++		write_sysreg(reg, cpacr_el1);
++	} else {
+ 		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
+ 			     cptr_el2);
++	}
+ 
+ 	isb();
+ 
+@@ -335,24 +370,28 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+ 		 * In the SVE case, VHE is assumed: it is enforced by
+ 		 * Kconfig and kvm_arch_init().
+ 		 */
+-		if (system_supports_sve() &&
+-		    (vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE)) {
++		if (sve_host) {
+ 			struct thread_struct *thread = container_of(
+-				host_fpsimd,
++				vcpu->arch.host_fpsimd_state,
+ 				struct thread_struct, uw.fpsimd_state);
+ 
+-			sve_save_state(sve_pffr(thread), &host_fpsimd->fpsr);
++			sve_save_state(sve_pffr(thread),
++				       &vcpu->arch.host_fpsimd_state->fpsr);
+ 		} else {
+-			__fpsimd_save_state(host_fpsimd);
++			__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
+ 		}
+ 
+ 		vcpu->arch.flags &= ~KVM_ARM64_FP_HOST;
+ 	}
+ 
+-	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+-
+-	if (vcpu_has_sve(vcpu))
++	if (sve_guest) {
++		sve_load_state(vcpu_sve_pffr(vcpu),
++			       &vcpu->arch.ctxt.gp_regs.fp_regs.fpsr,
++			       sve_vq_from_vl(vcpu->arch.sve_max_vl) - 1);
+ 		write_sysreg_s(vcpu->arch.ctxt.sys_regs[ZCR_EL1], SYS_ZCR_EL12);
++	} else {
++		__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
++	}
+ 
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+@@ -388,10 +427,10 @@ static bool __hyp_text fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * and restore the guest context lazily.
+ 	 * If FP/SIMD is not implemented, handle the trap and inject an
+ 	 * undefined instruction exception to the guest.
++	 * Similarly for trapped SVE accesses.
+ 	 */
+-	if (system_supports_fpsimd() &&
+-	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_FP_ASIMD)
+-		return __hyp_switch_fpsimd(vcpu);
++	if (__hyp_handle_fpsimd(vcpu))
++		return true;
+ 
+ 	if (!__populate_fault_info(vcpu))
+ 		return true;
+-- 
+2.1.4
