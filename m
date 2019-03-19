@@ -1,115 +1,189 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
-Date: Tue, 19 Mar 2019 09:33:58 +0800
-Message-ID: <20190319013358.GA3374@leoy-ThinkPad-X240s>
-References: <762d54fb-b146-e591-d544-676cb5606837@redhat.com>
- <20190311143501.GH13422@leoy-ThinkPad-X240s>
- <20190313080048.GI13422@leoy-ThinkPad-X240s>
- <35c22d0c-7da5-4e68-effb-05c8571d8b63@redhat.com>
- <e98d267e-db97-8680-62e4-f0788c00cea8@redhat.com>
- <20190315093748.GA20568@leoy-ThinkPad-X240s>
- <adde331f-1be9-2f0c-435a-bd906e0f253f@redhat.com>
- <0e58d46a-a076-e7b6-9b14-6bbefa2ef404@arm.com>
- <20190316045632.GA5330@leoy-ThinkPad-X240s>
- <f245a401-163c-7819-9af5-4226b0ac5f25@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A804A42B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 21:34:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iqMZSTi6lkow for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Mar 2019 21:34:06 -0400 (EDT)
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
- [209.85.167.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A26A64A414
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 21:34:06 -0400 (EDT)
-Received: by mail-oi1-f176.google.com with SMTP id t206so14718118oib.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 18:34:06 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <f245a401-163c-7819-9af5-4226b0ac5f25@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>, kvmarm@lists.cs.columbia.edu
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: [PATCH v7 0/10] Add ARMv8.3 pointer authentication for kvm guest
+Date: Tue, 19 Mar 2019 14:00:33 +0530
+Message-ID: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Robin,
+Hi,
 
-On Mon, Mar 18, 2019 at 12:25:33PM +0000, Robin Murphy wrote:
+This patch series adds pointer authentication support for KVM guest and
+is based on top of Linux 5.1-rc1. The basic patches in this series was
+originally posted by Mark Rutland earlier[1,2] and contains some history
+of this work.
 
-[...]
+Extension Overview:
+=============================================
 
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index b9d486d..43f78b1 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -7,10 +7,10 @@
-> > 
-> >   #include "arm-common/gic.h"
-> > 
-> > -#define ARM_IOPORT_AREA                _AC(0x0000000000000000, UL)
-> > -#define ARM_MMIO_AREA          _AC(0x0000000000010000, UL)
-> > -#define ARM_AXI_AREA           _AC(0x0000000040000000, UL)
-> > -#define ARM_MEMORY_AREA                _AC(0x0000000080000000, UL)
-> > +#define ARM_IOPORT_AREA                _AC(0x0000000080000000, UL)
-> > +#define ARM_MMIO_AREA          _AC(0x0000000080010000, UL)
-> > +#define ARM_AXI_AREA           _AC(0x0000000088000000, UL)
-> > +#define ARM_MEMORY_AREA                _AC(0x0000000090000000, UL)
-> > 
-> > Anyway, very appreciate for the suggestions; it's sufficent for me to
-> > dig more for memory related information (e.g. PCIe configurations,
-> > IOMMU, etc) and will keep posted if I make any progress.
-> 
-> None of those should need to change (all the MMIO emulation stuff is
-> irrelevant to PCIe DMA anyway) - provided you don't give the guest more than
-> 2GB of RAM, passthrough with legacy INTx ought to work out-of-the-box. For
-> MSIs to get through, you'll further need to change the host kernel to place
-> its software MSI region[2] within any of the host bridge windows as well.
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder.
 
->From PCI configurations dumping, I can see after launch the guest with
-kvmtool, the host receives the first interrupt (checked with the
-function vfio_intx_handler() has been invoked once) and then PCI sent
-command with PCI_COMMAND_INTX_DISABLE to disable interrupt line.  So
-this flow is very likely the interrupt is not forwarded properly and
-guest doesn't receive interrupt.
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
 
-It's lucky that I found below flow can let interrupt forwarding from
-host to guest after I always set "sky2.disable_msi=1" for both kernel
-command lines:
+New instructions are added which can be used to:
 
-    host                    guest
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate and strip a PAC from a pointer
 
-  INTx mode               INTx mode
+The detailed description of ARMv8.3 pointer authentication support in
+userspace/kernel and can be found in Kristina's generic pointer authentication
+patch series[3].
 
-So far, it still cannot work well if I only set "sky2.disable_msi=1"
-for host kernel command line, with this config it runs with below flow
-and which cannot forward interrupt properly from host to guest:
+KVM guest work:
+==============================================
 
-    host                    guest
+If pointer authentication is enabled for KVM guests then the new PAC instructions
+will not trap to EL2. If not then they may be ignored if in HINT region or trapped
+in EL2 as illegal instruction. Since KVM guest vcpu runs as a thread so they have
+a key initialized which will be used by PAC. When world switch happens between
+host and guest then this key is exchanged.
 
-  INTx mode               msi enable
-                          msi disable
-                          Switch back to INTx mode
+The current v7 patch series contains review comments and suggestions by James
+Morse, Mark Rutland and Dave Martin.
 
-I am so happy now I can use pure INTx mode on Juno board for NIC
-enabling and pinged successfully from guest OS to my router :)
+The first two patch is cherry picked from Dave Martin [9] v5 series which adds
+SVE support for KVM guest. 
 
-Will look into the issue in the second secnario; and if I have more
-time I will look into msi mode as well (I confirmed msi mode can work
-with host OS but failed in guest OS).
+Changes since v6 [8]: Major changes are listed below.
 
-Very appreciate you & Eric helping!
+* Pointer authentication key switch entirely in assembly now.
+* isb instruction added after Key switched to host.
+* Use __hyp_this_cpu_ptr for both VHE and nVHE mode.
+* 2 separate flags for address and generic authentication.
+* kvm_arm_vcpu_ptrauth_allowed renamed to has_vcpu_ptrauth.
+* kvm_arm_vcpu_ptrauth_reset renamed to kvm_arm_vcpu_ptrauth_setup_lazy.
+* Save of host Key registers now done in ptrauth instruction trap.
+* A fix to add kern_hyp_va to get correct host_ctxt pointer in nVHE mode.
+* Patches re-structured to better reflect ABI change.
+
+Changes since v5 [7]: Major changes are listed below.
+
+* Split hcr_el2 and mdcr_el2 save/restore in two patches.
+* Reverted back save/restore of sys-reg keys as done in V4 [5]. There was
+  suggestion by James Morse to use ptrauth utilities in a single place
+  in arm core and use them from kvm. However this change deviates from the
+  existing sys-reg implementations and is not scalable.
+* Invoked the key switch C functions from __guest_enter/__guest_exit assembly.
+* Host key save is now done inside vcpu_load.
+* Reverted back masking of cpufeature ID registers for ptrauth when disabled
+  from userpace.
+* Reset of ptrauth key registers not done conditionally.
+* Code and Documentation cleanup.
+
+Changes since v4 [6]: Several suggestions from James Morse
+* Move host registers to be saved/restored inside struct kvm_cpu_context.
+* Similar to hcr_el2, save/restore mdcr_el2 register also.
+* Added save routines for ptrauth keys in generic arm core and
+  use them during KVM context switch.
+* Defined a GCC attribute __no_ptrauth which discards generating
+  ptrauth instructions in a function. This is taken from Kristina's
+  earlier kernel pointer authentication support patches [4].
+* Dropped a patch to mask cpufeature when not enabled from userspace and
+  now only key registers are masked from register list.
+
+Changes since v3 [5]:
+* Use pointer authentication only when VHE is present as ARM8.3 implies ARM8.1
+  features to be present.
+* Added lazy context handling of ptrauth instructions from V2 version again. 
+* Added more details in Documentation.
+
+Changes since v2 [1,2]:
+* Allow host and guest to have different HCR_EL2 settings and not just constant
+  value HCR_HOST_VHE_FLAGS or HCR_HOST_NVHE_FLAGS.
+* Optimise the reading of HCR_EL2 in host/guest switch by fetching it once
+  during KVM initialisation state and using it later.
+* Context switch pointer authentication keys when switching between guest
+  and host. Pointer authentication was enabled in a lazy context earlier[2] and
+  is removed now to make it simple. However it can be revisited later if there
+  is significant performance issue.
+* Added a userspace option to choose pointer authentication.
+* Based on the userspace option, ptrauth cpufeature will be visible.
+* Based on the userspace option, ptrauth key registers will be accessible.
+* A small document is added on how to enable pointer authentication from
+  userspace KVM API.
+
+Looking for feedback and comments.
 
 Thanks,
-Leo Yan
+Amit
+
+[1]: https://lore.kernel.org/lkml/20171127163806.31435-11-mark.rutland@arm.com/
+[2]: https://lore.kernel.org/lkml/20171127163806.31435-10-mark.rutland@arm.com/
+[3]: https://lkml.org/lkml/2018/12/7/666
+[4]: https://lore.kernel.org/lkml/20181005084754.20950-1-kristina.martsenko@arm.com/
+[5]: https://lkml.org/lkml/2018/10/17/594
+[6]: https://lkml.org/lkml/2018/12/18/80
+[7]: https://lkml.org/lkml/2019/1/28/49
+[8]: https://lkml.org/lkml/2019/2/19/190 
+[9]: https://patchwork.kernel.org/cover/10818797/
+
+Linux (5.1-rc1 based):
+
+Amit Daniel Kachhap (5):
+  KVM: arm64: Move hyp_symbol_addr to fix dependency
+  KVM: arm/arm64: preserve host MDCR_EL2 value
+  KVM: arm64: Add vcpu feature flags to control ptrauth accessibility
+  KVM: arm64: Add capability to advertise pointer authentication for
+    guest
+  KVM: arm64: docs: document KVM support of pointer authentication
+
+Dave Martin (2):
+  KVM: arm64: Propagate vcpu into read_id_reg()
+  KVM: arm64: Support runtime sysreg visibility filtering
+
+Mark Rutland (2):
+  KVM: arm/arm64: preserve host HCR_EL2 value
+  KVM: arm/arm64: context-switch ptrauth registers
+
+ Documentation/arm64/pointer-authentication.txt |  15 +++-
+ Documentation/virtual/kvm/api.txt              |   6 ++
+ arch/arm/include/asm/kvm_host.h                |   3 +-
+ arch/arm64/include/asm/kvm_asm.h               |  22 ++++++
+ arch/arm64/include/asm/kvm_emulate.h           |  24 +++---
+ arch/arm64/include/asm/kvm_host.h              |  46 ++++++++++--
+ arch/arm64/include/asm/kvm_hyp.h               |   2 +-
+ arch/arm64/include/asm/kvm_mmu.h               |  20 -----
+ arch/arm64/include/asm/kvm_ptrauth_asm.h       | 100 +++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/kvm.h              |   2 +
+ arch/arm64/kernel/asm-offsets.c                |   6 ++
+ arch/arm64/kvm/debug.c                         |  28 ++-----
+ arch/arm64/kvm/guest.c                         |  16 +++-
+ arch/arm64/kvm/handle_exit.c                   |  24 ++++--
+ arch/arm64/kvm/hyp/entry.S                     |   7 ++
+ arch/arm64/kvm/hyp/switch.c                    |  40 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c                 |  22 +++++-
+ arch/arm64/kvm/hyp/tlb.c                       |   6 +-
+ arch/arm64/kvm/reset.c                         |  11 +++
+ arch/arm64/kvm/sys_regs.c                      |  93 +++++++++++++++++++----
+ arch/arm64/kvm/sys_regs.h                      |  13 ++++
+ include/uapi/linux/kvm.h                       |   1 +
+ virt/kvm/arm/arm.c                             |   4 +-
+ 23 files changed, 395 insertions(+), 116 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_ptrauth_asm.h
+
+kvmtool:
+
+Repo: git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
+
+Amit Daniel Kachhap (1):
+  KVM: arm/arm64: Add a vcpu feature for pointer authentication
+
+ arm/aarch32/include/kvm/kvm-cpu-arch.h    | 1 +
+ arm/aarch64/include/asm/kvm.h             | 2 ++
+ arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    | 2 ++
+ arm/include/arm-common/kvm-config-arch.h  | 1 +
+ arm/kvm-cpu.c                             | 6 ++++++
+ include/linux/kvm.h                       | 1 +
+ 7 files changed, 16 insertions(+), 1 deletion(-)
+
+-- 
+2.7.4
