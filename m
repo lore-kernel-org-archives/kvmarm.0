@@ -1,209 +1,184 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC] Question about TLB flush while set Stage-2 huge pages
-Date: Tue, 19 Mar 2019 17:05:23 +0800
-Message-ID: <25971fd5-3774-3389-a82a-04707480c1e0@huawei.com>
-References: <5f712cc6-0874-adbe-add6-46f5de24f36f@huawei.com>
- <e2a94937-c324-e2d6-7e61-3f998e6e6e22@arm.com>
- <1c0e07b9-73f0-efa4-c1b7-ad81789b42c5@huawei.com>
- <5188e3b9-5b5a-a6a7-7ef0-09b7b4f06af6@arm.com>
- <348d0b3b-c74b-7b39-ec30-85905c077c38@huawei.com>
- <20190314105537.GA15323@en101>
- <368bd218-ac1d-19b2-6e92-960b91afee8b@huawei.com>
- <d322e126-4da2-6dfd-a86d-088dfb3bf0f4@huawei.com>
- <6aea4049-7860-7144-a7be-14f856cdc789@arm.com>
- <f6639daa-cfba-c65a-7320-c9dcc1ef8377@huawei.com>
- <20190318173405.GA31412@en101>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
+Date: Tue, 19 Mar 2019 10:01:41 +0000
+Message-ID: <20190319100141.69821f8b@why.wild-wind.fr.eu.org>
+References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+ <86o969z42z.wl-marc.zyngier@arm.com>
+ <428b2aac-5a0f-e9da-8d74-8045f99a8c74@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190318173405.GA31412@en101>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: zhengxiang9@huawei.com, marc.zyngier@arm.com, christoffer.dall@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com, lious.lilei@hisilicon.com, lishuo1@hisilicon.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE90A4A41E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 06:01:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id k8oQw5j9eyZU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Mar 2019 06:01:53 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54BE94A41B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 06:01:53 -0400 (EDT)
+In-Reply-To: <428b2aac-5a0f-e9da-8d74-8045f99a8c74@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: mst@redhat.com, kvm@vger.kernel.org, "Raslan,
+ KarimAllah" <karahmed@amazon.de>, andre.przywara@arm.com, linux-kernel@vger.kernel.org, guoheyi@huawei.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+On Tue, 19 Mar 2019 09:09:43 +0800
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 
-On 2019/3/19 1:34, Suzuki K Poulose wrote:
-> Hi !
-> On Sun, Mar 17, 2019 at 09:34:11PM +0800, Zenghui Yu wrote:
->> Hi Suzuki,
->>
->> ---8<---
->>
->> test: kvm: arm: Maybe two more fixes
->>
->> Applied based on Suzuki's patch.
->>
->> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->> ---
->>   virt/kvm/arm/mmu.c | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 05765df..ccd5d5d 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1089,7 +1089,9 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct
->> kvm_mmu_memory_cache
->>   		 * Normal THP split/merge follows mmu_notifier
->>   		 * callbacks and do get handled accordingly.
->>   		 */
->> -			unmap_stage2_range(kvm, (addr & S2_PMD_MASK), S2_PMD_SIZE);
->> +			addr &= S2_PMD_MASK;
->> +			unmap_stage2_ptes(kvm, pmd, addr, addr + S2_PMD_SIZE);
->> +			get_page(virt_to_page(pmd));
->>   		} else {
->>
->>   			/*
->> @@ -1138,7 +1140,9 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct
->> kvm_mmu_memory_cache *cac
->>   	if (stage2_pud_present(kvm, old_pud)) {
->>   		/* If we have PTE level mapping, unmap the entire range */
->>   		if (WARN_ON_ONCE(!stage2_pud_huge(kvm, old_pud))) {
->> -			unmap_stage2_range(kvm, addr & S2_PUD_MASK, S2_PUD_SIZE);
->> +			addr &= S2_PUD_MASK;
->> +			unmap_stage2_pmds(kvm, pudp, addr, addr + S2_PUD_SIZE);
->> +			get_page(virt_to_page(pudp));
->>   		} else {
->>   			stage2_pud_clear(kvm, pudp);
->>   			kvm_tlb_flush_vmid_ipa(kvm, addr);
+> Hi all,
 > 
-> This makes it a bit tricky to follow the code. The other option is to
-> do something like :
+> On 2019/3/18 3:35, Marc Zyngier wrote:
+> > On Sun, 17 Mar 2019 14:36:13 +0000,
+> > Zenghui Yu <yuzenghui@huawei.com> wrote:  
+> >>
+> >> Currently, IRQFD on arm still uses the deferred workqueue mechanism
+> >> to inject interrupts into guest, which will likely lead to a busy
+> >> context-switching from/to the kworker thread. This overhead is for
+> >> no purpose (only in my view ...) and will result in an interrupt
+> >> performance degradation.
+> >>
+> >> Implement kvm_arch_set_irq_inatomic() for arm/arm64 to support direct
+> >> irqfd MSI injection, by which we can get rid of the annoying latency.
+> >> As a result, irqfd MSI intensive scenarios (e.g., DPDK with high packet
+> >> processing workloads) will benefit from it.
+> >>
+> >> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> >> ---
+> >>
+> >> It seems that only MSI will follow the IRQFD path, did I miss something?
+> >>
+> >> This patch is still under test and sent out for early feedback. If I have
+> >> any mis-understanding, please fix me up and let me know. Thanks!  
+> > 
+> > As mentioned by other folks in the thread, this is clearly wrong. The
+> > first thing kvm_inject_msi does is to lock the corresponding ITS using
+> > a mutex. So the "no purpose" bit was a bit too quick.
+> > 
+> > When doing this kind of work, I suggest you enable lockdep and all the
+> > related checkers. Also, for any optimisation, please post actual
+> > numbers for the relevant benchmarks. Saying "application X will
+> > benefit from it" is meaningless without any actual data.
+> >   
+> >>
+> >> ---
+> >>   virt/kvm/arm/vgic/trace.h      | 22 ++++++++++++++++++++++
+> >>   virt/kvm/arm/vgic/vgic-irqfd.c | 21 +++++++++++++++++++++
+> >>   2 files changed, 43 insertions(+)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
+> >> index 55fed77..bc1f4db 100644
+> >> --- a/virt/kvm/arm/vgic/trace.h
+> >> +++ b/virt/kvm/arm/vgic/trace.h
+> >> @@ -27,6 +27,28 @@
+> >>   		  __entry->vcpu_id, __entry->irq, __entry->level)
+> >>   );  
+> >>   >> +TRACE_EVENT(kvm_arch_set_irq_inatomic,  
+> >> +	TP_PROTO(u32 gsi, u32 type, int level, int irq_source_id),
+> >> +	TP_ARGS(gsi, type, level, irq_source_id),
+> >> +
+> >> +	TP_STRUCT__entry(
+> >> +		__field(	u32,	gsi		)
+> >> +		__field(	u32,	type		)
+> >> +		__field(	int,	level		)
+> >> +		__field(	int,	irq_source_id	)
+> >> +	),
+> >> +
+> >> +	TP_fast_assign(
+> >> +		__entry->gsi		= gsi;
+> >> +		__entry->type		= type;
+> >> +		__entry->level		= level;
+> >> +		__entry->irq_source_id	= irq_source_id;
+> >> +	),
+> >> +
+> >> +	TP_printk("gsi %u type %u level %d source %d", __entry->gsi,
+> >> +		  __entry->type, __entry->level, __entry->irq_source_id)
+> >> +);
+> >> +
+> >>   #endif /* _TRACE_VGIC_H */  
+> >>   >>   #undef TRACE_INCLUDE_PATH  
+> >> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
+> >> index 99e026d..4cfc3f4 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
+> >> @@ -19,6 +19,7 @@
+> >>   #include <trace/events/kvm.h>
+> >>   #include <kvm/arm_vgic.h>
+> >>   #include "vgic.h"
+> >> +#include "trace.h"  
+> >>   >>   /**  
+> >>    * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+> >> @@ -105,6 +106,26 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+> >>   	return vgic_its_inject_msi(kvm, &msi);
+> >>   }  
+> >>   >> +/**  
+> >> + * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+> >> + *
+> >> + * Currently only direct MSI injecton is supported.
+> >> + */
+> >> +int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+> >> +			      struct kvm *kvm, int irq_source_id, int level,
+> >> +			      bool line_status)
+> >> +{
+> >> +	int ret;
+> >> +
+> >> +	trace_kvm_arch_set_irq_inatomic(e->gsi, e->type, level, irq_source_id);
+> >> +
+> >> +	if (unlikely(e->type != KVM_IRQ_ROUTING_MSI))
+> >> +		return -EWOULDBLOCK;
+> >> +
+> >> +	ret = kvm_set_msi(e, kvm, irq_source_id, level, line_status);
+> >> +	return ret;
+> >> +}
+> >> +  
+> > 
+> > Although we've established that the approach is wrong, maybe we can
+> > look at improving this aspect.
+> > 
+> > A first approach would be to keep a small cache of the last few
+> > successful translations for this ITS, cache that could be looked-up by
+> > holding a spinlock instead. A hit in this cache could directly be
+> > injected. Any command that invalidates or changes anything (DISCARD,
+> > INV, INVALL, MAPC with V=0, MAPD with V=0, MOVALL, MOVI) should nuke
+> > the cache altogether.
+> > 
+> > Of course, all of that needs to be quantified.  
+> 
+> Thanks for all of your explanations, especially for Marc's suggestions!
+> It took me long time to figure out my mistakes, since I am not very
+> familiar with the locking stuff. Now I have to apologize for my noise.
 
-Yes.
+No need to apologize. The whole point of this list is to have
+discussions. Although your approach wasn't working, you did
+identify potential room for improvement.
 
-> 
-> 
-> ---8>---
-> 
-> kvm: arm: Fix handling of stage2 huge mappings
-> 
-> We rely on the mmu_notifier call backs to handle the split/merging
-> of huge pages and thus we are guaranteed that while creating a
-> block mapping, the entire block is unmapped at stage2. However,
-> we miss a case where the block mapping is split for dirty logging
-> case and then could later be made block mapping, if we cancel the
-> dirty logging. This not only creates inconsistent TLB entries for
-> the pages in the the block, but also leakes the table pages for
-> PMD level.
-> 
-> Handle these corner cases for the huge mappings at stage2 by
-> unmapping the PTE level mapping. This could potentially release
-> the upper level table. So we need to restart the table walk
-> once we unmap the range.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->   virt/kvm/arm/mmu.c | 57 +++++++++++++++++++++++++++++++++++++++---------------
->   1 file changed, 41 insertions(+), 16 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index fce0983..a38a3f1 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1060,25 +1060,41 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->   {
->   	pmd_t *pmd, old_pmd;
->   
-> +retry:
->   	pmd = stage2_get_pmd(kvm, cache, addr);
->   	VM_BUG_ON(!pmd);
->   
->   	old_pmd = *pmd;
-> +	/*
-> +	 * Multiple vcpus faulting on the same PMD entry, can
-> +	 * lead to them sequentially updating the PMD with the
-> +	 * same value. Following the break-before-make
-> +	 * (pmd_clear() followed by tlb_flush()) process can
-> +	 * hinder forward progress due to refaults generated
-> +	 * on missing translations.
-> +	 *
-> +	 * Skip updating the page table if the entry is
-> +	 * unchanged.
-> +	 */
-> +	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
-> +		return 0;
-> +
->   	if (pmd_present(old_pmd)) {
->   		/*
-> -		 * Multiple vcpus faulting on the same PMD entry, can
-> -		 * lead to them sequentially updating the PMD with the
-> -		 * same value. Following the break-before-make
-> -		 * (pmd_clear() followed by tlb_flush()) process can
-> -		 * hinder forward progress due to refaults generated
-> -		 * on missing translations.
-> -		 *
-> -		 * Skip updating the page table if the entry is
-> -		 * unchanged.
-> +		 * If we already have PTE level mapping for this block,
-> +		 * we must unmap it to avoid inconsistent TLB
-> +		 * state. We could end up in this situation if
-> +		 * the memory slot was marked for dirty logging
-> +		 * and was reverted, leaving PTE level mappings
-> +		 * for the pages accessed during the period.
-> +		 * Normal THP split/merge follows mmu_notifier
-> +		 * callbacks and do get handled accordingly.
-> +		 * Unmap the PTE level mapping and retry.
->   		 */
-> -		if (pmd_val(old_pmd) == pmd_val(*new_pmd))
-> -			return 0;
-> -
-> +		if (!pmd_thp_or_huge(old_pmd)) {
-> +			unmap_stage2_range(kvm, (addr & S2_PMD_MASK), S2_PMD_SIZE);
-Nit: we can get rid of the parentheses around "addr & S2_PMD_MASK" to
-make it looks the same as PUD level (but it is not necessary).
-> +			goto retry;
-> +		}
->   		/*
->   		 * Mapping in huge pages should only happen through a
->   		 * fault.  If a page is merged into a transparent huge
-> @@ -1090,8 +1106,7 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
->   		 * should become splitting first, unmapped, merged,
->   		 * and mapped back in on-demand.
->   		 */
-> -		VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
-> -
-> +		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
->   		pmd_clear(pmd);
->   		kvm_tlb_flush_vmid_ipa(kvm, addr);
->   	} else {
-> @@ -1107,6 +1122,7 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
->   {
->   	pud_t *pudp, old_pud;
->   
-> +retry:
->   	pudp = stage2_get_pud(kvm, cache, addr);
->   	VM_BUG_ON(!pudp);
->   
-> @@ -1122,8 +1138,17 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
->   		return 0;
->   
->   	if (stage2_pud_present(kvm, old_pud)) {
-> -		stage2_pud_clear(kvm, pudp);
-> -		kvm_tlb_flush_vmid_ipa(kvm, addr);
-> +		/*
-> +		 * If we already have PTE level mapping, unmap the entire
-> +		 * range and retry.
-> +		 */
-> +		if (!stage2_pud_huge(kvm, old_pud)) {
-> +			unmap_stage2_range(kvm, addr & S2_PUD_MASK, S2_PUD_SIZE);
-> +			goto retry;
-> +		} else {
-> +			stage2_pud_clear(kvm, pudp);
-> +			kvm_tlb_flush_vmid_ipa(kvm, addr);
-> +		}
->   	} else {
->   		get_page(virt_to_page(pudp));
->   	}
-> 
+> As for the its-translation-cache code (a really good news to us), we
+> have a rough look at it and start testing now!
 
-It look much better, and works fine now!
+Please let me know about your findings. My initial test doesn't show
+any improvement, but that could easily be attributed to the system I
+running this on (a tiny and slightly broken dual A53 system). The sizing
+of the cache is also important: too small, and you have the overhead of
+the lookup for no benefit; too big, and you waste memory.
 
+Having thought about it a bit more, I think we can drop the
+invalidation on MOVI/MOVALL, as the LPI is still perfectly valid, and
+we don't cache the target vcpu. On the other hand, the cache must be
+nuked when the ITS is turned off.
 
-thanks,
+Thanks,
 
-zenghui
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
