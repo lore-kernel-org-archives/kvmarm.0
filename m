@@ -1,122 +1,149 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/2] KVM: arm/arm64: vgic-its: Take the srcu lock when parsing
- the memslots
-Date: Tue, 19 Mar 2019 13:30:22 +0000
-Message-ID: <20190319133022.10693-3-marc.zyngier@arm.com>
-References: <20190319133022.10693-1-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 057904A484
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 09:30:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ikrfrRYdMQYM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Mar 2019 09:30:51 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F694A486
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 09:30:51 -0400 (EDT)
-In-Reply-To: <20190319133022.10693-1-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Andre Przywara <Andre.Przywara@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH] kvm: arm: Fix handling of stage2 huge mappings
+Date: Tue, 19 Mar 2019 14:11:08 +0000
+Message-ID: <1553004668-23296-1-git-send-email-suzuki.poulose@arm.com>
+References: <25971fd5-3774-3389-a82a-04707480c1e0@huawei.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <25971fd5-3774-3389-a82a-04707480c1e0@huawei.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry@arm.com, wanghaibin.wang@huawei.com, lious.lilei@hisilicon.com, lishuo1@hisilicon.com, zhengxiang9@huawei.com, yuzenghui@huawei.com, Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Calling kvm_is_visible_gfn() implies that we're parsing the memslots,
-and doing this without the srcu lock is frown upon:
+We rely on the mmu_notifier call backs to handle the split/merge
+of huge pages and thus we are guaranteed that, while creating a
+block mapping, either the entire block is unmapped at stage2 or it
+is missing permission.
 
-[12704.164532] =============================
-[12704.164544] WARNING: suspicious RCU usage
-[12704.164560] 5.1.0-rc1-00008-g600025238f51-dirty #16 Tainted: G        W
-[12704.164573] -----------------------------
-[12704.164589] ./include/linux/kvm_host.h:605 suspicious rcu_dereference_check() usage!
-[12704.164602] other info that might help us debug this:
-[12704.164616] rcu_scheduler_active = 2, debug_locks = 1
-[12704.164631] 6 locks held by qemu-system-aar/13968:
-[12704.164644]  #0: 000000007ebdae4f (&kvm->lock){+.+.}, at: vgic_its_set_attr+0x244/0x3a0
-[12704.164691]  #1: 000000007d751022 (&its->its_lock){+.+.}, at: vgic_its_set_attr+0x250/0x3a0
-[12704.164726]  #2: 00000000219d2706 (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
-[12704.164761]  #3: 00000000a760aecd (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
-[12704.164794]  #4: 000000000ef8e31d (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
-[12704.164827]  #5: 000000007a872093 (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
-[12704.164861] stack backtrace:
-[12704.164878] CPU: 2 PID: 13968 Comm: qemu-system-aar Tainted: G        W         5.1.0-rc1-00008-g600025238f51-dirty #16
-[12704.164887] Hardware name: rockchip evb_rk3399/evb_rk3399, BIOS 2019.04-rc3-00124-g2feec69fb1 03/15/2019
-[12704.164896] Call trace:
-[12704.164910]  dump_backtrace+0x0/0x138
-[12704.164920]  show_stack+0x24/0x30
-[12704.164934]  dump_stack+0xbc/0x104
-[12704.164946]  lockdep_rcu_suspicious+0xcc/0x110
-[12704.164958]  gfn_to_memslot+0x174/0x190
-[12704.164969]  kvm_is_visible_gfn+0x28/0x70
-[12704.164980]  vgic_its_check_id.isra.0+0xec/0x1e8
-[12704.164991]  vgic_its_save_tables_v0+0x1ac/0x330
-[12704.165001]  vgic_its_set_attr+0x298/0x3a0
-[12704.165012]  kvm_device_ioctl_attr+0x9c/0xd8
-[12704.165022]  kvm_device_ioctl+0x8c/0xf8
-[12704.165035]  do_vfs_ioctl+0xc8/0x960
-[12704.165045]  ksys_ioctl+0x8c/0xa0
-[12704.165055]  __arm64_sys_ioctl+0x28/0x38
-[12704.165067]  el0_svc_common+0xd8/0x138
-[12704.165078]  el0_svc_handler+0x38/0x78
-[12704.165089]  el0_svc+0x8/0xc
+However, we miss a case where the block mapping is split for dirty
+logging case and then could later be made block mapping, if we cancel the
+dirty logging. This not only creates inconsistent TLB entries for
+the pages in the the block, but also leakes the table pages for
+PMD level.
 
-Make sure the lock is taken when doing this.
+Handle this corner case for the huge mappings at stage2 by
+unmapping the non-huge mapping for the block. This could potentially
+release the upper level table. So we need to restart the table walk
+once we unmap the range.
 
-Fixes: bf308242ab98 ("KVM: arm/arm64: VGIC/ITS: protect kvm_read_guest() calls with SRCU lock")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Fixes : ad361f093c1e31d ("KVM: ARM: Support hugetlbfs backed huge pages")
+Reported-by: Zheng Xiang <zhengxiang9@huawei.com>
+Cc: Zheng Xiang <zhengxiang9@huawei.com>
+Cc: Zhengui Yu <yuzenghui@huawei.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ virt/kvm/arm/mmu.c | 63 ++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 45 insertions(+), 18 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index bb76220f2f30..7543f166943d 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -880,8 +880,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
- 	phys_addr_t base = GITS_BASER_ADDR_48_to_52(baser);
- 	int esz = GITS_BASER_ENTRY_SIZE(baser);
--	int index;
-+	int index, idx;
- 	gfn_t gfn;
-+	bool ret;
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index fce0983..6ad6f19d 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1060,25 +1060,43 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ {
+ 	pmd_t *pmd, old_pmd;
  
- 	switch (type) {
- 	case GITS_BASER_TYPE_DEVICE:
-@@ -908,7 +909,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
++retry:
+ 	pmd = stage2_get_pmd(kvm, cache, addr);
+ 	VM_BUG_ON(!pmd);
  
- 		if (eaddr)
- 			*eaddr = addr;
--		return kvm_is_visible_gfn(its->dev->kvm, gfn);
+ 	old_pmd = *pmd;
++	/*
++	 * Multiple vcpus faulting on the same PMD entry, can
++	 * lead to them sequentially updating the PMD with the
++	 * same value. Following the break-before-make
++	 * (pmd_clear() followed by tlb_flush()) process can
++	 * hinder forward progress due to refaults generated
++	 * on missing translations.
++	 *
++	 * Skip updating the page table if the entry is
++	 * unchanged.
++	 */
++	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
++		return 0;
 +
-+		goto out;
+ 	if (pmd_present(old_pmd)) {
+ 		/*
+-		 * Multiple vcpus faulting on the same PMD entry, can
+-		 * lead to them sequentially updating the PMD with the
+-		 * same value. Following the break-before-make
+-		 * (pmd_clear() followed by tlb_flush()) process can
+-		 * hinder forward progress due to refaults generated
+-		 * on missing translations.
++		 * If we already have PTE level mapping for this block,
++		 * we must unmap it to avoid inconsistent TLB state and
++		 * leaking the table page. We could end up in this situation
++		 * if the memory slot was marked for dirty logging and was
++		 * reverted, leaving PTE level mappings for the pages accessed
++		 * during the period. So, unmap the PTE level mapping for this
++		 * block and retry, as we could have released the upper level
++		 * table in the process.
+ 		 *
+-		 * Skip updating the page table if the entry is
+-		 * unchanged.
++		 * Normal THP split/merge follows mmu_notifier callbacks and do
++		 * get handled accordingly.
+ 		 */
+-		if (pmd_val(old_pmd) == pmd_val(*new_pmd))
+-			return 0;
+-
++		if (!pmd_thp_or_huge(old_pmd)) {
++			unmap_stage2_range(kvm, addr & S2_PMD_MASK, S2_PMD_SIZE);
++			goto retry;
++		}
+ 		/*
+ 		 * Mapping in huge pages should only happen through a
+ 		 * fault.  If a page is merged into a transparent huge
+@@ -1090,8 +1108,7 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 		 * should become splitting first, unmapped, merged,
+ 		 * and mapped back in on-demand.
+ 		 */
+-		VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+-
++		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
+ 		pmd_clear(pmd);
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 	} else {
+@@ -1107,6 +1124,7 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
+ {
+ 	pud_t *pudp, old_pud;
+ 
++retry:
+ 	pudp = stage2_get_pud(kvm, cache, addr);
+ 	VM_BUG_ON(!pudp);
+ 
+@@ -1114,16 +1132,25 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
+ 
+ 	/*
+ 	 * A large number of vcpus faulting on the same stage 2 entry,
+-	 * can lead to a refault due to the
+-	 * stage2_pud_clear()/tlb_flush(). Skip updating the page
+-	 * tables if there is no change.
++	 * can lead to a refault due to the stage2_pud_clear()/tlb_flush().
++	 * Skip updating the page tables if there is no change.
+ 	 */
+ 	if (pud_val(old_pud) == pud_val(*new_pudp))
+ 		return 0;
+ 
+ 	if (stage2_pud_present(kvm, old_pud)) {
+-		stage2_pud_clear(kvm, pudp);
+-		kvm_tlb_flush_vmid_ipa(kvm, addr);
++		/*
++		 * If we already have table level mapping for this block, unmap
++		 * the range for this block and retry.
++		 */
++		if (!stage2_pud_huge(kvm, old_pud)) {
++			unmap_stage2_range(kvm, addr & S2_PUD_MASK, S2_PUD_SIZE);
++			goto retry;
++		} else {
++			WARN_ON_ONCE(pud_pfn(old_pud) != pud_pfn(*new_pudp));
++			stage2_pud_clear(kvm, pudp);
++			kvm_tlb_flush_vmid_ipa(kvm, addr);
++		}
+ 	} else {
+ 		get_page(virt_to_page(pudp));
  	}
- 
- 	/* calculate and check the index into the 1st level */
-@@ -938,7 +940,12 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	if (eaddr)
- 		*eaddr = indirect_ptr;
--	return kvm_is_visible_gfn(its->dev->kvm, gfn);
-+
-+out:
-+	idx = srcu_read_lock(&its->dev->kvm->srcu);
-+	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
-+	srcu_read_unlock(&its->dev->kvm->srcu, idx);
-+	return ret;
- }
- 
- static int vgic_its_alloc_collection(struct vgic_its *its,
 -- 
-2.20.1
+2.7.4
