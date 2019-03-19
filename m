@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 22/27] KVM: arm/arm64: Add KVM_ARM_VCPU_FINALIZE ioctl
-Date: Tue, 19 Mar 2019 17:52:13 +0000
-Message-ID: <1553017938-710-23-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 20/27] arm64/sve: In-kernel vector length availability
+ query interface
+Date: Tue, 19 Mar 2019 17:52:11 +0000
+Message-ID: <1553017938-710-21-git-send-email-Dave.Martin@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C46524A485
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F3624A429
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zZzkf0msWgzt for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Mar 2019 13:53:54 -0400 (EDT)
+ with ESMTP id S0nVgUO0cU6c for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Mar 2019 13:53:50 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C9B4A4EE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DB444A438
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:50 -0400 (EDT)
 In-Reply-To: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,160 +32,104 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Some aspects of vcpu configuration may be too complex to be
-completed inside KVM_ARM_VCPU_INIT.  Thus, there may be a
-requirement for userspace to do some additional configuration
-before various other ioctls will work in a consistent way.
-
-In particular this will be the case for SVE, where userspace will
-need to negotiate the set of vector lengths to be made available to
-the guest before the vcpu becomes fully usable.
-
-In order to provide an explicit way for userspace to confirm that
-it has finished setting up a particular vcpu feature, this patch
-adds a new ioctl KVM_ARM_VCPU_FINALIZE.
-
-When userspace has opted into a feature that requires finalization,
-typically by means of a feature flag passed to KVM_ARM_VCPU_INIT, a
-matching call to KVM_ARM_VCPU_FINALIZE is now required before
-KVM_RUN or KVM_GET_REG_LIST is allowed.  Individual features may
-impose additional restrictions where appropriate.
-
-No existing vcpu features are affected by this, so current
-userspace implementations will continue to work exactly as before,
-with no need to issue KVM_ARM_VCPU_FINALIZE.
-
-As implemented in this patch, KVM_ARM_VCPU_FINALIZE is currently a
-placeholder: no finalizable features exist yet, so ioctl is not
-required and will always yield EINVAL.  Subsequent patches will add
-the finalization logic to make use of this ioctl for SVE.
-
-No functional change for existing userspace.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-
----
-
-Changes since v5:
-
- * Commit message, including subject line, rewritten.
-
-   This patch is a rework of "KVM: arm/arm64: Add hook to finalize the
-   vcpu configuration".  The old subject line and commit message no
-   longer accurately described what the patch does.  However, the code
-   is an evolution of the previous patch rather than a wholesale
-   rewrite.
-
- * Added an explicit KVM_ARM_VCPU_FINALIZE ioctl, rather than just
-   providing internal hooks in the kernel to finalize the vcpu
-   configuration implicitly.  This allows userspace to confirm exactly
-   when it has finished configuring the vcpu and is ready to use it.
-
-   This results in simpler (and hopefully more maintainable) ioctl
-   ordering rules.
----
- arch/arm/include/asm/kvm_host.h   |  4 ++++
- arch/arm64/include/asm/kvm_host.h |  4 ++++
- include/uapi/linux/kvm.h          |  3 +++
- virt/kvm/arm/arm.c                | 18 ++++++++++++++++++
- 4 files changed, 29 insertions(+)
-
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index a49ee01..e80cfc1 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -19,6 +19,7 @@
- #ifndef __ARM_KVM_HOST_H__
- #define __ARM_KVM_HOST_H__
- 
-+#include <linux/errno.h>
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/cputype.h>
-@@ -411,4 +412,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	return 0;
- }
- 
-+#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
-+#define kvm_arm_vcpu_is_finalized(vcpu) true
-+
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3e89509..98658f7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -23,6 +23,7 @@
- #define __ARM64_KVM_HOST_H__
- 
- #include <linux/bitmap.h>
-+#include <linux/errno.h>
- #include <linux/types.h>
- #include <linux/jump_label.h>
- #include <linux/kvm_types.h>
-@@ -625,4 +626,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
-+#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
-+#define kvm_arm_vcpu_is_finalized(vcpu) true
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index dc77a5a..c3b8e7a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1441,6 +1441,9 @@ struct kvm_enc_region {
- /* Available with KVM_CAP_HYPERV_CPUID */
- #define KVM_GET_SUPPORTED_HV_CPUID _IOWR(KVMIO, 0xc1, struct kvm_cpuid2)
- 
-+/* Available with KVM_CAP_ARM_SVE */
-+#define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
-+
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index c69e137..9edbf0f 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -545,6 +545,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 	if (likely(vcpu->arch.has_run_once))
- 		return 0;
- 
-+	if (!kvm_arm_vcpu_is_finalized(vcpu))
-+		return -EPERM;
-+
- 	vcpu->arch.has_run_once = true;
- 
- 	if (likely(irqchip_in_kernel(kvm))) {
-@@ -1116,6 +1119,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		if (unlikely(!kvm_vcpu_initialized(vcpu)))
- 			break;
- 
-+		r = -EPERM;
-+		if (!kvm_arm_vcpu_is_finalized(vcpu))
-+			break;
-+
- 		r = -EFAULT;
- 		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
- 			break;
-@@ -1169,6 +1176,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 
- 		return kvm_arm_vcpu_set_events(vcpu, &events);
- 	}
-+	case KVM_ARM_VCPU_FINALIZE: {
-+		int what;
-+
-+		if (!kvm_vcpu_initialized(vcpu))
-+			return -ENOEXEC;
-+
-+		if (get_user(what, (const int __user *)argp))
-+			return -EFAULT;
-+
-+		return kvm_arm_vcpu_finalize(vcpu, what);
-+	}
- 	default:
- 		r = -EINVAL;
- 	}
--- 
-2.1.4
+S1ZNIHdpbGwgbmVlZCB0byBpbnRlcnJvZ2F0ZSB0aGUgc2V0IG9mIFNWRSB2ZWN0b3IgbGVuZ3Ro
+cwphdmFpbGFibGUgb24gdGhlIHN5c3RlbS4KClRoaXMgcGF0Y2ggZXhwb3NlcyB0aGUgcmVsZXZh
+bnQgYml0cyB0byB0aGUga2VybmVsLCBhbG9uZyB3aXRoIGEKc3ZlX3ZxX2F2YWlsYWJsZSgpIGhl
+bHBlciB0byBjaGVjayB3aGV0aGVyIGEgcGFydGljdWxhciB2ZWN0b3IKbGVuZ3RoIGlzIHN1cHBv
+cnRlZC4KCl9fdnFfdG9fYml0KCkgYW5kIF9fYml0X3RvX3ZxKCkgYXJlIG5vdCBpbnRlbmRlZCBm
+b3IgdXNlIG91dHNpZGUKdGhlc2UgZnVuY3Rpb25zOiBub3cgdGhhdCB0aGVzZSBhcmUgZXhwb3Nl
+ZCBvdXRzaWRlIGZwc2ltZC5jLCB0aGV5CmFyZSBwcmVmaXhlZCB3aXRoIF9fIGluIG9yZGVyIHRv
+IHByb3ZpZGUgYW4gZXh0cmEgaGludCB0aGF0IHRoZXkKYXJlIG5vdCBpbnRlbmRlZCBmb3IgZ2Vu
+ZXJhbC1wdXJwb3NlIHVzZS4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRp
+bkBhcm0uY29tPgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8u
+b3JnPgotLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vZnBzaW1kLmggfCAyOSArKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKwogYXJjaC9hcm02NC9rZXJuZWwvZnBzaW1kLmMgICAgICB8IDM1
+ICsrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAyIGZpbGVzIGNoYW5nZWQsIDM3
+IGluc2VydGlvbnMoKyksIDI3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
+aW5jbHVkZS9hc20vZnBzaW1kLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Zwc2ltZC5oCmlu
+ZGV4IGRmN2ExNDMuLmFkNmQyZTQgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
+ZnBzaW1kLmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9mcHNpbWQuaApAQCAtMjQsMTAg
+KzI0LDEzIEBACiAKICNpZm5kZWYgX19BU1NFTUJMWV9fCiAKKyNpbmNsdWRlIDxsaW51eC9iaXRt
+YXAuaD4KICNpbmNsdWRlIDxsaW51eC9idWlsZF9idWcuaD4KKyNpbmNsdWRlIDxsaW51eC9idWcu
+aD4KICNpbmNsdWRlIDxsaW51eC9jYWNoZS5oPgogI2luY2x1ZGUgPGxpbnV4L2luaXQuaD4KICNp
+bmNsdWRlIDxsaW51eC9zdGRkZWYuaD4KKyNpbmNsdWRlIDxsaW51eC90eXBlcy5oPgogCiAjaWYg
+ZGVmaW5lZChfX0tFUk5FTF9fKSAmJiBkZWZpbmVkKENPTkZJR19DT01QQVQpCiAvKiBNYXNrcyBm
+b3IgZXh0cmFjdGluZyB0aGUgRlBTUiBhbmQgRlBDUiBmcm9tIHRoZSBGUFNDUiAqLwpAQCAtODks
+NiArOTIsMzIgQEAgZXh0ZXJuIHU2NCByZWFkX3pjcl9mZWF0dXJlcyh2b2lkKTsKIAogZXh0ZXJu
+IGludCBfX3JvX2FmdGVyX2luaXQgc3ZlX21heF92bDsKIGV4dGVybiBpbnQgX19yb19hZnRlcl9p
+bml0IHN2ZV9tYXhfdmlydHVhbGlzYWJsZV92bDsKKy8qIFNldCBvZiBhdmFpbGFibGUgdmVjdG9y
+IGxlbmd0aHMsIGFzIHZxX3RvX2JpdCh2cSk6ICovCitleHRlcm4gX19yb19hZnRlcl9pbml0IERF
+Q0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgpOworCisvKgorICogSGVscGVycyB0
+byB0cmFuc2xhdGUgYml0IGluZGljZXMgaW4gc3ZlX3ZxX21hcCB0byBWUSB2YWx1ZXMgKGFuZAor
+ICogdmljZSB2ZXJzYSkuICBUaGlzIGFsbG93cyBmaW5kX25leHRfYml0KCkgdG8gYmUgdXNlZCB0
+byBmaW5kIHRoZQorICogX21heGltdW1fIFZRIG5vdCBleGNlZWRpbmcgYSBjZXJ0YWluIHZhbHVl
+LgorICovCitzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGludCBfX3ZxX3RvX2JpdCh1bnNpZ25lZCBp
+bnQgdnEpCit7CisJcmV0dXJuIFNWRV9WUV9NQVggLSB2cTsKK30KKworc3RhdGljIGlubGluZSB1
+bnNpZ25lZCBpbnQgX19iaXRfdG9fdnEodW5zaWduZWQgaW50IGJpdCkKK3sKKwlpZiAoV0FSTl9P
+TihiaXQgPj0gU1ZFX1ZRX01BWCkpCisJCWJpdCA9IFNWRV9WUV9NQVggLSAxOworCisJcmV0dXJu
+IFNWRV9WUV9NQVggLSBiaXQ7Cit9CisKKy8qIEVuc3VyZSB2cSA+PSBTVkVfVlFfTUlOICYmIHZx
+IDw9IFNWRV9WUV9NQVggYmVmb3JlIGNhbGxpbmcgdGhpcyBmdW5jdGlvbiAqLworc3RhdGljIGlu
+bGluZSBib29sIHN2ZV92cV9hdmFpbGFibGUodW5zaWduZWQgaW50IHZxKQoreworCXJldHVybiB0
+ZXN0X2JpdChfX3ZxX3RvX2JpdCh2cSksIHN2ZV92cV9tYXApOworfQogCiAjaWZkZWYgQ09ORklH
+X0FSTTY0X1NWRQogCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9mcHNpbWQuYyBiL2Fy
+Y2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCmluZGV4IDhhOTNhZmEuLjU3NzI5NmIgMTAwNjQ0Ci0t
+LSBhL2FyY2gvYXJtNjQva2VybmVsL2Zwc2ltZC5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL2Zw
+c2ltZC5jCkBAIC0xMzYsNyArMTM2LDcgQEAgc3RhdGljIGludCBzdmVfZGVmYXVsdF92bCA9IC0x
+OwogaW50IF9fcm9fYWZ0ZXJfaW5pdCBzdmVfbWF4X3ZsID0gU1ZFX1ZMX01JTjsKIGludCBfX3Jv
+X2FmdGVyX2luaXQgc3ZlX21heF92aXJ0dWFsaXNhYmxlX3ZsID0gU1ZFX1ZMX01JTjsKIC8qIFNl
+dCBvZiBhdmFpbGFibGUgdmVjdG9yIGxlbmd0aHMsIGFzIHZxX3RvX2JpdCh2cSk6ICovCi1zdGF0
+aWMgX19yb19hZnRlcl9pbml0IERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgp
+OworX19yb19hZnRlcl9pbml0IERFQ0xBUkVfQklUTUFQKHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgp
+OwogLyogU2V0IG9mIHZlY3RvciBsZW5ndGhzIHByZXNlbnQgb24gYXQgbGVhc3Qgb25lIGNwdTog
+Ki8KIHN0YXRpYyBfX3JvX2FmdGVyX2luaXQgREVDTEFSRV9CSVRNQVAoc3ZlX3ZxX3BhcnRpYWxf
+bWFwLCBTVkVfVlFfTUFYKTsKIHN0YXRpYyB2b2lkIF9fcGVyY3B1ICplZmlfc3ZlX3N0YXRlOwpA
+QCAtMjcwLDI1ICsyNzAsNiBAQCB2b2lkIGZwc2ltZF9zYXZlKHZvaWQpCiB9CiAKIC8qCi0gKiBI
+ZWxwZXJzIHRvIHRyYW5zbGF0ZSBiaXQgaW5kaWNlcyBpbiBzdmVfdnFfbWFwIHRvIFZRIHZhbHVl
+cyAoYW5kCi0gKiB2aWNlIHZlcnNhKS4gIFRoaXMgYWxsb3dzIGZpbmRfbmV4dF9iaXQoKSB0byBi
+ZSB1c2VkIHRvIGZpbmQgdGhlCi0gKiBfbWF4aW11bV8gVlEgbm90IGV4Y2VlZGluZyBhIGNlcnRh
+aW4gdmFsdWUuCi0gKi8KLQotc3RhdGljIHVuc2lnbmVkIGludCB2cV90b19iaXQodW5zaWduZWQg
+aW50IHZxKQotewotCXJldHVybiBTVkVfVlFfTUFYIC0gdnE7Ci19Ci0KLXN0YXRpYyB1bnNpZ25l
+ZCBpbnQgYml0X3RvX3ZxKHVuc2lnbmVkIGludCBiaXQpCi17Ci0JaWYgKFdBUk5fT04oYml0ID49
+IFNWRV9WUV9NQVgpKQotCQliaXQgPSBTVkVfVlFfTUFYIC0gMTsKLQotCXJldHVybiBTVkVfVlFf
+TUFYIC0gYml0OwotfQotCi0vKgogICogQWxsIHZlY3RvciBsZW5ndGggc2VsZWN0aW9uIGZyb20g
+dXNlcnNwYWNlIGNvbWVzIHRocm91Z2ggaGVyZS4KICAqIFdlJ3JlIG9uIGEgc2xvdyBwYXRoLCBz
+byBzb21lIHNhbml0eS1jaGVja3MgYXJlIGluY2x1ZGVkLgogICogSWYgdGhpbmdzIGdvIHdyb25n
+IHRoZXJlJ3MgYSBidWcgc29tZXdoZXJlLCBidXQgdHJ5IHRvIGZhbGwgYmFjayB0byBhCkBAIC0z
+MDksOCArMjkwLDggQEAgc3RhdGljIHVuc2lnbmVkIGludCBmaW5kX3N1cHBvcnRlZF92ZWN0b3Jf
+bGVuZ3RoKHVuc2lnbmVkIGludCB2bCkKIAkJdmwgPSBtYXhfdmw7CiAKIAliaXQgPSBmaW5kX25l
+eHRfYml0KHN2ZV92cV9tYXAsIFNWRV9WUV9NQVgsCi0JCQkgICAgdnFfdG9fYml0KHN2ZV92cV9m
+cm9tX3ZsKHZsKSkpOwotCXJldHVybiBzdmVfdmxfZnJvbV92cShiaXRfdG9fdnEoYml0KSk7CisJ
+CQkgICAgX192cV90b19iaXQoc3ZlX3ZxX2Zyb21fdmwodmwpKSk7CisJcmV0dXJuIHN2ZV92bF9m
+cm9tX3ZxKF9fYml0X3RvX3ZxKGJpdCkpOwogfQogCiAjaWZkZWYgQ09ORklHX1NZU0NUTApAQCAt
+NjQ4LDcgKzYyOSw3IEBAIHN0YXRpYyB2b2lkIHN2ZV9wcm9iZV92cXMoREVDTEFSRV9CSVRNQVAo
+bWFwLCBTVkVfVlFfTUFYKSkKIAkJd3JpdGVfc3lzcmVnX3MoemNyIHwgKHZxIC0gMSksIFNZU19a
+Q1JfRUwxKTsgLyogc2VsZi1zeW5jaW5nICovCiAJCXZsID0gc3ZlX2dldF92bCgpOwogCQl2cSA9
+IHN2ZV92cV9mcm9tX3ZsKHZsKTsgLyogc2tpcCBpbnRlcnZlbmluZyBsZW5ndGhzICovCi0JCXNl
+dF9iaXQodnFfdG9fYml0KHZxKSwgbWFwKTsKKwkJc2V0X2JpdChfX3ZxX3RvX2JpdCh2cSksIG1h
+cCk7CiAJfQogfQogCkBAIC03MTcsNyArNjk4LDcgQEAgaW50IHN2ZV92ZXJpZnlfdnFfbWFwKHZv
+aWQpCiAJICogTWlzbWF0Y2hlcyBhYm92ZSBzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgYXJlIGZp
+bmUsIHNpbmNlCiAJICogbm8gZ3Vlc3QgaXMgYWxsb3dlZCB0byBjb25maWd1cmUgWkNSX0VMMi5M
+RU4gdG8gZXhjZWVkIHRoaXM6CiAJICovCi0JaWYgKHN2ZV92bF9mcm9tX3ZxKGJpdF90b192cShi
+KSkgPD0gc3ZlX21heF92aXJ0dWFsaXNhYmxlX3ZsKSB7CisJaWYgKHN2ZV92bF9mcm9tX3ZxKF9f
+Yml0X3RvX3ZxKGIpKSA8PSBzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwpIHsKIAkJcHJfd2Fybigi
+U1ZFOiBjcHUlZDogVW5zdXBwb3J0ZWQgdmVjdG9yIGxlbmd0aChzKSBwcmVzZW50XG4iLAogCQkJ
+c21wX3Byb2Nlc3Nvcl9pZCgpKTsKIAkJcmV0dXJuIC1FSU5WQUw7CkBAIC04MDEsOCArNzgyLDgg
+QEAgdm9pZCBfX2luaXQgc3ZlX3NldHVwKHZvaWQpCiAJICogc28gc3ZlX3ZxX21hcCBtdXN0IGhh
+dmUgYXQgbGVhc3QgU1ZFX1ZRX01JTiBzZXQuCiAJICogSWYgc29tZXRoaW5nIHdlbnQgd3Jvbmcs
+IGF0IGxlYXN0IHRyeSB0byBwYXRjaCBpdCB1cDoKIAkgKi8KLQlpZiAoV0FSTl9PTighdGVzdF9i
+aXQodnFfdG9fYml0KFNWRV9WUV9NSU4pLCBzdmVfdnFfbWFwKSkpCi0JCXNldF9iaXQodnFfdG9f
+Yml0KFNWRV9WUV9NSU4pLCBzdmVfdnFfbWFwKTsKKwlpZiAoV0FSTl9PTighdGVzdF9iaXQoX192
+cV90b19iaXQoU1ZFX1ZRX01JTiksIHN2ZV92cV9tYXApKSkKKwkJc2V0X2JpdChfX3ZxX3RvX2Jp
+dChTVkVfVlFfTUlOKSwgc3ZlX3ZxX21hcCk7CiAKIAl6Y3IgPSByZWFkX3Nhbml0aXNlZF9mdHJf
+cmVnKFNZU19aQ1JfRUwxKTsKIAlzdmVfbWF4X3ZsID0gc3ZlX3ZsX2Zyb21fdnEoKHpjciAmIFpD
+Ul9FTHhfTEVOX01BU0spICsgMSk7CkBAIC04MzEsNyArODEyLDcgQEAgdm9pZCBfX2luaXQgc3Zl
+X3NldHVwKHZvaWQpCiAJCS8qIE5vIHZpcnR1YWxpc2FibGUgVkxzPyAgVGhpcyBpcyBhcmNoaXRl
+Y3R1cmFsbHkgZm9yYmlkZGVuLiAqLwogCQlzdmVfbWF4X3ZpcnR1YWxpc2FibGVfdmwgPSBTVkVf
+VlFfTUlOOwogCWVsc2UgLyogYiArIDEgPCBTVkVfVlFfTUFYICovCi0JCXN2ZV9tYXhfdmlydHVh
+bGlzYWJsZV92bCA9IHN2ZV92bF9mcm9tX3ZxKGJpdF90b192cShiICsgMSkpOworCQlzdmVfbWF4
+X3ZpcnR1YWxpc2FibGVfdmwgPSBzdmVfdmxfZnJvbV92cShfX2JpdF90b192cShiICsgMSkpOwog
+CiAJaWYgKHN2ZV9tYXhfdmlydHVhbGlzYWJsZV92bCA+IHN2ZV9tYXhfdmwpCiAJCXN2ZV9tYXhf
+dmlydHVhbGlzYWJsZV92bCA9IHN2ZV9tYXhfdmw7Ci0tIAoyLjEuNAoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
