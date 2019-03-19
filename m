@@ -1,156 +1,115 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
-Date: Tue, 19 Mar 2019 09:09:43 +0800
-Message-ID: <428b2aac-5a0f-e9da-8d74-8045f99a8c74@huawei.com>
-References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
- <86o969z42z.wl-marc.zyngier@arm.com>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
+Date: Tue, 19 Mar 2019 09:33:58 +0800
+Message-ID: <20190319013358.GA3374@leoy-ThinkPad-X240s>
+References: <762d54fb-b146-e591-d544-676cb5606837@redhat.com>
+ <20190311143501.GH13422@leoy-ThinkPad-X240s>
+ <20190313080048.GI13422@leoy-ThinkPad-X240s>
+ <35c22d0c-7da5-4e68-effb-05c8571d8b63@redhat.com>
+ <e98d267e-db97-8680-62e4-f0788c00cea8@redhat.com>
+ <20190315093748.GA20568@leoy-ThinkPad-X240s>
+ <adde331f-1be9-2f0c-435a-bd906e0f253f@redhat.com>
+ <0e58d46a-a076-e7b6-9b14-6bbefa2ef404@arm.com>
+ <20190316045632.GA5330@leoy-ThinkPad-X240s>
+ <f245a401-163c-7819-9af5-4226b0ac5f25@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <86o969z42z.wl-marc.zyngier@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, eric.auger@redhat.com, "Raslan, KarimAllah" <karahmed@amazon.de>
-Cc: christoffer.dall@arm.com, andre.przywara@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mst@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, wanghaibin.wang@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, guoheyi@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A804A42B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 21:34:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iqMZSTi6lkow for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Mar 2019 21:34:06 -0400 (EDT)
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
+ [209.85.167.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A26A64A414
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 21:34:06 -0400 (EDT)
+Received: by mail-oi1-f176.google.com with SMTP id t206so14718118oib.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Mar 2019 18:34:06 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <f245a401-163c-7819-9af5-4226b0ac5f25@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi all,
+Hi Robin,
 
-On 2019/3/18 3:35, Marc Zyngier wrote:
-> On Sun, 17 Mar 2019 14:36:13 +0000,
-> Zenghui Yu <yuzenghui@huawei.com> wrote:
->>
->> Currently, IRQFD on arm still uses the deferred workqueue mechanism
->> to inject interrupts into guest, which will likely lead to a busy
->> context-switching from/to the kworker thread. This overhead is for
->> no purpose (only in my view ...) and will result in an interrupt
->> performance degradation.
->>
->> Implement kvm_arch_set_irq_inatomic() for arm/arm64 to support direct
->> irqfd MSI injection, by which we can get rid of the annoying latency.
->> As a result, irqfd MSI intensive scenarios (e.g., DPDK with high packet
->> processing workloads) will benefit from it.
->>
->> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->> ---
->>
->> It seems that only MSI will follow the IRQFD path, did I miss something?
->>
->> This patch is still under test and sent out for early feedback. If I have
->> any mis-understanding, please fix me up and let me know. Thanks!
-> 
-> As mentioned by other folks in the thread, this is clearly wrong. The
-> first thing kvm_inject_msi does is to lock the corresponding ITS using
-> a mutex. So the "no purpose" bit was a bit too quick.
-> 
-> When doing this kind of work, I suggest you enable lockdep and all the
-> related checkers. Also, for any optimisation, please post actual
-> numbers for the relevant benchmarks. Saying "application X will
-> benefit from it" is meaningless without any actual data.
-> 
->>
->> ---
->>   virt/kvm/arm/vgic/trace.h      | 22 ++++++++++++++++++++++
->>   virt/kvm/arm/vgic/vgic-irqfd.c | 21 +++++++++++++++++++++
->>   2 files changed, 43 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
->> index 55fed77..bc1f4db 100644
->> --- a/virt/kvm/arm/vgic/trace.h
->> +++ b/virt/kvm/arm/vgic/trace.h
->> @@ -27,6 +27,28 @@
->>   		  __entry->vcpu_id, __entry->irq, __entry->level)
->>   );
->>   
->> +TRACE_EVENT(kvm_arch_set_irq_inatomic,
->> +	TP_PROTO(u32 gsi, u32 type, int level, int irq_source_id),
->> +	TP_ARGS(gsi, type, level, irq_source_id),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(	u32,	gsi		)
->> +		__field(	u32,	type		)
->> +		__field(	int,	level		)
->> +		__field(	int,	irq_source_id	)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->gsi		= gsi;
->> +		__entry->type		= type;
->> +		__entry->level		= level;
->> +		__entry->irq_source_id	= irq_source_id;
->> +	),
->> +
->> +	TP_printk("gsi %u type %u level %d source %d", __entry->gsi,
->> +		  __entry->type, __entry->level, __entry->irq_source_id)
->> +);
->> +
->>   #endif /* _TRACE_VGIC_H */
->>   
->>   #undef TRACE_INCLUDE_PATH
->> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
->> index 99e026d..4cfc3f4 100644
->> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
->> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
->> @@ -19,6 +19,7 @@
->>   #include <trace/events/kvm.h>
->>   #include <kvm/arm_vgic.h>
->>   #include "vgic.h"
->> +#include "trace.h"
->>   
->>   /**
->>    * vgic_irqfd_set_irq: inject the IRQ corresponding to the
->> @@ -105,6 +106,26 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->>   	return vgic_its_inject_msi(kvm, &msi);
->>   }
->>   
->> +/**
->> + * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
->> + *
->> + * Currently only direct MSI injecton is supported.
->> + */
->> +int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
->> +			      struct kvm *kvm, int irq_source_id, int level,
->> +			      bool line_status)
->> +{
->> +	int ret;
->> +
->> +	trace_kvm_arch_set_irq_inatomic(e->gsi, e->type, level, irq_source_id);
->> +
->> +	if (unlikely(e->type != KVM_IRQ_ROUTING_MSI))
->> +		return -EWOULDBLOCK;
->> +
->> +	ret = kvm_set_msi(e, kvm, irq_source_id, level, line_status);
->> +	return ret;
->> +}
->> +
-> 
-> Although we've established that the approach is wrong, maybe we can
-> look at improving this aspect.
-> 
-> A first approach would be to keep a small cache of the last few
-> successful translations for this ITS, cache that could be looked-up by
-> holding a spinlock instead. A hit in this cache could directly be
-> injected. Any command that invalidates or changes anything (DISCARD,
-> INV, INVALL, MAPC with V=0, MAPD with V=0, MOVALL, MOVI) should nuke
-> the cache altogether.
-> 
-> Of course, all of that needs to be quantified.
+On Mon, Mar 18, 2019 at 12:25:33PM +0000, Robin Murphy wrote:
 
-Thanks for all of your explanations, especially for Marc's suggestions!
-It took me long time to figure out my mistakes, since I am not very
-familiar with the locking stuff. Now I have to apologize for my noise.
+[...]
 
-As for the its-translation-cache code (a really good news to us), we
-have a rough look at it and start testing now!
-
-
-thanks,
-
-zenghui
-
+> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> > index b9d486d..43f78b1 100644
+> > --- a/arm/include/arm-common/kvm-arch.h
+> > +++ b/arm/include/arm-common/kvm-arch.h
+> > @@ -7,10 +7,10 @@
+> > 
+> >   #include "arm-common/gic.h"
+> > 
+> > -#define ARM_IOPORT_AREA                _AC(0x0000000000000000, UL)
+> > -#define ARM_MMIO_AREA          _AC(0x0000000000010000, UL)
+> > -#define ARM_AXI_AREA           _AC(0x0000000040000000, UL)
+> > -#define ARM_MEMORY_AREA                _AC(0x0000000080000000, UL)
+> > +#define ARM_IOPORT_AREA                _AC(0x0000000080000000, UL)
+> > +#define ARM_MMIO_AREA          _AC(0x0000000080010000, UL)
+> > +#define ARM_AXI_AREA           _AC(0x0000000088000000, UL)
+> > +#define ARM_MEMORY_AREA                _AC(0x0000000090000000, UL)
+> > 
+> > Anyway, very appreciate for the suggestions; it's sufficent for me to
+> > dig more for memory related information (e.g. PCIe configurations,
+> > IOMMU, etc) and will keep posted if I make any progress.
 > 
-> Thanks,
-> 
-> 	M.
-> 
+> None of those should need to change (all the MMIO emulation stuff is
+> irrelevant to PCIe DMA anyway) - provided you don't give the guest more than
+> 2GB of RAM, passthrough with legacy INTx ought to work out-of-the-box. For
+> MSIs to get through, you'll further need to change the host kernel to place
+> its software MSI region[2] within any of the host bridge windows as well.
+
+>From PCI configurations dumping, I can see after launch the guest with
+kvmtool, the host receives the first interrupt (checked with the
+function vfio_intx_handler() has been invoked once) and then PCI sent
+command with PCI_COMMAND_INTX_DISABLE to disable interrupt line.  So
+this flow is very likely the interrupt is not forwarded properly and
+guest doesn't receive interrupt.
+
+It's lucky that I found below flow can let interrupt forwarding from
+host to guest after I always set "sky2.disable_msi=1" for both kernel
+command lines:
+
+    host                    guest
+
+  INTx mode               INTx mode
+
+So far, it still cannot work well if I only set "sky2.disable_msi=1"
+for host kernel command line, with this config it runs with below flow
+and which cannot forward interrupt properly from host to guest:
+
+    host                    guest
+
+  INTx mode               msi enable
+                          msi disable
+                          Switch back to INTx mode
+
+I am so happy now I can use pure INTx mode on Juno board for NIC
+enabling and pinged successfully from guest OS to my router :)
+
+Will look into the issue in the second secnario; and if I have more
+time I will look into msi mode as well (I confirmed msi mode can work
+with host OS but failed in guest OS).
+
+Very appreciate you & Eric helping!
+
+Thanks,
+Leo Yan
