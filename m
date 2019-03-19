@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 01/27] KVM: Documentation: Document arm64 core registers in
- detail
-Date: Tue, 19 Mar 2019 17:51:52 +0000
-Message-ID: <1553017938-710-2-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 04/27] KVM: arm64: Refactor kvm_arm_num_regs() for easier
+ maintenance
+Date: Tue, 19 Mar 2019 17:51:55 +0000
+Message-ID: <1553017938-710-5-git-send-email-Dave.Martin@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8C54A430
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19CA74A3FE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DPLptqJpeT3d for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Mar 2019 13:53:07 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB9E4A41C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:07 -0400 (EDT)
+ with ESMTP id X6MTe+sEnk5M for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Mar 2019 13:53:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D4484A47E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:14 -0400 (EDT)
 In-Reply-To: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,54 +32,26 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since the the sizes of individual members of the core arm64
-registers vary, the list of register encodings that make sense is
-not a simple linear sequence.
-
-To clarify which encodings to use, this patch adds a brief list
-to the documentation.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Julien Grall <julien.grall@arm.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- Documentation/virtual/kvm/api.txt | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 7de9eee..2d4f7ce 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2107,6 +2107,30 @@ contains elements ranging from 32 to 128 bits. The index is a 32bit
- value in the kvm_regs structure seen as a 32bit array.
-   0x60x0 0000 0010 <index into the kvm_regs struct:16>
- 
-+Specifically:
-+    Encoding            Register  Bits  kvm_regs member
-+----------------------------------------------------------------
-+  0x6030 0000 0010 0000 X0          64  regs.regs[0]
-+  0x6030 0000 0010 0002 X1          64  regs.regs[1]
-+    ...
-+  0x6030 0000 0010 003c X30         64  regs.regs[30]
-+  0x6030 0000 0010 003e SP          64  regs.sp
-+  0x6030 0000 0010 0040 PC          64  regs.pc
-+  0x6030 0000 0010 0042 PSTATE      64  regs.pstate
-+  0x6030 0000 0010 0044 SP_EL1      64  sp_el1
-+  0x6030 0000 0010 0046 ELR_EL1     64  elr_el1
-+  0x6030 0000 0010 0048 SPSR_EL1    64  spsr[KVM_SPSR_EL1] (alias SPSR_SVC)
-+  0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
-+  0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
-+  0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
-+  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-+  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]
-+  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]
-+    ...
-+  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]
-+  0x6020 0000 0010 00d4 FPSR        32  fp_regs.fpsr
-+  0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
-+
- arm64 CCSIDR registers are demultiplexed by CSSELR value:
-   0x6020 0000 0011 00 <csselr:8>
- 
--- 
-2.1.4
+a3ZtX2FybV9udW1fcmVncygpIGFkZHMgdG9nZXRoZXIgdmFyaW91cyBwYXJ0aWFsIHJlZ2lzdGVy
+IGNvdW50cyBpbgphIGZyZWVmb3JtIHN1bSBleHByZXNzaW9uLCB3aGljaCBtYWtlcyBpdCBoYXJk
+ZXIgdGhhbiBuZWNlc3NhcnkgdG8KcmVhZCBkaWZmcyB0aGF0IGFkZCwgbW9kaWZ5IG9yIHJlbW92
+ZSBhIHNpbmdsZSB0ZXJtIGluIHRoZSBzdW0KKHdoaWNoIGlzIGV4cGVjdGVkIHRvIHRoZSBjb21t
+b24gY2FzZSB1bmRlciBtYWludGVuYW5jZSkuCgpUaGlzIHBhdGNoIHJlZmFjdG9ycyB0aGUgY29k
+ZSB0byBhZGQgdGhlIHRlcm0gb25lIHBlciBsaW5lLCBmb3IKbWF4aW11bSByZWFkYWJpbGl0eS4K
+ClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgpSZXZpZXdl
+ZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgotLS0KIGFyY2gvYXJt
+NjQva3ZtL2d1ZXN0LmMgfCAxMCArKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRp
+b25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0
+LmMgYi9hcmNoL2FybTY0L2t2bS9ndWVzdC5jCmluZGV4IGRkNDM2YTUuLjYyNTE0Y2IgMTAwNjQ0
+Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3Qu
+YwpAQCAtMjU4LDggKzI1OCwxNCBAQCBzdGF0aWMgaW50IGdldF90aW1lcl9yZWcoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKICAqLwogdW5zaWdu
+ZWQgbG9uZyBrdm1fYXJtX251bV9yZWdzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHsKLQlyZXR1
+cm4gbnVtX2NvcmVfcmVncygpICsga3ZtX2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KQotCQkr
+IGt2bV9hcm1fZ2V0X2Z3X251bV9yZWdzKHZjcHUpCSsgTlVNX1RJTUVSX1JFR1M7CisJdW5zaWdu
+ZWQgbG9uZyByZXMgPSAwOworCisJcmVzICs9IG51bV9jb3JlX3JlZ3MoKTsKKwlyZXMgKz0ga3Zt
+X2FybV9udW1fc3lzX3JlZ19kZXNjcyh2Y3B1KTsKKwlyZXMgKz0ga3ZtX2FybV9nZXRfZndfbnVt
+X3JlZ3ModmNwdSk7CisJcmVzICs9IE5VTV9USU1FUl9SRUdTOworCisJcmV0dXJuIHJlczsKIH0K
+IAogLyoqCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
