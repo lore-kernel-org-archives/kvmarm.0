@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 05/27] KVM: arm64: Add missing #includes to kvm_host.h
-Date: Tue, 19 Mar 2019 17:51:56 +0000
-Message-ID: <1553017938-710-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v6 09/27] KVM: arm64: Add a vcpu flag to control SVE
+ visibility for the guest
+Date: Tue, 19 Mar 2019 17:52:00 +0000
+Message-ID: <1553017938-710-10-git-send-email-Dave.Martin@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A304A475
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 889D74A4B4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tN2OiZ4wmXbm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Mar 2019 13:53:18 -0400 (EDT)
+ with ESMTP id Y3fKlihDLPA5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Mar 2019 13:53:25 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8392E4A492
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92A374A438
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 13:53:25 -0400 (EDT)
 In-Reply-To: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,45 +32,25 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_host.h uses some declarations from other headers that are
-currently included by accident, without an explicit #include.
-
-This patch adds a few #includes that are clearly missing.  Although
-the header builds without them today, this should help to avoid
-future surprises.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
----
-
-Changes since v5:
-
- * [Mark Rutland] Add additional missing #includes <linux/jump_label.h>,
-   <linux/percpu.h>, <asm/barrier.h>, while we're about it.
-
-   Commit message reworded to match.
----
- arch/arm64/include/asm/kvm_host.h | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a01fe087..6d10100 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -22,9 +22,13 @@
- #ifndef __ARM64_KVM_HOST_H__
- #define __ARM64_KVM_HOST_H__
- 
-+#include <linux/bitmap.h>
- #include <linux/types.h>
-+#include <linux/jump_label.h>
- #include <linux/kvm_types.h>
-+#include <linux/percpu.h>
- #include <asm/arch_gicv3.h>
-+#include <asm/barrier.h>
- #include <asm/cpufeature.h>
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
--- 
-2.1.4
+U2luY2UgU1ZFIHdpbGwgYmUgZW5hYmxlZCBvciBkaXNhYmxlZCBvbiBhIHBlci12Y3B1IGJhc2lz
+LCBhIGZsYWcKaXMgbmVlZGVkIGluIG9yZGVyIHRvIHRyYWNrIHdoaWNoIHZjcHVzIGhhdmUgaXQg
+ZW5hYmxlZC4KClRoaXMgcGF0Y2ggYWRkcyBhIHN1aXRhYmxlIGZsYWcgYW5kIGEgaGVscGVyIGZv
+ciBjaGVja2luZyBpdC4KClNpZ25lZC1vZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBh
+cm0uY29tPgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3Jn
+PgotLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8IDQgKysrKwogMSBmaWxl
+IGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVk
+ZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRl
+eCA2ZDEwMTAwLi5hZDRmN2YwIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2
+bV9ob3N0LmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0zMjgs
+NiArMzI4LDEwIEBAIHN0cnVjdCBrdm1fdmNwdV9hcmNoIHsKICNkZWZpbmUgS1ZNX0FSTTY0X0ZQ
+X0hPU1QJCSgxIDw8IDIpIC8qIGhvc3QgRlAgcmVncyBsb2FkZWQgKi8KICNkZWZpbmUgS1ZNX0FS
+TTY0X0hPU1RfU1ZFX0lOX1VTRQkoMSA8PCAzKSAvKiBiYWNrdXAgZm9yIGhvc3QgVElGX1NWRSAq
+LwogI2RlZmluZSBLVk1fQVJNNjRfSE9TVF9TVkVfRU5BQkxFRAkoMSA8PCA0KSAvKiBTVkUgZW5h
+YmxlZCBmb3IgRUwwICovCisjZGVmaW5lIEtWTV9BUk02NF9HVUVTVF9IQVNfU1ZFCQkoMSA8PCA1
+KSAvKiBTVkUgZXhwb3NlZCB0byBndWVzdCAqLworCisjZGVmaW5lIHZjcHVfaGFzX3N2ZSh2Y3B1
+KSAoc3lzdGVtX3N1cHBvcnRzX3N2ZSgpICYmIFwKKwkJCSAgICAoKHZjcHUpLT5hcmNoLmZsYWdz
+ICYgS1ZNX0FSTTY0X0dVRVNUX0hBU19TVkUpKQogCiAjZGVmaW5lIHZjcHVfZ3BfcmVncyh2KQkJ
+KCYodiktPmFyY2guY3R4dC5ncF9yZWdzKQogCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
