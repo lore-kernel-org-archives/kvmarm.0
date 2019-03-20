@@ -1,77 +1,123 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: Question: KVM: Failed to bind vfio with PCI-e / SMMU on Juno-r2
-Date: Wed, 20 Mar 2019 16:42:40 +0800
-Message-ID: <20190320084240.GA17539@leoy-ThinkPad-X240s>
-References: <20190311143501.GH13422@leoy-ThinkPad-X240s>
- <20190313080048.GI13422@leoy-ThinkPad-X240s>
- <35c22d0c-7da5-4e68-effb-05c8571d8b63@redhat.com>
- <e98d267e-db97-8680-62e4-f0788c00cea8@redhat.com>
- <20190315093748.GA20568@leoy-ThinkPad-X240s>
- <adde331f-1be9-2f0c-435a-bd906e0f253f@redhat.com>
- <0e58d46a-a076-e7b6-9b14-6bbefa2ef404@arm.com>
- <20190316045632.GA5330@leoy-ThinkPad-X240s>
- <f245a401-163c-7819-9af5-4226b0ac5f25@arm.com>
- <20190319013358.GA3374@leoy-ThinkPad-X240s>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v7 3/10] KVM: arm64: Move hyp_symbol_addr to fix
+ dependency
+Date: Wed, 20 Mar 2019 08:49:02 +0000
+Message-ID: <aca8f96c-8f38-8688-f6e2-a50c0a79f4ae@arm.com>
+References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
+ <1552984243-7689-4-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03B494A2E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 04:42:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JKzG48hEauad for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Mar 2019 04:42:47 -0400 (EDT)
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com
- [209.85.167.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A2904A1DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 04:42:47 -0400 (EDT)
-Received: by mail-oi1-f172.google.com with SMTP id t206so1158599oib.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 01:42:47 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20190319013358.GA3374@leoy-ThinkPad-X240s>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1552984243-7689-4-git-send-email-amit.kachhap@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 19, 2019 at 09:33:58AM +0800, Leo Yan wrote:
+Hi Amit,
 
-[...]
-
-> So far, it still cannot work well if I only set "sky2.disable_msi=1"
-> for host kernel command line, with this config it runs with below flow
-> and which cannot forward interrupt properly from host to guest:
+On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
+> Currently hyp_symbol_addr is palced in kvm_mmu.h which is mostly
+> used by __hyp_this_cpu_ptr in kvm_asm.h but it cannot include
+> kvm_mmu.h directly as kvm_mmu.h uses kvm_ksym_ref which is
+> defined inside kvm_asm.h. Hence, hyp_symbol_addr is moved inside
+> kvm_asm.h to fix this dependency on each other.
 > 
->     host                    guest
+> Also kvm_ksym_ref is corresponding counterpart of hyp_symbol_addr
+> so should be ideally placed inside kvm_asm.h.
 > 
->   INTx mode               msi enable
->                           msi disable
->                           Switch back to INTx mode
 
-Just for heading up, for enabling vfio-pci with NIC device on Juno
-board, I sent out two patch set for related changes.  With these
-changes, the INTx mode can work well and it also can handle for up
-failure case.
+This part is a bit confusing, it lead me to think that kvm_ksym_ref was
+in kvm_mmu.h and should moved to kvm_asm.h as well. I'd suggest
+rephrasing it with something along the lines:
 
-  kvmtool changes:
-  https://lists.cs.columbia.edu/pipermail/kvmarm/2019-March/035186.html
+"Also, hyp_symbol_addr corresponding counterpart, kvm_ksym_ref, is
+already in kvm_asm.h, making it more sensible to move kvm_symbol_addr to
+the same file."
 
-  Juno DT binding for PCIe SMMU:
-  https://archive.armlinux.org.uk/lurker/message/20190320.083105.f002c91c.en.html
+Otherwise:
 
-@Robin, if you find issue for Juno DT binding in my patch and want to
-send your patch for related fixing, please feel free let me know.  I
-am happy to test it and drop my own.  Thanks!
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-Thanks,
-Leo Yan
+Cheers,
+
+Julien
+
+> Suggested by: James Morse <james.morse@arm.com>
+> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> ---
+>  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_mmu.h | 20 --------------------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index f5b79e9..57a07e8 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -80,6 +80,26 @@ extern void __vgic_v3_init_lrs(void);
+>  
+>  extern u32 __kvm_get_mdcr_el2(void);
+>  
+> +/*
+> + * Obtain the PC-relative address of a kernel symbol
+> + * s: symbol
+> + *
+> + * The goal of this macro is to return a symbol's address based on a
+> + * PC-relative computation, as opposed to a loading the VA from a
+> + * constant pool or something similar. This works well for HYP, as an
+> + * absolute VA is guaranteed to be wrong. Only use this if trying to
+> + * obtain the address of a symbol (i.e. not something you obtained by
+> + * following a pointer).
+> + */
+> +#define hyp_symbol_addr(s)						\
+> +	({								\
+> +		typeof(s) *addr;					\
+> +		asm("adrp	%0, %1\n"				\
+> +		    "add	%0, %0, :lo12:%1\n"			\
+> +		    : "=r" (addr) : "S" (&s));				\
+> +		addr;							\
+> +	})
+> +
+>  /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
+>  #define __hyp_this_cpu_ptr(sym)						\
+>  	({								\
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index b0742a1..3dea6af 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -118,26 +118,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
+>  #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
+>  
+>  /*
+> - * Obtain the PC-relative address of a kernel symbol
+> - * s: symbol
+> - *
+> - * The goal of this macro is to return a symbol's address based on a
+> - * PC-relative computation, as opposed to a loading the VA from a
+> - * constant pool or something similar. This works well for HYP, as an
+> - * absolute VA is guaranteed to be wrong. Only use this if trying to
+> - * obtain the address of a symbol (i.e. not something you obtained by
+> - * following a pointer).
+> - */
+> -#define hyp_symbol_addr(s)						\
+> -	({								\
+> -		typeof(s) *addr;					\
+> -		asm("adrp	%0, %1\n"				\
+> -		    "add	%0, %0, :lo12:%1\n"			\
+> -		    : "=r" (addr) : "S" (&s));				\
+> -		addr;							\
+> -	})
+> -
+> -/*
+>   * We currently support using a VM-specified IPA size. For backward
+>   * compatibility, the default IPA size is fixed to 40bits.
+>   */
+> 
+
+-- 
+Julien Thierry
