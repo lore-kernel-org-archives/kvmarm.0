@@ -1,76 +1,70 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] kvm: arm: Fix handling of stage2 huge mappings
-Date: Wed, 20 Mar 2019 11:12:47 +0000
-Message-ID: <c27d5828-3924-e209-82b6-c9168007867b@arm.com>
-References: <25971fd5-3774-3389-a82a-04707480c1e0@huawei.com>
- <1553004668-23296-1-git-send-email-suzuki.poulose@arm.com>
- <86d0mmynaz.wl-marc.zyngier@arm.com>
- <5e7e40b4-7983-4440-179a-6f107cee5994@arm.com>
- <20190320101126.11ff63af@why.wild-wind.fr.eu.org>
- <4daf0783-fc50-3346-0732-1e3f53c8ccbc@arm.com>
- <20190320103511.11d777b9@why.wild-wind.fr.eu.org>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH kvmtool v2 0/3] arm64: Basic SVE guest support
+Date: Wed, 20 Mar 2019 12:07:25 +0000
+Message-ID: <1553083648-5345-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190320103511.11d777b9@why.wild-wind.fr.eu.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: marc.zyngier@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will.deacon@arm.com, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry@arm.com, wanghaibin.wang@huawei.com, lious.lilei@hisilicon.com, lishuo1@hisilicon.com, zhengxiang9@huawei.com, yuzenghui@huawei.com, christoffer.dall@arm.com
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: Peter Maydell <peter.maydell@linaro.org>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <Julien.Grall@arm.com>, Andre Przywara <andre.przywara@arm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Marc,
+This series, based on kvmtool master [1], contains development hacks
+to accompany the recently posted v6 SVE guest support series for the
+Linux kernel [2].
 
-On 20/03/2019 10:35, Marc Zyngier wrote:
-> On Wed, 20 Mar 2019 10:23:39 +0000
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
-> Hi Suzuki,
-> 
->> Marc,
->>
->> On 20/03/2019 10:11, Marc Zyngier wrote:
->>> On Wed, 20 Mar 2019 09:44:38 +0000
->>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>    
->>>> Hi Marc,
->>>>
->>>> On 20/03/2019 08:15, Marc Zyngier wrote:
->>>>> Hi Suzuki,
->>>>>
->>>>> On Tue, 19 Mar 2019 14:11:08 +0000,
->>>>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+This series supersedes the previous posting [3], and is a clean(er)
+rewrite of the minimal support required for SVE, without the debug/
+testing cruft.
 
-...
+Due to an ABI change, this series does not work with the older (v5)
+KVM series.
 
->>>>>> +		if (!pmd_thp_or_huge(old_pmd)) {
->>>>>> +			unmap_stage2_range(kvm, addr & S2_PMD_MASK, S2_PMD_SIZE);
->>>>>> +			goto retry;
->>>>>   
->>
->>>>>> +		if (!stage2_pud_huge(kvm, old_pud)) {
->>>>>> +			unmap_stage2_range(kvm, addr & S2_PUD_MASK, S2_PUD_SIZE);
->>>>>   
->>
->>>> We should really get rid of the S2_P{U/M}D_* definitions, as they are
->>>> always the same as the host. The only thing that changes is the PGD size
->>>> which varies according to the IPA and the concatenation.
->>>>   
->>
->> Also what do you think about using  P{M,U}D_* instead of S2_P{M,U}D_*
->> above ? I could make that change with the respin.
-> 
-> Given that this is a fix, I'd like it to be as small as obvious as
-> possible, making it easier to backport.
-> 
-> I'm happy to take another patch for 5.2 that will drop the whole S2_P*
-> if we still think that this should be the case (though what I'd really
-> like is to have architectural levels instead of these arbitrary
-> definitions).
+Testing and review welcome.
 
-I only meant the two new instances added above in the patch. Of course, I
-could send something to fix the existing ones.
+In particular, if people have a view on the --sve-vls parameter, I'd
+be interested to discuss what that should look like.  See patch 3.
 
-Cheers
-Suzuki
+[1] 
+git://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git master
+https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/log/
+
+Specifically, commit c57e001a3efb ("arm: Auto-detect guest GIC type").
+
+[2] [PATCH v5 00/26] KVM: arm64: SVE guest support
+https://lists.cs.columbia.edu/pipermail/kvmarm/2019-March/thread.html
+
+(Note, the subject line for this posting was incorrect.  It should have
+read: [PATCH v6 00/27] KVM: arm64: SVE guest support)
+
+git://linux-arm.org/linux-dm.git sve-kvm/v6/head
+http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm/v6/head
+
+
+Dave Martin (3):
+  arm/arm64: [HACK] Sync kernel headers from sve-guest v6
+  arm64: Add basic SVE support
+  arm64: Add command-line option to set the guest's SVE vector lengths
+
+ arm/aarch32/include/kvm/kvm-cpu-arch.h    |  5 ++
+ arm/aarch64/include/asm/kvm.h             | 22 +++++++
+ arm/aarch64/include/kvm/kvm-config-arch.h | 10 +++-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    |  7 ++-
+ arm/aarch64/kvm-cpu.c                     | 97 +++++++++++++++++++++++++++++++
+ arm/include/arm-common/kvm-config-arch.h  |  2 +
+ arm/kvm-cpu.c                             |  3 +
+ include/linux/kvm.h                       |  5 ++
+ 8 files changed, 149 insertions(+), 2 deletions(-)
+
+-- 
+2.1.4
