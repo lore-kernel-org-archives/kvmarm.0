@@ -1,26 +1,26 @@
 From: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH kvmtool v2 1/3] vfio-pci: Release INTx's unmask eventfd
- properly
-Date: Wed, 20 Mar 2019 14:20:44 +0800
-Message-ID: <20190320062046.3895-2-leo.yan@linaro.org>
+Subject: [PATCH kvmtool v2 2/3] vfio-pci: Remove useless FDs reservation in
+ vfio_pci_enable_intx()
+Date: Wed, 20 Mar 2019 14:20:45 +0800
+Message-ID: <20190320062046.3895-3-leo.yan@linaro.org>
 References: <20190320062046.3895-1-leo.yan@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADC94A330
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 02:21:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD5A74A379
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 02:21:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uIDaEwb2OD9R for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Mar 2019 02:21:12 -0400 (EDT)
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com
- [209.85.167.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B96949F94
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 02:21:12 -0400 (EDT)
-Received: by mail-oi1-f196.google.com with SMTP id 67so882302oif.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 23:21:12 -0700 (PDT)
+ with ESMTP id PZf3MEpScDxi for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Mar 2019 02:21:16 -0400 (EDT)
+Received: from mail-oi1-f194.google.com (mail-oi1-f194.google.com
+ [209.85.167.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E53EF4A36D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 02:21:15 -0400 (EDT)
+Received: by mail-oi1-f194.google.com with SMTP id 67so882379oif.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Mar 2019 23:21:15 -0700 (PDT)
 In-Reply-To: <20190320062046.3895-1-leo.yan@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,50 +35,27 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@
 Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The PCI device INTx uses event fd 'unmask_fd' to signal the deassertion
-of the line from guest to host; but this eventfd isn't released properly
-when disable INTx.
-
-This patch firstly adds field 'unmask_fd' in struct vfio_pci_device for
-storing unmask eventfd and close it when disable INTx.
+Since INTx only uses 2 FDs, it's not particularly useful to reserve FDs
+in function vfio_pci_enable_intx(); so this patch is to remove FDs
+reservation in this function.
 
 Signed-off-by: Leo Yan <leo.yan@linaro.org>
 ---
- include/kvm/vfio.h | 1 +
- vfio/pci.c         | 2 ++
- 2 files changed, 3 insertions(+)
+ vfio/pci.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
-index 60e6c54..28223cf 100644
---- a/include/kvm/vfio.h
-+++ b/include/kvm/vfio.h
-@@ -74,6 +74,7 @@ struct vfio_pci_device {
- 
- 	unsigned long			irq_modes;
- 	int				intx_fd;
-+	int				unmask_fd;
- 	unsigned int			intx_gsi;
- 	struct vfio_pci_msi_common	msi;
- 	struct vfio_pci_msi_common	msix;
 diff --git a/vfio/pci.c b/vfio/pci.c
-index 03de3c1..5224fee 100644
+index 5224fee..d025581 100644
 --- a/vfio/pci.c
 +++ b/vfio/pci.c
-@@ -1008,6 +1008,7 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 	irq__del_irqfd(kvm, gsi, pdev->intx_fd);
+@@ -1025,8 +1025,6 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
+ 		.index = VFIO_PCI_INTX_IRQ_INDEX,
+ 	};
  
- 	close(pdev->intx_fd);
-+	close(pdev->unmask_fd);
- }
- 
- static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
-@@ -1095,6 +1096,7 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 	}
- 
- 	pdev->intx_fd = trigger_fd;
-+	pdev->unmask_fd = unmask_fd;
- 	/* Guest is going to ovewrite our irq_line... */
- 	pdev->intx_gsi = gsi;
- 
+-	vfio_pci_reserve_irq_fds(2);
+-
+ 	ret = ioctl(vdev->fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
+ 	if (ret || irq_info.count == 0) {
+ 		vfio_dev_err(vdev, "no INTx reported by VFIO");
 -- 
 2.19.1
