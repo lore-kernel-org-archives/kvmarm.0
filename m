@@ -1,29 +1,24 @@
-From: Steven Price <steven.price@arm.com>
-Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
-Date: Wed, 20 Mar 2019 16:29:11 +0000
-Message-ID: <101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
-References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
- <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
- <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
- <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
- <20190315085948.GB10950@e113682-lin.lund.arm.com>
- <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
+Date: Wed, 20 Mar 2019 09:37:27 -0700
+Message-ID: <20190320093727.45a86866@jacob-builder>
+References: <20190317172232.1068-1-eric.auger@redhat.com>
+ <20190317172232.1068-6-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5F274A332
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 12:29:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7754A332
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 12:35:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W+POLuPsf0JS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Mar 2019 12:29:15 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FD2B40A52
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 12:29:15 -0400 (EDT)
-In-Reply-To: <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
-Content-Language: en-GB
+ with ESMTP id JpWN94AEwSGq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Mar 2019 12:35:05 -0400 (EDT)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3949640A52
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Mar 2019 12:35:05 -0400 (EDT)
+In-Reply-To: <20190317172232.1068-6-eric.auger@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,108 +28,233 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@redhat.com>
+Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, alex.williamson@redhat.com, ashok.raj@intel.com, kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, jacob.jun.pan@linux.intel.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTkvMDMvMjAxOSAxNDozOSwgSGV5aSBHdW8gd3JvdGU6Cj4gSGkgQ2hyaXN0b2ZmZXIgYW5k
-IFN0ZXZlLAo+IAo+IAo+IE9uIDIwMTkvMy8xNSAxNjo1OSwgQ2hyaXN0b2ZmZXIgRGFsbCB3cm90
-ZToKPj4gSGkgU3RldmUsCj4+Cj4+IE9uIFdlZCwgTWFyIDEzLCAyMDE5IGF0IDEwOjExOjMwQU0g
-KzAwMDAsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4+IFBlcnNvbmFsbHkgSSB0aGluayB3aGF0IHdl
-IG5lZWQgaXM6Cj4+Pgo+Pj4gKiBFaXRoZXIgYSBwYXRjaCBsaWtlIHRoZSBvbmUgZnJvbSBIZXlp
-IEd1byAoc2F2ZS9yZXN0b3JlIENOVFZDVF9FTDApIG9yCj4+PiBhbHRlcm5hdGl2ZWx5IGhvb2tp
-bmcgdXAgS1ZNX0tWTUNMT0NLX0NUUkwgdG8gcHJldmVudCB0aGUgd2F0Y2hkb2cKPj4+IGZpcmlu
-ZyB3aGVuIHVzZXIgc3BhY2UgZXhwbGljaXRseSBzdG9wcyBzY2hlZHVsaW5nIHRoZSBndWVzdCBm
-b3IgYQo+Pj4gd2hpbGUuCj4+IElmIHdlIHNhdmUvcmVzdG9yZSBDTlRWQ1RfRUwwIGFuZCB0aGUg
-d2FybmluZyBnb2VzIGF3YXksIGRvZXMgdGhlIGd1ZXN0Cj4+IHdhbGwgY2xvY2sgdGltZWtlZXBp
-bmcgZ2V0IGFsbCBjb25mdXNlZCBhbmQgZG9lcyBpdCBmaWd1cmUgdGhpcyBvdXQKPj4gYXV0b21h
-Z2ljYWxseSBzb21laG93Pwo+IFdoYXQncyB0aGUgc291cmNlIGZvciBndWVzdCB3YWxsIGNsb2Nr
-IHRpbWVrZWVwaW5nIGluIGN1cnJlbnQgQVJNNjQKPiBpbXBsZW1lbnRhdGlvbj8gSXMgaXQgdGhl
-IHZhbHVlIGZyb20gQ05UUF9UVkFMX0VMMD8gV2lsbCBndWVzdCBPUyBrZWVwCj4gdHJhY2sgb2Yg
-dGhpcz8gT3IgaXMgdGhlIHdhbGwgY2xvY2sgc2ltcGx5IHBsYXRmb3JtIFJUQz8KPiAKPiBJIHRl
-c3RlZCB0aGUgUkZDIGNoYW5nZSBhbmQgZGlkIG5vdCBzZWUgYW55dGhpbmcgdW51c3VhbC4gRGlk
-IEkgbWlzcwo+IHNvbWV0aW5nPwoKQXJlIHlvdSBydW5uaW5nIEFSTSBvciBBUk02ND8gSSdtIGFz
-c3VtaW5nIEFSTTY0IGhlcmUuLi4KClVubGVzcyBJJ20gbWlzdGFrZW4geW91IHNob3VsZCBzZWUg
-dGhlIHRpbWUgcmVwb3J0ZWQgYnkgdGhlIGd1ZXN0IG5vdApwcm9ncmVzcyB3aGVuIHlvdSBoYXZl
-IHN0b3BwZWQgaXQgdXNpbmcgdGhlIFFFTVUgbW9uaXRvciBjb25zb2xlLgoKUnVubmluZyBzb21l
-dGhpbmcgbGlrZSAid2hpbGUgL2Jpbi90cnVlOyBkbyBkYXRlOyBzbGVlcCAxOyBkb25lIiBzaG91
-bGQKYWxsb3cgeW91IHRvIHNlZSB0aGF0IHdpdGhvdXQgdGhlIHBhdGNoIHRpbWUgd2lsbCBqdW1w
-IGluIHRoZSBndWVzdAooaS5lLiB0aGUgdGltZSByZWZsZWN0cyB3YWxsLWNsb2NrIHRpbWUpLiBX
-aXRoIHRoZSBwYXRjaCBJIGJlbGlldmUgaXQKd2lsbCBub3QganVtcCAoaS5lLiB0aGUgY2xvY2sg
-d2lsbCBiZSBiZWhpbmQgd2FsbC1jbG9jayB0aW1lIGFmdGVyIHRoZQpwYXVzZSkuCgpIb3dldmVy
-LCB0aGlzIGJlaGF2aW91ciBkb2VzIGRlcGVuZCBvbiB0aGUgZXhhY3Qgc3lzdGVtIGJlaW5nIGVt
-dWxhdGVkLgpGcm9tIGRyaXZlcnMvY2xvY2tzb3VyY2UvYXJtX2FyY2hfdGltZXIuYzoKCj4gc3Rh
-dGljIHZvaWQgX19pbml0IGFyY2hfY291bnRlcl9yZWdpc3Rlcih1bnNpZ25lZCB0eXBlKQo+IHsK
-PiAJdTY0IHN0YXJ0X2NvdW50Owo+IAo+IAkvKiBSZWdpc3RlciB0aGUgQ1AxNSBiYXNlZCBjb3Vu
-dGVyIGlmIHdlIGhhdmUgb25lICovCj4gCWlmICh0eXBlICYgQVJDSF9USU1FUl9UWVBFX0NQMTUp
-IHsKPiAJCWlmICgoSVNfRU5BQkxFRChDT05GSUdfQVJNNjQpICYmICFpc19oeXBfbW9kZV9hdmFp
-bGFibGUoKSkgfHwKPiAJCSAgICBhcmNoX3RpbWVyX3VzZXNfcHBpID09IEFSQ0hfVElNRVJfVklS
-VF9QUEkpCj4gCQkJYXJjaF90aW1lcl9yZWFkX2NvdW50ZXIgPSBhcmNoX2NvdW50ZXJfZ2V0X2Nu
-dHZjdDsKPiAJCWVsc2UKPiAJCQlhcmNoX3RpbWVyX3JlYWRfY291bnRlciA9IGFyY2hfY291bnRl
-cl9nZXRfY250cGN0Owo+IAo+IAkJY2xvY2tzb3VyY2VfY291bnRlci5hcmNoZGF0YS52ZHNvX2Rp
-cmVjdCA9IHZkc29fZGVmYXVsdDsKPiAJfSBlbHNlIHsKPiAJCWFyY2hfdGltZXJfcmVhZF9jb3Vu
-dGVyID0gYXJjaF9jb3VudGVyX2dldF9jbnR2Y3RfbWVtOwo+IAl9CgpTbyB3ZSBjYW4gc2VlIGhl
-cmUgdGhhdCB0aGVyZSBhcmUgdGhyZWUgZnVuY3Rpb25zIGZvciByZWFkaW5nIHRoZQpjb3VudGVy
-IC0gdGhlcmUncyB0aGUgbWVtb3J5IGludGVyZmFjZSBmb3IgQ05UVkNULCB0aGUgIkNQMTUiIGlu
-dGVyZmFjZQphbHNvIGZvciBDTlRWQ1QsIGFuZCBhbiBpbnRlcmZhY2UgZm9yIENOVFBDVC4gQ05U
-UENUIGlzIG9ubHkgdXNlZCBmb3IKIUFSTTY0IG9yIGlmIGh5cCBtb2RlIGlzIGF2YWlsYWJsZSAo
-bm90IHJlbGV2YW50IHVudGlsIG5lc3RlZAp2aXJ0dWFsaXNhdGlvbiBpcyBhZGRlZCkuCgpUaGUg
-dXBzaG90IGlzIHRoYXQgb24gYXJtNjQgd2UncmUgdXNpbmcgdGhlIHZpcnR1YWwgY291bnRlciAo
-Q05UVkNUKS4KCj4+Cj4+IERvZXMgS1ZNX0tWTUNMT0NLX0NUUkwgc29sdmUgdGhhdCBwcm9ibGVt
-Pwo+IEl0IHNlZW1zIEtWTV9LVk1DTE9DS19DVFJMIGlzIGRlZGljYXRlZCBmb3IgZ3Vlc3QgcGF1
-c2UvcmVzdW1lIHNjZW5hcmlvLAo+IGJ1dCBpdCByZWxpZXMgb24gcHZjbG9jayBib3RoIGluIEtW
-TSBhbmQgR3Vlc3QgYW5kIHJpZ2h0IG5vdyBvbmx5IFg4Ngo+IHN1cHBvcnRzIGl0IDooCgpLVk1f
-S1ZNQ0xPQ0tfQ1RSTCBzaW1wbHkgcHJvdmlkZXMgYSBtZWNoYW5pc20gZm9yIHRoZSBob3N0IHRv
-IGluZm9ybSB0aGUKZ3Vlc3QgdGhhdCBhIHZDUFUgaGFzbid0IGJlZW4gc2NoZWR1bGVkIGZvciAi
-YSB3aGlsZSIuIFRoZSBndWVzdCBjYW4KdGhlbiB1c2UgdGhhdCBpbmZvcm1hdGlvbiB0byBhdm9p
-ZCB0cmlnZ2VyaW5nIHRoZSB3YXRjaGRvZyB0aW1lb3V0LiBBcwp5b3Ugbm90ZSBpdCBpcyBvbmx5
-IGN1cnJlbnRseSBpbXBsZW1lbnRlZCBmb3IgWDg2LgoKPiBDb3VsZCBTdGV2ZSBwcm92aWRlIG1v
-cmUgaW5zaWdodHMgYWJvdXQgdGhlIHdob2xlIHRoaW5nPwoKSSdsbCB0cnkgLSBzZWUgYmVsb3cu
-Cgo+IFRoYW5rcywKPiBIZXlpCj4gCj4+Cj4+PiAqIEtWTSBpdHNlbGYgc2F2aW5nL3Jlc3Rvcmlu
-ZyBDTlRWQ1RfRUwwIGR1cmluZyBzdXNwZW5kL3Jlc3VtZSBzbyB0aGUKPj4+IGd1ZXN0IGRvZXNu
-J3Qgc2VlIHRpbWUgcGFzcyBkdXJpbmcgYSBzdXNwZW5kLgo+PiBUaGlzIHNtZWxscyBsaWtlIHBv
-bGljeSB0byBtZSBzbyBJJ2QgbXVjaCBwcmVmZXIga2VlcGluZyBhcyBtdWNoCj4+IGZ1bmN0aW9u
-YWxpdHkgaW4gdXNlciBzcGFjZSBhcyBwb3NzaWJsZS7CoCBJZiB3ZSBhbHJlYWR5IGhhdmUgdGhl
-IEFQSXMgd2UKPj4gbmVlZCBmcm9tIEtWTSwgbGV0J3MgdXNlIHRoZW0uCgpUaGUgcHJvYmxlbSB3
-aXRoIHN1c3BlbmQvcmVzdW1lIGlzIHRoYXQgdXNlciBzcGFjZSBkb2Vzbid0IGdldCBhCmxvb2st
-aW4uIFRoZXJlJ3Mgbm8gd2F5IChnZW5lcmljYWxseSkgZm9yIGEgdXNlciBzcGFjZSBhcHBsaWNh
-dGlvbiB0bwpzYXZlL3Jlc3RvcmUgcmVnaXN0ZXJzIGR1cmluZyB0aGUgc3VzcGVuZC4gVXNlciBz
-cGFjZSBzaW1wbHkgc2VlcyB0aW1lCmp1bXAgZm9yd2FyZHMgLSB3aGljaCBpcyBwcmVjaXNlbHkg
-d2hhdCB3ZSdyZSB0cnlpbmcgdG8gaGlkZSBmcm9tIHRoZQpndWVzdCAoYXMgaXQgb3RoZXJ3aXNl
-IGdldHMgdXBzZXQgdGhhdCBpdCBhcHBlYXJzIGEgdkNQVSBoYXMgZGVhZGxvY2tlZApmb3IgYSB3
-aGlsZSkuCgpTbyB3aGlsZSBJIGFncmVlIHRoaXMgaXMgInBvbGljeSIsIGl0J3Mgc29tZXRoaW5n
-IHdlIG5lZWQgdGhlIGtlcm5lbCB0bwpkbyBvbiBvdXIgYmVoYWxmLiBQb3RlbnRpYWxseSB3ZSBj
-YW4gcHV0IGl0IGJlaGluZCBhbiBpb2N0bCBzbyB0aGF0IHVzZXIKc3BhY2UgY2FuIG9wdC1pbiB0
-byBpdC4KCj4+PiAqIFNvbWV0aGluZyBlcXVpdmFsZW50IHRvIE1TUl9LVk1fV0FMTF9DTE9DS19O
-RVcgZm9yIGFybSB3aGljaCBhbGxvd3MKPj4+IHRoZSBndWVzdCB0byBxdWVyeSB0aGUgd2FsbCBj
-bG9jayB0aW1lIGZyb20gdGhlIGhvc3QgYW5kIHByb3ZpZGVzIGFuCj4+PiBvZmZzZXQgYmV0d2Vl
-biBDTlRWQ1RfRUwwIHRvIHdhbGwgY2xvY2sgdGltZSB3aGljaCB0aGUgS1ZNIGNhbiB1cGRhdGUK
-Pj4+IGR1cmluZyBzdXNwZW5kL3Jlc3VtZS4gVGhpcyBtZWFucyB0aGF0IGR1cmluZyBhIHN1c3Bl
-bmQvcmVzdW1lIHRoZSBndWVzdAo+Pj4gY2FuIG9ic2VydmUgdGhhdCB3YWxsIGNsb2NrIHRpbWUg
-aGFzIHBhc3NlZCwgd2l0aG91dCBoYXZpbmcgdG8gYmUKPj4+IGJvdGhlcmVkIGFib3V0IENOVFZD
-VF9FTDAganVtcGluZyBmb3J3YXJkcy4KPj4+Cj4+IElzbid0IHRoZSBwcm9wZXIgQXJtIGFyY2hp
-dGVjdHVyYWwgc29sdXRpb24gZm9yIHRoaXMgdG8gcmVhZCB0aGUKPj4gcGh5c2ljYWwgY291bnRl
-ciBmb3Igd2FsbCBjbG9jayB0aW1lIGtlZXBpbmcgPwo+Pgo+PiAoWWVzIHRoYXQgd2lsbCByZXF1
-aXJlIGEgdHJhcCBvbiBwaHlzaWNhbCBjb3VudGVyIHJlYWRzIGFmdGVyIG1pZ3JhdGlvbgo+PiBv
-biBjdXJyZW50IHN5c3RlbXMsIGJ1dCBtaWdyYXRpb24gc3Vja3MgaW4gdGVybXMgb2YgdGltZWtl
-ZXBpbmcKPj4gYWxyZWFkeS4pCgpUaGUgcGh5c2ljYWwgY291bnRlciBpcyBjZXJ0YWlubHkgdGVt
-cHRpbmcgYXMgaXQgbGFyZ2VseSBkb2VzIHdoYXQgd2UKd2FudCBhcyBhIHNlY29uZGFyeSBjb3Vu
-dGVyLiBIb3dldmVyIEknbSB3YXJ5IG9mIHVzaW5nIGl0IGJlY2F1c2UgaXQKc3RhcnRzIHRvIGdl
-dCAicmVhbGx5IGludGVyZXN0aW5nIiB3aGVuIGRlYWxpbmcgd2l0aCBuZXN0ZWQKdmlydHVhbGlz
-YXRpb24uIEFueSBieSAicmVhbGx5IGludGVyZXN0aW5nIiBJIG9mIGNvdXJzZSBtZWFuIGhvcnJp
-Ymx5CmJyb2tlbiA6KQoKQmFzaWNhbGx5IHRoZSBwcm9ibGVtIGlzIHRoYXQgd2l0aCBuZXN0ZWQg
-dmlydHVhbGlzYXRpb24gdGhlIG9mZnNldApiZXR3ZWVuIHRoZSBwaHlzaWNhbCBjb3VudGVyIGFu
-ZCB0aGUgdmlydHVhbCBjb3VudGVyIGlzIGNvbnRyb2xsZWQgYnkKdGhlIHZpcnR1YWwtRUwyLiBC
-ZWNhdXNlIHdlIHdhbnQgY2VydGFpbiBiZWhhdmlvdXJzIG9mIHRoZSB2aXJ0dWFsCmNvdW50ZXIg
-KHBhdXNpbmcgd2hlbiB0aGUgZ3Vlc3QgcGF1c2VzKSB3ZSBoYXZlIHRvIHJlcGxpY2F0ZSB0aGF0
-IG9udG8KdGhlIHBoeXNpY2FsIGNvdW50ZXIgdG8gbWFpbnRhaW4gdGhlIG9mZnNldCBiZXR3ZWVu
-IHRoZSB0d28gdGhhdCB0aGUKZ3Vlc3QgZXhwZWN0cy4KCkdpdmVuIHRoYXQgaXQgc2VlbXMgdG8g
-YmUgYSBub24tc3RhcnRlciB3aGVuIHlvdSBpbnRyb2R1Y2UgbmVzdGVkIHZpcnQgSQp0aGluayB3
-ZSBzaG91bGQganVzdCBiaXRlIHRoZSBidWxsZXQgYW5kIGltcGxlbWVudCBhIFBWIHdhbGwgY2xv
-Y2sKbWVjaGFuaXNtIGZvciBhcm02NCAoc2ltaWxhciB0byBNU1JfS1ZNX1dBTExfQ0xPQ0tfTkVX
-KS4KClRoaXMgYWxzbyBoYXMgdGhlIGFkdmFudGFnZSB0aGF0IGl0IGlzIGdvaW5nIHRvIGJlIGZh
-c3RlciB0aGFuIHRoZQpwaHlzaWNhbCBjb3VudGVyIHdoZW4gdGhhdCBoYXMgdG8gYmUgdHJhcHBl
-ZCAoZS5nLiBhZnRlciBtaWdyYXRpb24pLgoKU3RldmUKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+On Sun, 17 Mar 2019 18:22:15 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
+
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+> 
+> In any virtualization use case, when the first translation stage
+> is "owned" by the guest OS, the host IOMMU driver has no knowledge
+> of caching structure updates unless the guest invalidation activities
+> are trapped by the virtualizer and passed down to the host.
+> 
+> Since the invalidation data are obtained from user space and will be
+> written into physical IOMMU, we must allow security check at various
+> layers. Therefore, generic invalidation data format are proposed here,
+> model specific IOMMU drivers need to convert them into their own
+> format.
+> 
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> v5 -> v6:
+> - fix merge issue
+> 
+> v3 -> v4:
+> - full reshape of the API following Alex' comments
+> 
+> v1 -> v2:
+> - add arch_id field
+> - renamed tlb_invalidate into cache_invalidate as this API allows
+>   to invalidate context caches on top of IOTLBs
+> 
+> v1:
+> renamed sva_invalidate into tlb_invalidate and add iommu_ prefix in
+> header. Commit message reworded.
+> ---
+>  drivers/iommu/iommu.c      | 14 ++++++++
+>  include/linux/iommu.h      | 15 ++++++++
+>  include/uapi/linux/iommu.h | 71
+> ++++++++++++++++++++++++++++++++++++++ 3 files changed, 100
+> insertions(+)
+> 
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 7d9285cea100..b72e326ddd41 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1544,6 +1544,20 @@ void iommu_detach_pasid_table(struct
+> iommu_domain *domain) }
+>  EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
+>  
+> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
+> device *dev,
+> +			   struct iommu_cache_invalidate_info
+> *inv_info) +{
+> +	int ret = 0;
+> +
+> +	if (unlikely(!domain->ops->cache_invalidate))
+> +		return -ENODEV;
+> +
+> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_cache_invalidate);
+> +
+>  static void __iommu_detach_device(struct iommu_domain *domain,
+>  				  struct device *dev)
+>  {
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index fb9b7a8de25f..7c7c6bad1420 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -191,6 +191,7 @@ struct iommu_resv_region {
+>   *                      driver init to device driver init (default
+> no)
+>   * @attach_pasid_table: attach a pasid table
+>   * @detach_pasid_table: detach the pasid table
+> + * @cache_invalidate: invalidate translation caches
+>   * @pgsize_bitmap: bitmap of all possible supported page sizes
+>   */
+>  struct iommu_ops {
+> @@ -239,6 +240,9 @@ struct iommu_ops {
+>  				  struct iommu_pasid_table_config
+> *cfg); void (*detach_pasid_table)(struct iommu_domain *domain);
+>  
+> +	int (*cache_invalidate)(struct iommu_domain *domain, struct
+> device *dev,
+> +				struct iommu_cache_invalidate_info
+> *inv_info); +
+>  	unsigned long pgsize_bitmap;
+>  };
+>  
+> @@ -349,6 +353,9 @@ extern void iommu_detach_device(struct
+> iommu_domain *domain, extern int iommu_attach_pasid_table(struct
+> iommu_domain *domain, struct iommu_pasid_table_config *cfg);
+>  extern void iommu_detach_pasid_table(struct iommu_domain *domain);
+> +extern int iommu_cache_invalidate(struct iommu_domain *domain,
+> +				  struct device *dev,
+> +				  struct iommu_cache_invalidate_info
+> *inv_info); extern struct iommu_domain
+> *iommu_get_domain_for_dev(struct device *dev); extern struct
+> iommu_domain *iommu_get_dma_domain(struct device *dev); extern int
+> iommu_map(struct iommu_domain *domain, unsigned long iova, @@ -797,6
+> +804,14 @@ int iommu_attach_pasid_table(struct iommu_domain *domain,
+> static inline void iommu_detach_pasid_table(struct iommu_domain
+> *domain) {} 
+> +static inline int
+> +iommu_cache_invalidate(struct iommu_domain *domain,
+> +		       struct device *dev,
+> +		       struct iommu_cache_invalidate_info *inv_info)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  #endif /* CONFIG_IOMMU_API */
+>  
+>  #ifdef CONFIG_IOMMU_DEBUGFS
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index 532a64075f23..e4c6a447e85a 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -159,4 +159,75 @@ struct iommu_pasid_table_config {
+>  	};
+>  };
+>  
+> +/* defines the granularity of the invalidation */
+> +enum iommu_inv_granularity {
+> +	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective
+> invalidation */
+> +	IOMMU_INV_GRANU_PASID,	/* pasid-selective
+> invalidation */
+> +	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation
+> */ +};
+> +
+> +/**
+> + * Address Selective Invalidation Structure
+> + *
+> + * @flags indicates the granularity of the address-selective
+> invalidation
+> + * - if PASID bit is set, @pasid field is populated and the
+> invalidation
+> + *   relates to cache entries tagged with this PASID and matching the
+> + *   address range.
+> + * - if ARCHID bit is set, @archid is populated and the invalidation
+> relates
+> + *   to cache entries tagged with this architecture specific id and
+> matching
+> + *   the address range.
+> + * - Both PASID and ARCHID can be set as they may tag different
+> caches.
+> + * - if neither PASID or ARCHID is set, global addr invalidation
+> applies
+> + * - LEAF flag indicates whether only the leaf PTE caching needs to
+> be
+> + *   invalidated and other paging structure caches can be preserved.
+> + * @pasid: process address space id
+> + * @archid: architecture-specific id
+> + * @addr: first stage/level input address
+> + * @granule_size: page/block size of the mapping in bytes
+> + * @nb_granules: number of contiguous granules to be invalidated
+> + */
+> +struct iommu_inv_addr_info {
+> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
+> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
+> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
+> +	__u32	flags;
+> +	__u32	archid;
+> +	__u64	pasid;
+> +	__u64	addr;
+> +	__u64	granule_size;
+> +	__u64	nb_granules;
+> +};
+> +
+> +/**
+> + * First level/stage invalidation information
+> + * @cache: bitfield that allows to select which caches to invalidate
+> + * @granularity: defines the lowest granularity used for the
+> invalidation:
+> + *     domain > pasid > addr
+> + *
+> + * Not all the combinations of cache/granularity make sense:
+> + *
+> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
+> + * granularity	|		|		|
+> cache	|
+> + * -------------+---------------+---------------+---------------+
+> + * DOMAIN	|	N/A	|       Y	|
+> Y	|
+> + * PASID	|	Y	|       Y	|
+> Y	|
+> + * ADDR		|       Y	|       Y	|
+> N/A	|
+> + */
+> +struct iommu_cache_invalidate_info {
+> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
+> +	__u32	version;
+> +/* IOMMU paging structure cache */
+> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
+> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device
+> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID
+> cache */
+Just a clarification, this used to be an enum. You do intend to issue a
+single invalidation request on multiple cache types? Perhaps for
+virtio-IOMMU? I only see a single cache type in your patch #14. For VT-d
+we plan to issue one cache type at a time for now. So this format works
+for us.
+However, if multiple cache types are issued in a single invalidation.
+They must share a single granularity, not all combinations are valid.
+e.g. dev IOTLB does not support domain granularity. Just a reminder,
+not an issue. Driver could filter out invalid combinations.
+
+> +	__u8	cache;
+> +	__u8	granularity;
+> +	__u8	padding[2];
+> +	union {
+> +		__u64	pasid;
+> +		struct iommu_inv_addr_info addr_info;
+> +	};
+> +};
+> +
+> +
+>  #endif /* _UAPI_IOMMU_H */
+
+[Jacob Pan]
