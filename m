@@ -1,66 +1,96 @@
-From: Mukesh Ojha <mojha@codeaurora.org>
-Subject: Re: [PATCH -next] KVM: arm: vgic: Make two functions static
-Date: Thu, 21 Mar 2019 00:38:24 +0530
-Message-ID: <de8edaed-a37b-f143-75d8-9db9c45c5543@codeaurora.org>
-References: <20190320141813.10380-1-yuehaibing@huawei.com>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+Subject: Re: [PATCH v7 9/10] KVM: arm64: docs: document KVM support of pointer
+ authentication
+Date: Wed, 20 Mar 2019 20:56:35 +0000
+Message-ID: <6d84723d-e00e-e89f-4c42-d48d0eb03443@arm.com>
+References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
+ <1552984243-7689-10-git-send-email-amit.kachhap@arm.com>
+ <7bf19035-02ba-ae47-b08c-7d7622a45dbf@arm.com>
+ <648d66dd-519c-7567-a3e1-c23208f68cf2@arm.com>
+ <52d3f9c8-fc27-bf3d-f8f3-1b3921508a8c@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190320141813.10380-1-yuehaibing@huawei.com>
+In-Reply-To: <52d3f9c8-fc27-bf3d-f8f3-1b3921508a8c@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Yue Haibing <yuehaibing@huawei.com>, christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, andre.przywara@arm.com
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Julien Thierry <julien.thierry@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 20/03/2019 18:06, Julien Thierry wrote:
+> 
+> 
+> On 20/03/2019 15:04, Kristina Martsenko wrote:
+>> On 20/03/2019 13:37, Julien Thierry wrote:
+>>> Hi Amit,
+>>>
+>>> On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
+>>>> This adds sections for KVM API extension for pointer authentication.
+>>>> A brief description about usage of pointer authentication for KVM guests
+>>>> is added in the arm64 documentations.
+>>
+>> [...]
+>>
+>>>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>>>> index 7de9eee..b5c66bc 100644
+>>>> --- a/Documentation/virtual/kvm/api.txt
+>>>> +++ b/Documentation/virtual/kvm/api.txt
+>>>> @@ -2659,6 +2659,12 @@ Possible features:
+>>>>  	  Depends on KVM_CAP_ARM_PSCI_0_2.
+>>>>  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+>>>>  	  Depends on KVM_CAP_ARM_PMU_V3.
+>>>> +	- KVM_ARM_VCPU_PTRAUTH_ADDRESS:
+>>>> +	- KVM_ARM_VCPU_PTRAUTH_GENERIC:
+>>>> +	  Enables Pointer authentication for the CPU.
+>>>> +	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
+>>>> +	  set, then the KVM guest allows the execution of pointer authentication
+>>>> +	  instructions. Otherwise, KVM treats these instructions as undefined.
+>>>>  
+>>>
+>>> Overall I feel one could easily get confused to whether
+>>> PTRAUTH_ADDRESS/GENERIC are two individual features, whether one is a
+>>> superset of the other, if the names are just an alias of one another, etc...
+>>>
+>>> I think the doc should at least stress out that *both* flags are
+>>> required to enable ptrauth in a guest. However it raises the question,
+>>> if we don't plan to support the features individually (because we
+>>> can't), should we really expose two feature flags? I seems odd to
+>>> introduce two flags that only do something if used together...
+>>
+>> Why can't we support the features individually? For example, if we ever
+>> get a system where all CPUs support address authentication and none of
+>> them support generic authentication, then we could still support address
+>> authentication in the guest.
+>>
+>>
+> 
+> That's a good point, I didn't think of that.
+> 
+> Although, currently we don't have a way to detect that we are in such a
+> configuration. So as is, both flags are required to enable either
+> feature, and I feel the documentation should be clear on that aspect.
 
-On 3/20/2019 7:48 PM, Yue Haibing wrote:
-> From: YueHaibing <yuehaibing@huawei.com>
->
-> Fix sparse warnings:
->
-> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1732:5: warning:
->   symbol 'vgic_its_has_attr_regs' was not declared. Should it be static?
-> arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1753:5: warning:
->   symbol 'vgic_its_attr_regs_access' was not declared. Should it be static?
->
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->   virt/kvm/arm/vgic/vgic-its.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index ab3f477..a97db69 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1729,8 +1729,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
->   	kfree(its);
->   }
->   
-> -int vgic_its_has_attr_regs(struct kvm_device *dev,
-> -			   struct kvm_device_attr *attr)
-> +static int vgic_its_has_attr_regs(struct kvm_device *dev,
-> +				  struct kvm_device_attr *attr)
->   {
->   	const struct vgic_register_region *region;
->   	gpa_t offset = attr->attr;
-> @@ -1750,9 +1750,9 @@ int vgic_its_has_attr_regs(struct kvm_device *dev,
->   	return 0;
->   }
->   
-> -int vgic_its_attr_regs_access(struct kvm_device *dev,
-> -			      struct kvm_device_attr *attr,
-> -			      u64 *reg, bool is_write)
-> +static int vgic_its_attr_regs_access(struct kvm_device *dev,
-> +				     struct kvm_device_attr *attr,
-> +				     u64 *reg, bool is_write)
->   {
->   	const struct vgic_register_region *region;
->   	struct vgic_its *its;
+For now we only support enabling both features together, so both flags
+need to be set. I agree that the documentation should be made clear on this.
 
+In the future, if we need to, we can add "negative" cpucaps to detect
+that a feature is absent on all CPUs.
 
-Acked-by: Mukesh Ojha <mojha@codeaurora.org>
+> 
+> Another option would be to introduce a flag that enables both for now,
+> and if one day we decide to support the configuration you mentioned we
+> could add "more modular" flags that allow you to control those features
+> individually. While a bit cumbersome, I would find that less awkward
+> than having two flags that only do something if both are present.
 
-Cheers,
-Mukesh
+That would work too.
+
+I find it more logical to have two flags since there are two features
+(two ID register fields), and KVM enables two features for the guest.
+The fact that KVM does not currently support enabling them separately is
+a KVM implementation choice, and could change in the future.
+
+Thanks,
+Kristina
