@@ -1,100 +1,54 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
-Date: Wed, 20 Mar 2019 16:50:07 +0000
-Message-ID: <7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
-References: <20190317172232.1068-1-eric.auger@redhat.com>
- <20190317172232.1068-6-eric.auger@redhat.com>
- <20190320093727.45a86866@jacob-builder>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
+Date: Wed, 20 Mar 2019 17:02:19 +0000
+Message-ID: <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
+References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190320093727.45a86866@jacob-builder>
-Content-Language: en-US
+In-Reply-To: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>, Eric Auger <eric.auger@redhat.com>
-Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, alex.williamson@redhat.com, ashok.raj@intel.com, kvm@vger.kernel.org, peter.maydell@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Linuxarm <linuxarm@huawei.com>, guoheyi@huawei.com, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 20/03/2019 16:37, Jacob Pan wrote:
-[...]
->> +struct iommu_inv_addr_info {
->> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
->> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
->> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
->> +	__u32	flags;
->> +	__u32	archid;
->> +	__u64	pasid;
->> +	__u64	addr;
->> +	__u64	granule_size;
->> +	__u64	nb_granules;
->> +};
->> +
->> +/**
->> + * First level/stage invalidation information
->> + * @cache: bitfield that allows to select which caches to invalidate
->> + * @granularity: defines the lowest granularity used for the
->> invalidation:
->> + *     domain > pasid > addr
->> + *
->> + * Not all the combinations of cache/granularity make sense:
->> + *
->> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
->> + * granularity	|		|		|
->> cache	|
->> + * -------------+---------------+---------------+---------------+
->> + * DOMAIN	|	N/A	|       Y	|
->> Y	|
->> + * PASID	|	Y	|       Y	|
->> Y	|
->> + * ADDR		|       Y	|       Y	|
->> N/A	|
->> + */
->> +struct iommu_cache_invalidate_info {
->> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
->> +	__u32	version;
->> +/* IOMMU paging structure cache */
->> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
->> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device
->> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID
->> cache */
-> Just a clarification, this used to be an enum. You do intend to issue a
-> single invalidation request on multiple cache types? Perhaps for
-> virtio-IOMMU? I only see a single cache type in your patch #14. For VT-d
-> we plan to issue one cache type at a time for now. So this format works
-> for us.
+On Tue, 19 Mar 2019 21:25:47 +0800
+"Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
 
-Yes for virtio-iommu I'd like as little overhead as possible, which
-means a single invalidation message to hit both IOTLB and ATC at once,
-and the ability to specify multiple pages with @nb_granules.
+> Hi, all
+> 
+> Using gicv4, when guest is waiting for irq, it sends wfi and traps to kvm.
+> When vlpi is forwarded to PE after its_vpe_deschedule, before halt_poll in
+> kvm_vcpu_block, halt_poll may increase latency for this vlpi getting to guest.
+> In halt_poll process, it checks if there's pending irq for vcpu using pending_last.
+> However, doorbell is not enable at this moment and vlpi or doorbell can not set
+> pending_last true, to stop halt_poll. It will run until halt_poll time ends, if
+> there's no other physical irq coming in the meantime. And then vcpu is scheduled out.
+> This pending vlpi has to wait for vcpu getting schedule in next time.
+> 
+> Should we enable doorbell before halt_poll process ?
 
-> However, if multiple cache types are issued in a single invalidation.
-> They must share a single granularity, not all combinations are valid.
-> e.g. dev IOTLB does not support domain granularity. Just a reminder,
-> not an issue. Driver could filter out invalid combinations.
+Enabling doorbells can be quite expensive. Depending on the HW, this is
+either:
 
-Agreed. Even the core could filter out invalid combinations based on the
-table above: IOTLB and domain granularity are N/A.
+- a write to memory (+DSB, potential cache maintenance), a write to the
+  INVLPI register, and a poll of the SYNC register
+- a write to memory (+DSB, potential cache maintenance), potentially
+  a string of DISCARD+SYNC+MAPI+SYNC commands, and an INV+SYNC command
+
+Frankly, you want to be careful with that. I'd rather enable them late
+and have a chance of not blocking because of another (virtual)
+interrupt, which saves us the doorbell business.
+
+I wonder if you wouldn't be in a better position by drastically
+reducing halt_poll_ns for vcpu that can have directly injected
+interrupts.
+
+In any case, this is something that we should measure, not guess.
 
 Thanks,
-Jean
 
-> 
->> +	__u8	cache;
->> +	__u8	granularity;
->> +	__u8	padding[2];
->> +	union {
->> +		__u64	pasid;
->> +		struct iommu_inv_addr_info addr_info;
->> +	};
->> +};
->> +
->> +
->>  #endif /* _UAPI_IOMMU_H */
-> 
-> [Jacob Pan]
-> _______________________________________________
-> iommu mailing list
-> iommu@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> 
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
