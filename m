@@ -1,56 +1,35 @@
-From: Yue Haibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] KVM: arm: vgic: Make two functions static
-Date: Wed, 20 Mar 2019 22:18:13 +0800
-Message-ID: <20190320141813.10380-1-yuehaibing@huawei.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
+Date: Wed, 20 Mar 2019 22:31:36 +0800
+Message-ID: <f04863f2-1b50-3c66-e4cb-0cd8da239c77@huawei.com>
+References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, andre.przywara@arm.com
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, YueHaibing <yuehaibing@huawei.com>
+To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Linuxarm <linuxarm@huawei.com>
+Cc: wanghaibin.wang@huawei.com, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: YueHaibing <yuehaibing@huawei.com>
++cc Marc and Christoffer...
 
-Fix sparse warnings:
 
-arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1732:5: warning:
- symbol 'vgic_its_has_attr_regs' was not declared. Should it be static?
-arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1753:5: warning:
- symbol 'vgic_its_attr_regs_access' was not declared. Should it be static?
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- virt/kvm/arm/vgic/vgic-its.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index ab3f477..a97db69 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1729,8 +1729,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
- 	kfree(its);
- }
- 
--int vgic_its_has_attr_regs(struct kvm_device *dev,
--			   struct kvm_device_attr *attr)
-+static int vgic_its_has_attr_regs(struct kvm_device *dev,
-+				  struct kvm_device_attr *attr)
- {
- 	const struct vgic_register_region *region;
- 	gpa_t offset = attr->attr;
-@@ -1750,9 +1750,9 @@ int vgic_its_has_attr_regs(struct kvm_device *dev,
- 	return 0;
- }
- 
--int vgic_its_attr_regs_access(struct kvm_device *dev,
--			      struct kvm_device_attr *attr,
--			      u64 *reg, bool is_write)
-+static int vgic_its_attr_regs_access(struct kvm_device *dev,
-+				     struct kvm_device_attr *attr,
-+				     u64 *reg, bool is_write)
- {
- 	const struct vgic_register_region *region;
- 	struct vgic_its *its;
--- 
-2.7.0
+On 2019/3/19 21:25, Tangnianyao (ICT) wrote:
+> Hi, all
+>
+> Using gicv4, when guest is waiting for irq, it sends wfi and traps to kvm.
+> When vlpi is forwarded to PE after its_vpe_deschedule, before halt_poll in
+> kvm_vcpu_block, halt_poll may increase latency for this vlpi getting to guest.
+> In halt_poll process, it checks if there's pending irq for vcpu using pending_last.
+> However, doorbell is not enable at this moment and vlpi or doorbell can not set
+> pending_last true, to stop halt_poll. It will run until halt_poll time ends, if
+> there's no other physical irq coming in the meantime. And then vcpu is scheduled out.
+> This pending vlpi has to wait for vcpu getting schedule in next time.
+>
+> Should we enable doorbell before halt_poll process ?
+>
+>
+> .
+>
