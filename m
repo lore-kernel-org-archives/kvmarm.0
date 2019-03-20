@@ -1,91 +1,56 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v7 9/10] KVM: arm64: docs: document KVM support of pointer
- authentication
-Date: Wed, 20 Mar 2019 13:37:58 +0000
-Message-ID: <7bf19035-02ba-ae47-b08c-7d7622a45dbf@arm.com>
-References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-10-git-send-email-amit.kachhap@arm.com>
+From: Yue Haibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] KVM: arm: vgic: Make two functions static
+Date: Wed, 20 Mar 2019 22:18:13 +0800
+Message-ID: <20190320141813.10380-1-yuehaibing@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1552984243-7689-10-git-send-email-amit.kachhap@arm.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
+To: christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, andre.przywara@arm.com
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, YueHaibing <yuehaibing@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Amit,
+From: YueHaibing <yuehaibing@huawei.com>
 
-On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
-> This adds sections for KVM API extension for pointer authentication.
-> A brief description about usage of pointer authentication for KVM guests
-> is added in the arm64 documentations.
-> 
-> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> ---
->  Documentation/arm64/pointer-authentication.txt | 15 +++++++++++----
->  Documentation/virtual/kvm/api.txt              |  6 ++++++
->  2 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/arm64/pointer-authentication.txt b/Documentation/arm64/pointer-authentication.txt
-> index 5baca42..4b769e6 100644
-> --- a/Documentation/arm64/pointer-authentication.txt
-> +++ b/Documentation/arm64/pointer-authentication.txt
-> @@ -87,7 +87,14 @@ used to get and set the keys for a thread.
->  Virtualization
->  --------------
->  
-> -Pointer authentication is not currently supported in KVM guests. KVM
-> -will mask the feature bits from ID_AA64ISAR1_EL1, and attempted use of
-> -the feature will result in an UNDEFINED exception being injected into
-> -the guest.
-> +Pointer authentication is enabled in KVM guest when each virtual cpu is
-> +initialised by passing flags KVM_ARM_VCPU_PTRAUTH_[ADDRESS/GENERIC] and
-> +requesting this feature to be enabled. Without this flag, pointer
+Fix sparse warnings:
 
-"Without these flags"*
+arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1732:5: warning:
+ symbol 'vgic_its_has_attr_regs' was not declared. Should it be static?
+arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-its.c:1753:5: warning:
+ symbol 'vgic_its_attr_regs_access' was not declared. Should it be static?
 
-> +authentication is not enabled in KVM guests and attempted use of the
-> +feature will result in an UNDEFINED exception being injected into the
-> +guest.
-> +
-> +Additionally, when these vcpu feature flags are not set then KVM will
-> +filter out the Pointer Authentication system key registers from
-> +KVM_GET/SET_REG_* ioctls and mask those features from cpufeature ID
-> +register.
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 7de9eee..b5c66bc 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2659,6 +2659,12 @@ Possible features:
->  	  Depends on KVM_CAP_ARM_PSCI_0_2.
->  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
->  	  Depends on KVM_CAP_ARM_PMU_V3.
-> +	- KVM_ARM_VCPU_PTRAUTH_ADDRESS:
-> +	- KVM_ARM_VCPU_PTRAUTH_GENERIC:
-> +	  Enables Pointer authentication for the CPU.
-> +	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
-> +	  set, then the KVM guest allows the execution of pointer authentication
-> +	  instructions. Otherwise, KVM treats these instructions as undefined.
->  
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ virt/kvm/arm/vgic/vgic-its.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Overall I feel one could easily get confused to whether
-PTRAUTH_ADDRESS/GENERIC are two individual features, whether one is a
-superset of the other, if the names are just an alias of one another, etc...
-
-I think the doc should at least stress out that *both* flags are
-required to enable ptrauth in a guest. However it raises the question,
-if we don't plan to support the features individually (because we
-can't), should we really expose two feature flags? I seems odd to
-introduce two flags that only do something if used together...
-
-Cheers,
-
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index ab3f477..a97db69 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1729,8 +1729,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ 	kfree(its);
+ }
+ 
+-int vgic_its_has_attr_regs(struct kvm_device *dev,
+-			   struct kvm_device_attr *attr)
++static int vgic_its_has_attr_regs(struct kvm_device *dev,
++				  struct kvm_device_attr *attr)
+ {
+ 	const struct vgic_register_region *region;
+ 	gpa_t offset = attr->attr;
+@@ -1750,9 +1750,9 @@ int vgic_its_has_attr_regs(struct kvm_device *dev,
+ 	return 0;
+ }
+ 
+-int vgic_its_attr_regs_access(struct kvm_device *dev,
+-			      struct kvm_device_attr *attr,
+-			      u64 *reg, bool is_write)
++static int vgic_its_attr_regs_access(struct kvm_device *dev,
++				     struct kvm_device_attr *attr,
++				     u64 *reg, bool is_write)
+ {
+ 	const struct vgic_register_region *region;
+ 	struct vgic_its *its;
 -- 
-Julien Thierry
+2.7.0
