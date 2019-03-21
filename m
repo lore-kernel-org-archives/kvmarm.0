@@ -1,368 +1,313 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 1/2] KVM: arm/arm64: Add save/restore support for
- firmware workaround state
-Date: Thu, 21 Mar 2019 19:03:03 +0100
-Message-ID: <81724921-b986-4b81-d9fa-b73f905c7923@redhat.com>
-References: <20190228234334.20456-1-andre.przywara@arm.com>
- <20190228234334.20456-2-andre.przywara@arm.com>
- <6f155e8b-b679-d868-865c-6fd6f4ee611a@redhat.com>
- <20190321173520.554c7e97@donnerap.cambridge.arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v6 03/22] iommu: introduce device fault report API
+Date: Thu, 21 Mar 2019 14:57:56 -0600
+Message-ID: <20190321145756.79ca69e4@x1.home>
+References: <20190317172232.1068-1-eric.auger@redhat.com>
+        <20190317172232.1068-4-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20190321173520.554c7e97@donnerap.cambridge.arm.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Dave Martin <dave.martin@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190317172232.1068-4-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+On Sun, 17 Mar 2019 18:22:13 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-On 3/21/19 6:35 PM, Andre Przywara wrote:
-> On Thu, 21 Mar 2019 13:54:07 +0100
-> Auger Eric <eric.auger@redhat.com> wrote:
+> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > 
-> Hi Eric,
+> Traditionally, device specific faults are detected and handled within
+> their own device drivers. When IOMMU is enabled, faults such as DMA
+> related transactions are detected by IOMMU. There is no generic
+> reporting mechanism to report faults back to the in-kernel device
+> driver or the guest OS in case of assigned devices.
 > 
-> many thanks for looking at this!
-> I was about to prepare a new revision.
+> This patch introduces a registration API for device specific fault
+> handlers. This differs from the existing iommu_set_fault_handler/
+> report_iommu_fault infrastructures in several ways:
+> - it allows to report more sophisticated fault events (both
+>   unrecoverable faults and page request faults) due to the nature
+>   of the iommu_fault struct
+> - it is device specific and not domain specific.
 > 
->> Hi Andre,
->>
->> On 3/1/19 12:43 AM, Andre Przywara wrote:
->>> KVM implements the firmware interface for mitigating cache speculation
->>> vulnerabilities. Guests may use this interface to ensure mitigation is
->>> active.
->>> If we want to migrate such a guest to a host with a different support
->>> level for those workarounds, migration might need to fail, to ensure that
->>> critical guests don't loose their protection.
->>>
->>> Introduce a way for userland to save and restore the workarounds state.
->>> On restoring we do checks that make sure we don't downgrade our
->>> mitigation level.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  arch/arm/include/asm/kvm_emulate.h   |  10 +++
->>>  arch/arm/include/uapi/asm/kvm.h      |  10 +++
->>>  arch/arm64/include/asm/kvm_emulate.h |  14 +++
->>>  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
->>>  virt/kvm/arm/psci.c                  | 128 +++++++++++++++++++++++----
->>>  5 files changed, 155 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
->>> index 8927cae7c966..663a02d7e6f4 100644
->>> --- a/arch/arm/include/asm/kvm_emulate.h
->>> +++ b/arch/arm/include/asm/kvm_emulate.h
->>> @@ -283,6 +283,16 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
->>>  	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
->>>  }
->>>  
->>> +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
->>> +{
->>> +	return false;
->>> +}
->>> +
->>> +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
->>> +						      bool flag)
->>> +{
->>> +}
->>> +
->>>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
->>>  {
->>>  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
->>> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
->>> index 4602464ebdfb..ba4d2afe65e3 100644
->>> --- a/arch/arm/include/uapi/asm/kvm.h
->>> +++ b/arch/arm/include/uapi/asm/kvm.h
->>> @@ -214,6 +214,16 @@ struct kvm_vcpu_events {
->>>  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM | KVM_REG_SIZE_U64 | \
->>>  					 KVM_REG_ARM_FW | ((r) & 0xffff))
->>>  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED	2
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1  
->> Would be worth adding a comment saying that values are chosen so that
->> higher values mean better protection. Otherwise it looks strange
->> NOT_AVAIL/AVAIL/UNAFFECTED values are not the same for both workarounds.	
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	(1U << 4)  
->>
->>>  
->>>  /* Device Control API: ARM VGIC */
->>>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
->>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->>> index d3842791e1c4..c00c17c9adb6 100644
->>> --- a/arch/arm64/include/asm/kvm_emulate.h
->>> +++ b/arch/arm64/include/asm/kvm_emulate.h
->>> @@ -348,6 +348,20 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
->>>  	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
->>>  }
->>>  
->>> +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
->>> +{
->>> +	return vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG;
->>> +}
->>> +
->>> +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
->>> +						      bool flag)
->>> +{
->>> +	if (flag)
->>> +		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
->>> +	else
->>> +		vcpu->arch.workaround_flags &= ~VCPU_WORKAROUND_2_FLAG;
->>> +}
->>> +
->>>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
->>>  {
->>>  	if (vcpu_mode_is_32bit(vcpu)) {
->>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->>> index 97c3478ee6e7..367e96fe654e 100644
->>> --- a/arch/arm64/include/uapi/asm/kvm.h
->>> +++ b/arch/arm64/include/uapi/asm/kvm.h
->>> @@ -225,6 +225,15 @@ struct kvm_vcpu_events {
->>>  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->>>  					 KVM_REG_ARM_FW | ((r) & 0xffff))
->>>  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
->>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     (1U << 4)
->>>  
->>>  /* Device Control API: ARM VGIC */
->>>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
->>> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
->>> index 9b73d3ad918a..e65664c09b12 100644
->>> --- a/virt/kvm/arm/psci.c
->>> +++ b/virt/kvm/arm/psci.c
->>> @@ -445,42 +445,97 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>>  
->>>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
->>>  {
->>> -	return 1;		/* PSCI version */
->>> +	return 3;		/* PSCI version and two workaround registers */
->>>  }
->>>  
->>>  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>>  {
->>> -	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices))
->>> +	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
->>> +		return -EFAULT;
->>> +
->>> +	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
->>> +		return -EFAULT;
->>> +
->>> +	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
->>>  		return -EFAULT;  
->> Wouldn't it make sense to have a const array somewhere listing the FW
->> regs and putting KVM_REG_ARM_FW_REG[i]? Also kvm_arm_get_fw_num_regs
->> could return the ARRAY_SIZE.
+> The current iommu_report_device_fault() implementation only handles
+> the "shoot and forget" unrecoverable fault case. Handling of page
+> request faults or stalled faults will come later.
 > 
-> Yeah, makes sense. I was cowardly pushing this off to the one adding the next firmware register ;-)
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
->> vcpu arg is never used actually (not related to this patch).
->>>  
->>>  	return 0;
->>>  }
->>>  
->>> +#define KVM_REG_FEATURE_LEVEL_WIDTH	4
->>> +#define KVM_REG_FEATURE_LEVEL_MASK	(BIT(KVM_REG_FEATURE_LEVEL_WIDTH) - 1)
->>> +
->>> +/*
->>> + * Convert the workaround level into an easy-to-compare number, where higher
->>> + * values mean better protection.
->>> + */
->>> +static int get_kernel_wa_level(u64 regid)
->>> +{
->>> +	switch (regid) {
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
->>> +		if (kvm_arm_harden_branch_predictor())
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
->>> +		else
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
->>> +		switch (kvm_arm_have_ssbd()) {
->>> +		case KVM_SSBD_FORCE_DISABLE:
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
->>> +		case KVM_SSBD_KERNEL:
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL;
->>> +		case KVM_SSBD_FORCE_ENABLE:
->>> +		case KVM_SSBD_MITIGATED:
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED;
->>> +		case KVM_SSBD_UNKNOWN:
->>> +		default:
->>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN;
->>> +		}
->>> +	}
->>> +
->>> +	return 0;  
->> I would rather return -EINVAL although the function is not called for
->> any invalid reg.
->>> +}
->>> +
->>>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>>  {
->>> -	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
->>> -		void __user *uaddr = (void __user *)(long)reg->addr;
->>> -		u64 val;
->>> +	void __user *uaddr = (void __user *)(long)reg->addr;
->>> +	u64 val;
->>>  
->>> +	switch (reg->id) {
->>> +	case KVM_REG_ARM_PSCI_VERSION:
->>>  		val = kvm_psci_version(vcpu, vcpu->kvm);
->>> -		if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
->>> -			return -EFAULT;
->>> -
->>> -		return 0;
->>> +		break;
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
->>> +		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;  
->> Can get_kernel_wa_level return something outside of
->> KVM_REG_FEATURE_LEVEL_MASK?
->>> +		break;
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
->>> +		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;  
->> same here
->>> +		if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL &&> +		    kvm_arm_get_vcpu_workaround_2_flag(vcpu))  
->> nit: if (val == KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL &&
->> kvm_arm_get_vcpu_workaround_2_flag(vcpu)).
+> ---
 > 
-> Yeah, might be better, since we operate in the KVM_REG_ARM_ namespace here.
+> v4 -> v5:
+> - remove stuff related to recoverable faults
+> ---
+>  drivers/iommu/iommu.c | 134 +++++++++++++++++++++++++++++++++++++++++-
+>  include/linux/iommu.h |  36 +++++++++++-
+>  2 files changed, 168 insertions(+), 2 deletions(-)
 > 
->>> +			val |= KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED;
->>> +		break;
->>> +	default:
->>> +		return -ENOENT;
->>>  	}
->>>  
->>> -	return -EINVAL;
->>> +	if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
->>> +		return -EFAULT;
->>> +
->>> +	return 0;
->>>  }
->>>  
->>>  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>>  {
->>> -	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
->>> -		void __user *uaddr = (void __user *)(long)reg->addr;
->>> -		bool wants_02;
->>> -		u64 val;
->>> +	void __user *uaddr = (void __user *)(long)reg->addr;
->>> +	u64 val;
->>> +	int wa_level;
->>> +
->>> +	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
->>> +		return -EFAULT;
->>>  
->>> -		if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
->>> -			return -EFAULT;
->>> +	switch (reg->id) {
->>> +	case KVM_REG_ARM_PSCI_VERSION:
->>> +	{
->>> +		bool wants_02;
->>>  
->>>  		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
->>>  
->>> @@ -497,6 +552,47 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>>  			vcpu->kvm->arch.psci_version = val;
->>>  			return 0;
->>>  		}
->>> +		break;
->>> +	}
->>> +
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
->>> +		if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
->>> +			return -EINVAL;
->>> +
->>> +		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;  
->> not needed
-> 
-> Yeah, I kept it in for symmetry reasons. I was also afraid that someone
-> changes the check above in the future.
-> 
->>> +
->>> +		/* For now we only accept the very same workaround level. */
->>> +		if (get_kernel_wa_level(reg->id) != wa_level)
->>> +			return -EINVAL;
->>> +
->>> +		return 0;
->>> +
->>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
->>> +		if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
->>> +			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))> +			return -EINVAL;
->>> +
->>> +		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
->>> +
->>> +		if (get_kernel_wa_level(reg->id) < wa_level)
->>> +			return -EINVAL;
->>> +  
->> worth a comment?
-> 
-> True.
-> 
->>> +		if (kvm_arm_have_ssbd() != KVM_SSBD_KERNEL)
->>> +			return 0;
->>> +
->>> +		switch (wa_level) {
->>> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
->>> +			kvm_arm_set_vcpu_workaround_2_flag(vcpu,
->>> +			    val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED);
->>> +			break;
->>> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED:
->>> +			kvm_arm_set_vcpu_workaround_2_flag(vcpu, true);  
->> Looks strange to me we enable the flag when unaffected.
-> 
-> UNAFFECTED is the *requested* level here, so the original kernel had it.
-> It means "always active or not needed". We get here if the local kernel
-> has a *switchable* workaround, so we have to make sure it's enabled, to
-> match the original workaround level.
-> Will add a comment before the switch.
-OK I get it now. Adding such kind of comments at main decision levels
-would definitively help (me).
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 33a982e33716..56d5bf68de53 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -648,6 +648,13 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
+>  		goto err_free_name;
+>  	}
+>  
+> +	dev->iommu_param = kzalloc(sizeof(*dev->iommu_param), GFP_KERNEL);
+> +	if (!dev->iommu_param) {
+> +		ret = -ENOMEM;
+> +		goto err_free_name;
+> +	}
+> +	mutex_init(&dev->iommu_param->lock);
+> +
+>  	kobject_get(group->devices_kobj);
+>  
+>  	dev->iommu_group = group;
+> @@ -678,6 +685,7 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
+>  	mutex_unlock(&group->mutex);
+>  	dev->iommu_group = NULL;
+>  	kobject_put(group->devices_kobj);
+> +	kfree(dev->iommu_param);
+>  err_free_name:
+>  	kfree(device->name);
+>  err_remove_link:
+> @@ -724,7 +732,7 @@ void iommu_group_remove_device(struct device *dev)
+>  	sysfs_remove_link(&dev->kobj, "iommu_group");
+>  
+>  	trace_remove_device_from_group(group->id, dev);
+> -
+> +	kfree(dev->iommu_param);
+>  	kfree(device->name);
+>  	kfree(device);
+>  	dev->iommu_group = NULL;
+> @@ -858,6 +866,130 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
+>  
+> +/**
+> + * iommu_register_device_fault_handler() - Register a device fault handler
+> + * @dev: the device
+> + * @handler: the fault handler
+> + * @data: private data passed as argument to the handler
+> + *
+> + * When an IOMMU fault event is received, this handler gets called with the
+> + * fault event and data as argument.
+> + *
+> + * Return 0 if the fault handler was installed successfully, or an error.
+> + */
+> +int iommu_register_device_fault_handler(struct device *dev,
+> +					iommu_dev_fault_handler_t handler,
+> +					void *data)
+> +{
+> +	struct iommu_param *param = dev->iommu_param;
+> +	int ret = 0;
+> +
+> +	/*
+> +	 * Device iommu_param should have been allocated when device is
+> +	 * added to its iommu_group.
+> +	 */
+> +	if (!param)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&param->lock);
+> +	/* Only allow one fault handler registered for each device */
+> +	if (param->fault_param) {
+> +		ret = -EBUSY;
+> +		goto done_unlock;
+> +	}
+> +
+> +	get_device(dev);
+> +	param->fault_param =
+> +		kzalloc(sizeof(struct iommu_fault_param), GFP_KERNEL);
+> +	if (!param->fault_param) {
+> +		put_device(dev);
+> +		ret = -ENOMEM;
+> +		goto done_unlock;
+> +	}
+> +	mutex_init(&param->fault_param->lock);
+> +	param->fault_param->handler = handler;
+> +	param->fault_param->data = data;
+> +	INIT_LIST_HEAD(&param->fault_param->faults);
+> +
+> +done_unlock:
+> +	mutex_unlock(&param->lock);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_register_device_fault_handler);
+> +
+> +/**
+> + * iommu_unregister_device_fault_handler() - Unregister the device fault handler
+> + * @dev: the device
+> + *
+> + * Remove the device fault handler installed with
+> + * iommu_register_device_fault_handler().
+> + *
+> + * Return 0 on success, or an error.
+> + */
+> +int iommu_unregister_device_fault_handler(struct device *dev)
+> +{
+> +	struct iommu_param *param = dev->iommu_param;
+> +	int ret = 0;
+> +
+> +	if (!param)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&param->lock);
+> +
+> +	if (!param->fault_param)
+> +		goto unlock;
+> +
+> +	/* we cannot unregister handler if there are pending faults */
+> +	if (!list_empty(&param->fault_param->faults)) {
+> +		ret = -EBUSY;
+> +		goto unlock;
+> +	}
+> +
+> +	kfree(param->fault_param);
+> +	param->fault_param = NULL;
+> +	put_device(dev);
+> +unlock:
+> +	mutex_unlock(&param->lock);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_unregister_device_fault_handler);
+> +
+> +
+> +/**
+> + * iommu_report_device_fault() - Report fault event to device
+> + * @dev: the device
+> + * @evt: fault event data
+> + *
+> + * Called by IOMMU model specific drivers when fault is detected, typically
+> + * in a threaded IRQ handler.
+> + *
+> + * Return 0 on success, or an error.
+> + */
+> +int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
+> +{
+> +	struct iommu_fault_param *fparam;
+> +	int ret = 0;
+> +
 
-Thanks
 
-Eric
-> 
-> Cheers,
-> Andre.
-> 
-> 
->>
->>> +			break;
->>> +		}
->>> +
->>> +		return 0;
->>> +	default:
->>> +		return -ENOENT;
->>>  	}
->>>  
->>>  	return -EINVAL;
->>>   
->>
->> Thanks
->>
->> Eric
-> 
+Nit, for consistency with above functions, it'd be useful to have:
+
+struct iommu_param *param = dev->iommu_param;
+
+It's not as obvious as it could be that we're using the same mutex here
+as in the register/unregister above.  Thanks,
+
+Alex
+
+> +	/* iommu_param is allocated when device is added to group */
+> +	if (!dev->iommu_param || !evt)
+> +		return -EINVAL;
+> +	/* we only report device fault if there is a handler registered */
+> +	mutex_lock(&dev->iommu_param->lock);
+> +	if (!dev->iommu_param->fault_param ||
+> +		!dev->iommu_param->fault_param->handler) {
+> +		ret = -EINVAL;
+> +		goto done_unlock;
+> +	}
+> +	fparam = dev->iommu_param->fault_param;
+> +	ret = fparam->handler(evt, fparam->data);
+> +done_unlock:
+> +	mutex_unlock(&dev->iommu_param->lock);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_report_device_fault);
+> +
+>  /**
+>   * iommu_group_id - Return ID for a group
+>   * @group: the group to ID
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index c6f398f7e6e0..aeb4b615cb44 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -257,11 +257,13 @@ struct iommu_device {
+>   * unrecoverable faults such as DMA or IRQ remapping faults.
+>   *
+>   * @fault: fault descriptor
+> + * @list pending fault event list, used for tracking responses
+>   * @iommu_private: used by the IOMMU driver for storing fault-specific
+>   *                 data. Users should not modify this field before
+>   *                 sending the fault response.
+>   */
+>  struct iommu_fault_event {
+> +	struct list_head list;
+>  	struct iommu_fault fault;
+>  	u64 iommu_private;
+>  };
+> @@ -270,10 +272,13 @@ struct iommu_fault_event {
+>   * struct iommu_fault_param - per-device IOMMU fault data
+>   * @dev_fault_handler: Callback function to handle IOMMU faults at device level
+>   * @data: handler private data
+> - *
+> + * @faults: holds the pending faults which needs response, e.g. page response.
+> + * @lock: protect pending PRQ event list
+>   */
+>  struct iommu_fault_param {
+>  	iommu_dev_fault_handler_t handler;
+> +	struct list_head faults;
+> +	struct mutex lock;
+>  	void *data;
+>  };
+>  
+> @@ -287,6 +292,7 @@ struct iommu_fault_param {
+>   *	struct iommu_fwspec	*iommu_fwspec;
+>   */
+>  struct iommu_param {
+> +	struct mutex lock;
+>  	struct iommu_fault_param *fault_param;
+>  };
+>  
+> @@ -379,6 +385,15 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
+>  					 struct notifier_block *nb);
+>  extern int iommu_group_unregister_notifier(struct iommu_group *group,
+>  					   struct notifier_block *nb);
+> +extern int iommu_register_device_fault_handler(struct device *dev,
+> +					iommu_dev_fault_handler_t handler,
+> +					void *data);
+> +
+> +extern int iommu_unregister_device_fault_handler(struct device *dev);
+> +
+> +extern int iommu_report_device_fault(struct device *dev,
+> +				     struct iommu_fault_event *evt);
+> +
+>  extern int iommu_group_id(struct iommu_group *group);
+>  extern struct iommu_group *iommu_group_get_for_dev(struct device *dev);
+>  extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
+> @@ -659,6 +674,25 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
+>  	return 0;
+>  }
+>  
+> +static inline
+> +int iommu_register_device_fault_handler(struct device *dev,
+> +					iommu_dev_fault_handler_t handler,
+> +					void *data)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +static inline int iommu_unregister_device_fault_handler(struct device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline
+> +int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  static inline int iommu_group_id(struct iommu_group *group)
+>  {
+>  	return -ENODEV;
