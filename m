@@ -1,193 +1,107 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v7 7/10] KVM: arm/arm64: context-switch ptrauth registers
-Date: Thu, 21 Mar 2019 11:38:35 +0530
-Message-ID: <44e16529-4792-0ec2-d2d5-f5c14c6bb2c4@arm.com>
+Subject: Re: [PATCH v7 9/10] KVM: arm64: docs: document KVM support of pointer
+ authentication
+Date: Thu, 21 Mar 2019 12:11:01 +0530
+Message-ID: <462c5f79-b0d6-8c4b-ce43-2dfcc0f3b7a6@arm.com>
 References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-8-git-send-email-amit.kachhap@arm.com>
- <a3252299-b1ac-3d39-31a4-ca653daa815f@arm.com>
+ <1552984243-7689-10-git-send-email-amit.kachhap@arm.com>
+ <7bf19035-02ba-ae47-b08c-7d7622a45dbf@arm.com>
+ <648d66dd-519c-7567-a3e1-c23208f68cf2@arm.com>
+ <52d3f9c8-fc27-bf3d-f8f3-1b3921508a8c@arm.com>
+ <6d84723d-e00e-e89f-4c42-d48d0eb03443@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <a3252299-b1ac-3d39-31a4-ca653daa815f@arm.com>
+In-Reply-To: <6d84723d-e00e-e89f-4c42-d48d0eb03443@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Thierry <julien.thierry@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
+To: Kristina Martsenko <kristina.martsenko@arm.com>, Julien Thierry <julien.thierry@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Julien,
+Hi Julien/Kristina,
 
-On 3/20/19 5:43 PM, Julien Thierry wrote:
-> Hi Amit,
-> 
-> On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
->> From: Mark Rutland <mark.rutland@arm.com>
+On 3/21/19 2:26 AM, Kristina Martsenko wrote:
+> On 20/03/2019 18:06, Julien Thierry wrote:
 >>
->> When pointer authentication is supported, a guest may wish to use it.
->> This patch adds the necessary KVM infrastructure for this to work, with
->> a semi-lazy context switch of the pointer auth state.
 >>
->> Pointer authentication feature is only enabled when VHE is built
->> in the kernel and present in the CPU implementation so only VHE code
->> paths are modified.
+>> On 20/03/2019 15:04, Kristina Martsenko wrote:
+>>> On 20/03/2019 13:37, Julien Thierry wrote:
+>>>> Hi Amit,
+>>>>
+>>>> On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
+>>>>> This adds sections for KVM API extension for pointer authentication.
+>>>>> A brief description about usage of pointer authentication for KVM guests
+>>>>> is added in the arm64 documentations.
+>>>
+>>> [...]
+>>>
+>>>>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>>>>> index 7de9eee..b5c66bc 100644
+>>>>> --- a/Documentation/virtual/kvm/api.txt
+>>>>> +++ b/Documentation/virtual/kvm/api.txt
+>>>>> @@ -2659,6 +2659,12 @@ Possible features:
+>>>>>   	  Depends on KVM_CAP_ARM_PSCI_0_2.
+>>>>>   	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+>>>>>   	  Depends on KVM_CAP_ARM_PMU_V3.
+>>>>> +	- KVM_ARM_VCPU_PTRAUTH_ADDRESS:
+>>>>> +	- KVM_ARM_VCPU_PTRAUTH_GENERIC:
+>>>>> +	  Enables Pointer authentication for the CPU.
+>>>>> +	  Depends on KVM_CAP_ARM_PTRAUTH and only on arm64 architecture. If
+>>>>> +	  set, then the KVM guest allows the execution of pointer authentication
+>>>>> +	  instructions. Otherwise, KVM treats these instructions as undefined.
+>>>>>   
+>>>>
+>>>> Overall I feel one could easily get confused to whether
+>>>> PTRAUTH_ADDRESS/GENERIC are two individual features, whether one is a
+>>>> superset of the other, if the names are just an alias of one another, etc...
+>>>>
+>>>> I think the doc should at least stress out that *both* flags are
+>>>> required to enable ptrauth in a guest. However it raises the question,
+>>>> if we don't plan to support the features individually (because we
+>>>> can't), should we really expose two feature flags? I seems odd to
+>>>> introduce two flags that only do something if used together...
+>>>
+>>> Why can't we support the features individually? For example, if we ever
+>>> get a system where all CPUs support address authentication and none of
+>>> them support generic authentication, then we could still support address
+>>> authentication in the guest.
+>>>
+>>>
 >>
->> When we schedule a vcpu, we disable guest usage of pointer
->> authentication instructions and accesses to the keys. While these are
->> disabled, we avoid context-switching the keys. When we trap the guest
->> trying to use pointer authentication functionality, we change to eagerly
->> context-switching the keys, and enable the feature. The next time the
->> vcpu is scheduled out/in, we start again. However the host key save is
->> optimized and implemented inside ptrauth instruction/register access
->> trap.
+>> That's a good point, I didn't think of that.
 >>
->> Pointer authentication consists of address authentication and generic
->> authentication, and CPUs in a system might have varied support for
->> either. Where support for either feature is not uniform, it is hidden
->> from guests via ID register emulation, as a result of the cpufeature
->> framework in the host.
+>> Although, currently we don't have a way to detect that we are in such a
+>> configuration. So as is, both flags are required to enable either
+>> feature, and I feel the documentation should be clear on that aspect.
+> 
+> For now we only support enabling both features together, so both flags
+> need to be set. I agree that the documentation should be made clear on this.
+> 
+> In the future, if we need to, we can add "negative" cpucaps to detect
+> that a feature is absent on all CPUs.
+> 
 >>
->> Unfortunately, address authentication and generic authentication cannot
->> be trapped separately, as the architecture provides a single EL2 trap
->> covering both. If we wish to expose one without the other, we cannot
->> prevent a (badly-written) guest from intermittently using a feature
->> which is not uniformly supported (when scheduled on a physical CPU which
->> supports the relevant feature). Hence, this patch expects both type of
->> authentication to be present in a cpu.
->>
->> This switch of key is done from guest enter/exit assembly as preperation
->> for the upcoming in-kernel pointer authentication support. Hence, these
->> key switching routines are not implemented in C code as they may cause
->> pointer authentication key signing error in some situations.
->>
->> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
->> [Only VHE, key switch in full assembly, vcpu_has_ptrauth checks
->> , save host key in ptrauth exception trap]
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> ---
->>   arch/arm64/include/asm/kvm_host.h        |  17 ++++++
->>   arch/arm64/include/asm/kvm_ptrauth_asm.h | 100 +++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/asm-offsets.c          |   6 ++
->>   arch/arm64/kvm/guest.c                   |  14 +++++
->>   arch/arm64/kvm/handle_exit.c             |  24 +++++---
->>   arch/arm64/kvm/hyp/entry.S               |   7 +++
->>   arch/arm64/kvm/reset.c                   |   7 +++
->>   arch/arm64/kvm/sys_regs.c                |  46 +++++++++++++-
->>   virt/kvm/arm/arm.c                       |   2 +
->>   9 files changed, 212 insertions(+), 11 deletions(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_ptrauth_asm.h
->>
-[...]
->> +#ifdef	CONFIG_ARM64_PTR_AUTH
->> +
->> +#define PTRAUTH_REG_OFFSET(x)	(x - CPU_APIAKEYLO_EL1)
+>> Another option would be to introduce a flag that enables both for now,
+>> and if one day we decide to support the configuration you mentioned we
+>> could add "more modular" flags that allow you to control those features
+>> individually. While a bit cumbersome, I would find that less awkward
+>> than having two flags that only do something if both are present.
 > 
-> I don't really see the point of this macro. You move the pointers of
-> kvm_cpu_contexts to point to where the ptr auth registers are (which is
-> in the middle of an array) by adding the offset of APIAKEYLO and then we
-> have to recompute all offsets with this macro.
+> That would work too.
 > 
-> Why not just pass the kvm_cpu_context pointers to
-> ptrauth_save/restore_state and use the already defined offsets
-> (CPU_AP*_EL1) directly?
-> 
-> I think this would also allow to use one less register for the
-> ptrauth_switch_to_* macros.
-Actually the values of CPU_AP*_EL1 are exceeding the immediate range 
-(i.e 512), so this was done to keep the immediate offset within the range.
-The other way would have been to calculate the destination register but 
-these would add one more add instruction everywhere.
-I should have mentioned them as comments somewhere.
-> 
->> +
->> +.macro	ptrauth_save_state base, reg1, reg2
->> +	mrs_s	\reg1, SYS_APIAKEYLO_EL1
->> +	mrs_s	\reg2, SYS_APIAKEYHI_EL1
->> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
->> +	mrs_s	\reg1, SYS_APIBKEYLO_EL1
->> +	mrs_s	\reg2, SYS_APIBKEYHI_EL1
->> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
->> +	mrs_s	\reg1, SYS_APDAKEYLO_EL1
->> +	mrs_s	\reg2, SYS_APDAKEYHI_EL1
->> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
->> +	mrs_s	\reg1, SYS_APDBKEYLO_EL1
->> +	mrs_s	\reg2, SYS_APDBKEYHI_EL1
->> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
->> +	mrs_s	\reg1, SYS_APGAKEYLO_EL1
->> +	mrs_s	\reg2, SYS_APGAKEYHI_EL1
->> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
->> +.endm
->> +
->> +.macro	ptrauth_restore_state base, reg1, reg2
->> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
->> +	msr_s	SYS_APIAKEYLO_EL1, \reg1
->> +	msr_s	SYS_APIAKEYHI_EL1, \reg2
->> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
->> +	msr_s	SYS_APIBKEYLO_EL1, \reg1
->> +	msr_s	SYS_APIBKEYHI_EL1, \reg2
->> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
->> +	msr_s	SYS_APDAKEYLO_EL1, \reg1
->> +	msr_s	SYS_APDAKEYHI_EL1, \reg2
->> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
->> +	msr_s	SYS_APDBKEYLO_EL1, \reg1
->> +	msr_s	SYS_APDBKEYHI_EL1, \reg2
->> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
->> +	msr_s	SYS_APGAKEYLO_EL1, \reg1
->> +	msr_s	SYS_APGAKEYHI_EL1, \reg2
->> +	.endm
-> 
-> Nit: Bad indentation.
-oops.
-> 
->> +
->> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
->> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
->> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
->> +	cbz	\reg1, skip_switch_to_guest
->> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
->> +	ptrauth_restore_state	\reg1, \reg2, \reg3
-> 
-> As mentioned we probably can get rid of one temporary register and
-> directly pass g_ctxt here.
-> 
->> +skip_switch_to_guest:
-> 
-> I believe you should use numbered labels for assembly macros, otherwise
-> multiple references to that macros will lead to symbol redefinitions.
-Yes agreed.
+> I find it more logical to have two flags since there are two features
+> (two ID register fields), and KVM enables two features for the guest.
+> The fact that KVM does not currently support enabling them separately is
+> a KVM implementation choice, and could change in the future.
+Kristina, this comments of yours is actually what this patch series is 
+trying to do. I should have added more details about the necessity of 
+keeping two flags and enhancement of them is actually a future work.
 
 Thanks,
-Amit
+Amit Daniel
 > 
->> +.endm
->> +
->> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
->> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
->> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
->> +	cbz	\reg1, skip_switch_to_host
->> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
->> +	ptrauth_save_state	\reg1, \reg2, \reg3
->> +	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
->> +	ptrauth_restore_state	\reg1, \reg2, \reg3
->> +	isb
->> +skip_switch_to_host:
-> 
-> Same.
-> 
-> Cheers,
-> 
-> Julien
-> 
->> +.endm
->> +
->> +#else /* !CONFIG_ARM64_PTR_AUTH */
->> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
->> +.endm
->> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
-[...]
->>
+> Thanks,
+> Kristina
 > 
