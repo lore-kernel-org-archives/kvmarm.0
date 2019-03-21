@@ -1,116 +1,81 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
-Date: Thu, 21 Mar 2019 15:32:45 +0100
-Message-ID: <41173658-dde0-6e58-90ed-65cff2b1dd1c@redhat.com>
-References: <20190317172232.1068-1-eric.auger@redhat.com>
- <20190317172232.1068-6-eric.auger@redhat.com>
- <20190320093727.45a86866@jacob-builder>
- <7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
- <ad4d18ec-0040-901f-8d37-0fccb3cfd0d5@redhat.com>
- <109c3520-dd26-3c0b-35d1-48b169fea982@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03FD44A34E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 10:32:55 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TGWzEZwnra5f for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Mar 2019 10:32:53 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF7134A1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 10:32:53 -0400 (EDT)
-In-Reply-To: <109c3520-dd26-3c0b-35d1-48b169fea982@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, alex.williamson@redhat.com, ashok.raj@intel.com, kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+From: Julien Grall <julien.grall@arm.com>
+Subject: [PATCH RFC 00/14] kvm/arm: Align the VMID allocation with the arm64 ASID one
+Date: Thu, 21 Mar 2019 16:36:09 +0000
+Message-ID: <20190321163623.20219-1-julien.grall@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@arm.com, james.morse@arm.com, marc.zyngier@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Julien Grall <julien.grall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgamVhbiwgSmFjb2IsCgpPbiAzLzIxLzE5IDM6MTMgUE0sIEplYW4tUGhpbGlwcGUgQnJ1Y2tl
-ciB3cm90ZToKPiBPbiAyMS8wMy8yMDE5IDEzOjU0LCBBdWdlciBFcmljIHdyb3RlOgo+PiBIaSBK
-YWNvYiwgSmVhbi1QaGlsaXBwZSwKPj4KPj4gT24gMy8yMC8xOSA1OjUwIFBNLCBKZWFuLVBoaWxp
-cHBlIEJydWNrZXIgd3JvdGU6Cj4+PiBPbiAyMC8wMy8yMDE5IDE2OjM3LCBKYWNvYiBQYW4gd3Jv
-dGU6Cj4+PiBbLi4uXQo+Pj4+PiArc3RydWN0IGlvbW11X2ludl9hZGRyX2luZm8gewo+Pj4+PiAr
-I2RlZmluZSBJT01NVV9JTlZfQUREUl9GTEFHU19QQVNJRAkoMSA8PCAwKQo+Pj4+PiArI2RlZmlu
-ZSBJT01NVV9JTlZfQUREUl9GTEFHU19BUkNISUQJKDEgPDwgMSkKPj4+Pj4gKyNkZWZpbmUgSU9N
-TVVfSU5WX0FERFJfRkxBR1NfTEVBRgkoMSA8PCAyKQo+Pj4+PiArCV9fdTMyCWZsYWdzOwo+Pj4+
-PiArCV9fdTMyCWFyY2hpZDsKPj4+Pj4gKwlfX3U2NAlwYXNpZDsKPj4+Pj4gKwlfX3U2NAlhZGRy
-Owo+Pj4+PiArCV9fdTY0CWdyYW51bGVfc2l6ZTsKPj4+Pj4gKwlfX3U2NAluYl9ncmFudWxlczsK
-Pj4+Pj4gK307Cj4+Pj4+ICsKPj4+Pj4gKy8qKgo+Pj4+PiArICogRmlyc3QgbGV2ZWwvc3RhZ2Ug
-aW52YWxpZGF0aW9uIGluZm9ybWF0aW9uCj4+Pj4+ICsgKiBAY2FjaGU6IGJpdGZpZWxkIHRoYXQg
-YWxsb3dzIHRvIHNlbGVjdCB3aGljaCBjYWNoZXMgdG8gaW52YWxpZGF0ZQo+Pj4+PiArICogQGdy
-YW51bGFyaXR5OiBkZWZpbmVzIHRoZSBsb3dlc3QgZ3JhbnVsYXJpdHkgdXNlZCBmb3IgdGhlCj4+
-Pj4+IGludmFsaWRhdGlvbjoKPj4+Pj4gKyAqICAgICBkb21haW4gPiBwYXNpZCA+IGFkZHIKPj4+
-Pj4gKyAqCj4+Pj4+ICsgKiBOb3QgYWxsIHRoZSBjb21iaW5hdGlvbnMgb2YgY2FjaGUvZ3JhbnVs
-YXJpdHkgbWFrZSBzZW5zZToKPj4+Pj4gKyAqCj4+Pj4+ICsgKiAgICAgICAgIHR5cGUgfCAgIERF
-Vl9JT1RMQiAgIHwgICAgIElPVExCICAgICB8ICAgICAgUEFTSUQgICAgfAo+Pj4+PiArICogZ3Jh
-bnVsYXJpdHkJfAkJfAkJfAo+Pj4+PiBjYWNoZQl8Cj4+Pj4+ICsgKiAtLS0tLS0tLS0tLS0tKy0t
-LS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tKwo+Pj4+PiArICog
-RE9NQUlOCXwJTi9BCXwgICAgICAgWQl8Cj4+Pj4+IFkJfAo+Pj4+PiArICogUEFTSUQJfAlZCXwg
-ICAgICAgWQl8Cj4+Pj4+IFkJfAo+Pj4+PiArICogQUREUgkJfCAgICAgICBZCXwgICAgICAgWQl8
-Cj4+Pj4+IE4vQQl8Cj4+Pj4+ICsgKi8KPj4+Pj4gK3N0cnVjdCBpb21tdV9jYWNoZV9pbnZhbGlk
-YXRlX2luZm8gewo+Pj4+PiArI2RlZmluZSBJT01NVV9DQUNIRV9JTlZBTElEQVRFX0lORk9fVkVS
-U0lPTl8xIDEKPj4+Pj4gKwlfX3UzMgl2ZXJzaW9uOwo+Pj4+PiArLyogSU9NTVUgcGFnaW5nIHN0
-cnVjdHVyZSBjYWNoZSAqLwo+Pj4+PiArI2RlZmluZSBJT01NVV9DQUNIRV9JTlZfVFlQRV9JT1RM
-QgkoMSA8PCAwKSAvKiBJT01NVSBJT1RMQiAqLwo+Pj4+PiArI2RlZmluZSBJT01NVV9DQUNIRV9J
-TlZfVFlQRV9ERVZfSU9UTEIJKDEgPDwgMSkgLyogRGV2aWNlCj4+Pj4+IElPVExCICovICsjZGVm
-aW5lIElPTU1VX0NBQ0hFX0lOVl9UWVBFX1BBU0lECSgxIDw8IDIpIC8qIFBBU0lECj4+Pj4+IGNh
-Y2hlICovCj4+Pj4gSnVzdCBhIGNsYXJpZmljYXRpb24sIHRoaXMgdXNlZCB0byBiZSBhbiBlbnVt
-LiBZb3UgZG8gaW50ZW5kIHRvIGlzc3VlIGEKPj4+PiBzaW5nbGUgaW52YWxpZGF0aW9uIHJlcXVl
-c3Qgb24gbXVsdGlwbGUgY2FjaGUgdHlwZXM/IFBlcmhhcHMgZm9yCj4+Pj4gdmlydGlvLUlPTU1V
-PyBJIG9ubHkgc2VlIGEgc2luZ2xlIGNhY2hlIHR5cGUgaW4geW91ciBwYXRjaCAjMTQuIEZvciBW
-VC1kCj4+Pj4gd2UgcGxhbiB0byBpc3N1ZSBvbmUgY2FjaGUgdHlwZSBhdCBhIHRpbWUgZm9yIG5v
-dy4gU28gdGhpcyBmb3JtYXQgd29ya3MKPj4+PiBmb3IgdXMuCj4+Pgo+Pj4gWWVzIGZvciB2aXJ0
-aW8taW9tbXUgSSdkIGxpa2UgYXMgbGl0dGxlIG92ZXJoZWFkIGFzIHBvc3NpYmxlLCB3aGljaAo+
-Pj4gbWVhbnMgYSBzaW5nbGUgaW52YWxpZGF0aW9uIG1lc3NhZ2UgdG8gaGl0IGJvdGggSU9UTEIg
-YW5kIEFUQyBhdCBvbmNlLAo+Pj4gYW5kIHRoZSBhYmlsaXR5IHRvIHNwZWNpZnkgbXVsdGlwbGUg
-cGFnZXMgd2l0aCBAbmJfZ3JhbnVsZXMuCj4+IFRoZSBvcmlnaW5hbCByZXF1ZXN0L2V4cGxhbmF0
-aW9uIGZyb20gSmVhbi1QaGlsaXBwZSBjYW4gYmUgZm91bmQgaGVyZToKPj4gaHR0cHM6Ly9sa21s
-Lm9yZy9sa21sLzIwMTkvMS8yOC8xNDk3Cj4+Cj4+Pgo+Pj4+IEhvd2V2ZXIsIGlmIG11bHRpcGxl
-IGNhY2hlIHR5cGVzIGFyZSBpc3N1ZWQgaW4gYSBzaW5nbGUgaW52YWxpZGF0aW9uLgo+Pj4+IFRo
-ZXkgbXVzdCBzaGFyZSBhIHNpbmdsZSBncmFudWxhcml0eSwgbm90IGFsbCBjb21iaW5hdGlvbnMg
-YXJlIHZhbGlkLgo+Pj4+IGUuZy4gZGV2IElPVExCIGRvZXMgbm90IHN1cHBvcnQgZG9tYWluIGdy
-YW51bGFyaXR5LiBKdXN0IGEgcmVtaW5kZXIsCj4+Pj4gbm90IGFuIGlzc3VlLiBEcml2ZXIgY291
-bGQgZmlsdGVyIG91dCBpbnZhbGlkIGNvbWJpbmF0aW9ucy4KPj4gU3VyZSBJIHdpbGwgYWRkIGEg
-Y29tbWVudCBhYm91dCB0aGlzIHJlc3RyaWN0aW9uLgo+Pj4KPj4+IEFncmVlZC4gRXZlbiB0aGUg
-Y29yZSBjb3VsZCBmaWx0ZXIgb3V0IGludmFsaWQgY29tYmluYXRpb25zIGJhc2VkIG9uIHRoZQo+
-Pj4gdGFibGUgYWJvdmU6IElPVExCIGFuZCBkb21haW4gZ3JhbnVsYXJpdHkgYXJlIE4vQS4KPj4g
-SSBkb24ndCBnZXQgdGhpcyBzZW50ZW5jZS4gV2hhdCBhYm91dCB2dGQgSU9UTEIgZG9tYWluLXNl
-bGVjdGl2ZQo+PiBpbnZhbGlkYXRpb246Cj4gCj4gTXkgbWlzdGFrZTogSSBtZWFudCBkZXYtSU9U
-TEIgYW5kIGRvbWFpbiBncmFudWxhcml0eSBhcmUgTi9BCgpBaCBPSywgbm8gd29ycmllcy4KCkhv
-dyBkbyB3ZSBwcm9jZWVkIGZ1cnRoZXIgd2l0aCB0aG9zZSB1c2VyIEFQSXM/IEJlc2lkZXMgdGhl
-IGNvbW1lbnQgdG8KYmUgYWRkZWQgYWJvdmUgYW5kIHByZXZpb3VzIHN1Z2dlc3Rpb24gZnJvbSBK
-ZWFuICgiSW52YWxpZGF0aW9ucyBieQpAZ3JhbnVsYXJpdHkgdXNlIGZpZWxkIC4uLiksIGhhdmUg
-d2UgcmVhY2hlZCBhIGNvbnNlbnN1cyBub3cgb246CgotIGF0dGFjaC9kZXRhY2hfcGFzaWRfdGFi
-bGUKLSBjYWNoZV9pbnZhbGlkYXRlCi0gZmF1bHQgZGF0YSBhbmQgZmF1bHQgcmVwb3J0IEFQST8K
-CklmIG5vdCwgcGxlYXNlIGxldCBtZSBrbm93LgoKVGhhbmtzCgpFcmljCgoKPiAKPiBUaGFua3Ms
-Cj4gSmVhbgo+IAo+PiAiCj4+IOKAoiBJT1RMQiBlbnRyaWVzIGNhY2hpbmcgbWFwcGluZ3MgYXNz
-b2NpYXRlZCB3aXRoIHRoZSBzcGVjaWZpZWQgZG9tYWluLWlkCj4+IGFyZSBpbnZhbGlkYXRlZC4K
-Pj4g4oCiIFBhZ2luZy1zdHJ1Y3R1cmUtY2FjaGUgZW50cmllcyBjYWNoaW5nIG1hcHBpbmdzIGFz
-c29jaWF0ZWQgd2l0aCB0aGUKPj4gc3BlY2lmaWVkIGRvbWFpbi1pZCBhcmUgaW52YWxpZGF0ZWQu
-Cj4+ICIKPj4KPj4gVGhhbmtzCj4+Cj4+IEVyaWMKPj4KPj4+Cj4+PiBUaGFua3MsCj4+PiBKZWFu
-Cj4+Pgo+Pj4+Cj4+Pj4+ICsJX191OAljYWNoZTsKPj4+Pj4gKwlfX3U4CWdyYW51bGFyaXR5Owo+
-Pj4+PiArCV9fdTgJcGFkZGluZ1syXTsKPj4+Pj4gKwl1bmlvbiB7Cj4+Pj4+ICsJCV9fdTY0CXBh
-c2lkOwo+Pj4+PiArCQlzdHJ1Y3QgaW9tbXVfaW52X2FkZHJfaW5mbyBhZGRyX2luZm87Cj4+Pj4+
-ICsJfTsKPj4+Pj4gK307Cj4+Pj4+ICsKPj4+Pj4gKwo+Pj4+PiAgI2VuZGlmIC8qIF9VQVBJX0lP
-TU1VX0ggKi8KPj4+Pgo+Pj4+IFtKYWNvYiBQYW5dCj4+Pj4gX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18KPj4+PiBpb21tdSBtYWlsaW5nIGxpc3QKPj4+PiBp
-b21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZwo+Pj4+IGh0dHBzOi8vbGlzdHMubGludXhm
-b3VuZGF0aW9uLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2lvbW11Cj4+Pj4KPj4+Cj4+IF9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4+IGlvbW11IG1haWxpbmcg
-bGlzdAo+PiBpb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZwo+PiBodHRwczovL2xpc3Rz
-LmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9pb21tdQo+Pgo+IApfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
-aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
-YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+This patch series is moving out the ASID allocator in a separate file in order
+to re-use it for the VMID. The benefits are:
+    - CPUs are not forced to exit a roll-over.
+    - Context invalidation is now per-CPU rather than
+      broadcasted.
+
+There are no performance regression on the fastpath for ASID allocation.
+Actually on the hackbench measurement (300 hackbench) it was .7% faster.
+
+The measurement was made on a Seattle based SoC (8 CPUs), with the
+number of VMID limited to 4-bit. The test involves running concurrently 40
+guests with 2 vCPUs. Each guest will then execute hackbench 5 times
+before exiting.
+
+The performance difference between the current algo and the new one are:
+    - 2.5% less exit from the guest
+    - 22.4% more flush, although they are now local rather than
+    broadcasted
+    - 0.11% faster (just for the record)
+
+The ASID allocator rework to make it generic has been divided in multiple
+patches to make the review easier.
+
+A branch with the patch based on 5.1-rc1 can be found:
+
+http://xenbits.xen.org/gitweb/?p=people/julieng/linux-arm.git;a=shortlog;h=refs/heads/vmid-rework/rfc
+
+Cheers,
+
+Julien Grall (14):
+  arm64/mm: Introduce asid_info structure and move
+    asid_generation/asid_map to it
+  arm64/mm: Move active_asids and reserved_asids to asid_info
+  arm64/mm: Move bits to asid_info
+  arm64/mm: Move the variable lock and tlb_flush_pending to asid_info
+  arm64/mm: Remove dependency on MM in new_context
+  arm64/mm: Store the number of asid allocated per context
+  arm64/mm: Introduce NUM_ASIDS
+  arm64/mm: Split asid_inits in 2 parts
+  arm64/mm: Split the function check_and_switch_context in 3 parts
+  arm64/mm: Introduce a callback to flush the local context
+  arm64: Move the ASID allocator code in a separate file
+  arm64/lib: asid: Allow user to update the context under the lock
+  arm/kvm: Introduce a new VMID allocator
+  kvm/arm: Align the VMID allocation with the arm64 ASID one
+
+ arch/arm/include/asm/kvm_asid.h   |  81 +++++++++++++++
+ arch/arm/include/asm/kvm_asm.h    |   2 +-
+ arch/arm/include/asm/kvm_host.h   |   5 +-
+ arch/arm/include/asm/kvm_hyp.h    |   1 +
+ arch/arm/kvm/Makefile             |   1 +
+ arch/arm/kvm/asid.c               | 191 +++++++++++++++++++++++++++++++++++
+ arch/arm/kvm/hyp/tlb.c            |   8 +-
+ arch/arm64/include/asm/asid.h     |  81 +++++++++++++++
+ arch/arm64/include/asm/kvm_asid.h |   8 ++
+ arch/arm64/include/asm/kvm_asm.h  |   2 +-
+ arch/arm64/include/asm/kvm_host.h |   5 +-
+ arch/arm64/kvm/hyp/tlb.c          |  10 +-
+ arch/arm64/lib/Makefile           |   2 +
+ arch/arm64/lib/asid.c             | 191 +++++++++++++++++++++++++++++++++++
+ arch/arm64/mm/context.c           | 205 ++++++--------------------------------
+ virt/kvm/arm/arm.c                | 112 +++++++--------------
+ 16 files changed, 638 insertions(+), 267 deletions(-)
+ create mode 100644 arch/arm/include/asm/kvm_asid.h
+ create mode 100644 arch/arm/kvm/asid.c
+ create mode 100644 arch/arm64/include/asm/asid.h
+ create mode 100644 arch/arm64/include/asm/kvm_asid.h
+ create mode 100644 arch/arm64/lib/asid.c
+
+-- 
+2.11.0
