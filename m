@@ -1,23 +1,23 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH RFC 09/14] arm64/mm: Split the function
- check_and_switch_context in 3 parts
-Date: Thu, 21 Mar 2019 16:36:18 +0000
-Message-ID: <20190321163623.20219-10-julien.grall@arm.com>
+Subject: [PATCH RFC 10/14] arm64/mm: Introduce a callback to flush the local
+ context
+Date: Thu, 21 Mar 2019 16:36:19 +0000
+Message-ID: <20190321163623.20219-11-julien.grall@arm.com>
 References: <20190321163623.20219-1-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86C4C4A3B2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 12:37:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F2624A472
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 12:37:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X3gDrzUm847R for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Mar 2019 12:37:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 004FC4A332
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 12:37:00 -0400 (EDT)
+ with ESMTP id F+bFHFT9FJ6T for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Mar 2019 12:37:03 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF7D4A41A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 12:37:03 -0400 (EDT)
 In-Reply-To: <20190321163623.20219-1-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,119 +32,72 @@ To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@l
 Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Julien Grall <julien.grall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The function check_and_switch_context is used to:
-    1) Check whether the ASID is still valid
-    2) Generate a new one if it is not valid
-    3) Switch the context
-
-While the latter is specific to the MM subsystem, the rest could be part
-of the generic ASID allocator.
-
-After this patch, the function is now split in 3 parts which corresponds
-to the use of the functions:
-    1) asid_check_context: Check if the ASID is still valid
-    2) asid_new_context: Generate a new ASID for the context
-    3) check_and_switch_context: Call 1) and 2) and switch the context
-
-1) and 2) have not been merged in a single function because we want to
-avoid to add a branch in when the ASID is still valid. This will matter
-when the code will be moved in separate file later on as 1) will reside
-in the header as a static inline function.
+Flushing the local context will vary depending on the actual user of the ASID
+allocator. Introduce a new callback to flush the local context and move
+the call to flush local TLB in it.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
-
 ---
-
-    Will wants to avoid to add a branch when the ASID is still valid. So
-    1) and 2) are in separates function. The former will move to a new
-    header and make static inline.
----
- arch/arm64/mm/context.c | 51 +++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 39 insertions(+), 12 deletions(-)
+ arch/arm64/mm/context.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index b071a1b3469e..cbf1c24cb3ee 100644
+index cbf1c24cb3ee..678a57b77c91 100644
 --- a/arch/arm64/mm/context.c
 +++ b/arch/arm64/mm/context.c
-@@ -204,16 +204,21 @@ static u64 new_context(struct asid_info *info, atomic64_t *pasid)
- 	return idx2asid(info, asid) | generation;
- }
+@@ -39,6 +39,8 @@ struct asid_info
+ 	cpumask_t		flush_pending;
+ 	/* Number of ASID allocated by context (shift value) */
+ 	unsigned int		ctxt_shift;
++	/* Callback to locally flush the context. */
++	void			(*flush_cpu_ctxt_cb)(void);
+ } asid_info;
  
--void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
-+static void asid_new_context(struct asid_info *info, atomic64_t *pasid,
-+			     unsigned int cpu);
-+
-+/*
-+ * Check the ASID is still valid for the context. If not generate a new ASID.
-+ *
-+ * @pasid: Pointer to the current ASID batch
-+ * @cpu: current CPU ID. Must have been acquired throught get_cpu()
-+ */
-+static void asid_check_context(struct asid_info *info,
-+			       atomic64_t *pasid, unsigned int cpu)
- {
--	unsigned long flags;
- 	u64 asid, old_active_asid;
--	struct asid_info *info = &asid_info;
- 
--	if (system_supports_cnp())
--		cpu_set_reserved_ttbr0();
--
--	asid = atomic64_read(&mm->context.id);
-+	asid = atomic64_read(pasid);
- 
- 	/*
- 	 * The memory ordering here is subtle.
-@@ -234,14 +239,30 @@ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
- 	    !((asid ^ atomic64_read(&info->generation)) >> info->bits) &&
- 	    atomic64_cmpxchg_relaxed(&active_asid(info, cpu),
- 				     old_active_asid, asid))
--		goto switch_mm_fastpath;
-+		return;
-+
-+	asid_new_context(info, pasid, cpu);
-+}
-+
-+/*
-+ * Generate a new ASID for the context.
-+ *
-+ * @pasid: Pointer to the current ASID batch allocated. It will be updated
-+ * with the new ASID batch.
-+ * @cpu: current CPU ID. Must have been acquired through get_cpu()
-+ */
-+static void asid_new_context(struct asid_info *info, atomic64_t *pasid,
-+			     unsigned int cpu)
-+{
-+	unsigned long flags;
-+	u64 asid;
- 
- 	raw_spin_lock_irqsave(&info->lock, flags);
- 	/* Check that our ASID belongs to the current generation. */
--	asid = atomic64_read(&mm->context.id);
-+	asid = atomic64_read(pasid);
- 	if ((asid ^ atomic64_read(&info->generation)) >> info->bits) {
--		asid = new_context(info, &mm->context.id);
--		atomic64_set(&mm->context.id, asid);
-+		asid = new_context(info, pasid);
-+		atomic64_set(pasid, asid);
+ #define active_asid(info, cpu)	*per_cpu_ptr((info)->active, cpu)
+@@ -266,7 +268,7 @@ static void asid_new_context(struct asid_info *info, atomic64_t *pasid,
  	}
  
  	if (cpumask_test_and_clear_cpu(cpu, &info->flush_pending))
-@@ -249,8 +270,14 @@ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
+-		local_flush_tlb_all();
++		info->flush_cpu_ctxt_cb();
  
  	atomic64_set(&active_asid(info, cpu), asid);
  	raw_spin_unlock_irqrestore(&info->lock, flags);
+@@ -298,6 +300,11 @@ asmlinkage void post_ttbr_update_workaround(void)
+ 			CONFIG_CAVIUM_ERRATUM_27456));
+ }
+ 
++static void asid_flush_cpu_ctxt(void)
++{
++	local_flush_tlb_all();
 +}
 +
-+void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
-+{
-+	if (system_supports_cnp())
-+		cpu_set_reserved_ttbr0();
+ /*
+  * Initialize the ASID allocator
+  *
+@@ -308,10 +315,12 @@ asmlinkage void post_ttbr_update_workaround(void)
+  * 2.
+  */
+ static int asid_allocator_init(struct asid_info *info,
+-			       u32 bits, unsigned int asid_per_ctxt)
++			       u32 bits, unsigned int asid_per_ctxt,
++			       void (*flush_cpu_ctxt_cb)(void))
+ {
+ 	info->bits = bits;
+ 	info->ctxt_shift = ilog2(asid_per_ctxt);
++	info->flush_cpu_ctxt_cb = flush_cpu_ctxt_cb;
+ 	/*
+ 	 * Expect allocation after rollover to fail if we don't have at least
+ 	 * one more ASID than CPUs. ASID #0 is always reserved.
+@@ -332,7 +341,8 @@ static int asids_init(void)
+ {
+ 	u32 bits = get_cpu_asid_bits();
  
--switch_mm_fastpath:
-+	asid_check_context(&asid_info, &mm->context.id, cpu);
- 
- 	arm64_apply_bp_hardening();
+-	if (!asid_allocator_init(&asid_info, bits, ASID_PER_CONTEXT))
++	if (!asid_allocator_init(&asid_info, bits, ASID_PER_CONTEXT,
++				 asid_flush_cpu_ctxt))
+ 		panic("Unable to initialize ASID allocator for %lu ASIDs\n",
+ 		      1UL << bits);
  
 -- 
 2.11.0
