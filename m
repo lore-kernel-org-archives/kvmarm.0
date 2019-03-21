@@ -1,146 +1,193 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v7 3/10] KVM: arm64: Move hyp_symbol_addr to fix dependency
-Date: Thu, 21 Mar 2019 10:59:08 +0530
-Message-ID: <7fda2a45-cd34-b981-44b5-7ca0a596d100@arm.com>
+Subject: Re: [PATCH v7 7/10] KVM: arm/arm64: context-switch ptrauth registers
+Date: Thu, 21 Mar 2019 11:38:35 +0530
+Message-ID: <44e16529-4792-0ec2-d2d5-f5c14c6bb2c4@arm.com>
 References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-4-git-send-email-amit.kachhap@arm.com>
- <aca8f96c-8f38-8688-f6e2-a50c0a79f4ae@arm.com>
+ <1552984243-7689-8-git-send-email-amit.kachhap@arm.com>
+ <a3252299-b1ac-3d39-31a4-ca653daa815f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA3C84A36D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 01:29:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xL9mPcD5mClx for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Mar 2019 01:29:16 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3850D4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Mar 2019 01:29:16 -0400 (EDT)
-In-Reply-To: <aca8f96c-8f38-8688-f6e2-a50c0a79f4ae@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <a3252299-b1ac-3d39-31a4-ca653daa815f@arm.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: Julien Thierry <julien.thierry@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Julien,
 
-On 3/20/19 2:19 PM, Julien Thierry wrote:
+On 3/20/19 5:43 PM, Julien Thierry wrote:
 > Hi Amit,
 > 
 > On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
->> Currently hyp_symbol_addr is palced in kvm_mmu.h which is mostly
->> used by __hyp_this_cpu_ptr in kvm_asm.h but it cannot include
->> kvm_mmu.h directly as kvm_mmu.h uses kvm_ksym_ref which is
->> defined inside kvm_asm.h. Hence, hyp_symbol_addr is moved inside
->> kvm_asm.h to fix this dependency on each other.
+>> From: Mark Rutland <mark.rutland@arm.com>
 >>
->> Also kvm_ksym_ref is corresponding counterpart of hyp_symbol_addr
->> so should be ideally placed inside kvm_asm.h.
+>> When pointer authentication is supported, a guest may wish to use it.
+>> This patch adds the necessary KVM infrastructure for this to work, with
+>> a semi-lazy context switch of the pointer auth state.
 >>
+>> Pointer authentication feature is only enabled when VHE is built
+>> in the kernel and present in the CPU implementation so only VHE code
+>> paths are modified.
+>>
+>> When we schedule a vcpu, we disable guest usage of pointer
+>> authentication instructions and accesses to the keys. While these are
+>> disabled, we avoid context-switching the keys. When we trap the guest
+>> trying to use pointer authentication functionality, we change to eagerly
+>> context-switching the keys, and enable the feature. The next time the
+>> vcpu is scheduled out/in, we start again. However the host key save is
+>> optimized and implemented inside ptrauth instruction/register access
+>> trap.
+>>
+>> Pointer authentication consists of address authentication and generic
+>> authentication, and CPUs in a system might have varied support for
+>> either. Where support for either feature is not uniform, it is hidden
+>> from guests via ID register emulation, as a result of the cpufeature
+>> framework in the host.
+>>
+>> Unfortunately, address authentication and generic authentication cannot
+>> be trapped separately, as the architecture provides a single EL2 trap
+>> covering both. If we wish to expose one without the other, we cannot
+>> prevent a (badly-written) guest from intermittently using a feature
+>> which is not uniformly supported (when scheduled on a physical CPU which
+>> supports the relevant feature). Hence, this patch expects both type of
+>> authentication to be present in a cpu.
+>>
+>> This switch of key is done from guest enter/exit assembly as preperation
+>> for the upcoming in-kernel pointer authentication support. Hence, these
+>> key switching routines are not implemented in C code as they may cause
+>> pointer authentication key signing error in some situations.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> [Only VHE, key switch in full assembly, vcpu_has_ptrauth checks
+>> , save host key in ptrauth exception trap]
+>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h        |  17 ++++++
+>>   arch/arm64/include/asm/kvm_ptrauth_asm.h | 100 +++++++++++++++++++++++++++++++
+>>   arch/arm64/kernel/asm-offsets.c          |   6 ++
+>>   arch/arm64/kvm/guest.c                   |  14 +++++
+>>   arch/arm64/kvm/handle_exit.c             |  24 +++++---
+>>   arch/arm64/kvm/hyp/entry.S               |   7 +++
+>>   arch/arm64/kvm/reset.c                   |   7 +++
+>>   arch/arm64/kvm/sys_regs.c                |  46 +++++++++++++-
+>>   virt/kvm/arm/arm.c                       |   2 +
+>>   9 files changed, 212 insertions(+), 11 deletions(-)
+>>   create mode 100644 arch/arm64/include/asm/kvm_ptrauth_asm.h
+>>
+[...]
+>> +#ifdef	CONFIG_ARM64_PTR_AUTH
+>> +
+>> +#define PTRAUTH_REG_OFFSET(x)	(x - CPU_APIAKEYLO_EL1)
 > 
-> This part is a bit confusing, it lead me to think that kvm_ksym_ref was
-> in kvm_mmu.h and should moved to kvm_asm.h as well. I'd suggest
-> rephrasing it with something along the lines:
+> I don't really see the point of this macro. You move the pointers of
+> kvm_cpu_contexts to point to where the ptr auth registers are (which is
+> in the middle of an array) by adding the offset of APIAKEYLO and then we
+> have to recompute all offsets with this macro.
 > 
-> "Also, hyp_symbol_addr corresponding counterpart, kvm_ksym_ref, is
-> already in kvm_asm.h, making it more sensible to move kvm_symbol_addr to
-> the same file."
-ok, will rephrase.
+> Why not just pass the kvm_cpu_context pointers to
+> ptrauth_save/restore_state and use the already defined offsets
+> (CPU_AP*_EL1) directly?
 > 
-> Otherwise:
+> I think this would also allow to use one less register for the
+> ptrauth_switch_to_* macros.
+Actually the values of CPU_AP*_EL1 are exceeding the immediate range 
+(i.e 512), so this was done to keep the immediate offset within the range.
+The other way would have been to calculate the destination register but 
+these would add one more add instruction everywhere.
+I should have mentioned them as comments somewhere.
 > 
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+>> +
+>> +.macro	ptrauth_save_state base, reg1, reg2
+>> +	mrs_s	\reg1, SYS_APIAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APIAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APIBKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APIBKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APDAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APDAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APDBKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APDBKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APGAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APGAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+>> +.endm
+>> +
+>> +.macro	ptrauth_restore_state base, reg1, reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+>> +	msr_s	SYS_APIAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APIAKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+>> +	msr_s	SYS_APIBKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APIBKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+>> +	msr_s	SYS_APDAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APDAKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+>> +	msr_s	SYS_APDBKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APDBKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+>> +	msr_s	SYS_APGAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APGAKEYHI_EL1, \reg2
+>> +	.endm
+> 
+> Nit: Bad indentation.
+oops.
+> 
+>> +
+>> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+>> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+>> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+>> +	cbz	\reg1, skip_switch_to_guest
+>> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+> 
+> As mentioned we probably can get rid of one temporary register and
+> directly pass g_ctxt here.
+> 
+>> +skip_switch_to_guest:
+> 
+> I believe you should use numbered labels for assembly macros, otherwise
+> multiple references to that macros will lead to symbol redefinitions.
+Yes agreed.
 
 Thanks,
 Amit
+> 
+>> +.endm
+>> +
+>> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+>> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+>> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+>> +	cbz	\reg1, skip_switch_to_host
+>> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_save_state	\reg1, \reg2, \reg3
+>> +	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+>> +	isb
+>> +skip_switch_to_host:
+> 
+> Same.
 > 
 > Cheers,
 > 
 > Julien
 > 
->> Suggested by: James Morse <james.morse@arm.com>
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> ---
->>   arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
->>   arch/arm64/include/asm/kvm_mmu.h | 20 --------------------
->>   2 files changed, 20 insertions(+), 20 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
->> index f5b79e9..57a07e8 100644
->> --- a/arch/arm64/include/asm/kvm_asm.h
->> +++ b/arch/arm64/include/asm/kvm_asm.h
->> @@ -80,6 +80,26 @@ extern void __vgic_v3_init_lrs(void);
->>   
->>   extern u32 __kvm_get_mdcr_el2(void);
->>   
->> +/*
->> + * Obtain the PC-relative address of a kernel symbol
->> + * s: symbol
->> + *
->> + * The goal of this macro is to return a symbol's address based on a
->> + * PC-relative computation, as opposed to a loading the VA from a
->> + * constant pool or something similar. This works well for HYP, as an
->> + * absolute VA is guaranteed to be wrong. Only use this if trying to
->> + * obtain the address of a symbol (i.e. not something you obtained by
->> + * following a pointer).
->> + */
->> +#define hyp_symbol_addr(s)						\
->> +	({								\
->> +		typeof(s) *addr;					\
->> +		asm("adrp	%0, %1\n"				\
->> +		    "add	%0, %0, :lo12:%1\n"			\
->> +		    : "=r" (addr) : "S" (&s));				\
->> +		addr;							\
->> +	})
+>> +.endm
 >> +
->>   /* Home-grown __this_cpu_{ptr,read} variants that always work at HYP */
->>   #define __hyp_this_cpu_ptr(sym)						\
->>   	({								\
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index b0742a1..3dea6af 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -118,26 +118,6 @@ static inline unsigned long __kern_hyp_va(unsigned long v)
->>   #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
->>   
->>   /*
->> - * Obtain the PC-relative address of a kernel symbol
->> - * s: symbol
->> - *
->> - * The goal of this macro is to return a symbol's address based on a
->> - * PC-relative computation, as opposed to a loading the VA from a
->> - * constant pool or something similar. This works well for HYP, as an
->> - * absolute VA is guaranteed to be wrong. Only use this if trying to
->> - * obtain the address of a symbol (i.e. not something you obtained by
->> - * following a pointer).
->> - */
->> -#define hyp_symbol_addr(s)						\
->> -	({								\
->> -		typeof(s) *addr;					\
->> -		asm("adrp	%0, %1\n"				\
->> -		    "add	%0, %0, :lo12:%1\n"			\
->> -		    : "=r" (addr) : "S" (&s));				\
->> -		addr;							\
->> -	})
->> -
->> -/*
->>    * We currently support using a VM-specified IPA size. For backward
->>    * compatibility, the default IPA size is fixed to 40bits.
->>    */
+>> +#else /* !CONFIG_ARM64_PTR_AUTH */
+>> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+>> +.endm
+>> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+[...]
 >>
 > 
