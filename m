@@ -1,175 +1,161 @@
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
-Date: Thu, 21 Mar 2019 15:10:05 -0700
-Message-ID: <20190321151005.07374be0@jacob-builder>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v6 07/22] vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
+Date: Thu, 21 Mar 2019 16:19:38 -0600
+Message-ID: <20190321161938.4358b436@x1.home>
 References: <20190317172232.1068-1-eric.auger@redhat.com>
-        <20190317172232.1068-6-eric.auger@redhat.com>
-        <20190320093727.45a86866@jacob-builder>
-        <7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
-        <ad4d18ec-0040-901f-8d37-0fccb3cfd0d5@redhat.com>
-        <109c3520-dd26-3c0b-35d1-48b169fea982@arm.com>
-        <41173658-dde0-6e58-90ed-65cff2b1dd1c@redhat.com>
+        <20190317172232.1068-8-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <41173658-dde0-6e58-90ed-65cff2b1dd1c@redhat.com>
+In-Reply-To: <20190317172232.1068-8-eric.auger@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com, kvm@vger.kernel.org, peter.maydell@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, christoffer.dall@arm.com, alex.williamson@redhat.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com, jacob.jun.pan@linux.intel.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 21 Mar 2019 15:32:45 +0100
-Auger Eric <eric.auger@redhat.com> wrote:
+On Sun, 17 Mar 2019 18:22:17 +0100
+Eric Auger <eric.auger@redhat.com> wrote:
 
-> Hi jean, Jacob,
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 > 
-> On 3/21/19 3:13 PM, Jean-Philippe Brucker wrote:
-> > On 21/03/2019 13:54, Auger Eric wrote:  
-> >> Hi Jacob, Jean-Philippe,
-> >>
-> >> On 3/20/19 5:50 PM, Jean-Philippe Brucker wrote:  
-> >>> On 20/03/2019 16:37, Jacob Pan wrote:
-> >>> [...]  
-> >>>>> +struct iommu_inv_addr_info {
-> >>>>> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
-> >>>>> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
-> >>>>> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
-> >>>>> +	__u32	flags;
-> >>>>> +	__u32	archid;
-> >>>>> +	__u64	pasid;
-> >>>>> +	__u64	addr;
-> >>>>> +	__u64	granule_size;
-> >>>>> +	__u64	nb_granules;
-> >>>>> +};
-> >>>>> +
-> >>>>> +/**
-> >>>>> + * First level/stage invalidation information
-> >>>>> + * @cache: bitfield that allows to select which caches to
-> >>>>> invalidate
-> >>>>> + * @granularity: defines the lowest granularity used for the
-> >>>>> invalidation:
-> >>>>> + *     domain > pasid > addr
-> >>>>> + *
-> >>>>> + * Not all the combinations of cache/granularity make sense:
-> >>>>> + *
-> >>>>> + *         type |   DEV_IOTLB   |     IOTLB     |
-> >>>>> PASID    |
-> >>>>> + * granularity	|		|		|
-> >>>>> cache	|
-> >>>>> + *
-> >>>>> -------------+---------------+---------------+---------------+
-> >>>>> + * DOMAIN	|	N/A	|       Y	|
-> >>>>> Y	|
-> >>>>> + * PASID	|	Y	|       Y	|
-> >>>>> Y	|
-> >>>>> + * ADDR		|       Y	|       Y	|
-> >>>>> N/A	|
-> >>>>> + */
-> >>>>> +struct iommu_cache_invalidate_info {
-> >>>>> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
-> >>>>> +	__u32	version;
-> >>>>> +/* IOMMU paging structure cache */
-> >>>>> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU
-> >>>>> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 <<
-> >>>>> 1) /* Device IOTLB */ +#define
-> >>>>> IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */  
-> >>>> Just a clarification, this used to be an enum. You do intend to
-> >>>> issue a single invalidation request on multiple cache types?
-> >>>> Perhaps for virtio-IOMMU? I only see a single cache type in your
-> >>>> patch #14. For VT-d we plan to issue one cache type at a time
-> >>>> for now. So this format works for us.  
-> >>>
-> >>> Yes for virtio-iommu I'd like as little overhead as possible,
-> >>> which means a single invalidation message to hit both IOTLB and
-> >>> ATC at once, and the ability to specify multiple pages with
-> >>> @nb_granules.  
-> >> The original request/explanation from Jean-Philippe can be found
-> >> here: https://lkml.org/lkml/2019/1/28/1497
-> >>  
-> >>>  
-> >>>> However, if multiple cache types are issued in a single
-> >>>> invalidation. They must share a single granularity, not all
-> >>>> combinations are valid. e.g. dev IOTLB does not support domain
-> >>>> granularity. Just a reminder, not an issue. Driver could filter
-> >>>> out invalid combinations.  
-> >> Sure I will add a comment about this restriction.  
-> >>>
-> >>> Agreed. Even the core could filter out invalid combinations based
-> >>> on the table above: IOTLB and domain granularity are N/A.  
-> >> I don't get this sentence. What about vtd IOTLB domain-selective
-> >> invalidation:  
-> > 
-> > My mistake: I meant dev-IOTLB and domain granularity are N/A  
+> This patch adds VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE ioctl
+> which aims to pass/withdraw the virtual iommu guest configuration
+> to/from the VFIO driver downto to the iommu subsystem.
 > 
-> Ah OK, no worries.
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> How do we proceed further with those user APIs? Besides the comment to
-> be added above and previous suggestion from Jean ("Invalidations by
-> @granularity use field ...), have we reached a consensus now on:
+> ---
+> v3 -> v4:
+> - restore ATTACH/DETACH
+> - add unwind on failure
 > 
-> - attach/detach_pasid_table
-> - cache_invalidate
-> - fault data and fault report API?
+> v2 -> v3:
+> - s/BIND_PASID_TABLE/SET_PASID_TABLE
 > 
-These APIs are sufficient for today's VT-d use and leave enough space
-for extension. E.g. new fault reasons.
+> v1 -> v2:
+> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+> - remove the struct device arg
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       | 17 +++++++++++
+>  2 files changed, 70 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 73652e21efec..222e9199edbf 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1644,6 +1644,43 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>  	return ret;
+>  }
+>  
+> +static void
+> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
+> +{
+> +	struct vfio_domain *d;
+> +
+> +	mutex_lock(&iommu->lock);
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		iommu_detach_pasid_table(d->domain);
+> +	}
+> +	mutex_unlock(&iommu->lock);
+> +}
+> +
+> +static int
+> +vfio_attach_pasid_table(struct vfio_iommu *iommu,
+> +			struct vfio_iommu_type1_attach_pasid_table *ustruct)
+> +{
+> +	struct vfio_domain *d;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		ret = iommu_attach_pasid_table(d->domain, &ustruct->config);
+> +		if (ret)
+> +			goto unwind;
+> +	}
+> +	goto unlock;
+> +unwind:
+> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+> +		iommu_detach_pasid_table(d->domain);
+> +	}
+> +unlock:
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -1714,6 +1751,22 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  
+>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>  			-EFAULT : 0;
+> +	} else if (cmd == VFIO_IOMMU_ATTACH_PASID_TABLE) {
+> +		struct vfio_iommu_type1_attach_pasid_table ustruct;
+> +
+> +		minsz = offsetofend(struct vfio_iommu_type1_attach_pasid_table,
+> +				    config);
+> +
+> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (ustruct.argsz < minsz || ustruct.flags)
+> +			return -EINVAL;
 
-I have cherry picked the above APIs from your patchset to enable VT-d
-nested translation. Going forward, I will reuse these until they get
-merged.
+Who is responsible for validating the ustruct.config?
+arm_smmu_attach_pasid_table() only looks at the format, ignoring the
+version field :-\  In fact, where is struct iommu_pasid_smmuv3 ever used
+from the config?  Should the padding fields be forced to zero?  We
+don't have flags to incorporate use of them with future extensions, so
+maybe we don't care?
 
-> If not, please let me know.
-> 
-> Thanks
-> 
-> Eric
-> 
-> 
-> > 
-> > Thanks,
-> > Jean
-> >   
-> >> "
-> >> • IOTLB entries caching mappings associated with the specified
-> >> domain-id are invalidated.
-> >> • Paging-structure-cache entries caching mappings associated with
-> >> the specified domain-id are invalidated.
-> >> "
-> >>
-> >> Thanks
-> >>
-> >> Eric
-> >>  
-> >>>
-> >>> Thanks,
-> >>> Jean
-> >>>  
-> >>>>  
-> >>>>> +	__u8	cache;
-> >>>>> +	__u8	granularity;
-> >>>>> +	__u8	padding[2];
-> >>>>> +	union {
-> >>>>> +		__u64	pasid;
-> >>>>> +		struct iommu_inv_addr_info addr_info;
-> >>>>> +	};
-> >>>>> +};
-> >>>>> +
-> >>>>> +
-> >>>>>  #endif /* _UAPI_IOMMU_H */  
-> >>>>
-> >>>> [Jacob Pan]
-> >>>> _______________________________________________
-> >>>> iommu mailing list
-> >>>> iommu@lists.linux-foundation.org
-> >>>> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> >>>>  
-> >>>  
-> >> _______________________________________________
-> >> iommu mailing list
-> >> iommu@lists.linux-foundation.org
-> >> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> >>  
-> >   
+> +
+> +		return vfio_attach_pasid_table(iommu, &ustruct);
+> +	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+> +		vfio_detach_pasid_table(iommu);
+> +		return 0;
+>  	}
+>  
+>  	return -ENOTTY;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 02bb7ad6e986..329d378565d9 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+>  
+>  #define VFIO_API_VERSION	0
+>  
+> @@ -759,6 +760,22 @@ struct vfio_iommu_type1_dma_unmap {
+>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>  
+> +/**
+> + * VFIO_IOMMU_ATTACH_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
+> + *			struct vfio_iommu_type1_attach_pasid_table)
+> + *
+> + * Passes the PASID table to the host. Calling ATTACH_PASID_TABLE
+> + * while a table is already installed is allowed: it replaces the old
+> + * table. DETACH does a comprehensive tear down of the nested mode.
+> + */
+> +struct vfio_iommu_type1_attach_pasid_table {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +	struct iommu_pasid_table_config config;
+> +};
+> +#define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> +#define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
+> +
 
-[Jacob Pan]
+DETACH should also be documented, it's not clear from the uapi that it
+requires no parameters.  Thanks,
+
+Alex
