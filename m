@@ -1,122 +1,96 @@
-From: Auger Eric <eric.auger@redhat.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org>
 Subject: Re: [PATCH v6 05/22] iommu: Introduce cache_invalidate API
-Date: Thu, 21 Mar 2019 14:54:26 +0100
-Message-ID: <ad4d18ec-0040-901f-8d37-0fccb3cfd0d5@redhat.com>
+Date: Thu, 21 Mar 2019 14:13:22 +0000
+Message-ID: <109c3520-dd26-3c0b-35d1-48b169fea982@arm.com>
 References: <20190317172232.1068-1-eric.auger@redhat.com>
- <20190317172232.1068-6-eric.auger@redhat.com>
- <20190320093727.45a86866@jacob-builder>
- <7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
+	<20190317172232.1068-6-eric.auger@redhat.com>
+	<20190320093727.45a86866@jacob-builder>
+	<7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
+	<ad4d18ec-0040-901f-8d37-0fccb3cfd0d5@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7ae1df77-18d0-0993-8dab-6af3a4474b42@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <ad4d18ec-0040-901f-8d37-0fccb3cfd0d5-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, vincent.stehle@arm.com, alex.williamson@redhat.com, ashok.raj@intel.com, kvm@vger.kernel.org, peter.maydell@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Auger Eric <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Jacob Pan <jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Cc: yi.l.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, vincent.stehle-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jacob, Jean-Philippe,
-
-On 3/20/19 5:50 PM, Jean-Philippe Brucker wrote:
-> On 20/03/2019 16:37, Jacob Pan wrote:
-> [...]
->>> +struct iommu_inv_addr_info {
->>> +#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
->>> +#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
->>> +#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
->>> +	__u32	flags;
->>> +	__u32	archid;
->>> +	__u64	pasid;
->>> +	__u64	addr;
->>> +	__u64	granule_size;
->>> +	__u64	nb_granules;
->>> +};
->>> +
->>> +/**
->>> + * First level/stage invalidation information
->>> + * @cache: bitfield that allows to select which caches to invalidate
->>> + * @granularity: defines the lowest granularity used for the
->>> invalidation:
->>> + *     domain > pasid > addr
->>> + *
->>> + * Not all the combinations of cache/granularity make sense:
->>> + *
->>> + *         type |   DEV_IOTLB   |     IOTLB     |      PASID    |
->>> + * granularity	|		|		|
->>> cache	|
->>> + * -------------+---------------+---------------+---------------+
->>> + * DOMAIN	|	N/A	|       Y	|
->>> Y	|
->>> + * PASID	|	Y	|       Y	|
->>> Y	|
->>> + * ADDR		|       Y	|       Y	|
->>> N/A	|
->>> + */
->>> +struct iommu_cache_invalidate_info {
->>> +#define IOMMU_CACHE_INVALIDATE_INFO_VERSION_1 1
->>> +	__u32	version;
->>> +/* IOMMU paging structure cache */
->>> +#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
->>> +#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device
->>> IOTLB */ +#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID
->>> cache */
->> Just a clarification, this used to be an enum. You do intend to issue a
->> single invalidation request on multiple cache types? Perhaps for
->> virtio-IOMMU? I only see a single cache type in your patch #14. For VT-d
->> we plan to issue one cache type at a time for now. So this format works
->> for us.
-> 
-> Yes for virtio-iommu I'd like as little overhead as possible, which
-> means a single invalidation message to hit both IOTLB and ATC at once,
-> and the ability to specify multiple pages with @nb_granules.
-The original request/explanation from Jean-Philippe can be found here:
-https://lkml.org/lkml/2019/1/28/1497
-
-> 
->> However, if multiple cache types are issued in a single invalidation.
->> They must share a single granularity, not all combinations are valid.
->> e.g. dev IOTLB does not support domain granularity. Just a reminder,
->> not an issue. Driver could filter out invalid combinations.
-Sure I will add a comment about this restriction.
-> 
-> Agreed. Even the core could filter out invalid combinations based on the
-> table above: IOTLB and domain granularity are N/A.
-I don't get this sentence. What about vtd IOTLB domain-selective
-invalidation:
-"
-• IOTLB entries caching mappings associated with the specified domain-id
-are invalidated.
-• Paging-structure-cache entries caching mappings associated with the
-specified domain-id are invalidated.
-"
-
-Thanks
-
-Eric
-
-> 
-> Thanks,
-> Jean
-> 
->>
->>> +	__u8	cache;
->>> +	__u8	granularity;
->>> +	__u8	padding[2];
->>> +	union {
->>> +		__u64	pasid;
->>> +		struct iommu_inv_addr_info addr_info;
->>> +	};
->>> +};
->>> +
->>> +
->>>  #endif /* _UAPI_IOMMU_H */
->>
->> [Jacob Pan]
->> _______________________________________________
->> iommu mailing list
->> iommu@lists.linux-foundation.org
->> https://lists.linuxfoundation.org/mailman/listinfo/iommu
->>
-> 
+T24gMjEvMDMvMjAxOSAxMzo1NCwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBKYWNvYiwgSmVhbi1Q
+aGlsaXBwZSwKPiAKPiBPbiAzLzIwLzE5IDU6NTAgUE0sIEplYW4tUGhpbGlwcGUgQnJ1Y2tlciB3
+cm90ZToKPj4gT24gMjAvMDMvMjAxOSAxNjozNywgSmFjb2IgUGFuIHdyb3RlOgo+PiBbLi4uXQo+
+Pj4+ICtzdHJ1Y3QgaW9tbXVfaW52X2FkZHJfaW5mbyB7Cj4+Pj4gKyNkZWZpbmUgSU9NTVVfSU5W
+X0FERFJfRkxBR1NfUEFTSUQJKDEgPDwgMCkKPj4+PiArI2RlZmluZSBJT01NVV9JTlZfQUREUl9G
+TEFHU19BUkNISUQJKDEgPDwgMSkKPj4+PiArI2RlZmluZSBJT01NVV9JTlZfQUREUl9GTEFHU19M
+RUFGCSgxIDw8IDIpCj4+Pj4gKwlfX3UzMglmbGFnczsKPj4+PiArCV9fdTMyCWFyY2hpZDsKPj4+
+PiArCV9fdTY0CXBhc2lkOwo+Pj4+ICsJX191NjQJYWRkcjsKPj4+PiArCV9fdTY0CWdyYW51bGVf
+c2l6ZTsKPj4+PiArCV9fdTY0CW5iX2dyYW51bGVzOwo+Pj4+ICt9Owo+Pj4+ICsKPj4+PiArLyoq
+Cj4+Pj4gKyAqIEZpcnN0IGxldmVsL3N0YWdlIGludmFsaWRhdGlvbiBpbmZvcm1hdGlvbgo+Pj4+
+ICsgKiBAY2FjaGU6IGJpdGZpZWxkIHRoYXQgYWxsb3dzIHRvIHNlbGVjdCB3aGljaCBjYWNoZXMg
+dG8gaW52YWxpZGF0ZQo+Pj4+ICsgKiBAZ3JhbnVsYXJpdHk6IGRlZmluZXMgdGhlIGxvd2VzdCBn
+cmFudWxhcml0eSB1c2VkIGZvciB0aGUKPj4+PiBpbnZhbGlkYXRpb246Cj4+Pj4gKyAqICAgICBk
+b21haW4gPiBwYXNpZCA+IGFkZHIKPj4+PiArICoKPj4+PiArICogTm90IGFsbCB0aGUgY29tYmlu
+YXRpb25zIG9mIGNhY2hlL2dyYW51bGFyaXR5IG1ha2Ugc2Vuc2U6Cj4+Pj4gKyAqCj4+Pj4gKyAq
+ICAgICAgICAgdHlwZSB8ICAgREVWX0lPVExCICAgfCAgICAgSU9UTEIgICAgIHwgICAgICBQQVNJ
+RCAgICB8Cj4+Pj4gKyAqIGdyYW51bGFyaXR5CXwJCXwJCXwKPj4+PiBjYWNoZQl8Cj4+Pj4gKyAq
+IC0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0t
+LS0tLS0rCj4+Pj4gKyAqIERPTUFJTgl8CU4vQQl8ICAgICAgIFkJfAo+Pj4+IFkJfAo+Pj4+ICsg
+KiBQQVNJRAl8CVkJfCAgICAgICBZCXwKPj4+PiBZCXwKPj4+PiArICogQUREUgkJfCAgICAgICBZ
+CXwgICAgICAgWQl8Cj4+Pj4gTi9BCXwKPj4+PiArICovCj4+Pj4gK3N0cnVjdCBpb21tdV9jYWNo
+ZV9pbnZhbGlkYXRlX2luZm8gewo+Pj4+ICsjZGVmaW5lIElPTU1VX0NBQ0hFX0lOVkFMSURBVEVf
+SU5GT19WRVJTSU9OXzEgMQo+Pj4+ICsJX191MzIJdmVyc2lvbjsKPj4+PiArLyogSU9NTVUgcGFn
+aW5nIHN0cnVjdHVyZSBjYWNoZSAqLwo+Pj4+ICsjZGVmaW5lIElPTU1VX0NBQ0hFX0lOVl9UWVBF
+X0lPVExCCSgxIDw8IDApIC8qIElPTU1VIElPVExCICovCj4+Pj4gKyNkZWZpbmUgSU9NTVVfQ0FD
+SEVfSU5WX1RZUEVfREVWX0lPVExCCSgxIDw8IDEpIC8qIERldmljZQo+Pj4+IElPVExCICovICsj
+ZGVmaW5lIElPTU1VX0NBQ0hFX0lOVl9UWVBFX1BBU0lECSgxIDw8IDIpIC8qIFBBU0lECj4+Pj4g
+Y2FjaGUgKi8KPj4+IEp1c3QgYSBjbGFyaWZpY2F0aW9uLCB0aGlzIHVzZWQgdG8gYmUgYW4gZW51
+bS4gWW91IGRvIGludGVuZCB0byBpc3N1ZSBhCj4+PiBzaW5nbGUgaW52YWxpZGF0aW9uIHJlcXVl
+c3Qgb24gbXVsdGlwbGUgY2FjaGUgdHlwZXM/IFBlcmhhcHMgZm9yCj4+PiB2aXJ0aW8tSU9NTVU/
+IEkgb25seSBzZWUgYSBzaW5nbGUgY2FjaGUgdHlwZSBpbiB5b3VyIHBhdGNoICMxNC4gRm9yIFZU
+LWQKPj4+IHdlIHBsYW4gdG8gaXNzdWUgb25lIGNhY2hlIHR5cGUgYXQgYSB0aW1lIGZvciBub3cu
+IFNvIHRoaXMgZm9ybWF0IHdvcmtzCj4+PiBmb3IgdXMuCj4+Cj4+IFllcyBmb3IgdmlydGlvLWlv
+bW11IEknZCBsaWtlIGFzIGxpdHRsZSBvdmVyaGVhZCBhcyBwb3NzaWJsZSwgd2hpY2gKPj4gbWVh
+bnMgYSBzaW5nbGUgaW52YWxpZGF0aW9uIG1lc3NhZ2UgdG8gaGl0IGJvdGggSU9UTEIgYW5kIEFU
+QyBhdCBvbmNlLAo+PiBhbmQgdGhlIGFiaWxpdHkgdG8gc3BlY2lmeSBtdWx0aXBsZSBwYWdlcyB3
+aXRoIEBuYl9ncmFudWxlcy4KPiBUaGUgb3JpZ2luYWwgcmVxdWVzdC9leHBsYW5hdGlvbiBmcm9t
+IEplYW4tUGhpbGlwcGUgY2FuIGJlIGZvdW5kIGhlcmU6Cj4gaHR0cHM6Ly9sa21sLm9yZy9sa21s
+LzIwMTkvMS8yOC8xNDk3Cj4gCj4+Cj4+PiBIb3dldmVyLCBpZiBtdWx0aXBsZSBjYWNoZSB0eXBl
+cyBhcmUgaXNzdWVkIGluIGEgc2luZ2xlIGludmFsaWRhdGlvbi4KPj4+IFRoZXkgbXVzdCBzaGFy
+ZSBhIHNpbmdsZSBncmFudWxhcml0eSwgbm90IGFsbCBjb21iaW5hdGlvbnMgYXJlIHZhbGlkLgo+
+Pj4gZS5nLiBkZXYgSU9UTEIgZG9lcyBub3Qgc3VwcG9ydCBkb21haW4gZ3JhbnVsYXJpdHkuIEp1
+c3QgYSByZW1pbmRlciwKPj4+IG5vdCBhbiBpc3N1ZS4gRHJpdmVyIGNvdWxkIGZpbHRlciBvdXQg
+aW52YWxpZCBjb21iaW5hdGlvbnMuCj4gU3VyZSBJIHdpbGwgYWRkIGEgY29tbWVudCBhYm91dCB0
+aGlzIHJlc3RyaWN0aW9uLgo+Pgo+PiBBZ3JlZWQuIEV2ZW4gdGhlIGNvcmUgY291bGQgZmlsdGVy
+IG91dCBpbnZhbGlkIGNvbWJpbmF0aW9ucyBiYXNlZCBvbiB0aGUKPj4gdGFibGUgYWJvdmU6IElP
+VExCIGFuZCBkb21haW4gZ3JhbnVsYXJpdHkgYXJlIE4vQS4KPiBJIGRvbid0IGdldCB0aGlzIHNl
+bnRlbmNlLiBXaGF0IGFib3V0IHZ0ZCBJT1RMQiBkb21haW4tc2VsZWN0aXZlCj4gaW52YWxpZGF0
+aW9uOgoKTXkgbWlzdGFrZTogSSBtZWFudCBkZXYtSU9UTEIgYW5kIGRvbWFpbiBncmFudWxhcml0
+eSBhcmUgTi9BCgpUaGFua3MsCkplYW4KCj4gIgo+IOKAoiBJT1RMQiBlbnRyaWVzIGNhY2hpbmcg
+bWFwcGluZ3MgYXNzb2NpYXRlZCB3aXRoIHRoZSBzcGVjaWZpZWQgZG9tYWluLWlkCj4gYXJlIGlu
+dmFsaWRhdGVkLgo+IOKAoiBQYWdpbmctc3RydWN0dXJlLWNhY2hlIGVudHJpZXMgY2FjaGluZyBt
+YXBwaW5ncyBhc3NvY2lhdGVkIHdpdGggdGhlCj4gc3BlY2lmaWVkIGRvbWFpbi1pZCBhcmUgaW52
+YWxpZGF0ZWQuCj4gIgo+IAo+IFRoYW5rcwo+IAo+IEVyaWMKPiAKPj4KPj4gVGhhbmtzLAo+PiBK
+ZWFuCj4+Cj4+Pgo+Pj4+ICsJX191OAljYWNoZTsKPj4+PiArCV9fdTgJZ3JhbnVsYXJpdHk7Cj4+
+Pj4gKwlfX3U4CXBhZGRpbmdbMl07Cj4+Pj4gKwl1bmlvbiB7Cj4+Pj4gKwkJX191NjQJcGFzaWQ7
+Cj4+Pj4gKwkJc3RydWN0IGlvbW11X2ludl9hZGRyX2luZm8gYWRkcl9pbmZvOwo+Pj4+ICsJfTsK
+Pj4+PiArfTsKPj4+PiArCj4+Pj4gKwo+Pj4+ICAjZW5kaWYgLyogX1VBUElfSU9NTVVfSCAqLwo+
+Pj4KPj4+IFtKYWNvYiBQYW5dCj4+PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwo+Pj4gaW9tbXUgbWFpbGluZyBsaXN0Cj4+PiBpb21tdUBsaXN0cy5saW51
+eC1mb3VuZGF0aW9uLm9yZwo+Pj4gaHR0cHM6Ly9saXN0cy5saW51eGZvdW5kYXRpb24ub3JnL21h
+aWxtYW4vbGlzdGluZm8vaW9tbXUKPj4+Cj4+Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KPiBpb21tdSBtYWlsaW5nIGxpc3QKPiBpb21tdUBsaXN0cy5s
+aW51eC1mb3VuZGF0aW9uLm9yZwo+IGh0dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9yZy9t
+YWlsbWFuL2xpc3RpbmZvL2lvbW11Cj4gCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwppb21tdSBtYWlsaW5nIGxpc3QKaW9tbXVAbGlzdHMubGludXgtZm91
+bmRhdGlvbi5vcmcKaHR0cHM6Ly9saXN0cy5saW51eGZvdW5kYXRpb24ub3JnL21haWxtYW4vbGlz
+dGluZm8vaW9tbXU=
