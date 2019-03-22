@@ -1,292 +1,229 @@
 From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 02/22] iommu: introduce device fault data
-Date: Fri, 22 Mar 2019 09:00:27 +0100
-Message-ID: <ccd64817-be47-0dcd-8293-4971a435892b@redhat.com>
+Subject: Re: [PATCH v6 09/22] vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+Date: Fri, 22 Mar 2019 10:30:02 +0100
+Message-ID: <16931d58-9c88-8cfb-a392-408ea7afdf16@redhat.com>
 References: <20190317172232.1068-1-eric.auger@redhat.com>
- <20190317172232.1068-3-eric.auger@redhat.com>
- <20190321150439.5aac2c01@jacob-builder>
+ <20190317172232.1068-10-eric.auger@redhat.com>
+ <20190321170159.38358f38@x1.home>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190321150439.5aac2c01@jacob-builder>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6543D4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 05:30:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id VlyHshU81+s8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Mar 2019 05:30:12 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 013474A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 05:30:11 -0400 (EDT)
+In-Reply-To: <20190321170159.38358f38@x1.home>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: yi.l.liu@linux.intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com, kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, marc.zyngier@arm.com, iommu@lists.linux-foundation.org, vincent.stehle@arm.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jacob,
-
-On 3/21/19 11:04 PM, Jacob Pan wrote:
-> On Sun, 17 Mar 2019 18:22:12 +0100
+Hi Alex,
+On 3/22/19 12:01 AM, Alex Williamson wrote:
+> On Sun, 17 Mar 2019 18:22:19 +0100
 > Eric Auger <eric.auger@redhat.com> wrote:
 > 
->> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> This patch adds the VFIO_IOMMU_BIND/UNBIND_MSI ioctl which aim
+>> to pass/withdraw the guest MSI binding to/from the host.
 >>
->> Device faults detected by IOMMU can be reported outside the IOMMU
->> subsystem for further processing. This patch introduces
->> a generic device fault data structure.
->>
->> The fault can be either an unrecoverable fault or a page request,
->> also referred to as a recoverable fault.
->>
->> We only care about non internal faults that are likely to be reported
->> to an external subsystem.
->>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
 >> ---
->> v4 -> v5:
->> - simplified struct iommu_fault_event comment
->> - Moved IOMMU_FAULT_PERM outside of the struct
->> - Removed IOMMU_FAULT_PERM_INST
->> - s/IOMMU_FAULT_PAGE_REQUEST_PASID_PRESENT/
->>   IOMMU_FAULT_PAGE_REQUEST_PASID_VALID
->>
 >> v3 -> v4:
->> - use a union containing aither an unrecoverable fault or a page
->>   request message. Move the device private data in the page request
->>   structure. Reshuffle the fields and use flags.
->> - move fault perm attributes to the uapi
->> - remove a bunch of iommu_fault_reason enum values that were related
->>   to internal errors
->> ---
->>  include/linux/iommu.h      |  44 ++++++++++++++
->>  include/uapi/linux/iommu.h | 115
->> +++++++++++++++++++++++++++++++++++++ 2 files changed, 159
->> insertions(+) create mode 100644 include/uapi/linux/iommu.h
+>> - add UNBIND
+>> - unwind on BIND error
 >>
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index ffbbc7e39cee..c6f398f7e6e0 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -25,6 +25,7 @@
->>  #include <linux/errno.h>
->>  #include <linux/err.h>
->>  #include <linux/of.h>
->> +#include <uapi/linux/iommu.h>
+>> v2 -> v3:
+>> - adapt to new proto of bind_guest_msi
+>> - directly use vfio_iommu_for_each_dev
+>>
+>> v1 -> v2:
+>> - s/vfio_iommu_type1_guest_msi_binding/vfio_iommu_type1_bind_guest_msi
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 58 +++++++++++++++++++++++++++++++++
+>>  include/uapi/linux/vfio.h       | 29 +++++++++++++++++
+>>  2 files changed, 87 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 12a40b9db6aa..66513679081b 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -1710,6 +1710,25 @@ static int vfio_cache_inv_fn(struct device *dev, void *data)
+>>  	return iommu_cache_invalidate(d, dev, &ustruct->info);
+>>  }
 >>  
->>  #define IOMMU_READ	(1 << 0)
->>  #define IOMMU_WRITE	(1 << 1)
->> @@ -48,6 +49,7 @@ struct bus_type;
->>  struct device;
->>  struct iommu_domain;
->>  struct notifier_block;
->> +struct iommu_fault_event;
->>  
->>  /* iommu fault flags */
->>  #define IOMMU_FAULT_READ	0x0
->> @@ -55,6 +57,7 @@ struct notifier_block;
->>  
->>  typedef int (*iommu_fault_handler_t)(struct iommu_domain *,
->>  			struct device *, unsigned long, int, void *);
->> +typedef int (*iommu_dev_fault_handler_t)(struct iommu_fault_event *,
->> void *); 
->>  struct iommu_domain_geometry {
->>  	dma_addr_t aperture_start; /* First address that can be
->> mapped    */ @@ -247,6 +250,46 @@ struct iommu_device {
->>  	struct device *dev;
->>  };
->>  
->> +/**
->> + * struct iommu_fault_event - Generic fault event
->> + *
->> + * Can represent recoverable faults such as a page requests or
->> + * unrecoverable faults such as DMA or IRQ remapping faults.
->> + *
->> + * @fault: fault descriptor
->> + * @iommu_private: used by the IOMMU driver for storing
->> fault-specific
->> + *                 data. Users should not modify this field before
->> + *                 sending the fault response.
->> + */
->> +struct iommu_fault_event {
->> +	struct iommu_fault fault;
->> +	u64 iommu_private;
->> +};
+>> +static int vfio_bind_msi_fn(struct device *dev, void *data)
+>> +{
+>> +	struct vfio_iommu_type1_bind_msi *ustruct =
+>> +		(struct vfio_iommu_type1_bind_msi *)data;
+>> +	struct iommu_domain *d = iommu_get_domain_for_dev(dev);
 >> +
->> +/**
->> + * struct iommu_fault_param - per-device IOMMU fault data
->> + * @dev_fault_handler: Callback function to handle IOMMU faults at
->> device level
->> + * @data: handler private data
->> + *
->> + */
->> +struct iommu_fault_param {
->> +	iommu_dev_fault_handler_t handler;
->> +	void *data;
->> +};
+>> +	return iommu_bind_guest_msi(d, dev, ustruct->iova,
+>> +				    ustruct->gpa, ustruct->size);
+>> +}
 >> +
->> +/**
->> + * struct iommu_param - collection of per-device IOMMU data
->> + *
->> + * @fault_param: IOMMU detected device fault reporting data
->> + *
->> + * TODO: migrate other per device data pointers under
->> iommu_dev_data, e.g.
->> + *	struct iommu_group	*iommu_group;
->> + *	struct iommu_fwspec	*iommu_fwspec;
->> + */
->> +struct iommu_param {
->> +	struct iommu_fault_param *fault_param;
->> +};
+>> +static int vfio_unbind_msi_fn(struct device *dev, void *data)
+>> +{
+>> +	dma_addr_t *iova = (dma_addr_t *)data;
+>> +	struct iommu_domain *d = iommu_get_domain_for_dev(dev);
+> 
+> Same as previous, we can encapsulate domain in our own struct to avoid
+> a lookup.
+> 
 >> +
->>  int  iommu_device_register(struct iommu_device *iommu);
->>  void iommu_device_unregister(struct iommu_device *iommu);
->>  int  iommu_device_sysfs_add(struct iommu_device *iommu,
->> @@ -422,6 +465,7 @@ struct iommu_ops {};
->>  struct iommu_group {};
->>  struct iommu_fwspec {};
->>  struct iommu_device {};
->> +struct iommu_fault_param {};
->>  
->>  static inline bool iommu_present(struct bus_type *bus)
->>  {
->> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->> new file mode 100644
->> index 000000000000..edcc0dda7993
->> --- /dev/null
->> +++ b/include/uapi/linux/iommu.h
->> @@ -0,0 +1,115 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/*
->> + * IOMMU user API definitions
->> + */
->> +
->> +#ifndef _UAPI_IOMMU_H
->> +#define _UAPI_IOMMU_H
->> +
->> +#include <linux/types.h>
->> +
->> +#define IOMMU_FAULT_PERM_WRITE	(1 << 0) /* write */
->> +#define IOMMU_FAULT_PERM_EXEC	(1 << 1) /* exec */
->> +#define IOMMU_FAULT_PERM_PRIV	(1 << 2) /* privileged */
->> +
->> +/*  Generic fault types, can be expanded IRQ remapping fault */
->> +enum iommu_fault_type {
->> +	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
->> +	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
->> +};
->> +
->> +enum iommu_fault_reason {
->> +	IOMMU_FAULT_REASON_UNKNOWN = 0,
->> +
->> +	/* Could not access the PASID table (fetch caused external
->> abort) */
->> +	IOMMU_FAULT_REASON_PASID_FETCH,
->> +
->> +	/* pasid entry is invalid or has configuration errors */
->> +	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
->> +
->> +	/*
->> +	 * PASID is out of range (e.g. exceeds the maximum PASID
->> +	 * supported by the IOMMU) or disabled.
->> +	 */
->> +	IOMMU_FAULT_REASON_PASID_INVALID,
->> +
->> +	/*
->> +	 * An external abort occurred fetching (or updating) a
->> translation
->> +	 * table descriptor
->> +	 */
->> +	IOMMU_FAULT_REASON_WALK_EABT,
->> +
->> +	/*
->> +	 * Could not access the page table entry (Bad address),
->> +	 * actual translation fault
->> +	 */
->> +	IOMMU_FAULT_REASON_PTE_FETCH,
->> +
->> +	/* Protection flag check failed */
->> +	IOMMU_FAULT_REASON_PERMISSION,
->> +
->> +	/* access flag check failed */
->> +	IOMMU_FAULT_REASON_ACCESS,
->> +
->> +	/* Output address of a translation stage caused Address Size
->> fault */
->> +	IOMMU_FAULT_REASON_OOR_ADDRESS,
->> +};
->> +
-> For VT-d scalable mode, fault reason can be further split into first
-> level faults and second level faults. But since we pin the second level
-> today and guest owns the first level, we only need to inject faults of
-> the FL to vIOMMU. So I think this is fine today, I think this enum can
-> be extended w/o a new version of the structure.
+>> +	iommu_unbind_guest_msi(d, dev, *iova);
+> 
+> Is it strange that iommu-core is exposing these interfaces at a device
+> level if every one of them requires us to walk all the devices?  Thanks,
 
-I think that's the same actually for SMMUv3. Here we only kept stage1
-related fault reasons as stage2 should rather be kept internal to the
-driver.
+Hum this per device API was devised in response of Robin's comments on
+
+[RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie.
+
+"
+But that then seems to reveal a somewhat bigger problem - if the callers
+are simply registering IPAs, and relying on the ITS driver to grab an
+entry and fill in a PA later, then how does either one know *which* PA
+is supposed to belong to a given IPA in the case where you have multiple
+devices with different ITS targets assigned to the same guest? (and if
+it's possible to assume a guest will use per-device stage 1 mappings and
+present it with a single vITS backed by multiple pITSes, I think things
+start breaking even harder.)
+"
+
+However looking back into the problem I wonder if there was an issue
+with the iommu_domain based API.
+
+If my understanding is correct, when assigned devices are protected by a
+vIOMMU then they necessarily end up in separate host iommu domains even
+if they belong to the same iommu_domain on the guest. And there can only
+be a single device in this iommu_domain.
+
+If this is confirmed, there is a non ambiguous association between 1
+physical iommu_domain, 1 device, 1 S1 mapping and 1 physical MSI
+controller.
+
+I added the device handle handle to disambiguate those associations. The
+gIOVA ->gDB mapping is associated with a device handle. Then when the
+host needs a stage 1 mapping for this device, to build the nested
+mapping towards the physical DB it can easily grab the gIOVA->gDB stage
+1 mapping registered for this device.
+
+The correctness looks more obvious to me, at least.
 
 Thanks
 
 Eric
+
 > 
->> +/**
->> + * Unrecoverable fault data
->> + * @reason: reason of the fault
->> + * @addr: offending page address
->> + * @fetch_addr: address that caused a fetch abort, if any
->> + * @pasid: contains process address space ID, used in shared virtual
->> memory
->> + * @perm: Requested permission access using by the incoming
->> transaction
->> + * (IOMMU_FAULT_PERM_* values)
->> + */
->> +struct iommu_fault_unrecoverable {
->> +	__u32	reason; /* enum iommu_fault_reason */
->> +#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
->> +#define IOMMU_FAULT_UNRECOV_PERM_VALID		(1 << 1)
->> +#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 2)
->> +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 3)
->> +	__u32	flags;
->> +	__u32	pasid;
->> +	__u32	perm;
->> +	__u64	addr;
->> +	__u64	fetch_addr;
->> +};
+> Alex
+> 
+>> +	return 0;
+>> +}
 >> +
->> +/*
->> + * Page Request data (aka. recoverable fault data)
->> + * @flags : encodes whether the pasid is valid and whether this
->> + * is the last page in group
->> + * @pasid: pasid
->> + * @grpid: page request group index
->> + * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
->> + * @addr: page address
->> + */
->> +struct iommu_fault_page_request {
->> +#define IOMMU_FAULT_PAGE_REQUEST_PASID_VALID	(1 << 0)
->> +#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
->> +#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
->> +	__u32   flags;
->> +	__u32	pasid;
->> +	__u32	grpid;
->> +	__u32	perm;
->> +	__u64	addr;
->> +	__u64	private_data[2];
->> +};
+>>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  				   unsigned int cmd, unsigned long arg)
+>>  {
+>> @@ -1814,6 +1833,45 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  					      vfio_cache_inv_fn);
+>>  		mutex_unlock(&iommu->lock);
+>>  		return ret;
+>> +	} else if (cmd == VFIO_IOMMU_BIND_MSI) {
+>> +		struct vfio_iommu_type1_bind_msi ustruct;
+>> +		int ret;
 >> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_bind_msi,
+>> +				    size);
+>> +
+>> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (ustruct.argsz < minsz || ustruct.flags)
+>> +			return -EINVAL;
+>> +
+>> +		mutex_lock(&iommu->lock);
+>> +		ret = vfio_iommu_for_each_dev(iommu, &ustruct,
+>> +					      vfio_bind_msi_fn);
+>> +		if (ret)
+>> +			vfio_iommu_for_each_dev(iommu, &ustruct.iova,
+>> +						vfio_unbind_msi_fn);
+>> +		mutex_unlock(&iommu->lock);
+>> +		return ret;
+>> +	} else if (cmd == VFIO_IOMMU_UNBIND_MSI) {
+>> +		struct vfio_iommu_type1_unbind_msi ustruct;
+>> +		int ret;
+>> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_unbind_msi,
+>> +				    iova);
+>> +
+>> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (ustruct.argsz < minsz || ustruct.flags)
+>> +			return -EINVAL;
+>> +
+>> +		mutex_lock(&iommu->lock);
+>> +		ret = vfio_iommu_for_each_dev(iommu, &ustruct.iova,
+>> +					      vfio_unbind_msi_fn);
+>> +		mutex_unlock(&iommu->lock);
+>> +		return ret;
+>>  	}
+>>  
+>>  	return -ENOTTY;
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 29f0ef2d805d..6763389b6adc 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -789,6 +789,35 @@ struct vfio_iommu_type1_cache_invalidate {
+>>  };
+>>  #define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
+>>  
 >> +/**
->> + * struct iommu_fault - Generic fault data
+>> + * VFIO_IOMMU_BIND_MSI - _IOWR(VFIO_TYPE, VFIO_BASE + 25,
+>> + *			struct vfio_iommu_type1_bind_msi)
 >> + *
->> + * @type contains fault type
+>> + * Pass a stage 1 MSI doorbell mapping to the host so that this
+>> + * latter can build a nested stage2 mapping
 >> + */
->> +
->> +struct iommu_fault {
->> +	__u32	type;   /* enum iommu_fault_type */
->> +	__u32	reserved;
->> +	union {
->> +		struct iommu_fault_unrecoverable event;
->> +		struct iommu_fault_page_request prm;
->> +	};
+>> +struct vfio_iommu_type1_bind_msi {
+>> +	__u32   argsz;
+>> +	__u32   flags;
+>> +	__u64	iova;
+>> +	__u64	gpa;
+>> +	__u64	size;
 >> +};
->> +#endif /* _UAPI_IOMMU_H */
-> 
-> [Jacob Pan]
+>> +#define VFIO_IOMMU_BIND_MSI      _IO(VFIO_TYPE, VFIO_BASE + 25)
+>> +
+>> +/**
+>> + * VFIO_IOMMU_UNBIND_MSI - _IOWR(VFIO_TYPE, VFIO_BASE + 26,
+>> + *			struct vfio_iommu_type1_unbind_msi)
+>> + *
+>> + * Unregister an MSI mapping
+>> + */
+>> +struct vfio_iommu_type1_unbind_msi {
+>> +	__u32   argsz;
+>> +	__u32   flags;
+>> +	__u64	iova;
+>> +};
+>> +#define VFIO_IOMMU_UNBIND_MSI      _IO(VFIO_TYPE, VFIO_BASE + 26)
+>> +
+>>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>>  
+>>  /*
 > 
