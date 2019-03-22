@@ -1,166 +1,135 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v6 00/22] SMMUv3 Nested Stage Setup
-Date: Fri, 22 Mar 2019 14:27:16 +0100
-Message-ID: <1281b754-3a66-1dd2-5e7f-6dc853f09a90@redhat.com>
-References: <20190317172232.1068-1-eric.auger@redhat.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH v2 7/9] arm/arm64: kvm: pmu: Make overflow handler NMI safe
+Date: Fri, 22 Mar 2019 16:24:02 +0000
+Message-ID: <1553271844-49003-8-git-send-email-julien.thierry@arm.com>
+References: <1553271844-49003-1-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190317172232.1068-1-eric.auger@redhat.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D67554A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 12:24:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XktIu4VFwSi6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Mar 2019 12:24:28 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4407A4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 12:24:28 -0400 (EDT)
+In-Reply-To: <1553271844-49003-1-git-send-email-julien.thierry@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: peterz@infradead.org, will.deacon@arm.com, acme@kernel.org, alexander.shishkin@linux.intel.com, mingo@redhat.com, Marc Zyngier <marc.zyngier@arm.com>, namhyung@kernel.org, jolsa@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+When using an NMI for the PMU interrupt, taking any lock migh cause a
+deadlock. The current PMU overflow handler in KVM takes takes locks when
+trying to wake up a vcpu.
 
-On 3/17/19 6:22 PM, Eric Auger wrote:
-> This series allows a virtualizer to program the nested stage mode.
-> This is useful when both the host and the guest are exposed with
-> an SMMUv3 and a PCI device is assigned to the guest using VFIO.
-> 
-> In this mode, the physical IOMMU must be programmed to translate
-> the two stages: the one set up by the guest (IOVA -> GPA) and the
-> one set up by the host VFIO driver as part of the assignment process
-> (GPA -> HPA).
-> 
-> On Intel, this is traditionnaly achieved by combining the 2 stages
-> into a single physical stage. However this relies on the capability
-> to trap on each guest translation structure update. This is possible
-> by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
-> not offer a similar mechanism.
-> 
-> However, the ARM SMMUv3 architecture supports 2 physical stages! Those
-> were devised exactly with that use case in mind. Assuming the HW
-> implements both stages (optional), the guest now can use stage 1
-> while the host uses stage 2.
-> 
-> This assumes the virtualizer has means to propagate guest settings
-> to the host SMMUv3 driver. This series brings this VFIO/IOMMU
-> infrastructure.  Those services are:
-> - bind the guest stage 1 configuration to the stream table entry
-> - propagate guest TLB invalidations
-> - bind MSI IOVAs
-> - propagate faults collected at physical level up to the virtualizer
-> 
-> This series largely reuses the user API and infrastructure originally
-> devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
-> [1-2] and Jean-Philippe [3-4].
-> 
-> Best Regards
-> 
-> Eric
-> 
-> This series can be found at:
-> https://github.com/eauger/linux/tree/v5.0-2stage-v6
-For those who would like to test this series with qemu, please use the
-following qemu branch:
+When overflow handler is called by an NMI, defer the vcpu waking in an
+irq_work queue.
 
-https://github.com/eauger/qemu/tree/v4.0-2stage-unformal-for-v6-testing
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
+---
+ include/kvm/arm_pmu.h |  1 +
+ virt/kvm/arm/pmu.c    | 37 +++++++++++++++++++++++++++++++++----
+ 2 files changed, 34 insertions(+), 4 deletions(-)
 
-until I release a formal respin.
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index f87fe20..6a7c9dd 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -37,6 +37,7 @@ struct kvm_pmu {
+ 	bool ready;
+ 	bool created;
+ 	bool irq_level;
++	struct irq_work overflow_work;
+ };
 
-Thanks
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 1c5b76c..a72c972 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -273,15 +273,37 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_update_state(vcpu);
+ }
 
-Eric
-> 
-> References:
-> [1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
->     Address (SVA)
->     https://lwn.net/Articles/754331/
-> [2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
->     (VFIO part)
->     https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
-> [3] [v2,00/40] Shared Virtual Addressing for the IOMMU
->     https://patchwork.ozlabs.org/cover/912129/
-> [4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
->     https://patchwork.kernel.org/cover/10608299/
-> 
-> History:
-> v5 -> v6:
-> - Fix compilation issue when CONFIG_IOMMU_API is unset
-> 
-> v4 -> v5:
-> - fix bug reported by Vincent: fault handler unregistration now happens in
->   vfio_pci_release
-> - IOMMU_FAULT_PERM_* moved outside of struct definition + small
->   uapi changes suggested by Kean-Philippe (except fetch_addr)
-> - iommu: introduce device fault report API: removed the PRI part.
-> - see individual logs for more details
-> - reset the ste abort flag on detach
-> 
-> v3 -> v4:
-> - took into account Alex, jean-Philippe and Robin's comments on v3
-> - rework of the smmuv3 driver integration
-> - add tear down ops for msi binding and PASID table binding
-> - fix S1 fault propagation
-> - put fault reporting patches at the beginning of the series following
->   Jean-Philippe's request
-> - update of the cache invalidate and fault API uapis
-> - VFIO fault reporting rework with 2 separate regions and one mmappable
->   segment for the fault queue
-> - moved to PATCH
-> 
-> v2 -> v3:
-> - When registering the S1 MSI binding we now store the device handle. This
->   addresses Robin's comment about discimination of devices beonging to
->   different S1 groups and using different physical MSI doorbells.
-> - Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
->   set the eventfd and expose the faults through an mmappable fault region
-> 
-> v1 -> v2:
-> - Added the fault reporting capability
-> - asid properly passed on invalidation (fix assignment of multiple
->   devices)
-> - see individual change logs for more info
-> 
-> 
-> Eric Auger (13):
->   iommu: Introduce bind/unbind_guest_msi
->   vfio: VFIO_IOMMU_BIND/UNBIND_MSI
->   iommu/smmuv3: Get prepared for nested stage support
->   iommu/smmuv3: Implement attach/detach_pasid_table
->   iommu/smmuv3: Implement cache_invalidate
->   dma-iommu: Implement NESTED_MSI cookie
->   iommu/smmuv3: Implement bind/unbind_guest_msi
->   iommu/smmuv3: Report non recoverable faults
->   vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
->   vfio-pci: Register an iommu fault handler
->   vfio_pci: Allow to mmap the fault queue
->   vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
->   vfio: Document nested stage control
-> 
-> Jacob Pan (4):
->   driver core: add per device iommu param
->   iommu: introduce device fault data
->   iommu: introduce device fault report API
->   iommu: Introduce attach/detach_pasid_table API
-> 
-> Jean-Philippe Brucker (2):
->   iommu/arm-smmu-v3: Link domains and devices
->   iommu/arm-smmu-v3: Maintain a SID->device structure
-> 
-> Liu, Yi L (3):
->   iommu: Introduce cache_invalidate API
->   vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
->   vfio: VFIO_IOMMU_CACHE_INVALIDATE
-> 
->  Documentation/vfio.txt              |  83 ++++
->  drivers/iommu/arm-smmu-v3.c         | 581 ++++++++++++++++++++++++++--
->  drivers/iommu/dma-iommu.c           | 145 ++++++-
->  drivers/iommu/iommu.c               | 201 +++++++++-
->  drivers/vfio/pci/vfio_pci.c         | 214 ++++++++++
->  drivers/vfio/pci/vfio_pci_intrs.c   |  19 +
->  drivers/vfio/pci/vfio_pci_private.h |  18 +
->  drivers/vfio/pci/vfio_pci_rdwr.c    |  73 ++++
->  drivers/vfio/vfio_iommu_type1.c     | 158 ++++++++
->  include/linux/device.h              |   3 +
->  include/linux/dma-iommu.h           |  18 +
->  include/linux/iommu.h               | 137 +++++++
->  include/uapi/linux/iommu.h          | 233 +++++++++++
->  include/uapi/linux/vfio.h           | 102 +++++
->  14 files changed, 1951 insertions(+), 34 deletions(-)
->  create mode 100644 include/uapi/linux/iommu.h
-> 
++static inline struct kvm_vcpu *kvm_pmu_to_vcpu(struct kvm_pmu *pmu)
++{
++	struct kvm_vcpu_arch *vcpu_arch;
++
++	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
++	return container_of(vcpu_arch, struct kvm_vcpu, arch);
++}
++
+ static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu *pmu;
+-	struct kvm_vcpu_arch *vcpu_arch;
+
+ 	pmc -= pmc->idx;
+ 	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
+-	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
+-	return container_of(vcpu_arch, struct kvm_vcpu, arch);
++	return kvm_pmu_to_vcpu(pmu);
++}
++
++/**
++ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
++ * to the even.
++ * This is why we need a callback to do it once outside of the NMI context.
++ */
++static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_pmu *pmu;
++
++	pmu = container_of(work, struct kvm_pmu, overflow_work);
++	vcpu = kvm_pmu_to_vcpu(pmu);
++
++	kvm_vcpu_kick(vcpu);
+ }
+
+ /**
+@@ -299,7 +321,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+
+ 	if (kvm_pmu_overflow_status(vcpu)) {
+ 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+-		kvm_vcpu_kick(vcpu);
++
++		if (!in_nmi())
++			kvm_vcpu_kick(vcpu);
++		else
++			irq_work_queue(&vcpu->arch.pmu.overflow_work);
+ 	}
+ }
+
+@@ -501,6 +527,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 			return ret;
+ 	}
+
++	init_irq_work(&vcpu->arch.pmu.overflow_work,
++		      kvm_pmu_perf_overflow_notify_vcpu);
++
+ 	vcpu->arch.pmu.created = true;
+ 	return 0;
+ }
+--
+1.9.1
