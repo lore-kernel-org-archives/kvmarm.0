@@ -1,135 +1,132 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v2 7/9] arm/arm64: kvm: pmu: Make overflow handler NMI safe
-Date: Fri, 22 Mar 2019 16:24:02 +0000
-Message-ID: <1553271844-49003-8-git-send-email-julien.thierry@arm.com>
-References: <1553271844-49003-1-git-send-email-julien.thierry@arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v6 09/22] vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+Date: Fri, 22 Mar 2019 16:09:47 -0600
+Message-ID: <20190322160947.3f8dacdb@x1.home>
+References: <20190317172232.1068-1-eric.auger@redhat.com>
+        <20190317172232.1068-10-eric.auger@redhat.com>
+        <20190321170159.38358f38@x1.home>
+        <16931d58-9c88-8cfb-a392-408ea7afdf16@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D67554A369
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 12:24:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XktIu4VFwSi6 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Mar 2019 12:24:28 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4407A4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Mar 2019 12:24:28 -0400 (EDT)
-In-Reply-To: <1553271844-49003-1-git-send-email-julien.thierry@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: peterz@infradead.org, will.deacon@arm.com, acme@kernel.org, alexander.shishkin@linux.intel.com, mingo@redhat.com, Marc Zyngier <marc.zyngier@arm.com>, namhyung@kernel.org, jolsa@redhat.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <16931d58-9c88-8cfb-a392-408ea7afdf16@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When using an NMI for the PMU interrupt, taking any lock migh cause a
-deadlock. The current PMU overflow handler in KVM takes takes locks when
-trying to wake up a vcpu.
+On Fri, 22 Mar 2019 10:30:02 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-When overflow handler is called by an NMI, defer the vcpu waking in an
-irq_work queue.
+> Hi Alex,
+> On 3/22/19 12:01 AM, Alex Williamson wrote:
+> > On Sun, 17 Mar 2019 18:22:19 +0100
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >   
+> >> This patch adds the VFIO_IOMMU_BIND/UNBIND_MSI ioctl which aim
+> >> to pass/withdraw the guest MSI binding to/from the host.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>
+> >> ---
+> >> v3 -> v4:
+> >> - add UNBIND
+> >> - unwind on BIND error
+> >>
+> >> v2 -> v3:
+> >> - adapt to new proto of bind_guest_msi
+> >> - directly use vfio_iommu_for_each_dev
+> >>
+> >> v1 -> v2:
+> >> - s/vfio_iommu_type1_guest_msi_binding/vfio_iommu_type1_bind_guest_msi
+> >> ---
+> >>  drivers/vfio/vfio_iommu_type1.c | 58 +++++++++++++++++++++++++++++++++
+> >>  include/uapi/linux/vfio.h       | 29 +++++++++++++++++
+> >>  2 files changed, 87 insertions(+)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 12a40b9db6aa..66513679081b 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -1710,6 +1710,25 @@ static int vfio_cache_inv_fn(struct device *dev, void *data)
+> >>  	return iommu_cache_invalidate(d, dev, &ustruct->info);
+> >>  }
+> >>  
+> >> +static int vfio_bind_msi_fn(struct device *dev, void *data)
+> >> +{
+> >> +	struct vfio_iommu_type1_bind_msi *ustruct =
+> >> +		(struct vfio_iommu_type1_bind_msi *)data;
+> >> +	struct iommu_domain *d = iommu_get_domain_for_dev(dev);
+> >> +
+> >> +	return iommu_bind_guest_msi(d, dev, ustruct->iova,
+> >> +				    ustruct->gpa, ustruct->size);
+> >> +}
+> >> +
+> >> +static int vfio_unbind_msi_fn(struct device *dev, void *data)
+> >> +{
+> >> +	dma_addr_t *iova = (dma_addr_t *)data;
+> >> +	struct iommu_domain *d = iommu_get_domain_for_dev(dev);  
+> > 
+> > Same as previous, we can encapsulate domain in our own struct to avoid
+> > a lookup.
+> >   
+> >> +
+> >> +	iommu_unbind_guest_msi(d, dev, *iova);  
+> > 
+> > Is it strange that iommu-core is exposing these interfaces at a device
+> > level if every one of them requires us to walk all the devices?  Thanks,  
+> 
+> Hum this per device API was devised in response of Robin's comments on
+> 
+> [RFC v2 12/20] dma-iommu: Implement NESTED_MSI cookie.
+> 
+> "
+> But that then seems to reveal a somewhat bigger problem - if the callers
+> are simply registering IPAs, and relying on the ITS driver to grab an
+> entry and fill in a PA later, then how does either one know *which* PA
+> is supposed to belong to a given IPA in the case where you have multiple
+> devices with different ITS targets assigned to the same guest? (and if
+> it's possible to assume a guest will use per-device stage 1 mappings and
+> present it with a single vITS backed by multiple pITSes, I think things
+> start breaking even harder.)
+> "
+> 
+> However looking back into the problem I wonder if there was an issue
+> with the iommu_domain based API.
+> 
+> If my understanding is correct, when assigned devices are protected by a
+> vIOMMU then they necessarily end up in separate host iommu domains even
+> if they belong to the same iommu_domain on the guest. And there can only
+> be a single device in this iommu_domain.
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
----
- include/kvm/arm_pmu.h |  1 +
- virt/kvm/arm/pmu.c    | 37 +++++++++++++++++++++++++++++++++----
- 2 files changed, 34 insertions(+), 4 deletions(-)
+Don't forget that a container represents the IOMMU context in a vfio
+environment, groups are associated with containers and a group may
+contain one or more devices.  When a vIOMMU comes into play, we still
+only have an IOMMU context per container.  If we have multiple devices
+in a group, we run into problems with vIOMMU.  We can resolve this by
+requiring that the user ignore all but one device in the group,
+or making sure that the devices in the group have the same IOMMU
+context.  The latter we could do in QEMU if PCIe-to-PCI bridges there
+masked the per-device address space as it does on real hardware (ie.
+there is no requester ID on conventional PCI, all transactions appear to
+the IOMMU with the bridge requester ID).  So I raise this question
+because vfio's minimum domain granularity is a group.
 
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index f87fe20..6a7c9dd 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -37,6 +37,7 @@ struct kvm_pmu {
- 	bool ready;
- 	bool created;
- 	bool irq_level;
-+	struct irq_work overflow_work;
- };
+> If this is confirmed, there is a non ambiguous association between 1
+> physical iommu_domain, 1 device, 1 S1 mapping and 1 physical MSI
+> controller.
+> 
+> I added the device handle handle to disambiguate those associations. The
+> gIOVA ->gDB mapping is associated with a device handle. Then when the
+> host needs a stage 1 mapping for this device, to build the nested
+> mapping towards the physical DB it can easily grab the gIOVA->gDB stage
+> 1 mapping registered for this device.
+> 
+> The correctness looks more obvious to me, at least.
 
- #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 1c5b76c..a72c972 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -273,15 +273,37 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
- 	kvm_pmu_update_state(vcpu);
- }
+Except all devices within all groups within the same container
+necessarily share the same IOMMU context, so from that perspective, it
+appears to impose non-trivial redundancy on the caller.  Thanks,
 
-+static inline struct kvm_vcpu *kvm_pmu_to_vcpu(struct kvm_pmu *pmu)
-+{
-+	struct kvm_vcpu_arch *vcpu_arch;
-+
-+	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
-+	return container_of(vcpu_arch, struct kvm_vcpu, arch);
-+}
-+
- static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
- {
- 	struct kvm_pmu *pmu;
--	struct kvm_vcpu_arch *vcpu_arch;
-
- 	pmc -= pmc->idx;
- 	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
--	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
--	return container_of(vcpu_arch, struct kvm_vcpu, arch);
-+	return kvm_pmu_to_vcpu(pmu);
-+}
-+
-+/**
-+ * When perf interrupt is an NMI, we cannot safely notify the vcpu corresponding
-+ * to the even.
-+ * This is why we need a callback to do it once outside of the NMI context.
-+ */
-+static void kvm_pmu_perf_overflow_notify_vcpu(struct irq_work *work)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_pmu *pmu;
-+
-+	pmu = container_of(work, struct kvm_pmu, overflow_work);
-+	vcpu = kvm_pmu_to_vcpu(pmu);
-+
-+	kvm_vcpu_kick(vcpu);
- }
-
- /**
-@@ -299,7 +321,11 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-
- 	if (kvm_pmu_overflow_status(vcpu)) {
- 		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
--		kvm_vcpu_kick(vcpu);
-+
-+		if (!in_nmi())
-+			kvm_vcpu_kick(vcpu);
-+		else
-+			irq_work_queue(&vcpu->arch.pmu.overflow_work);
- 	}
- }
-
-@@ -501,6 +527,9 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
-
-+	init_irq_work(&vcpu->arch.pmu.overflow_work,
-+		      kvm_pmu_perf_overflow_notify_vcpu);
-+
- 	vcpu->arch.pmu.created = true;
- 	return 0;
- }
---
-1.9.1
+Alex
