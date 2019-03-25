@@ -1,14 +1,14 @@
 From: Kristina Martsenko <kristina.martsenko@arm.com>
-Subject: Re: [PATCH v7 5/10] KVM: arm/arm64: preserve host MDCR_EL2 value
-Date: Mon, 25 Mar 2019 20:04:05 +0000
-Message-ID: <19c2bdb3-6917-286e-3f2a-35fd71f69f51@arm.com>
+Subject: Re: [PATCH v7 7/10] KVM: arm/arm64: context-switch ptrauth registers
+Date: Mon, 25 Mar 2019 20:04:54 +0000
+Message-ID: <64505666-8a1f-cf64-7067-4b2dd53b0b40@arm.com>
 References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-6-git-send-email-amit.kachhap@arm.com>
+ <1552984243-7689-8-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1552984243-7689-6-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1552984243-7689-8-git-send-email-amit.kachhap@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
@@ -16,39 +16,97 @@ Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
-> Save host MDCR_EL2 value during kvm HYP initialisation and restore
-> after every switch from host to guest. There should not be any
-> change in functionality due to this.
+> From: Mark Rutland <mark.rutland@arm.com>
 > 
-> The value of mdcr_el2 is now stored in struct kvm_cpu_context as
-> both host and guest can now use this field in a common way.
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
 > 
+> Pointer authentication feature is only enabled when VHE is built
+> in the kernel and present in the CPU implementation so only VHE code
+> paths are modified.
+> 
+> When we schedule a vcpu, we disable guest usage of pointer
+> authentication instructions and accesses to the keys. While these are
+> disabled, we avoid context-switching the keys. When we trap the guest
+> trying to use pointer authentication functionality, we change to eagerly
+> context-switching the keys, and enable the feature. The next time the
+> vcpu is scheduled out/in, we start again. However the host key save is
+> optimized and implemented inside ptrauth instruction/register access
+> trap.
+> 
+> Pointer authentication consists of address authentication and generic
+> authentication, and CPUs in a system might have varied support for
+> either. Where support for either feature is not uniform, it is hidden
+> from guests via ID register emulation, as a result of the cpufeature
+> framework in the host.
+> 
+> Unfortunately, address authentication and generic authentication cannot
+> be trapped separately, as the architecture provides a single EL2 trap
+> covering both. If we wish to expose one without the other, we cannot
+> prevent a (badly-written) guest from intermittently using a feature
+> which is not uniformly supported (when scheduled on a physical CPU which
+> supports the relevant feature). Hence, this patch expects both type of
+> authentication to be present in a cpu.
+> 
+> This switch of key is done from guest enter/exit assembly as preperation
+> for the upcoming in-kernel pointer authentication support. Hence, these
+> key switching routines are not implemented in C code as they may cause
+> pointer authentication key signing error in some situations.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> [Only VHE, key switch in full assembly, vcpu_has_ptrauth checks
+> , save host key in ptrauth exception trap]
 > Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
 > Cc: Christoffer Dall <christoffer.dall@arm.com>
 > Cc: kvmarm@lists.cs.columbia.edu
 
 [...]
 
->  /**
-> - * kvm_arm_init_debug - grab what we need for debug
-> - *
-> - * Currently the sole task of this function is to retrieve the initial
-> - * value of mdcr_el2 so we can preserve MDCR_EL2.HPMN which has
-> - * presumably been set-up by some knowledgeable bootcode.
-> - *
-> - * It is called once per-cpu during CPU hyp initialisation.
-> - */
-> -
-> -void kvm_arm_init_debug(void)
-> -{
-> -	__this_cpu_write(mdcr_el2, kvm_call_hyp_ret(__kvm_get_mdcr_el2));
-> -}
+> +/* SPDX-License-Identifier: GPL-2.0
+> + * arch/arm64/include/asm/kvm_ptrauth_asm.h: Guest/host ptrauth save/restore
+> + * Copyright 2019 Arm Limited
+> + * Author: Mark Rutland <mark.rutland@arm.com>
+> + *         Amit Daniel Kachhap <amit.kachhap@arm.com>
+> + */
 
-The __kvm_get_mdcr_el2 function is no longer used anywhere, so can also
-be removed.
+I think the license needs to be in its own comment, like
+
+/* SPDX-License-Identifier: GPL-2.0 */
+/* arch/arm64/include/asm/kvm_ptrauth_asm.h: ...
+ * ...
+ */
+
+> +
+> +#ifndef __ASM_KVM_ASM_PTRAUTH_H
+> +#define __ASM_KVM_ASM_PTRAUTH_H
+
+__ASM_KVM_PTRAUTH_ASM_H ? (to match the file name)
+
+> +	if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
+> +		test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features)) {
+> +		/* Verify that KVM startup matches the conditions for ptrauth */
+> +		if (WARN_ON(!vcpu_has_ptrauth(vcpu)))
+> +			return -EINVAL;
+> +	}
+
+I think this now needs to have "goto out;" instead of "return -EINVAL;",
+since 5.1-rcX contains commit e761a927bc9a ("KVM: arm/arm64: Reset the
+VCPU without preemption and vcpu state loaded") which changed some of
+this code.
+
+> @@ -385,6 +385,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		vcpu_clear_wfe_traps(vcpu);
+>  	else
+>  		vcpu_set_wfe_traps(vcpu);
+> +
+> +	kvm_arm_vcpu_ptrauth_setup_lazy(vcpu);
+
+This version of the series seems to have lost the arch/arm/ definition
+of kvm_arm_vcpu_ptrauth_setup_lazy (previously
+kvm_arm_vcpu_ptrauth_reset), so KVM no longer compiles for arch/arm/ :(
 
 Thanks,
 Kristina
