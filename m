@@ -1,85 +1,71 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Comments cleanup in mmu.c
-Date: Mon, 25 Mar 2019 09:58:09 +0000
-Message-ID: <194b5370-0ed2-5dbd-9a5d-e20e4f8413ec@arm.com>
-References: <1553500925-26000-1-git-send-email-yuzenghui@huawei.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v5 00/26] KVM: arm64: SVE guest support
+Date: Mon, 25 Mar 2019 17:32:49 +0100
+Message-ID: <20190325163249.rkk6vvnzex5d4z7k@kamzik.brq.redhat.com>
+References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1553500925-26000-1-git-send-email-yuzenghui@huawei.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: yuzenghui@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com
-Cc: james.morse@arm.com, julien.thierry@arm.com, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A1E24A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Mar 2019 12:33:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id weHxbgHcJSG2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Mar 2019 12:33:07 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40AE74A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Mar 2019 12:33:07 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, peter.maydell@linaro.org
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 25/03/2019 08:02, Zenghui Yu wrote:
-> Some comments in virt/kvm/arm/mmu.c are outdated and incorrect.
-> Get rid of these comments, to keep the code&comment correct and
-> current as a whole.
+On Tue, Mar 19, 2019 at 05:51:51PM +0000, Dave Martin wrote:
+> This series implements support for allowing KVM guests to use the Arm
+> Scalable Vector Extension (SVE), superseding the previous v5 series [1].
 > 
-> Only a cleanup here, no functional change.
+> The patches are also available on a branch for reviewer convenience. [2]
 > 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->   virt/kvm/arm/mmu.c | 23 +++++++++--------------
->   1 file changed, 9 insertions(+), 14 deletions(-)
+> The patches are based on v5.1-rc1.
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index ffd7acd..0a6efe7 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -102,8 +102,7 @@ static bool kvm_is_device_pfn(unsigned long pfn)
->    * @addr:	IPA
->    * @pmd:	pmd pointer for IPA
->    *
-> - * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs. Marks all
-> - * pages in the range dirty.
-> + * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
->    */
->   static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
->   {
-> @@ -121,8 +120,7 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
->    * @addr:	IPA
->    * @pud:	pud pointer for IPA
->    *
-> - * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs. Marks all
-> - * pages in the range dirty.
-> + * Function clears a PUD entry, flushes addr 1st and 2nd stage TLBs.
->    */
->   static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
->   {
-> @@ -899,9 +897,8 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->    * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
->    * @kvm:	The KVM struct pointer for the VM.
->    *
-> - * Allocates only the stage-2 HW PGD level table(s) (can support either full
-> - * 40-bit input addresses or limited to 32-bit input addresses). Clears the
-> - * allocated pages.
-> + * Allocates only the stage-2 HW PGD level table(s) of size defined by
-> + * stage2_pgd_size(kvm).
->    *
->    * Note we don't need locking here as this is only called when the VM is
->    * created, which can only be done once.
-> @@ -1451,13 +1448,11 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
->   }
->   
->   /**
-> -  * stage2_wp_puds - write protect PGD range
-> -  * @pgd:	pointer to pgd entry
-> -  * @addr:	range start address
-> -  * @end:	range end address
-> -  *
-> -  * Process PUD entries, for a huge PUD we cause a panic.
-> -  */
-> + * stage2_wp_puds - write protect PGD range
-> + * @pgd:	pointer to pgd entry
-> + * @addr:	range start address
-> + * @end:	range end address
-> + */
+> The series has been reworked to remove the dependency on [3],
+> eliminating the ABI "fixes" but keeping the relevant cleanup/
+> refactoring.  (See patch 16.)
+> 
+> This series addresses review comments received on v5, and contains one
+> significant change:
+> 
+>  * A new ioctl KVM_ARM_VCPU_FINALIZE is added to replace the implicit
+>    finalization behaviour in v5.  If userspace enables SVE, it must now
+>    use this ioctl to finalize the vcpu configuration before KVM_RUN
+>    etc. or SVE register access are permitted.
+> 
+> For a description of minor updates, see the individual patches.
+> 
+> 
+> Known issues:
+> 
+>  * This update requires modifications to kvmtool that are not published
+>    yet.  I will reply to this cover letter with a link when those are
+>    available (hopefully within 24 hours of this posting).
+>
 
+Hi Dave and Peter,
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Do either of you know if anyone has picked up the QEMU side of this?
+If not, then I'll take it.
+
+Thanks,
+drew
