@@ -1,27 +1,27 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v7 8/10] KVM: arm64: Add capability to advertise ptrauth
- for guest
-Date: Tue, 26 Mar 2019 09:42:01 +0530
-Message-ID: <b46cd65c-6e4f-c946-cfb4-df95a718c48f@arm.com>
-References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-9-git-send-email-amit.kachhap@arm.com>
- <1ea6ab95-a52e-3f14-a514-b0b747b85f3a@arm.com>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: [PATCH kvmtool v3 1/3] vfio-pci: Release INTx's unmask eventfd
+ properly
+Date: Tue, 26 Mar 2019 15:41:29 +0800
+Message-ID: <20190326074131.4284-2-leo.yan@linaro.org>
+References: <20190326074131.4284-1-leo.yan@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07D724A2E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 00:12:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8560740A52
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 03:42:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Axp-1qz9GhZC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Mar 2019 00:12:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD1F40493
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 00:12:07 -0400 (EDT)
-In-Reply-To: <1ea6ab95-a52e-3f14-a514-b0b747b85f3a@arm.com>
-Content-Language: en-US
+ with ESMTP id JhtTuNNjwgWH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Mar 2019 03:42:14 -0400 (EDT)
+Received: from mail-yw1-f66.google.com (mail-yw1-f66.google.com
+ [209.85.161.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 956CD4A422
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 03:42:14 -0400 (EDT)
+Received: by mail-yw1-f66.google.com with SMTP id v127so9019997ywe.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 00:42:14 -0700 (PDT)
+In-Reply-To: <20190326074131.4284-1-leo.yan@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,63 +31,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Eric Auger <eric.auger@redhat.com>, Robin Murphy <robin.murphy@arm.com>
+Cc: Leo Yan <leo.yan@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The PCI device INTx uses event fd 'unmask_fd' to signal the deassertion
+of the line from guest to host; but this eventfd isn't released properly
+when disable INTx.
 
-On 3/26/19 1:35 AM, Kristina Martsenko wrote:
-> On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
->> This patch advertises the capability of pointer authentication
->> when system supports pointer authentication and VHE mode present.
->>
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
->> ---
->>   arch/arm64/kvm/reset.c   | 4 ++++
->>   include/uapi/linux/kvm.h | 1 +
->>   2 files changed, 5 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index 00f0639..a3b269e 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -92,6 +92,10 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   	case KVM_CAP_ARM_VM_IPA_SIZE:
->>   		r = kvm_ipa_limit;
->>   		break;
->> +	case KVM_CAP_ARM_PTRAUTH:
->> +		r = has_vhe() && system_supports_address_auth() &&
->> +			system_supports_generic_auth();
->> +		break;
->>   	default:
->>   		r = 0;
->>   	}
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 6d4ea4b..a553477 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
->>   #define KVM_CAP_ARM_VM_IPA_SIZE 165
->>   #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
->>   #define KVM_CAP_HYPERV_CPUID 167
->> +#define KVM_CAP_ARM_PTRAUTH 168
-> 
-> Since we now have two separate vcpu flags, then I think we also need two
-> capabilities here (one for address auth and one for generic auth). This
-> will allow us to support the features separately in the future if we
-> need to.
-I have no objection to your suggestion. Infact all other KVM_ARM_VCPU_* 
-features have there own capability defined. I will check other 
-architectures if they define separate capability for major/minor features.
+This patch firstly adds field 'unmask_fd' in struct vfio_pci_device for
+storing unmask eventfd and close it when disable INTx.
 
-Thanks,
-Amit D
-> 
-> Thanks,
-> Kristina
-> 
+Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Signed-off-by: Leo Yan <leo.yan@linaro.org>
+---
+ include/kvm/vfio.h | 1 +
+ vfio/pci.c         | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/kvm/vfio.h b/include/kvm/vfio.h
+index 60e6c54..28223cf 100644
+--- a/include/kvm/vfio.h
++++ b/include/kvm/vfio.h
+@@ -74,6 +74,7 @@ struct vfio_pci_device {
+ 
+ 	unsigned long			irq_modes;
+ 	int				intx_fd;
++	int				unmask_fd;
+ 	unsigned int			intx_gsi;
+ 	struct vfio_pci_msi_common	msi;
+ 	struct vfio_pci_msi_common	msix;
+diff --git a/vfio/pci.c b/vfio/pci.c
+index 03de3c1..5224fee 100644
+--- a/vfio/pci.c
++++ b/vfio/pci.c
+@@ -1008,6 +1008,7 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
+ 	irq__del_irqfd(kvm, gsi, pdev->intx_fd);
+ 
+ 	close(pdev->intx_fd);
++	close(pdev->unmask_fd);
+ }
+ 
+ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
+@@ -1095,6 +1096,7 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
+ 	}
+ 
+ 	pdev->intx_fd = trigger_fd;
++	pdev->unmask_fd = unmask_fd;
+ 	/* Guest is going to ovewrite our irq_line... */
+ 	pdev->intx_gsi = gsi;
+ 
+-- 
+2.19.1
