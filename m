@@ -1,30 +1,26 @@
-From: Heyi Guo <guoheyi@huawei.com>
-Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
-Date: Tue, 26 Mar 2019 21:53:31 +0800
-Message-ID: <1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
-References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
- <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
- <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
- <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
- <20190315085948.GB10950@e113682-lin.lund.arm.com>
- <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
- <101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
- <662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v6 12/27] KVM: arm64/sve: System register context switch
+ and access support
+Date: Tue, 26 Mar 2019 13:58:36 +0000
+Message-ID: <1a2707d4-c4ae-5962-22db-333b46bc0790@arm.com>
+References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
+ <1553017938-710-13-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B402D4A380
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 09:53:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03E9D4A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 09:58:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-bGwJV1jnBB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Mar 2019 09:53:42 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09C8C4A1FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 09:53:41 -0400 (EDT)
-In-Reply-To: <662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
+ with ESMTP id whLRJoFVqPmt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Mar 2019 09:58:42 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 266644A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Mar 2019 09:58:42 -0400 (EDT)
+In-Reply-To: <1553017938-710-13-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,161 +30,268 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steven Price <steven.price@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I also tested save/restore operations, and observed that clock in guest would not jump after restoring either. If we consider guest clock not being synchronized with real wall clock as an issue, does it mean save/restore function has the same issue?
+Hi Dave,
 
-Thanks,
+On 19/03/2019 17:52, Dave Martin wrote:
+> This patch adds the necessary support for context switching ZCR_EL1
+> for each vcpu.
+> 
+> ZCR_EL1 is trapped alongside the FPSIMD/SVE registers, so it makes
+> sense for it to be handled as part of the guest FPSIMD/SVE context
+> for context switch purposes instead of handling it as a general
+> system register.  This means that it can be switched in lazily at
+> the appropriate time.  No effort is made to track host context for
+> this register, since SVE requires VHE: thus the hosts's value for
+> this register lives permanently in ZCR_EL2 and does not alias the
+> guest's value at any time.
+> 
+> The Hyp switch and fpsimd context handling code is extended
+> appropriately.
+> 
+> Accessors are added in sys_regs.c to expose the SVE system
+> registers and ID register fields.  Because these need to be
+> conditionally visible based on the guest configuration, they are
+> implemented separately for now rather than by use of the generic
+> system register helpers.  This may be abstracted better later on
+> when/if there are more features requiring this model.
+> 
+> ID_AA64ZFR0_EL1 is RO-RAZ for MRS/MSR when SVE is disabled for the
+> guest, but for compatibility with non-SVE aware KVM implementations
+> the register should not be enumerated at all for KVM_GET_REG_LIST
+> in this case.  For consistency we also reject ioctl access to the
+> register.  This ensures that a non-SVE-enabled guest looks the same
+> to userspace, irrespective of whether the kernel KVM implementation
+> supports SVE.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-Heyi
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
+Cheers,
 
-On 2019/3/26 19:54, Heyi Guo wrote:
-> Hi Steven,
->
-> Thanks for your explanation. Please see my comments below.
->
->
-> On 2019/3/21 0:29, Steven Price wrote:
->> On 19/03/2019 14:39, Heyi Guo wrote:
->>> Hi Christoffer and Steve,
->>>
->>>
->>> On 2019/3/15 16:59, Christoffer Dall wrote:
->>>> Hi Steve,
->>>>
->>>> On Wed, Mar 13, 2019 at 10:11:30AM +0000, Steven Price wrote:
->>>>> Personally I think what we need is:
->>>>>
->>>>> * Either a patch like the one from Heyi Guo (save/restore CNTVCT_EL0) or
->>>>> alternatively hooking up KVM_KVMCLOCK_CTRL to prevent the watchdog
->>>>> firing when user space explicitly stops scheduling the guest for a
->>>>> while.
->>>> If we save/restore CNTVCT_EL0 and the warning goes away, does the guest
->>>> wall clock timekeeping get all confused and does it figure this out
->>>> automagically somehow?
->>> What's the source for guest wall clock timekeeping in current ARM64
->>> implementation? Is it the value from CNTP_TVAL_EL0? Will guest OS keep
->>> track of this? Or is the wall clock simply platform RTC?
->>>
->>> I tested the RFC change and did not see anything unusual. Did I miss
->>> someting?
->> Are you running ARM or ARM64? I'm assuming ARM64 here...
-> Yes, definitely :)
->
->>
->> Unless I'm mistaken you should see the time reported by the guest not
->> progress when you have stopped it using the QEMU monitor console.
->>
->> Running something like "while /bin/true; do date; sleep 1; done" should
->> allow you to see that without the patch time will jump in the guest
->> (i.e. the time reflects wall-clock time). With the patch I believe it
->> will not jump (i.e. the clock will be behind wall-clock time after the
->> pause).
-> I did the test and the result was exactly like you said.
->>
->> However, this behaviour does depend on the exact system being emulated.
->> >From drivers/clocksource/arm_arch_timer.c:
->>
->>> static void __init arch_counter_register(unsigned type)
->>> {
->>>     u64 start_count;
->>>
->>>     /* Register the CP15 based counter if we have one */
->>>     if (type & ARCH_TIMER_TYPE_CP15) {
->>>         if ((IS_ENABLED(CONFIG_ARM64) && !is_hyp_mode_available()) ||
->>>             arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
->>>             arch_timer_read_counter = arch_counter_get_cntvct;
->>>         else
->>>             arch_timer_read_counter = arch_counter_get_cntpct;
->>>
->>>         clocksource_counter.archdata.vdso_direct = vdso_default;
->>>     } else {
->>>         arch_timer_read_counter = arch_counter_get_cntvct_mem;
->>>     }
->> So we can see here that there are three functions for reading the
->> counter - there's the memory interface for CNTVCT, the "CP15" interface
->> also for CNTVCT, and an interface for CNTPCT. CNTPCT is only used for
->> !ARM64 or if hyp mode is available (not relevant until nested
->> virtualisation is added).
->>
->> The upshot is that on arm64 we're using the virtual counter (CNTVCT).
->>
->>>> Does KVM_KVMCLOCK_CTRL solve that problem?
->>> It seems KVM_KVMCLOCK_CTRL is dedicated for guest pause/resume scenario,
->>> but it relies on pvclock both in KVM and Guest and right now only X86
->>> supports it :(
->> KVM_KVMCLOCK_CTRL simply provides a mechanism for the host to inform the
->> guest that a vCPU hasn't been scheduled for "a while". The guest can
->> then use that information to avoid triggering the watchdog timeout. As
->> you note it is only currently implemented for X86.
->>
->>> Could Steve provide more insights about the whole thing?
->> I'll try - see below.
->>
->>> Thanks,
->>> Heyi
->>>
->>>>> * KVM itself saving/restoring CNTVCT_EL0 during suspend/resume so the
->>>>> guest doesn't see time pass during a suspend.
->>>> This smells like policy to me so I'd much prefer keeping as much
->>>> functionality in user space as possible.  If we already have the APIs we
->>>> need from KVM, let's use them.
->> The problem with suspend/resume is that user space doesn't get a
->> look-in. There's no way (generically) for a user space application to
->> save/restore registers during the suspend. User space simply sees time
->> jump forwards - which is precisely what we're trying to hide from the
->> guest (as it otherwise gets upset that it appears a vCPU has deadlocked
->> for a while).
->>
->> So while I agree this is "policy", it's something we need the kernel to
->> do on our behalf. Potentially we can put it behind an ioctl so that user
->> space can opt-in to it.
->>
->>>>> * Something equivalent to MSR_KVM_WALL_CLOCK_NEW for arm which allows
->>>>> the guest to query the wall clock time from the host and provides an
->>>>> offset between CNTVCT_EL0 to wall clock time which the KVM can update
->>>>> during suspend/resume. This means that during a suspend/resume the guest
->>>>> can observe that wall clock time has passed, without having to be
->>>>> bothered about CNTVCT_EL0 jumping forwards.
->>>>>
->>>> Isn't the proper Arm architectural solution for this to read the
->>>> physical counter for wall clock time keeping ?
->>>>
->>>> (Yes that will require a trap on physical counter reads after migration
->>>> on current systems, but migration sucks in terms of timekeeping
->>>> already.)
->> The physical counter is certainly tempting as it largely does what we
->> want as a secondary counter. However I'm wary of using it because it
->> starts to get "really interesting" when dealing with nested
->> virtualisation. Any by "really interesting" I of course mean horribly
->> broken :)
->>
->> Basically the problem is that with nested virtualisation the offset
->> between the physical counter and the virtual counter is controlled by
->> the virtual-EL2. Because we want certain behaviours of the virtual
->> counter (pausing when the guest pauses) we have to replicate that onto
->> the physical counter to maintain the offset between the two that the
->> guest expects.
->>
->> Given that it seems to be a non-starter when you introduce nested virt I
->> think we should just bite the bullet and implement a PV wall clock
->> mechanism for arm64 (similar to MSR_KVM_WALL_CLOCK_NEW).
->
-> If we decide to implement something like pvclock, shall we increase the priority of this work? It seems there is much to do, including the spec, KVM, qemu and guest kernel driver...
->
-> Thanks,
->
-> Heyi
->
->>
->> This also has the advantage that it is going to be faster than the
->> physical counter when that has to be trapped (e.g. after migration).
->>
->> Steve
->>
->> .
->>
->
+Julien
+
+> 
+> ---
+> 
+> Changes since v5:
+> 
+>  * Port to the renamed visibility() framework.
+> 
+>  * Swap visiblity() helpers so that they appear by the relevant accessor
+>    functions.
+> 
+>  * [Julien Grall] With the visibility() checks, {get,set}_zcr_el1()
+>    degenerate to doing exactly what the common code does, so drop them.
+> 
+>    The ID_AA64ZFR0_EL1 handlers are still needed to provide contitional
+>    RAZ behaviour.  This could be moved to the common code too, but since
+>    this is a one-off case I don't do this for now.  We can address this
+>    later if other regs need to follow the same pattern.
+> 
+>  * [Julien Thierry] Reset ZCR_EL1 to a fixed value using reset_val
+>    instead of using relying on reset_unknown() honouring set bits in val
+>    as RES0.
+> 
+>    Most of the bits in ZCR_EL1 are RES0 anyway, and many implementations
+>    of SVE will support larger vectors than 128 bits, so 0 seems as good
+>    a value as any to expose guests that forget to initialise this
+>    register properly.
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/include/asm/sysreg.h   |  3 ++
+>  arch/arm64/kvm/fpsimd.c           |  9 ++++-
+>  arch/arm64/kvm/hyp/switch.c       |  3 ++
+>  arch/arm64/kvm/sys_regs.c         | 83 ++++++++++++++++++++++++++++++++++++---
+>  5 files changed, 93 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ad4f7f0..22cf484 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -121,6 +121,7 @@ enum vcpu_sysreg {
+>  	SCTLR_EL1,	/* System Control Register */
+>  	ACTLR_EL1,	/* Auxiliary Control Register */
+>  	CPACR_EL1,	/* Coprocessor Access Control */
+> +	ZCR_EL1,	/* SVE Control */
+>  	TTBR0_EL1,	/* Translation Table Base Register 0 */
+>  	TTBR1_EL1,	/* Translation Table Base Register 1 */
+>  	TCR_EL1,	/* Translation Control Register */
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 5b267de..4d6262d 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -454,6 +454,9 @@
+>  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+>  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+>  
+> +/* VHE encodings for architectural EL0/1 system registers */
+> +#define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_DSSBS	(_BITUL(44))
+>  #define SCTLR_ELx_ENIA	(_BITUL(31))
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 1cf4f02..7053bf4 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -103,14 +103,21 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+>  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long flags;
+> +	bool host_has_sve = system_supports_sve();
+> +	bool guest_has_sve = vcpu_has_sve(vcpu);
+>  
+>  	local_irq_save(flags);
+>  
+>  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+> +		u64 *guest_zcr = &vcpu->arch.ctxt.sys_regs[ZCR_EL1];
+> +
+>  		/* Clean guest FP state to memory and invalidate cpu view */
+>  		fpsimd_save();
+>  		fpsimd_flush_cpu_state();
+> -	} else if (system_supports_sve()) {
+> +
+> +		if (guest_has_sve)
+> +			*guest_zcr = read_sysreg_s(SYS_ZCR_EL12);
+> +	} else if (host_has_sve) {
+>  		/*
+>  		 * The FPSIMD/SVE state in the CPU has not been touched, and we
+>  		 * have SVE (and VHE): CPACR_EL1 (alias CPTR_EL2) has been
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 3563fe6..9d46066 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -351,6 +351,9 @@ static bool __hyp_text __hyp_switch_fpsimd(struct kvm_vcpu *vcpu)
+>  
+>  	__fpsimd_restore_state(&vcpu->arch.ctxt.gp_regs.fp_regs);
+>  
+> +	if (vcpu_has_sve(vcpu))
+> +		write_sysreg_s(vcpu->arch.ctxt.sys_regs[ZCR_EL1], SYS_ZCR_EL12);
+> +
+>  	/* Skip restoring fpexc32 for AArch64 guests */
+>  	if (!(read_sysreg(hcr_el2) & HCR_RW))
+>  		write_sysreg(vcpu->arch.ctxt.sys_regs[FPEXC32_EL2],
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c86a7b0..09e9b06 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1051,10 +1051,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+>  	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+>  
+> -	if (id == SYS_ID_AA64PFR0_EL1) {
+> -		if (val & (0xfUL << ID_AA64PFR0_SVE_SHIFT))
+> -			kvm_debug("SVE unsupported for guests, suppressing\n");
+> -
+> +	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
+>  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+>  	} else if (id == SYS_ID_AA64ISAR1_EL1) {
+>  		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> @@ -1101,6 +1098,81 @@ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
+>  static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
+>  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+>  
+> +/* Visibility overrides for SVE-specific control registers */
+> +static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+> +				   const struct sys_reg_desc *rd)
+> +{
+> +	if (vcpu_has_sve(vcpu))
+> +		return 0;
+> +
+> +	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+> +}
+> +
+> +/* Visibility overrides for SVE-specific ID registers */
+> +static unsigned int sve_id_visibility(const struct kvm_vcpu *vcpu,
+> +				      const struct sys_reg_desc *rd)
+> +{
+> +	if (vcpu_has_sve(vcpu))
+> +		return 0;
+> +
+> +	return REG_HIDDEN_USER;
+> +}
+> +
+> +/* Generate the emulated ID_AA64ZFR0_EL1 value exposed to the guest */
+> +static u64 guest_id_aa64zfr0_el1(const struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vcpu_has_sve(vcpu))
+> +		return 0;
+> +
+> +	return read_sanitised_ftr_reg(SYS_ID_AA64ZFR0_EL1);
+> +}
+> +
+> +static bool access_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> +				   struct sys_reg_params *p,
+> +				   const struct sys_reg_desc *rd)
+> +{
+> +	if (p->is_write)
+> +		return write_to_read_only(vcpu, p, rd);
+> +
+> +	p->regval = guest_id_aa64zfr0_el1(vcpu);
+> +	return true;
+> +}
+> +
+> +static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> +		const struct sys_reg_desc *rd,
+> +		const struct kvm_one_reg *reg, void __user *uaddr)
+> +{
+> +	u64 val;
+> +
+> +	if (!vcpu_has_sve(vcpu))
+> +		return -ENOENT;
+> +
+> +	val = guest_id_aa64zfr0_el1(vcpu);
+> +	return reg_to_user(uaddr, &val, reg->id);
+> +}
+> +
+> +static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+> +		const struct sys_reg_desc *rd,
+> +		const struct kvm_one_reg *reg, void __user *uaddr)
+> +{
+> +	const u64 id = sys_reg_to_index(rd);
+> +	int err;
+> +	u64 val;
+> +
+> +	if (!vcpu_has_sve(vcpu))
+> +		return -ENOENT;
+> +
+> +	err = reg_from_user(&val, uaddr, id);
+> +	if (err)
+> +		return err;
+> +
+> +	/* This is what we mean by invariant: you can't change it. */
+> +	if (val != guest_id_aa64zfr0_el1(vcpu))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * cpufeature ID register user accessors
+>   *
+> @@ -1346,7 +1418,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+>  	ID_UNALLOCATED(4,2),
+>  	ID_UNALLOCATED(4,3),
+> -	ID_UNALLOCATED(4,4),
+> +	{ SYS_DESC(SYS_ID_AA64ZFR0_EL1), access_id_aa64zfr0_el1, .get_user = get_id_aa64zfr0_el1, .set_user = set_id_aa64zfr0_el1, .visibility = sve_id_visibility },
+>  	ID_UNALLOCATED(4,5),
+>  	ID_UNALLOCATED(4,6),
+>  	ID_UNALLOCATED(4,7),
+> @@ -1383,6 +1455,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+>  	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
+> +	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+>  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+>  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>  	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+> 
+
+-- 
+Julien Thierry
