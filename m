@@ -1,65 +1,211 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 9/10] KVM: arm64: docs: document KVM support of
- pointer authentication
-Date: Wed, 27 Mar 2019 13:50:59 +0000
-Message-ID: <20190327135058.GW3567@e103592.cambridge.arm.com>
-References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-10-git-send-email-amit.kachhap@arm.com>
- <23e4a9d4-e9e1-2c1f-32ce-e7fd96080437@arm.com>
- <20190327104428.GV3567@e103592.cambridge.arm.com>
- <bdd480a4-44b3-7ddf-44f5-5b55e6251ced@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v6 22/27] KVM: arm/arm64: Add KVM_ARM_VCPU_FINALIZE ioctl
+Date: Wed, 27 Mar 2019 14:07:56 +0000
+Message-ID: <e49ba75d-518d-22bb-6ed9-be986064efcc@arm.com>
+References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
+ <1553017938-710-23-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <bdd480a4-44b3-7ddf-44f5-5b55e6251ced@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Kristina Martsenko <kristina.martsenko@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CFB34A332
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 10:08:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ynmCMsRJUbTV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Mar 2019 10:08:07 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FAFF4A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 10:08:07 -0400 (EDT)
+In-Reply-To: <1553017938-710-23-git-send-email-Dave.Martin@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 27, 2019 at 05:19:28PM +0530, Amit Daniel Kachhap wrote:
-> Hi,
+Hi Dave,
+
+On 19/03/2019 17:52, Dave Martin wrote:
+> Some aspects of vcpu configuration may be too complex to be
+> completed inside KVM_ARM_VCPU_INIT.  Thus, there may be a
+> requirement for userspace to do some additional configuration
+> before various other ioctls will work in a consistent way.
 > 
-> On 3/27/19 4:14 PM, Dave Martin wrote:
-> >On Mon, Mar 25, 2019 at 08:05:49PM +0000, Kristina Martsenko wrote:
-> >>On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
-> >>>This adds sections for KVM API extension for pointer authentication.
-> >>>A brief description about usage of pointer authentication for KVM guests
-> >>>is added in the arm64 documentations.
-> >>>
-> >>>Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> >>>Cc: Mark Rutland <mark.rutland@arm.com>
-> >>>Cc: Christoffer Dall <christoffer.dall@arm.com>
-> >>>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>>Cc: kvmarm@lists.cs.columbia.edu
-> >>
-> >>I think it makes sense to also update the Kconfig symbol description for
-> >>CONFIG_ARM64_PTR_AUTH, since it currently only mentions userspace
-> >>support, but now the option also enables KVM guest support.
-> >>
-> >>It's also worth mentioning that CONFIG_ARM64_VHE=y is required for guest
-> >>support.
-> >
-> >Is it worth making this dependency explicit in Kconfig?
-> Currently there is discrepancy that userspace supports ptrauth in both
-> nVHE/VHE mode and KVM guest only in VHE mode. I suppose adding explicit
-> dependency flag here makes both of them similar.
+> In particular this will be the case for SVE, where userspace will
+> need to negotiate the set of vector lengths to be made available to
+> the guest before the vcpu becomes fully usable.
+> 
+> In order to provide an explicit way for userspace to confirm that
+> it has finished setting up a particular vcpu feature, this patch
+> adds a new ioctl KVM_ARM_VCPU_FINALIZE.
+> 
+> When userspace has opted into a feature that requires finalization,
+> typically by means of a feature flag passed to KVM_ARM_VCPU_INIT, a
+> matching call to KVM_ARM_VCPU_FINALIZE is now required before
+> KVM_RUN or KVM_GET_REG_LIST is allowed.  Individual features may
+> impose additional restrictions where appropriate.
+> 
+> No existing vcpu features are affected by this, so current
+> userspace implementations will continue to work exactly as before,
+> with no need to issue KVM_ARM_VCPU_FINALIZE.
+> 
+> As implemented in this patch, KVM_ARM_VCPU_FINALIZE is currently a
+> placeholder: no finalizable features exist yet, so ioctl is not
+> required and will always yield EINVAL.  Subsequent patches will add
+> the finalization logic to make use of this ioctl for SVE.
+> 
+> No functional change for existing userspace.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> 
+> ---
+> 
+> Changes since v5:
+> 
+>  * Commit message, including subject line, rewritten.
+> 
+>    This patch is a rework of "KVM: arm/arm64: Add hook to finalize the
+>    vcpu configuration".  The old subject line and commit message no
+>    longer accurately described what the patch does.  However, the code
+>    is an evolution of the previous patch rather than a wholesale
+>    rewrite.
+> 
+>  * Added an explicit KVM_ARM_VCPU_FINALIZE ioctl, rather than just
+>    providing internal hooks in the kernel to finalize the vcpu
+>    configuration implicitly.  This allows userspace to confirm exactly
+>    when it has finished configuring the vcpu and is ready to use it.
+> 
+>    This results in simpler (and hopefully more maintainable) ioctl
+>    ordering rules.
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  4 ++++
+>  arch/arm64/include/asm/kvm_host.h |  4 ++++
+>  include/uapi/linux/kvm.h          |  3 +++
+>  virt/kvm/arm/arm.c                | 18 ++++++++++++++++++
+>  4 files changed, 29 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index a49ee01..e80cfc1 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -19,6 +19,7 @@
+>  #ifndef __ARM_KVM_HOST_H__
+>  #define __ARM_KVM_HOST_H__
+>  
+> +#include <linux/errno.h>
+>  #include <linux/types.h>
+>  #include <linux/kvm_types.h>
+>  #include <asm/cputype.h>
+> @@ -411,4 +412,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+>  	return 0;
+>  }
+>  
+> +#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
+> +#define kvm_arm_vcpu_is_finalized(vcpu) true
+> +
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3e89509..98658f7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -23,6 +23,7 @@
+>  #define __ARM64_KVM_HOST_H__
+>  
+>  #include <linux/bitmap.h>
+> +#include <linux/errno.h>
+>  #include <linux/types.h>
+>  #include <linux/jump_label.h>
+>  #include <linux/kvm_types.h>
+> @@ -625,4 +626,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
+>  
+>  int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+>  
+> +#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
+> +#define kvm_arm_vcpu_is_finalized(vcpu) true
 
-Looking at the history, for SVE this Kconfig restriction has always been
-present.  Since ptrauth initially upstreamed without an equivalent
-restriction in Kconfig, adding it now could be seen as a regression.
+I had a bit of hesitation for having a per feature ioctl call but in the
+end this seems a simple enough to keep existing guest (not doing the
+ioctl call) working and checking that the necessary features have been
+finalized is also pretty straight forward.
 
-So, maybe it's not worth it here.
+FWIW:
 
-You could add a separate option, say
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 
-config ARM64_PTR_AUTH_KVM
-	bool "Pointer authentication support for KVM guests"
-	default y
-	depends on ARM64_PTR_AUTH && ARM64_VHE && KVM
+Thanks,
 
-...but that may be overkill.
+Julien
 
-Cheers,
----Dave
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index dc77a5a..c3b8e7a 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1441,6 +1441,9 @@ struct kvm_enc_region {
+>  /* Available with KVM_CAP_HYPERV_CPUID */
+>  #define KVM_GET_SUPPORTED_HV_CPUID _IOWR(KVMIO, 0xc1, struct kvm_cpuid2)
+>  
+> +/* Available with KVM_CAP_ARM_SVE */
+> +#define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
+> +
+>  /* Secure Encrypted Virtualization command */
+>  enum sev_cmd_id {
+>  	/* Guest initialization commands */
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index c69e137..9edbf0f 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -545,6 +545,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+>  	if (likely(vcpu->arch.has_run_once))
+>  		return 0;
+>  
+> +	if (!kvm_arm_vcpu_is_finalized(vcpu))
+> +		return -EPERM;
+> +
+>  	vcpu->arch.has_run_once = true;
+>  
+>  	if (likely(irqchip_in_kernel(kvm))) {
+> @@ -1116,6 +1119,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		if (unlikely(!kvm_vcpu_initialized(vcpu)))
+>  			break;
+>  
+> +		r = -EPERM;
+> +		if (!kvm_arm_vcpu_is_finalized(vcpu))
+> +			break;
+> +
+>  		r = -EFAULT;
+>  		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
+>  			break;
+> @@ -1169,6 +1176,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  
+>  		return kvm_arm_vcpu_set_events(vcpu, &events);
+>  	}
+> +	case KVM_ARM_VCPU_FINALIZE: {
+> +		int what;
+> +
+> +		if (!kvm_vcpu_initialized(vcpu))
+> +			return -ENOEXEC;
+> +
+> +		if (get_user(what, (const int __user *)argp))
+> +			return -EFAULT;
+> +
+> +		return kvm_arm_vcpu_finalize(vcpu, what);
+> +	}
+>  	default:
+>  		r = -EINVAL;
+>  	}
+> 
+
+-- 
+Julien Thierry
