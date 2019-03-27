@@ -1,25 +1,25 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v6 19/27] KVM: arm64: Enumerate SVE register indices for
- KVM_GET_REG_LIST
-Date: Wed, 27 Mar 2019 09:47:42 +0000
-Message-ID: <612e5089-fc43-eee4-1856-cdca89ce3b50@arm.com>
+Subject: Re: [PATCH v6 21/27] KVM: arm/arm64: Add hook for arch-specific KVM
+ initialisation
+Date: Wed, 27 Mar 2019 10:07:17 +0000
+Message-ID: <5e0bdb27-4140-0e53-e15c-369a51e9f744@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
- <1553017938-710-20-git-send-email-Dave.Martin@arm.com>
+ <1553017938-710-22-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7422A4A2E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 05:47:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C73F44A2E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 06:07:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id czL8K5GpzASp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Mar 2019 05:47:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25FC04A2E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 05:47:48 -0400 (EDT)
-In-Reply-To: <1553017938-710-20-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id c3pAV2hogarH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Mar 2019 06:07:28 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64BCF4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 06:07:28 -0400 (EDT)
+In-Reply-To: <1553017938-710-22-git-send-email-Dave.Martin@arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,58 +37,70 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Hi Dave,
 
 On 19/03/2019 17:52, Dave Martin wrote:
-> This patch includes the SVE register IDs in the list returned by
-> KVM_GET_REG_LIST, as appropriate.
+> This patch adds a kvm_arm_init_arch_resources() hook to perform
+> subarch-specific initialisation when starting up KVM.
 > 
-> On a non-SVE-enabled vcpu, no new IDs are added.
+> This will be used in a subsequent patch for global SVE-related
+> setup on arm64.
 > 
-> On an SVE-enabled vcpu, IDs for the FPSIMD V-registers are removed
-> from the list, since userspace is required to access the Z-
-> registers instead in order to access the V-register content.  For
-> the variably-sized SVE registers, the appropriate set of slice IDs
-> are enumerated, depending on the maximum vector length for the
-> vcpu.
-> 
-> As it currently stands, the SVE architecture never requires more
-> than one slice to exist per register, so this patch adds no
-> explicit support for enumerating multiple slices.  The code can be
-> extended straightforwardly to support this in the future, if
-> needed.
+> No functional change.
 > 
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   | 2 ++
+>  arch/arm64/include/asm/kvm_host.h | 2 ++
+>  virt/kvm/arm/arm.c                | 4 ++++
+>  3 files changed, 8 insertions(+)
 > 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 770d732..a49ee01 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -53,6 +53,8 @@
+>  
+>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>  
+> +static inline int kvm_arm_init_arch_resources(void) { return 0; }
+> +
+>  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+>  int __attribute_const__ kvm_target_cpu(void);
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 205438a..3e89509 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -58,6 +58,8 @@
+>  
+>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>  
+> +static inline int kvm_arm_init_arch_resources(void) { return 0; }
+> +
+>  int __attribute_const__ kvm_target_cpu(void);
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+>  int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 99c3738..c69e137 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1664,6 +1664,10 @@ int kvm_arch_init(void *opaque)
+>  	if (err)
+>  		return err;
+>  
+> +	err = kvm_arm_init_arch_resources();
+> +	if (err)
+> +		return err;
+> +
+
+Nit: Does this need to be the very first thing we do for arch
+initialization?
+
+In the same function I see a call to init_common_resources(), so I
+would've pictured kvm_arm_init_arch_resources() being called close to it
+(either right before or right after).
+
+Otherwise:
 
 Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-
-> ---
-> 
-> Changes since v5:
-> 
-> (Dropped Julien Thierry's Reviewed-by due to non-trivial rebasing)
-> 
->  * Move mis-split reword to prevent put_user()s being accidentally the
->    correct size from KVM: arm64/sve: Add pseudo-register for the guest's
->    vector lengths.
-> ---
->  arch/arm64/kvm/guest.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 736d8cb..585c31e5 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -411,6 +411,56 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	return copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)) ? -EFAULT : 0;
->  }
->  
-> +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
-> +{
-> +	/* Only the first slice ever exists, for now */
-> +	const unsigned int slices = 1;
-
-Nit: Might be worth introducing a macro/inline function for the number
-of slices supported. This way, the day we need to change that, we only
-need to look for that identifier.
 
 Cheers,
 
