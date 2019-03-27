@@ -1,25 +1,27 @@
 From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v6 25/27] KVM: arm64: Add a capability to advertise SVE
- support
-Date: Wed, 27 Mar 2019 15:16:25 +0000
-Message-ID: <3af0f011-57f7-e429-9ce4-633b4b2f3b34@arm.com>
+Subject: Re: [PATCH v6 19/27] KVM: arm64: Enumerate SVE register indices for
+ KVM_GET_REG_LIST
+Date: Wed, 27 Mar 2019 15:21:02 +0000
+Message-ID: <71c30b21-9a4b-42d5-02a8-25bc18044c1f@arm.com>
 References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
- <1553017938-710-26-git-send-email-Dave.Martin@arm.com>
+ <1553017938-710-20-git-send-email-Dave.Martin@arm.com>
+ <612e5089-fc43-eee4-1856-cdca89ce3b50@arm.com>
+ <20190327103319.GT3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 397F74A32E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 11:16:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 073BC4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 11:21:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YGEicNY6uaSL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Mar 2019 11:16:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0824C4A319
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 11:16:31 -0400 (EDT)
-In-Reply-To: <1553017938-710-26-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id nMYCwFcRcHPl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Mar 2019 11:21:14 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 747484A319
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Mar 2019 11:21:14 -0400 (EDT)
+In-Reply-To: <20190327103319.GT3567@e103592.cambridge.arm.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,68 +32,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
 
-On 19/03/2019 17:52, Dave Martin wrote:
-> To provide a uniform way to check for KVM SVE support amongst other
-> features, this patch adds a suitable capability KVM_CAP_ARM_SVE,
-> and reports it as present when SVE is available.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> 
 
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+On 27/03/2019 10:33, Dave Martin wrote:
+> On Wed, Mar 27, 2019 at 09:47:42AM +0000, Julien Thierry wrote:
+>> Hi Dave,
+>>
+>> On 19/03/2019 17:52, Dave Martin wrote:
+>>> This patch includes the SVE register IDs in the list returned by
+>>> KVM_GET_REG_LIST, as appropriate.
+>>>
+>>> On a non-SVE-enabled vcpu, no new IDs are added.
+>>>
+>>> On an SVE-enabled vcpu, IDs for the FPSIMD V-registers are removed
+>>> from the list, since userspace is required to access the Z-
+>>> registers instead in order to access the V-register content.  For
+>>> the variably-sized SVE registers, the appropriate set of slice IDs
+>>> are enumerated, depending on the maximum vector length for the
+>>> vcpu.
+>>>
+>>> As it currently stands, the SVE architecture never requires more
+>>> than one slice to exist per register, so this patch adds no
+>>> explicit support for enumerating multiple slices.  The code can be
+>>> extended straightforwardly to support this in the future, if
+>>> needed.
+>>>
+>>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+>>>
+>>
+>> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> 
+> Thanks, although...
+> 
+>>> ---
+>>>
+>>> Changes since v5:
+>>>
+>>> (Dropped Julien Thierry's Reviewed-by due to non-trivial rebasing)
+>>>
+>>>  * Move mis-split reword to prevent put_user()s being accidentally the
+>>>    correct size from KVM: arm64/sve: Add pseudo-register for the guest's
+>>>    vector lengths.
+>>> ---
+>>>  arch/arm64/kvm/guest.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 56 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>>> index 736d8cb..585c31e5 100644
+>>> --- a/arch/arm64/kvm/guest.c
+>>> +++ b/arch/arm64/kvm/guest.c
+>>> @@ -411,6 +411,56 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>  	return copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)) ? -EFAULT : 0;
+>>>  }
+>>>  
+>>> +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	/* Only the first slice ever exists, for now */
+>>> +	const unsigned int slices = 1;
+>>
+>> Nit: Might be worth introducing a macro/inline function for the number
+>> of slices supported. This way, the day we need to change that, we only
+>> need to look for that identifier.
+> 
+> ... Reasonable point, but I wanted to avoid inventing anything
+> prematurely, partly because sve_reg_to_region() will need work in order
+> to support multiple slices (though it's not rocket science).
+> 
+> I could introduce something like the following:
+> 
+> static unsigned int sve_num_slices(const struct kvm_vcpu *vcpu)
+> {
+> 	unsigned int slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0));
+> 	unsigned int slices = DIV_ROUND_UP(vcpu->arch.sve_max_vl, slice_size);
+> 
+> 	/*
+> 	 * For now, the SVE register ioctl access code won't work
+> 	 * properly with multiple register slices.  KVM should prevent
+> 	 * configuration of a vcpu with a maximum vector length large
+> 	 * enough to trigger this:
+> 	 */
+> 	if (WARN_ON_ONCE(slices > 1))
+> 		return 1;
+> 
+> 	return slices;
+> }
+> 
+> This may be clearer, but felt a bit like overkill...
+> 
+> Thoughts?
 
-Cheers,
+Seems a bit overkill yes... I was more thinking of a define and the
+person in charge of adding the slice support would just need to look for
+references to that define to know (some of) the places that would need
+rework/review.
 
-Julien
+So, unless someone else thinks it's good to introduce it right now you
+can ignore that.
 
-> ---
-> 
-> Changes since v5:
-> 
->  * [Julien Thierry] Strip out has_vhe() sanity-check, which wasn't in
->    the most logical place, and anyway doesn't really belong in this
->    patch.
-> 
->    Moved to KVM: arm64/sve: Allow userspace to enable SVE for vcpus
->    instead.
-> ---
->  arch/arm64/kvm/reset.c   | 3 +++
->  include/uapi/linux/kvm.h | 1 +
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 4f04dbf..180d7a5 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -98,6 +98,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_VM_IPA_SIZE:
->  		r = kvm_ipa_limit;
->  		break;
-> +	case KVM_CAP_ARM_SVE:
-> +		r = system_supports_sve();
-> +		break;
->  	default:
->  		r = 0;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index c3b8e7a..1d56444 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_VM_IPA_SIZE 165
->  #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
->  #define KVM_CAP_HYPERV_CPUID 167
-> +#define KVM_CAP_ARM_SVE 168
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> 
+Thanks,
 
 -- 
 Julien Thierry
