@@ -1,87 +1,92 @@
-From: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH v6 19/27] KVM: arm64: Enumerate SVE register indices for
- KVM_GET_REG_LIST
-Date: Thu, 28 Mar 2019 16:59:46 +0000
-Message-ID: <9832368a-dfd6-d0eb-ee05-3663e1bda3c1@arm.com>
-References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
- <1553017938-710-20-git-send-email-Dave.Martin@arm.com>
- <612e5089-fc43-eee4-1856-cdca89ce3b50@arm.com>
- <20190327103319.GT3567@e103592.cambridge.arm.com>
- <71c30b21-9a4b-42d5-02a8-25bc18044c1f@arm.com>
- <20190328122702.GB3567@e103592.cambridge.arm.com>
- <7ac932dd-18b4-41c0-d7d8-1ddb74e088d1@arm.com>
- <20190328164833.GC3567@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: Unexpected interrupt received in Guest OS when booting after
+ "system_reset"
+Date: Thu, 28 Mar 2019 17:18:32 +0000
+Message-ID: <9a6ece7e-9984-dc9e-8fa2-df9736393dd2@arm.com>
+References: <e8ffbc4e-f7b7-14a1-7614-a3db85c9152f@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E1F4A320
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 12:59:52 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZeSVw+iqgOCr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Mar 2019 12:59:51 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE0C4A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 12:59:51 -0400 (EDT)
-In-Reply-To: <20190328164833.GC3567@e103592.cambridge.arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <e8ffbc4e-f7b7-14a1-7614-a3db85c9152f@huawei.com>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
+To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, wanghaibin 00208455 <wanghaibin.wang@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+[Please do not send HTML emails]
 
+On 28/03/2019 15:44, Heyi Guo wrote:
+> Hi Marc and Christoffer,
+> 
+> When we issue "system_reset" from qemu monitor to a running VM, guest
+> Linux will occasionally get "Unexpected interrupt" after rebooting, with
+> kernel message at the bottom.
+> 
+> After some investigation, we found it might be caused by the
+> preservation of virtual LPI during system reset: it seems the virtual
+> LPI remains in the ap_list during VM reset, as well as its "enabled" and
+> "pending_latch" status, and this causes the virtual LPI to be injected
+> wrongly after VCPU reboots and enables interrupt.
+> 
+> We propose to clear "enabled" flag of virtual LPI when PROPBASER (or
+> GICR_CTRL) of virtual GICR is written to 0, and update virtual LPI
+> properties when GICR_CTRL.enableLPIs is set to 1 again.
+> 
+> Any advice? Or did we miss something?
 
-On 28/03/2019 16:48, Dave Martin wrote:
-> On Thu, Mar 28, 2019 at 02:29:23PM +0000, Julien Thierry wrote:
->>
->>
->> On 28/03/2019 12:27, Dave Martin wrote:
->>> On Wed, Mar 27, 2019 at 03:21:02PM +0000, Julien Thierry wrote:
->>>>
->>>>
->>>> On 27/03/2019 10:33, Dave Martin wrote:
-> 
-> [...]
-> 
->>>>> 	return slices;
->>>>> }
->>>>>
->>>>> This may be clearer, but felt a bit like overkill...
->>>>>
->>>>> Thoughts?
->>>>
->>>> Seems a bit overkill yes... I was more thinking of a define and the
->>>> person in charge of adding the slice support would just need to look for
->>>> references to that define to know (some of) the places that would need
->>>> rework/review.
->>>>
->>>> So, unless someone else thinks it's good to introduce it right now you
->>>> can ignore that.
->>>
->>> OK, how about the following?  This keeps things minimal, but should help
->>> future maintainers know that something may need updating here in the
->>> future. 
->>>
->>
->> Yes, I think this looks good.
-> 
-> OK, are you happy for me to keep your Reviewed-by with that change?
-> 
+We're clearly missing a trick here, but I'm not convinced of your 
+approach. What should happend is that the redistributors should be reset 
+as well, and that this should recall any LPI that has been made pending. 
+Unfortunately, we don't seem to have such code in place, which is 
+embarrassing.
 
-Yes, please do!
+Can you give the following, untested patch a go? It isn't right either, 
+but it should have the right effect. If you confirm that it solves your 
+problem, we can look at adding the right hooks...
 
 Thanks,
 
+	M.
+
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index ab3f47745d9c..bd9a9250f323 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -2403,8 +2403,32 @@ static int vgic_its_commit_v0(struct vgic_its *its)
+ 	return 0;
+ }
+ 
++static void vgic_nuke_pending_lpis(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq, *tmp;
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++
++	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
++		if (irq->intid >= VGIC_MIN_LPI) {
++			list_del(&irq->ap_list);
++			vgic_put_irq(vcpu->kvm, irq);
++		}
++	}
++
++	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
++}
++
+ static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
+ {
++	struct kvm_vcpu *vcpu;
++	int c;
++
++	kvm_for_each_vcpu(c, vcpu, kvm)
++		vgic_nuke_pending_lpis(vcpu);
++
+ 	/* We need to keep the ABI specific field values */
+ 	its->baser_coll_table &= ~GITS_BASER_VALID;
+ 	its->baser_device_table &= ~GITS_BASER_VALID;
+
 -- 
-Julien Thierry
+Jazz is not dead. It just smells funny...
