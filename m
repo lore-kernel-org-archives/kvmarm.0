@@ -1,76 +1,138 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v7 7/10] KVM: arm/arm64: context-switch ptrauth registers
-Date: Thu, 28 Mar 2019 16:59:17 +0530
-Message-ID: <8c38a9fe-8310-4903-7042-e8b5eb3b5f1b@arm.com>
-References: <1552984243-7689-1-git-send-email-amit.kachhap@arm.com>
- <1552984243-7689-8-git-send-email-amit.kachhap@arm.com>
- <64505666-8a1f-cf64-7067-4b2dd53b0b40@arm.com>
- <da7091a9-01b2-bead-3777-972fbb293def@arm.com>
- <949327ae-081c-0964-3315-ac2695243b5f@arm.com>
- <536f518d-5425-cb94-3f64-4c56e5cd65c1@arm.com>
- <13ab02cf-db27-d604-6e5f-d276dec0779b@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v6 19/27] KVM: arm64: Enumerate SVE register indices for
+ KVM_GET_REG_LIST
+Date: Thu, 28 Mar 2019 12:27:03 +0000
+Message-ID: <20190328122702.GB3567@e103592.cambridge.arm.com>
+References: <1553017938-710-1-git-send-email-Dave.Martin@arm.com>
+ <1553017938-710-20-git-send-email-Dave.Martin@arm.com>
+ <612e5089-fc43-eee4-1856-cdca89ce3b50@arm.com>
+ <20190327103319.GT3567@e103592.cambridge.arm.com>
+ <71c30b21-9a4b-42d5-02a8-25bc18044c1f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <13ab02cf-db27-d604-6e5f-d276dec0779b@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: James Morse <james.morse@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3FF84A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 08:27:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dwmrUNh9CP3O for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Mar 2019 08:27:08 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 549C84A2B6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 08:27:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <71c30b21-9a4b-42d5-02a8-25bc18044c1f@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Wed, Mar 27, 2019 at 03:21:02PM +0000, Julien Thierry wrote:
+> 
+> 
+> On 27/03/2019 10:33, Dave Martin wrote:
+> > On Wed, Mar 27, 2019 at 09:47:42AM +0000, Julien Thierry wrote:
+> >> Hi Dave,
+> >>
+> >> On 19/03/2019 17:52, Dave Martin wrote:
 
-Hi James,
-On 3/27/19 11:46 PM, James Morse wrote:
-> Hi Amit, Kristina,
-> 
-> On 27/03/2019 03:21, Amit Daniel Kachhap wrote:
->> On 3/26/19 11:31 PM, Kristina Martsenko wrote:
->>> On 26/03/2019 04:03, Amit Daniel Kachhap wrote:
->>>> On 3/26/19 1:34 AM, Kristina Martsenko wrote:
->>>>> On 19/03/2019 08:30, Amit Daniel Kachhap wrote:
->>>>>> From: Mark Rutland <mark.rutland@arm.com>
->>>>>>
->>>>>> When pointer authentication is supported, a guest may wish to use it.
->>>>>> This patch adds the necessary KVM infrastructure for this to work, with
->>>>>> a semi-lazy context switch of the pointer auth state.
-> 
->>>>>> +    if (test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
->>>>>> +        test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features)) {>>>>> +        /* Verify that KVM startup matches the conditions for ptrauth */
->>>>>> +        if (WARN_ON(!vcpu_has_ptrauth(vcpu)))
->>>>>> +            return -EINVAL;
->>>>>> +    }
-> 
->>> One more thing - I think the WARN_ON() here should be removed. Otherwise
->>> if panic_on_warn is set then userspace can panic the kernel. I think
->>> WARN_ON is only for internal kernel errors (see comment in
->>> include/asm-generic/bug.h).
->>
->> The documentation makes sense so in this case a pr_err like message will suffice.
-> 
-> (could it be a kvm_debug() at most?)
-> 
-> Do we need to print anything at all? User-space asked us for something we can't do.
-> Filling up the kernel log with user-space's mistakes makes it harder to debug the kernel
-> when something goes wrong.
-> 
-> kvm_arm_pmu_v3_init() returns -ENODEV if you ask if for the PMU and the platform can't
-> support it. Isn't the returned error enough?
-Yes Agree that most of the time the user invoked functions are just 
-returned with error value in case of failure. Thanks for the details.
+[...]
 
-Regards,
-Amit D
+> >>> +static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+> >>> +{
+> >>> +	/* Only the first slice ever exists, for now */
+> >>> +	const unsigned int slices = 1;
+> >>
+> >> Nit: Might be worth introducing a macro/inline function for the number
+> >> of slices supported. This way, the day we need to change that, we only
+> >> need to look for that identifier.
+> > 
+> > ... Reasonable point, but I wanted to avoid inventing anything
+> > prematurely, partly because sve_reg_to_region() will need work in order
+> > to support multiple slices (though it's not rocket science).
+> > 
+> > I could introduce something like the following:
+> > 
+> > static unsigned int sve_num_slices(const struct kvm_vcpu *vcpu)
+> > {
+> > 	unsigned int slice_size = KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0));
+> > 	unsigned int slices = DIV_ROUND_UP(vcpu->arch.sve_max_vl, slice_size);
+> > 
+> > 	/*
+> > 	 * For now, the SVE register ioctl access code won't work
+> > 	 * properly with multiple register slices.  KVM should prevent
+> > 	 * configuration of a vcpu with a maximum vector length large
+> > 	 * enough to trigger this:
+> > 	 */
+> > 	if (WARN_ON_ONCE(slices > 1))
+> > 		return 1;
+> > 
+> > 	return slices;
+> > }
+> > 
+> > This may be clearer, but felt a bit like overkill...
+> > 
+> > Thoughts?
 > 
+> Seems a bit overkill yes... I was more thinking of a define and the
+> person in charge of adding the slice support would just need to look for
+> references to that define to know (some of) the places that would need
+> rework/review.
 > 
->> Btw
->> there is one WARN in the function kvm_set_ipa_limit in the same file.
-> 
-> That is called once via kvm_arch_init(), it can't be triggered repeatedly from user-space.
-> 
-> 
-> Thanks,
-> 
-> James
-> 
+> So, unless someone else thinks it's good to introduce it right now you
+> can ignore that.
+
+OK, how about the following?  This keeps things minimal, but should help
+future maintainers know that something may need updating here in the
+future. 
+
+Cheers
+---Dave
+
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index ea5219d..086ab05 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -289,6 +289,13 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ #define KVM_SVE_ZREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0))
+ #define KVM_SVE_PREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0))
+ 
++/*
++ * number of register slices required to cover each whole SVE register on vcpu
++ * NOTE: If you are tempted to modify this, you must also rework
++ * sve_reg_to_region() to match:
++ */
++#define vcpu_sve_slices(vcpu) 1
++
+ /* Bounds of a single SVE register slice within vcpu->arch.sve_state */
+ struct sve_state_reg_region {
+ 	unsigned int koffset;	/* offset into sve_state in kernel memory */
+@@ -505,7 +512,7 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+ {
+ 	/* Only the first slice ever exists, for now */
+-	const unsigned int slices = 1;
++	const unsigned int slices = vcpu_sve_slices(vcpu);
+ 
+ 	if (!vcpu_has_sve(vcpu))
+ 		return 0;
+@@ -521,7 +528,7 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
+ 				u64 __user *uindices)
+ {
+ 	/* Only the first slice ever exists, for now */
+-	const unsigned int slices = 1;
++	const unsigned int slices = vcpu_sve_slices(vcpu);
+ 	u64 reg;
+ 	unsigned int i, n;
+ 	int num_regs = 0;
