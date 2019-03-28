@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/8] KVM: arm64: Reset the PMU in preemptible context
-Date: Thu, 28 Mar 2019 13:36:01 +0000
-Message-ID: <20190328133608.110805-2-marc.zyngier@arm.com>
+Subject: [PATCH 2/8] arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled
+Date: Thu, 28 Mar 2019 13:36:02 +0000
+Message-ID: <20190328133608.110805-3-marc.zyngier@arm.com>
 References: <20190328133608.110805-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D456C4A418
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD8384A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u7kwp61vMsT1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Mar 2019 09:36:38 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F374A417
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:38 -0400 (EDT)
+ with ESMTP id r1UIM9ilOW7D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Mar 2019 09:36:40 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A214A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:40 -0400 (EDT)
 In-Reply-To: <20190328133608.110805-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,48 +31,71 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>, Julien Grall <julien.grall@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We've become very cautious to now always reset the vcpu when nothing
-is loaded on the physical CPU. To do so, we now disable preemption
-and do a kvm_arch_vcpu_put() to make sure we have all the state
-in memory (and that it won't be loaded behind out back).
+The normal interrupt flow is not to enable the vgic when no virtual
+interrupt is to be injected (i.e. the LRs are empty). But when a guest
+is likely to use GICv4 for LPIs, we absolutely need to switch it on
+at all times. Otherwise, VLPIs only get delivered when there is something
+in the LRs, which doesn't happen very often.
 
-This now causes issues with resetting the PMU, which calls into perf.
-Perf itself uses mutexes, which clashes with the lack of preemption.
-It is worth realizing that the PMU is fully emulated, and that
-no PMU state is ever loaded on the physical CPU. This means we can
-perfectly reset the PMU outside of the non-preemptible section.
-
-Fixes: e761a927bc9a ("KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded")
-Reported-by: Julien Grall <julien.grall@arm.com>
-Tested-by: Julien Grall <julien.grall@arm.com>
+Reported-by: Nianyao Tang <tangnianyao@huawei.com>
+Tested-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/reset.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ virt/kvm/arm/hyp/vgic-v3-sr.c |  4 ++--
+ virt/kvm/arm/vgic/vgic.c      | 14 ++++++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f16a5f8ff2b4..e2a0500cd7a2 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -123,6 +123,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	int ret = -EINVAL;
- 	bool loaded;
- 
-+	/* Reset PMU outside of the non-preemptible section */
-+	kvm_pmu_vcpu_reset(vcpu);
-+
- 	preempt_disable();
- 	loaded = (vcpu->cpu != -1);
- 	if (loaded)
-@@ -170,9 +173,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		vcpu->arch.reset_state.reset = false;
+diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
+index 264d92da3240..370bd6c5e6cb 100644
+--- a/virt/kvm/arm/hyp/vgic-v3-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
+@@ -222,7 +222,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 		}
  	}
  
--	/* Reset PMU */
--	kvm_pmu_vcpu_reset(vcpu);
--
- 	/* Default workaround setup is enabled (if supported) */
- 	if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL)
- 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+-	if (used_lrs) {
++	if (used_lrs || cpu_if->its_vpe.its_vm) {
+ 		int i;
+ 		u32 elrsr;
+ 
+@@ -247,7 +247,7 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
+ 	int i;
+ 
+-	if (used_lrs) {
++	if (used_lrs || cpu_if->its_vpe.its_vm) {
+ 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+ 
+ 		for (i = 0; i < used_lrs; i++)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index abd9c7352677..3af69f2a3866 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -867,15 +867,21 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	 * either observe the new interrupt before or after doing this check,
+ 	 * and introducing additional synchronization mechanism doesn't change
+ 	 * this.
++	 *
++	 * Note that we still need to go through the whole thing if anything
++	 * can be directly injected (GICv4).
+ 	 */
+-	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
++	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head) &&
++	    !vgic_supports_direct_msis(vcpu->kvm))
+ 		return;
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+-	raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
+-	vgic_flush_lr_state(vcpu);
+-	raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	if (!list_empty(&vcpu->arch.vgic_cpu.ap_list_head)) {
++		raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
++		vgic_flush_lr_state(vcpu);
++		raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++	}
+ 
+ 	if (can_access_vgic_from_kernel())
+ 		vgic_restore_state(vcpu);
 -- 
 2.20.1
