@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/8] arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled
-Date: Thu, 28 Mar 2019 13:36:02 +0000
-Message-ID: <20190328133608.110805-3-marc.zyngier@arm.com>
+Subject: [PATCH 3/8] KVM: arm/arm64: vgic-its: Take the srcu lock when writing
+ to guest memory
+Date: Thu, 28 Mar 2019 13:36:03 +0000
+Message-ID: <20190328133608.110805-4-marc.zyngier@arm.com>
 References: <20190328133608.110805-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD8384A2E7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6118C4A2E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r1UIM9ilOW7D for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Mar 2019 09:36:40 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A214A2E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:40 -0400 (EDT)
+ with ESMTP id shdxTyy07iYY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Mar 2019 09:36:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4404A439
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Mar 2019 09:36:43 -0400 (EDT)
 In-Reply-To: <20190328133608.110805-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +32,166 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>, Julien Grall <julien.grall@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The normal interrupt flow is not to enable the vgic when no virtual
-interrupt is to be injected (i.e. the LRs are empty). But when a guest
-is likely to use GICv4 for LPIs, we absolutely need to switch it on
-at all times. Otherwise, VLPIs only get delivered when there is something
-in the LRs, which doesn't happen very often.
+When halting a guest, QEMU flushes the virtual ITS caches, which
+amounts to writing to the various tables that the guest has allocated.
 
-Reported-by: Nianyao Tang <tangnianyao@huawei.com>
-Tested-by: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+When doing this, we fail to take the srcu lock, and the kernel
+shouts loudly if running a lockdep kernel:
+
+[   69.680416] =============================
+[   69.680819] WARNING: suspicious RCU usage
+[   69.681526] 5.1.0-rc1-00008-g600025238f51-dirty #18 Not tainted
+[   69.682096] -----------------------------
+[   69.682501] ./include/linux/kvm_host.h:605 suspicious rcu_dereference_check() usage!
+[   69.683225]
+[   69.683225] other info that might help us debug this:
+[   69.683225]
+[   69.683975]
+[   69.683975] rcu_scheduler_active = 2, debug_locks = 1
+[   69.684598] 6 locks held by qemu-system-aar/4097:
+[   69.685059]  #0: 0000000034196013 (&kvm->lock){+.+.}, at: vgic_its_set_attr+0x244/0x3a0
+[   69.686087]  #1: 00000000f2ed935e (&its->its_lock){+.+.}, at: vgic_its_set_attr+0x250/0x3a0
+[   69.686919]  #2: 000000005e71ea54 (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
+[   69.687698]  #3: 00000000c17e548d (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
+[   69.688475]  #4: 00000000ba386017 (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
+[   69.689978]  #5: 00000000c2c3c335 (&vcpu->mutex){+.+.}, at: lock_all_vcpus+0x64/0xd0
+[   69.690729]
+[   69.690729] stack backtrace:
+[   69.691151] CPU: 2 PID: 4097 Comm: qemu-system-aar Not tainted 5.1.0-rc1-00008-g600025238f51-dirty #18
+[   69.691984] Hardware name: rockchip evb_rk3399/evb_rk3399, BIOS 2019.04-rc3-00124-g2feec69fb1 03/15/2019
+[   69.692831] Call trace:
+[   69.694072]  lockdep_rcu_suspicious+0xcc/0x110
+[   69.694490]  gfn_to_memslot+0x174/0x190
+[   69.694853]  kvm_write_guest+0x50/0xb0
+[   69.695209]  vgic_its_save_tables_v0+0x248/0x330
+[   69.695639]  vgic_its_set_attr+0x298/0x3a0
+[   69.696024]  kvm_device_ioctl_attr+0x9c/0xd8
+[   69.696424]  kvm_device_ioctl+0x8c/0xf8
+[   69.696788]  do_vfs_ioctl+0xc8/0x960
+[   69.697128]  ksys_ioctl+0x8c/0xa0
+[   69.697445]  __arm64_sys_ioctl+0x28/0x38
+[   69.697817]  el0_svc_common+0xd8/0x138
+[   69.698173]  el0_svc_handler+0x38/0x78
+[   69.698528]  el0_svc+0x8/0xc
+
+The fix is to obviously take the srcu lock, just like we do on the
+read side of things since bf308242ab98. One wonders why this wasn't
+fixed at the same time, but hey...
+
+Fixes: bf308242ab98 ("KVM: arm/arm64: VGIC/ITS: protect kvm_read_guest() calls with SRCU lock")
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/hyp/vgic-v3-sr.c |  4 ++--
- virt/kvm/arm/vgic/vgic.c      | 14 ++++++++++----
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   | 11 +++++++++++
+ arch/arm64/include/asm/kvm_mmu.h | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic-its.c     |  8 ++++----
+ virt/kvm/arm/vgic/vgic-v3.c      |  4 ++--
+ 4 files changed, 28 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/arm/hyp/vgic-v3-sr.c b/virt/kvm/arm/hyp/vgic-v3-sr.c
-index 264d92da3240..370bd6c5e6cb 100644
---- a/virt/kvm/arm/hyp/vgic-v3-sr.c
-+++ b/virt/kvm/arm/hyp/vgic-v3-sr.c
-@@ -222,7 +222,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 		}
- 	}
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 2de96a180166..31de4ab93005 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -381,6 +381,17 @@ static inline int kvm_read_guest_lock(struct kvm *kvm,
+ 	return ret;
+ }
  
--	if (used_lrs) {
-+	if (used_lrs || cpu_if->its_vpe.its_vm) {
- 		int i;
- 		u32 elrsr;
++static inline int kvm_write_guest_lock(struct kvm *kvm, gpa_t gpa,
++				       const void *data, unsigned long len)
++{
++	int srcu_idx = srcu_read_lock(&kvm->srcu);
++	int ret = kvm_write_guest(kvm, gpa, data, len);
++
++	srcu_read_unlock(&kvm->srcu, srcu_idx);
++
++	return ret;
++}
++
+ static inline void *kvm_get_hyp_vector(void)
+ {
+ 	switch(read_cpuid_part()) {
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index b0742a16c6c9..ebeefcf835e8 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -445,6 +445,17 @@ static inline int kvm_read_guest_lock(struct kvm *kvm,
+ 	return ret;
+ }
  
-@@ -247,7 +247,7 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 	u64 used_lrs = vcpu->arch.vgic_cpu.used_lrs;
- 	int i;
++static inline int kvm_write_guest_lock(struct kvm *kvm, gpa_t gpa,
++				       const void *data, unsigned long len)
++{
++	int srcu_idx = srcu_read_lock(&kvm->srcu);
++	int ret = kvm_write_guest(kvm, gpa, data, len);
++
++	srcu_read_unlock(&kvm->srcu, srcu_idx);
++
++	return ret;
++}
++
+ #ifdef CONFIG_KVM_INDIRECT_VECTORS
+ /*
+  * EL2 vectors can be mapped and rerouted in a number of ways,
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index ab3f47745d9c..c41e11fd841c 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1919,7 +1919,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+ 		ite->collection->collection_id;
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest(kvm, gpa, &val, ite_esz);
++	return kvm_write_guest_lock(kvm, gpa, &val, ite_esz);
+ }
  
--	if (used_lrs) {
-+	if (used_lrs || cpu_if->its_vpe.its_vm) {
- 		write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
+ /**
+@@ -2066,7 +2066,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+ 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+ 		(dev->num_eventid_bits - 1));
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest(kvm, ptr, &val, dte_esz);
++	return kvm_write_guest_lock(kvm, ptr, &val, dte_esz);
+ }
  
- 		for (i = 0; i < used_lrs; i++)
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index abd9c7352677..3af69f2a3866 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -867,15 +867,21 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	 * either observe the new interrupt before or after doing this check,
- 	 * and introducing additional synchronization mechanism doesn't change
- 	 * this.
-+	 *
-+	 * Note that we still need to go through the whole thing if anything
-+	 * can be directly injected (GICv4).
+ /**
+@@ -2246,7 +2246,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
+ 	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
+ 	       collection->collection_id);
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest(its->dev->kvm, gpa, &val, esz);
++	return kvm_write_guest_lock(its->dev->kvm, gpa, &val, esz);
+ }
+ 
+ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+@@ -2317,7 +2317,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
  	 */
--	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-+	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head) &&
-+	    !vgic_supports_direct_msis(vcpu->kvm))
- 		return;
+ 	val = 0;
+ 	BUG_ON(cte_esz > sizeof(val));
+-	ret = kvm_write_guest(its->dev->kvm, gpa, &val, cte_esz);
++	ret = kvm_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
+ 	return ret;
+ }
  
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 408a78eb6a97..9f87e58dbd4a 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -358,7 +358,7 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+ 	if (status) {
+ 		/* clear consumed data */
+ 		val &= ~(1 << bit_nr);
+-		ret = kvm_write_guest(kvm, ptr, &val, 1);
++		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -409,7 +409,7 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 		else
+ 			val &= ~(1 << bit_nr);
  
--	raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
--	vgic_flush_lr_state(vcpu);
--	raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+	if (!list_empty(&vcpu->arch.vgic_cpu.ap_list_head)) {
-+		raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+		vgic_flush_lr_state(vcpu);
-+		raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+	}
- 
- 	if (can_access_vgic_from_kernel())
- 		vgic_restore_state(vcpu);
+-		ret = kvm_write_guest(kvm, ptr, &val, 1);
++		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+ 		if (ret)
+ 			return ret;
+ 	}
 -- 
 2.20.1
