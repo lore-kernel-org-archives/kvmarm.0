@@ -1,92 +1,91 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: Unexpected interrupt received in Guest OS when booting after
- "system_reset"
-Date: Thu, 28 Mar 2019 17:18:32 +0000
-Message-ID: <9a6ece7e-9984-dc9e-8fa2-df9736393dd2@arm.com>
-References: <e8ffbc4e-f7b7-14a1-7614-a3db85c9152f@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [GIT PULL] KVM/ARM fixes for 5.1-rc3
+Date: Thu, 28 Mar 2019 19:07:50 +0100
+Message-ID: <87a94c00-c654-106e-5ab5-22e59af093d8@redhat.com>
+References: <20190328133608.110805-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <e8ffbc4e-f7b7-14a1-7614-a3db85c9152f@huawei.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190328133608.110805-1-marc.zyngier@arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, wanghaibin 00208455 <wanghaibin.wang@huawei.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>, Julien Thierry <julien.thierry@arm.com>, YueHaibing <yuehaibing@huawei.com>, Zheng Xiang <zhengxiang9@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, Eric Auger <eric.auger@redhat.com>, Julien Grall <julien.grall@arm.com>, James Morse <james.morse@arm.com>, Nianyao Tang <tangnianyao@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[Please do not send HTML emails]
-
-On 28/03/2019 15:44, Heyi Guo wrote:
-> Hi Marc and Christoffer,
+On 28/03/19 14:36, Marc Zyngier wrote:
+> Paolo, Radim,
 > 
-> When we issue "system_reset" from qemu monitor to a running VM, guest
-> Linux will occasionally get "Unexpected interrupt" after rebooting, with
-> kernel message at the bottom.
+> Here's a handful of KVM/ARM fixes for 5.1-rc3. We have a number of
+> stage-2 page table fixes, some srcu fixes the the ITS emulation, a
+> reset fix for the virtual PMU, a GICv4 regression fix, and some
+> cleanups.
 > 
-> After some investigation, we found it might be caused by the
-> preservation of virtual LPI during system reset: it seems the virtual
-> LPI remains in the ap_list during VM reset, as well as its "enabled" and
-> "pending_latch" status, and this causes the virtual LPI to be injected
-> wrongly after VCPU reboots and enables interrupt.
+> Please pull,
 > 
-> We propose to clear "enabled" flag of virtual LPI when PROPBASER (or
-> GICR_CTRL) of virtual GICR is written to 0, and update virtual LPI
-> properties when GICR_CTRL.enableLPIs is set to 1 again.
+> 	M.
 > 
-> Any advice? Or did we miss something?
+> The following changes since commit 9e98c678c2d6ae3a17cb2de55d17f69dddaa231b:
+> 
+>   Linux 5.1-rc1 (2019-03-17 14:22:26 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.1
+> 
+> for you to fetch changes up to 8324c3d518cfd69f2a17866b52c13bf56d3042d8:
+> 
+>   KVM: arm/arm64: Comments cleanup in mmu.c (2019-03-28 13:17:17 +0000)
+> 
+> ----------------------------------------------------------------
+> KVM/ARM fixes for 5.1
+> 
+> - Fix THP handling in the presence of pre-existing PTEs
+> - Honor request for PTE mappings even when THPs are available
+> - GICv4 performance improvement
+> - Take the srcu lock when writing to guest-controlled ITS data structures
+> - Reset the virtual PMU in preemptible context
+> - Various cleanups
+> 
+> ----------------------------------------------------------------
+> Marc Zyngier (4):
+>       KVM: arm64: Reset the PMU in preemptible context
+>       arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled
+>       KVM: arm/arm64: vgic-its: Take the srcu lock when writing to guest memory
+>       KVM: arm/arm64: vgic-its: Take the srcu lock when parsing the memslots
+> 
+> Suzuki K Poulose (2):
+>       KVM: arm/arm64: Enforce PTE mappings at stage2 when needed
+>       KVM: arm/arm64: Fix handling of stage2 huge mappings
+> 
+> YueHaibing (1):
+>       KVM: arm/arm64: vgic-its: Make attribute accessors static
+> 
+> Zenghui Yu (1):
+>       KVM: arm/arm64: Comments cleanup in mmu.c
+> 
+>  arch/arm/include/asm/kvm_mmu.h        |  11 +++
+>  arch/arm/include/asm/stage2_pgtable.h |   2 +
+>  arch/arm64/include/asm/kvm_mmu.h      |  11 +++
+>  arch/arm64/kvm/reset.c                |   6 +-
+>  virt/kvm/arm/hyp/vgic-v3-sr.c         |   4 +-
+>  virt/kvm/arm/mmu.c                    | 125 ++++++++++++++++++++--------------
+>  virt/kvm/arm/vgic/vgic-its.c          |  31 +++++----
+>  virt/kvm/arm/vgic/vgic-v3.c           |   4 +-
+>  virt/kvm/arm/vgic/vgic.c              |  14 ++--
+>  9 files changed, 133 insertions(+), 75 deletions(-)
+> 
 
-We're clearly missing a trick here, but I'm not convinced of your 
-approach. What should happend is that the redistributors should be reset 
-as well, and that this should recall any LPI that has been made pending. 
-Unfortunately, we don't seem to have such code in place, which is 
-embarrassing.
+Pulled, thanks.  Will push together with the x86 stuff I'm testing now,
+and send it to Linus tomorrow.
 
-Can you give the following, untested patch a go? It isn't right either, 
-but it should have the right effect. If you confirm that it solves your 
-problem, we can look at adding the right hooks...
-
-Thanks,
-
-	M.
-
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index ab3f47745d9c..bd9a9250f323 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -2403,8 +2403,32 @@ static int vgic_its_commit_v0(struct vgic_its *its)
- 	return 0;
- }
- 
-+static void vgic_nuke_pending_lpis(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq, *tmp;
-+	unsigned long flags;
-+
-+	raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+
-+	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
-+		if (irq->intid >= VGIC_MIN_LPI) {
-+			list_del(&irq->ap_list);
-+			vgic_put_irq(vcpu->kvm, irq);
-+		}
-+	}
-+
-+	raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
-+}
-+
- static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
- {
-+	struct kvm_vcpu *vcpu;
-+	int c;
-+
-+	kvm_for_each_vcpu(c, vcpu, kvm)
-+		vgic_nuke_pending_lpis(vcpu);
-+
- 	/* We need to keep the ABI specific field values */
- 	its->baser_coll_table &= ~GITS_BASER_VALID;
- 	its->baser_device_table &= ~GITS_BASER_VALID;
-
--- 
-Jazz is not dead. It just smells funny...
+Paolo
