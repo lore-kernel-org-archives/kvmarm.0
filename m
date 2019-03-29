@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v7 14/27] KVM: Allow 2048-bit register access via ioctl
- interface
-Date: Fri, 29 Mar 2019 13:00:39 +0000
-Message-ID: <1553864452-15080-15-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v7 11/27] KVM: arm64: Support runtime sysreg visibility
+ filtering
+Date: Fri, 29 Mar 2019 13:00:36 +0000
+Message-ID: <1553864452-15080-12-git-send-email-Dave.Martin@arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 459454A441
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FF8F4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AobPePOS2AKz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Mar 2019 09:02:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 071414A43B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:12 -0400 (EDT)
+ with ESMTP id eNvJIzy9SFhO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Mar 2019 09:02:06 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E6D34A4D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:05 -0400 (EDT)
 In-Reply-To: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,31 +32,162 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIEFybSBTVkUgYXJjaGl0ZWN0dXJlIGRlZmluZXMgcmVnaXN0ZXJzIHRoYXQgYXJlIHVwIHRv
-IDIwNDggYml0cwppbiBzaXplICh3aXRoIHNvbWUgcG9zc2liaWxpdHkgb2YgZnVydGhlciBmdXR1
-cmUgZXhwYW5zaW9uKS4KCkluIG9yZGVyIHRvIGF2b2lkIHRoZSBuZWVkIGZvciBhbiBleGNlc3Np
-dmVseSBsYXJnZSBudW1iZXIgb2YKaW9jdGxzIHdoZW4gc2F2aW5nIGFuZCByZXN0b3JpbmcgYSB2
-Y3B1J3MgcmVnaXN0ZXJzLCB0aGlzIHBhdGNoCmFkZHMgYSAjZGVmaW5lIHRvIG1ha2Ugc3VwcG9y
-dCBmb3IgaW5kaXZpZHVhbCAyMDQ4LWJpdCByZWdpc3RlcnMKdGhyb3VnaCB0aGUgS1ZNX3tHRVQs
-U0VUfV9PTkVfUkVHIGlvY3RsIGludGVyZmFjZSBvZmZpY2lhbC4gIFRoaXMKd2lsbCBhbGxvdyBl
-YWNoIFNWRSByZWdpc3RlciB0byBiZSBhY2Nlc3NlZCBpbiBhIHNpbmdsZSBjYWxsLgoKVGhlcmUg
-YXJlIHN1ZmZpY2llbnQgc3BhcmUgYml0cyBpbiB0aGUgcmVnaXN0ZXIgaWQgc2l6ZSBmaWVsZCBm
-b3IKdGhpcyBjaGFuZ2UsIHNvIHRoZXJlIGlzIG5vIEFCSSBpbXBhY3QsIHByb3ZpZGluZyB0aGF0
-CktWTV9HRVRfUkVHX0xJU1QgZG9lcyBub3QgZW51bWVyYXRlIGFueSAyMDQ4LWJpdCByZWdpc3Rl
-ciB1bmxlc3MKdXNlcnNwYWNlIGV4cGxpY2l0bHkgb3B0cyBpbiB0byB0aGUgcmVsZXZhbnQgYXJj
-aGl0ZWN0dXJlLXNwZWNpZmljCmZlYXR1cmVzLgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4g
-PERhdmUuTWFydGluQGFybS5jb20+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVu
-bmVlQGxpbmFyby5vcmc+ClRlc3RlZC1ieTogemhhbmcubGVpIDx6aGFuZy5sZWlAanAuZnVqaXRz
-dS5jb20+Ci0tLQogaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oIHwgMSArCiAxIGZpbGUgY2hhbmdl
-ZCwgMSBpbnNlcnRpb24oKykKCmRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgg
-Yi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKaW5kZXggNmQ0ZWE0Yi4uZGM3N2E1YSAxMDA2NDQK
-LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCisrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9r
-dm0uaApAQCAtMTE0NSw2ICsxMTQ1LDcgQEAgc3RydWN0IGt2bV9kaXJ0eV90bGIgewogI2RlZmlu
-ZSBLVk1fUkVHX1NJWkVfVTI1NgkweDAwNTAwMDAwMDAwMDAwMDBVTEwKICNkZWZpbmUgS1ZNX1JF
-R19TSVpFX1U1MTIJMHgwMDYwMDAwMDAwMDAwMDAwVUxMCiAjZGVmaW5lIEtWTV9SRUdfU0laRV9V
-MTAyNAkweDAwNzAwMDAwMDAwMDAwMDBVTEwKKyNkZWZpbmUgS1ZNX1JFR19TSVpFX1UyMDQ4CTB4
-MDA4MDAwMDAwMDAwMDAwMFVMTAogCiBzdHJ1Y3Qga3ZtX3JlZ19saXN0IHsKIAlfX3U2NCBuOyAv
-KiBudW1iZXIgb2YgcmVncyAqLwotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
-bmZvL2t2bWFybQo=
+Some optional features of the Arm architecture add new system
+registers that are not present in the base architecture.
+
+Where these features are optional for the guest, the visibility of
+these registers may need to depend on some runtime configuration,
+such as a flag passed to KVM_ARM_VCPU_INIT.
+
+For example, ZCR_EL1 and ID_AA64ZFR0_EL1 need to be hidden if SVE
+is not enabled for the guest, even though these registers may be
+present in the hardware and visible to the host at EL2.
+
+Adding special-case checks all over the place for individual
+registers is going to get messy as the number of conditionally-
+visible registers grows.
+
+In order to help solve this problem, this patch adds a new sysreg
+method visibility() that can be used to hook in any needed runtime
+visibility checks.  This method can currently return
+REG_HIDDEN_USER to inhibit enumeration and ioctl access to the
+register for userspace, and REG_HIDDEN_GUEST to inhibit runtime
+access by the guest using MSR/MRS.  Wrappers are added to allow
+these flags to be conveniently queried.
+
+This approach allows a conditionally modified view of individual
+system registers such as the CPU ID registers, in addition to
+completely hiding register where appropriate.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
+
+---
+
+Changes since v5:
+
+ * Rename the visibility override flags, add some comments, and rename/
+   introduce helpers to make the purpose of this code clearer.
+---
+ arch/arm64/kvm/sys_regs.c | 24 +++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.h | 25 +++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a5d14b5..c86a7b0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1927,6 +1927,12 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ {
+ 	trace_kvm_sys_access(*vcpu_pc(vcpu), params, r);
+ 
++	/* Check for regs disabled by runtime config */
++	if (sysreg_hidden_from_guest(vcpu, r)) {
++		kvm_inject_undefined(vcpu);
++		return;
++	}
++
+ 	/*
+ 	 * Not having an accessor means that we have configured a trap
+ 	 * that we don't know how to handle. This certainly qualifies
+@@ -2438,6 +2444,10 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 	if (!r)
+ 		return get_invariant_sys_reg(reg->id, uaddr);
+ 
++	/* Check for regs disabled by runtime config */
++	if (sysreg_hidden_from_user(vcpu, r))
++		return -ENOENT;
++
+ 	if (r->get_user)
+ 		return (r->get_user)(vcpu, r, reg, uaddr);
+ 
+@@ -2459,6 +2469,10 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 	if (!r)
+ 		return set_invariant_sys_reg(reg->id, uaddr);
+ 
++	/* Check for regs disabled by runtime config */
++	if (sysreg_hidden_from_user(vcpu, r))
++		return -ENOENT;
++
+ 	if (r->set_user)
+ 		return (r->set_user)(vcpu, r, reg, uaddr);
+ 
+@@ -2515,7 +2529,8 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
+ 	return true;
+ }
+ 
+-static int walk_one_sys_reg(const struct sys_reg_desc *rd,
++static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
++			    const struct sys_reg_desc *rd,
+ 			    u64 __user **uind,
+ 			    unsigned int *total)
+ {
+@@ -2526,6 +2541,9 @@ static int walk_one_sys_reg(const struct sys_reg_desc *rd,
+ 	if (!(rd->reg || rd->get_user))
+ 		return 0;
+ 
++	if (sysreg_hidden_from_user(vcpu, rd))
++		return 0;
++
+ 	if (!copy_reg_to_user(rd, uind))
+ 		return -EFAULT;
+ 
+@@ -2554,9 +2572,9 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
+ 		int cmp = cmp_sys_reg(i1, i2);
+ 		/* target-specific overrides generic entry. */
+ 		if (cmp <= 0)
+-			err = walk_one_sys_reg(i1, &uind, &total);
++			err = walk_one_sys_reg(vcpu, i1, &uind, &total);
+ 		else
+-			err = walk_one_sys_reg(i2, &uind, &total);
++			err = walk_one_sys_reg(vcpu, i2, &uind, &total);
+ 
+ 		if (err)
+ 			return err;
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 3b1bc7f..2be9950 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -64,8 +64,15 @@ struct sys_reg_desc {
+ 			const struct kvm_one_reg *reg, void __user *uaddr);
+ 	int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			const struct kvm_one_reg *reg, void __user *uaddr);
++
++	/* Return mask of REG_* runtime visibility overrides */
++	unsigned int (*visibility)(const struct kvm_vcpu *vcpu,
++				   const struct sys_reg_desc *rd);
+ };
+ 
++#define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
++#define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
++
+ static inline void print_sys_reg_instr(const struct sys_reg_params *p)
+ {
+ 	/* Look, we even formatted it for you to paste into the table! */
+@@ -102,6 +109,24 @@ static inline void reset_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r
+ 	__vcpu_sys_reg(vcpu, r->reg) = r->val;
+ }
+ 
++static inline bool sysreg_hidden_from_guest(const struct kvm_vcpu *vcpu,
++					    const struct sys_reg_desc *r)
++{
++	if (likely(!r->visibility))
++		return false;
++
++	return r->visibility(vcpu, r) & REG_HIDDEN_GUEST;
++}
++
++static inline bool sysreg_hidden_from_user(const struct kvm_vcpu *vcpu,
++					   const struct sys_reg_desc *r)
++{
++	if (likely(!r->visibility))
++		return false;
++
++	return r->visibility(vcpu, r) & REG_HIDDEN_USER;
++}
++
+ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
+ 			      const struct sys_reg_desc *i2)
+ {
+-- 
+2.1.4
