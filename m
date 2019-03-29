@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v7 03/27] KVM: arm64: Delete orphaned declaration for
- __fpsimd_enabled()
-Date: Fri, 29 Mar 2019 13:00:28 +0000
-Message-ID: <1553864452-15080-4-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v7 06/27] arm64/sve: Clarify role of the VQ map maintenance
+ functions
+Date: Fri, 29 Mar 2019 13:00:31 +0000
+Message-ID: <1553864452-15080-7-git-send-email-Dave.Martin@arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AC324A380
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:01:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F4D84A475
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:01:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rANGxrgMjvde for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Mar 2019 09:01:47 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 548D64A418
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:01:47 -0400 (EDT)
+ with ESMTP id clqhzzUtNG3s for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Mar 2019 09:01:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A5E4A41C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:01:54 -0400 (EDT)
 In-Reply-To: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,21 +32,67 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-X19mcHNpbWRfZW5hYmxlZCgpIG5vIGxvbmdlciBleGlzdHMsIGJ1dCBhIGRhbmdsaW5nIGRlY2xh
-cmF0aW9uIGhhcwpzdXJ2aXZlZCBpbiBrdm1faHlwLmguCgpUaGlzIHBhdGNoIGdldHMgcmlkIG9m
-IGl0LgoKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+ClJl
-dmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+ClRlc3RlZC1i
-eTogemhhbmcubGVpIDx6aGFuZy5sZWlAanAuZnVqaXRzdS5jb20+Ci0tLQogYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1faHlwLmggfCAxIC0KIDEgZmlsZSBjaGFuZ2VkLCAxIGRlbGV0aW9uKC0p
-CgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmggYi9hcmNoL2Fy
-bTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAppbmRleCA0ZGE3NjVmLi5lZjhiODM5IDEwMDY0NAot
-LS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAuaAorKysgYi9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2t2bV9oeXAuaApAQCAtMTQ5LDcgKzE0OSw2IEBAIHZvaWQgX19kZWJ1Z19zd2l0
-Y2hfdG9faG9zdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogCiB2b2lkIF9fZnBzaW1kX3NhdmVf
-c3RhdGUoc3RydWN0IHVzZXJfZnBzaW1kX3N0YXRlICpmcF9yZWdzKTsKIHZvaWQgX19mcHNpbWRf
-cmVzdG9yZV9zdGF0ZShzdHJ1Y3QgdXNlcl9mcHNpbWRfc3RhdGUgKmZwX3JlZ3MpOwotYm9vbCBf
-X2Zwc2ltZF9lbmFibGVkKHZvaWQpOwogCiB2b2lkIGFjdGl2YXRlX3RyYXBzX3ZoZV9sb2FkKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB2b2lkIGRlYWN0aXZhdGVfdHJhcHNfdmhlX3B1dCh2b2lk
-KTsKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
-cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+The roles of sve_init_vq_map(), sve_update_vq_map() and
+sve_verify_vq_map() are highly non-obvious to anyone who has not dug
+through cpufeatures.c in detail.
+
+Since the way these functions interact with each other is more
+important here than a full understanding of the cpufeatures code, this
+patch adds comments to make the functions' roles clearer.
+
+No functional change.
+
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+Reviewed-by: Julien Grall <julien.grall@arm.com>
+Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
+
+---
+
+Changes since v5:
+
+ * [Julien Thierry] This patch is useful for explaining the previous
+   patch (as per the v5 ordering), and is anyway non-functional.
+   Swapped it with the previous patch to provide a more logical reading
+   order for the series.
+---
+ arch/arm64/kernel/fpsimd.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 62c37f0..f59ea67 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -647,6 +647,10 @@ static void sve_probe_vqs(DECLARE_BITMAP(map, SVE_VQ_MAX))
+ 	}
+ }
+ 
++/*
++ * Initialise the set of known supported VQs for the boot CPU.
++ * This is called during kernel boot, before secondary CPUs are brought up.
++ */
+ void __init sve_init_vq_map(void)
+ {
+ 	sve_probe_vqs(sve_vq_map);
+@@ -655,6 +659,7 @@ void __init sve_init_vq_map(void)
+ /*
+  * If we haven't committed to the set of supported VQs yet, filter out
+  * those not supported by the current CPU.
++ * This function is called during the bring-up of early secondary CPUs only.
+  */
+ void sve_update_vq_map(void)
+ {
+@@ -662,7 +667,10 @@ void sve_update_vq_map(void)
+ 	bitmap_and(sve_vq_map, sve_vq_map, sve_secondary_vq_map, SVE_VQ_MAX);
+ }
+ 
+-/* Check whether the current CPU supports all VQs in the committed set */
++/*
++ * Check whether the current CPU supports all VQs in the committed set.
++ * This function is called during the bring-up of late secondary CPUs only.
++ */
+ int sve_verify_vq_map(void)
+ {
+ 	int ret = 0;
+-- 
+2.1.4
