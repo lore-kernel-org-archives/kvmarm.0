@@ -1,23 +1,22 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v7 23/27] KVM: arm64/sve: Add pseudo-register for the guest's
- vector lengths
-Date: Fri, 29 Mar 2019 13:00:48 +0000
-Message-ID: <1553864452-15080-24-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v7 27/27] KVM: arm64/sve: Document KVM API extensions for SVE
+Date: Fri, 29 Mar 2019 13:00:52 +0000
+Message-ID: <1553864452-15080-28-git-send-email-Dave.Martin@arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4162B4A2E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B2E34A320
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r+YDOcEKyMfL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Mar 2019 09:02:32 -0400 (EDT)
+ with ESMTP id ouzqHvLCYMyK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Mar 2019 09:02:41 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0468A4A4F2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F2C44A460
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 09:02:41 -0400 (EDT)
 In-Reply-To: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,444 +31,147 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds a new pseudo-register KVM_REG_ARM64_SVE_VLS to
-allow userspace to set and query the set of vector lengths visible
-to the guest.
-
-In the future, multiple register slices per SVE register may be
-visible through the ioctl interface.  Once the set of slices has
-been determined we would not be able to allow the vector length set
-to be changed any more, in order to avoid userspace seeing
-inconsistent sets of registers.  For this reason, this patch adds
-support for explicit finalization of the SVE configuration via the
-KVM_ARM_VCPU_FINALIZE ioctl.
-
-Finalization is the proper place to allocate the SVE register state
-storage in vcpu->arch.sve_state, so this patch adds that as
-appropriate.  The data is freed via kvm_arch_vcpu_uninit(), which
-was previously a no-op on arm64.
-
-To simplify the logic for determining what vector lengths can be
-supported, some code is added to KVM init to work this out, in the
-kvm_arm_init_arch_resources() hook.
-
-The KVM_REG_ARM64_SVE_VLS pseudo-register is not exposed yet.
-Subsequent patches will allow SVE to be turned on for guest vcpus,
-making it visible.
-
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-
----
-
-Changes since v5:
-
- * [Julien Thierry] Delete overzealous BUILD_BUG_ON() checks.
-   It also turns out that these could cause kernel build failures in
-   some configurations, even though the checked condition is compile-
-   time constant.
-
-   Because of the way the affected functions are called, the checks
-   are superfluous, so the simplest option is simply to get rid of
-   them.
-
- * [Julien Thierry] Free vcpu->arch.sve_state (if any) in
-   kvm_arch_vcpu_uninit() (which is currently a no-op).
-
-   This was accidentally lost during a previous rebase.
-
- * Add kvm_arm_init_arch_resources() hook, and use it to probe SVE
-   configuration for KVM, to avoid duplicating the logic elsewhere.
-   We only need to do this once.
-
- * Move sve_state buffer allocation to kvm_arm_vcpu_finalize().
-
-   As well as making the code more straightforward, this avoids the
-   need to allocate memory in kvm_reset_vcpu(), the meat of which is
-   non-preemptible since commit 358b28f09f0a ("arm/arm64: KVM: Allow a
-   VCPU to fully reset itself").
-
-   The refactoring means that if this has not been done by the time
-   we hit KVM_RUN, then this allocation will happen on the
-   kvm_arm_first_run_init() path, where preemption remains enabled.
-
- * Add a couple of comments in {get,set}_sve_reg() to make the handling
-   of the KVM_REG_ARM64_SVE_VLS special case a little clearer.
-
- * Move mis-split rework to avoid put_user() being the correct size
-   by accident in KVM_GET_REG_LIST to KVM: arm64: Enumerate SVE register
-   indices for KVM_GET_REG_LIST.
-
- * Fix wrong WARN_ON() check sense when checking whether the
-   implementation may needs move SVE register slices than KVM can
-   support.
-
- * Fix erroneous setting of vcpu->arch.sve_max_vl based on stale loop
-   control veriable vq.
-
- * Move definition of KVM_ARM_VCPU_SVE from KVM: arm64/sve: Allow
-   userspace to enable SVE for vcpus.
-
- * Migrate to explicit finalization of the SVE configuration, using
-   KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE).
----
- arch/arm64/include/asm/kvm_host.h |  15 +++--
- arch/arm64/include/uapi/asm/kvm.h |   5 ++
- arch/arm64/kvm/guest.c            | 114 +++++++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/reset.c            |  89 +++++++++++++++++++++++++++++
- 4 files changed, 215 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 98658f7..5475cc4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -23,7 +23,6 @@
- #define __ARM64_KVM_HOST_H__
- 
- #include <linux/bitmap.h>
--#include <linux/errno.h>
- #include <linux/types.h>
- #include <linux/jump_label.h>
- #include <linux/kvm_types.h>
-@@ -50,6 +49,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
-+/* Will be incremented when KVM_ARM_VCPU_SVE is fully implemented: */
- #define KVM_VCPU_MAX_FEATURES 4
- 
- #define KVM_REQ_SLEEP \
-@@ -59,10 +59,12 @@
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
--static inline int kvm_arm_init_arch_resources(void) { return 0; }
-+extern unsigned int kvm_sve_max_vl;
-+int kvm_arm_init_arch_resources(void);
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-+void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu);
- int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
- void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
- 
-@@ -353,6 +355,7 @@ struct kvm_vcpu_arch {
- #define KVM_ARM64_HOST_SVE_IN_USE	(1 << 3) /* backup for host TIF_SVE */
- #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
- #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
-+#define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
- 
- #define vcpu_has_sve(vcpu) (system_supports_sve() && \
- 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
-@@ -525,7 +528,6 @@ static inline bool kvm_arch_requires_vhe(void)
- 
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
--static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
-@@ -626,7 +628,10 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
--#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
--#define kvm_arm_vcpu_is_finalized(vcpu) true
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what);
-+bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-+
-+#define kvm_arm_vcpu_sve_finalized(vcpu) \
-+	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
- 
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ced760c..6963b7e 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-@@ -243,6 +244,10 @@ struct kvm_vcpu_events {
- 					 ((n) << 5) | (i))
- #define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
- 
-+/* Vector lengths pseudo-register: */
-+#define KVM_REG_ARM64_SVE_VLS		(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-+					 KVM_REG_SIZE_U512 | 0xffff)
-+
- /* Device Control API: ARM VGIC */
- #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
- #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 2aa80a5..086ab05 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -206,6 +206,73 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return err;
- }
- 
-+#define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-+#define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-+
-+static bool vq_present(
-+	const u64 (*const vqs)[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)],
-+	unsigned int vq)
-+{
-+	return (*vqs)[vq_word(vq)] & vq_mask(vq);
-+}
-+
-+static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	unsigned int max_vq, vq;
-+	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-+
-+	if (WARN_ON(!sve_vl_valid(vcpu->arch.sve_max_vl)))
-+		return -EINVAL;
-+
-+	memset(vqs, 0, sizeof(vqs));
-+
-+	max_vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
-+	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-+		if (sve_vq_available(vq))
-+			vqs[vq_word(vq)] |= vq_mask(vq);
-+
-+	if (copy_to_user((void __user *)reg->addr, vqs, sizeof(vqs)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
-+	unsigned int max_vq, vq;
-+	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-+
-+	if (kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM; /* too late! */
-+
-+	if (WARN_ON(vcpu->arch.sve_state))
-+		return -EINVAL;
-+
-+	if (copy_from_user(vqs, (const void __user *)reg->addr, sizeof(vqs)))
-+		return -EFAULT;
-+
-+	max_vq = 0;
-+	for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
-+		if (vq_present(&vqs, vq))
-+			max_vq = vq;
-+
-+	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
-+		return -EINVAL;
-+
-+	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-+		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-+			return -EINVAL;
-+
-+	/* Can't run with no vector lengths at all: */
-+	if (max_vq < SVE_VQ_MIN)
-+		return -EINVAL;
-+
-+	/* vcpu->arch.sve_state will be alloc'd by kvm_vcpu_finalize_sve() */
-+	vcpu->arch.sve_max_vl = sve_vl_from_vq(max_vq);
-+
-+	return 0;
-+}
-+
- #define SVE_REG_SLICE_SHIFT	0
- #define SVE_REG_SLICE_BITS	5
- #define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-@@ -296,7 +363,19 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	struct sve_state_reg_region region;
- 	char __user *uptr = (char __user *)reg->addr;
- 
--	if (!vcpu_has_sve(vcpu) || sve_reg_to_region(&region, vcpu, reg))
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	/* Handle the KVM_REG_ARM64_SVE_VLS pseudo-reg as a special case: */
-+	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-+		return get_sve_vls(vcpu, reg);
-+
-+	/* Otherwise, reg is an architectural SVE register... */
-+
-+	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM;
-+
-+	if (sve_reg_to_region(&region, vcpu, reg))
- 		return -ENOENT;
- 
- 	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
-@@ -312,7 +391,19 @@ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	struct sve_state_reg_region region;
- 	const char __user *uptr = (const char __user *)reg->addr;
- 
--	if (!vcpu_has_sve(vcpu) || sve_reg_to_region(&region, vcpu, reg))
-+	if (!vcpu_has_sve(vcpu))
-+		return -ENOENT;
-+
-+	/* Handle the KVM_REG_ARM64_SVE_VLS pseudo-reg as a special case: */
-+	if (reg->id == KVM_REG_ARM64_SVE_VLS)
-+		return set_sve_vls(vcpu, reg);
-+
-+	/* Otherwise, reg is an architectural SVE register... */
-+
-+	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-+		return -EPERM;
-+
-+	if (sve_reg_to_region(&region, vcpu, reg))
- 		return -ENOENT;
- 
- 	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
-@@ -426,7 +517,11 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- 	if (!vcpu_has_sve(vcpu))
- 		return 0;
- 
--	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */);
-+	/* Policed by KVM_GET_REG_LIST: */
-+	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
-+
-+	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */)
-+		+ 1; /* KVM_REG_ARM64_SVE_VLS */
- }
- 
- static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
-@@ -441,6 +536,19 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
- 	if (!vcpu_has_sve(vcpu))
- 		return 0;
- 
-+	/* Policed by KVM_GET_REG_LIST: */
-+	WARN_ON(!kvm_arm_vcpu_sve_finalized(vcpu));
-+
-+	/*
-+	 * Enumerate this first, so that userspace can save/restore in
-+	 * the order reported by KVM_GET_REG_LIST:
-+	 */
-+	reg = KVM_REG_ARM64_SVE_VLS;
-+	if (put_user(reg, uindices++))
-+		return -EFAULT;
-+
-+	++num_regs;
-+
- 	for (i = 0; i < slices; i++) {
- 		for (n = 0; n < SVE_NUM_ZREGS; n++) {
- 			reg = KVM_REG_ARM64_SVE_ZREG(n, i);
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f16a5f8..e7f9c06 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -23,11 +23,14 @@
- #include <linux/kvm_host.h>
- #include <linux/kvm.h>
- #include <linux/hw_breakpoint.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
- 
- #include <kvm/arm_arch_timer.h>
- 
- #include <asm/cpufeature.h>
- #include <asm/cputype.h>
-+#include <asm/fpsimd.h>
- #include <asm/ptrace.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
-@@ -99,6 +102,92 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	return r;
- }
- 
-+unsigned int kvm_sve_max_vl;
-+
-+int kvm_arm_init_arch_resources(void)
-+{
-+	if (system_supports_sve()) {
-+		kvm_sve_max_vl = sve_max_virtualisable_vl;
-+
-+		/*
-+		 * The get_sve_reg()/set_sve_reg() ioctl interface will need
-+		 * to be extended with multiple register slice support in
-+		 * order to support vector lengths greater than
-+		 * SVE_VL_ARCH_MAX:
-+		 */
-+		if (WARN_ON(kvm_sve_max_vl > SVE_VL_ARCH_MAX))
-+			kvm_sve_max_vl = SVE_VL_ARCH_MAX;
-+
-+		/*
-+		 * Don't even try to make use of vector lengths that
-+		 * aren't available on all CPUs, for now:
-+		 */
-+		if (kvm_sve_max_vl < sve_max_vl)
-+			pr_warn("KVM: SVE vector length for guests limited to %u bytes\n",
-+				kvm_sve_max_vl);
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Finalize vcpu's maximum SVE vector length, allocating
-+ * vcpu->arch.sve_state as necessary.
-+ */
-+static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
-+{
-+	void *buf;
-+	unsigned int vl;
-+
-+	vl = vcpu->arch.sve_max_vl;
-+
-+	/*
-+	 * Resposibility for these properties is shared between
-+	 * kvm_arm_init_arch_resources(), kvm_vcpu_enable_sve() and
-+	 * set_sve_vls().  Double-check here just to be sure:
-+	 */
-+	if (WARN_ON(!sve_vl_valid(vl) || vl > sve_max_virtualisable_vl ||
-+		    vl > SVE_VL_ARCH_MAX))
-+		return -EIO;
-+
-+	buf = kzalloc(SVE_SIG_REGS_SIZE(sve_vq_from_vl(vl)), GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	vcpu->arch.sve_state = buf;
-+	vcpu->arch.flags |= KVM_ARM64_VCPU_SVE_FINALIZED;
-+	return 0;
-+}
-+
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+{
-+	switch (what) {
-+	case KVM_ARM_VCPU_SVE:
-+		if (!vcpu_has_sve(vcpu))
-+			return -EINVAL;
-+
-+		if (kvm_arm_vcpu_sve_finalized(vcpu))
-+			return -EPERM;
-+
-+		return kvm_vcpu_finalize_sve(vcpu);
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
-+		return false;
-+
-+	return true;
-+}
-+
-+void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
-+{
-+	kfree(vcpu->arch.sve_state);
-+}
-+
- /**
-  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
-  * @vcpu: The VCPU pointer
--- 
-2.1.4
+VGhpcyBwYXRjaCBhZGRzIHNlY3Rpb25zIHRvIHRoZSBLVk0gQVBJIGRvY3VtZW50YXRpb24gZGVz
+Y3JpYmluZwp0aGUgZXh0ZW5zaW9ucyBmb3Igc3VwcG9ydGluZyB0aGUgU2NhbGFibGUgVmVjdG9y
+IEV4dGVuc2lvbiAoU1ZFKQppbiBndWVzdHMuCgpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8
+RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KCi0tLQoKQ2hhbmdlcyBzaW5jZSB2NToKCiAqIERvY3VtZW50
+IEtWTV9BUk1fVkNQVV9GSU5BTElaRSBhbmQgaXRzIGludGVyYWN0aW9ucyB3aXRoIFNWRS4KLS0t
+CiBEb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQgfCAxMzIgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCAxMjkgaW5zZXJ0aW9ucygr
+KSwgMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3Zt
+L2FwaS50eHQgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQKaW5kZXggY2Q5MjBk
+ZC4uNjg1MDlkZSAxMDA2NDQKLS0tIGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0
+CisrKyBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dApAQCAtMTg3Myw2ICsxODcz
+LDcgQEAgUGFyYW1ldGVyczogc3RydWN0IGt2bV9vbmVfcmVnIChpbikKIFJldHVybnM6IDAgb24g
+c3VjY2VzcywgbmVnYXRpdmUgdmFsdWUgb24gZmFpbHVyZQogRXJyb3JzOgogIMKgRU5PRU5UOiDC
+oMKgbm8gc3VjaCByZWdpc3RlcgorIMKgRVBFUk06IMKgwqDCoHJlZ2lzdGVyIGFjY2VzcyBmb3Ji
+aWRkZW4gZm9yIGFyY2hpdGVjdHVyZS1kZXBlbmRlbnQgcmVhc29ucwogIMKgRUlOVkFMOiDCoMKg
+b3RoZXIgZXJyb3JzLCBzdWNoIGFzIGJhZCBzaXplIGVuY29kaW5nIGZvciBhIGtub3duIHJlZ2lz
+dGVyCiAKIHN0cnVjdCBrdm1fb25lX3JlZyB7CkBAIC0yMTI3LDEzICsyMTI4LDIwIEBAIFNwZWNp
+ZmljYWxseToKICAgMHg2MDMwIDAwMDAgMDAxMCAwMDRjIFNQU1JfVU5EICAgIDY0ICBzcHNyW0tW
+TV9TUFNSX1VORF0KICAgMHg2MDMwIDAwMDAgMDAxMCAwMDRlIFNQU1JfSVJRICAgIDY0ICBzcHNy
+W0tWTV9TUFNSX0lSUV0KICAgMHg2MDYwIDAwMDAgMDAxMCAwMDUwIFNQU1JfRklRICAgIDY0ICBz
+cHNyW0tWTV9TUFNSX0ZJUV0KLSAgMHg2MDQwIDAwMDAgMDAxMCAwMDU0IFYwICAgICAgICAgMTI4
+ICBmcF9yZWdzLnZyZWdzWzBdCi0gIDB4NjA0MCAwMDAwIDAwMTAgMDA1OCBWMSAgICAgICAgIDEy
+OCAgZnBfcmVncy52cmVnc1sxXQorICAweDYwNDAgMDAwMCAwMDEwIDAwNTQgVjAgICAgICAgICAx
+MjggIGZwX3JlZ3MudnJlZ3NbMF0gICAgKCopCisgIDB4NjA0MCAwMDAwIDAwMTAgMDA1OCBWMSAg
+ICAgICAgIDEyOCAgZnBfcmVncy52cmVnc1sxXSAgICAoKikKICAgICAuLi4KLSAgMHg2MDQwIDAw
+MDAgMDAxMCAwMGQwIFYzMSAgICAgICAgMTI4ICBmcF9yZWdzLnZyZWdzWzMxXQorICAweDYwNDAg
+MDAwMCAwMDEwIDAwZDAgVjMxICAgICAgICAxMjggIGZwX3JlZ3MudnJlZ3NbMzFdICAgKCopCiAg
+IDB4NjAyMCAwMDAwIDAwMTAgMDBkNCBGUFNSICAgICAgICAzMiAgZnBfcmVncy5mcHNyCiAgIDB4
+NjAyMCAwMDAwIDAwMTAgMDBkNSBGUENSICAgICAgICAzMiAgZnBfcmVncy5mcGNyCiAKKygqKSBU
+aGVzZSBlbmNvZGluZ3MgYXJlIG5vdCBhY2NlcHRlZCBmb3IgU1ZFLWVuYWJsZWQgdmNwdXMuICBT
+ZWUKKyAgICBLVk1fQVJNX1ZDUFVfSU5JVC4KKworICAgIFRoZSBlcXVpdmFsZW50IHJlZ2lzdGVy
+IGNvbnRlbnQgY2FuIGJlIGFjY2Vzc2VkIHZpYSBiaXRzIFsxMjc6MF0gb2YKKyAgICB0aGUgY29y
+cmVzcG9uZGluZyBTVkUgWm4gcmVnaXN0ZXJzIGluc3RlYWQgZm9yIHZjcHVzIHRoYXQgaGF2ZSBT
+VkUKKyAgICBlbmFibGVkIChzZWUgYmVsb3cpLgorCiBhcm02NCBDQ1NJRFIgcmVnaXN0ZXJzIGFy
+ZSBkZW11bHRpcGxleGVkIGJ5IENTU0VMUiB2YWx1ZToKICAgMHg2MDIwIDAwMDAgMDAxMSAwMCA8
+Y3NzZWxyOjg+CiAKQEAgLTIxNDMsNiArMjE1MSw2MSBAQCBhcm02NCBzeXN0ZW0gcmVnaXN0ZXJz
+IGhhdmUgdGhlIGZvbGxvd2luZyBpZCBiaXQgcGF0dGVybnM6CiBhcm02NCBmaXJtd2FyZSBwc2V1
+ZG8tcmVnaXN0ZXJzIGhhdmUgdGhlIGZvbGxvd2luZyBiaXQgcGF0dGVybjoKICAgMHg2MDMwIDAw
+MDAgMDAxNCA8cmVnbm86MTY+CiAKK2FybTY0IFNWRSByZWdpc3RlcnMgaGF2ZSB0aGUgZm9sbG93
+aW5nIGJpdCBwYXR0ZXJuczoKKyAgMHg2MDgwIDAwMDAgMDAxNSAwMCA8bjo1PiA8c2xpY2U6NT4g
+ICBabiBiaXRzWzIwNDgqc2xpY2UgKyAyMDQ3IDogMjA0OCpzbGljZV0KKyAgMHg2MDUwIDAwMDAg
+MDAxNSAwNCA8bjo0PiA8c2xpY2U6NT4gICBQbiBiaXRzWzI1NipzbGljZSArIDI1NSA6IDI1Nipz
+bGljZV0KKyAgMHg2MDUwIDAwMDAgMDAxNSAwNjAgPHNsaWNlOjU+ICAgICAgICBGRlIgYml0c1sy
+NTYqc2xpY2UgKyAyNTUgOiAyNTYqc2xpY2VdCisgIDB4NjA2MCAwMDAwIDAwMTUgZmZmZiAgICAg
+ICAgICAgICAgICAgS1ZNX1JFR19BUk02NF9TVkVfVkxTIHBzZXVkby1yZWdpc3RlcgorCitBY2Nl
+c3MgdG8gc2xpY2VzIGJleW9uZCB0aGUgbWF4aW11bSB2ZWN0b3IgbGVuZ3RoIGNvbmZpZ3VyZWQg
+Zm9yIHRoZQordmNwdSAoaS5lLiwgd2hlcmUgMTYgKiBzbGljZSA+PSBtYXhfdnEgKCoqKSkgd2ls
+bCBmYWlsIHdpdGggRU5PRU5ULgorCitUaGVzZSByZWdpc3RlcnMgYXJlIG9ubHkgYWNjZXNzaWJs
+ZSBvbiB2Y3B1cyBmb3Igd2hpY2ggU1ZFIGlzIGVuYWJsZWQuCitTZWUgS1ZNX0FSTV9WQ1BVX0lO
+SVQgZm9yIGRldGFpbHMuCisKK0luIGFkZGl0aW9uLCBleGNlcHQgZm9yIEtWTV9SRUdfQVJNNjRf
+U1ZFX1ZMUywgdGhlc2UgcmVnaXN0ZXJzIGFyZSBub3QKK2FjY2Vzc2libGUgdW50aWwgdGhlIHZj
+cHUncyBTVkUgY29uZmlndXJhdGlvbiBoYXMgYmVlbiBmaW5hbGl6ZWQKK3VzaW5nIEtWTV9BUk1f
+VkNQVV9GSU5BTElaRShLVk1fQVJNX1ZDUFVfU1ZFKS4gIFNlZSBLVk1fQVJNX1ZDUFVfSU5JVAor
+YW5kIEtWTV9BUk1fVkNQVV9GSU5BTElaRSBmb3IgbW9yZSBpbmZvcm1hdGlvbiBhYm91dCB0aGlz
+IHByb2NlZHVyZS4KKworS1ZNX1JFR19BUk02NF9TVkVfVkxTIGlzIGEgcHNldWRvLXJlZ2lzdGVy
+IHRoYXQgYWxsb3dzIHRoZSBzZXQgb2YgdmVjdG9yCitsZW5ndGhzIHN1cHBvcnRlZCBieSB0aGUg
+dmNwdSB0byBiZSBkaXNjb3ZlcmVkIGFuZCBjb25maWd1cmVkIGJ5Cit1c2Vyc3BhY2UuICBXaGVu
+IHRyYW5zZmVycmVkIHRvIG9yIGZyb20gdXNlciBtZW1vcnkgdmlhIEtWTV9HRVRfT05FX1JFRwor
+b3IgS1ZNX1NFVF9PTkVfUkVHLCB0aGUgdmFsdWUgb2YgdGhpcyByZWdpc3RlciBpcyBvZiB0eXBl
+IF9fdTY0WzhdLCBhbmQKK2VuY29kZXMgdGhlIHNldCBvZiB2ZWN0b3IgbGVuZ3RocyBhcyBmb2xs
+b3dzOgorCitfX3U2NCB2ZWN0b3JfbGVuZ3Roc1s4XTsKKworaWYgKHZxID49IFNWRV9WUV9NSU4g
+JiYgdnEgPD0gU1ZFX1ZRX01BWCAmJgorICAgICgodmVjdG9yX2xlbmd0aHNbKHZxIC0gMSkgLyA2
+NF0gPj4gKCh2cSAtIDEpICUgNjQpKSAmIDEpKQorCS8qIFZlY3RvciBsZW5ndGggdnEgKiAxNiBi
+eXRlcyBzdXBwb3J0ZWQgKi8KK2Vsc2UKKwkvKiBWZWN0b3IgbGVuZ3RoIHZxICogMTYgYnl0ZXMg
+bm90IHN1cHBvcnRlZCAqLworCisoKiopIFRoZSBtYXhpbXVtIHZhbHVlIHZxIGZvciB3aGljaCB0
+aGUgYWJvdmUgY29uZGl0aW9uIGlzIHRydWUgaXMKK21heF92cS4gIFRoaXMgaXMgdGhlIG1heGlt
+dW0gdmVjdG9yIGxlbmd0aCBhdmFpbGFibGUgdG8gdGhlIGd1ZXN0IG9uCit0aGlzIHZjcHUsIGFu
+ZCBkZXRlcm1pbmVzIHdoaWNoIHJlZ2lzdGVyIHNsaWNlcyBhcmUgdmlzaWJsZSB0aHJvdWdoCit0
+aGlzIGlvY3RsIGludGVyZmFjZS4KKworKFNlZSBEb2N1bWVudGF0aW9uL2FybTY0L3N2ZS50eHQg
+Zm9yIGFuIGV4cGxhbmF0aW9uIG9mIHRoZSAidnEiCitub21lbmNsYXR1cmUuKQorCitLVk1fUkVH
+X0FSTTY0X1NWRV9WTFMgaXMgb25seSBhY2Nlc3NpYmxlIGFmdGVyIEtWTV9BUk1fVkNQVV9JTklU
+LgorS1ZNX0FSTV9WQ1BVX0lOSVQgaW5pdGlhbGlzZXMgaXQgdG8gdGhlIGJlc3Qgc2V0IG9mIHZl
+Y3RvciBsZW5ndGhzIHRoYXQKK3RoZSBob3N0IHN1cHBvcnRzLgorCitVc2Vyc3BhY2UgbWF5IHN1
+YnNlcXVlbnRseSBtb2RpZnkgaXQgaWYgZGVzaXJlZCB1bnRpbCB0aGUgdmNwdSdzIFNWRQorY29u
+ZmlndXJhdGlvbiBpcyBmaW5hbGl6ZWQgdXNpbmcgS1ZNX0FSTV9WQ1BVX0ZJTkFMSVpFKEtWTV9B
+Uk1fVkNQVV9TVkUpLgorCitBcGFydCBmcm9tIHNpbXBseSByZW1vdmluZyBhbGwgdmVjdG9yIGxl
+bmd0aHMgZnJvbSB0aGUgaG9zdCBzZXQgdGhhdAorZXhjZWVkIHNvbWUgdmFsdWUsIHN1cHBvcnQg
+Zm9yIGFyYml0cmFyaWx5IGNob3NlbiBzZXRzIG9mIHZlY3RvciBsZW5ndGhzCitpcyBoYXJkd2Fy
+ZS1kZXBlbmRlbnQgYW5kIG1heSBub3QgYmUgYXZhaWxhYmxlLiAgQXR0ZW1wdGluZyB0byBjb25m
+aWd1cmUKK2FuIGludmFsaWQgc2V0IG9mIHZlY3RvciBsZW5ndGhzIHZpYSBLVk1fU0VUX09ORV9S
+RUcgd2lsbCBmYWlsIHdpdGgKK0VJTlZBTC4KKworQWZ0ZXIgdGhlIHZjcHUncyBTVkUgY29uZmln
+dXJhdGlvbiBpcyBmaW5hbGl6ZWQsIGZ1cnRoZXIgYXR0ZW1wdHMgdG8KK3dyaXRlIHRoaXMgcmVn
+aXN0ZXIgd2lsbCBmYWlsIHdpdGggRVBFUk0uCisKIAogTUlQUyByZWdpc3RlcnMgYXJlIG1hcHBl
+ZCB1c2luZyB0aGUgbG93ZXIgMzIgYml0cy4gIFRoZSB1cHBlciAxNiBvZiB0aGF0IGlzCiB0aGUg
+cmVnaXN0ZXIgZ3JvdXAgdHlwZToKQEAgLTIxOTcsNiArMjI2MCw3IEBAIFBhcmFtZXRlcnM6IHN0
+cnVjdCBrdm1fb25lX3JlZyAoaW4gYW5kIG91dCkKIFJldHVybnM6IDAgb24gc3VjY2VzcywgbmVn
+YXRpdmUgdmFsdWUgb24gZmFpbHVyZQogRXJyb3JzOgogIMKgRU5PRU5UOiDCoMKgbm8gc3VjaCBy
+ZWdpc3RlcgorIMKgRVBFUk06IMKgwqDCoHJlZ2lzdGVyIGFjY2VzcyBmb3JiaWRkZW4gZm9yIGFy
+Y2hpdGVjdHVyZS1kZXBlbmRlbnQgcmVhc29ucwogIMKgRUlOVkFMOiDCoMKgb3RoZXIgZXJyb3Jz
+LCBzdWNoIGFzIGJhZCBzaXplIGVuY29kaW5nIGZvciBhIGtub3duIHJlZ2lzdGVyCiAKIFRoaXMg
+aW9jdGwgYWxsb3dzIHRvIHJlY2VpdmUgdGhlIHZhbHVlIG9mIGEgc2luZ2xlIHJlZ2lzdGVyIGlt
+cGxlbWVudGVkCkBAIC0yNjkwLDYgKzI3NTQsMzMgQEAgUG9zc2libGUgZmVhdHVyZXM6CiAJLSBL
+Vk1fQVJNX1ZDUFVfUE1VX1YzOiBFbXVsYXRlIFBNVXYzIGZvciB0aGUgQ1BVLgogCSAgRGVwZW5k
+cyBvbiBLVk1fQ0FQX0FSTV9QTVVfVjMuCiAKKwktIEtWTV9BUk1fVkNQVV9TVkU6IEVuYWJsZXMg
+U1ZFIGZvciB0aGUgQ1BVIChhcm02NCBvbmx5KS4KKwkgIERlcGVuZHMgb24gS1ZNX0NBUF9BUk1f
+U1ZFLgorCSAgUmVxdWlyZXMgS1ZNX0FSTV9WQ1BVX0ZJTkFMSVpFKEtWTV9BUk1fVkNQVV9TVkUp
+OgorCisJICAgKiBBZnRlciBLVk1fQVJNX1ZDUFVfSU5JVDoKKworCSAgICAgIC0gS1ZNX1JFR19B
+Uk02NF9TVkVfVkxTIG1heSBiZSByZWFkIHVzaW5nIEtWTV9HRVRfT05FX1JFRzogdGhlCisJICAg
+ICAgICBpbml0aWFsIHZhbHVlIG9mIHRoaXMgcHNldWRvLXJlZ2lzdGVyIGluZGljYXRlcyB0aGUg
+YmVzdCBzZXQgb2YKKwkgICAgICAgIHZlY3RvciBsZW5ndGhzIHBvc3NpYmxlIGZvciBhIHZjcHUg
+b24gdGhpcyBob3N0LgorCisJICAgKiBCZWZvcmUgS1ZNX0FSTV9WQ1BVX0ZJTkFMSVpFKEtWTV9B
+Uk1fVkNQVV9TVkUpOgorCisJICAgICAgLSBLVk1fUlVOIGFuZCBLVk1fR0VUX1JFR19MSVNUIGFy
+ZSBub3QgYXZhaWxhYmxlOworCisJICAgICAgLSBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRf
+T05FX1JFRyBjYW5ub3QgYmUgdXNlZCB0byBhY2Nlc3MKKwkgICAgICAgIHRoZSBzY2FsYWJsZSBh
+cmNoaWV0Y3R1cmFsIFNWRSByZWdpc3RlcnMKKwkgICAgICAgIEtWTV9SRUdfQVJNNjRfU1ZFX1pS
+RUcoKSwgS1ZNX1JFR19BUk02NF9TVkVfUFJFRygpIG9yCisJICAgICAgICBLVk1fUkVHX0FSTTY0
+X1NWRV9GRlI7CisKKwkgICAgICAtIEtWTV9SRUdfQVJNNjRfU1ZFX1ZMUyBtYXkgb3B0aW9uYWxs
+eSBiZSB3cml0dGVuIHVzaW5nCisJICAgICAgICBLVk1fU0VUX09ORV9SRUcsIHRvIG1vZGlmeSB0
+aGUgc2V0IG9mIHZlY3RvciBsZW5ndGhzIGF2YWlsYWJsZQorCSAgICAgICAgZm9yIHRoZSB2Y3B1
+LgorCisJICAgKiBBZnRlciBLVk1fQVJNX1ZDUFVfRklOQUxJWkUoS1ZNX0FSTV9WQ1BVX1NWRSk6
+CisKKwkgICAgICAtIHRoZSBLVk1fUkVHX0FSTTY0X1NWRV9WTFMgcHNldWRvLXJlZ2lzdGVyIGlz
+IGltbXV0YWJsZSwgYW5kIGNhbgorCSAgICAgICAgbm8gbG9uZ2VyIGJlIHdyaXR0ZW4gdXNpbmcg
+S1ZNX1NFVF9PTkVfUkVHLgogCiA0LjgzIEtWTV9BUk1fUFJFRkVSUkVEX1RBUkdFVAogCkBAIC0z
+OTA0LDYgKzM5OTUsNDEgQEAgbnVtYmVyIG9mIHZhbGlkIGVudHJpZXMgaW4gdGhlICdlbnRyaWVz
+JyBhcnJheSwgd2hpY2ggaXMgdGhlbiBmaWxsZWQuCiAnaW5kZXgnIGFuZCAnZmxhZ3MnIGZpZWxk
+cyBpbiAnc3RydWN0IGt2bV9jcHVpZF9lbnRyeTInIGFyZSBjdXJyZW50bHkgcmVzZXJ2ZWQsCiB1
+c2Vyc3BhY2Ugc2hvdWxkIG5vdCBleHBlY3QgdG8gZ2V0IGFueSBwYXJ0aWN1bGFyIHZhbHVlIHRo
+ZXJlLgogCis0LjExOSBLVk1fQVJNX1ZDUFVfRklOQUxJWkUKKworQ2FwYWJpbGl0eTogS1ZNX0NB
+UF9BUk1fU1ZFCitBcmNoaXRlY3R1cmVzOiBhcm0sIGFybTY0CitUeXBlOiB2Y3B1IGlvY3RsCitQ
+YXJhbWV0ZXJzOiBpbnQgZmVhdHVyZSAoaW4pCitSZXR1cm5zOiAwIG9uIHN1Y2Nlc3MsIC0xIG9u
+IGVycm9yCitFcnJvcnM6CisgIEVQRVJNOiAgICAgZmVhdHVyZSBub3QgZW5hYmxlZCwgbmVlZHMg
+Y29uZmlndXJhdGlvbiwgb3IgYWxyZWFkeSBmaW5hbGl6ZWQKKyAgRUlOVkFMOiAgICB1bmtub3du
+IGZlYXR1cmUKKworUmVjb2duaXNlZCB2YWx1ZXMgZm9yIGZlYXR1cmU6CisgIGFybTY0ICAgICAg
+S1ZNX0FSTV9WQ1BVX1NWRQorCitGaW5hbGl6ZXMgdGhlIGNvbmZpZ3VyYXRpb24gb2YgdGhlIHNw
+ZWNpZmllZCB2Y3B1IGZlYXR1cmUuCisKK1RoZSB2Y3B1IG11c3QgYWxyZWFkeSBoYXZlIGJlZW4g
+aW5pdGlhbGlzZWQsIGVuYWJsaW5nIHRoZSBhZmZlY3RlZCBmZWF0dXJlLCBieQorbWVhbnMgb2Yg
+YSBzdWNjZXNzZnVsIEtWTV9BUk1fVkNQVV9JTklUIGNhbGwgd2l0aCB0aGUgYXBwcm9wcmlhdGUg
+ZmxhZyBzZXQgaW4KK2ZlYXR1cmVzW10uCisKK0ZvciBhZmZlY3RlZCB2Y3B1IGZlYXR1cmVzLCB0
+aGlzIGlzIGEgbWFuZGF0b3J5IHN0ZXAgdGhhdCBtdXN0IGJlIHBlcmZvcm1lZAorYmVmb3JlIHRo
+ZSB2Y3B1IGlzIGZ1bGx5IHVzYWJsZS4KKworQmV0d2VlbiBLVk1fQVJNX1ZDUFVfSU5JVCBhbmQg
+S1ZNX0FSTV9WQ1BVX0ZJTkFMSVpFLCB0aGUgZmVhdHVyZSBtYXkgYmUKK2NvbmZpZ3VyZWQgYnkg
+dXNlIG9mIGlvY3RscyBzdWNoIGFzIEtWTV9TRVRfT05FX1JFRy4gIFRoZSBleGFjdCBjb25maWd1
+cmF0aW9uCit0aGF0IHNob3VsZCBiZSBwZXJmb3JtYW5lZCBhbmQgaG93IHRvIGRvIGl0IGFyZSBm
+ZWF0dXJlLWRlcGVuZGVudC4KKworT3RoZXIgY2FsbHMgdGhhdCBkZXBlbmQgb24gYSBwYXJ0aWN1
+bGFyIGZlYXR1cmUgYmVpbmcgZmluYWxpemVkLCBzdWNoIGFzCitLVk1fUlVOLCBLVk1fR0VUX1JF
+R19MSVNULCBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRfT05FX1JFRywgd2lsbCBmYWlsIHdp
+dGgKKy1FUEVSTSB1bmxlc3MgdGhlIGZlYXR1cmUgaGFzIGFscmVhZHkgYmVlbiBmaW5hbGl6ZWQg
+YnkgbWVhbnMgb2YgYQorS1ZNX0FSTV9WQ1BVX0ZJTkFMSVpFIGNhbGwuCisKK1NlZSBLVk1fQVJN
+X1ZDUFVfSU5JVCBmb3IgZGV0YWlscyBvZiB2Y3B1IGZlYXR1cmVzIHRoYXQgcmVxdWlyZSBmaW5h
+bGl6YXRpb24KK3VzaW5nIHRoaXMgaW9jdGwuCisKIDUuIFRoZSBrdm1fcnVuIHN0cnVjdHVyZQog
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
