@@ -1,55 +1,160 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [PATCH 1/1] KVM: arm/arm64: arch_timer: Fix TimerValue TVAL calculation in KVM
-Date: Fri, 29 Mar 2019 15:12:53 -0500
-Message-ID: <20190329201253.29164-1-wei@redhat.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: Unexpected interrupt received in Guest OS when booting after
+ "system_reset"
+Date: Sat, 30 Mar 2019 08:55:46 +0800
+Message-ID: <f9c4c211-3579-69de-37e2-d5468932e253@huawei.com>
+References: <e8ffbc4e-f7b7-14a1-7614-a3db85c9152f@huawei.com>
+ <9a6ece7e-9984-dc9e-8fa2-df9736393dd2@arm.com>
+ <9694b5f2-80bd-b85c-8fc5-bd1d917e1b33@huawei.com>
+ <2e8f8bfb-4ae2-5fc6-4022-222a8f44e1f6@huawei.com>
+ <ad743120-8d9b-57e1-ef19-657047d6ccf8@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, andre.przywara@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, wei@redhat.com
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30E1A4A424
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 20:56:02 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 49sVuPYC+y-z for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Mar 2019 20:56:00 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 907EB4A319
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Mar 2019 20:56:00 -0400 (EDT)
+In-Reply-To: <ad743120-8d9b-57e1-ef19-657047d6ccf8@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Recently the generic timer test of kvm-unit-tests failed to complete
-(stalled) when a physical timer is being used. This issue is caused
-by incorrect update of CNT_CVAL when TimerValue is being accessed,
-introduced by 'Commit 84135d3d18da ("KVM: arm/arm64: consolidate arch
-timer trap handlers")'. According to Arm ARM, the read/write behavior
-of accesses to TimeValue registers is expected to be:
 
-  * READ: TimerValue = (CompareValue – (Counter - Offset)
-  * WRITE: CompareValue = ((Counter - Offset) + Sign(TimerValue)
 
-This patch fixes the TVAL read/write code path according to the
-specification.
+On 2019/3/29 18:54, Marc Zyngier wrote:
+> On 29/03/2019 09:19, Heyi Guo wrote:
+>> Hi Marc,
+>>
+>> The patch works. I tested for 1.5 hour and 52 VM resets. There were
+>> 16 times that a virtual LPI left in the ap_list (seen by an
+>> additional printk) during reset and we never saw "Unexpected
+>> interrupt received" any more.
+>
+> Thanks for testing, much appreciated.
+>
+>> Just a minor comment: how about replacing /vcpu->arch.vgic_cpu./ with
+>> /vgic_cpu->/ in the lock/unlock code line, to reduce some words?
+> Well, as I said, the patch is wrong in other ways, so I wouldn't bother
+> with that. It only serves as a test for my theory.
+Sure, I hadn't caught the last sentence of your previous mail...
+>
+> I think I'm slowly warming up to you initial proposal to hook things
+> into the PROPBASER/PENDBASER registers, as the LPIs do have a life
+> outside of the ITS itself.
+>
+> I'll try to respin something next week.
+Thanks,
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- virt/kvm/arm/arch_timer.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Heyi
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 3417f2dbc366..d43308dc3617 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -812,7 +812,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 
- 	switch (treg) {
- 	case TIMER_REG_TVAL:
--		val = kvm_phys_timer_read() - timer->cntvoff - timer->cnt_cval;
-+		val = timer->cnt_cval - kvm_phys_timer_read() + timer->cntvoff;
- 		break;
- 
- 	case TIMER_REG_CTL:
-@@ -858,7 +858,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- {
- 	switch (treg) {
- 	case TIMER_REG_TVAL:
--		timer->cnt_cval = val - kvm_phys_timer_read() - timer->cntvoff;
-+		timer->cnt_cval = kvm_phys_timer_read() - timer->cntvoff + val;
- 		break;
- 
- 	case TIMER_REG_CTL:
--- 
-2.14.5
+>
+> Thanks,
+>
+> 	M.
+>
+>> Thanks,
+>>
+>> Heyi
+>>
+>> On 2019/3/29 9:19, Heyi Guo wrote:
+>>>
+>>> On 2019/3/29 1:18, Marc Zyngier wrote:
+>>>> [Please do not send HTML emails]
+>>> Sorry; will keep in mind next time :)
+>>>> On 28/03/2019 15:44, Heyi Guo wrote:
+>>>>> Hi Marc and Christoffer,
+>>>>>
+>>>>> When we issue "system_reset" from qemu monitor to a running VM, guest
+>>>>> Linux will occasionally get "Unexpected interrupt" after rebooting, with
+>>>>> kernel message at the bottom.
+>>>>>
+>>>>> After some investigation, we found it might be caused by the
+>>>>> preservation of virtual LPI during system reset: it seems the virtual
+>>>>> LPI remains in the ap_list during VM reset, as well as its "enabled" and
+>>>>> "pending_latch" status, and this causes the virtual LPI to be injected
+>>>>> wrongly after VCPU reboots and enables interrupt.
+>>>>>
+>>>>> We propose to clear "enabled" flag of virtual LPI when PROPBASER (or
+>>>>> GICR_CTRL) of virtual GICR is written to 0, and update virtual LPI
+>>>>> properties when GICR_CTRL.enableLPIs is set to 1 again.
+>>>>>
+>>>>> Any advice? Or did we miss something?
+>>>> We're clearly missing a trick here, but I'm not convinced of your
+>>>> approach.
+>>> To be honest, we were not fully convinced by ourselves either. I was worrying about guest switching GICR_CTRL or GICR_PROPBASER at runtime which probably causes issue for our rough approach.
+>>>
+>>>> What should happend is that the redistributors should be reset
+>>>> as well, and that this should recall any LPI that has been made pending.
+>>>> Unfortunately, we don't seem to have such code in place, which is
+>>>> embarrassing.
+>>>>
+>>>> Can you give the following, untested patch a go? It isn't right either,
+>>>> but it should have the right effect. If you confirm that it solves your
+>>>> problem, we can look at adding the right hooks...
+>>> Thanks, I'll test this and get back to you.
+>>> Heyi
+>>>
+>>>> Thanks,
+>>>>
+>>>>      M.
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>> index ab3f47745d9c..bd9a9250f323 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>> @@ -2403,8 +2403,32 @@ static int vgic_its_commit_v0(struct vgic_its *its)
+>>>>        return 0;
+>>>>    }
+>>>>    +static void vgic_nuke_pending_lpis(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +    struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>>> +    struct vgic_irq *irq, *tmp;
+>>>> +    unsigned long flags;
+>>>> +
+>>>> + raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+>>>> +
+>>>> +    list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+>>>> +        if (irq->intid >= VGIC_MIN_LPI) {
+>>>> +            list_del(&irq->ap_list);
+>>>> +            vgic_put_irq(vcpu->kvm, irq);
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> + raw_spin_unlock_irqrestore(&vcpu->arch.vgic_cpu.ap_list_lock, flags);
+>>>> +}
+>>>> +
+>>>>    static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
+>>>>    {
+>>>> +    struct kvm_vcpu *vcpu;
+>>>> +    int c;
+>>>> +
+>>>> +    kvm_for_each_vcpu(c, vcpu, kvm)
+>>>> +        vgic_nuke_pending_lpis(vcpu);
+>>>> +
+>>>>        /* We need to keep the ABI specific field values */
+>>>>        its->baser_coll_table &= ~GITS_BASER_VALID;
+>>>>        its->baser_device_table &= ~GITS_BASER_VALID;
+>>>>
+>>>
+>>>
+>>> .
+>>>
+>>
+>
