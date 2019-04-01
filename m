@@ -1,116 +1,180 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH V2] KVM: ARM: Remove pgtable page standard functions from
- stage-2 page tables
-Date: Mon, 1 Apr 2019 17:16:38 +0100
-Message-ID: <20190401161638.GB22092@fuggles.cambridge.arm.com>
-References: <3be0b7e0-2ef8-babb-88c9-d229e0fdd220@arm.com>
- <1552397145-10665-1-git-send-email-anshuman.khandual@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 5/8] KVM: arm/arm64: Enforce PTE mappings at stage2 when
+ needed
+Date: Mon, 1 Apr 2019 19:10:37 +0200
+Message-ID: <496ad70d-eaa5-c46e-ddf0-d07607522eeb@redhat.com>
+References: <20190328133608.110805-1-marc.zyngier@arm.com>
+ <20190328133608.110805-6-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1552397145-10665-1-git-send-email-anshuman.khandual@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: mark.rutland@arm.com, yuzhao@google.com, suzuki.poulose@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, julien.thierry@arm.com, christoffer.dall@arm.com, linux-mm@kvack.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32DA14A319
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Apr 2019 13:10:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xWcbXfXgRqE3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Apr 2019 13:10:44 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B9634A447
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Apr 2019 13:10:44 -0400 (EDT)
+In-Reply-To: <20190328133608.110805-6-marc.zyngier@arm.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>, Julien Grall <julien.grall@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[+KVM/ARM folks, since I can't take this without an Ack in place from them]
+Hi Suzuki,
 
-My understanding is that this patch is intended to replace patch 3/4 in
-this series:
-
-http://lists.infradead.org/pipermail/linux-arm-kernel/2019-March/638083.html
-
-On Tue, Mar 12, 2019 at 06:55:45PM +0530, Anshuman Khandual wrote:
-> ARM64 standard pgtable functions are going to use pgtable_page_[ctor|dtor]
-> or pgtable_pmd_page_[ctor|dtor] constructs. At present KVM guest stage-2
-> PUD|PMD|PTE level page tabe pages are allocated with __get_free_page()
-> via mmu_memory_cache_alloc() but released with standard pud|pmd_free() or
-> pte_free_kernel(). These will fail once they start calling into pgtable_
-> [pmd]_page_dtor() for pages which never originally went through respective
-> constructor functions. Hence convert all stage-2 page table page release
-> functions to call buddy directly while freeing pages.
+On 3/28/19 2:36 PM, Marc Zyngier wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Acked-by: Yu Zhao <yuzhao@google.com>
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> made the checks to skip huge mappings, stricter. However it introduced
+> a bug where we still use huge mappings, ignoring the flag to
+> use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
+> 
+> Also, the checks do not cover the PUD huge pages, that was
+> under review during the same period. This patch fixes both
+> the issues.
+
+I face a regression with this patch. My guest gets stuck. I am running
+on AMD Seattle. Reverting the patch makes things work again for me. I
+run with qemu. In this scenario I don't use hugepages. I use 64kB page
+size for both the host and guest.
+
+Thanks
+
+Eric
+> 
+> Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
-> Changes in V2:
+>  virt/kvm/arm/mmu.c | 43 +++++++++++++++++++++----------------------
+>  1 file changed, 21 insertions(+), 22 deletions(-)
 > 
-> - Updated stage2_pud_free() with NOP as per Suzuki
-> - s/__free_page/free_page/ in clear_stage2_pmd_entry() for uniformity
-> 
->  arch/arm/include/asm/stage2_pgtable.h   | 4 ++--
->  arch/arm64/include/asm/stage2_pgtable.h | 4 ++--
->  virt/kvm/arm/mmu.c                      | 2 +-
->  3 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-> index de2089501b8b..fed02c3b4600 100644
-> --- a/arch/arm/include/asm/stage2_pgtable.h
-> +++ b/arch/arm/include/asm/stage2_pgtable.h
-> @@ -32,14 +32,14 @@
->  #define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
->  #define stage2_pgd_populate(kvm, pgd, pud)	pgd_populate(NULL, pgd, pud)
->  #define stage2_pud_offset(kvm, pgd, address)	pud_offset(pgd, address)
-> -#define stage2_pud_free(kvm, pud)		pud_free(NULL, pud)
-> +#define stage2_pud_free(kvm, pud)		do { } while (0)
->  
->  #define stage2_pud_none(kvm, pud)		pud_none(pud)
->  #define stage2_pud_clear(kvm, pud)		pud_clear(pud)
->  #define stage2_pud_present(kvm, pud)		pud_present(pud)
->  #define stage2_pud_populate(kvm, pud, pmd)	pud_populate(NULL, pud, pmd)
->  #define stage2_pmd_offset(kvm, pud, address)	pmd_offset(pud, address)
-> -#define stage2_pmd_free(kvm, pmd)		pmd_free(NULL, pmd)
-> +#define stage2_pmd_free(kvm, pmd)		free_page((unsigned long)pmd)
->  
->  #define stage2_pud_huge(kvm, pud)		pud_huge(pud)
->  
-> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> index 5412fa40825e..915809e4ac32 100644
-> --- a/arch/arm64/include/asm/stage2_pgtable.h
-> +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> @@ -119,7 +119,7 @@ static inline pud_t *stage2_pud_offset(struct kvm *kvm,
->  static inline void stage2_pud_free(struct kvm *kvm, pud_t *pud)
->  {
->  	if (kvm_stage2_has_pud(kvm))
-> -		pud_free(NULL, pud);
-> +		free_page((unsigned long)pud);
->  }
->  
->  static inline bool stage2_pud_table_empty(struct kvm *kvm, pud_t *pudp)
-> @@ -192,7 +192,7 @@ static inline pmd_t *stage2_pmd_offset(struct kvm *kvm,
->  static inline void stage2_pmd_free(struct kvm *kvm, pmd_t *pmd)
->  {
->  	if (kvm_stage2_has_pmd(kvm))
-> -		pmd_free(NULL, pmd);
-> +		free_page((unsigned long)pmd);
->  }
->  
->  static inline bool stage2_pud_huge(struct kvm *kvm, pud_t pud)
 > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index e9d28a7ca673..cbfbdadca8a5 100644
+> index ffd7acdceac7..bcdf978c0d1d 100644
 > --- a/virt/kvm/arm/mmu.c
 > +++ b/virt/kvm/arm/mmu.c
-> @@ -191,7 +191,7 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
->  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
->  	pmd_clear(pmd);
->  	kvm_tlb_flush_vmid_ipa(kvm, addr);
-> -	pte_free_kernel(NULL, pte_table);
-> +	free_page((unsigned long)pte_table);
->  	put_page(virt_to_page(pmd));
+> @@ -1594,8 +1594,9 @@ static void kvm_send_hwpoison_signal(unsigned long address,
+>  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
 >  }
 >  
-> -- 
-> 2.20.1
+> -static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+> -					       unsigned long hva)
+> +static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+> +					       unsigned long hva,
+> +					       unsigned long map_size)
+>  {
+>  	gpa_t gpa_start;
+>  	hva_t uaddr_start, uaddr_end;
+> @@ -1610,34 +1611,34 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+>  
+>  	/*
+>  	 * Pages belonging to memslots that don't have the same alignment
+> -	 * within a PMD for userspace and IPA cannot be mapped with stage-2
+> -	 * PMD entries, because we'll end up mapping the wrong pages.
+> +	 * within a PMD/PUD for userspace and IPA cannot be mapped with stage-2
+> +	 * PMD/PUD entries, because we'll end up mapping the wrong pages.
+>  	 *
+>  	 * Consider a layout like the following:
+>  	 *
+>  	 *    memslot->userspace_addr:
+>  	 *    +-----+--------------------+--------------------+---+
+> -	 *    |abcde|fgh  Stage-1 PMD    |    Stage-1 PMD   tv|xyz|
+> +	 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
+>  	 *    +-----+--------------------+--------------------+---+
+>  	 *
+>  	 *    memslot->base_gfn << PAGE_SIZE:
+>  	 *      +---+--------------------+--------------------+-----+
+> -	 *      |abc|def  Stage-2 PMD    |    Stage-2 PMD     |tvxyz|
+> +	 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
+>  	 *      +---+--------------------+--------------------+-----+
+>  	 *
+> -	 * If we create those stage-2 PMDs, we'll end up with this incorrect
+> +	 * If we create those stage-2 blocks, we'll end up with this incorrect
+>  	 * mapping:
+>  	 *   d -> f
+>  	 *   e -> g
+>  	 *   f -> h
+>  	 */
+> -	if ((gpa_start & ~S2_PMD_MASK) != (uaddr_start & ~S2_PMD_MASK))
+> +	if ((gpa_start & (map_size - 1)) != (uaddr_start & (map_size - 1)))
+>  		return false;
+>  
+>  	/*
+>  	 * Next, let's make sure we're not trying to map anything not covered
+> -	 * by the memslot. This means we have to prohibit PMD size mappings
+> -	 * for the beginning and end of a non-PMD aligned and non-PMD sized
+> +	 * by the memslot. This means we have to prohibit block size mappings
+> +	 * for the beginning and end of a non-block aligned and non-block sized
+>  	 * memory slot (illustrated by the head and tail parts of the
+>  	 * userspace view above containing pages 'abcde' and 'xyz',
+>  	 * respectively).
+> @@ -1646,8 +1647,8 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+>  	 * userspace_addr or the base_gfn, as both are equally aligned (per
+>  	 * the check above) and equally sized.
+>  	 */
+> -	return (hva & S2_PMD_MASK) >= uaddr_start &&
+> -	       (hva & S2_PMD_MASK) + S2_PMD_SIZE <= uaddr_end;
+> +	return (hva & ~(map_size - 1)) >= uaddr_start &&
+> +	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
+>  }
+>  
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> @@ -1676,12 +1677,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	if (!fault_supports_stage2_pmd_mappings(memslot, hva))
+> -		force_pte = true;
+> -
+> -	if (logging_active)
+> -		force_pte = true;
+> -
+>  	/* Let's check if we will get back a huge page backed by hugetlbfs */
+>  	down_read(&current->mm->mmap_sem);
+>  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> @@ -1692,6 +1687,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	}
+>  
+>  	vma_pagesize = vma_kernel_pagesize(vma);
+> +	if (logging_active ||
+> +	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+> +		force_pte = true;
+> +		vma_pagesize = PAGE_SIZE;
+> +	}
+> +
+>  	/*
+>  	 * The stage2 has a minimum of 2 level table (For arm64 see
+>  	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+> @@ -1699,11 +1700,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * As for PUD huge maps, we must make sure that we have at least
+>  	 * 3 levels, i.e, PMD is not folded.
+>  	 */
+> -	if ((vma_pagesize == PMD_SIZE ||
+> -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
+> -	    !force_pte) {
+> +	if (vma_pagesize == PMD_SIZE ||
+> +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+>  		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+> -	}
+>  	up_read(&current->mm->mmap_sem);
+>  
+>  	/* We need minimum second+third level pages */
 > 
