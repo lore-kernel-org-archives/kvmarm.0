@@ -1,97 +1,89 @@
-From: Dave P Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 16/27] KVM: arm64: Factor out core register ID
- enumeration
-Date: Tue, 2 Apr 2019 09:54:19 +0000
-Message-ID: <20190402095416.GV27348@e103592.cambridge.arm.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-17-git-send-email-Dave.Martin@arm.com>
- <86ftr15dsb.wl-marc.zyngier@arm.com>
- <20190402085917.GF3567@e103592.cambridge.arm.com>
- <865zrw69cd.wl-marc.zyngier@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 5/8] KVM: arm/arm64: Enforce PTE mappings at stage2 when
+ needed
+Date: Tue, 2 Apr 2019 12:07:28 +0200
+Message-ID: <fd6fb49e-5f46-1f0c-c849-f328c7540059@redhat.com>
+References: <20190328133608.110805-1-marc.zyngier@arm.com>
+ <20190328133608.110805-6-marc.zyngier@arm.com>
+ <496ad70d-eaa5-c46e-ddf0-d07607522eeb@redhat.com>
+ <20190402094716.GA1082@en101>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5FEF4A41A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:54:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tzANOKCaFjk4 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Apr 2019 05:54:22 -0400 (EDT)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com
- (mail-eopbgr80042.outbound.protection.outlook.com [40.107.8.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C5B74A34E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:54:22 -0400 (EDT)
-In-Reply-To: <865zrw69cd.wl-marc.zyngier@arm.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20190402094716.GA1082@en101>
 Content-Language: en-US
-Content-ID: <8759304C539B454A91AEFAC038DC002C@eurprd08.prod.outlook.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <Marc.Zyngier@arm.com>
-Cc: "tokamoto@jp.fujitsu.com" <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <Julien.Grall@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Cc: kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Julien Thierry <julien.thierry@arm.com>, YueHaibing <yuehaibing@huawei.com>, Zheng Xiang <zhengxiang9@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, Julien Grall <julien.grall@arm.com>, James Morse <james.morse@arm.com>, Nianyao Tang <tangnianyao@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 02, 2019 at 10:32:34AM +0100, Marc Zyngier wrote:
-> On Tue, 02 Apr 2019 09:59:19 +0100,
-> Dave Martin <Dave.Martin@arm.com> wrote:
-> >
-> > On Tue, Apr 02, 2019 at 03:41:56AM +0100, Marc Zyngier wrote:
+Hi Suzuki,
 
-[...]
+On 4/2/19 11:47 AM, Suzuki K Poulose wrote:
+> On Mon, Apr 01, 2019 at 07:10:37PM +0200, Auger Eric wrote:
+>> Hi Suzuki,
+>>
+>> On 3/28/19 2:36 PM, Marc Zyngier wrote:
+>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>> commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+>>> made the checks to skip huge mappings, stricter. However it introduced
+>>> a bug where we still use huge mappings, ignoring the flag to
+>>> use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
+>>>
+>>> Also, the checks do not cover the PUD huge pages, that was
+>>> under review during the same period. This patch fixes both
+>>> the issues.
+>>
+>> I face a regression with this patch. My guest gets stuck. I am running
+>> on AMD Seattle. Reverting the patch makes things work again for me. I
+>> run with qemu. In this scenario I don't use hugepages. I use 64kB page
+>> size for both the host and guest.
+> 
+> Hi Eric,
+> 
+> Thanks for the testing. Does the following patch fix the issue for you ?
 
-> > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > index 086ab0508d69..4f7b26bbf671 100644
-> > > --- a/arch/arm64/kvm/guest.c
-> > > +++ b/arch/arm64/kvm/guest.c
-> > > @@ -604,22 +604,22 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+Yes it does.
 
-[...]
+Thanks
 
-> > >  ret = kvm_arm_copy_fw_reg_indices(vcpu, uindices);
-> > > -if (ret)
-> > > +if (ret < 0)
-> > >  return ret;
-> > >  uindices += kvm_arm_get_fw_num_regs(vcpu);
-> > >
-> > >  ret = copy_timer_indices(vcpu, uindices);
-> > > -if (ret)
-> > > +if (ret < 0)
-> > >  return ret;
-> > >  uindices += NUM_TIMER_REGS;
-> >
-> > For these two, the interface is not really the same.  These don't
-> > return the number of registers, so return 0 on success.  "< 0" here
-> > could be a trap for the future, though the risk looks low.
->
-> I realised that, but since they all return a negative value on error,
-> I went for a similar error handling.
-
-Sure, this is more potential future maintenance thing -- and anyway not
-a big deal.
-
-I agree that your changes look like they work.
-
-> > I can have a go at some rework on top to make this more consistent,
-> > but I'd rather not muddy the water further for the moment.
-> >
-> > Any view on that?
->
-> I don't think there is any urgency on that front. For now, I'd like to
-> make sure things do not regress. Once we're sure we have something
-> stable, we'll be able to make it shiny.
-
-Agreed.
-
-I won't worry about this for now, but we can discuss it later.
-
-Cheers
----Dave
-IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+Eric
+> 
+> 
+> ---8>---
+> kvm: arm: Skip transparent huge pages in unaligned memslots
+> 
+> We silently create stage2 huge mappings for a memslot with
+> unaligned IPA and user address.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  virt/kvm/arm/mmu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 27c9583..4a22f5b 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1412,7 +1412,9 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+>  		 * page accordingly.
+>  		 */
+>  		mask = PTRS_PER_PMD - 1;
+> -		VM_BUG_ON((gfn & mask) != (pfn & mask));
+> +		/* Skip memslots with unaligned IPA and user address */
+> +		if ((gfn & mask) != (pfn & mask))
+> +			return false;
+>  		if (pfn & mask) {
+>  			*ipap &= PMD_MASK;
+>  			kvm_release_pfn_clean(pfn);
+> 
