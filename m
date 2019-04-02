@@ -1,73 +1,73 @@
-From: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-Date: Tue, 2 Apr 2019 16:53:07 +0100
-Message-ID: <20190402155307.GE53702@e119886-lin.cambridge.arm.com>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH kvmtool v3 0/3] vfio-pci: Support INTx mode re-enabling
+Date: Tue, 2 Apr 2019 17:50:25 +0100
+Message-ID: <20190402165025.GA1442@fuggles.cambridge.arm.com>
+References: <20190326074131.4284-1-leo.yan@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 813894A3B2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 12:50:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2GOJ24Bs+xxy for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Apr 2019 12:50:32 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44F274A34E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 12:50:32 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190326074131.4284-1-leo.yan@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Leo Yan <leo.yan@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 02, 2019 at 12:06:16PM +0100, Suzuki K Poulose wrote:
-> With commit a80868f398554842b14, we no longer ensure that the
-> THP page is properly aligned in the guest IPA. Skip the stage2
-> huge mapping for unaligned IPA backed by transparent hugepages.
+Hi Leo,
+
+On Tue, Mar 26, 2019 at 03:41:28PM +0800, Leo Yan wrote:
+> When enable vfio-pci mode for NIC driver on Juno board, the IRQ is
+> failed to forward properly from host to guest, finally root caused this
+> issue is related with kvmtool cannot re-enable INTx mode properly.
 > 
-> Fixes: a80868f398554842b14 ("KVM: arm/arm64: Enforce PTE mappings at stage2 when needed")
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Chirstoffer Dall <christoffer.dall@arm.com>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: Zheng Xiang <zhengxiang9@huawei.com>
-> Tested-by: Eric Auger <eric.auger@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  virt/kvm/arm/mmu.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> So the basic working flow to reproduce this issue is as below:
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 27c9583..4a22f5b 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1412,7 +1412,9 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
->  		 * page accordingly.
->  		 */
->  		mask = PTRS_PER_PMD - 1;
-> -		VM_BUG_ON((gfn & mask) != (pfn & mask));
-> +		/* Skip memslots with unaligned IPA and user address */
-> +		if ((gfn & mask) != (pfn & mask))
-> +			return false;
->  		if (pfn & mask) {
->  			*ipap &= PMD_MASK;
->  			kvm_release_pfn_clean(pfn);
-> -- 
-> 2.7.4
+>     Host             Guest
+> -------------  --------------------
+>   INTx mode
+>                  MSI enable failed in NIC driver
+>                  MSI disable in NIC driver
+>                  Switch back to INTx mode --> kvmtool doesn't support
+> 
+> So this patch is to support INTx mode re-enabling; patch 0001 is one
+> minor fixing up for eventfd releasing; patch 0002 introduces a new
+> function vfio_pci_init_intx() which is used to finish INTx one-time
+> initialisation; patch 0003 is the core patch for support INTx mode
+> re-enabling, when kvmtool detects MSI is disabled it rollbacks to INTx
+> mode.
+> 
+> This patch set has been tested on Juno-r2 board.
+> 
+> == Changes for V3 ==
+> * Add new function vfio_pci_init_intx() for one-time initialisation.
+> * Simplized INTx re-enabling (don't change irq_line anymore at the
+>   runtime).
 
-I was able to reproduce this issue on v5.1-rc3 on a SoftIron Overdrive 1000
-(AMD Seattle (Rev.B1)) with defconfig+ARM64_64K_PAGES with:
+Just checking, but is this series intended to supersede this one:
 
-qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -nographic -smp 4
--m 4096 -kernel /boot/vmlinuz-4.9.0-7-arm64 --append "console=ttyAMA0
-default_hugepagesz=2M hugepages=256"
+https://www.spinics.net/lists/kvm/msg183750.html
 
-The 'default_hugepagesz=2M hugepages=256' had no effect on the reproducibility,
-however the guest only intermittently failed to boot. Applying the above
-patch fixed this and the guest boots every time.
-
-Tested-by: Andrew Murray <andrew.murray@arm.com>
+?
 
 Thanks,
 
-Andrew Murray
-
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Will
