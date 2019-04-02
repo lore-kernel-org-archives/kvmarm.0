@@ -1,200 +1,138 @@
 From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: [PATCH v8 0/9] Add ARMv8.3 pointer authentication for kvm guest
-Date: Tue,  2 Apr 2019 07:57:08 +0530
-Message-ID: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH v8 1/9] KVM: arm64: Propagate vcpu into read_id_reg()
+Date: Tue,  2 Apr 2019 07:57:09 +0530
+Message-ID: <1554172037-4516-2-git-send-email-amit.kachhap@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C0B4A46E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Apr 2019 22:27:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ifma-v7pj4q3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Apr 2019 22:27:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FBCE4A36C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Apr 2019 22:27:40 -0400 (EDT)
+In-Reply-To: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+From: Dave Martin <Dave.Martin@arm.com>
 
-This patch series adds pointer authentication support for KVM guest and
-is based on top of Linux 5.1-rc3. The basic patches in this series was
-originally posted by Mark Rutland earlier[1,2] and contains some history
-of this work.
+Architecture features that are conditionally visible to the guest
+will require run-time checks in the ID register accessor functions.
+In particular, read_id_reg() will need to perform checks in order
+to generate the correct emulated value for certain ID register
+fields such as ID_AA64PFR0_EL1.SVE for example.
 
-Extension Overview:
-=============================================
+This patch propagates vcpu into read_id_reg() so that future
+patches can add run-time checks on the guest configuration here.
 
-The ARMv8.3 pointer authentication extension adds functionality to detect
-modification of pointer values, mitigating certain classes of attack such as
-stack smashing, and making return oriented programming attacks harder.
+For now, there is no functional change.
 
-The extension introduces the concept of a pointer authentication code (PAC),
-which is stored in some upper bits of pointers. Each PAC is derived from the
-original pointer, another 64-bit value (e.g. the stack pointer), and a secret
-128-bit key.
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+---
+ arch/arm64/kvm/sys_regs.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-New instructions are added which can be used to:
-
-* Insert a PAC into a pointer
-* Strip a PAC from a pointer
-* Authenticate and strip a PAC from a pointer
-
-The detailed description of ARMv8.3 pointer authentication support in
-userspace/kernel and can be found in Kristina's generic pointer authentication
-patch series[3].
-
-KVM guest work:
-==============================================
-
-If pointer authentication is enabled for KVM guests then the new PAC instructions
-will not trap to EL2. If not then they may be ignored if in HINT region or trapped
-in EL2 as illegal instruction. Since KVM guest vcpu runs as a thread so they have
-a key initialized which will be used by PAC. When world switch happens between
-host and guest then this key is exchanged.
-
-The current v8 patch series contains review comments and suggestions by James
-Morse, Kristina Martsenko, Julien Thierry and Dave Martin.
-
-The first two patch is cherry picked from Dave Martin [10, 11] v6 series which adds
-SVE support for KVM guest. 
-
-Changes since v7 [9]: Major changes are listed below and detail changes are in
-		      each patch.
- * Comments and Documentation updated to reflect using address/generic
-   features flag together.
- * Dropped the documentation patch and added those details in the relevant
-   patches.
- * Rebased the patch series on 2 patches of Dave Martin v6 SVE series. 
- * Small bug fixes.
-
-Changes since v6 [8]: Major changes are listed below.
-
-* Pointer authentication key switch entirely in assembly now.
-* isb instruction added after Key switched to host.
-* Use __hyp_this_cpu_ptr for both VHE and nVHE mode.
-* 2 separate flags for address and generic authentication.
-* kvm_arm_vcpu_ptrauth_allowed renamed to has_vcpu_ptrauth.
-* kvm_arm_vcpu_ptrauth_reset renamed to kvm_arm_vcpu_ptrauth_setup_lazy.
-* Save of host Key registers now done in ptrauth instruction trap.
-* A fix to add kern_hyp_va to get correct host_ctxt pointer in nVHE mode.
-* Patches re-structured to better reflect ABI change.
-
-Changes since v5 [7]: Major changes are listed below.
-
-* Split hcr_el2 and mdcr_el2 save/restore in two patches.
-* Reverted back save/restore of sys-reg keys as done in V4 [5]. There was
-  suggestion by James Morse to use ptrauth utilities in a single place
-  in arm core and use them from kvm. However this change deviates from the
-  existing sys-reg implementations and is not scalable.
-* Invoked the key switch C functions from __guest_enter/__guest_exit assembly.
-* Host key save is now done inside vcpu_load.
-* Reverted back masking of cpufeature ID registers for ptrauth when disabled
-  from userpace.
-* Reset of ptrauth key registers not done conditionally.
-* Code and Documentation cleanup.
-
-Changes since v4 [6]: Several suggestions from James Morse
-* Move host registers to be saved/restored inside struct kvm_cpu_context.
-* Similar to hcr_el2, save/restore mdcr_el2 register also.
-* Added save routines for ptrauth keys in generic arm core and
-  use them during KVM context switch.
-* Defined a GCC attribute __no_ptrauth which discards generating
-  ptrauth instructions in a function. This is taken from Kristina's
-  earlier kernel pointer authentication support patches [4].
-* Dropped a patch to mask cpufeature when not enabled from userspace and
-  now only key registers are masked from register list.
-
-Changes since v3 [5]:
-* Use pointer authentication only when VHE is present as ARM8.3 implies ARM8.1
-  features to be present.
-* Added lazy context handling of ptrauth instructions from V2 version again. 
-* Added more details in Documentation.
-
-Changes since v2 [1,2]:
-* Allow host and guest to have different HCR_EL2 settings and not just constant
-  value HCR_HOST_VHE_FLAGS or HCR_HOST_NVHE_FLAGS.
-* Optimise the reading of HCR_EL2 in host/guest switch by fetching it once
-  during KVM initialisation state and using it later.
-* Context switch pointer authentication keys when switching between guest
-  and host. Pointer authentication was enabled in a lazy context earlier[2] and
-  is removed now to make it simple. However it can be revisited later if there
-  is significant performance issue.
-* Added a userspace option to choose pointer authentication.
-* Based on the userspace option, ptrauth cpufeature will be visible.
-* Based on the userspace option, ptrauth key registers will be accessible.
-* A small document is added on how to enable pointer authentication from
-  userspace KVM API.
-
-Looking for feedback and comments.
-
-Thanks,
-Amit
-
-[1]: https://lore.kernel.org/lkml/20171127163806.31435-11-mark.rutland@arm.com/
-[2]: https://lore.kernel.org/lkml/20171127163806.31435-10-mark.rutland@arm.com/
-[3]: https://lkml.org/lkml/2018/12/7/666
-[4]: https://lore.kernel.org/lkml/20181005084754.20950-1-kristina.martsenko@arm.com/
-[5]: https://lkml.org/lkml/2018/10/17/594
-[6]: https://lkml.org/lkml/2018/12/18/80
-[7]: https://lkml.org/lkml/2019/1/28/49
-[8]: https://lkml.org/lkml/2019/2/19/190 
-[9]: https://lkml.org/lkml/2019/3/19/125 
-[10]: https://patchwork.kernel.org/patch/10860139/
-[11]: https://patchwork.kernel.org/patch/10860141/
-
-Linux (5.1-rc3 based):
-
-Amit Daniel Kachhap (4):
-  KVM: arm64: Move hyp_symbol_addr to fix dependency
-  KVM: arm/arm64: preserve host MDCR_EL2 value
-  KVM: arm64: Add vcpu feature flags to control ptrauth accessibility
-  KVM: arm64: Add capability to advertise ptrauth for guest
-
-Dave Martin (2):
-  KVM: arm64: Propagate vcpu into read_id_reg()
-  KVM: arm64: Support runtime sysreg visibility filtering
-
-Mark Rutland (2):
-  KVM: arm/arm64: preserve host HCR_EL2 value
-  KVM: arm/arm64: context-switch ptrauth registers
-
- Documentation/arm64/pointer-authentication.txt |  19 ++++-
- Documentation/virtual/kvm/api.txt              |   7 ++
- arch/arm/include/asm/kvm_host.h                |   4 +-
- arch/arm64/Kconfig                             |   5 +-
- arch/arm64/include/asm/kvm_asm.h               |  22 ++++-
- arch/arm64/include/asm/kvm_emulate.h           |  24 +++---
- arch/arm64/include/asm/kvm_host.h              |  46 +++++++++--
- arch/arm64/include/asm/kvm_hyp.h               |   2 +-
- arch/arm64/include/asm/kvm_mmu.h               |  20 -----
- arch/arm64/include/asm/kvm_ptrauth_asm.h       | 106 +++++++++++++++++++++++++
- arch/arm64/include/uapi/asm/kvm.h              |   2 +
- arch/arm64/kernel/asm-offsets.c                |   6 ++
- arch/arm64/kvm/debug.c                         |  28 ++-----
- arch/arm64/kvm/guest.c                         |  16 +++-
- arch/arm64/kvm/handle_exit.c                   |  24 ++++--
- arch/arm64/kvm/hyp/debug-sr.c                  |   5 --
- arch/arm64/kvm/hyp/entry.S                     |   7 ++
- arch/arm64/kvm/hyp/switch.c                    |  40 +++++-----
- arch/arm64/kvm/hyp/sysreg-sr.c                 |  22 ++++-
- arch/arm64/kvm/hyp/tlb.c                       |   6 +-
- arch/arm64/kvm/reset.c                         |  13 +++
- arch/arm64/kvm/sys_regs.c                      |  93 ++++++++++++++++++----
- arch/arm64/kvm/sys_regs.h                      |  25 ++++++
- include/uapi/linux/kvm.h                       |   2 +
- virt/kvm/arm/arm.c                             |   4 +-
- 25 files changed, 424 insertions(+), 124 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_ptrauth_asm.h
-
-kvmtool:
-
-Repo: git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
-
-Amit Daniel Kachhap (1):
-  KVM: arm/arm64: Add a vcpu feature for pointer authentication
-
- arm/aarch32/include/kvm/kvm-cpu-arch.h    | 1 +
- arm/aarch64/include/asm/kvm.h             | 2 ++
- arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    | 2 ++
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- arm/kvm-cpu.c                             | 7 +++++++
- include/linux/kvm.h                       | 2 ++
- 7 files changed, 18 insertions(+), 1 deletion(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 539feec..a5d14b5 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1044,7 +1044,8 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ }
+ 
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+-static u64 read_id_reg(struct sys_reg_desc const *r, bool raz)
++static u64 read_id_reg(const struct kvm_vcpu *vcpu,
++		struct sys_reg_desc const *r, bool raz)
+ {
+ 	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+ 			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+@@ -1078,7 +1079,7 @@ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+ 	if (p->is_write)
+ 		return write_to_read_only(vcpu, p, r);
+ 
+-	p->regval = read_id_reg(r, raz);
++	p->regval = read_id_reg(vcpu, r, raz);
+ 	return true;
+ }
+ 
+@@ -1107,16 +1108,18 @@ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+  * are stored, and for set_id_reg() we don't allow the effective value
+  * to be changed.
+  */
+-static int __get_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++static int __get_id_reg(const struct kvm_vcpu *vcpu,
++			const struct sys_reg_desc *rd, void __user *uaddr,
+ 			bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+-	const u64 val = read_id_reg(rd, raz);
++	const u64 val = read_id_reg(vcpu, rd, raz);
+ 
+ 	return reg_to_user(uaddr, &val, id);
+ }
+ 
+-static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
++static int __set_id_reg(const struct kvm_vcpu *vcpu,
++			const struct sys_reg_desc *rd, void __user *uaddr,
+ 			bool raz)
+ {
+ 	const u64 id = sys_reg_to_index(rd);
+@@ -1128,7 +1131,7 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ 		return err;
+ 
+ 	/* This is what we mean by invariant: you can't change it. */
+-	if (val != read_id_reg(rd, raz))
++	if (val != read_id_reg(vcpu, rd, raz))
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -1137,25 +1140,25 @@ static int __set_id_reg(const struct sys_reg_desc *rd, void __user *uaddr,
+ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, false);
++	return __get_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, false);
++	return __set_id_reg(vcpu, rd, uaddr, false);
+ }
+ 
+ static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __get_id_reg(rd, uaddr, true);
++	return __get_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			  const struct kvm_one_reg *reg, void __user *uaddr)
+ {
+-	return __set_id_reg(rd, uaddr, true);
++	return __set_id_reg(vcpu, rd, uaddr, true);
+ }
+ 
+ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 -- 
 2.7.4
