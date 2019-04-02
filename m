@@ -1,26 +1,27 @@
-From: Heyi Guo <guoheyi@huawei.com>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic-v3: Retire pending interrupts on
- disabling LPIs
-Date: Tue, 2 Apr 2019 17:32:42 +0800
-Message-ID: <ef66bdd3-1e5f-e898-3850-a325ed6a4a69@huawei.com>
-References: <20190402072431.29389-1-marc.zyngier@arm.com>
- <6ccb354f-9482-a7eb-46aa-53bf79b67299@redhat.com>
- <867ecc6bdh.wl-marc.zyngier@arm.com>
+From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 5/8] KVM: arm/arm64: Enforce PTE mappings at stage2 when
+ needed
+Date: Tue, 2 Apr 2019 10:47:16 +0100
+Message-ID: <20190402094716.GA1082@en101>
+References: <20190328133608.110805-1-marc.zyngier@arm.com>
+ <20190328133608.110805-6-marc.zyngier@arm.com>
+ <496ad70d-eaa5-c46e-ddf0-d07607522eeb@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBD294A41A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:32:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7252A4A41A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:47:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 58Y12EKRBuIF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Apr 2019 05:32:51 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BF774A3BB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:32:51 -0400 (EDT)
-In-Reply-To: <867ecc6bdh.wl-marc.zyngier@arm.com>
+ with ESMTP id U888bFrnBSEK for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Apr 2019 05:47:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C36934A34E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Apr 2019 05:47:27 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <496ad70d-eaa5-c46e-ddf0-d07607522eeb@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,139 +31,192 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Auger Eric <eric.auger@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, Andre Przywara <Andre.Przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Auger Eric <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, YueHaibing <yuehaibing@huawei.com>, Julien Grall <julien.grall@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Thanks, I'll use this one for test.
+On Mon, Apr 01, 2019 at 07:10:37PM +0200, Auger Eric wrote:
+> Hi Suzuki,
+> 
+> On 3/28/19 2:36 PM, Marc Zyngier wrote:
+> > From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > 
+> > commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> > made the checks to skip huge mappings, stricter. However it introduced
+> > a bug where we still use huge mappings, ignoring the flag to
+> > use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
+> > 
+> > Also, the checks do not cover the PUD huge pages, that was
+> > under review during the same period. This patch fixes both
+> > the issues.
+> 
+> I face a regression with this patch. My guest gets stuck. I am running
+> on AMD Seattle. Reverting the patch makes things work again for me. I
+> run with qemu. In this scenario I don't use hugepages. I use 64kB page
+> size for both the host and guest.
 
-Heyi
+Hi Eric,
+
+Thanks for the testing. Does the following patch fix the issue for you ?
 
 
-On 2019/4/2 16:48, Marc Zyngier wrote:
-> On Tue, 02 Apr 2019 09:22:29 +0100,
-> Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Marc,
->>
->> On 4/2/19 9:24 AM, Marc Zyngier wrote:
->>> When disabling LPIs (for example on reset) at the redistributor
->>> level, it is expected that LPIs that was pending in the CPU
->>> interface are eventually retired.
->>>
->>> Currently, this is not what is happening, and these LPIs will
->>> stay in the ap_list, eventually being acknowledged by the vcpu
->>> (which didn't quite expect this behaviour).
->>>
->>> The fix is thus to retire these LPIs from the list of pending
->>> interrupts as we disable LPIs.
->>>
->>> Reported-by: Heyi Guo <guoheyi@huawei.com>
->>> Fixes: 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as a virtual MSI controller")
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>> Heyi,
->>>
->>> Can you please give this alternative patch a go on your setup?
->>> This should be a much better fit than my original hack.
->>>
->>> Thanks,
->>>
->>>          M.
->>>
->>>   virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +++
->>>   virt/kvm/arm/vgic/vgic.c         | 24 ++++++++++++++++++++++++
->>>   virt/kvm/arm/vgic/vgic.h         |  1 +
->>>   3 files changed, 28 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> index 4a12322bf7df..9f4843fe9cda 100644
->>> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->>> @@ -200,6 +200,9 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
->>>   
->>>   	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
->>>   
->>> +	if (was_enabled && !vgic_cpu->lpis_enabled)
->>> +		vgic_flush_pending_lpis(vcpu);
->>> +
->>>   	if (!was_enabled && vgic_cpu->lpis_enabled)
->>>   		vgic_enable_lpis(vcpu);
->>>   }
->>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>> index 3af69f2a3866..3f429cf2f694 100644
->>> --- a/virt/kvm/arm/vgic/vgic.c
->>> +++ b/virt/kvm/arm/vgic/vgic.c
->>> @@ -151,6 +151,30 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->>>   	kfree(irq);
->>>   }
->>>   
->>> +void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->>> +	struct vgic_irq *irq, *tmp;
->>> +	unsigned long flags;
->>> +
->>> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
->> Do you need to hold the lpi_list_lock here as it is taken in vgic_put_irq.
-> You're right, this is absolutely silly, as it violates the rules at
-> the top of this very file. Don't write that kind of patches while
-> being severely jet-lagged. It should be better with this on top.
->
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 3f429cf2f694..191deccf60bf 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -153,13 +153,11 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->   
->   void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
->   {
-> -	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->   	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->   	struct vgic_irq *irq, *tmp;
->   	unsigned long flags;
->   
-> -	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-> -	raw_spin_lock(&vgic_cpu->ap_list_lock);
-> +	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
->   
->   	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
->   		if (irq->intid >= VGIC_MIN_LPI) {
-> @@ -171,8 +169,7 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
->   		}
->   	}
->   
-> -	raw_spin_unlock(&vgic_cpu->ap_list_lock);
-> -	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-> +	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
->   }
->   
->   void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
->
->
->>> +	raw_spin_lock(&vgic_cpu->ap_list_lock);
->>> +
->>> +	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
->>> +		if (irq->intid >= VGIC_MIN_LPI) {
->>> +			raw_spin_lock(&irq->irq_lock);
->>> +			list_del(&irq->ap_list);
->>> +			irq->vcpu = NULL;
->>> +			raw_spin_unlock(&irq->irq_lock);
->>> +			vgic_put_irq(vcpu->kvm, irq);
->>> +		}
->>> +	}
->>> +
->>> +	raw_spin_unlock(&vgic_cpu->ap_list_lock);
->>> +	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
->> A concern I have is how does this live with
->> vgic_v3_save_pending_tables/its_sync_lpi_pending_table ctrl flow. I need
->> to trace things.
-> It shouldn't change a thing. The only thing this patch tries to do is
-> to make sure that LPIs are not kept on the ap_list when they have been
-> turned off at the redistributor level. The pending bits are still
-> stored, and save/sync should work as expected (famous last words...).
->
-> Thanks,
->
-> 	M.
->
+---8>---
+kvm: arm: Skip transparent huge pages in unaligned memslots
+
+We silently create stage2 huge mappings for a memslot with
+unaligned IPA and user address.
+
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ virt/kvm/arm/mmu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 27c9583..4a22f5b 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -1412,7 +1412,9 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+ 		 * page accordingly.
+ 		 */
+ 		mask = PTRS_PER_PMD - 1;
+-		VM_BUG_ON((gfn & mask) != (pfn & mask));
++		/* Skip memslots with unaligned IPA and user address */
++		if ((gfn & mask) != (pfn & mask))
++			return false;
+ 		if (pfn & mask) {
+ 			*ipap &= PMD_MASK;
+ 			kvm_release_pfn_clean(pfn);
+-- 
+2.7.4
+
+
+Kind regards
+Suzuki
+
+
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> > Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> > Cc: Zenghui Yu <yuzenghui@huawei.com>
+> > Cc: Christoffer Dall <christoffer.dall@arm.com>
+> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> >  virt/kvm/arm/mmu.c | 43 +++++++++++++++++++++----------------------
+> >  1 file changed, 21 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> > index ffd7acdceac7..bcdf978c0d1d 100644
+> > --- a/virt/kvm/arm/mmu.c
+> > +++ b/virt/kvm/arm/mmu.c
+> > @@ -1594,8 +1594,9 @@ static void kvm_send_hwpoison_signal(unsigned long address,
+> >  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+> >  }
+> >  
+> > -static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+> > -					       unsigned long hva)
+> > +static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+> > +					       unsigned long hva,
+> > +					       unsigned long map_size)
+> >  {
+> >  	gpa_t gpa_start;
+> >  	hva_t uaddr_start, uaddr_end;
+> > @@ -1610,34 +1611,34 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+> >  
+> >  	/*
+> >  	 * Pages belonging to memslots that don't have the same alignment
+> > -	 * within a PMD for userspace and IPA cannot be mapped with stage-2
+> > -	 * PMD entries, because we'll end up mapping the wrong pages.
+> > +	 * within a PMD/PUD for userspace and IPA cannot be mapped with stage-2
+> > +	 * PMD/PUD entries, because we'll end up mapping the wrong pages.
+> >  	 *
+> >  	 * Consider a layout like the following:
+> >  	 *
+> >  	 *    memslot->userspace_addr:
+> >  	 *    +-----+--------------------+--------------------+---+
+> > -	 *    |abcde|fgh  Stage-1 PMD    |    Stage-1 PMD   tv|xyz|
+> > +	 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
+> >  	 *    +-----+--------------------+--------------------+---+
+> >  	 *
+> >  	 *    memslot->base_gfn << PAGE_SIZE:
+> >  	 *      +---+--------------------+--------------------+-----+
+> > -	 *      |abc|def  Stage-2 PMD    |    Stage-2 PMD     |tvxyz|
+> > +	 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
+> >  	 *      +---+--------------------+--------------------+-----+
+> >  	 *
+> > -	 * If we create those stage-2 PMDs, we'll end up with this incorrect
+> > +	 * If we create those stage-2 blocks, we'll end up with this incorrect
+> >  	 * mapping:
+> >  	 *   d -> f
+> >  	 *   e -> g
+> >  	 *   f -> h
+> >  	 */
+> > -	if ((gpa_start & ~S2_PMD_MASK) != (uaddr_start & ~S2_PMD_MASK))
+> > +	if ((gpa_start & (map_size - 1)) != (uaddr_start & (map_size - 1)))
+> >  		return false;
+> >  
+> >  	/*
+> >  	 * Next, let's make sure we're not trying to map anything not covered
+> > -	 * by the memslot. This means we have to prohibit PMD size mappings
+> > -	 * for the beginning and end of a non-PMD aligned and non-PMD sized
+> > +	 * by the memslot. This means we have to prohibit block size mappings
+> > +	 * for the beginning and end of a non-block aligned and non-block sized
+> >  	 * memory slot (illustrated by the head and tail parts of the
+> >  	 * userspace view above containing pages 'abcde' and 'xyz',
+> >  	 * respectively).
+> > @@ -1646,8 +1647,8 @@ static bool fault_supports_stage2_pmd_mappings(struct kvm_memory_slot *memslot,
+> >  	 * userspace_addr or the base_gfn, as both are equally aligned (per
+> >  	 * the check above) and equally sized.
+> >  	 */
+> > -	return (hva & S2_PMD_MASK) >= uaddr_start &&
+> > -	       (hva & S2_PMD_MASK) + S2_PMD_SIZE <= uaddr_end;
+> > +	return (hva & ~(map_size - 1)) >= uaddr_start &&
+> > +	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
+> >  }
+> >  
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > @@ -1676,12 +1677,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	if (!fault_supports_stage2_pmd_mappings(memslot, hva))
+> > -		force_pte = true;
+> > -
+> > -	if (logging_active)
+> > -		force_pte = true;
+> > -
+> >  	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> >  	down_read(&current->mm->mmap_sem);
+> >  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> > @@ -1692,6 +1687,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	}
+> >  
+> >  	vma_pagesize = vma_kernel_pagesize(vma);
+> > +	if (logging_active ||
+> > +	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
+> > +		force_pte = true;
+> > +		vma_pagesize = PAGE_SIZE;
+> > +	}
+> > +
+> >  	/*
+> >  	 * The stage2 has a minimum of 2 level table (For arm64 see
+> >  	 * kvm_arm_setup_stage2()). Hence, we are guaranteed that we can
+> > @@ -1699,11 +1700,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	 * As for PUD huge maps, we must make sure that we have at least
+> >  	 * 3 levels, i.e, PMD is not folded.
+> >  	 */
+> > -	if ((vma_pagesize == PMD_SIZE ||
+> > -	     (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm))) &&
+> > -	    !force_pte) {
+> > +	if (vma_pagesize == PMD_SIZE ||
+> > +	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+> >  		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+> > -	}
+> >  	up_read(&current->mm->mmap_sem);
+> >  
+> >  	/* We need minimum second+third level pages */
+> > 
