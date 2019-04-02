@@ -1,121 +1,200 @@
-From: Yu Zhao <yuzhao@google.com>
-Subject: Re: [PATCH V2] KVM: ARM: Remove pgtable page standard functions from
- stage-2 page tables
-Date: Mon, 1 Apr 2019 12:34:25 -0600
-Message-ID: <20190401183425.GA106130@google.com>
-References: <3be0b7e0-2ef8-babb-88c9-d229e0fdd220@arm.com>
- <1552397145-10665-1-git-send-email-anshuman.khandual@arm.com>
- <20190401161638.GB22092@fuggles.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20190401161638.GB22092@fuggles.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: mark.rutland@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, Anshuman Khandual <anshuman.khandual@arm.com>, christoffer.dall@arm.com, linux-mm@kvack.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: [PATCH v8 0/9] Add ARMv8.3 pointer authentication for kvm guest
+Date: Tue,  2 Apr 2019 07:57:08 +0530
+Message-ID: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, Kristina Martsenko <kristina.martsenko@arm.com>, linux-kernel@vger.kernel.org, Amit Daniel Kachhap <amit.kachhap@arm.com>, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 01, 2019 at 05:16:38PM +0100, Will Deacon wrote:
-> [+KVM/ARM folks, since I can't take this without an Ack in place from them]
-> 
-> My understanding is that this patch is intended to replace patch 3/4 in
-> this series:
-> 
-> http://lists.infradead.org/pipermail/linux-arm-kernel/2019-March/638083.html
+Hi,
 
-Yes, and sorry for the confusion. I could send an updated series once
-this patch is merged. Thanks.
+This patch series adds pointer authentication support for KVM guest and
+is based on top of Linux 5.1-rc3. The basic patches in this series was
+originally posted by Mark Rutland earlier[1,2] and contains some history
+of this work.
 
-> On Tue, Mar 12, 2019 at 06:55:45PM +0530, Anshuman Khandual wrote:
-> > ARM64 standard pgtable functions are going to use pgtable_page_[ctor|dtor]
-> > or pgtable_pmd_page_[ctor|dtor] constructs. At present KVM guest stage-2
-> > PUD|PMD|PTE level page tabe pages are allocated with __get_free_page()
-> > via mmu_memory_cache_alloc() but released with standard pud|pmd_free() or
-> > pte_free_kernel(). These will fail once they start calling into pgtable_
-> > [pmd]_page_dtor() for pages which never originally went through respective
-> > constructor functions. Hence convert all stage-2 page table page release
-> > functions to call buddy directly while freeing pages.
-> > 
-> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Acked-by: Yu Zhao <yuzhao@google.com>
-> > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> > ---
-> > Changes in V2:
-> > 
-> > - Updated stage2_pud_free() with NOP as per Suzuki
-> > - s/__free_page/free_page/ in clear_stage2_pmd_entry() for uniformity
-> > 
-> >  arch/arm/include/asm/stage2_pgtable.h   | 4 ++--
-> >  arch/arm64/include/asm/stage2_pgtable.h | 4 ++--
-> >  virt/kvm/arm/mmu.c                      | 2 +-
-> >  3 files changed, 5 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-> > index de2089501b8b..fed02c3b4600 100644
-> > --- a/arch/arm/include/asm/stage2_pgtable.h
-> > +++ b/arch/arm/include/asm/stage2_pgtable.h
-> > @@ -32,14 +32,14 @@
-> >  #define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
-> >  #define stage2_pgd_populate(kvm, pgd, pud)	pgd_populate(NULL, pgd, pud)
-> >  #define stage2_pud_offset(kvm, pgd, address)	pud_offset(pgd, address)
-> > -#define stage2_pud_free(kvm, pud)		pud_free(NULL, pud)
-> > +#define stage2_pud_free(kvm, pud)		do { } while (0)
-> >  
-> >  #define stage2_pud_none(kvm, pud)		pud_none(pud)
-> >  #define stage2_pud_clear(kvm, pud)		pud_clear(pud)
-> >  #define stage2_pud_present(kvm, pud)		pud_present(pud)
-> >  #define stage2_pud_populate(kvm, pud, pmd)	pud_populate(NULL, pud, pmd)
-> >  #define stage2_pmd_offset(kvm, pud, address)	pmd_offset(pud, address)
-> > -#define stage2_pmd_free(kvm, pmd)		pmd_free(NULL, pmd)
-> > +#define stage2_pmd_free(kvm, pmd)		free_page((unsigned long)pmd)
-> >  
-> >  #define stage2_pud_huge(kvm, pud)		pud_huge(pud)
-> >  
-> > diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> > index 5412fa40825e..915809e4ac32 100644
-> > --- a/arch/arm64/include/asm/stage2_pgtable.h
-> > +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> > @@ -119,7 +119,7 @@ static inline pud_t *stage2_pud_offset(struct kvm *kvm,
-> >  static inline void stage2_pud_free(struct kvm *kvm, pud_t *pud)
-> >  {
-> >  	if (kvm_stage2_has_pud(kvm))
-> > -		pud_free(NULL, pud);
-> > +		free_page((unsigned long)pud);
-> >  }
-> >  
-> >  static inline bool stage2_pud_table_empty(struct kvm *kvm, pud_t *pudp)
-> > @@ -192,7 +192,7 @@ static inline pmd_t *stage2_pmd_offset(struct kvm *kvm,
-> >  static inline void stage2_pmd_free(struct kvm *kvm, pmd_t *pmd)
-> >  {
-> >  	if (kvm_stage2_has_pmd(kvm))
-> > -		pmd_free(NULL, pmd);
-> > +		free_page((unsigned long)pmd);
-> >  }
-> >  
-> >  static inline bool stage2_pud_huge(struct kvm *kvm, pud_t pud)
-> > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> > index e9d28a7ca673..cbfbdadca8a5 100644
-> > --- a/virt/kvm/arm/mmu.c
-> > +++ b/virt/kvm/arm/mmu.c
-> > @@ -191,7 +191,7 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
-> >  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
-> >  	pmd_clear(pmd);
-> >  	kvm_tlb_flush_vmid_ipa(kvm, addr);
-> > -	pte_free_kernel(NULL, pte_table);
-> > +	free_page((unsigned long)pte_table);
-> >  	put_page(virt_to_page(pmd));
-> >  }
-> >  
-> > -- 
-> > 2.20.1
-> > 
+Extension Overview:
+=============================================
+
+The ARMv8.3 pointer authentication extension adds functionality to detect
+modification of pointer values, mitigating certain classes of attack such as
+stack smashing, and making return oriented programming attacks harder.
+
+The extension introduces the concept of a pointer authentication code (PAC),
+which is stored in some upper bits of pointers. Each PAC is derived from the
+original pointer, another 64-bit value (e.g. the stack pointer), and a secret
+128-bit key.
+
+New instructions are added which can be used to:
+
+* Insert a PAC into a pointer
+* Strip a PAC from a pointer
+* Authenticate and strip a PAC from a pointer
+
+The detailed description of ARMv8.3 pointer authentication support in
+userspace/kernel and can be found in Kristina's generic pointer authentication
+patch series[3].
+
+KVM guest work:
+==============================================
+
+If pointer authentication is enabled for KVM guests then the new PAC instructions
+will not trap to EL2. If not then they may be ignored if in HINT region or trapped
+in EL2 as illegal instruction. Since KVM guest vcpu runs as a thread so they have
+a key initialized which will be used by PAC. When world switch happens between
+host and guest then this key is exchanged.
+
+The current v8 patch series contains review comments and suggestions by James
+Morse, Kristina Martsenko, Julien Thierry and Dave Martin.
+
+The first two patch is cherry picked from Dave Martin [10, 11] v6 series which adds
+SVE support for KVM guest. 
+
+Changes since v7 [9]: Major changes are listed below and detail changes are in
+		      each patch.
+ * Comments and Documentation updated to reflect using address/generic
+   features flag together.
+ * Dropped the documentation patch and added those details in the relevant
+   patches.
+ * Rebased the patch series on 2 patches of Dave Martin v6 SVE series. 
+ * Small bug fixes.
+
+Changes since v6 [8]: Major changes are listed below.
+
+* Pointer authentication key switch entirely in assembly now.
+* isb instruction added after Key switched to host.
+* Use __hyp_this_cpu_ptr for both VHE and nVHE mode.
+* 2 separate flags for address and generic authentication.
+* kvm_arm_vcpu_ptrauth_allowed renamed to has_vcpu_ptrauth.
+* kvm_arm_vcpu_ptrauth_reset renamed to kvm_arm_vcpu_ptrauth_setup_lazy.
+* Save of host Key registers now done in ptrauth instruction trap.
+* A fix to add kern_hyp_va to get correct host_ctxt pointer in nVHE mode.
+* Patches re-structured to better reflect ABI change.
+
+Changes since v5 [7]: Major changes are listed below.
+
+* Split hcr_el2 and mdcr_el2 save/restore in two patches.
+* Reverted back save/restore of sys-reg keys as done in V4 [5]. There was
+  suggestion by James Morse to use ptrauth utilities in a single place
+  in arm core and use them from kvm. However this change deviates from the
+  existing sys-reg implementations and is not scalable.
+* Invoked the key switch C functions from __guest_enter/__guest_exit assembly.
+* Host key save is now done inside vcpu_load.
+* Reverted back masking of cpufeature ID registers for ptrauth when disabled
+  from userpace.
+* Reset of ptrauth key registers not done conditionally.
+* Code and Documentation cleanup.
+
+Changes since v4 [6]: Several suggestions from James Morse
+* Move host registers to be saved/restored inside struct kvm_cpu_context.
+* Similar to hcr_el2, save/restore mdcr_el2 register also.
+* Added save routines for ptrauth keys in generic arm core and
+  use them during KVM context switch.
+* Defined a GCC attribute __no_ptrauth which discards generating
+  ptrauth instructions in a function. This is taken from Kristina's
+  earlier kernel pointer authentication support patches [4].
+* Dropped a patch to mask cpufeature when not enabled from userspace and
+  now only key registers are masked from register list.
+
+Changes since v3 [5]:
+* Use pointer authentication only when VHE is present as ARM8.3 implies ARM8.1
+  features to be present.
+* Added lazy context handling of ptrauth instructions from V2 version again. 
+* Added more details in Documentation.
+
+Changes since v2 [1,2]:
+* Allow host and guest to have different HCR_EL2 settings and not just constant
+  value HCR_HOST_VHE_FLAGS or HCR_HOST_NVHE_FLAGS.
+* Optimise the reading of HCR_EL2 in host/guest switch by fetching it once
+  during KVM initialisation state and using it later.
+* Context switch pointer authentication keys when switching between guest
+  and host. Pointer authentication was enabled in a lazy context earlier[2] and
+  is removed now to make it simple. However it can be revisited later if there
+  is significant performance issue.
+* Added a userspace option to choose pointer authentication.
+* Based on the userspace option, ptrauth cpufeature will be visible.
+* Based on the userspace option, ptrauth key registers will be accessible.
+* A small document is added on how to enable pointer authentication from
+  userspace KVM API.
+
+Looking for feedback and comments.
+
+Thanks,
+Amit
+
+[1]: https://lore.kernel.org/lkml/20171127163806.31435-11-mark.rutland@arm.com/
+[2]: https://lore.kernel.org/lkml/20171127163806.31435-10-mark.rutland@arm.com/
+[3]: https://lkml.org/lkml/2018/12/7/666
+[4]: https://lore.kernel.org/lkml/20181005084754.20950-1-kristina.martsenko@arm.com/
+[5]: https://lkml.org/lkml/2018/10/17/594
+[6]: https://lkml.org/lkml/2018/12/18/80
+[7]: https://lkml.org/lkml/2019/1/28/49
+[8]: https://lkml.org/lkml/2019/2/19/190 
+[9]: https://lkml.org/lkml/2019/3/19/125 
+[10]: https://patchwork.kernel.org/patch/10860139/
+[11]: https://patchwork.kernel.org/patch/10860141/
+
+Linux (5.1-rc3 based):
+
+Amit Daniel Kachhap (4):
+  KVM: arm64: Move hyp_symbol_addr to fix dependency
+  KVM: arm/arm64: preserve host MDCR_EL2 value
+  KVM: arm64: Add vcpu feature flags to control ptrauth accessibility
+  KVM: arm64: Add capability to advertise ptrauth for guest
+
+Dave Martin (2):
+  KVM: arm64: Propagate vcpu into read_id_reg()
+  KVM: arm64: Support runtime sysreg visibility filtering
+
+Mark Rutland (2):
+  KVM: arm/arm64: preserve host HCR_EL2 value
+  KVM: arm/arm64: context-switch ptrauth registers
+
+ Documentation/arm64/pointer-authentication.txt |  19 ++++-
+ Documentation/virtual/kvm/api.txt              |   7 ++
+ arch/arm/include/asm/kvm_host.h                |   4 +-
+ arch/arm64/Kconfig                             |   5 +-
+ arch/arm64/include/asm/kvm_asm.h               |  22 ++++-
+ arch/arm64/include/asm/kvm_emulate.h           |  24 +++---
+ arch/arm64/include/asm/kvm_host.h              |  46 +++++++++--
+ arch/arm64/include/asm/kvm_hyp.h               |   2 +-
+ arch/arm64/include/asm/kvm_mmu.h               |  20 -----
+ arch/arm64/include/asm/kvm_ptrauth_asm.h       | 106 +++++++++++++++++++++++++
+ arch/arm64/include/uapi/asm/kvm.h              |   2 +
+ arch/arm64/kernel/asm-offsets.c                |   6 ++
+ arch/arm64/kvm/debug.c                         |  28 ++-----
+ arch/arm64/kvm/guest.c                         |  16 +++-
+ arch/arm64/kvm/handle_exit.c                   |  24 ++++--
+ arch/arm64/kvm/hyp/debug-sr.c                  |   5 --
+ arch/arm64/kvm/hyp/entry.S                     |   7 ++
+ arch/arm64/kvm/hyp/switch.c                    |  40 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c                 |  22 ++++-
+ arch/arm64/kvm/hyp/tlb.c                       |   6 +-
+ arch/arm64/kvm/reset.c                         |  13 +++
+ arch/arm64/kvm/sys_regs.c                      |  93 ++++++++++++++++++----
+ arch/arm64/kvm/sys_regs.h                      |  25 ++++++
+ include/uapi/linux/kvm.h                       |   2 +
+ virt/kvm/arm/arm.c                             |   4 +-
+ 25 files changed, 424 insertions(+), 124 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_ptrauth_asm.h
+
+kvmtool:
+
+Repo: git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
+
+Amit Daniel Kachhap (1):
+  KVM: arm/arm64: Add a vcpu feature for pointer authentication
+
+ arm/aarch32/include/kvm/kvm-cpu-arch.h    | 1 +
+ arm/aarch64/include/asm/kvm.h             | 2 ++
+ arm/aarch64/include/kvm/kvm-config-arch.h | 4 +++-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    | 2 ++
+ arm/include/arm-common/kvm-config-arch.h  | 1 +
+ arm/kvm-cpu.c                             | 7 +++++++
+ include/linux/kvm.h                       | 2 ++
+ 7 files changed, 18 insertions(+), 1 deletion(-)
+
+-- 
+2.7.4
