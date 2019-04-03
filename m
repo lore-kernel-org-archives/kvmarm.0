@@ -1,26 +1,26 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 17/27] KVM: arm64: Reject ioctl access to FPSIMD
- V-regs on SVE vcpus
-Date: Wed, 3 Apr 2019 22:15:01 +0200
-Message-ID: <20190403201501.6lyqoxzqkb7j63zz@kamzik.brq.redhat.com>
+Subject: Re: [PATCH v7 26/27] KVM: Document errors for KVM_GET_ONE_REG and
+ KVM_SET_ONE_REG
+Date: Wed, 3 Apr 2019 22:27:46 +0200
+Message-ID: <20190403202746.yoxwokr5uitli5q4@kamzik.brq.redhat.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-18-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-27-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B228B4A36B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:15:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4574E4A332
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:27:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AKwRmja60PTW for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Apr 2019 16:15:07 -0400 (EDT)
+ with ESMTP id s+8ARmOX6Lik for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Apr 2019 16:27:53 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DC424A34E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:15:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3654C4A2BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:27:53 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1553864452-15080-18-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <1553864452-15080-27-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,159 +34,56 @@ To: Dave Martin <Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 29, 2019 at 01:00:42PM +0000, Dave Martin wrote:
-> In order to avoid the pointless complexity of maintaining two ioctl
-> register access views of the same data, this patch blocks ioctl
-> access to the FPSIMD V-registers on vcpus that support SVE.
-> 
-> This will make it more straightforward to add SVE register access
-> support.
-> 
-> Since SVE is an opt-in feature for userspace, this will not affect
-> existing users.
-> 
+On Fri, Mar 29, 2019 at 01:00:51PM +0000, Dave Martin wrote:
+> KVM_GET_ONE_REG and KVM_SET_ONE_REG return some error codes that
+> are not documented (but hopefully not surprising either).  To give
+> an indication of what these may mean, this patch adds brief
+> documentation.
+> =
+
 > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> 
 > ---
-> 
-> Changes since v5:
-> 
->  * Refactored to cope with the removal of core_reg_size_from_offset()
->    (which was added by another series which will now be handled
->    independently).
-> 
->    This leaves some duplication in that we still filter the V-regs out
->    in two places, but this no worse than other existing code in guest.c.
->    I plan to tidy this up independently later on.
-> ---
->  arch/arm64/kvm/guest.c | 48 ++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 36 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index a391a61..756d0d6 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -54,12 +54,19 @@ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> +static bool core_reg_offset_is_vreg(u64 off)
-> +{
-> +	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
-> +		off < KVM_REG_ARM_CORE_REG(fp_regs.fpsr);
-> +}
-> +
->  static u64 core_reg_offset_from_id(u64 id)
->  {
->  	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
->  }
->  
-> -static int validate_core_offset(const struct kvm_one_reg *reg)
-> +static int validate_core_offset(const struct kvm_vcpu *vcpu,
-> +				const struct kvm_one_reg *reg)
->  {
->  	u64 off = core_reg_offset_from_id(reg->id);
->  	int size;
-> @@ -91,11 +98,19 @@ static int validate_core_offset(const struct kvm_one_reg *reg)
->  		return -EINVAL;
->  	}
->  
-> -	if (KVM_REG_SIZE(reg->id) == size &&
-> -	    IS_ALIGNED(off, size / sizeof(__u32)))
-> -		return 0;
-> +	if (KVM_REG_SIZE(reg->id) != size ||
-> +	    !IS_ALIGNED(off, size / sizeof(__u32)))
-> +		return -EINVAL;
->  
-> -	return -EINVAL;
-> +	/*
-> +	 * The KVM_REG_ARM64_SVE regs must be used instead of
-> +	 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
-> +	 * SVE-enabled vcpus:
-> +	 */
-> +	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
-> +		return -EINVAL;
-> +
-> +	return 0;
->  }
->  
->  static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> @@ -117,7 +132,7 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
->  		return -ENOENT;
->  
-> -	if (validate_core_offset(reg))
-> +	if (validate_core_offset(vcpu, reg))
->  		return -EINVAL;
->  
->  	if (copy_to_user(uaddr, ((u32 *)regs) + off, KVM_REG_SIZE(reg->id)))
-> @@ -142,7 +157,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  	    (off + (KVM_REG_SIZE(reg->id) / sizeof(__u32))) >= nr_regs)
->  		return -ENOENT;
->  
-> -	if (validate_core_offset(reg))
-> +	if (validate_core_offset(vcpu, reg))
->  		return -EINVAL;
->  
->  	if (KVM_REG_SIZE(reg->id) > sizeof(tmp))
-> @@ -195,13 +210,22 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
->  	return -EINVAL;
->  }
->  
-> -static int kvm_arm_copy_core_reg_indices(u64 __user *uindices)
-> +static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
-> +				 u64 __user *uindices)
->  {
->  	unsigned int i;
->  	int n = 0;
->  	const u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
->  
->  	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
-> +		/*
-> +		 * The KVM_REG_ARM64_SVE regs must be used instead of
-> +		 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
-> +		 * SVE-enabled vcpus:
-> +		 */
-> +		if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(i))
-> +			continue;
-> +
->  		if (uindices) {
->  			if (put_user(core_reg | i, uindices))
->  				return -EFAULT;
-> @@ -214,9 +238,9 @@ static int kvm_arm_copy_core_reg_indices(u64 __user *uindices)
->  	return n;
->  }
->  
-> -static unsigned long num_core_regs(void)
-> +static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
->  {
-> -	return kvm_arm_copy_core_reg_indices(NULL);
-> +	return copy_core_reg_indices(vcpu, NULL);
->  }
->  
->  /**
-> @@ -281,7 +305,7 @@ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
->  {
->  	unsigned long res = 0;
->  
-> -	res += num_core_regs();
-> +	res += num_core_regs(vcpu);
->  	res += kvm_arm_num_sys_reg_descs(vcpu);
->  	res += kvm_arm_get_fw_num_regs(vcpu);
->  	res += NUM_TIMER_REGS;
-> @@ -298,7 +322,7 @@ int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->  {
->  	int ret;
->  
-> -	ret = kvm_arm_copy_core_reg_indices(uindices);
-> +	ret = copy_core_reg_indices(vcpu, uindices);
->  	if (ret)
->  		return ret;
->  	uindices += ret;
-> -- 
+>  Documentation/virtual/kvm/api.txt | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> =
+
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kv=
+m/api.txt
+> index 2d4f7ce..cd920dd 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -1871,6 +1871,9 @@ Architectures: all
+>  Type: vcpu ioctl
+>  Parameters: struct kvm_one_reg (in)
+>  Returns: 0 on success, negative value on failure
+> +Errors:
+> + =A0ENOENT: =A0=A0no such register
+> + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known re=
+gister
+>  =
+
+>  struct kvm_one_reg {
+>         __u64 id;
+> @@ -2192,6 +2195,9 @@ Architectures: all
+>  Type: vcpu ioctl
+>  Parameters: struct kvm_one_reg (in and out)
+>  Returns: 0 on success, negative value on failure
+> +Errors:
+> + =A0ENOENT: =A0=A0no such register
+> + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known re=
+gister
+>  =
+
+>  This ioctl allows to receive the value of a single register implemented
+>  in a vcpu. The register to read is indicated by the "id" field of the
+> -- =
+
 > 2.1.4
 >
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Are we sure all architectures have these, and only these errors? A quick
+grep indicates not. I'm not sure we can document this easily here due to
+it addressing all architectures at once. Maybe we could add arch-specific
+subsections, but I'm not sure it's worth it.
+
+drew
