@@ -1,75 +1,188 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH] KVM: arm/arm64: ensure vcpu target is unset on reset failure
-Date: Thu,  4 Apr 2019 19:42:30 +0200
-Message-ID: <20190404174230.18587-1-drjones@redhat.com>
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+Subject: Re: [PATCH v8 7/9] KVM: arm/arm64: context-switch ptrauth registers
+Date: Thu, 4 Apr 2019 20:29:59 +0100
+Message-ID: <efe4fd6b-7f1f-c8b7-0667-e2bf636dcf4f@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-8-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A67D4A3BB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 13:42:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ExkSQJy6j0FX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 13:42:34 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 218E74A3A5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 13:42:34 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1554172037-4516-8-git-send-email-amit.kachhap@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A failed KVM_ARM_VCPU_INIT, should not set the vcpu target,
-as the vcpu target is used by kvm_vcpu_initialized() to
-determine if other vcpu ioctls may proceed. We need to set
-the target before calling kvm_reset_vcpu(), but if that call
-fails, we should then unset it.
+On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
+> 
+> When pointer authentication is supported, a guest may wish to use it.
+> This patch adds the necessary KVM infrastructure for this to work, with
+> a semi-lazy context switch of the pointer auth state.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- virt/kvm/arm/arm.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+[...]
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 99c37384ba7b..7e5724ae1efd 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -934,7 +934,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 			       const struct kvm_vcpu_init *init)
- {
--	unsigned int i;
-+	unsigned int i, ret;
- 	int phys_target = kvm_target_cpu();
- 
- 	if (init->target != phys_target)
-@@ -969,9 +969,15 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 	vcpu->arch.target = phys_target;
- 
- 	/* Now we know what it is, we can reset it. */
--	return kvm_reset_vcpu(vcpu);
--}
-+	ret = kvm_reset_vcpu(vcpu);
-+	if (ret) {
-+		vcpu->arch.target = -1;
-+		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-+		return ret;
-+	}
- 
-+	return 0;
-+}
- 
- static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 					 struct kvm_vcpu_init *init)
--- 
-2.20.1
+> diff --git a/arch/arm64/include/asm/kvm_ptrauth_asm.h b/arch/arm64/include/asm/kvm_ptrauth_asm.h
+> new file mode 100644
+> index 0000000..65f99e9
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_ptrauth_asm.h
+> @@ -0,0 +1,106 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* arch/arm64/include/asm/kvm_ptrauth_asm.h: Guest/host ptrauth save/restore
+> + * Copyright 2019 Arm Limited
+> + * Author: Mark Rutland <mark.rutland@arm.com>
+> + *         Amit Daniel Kachhap <amit.kachhap@arm.com>
+> + */
+> +
+> +#ifndef __ASM_KVM_PTRAUTH_ASM_H
+> +#define __ASM_KVM_PTRAUTH_ASM_H
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +#define __ptrauth_save_key(regs, key)						\
+> +({										\
+> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
+> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
+> +})
+> +
+> +#define __ptrauth_save_state(ctxt)						\
+> +({										\
+> +	__ptrauth_save_key(ctxt->sys_regs, APIA);				\
+> +	__ptrauth_save_key(ctxt->sys_regs, APIB);				\
+> +	__ptrauth_save_key(ctxt->sys_regs, APDA);				\
+> +	__ptrauth_save_key(ctxt->sys_regs, APDB);				\
+> +	__ptrauth_save_key(ctxt->sys_regs, APGA);				\
+> +})
+> +
+> +#else /* __ASSEMBLY__ */
+> +
+> +#include <asm/sysreg.h>
+> +
+> +#ifdef	CONFIG_ARM64_PTR_AUTH
+> +
+> +#define PTRAUTH_REG_OFFSET(x)	(x - CPU_APIAKEYLO_EL1)
+> +
+> +/*
+> + * CPU_AP*_EL1 values exceed immediate offset range (512) for stp instruction
+> + * so below macros takes CPU_APIAKEYLO_EL1 as base and calculates the offset of
+> + * the keys from this base to avoid an extra add instruction. These macros
+> + * assumes the keys offsets are aligned in a specific increasing order.
+> + */
+> +.macro	ptrauth_save_state base, reg1, reg2
+> +	mrs_s	\reg1, SYS_APIAKEYLO_EL1
+> +	mrs_s	\reg2, SYS_APIAKEYHI_EL1
+> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+> +	mrs_s	\reg1, SYS_APIBKEYLO_EL1
+> +	mrs_s	\reg2, SYS_APIBKEYHI_EL1
+> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+> +	mrs_s	\reg1, SYS_APDAKEYLO_EL1
+> +	mrs_s	\reg2, SYS_APDAKEYHI_EL1
+> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+> +	mrs_s	\reg1, SYS_APDBKEYLO_EL1
+> +	mrs_s	\reg2, SYS_APDBKEYHI_EL1
+> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+> +	mrs_s	\reg1, SYS_APGAKEYLO_EL1
+> +	mrs_s	\reg2, SYS_APGAKEYHI_EL1
+> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+> +.endm
+> +
+> +.macro	ptrauth_restore_state base, reg1, reg2
+> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+> +	msr_s	SYS_APIAKEYLO_EL1, \reg1
+> +	msr_s	SYS_APIAKEYHI_EL1, \reg2
+> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+> +	msr_s	SYS_APIBKEYLO_EL1, \reg1
+> +	msr_s	SYS_APIBKEYHI_EL1, \reg2
+> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+> +	msr_s	SYS_APDAKEYLO_EL1, \reg1
+> +	msr_s	SYS_APDAKEYHI_EL1, \reg2
+> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+> +	msr_s	SYS_APDBKEYLO_EL1, \reg1
+> +	msr_s	SYS_APDBKEYHI_EL1, \reg2
+> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+> +	msr_s	SYS_APGAKEYLO_EL1, \reg1
+> +	msr_s	SYS_APGAKEYHI_EL1, \reg2
+> +.endm
+> +
+> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+> +	cbz	\reg1, 1f
+> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+> +1:
+
+Nit: the label in assembly macros is usually a larger number (see
+assembler.h or alternative.h for example). I think this is to avoid
+future accidents like
+
+	cbz	x0, 1f
+	ptrauth_switch_to_guest	x1, x2, x3, x4
+	add	x5, x5, x6
+1:
+	...
+
+where the code would incorrectly branch to the label inside
+ptrauth_switch_to_guest, instead of the one after it.
+
+Thanks,
+Kristina
+
+> +.endm
+> +
+> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+> +	cbz	\reg1, 2f
+> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+> +	ptrauth_save_state	\reg1, \reg2, \reg3
+> +	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
+> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+> +	isb
+> +2:
+> +.endm
+> +
+> +#else /* !CONFIG_ARM64_PTR_AUTH */
+> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+> +.endm
+> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+> +.endm
+> +#endif /* CONFIG_ARM64_PTR_AUTH */
+> +#endif /* __ASSEMBLY__ */
+> +#endif /* __ASM_KVM_PTRAUTH_ASM_H */
+
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 675fdc1..3a70213 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -24,6 +24,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_ptrauth_asm.h>
+>  
+>  #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+>  #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+> @@ -64,6 +65,9 @@ ENTRY(__guest_enter)
+>  
+>  	add	x18, x0, #VCPU_CONTEXT
+>  
+> +	// Macro ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3).
+> +	ptrauth_switch_to_guest x18, x0, x1, x2
+> +
+>  	// Restore guest regs x0-x17
+>  	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+>  	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+> @@ -118,6 +122,9 @@ ENTRY(__guest_exit)
+>  
+>  	get_host_ctxt	x2, x3
+>  
+> +	// Macro ptrauth_switch_to_host(guest cxt, host cxt, tmp1, tmp2, tmp3).
+> +	ptrauth_switch_to_host x1, x2, x3, x4, x5
+> +
+>  	// Now restore the host regs
+>  	restore_callee_saved_regs x2
+>  
