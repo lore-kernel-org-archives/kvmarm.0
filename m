@@ -1,8 +1,8 @@
 From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [PATCH v7 23/27] KVM: arm64/sve: Add pseudo-register for the
  guest's vector lengths
-Date: Thu, 4 Apr 2019 22:18:54 +0200
-Message-ID: <20190404201854.7dzga3ctjj7427hk@kamzik.brq.redhat.com>
+Date: Thu, 4 Apr 2019 22:31:09 +0200
+Message-ID: <20190404203109.lrt5czzlqpritecd@kamzik.brq.redhat.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
  <1553864452-15080-24-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
@@ -10,15 +10,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83DCD4A449
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 16:19:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBA714A42E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 16:31:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vf6-0NVAv1qM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 16:19:00 -0400 (EDT)
+ with ESMTP id PCBrKDVoJovu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 16:31:16 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F6714A36D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 16:19:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E34A24A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 16:31:15 -0400 (EDT)
 Content-Disposition: inline
 In-Reply-To: <1553864452-15080-24-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -252,10 +252,6 @@ On Fri, Mar 29, 2019 at 01:00:48PM +0000, Dave Martin wrote:
 > +{
 > +	unsigned int max_vq, vq;
 > +	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-
-There are three of these long 'DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)'.
-A macro is probably warranted.
-
 > +
 > +	if (kvm_arm_vcpu_sve_finalized(vcpu))
 > +		return -EPERM; /* too late! */
@@ -277,15 +273,6 @@ A macro is probably warranted.
 > +	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
 > +		if (vq_present(&vqs, vq) != sve_vq_available(vq))
 > +			return -EINVAL;
-
-What about supporting the optional non-power-of-2 vector lengths? For
-example, if the maximum VL is 512, then in addition to 512, 128, and
-256 there could be a 384. If we plan to start a guest on a machine
-that has all four and then migrate it to a machine that only has
-128,256,512 we would want to set the VL set to 128,256,512, even on
-the machine that supports 384. If I understand the above test correctly,
-then that wouldn't work.
-
 > +
 > +	/* Can't run with no vector lengths at all: */
 > +	if (max_vq < SVE_VQ_MIN)
@@ -466,6 +453,16 @@ then that wouldn't work.
 > +			return -EPERM;
 > +
 > +		return kvm_vcpu_finalize_sve(vcpu);
+
+In the next patch I see that we already have KVM_ARM64_GUEST_HAS_SVE
+set in vcpu->arch.flags at this point. So if this kvm_vcpu_finalize_sve()
+call fails, shouldn't we unset KVM_ARM64_GUEST_HAS_SVE and anything
+else used to indicate the vcpu has sve?
+
+Thanks,
+drew
+
+
 > +	}
 > +
 > +	return -EINVAL;
@@ -489,7 +486,8 @@ then that wouldn't work.
 >   * @vcpu: The VCPU pointer
 > -- 
 > 2.1.4
->
-
-Thanks,
-drew
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
