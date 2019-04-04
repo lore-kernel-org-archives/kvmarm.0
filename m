@@ -1,176 +1,106 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH kvmtool v3 3/3] vfio-pci: Re-enable INTx mode when disable
- MSI/MSIX
-Date: Thu, 4 Apr 2019 12:06:51 +0100
-Message-ID: <fea39efb-1bc1-deff-e1a0-f695db429abb@arm.com>
-References: <20190326074131.4284-1-leo.yan@linaro.org>
- <20190326074131.4284-4-leo.yan@linaro.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: Restrict setting irq->targets only in GICv2
+Date: Thu, 4 Apr 2019 12:30:15 +0000
+Message-ID: <1554381015-13056-1-git-send-email-yuzenghui@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3D7A4A3A3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 07:07:13 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rBjfzvWmJHDl for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 07:07:12 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A954A380
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 07:07:12 -0400 (EDT)
-In-Reply-To: <20190326074131.4284-4-leo.yan@linaro.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Leo Yan <leo.yan@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Will Deacon <Will.Deacon@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Robin Murphy <Robin.Murphy@arm.com>
+Content-Type: text/plain
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: marc.zyngier@arm.com, christoffer.dall@arm.com
+Cc: eric.auger@redhat.com, andre.przywara@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Zenghui Yu <yuzenghui@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/03/2019 07:41, Leo Yan wrote:
-> Since PCI forbids enabling INTx, MSI or MSIX at the same time, it's by
-> default to disable INTx mode when enable MSI/MSIX mode; but this logic is
-> easily broken if the guest PCI driver detects the MSI/MSIX cannot work as
-> expected and tries to rollback to use INTx mode.  In this case, the INTx
-> mode has been disabled and has no chance to re-enable it, thus both INTx
-> mode and MSI/MSIX mode cannot work in vfio.
-> 
-> Below shows the detailed flow for introducing this issue:
-> 
->   vfio_pci_configure_dev_irqs()
->     `-> vfio_pci_enable_intx()
-> 
->   vfio_pci_enable_msis()
->     `-> vfio_pci_disable_intx()
-> 
->   vfio_pci_disable_msis()   => Guest PCI driver disables MSI
-> 
-> To fix this issue, when disable MSI/MSIX we need to check if INTx mode
-> is available for this device or not; if the device can support INTx then
-> re-enable it so that the device can fallback to use it.
-> 
-> Since vfio_pci_disable_intx() / vfio_pci_enable_intx() pair functions
-> may be called for multiple times, this patch uses 'intx_fd == -1' to
-> denote the INTx is disabled, the pair functions can directly bail out
-> when detect INTx has been disabled and enabled respectively.
-> 
-> Suggested-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> Signed-off-by: Leo Yan <leo.yan@linaro.org>
-> ---
->  vfio/pci.c | 41 ++++++++++++++++++++++++++++++-----------
->  1 file changed, 30 insertions(+), 11 deletions(-)
-> 
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index 3c39844..3b2b1e7 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -28,6 +28,7 @@ struct vfio_irq_eventfd {
->  	msi_update_state(state, val, VFIO_PCI_MSI_STATE_EMPTY)
->  
->  static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev);
-> +static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev);
->  
->  static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  				bool msix)
-> @@ -50,17 +51,14 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  	if (!msi_is_enabled(msis->virt_state))
->  		return 0;
->  
-> -	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX) {
-> -		/*
-> -		 * PCI (and VFIO) forbids enabling INTx, MSI or MSIX at the same
-> -		 * time. Since INTx has to be enabled from the start (we don't
-> -		 * have a reliable way to know when the user starts using it),
-> -		 * disable it now.
-> -		 */
-> +	/*
-> +	 * PCI (and VFIO) forbids enabling INTx, MSI or MSIX at the same
-> +	 * time. Since INTx has to be enabled from the start (after enabling
-> +	 * 'pdev->intx_fd' will be assigned to an eventfd and doesn't equal
-> +	 * to the init value -1), disable it now.
-> +	 */
+Commit ad275b8bb1e6 ("KVM: arm/arm64: vgic-new: vgic_init: implement
+vgic_init") had set irq->targets in kvm_vgic_vcpu_init(), regardless of
+the GIC architecture (v2 or v3). When the number of vcpu reaches 32
+(in v3), UBSAN will complain about it.
 
-I don't think the comment change is useful, we don't need that much
-detail. The text that you replaced was trying to explain why we enable
-INTx from the start, and would still apply (although it should have been
-s/user/guest/)
+ ================================================================================
+ UBSAN: Undefined behaviour in arch/arm64/kvm/../../../virt/kvm/arm/vgic/vgic-init.c:223:21
+ shift exponent 32 is too large for 32-bit type 'unsigned int'
+ CPU: 13 PID: 833 Comm: CPU 32/KVM Kdump: loaded Not tainted 5.1.0-rc1+ #16
+ Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 10/24/2018
+ Call trace:
+  dump_backtrace+0x0/0x190
+  show_stack+0x24/0x30
+  dump_stack+0xc8/0x114
+  ubsan_epilogue+0x14/0x50
+  __ubsan_handle_shift_out_of_bounds+0x118/0x188
+  kvm_vgic_vcpu_init+0x1d4/0x200
+  kvm_arch_vcpu_init+0x3c/0x48
+  kvm_vcpu_init+0xa8/0x100
+  kvm_arch_vcpu_create+0x94/0x120
+  kvm_vm_ioctl+0x57c/0xe58
+  do_vfs_ioctl+0xc4/0x7f0
+  ksys_ioctl+0x8c/0xa0
+  __arm64_sys_ioctl+0x28/0x38
+  el0_svc_common+0xa0/0x190
+  el0_svc_handler+0x38/0x78
+  el0_svc+0x8/0xc
+ ================================================================================
 
-> +	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
->  		vfio_pci_disable_intx(kvm, vdev);
-> -		/* Permanently disable INTx */
-> -		pdev->irq_modes &= ~VFIO_PCI_IRQ_MODE_INTX;
-> -	}
->  
->  	eventfds = (void *)msis->irq_set + sizeof(struct vfio_irq_set);
->  
-> @@ -162,7 +160,16 @@ static int vfio_pci_disable_msis(struct kvm *kvm, struct vfio_device *vdev,
->  	msi_set_enabled(msis->phys_state, false);
->  	msi_set_empty(msis->phys_state, true);
->  
-> -	return 0;
-> +	/*
-> +	 * When MSI or MSIX is disabled, this might be called when
-> +	 * PCI driver detects the MSI interrupt failure and wants to
-> +	 * rollback to INTx mode.  Thus enable INTx if the device
-> +	 * supports INTx mode in this case.
-> +	 */
-> +	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
-> +		ret = vfio_pci_enable_intx(kvm, vdev);
-> +
-> +	return ret >= 0 ? 0 : ret;
->  }
->  
->  static int vfio_pci_update_msi_entry(struct kvm *kvm, struct vfio_device *vdev,
-> @@ -1002,6 +1009,10 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
->  		.index	= VFIO_PCI_INTX_IRQ_INDEX,
->  	};
->  
-> +	/* INTx mode has been disabled */
+This patch Restricts setting irq->targets in GICv2, which only supports
+a maximum of eight PEs, to keep UBSAN quiet. And since irq->mpidr will
+only be used by SPI in GICv3, we decided to set mpidr to 0 for SGI and
+PPI.
 
-Here as well, the comments on intx_fd seem unnecessary. But these are
-only nits, the code is fine and I tested for regressions on my hardware, so:
+Like commit ab2d5eb03dbb ("KVM: arm/arm64: vgic: Always initialize the
+group of private IRQs"), we should also take the creating order of the
+VGIC and VCPUs into consideration.
 
-Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ virt/kvm/arm/vgic/vgic-init.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-> +	if (pdev->intx_fd == -1)
-> +		return;
-> +
->  	pr_debug("user requested MSI, disabling INTx %d", gsi);
->  
->  	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
-> @@ -1009,6 +1020,7 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
->  
->  	close(pdev->intx_fd);
->  	close(pdev->unmask_fd);
-> +	pdev->intx_fd = -1;
->  }
->  
->  static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
-> @@ -1020,6 +1032,10 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  	int gsi = pdev->intx_gsi;
->  
-> +	/* INTx mode has been enabled */
-> +	if (pdev->intx_fd != -1)
-> +		return 0;
-> +
->  	/*
->  	 * PCI IRQ is level-triggered, so we use two eventfds. trigger_fd
->  	 * signals an interrupt from host to guest, and unmask_fd signals the
-> @@ -1122,6 +1138,9 @@ static int vfio_pci_init_intx(struct kvm *kvm, struct vfio_device *vdev)
->  	/* Guest is going to ovewrite our irq_line... */
->  	pdev->intx_gsi = pdev->hdr.irq_line - KVM_IRQ_OFFSET;
->  
-> +	/* Use intx_fd = -1 to denote INTx is disabled */
-> +	pdev->intx_fd = -1;
-> +
->  	return 0;
->  }
->  
-> 
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 3bdb31e..0cba92e 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -220,7 +220,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 		irq->intid = i;
+ 		irq->vcpu = NULL;
+ 		irq->target_vcpu = vcpu;
+-		irq->targets = 1U << vcpu->vcpu_id;
+ 		kref_init(&irq->refcount);
+ 		if (vgic_irq_is_sgi(i)) {
+ 			/* SGIs */
+@@ -231,10 +230,14 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 			irq->config = VGIC_CONFIG_LEVEL;
+ 		}
+ 
+-		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+ 			irq->group = 1;
+-		else
++			irq->mpidr = 0;
++		} else {
+ 			irq->group = 0;
++			if (vcpu->vcpu_id < VGIC_V2_MAX_CPUS)
++				irq->targets = 1U << vcpu->vcpu_id;
++		}
+ 	}
+ 
+ 	if (!irqchip_in_kernel(vcpu->kvm))
+@@ -297,10 +300,13 @@ int vgic_init(struct kvm *kvm)
+ 
+ 		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
+ 			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+-			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+ 				irq->group = 1;
+-			else
++				irq->mpidr = 0;
++			} else {
+ 				irq->group = 0;
++				irq->targets = 1U << vcpu->vcpu_id;
++			}
+ 		}
+ 	}
+ 
+-- 
+1.8.3.1
