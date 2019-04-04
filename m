@@ -1,122 +1,133 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 21/27] KVM: arm/arm64: Add hook for arch-specific KVM
- initialisation
-Date: Thu, 4 Apr 2019 18:33:08 +0200
-Message-ID: <20190404163308.2aaauxituh6rfffu@kamzik.brq.redhat.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-22-git-send-email-Dave.Martin@arm.com>
- <20190404142528.pxo3vrnk6mfsgmyq@kamzik.brq.redhat.com>
- <20190404145354.GG3567@e103592.cambridge.arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v12 4/8] arm64: arm_pmu: Add !VHE support for
+ exclude_host/exclude_guest attributes
+Date: Thu, 4 Apr 2019 17:34:00 +0100
+Message-ID: <20190404163400.GA28903@fuggles.cambridge.arm.com>
+References: <20190328103731.27264-1-andrew.murray@arm.com>
+ <20190328103731.27264-5-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 558744A34E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:34:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jl8VqhPIgxIE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 12:34:07 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A04E40217
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:34:07 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20190404145354.GG3567@e103592.cambridge.arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190328103731.27264-5-andrew.murray@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 04, 2019 at 03:53:55PM +0100, Dave Martin wrote:
-> On Thu, Apr 04, 2019 at 04:25:28PM +0200, Andrew Jones wrote:
-> > On Fri, Mar 29, 2019 at 01:00:46PM +0000, Dave Martin wrote:
-> > > This patch adds a kvm_arm_init_arch_resources() hook to perform
-> > > subarch-specific initialisation when starting up KVM.
-> > > 
-> > > This will be used in a subsequent patch for global SVE-related
-> > > setup on arm64.
-> > > 
-> > > No functional change.
-> > > 
-> > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> > > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> > > ---
-> > >  arch/arm/include/asm/kvm_host.h   | 2 ++
-> > >  arch/arm64/include/asm/kvm_host.h | 2 ++
-> > >  virt/kvm/arm/arm.c                | 4 ++++
-> > >  3 files changed, 8 insertions(+)
-> > > 
-> > > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > > index 770d732..a49ee01 100644
-> > > --- a/arch/arm/include/asm/kvm_host.h
-> > > +++ b/arch/arm/include/asm/kvm_host.h
-> > > @@ -53,6 +53,8 @@
-> > >  
-> > >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> > >  
-> > > +static inline int kvm_arm_init_arch_resources(void) { return 0; }
-> > > +
-> > >  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
-> > >  int __attribute_const__ kvm_target_cpu(void);
-> > >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 205438a..3e89509 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -58,6 +58,8 @@
-> > >  
-> > >  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-> > >  
-> > > +static inline int kvm_arm_init_arch_resources(void) { return 0; }
-> > > +
-> > >  int __attribute_const__ kvm_target_cpu(void);
-> > >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> > >  int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
-> > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > > index 99c3738..c69e137 100644
-> > > --- a/virt/kvm/arm/arm.c
-> > > +++ b/virt/kvm/arm/arm.c
-> > > @@ -1664,6 +1664,10 @@ int kvm_arch_init(void *opaque)
-> > >  	if (err)
-> > >  		return err;
-> > >  
-> > > +	err = kvm_arm_init_arch_resources();
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > >  	if (!in_hyp_mode) {
-> > >  		err = init_hyp_mode();
-> > >  		if (err)
-> > > -- 
-> > > 2.1.4
-> > >
-> > 
-> > It's not clear to me from the commit message why init_common_resources()
-> > won't work for this. Maybe it'll be more clear as I continue the review.
+On Thu, Mar 28, 2019 at 10:37:27AM +0000, Andrew Murray wrote:
+> Add support for the :G and :H attributes in perf by handling the
+> exclude_host/exclude_guest event attributes.
 > 
-> init_common_resources() is for stuff common to arm and arm64.
-
-Well currently init_common_resources() only calls kvm_set_ipa_limit(),
-which isn't implemented for arm. So if there was a plan to only use
-that function for init that actually does something on both, it doesn't.
-
+> We notify KVM of counters that we wish to be enabled or disabled on
+> guest entry/exit and thus defer from starting or stopping events based
+> on their event attributes.
 > 
-> kvm_arm_init_arch_resources() is intended for stuff specific to the
-> particular arch backend.
-
-I'm not sure we need that yet. We just need an arm setup sve stub like
-arm's kvm_set_ipa_limit() stub. OTOH, if we have to keep adding stubs
-to arm we should probably have something like
-kvm_arm_init_arch_resources() instead, and kvm_set_ipa_limit() should
-be moved inside the arm64 one and the arm ipa limit stub can go. Then
-since init_common_resources() would no longer be used, it could just
-be deleted.
-
+> With !VHE we switch the counters between host/guest at EL2. We are able
+> to eliminate counters counting host events on the boundaries of guest
+> entry/exit when using :G by filtering out EL2 for exclude_host. When
+> using !exclude_hv there is a small blackout window at the guest
+> entry/exit where host events are not captured.
 > 
-> Maybe there is a better name for this.
->
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>  arch/arm64/kernel/perf_event.c | 43 ++++++++++++++++++++++++++++------
+>  1 file changed, 36 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index cccf4fc86d67..6bb28aaf5aea 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -26,6 +26,7 @@
+>  
+>  #include <linux/acpi.h>
+>  #include <linux/clocksource.h>
+> +#include <linux/kvm_host.h>
+>  #include <linux/of.h>
+>  #include <linux/perf/arm_pmu.h>
+>  #include <linux/platform_device.h>
+> @@ -528,11 +529,21 @@ static inline int armv8pmu_enable_counter(int idx)
+>  
+>  static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+>  {
+> +	struct perf_event_attr *attr = &event->attr;
+>  	int idx = event->hw.idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>  
+> -	armv8pmu_enable_counter(idx);
+>  	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_enable_counter(idx - 1);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	kvm_set_pmu_events(counter_bits, attr);
+> +
+> +	/* We rely on the hypervisor switch code to enable guest counters */
+> +	if (!kvm_pmu_counter_deferred(attr)) {
+> +		armv8pmu_enable_counter(idx);
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_enable_counter(idx - 1);
+> +	}
+>  }
+>  
+>  static inline int armv8pmu_disable_counter(int idx)
+> @@ -545,11 +556,21 @@ static inline int armv8pmu_disable_counter(int idx)
+>  static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+>  {
+>  	struct hw_perf_event *hwc = &event->hw;
+> +	struct perf_event_attr *attr = &event->attr;
+>  	int idx = hwc->idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>  
+>  	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_disable_counter(idx - 1);
+> -	armv8pmu_disable_counter(idx);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	kvm_clr_pmu_events(counter_bits);
+> +
+> +	/* We rely on the hypervisor switch code to disable guest counters */
+> +	if (!kvm_pmu_counter_deferred(attr)) {
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_disable_counter(idx - 1);
+> +		armv8pmu_disable_counter(idx);
+> +	}
+>  }
+>  
+>  static inline int armv8pmu_enable_intens(int idx)
+> @@ -829,11 +850,16 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>  		if (!attr->exclude_kernel)
+>  			config_base |= ARMV8_PMU_INCLUDE_EL2;
+>  	} else {
+> -		if (attr->exclude_kernel)
+> -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> -		if (!attr->exclude_hv)
+> +		if (!attr->exclude_hv && !attr->exclude_host)
+>  			config_base |= ARMV8_PMU_INCLUDE_EL2;
 
-The name is fine for me.
+FWIW, that doesn't align with my personal view of what the host is, but
+I'm not going to argue if Marc and Christoffer are happy with it.
 
-Thanks,
-drew 
+Anyway, thanks for persevering with this:
+
+Acked-by: Will Deacon <will.deacon@arm.com>
+
+Will
