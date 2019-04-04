@@ -1,25 +1,24 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 05/16] ioport: pci: Move port allocations to PCI
- devices
-Date: Thu, 4 Apr 2019 14:45:37 +0100
-Message-ID: <20190404144537.6d2343fc@donnerap.cambridge.arm.com>
+Subject: Re: [PATCH kvmtool 06/16] pci: Fix ioport allocation size
+Date: Thu, 4 Apr 2019 14:46:02 +0100
+Message-ID: <20190404144602.049922ef@donnerap.cambridge.arm.com>
 References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
- <1551947777-13044-6-git-send-email-julien.thierry@arm.com>
+ <1551947777-13044-7-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8104A332
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:45:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3F254A43B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:46:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FpXMlzbGMrF7 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 09:45:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADF54A43B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:45:42 -0400 (EDT)
-In-Reply-To: <1551947777-13044-6-git-send-email-julien.thierry@arm.com>
+ with ESMTP id DDZebeYwRc-v for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 09:46:06 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9954A332
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:46:06 -0400 (EDT)
+In-Reply-To: <1551947777-13044-7-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,203 +32,130 @@ To: Julien Thierry <julien.thierry@arm.com>
 Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 7 Mar 2019 08:36:06 +0000
+On Thu, 7 Mar 2019 08:36:07 +0000
 Julien Thierry <julien.thierry@arm.com> wrote:
 
-Hi,
+> The PCI Local Bus Specification, Rev. 3.0,
+> Section 6.2.5.1. "Address Maps" states:
+> "Devices that map control functions into I/O Space must not consume more
+> than 256 bytes per I/O Base Address register."
+> 
+> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
+> 
+> Fix this by having PCI devices use 256 bytes ports for IO BARs.
 
-> The dynamic ioport allocation with IOPORT_EMPTY is currently only used
-> by PCI devices. Other devices use fixed ports for which they request
-> registration to the ioport API.
-> 
-> PCI ports need to be in the PCI IO space and there is no reason ioport
-> API should know a PCI port is being allocated and needs to be placed in
-> PCI IO space. This currently just happens to be the case.
-> 
-> Move the responsability of dynamic allocation of ioports from the ioport
-> API to PCI.
-> 
-> In the future, if other types of devices also need dynamic ioport
-> allocation, they'll have to figure out the range of ports they are
-> allowed to use.
-> 
+Good catch!
+
 > Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre.
+
 > ---
->  hw/pci-shmem.c       |  3 ++-
+>  hw/pci-shmem.c       |  4 ++--
 >  hw/vesa.c            |  4 ++--
->  include/kvm/ioport.h |  3 ---
->  include/kvm/pci.h    |  2 ++
->  ioport.c             | 18 ------------------
->  pci.c                |  8 ++++++++
->  vfio/core.c          |  6 ++++--
->  virtio/pci.c         |  3 ++-
->  8 files changed, 20 insertions(+), 27 deletions(-)
+>  include/kvm/ioport.h |  1 -
+>  pci.c                |  2 +-
+>  virtio/pci.c         | 14 +++++++-------
+>  5 files changed, 12 insertions(+), 13 deletions(-)
 > 
 > diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-> index f92bc75..a0c5ba8 100644
+> index a0c5ba8..2e1474b 100644
 > --- a/hw/pci-shmem.c
 > +++ b/hw/pci-shmem.c
-> @@ -357,7 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
+> @@ -357,8 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
 >  		return 0;
 >  
 >  	/* Register MMIO space for MSI-X */
-> -	r = ioport__register(kvm, IOPORT_EMPTY, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
-> +	r = pci_get_io_port_block(IOPORT_SIZE);
-> +	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+> -	r = pci_get_io_port_block(IOPORT_SIZE);
+> -	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+> +	r = ioport__register(kvm, r, &shmem_pci__io_ops, PCI_IO_SIZE, NULL);
 >  	if (r < 0)
 >  		return r;
 >  	ivshmem_registers = (u16)r;
 > diff --git a/hw/vesa.c b/hw/vesa.c
-> index f3c5114..404a8a3 100644
+> index 404a8a3..71935d5 100644
 > --- a/hw/vesa.c
 > +++ b/hw/vesa.c
 > @@ -60,8 +60,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
 >  
 >  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
 >  		return NULL;
-> -
-> -	r = ioport__register(kvm, IOPORT_EMPTY, &vesa_io_ops, IOPORT_SIZE, NULL);
-> +	r = pci_get_io_space_block(IOPORT_SIZE);
-
-I am confused. This is still registering I/O ports, right? And this
-(misnamed) function is about MMIO?
-So should it read r = pci_get_io_port_block(IOPORT_SIZE); ?
-
-> +	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+> -	r = pci_get_io_space_block(IOPORT_SIZE);
+> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+> +	r = pci_get_io_space_block(PCI_IO_SIZE);
+> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
 >  	if (r < 0)
 >  		return ERR_PTR(r);
 >  
 > diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index db52a47..b10fcd5 100644
+> index b10fcd5..8c86b71 100644
 > --- a/include/kvm/ioport.h
 > +++ b/include/kvm/ioport.h
-> @@ -14,11 +14,8 @@
+> @@ -14,7 +14,6 @@
 >  
 >  /* some ports we reserve for own use */
 >  #define IOPORT_DBG			0xe0
-> -#define IOPORT_START			0x6200
->  #define IOPORT_SIZE			0x400
->  
-> -#define IOPORT_EMPTY			USHRT_MAX
-> -
->  struct kvm;
->  
->  struct ioport {
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index a86c15a..bdbd183 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -19,6 +19,7 @@
->  #define PCI_CONFIG_DATA		0xcfc
->  #define PCI_CONFIG_BUS_FORWARD	0xcfa
->  #define PCI_IO_SIZE		0x100
-> +#define PCI_IOPORT_START	0x6200
->  #define PCI_CFG_SIZE		(1ULL << 24)
+> -#define IOPORT_SIZE			0x400
 >  
 >  struct kvm;
-> @@ -153,6 +154,7 @@ int pci__init(struct kvm *kvm);
->  int pci__exit(struct kvm *kvm);
->  struct pci_device_header *pci__find_dev(u8 dev_num);
->  u32 pci_get_io_space_block(u32 size);
-
-So I think this was already misnamed, but with your new function below
-becomes utterly confusing. Can we rename this to pci_get_mmio_space_block?
-
-> +u16 pci_get_io_port_block(u32 size);
->  void pci__assign_irq(struct device_header *dev_hdr);
->  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
->  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
-> diff --git a/ioport.c b/ioport.c
-> index a6dc65e..a72e403 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -16,24 +16,8 @@
 >  
->  #define ioport_node(n) rb_entry(n, struct ioport, node)
->  
-> -DEFINE_MUTEX(ioport_mutex);
-> -
-> -static u16			free_io_port_idx; /* protected by ioport_mutex */
-> -
->  static struct rb_root		ioport_tree = RB_ROOT;
->  
-> -static u16 ioport__find_free_port(void)
-> -{
-> -	u16 free_port;
-> -
-> -	mutex_lock(&ioport_mutex);
-> -	free_port = IOPORT_START + free_io_port_idx * IOPORT_SIZE;
-> -	free_io_port_idx++;
-> -	mutex_unlock(&ioport_mutex);
-> -
-> -	return free_port;
-> -}
-> -
->  static struct ioport *ioport_search(struct rb_root *root, u64 addr)
->  {
->  	struct rb_int_node *node;
-> @@ -85,8 +69,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
->  	int r;
->  
->  	br_write_lock(kvm);
-> -	if (port == IOPORT_EMPTY)
-> -		port = ioport__find_free_port();
->  
->  	entry = ioport_search(&ioport_tree, port);
->  	if (entry) {
 > diff --git a/pci.c b/pci.c
-> index 9edefa5..cd749db 100644
+> index cd749db..228a628 100644
 > --- a/pci.c
 > +++ b/pci.c
-> @@ -19,6 +19,14 @@ static u32 pci_config_address_bits;
->   * PCI isn't currently supported.)
->   */
->  static u32 io_space_blocks		= KVM_PCI_MMIO_AREA;
-> +static u16 io_port_blocks		= PCI_IOPORT_START;
-> +
-> +u16 pci_get_io_port_block(u32 size)
-> +{
-> +	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
-
-Nit: Can we please have an empty line after the variable declaration?
-
-Cheers,
-Andre.
-
-> +	io_port_blocks = port + size;
-> +	return port;
-> +}
+> @@ -23,7 +23,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
 >  
->  /*
->   * BARs must be naturally aligned, so enforce this in the allocator.
-> diff --git a/vfio/core.c b/vfio/core.c
-> index 17b5b0c..0ed1e6f 100644
-> --- a/vfio/core.c
-> +++ b/vfio/core.c
-> @@ -202,8 +202,10 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
->  				  struct vfio_region *region)
+>  u16 pci_get_io_port_block(u32 size)
 >  {
->  	if (region->is_ioport) {
-> -		int port = ioport__register(kvm, IOPORT_EMPTY, &vfio_ioport_ops,
-> -					    region->info.size, region);
-> +		int port = pci_get_io_port_block(region->info.size);
-> +
-> +		port = ioport__register(kvm, port, &vfio_ioport_ops,
-> +					region->info.size, region);
->  		if (port < 0)
->  			return port;
->  
+> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
+>  	io_port_blocks = port + size;
+>  	return port;
+>  }
 > diff --git a/virtio/pci.c b/virtio/pci.c
-> index 5a5fc6e..c8e16dd 100644
+> index c8e16dd..5a6c0d0 100644
 > --- a/virtio/pci.c
 > +++ b/virtio/pci.c
-> @@ -420,7 +420,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+> @@ -406,7 +406,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>  {
+>  	struct virtio_pci *vpci = ptr;
+>  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
+> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
+>  
+>  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
+>  }
+> @@ -420,14 +420,14 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
 >  	vpci->kvm = kvm;
 >  	vpci->dev = dev;
 >  
-> -	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
-> +	r = pci_get_io_port_block(IOPORT_SIZE);
-> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> -	r = pci_get_io_port_block(IOPORT_SIZE);
+> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> +	r = pci_get_io_port_block(PCI_IO_SIZE);
+> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
 >  	if (r < 0)
 >  		return r;
 >  	vpci->port_addr = (u16)r;
+>  
+> -	vpci->mmio_addr = pci_get_io_space_block(IOPORT_SIZE);
+> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
+> +	vpci->mmio_addr = pci_get_io_space_block(PCI_IO_SIZE);
+> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
+>  			       virtio_pci__io_mmio_callback, vpci);
+>  	if (r < 0)
+>  		goto free_ioport;
+> @@ -457,8 +457,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
+>  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
+>  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
+> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
+> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+>  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+>  	};
+>  
