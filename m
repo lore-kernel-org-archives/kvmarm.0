@@ -1,24 +1,26 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 06/16] pci: Fix ioport allocation size
-Date: Thu, 4 Apr 2019 14:46:02 +0100
-Message-ID: <20190404144602.049922ef@donnerap.cambridge.arm.com>
-References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
- <1551947777-13044-7-git-send-email-julien.thierry@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v7 18/27] KVM: arm64/sve: Add SVE support to register
+ access ioctl interface
+Date: Thu, 4 Apr 2019 15:57:06 +0200
+Message-ID: <20190404135706.2yxakb4w6h6s7kxc@kamzik.brq.redhat.com>
+References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-19-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3F254A43B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:46:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F5284A43B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:57:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DDZebeYwRc-v for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 09:46:06 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9954A332
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:46:06 -0400 (EDT)
-In-Reply-To: <1551947777-13044-7-git-send-email-julien.thierry@arm.com>
+ with ESMTP id 7drw1D9t6frh for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 09:57:12 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B3394A332
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:57:12 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1553864452-15080-19-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,134 +30,339 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>
-Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 7 Mar 2019 08:36:07 +0000
-Julien Thierry <julien.thierry@arm.com> wrote:
-
-> The PCI Local Bus Specification, Rev. 3.0,
-> Section 6.2.5.1. "Address Maps" states:
-> "Devices that map control functions into I/O Space must not consume more
-> than 256 bytes per I/O Base Address register."
+On Fri, Mar 29, 2019 at 01:00:43PM +0000, Dave Martin wrote:
+> This patch adds the following registers for access via the
+> KVM_{GET,SET}_ONE_REG interface:
 > 
-> Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
+>  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
+>  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
+>  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
 > 
-> Fix this by having PCI devices use 256 bytes ports for IO BARs.
-
-Good catch!
-
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
+> In order to adapt gracefully to future architectural extensions,
+> the registers are logically divided up into slices as noted above:
+> the i parameter denotes the slice index.
+> 
+> This allows us to reserve space in the ABI for future expansion of
+> these registers.  However, as of today the architecture does not
+> permit registers to be larger than a single slice, so no code is
+> needed in the kernel to expose additional slices, for now.  The
+> code can be extended later as needed to expose them up to a maximum
+> of 32 slices (as carved out in the architecture itself) if they
+> really exist someday.
+> 
+> The registers are only visible for vcpus that have SVE enabled.
+> They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
+> have SVE.
+> 
+> Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
+> allowed for SVE-enabled vcpus: SVE-aware userspace can use the
+> KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
+> register state.  This avoids some complex and pointless emulation
+> in the kernel to convert between the two views of these aliased
+> registers.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
+> 
 > ---
->  hw/pci-shmem.c       |  4 ++--
->  hw/vesa.c            |  4 ++--
->  include/kvm/ioport.h |  1 -
->  pci.c                |  2 +-
->  virtio/pci.c         | 14 +++++++-------
->  5 files changed, 12 insertions(+), 13 deletions(-)
 > 
-> diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-> index a0c5ba8..2e1474b 100644
-> --- a/hw/pci-shmem.c
-> +++ b/hw/pci-shmem.c
-> @@ -357,8 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
->  		return 0;
+> Changes since v5:
+> 
+>  * [Julien Thierry] rename sve_reg_region() to sve_reg_to_region() to
+>    make its purpose a bit clearer.
+> 
+>  * [Julien Thierry] rename struct sve_state_region to
+>    sve_state_reg_region to make it clearer this this struct only
+>    describes the bounds of (part of) a single register within
+>    sve_state.
+> 
+>  * [Julien Thierry] Add a comment to clarify the purpose of struct
+>    sve_state_reg_region.
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  14 ++++
+>  arch/arm64/include/uapi/asm/kvm.h |  17 +++++
+>  arch/arm64/kvm/guest.c            | 139 ++++++++++++++++++++++++++++++++++----
+>  3 files changed, 158 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4fabfd2..205438a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -329,6 +329,20 @@ struct kvm_vcpu_arch {
+>  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
+>  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
 >  
->  	/* Register MMIO space for MSI-X */
-> -	r = pci_get_io_port_block(IOPORT_SIZE);
-> -	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
-> +	r = pci_get_io_port_block(PCI_IO_SIZE);
-> +	r = ioport__register(kvm, r, &shmem_pci__io_ops, PCI_IO_SIZE, NULL);
->  	if (r < 0)
->  		return r;
->  	ivshmem_registers = (u16)r;
-> diff --git a/hw/vesa.c b/hw/vesa.c
-> index 404a8a3..71935d5 100644
-> --- a/hw/vesa.c
-> +++ b/hw/vesa.c
-> @@ -60,8 +60,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+> +#define vcpu_sve_state_size(vcpu) ({					\
+> +	size_t __size_ret;						\
+> +	unsigned int __vcpu_vq;						\
+> +									\
+> +	if (WARN_ON(!sve_vl_valid((vcpu)->arch.sve_max_vl))) {		\
+> +		__size_ret = 0;						\
+> +	} else {							\
+> +		__vcpu_vq = sve_vq_from_vl((vcpu)->arch.sve_max_vl);	\
+> +		__size_ret = SVE_SIG_REGS_SIZE(__vcpu_vq);		\
+> +	}								\
+> +									\
+> +	__size_ret;							\
+> +})
+
+I know why this is a macro instead of an inline :)
+
+> +
+>  /* vcpu_arch flags field values: */
+>  #define KVM_ARM64_DEBUG_DIRTY		(1 << 0)
+>  #define KVM_ARM64_FP_ENABLED		(1 << 1) /* guest FP regs loaded */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 97c3478..ced760c 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -226,6 +226,23 @@ struct kvm_vcpu_events {
+>  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+>  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
 >  
->  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->  		return NULL;
-> -	r = pci_get_io_space_block(IOPORT_SIZE);
-> -	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
-> +	r = pci_get_io_space_block(PCI_IO_SIZE);
-> +	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
->  	if (r < 0)
->  		return ERR_PTR(r);
+> +/* SVE registers */
+> +#define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
+> +
+> +/* Z- and P-regs occupy blocks at the following offsets within this range: */
+> +#define KVM_REG_ARM64_SVE_ZREG_BASE	0
+> +#define KVM_REG_ARM64_SVE_PREG_BASE	0x400
+> +
+> +#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
+> +					 KVM_REG_ARM64_SVE_ZREG_BASE |	\
+> +					 KVM_REG_SIZE_U2048 |		\
+> +					 ((n) << 5) | (i))
+> +#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
+> +					 KVM_REG_ARM64_SVE_PREG_BASE |	\
+> +					 KVM_REG_SIZE_U256 |		\
+> +					 ((n) << 5) | (i))
+
+I think (n) in the above two macros should be masked to document their
+size constraints. Since KVM_REG_ARM_COPROC_SHIFT is 16 they can't be
+larger than 1 << (16 - 5), which would be a mask of 0x7ff, but as there
+are only 32 zregs and 16 pregs so we should use 0x1f and 0xf respectively.
+
+> +#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
+
+Since this is user api and a user may want to construct their own register
+indices, then shouldn't we instead provide KVM_REG_ARM64_SVE_FFR_BASE as
+
+ #define KVM_REG_ARM64_SVE_FFR_BASE KVM_REG_ARM64_SVE_PREG_BASE | (16 << 5)
+
+and then KVM_REG_ARM64_SVE_FFR(i) would follow the typical pattern
+
+ #define KVM_REG_ARM64_SVE_FFR(i) (KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
+                                   KVM_REG_ARM64_SVE_FFR_BASE | \
+                                   KVM_REG_SIZE_U256 | (i))
+
+> +
+>  /* Device Control API: ARM VGIC */
+>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+>  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 756d0d6..736d8cb 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -19,8 +19,11 @@
+>   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>   */
 >  
-> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index b10fcd5..8c86b71 100644
-> --- a/include/kvm/ioport.h
-> +++ b/include/kvm/ioport.h
-> @@ -14,7 +14,6 @@
+> +#include <linux/bits.h>
+>  #include <linux/errno.h>
+>  #include <linux/err.h>
+> +#include <linux/nospec.h>
+> +#include <linux/kernel.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/module.h>
+>  #include <linux/stddef.h>
+> @@ -30,9 +33,12 @@
+>  #include <kvm/arm_psci.h>
+>  #include <asm/cputype.h>
+>  #include <linux/uaccess.h>
+> +#include <asm/fpsimd.h>
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_coproc.h>
+> +#include <asm/kvm_host.h>
+> +#include <asm/sigcontext.h>
 >  
->  /* some ports we reserve for own use */
->  #define IOPORT_DBG			0xe0
-> -#define IOPORT_SIZE			0x400
+>  #include "trace.h"
 >  
->  struct kvm;
->  
-> diff --git a/pci.c b/pci.c
-> index cd749db..228a628 100644
-> --- a/pci.c
-> +++ b/pci.c
-> @@ -23,7 +23,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
->  
->  u16 pci_get_io_port_block(u32 size)
->  {
-> -	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
-> +	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
->  	io_port_blocks = port + size;
->  	return port;
+> @@ -200,6 +206,115 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	return err;
 >  }
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index c8e16dd..5a6c0d0 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -406,7 +406,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>  
+> +#define SVE_REG_SLICE_SHIFT	0
+> +#define SVE_REG_SLICE_BITS	5
+> +#define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
+> +#define SVE_REG_ID_BITS		5
+> +
+> +#define SVE_REG_SLICE_MASK					\
+> +	GENMASK(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS - 1,	\
+> +		SVE_REG_SLICE_SHIFT)
+> +#define SVE_REG_ID_MASK							\
+> +	GENMASK(SVE_REG_ID_SHIFT + SVE_REG_ID_BITS - 1, SVE_REG_ID_SHIFT)
+> +
+> +#define SVE_NUM_SLICES (1 << SVE_REG_SLICE_BITS)
+> +
+> +#define KVM_SVE_ZREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0))
+> +#define KVM_SVE_PREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0))
+> +
+> +/* Bounds of a single SVE register slice within vcpu->arch.sve_state */
+> +struct sve_state_reg_region {
+> +	unsigned int koffset;	/* offset into sve_state in kernel memory */
+> +	unsigned int klen;	/* length in kernel memory */
+> +	unsigned int upad;	/* extra trailing padding in user memory */
+> +};
+> +
+> +/* Get sanitised bounds for user/kernel SVE register copy */
+> +static int sve_reg_to_region(struct sve_state_reg_region *region,
+> +			     struct kvm_vcpu *vcpu,
+> +			     const struct kvm_one_reg *reg)
+> +{
+> +	/* reg ID ranges for Z- registers */
+> +	const u64 zreg_id_min = KVM_REG_ARM64_SVE_ZREG(0, 0);
+> +	const u64 zreg_id_max = KVM_REG_ARM64_SVE_ZREG(SVE_NUM_ZREGS - 1,
+> +						       SVE_NUM_SLICES - 1);
+> +
+> +	/* reg ID ranges for P- registers and FFR (which are contiguous) */
+> +	const u64 preg_id_min = KVM_REG_ARM64_SVE_PREG(0, 0);
+> +	const u64 preg_id_max = KVM_REG_ARM64_SVE_FFR(SVE_NUM_SLICES - 1);
+> +
+> +	unsigned int vq;
+> +	unsigned int reg_num;
+> +
+> +	unsigned int reqoffset, reqlen; /* User-requested offset and length */
+> +	unsigned int maxlen; /* Maxmimum permitted length */
+> +
+> +	size_t sve_state_size;
+> +
+> +	/* Only the first slice ever exists, for now: */
+> +	if ((reg->id & SVE_REG_SLICE_MASK) != 0)
+> +		return -ENOENT;
+> +
+> +	vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
+> +
+> +	reg_num = (reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
+> +
+> +	if (reg->id >= zreg_id_min && reg->id <= zreg_id_max) {
+> +		reqoffset = SVE_SIG_ZREG_OFFSET(vq, reg_num) -
+> +				SVE_SIG_REGS_OFFSET;
+> +		reqlen = KVM_SVE_ZREG_SIZE;
+> +		maxlen = SVE_SIG_ZREG_SIZE(vq);
+> +	} else if (reg->id >= preg_id_min && reg->id <= preg_id_max) {
+> +		reqoffset = SVE_SIG_PREG_OFFSET(vq, reg_num) -
+> +				SVE_SIG_REGS_OFFSET;
+> +		reqlen = KVM_SVE_PREG_SIZE;
+> +		maxlen = SVE_SIG_PREG_SIZE(vq);
+> +	} else {
+> +		return -ENOENT;
+> +	}
+> +
+> +	sve_state_size = vcpu_sve_state_size(vcpu);
+> +	if (!sve_state_size)
+> +		return -EINVAL;
+> +
+> +	region->koffset = array_index_nospec(reqoffset, sve_state_size);
+> +	region->klen = min(maxlen, reqlen);
+> +	region->upad = reqlen - region->klen;
+> +
+> +	return 0;
+> +}
+> +
+> +static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +	struct sve_state_reg_region region;
+> +	char __user *uptr = (char __user *)reg->addr;
+> +
+> +	if (!vcpu_has_sve(vcpu) || sve_reg_to_region(&region, vcpu, reg))
+> +		return -ENOENT;
+
+sve_reg_to_region() can return EINVAL, but here it would get changed to
+ENOENT.
+
+> +
+> +	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
+> +			 region.klen) ||
+> +	    clear_user(uptr + region.klen, region.upad))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> +{
+> +	struct sve_state_reg_region region;
+> +	const char __user *uptr = (const char __user *)reg->addr;
+> +
+> +	if (!vcpu_has_sve(vcpu) || sve_reg_to_region(&region, vcpu, reg))
+> +		return -ENOENT;
+
+Same as above.
+
+> +
+> +	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
+> +			   region.klen))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
 >  {
->  	struct virtio_pci *vpci = ptr;
->  	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
-> -	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
-> +	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
+>  	return -EINVAL;
+> @@ -346,12 +461,12 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+>  		return -EINVAL;
 >  
->  	kvm__emulate_io(vcpu, port, data, direction, len, 1);
->  }
-> @@ -420,14 +420,14 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  	vpci->kvm = kvm;
->  	vpci->dev = dev;
+> -	/* Register group 16 means we want a core register. */
+> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
+> -		return get_core_reg(vcpu, reg);
+> -
+> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
+> -		return kvm_arm_get_fw_reg(vcpu, reg);
+> +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> +	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
+> +	case KVM_REG_ARM_FW:	return kvm_arm_get_fw_reg(vcpu, reg);
+> +	case KVM_REG_ARM64_SVE:	return get_sve_reg(vcpu, reg);
+> +	default: break; /* fall through */
+
+This case has a 'break', so it's not a 'fall through'. Do we require
+default cases even when they're unused? If not, why have it?
+
+> +	}
 >  
-> -	r = pci_get_io_port_block(IOPORT_SIZE);
-> -	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
-> +	r = pci_get_io_port_block(PCI_IO_SIZE);
-> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
->  	if (r < 0)
->  		return r;
->  	vpci->port_addr = (u16)r;
+>  	if (is_timer_reg(reg->id))
+>  		return get_timer_reg(vcpu, reg);
+> @@ -365,12 +480,12 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+>  		return -EINVAL;
 >  
-> -	vpci->mmio_addr = pci_get_io_space_block(IOPORT_SIZE);
-> -	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
-> +	vpci->mmio_addr = pci_get_io_space_block(PCI_IO_SIZE);
-> +	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
->  			       virtio_pci__io_mmio_callback, vpci);
->  	if (r < 0)
->  		goto free_ioport;
-> @@ -457,8 +457,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  							| PCI_BASE_ADDRESS_SPACE_MEMORY),
->  		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
->  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
-> -		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
-> -		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
-> +		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
-> +		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
->  		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
->  	};
+> -	/* Register group 16 means we set a core register. */
+> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
+> -		return set_core_reg(vcpu, reg);
+> -
+> -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
+> -		return kvm_arm_set_fw_reg(vcpu, reg);
+> +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> +	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
+> +	case KVM_REG_ARM_FW:	return kvm_arm_set_fw_reg(vcpu, reg);
+> +	case KVM_REG_ARM64_SVE:	return set_sve_reg(vcpu, reg);
+> +	default: break; /* fall through */
+
+Same as above.
+
+> +	}
 >  
+>  	if (is_timer_reg(reg->id))
+>  		return set_timer_reg(vcpu, reg);
+> -- 
+> 2.1.4
+>
+
+Thanks,
+drew 
