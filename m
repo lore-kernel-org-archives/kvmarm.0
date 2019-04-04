@@ -1,60 +1,67 @@
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [PATCH v7 05/23] iommu: Introduce cache_invalidate API
-Date: Thu, 2 May 2019 09:46:24 -0700
-Message-ID: <20190502094624.43924be8@jacob-builder>
-References: <20190408121911.24103-1-eric.auger@redhat.com>
-        <20190408121911.24103-6-eric.auger@redhat.com>
-        <a9745aef-8686-c761-e3d0-dd0e98a1f5b2@arm.com>
-        <e5d2fdd6-4ce1-863e-5198-0b05d727a5b6@redhat.com>
-        <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Return-Path: <SRS0=zYmH=SG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CAEC4360F
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Apr 2019 22:12:35 +0000 (UTC)
+Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
+	by mail.kernel.org (Postfix) with ESMTP id DE4232177E
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Apr 2019 22:12:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4232177E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lists.cs.columbia.edu
+Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
+Received: from localhost (localhost [127.0.0.1])
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F16494A455
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Apr 2019 18:12:33 -0400 (EDT)
+X-Virus-Scanned: at lists.cs.columbia.edu
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id cpOhpHYBVvDX for <kvmarm@archiver.kernel.org>;
+	Thu,  4 Apr 2019 18:12:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CBA4A331
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Apr 2019 18:12:33 -0400 (EDT)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Cc: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Vincent Stehle <Vincent.Stehle@arm.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>
-List-Id: kvmarm@lists.cs.columbia.edu
+From: kvmarm-request@lists.cs.columbia.edu
+To: kvmarm@archiver.kernel.org
+Subject: confirm 91da23f25b659018846f7bb68764472d792d93a0
+Reply-To: kvmarm-request@lists.cs.columbia.edu
+Message-ID: <mailman.0.1554415951.61662.kvmarm@lists.cs.columbia.edu>
+Date: Thu, 04 Apr 2019 18:12:31 -0400
+Precedence: bulk
+X-BeenThere: kvmarm@lists.cs.columbia.edu
+X-Mailman-Version: 2.1.14
+List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
+X-List-Administrivia: yes
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 2 May 2019 11:53:34 +0100
-Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+Mailing list subscription confirmation notice for mailing list kvmarm
 
-> On 02/05/2019 07:58, Auger Eric wrote:
-> > Hi Jean-Philippe,
-> > 
-> > On 5/1/19 12:38 PM, Jean-Philippe Brucker wrote:  
-> >> On 08/04/2019 13:18, Eric Auger wrote:  
-> >>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
-> >>> device *dev,
-> >>> +			   struct iommu_cache_invalidate_info
-> >>> *inv_info) +{
-> >>> +	int ret = 0;
-> >>> +
-> >>> +	if (unlikely(!domain->ops->cache_invalidate))
-> >>> +		return -ENODEV;
-> >>> +
-> >>> +	ret = domain->ops->cache_invalidate(domain, dev,
-> >>> inv_info); +
-> >>> +	return ret;  
-> >>
-> >> Nit: you don't really need ret
-> >>
-> >> The UAPI looks good to me, so
-> >>
-> >> Reviewed-by: Jean-Philippe Brucker
-> >> <jean-philippe.brucker@arm.com>  
-> > Just to make sure, do you accept changes proposed by Jacob in
-> > https://lkml.org/lkml/2019/4/29/659 ie.
-> > - the addition of NR_IOMMU_INVAL_GRANU in enum
-> > iommu_inv_granularity and
-> > - the addition of NR_IOMMU_CACHE_TYPE  
-> 
-> Ah sorry, I forgot about that, I'll review the next version. Yes they
-> can be useful (maybe call them IOMMU_INV_GRANU_NR and
-> IOMMU_CACHE_INV_TYPE_NR?). I guess it's legal to export in UAPI values
-> that will change over time, as VFIO also does it in its enums.
-> 
-I am fine with the names. Maybe you can put this patch in your sva/api
-branch once you reviewed it? Having a common branch for common code
-makes life so much easier.
+We have received a request from 176.113.74.187 for subscription of
+your email address, "kvmarm@archiver.kernel.org", to the
+kvmarm@lists.cs.columbia.edu mailing list.  To confirm that you want
+to be added to this mailing list, simply reply to this message,
+keeping the Subject: header intact.  Or visit this web page:
+
+    https://lists.cs.columbia.edu/mailman/confirm/kvmarm/91da23f25b659018846f7bb68764472d792d93a0
+
+
+Or include the following line -- and only the following line -- in a
+message to kvmarm-request@lists.cs.columbia.edu:
+
+    confirm 91da23f25b659018846f7bb68764472d792d93a0
+
+Note that simply sending a `reply' to this message should work from
+most mail readers, since that usually leaves the Subject: line in the
+right form (additional "Re:" text in the Subject: is okay).
+
+If you do not wish to be subscribed to this list, please simply
+disregard this message.  If you think you are being maliciously
+subscribed to the list, or have any other questions, send them to
+kvmarm-owner@lists.cs.columbia.edu.
