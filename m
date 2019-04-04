@@ -1,24 +1,25 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH kvmtool 04/16] pci: Fix BAR resource sizing arbitration
-Date: Thu, 4 Apr 2019 14:44:53 +0100
-Message-ID: <20190404144453.1342bdeb@donnerap.cambridge.arm.com>
+Subject: Re: [PATCH kvmtool 05/16] ioport: pci: Move port allocations to PCI
+ devices
+Date: Thu, 4 Apr 2019 14:45:37 +0100
+Message-ID: <20190404144537.6d2343fc@donnerap.cambridge.arm.com>
 References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
- <1551947777-13044-5-git-send-email-julien.thierry@arm.com>
+ <1551947777-13044-6-git-send-email-julien.thierry@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C414A43B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:44:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8104A332
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:45:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F6MGMj-dL1hn for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 09:44:58 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 578CB4A332
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:44:58 -0400 (EDT)
-In-Reply-To: <1551947777-13044-5-git-send-email-julien.thierry@arm.com>
+ with ESMTP id FpXMlzbGMrF7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 09:45:42 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADF54A43B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 09:45:42 -0400 (EDT)
+In-Reply-To: <1551947777-13044-6-git-send-email-julien.thierry@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,141 +29,207 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Thierry <julien.thierry@arm.com>, Sami.Mujawar@arm.com
-Cc: will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Julien Thierry <julien.thierry@arm.com>
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 7 Mar 2019 08:36:05 +0000
+On Thu, 7 Mar 2019 08:36:06 +0000
 Julien Thierry <julien.thierry@arm.com> wrote:
 
 Hi,
 
-> From: Sami Mujawar <sami.mujawar@arm.com>
+> The dynamic ioport allocation with IOPORT_EMPTY is currently only used
+> by PCI devices. Other devices use fixed ports for which they request
+> registration to the ioport API.
 > 
-> According to the 'PCI Local Bus Specification, Revision 3.0,
-> February 3, 2004, Section 6.2.5.1, Implementation Notes, page 227'
+> PCI ports need to be in the PCI IO space and there is no reason ioport
+> API should know a PCI port is being allocated and needs to be placed in
+> PCI IO space. This currently just happens to be the case.
 > 
->     "Software saves the original value of the Base Address register,
->     writes 0 FFFF FFFFh to the register, then reads it back. Size
->     calculation can be done from the 32-bit value read by first
->     clearing encoding information bits (bit 0 for I/O, bits 0-3 for
->     memory), inverting all 32 bits (logical NOT), then incrementing
->     by 1. The resultant 32-bit value is the memory/I/O range size
->     decoded by the register. Note that the upper 16 bits of the result
->     is ignored if the Base Address register is for I/O and bits 16-31
->     returned zero upon read."
+> Move the responsability of dynamic allocation of ioports from the ioport
+> API to PCI.
 > 
-> kvmtool was returning the actual BAR resource size which would be
-> incorrect as the software software drivers would invert all 32 bits
-> (logical NOT), then incrementing by 1. This ends up with a very large
-> resource size (in some cases more than 4GB) due to which drivers
-> assert/fail to work.
+> In the future, if other types of devices also need dynamic ioport
+> allocation, they'll have to figure out the range of ports they are
+> allowed to use.
 > 
-> e.g if the BAR resource size was 0x1000, kvmtool would return 0x1000
-> instead of 0xFFFFF00x.
-
-Ouch!
-
-> 
-> Fixed pci__config_wr() to return the size of the BAR in accordance with
-> the PCI Local Bus specification, Implementation Notes.
-> 
-> Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
 > Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 > ---
->  pci.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 48 insertions(+), 3 deletions(-)
+>  hw/pci-shmem.c       |  3 ++-
+>  hw/vesa.c            |  4 ++--
+>  include/kvm/ioport.h |  3 ---
+>  include/kvm/pci.h    |  2 ++
+>  ioport.c             | 18 ------------------
+>  pci.c                |  8 ++++++++
+>  vfio/core.c          |  6 ++++--
+>  virtio/pci.c         |  3 ++-
+>  8 files changed, 20 insertions(+), 27 deletions(-)
 > 
+> diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+> index f92bc75..a0c5ba8 100644
+> --- a/hw/pci-shmem.c
+> +++ b/hw/pci-shmem.c
+> @@ -357,7 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
+>  		return 0;
+>  
+>  	/* Register MMIO space for MSI-X */
+> -	r = ioport__register(kvm, IOPORT_EMPTY, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+> +	r = pci_get_io_port_block(IOPORT_SIZE);
+> +	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+>  	if (r < 0)
+>  		return r;
+>  	ivshmem_registers = (u16)r;
+> diff --git a/hw/vesa.c b/hw/vesa.c
+> index f3c5114..404a8a3 100644
+> --- a/hw/vesa.c
+> +++ b/hw/vesa.c
+> @@ -60,8 +60,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>  
+>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+>  		return NULL;
+> -
+> -	r = ioport__register(kvm, IOPORT_EMPTY, &vesa_io_ops, IOPORT_SIZE, NULL);
+> +	r = pci_get_io_space_block(IOPORT_SIZE);
+
+I am confused. This is still registering I/O ports, right? And this
+(misnamed) function is about MMIO?
+So should it read r = pci_get_io_port_block(IOPORT_SIZE); ?
+
+> +	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+>  	if (r < 0)
+>  		return ERR_PTR(r);
+>  
+> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> index db52a47..b10fcd5 100644
+> --- a/include/kvm/ioport.h
+> +++ b/include/kvm/ioport.h
+> @@ -14,11 +14,8 @@
+>  
+>  /* some ports we reserve for own use */
+>  #define IOPORT_DBG			0xe0
+> -#define IOPORT_START			0x6200
+>  #define IOPORT_SIZE			0x400
+>  
+> -#define IOPORT_EMPTY			USHRT_MAX
+> -
+>  struct kvm;
+>  
+>  struct ioport {
+> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+> index a86c15a..bdbd183 100644
+> --- a/include/kvm/pci.h
+> +++ b/include/kvm/pci.h
+> @@ -19,6 +19,7 @@
+>  #define PCI_CONFIG_DATA		0xcfc
+>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
+>  #define PCI_IO_SIZE		0x100
+> +#define PCI_IOPORT_START	0x6200
+>  #define PCI_CFG_SIZE		(1ULL << 24)
+>  
+>  struct kvm;
+> @@ -153,6 +154,7 @@ int pci__init(struct kvm *kvm);
+>  int pci__exit(struct kvm *kvm);
+>  struct pci_device_header *pci__find_dev(u8 dev_num);
+>  u32 pci_get_io_space_block(u32 size);
+
+So I think this was already misnamed, but with your new function below
+becomes utterly confusing. Can we rename this to pci_get_mmio_space_block?
+
+> +u16 pci_get_io_port_block(u32 size);
+>  void pci__assign_irq(struct device_header *dev_hdr);
+>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+> diff --git a/ioport.c b/ioport.c
+> index a6dc65e..a72e403 100644
+> --- a/ioport.c
+> +++ b/ioport.c
+> @@ -16,24 +16,8 @@
+>  
+>  #define ioport_node(n) rb_entry(n, struct ioport, node)
+>  
+> -DEFINE_MUTEX(ioport_mutex);
+> -
+> -static u16			free_io_port_idx; /* protected by ioport_mutex */
+> -
+>  static struct rb_root		ioport_tree = RB_ROOT;
+>  
+> -static u16 ioport__find_free_port(void)
+> -{
+> -	u16 free_port;
+> -
+> -	mutex_lock(&ioport_mutex);
+> -	free_port = IOPORT_START + free_io_port_idx * IOPORT_SIZE;
+> -	free_io_port_idx++;
+> -	mutex_unlock(&ioport_mutex);
+> -
+> -	return free_port;
+> -}
+> -
+>  static struct ioport *ioport_search(struct rb_root *root, u64 addr)
+>  {
+>  	struct rb_int_node *node;
+> @@ -85,8 +69,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+>  	int r;
+>  
+>  	br_write_lock(kvm);
+> -	if (port == IOPORT_EMPTY)
+> -		port = ioport__find_free_port();
+>  
+>  	entry = ioport_search(&ioport_tree, port);
+>  	if (entry) {
 > diff --git a/pci.c b/pci.c
-> index 689869c..9edefa5 100644
+> index 9edefa5..cd749db 100644
 > --- a/pci.c
 > +++ b/pci.c
-> @@ -8,6 +8,9 @@
->  #include <linux/err.h>
->  #include <assert.h>
+> @@ -19,6 +19,14 @@ static u32 pci_config_address_bits;
+>   * PCI isn't currently supported.)
+>   */
+>  static u32 io_space_blocks		= KVM_PCI_MMIO_AREA;
+> +static u16 io_port_blocks		= PCI_IOPORT_START;
+> +
+> +u16 pci_get_io_port_block(u32 size)
+> +{
+> +	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+
+Nit: Can we please have an empty line after the variable declaration?
+
+Cheers,
+Andre.
+
+> +	io_port_blocks = port + size;
+> +	return port;
+> +}
 >  
-> +/* Macro to check that a value is a power of 2 */
-> +#define power_of_2(pow) (((pow) != 0) && (((pow) & ((pow) - 1)) == 0))
-
-That is probably correct, but a bit hard to read. What about defining a
-static function instead? That would allow this to be written in multiple
-lines. And to improve readability, the prototype should probably be:
-static bool is_power_of_two(u32 value)
-
+>  /*
+>   * BARs must be naturally aligned, so enforce this in the allocator.
+> diff --git a/vfio/core.c b/vfio/core.c
+> index 17b5b0c..0ed1e6f 100644
+> --- a/vfio/core.c
+> +++ b/vfio/core.c
+> @@ -202,8 +202,10 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
+>  				  struct vfio_region *region)
+>  {
+>  	if (region->is_ioport) {
+> -		int port = ioport__register(kvm, IOPORT_EMPTY, &vfio_ioport_ops,
+> -					    region->info.size, region);
+> +		int port = pci_get_io_port_block(region->info.size);
 > +
->  static u32 pci_config_address_bits;
+> +		port = ioport__register(kvm, port, &vfio_ioport_ops,
+> +					region->info.size, region);
+>  		if (port < 0)
+>  			return port;
 >  
->  /* This is within our PCI gap - in an unused area.
-> @@ -173,9 +176,51 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->  	 * BAR there next time it reads from it. When the kernel got the size it
->  	 * would write the address back.
->  	 */
-> -	if (bar < 6 && ioport__read32(data) == 0xFFFFFFFF) {
-> -		u32 sz = pci_hdr->bar_size[bar];
-> -		memcpy(base + offset, &sz, sizeof(sz));
-> +	if (bar < 6) {
-> +		/*
-> +		 * According to the PCI local bus specification REV 3.0:
-> +		 * The number of upper bits that a device actually implements
-> +		 * depends on how much of the address space the device will
-> +		 * respond to. A device that wants a 1 MB memory address space
-> +		 * (using a 32-bit base address register) would build the top
-> +		 * 12 bits of the address register, hardwiring the other bits
-> +		 * to 0.
-> +		 * Furthermore software can determine how much address space the
-> +		 * device requires by writing a value of all 1's to the register
-> +		 * and then reading the value back. The device will return 0's in
-> +		 * all don't-care address bits, effectively specifying the address
-> +		 * space required.
-> +		 *
-> +		 * The following code emulates this by storing the value written
-> +		 * to the BAR, applying the size mask to clear the lower bits,
-> +		 * restoring the information bits and then updating the BAR value.
-> +		 */
-> +		u32 bar_value;
-> +		/* Get the size mask */
-> +		u32 sz = ~(pci_hdr->bar_size[bar] - 1);
-
-It's a bit confusing to read just "sz", when it's actually a mask.
-Actually there is only one user, so to make the comment there more
-meaningful, you can just use the mask expression there, and get rid of
-"sz" altogether.
-
-> +		/* Extract the info bits */
-> +		u32 info = pci_hdr->bar[bar] & 0xF;
-
-Just a nit, but I find it a bit confusing to see those variable
-definitions mixed with comments, especially with those short type names
-and after the big introductory comment. Can we just put the comment on the
-same line as the declaration, at least?
-
-> +
-> +		/* Store the value written by software */
-> +		memcpy(base + offset, data, size);
-> +
-> +		/* Apply the size mask to the bar value to clear the lower bits */
-> +		bar_value = pci_hdr->bar[bar] & sz;
-> +
-> +		/* Warn if the bar size is not a power of 2 */
-> +		WARN_ON(!power_of_2(pci_hdr->bar_size[bar]));
-
-Is this actually useful? This would put out a warning to the console, but
-is there something an admin could do about it? Looks more like a kvmtool
-issue (for instance the VESA and pci-shmem devices don't use power-of-2
-sizes at the moment)?
-
-> +
-> +		/* Restore the info bits */
-> +		if ((info & 0x1) == 0x1) {
-> +			/* BAR for I/O */
-> +			bar_value = ((bar_value & ~0x3) | 0x1);
-> +		} else {
-> +			/* BAR for Memory */
-> +			bar_value = ((bar_value & ~0xF) | info);
-> +		}
-> +
-> +		/* Store the final BAR value */
-> +		pci_hdr->bar[bar] = bar_value;
->  	} else {
->  		memcpy(base + offset, data, size);
->  	}
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 5a5fc6e..c8e16dd 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -420,7 +420,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  	vpci->kvm = kvm;
+>  	vpci->dev = dev;
+>  
+> -	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+> +	r = pci_get_io_port_block(IOPORT_SIZE);
+> +	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
+>  	if (r < 0)
+>  		return r;
+>  	vpci->port_addr = (u16)r;
