@@ -1,26 +1,29 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 22/27] KVM: arm/arm64: Add KVM_ARM_VCPU_FINALIZE ioctl
-Date: Thu, 4 Apr 2019 17:47:07 +0100
-Message-ID: <20190404164707.GH3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v7 18/27] KVM: arm64/sve: Add SVE support to register
+ access ioctl interface
+Date: Thu, 4 Apr 2019 17:56:46 +0100
+Message-ID: <20190404165645.GI3567@e103592.cambridge.arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-23-git-send-email-Dave.Martin@arm.com>
- <20190404150709.ihxlndxc6mvuwomp@kamzik.brq.redhat.com>
+ <1553864452-15080-19-git-send-email-Dave.Martin@arm.com>
+ <20190404135706.2yxakb4w6h6s7kxc@kamzik.brq.redhat.com>
+ <20190404145056.GF3567@e103592.cambridge.arm.com>
+ <20190404162539.tqygabtqrlma2272@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B9344A422
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:47:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60CD84A36D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:56:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LSnhi0xkUzGA for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 12:47:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEF0D4A331
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:47:12 -0400 (EDT)
+ with ESMTP id A+-Rw3aPTd7e for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Apr 2019 12:56:51 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF07C4A331
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 12:56:50 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20190404150709.ihxlndxc6mvuwomp@kamzik.brq.redhat.com>
+In-Reply-To: <20190404162539.tqygabtqrlma2272@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,202 +37,191 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 04, 2019 at 05:07:09PM +0200, Andrew Jones wrote:
-> On Fri, Mar 29, 2019 at 01:00:47PM +0000, Dave Martin wrote:
-> > Some aspects of vcpu configuration may be too complex to be
-> > completed inside KVM_ARM_VCPU_INIT.  Thus, there may be a
-> > requirement for userspace to do some additional configuration
-> > before various other ioctls will work in a consistent way.
+On Thu, Apr 04, 2019 at 06:25:39PM +0200, Andrew Jones wrote:
+> On Thu, Apr 04, 2019 at 03:50:56PM +0100, Dave Martin wrote:
+> > On Thu, Apr 04, 2019 at 03:57:06PM +0200, Andrew Jones wrote:
+> > > On Fri, Mar 29, 2019 at 01:00:43PM +0000, Dave Martin wrote:
+> > > > This patch adds the following registers for access via the
+> > > > KVM_{GET,SET}_ONE_REG interface:
+> > > > 
+> > > >  * KVM_REG_ARM64_SVE_ZREG(n, i) (n = 0..31) (in 2048-bit slices)
+> > > >  * KVM_REG_ARM64_SVE_PREG(n, i) (n = 0..15) (in 256-bit slices)
+> > > >  * KVM_REG_ARM64_SVE_FFR(i) (in 256-bit slices)
+> > > > 
+> > > > In order to adapt gracefully to future architectural extensions,
+> > > > the registers are logically divided up into slices as noted above:
+> > > > the i parameter denotes the slice index.
+> > > > 
+> > > > This allows us to reserve space in the ABI for future expansion of
+> > > > these registers.  However, as of today the architecture does not
+> > > > permit registers to be larger than a single slice, so no code is
+> > > > needed in the kernel to expose additional slices, for now.  The
+> > > > code can be extended later as needed to expose them up to a maximum
+> > > > of 32 slices (as carved out in the architecture itself) if they
+> > > > really exist someday.
+> > > > 
+> > > > The registers are only visible for vcpus that have SVE enabled.
+> > > > They are not enumerated by KVM_GET_REG_LIST on vcpus that do not
+> > > > have SVE.
+> > > > 
+> > > > Accesses to the FPSIMD registers via KVM_REG_ARM_CORE is not
+> > > > allowed for SVE-enabled vcpus: SVE-aware userspace can use the
+> > > > KVM_REG_ARM64_SVE_ZREG() interface instead to access the same
+> > > > register state.  This avoids some complex and pointless emulation
+> > > > in the kernel to convert between the two views of these aliased
+> > > > registers.
+> > > > 
+> > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > > > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> > > > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
+
+[...]
+
+> > > > +#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
+> > > 
+> > > Since this is user api and a user may want to construct their own register
+> > > indices, then shouldn't we instead provide KVM_REG_ARM64_SVE_FFR_BASE as
+> > > 
+> > >  #define KVM_REG_ARM64_SVE_FFR_BASE KVM_REG_ARM64_SVE_PREG_BASE | (16 << 5)
 > > 
-> > In particular this will be the case for SVE, where userspace will
-> > need to negotiate the set of vector lengths to be made available to
-> > the guest before the vcpu becomes fully usable.
+> > Can do, or just
 > > 
-> > In order to provide an explicit way for userspace to confirm that
-> > it has finished setting up a particular vcpu feature, this patch
-> > adds a new ioctl KVM_ARM_VCPU_FINALIZE.
-> > 
-> > When userspace has opted into a feature that requires finalization,
-> > typically by means of a feature flag passed to KVM_ARM_VCPU_INIT, a
-> > matching call to KVM_ARM_VCPU_FINALIZE is now required before
-> > KVM_RUN or KVM_GET_REG_LIST is allowed.  Individual features may
-> > impose additional restrictions where appropriate.
-> > 
-> > No existing vcpu features are affected by this, so current
-> > userspace implementations will continue to work exactly as before,
-> > with no need to issue KVM_ARM_VCPU_FINALIZE.
-> > 
-> > As implemented in this patch, KVM_ARM_VCPU_FINALIZE is currently a
-> > placeholder: no finalizable features exist yet, so ioctl is not
-> > required and will always yield EINVAL.  Subsequent patches will add
-> > the finalization logic to make use of this ioctl for SVE.
-> > 
-> > No functional change for existing userspace.
-> > 
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> > 
-> > ---
-> > 
-> > Changes since v5:
-> > 
-> >  * Commit message, including subject line, rewritten.
-> > 
-> >    This patch is a rework of "KVM: arm/arm64: Add hook to finalize the
-> >    vcpu configuration".  The old subject line and commit message no
-> >    longer accurately described what the patch does.  However, the code
-> >    is an evolution of the previous patch rather than a wholesale
-> >    rewrite.
-> > 
-> >  * Added an explicit KVM_ARM_VCPU_FINALIZE ioctl, rather than just
-> >    providing internal hooks in the kernel to finalize the vcpu
-> >    configuration implicitly.  This allows userspace to confirm exactly
-> >    when it has finished configuring the vcpu and is ready to use it.
-> > 
-> >    This results in simpler (and hopefully more maintainable) ioctl
-> >    ordering rules.
-> > ---
-> >  arch/arm/include/asm/kvm_host.h   |  4 ++++
-> >  arch/arm64/include/asm/kvm_host.h |  4 ++++
-> >  include/uapi/linux/kvm.h          |  3 +++
-> >  virt/kvm/arm/arm.c                | 18 ++++++++++++++++++
-> >  4 files changed, 29 insertions(+)
-> > 
-> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> > index a49ee01..e80cfc1 100644
-> > --- a/arch/arm/include/asm/kvm_host.h
-> > +++ b/arch/arm/include/asm/kvm_host.h
-> > @@ -19,6 +19,7 @@
-> >  #ifndef __ARM_KVM_HOST_H__
-> >  #define __ARM_KVM_HOST_H__
-> >  
-> > +#include <linux/errno.h>
-> >  #include <linux/types.h>
-> >  #include <linux/kvm_types.h>
-> >  #include <asm/cputype.h>
-> > @@ -411,4 +412,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
-> >  	return 0;
-> >  }
-> >  
-> > +#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
-> > +#define kvm_arm_vcpu_is_finalized(vcpu) true
-> > +
+> > #define KVM_REG_ARM64_SVE_FFR_BASE KVM_REG_ARM64_SVE_PREG(0, 0)
 > 
-> We usually use inline functions for the stubs.
+> I don't see how this would work for an FFR base.
 
-I guess we could.
+Err yes, scratch that.  But I'm happy to have it, however defined.
 
-The vcpu_has_sve() circular include problem applies here too if we put
-the actual function bodies here, which is why I ended up with this.  Now
-that the bodies (for arm64) are out of line, it actually doesn't matter.
+[...]
 
-> >  #endif /* __ARM_KVM_HOST_H__ */
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 3e89509..98658f7 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -23,6 +23,7 @@
-> >  #define __ARM64_KVM_HOST_H__
-> >  
-> >  #include <linux/bitmap.h>
-> > +#include <linux/errno.h>
-> >  #include <linux/types.h>
-> >  #include <linux/jump_label.h>
-> >  #include <linux/kvm_types.h>
-> > @@ -625,4 +626,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
-> >  
-> >  int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
-> >  
-> > +#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
-> > +#define kvm_arm_vcpu_is_finalized(vcpu) true
+> > > > +/* Get sanitised bounds for user/kernel SVE register copy */
+> > > > +static int sve_reg_to_region(struct sve_state_reg_region *region,
+> > > > +			     struct kvm_vcpu *vcpu,
+> > > > +			     const struct kvm_one_reg *reg)
+> > > > +{
+
+[...]
+
+> > > > +	sve_state_size = vcpu_sve_state_size(vcpu);
+> > > > +	if (!sve_state_size)
+> > > > +		return -EINVAL;
+> > > > +
+> > > > +	region->koffset = array_index_nospec(reqoffset, sve_state_size);
+> > > > +	region->klen = min(maxlen, reqlen);
+> > > > +	region->upad = reqlen - region->klen;
+> > > > +
+> > > > +	return 0;
+> > > > +}
+> > > > +
+> > > > +static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > > > +{
+> > > > +	struct sve_state_reg_region region;
+> > > > +	char __user *uptr = (char __user *)reg->addr;
+> > > > +
+> > > > +	if (!vcpu_has_sve(vcpu) || sve_reg_to_region(&region, vcpu, reg))
+> > > > +		return -ENOENT;
+> > > 
+> > > sve_reg_to_region() can return EINVAL, but here it would get changed to
+> > > ENOENT.
+> > 
+> > Hmm, I'd say the affected code in sve_reg_to_region() should really be
+> > a WARN_ON(): we're not supposed to hit it because we can't get here
+> > until the vcpu is finalized.  It's really just a defensive check before
+> > dividing by some potentially invalid value.  In such a case, it's
+> > reasonable to have that EINVAL show through to userspace.
 > 
-> Same as above.
+> Adding the WARN_ON is a good idea. The thing is that the EINVAL is *not*
+> going to show through to userspace. ENOENT will. Which might be fine,
+> but if so, then it would clear things up to just return ENOENT in
+> sve_reg_to_region() as well.
 
-Ditto
+I meant that we can propagate the actual return value back.
 
-> > +
-> >  #endif /* __ARM64_KVM_HOST_H__ */
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index dc77a5a..c3b8e7a 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1441,6 +1441,9 @@ struct kvm_enc_region {
-> >  /* Available with KVM_CAP_HYPERV_CPUID */
-> >  #define KVM_GET_SUPPORTED_HV_CPUID _IOWR(KVMIO, 0xc1, struct kvm_cpuid2)
-> >  
-> > +/* Available with KVM_CAP_ARM_SVE */
-> > +#define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
-> > +
-> >  /* Secure Encrypted Virtualization command */
-> >  enum sev_cmd_id {
-> >  	/* Guest initialization commands */
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index c69e137..9edbf0f 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -545,6 +545,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-> >  	if (likely(vcpu->arch.has_run_once))
-> >  		return 0;
-> >  
-> > +	if (!kvm_arm_vcpu_is_finalized(vcpu))
-> > +		return -EPERM;
-> > +
-> >  	vcpu->arch.has_run_once = true;
-> >  
-> >  	if (likely(irqchip_in_kernel(kvm))) {
-> > @@ -1116,6 +1119,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> >  		if (unlikely(!kvm_vcpu_initialized(vcpu)))
-> >  			break;
-> >  
-> > +		r = -EPERM;
-> > +		if (!kvm_arm_vcpu_is_finalized(vcpu))
-> > +			break;
-> > +
+It might be better just to merge the vcpu_has_sve() check into sve_reg_to_region(), and simply have
+
+	int ret;
+
+	ret = sve_reg_to_region(...);
+	if (ret)
+		return ret;
+
+here.
+
+Currently we return -ENOENT for a non-SVE-enabled vcpu, even if the reg
+ID is complete garbage.  It would probably be useful to tidy that up at
+the same time: -EINVAL would probably be more appropriate for such
+cases.
+
+[...]
+
+> > > >  int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+> > > >  {
+> > > >  	return -EINVAL;
+> > > > @@ -346,12 +461,12 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > > >  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+> > > >  		return -EINVAL;
+> > > >  
+> > > > -	/* Register group 16 means we want a core register. */
+> > > > -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
+> > > > -		return get_core_reg(vcpu, reg);
+> > > > -
+> > > > -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
+> > > > -		return kvm_arm_get_fw_reg(vcpu, reg);
+> > > > +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> > > > +	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
+> > > > +	case KVM_REG_ARM_FW:	return kvm_arm_get_fw_reg(vcpu, reg);
+> > > > +	case KVM_REG_ARM64_SVE:	return get_sve_reg(vcpu, reg);
+> > > > +	default: break; /* fall through */
+> > > 
+> > > This case has a 'break', so it's not a 'fall through'. Do we require
+> > > default cases even when they're unused? If not, why have it?
+> > 
+> > My reason for having that was to highlight that we fall through to the
+> > code following the switch only in this case, because the other cases
+> > all consist of return statements.
 > 
-> What's the rationale for using EPERM? The finalized concept is very
-> similar to the initialized one. So why not also use ENOEXEC for it too?
+> I think it's pretty clear from the 'case,return' pattern what's going on
+> and the default case isn't needed at all. And since the fall through
+> comment is typically used to document why there is not a break, then
+> having both looks weird.
 
-Hmm, I guess we could equally return ENOEXEC.  Initially this felt like
-a more distinctive case.
+Sure, I'm more than happy to remove the redundant default case if you
+feel its presence is confusing rather than helpful.
 
-Assuming Marc is happy to take an ABI fix into kvmarm/next, I'm can
-change them.  We're not absolutely committed until this hits mainline...
+I didn't want it to look like the switch() was supposed to be exhaustive,
+but the presence of code after it _should_ make that obvious.
 
-> >  		r = -EFAULT;
-> >  		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
-> >  			break;
-> > @@ -1169,6 +1176,17 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> >  
-> >  		return kvm_arm_vcpu_set_events(vcpu, &events);
-> >  	}
-> > +	case KVM_ARM_VCPU_FINALIZE: {
-> > +		int what;
-> > +
-> > +		if (!kvm_vcpu_initialized(vcpu))
-> > +			return -ENOEXEC;
-> > +
-> > +		if (get_user(what, (const int __user *)argp))
-> > +			return -EFAULT;
-> > +
-> > +		return kvm_arm_vcpu_finalize(vcpu, what);
+> > 
+> > > > +	}
+> > > >  
+> > > >  	if (is_timer_reg(reg->id))
+> > > >  		return get_timer_reg(vcpu, reg);
+> > > > @@ -365,12 +480,12 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > > >  	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+> > > >  		return -EINVAL;
+> > > >  
+> > > > -	/* Register group 16 means we set a core register. */
+> > > > -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE)
+> > > > -		return set_core_reg(vcpu, reg);
+> > > > -
+> > > > -	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_FW)
+> > > > -		return kvm_arm_set_fw_reg(vcpu, reg);
+> > > > +	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> > > > +	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
+> > > > +	case KVM_REG_ARM_FW:	return kvm_arm_set_fw_reg(vcpu, reg);
+> > > > +	case KVM_REG_ARM64_SVE:	return set_sve_reg(vcpu, reg);
+> > > > +	default: break; /* fall through */
+> > > 
+> > > Same as above.
+> > 
+> > I could move the trailing code into the default case, but that felt a
+> > bit ugly.
+> > 
+> > Thoughts?
 > 
-> Almost all the cases use the 'r = ...; break;' type of pattern, leaving
-> it to the 'return r' at the end of the function. I guess that's in case
-> at some point more stuff is added after the switch. The only cases that
-> don't do that are the most recent ones KVM_GET/SET_VCPU_EVENTS, which
-> should probably be changed to fit the pattern too, rather than this
-> new ioctl following there pattern.
+> I'd remove the default case :)
 
-I have no strong opinion on this: it's basically a question of style.
-I followed KVM_GET/SET_VCPU_EVENTS, but you're right, the
-r = ...; break; style is used for the others.
-
-If there's an intention of putting stuff at the end of the function,
-it will make a difference.  But this seems unlikely to happen: this
-function is really just a dispatcher.
-
-I'm happy to change it (and the others) if there are strong views.
+OK
 
 Cheers
 ---Dave
