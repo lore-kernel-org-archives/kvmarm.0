@@ -1,123 +1,104 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 13/27] KVM: arm64/sve: Context switch the SVE registers
-Date: Thu, 4 Apr 2019 10:35:02 +0200
-Message-ID: <20190404083502.b7a345l2gx3df2zk@kamzik.brq.redhat.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v7 26/27] KVM: Document errors for KVM_GET_ONE_REG and
+ KVM_SET_ONE_REG
+Date: Thu, 4 Apr 2019 09:35:26 +0100
+Message-ID: <20190404083526.GZ3567@e103592.cambridge.arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-14-git-send-email-Dave.Martin@arm.com>
- <20190403200145.c2oep2hbugl7db5t@kamzik.brq.redhat.com>
- <20190404081008.GY3567@e103592.cambridge.arm.com>
+ <1553864452-15080-27-git-send-email-Dave.Martin@arm.com>
+ <20190403202746.yoxwokr5uitli5q4@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE20D4A36C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 04:35:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JGMQvYPhUVmP for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Apr 2019 04:35:07 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD13D4A320
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Apr 2019 04:35:07 -0400 (EDT)
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20190404081008.GY3567@e103592.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+In-Reply-To: <20190403202746.yoxwokr5uitli5q4@kamzik.brq.redhat.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 04, 2019 at 09:10:08AM +0100, Dave Martin wrote:
-> On Wed, Apr 03, 2019 at 10:01:45PM +0200, Andrew Jones wrote:
-> > On Fri, Mar 29, 2019 at 01:00:38PM +0000, Dave Martin wrote:
-> > > In order to give each vcpu its own view of the SVE registers, this
-> > > patch adds context storage via a new sve_state pointer in struct
-> > > vcpu_arch.  An additional member sve_max_vl is also added for each
-> > > vcpu, to determine the maximum vector length visible to the guest
-> > > and thus the value to be configured in ZCR_EL2.LEN while the vcpu
-> > > is active.  This also determines the layout and size of the storage
-> > > in sve_state, which is read and written by the same backend
-> > > functions that are used for context-switching the SVE state for
-> > > host tasks.
-> > > 
-> > > On SVE-enabled vcpus, SVE access traps are now handled by switching
-> > > in the vcpu's SVE context and disabling the trap before returning
-> > > to the guest.  On other vcpus, the trap is not handled and an exit
-> > > back to the host occurs, where the handle_sve() fallback path
-> > > reflects an undefined instruction exception back to the guest,
-> > > consistently with the behaviour of non-SVE-capable hardware (as was
-> > > done unconditionally prior to this patch).
-> > > 
-> > > No SVE handling is added on non-VHE-only paths, since VHE is an
-> > > architectural and Kconfig prerequisite of SVE.
-> > > 
-> > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> > > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> > > 
-> > > ---
-> > > 
-> > > Changes since v5:
-> > > 
-> > >  * [Julien Thierry, Julien Grall] Commit message typo fixes
-> > > 
-> > >  * [Mark Rutland] Rename trap_class to hsr_ec, for consistency with
-> > >    existing code.
-> > > 
-> > >  * [Mark Rutland] Simplify condition for refusing to handle an
-> > >    FPSIMD/SVE trap, using multiple if () statements for clarity.  The
-> > >    previous condition was a bit tortuous, and how that the static_key
-> > >    checks have been hoisted out, it makes little difference to the
-> > >    compiler how we express the condition here.
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h |  6 ++++
-> > >  arch/arm64/kvm/fpsimd.c           |  5 +--
-> > >  arch/arm64/kvm/hyp/switch.c       | 75 +++++++++++++++++++++++++++++----------
-> > >  3 files changed, 66 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 22cf484..4fabfd2 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -228,6 +228,8 @@ struct vcpu_reset_state {
-> > >  
-> > >  struct kvm_vcpu_arch {
-> > >  	struct kvm_cpu_context ctxt;
-> > > +	void *sve_state;
-> > > +	unsigned int sve_max_vl;
-> > >  
-> > >  	/* HYP configuration */
-> > >  	u64 hcr_el2;
-> > > @@ -323,6 +325,10 @@ struct kvm_vcpu_arch {
-> > >  	bool sysregs_loaded_on_cpu;
-> > >  };
-> > >  
-> > > +/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> > > +#define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
-> > > +				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-> > 
-> > Maybe an inline function instead?
-> 
-> I tried, but that requires the definition of struct kvm_vcpu to be
-> visible.  I failed to get that here without circular #include problems,
-> and it looked tricky to fix.
+On Wed, Apr 03, 2019 at 10:27:46PM +0200, Andrew Jones wrote:
+> On Fri, Mar 29, 2019 at 01:00:51PM +0000, Dave Martin wrote:
+> > KVM_GET_ONE_REG and KVM_SET_ONE_REG return some error codes that
+> > are not documented (but hopefully not surprising either).  To give
+> > an indication of what these may mean, this patch adds brief
+> > documentation.
+> > =
 
-Ah, OK
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  Documentation/virtual/kvm/api.txt | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > =
 
-> 
-> Since this is a small bit of code which is unlikely to get used by
-> accident, I decided it was OK to keep it as a macro.
-> 
-> Can you see another way around this?
+> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+> > index 2d4f7ce..cd920dd 100644
+> > --- a/Documentation/virtual/kvm/api.txt
+> > +++ b/Documentation/virtual/kvm/api.txt
+> > @@ -1871,6 +1871,9 @@ Architectures: all
+> >  Type: vcpu ioctl
+> >  Parameters: struct kvm_one_reg (in)
+> >  Returns: 0 on success, negative value on failure
+> > +Errors:
+> > + =A0ENOENT: =A0=A0no such register
+> > + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known =
+register
+> >  =
 
-Nope
+> >  struct kvm_one_reg {
+> >         __u64 id;
+> > @@ -2192,6 +2195,9 @@ Architectures: all
+> >  Type: vcpu ioctl
+> >  Parameters: struct kvm_one_reg (in and out)
+> >  Returns: 0 on success, negative value on failure
+> > +Errors:
+> > + =A0ENOENT: =A0=A0no such register
+> > + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known =
+register
+> >  =
 
-drew
+> >  This ioctl allows to receive the value of a single register implemented
+> >  in a vcpu. The register to read is indicated by the "id" field of the
+> > -- =
+
+> > 2.1.4
+> >
+> =
+
+> Are we sure all architectures have these, and only these errors? A quick
+> grep indicates not. I'm not sure we can document this easily here due to
+> it addressing all architectures at once. Maybe we could add arch-specific
+> subsections, but I'm not sure it's worth it.
+
+Error codes are generally indicative at best, and rarely mutually
+exclusive in a given situation.
+
+Writing a caveat to say that you shouldn't make assumptions about
+precisely what error code will be returned in a given situation would
+look odd: that really applies widely all over the kernel/user ABI, not
+just here.
+
+_Maybe_ everything is exhaustively correct in this file already, but
+given the size of it, and the fact that many things are implemented
+per-arch, the chance of this seems zero.
+
+I could add "invalid register ID" for EINVAL.  This allows some
+ambiguity about which error code applies for a nonexistent register.
+
+Alternatively, we could revert this documentation instead.
+
+It seemed appropriate to document the EPERM error for finalization
+ordering (added later), but since correct userspace code should never
+see this maybe it's reasonable to leave it undocumented(?)
+
+Cheers
+---Dave
