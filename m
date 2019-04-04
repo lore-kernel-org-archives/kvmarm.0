@@ -1,26 +1,30 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 26/27] KVM: Document errors for KVM_GET_ONE_REG and
- KVM_SET_ONE_REG
-Date: Wed, 3 Apr 2019 22:27:46 +0200
-Message-ID: <20190403202746.yoxwokr5uitli5q4@kamzik.brq.redhat.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-27-git-send-email-Dave.Martin@arm.com>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH kvmtool v3 0/3] vfio-pci: Support INTx mode re-enabling
+Date: Thu, 4 Apr 2019 10:57:39 +0800
+Message-ID: <20190404025739.GA4490@leoy-ThinkPad-X240s>
+References: <20190326074131.4284-1-leo.yan@linaro.org>
+ <20190402165025.GA1442@fuggles.cambridge.arm.com>
+ <20190403014730.GA5339@leoy-ThinkPad-X240s>
+ <20190403124331.GA16362@fuggles.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4574E4A332
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:27:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD8344A424
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 22:57:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s+8ARmOX6Lik for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Apr 2019 16:27:53 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3654C4A2BE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 16:27:53 -0400 (EDT)
+ with ESMTP id qg+K6MebPVOf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Apr 2019 22:57:46 -0400 (EDT)
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com
+ [209.85.210.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CAC04A36C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Apr 2019 22:57:46 -0400 (EDT)
+Received: by mail-pf1-f194.google.com with SMTP id z5so585502pfn.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Apr 2019 19:57:46 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1553864452-15080-27-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20190403124331.GA16362@fuggles.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,60 +34,32 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 29, 2019 at 01:00:51PM +0000, Dave Martin wrote:
-> KVM_GET_ONE_REG and KVM_SET_ONE_REG return some error codes that
-> are not documented (but hopefully not surprising either).  To give
-> an indication of what these may mean, this patch adds brief
-> documentation.
-> =
+Hi Will,
 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
->  Documentation/virtual/kvm/api.txt | 6 ++++++
->  1 file changed, 6 insertions(+)
-> =
+On Wed, Apr 03, 2019 at 01:43:31PM +0100, Will Deacon wrote:
+> On Wed, Apr 03, 2019 at 11:58:17AM +0800, Leo Yan wrote:
+> > On Tue, Apr 02, 2019 at 05:50:25PM +0100, Will Deacon wrote:
+> > > Just checking, but is this series intended to supersede this one:
+> > > 
+> > > https://www.spinics.net/lists/kvm/msg183750.html
+> > > 
+> > > ?
+> > 
+> > Yes, this patch series is v3 and the link you pointed out is the old
+> > patch series v1.  Sorry for confusion.
+> 
+> No, that's fine and what I was assuming. Just wanted to confirm due to the
+> change in $subject, so I don't miss anything.
 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kv=
-m/api.txt
-> index 2d4f7ce..cd920dd 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -1871,6 +1871,9 @@ Architectures: all
->  Type: vcpu ioctl
->  Parameters: struct kvm_one_reg (in)
->  Returns: 0 on success, negative value on failure
-> +Errors:
-> + =A0ENOENT: =A0=A0no such register
-> + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known re=
-gister
->  =
+Yes.
 
->  struct kvm_one_reg {
->         __u64 id;
-> @@ -2192,6 +2195,9 @@ Architectures: all
->  Type: vcpu ioctl
->  Parameters: struct kvm_one_reg (in and out)
->  Returns: 0 on success, negative value on failure
-> +Errors:
-> + =A0ENOENT: =A0=A0no such register
-> + =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known re=
-gister
->  =
+Gently ping Jean-Philippe if I can get green light for this patch set?
+Otherwise, please let me know if I need to follow up anything; thanks
+for reviewing.
 
->  This ioctl allows to receive the value of a single register implemented
->  in a vcpu. The register to read is indicated by the "id" field of the
-> -- =
-
-> 2.1.4
->
-
-Are we sure all architectures have these, and only these errors? A quick
-grep indicates not. I'm not sure we can document this easily here due to
-it addressing all architectures at once. Maybe we could add arch-specific
-subsections, but I'm not sure it's worth it.
-
-drew
+Thanks,
+Leo Yan
