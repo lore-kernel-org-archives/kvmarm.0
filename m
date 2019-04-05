@@ -1,26 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] KVM: arm/arm64: ensure vcpu target is unset on reset
- failure
-Date: Fri, 5 Apr 2019 09:27:36 +0200
-Message-ID: <20190405072736.lfxea4fxe6wvlffp@kamzik.brq.redhat.com>
-References: <20190404174230.18587-1-drjones@redhat.com>
- <86ftqx3qik.wl-marc.zyngier@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v7 07/27] arm64/sve: Check SVE virtualisability
+Date: Fri, 5 Apr 2019 10:35:36 +0100
+Message-ID: <20190405093536.GJ3567@e103592.cambridge.arm.com>
+References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-8-git-send-email-Dave.Martin@arm.com>
+ <20190404212104.qhtklabh7mzwapje@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F4AB4A44D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 03:27:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 615A64A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 05:35:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NIyCmVl5K2cg for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Apr 2019 03:27:42 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 804114A332
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 03:27:42 -0400 (EDT)
+ with ESMTP id iXngqpCFsDWw for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Apr 2019 05:35:42 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B99D4A332
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 05:35:42 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <86ftqx3qik.wl-marc.zyngier@arm.com>
+In-Reply-To: <20190404212104.qhtklabh7mzwapje@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,67 +30,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 05, 2019 at 07:38:59AM +0100, Marc Zyngier wrote:
-> On Thu, 04 Apr 2019 18:42:30 +0100,
-> Andrew Jones <drjones@redhat.com> wrote:
+On Thu, Apr 04, 2019 at 11:21:04PM +0200, Andrew Jones wrote:
+> On Fri, Mar 29, 2019 at 01:00:32PM +0000, Dave Martin wrote:
+> > Due to the way the effective SVE vector length is controlled and
+> > trapped at different exception levels, certain mismatches in the
+> > sets of vector lengths supported by different physical CPUs in the
+> > system may prevent straightforward virtualisation of SVE at parity
+> > with the host.
 > > 
-> > A failed KVM_ARM_VCPU_INIT, should not set the vcpu target,
-> > as the vcpu target is used by kvm_vcpu_initialized() to
-> > determine if other vcpu ioctls may proceed. We need to set
-> > the target before calling kvm_reset_vcpu(), but if that call
-> > fails, we should then unset it.
+> > This patch analyses the extent to which SVE can be virtualised
+> > safely without interfering with migration of vcpus between physical
+> > CPUs, and rejects late secondary CPUs that would erode the
+> > situation further.
 > > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > It is left up to KVM to decide what to do with this information.
+> > 
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
+> > 
 > > ---
-> >  virt/kvm/arm/arm.c | 12 +++++++++---
-> >  1 file changed, 9 insertions(+), 3 deletions(-)
 > > 
-> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > index 99c37384ba7b..7e5724ae1efd 100644
-> > --- a/virt/kvm/arm/arm.c
-> > +++ b/virt/kvm/arm/arm.c
-> > @@ -934,7 +934,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
-> >  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >  			       const struct kvm_vcpu_init *init)
-> >  {
-> > -	unsigned int i;
-> > +	unsigned int i, ret;
-> >  	int phys_target = kvm_target_cpu();
-> >  
-> >  	if (init->target != phys_target)
-> > @@ -969,9 +969,15 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >  	vcpu->arch.target = phys_target;
-> >  
-> >  	/* Now we know what it is, we can reset it. */
-> > -	return kvm_reset_vcpu(vcpu);
-> > -}
-> > +	ret = kvm_reset_vcpu(vcpu);
-> > +	if (ret) {
-> > +		vcpu->arch.target = -1;
-> > +		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> > +		return ret;
+> > QUESTION: The final structure of this code makes it quite natural to
+> > clamp the vector length for KVM guests to the maximum value supportable
+> > across all CPUs; such a value is guaranteed to exist, but may be
+> > surprisingly small on a given hardware platform.
+> > 
+> > Should we be stricter and actually refuse to support KVM at all on such
+> > hardware?  This may help to force people to fix Linux (or the
+> > architecture) if/when this issue comes up.
 > 
-> This return could trivially be removed...
+> Blocking KVM would be too harsh, since the users of the host may not
+> care about guests with SVE, but still care about guests.
 > 
-> > +	}
-> >  
-> > +	return 0;
-> > +}
+> > 
+> > For now, I stick with pr_warn() and make do with a limited SVE vector
+> > length for guests.
 > 
-> ... and this turned into 'return ret'.
-> 
-> I've tentatively applied this to the 5.1-fixes branch. Let me know if
-> you're OK with it.
->
+> I think that's probably the best we can do.
 
-Either way is fine by me. I actually did it this way on purpose though
-because I preferred the way the explicit 'return 0' at the bottom
-documented that we were sure at that point of success, so no longer
-needed to be concerned that target should be reset to -1.
+Agreed.  Since it fell out quite nicely this way in the code, this was
+my preferred option.
 
-Thanks,
-drew
+[...]
+
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks
+
+---Dave
