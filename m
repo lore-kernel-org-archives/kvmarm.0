@@ -1,29 +1,29 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 23/27] KVM: arm64/sve: Add pseudo-register for the
- guest's vector lengths
-Date: Fri, 5 Apr 2019 13:54:13 +0100
-Message-ID: <20190405125413.GA3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v7 27/27] KVM: arm64/sve: Document KVM API extensions for
+ SVE
+Date: Fri, 5 Apr 2019 14:00:07 +0100
+Message-ID: <20190405130007.GB3567@e103592.cambridge.arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-24-git-send-email-Dave.Martin@arm.com>
- <20190404201854.7dzga3ctjj7427hk@kamzik.brq.redhat.com>
- <20190405093603.GM3567@e103592.cambridge.arm.com>
- <20190405101451.xtx7ggyomvrbrpxl@kamzik.brq.redhat.com>
+ <1553864452-15080-28-git-send-email-Dave.Martin@arm.com>
+ <20190404210921.7xz6o56wietd77li@kamzik.brq.redhat.com>
+ <20190405093617.GO3567@e103592.cambridge.arm.com>
+ <20190405103937.quhaxxwkjjdxab6z@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E9A34A332
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 08:54:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2758D4A320
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 09:00:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Omgd+t04+SId for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Apr 2019 08:54:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA33F4A320
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 08:54:18 -0400 (EDT)
+ with ESMTP id mkW+GIjitMCV for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Apr 2019 09:00:12 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8ED4A472
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 09:00:12 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20190405101451.xtx7ggyomvrbrpxl@kamzik.brq.redhat.com>
+In-Reply-To: <20190405103937.quhaxxwkjjdxab6z@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,230 +37,400 @@ To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 05, 2019 at 12:14:51PM +0200, Andrew Jones wrote:
-> On Fri, Apr 05, 2019 at 10:36:03AM +0100, Dave Martin wrote:
-> > On Thu, Apr 04, 2019 at 10:18:54PM +0200, Andrew Jones wrote:
-> > > On Fri, Mar 29, 2019 at 01:00:48PM +0000, Dave Martin wrote:
-> > > > This patch adds a new pseudo-register KVM_REG_ARM64_SVE_VLS to
-> > > > allow userspace to set and query the set of vector lengths visible
-> > > > to the guest.
-> > > > 
-> > > > In the future, multiple register slices per SVE register may be
-> > > > visible through the ioctl interface.  Once the set of slices has
-> > > > been determined we would not be able to allow the vector length set
-> > > > to be changed any more, in order to avoid userspace seeing
-> > > > inconsistent sets of registers.  For this reason, this patch adds
-> > > > support for explicit finalization of the SVE configuration via the
-> > > > KVM_ARM_VCPU_FINALIZE ioctl.
-> > > > 
-> > > > Finalization is the proper place to allocate the SVE register state
-> > > > storage in vcpu->arch.sve_state, so this patch adds that as
-> > > > appropriate.  The data is freed via kvm_arch_vcpu_uninit(), which
-> > > > was previously a no-op on arm64.
-> > > > 
-> > > > To simplify the logic for determining what vector lengths can be
-> > > > supported, some code is added to KVM init to work this out, in the
-> > > > kvm_arm_init_arch_resources() hook.
-> > > > 
-> > > > The KVM_REG_ARM64_SVE_VLS pseudo-register is not exposed yet.
-> > > > Subsequent patches will allow SVE to be turned on for guest vcpus,
-> > > > making it visible.
-> > > > 
+On Fri, Apr 05, 2019 at 12:39:37PM +0200, Andrew Jones wrote:
+> On Fri, Apr 05, 2019 at 10:36:17AM +0100, Dave Martin wrote:
+> > On Thu, Apr 04, 2019 at 11:09:21PM +0200, Andrew Jones wrote:
+> > > On Fri, Mar 29, 2019 at 01:00:52PM +0000, Dave Martin wrote:
+> > > > This patch adds sections to the KVM API documentation describing
+> > > > the extensions for supporting the Scalable Vector Extension (SVE)
+> > > > in guests.
+> > > > =
+
 > > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > > Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> > > > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> > > > 
+> > > > =
+
 > > > > ---
-> > 
-> > [...]
-> > 
-> > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > > index 2aa80a5..086ab05 100644
-> > > > --- a/arch/arm64/kvm/guest.c
-> > > > +++ b/arch/arm64/kvm/guest.c
-> > > > @@ -206,6 +206,73 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > > >  	return err;
-> > > >  }
-> > > >  
-> > > > +#define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-> > > > +#define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> > > > +
-> > > > +static bool vq_present(
-> > > > +	const u64 (*const vqs)[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)],
-> > > > +	unsigned int vq)
-> > > > +{
-> > > > +	return (*vqs)[vq_word(vq)] & vq_mask(vq);
-> > > > +}
-> > > > +
-> > > > +static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > > > +{
-> > > > +	unsigned int max_vq, vq;
-> > > > +	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> > > > +
-> > > > +	if (WARN_ON(!sve_vl_valid(vcpu->arch.sve_max_vl)))
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	memset(vqs, 0, sizeof(vqs));
-> > > > +
-> > > > +	max_vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
-> > > > +	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> > > > +		if (sve_vq_available(vq))
-> > > > +			vqs[vq_word(vq)] |= vq_mask(vq);
-> > > > +
-> > > > +	if (copy_to_user((void __user *)reg->addr, vqs, sizeof(vqs)))
-> > > > +		return -EFAULT;
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> > > > +{
-> > > > +	unsigned int max_vq, vq;
-> > > > +	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> > > 
-> > > There are three of these long 'DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)'.
-> > > A macro is probably warranted.
-> > 
-> > Fair point.  These are a bit cumbersome.  How about:
-> > 
-> > #define SVE_VLS_WORDS DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)
-> > 
-> > Annoyingly, this is virtually identical to a Linux bitmap: the base type
-> > is u64 instead of unsigned long; otherwise there's no intentional
-> > difference.
-> 
-> Yeah, I noticed it was a reinvented bitmap, but I liked that it was,
-> because, for the userspace api, removing the bitmap abstractions
-> ensures we know what is what and where exactly it is.
+> > > > =
 
-Agreed.  I thought of using the bitmap API inside the kernel, but even
-if this is arm64-specific code, it made me uneasy: the compiler doesn't
-necessarily think that u64 and unsigned long are the same type even if
-they're both 64-bit, so there's the potential for weird optimisations to
-happen.
+> > > > Changes since v5:
+> > > > =
 
-> > (Aside: do you know why the KVM API insists on everything being u64?
-> > This makes sense for non-native types (like guest registers), but not
-> > for native things like host userspace addresses etc.)
-> 
-> Would that work when the kernel is 64-bit and the userspace is 32? I
-> personally like the interfaces being explicit with type size, as it
-> removes the brain burden of translating long and int when moving arch
-> to arch and kernel to userspace.
+> > > >  * Document KVM_ARM_VCPU_FINALIZE and its interactions with SVE.
+> > > > ---
+> > > >  Documentation/virtual/kvm/api.txt | 132 ++++++++++++++++++++++++++=
++++++++++++-
+> > > >  1 file changed, 129 insertions(+), 3 deletions(-)
+> > > > =
 
-Ah yes, the joys of compat.  And ioctl.  Ignore me.
+> > > > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virt=
+ual/kvm/api.txt
+> > > > index cd920dd..68509de 100644
+> > > > --- a/Documentation/virtual/kvm/api.txt
+> > > > +++ b/Documentation/virtual/kvm/api.txt
+> > > > @@ -1873,6 +1873,7 @@ Parameters: struct kvm_one_reg (in)
+> > > >  Returns: 0 on success, negative value on failure
+> > > >  Errors:
+> > > >   =A0ENOENT: =A0=A0no such register
+> > > > + =A0EPERM: =A0=A0=A0register access forbidden for architecture-dep=
+endent reasons
+> > > >   =A0EINVAL: =A0=A0other errors, such as bad size encoding for a kn=
+own register
+> > > >  =
+
+> > > >  struct kvm_one_reg {
+> > > > @@ -2127,13 +2128,20 @@ Specifically:
+> > > >    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
+> > > >    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
+> > > >    0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+> > > > -  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]
+> > > > -  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]
+> > > > +  0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    (*)
+> > > > +  0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    (*)
+> > > >      ...
+> > > > -  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]
+> > > > +  0x6040 0000 0010 00d0 V31        128  fp_regs.vregs[31]   (*)
+> > > >    0x6020 0000 0010 00d4 FPSR        32  fp_regs.fpsr
+> > > >    0x6020 0000 0010 00d5 FPCR        32  fp_regs.fpcr
+> > > >  =
+
+> > > > +(*) These encodings are not accepted for SVE-enabled vcpus.  See
+> > > > +    KVM_ARM_VCPU_INIT.
+> > > > +
+> > > > +    The equivalent register content can be accessed via bits [127:=
+0] of
+> > > > +    the corresponding SVE Zn registers instead for vcpus that have=
+ SVE
+> > > > +    enabled (see below).
+> > > > +
+> > > >  arm64 CCSIDR registers are demultiplexed by CSSELR value:
+> > > >    0x6020 0000 0011 00 <csselr:8>
+> > > >  =
+
+> > > > @@ -2143,6 +2151,61 @@ arm64 system registers have the following id=
+ bit patterns:
+> > > >  arm64 firmware pseudo-registers have the following bit pattern:
+> > > >    0x6030 0000 0014 <regno:16>
+> > > >  =
+
+> > > > +arm64 SVE registers have the following bit patterns:
+> > > > +  0x6080 0000 0015 00 <n:5> <slice:5>   Zn bits[2048*slice + 2047 =
+: 2048*slice]
+> > > > +  0x6050 0000 0015 04 <n:4> <slice:5>   Pn bits[256*slice + 255 : =
+256*slice]
+> > > > +  0x6050 0000 0015 060 <slice:5>        FFR bits[256*slice + 255 :=
+ 256*slice]
+> > > > +  0x6060 0000 0015 ffff                 KVM_REG_ARM64_SVE_VLS pseu=
+do-register
+> > > > +
+> > > > +Access to slices beyond the maximum vector length configured for t=
+he
+> > > > +vcpu (i.e., where 16 * slice >=3D max_vq (**)) will fail with ENOE=
+NT.
+> > > =
+
+> > > I've been doing pretty well keeping track of the 16's, 128's, VL's and
+> > > VQ's, but this example lost me. Also, should it be >=3D or just > ?
+> > =
+
+> > It should be >=3D.  It's analogous to not being allowed to derefence an
+> > array index that is >=3D the size of the array.
+> > =
+
+> > Also, the 16 here is not the number of bytes per quadword (as it often
+> > does with all things SVE), but the number of quadwords per 2048-bit
+> > KVM register slice.
+> > =
+
+> > To make matters worse (**) resembles some weird C syntax.
+> > =
+
+> > Maybe this would be less confusing written as
+> > =
+
+> >     Access to register IDs where 2048 * slice >=3D 128 * max_vq will fa=
+il
+> >     with ENOENT.  max_vq is the vcpu's maximum supported vector length
+> >     in 128-bit quadwords: see (**) below.
+> > =
+
+> > Does that help at all?
+> =
+
+> Yes. Thanks.
+
+OK, I'll do that.
+
+> =
+
+> > =
+
+> > > =
 
 > > > > +
-> > > > +	if (kvm_arm_vcpu_sve_finalized(vcpu))
-> > > > +		return -EPERM; /* too late! */
+> > > > +These registers are only accessible on vcpus for which SVE is enab=
+led.
+> > > > +See KVM_ARM_VCPU_INIT for details.
 > > > > +
-> > > > +	if (WARN_ON(vcpu->arch.sve_state))
-> > > > +		return -EINVAL;
+> > > > +In addition, except for KVM_REG_ARM64_SVE_VLS, these registers are=
+ not
+> > > > +accessible until the vcpu's SVE configuration has been finalized
+> > > > +using KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE).  See KVM_ARM_VCPU_I=
+NIT
+> > > > +and KVM_ARM_VCPU_FINALIZE for more information about this procedur=
+e.
 > > > > +
-> > > > +	if (copy_from_user(vqs, (const void __user *)reg->addr, sizeof(vqs)))
-> > > > +		return -EFAULT;
+> > > > +KVM_REG_ARM64_SVE_VLS is a pseudo-register that allows the set of =
+vector
+> > > > +lengths supported by the vcpu to be discovered and configured by
+> > > > +userspace.  When transferred to or from user memory via KVM_GET_ON=
+E_REG
+> > > > +or KVM_SET_ONE_REG, the value of this register is of type __u64[8]=
+, and
+> > > > +encodes the set of vector lengths as follows:
 > > > > +
-> > > > +	max_vq = 0;
-> > > > +	for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
-> > > > +		if (vq_present(&vqs, vq))
-> > > > +			max_vq = vq;
+> > > > +__u64 vector_lengths[8];
 > > > > +
-> > > > +	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
-> > > > +		return -EINVAL;
+> > > > +if (vq >=3D SVE_VQ_MIN && vq <=3D SVE_VQ_MAX &&
+> > > > +    ((vector_lengths[(vq - 1) / 64] >> ((vq - 1) % 64)) & 1))
+> > > > +	/* Vector length vq * 16 bytes supported */
+> > > > +else
+> > > > +	/* Vector length vq * 16 bytes not supported */
 > > > > +
-> > > > +	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> > > > +		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-> > > > +			return -EINVAL;
-> > > 
-> > > What about supporting the optional non-power-of-2 vector lengths? For
-> > > example, if the maximum VL is 512, then in addition to 512, 128, and
-> > > 256 there could be a 384. If we plan to start a guest on a machine
-> > > that has all four and then migrate it to a machine that only has
-> > > 128,256,512 we would want to set the VL set to 128,256,512, even on
-> > > the machine that supports 384. If I understand the above test correctly,
-> > > then that wouldn't work.
-> > 
-> > This is exactly what the code is trying to forbid, though it may not be
-> > obvious here why.
-> > 
-> > The trouble is, we can't correctly emulate a vcpu supporting
-> > {128,256,512} on hardware that also supports 384-bit vectors: the
-> > architecture says that the vector length you get is determined by
-> > rounding ZCR_EL1.LEN down to the next vector length actually
-> > supported.
-> > 
-> > So, the guest would expect writing ZCR_EL1.LEN = 2 to give a vector
-> > length of 256 bits, whereas on this hardware the actual resulting
-> > vector length would be 384 bits.
-> 
-> Oh, I see.
-> 
-> > 
-> > sve_probe_vqs() relies on this property to detect the set of available
-> > vector lengths.  Simple, bare-metal guests might also just set
-> > ZCR_ELx.LEN = 0x1ff to just get the max available.
-> > 
-> > 
-> > The architecture says categorically that the set of vector lengths
-> > supported is a fixed property of the (emulated) hardware -- we can't
-> > having this changing under the guest's feet.
-> > 
-> > Fixing this would require an archietctural way to filter out individual
-> > vector lengths from the supported set, not just a way to clamp the
-> > maximum (which is all ZCR_EL2.LEN gives us).
-> > 
-> > The general expectation is that sanely designed cluster will be
-> > "homogeneous enough" and won't trigger this check -- it's here
-> > just in case.
-> 
-> Data centers evolve as they expand and hardware is replaced. I wouldn't
-> expect them to stay homogeneous for long, not without keeping them that
-> way at substantial cost. This isn't the first thing that is forcing Arm
-> virt data centers to be homogeneous (we still use qemu's '-cpu host'),
-> but it's disappointing to have yet another one.
+> > > > +(**) The maximum value vq for which the above condition is true is
+> > > > +max_vq.  This is the maximum vector length available to the guest =
+on
+> > > > +this vcpu, and determines which register slices are visible through
+> > > > +this ioctl interface.
+> > > > +
+> > > > +(See Documentation/arm64/sve.txt for an explanation of the "vq"
+> > > > +nomenclature.)
+> > > > +
+> > > > +KVM_REG_ARM64_SVE_VLS is only accessible after KVM_ARM_VCPU_INIT.
+> > > > +KVM_ARM_VCPU_INIT initialises it to the best set of vector lengths=
+ that
+> > > > +the host supports.
+> > > > +
+> > > > +Userspace may subsequently modify it if desired until the vcpu's S=
+VE
+> > > > +configuration is finalized using KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCP=
+U_SVE).
+> > > > +
+> > > > +Apart from simply removing all vector lengths from the host set th=
+at
+> > > > +exceed some value, support for arbitrarily chosen sets of vector l=
+engths
+> > > > +is hardware-dependent and may not be available.  Attempting to con=
+figure
+> > > > +an invalid set of vector lengths via KVM_SET_ONE_REG will fail with
+> > > > +EINVAL.
+> > > > +
+> > > > +After the vcpu's SVE configuration is finalized, further attempts =
+to
+> > > > +write this register will fail with EPERM.
+> > > > +
+> > > >  =
 
-This may or may not be a problem in practive, since I suspect
-implementations that support non-power-of-two vector lengths may be in
-the minority anyway.
+> > > >  MIPS registers are mapped using the lower 32 bits.  The upper 16 o=
+f that is
+> > > >  the register group type:
+> > > > @@ -2197,6 +2260,7 @@ Parameters: struct kvm_one_reg (in and out)
+> > > >  Returns: 0 on success, negative value on failure
+> > > >  Errors:
+> > > >   =A0ENOENT: =A0=A0no such register
+> > > > + =A0EPERM: =A0=A0=A0register access forbidden for architecture-dep=
+endent reasons
+> > > >   =A0EINVAL: =A0=A0other errors, such as bad size encoding for a kn=
+own register
+> > > >  =
 
-The ARM Fast Model and probably QEMU can do it, but people are less
-likely to try to build a high-performance cluster out of those...
+> > > >  This ioctl allows to receive the value of a single register implem=
+ented
+> > > > @@ -2690,6 +2754,33 @@ Possible features:
+> > > >  	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
+> > > >  	  Depends on KVM_CAP_ARM_PMU_V3.
+> > > >  =
 
-> > I attempt to capture this in api.txt, leaving the door open in case the
-> > architecture gives a way to support this in future:
-> > 
-> >   | KVM_REG_ARM64_SVE_VLS
-> >   | 
-> >   | [...]
-> >   | 
-> >   | Apart from simply removing all vector lengths from the host set
-> >   | that exceed some value, support for arbitrarily chosen sets of
-> >   | vector lengths is hardware-dependent and may not be available.
-> >   | Attempting to configure an invalid set of vector lengths via
-> >   | KVM_SET_ONE_REG will fail with EINVAL.
-> > 
-> > Is this enough, or do you think more explanation is needed somewhere?
-> 
-> I saw that before, so I guess more is needed :) What you wrote above about
-> how we can only shorten the list due to how zcr_el1.len works was the
-> missing piece for me. Maybe that should be integrated into the text
-> somehow.
+> > > > +	- KVM_ARM_VCPU_SVE: Enables SVE for the CPU (arm64 only).
+> > > > +	  Depends on KVM_CAP_ARM_SVE.
+> > > > +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE):
+> > > > +
+> > > > +	   * After KVM_ARM_VCPU_INIT:
+> > > > +
+> > > > +	      - KVM_REG_ARM64_SVE_VLS may be read using KVM_GET_ONE_REG: =
+the
+> > > > +	        initial value of this pseudo-register indicates the best =
+set of
+> > > > +	        vector lengths possible for a vcpu on this host.
+> > > > +
+> > > > +	   * Before KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE):
+> > > > +
+> > > > +	      - KVM_RUN and KVM_GET_REG_LIST are not available;
+> > > > +
+> > > > +	      - KVM_GET_ONE_REG and KVM_SET_ONE_REG cannot be used to acc=
+ess
+> > > > +	        the scalable archietctural SVE registers
+> > > > +	        KVM_REG_ARM64_SVE_ZREG(), KVM_REG_ARM64_SVE_PREG() or
+> > > > +	        KVM_REG_ARM64_SVE_FFR;
+> > > > +
+> > > > +	      - KVM_REG_ARM64_SVE_VLS may optionally be written using
+> > > > +	        KVM_SET_ONE_REG, to modify the set of vector lengths avai=
+lable
+> > > > +	        for the vcpu.
+> > > > +
+> > > > +	   * After KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_SVE):
+> > > > +
+> > > > +	      - the KVM_REG_ARM64_SVE_VLS pseudo-register is immutable, a=
+nd can
+> > > > +	        no longer be written using KVM_SET_ONE_REG.
+> > > >  =
 
-If you think the above is enough for ABI documentation purposes, I will
-aim to drop the following comment into set_sve_vls():
+> > > >  4.83 KVM_ARM_PREFERRED_TARGET
+> > > >  =
 
-	/*
-	 * Vector lengths supported by the host can't currently be
-	 * hidden from the guest individually: instead we can only set a
-	 * maxmium via ZCR_EL2.LEN.  So, make sure the available vector
-	 * length match the set requested exactly up to the requested
-	 * maximum:
-	 */
-	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-			return -EINVAL;
+> > > > @@ -3904,6 +3995,41 @@ number of valid entries in the 'entries' arr=
+ay, which is then filled.
+> > > >  'index' and 'flags' fields in 'struct kvm_cpuid_entry2' are curren=
+tly reserved,
+> > > >  userspace should not expect to get any particular value there.
+> > > >  =
 
-Do you think that's enough?
+> > > > +4.119 KVM_ARM_VCPU_FINALIZE
+> > > > +
+> > > > +Capability: KVM_CAP_ARM_SVE
+> > > =
+
+> > > The KVM_ARM_VCPU_FINALIZE vcpu ioctl isn't SVE specific, so it should=
+n't
+> > > depend on the SVE cap. It should have it's own cap, or maybe it should
+> > > just be an KVM_ARM_VCPU_SVE_FINALIZE ioctl instead, i.e. not general.
+> > =
+
+> > This one's a bit annoying.  This would ideally read
+> > =
+
+> > Capability: KVM_CAP_ARM_SVE, or any other capability that advertises the
+> > availability of a feature that requires KVM_ARM_VCPU_FINALIZE to be use=
+d.
+> > =
+
+> > (which sounds vague).
+> > =
+
+> > We could add a specific cap for KVM_ARM_VCPU_FINALIZE, but that seemed
+> > overkill.  Or document KVM_ARM_VCPU_FINALIZE as unconditionally
+> > supported, but make the individual feature values cap-dependent.  This
+> > works because the symptom of missing support is the same (EINVAL)
+> > ragardless of whether it is the specific feature or
+> > KVM_ARM_VCPU_FINALIZE that is unsupported.
+> > =
+
+> > Thoughts?
+> > =
+
+> =
+
+> I like that unconditionally supported idea.
+
+OK, I'll see how to write this up in the documentation.
+
+> > > > +Architectures: arm, arm64
+> > > > +Type: vcpu ioctl
+> > > > +Parameters: int feature (in)
+> > > =
+
+> > > This was called 'what' in the code.
+> > =
+
+> > Indeed it is.  I wanted to avoid the implication that this paramter
+> > exactly maps onto the KVM_ARM_VCPU_INIT features.  But "what" seemed
+> > a bit too vague for the documentation.
+> > =
+
+> > Mind you, if lseek() can have a "whence" parameter, perhaps "what" is
+> > also acceptable.
+> > =
+
+> > OTOH I don't mind changing the name in the code to "feature" if you
+> > think that's preferable.
+> > =
+
+> > Thoughts?
+> =
+
+> I prefer them to be the same, and I think both are fine.
+
+OK.  I'll go with "feature".
+
+> > > > +Returns: 0 on success, -1 on error
+> > > > +Errors:
+> > > > +  EPERM:     feature not enabled, needs configuration, or already =
+finalized
+> > > > +  EINVAL:    unknown feature
+> > > > +
+> > > > +Recognised values for feature:
+> > > > +  arm64      KVM_ARM_VCPU_SVE
+> > > > +
+> > > > +Finalizes the configuration of the specified vcpu feature.
+> > > > +
+> > > > +The vcpu must already have been initialised, enabling the affected=
+ feature, by
+> > > > +means of a successful KVM_ARM_VCPU_INIT call with the appropriate =
+flag set in
+> > > > +features[].
+> > > > +
+> > > > +For affected vcpu features, this is a mandatory step that must be =
+performed
+> > > > +before the vcpu is fully usable.
+> > > > +
+> > > > +Between KVM_ARM_VCPU_INIT and KVM_ARM_VCPU_FINALIZE, the feature m=
+ay be
+> > > > +configured by use of ioctls such as KVM_SET_ONE_REG.  The exact co=
+nfiguration
+> > > > +that should be performaned and how to do it are feature-dependent.
+> > > > +
+> > > > +Other calls that depend on a particular feature being finalized, s=
+uch as
+> > > > +KVM_RUN, KVM_GET_REG_LIST, KVM_GET_ONE_REG and KVM_SET_ONE_REG, wi=
+ll fail with
+> > > > +-EPERM unless the feature has already been finalized by means of a
+> > > > +KVM_ARM_VCPU_FINALIZE call.
+> > > > +
+> > > > +See KVM_ARM_VCPU_INIT for details of vcpu features that require fi=
+nalization
+> > > > +using this ioctl.
+> > > > +
+> > > >  5. The kvm_run structure
+> > > >  ------------------------
+> > > >
+> > > =
+
+> > > I'm still not sure about EPERM vs. ENOEXEC.
+> > =
+
+> > There is no need to distinguish the two: this is just a generic "vcpu in
+> > wrong state for this to work" error.  I can't think of another subsystem
+> > that uses ENOEXEC for this meaning, but it's established in KVM.
+> > =
+
+> > If you can't see a reason why we would need these to be distinct
+> > errors (?) then I'm happy for this to be ENOEXEC for all cases.
+> > =
+
+> =
+
+> I do see some value in keeping them distinct. I think it's just the use
+> of EPERM specifically that bothers me, but I don't have that strong of
+> an opinion against its use either. So I'll just shut up :)
+
+In an earlier incarnation I had EBADFD, which does kind of mean the
+right thing.
+
+If there's not a clear way forward, I may leave this all as-is for now
+(but I'll remove the explicit documentation for KVM_{GET,SET}_ONE_REG
+error codes to give us more flexibility about this in the future, as
+discussed).
+
+Any objection?
 
 Cheers
 ---Dave
