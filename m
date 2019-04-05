@@ -1,76 +1,154 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v8 3/9] KVM: arm64: Move hyp_symbol_addr to fix dependency
-Date: Fri, 5 Apr 2019 12:02:19 +0100
-Message-ID: <20190405110219.GQ3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
+Date: Fri, 5 Apr 2019 12:02:29 +0100
+Message-ID: <20190405110229.GR3567@e103592.cambridge.arm.com>
 References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
- <1554172037-4516-4-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1554172037-4516-4-git-send-email-amit.kachhap@arm.com>
+In-Reply-To: <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Amit Daniel Kachhap <amit.kachhap@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 02, 2019 at 07:57:11AM +0530, Amit Daniel Kachhap wrote:
-> Currently hyp_symbol_addr is placed in kvm_mmu.h which is mostly
-> used by __hyp_this_cpu_ptr in kvm_asm.h but it cannot include
-> kvm_mmu.h directly as kvm_mmu.h uses kvm_ksym_ref which is
-> defined inside kvm_asm.h. Hence, hyp_symbol_addr is moved inside
-> kvm_asm.h to fix this dependency on each other.
+On Tue, Apr 02, 2019 at 07:57:12AM +0530, Amit Daniel Kachhap wrote:
+> From: Mark Rutland <mark.rutland@arm.com>
 > 
-> Also, hyp_symbol_addr corresponding counterpart, kvm_ksym_ref,
-> is already in kvm_asm.h, making it more sensible to move
-> kvm_symbol_addr to the same file.
+> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+> is a constant value. This works today, as the host HCR_EL2 value is
+> always the same, but this will get in the way of supporting extensions
+> that require HCR_EL2 bits to be set conditionally for the host.
 > 
-> Suggested by: James Morse <james.morse@arm.com>
+> To allow such features to work without KVM having to explicitly handle
+> every possible host feature combination, this patch has KVM save/restore
+> for the host HCR when switching to/from a guest HCR. The saving of the
+> register is done once during cpu hypervisor initialization state and is
+> just restored after switch from guest.
+> 
+> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+> kvm_call_hyp and is helpful in non-VHE case.
+> 
+> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+> to toggle the TGE bit with a RMW sequence, as we already do in
+> __tlb_switch_to_guest_vhe().
+> 
+> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+> and guest can now use this field in a common way.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> [Added cpu_init_host_ctxt, hcr_el2 field in struct kvm_cpu_context,
+> save hcr_el2 in hyp init stage]
 > Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> Reviewed-by: James Morse <james.morse@arm.com>
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Cc: Christoffer Dall <christoffer.dall@arm.com>
 > Cc: kvmarm@lists.cs.columbia.edu
-> ---
-> 
-> Changes since v7:
-> * Slight change in commit message [Julien Thierry].
-> 
->  arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
->  arch/arm64/include/asm/kvm_mmu.h | 20 --------------------
->  2 files changed, 20 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index f5b79e9..57a07e8 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -80,6 +80,26 @@ extern void __vgic_v3_init_lrs(void);
+
+[...]
+
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a01fe087..3b09fd0 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -209,6 +209,8 @@ struct kvm_cpu_context {
+>  		u32 copro[NR_COPRO_REGS];
+>  	};
 >  
->  extern u32 __kvm_get_mdcr_el2(void);
+> +	/* HYP host/guest configuration */
+> +	u64 hcr_el2;
+
+Minor nit: You could delete "host/guest" from the comment here.  This is
+implied by the fact that the member is in struct kvm_cpu_context in the
+first place.
+
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+>  };
+
+[...]
+
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index 3563fe6..f5cefa1 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+
+[...]
+
+> @@ -159,9 +159,10 @@ static void deactivate_traps_vhe(void)
+>  }
+>  NOKPROBE_SYMBOL(deactivate_traps_vhe);
 >  
-> +/*
-> + * Obtain the PC-relative address of a kernel symbol
-> + * s: symbol
-> + *
-> + * The goal of this macro is to return a symbol's address based on a
-> + * PC-relative computation, as opposed to a loading the VA from a
-> + * constant pool or something similar. This works well for HYP, as an
-> + * absolute VA is guaranteed to be wrong. Only use this if trying to
-> + * obtain the address of a symbol (i.e. not something you obtained by
-> + * following a pointer).
-> + */
-> +#define hyp_symbol_addr(s)						\
-> +	({								\
-> +		typeof(s) *addr;					\
-> +		asm("adrp	%0, %1\n"				\
-> +		    "add	%0, %0, :lo12:%1\n"			\
-> +		    : "=r" (addr) : "S" (&s));				\
-> +		addr;							\
-> +	})
+> -static void __hyp_text __deactivate_traps_nvhe(void)
+> +static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
+
+Where __hyp_text functions accept pointer arguments, they are usually
+hyp pointers already...  (see below)
+
+>  {
+>  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+> +	struct kvm_cpu_context *hyp_host_ctxt = kern_hyp_va(host_ctxt);
+>  
+>  	__deactivate_traps_common();
+>  
+> @@ -169,25 +170,28 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+>  	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+>  
+>  	write_sysreg(mdcr_el2, mdcr_el2);
+> -	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+> +	write_sysreg(hyp_host_ctxt->hcr_el2, hcr_el2);
+>  	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+>  }
+>  
+>  static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_cpu_context *host_ctxt;
 > +
+> +	host_ctxt = vcpu->arch.host_cpu_context;
 
-Do we need to include <asm/kvm_asm.h> in vgic-v2-cpuif-proxy.c now?
+host_ctxt is not otherwise used here, so can we convert it up-front so
+that the argument to __deactivate_traps_nvhe() and
+deactivate_traps_vhe() is a hyp pointer already?
 
-Otherwise,
+So:
 
-Reviewed-by: Dave Martin <Dave.Martin@arm.com>
+	struct kvm_cpu_context *hyp_host_ctxt;
+
+	hyp_host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+
+>  	/*
+>  	 * If we pended a virtual abort, preserve it until it gets
+>  	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
+>  	 * the crucial bit is "On taking a vSError interrupt,
+>  	 * HCR_EL2.VSE is cleared to 0."
+>  	 */
+> -	if (vcpu->arch.hcr_el2 & HCR_VSE)
+> -		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+> +	if (vcpu->arch.ctxt.hcr_el2 & HCR_VSE)
+> +		vcpu->arch.ctxt.hcr_el2 = read_sysreg(hcr_el2);
+>  
+>  	if (has_vhe())
+> -		deactivate_traps_vhe();
+> +		deactivate_traps_vhe(host_ctxt);
+>  	else
+> -		__deactivate_traps_nvhe();
+> +		__deactivate_traps_nvhe(host_ctxt);
+
+Then just pass hyp_host_ctxt to both of these, and drop the
+kern_hyp_va() conversion from __deactivate_traps_nvhe().
+
+This may be a bit less confusing.
+
+Alternatively, just pass in the vcpu pointer (since this pattern is
+already well established all over the place).
+
+Another option could be to pull the hcr_el2 write out of the backends
+entirely and put it in this common code instead.  This doesn't look
+straightforward though (or at least, I don't remember enough about how
+all these traps handling functions fit together...)
+
+[...]
+
+Cheers
+---Dave
