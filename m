@@ -1,175 +1,106 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 20/27] arm64/sve: In-kernel vector length availability
- query interface
-Date: Fri, 5 Apr 2019 12:13:42 +0100
-Message-ID: <20190405111342.GY3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH v7 21/27] KVM: arm/arm64: Add hook for arch-specific KVM
+ initialisation
+Date: Fri, 5 Apr 2019 12:14:11 +0100
+Message-ID: <20190405111410.GZ3567@e103592.cambridge.arm.com>
 References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-21-git-send-email-Dave.Martin@arm.com>
- <20190404142034.ikkn7lkgbnntsziq@kamzik.brq.redhat.com>
- <20190405093555.GL3567@e103592.cambridge.arm.com>
- <20190405095407.nu22vu5ycbfnts3t@kamzik.brq.redhat.com>
+ <1553864452-15080-22-git-send-email-Dave.Martin@arm.com>
+ <20190404142528.pxo3vrnk6mfsgmyq@kamzik.brq.redhat.com>
+ <20190404145354.GG3567@e103592.cambridge.arm.com>
+ <20190404163308.2aaauxituh6rfffu@kamzik.brq.redhat.com>
+ <20190405093624.GP3567@e103592.cambridge.arm.com>
+ <20190405104057.tonyqmskty62yw4v@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 324724A36C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 07:14:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Yc+Tnq0N0ySq for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Apr 2019 07:14:16 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2707B4A331
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 07:14:16 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20190405095407.nu22vu5ycbfnts3t@kamzik.brq.redhat.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20190405104057.tonyqmskty62yw4v@kamzik.brq.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 05, 2019 at 11:54:07AM +0200, Andrew Jones wrote:
-> On Fri, Apr 05, 2019 at 10:35:55AM +0100, Dave Martin wrote:
-> > On Thu, Apr 04, 2019 at 04:20:34PM +0200, Andrew Jones wrote:
-> > > On Fri, Mar 29, 2019 at 01:00:45PM +0000, Dave Martin wrote:
-> > > > KVM will need to interrogate the set of SVE vector lengths
-> > > > available on the system.
-> > > > =
+On Fri, Apr 05, 2019 at 12:40:57PM +0200, Andrew Jones wrote:
+> On Fri, Apr 05, 2019 at 10:36:24AM +0100, Dave Martin wrote:
+> > On Thu, Apr 04, 2019 at 06:33:08PM +0200, Andrew Jones wrote:
+> > > On Thu, Apr 04, 2019 at 03:53:55PM +0100, Dave Martin wrote:
+> > > > On Thu, Apr 04, 2019 at 04:25:28PM +0200, Andrew Jones wrote:
+> > > > > On Fri, Mar 29, 2019 at 01:00:46PM +0000, Dave Martin wrote:
+> > 
+> > [...]
+> > 
+> > > > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > > > > > index 99c3738..c69e137 100644
+> > > > > > --- a/virt/kvm/arm/arm.c
+> > > > > > +++ b/virt/kvm/arm/arm.c
+> > > > > > @@ -1664,6 +1664,10 @@ int kvm_arch_init(void *opaque)
+> > > > > >  	if (err)
+> > > > > >  		return err;
+> > > > > >  
+> > > > > > +	err = kvm_arm_init_arch_resources();
+> > > > > > +	if (err)
+> > > > > > +		return err;
+> > > > > > +
+> > > > > >  	if (!in_hyp_mode) {
+> > > > > >  		err = init_hyp_mode();
+> > > > > >  		if (err)
+> > > > > > -- 
+> > > > > > 2.1.4
+> > > > > >
+> > > > > 
+> > > > > It's not clear to me from the commit message why init_common_resources()
+> > > > > won't work for this. Maybe it'll be more clear as I continue the review.
+> > > > 
+> > > > init_common_resources() is for stuff common to arm and arm64.
+> > > 
+> > > Well currently init_common_resources() only calls kvm_set_ipa_limit(),
+> > > which isn't implemented for arm. So if there was a plan to only use
+> > > that function for init that actually does something on both, it doesn't.
+> > 
+> > Hmmm, perhaps I was wishfully interpreting the word "common" to mean
+> > what I would like it to mean...
+> > 
+> > > > kvm_arm_init_arch_resources() is intended for stuff specific to the
+> > > > particular arch backend.
+> > > 
+> > > I'm not sure we need that yet. We just need an arm setup sve stub like
+> > > arm's kvm_set_ipa_limit() stub. OTOH, if we have to keep adding stubs
+> > > to arm we should probably have something like
+> > > kvm_arm_init_arch_resources() instead, and kvm_set_ipa_limit() should
+> > > be moved inside the arm64 one and the arm ipa limit stub can go. Then
+> > > since init_common_resources() would no longer be used, it could just
+> > > be deleted.
+> > 
+> > OK, for simplicity I may call the sve setup directly as you suggest, and
+> > make an arm stub for it: that feels a bit weird, but there is precedent.
+> > 
+> > If we end up accumulating a lot of these, we can revisit it and maybe
+> > invent something like kvm_arm_init_arch_resources() at that point.
+> > 
+> > Does that sound reasonable?
+> 
+> Yup. Sounds good to me.
 
-> > > > This patch exposes the relevant bits to the kernel, along with a
-> > > > sve_vq_available() helper to check whether a particular vector
-> > > > length is supported.
-> > > > =
-
-> > > > __vq_to_bit() and __bit_to_vq() are not intended for use outside
-> > > > these functions: now that these are exposed outside fpsimd.c, they
-> > > > are prefixed with __ in order to provide an extra hint that they
-> > > > are not intended for general-purpose use.
-> > > > =
-
-> > > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> > > > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > > > Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/fpsimd.h | 29 +++++++++++++++++++++++++++++
-> > > >  arch/arm64/kernel/fpsimd.c      | 35 ++++++++---------------------=
-------
-> > > >  2 files changed, 37 insertions(+), 27 deletions(-)
-> > > > =
-
-> > > > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/a=
-sm/fpsimd.h
-
-[...]
-
-> > > > +/* Set of available vector lengths, as vq_to_bit(vq): */
-> > > =
-
-> > > s/as/for use with/ ?
-> > =
-
-> > Not exactly.  Does the following work for you:
-> > =
-
-> > /*
-> >  * Set of available vector lengths
-> >  * Vector length vq is encoded as bit __vq_to_bit(vq):
-> >  */
-> =
-
-> Yes. That reads much better.
-
-OK
-
-> > > s/vq_to_bit/__vq_to_bit/
-> > =
-
-> > Ack: that got renamed when I moved it to fpsimd.h, bit I clearly didn't
-> > update the comment as I pasted it across.
-> > =
-
-> > > =
-
-> > > > +extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
-> > > > +
-> > > > +/*
-> > > > + * Helpers to translate bit indices in sve_vq_map to VQ values (and
-> > > > + * vice versa).  This allows find_next_bit() to be used to find the
-> > > > + * _maximum_ VQ not exceeding a certain value.
-> > > > + */
-> > > > +static inline unsigned int __vq_to_bit(unsigned int vq)
-> > > > +{
-> > > =
-
-> > > Why not have the same WARN_ON and clamping here as we do
-> > > in __bit_to_vq. Here a vq > SVE_VQ_MAX will wrap around
-> > > to a super high bit.
-> > > =
-
-> > > > +	return SVE_VQ_MAX - vq;
-> > > > +}
-> > > > +
-> > > > +static inline unsigned int __bit_to_vq(unsigned int bit)
-> > > > +{
-> > > > +	if (WARN_ON(bit >=3D SVE_VQ_MAX))
-> > > > +		bit =3D SVE_VQ_MAX - 1;
-> > > > +
-> > > > +	return SVE_VQ_MAX - bit;
-> > > > +}
-> > > > +
-> > > > +/* Ensure vq >=3D SVE_VQ_MIN && vq <=3D SVE_VQ_MAX before calling =
-this function */
-> > > =
-
-> > > Are we avoiding putting these tests and WARN_ONs in this function to
-> > > keep it fast?
-> > =
-
-> > These are intended as backend for use only by fpsimd.c and this header,
-> > so peppering them with WARN_ON() felt excessive.  I don't expect a lot
-> > of new calls to these (or any, probably).
-> > =
-
-> > I don't recall why I kept the WARN_ON() just in __bit_to_vq(), except
-> > that the way that gets called is a bit more complex in some places.
-> > =
-
-> > Are you happy to replace these with comments?  e.g.:
-> > =
-
-> > /* Only valid when vq >=3D SVE_VQ_MIN && vq <=3D SVE_VQ_MAX */
-> > __vq_to_bit()
-> > =
-
-> > /* Only valid when bit < SVE_VQ_MAX */
-> > __bit_to_vq()
-> > =
-
-> > =
-
-> > OTOH, these are not used on fast paths, so maybe having both as
-> > WARN_ON() would be better.  Part of the problem is knowing what to clamp
-> > to: these are generally used in conjunction with looping or bitmap find
-> > operations, so the caller may be making assumptions about the return
-> > value that may wrong when the value is clamped.
-> > =
-
-> > Alternatively, these could be BUG() -- but that seems heavy.
-> > =
-
-> > What do you think?
-> =
-
-> I like the idea of having WARN_ON's to enforce the constraints. I
-> wouldn't be completely opposed to not having anything other than
-> the comments, though, as there is a limit to how defensive we should
-> be. I'll abstain from this vote.
-
-I'll have a think about whether there's anything non-toxic that we can
-return in the error cases.  If not, I may demote these to comments:
-returning an actual error code for this sort of things feels like a
-step too far.
-
-Otherwise we can have WARNs.
+OK, can do
 
 Cheers
 ---Dave
