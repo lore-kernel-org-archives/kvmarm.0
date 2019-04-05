@@ -1,102 +1,197 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 21/27] KVM: arm/arm64: Add hook for arch-specific KVM
- initialisation
-Date: Fri, 5 Apr 2019 12:40:57 +0200
-Message-ID: <20190405104057.tonyqmskty62yw4v@kamzik.brq.redhat.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-22-git-send-email-Dave.Martin@arm.com>
- <20190404142528.pxo3vrnk6mfsgmyq@kamzik.brq.redhat.com>
- <20190404145354.GG3567@e103592.cambridge.arm.com>
- <20190404163308.2aaauxituh6rfffu@kamzik.brq.redhat.com>
- <20190405093624.GP3567@e103592.cambridge.arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v8 7/9] KVM: arm/arm64: context-switch ptrauth registers
+Date: Fri, 5 Apr 2019 16:30:58 +0530
+Message-ID: <4065308b-20ed-31ba-9fe9-f8a63531444e@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-8-git-send-email-amit.kachhap@arm.com>
+ <efe4fd6b-7f1f-c8b7-0667-e2bf636dcf4f@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52D014A420
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 06:41:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dj6s3SiDVFDV for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Apr 2019 06:41:05 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FC5E4A320
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Apr 2019 06:41:05 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20190405093624.GP3567@e103592.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <efe4fd6b-7f1f-c8b7-0667-e2bf636dcf4f@arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Kristina Martsenko <kristina.martsenko@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 05, 2019 at 10:36:24AM +0100, Dave Martin wrote:
-> On Thu, Apr 04, 2019 at 06:33:08PM +0200, Andrew Jones wrote:
-> > On Thu, Apr 04, 2019 at 03:53:55PM +0100, Dave Martin wrote:
-> > > On Thu, Apr 04, 2019 at 04:25:28PM +0200, Andrew Jones wrote:
-> > > > On Fri, Mar 29, 2019 at 01:00:46PM +0000, Dave Martin wrote:
+Hi Kristina,
+
+On 4/5/19 12:59 AM, Kristina Martsenko wrote:
+> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> When pointer authentication is supported, a guest may wish to use it.
+>> This patch adds the necessary KVM infrastructure for this to work, with
+>> a semi-lazy context switch of the pointer auth state.
 > 
 > [...]
 > 
-> > > > > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> > > > > index 99c3738..c69e137 100644
-> > > > > --- a/virt/kvm/arm/arm.c
-> > > > > +++ b/virt/kvm/arm/arm.c
-> > > > > @@ -1664,6 +1664,10 @@ int kvm_arch_init(void *opaque)
-> > > > >  	if (err)
-> > > > >  		return err;
-> > > > >  
-> > > > > +	err = kvm_arm_init_arch_resources();
-> > > > > +	if (err)
-> > > > > +		return err;
-> > > > > +
-> > > > >  	if (!in_hyp_mode) {
-> > > > >  		err = init_hyp_mode();
-> > > > >  		if (err)
-> > > > > -- 
-> > > > > 2.1.4
-> > > > >
-> > > > 
-> > > > It's not clear to me from the commit message why init_common_resources()
-> > > > won't work for this. Maybe it'll be more clear as I continue the review.
-> > > 
-> > > init_common_resources() is for stuff common to arm and arm64.
-> > 
-> > Well currently init_common_resources() only calls kvm_set_ipa_limit(),
-> > which isn't implemented for arm. So if there was a plan to only use
-> > that function for init that actually does something on both, it doesn't.
+>> diff --git a/arch/arm64/include/asm/kvm_ptrauth_asm.h b/arch/arm64/include/asm/kvm_ptrauth_asm.h
+>> new file mode 100644
+>> index 0000000..65f99e9
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/kvm_ptrauth_asm.h
+>> @@ -0,0 +1,106 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/* arch/arm64/include/asm/kvm_ptrauth_asm.h: Guest/host ptrauth save/restore
+>> + * Copyright 2019 Arm Limited
+>> + * Author: Mark Rutland <mark.rutland@arm.com>
+>> + *         Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> + */
+>> +
+>> +#ifndef __ASM_KVM_PTRAUTH_ASM_H
+>> +#define __ASM_KVM_PTRAUTH_ASM_H
+>> +
+>> +#ifndef __ASSEMBLY__
+>> +
+>> +#define __ptrauth_save_key(regs, key)						\
+>> +({										\
+>> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
+>> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
+>> +})
+>> +
+>> +#define __ptrauth_save_state(ctxt)						\
+>> +({										\
+>> +	__ptrauth_save_key(ctxt->sys_regs, APIA);				\
+>> +	__ptrauth_save_key(ctxt->sys_regs, APIB);				\
+>> +	__ptrauth_save_key(ctxt->sys_regs, APDA);				\
+>> +	__ptrauth_save_key(ctxt->sys_regs, APDB);				\
+>> +	__ptrauth_save_key(ctxt->sys_regs, APGA);				\
+>> +})
+>> +
+>> +#else /* __ASSEMBLY__ */
+>> +
+>> +#include <asm/sysreg.h>
+>> +
+>> +#ifdef	CONFIG_ARM64_PTR_AUTH
+>> +
+>> +#define PTRAUTH_REG_OFFSET(x)	(x - CPU_APIAKEYLO_EL1)
+>> +
+>> +/*
+>> + * CPU_AP*_EL1 values exceed immediate offset range (512) for stp instruction
+>> + * so below macros takes CPU_APIAKEYLO_EL1 as base and calculates the offset of
+>> + * the keys from this base to avoid an extra add instruction. These macros
+>> + * assumes the keys offsets are aligned in a specific increasing order.
+>> + */
+>> +.macro	ptrauth_save_state base, reg1, reg2
+>> +	mrs_s	\reg1, SYS_APIAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APIAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APIBKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APIBKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APDAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APDAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APDBKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APDBKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+>> +	mrs_s	\reg1, SYS_APGAKEYLO_EL1
+>> +	mrs_s	\reg2, SYS_APGAKEYHI_EL1
+>> +	stp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+>> +.endm
+>> +
+>> +.macro	ptrauth_restore_state base, reg1, reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIAKEYLO_EL1)]
+>> +	msr_s	SYS_APIAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APIAKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APIBKEYLO_EL1)]
+>> +	msr_s	SYS_APIBKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APIBKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDAKEYLO_EL1)]
+>> +	msr_s	SYS_APDAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APDAKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APDBKEYLO_EL1)]
+>> +	msr_s	SYS_APDBKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APDBKEYHI_EL1, \reg2
+>> +	ldp	\reg1, \reg2, [\base, #PTRAUTH_REG_OFFSET(CPU_APGAKEYLO_EL1)]
+>> +	msr_s	SYS_APGAKEYLO_EL1, \reg1
+>> +	msr_s	SYS_APGAKEYHI_EL1, \reg2
+>> +.endm
+>> +
+>> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+>> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+>> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+>> +	cbz	\reg1, 1f
+>> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+>> +1:
 > 
-> Hmmm, perhaps I was wishfully interpreting the word "common" to mean
-> what I would like it to mean...
+> Nit: the label in assembly macros is usually a larger number (see
+> assembler.h or alternative.h for example). I think this is to avoid
+> future accidents like
 > 
-> > > kvm_arm_init_arch_resources() is intended for stuff specific to the
-> > > particular arch backend.
-> > 
-> > I'm not sure we need that yet. We just need an arm setup sve stub like
-> > arm's kvm_set_ipa_limit() stub. OTOH, if we have to keep adding stubs
-> > to arm we should probably have something like
-> > kvm_arm_init_arch_resources() instead, and kvm_set_ipa_limit() should
-> > be moved inside the arm64 one and the arm ipa limit stub can go. Then
-> > since init_common_resources() would no longer be used, it could just
-> > be deleted.
+> 	cbz	x0, 1f
+> 	ptrauth_switch_to_guest	x1, x2, x3, x4
+> 	add	x5, x5, x6
+> 1:
+> 	...
 > 
-> OK, for simplicity I may call the sve setup directly as you suggest, and
-> make an arm stub for it: that feels a bit weird, but there is precedent.
-> 
-> If we end up accumulating a lot of these, we can revisit it and maybe
-> invent something like kvm_arm_init_arch_resources() at that point.
-> 
-> Does that sound reasonable?
-
-Yup. Sounds good to me.
+> where the code would incorrectly branch to the label inside
+> ptrauth_switch_to_guest, instead of the one after it.
+Yes agree that these kind of labels are problematic. I will update in 
+the next iteration.
 
 Thanks,
-drew
+Amit Daniel
+> 
+> Thanks,
+> Kristina
+> 
+>> +.endm
+>> +
+>> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+>> +	ldr	\reg1, [\g_ctxt, #CPU_HCR_EL2]
+>> +	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+>> +	cbz	\reg1, 2f
+>> +	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_save_state	\reg1, \reg2, \reg3
+>> +	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
+>> +	ptrauth_restore_state	\reg1, \reg2, \reg3
+>> +	isb
+>> +2:
+>> +.endm
+>> +
+>> +#else /* !CONFIG_ARM64_PTR_AUTH */
+>> +.macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+>> +.endm
+>> +.macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+>> +.endm
+>> +#endif /* CONFIG_ARM64_PTR_AUTH */
+>> +#endif /* __ASSEMBLY__ */
+>> +#endif /* __ASM_KVM_PTRAUTH_ASM_H */
+> 
+>> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+>> index 675fdc1..3a70213 100644
+>> --- a/arch/arm64/kvm/hyp/entry.S
+>> +++ b/arch/arm64/kvm/hyp/entry.S
+>> @@ -24,6 +24,7 @@
+>>   #include <asm/kvm_arm.h>
+>>   #include <asm/kvm_asm.h>
+>>   #include <asm/kvm_mmu.h>
+>> +#include <asm/kvm_ptrauth_asm.h>
+>>   
+>>   #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+>>   #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+>> @@ -64,6 +65,9 @@ ENTRY(__guest_enter)
+>>   
+>>   	add	x18, x0, #VCPU_CONTEXT
+>>   
+>> +	// Macro ptrauth_switch_to_guest(guest cxt, tmp1, tmp2, tmp3).
+>> +	ptrauth_switch_to_guest x18, x0, x1, x2
+>> +
+>>   	// Restore guest regs x0-x17
+>>   	ldp	x0, x1,   [x18, #CPU_XREG_OFFSET(0)]
+>>   	ldp	x2, x3,   [x18, #CPU_XREG_OFFSET(2)]
+>> @@ -118,6 +122,9 @@ ENTRY(__guest_exit)
+>>   
+>>   	get_host_ctxt	x2, x3
+>>   
+>> +	// Macro ptrauth_switch_to_host(guest cxt, host cxt, tmp1, tmp2, tmp3).
+>> +	ptrauth_switch_to_host x1, x2, x3, x4, x5
+>> +
+>>   	// Now restore the host regs
+>>   	restore_callee_saved_regs x2
+>>   
