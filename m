@@ -2,91 +2,92 @@ Return-Path: <SRS0=T7i1=SK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7004DC282DD
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 01:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1F2C10F0E
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 01:34:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 24C1D20880
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 01:28:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E779920880
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 01:34:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uVhjfmZH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C1D20880
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t56JIJp9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E779920880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D04FA4A3A3;
-	Sun,  7 Apr 2019 21:28:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79AD24A321;
+	Sun,  7 Apr 2019 21:34:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, body has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mb9ThxM4ieF5; Sun,  7 Apr 2019 21:27:59 -0400 (EDT)
+	with ESMTP id yICZCimiWQSb; Sun,  7 Apr 2019 21:34:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AD4E4A48C;
-	Sun,  7 Apr 2019 21:27:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EF474A452;
+	Sun,  7 Apr 2019 21:34:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D074A47F
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:27:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF7C4A331
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:34:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pl03sdNzzV2R for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 Apr 2019 21:27:57 -0400 (EDT)
-Received: from mail-yw1-f68.google.com (mail-yw1-f68.google.com
- [209.85.161.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28A124A321
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:27:57 -0400 (EDT)
-Received: by mail-yw1-f68.google.com with SMTP id u197so4371584ywf.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 07 Apr 2019 18:27:57 -0700 (PDT)
+ with ESMTP id NOtrsePlpeYV for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  7 Apr 2019 21:34:50 -0400 (EDT)
+Received: from mail-yw1-f65.google.com (mail-yw1-f65.google.com
+ [209.85.161.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 393AF4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:34:50 -0400 (EDT)
+Received: by mail-yw1-f65.google.com with SMTP id j66so4360651ywc.10
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 07 Apr 2019 18:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=9jMj4zisIi2PTAUSf9rNiwxCUVuPxEzAObjIhEFNUsQ=;
- b=uVhjfmZH5BN7AtgpBxgCNuaXgvIxp2FyOJ5KAtnLsAQKmtND0SiVJIF2W29FSsgj+C
- +H3IzdtwndJik/uDfjKnUyVkTyENTbeYN2oIzULB9woIWZBMIQ9xJDUzHjPnkMXfht9m
- 5+Nz3tTvx5owKr0OsXkL7XlJbECEzk9MpQ2vaEGPhptYPAyibbv/pjAYhN9XC5tNUz79
- cc3k0aWWE39sr+VhAKpM76d9sh3S1+VqBd70N0oBq5JXS6k/kbg+8LvlsiY7Q4jO7NEh
- hvtMEkIOFOWUDh8NrEHNpET0VXD3IDODIN1w5FL/F9casKED/D6Oianoo2kzvxghaNU3
- gdPA==
+ h=date:from:to:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=94R1PsB3DOvrvTb4L+SuN8cpW6ir/jjUWNee5sxFAwA=;
+ b=t56JIJp9Z+taxl58zDxj126cBjzW2MJrq9M+DRfRtjaaTVGruRWAJZe5wti1xmy0Jk
+ g93iT8KuFUWg6I1pLCRs/WGJI7xfa0vvgOs6ed/QmmQQ9aa3pufT2bBw9HunZ5axZ0tl
+ smsopvTFHG/pkzhH0+JkU9D7tzE22bB3T8n2gHB2MFZBcptNZEjXGY+VKqyvsZs8WBmk
+ xd/gaLn5/7esVa3lBU96DsG+tvYrCpUEpeHdp9B6CdPnK34ZjDNgFv+qr+HthWvSEPKx
+ vMOjdRQdhHZUEQWceBF/YSj3DLP5094id+gfzkCQr9gw5VJI8nSSS0SpDR8Mixi4y5vj
+ LxwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=9jMj4zisIi2PTAUSf9rNiwxCUVuPxEzAObjIhEFNUsQ=;
- b=BsHSO25/T3Uhedoo0fRw1M6N1TiwS4oDbTStRt8vNABbSj30Fc48OHrx6wNLL223Dl
- wSSjnVIwueMOUZtYZExElmZb6Jvkxjq+BSpiwXBe/rZUBtOnFpoV6aScGowKYVtP7/QH
- uAymMXXhwaIyXOQKENT28Rcy/2Sxn+KvVTIEEE1fhrDeXCAanclbLftpgPyPH9qFkvmw
- 7wwPEeHSdXseb9LxyBoWmaWgkQ5UNYytbQM78T+ct1q6Ou1b3f6MbYQCm+LCkwwyK0jR
- bvMS6sfkL5gZV0h9jqnRztvS8brNiI7C4RG93erlYGSRYjw93x9DrwL2suCJQ4zM02sJ
- WEHQ==
-X-Gm-Message-State: APjAAAXhO5yfk7sliYVJZJNLOrqv+YI3Xhp1Ehy4Mm4bruaLMKLd4OMT
- 1+RkORFexouUa28Qdk3C5nqICQ==
-X-Google-Smtp-Source: APXvYqyt8WJ2bAhRgvq3AHr/y7EBERk4LqRyLa1Gh4nLELo8/NnIUle1muXyjkwAwMcCQrN5ns0MbA==
-X-Received: by 2002:a81:2e83:: with SMTP id u125mr20760789ywu.18.1554686876734; 
- Sun, 07 Apr 2019 18:27:56 -0700 (PDT)
-Received: from localhost.localdomain (li931-65.members.linode.com.
+ h=x-gm-message-state:date:from:to:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=94R1PsB3DOvrvTb4L+SuN8cpW6ir/jjUWNee5sxFAwA=;
+ b=eesH4DRDFrmFeDMmpoaBKnR2MMuVUuxNxtD4mUp/Ykz64PWNCZ6feeZgwn/6lA1wrW
+ 9XCBU9Ue0um5Vz/mjKG/ahGiu6w7kRHzCgfY9FWbXZAkQBPcsqDSJYunormlBWJFDiig
+ nwCR3pWJ1TOyoHj4mCn/aBpB03+EprgGGIISHxVPKqvfg6Vf0rbmGn0jUt/Gt5qT9/BW
+ NeHDSPap0mdzFbvzMQay6lARt8FFxXOQ1kwzA+iy7XJc886wLEV/E3G6uGuZOZ1VmDAf
+ iRvjlEPWrykEJXBo6BF2mGZDvfhkJUNgYmWVn8+8AKGoMQhue6lmi+xt7HwBydgF2bKH
+ ApyQ==
+X-Gm-Message-State: APjAAAUoswQkZFw+Ki0UVQM4kZ5smH6Hnu6f/nfEaPCbl1DGCOo/yGys
+ GTRHF8DbkzjesR4tVb887wz8ug==
+X-Google-Smtp-Source: APXvYqzn1PliCtFjz8vasmNLaeFoFVGdcqFswu1IclRGeH8o8VoJa06HSp2a43e+Ei1t/KvconLyaw==
+X-Received: by 2002:a81:1393:: with SMTP id 141mr21053423ywt.140.1554687289666; 
+ Sun, 07 Apr 2019 18:34:49 -0700 (PDT)
+Received: from leoy-ThinkPad-X240s (li931-65.members.linode.com.
  [45.56.113.65])
- by smtp.gmail.com with ESMTPSA id 190sm10494919ywd.62.2019.04.07.18.27.53
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 07 Apr 2019 18:27:55 -0700 (PDT)
+ by smtp.gmail.com with ESMTPSA id 207sm9641421ywv.9.2019.04.07.18.34.46
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 07 Apr 2019 18:34:48 -0700 (PDT)
+Date: Mon, 8 Apr 2019 09:34:42 +0800
 From: Leo Yan <leo.yan@linaro.org>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Will Deacon <Will.Deacon@arm.com>,
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
  Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
- Marc Zyngier <Marc.Zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>,
- Robin Murphy <Robin.Murphy@arm.com>
-Subject: [PATCH v4 3/3] vfio-pci: Re-enable INTx mode when disable MSI/MSIX
-Date: Mon,  8 Apr 2019 09:27:19 +0800
-Message-Id: <20190408012719.16158-4-leo.yan@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190408012719.16158-1-leo.yan@linaro.org>
-References: <20190408012719.16158-1-leo.yan@linaro.org>
-Cc: Leo Yan <leo.yan@linaro.org>
+ Eric Auger <eric.auger@redhat.com>, Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH] vfio-pci: Fix MSI IRQ forwarding for without per-vector
+ masking
+Message-ID: <20190408013442.GA10011@leoy-ThinkPad-X240s>
+References: <20190322052308.28254-1-leo.yan@linaro.org>
+ <20190322052924.GB31904@leoy-ThinkPad-X240s>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20190322052924.GB31904@leoy-ThinkPad-X240s>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,136 +99,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408012719.iGVKe3ROtTdvbVq-b9DNwpRiK1Y5FeKFW15xRhfxgd0@z>
+Message-ID: <20190408013442.zEPEwcnIICjO_vg6d5OdvlnBcnF2pnWn5FvT6NETmkg@z>
 
-Since PCI forbids enabling INTx, MSI or MSIX at the same time, it's by
-default to disable INTx mode when enable MSI/MSIX mode; but this logic is
-easily broken if the guest PCI driver detects the MSI/MSIX cannot work as
-expected and tries to rollback to use INTx mode.  In this case, the INTx
-mode has been disabled and has no chance to re-enable it, thus both INTx
-mode and MSI/MSIX mode cannot work in vfio.
+Hi Jean-Philippe,
 
-Below shows the detailed flow for introducing this issue:
+On Fri, Mar 22, 2019 at 01:29:24PM +0800, Leo Yan wrote:
+> On Fri, Mar 22, 2019 at 01:23:08PM +0800, Leo Yan wrote:
+> > If MSI doesn't support per-vector masking capability and
+> > PCI_MSI_FLAGS_MASKBIT isn't set in message control field, the function
+> > vfio_pci_msi_vector_write() will directly bail out for this case and
+> > every vector's 'virt_state' keeps setting bit VFIO_PCI_MSI_STATE_MASKED.
+> > 
+> > This results in the state maintained in 'virt_state' cannot really
+> > reflect the MSI hardware state; finally it will mislead the function
+> > vfio_pci_update_msi_entry() to skip IRQ forwarding with below flow:
+> > 
+> > vfio_pci_update_msi_entry() {
+> > 
+> >   [...]
+> > 
+> >   if (msi_is_masked(entry->virt_state) == msi_is_masked(entry->phys_state))
+> >       return 0;  ==> skip IRQ forwarding
+> > 
+> >   [...]
+> > }
+> > 
+> > To fix this issue, when detect PCI_MSI_FLAGS_MASKBIT is not set in the
+> > message control field, this patch simply clears bit
+> > VFIO_PCI_MSI_STATE_MASKED for all vectors 'virt_state'; at the end
+> > vfio_pci_update_msi_entry() can forward MSI IRQ successfully.
+> 
+> Just remind, this patch is for kvmtool but not for kernel.  Sorry I
+> forget to add it in subject.
 
-  vfio_pci_configure_dev_irqs()
-    `-> vfio_pci_enable_intx()
+Gentle ping.  Not sure if this patch is reasonable, could you help to
+give a review?
 
-  vfio_pci_enable_msis()
-    `-> vfio_pci_disable_intx()
+[...]
 
-  vfio_pci_disable_msis()   => Guest PCI driver disables MSI
-
-To fix this issue, when disable MSI/MSIX we need to check if INTx mode
-is available for this device or not; if the device can support INTx then
-re-enable it so that the device can fallback to use it.
-
-Since vfio_pci_disable_intx() / vfio_pci_enable_intx() pair functions
-may be called for multiple times, this patch uses 'intx_fd == -1' to
-denote the INTx is disabled, the pair functions can directly bail out
-when detect INTx has been disabled and enabled respectively.
-
-Suggested-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Leo Yan <leo.yan@linaro.org>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
----
- vfio/pci.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
-
-diff --git a/vfio/pci.c b/vfio/pci.c
-index 3c39844..f17498e 100644
---- a/vfio/pci.c
-+++ b/vfio/pci.c
-@@ -28,6 +28,7 @@ struct vfio_irq_eventfd {
- 	msi_update_state(state, val, VFIO_PCI_MSI_STATE_EMPTY)
- 
- static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev);
-+static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev);
- 
- static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 				bool msix)
-@@ -50,17 +51,14 @@ static int vfio_pci_enable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 	if (!msi_is_enabled(msis->virt_state))
- 		return 0;
- 
--	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX) {
-+	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
- 		/*
- 		 * PCI (and VFIO) forbids enabling INTx, MSI or MSIX at the same
- 		 * time. Since INTx has to be enabled from the start (we don't
--		 * have a reliable way to know when the user starts using it),
-+		 * have a reliable way to know when the guest starts using it),
- 		 * disable it now.
- 		 */
- 		vfio_pci_disable_intx(kvm, vdev);
--		/* Permanently disable INTx */
--		pdev->irq_modes &= ~VFIO_PCI_IRQ_MODE_INTX;
--	}
- 
- 	eventfds = (void *)msis->irq_set + sizeof(struct vfio_irq_set);
- 
-@@ -162,7 +160,16 @@ static int vfio_pci_disable_msis(struct kvm *kvm, struct vfio_device *vdev,
- 	msi_set_enabled(msis->phys_state, false);
- 	msi_set_empty(msis->phys_state, true);
- 
--	return 0;
-+	/*
-+	 * When MSI or MSIX is disabled, this might be called when
-+	 * PCI driver detects the MSI interrupt failure and wants to
-+	 * rollback to INTx mode.  Thus enable INTx if the device
-+	 * supports INTx mode in this case.
-+	 */
-+	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_INTX)
-+		ret = vfio_pci_enable_intx(kvm, vdev);
-+
-+	return ret >= 0 ? 0 : ret;
- }
- 
- static int vfio_pci_update_msi_entry(struct kvm *kvm, struct vfio_device *vdev,
-@@ -1002,6 +1009,9 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 		.index	= VFIO_PCI_INTX_IRQ_INDEX,
- 	};
- 
-+	if (pdev->intx_fd == -1)
-+		return;
-+
- 	pr_debug("user requested MSI, disabling INTx %d", gsi);
- 
- 	ioctl(vdev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
-@@ -1009,6 +1019,7 @@ static void vfio_pci_disable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 
- 	close(pdev->intx_fd);
- 	close(pdev->unmask_fd);
-+	pdev->intx_fd = -1;
- }
- 
- static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
-@@ -1020,6 +1031,9 @@ static int vfio_pci_enable_intx(struct kvm *kvm, struct vfio_device *vdev)
- 	struct vfio_pci_device *pdev = &vdev->pci;
- 	int gsi = pdev->intx_gsi;
- 
-+	if (pdev->intx_fd != -1)
-+		return 0;
-+
- 	/*
- 	 * PCI IRQ is level-triggered, so we use two eventfds. trigger_fd
- 	 * signals an interrupt from host to guest, and unmask_fd signals the
-@@ -1122,6 +1136,8 @@ static int vfio_pci_init_intx(struct kvm *kvm, struct vfio_device *vdev)
- 	/* Guest is going to ovewrite our irq_line... */
- 	pdev->intx_gsi = pdev->hdr.irq_line - KVM_IRQ_OFFSET;
- 
-+	pdev->intx_fd = -1;
-+
- 	return 0;
- }
- 
--- 
-2.19.1
-
+Thanks,
+Leo Yan
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
