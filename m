@@ -1,301 +1,98 @@
-From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v7 15/23] dma-iommu: Implement NESTED_MSI cookie
-Date: Mon,  8 Apr 2019 14:19:03 +0200
-Message-ID: <20190408121911.24103-16-eric.auger@redhat.com>
+From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v7 16/23] iommu/smmuv3: Nested mode single MSI doorbell per
+	domain enforcement
+Date: Mon,  8 Apr 2019 14:19:04 +0200
+Message-ID: <20190408121911.24103-17-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
-Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20190408121911.24103-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
+Cc: peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, vincent.stehle-5wv7dgnIgG8@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Up to now, when the type was UNMANAGED, we used to
-allocate IOVA pages within a reserved IOVA MSI range.
+In nested mode we enforce the rule that all devices belonging
+to the same iommu_domain share the same msi_domain.
 
-If both the host and the guest are exposed with SMMUs, each
-would allocate an IOVA. The guest allocates an IOVA (gIOVA)
-to map onto the guest MSI doorbell (gDB). The Host allocates
-another IOVA (hIOVA) to map onto the physical doorbell (hDB).
+Indeed if there were several physical MSI doorbells being used
+within a single iommu_domain, it becomes really difficult to
+resolve the nested stage mapping translating into the correct
+physical doorbell. So let's forbid this situation.
 
-So we end up with 2 unrelated mappings, at S1 and S2:
-         S1             S2
-gIOVA    ->     gDB
-               hIOVA    ->    hDB
-
-The PCI device would be programmed with hIOVA.
-No stage 1 mapping would existing, causing the MSIs to fault.
-
-iommu_dma_bind_guest_msi() allows to pass gIOVA/gDB
-to the host so that gIOVA can be used by the host instead of
-re-allocating a new hIOVA.
-
-         S1           S2
-gIOVA    ->    gDB    ->    hDB
-
-this time, the PCI device can be programmed with the gIOVA MSI
-doorbell which is correctly mapped through both stages.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
-v6 -> v7:
-- removed device handle
+ drivers/iommu/arm-smmu-v3.c | 41 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-v3 -> v4:
-- change function names; add unregister
-- protect with msi_lock
-
-v2 -> v3:
-- also store the device handle on S1 mapping registration.
-  This garantees we associate the associated S2 mapping binds
-  to the correct physical MSI controller.
-
-v1 -> v2:
-- unmap stage2 on put()
----
- drivers/iommu/dma-iommu.c | 129 +++++++++++++++++++++++++++++++++++++-
- include/linux/dma-iommu.h |  17 +++++
- 2 files changed, 143 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index 77aabe637a60..9905260ad342 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -35,12 +35,15 @@
- struct iommu_dma_msi_page {
- 	struct list_head	list;
- 	dma_addr_t		iova;
-+	dma_addr_t		gpa;
- 	phys_addr_t		phys;
-+	size_t			s1_granule;
- };
- 
- enum iommu_dma_cookie_type {
- 	IOMMU_DMA_IOVA_COOKIE,
- 	IOMMU_DMA_MSI_COOKIE,
-+	IOMMU_DMA_NESTED_MSI_COOKIE,
- };
- 
- struct iommu_dma_cookie {
-@@ -110,14 +113,17 @@ EXPORT_SYMBOL(iommu_get_dma_cookie);
-  *
-  * Users who manage their own IOVA allocation and do not want DMA API support,
-  * but would still like to take advantage of automatic MSI remapping, can use
-- * this to initialise their own domain appropriately. Users should reserve a
-+ * this to initialise their own domain appropriately. Users may reserve a
-  * contiguous IOVA region, starting at @base, large enough to accommodate the
-  * number of PAGE_SIZE mappings necessary to cover every MSI doorbell address
-- * used by the devices attached to @domain.
-+ * used by the devices attached to @domain. The other way round is to provide
-+ * usable iova pages through the iommu_dma_bind_doorbell API (nested stages
-+ * use case)
-  */
- int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
- {
- 	struct iommu_dma_cookie *cookie;
-+	int nesting, ret;
- 
- 	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
- 		return -EINVAL;
-@@ -125,7 +131,12 @@ int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
- 	if (domain->iova_cookie)
- 		return -EEXIST;
- 
--	cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
-+	ret =  iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nesting);
-+	if (!ret && nesting)
-+		cookie = cookie_alloc(IOMMU_DMA_NESTED_MSI_COOKIE);
-+	else
-+		cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
-+
- 	if (!cookie)
- 		return -ENOMEM;
- 
-@@ -146,6 +157,7 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
- {
- 	struct iommu_dma_cookie *cookie = domain->iova_cookie;
- 	struct iommu_dma_msi_page *msi, *tmp;
-+	bool s2_unmap = false;
- 
- 	if (!cookie)
- 		return;
-@@ -153,7 +165,15 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
- 	if (cookie->type == IOMMU_DMA_IOVA_COOKIE && cookie->iovad.granule)
- 		put_iova_domain(&cookie->iovad);
- 
-+	if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE)
-+		s2_unmap = true;
-+
- 	list_for_each_entry_safe(msi, tmp, &cookie->msi_page_list, list) {
-+		if (s2_unmap && msi->phys) {
-+			size_t size = cookie_msi_granule(cookie);
-+
-+			WARN_ON(iommu_unmap(domain, msi->gpa, size) != size);
-+		}
- 		list_del(&msi->list);
- 		kfree(msi);
- 	}
-@@ -162,6 +182,82 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
+diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+index 4366921d8318..2b2d90d736d6 100644
+--- a/drivers/iommu/arm-smmu-v3.c
++++ b/drivers/iommu/arm-smmu-v3.c
+@@ -1781,6 +1781,37 @@ static void arm_smmu_detach_dev(struct device *dev)
+ 	arm_smmu_install_ste_for_dev(fwspec);
  }
- EXPORT_SYMBOL(iommu_put_dma_cookie);
  
-+/**
-+ * iommu_dma_bind_guest_msi - Allows to pass the stage 1
-+ * binding of a virtual MSI doorbell used by @dev.
-+ *
-+ * @domain: domain handle
-+ * @iova: guest iova
-+ * @gpa: gpa of the virtual doorbell
-+ * @size: size of the granule used for the stage1 mapping
-+ *
-+ * In nested stage use case, the user can provide IOVA/IPA bindings
-+ * corresponding to a guest MSI stage 1 mapping. When the host needs
-+ * to map its own MSI doorbells, it can use @gpa as stage 2 input
-+ * and map it onto the physical MSI doorbell.
-+ */
-+int iommu_dma_bind_guest_msi(struct iommu_domain *domain,
-+			     dma_addr_t iova, phys_addr_t gpa, size_t size)
++static bool arm_smmu_share_msi_domain(struct iommu_domain *domain,
++				      struct device *dev)
 +{
-+	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-+	struct iommu_dma_msi_page *msi;
-+	int ret = 0;
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct irq_domain *irqd = dev_get_msi_domain(dev);
++	struct arm_smmu_master_data *entry;
++	unsigned long flags;
++	bool share = false;
 +
-+	if (!cookie)
-+		return -EINVAL;
++	if (!irqd)
++		return true;
 +
-+	if (cookie->type != IOMMU_DMA_NESTED_MSI_COOKIE)
-+		return -EINVAL;
++	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
++	list_for_each_entry(entry, &smmu_domain->devices, list) {
++		struct irq_domain *d = dev_get_msi_domain(entry->dev);
 +
-+	iova = iova & ~(dma_addr_t)(size - 1);
-+	gpa = gpa & ~(phys_addr_t)(size - 1);
-+
-+	spin_lock(&cookie->msi_lock);
-+
-+	list_for_each_entry(msi, &cookie->msi_page_list, list) {
-+		if (msi->iova == iova)
-+			goto unlock; /* this page is already registered */
++		if (!d)
++			continue;
++		if (irqd != d) {
++			dev_info(dev, "Nested mode forbids to attach devices "
++				 "using different physical MSI doorbells "
++				 "to the same iommu_domain");
++			goto unlock;
++		}
 +	}
-+
-+	msi = kzalloc(sizeof(*msi), GFP_ATOMIC);
-+	if (!msi) {
-+		ret = -ENOMEM;
-+		goto unlock;
-+	}
-+
-+	msi->iova = iova;
-+	msi->gpa = gpa;
-+	msi->s1_granule = size;
-+	list_add(&msi->list, &cookie->msi_page_list);
++	share = true;
 +unlock:
-+	spin_unlock(&cookie->msi_lock);
-+	return ret;
++	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
++	return share;
 +}
-+EXPORT_SYMBOL(iommu_dma_bind_guest_msi);
 +
-+void iommu_dma_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
-+{
-+	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-+	struct iommu_dma_msi_page *msi, *tmp;
-+
-+	list_for_each_entry_safe(msi, tmp, &cookie->msi_page_list, list) {
-+		dma_addr_t aligned_giova =
-+			giova & ~(dma_addr_t)(msi->s1_granule - 1);
-+
-+		if (msi->iova == aligned_giova) {
-+			if (msi->phys) {
-+				/* unmap the stage 2 */
-+				size_t size = cookie_msi_granule(cookie);
-+
-+				WARN_ON(iommu_unmap(domain, msi->gpa, size) != size);
-+			}
-+			list_del(&msi->list);
-+			kfree(msi);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(iommu_dma_unbind_guest_msi);
-+
- /**
-  * iommu_dma_get_resv_regions - Reserved region driver helper
-  * @dev: Device from iommu_get_resv_regions()
-@@ -869,6 +965,33 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
- 		if (msi_page->phys == msi_addr)
- 			return msi_page;
- 
+ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+ {
+ 	int ret = 0;
+@@ -1819,6 +1850,16 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+ 		ret = -ENXIO;
+ 		goto out_unlock;
+ 	}
 +	/*
-+	 * In nested stage mode, we do not allocate an MSI page in
-+	 * a range provided by the user. Instead, IOVA/IPA bindings are
-+	 * individually provided. We reuse thise IOVAs to build the
-+	 * GIOVA -> GPA -> MSI HPA nested stage mapping.
++	 * In nested mode we must check all devices belonging to the
++	 * domain share the same physical MSI doorbell. Otherwise nested
++	 * stage MSI binding is not supported.
 +	 */
-+	if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE) {
-+		list_for_each_entry(msi_page, &cookie->msi_page_list, list)
-+			if (!msi_page->phys) {
-+				int ret;
-+
-+				/* do the stage 2 mapping */
-+				ret = iommu_map(domain,
-+						msi_page->gpa, msi_addr, size,
-+						IOMMU_MMIO | IOMMU_WRITE);
-+				if (ret) {
-+					pr_warn("MSI S2 mapping failed (%d)\n",
-+						ret);
-+					return NULL;
-+				}
-+				msi_page->phys = msi_addr;
-+				return msi_page;
-+			}
-+		pr_warn("%s no MSI binding found\n", __func__);
-+		return NULL;
++	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
++		!arm_smmu_share_msi_domain(domain, dev)) {
++		ret = -EINVAL;
++		goto out_unlock;
 +	}
-+
- 	msi_page = kzalloc(sizeof(*msi_page), GFP_ATOMIC);
- 	if (!msi_page)
- 		return NULL;
-diff --git a/include/linux/dma-iommu.h b/include/linux/dma-iommu.h
-index e760dc5d1fa8..fa898d514edb 100644
---- a/include/linux/dma-iommu.h
-+++ b/include/linux/dma-iommu.h
-@@ -24,6 +24,7 @@
- #include <linux/dma-mapping.h>
- #include <linux/iommu.h>
- #include <linux/msi.h>
-+#include <uapi/linux/iommu.h>
  
- int iommu_dma_init(void);
- 
-@@ -73,6 +74,9 @@ void iommu_dma_unmap_resource(struct device *dev, dma_addr_t handle,
- /* The DMA API isn't _quite_ the whole story, though... */
- void iommu_dma_map_msi_msg(int irq, struct msi_msg *msg);
- void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list);
-+int iommu_dma_bind_guest_msi(struct iommu_domain *domain,
-+			     dma_addr_t iova, phys_addr_t gpa, size_t size);
-+void iommu_dma_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova);
- 
- #else
- 
-@@ -103,6 +107,19 @@ static inline void iommu_dma_map_msi_msg(int irq, struct msi_msg *msg)
- {
- }
- 
-+static inline int
-+iommu_dma_bind_guest_msi(struct iommu_domain *domain, struct device *dev,
-+			 dma_addr_t iova, phys_addr_t gpa, size_t size)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline void
-+iommu_dma_unbind_guest_msi(struct iommu_domain *domain,
-+			   struct device *dev, dma_addr_t giova);
-+{
-+}
-+
- static inline void iommu_dma_get_resv_regions(struct device *dev, struct list_head *list)
- {
- }
+ 	ste->assigned = true;
+ 	master->domain = smmu_domain;
 -- 
 2.20.1
