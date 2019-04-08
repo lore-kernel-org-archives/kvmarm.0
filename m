@@ -1,154 +1,158 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-Date: Mon, 8 Apr 2019 11:35:30 +0100
-Message-ID: <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v7 00/23] SMMUv3 Nested Stage Setup
+Date: Mon,  8 Apr 2019 14:18:48 +0200
+Message-ID: <20190408121911.24103-1-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@arm.com, zhengxiang9@huawei.com, andrew.murray@arm.com, wanghaibin.wang@huawei.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/08/2019 04:50 AM, Zenghui Yu wrote:
-> 
-> 
-> On 2019/4/2 19:06, Suzuki K Poulose wrote:
->> With commit a80868f398554842b14, we no longer ensure that the
->> THP page is properly aligned in the guest IPA. Skip the stage2
->> huge mapping for unaligned IPA backed by transparent hugepages.
->>
->> Fixes: a80868f398554842b14 ("KVM: arm/arm64: Enforce PTE mappings at 
->> stage2 when needed")
->> Reported-by: Eric Auger <eric.auger@redhat.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Chirstoffer Dall <christoffer.dall@arm.com>
->> Cc: Zenghui Yu <yuzenghui@huawei.com>
->> Cc: Zheng Xiang <zhengxiang9@huawei.com>
->> Tested-by: Eric Auger <eric.auger@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Hi Suzuki,
-> 
-> Why not making use of fault_supports_stage2_huge_mapping()?  Let it do
-> some checks for us.
-> 
-> fault_supports_stage2_huge_mapping() was intended to do a *two-step*
-> check to tell us that can we create stage2 huge block mappings, and this
-> check is both for hugetlbfs and THP.  With commit a80868f398554842b14,
-> we pass PAGE_SIZE as "map_size" for normal size pages (which turned out
-> to be almost meaningless), and unfortunately the THP check no longer
-> works.
+This series allows a virtualizer to program the nested stage mode.
+This is useful when both the host and the guest are exposed with
+an SMMUv3 and a PCI device is assigned to the guest using VFIO.
 
-Thats correct.
+In this mode, the physical IOMMU must be programmed to translate
+the two stages: the one set up by the guest (IOVA -> GPA) and the
+one set up by the host VFIO driver as part of the assignment process
+(GPA -> HPA).
 
-> 
-> So we want to rework *THP* check process.  Your patch fixes the first
-> checking-step, but the second is still missed, am I wrong?
+On Intel, this is traditionnaly achieved by combining the 2 stages
+into a single physical stage. However this relies on the capability
+to trap on each guest translation structure update. This is possible
+by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
+not offer a similar mechanism.
 
-It fixes the step explicitly for the THP by making sure that the GPA and
-the HVA are aligned to the map size.
+However, the ARM SMMUv3 architecture supports 2 physical stages! Those
+were devised exactly with that use case in mind. Assuming the HW
+implements both stages (optional), the guest now can use stage 1
+while the host uses stage 2.
 
-> 
-> Can you please give a look at the below diff?
-> 
-> 
-> thanks,
-> 
-> zenghui
-> 
->> ---
->>   virt/kvm/arm/mmu.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 27c9583..4a22f5b 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1412,7 +1412,9 @@ static bool 
->> transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
->>            * page accordingly.
->>            */
->>           mask = PTRS_PER_PMD - 1;
->> -        VM_BUG_ON((gfn & mask) != (pfn & mask));
-> Somehow, I'd prefer keeping the VM_BUG_ON() here, let it report some
-> potential issues in the future (of course I hope none:) )
+This assumes the virtualizer has means to propagate guest settings
+to the host SMMUv3 driver. This series brings this VFIO/IOMMU
+infrastructure.  Those services are:
+- bind the guest stage 1 configuration to the stream table entry
+- propagate guest TLB invalidations
+- bind MSI IOVAs
+- propagate faults collected at physical level up to the virtualizer
 
-I don't think this calls for a VM_BUG_ON(). It is simply a case where
-the GPA is not aligned to HVA, but for normal VMA that could be made THP.
+This series largely reuses the user API and infrastructure originally
+devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
+[1-2] and Jean-Philippe [3-4].
 
-We had this VM_BUG_ON(), which would have never hit because we would
-have set force_pte if they were not aligned.
+Best Regards
 
->> +        /* Skip memslots with unaligned IPA and user address */
->> +        if ((gfn & mask) != (pfn & mask))
->> +            return false;
->>           if (pfn & mask) {
->>               *ipap &= PMD_MASK;
->>               kvm_release_pfn_clean(pfn);
->>
-> 
-> ---8>---
-> 
-> Rework fault_supports_stage2_huge_mapping(), let it check THP again.
-> 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->   virt/kvm/arm/mmu.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 27c9583..5e1b258 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1632,6 +1632,15 @@ static bool 
-> fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->       uaddr_end = uaddr_start + size;
-> 
->       /*
-> +     * If the memslot is _not_ backed by hugetlbfs, then check if it
-> +     * can be backed by transparent hugepages.
-> +     *
-> +     * Currently only PMD_SIZE THPs are supported, revisit it later.
-> +     */
-> +    if (map_size == PAGE_SIZE)
-> +        map_size = PMD_SIZE;
-> +
+Eric
 
-This looks hackish. What is we support PUD_SIZE huge page in the future
-?
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.1-rc3-2stage-v7
 
-> +    /*
->        * Pages belonging to memslots that don't have the same alignment
->        * within a PMD/PUD for userspace and IPA cannot be mapped with 
-> stage-2
->        * PMD/PUD entries, because we'll end up mapping the wrong pages.
-> @@ -1643,7 +1652,7 @@ static bool 
-> fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->        *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
->        *    +-----+--------------------+--------------------+---+
->        *
-> -     *    memslot->base_gfn << PAGE_SIZE:
-> +     *    memslot->base_gfn << PAGE_SHIFT:
+References:
+[1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
+    Address (SVA)
+    https://lwn.net/Articles/754331/
+[2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
+    (VFIO part)
+    https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
+[3] [v2,00/40] Shared Virtual Addressing for the IOMMU
+    https://patchwork.ozlabs.org/cover/912129/
+[4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
+    https://patchwork.kernel.org/cover/10608299/
 
-That could be fixed.
+History:
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
 
->        *      +---+--------------------+--------------------+-----+
->        *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
->        *      +---+--------------------+--------------------+-----+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens in
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
 
 
-But personally I don't think this is the right way to fix it. And as
-mentioned, the VM_BUG_ON() is unnecessary and could easily be triggered
-by the user by using unaligned GPA/HVA. All we need to do is, use page
-mapping in such cases, which we do with my patch.
+Eric Auger (14):
+  iommu: Introduce bind/unbind_guest_msi
+  vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
+  vfio-pci: Register an iommu fault handler
+  vfio_pci: Allow to mmap the fault queue
+  vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
+  vfio: Document nested stage control
 
+Jacob Pan (4):
+  driver core: add per device iommu param
+  iommu: introduce device fault data
+  iommu: introduce device fault report API
+  iommu: Introduce attach/detach_pasid_table API
 
-Cheers
-Suzuki
+Jean-Philippe Brucker (2):
+  iommu/arm-smmu-v3: Link domains and devices
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+Liu, Yi L (3):
+  iommu: Introduce cache_invalidate API
+  vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
+  vfio: VFIO_IOMMU_CACHE_INVALIDATE
+
+ Documentation/vfio.txt              |  83 ++++
+ drivers/iommu/arm-smmu-v3.c         | 631 ++++++++++++++++++++++++++--
+ drivers/iommu/dma-iommu.c           | 129 +++++-
+ drivers/iommu/iommu.c               | 205 ++++++++-
+ drivers/vfio/pci/vfio_pci.c         | 214 ++++++++++
+ drivers/vfio/pci/vfio_pci_intrs.c   |  19 +
+ drivers/vfio/pci/vfio_pci_private.h |  18 +
+ drivers/vfio/pci/vfio_pci_rdwr.c    |  73 ++++
+ drivers/vfio/vfio_iommu_type1.c     | 172 ++++++++
+ include/linux/device.h              |   3 +
+ include/linux/dma-iommu.h           |  17 +
+ include/linux/iommu.h               | 135 ++++++
+ include/uapi/linux/iommu.h          | 240 +++++++++++
+ include/uapi/linux/vfio.h           | 107 +++++
+ 14 files changed, 2013 insertions(+), 33 deletions(-)
+ create mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.20.1
