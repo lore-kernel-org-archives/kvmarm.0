@@ -2,62 +2,65 @@ Return-Path: <SRS0=T7i1=SK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E19C10F14
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 18:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A38D4C10F14
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 18:39:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 46D36206C0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 18:38:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D36206C0
+	by mail.kernel.org (Postfix) with ESMTP id 17B5820833
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 18:39:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B5820833
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2F834A47B;
-	Mon,  8 Apr 2019 14:38:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0A114A3A3;
+	Mon,  8 Apr 2019 14:39:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id t3-dZuDdeSmA; Mon,  8 Apr 2019 14:37:58 -0400 (EDT)
+	with ESMTP id V6SIDESA7Gm9; Mon,  8 Apr 2019 14:39:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 070CF4A477;
-	Mon,  8 Apr 2019 14:37:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 415B54A477;
+	Mon,  8 Apr 2019 14:39:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20EC54A418
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 14:37:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EC744A418
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 14:39:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WDwnjiFPqo9n for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 14:37:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E63D4A3A3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 14:37:55 -0400 (EDT)
+ with ESMTP id mPaFHmJEwDrN for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 14:39:23 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A319D4A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 14:39:23 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7804E15BE;
- Mon,  8 Apr 2019 11:37:54 -0700 (PDT)
-Received: from [10.37.12.66] (unknown [10.37.12.66])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1342F3F718;
- Mon,  8 Apr 2019 11:37:51 -0700 (PDT)
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
- <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
- <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
-Date: Mon, 8 Apr 2019 19:40:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0056B15BE;
+ Mon,  8 Apr 2019 11:39:23 -0700 (PDT)
+Received: from [10.1.197.21] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ BC9F43F718; Mon,  8 Apr 2019 11:39:20 -0700 (PDT)
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>,
+ James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
+ <f27a3e70-2099-45a6-48e6-481a67e360eb@arm.com>
+ <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
+Message-ID: <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
+Date: Mon, 8 Apr 2019 19:39:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
+In-Reply-To: <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ kvmarm@lists.cs.columbia.edu,
+ Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,83 +72,98 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408184009.rrVASaq0KOyGIzqup3-mR_l9nmMAv524lClBONSlH8s@z>
+Message-ID: <20190408183919.xJ5gTYYFU6AsjNO52uX0YejvJfz2SSawgK8XGjDp05w@z>
 
-SGkgWmVuaHVpLAoKT24gMDQvMDgvMjAxOSAwNDoxMSBQTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiBI
-aSBTdXp1a2ksCj4gCj4gVGhhbmtzIGZvciB0aGUgcmVwbHkuCj4gCgouLi4KCj4+PiBIaSBTdXp1
-a2ksCj4+Pgo+Pj4gV2h5IG5vdCBtYWtpbmcgdXNlIG9mIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9o
-dWdlX21hcHBpbmcoKT/CoCBMZXQgaXQgZG8KPj4+IHNvbWUgY2hlY2tzIGZvciB1cy4KPj4+Cj4+
-PiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5nKCkgd2FzIGludGVuZGVkIHRvIGRv
-IGEgKnR3by1zdGVwKgo+Pj4gY2hlY2sgdG8gdGVsbCB1cyB0aGF0IGNhbiB3ZSBjcmVhdGUgc3Rh
-Z2UyIGh1Z2UgYmxvY2sgbWFwcGluZ3MsIGFuZCB0aGlzCj4+PiBjaGVjayBpcyBib3RoIGZvciBo
-dWdldGxiZnMgYW5kIFRIUC7CoCBXaXRoIGNvbW1pdCBhODA4NjhmMzk4NTU0ODQyYjE0LAo+Pj4g
-d2UgcGFzcyBQQUdFX1NJWkUgYXMgIm1hcF9zaXplIiBmb3Igbm9ybWFsIHNpemUgcGFnZXMgKHdo
-aWNoIHR1cm5lZCBvdXQKPj4+IHRvIGJlIGFsbW9zdCBtZWFuaW5nbGVzcyksIGFuZCB1bmZvcnR1
-bmF0ZWx5IHRoZSBUSFAgY2hlY2sgbm8gbG9uZ2VyCj4+PiB3b3Jrcy4KPj4KPj4gVGhhdHMgY29y
-cmVjdC4KPj4KPj4+Cj4+PiBTbyB3ZSB3YW50IHRvIHJld29yayAqVEhQKiBjaGVjayBwcm9jZXNz
-LsKgIFlvdXIgcGF0Y2ggZml4ZXMgdGhlIGZpcnN0Cj4+PiBjaGVja2luZy1zdGVwLCBidXQgdGhl
-IHNlY29uZCBpcyBzdGlsbCBtaXNzZWQsIGFtIEkgd3Jvbmc/Cj4+Cj4+IEl0IGZpeGVzIHRoZSBz
-dGVwIGV4cGxpY2l0bHkgZm9yIHRoZSBUSFAgYnkgbWFraW5nIHN1cmUgdGhhdCB0aGUgR1BBIGFu
-ZAo+PiB0aGUgSFZBIGFyZSBhbGlnbmVkIHRvIHRoZSBtYXAgc2l6ZS4KPiAKPiBZZXMsIEkgdW5k
-ZXJzdGFuZCBob3cgeW91ciBwYXRjaCBoYWQgZml4ZWQgdGhlIGlzc3VlLsKgIEJ1dCB3aGF0IEkn
-bQo+IHJlYWxseSBjb25jZXJuZWQgYWJvdXQgaGVyZSBpcyB0aGUgKnNlY29uZCogY2hlY2tpbmct
-c3RlcCBpbgo+IGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKS4KPiAKPiBXZSBo
-YXZlIHRvIGNoZWNrIGlmIHdlIGFyZSBtYXBwaW5nIGEgbm9uLWJsb2NrIGFsaWduZWQgb3Igbm9u
-LWJsb2NrCj4gc2l6ZWQgbWVtc2xvdCwgaWYgc28sIHdlIGNhbiBub3QgY3JlYXRlIGJsb2NrIG1h
-cHBpbmdzIGZvciB0aGUgYmVnaW5uaW5nCj4gYW5kIGVuZCBvZiB0aGlzIG1lbXNsb3QuwqAgVGhp
-cyBpcyB3aGF0IHRoZSBzZWNvbmQgcGFydCBvZgo+IGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdl
-X21hcHBpbmcoKSBoYWQgZG9uZS4KPiAKPiBJIGhhdmVuJ3Qgc2VlbiB0aGlzIGNoZWNraW5nLXN0
-ZXAgaW4geW91ciBwYXRjaCwgZGlkIEkgbWlzcyBzb21ldGhpbmc/Cj4gCgpJIHNlZS4KCj4+IEkg
-ZG9uJ3QgdGhpbmsgdGhpcyBjYWxscyBmb3IgYSBWTV9CVUdfT04oKS4gSXQgaXMgc2ltcGx5IGEg
-Y2FzZSB3aGVyZQo+PiB0aGUgR1BBIGlzIG5vdCBhbGlnbmVkIHRvIEhWQSwgYnV0IGZvciBub3Jt
-YWwgVk1BIHRoYXQgY291bGQgYmUgbWFkZSBUSFAuCj4+Cj4+IFdlIGhhZCB0aGlzIFZNX0JVR19P
-TigpLCB3aGljaCB3b3VsZCBoYXZlIG5ldmVyIGhpdCBiZWNhdXNlIHdlIHdvdWxkCj4+IGhhdmUg
-c2V0IGZvcmNlX3B0ZSBpZiB0aGV5IHdlcmUgbm90IGFsaWduZWQuCj4gCj4gWWVzLCBJIGFncmVl
-Lgo+IAo+Pj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBTa2lwIG1lbXNsb3RzIHdpdGggdW5hbGlnbmVk
-IElQQSBhbmQgdXNlciBhZGRyZXNzICovCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmICgoZ2ZuICYg
-bWFzaykgIT0gKHBmbiAmIG1hc2spKQo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVy
-biBmYWxzZTsKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHBmbiAmIG1hc2spIHsKPj4+PiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqaXBhcCAmPSBQTURfTUFTSzsKPj4+PiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fcmVsZWFzZV9wZm5fY2xlYW4ocGZuKTsKPj4+Pgo+Pj4K
-Pj4+IC0tLTg+LS0tCj4+Pgo+Pj4gUmV3b3JrIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21h
-cHBpbmcoKSwgbGV0IGl0IGNoZWNrIFRIUCBhZ2Fpbi4KPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBa
-ZW5naHVpIFl1IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KPj4+IC0tLQo+Pj4gwqDCoHZpcnQva3Zt
-L2FybS9tbXUuYyB8IDExICsrKysrKysrKystCj4+PiDCoMKgMSBmaWxlIGNoYW5nZWQsIDEwIGlu
-c2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4+Cj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0v
-YXJtL21tdS5jIGIvdmlydC9rdm0vYXJtL21tdS5jCj4+PiBpbmRleCAyN2M5NTgzLi41ZTFiMjU4
-IDEwMDY0NAo+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4+PiArKysgYi92aXJ0L2t2bS9h
-cm0vbW11LmMKPj4+IEBAIC0xNjMyLDYgKzE2MzIsMTUgQEAgc3RhdGljIGJvb2wgCj4+PiBmYXVs
-dF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QgKm1l
-bXNsb3QsCj4+PiDCoMKgwqDCoMKgIHVhZGRyX2VuZCA9IHVhZGRyX3N0YXJ0ICsgc2l6ZTsKPj4+
-Cj4+PiDCoMKgwqDCoMKgIC8qCj4+PiArwqDCoMKgwqAgKiBJZiB0aGUgbWVtc2xvdCBpcyBfbm90
-XyBiYWNrZWQgYnkgaHVnZXRsYmZzLCB0aGVuIGNoZWNrIGlmIGl0Cj4+PiArwqDCoMKgwqAgKiBj
-YW4gYmUgYmFja2VkIGJ5IHRyYW5zcGFyZW50IGh1Z2VwYWdlcy4KPj4+ICvCoMKgwqDCoCAqCj4+
-PiArwqDCoMKgwqAgKiBDdXJyZW50bHkgb25seSBQTURfU0laRSBUSFBzIGFyZSBzdXBwb3J0ZWQs
-IHJldmlzaXQgaXQgbGF0ZXIuCj4+PiArwqDCoMKgwqAgKi8KPj4+ICvCoMKgwqAgaWYgKG1hcF9z
-aXplID09IFBBR0VfU0laRSkKPj4+ICvCoMKgwqDCoMKgwqDCoCBtYXBfc2l6ZSA9IFBNRF9TSVpF
-Owo+Pj4gKwo+Pgo+PiBUaGlzIGxvb2tzIGhhY2tpc2guIFdoYXQgaXMgd2Ugc3VwcG9ydCBQVURf
-U0laRSBodWdlIHBhZ2UgaW4gdGhlIGZ1dHVyZQo+PiA/Cj4gCj4gWWVzLCB0aGlzIG1pZ2h0IG1h
-a2UgdGhlIGNvZGUgYSBsaXR0bGUgZGlmZmljdWx0IHRvIHVuZGVyc3RhbmQuIEJ1dCBieQo+IGRv
-aW5nIHNvLCB3ZSBmb2xsb3cgdGhlIHNhbWUgbG9naWMgYmVmb3JlIGNvbW1pdCBhODA4NjhmMzk4
-NTU0ODQyYjE0LAo+IHRoYXQgc2FpZCwgd2UgZG8gdGhlIHR3by1zdGVwIGNoZWNraW5nIGZvciBu
-b3JtYWwgc2l6ZSBwYWdlcyBpbgo+IGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmco
-KSwgdG8gZGVjaWRlIGlmIHdlIGNhbiBjcmVhdGUgVEhQCj4gbWFwcGluZ3MgZm9yIHRoZXNlIHBh
-Z2VzLgo+IAo+IEFzIGZvciBQVURfU0laRSBUSFBzLCB0byBiZSBob25lc3QsIEkgaGF2ZSBubyBp
-ZGVhIG5vdyA6KAoKSG93IGFib3V0IHRoZSBmb2xsb3dpbmcgZGlmZiA/CgpkaWZmIC0tZ2l0IGEv
-dmlydC9rdm0vYXJtL21tdS5jIGIvdmlydC9rdm0vYXJtL21tdS5jCmluZGV4IDk3YjU0MTcuLjk4
-ZTVjZWMgMTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL2FybS9tbXUuYworKysgYi92aXJ0L2t2bS9hcm0v
-bW11LmMKQEAgLTE3OTEsNyArMTc5MSw4IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3Ry
-dWN0IGt2bV92Y3B1ICp2Y3B1LCAKcGh5c19hZGRyX3QgZmF1bHRfaXBhLAogIAkJICogY3VycmVu
-dGx5IHN1cHBvcnRlZC4gVGhpcyBjb2RlIHdpbGwgbmVlZCB0byBiZQogIAkJICogdXBkYXRlZCB0
-byBzdXBwb3J0IG90aGVyIFRIUCBzaXplcy4KICAJCSAqLwotCQlpZiAodHJhbnNwYXJlbnRfaHVn
-ZXBhZ2VfYWRqdXN0KCZwZm4sICZmYXVsdF9pcGEpKQorCQlpZiAoZmF1bHRfc3VwcG9ydHNfc3Rh
-Z2UyX2h1Z2VfbWFwcGluZ3MobWVtc2xvdCwgaHZhLCBQTURfU0laRSkgJiYKKwkJICAgIHRyYW5z
-cGFyZW50X2h1Z2VwYWdlX2FkanVzdCgmcGZuLCAmZmF1bHRfaXBhKSkKICAJCQl2bWFfcGFnZXNp
-emUgPSBQTURfU0laRTsKICAJfQoKLS0gCjIuNy40CgoKClN1enVraQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+On 08/04/2019 14:05, Amit Daniel Kachhap wrote:
+> Hi James,
+> 
+> On 4/6/19 4:07 PM, James Morse wrote:
+>> Hi Amit,
+>>
+>> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
+>>> From: Mark Rutland <mark.rutland@arm.com>
+>>>
+>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>>> is a constant value. This works today, as the host HCR_EL2 value is
+>>> always the same, but this will get in the way of supporting extensions
+>>> that require HCR_EL2 bits to be set conditionally for the host.
+>>>
+>>> To allow such features to work without KVM having to explicitly handle
+>>> every possible host feature combination, this patch has KVM save/restore
+>>> for the host HCR when switching to/from a guest HCR. The saving of the
+>>> register is done once during cpu hypervisor initialization state and is
+>>> just restored after switch from guest.
+>>>
+>>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>>> kvm_call_hyp and is helpful in non-VHE case.
+>>>
+>>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>>> to toggle the TGE bit with a RMW sequence, as we already do in
+>>> __tlb_switch_to_guest_vhe().
+>>>
+>>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>>> and guest can now use this field in a common way.
+>>
+>> These HCR_EL2 flags have had me confused for quite a while.
+>> I thought this was preserving the value that head.S or cpufeature.c had set, and with
+>> ptrauth we couldn't know what this register should be anymore, the host flags has to vary.
+>>
+>> Kristina's explanation of it[0], clarified things, and with a bit more digging it appears
+>> we always set API/APK, even if the hardware doesn't support the feature (as its harmless).
+>> So we don't need to vary the host flags...
+> 
+> API/APK is always set for NVHE host mode.
+>>
+>> My question is, what breaks if this patch isn't merged? (the MDCR change is cleanup we can
+>> do because of this HCR change), is this HCR change just cleanup too? If so, can we merge
+>> ptrauth without either, so we only make the change when its needed? (it will cause some
+>> changes in your patch 7, but I can't see where you depend on the host flags).
+> 
+> Yes you are right that this patch does not directly effect pointer authentication functionality but contains several optimizations and cleanups such as,
+> 
+> * Removes assigning static flags HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS from switch.c so switching functions now are more generic in nature.
+> * Currently the variation in hcr_el2 flags is across modes (VHE/NVHE). Any future conditional change within those modes in host HCR_EL2 may not effect code changes in switch.c
+> * Save of hcr_el2 done at hyp init time so not expensive switching wise.
+> 
+> I am fine on posting it separately also.
+
+FWIW I think it makes sense to post the HCR and MDCR patches separately
+from this series. That should make it clear that pointer auth does not
+depend on these changes, and should make it easier to evaluate the
+changes on their own.
+
+Others' opinions are welcome as well.
+
+>> I recall Christoffer wanting to keep the restored DAIF register value on guest-exit static
+>> to avoid extra loads/stores when we know what the value would be. I think the same logic
+>> applies here.
+> Yes the saving of host registers once was suggested by Christoffer.
+
+I'm not familiar with this, but James may be referring to
+kvm_arm_vhe_guest_exit, which restores DAIF to a constant value. It
+seems like originally the patch saved/restored DAIF [1], but it was
+decided that a constant value was better.
+
+Thanks,
+Kristina
+
+[1] https://www.spinics.net/lists/arm-kernel/msg599798.html
+
+>> You mentioned in the cover letter the series has some history to it!
+>>
+>>
+>> Thanks,
+>>
+>> James
+>>
+>> [0] http://lore.kernel.org/r/7ec2f950-7587-5ecd-6caa-c2fd091ad22c@arm.com
+>>
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
