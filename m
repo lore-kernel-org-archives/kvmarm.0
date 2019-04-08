@@ -1,76 +1,85 @@
-From: Leo Yan <leo.yan@linaro.org>
-Subject: Re: [PATCH] vfio-pci: Fix MSI IRQ forwarding for without per-vector
- masking
-Date: Mon, 8 Apr 2019 09:34:42 +0800
-Message-ID: <20190408013442.GA10011@leoy-ThinkPad-X240s>
-References: <20190322052308.28254-1-leo.yan@linaro.org>
- <20190322052924.GB31904@leoy-ThinkPad-X240s>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v8 3/9] KVM: arm64: Move hyp_symbol_addr to fix dependency
+Date: Mon, 8 Apr 2019 09:12:24 +0530
+Message-ID: <3010dfe9-f423-1e28-d89f-0731ae52a08b@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-4-git-send-email-amit.kachhap@arm.com>
+ <20190405110219.GQ3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF7C4A331
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:34:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NOtrsePlpeYV for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 Apr 2019 21:34:50 -0400 (EDT)
-Received: from mail-yw1-f65.google.com (mail-yw1-f65.google.com
- [209.85.161.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 393AF4A2E5
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Apr 2019 21:34:50 -0400 (EDT)
-Received: by mail-yw1-f65.google.com with SMTP id j66so4360651ywc.10
- for <kvmarm@lists.cs.columbia.edu>; Sun, 07 Apr 2019 18:34:50 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20190322052924.GB31904@leoy-ThinkPad-X240s>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Will Deacon <will.deacon@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Eric Auger <eric.auger@redhat.com>, Robin Murphy <robin.murphy@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190405110219.GQ3567@e103592.cambridge.arm.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Jean-Philippe,
+Hi,
 
-On Fri, Mar 22, 2019 at 01:29:24PM +0800, Leo Yan wrote:
-> On Fri, Mar 22, 2019 at 01:23:08PM +0800, Leo Yan wrote:
-> > If MSI doesn't support per-vector masking capability and
-> > PCI_MSI_FLAGS_MASKBIT isn't set in message control field, the function
-> > vfio_pci_msi_vector_write() will directly bail out for this case and
-> > every vector's 'virt_state' keeps setting bit VFIO_PCI_MSI_STATE_MASKED.
-> > 
-> > This results in the state maintained in 'virt_state' cannot really
-> > reflect the MSI hardware state; finally it will mislead the function
-> > vfio_pci_update_msi_entry() to skip IRQ forwarding with below flow:
-> > 
-> > vfio_pci_update_msi_entry() {
-> > 
-> >   [...]
-> > 
-> >   if (msi_is_masked(entry->virt_state) == msi_is_masked(entry->phys_state))
-> >       return 0;  ==> skip IRQ forwarding
-> > 
-> >   [...]
-> > }
-> > 
-> > To fix this issue, when detect PCI_MSI_FLAGS_MASKBIT is not set in the
-> > message control field, this patch simply clears bit
-> > VFIO_PCI_MSI_STATE_MASKED for all vectors 'virt_state'; at the end
-> > vfio_pci_update_msi_entry() can forward MSI IRQ successfully.
+On 4/5/19 4:32 PM, Dave Martin wrote:
+> On Tue, Apr 02, 2019 at 07:57:11AM +0530, Amit Daniel Kachhap wrote:
+>> Currently hyp_symbol_addr is placed in kvm_mmu.h which is mostly
+>> used by __hyp_this_cpu_ptr in kvm_asm.h but it cannot include
+>> kvm_mmu.h directly as kvm_mmu.h uses kvm_ksym_ref which is
+>> defined inside kvm_asm.h. Hence, hyp_symbol_addr is moved inside
+>> kvm_asm.h to fix this dependency on each other.
+>>
+>> Also, hyp_symbol_addr corresponding counterpart, kvm_ksym_ref,
+>> is already in kvm_asm.h, making it more sensible to move
+>> kvm_symbol_addr to the same file.
+>>
+>> Suggested by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> ---
+>>
+>> Changes since v7:
+>> * Slight change in commit message [Julien Thierry].
+>>
+>>   arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+>>   arch/arm64/include/asm/kvm_mmu.h | 20 --------------------
+>>   2 files changed, 20 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>> index f5b79e9..57a07e8 100644
+>> --- a/arch/arm64/include/asm/kvm_asm.h
+>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>> @@ -80,6 +80,26 @@ extern void __vgic_v3_init_lrs(void);
+>>   
+>>   extern u32 __kvm_get_mdcr_el2(void);
+>>   
+>> +/*
+>> + * Obtain the PC-relative address of a kernel symbol
+>> + * s: symbol
+>> + *
+>> + * The goal of this macro is to return a symbol's address based on a
+>> + * PC-relative computation, as opposed to a loading the VA from a
+>> + * constant pool or something similar. This works well for HYP, as an
+>> + * absolute VA is guaranteed to be wrong. Only use this if trying to
+>> + * obtain the address of a symbol (i.e. not something you obtained by
+>> + * following a pointer).
+>> + */
+>> +#define hyp_symbol_addr(s)						\
+>> +	({								\
+>> +		typeof(s) *addr;					\
+>> +		asm("adrp	%0, %1\n"				\
+>> +		    "add	%0, %0, :lo12:%1\n"			\
+>> +		    : "=r" (addr) : "S" (&s));				\
+>> +		addr;							\
+>> +	})
+>> +
 > 
-> Just remind, this patch is for kvmtool but not for kernel.  Sorry I
-> forget to add it in subject.
-
-Gentle ping.  Not sure if this patch is reasonable, could you help to
-give a review?
-
-[...]
-
+> Do we need to include <asm/kvm_asm.h> in vgic-v2-cpuif-proxy.c now?
+Yes asm/kvm_asm.h should be included now.
+> 
+> Otherwise,
+> 
+> Reviewed-by: Dave Martin <Dave.Martin@arm.com>
 Thanks,
-Leo Yan
+Amit D
+> 
