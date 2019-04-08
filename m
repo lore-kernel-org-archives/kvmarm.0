@@ -1,119 +1,169 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-Date: Mon, 8 Apr 2019 11:50:58 +0800
-Message-ID: <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
+Date: Mon, 8 Apr 2019 10:01:26 +0530
+Message-ID: <8066f634-b2e0-33c3-a6f4-4f38729b3f86@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
+ <20190405110229.GR3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <20190405110229.GR3567@e103592.cambridge.arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, eric.auger@redhat.com, Marc Zyngier <marc.zyngier@arm.com>, Chirstoffer Dall <christoffer.dall@arm.com>, Zheng Xiang <zhengxiang9@huawei.com>, andrew.murray@arm.com, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi,
 
-
-On 2019/4/2 19:06, Suzuki K Poulose wrote:
-> With commit a80868f398554842b14, we no longer ensure that the
-> THP page is properly aligned in the guest IPA. Skip the stage2
-> huge mapping for unaligned IPA backed by transparent hugepages.
+On 4/5/19 4:32 PM, Dave Martin wrote:
+> On Tue, Apr 02, 2019 at 07:57:12AM +0530, Amit Daniel Kachhap wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>> is a constant value. This works today, as the host HCR_EL2 value is
+>> always the same, but this will get in the way of supporting extensions
+>> that require HCR_EL2 bits to be set conditionally for the host.
+>>
+>> To allow such features to work without KVM having to explicitly handle
+>> every possible host feature combination, this patch has KVM save/restore
+>> for the host HCR when switching to/from a guest HCR. The saving of the
+>> register is done once during cpu hypervisor initialization state and is
+>> just restored after switch from guest.
+>>
+>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>> kvm_call_hyp and is helpful in non-VHE case.
+>>
+>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>> to toggle the TGE bit with a RMW sequence, as we already do in
+>> __tlb_switch_to_guest_vhe().
+>>
+>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>> and guest can now use this field in a common way.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> [Added cpu_init_host_ctxt, hcr_el2 field in struct kvm_cpu_context,
+>> save hcr_el2 in hyp init stage]
+>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> Reviewed-by: James Morse <james.morse@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
 > 
-> Fixes: a80868f398554842b14 ("KVM: arm/arm64: Enforce PTE mappings at stage2 when needed")
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Chirstoffer Dall <christoffer.dall@arm.com>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: Zheng Xiang <zhengxiang9@huawei.com>
-> Tested-by: Eric Auger <eric.auger@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-Hi Suzuki,
-
-Why not making use of fault_supports_stage2_huge_mapping()?  Let it do
-some checks for us.
-
-fault_supports_stage2_huge_mapping() was intended to do a *two-step*
-check to tell us that can we create stage2 huge block mappings, and this
-check is both for hugetlbfs and THP.  With commit a80868f398554842b14,
-we pass PAGE_SIZE as "map_size" for normal size pages (which turned out
-to be almost meaningless), and unfortunately the THP check no longer
-works.
-
-So we want to rework *THP* check process.  Your patch fixes the first
-checking-step, but the second is still missed, am I wrong?
-
-Can you please give a look at the below diff?
-
-
-thanks,
-
-zenghui
-
-> ---
->   virt/kvm/arm/mmu.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+> [...]
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 27c9583..4a22f5b 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1412,7 +1412,9 @@ static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
->   		 * page accordingly.
->   		 */
->   		mask = PTRS_PER_PMD - 1;
-> -		VM_BUG_ON((gfn & mask) != (pfn & mask));
-Somehow, I'd prefer keeping the VM_BUG_ON() here, let it report some
-potential issues in the future (of course I hope none:) )
-> +		/* Skip memslots with unaligned IPA and user address */
-> +		if ((gfn & mask) != (pfn & mask))
-> +			return false;
->   		if (pfn & mask) {
->   			*ipap &= PMD_MASK;
->   			kvm_release_pfn_clean(pfn);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index a01fe087..3b09fd0 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -209,6 +209,8 @@ struct kvm_cpu_context {
+>>   		u32 copro[NR_COPRO_REGS];
+>>   	};
+>>   
+>> +	/* HYP host/guest configuration */
+>> +	u64 hcr_el2;
 > 
+> Minor nit: You could delete "host/guest" from the comment here.  This is
+> implied by the fact that the member is in struct kvm_cpu_context in the
+> first place.
+ok. Agree with you.
+> 
+>>   	struct kvm_vcpu *__hyp_running_vcpu;
+>>   };
+> 
+> [...]
+> 
+>> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+>> index 3563fe6..f5cefa1 100644
+>> --- a/arch/arm64/kvm/hyp/switch.c
+>> +++ b/arch/arm64/kvm/hyp/switch.c
+> 
+> [...]
+> 
+>> @@ -159,9 +159,10 @@ static void deactivate_traps_vhe(void)
+>>   }
+>>   NOKPROBE_SYMBOL(deactivate_traps_vhe);
+>>   
+>> -static void __hyp_text __deactivate_traps_nvhe(void)
+>> +static void __hyp_text __deactivate_traps_nvhe(struct kvm_cpu_context *host_ctxt)
+> 
+> Where __hyp_text functions accept pointer arguments, they are usually
+> hyp pointers already...  (see below)
+> 
+>>   {
+>>   	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+>> +	struct kvm_cpu_context *hyp_host_ctxt = kern_hyp_va(host_ctxt);
+>>   
+>>   	__deactivate_traps_common();
+>>   
+>> @@ -169,25 +170,28 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+>>   	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+>>   
+>>   	write_sysreg(mdcr_el2, mdcr_el2);
+>> -	write_sysreg(HCR_HOST_NVHE_FLAGS, hcr_el2);
+>> +	write_sysreg(hyp_host_ctxt->hcr_el2, hcr_el2);
+>>   	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+>>   }
+>>   
+>>   static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+>>   {
+>> +	struct kvm_cpu_context *host_ctxt;
+>> +
+>> +	host_ctxt = vcpu->arch.host_cpu_context;
+> 
+> host_ctxt is not otherwise used here, so can we convert it up-front so
+> that the argument to __deactivate_traps_nvhe() and
+> deactivate_traps_vhe() is a hyp pointer already?
+> 
+> So:
+> 
+> 	struct kvm_cpu_context *hyp_host_ctxt;
+> 
+> 	hyp_host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> 
+>>   	/*
+>>   	 * If we pended a virtual abort, preserve it until it gets
+>>   	 * cleared. See D1.14.3 (Virtual Interrupts) for details, but
+>>   	 * the crucial bit is "On taking a vSError interrupt,
+>>   	 * HCR_EL2.VSE is cleared to 0."
+>>   	 */
+>> -	if (vcpu->arch.hcr_el2 & HCR_VSE)
+>> -		vcpu->arch.hcr_el2 = read_sysreg(hcr_el2);
+>> +	if (vcpu->arch.ctxt.hcr_el2 & HCR_VSE)
+>> +		vcpu->arch.ctxt.hcr_el2 = read_sysreg(hcr_el2);
+>>   
+>>   	if (has_vhe())
+>> -		deactivate_traps_vhe();
+>> +		deactivate_traps_vhe(host_ctxt);
+>>   	else
+>> -		__deactivate_traps_nvhe();
+>> +		__deactivate_traps_nvhe(host_ctxt);
+> 
+> Then just pass hyp_host_ctxt to both of these, and drop the
+> kern_hyp_va() conversion from __deactivate_traps_nvhe().
+> 
+> This may be a bit less confusing.
+Yes your explanation makes sense.
+> 
+> Alternatively, just pass in the vcpu pointer (since this pattern is
+> already well established all over the place).
+I think passing vcpu as parameter will make it consistent with other 
+existing functions. __kvm_vcpu_run_nvhe function also takes vcpu and 
+extracts hyp_host_ctxt.
+> 
+> Another option could be to pull the hcr_el2 write out of the backends
+> entirely and put it in this common code instead.  This doesn't look
+> straightforward though (or at least, I don't remember enough about how
+> all these traps handling functions fit together...)
+ok.
 
----8>---
-
-Rework fault_supports_stage2_huge_mapping(), let it check THP again.
-
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
-  virt/kvm/arm/mmu.c | 11 ++++++++++-
-  1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 27c9583..5e1b258 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1632,6 +1632,15 @@ static bool 
-fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-  	uaddr_end = uaddr_start + size;
-
-  	/*
-+	 * If the memslot is _not_ backed by hugetlbfs, then check if it
-+	 * can be backed by transparent hugepages.
-+	 *
-+	 * Currently only PMD_SIZE THPs are supported, revisit it later.
-+	 */
-+	if (map_size == PAGE_SIZE)
-+		map_size = PMD_SIZE;
-+
-+	/*
-  	 * Pages belonging to memslots that don't have the same alignment
-  	 * within a PMD/PUD for userspace and IPA cannot be mapped with stage-2
-  	 * PMD/PUD entries, because we'll end up mapping the wrong pages.
-@@ -1643,7 +1652,7 @@ static bool 
-fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-  	 *    |abcde|fgh  Stage-1 block  |    Stage-1 block tv|xyz|
-  	 *    +-----+--------------------+--------------------+---+
-  	 *
--	 *    memslot->base_gfn << PAGE_SIZE:
-+	 *    memslot->base_gfn << PAGE_SHIFT:
-  	 *      +---+--------------------+--------------------+-----+
-  	 *      |abc|def  Stage-2 block  |    Stage-2 block   |tvxyz|
-  	 *      +---+--------------------+--------------------+-----+
--- 
+Thanks,
+Amit D
+> 
+> [...]
+> 
+> Cheers
+> ---Dave
+> 
