@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54648C10F14
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54324C10F13
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:21:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DD0552087F
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:21:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0552087F
+	by mail.kernel.org (Postfix) with ESMTP id 0AF272148D
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:21:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AF272148D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8D74A389;
-	Mon,  8 Apr 2019 08:21:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5E914A476;
+	Mon,  8 Apr 2019 08:21:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5iczIgUVjYrg; Mon,  8 Apr 2019 08:21:34 -0400 (EDT)
+	with ESMTP id 3Rt6bH2Y6JG3; Mon,  8 Apr 2019 08:21:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8644A422;
-	Mon,  8 Apr 2019 08:21:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F96A4A3A3;
+	Mon,  8 Apr 2019 08:21:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4EB04A389
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:21:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D164A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:21:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8rj9MVzUK4+y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 08:21:32 -0400 (EDT)
+ with ESMTP id GyEzZdl-xhGM for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 08:21:37 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE66F4A380
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:21:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 279BC4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:21:37 -0400 (EDT)
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 13D3A30024AD;
- Mon,  8 Apr 2019 12:21:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7273A3DFCD;
+ Mon,  8 Apr 2019 12:21:36 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1777C60471;
- Mon,  8 Apr 2019 12:21:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 684F72B9D3;
+ Mon,  8 Apr 2019 12:21:32 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -51,16 +51,15 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
  yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
  robin.murphy@arm.com
-Subject: [PATCH v7 16/23] iommu/smmuv3: Nested mode single MSI doorbell per
- domain enforcement
-Date: Mon,  8 Apr 2019 14:19:04 +0200
-Message-Id: <20190408121911.24103-17-eric.auger@redhat.com>
+Subject: [PATCH v7 17/23] iommu/smmuv3: Implement bind/unbind_guest_msi
+Date: Mon,  8 Apr 2019 14:19:05 +0200
+Message-Id: <20190408121911.24103-18-eric.auger@redhat.com>
 In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 08 Apr 2019 12:21:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Mon, 08 Apr 2019 12:21:36 +0000 (UTC)
 Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
  marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -78,80 +77,82 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408121904.PuIwBa7ViyM23V9VuBIAvhjgyq7fud2SsV-V-04qubY@z>
+Message-ID: <20190408121905.5ndrnDoAHsBXxxOhimcUGoTu8v5AJ_T-gYibLpJh54Q@z>
 
-In nested mode we enforce the rule that all devices belonging
-to the same iommu_domain share the same msi_domain.
-
-Indeed if there were several physical MSI doorbells being used
-within a single iommu_domain, it becomes really difficult to
-resolve the nested stage mapping translating into the correct
-physical doorbell. So let's forbid this situation.
+The bind/unbind_guest_msi() callbacks check the domain
+is NESTED and redirect to the dma-iommu implementation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
 ---
- drivers/iommu/arm-smmu-v3.c | 41 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+
+v6 -> v7:
+- remove device handle argument
+---
+ drivers/iommu/arm-smmu-v3.c | 43 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 4366921d8318..2b2d90d736d6 100644
+index 2b2d90d736d6..8044445bc32a 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1781,6 +1781,37 @@ static void arm_smmu_detach_dev(struct device *dev)
- 	arm_smmu_install_ste_for_dev(fwspec);
+@@ -2248,6 +2248,47 @@ static void arm_smmu_put_resv_regions(struct device *dev,
+ 		kfree(entry);
  }
  
-+static bool arm_smmu_share_msi_domain(struct iommu_domain *domain,
-+				      struct device *dev)
++static int
++arm_smmu_bind_guest_msi(struct iommu_domain *domain,
++			dma_addr_t giova, phys_addr_t gpa, size_t size)
 +{
 +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct irq_domain *irqd = dev_get_msi_domain(dev);
-+	struct arm_smmu_master_data *entry;
-+	unsigned long flags;
-+	bool share = false;
++	struct arm_smmu_device *smmu;
++	int ret = -EINVAL;
 +
-+	if (!irqd)
-+		return true;
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto out;
 +
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(entry, &smmu_domain->devices, list) {
-+		struct irq_domain *d = dev_get_msi_domain(entry->dev);
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto out;
 +
-+		if (!d)
-+			continue;
-+		if (irqd != d) {
-+			dev_info(dev, "Nested mode forbids to attach devices "
-+				 "using different physical MSI doorbells "
-+				 "to the same iommu_domain");
-+			goto unlock;
-+		}
-+	}
-+	share = true;
-+unlock:
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+	return share;
++	ret = iommu_dma_bind_guest_msi(domain, giova, gpa, size);
++out:
++	mutex_unlock(&smmu_domain->init_mutex);
++	return ret;
 +}
 +
- static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
++static void
++arm_smmu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu;
++
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto unlock;
++
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto unlock;
++
++	iommu_dma_unbind_guest_msi(domain, giova);
++unlock:
++	mutex_unlock(&smmu_domain->init_mutex);
++}
++
+ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+ 				       struct iommu_pasid_table_config *cfg)
  {
- 	int ret = 0;
-@@ -1819,6 +1850,16 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- 		ret = -ENXIO;
- 		goto out_unlock;
- 	}
-+	/*
-+	 * In nested mode we must check all devices belonging to the
-+	 * domain share the same physical MSI doorbell. Otherwise nested
-+	 * stage MSI binding is not supported.
-+	 */
-+	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
-+		!arm_smmu_share_msi_domain(domain, dev)) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
+@@ -2447,6 +2488,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+ 	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+ 	.cache_invalidate	= arm_smmu_cache_invalidate,
++	.bind_guest_msi		= arm_smmu_bind_guest_msi,
++	.unbind_guest_msi	= arm_smmu_unbind_guest_msi,
+ 	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+ };
  
- 	ste->assigned = true;
- 	master->domain = smmu_domain;
 -- 
 2.20.1
 
