@@ -2,60 +2,64 @@ Return-Path: <SRS0=T7i1=SK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4438FC10F14
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 10:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81577C10F13
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:19:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B84CD20870
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 10:33:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B84CD20870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 111312087F
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:19:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111312087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 058404A44E;
-	Mon,  8 Apr 2019 06:33:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EF0F4A47E;
+	Mon,  8 Apr 2019 08:19:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S-urcnv7JlBB; Mon,  8 Apr 2019 06:33:18 -0400 (EDT)
+	with ESMTP id 6fC6qiF+5S96; Mon,  8 Apr 2019 08:19:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D9B84A474;
-	Mon,  8 Apr 2019 06:33:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 141344A418;
+	Mon,  8 Apr 2019 08:19:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EFB94A44E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 06:33:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41CFD4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:19:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uGpdanWLDcRq for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 06:33:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA21F4A321
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 06:33:15 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 055AC15AD;
- Mon,  8 Apr 2019 03:33:15 -0700 (PDT)
-Received: from [192.168.0.21] (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 025113F718; Mon,  8 Apr 2019 03:33:12 -0700 (PDT)
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
-Date: Mon, 8 Apr 2019 11:35:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.7.0
+ with ESMTP id gAdr8R1pC7KY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 08:19:26 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 782764A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:19:26 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A19059468;
+ Mon,  8 Apr 2019 12:19:25 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FA3060185;
+ Mon,  8 Apr 2019 12:19:16 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+ yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
+ robin.murphy@arm.com
+Subject: [PATCH v7 00/23] SMMUv3 Nested Stage Setup
+Date: Mon,  8 Apr 2019 14:18:48 +0200
+Message-Id: <20190408121911.24103-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 08 Apr 2019 12:19:25 +0000 (UTC)
+Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
+ marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,99 +71,160 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408103530.mIf-qx1xiMZMZuWKUhq3yzbzAIXotlIsVxFnAhTIfPg@z>
+Message-ID: <20190408121848.Qifm1hjO_zTCJkIn5AFv5FOM_qrzS4lXkIWppeAqZ_s@z>
 
-T24gMDQvMDgvMjAxOSAwNDo1MCBBTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiAKPiAKPiBPbiAyMDE5
-LzQvMiAxOTowNiwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKPj4gV2l0aCBjb21taXQgYTgwODY4
-ZjM5ODU1NDg0MmIxNCwgd2Ugbm8gbG9uZ2VyIGVuc3VyZSB0aGF0IHRoZQo+PiBUSFAgcGFnZSBp
-cyBwcm9wZXJseSBhbGlnbmVkIGluIHRoZSBndWVzdCBJUEEuIFNraXAgdGhlIHN0YWdlMgo+PiBo
-dWdlIG1hcHBpbmcgZm9yIHVuYWxpZ25lZCBJUEEgYmFja2VkIGJ5IHRyYW5zcGFyZW50IGh1Z2Vw
-YWdlcy4KPj4KPj4gRml4ZXM6IGE4MDg2OGYzOTg1NTQ4NDJiMTQgKCJLVk06IGFybS9hcm02NDog
-RW5mb3JjZSBQVEUgbWFwcGluZ3MgYXQgCj4+IHN0YWdlMiB3aGVuIG5lZWRlZCIpCj4+IFJlcG9y
-dGVkLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+Cj4+IENjOiBNYXJjIFp5
-bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+PiBDYzogQ2hpcnN0b2ZmZXIgRGFsbCA8Y2hy
-aXN0b2ZmZXIuZGFsbEBhcm0uY29tPgo+PiBDYzogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdl
-aS5jb20+Cj4+IENjOiBaaGVuZyBYaWFuZyA8emhlbmd4aWFuZzlAaHVhd2VpLmNvbT4KPj4gVGVz
-dGVkLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQGFybS5jb20+Cj4+IFNpZ25lZC1vZmYtYnk6
-IFN1enVraSBLIFBvdWxvc2UgPHN1enVraS5wb3Vsb3NlQGFybS5jb20+Cj4gCj4gSGkgU3V6dWtp
-LAo+IAo+IFdoeSBub3QgbWFraW5nIHVzZSBvZiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9t
-YXBwaW5nKCk/wqAgTGV0IGl0IGRvCj4gc29tZSBjaGVja3MgZm9yIHVzLgo+IAo+IGZhdWx0X3N1
-cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKSB3YXMgaW50ZW5kZWQgdG8gZG8gYSAqdHdvLXN0
-ZXAqCj4gY2hlY2sgdG8gdGVsbCB1cyB0aGF0IGNhbiB3ZSBjcmVhdGUgc3RhZ2UyIGh1Z2UgYmxv
-Y2sgbWFwcGluZ3MsIGFuZCB0aGlzCj4gY2hlY2sgaXMgYm90aCBmb3IgaHVnZXRsYmZzIGFuZCBU
-SFAuwqAgV2l0aCBjb21taXQgYTgwODY4ZjM5ODU1NDg0MmIxNCwKPiB3ZSBwYXNzIFBBR0VfU0la
-RSBhcyAibWFwX3NpemUiIGZvciBub3JtYWwgc2l6ZSBwYWdlcyAod2hpY2ggdHVybmVkIG91dAo+
-IHRvIGJlIGFsbW9zdCBtZWFuaW5nbGVzcyksIGFuZCB1bmZvcnR1bmF0ZWx5IHRoZSBUSFAgY2hl
-Y2sgbm8gbG9uZ2VyCj4gd29ya3MuCgpUaGF0cyBjb3JyZWN0LgoKPiAKPiBTbyB3ZSB3YW50IHRv
-IHJld29yayAqVEhQKiBjaGVjayBwcm9jZXNzLsKgIFlvdXIgcGF0Y2ggZml4ZXMgdGhlIGZpcnN0
-Cj4gY2hlY2tpbmctc3RlcCwgYnV0IHRoZSBzZWNvbmQgaXMgc3RpbGwgbWlzc2VkLCBhbSBJIHdy
-b25nPwoKSXQgZml4ZXMgdGhlIHN0ZXAgZXhwbGljaXRseSBmb3IgdGhlIFRIUCBieSBtYWtpbmcg
-c3VyZSB0aGF0IHRoZSBHUEEgYW5kCnRoZSBIVkEgYXJlIGFsaWduZWQgdG8gdGhlIG1hcCBzaXpl
-LgoKPiAKPiBDYW4geW91IHBsZWFzZSBnaXZlIGEgbG9vayBhdCB0aGUgYmVsb3cgZGlmZj8KPiAK
-PiAKPiB0aGFua3MsCj4gCj4gemVuZ2h1aQo+IAo+PiAtLS0KPj4gwqAgdmlydC9rdm0vYXJtL21t
-dS5jIHwgNCArKystCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkKPj4KPj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9tbXUuYyBiL3ZpcnQva3Zt
-L2FybS9tbXUuYwo+PiBpbmRleCAyN2M5NTgzLi40YTIyZjViIDEwMDY0NAo+PiAtLS0gYS92aXJ0
-L2t2bS9hcm0vbW11LmMKPj4gKysrIGIvdmlydC9rdm0vYXJtL21tdS5jCj4+IEBAIC0xNDEyLDcg
-KzE0MTIsOSBAQCBzdGF0aWMgYm9vbCAKPj4gdHJhbnNwYXJlbnRfaHVnZXBhZ2VfYWRqdXN0KGt2
-bV9wZm5fdCAqcGZucCwgcGh5c19hZGRyX3QgKmlwYXApCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-ICogcGFnZSBhY2NvcmRpbmdseS4KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKg
-wqDCoMKgwqDCoMKgIG1hc2sgPSBQVFJTX1BFUl9QTUQgLSAxOwo+PiAtwqDCoMKgwqDCoMKgwqAg
-Vk1fQlVHX09OKChnZm4gJiBtYXNrKSAhPSAocGZuICYgbWFzaykpOwo+IFNvbWVob3csIEknZCBw
-cmVmZXIga2VlcGluZyB0aGUgVk1fQlVHX09OKCkgaGVyZSwgbGV0IGl0IHJlcG9ydCBzb21lCj4g
-cG90ZW50aWFsIGlzc3VlcyBpbiB0aGUgZnV0dXJlIChvZiBjb3Vyc2UgSSBob3BlIG5vbmU6KSAp
-CgpJIGRvbid0IHRoaW5rIHRoaXMgY2FsbHMgZm9yIGEgVk1fQlVHX09OKCkuIEl0IGlzIHNpbXBs
-eSBhIGNhc2Ugd2hlcmUKdGhlIEdQQSBpcyBub3QgYWxpZ25lZCB0byBIVkEsIGJ1dCBmb3Igbm9y
-bWFsIFZNQSB0aGF0IGNvdWxkIGJlIG1hZGUgVEhQLgoKV2UgaGFkIHRoaXMgVk1fQlVHX09OKCks
-IHdoaWNoIHdvdWxkIGhhdmUgbmV2ZXIgaGl0IGJlY2F1c2Ugd2Ugd291bGQKaGF2ZSBzZXQgZm9y
-Y2VfcHRlIGlmIHRoZXkgd2VyZSBub3QgYWxpZ25lZC4KCj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBT
-a2lwIG1lbXNsb3RzIHdpdGggdW5hbGlnbmVkIElQQSBhbmQgdXNlciBhZGRyZXNzICovCj4+ICvC
-oMKgwqDCoMKgwqDCoCBpZiAoKGdmbiAmIG1hc2spICE9IChwZm4gJiBtYXNrKSkKPj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIGZhbHNlOwo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYg
-KHBmbiAmIG1hc2spIHsKPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKmlwYXAgJj0gUE1E
-X01BU0s7Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGt2bV9yZWxlYXNlX3Bmbl9jbGVh
-bihwZm4pOwo+Pgo+IAo+IC0tLTg+LS0tCj4gCj4gUmV3b3JrIGZhdWx0X3N1cHBvcnRzX3N0YWdl
-Ml9odWdlX21hcHBpbmcoKSwgbGV0IGl0IGNoZWNrIFRIUCBhZ2Fpbi4KPiAKPiBTaWduZWQtb2Zm
-LWJ5OiBaZW5naHVpIFl1IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KPiAtLS0KPiAgwqB2aXJ0L2t2
-bS9hcm0vbW11LmMgfCAxMSArKysrKysrKysrLQo+ICDCoDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNl
-cnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gCj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9t
-bXUuYyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+IGluZGV4IDI3Yzk1ODMuLjVlMWIyNTggMTAwNjQ0
-Cj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4gKysrIGIvdmlydC9rdm0vYXJtL21tdS5jCj4g
-QEAgLTE2MzIsNiArMTYzMiwxNSBAQCBzdGF0aWMgYm9vbCAKPiBmYXVsdF9zdXBwb3J0c19zdGFn
-ZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4gIMKgwqDC
-oMKgIHVhZGRyX2VuZCA9IHVhZGRyX3N0YXJ0ICsgc2l6ZTsKPiAKPiAgwqDCoMKgwqAgLyoKPiAr
-wqDCoMKgwqAgKiBJZiB0aGUgbWVtc2xvdCBpcyBfbm90XyBiYWNrZWQgYnkgaHVnZXRsYmZzLCB0
-aGVuIGNoZWNrIGlmIGl0Cj4gK8KgwqDCoMKgICogY2FuIGJlIGJhY2tlZCBieSB0cmFuc3BhcmVu
-dCBodWdlcGFnZXMuCj4gK8KgwqDCoMKgICoKPiArwqDCoMKgwqAgKiBDdXJyZW50bHkgb25seSBQ
-TURfU0laRSBUSFBzIGFyZSBzdXBwb3J0ZWQsIHJldmlzaXQgaXQgbGF0ZXIuCj4gK8KgwqDCoMKg
-ICovCj4gK8KgwqDCoCBpZiAobWFwX3NpemUgPT0gUEFHRV9TSVpFKQo+ICvCoMKgwqDCoMKgwqDC
-oCBtYXBfc2l6ZSA9IFBNRF9TSVpFOwo+ICsKClRoaXMgbG9va3MgaGFja2lzaC4gV2hhdCBpcyB3
-ZSBzdXBwb3J0IFBVRF9TSVpFIGh1Z2UgcGFnZSBpbiB0aGUgZnV0dXJlCj8KCj4gK8KgwqDCoCAv
-Kgo+ICDCoMKgwqDCoMKgICogUGFnZXMgYmVsb25naW5nIHRvIG1lbXNsb3RzIHRoYXQgZG9uJ3Qg
-aGF2ZSB0aGUgc2FtZSBhbGlnbm1lbnQKPiAgwqDCoMKgwqDCoCAqIHdpdGhpbiBhIFBNRC9QVUQg
-Zm9yIHVzZXJzcGFjZSBhbmQgSVBBIGNhbm5vdCBiZSBtYXBwZWQgd2l0aCAKPiBzdGFnZS0yCj4g
-IMKgwqDCoMKgwqAgKiBQTUQvUFVEIGVudHJpZXMsIGJlY2F1c2Ugd2UnbGwgZW5kIHVwIG1hcHBp
-bmcgdGhlIHdyb25nIHBhZ2VzLgo+IEBAIC0xNjQzLDcgKzE2NTIsNyBAQCBzdGF0aWMgYm9vbCAK
-PiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Ns
-b3QgKm1lbXNsb3QsCj4gIMKgwqDCoMKgwqAgKsKgwqDCoCB8YWJjZGV8ZmdowqAgU3RhZ2UtMSBi
-bG9ja8KgIHzCoMKgwqAgU3RhZ2UtMSBibG9jayB0dnx4eXp8Cj4gIMKgwqDCoMKgwqAgKsKgwqDC
-oCArLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tKwo+
-ICDCoMKgwqDCoMKgICoKPiAtwqDCoMKgwqAgKsKgwqDCoCBtZW1zbG90LT5iYXNlX2dmbiA8PCBQ
-QUdFX1NJWkU6Cj4gK8KgwqDCoMKgICrCoMKgwqAgbWVtc2xvdC0+YmFzZV9nZm4gPDwgUEFHRV9T
-SElGVDoKClRoYXQgY291bGQgYmUgZml4ZWQuCgo+ICDCoMKgwqDCoMKgICrCoMKgwqDCoMKgICst
-LS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0rCj4gIMKg
-wqDCoMKgwqAgKsKgwqDCoMKgwqAgfGFiY3xkZWbCoCBTdGFnZS0yIGJsb2NrwqAgfMKgwqDCoCBT
-dGFnZS0yIGJsb2NrwqDCoCB8dHZ4eXp8Cj4gIMKgwqDCoMKgwqAgKsKgwqDCoMKgwqAgKy0tLSst
-LS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLSstLS0tLSsKCgpCdXQgcGVy
-c29uYWxseSBJIGRvbid0IHRoaW5rIHRoaXMgaXMgdGhlIHJpZ2h0IHdheSB0byBmaXggaXQuIEFu
-ZCBhcwptZW50aW9uZWQsIHRoZSBWTV9CVUdfT04oKSBpcyB1bm5lY2Vzc2FyeSBhbmQgY291bGQg
-ZWFzaWx5IGJlIHRyaWdnZXJlZApieSB0aGUgdXNlciBieSB1c2luZyB1bmFsaWduZWQgR1BBL0hW
-QS4gQWxsIHdlIG5lZWQgdG8gZG8gaXMsIHVzZSBwYWdlCm1hcHBpbmcgaW4gc3VjaCBjYXNlcywg
-d2hpY2ggd2UgZG8gd2l0aCBteSBwYXRjaC4KCgpDaGVlcnMKU3V6dWtpCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+This series allows a virtualizer to program the nested stage mode.
+This is useful when both the host and the guest are exposed with
+an SMMUv3 and a PCI device is assigned to the guest using VFIO.
+
+In this mode, the physical IOMMU must be programmed to translate
+the two stages: the one set up by the guest (IOVA -> GPA) and the
+one set up by the host VFIO driver as part of the assignment process
+(GPA -> HPA).
+
+On Intel, this is traditionnaly achieved by combining the 2 stages
+into a single physical stage. However this relies on the capability
+to trap on each guest translation structure update. This is possible
+by using the VTD Caching Mode. Unfortunately the ARM SMMUv3 does
+not offer a similar mechanism.
+
+However, the ARM SMMUv3 architecture supports 2 physical stages! Those
+were devised exactly with that use case in mind. Assuming the HW
+implements both stages (optional), the guest now can use stage 1
+while the host uses stage 2.
+
+This assumes the virtualizer has means to propagate guest settings
+to the host SMMUv3 driver. This series brings this VFIO/IOMMU
+infrastructure.  Those services are:
+- bind the guest stage 1 configuration to the stream table entry
+- propagate guest TLB invalidations
+- bind MSI IOVAs
+- propagate faults collected at physical level up to the virtualizer
+
+This series largely reuses the user API and infrastructure originally
+devised for SVA/SVM and patches submitted by Jacob, Yi Liu, Tianyu in
+[1-2] and Jean-Philippe [3-4].
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.1-rc3-2stage-v7
+
+References:
+[1] [PATCH v5 00/23] IOMMU and VT-d driver support for Shared Virtual
+    Address (SVA)
+    https://lwn.net/Articles/754331/
+[2] [RFC PATCH 0/8] Shared Virtual Memory virtualization for VT-d
+    (VFIO part)
+    https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021475.html
+[3] [v2,00/40] Shared Virtual Addressing for the IOMMU
+    https://patchwork.ozlabs.org/cover/912129/
+[4] [PATCH v3 00/10] Shared Virtual Addressing for the IOMMU
+    https://patchwork.kernel.org/cover/10608299/
+
+History:
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens in
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
+
+
+Eric Auger (14):
+  iommu: Introduce bind/unbind_guest_msi
+  vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
+  vfio-pci: Add a new VFIO_REGION_TYPE_NESTED region type
+  vfio-pci: Register an iommu fault handler
+  vfio_pci: Allow to mmap the fault queue
+  vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
+  vfio: Document nested stage control
+
+Jacob Pan (4):
+  driver core: add per device iommu param
+  iommu: introduce device fault data
+  iommu: introduce device fault report API
+  iommu: Introduce attach/detach_pasid_table API
+
+Jean-Philippe Brucker (2):
+  iommu/arm-smmu-v3: Link domains and devices
+  iommu/arm-smmu-v3: Maintain a SID->device structure
+
+Liu, Yi L (3):
+  iommu: Introduce cache_invalidate API
+  vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
+  vfio: VFIO_IOMMU_CACHE_INVALIDATE
+
+ Documentation/vfio.txt              |  83 ++++
+ drivers/iommu/arm-smmu-v3.c         | 631 ++++++++++++++++++++++++++--
+ drivers/iommu/dma-iommu.c           | 129 +++++-
+ drivers/iommu/iommu.c               | 205 ++++++++-
+ drivers/vfio/pci/vfio_pci.c         | 214 ++++++++++
+ drivers/vfio/pci/vfio_pci_intrs.c   |  19 +
+ drivers/vfio/pci/vfio_pci_private.h |  18 +
+ drivers/vfio/pci/vfio_pci_rdwr.c    |  73 ++++
+ drivers/vfio/vfio_iommu_type1.c     | 172 ++++++++
+ include/linux/device.h              |   3 +
+ include/linux/dma-iommu.h           |  17 +
+ include/linux/iommu.h               | 135 ++++++
+ include/uapi/linux/iommu.h          | 240 +++++++++++
+ include/uapi/linux/vfio.h           | 107 +++++
+ 14 files changed, 2013 insertions(+), 33 deletions(-)
+ create mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.20.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
