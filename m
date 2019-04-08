@@ -1,111 +1,138 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v8 8/9] KVM: arm64: Add capability to advertise ptrauth
- for guest
-Date: Mon, 8 Apr 2019 14:21:42 +0530
-Message-ID: <d50f78e4-6608-fb8a-6b8a-b4c246387d72@arm.com>
-References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
- <1554172037-4516-9-git-send-email-amit.kachhap@arm.com>
- <20190405110339.GU3567@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH V2] KVM: ARM: Remove pgtable page standard functions from
+ stage-2 page tables
+Date: Mon, 8 Apr 2019 10:09:25 +0100
+Message-ID: <77aaaaca-f9fb-cbad-74f6-e3bd159e7b37@arm.com>
+References: <3be0b7e0-2ef8-babb-88c9-d229e0fdd220@arm.com>
+ <1552397145-10665-1-git-send-email-anshuman.khandual@arm.com>
+ <20190401161638.GB22092@fuggles.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190405110339.GU3567@e103592.cambridge.arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B4D4A44E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 05:09:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7zIumBIppm6X for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 05:09:33 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E73C74A331
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 05:09:32 -0400 (EDT)
+In-Reply-To: <20190401161638.GB22092@fuggles.cambridge.arm.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>, Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: yuzhao@google.com, catalin.marinas@arm.com, linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 4/5/19 4:33 PM, Dave Martin wrote:
-> On Tue, Apr 02, 2019 at 07:57:16AM +0530, Amit Daniel Kachhap wrote:
->> This patch advertises the capability of two cpu feature called address
->> pointer authentication and generic pointer authentication. These
->> capabilities depend upon system support for pointer authentication and
->> VHE mode.
+On 01/04/2019 17:16, Will Deacon wrote:
+> [+KVM/ARM folks, since I can't take this without an Ack in place from them]
+> 
+> My understanding is that this patch is intended to replace patch 3/4 in
+> this series:
+> 
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2019-March/638083.html
+> 
+> On Tue, Mar 12, 2019 at 06:55:45PM +0530, Anshuman Khandual wrote:
+>> ARM64 standard pgtable functions are going to use pgtable_page_[ctor|dtor]
+>> or pgtable_pmd_page_[ctor|dtor] constructs. At present KVM guest stage-2
+>> PUD|PMD|PTE level page tabe pages are allocated with __get_free_page()
+>> via mmu_memory_cache_alloc() but released with standard pud|pmd_free() or
+>> pte_free_kernel(). These will fail once they start calling into pgtable_
+>> [pmd]_page_dtor() for pages which never originally went through respective
+>> constructor functions. Hence convert all stage-2 page table page release
+>> functions to call buddy directly while freeing pages.
 >>
->> The current arm64 KVM partially implements pointer authentication and
->> support of address/generic authentication are tied together. However,
->> separate ABI requirements for both of them is added so that the future
->> isolated implementation will not require any ABI changes.
->>
->> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: kvmarm@lists.cs.columbia.edu
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Acked-by: Yu Zhao <yuzhao@google.com>
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 >> ---
+>> Changes in V2:
 >>
->> Changes since v7:
->> * Created 2 capabilities KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC
->>    instead of one KVM_CAP_ARM_PTRAUTH [Kristina Martsenko].
->> * Added documentation here itself instead of in a new patch.
+>> - Updated stage2_pud_free() with NOP as per Suzuki
+>> - s/__free_page/free_page/ in clear_stage2_pmd_entry() for uniformity
 >>
->>   Documentation/virtual/kvm/api.txt | 3 +++
->>   arch/arm64/kvm/reset.c            | 6 ++++++
->>   include/uapi/linux/kvm.h          | 2 ++
->>   3 files changed, 11 insertions(+)
+>>  arch/arm/include/asm/stage2_pgtable.h   | 4 ++--
+>>  arch/arm64/include/asm/stage2_pgtable.h | 4 ++--
+>>  virt/kvm/arm/mmu.c                      | 2 +-
+>>  3 files changed, 5 insertions(+), 5 deletions(-)
 >>
->> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
->> index aaa048d..9b56892 100644
->> --- a/Documentation/virtual/kvm/api.txt
->> +++ b/Documentation/virtual/kvm/api.txt
->> @@ -2661,8 +2661,11 @@ Possible features:
->>   	  Depends on KVM_CAP_ARM_PMU_V3.
->>   	- KVM_ARM_VCPU_PTRAUTH_ADDRESS: Enables Address Pointer authentication
->>   	  for the CPU and supported only on arm64 architecture.
->> +	  Depends on KVM_CAP_ARM_PTRAUTH_ADDRESS.
->>   	- KVM_ARM_VCPU_PTRAUTH_GENERIC: Enables Generic Pointer authentication
->>   	  for the CPU and supported only on arm64 architecture.
->> +	  Depends on KVM_CAP_ARM_PTRAUTH_GENERIC.
->>   
->>   
->>   4.83 KVM_ARM_PREFERRED_TARGET
->> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->> index 717afed..8aa8982 100644
->> --- a/arch/arm64/kvm/reset.c
->> +++ b/arch/arm64/kvm/reset.c
->> @@ -92,6 +92,12 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>   	case KVM_CAP_ARM_VM_IPA_SIZE:
->>   		r = kvm_ipa_limit;
->>   		break;
->> +	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
->> +		r = has_vhe() && system_supports_address_auth();
->> +		break;
->> +	case KVM_CAP_ARM_PTRAUTH_GENERIC:
->> +		r = has_vhe() && system_supports_generic_auth();
->> +		break;
-> 
-> If some hardware supports just one auth type, we would report just one
-> of these caps.  Although we have the rule that userspace is not allowed
-> to request these independently in KVM_ARM_VCPU_INIT anyway, I think it
-> would be easier for userspace if we suppress both caps if either auth
-> type isn't available on the host.  e.g.:
-> 
-> 	case KVM_ARM_ARM_PTRAUTH_ADDRESS:
-> 	case KVM_ARM_ARM_PTRAUTH_GENERIC:
-> 		r = has_vhe() && system_supports_address_auth() &&
-> 			system_supports_generic_auth();
-> 
-> We could revert back to the above code later on, and apply the ABI
-> relaxations described in my response to the vcpu features patch, if
-> someday we add support to KVM for coping with host hardware that
-> supports just one auth type.
-These 2 different capabilities are introduced in this iteration so I was 
-not clear whether to expose the suppression in capability ioctl level or 
-KVM_ARM_VCPU_INIT ioctl level. But agree that this way will be more 
-clearer to userspace.
-> 
-> 
-> I'd like Mark to comment on this, since he's more aware of the
-> architectural situation than I am.
-ok.
+>> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
+>> index de2089501b8b..fed02c3b4600 100644
+>> --- a/arch/arm/include/asm/stage2_pgtable.h
+>> +++ b/arch/arm/include/asm/stage2_pgtable.h
+>> @@ -32,14 +32,14 @@
+>>  #define stage2_pgd_present(kvm, pgd)		pgd_present(pgd)
+>>  #define stage2_pgd_populate(kvm, pgd, pud)	pgd_populate(NULL, pgd, pud)
+>>  #define stage2_pud_offset(kvm, pgd, address)	pud_offset(pgd, address)
+>> -#define stage2_pud_free(kvm, pud)		pud_free(NULL, pud)
+>> +#define stage2_pud_free(kvm, pud)		do { } while (0)
+>>  
+>>  #define stage2_pud_none(kvm, pud)		pud_none(pud)
+>>  #define stage2_pud_clear(kvm, pud)		pud_clear(pud)
+>>  #define stage2_pud_present(kvm, pud)		pud_present(pud)
+>>  #define stage2_pud_populate(kvm, pud, pmd)	pud_populate(NULL, pud, pmd)
+>>  #define stage2_pmd_offset(kvm, pud, address)	pmd_offset(pud, address)
+>> -#define stage2_pmd_free(kvm, pmd)		pmd_free(NULL, pmd)
+>> +#define stage2_pmd_free(kvm, pmd)		free_page((unsigned long)pmd)
+>>  
+>>  #define stage2_pud_huge(kvm, pud)		pud_huge(pud)
+>>  
+>> diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+>> index 5412fa40825e..915809e4ac32 100644
+>> --- a/arch/arm64/include/asm/stage2_pgtable.h
+>> +++ b/arch/arm64/include/asm/stage2_pgtable.h
+>> @@ -119,7 +119,7 @@ static inline pud_t *stage2_pud_offset(struct kvm *kvm,
+>>  static inline void stage2_pud_free(struct kvm *kvm, pud_t *pud)
+>>  {
+>>  	if (kvm_stage2_has_pud(kvm))
+>> -		pud_free(NULL, pud);
+>> +		free_page((unsigned long)pud);
+>>  }
+>>  
+>>  static inline bool stage2_pud_table_empty(struct kvm *kvm, pud_t *pudp)
+>> @@ -192,7 +192,7 @@ static inline pmd_t *stage2_pmd_offset(struct kvm *kvm,
+>>  static inline void stage2_pmd_free(struct kvm *kvm, pmd_t *pmd)
+>>  {
+>>  	if (kvm_stage2_has_pmd(kvm))
+>> -		pmd_free(NULL, pmd);
+>> +		free_page((unsigned long)pmd);
+>>  }
+>>  
+>>  static inline bool stage2_pud_huge(struct kvm *kvm, pud_t pud)
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index e9d28a7ca673..cbfbdadca8a5 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -191,7 +191,7 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
+>>  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
+>>  	pmd_clear(pmd);
+>>  	kvm_tlb_flush_vmid_ipa(kvm, addr);
+>> -	pte_free_kernel(NULL, pte_table);
+>> +	free_page((unsigned long)pte_table);
+>>  	put_page(virt_to_page(pmd));
+>>  }
+>>  
+>> -- 
+>> 2.20.1
+>>
+
+Looks good to me, please take it via the arm64 tree with my
+
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 Thanks,
-Amit D.
-> 
-> Cheers
-> ---Dave
-> 
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
