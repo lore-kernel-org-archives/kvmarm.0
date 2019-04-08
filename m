@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v7 07/23] vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
-Date: Mon,  8 Apr 2019 14:18:55 +0200
-Message-ID: <20190408121911.24103-8-eric.auger@redhat.com>
+Subject: [PATCH v7 08/23] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Date: Mon,  8 Apr 2019 14:18:56 +0200
+Message-ID: <20190408121911.24103-9-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -14,90 +14,100 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-This patch adds VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE ioctl
-which aims to pass/withdraw the virtual iommu guest configuration
-to/from the VFIO driver downto to the iommu subsystem.
+When the guest "owns" the stage 1 translation structures,  the host
+IOMMU driver has no knowledge of caching structure updates unless
+the guest invalidation requests are trapped and passed down to the
+host.
 
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
+at propagating guest stage1 IOMMU cache invalidations to the host.
+
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v6 -> v7:
-- add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
-
-v3 -> v4:
-- restore ATTACH/DETACH
-- add unwind on failure
+- Use iommu_capsule struct
+- renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
+  due to checkpatch error related to for_each_dev suffix
 
 v2 -> v3:
-- s/BIND_PASID_TABLE/SET_PASID_TABLE
+- introduce vfio_iommu_for_each_dev back in this patch
 
 v1 -> v2:
-- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
-- remove the struct device arg
+- s/TLB/CACHE
+- remove vfio_iommu_task usage
+- commit message rewording
 ---
- drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       | 22 ++++++++++++++
- 2 files changed, 75 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 13 ++++++++
+ 2 files changed, 68 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 73652e21efec..222e9199edbf 100644
+index 222e9199edbf..4a6b5a360a5e 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1644,6 +1644,43 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+@@ -113,6 +113,34 @@ struct vfio_regions {
+ #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+ 					(!list_empty(&iommu->domain_list))
+ 
++struct domain_capsule {
++	struct iommu_domain *domain;
++	void *data;
++};
++
++/* iommu->lock must be held */
++static int
++vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
++		      int (*fn)(struct device *dev, void *data),
++		      void *data)
++{
++	struct domain_capsule dc = {.data = data};
++	struct vfio_domain *d;
++	struct vfio_group *g;
++	int ret = 0;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		dc.domain = d->domain;
++		list_for_each_entry(g, &d->group_list, next) {
++			ret = iommu_group_for_each_dev(g->iommu_group,
++						       &dc, fn);
++			if (ret)
++				break;
++		}
++	}
++	return ret;
++}
++
+ static int put_pfn(unsigned long pfn, int prot);
+ 
+ /*
+@@ -1681,6 +1709,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
  	return ret;
  }
  
-+static void
-+vfio_detach_pasid_table(struct vfio_iommu *iommu)
++static int vfio_cache_inv_fn(struct device *dev, void *data)
 +{
-+	struct vfio_domain *d;
++	struct domain_capsule *dc = (struct domain_capsule *)data;
++	struct vfio_iommu_type1_cache_invalidate *ustruct =
++		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
 +
-+	mutex_lock(&iommu->lock);
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		iommu_detach_pasid_table(d->domain);
-+	}
-+	mutex_unlock(&iommu->lock);
-+}
-+
-+static int
-+vfio_attach_pasid_table(struct vfio_iommu *iommu,
-+			struct vfio_iommu_type1_attach_pasid_table *ustruct)
-+{
-+	struct vfio_domain *d;
-+	int ret = 0;
-+
-+	mutex_lock(&iommu->lock);
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		ret = iommu_attach_pasid_table(d->domain, &ustruct->config);
-+		if (ret)
-+			goto unwind;
-+	}
-+	goto unlock;
-+unwind:
-+	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
-+		iommu_detach_pasid_table(d->domain);
-+	}
-+unlock:
-+	mutex_unlock(&iommu->lock);
-+	return ret;
++	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
 +}
 +
  static long vfio_iommu_type1_ioctl(void *iommu_data,
  				   unsigned int cmd, unsigned long arg)
  {
-@@ -1714,6 +1751,22 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
- 			-EFAULT : 0;
-+	} else if (cmd == VFIO_IOMMU_ATTACH_PASID_TABLE) {
-+		struct vfio_iommu_type1_attach_pasid_table ustruct;
+@@ -1767,6 +1804,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+ 		vfio_detach_pasid_table(iommu);
+ 		return 0;
++	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
++		struct vfio_iommu_type1_cache_invalidate ustruct;
++		int ret;
 +
-+		minsz = offsetofend(struct vfio_iommu_type1_attach_pasid_table,
-+				    config);
++		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
++				    info);
 +
 +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
 +			return -EFAULT;
@@ -105,49 +115,34 @@ index 73652e21efec..222e9199edbf 100644
 +		if (ustruct.argsz < minsz || ustruct.flags)
 +			return -EINVAL;
 +
-+		return vfio_attach_pasid_table(iommu, &ustruct);
-+	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
-+		vfio_detach_pasid_table(iommu);
-+		return 0;
++		mutex_lock(&iommu->lock);
++		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
++					    &ustruct);
++		mutex_unlock(&iommu->lock);
++		return ret;
  	}
  
  	return -ENOTTY;
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 02bb7ad6e986..06db3247702f 100644
+index 06db3247702f..b5325552bae0 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -14,6 +14,7 @@
- 
- #include <linux/types.h>
- #include <linux/ioctl.h>
-+#include <linux/iommu.h>
- 
- #define VFIO_API_VERSION	0
- 
-@@ -759,6 +760,27 @@ struct vfio_iommu_type1_dma_unmap {
- #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
- #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+@@ -781,6 +781,19 @@ struct vfio_iommu_type1_attach_pasid_table {
+  */
+ #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
  
 +/**
-+ * VFIO_IOMMU_ATTACH_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-+ *			struct vfio_iommu_type1_attach_pasid_table)
++ * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
++ *			struct vfio_iommu_type1_cache_invalidate)
 + *
-+ * Passes the PASID table to the host. Calling ATTACH_PASID_TABLE
-+ * while a table is already installed is allowed: it replaces the old
-+ * table. DETACH does a comprehensive tear down of the nested mode.
++ * Propagate guest IOMMU cache invalidation to the host.
 + */
-+struct vfio_iommu_type1_attach_pasid_table {
-+	__u32	argsz;
-+	__u32	flags;
-+	struct iommu_pasid_table_config config;
++struct vfio_iommu_type1_cache_invalidate {
++	__u32   argsz;
++	__u32   flags;
++	struct iommu_cache_invalidate_info info;
 +};
-+#define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
-+
-+/**
-+ * VFIO_IOMMU_DETACH_PASID_TABLE - - _IOWR(VFIO_TYPE, VFIO_BASE + 23)
-+ * Detaches the PASID table
-+ */
-+#define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
++#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
 +
  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
