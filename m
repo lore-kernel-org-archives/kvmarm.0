@@ -2,48 +2,48 @@ Return-Path: <SRS0=T7i1=SK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3EFC10F14
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2711FC10F13
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA26E21473
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA26E21473
+	by mail.kernel.org (Postfix) with ESMTP id D929721473
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D929721473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75FD84A484;
-	Mon,  8 Apr 2019 08:20:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7437C4A321;
+	Mon,  8 Apr 2019 08:20:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sUslya30XY4Y; Mon,  8 Apr 2019 08:20:31 -0400 (EDT)
+	with ESMTP id 7ByrVyqiRIUl; Mon,  8 Apr 2019 08:20:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 413EF4A420;
-	Mon,  8 Apr 2019 08:20:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 610CC4A409;
+	Mon,  8 Apr 2019 08:20:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 787FA4A3BF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C09C54A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Aoxxq+6bqXPh for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 08:20:29 -0400 (EDT)
+ with ESMTP id Cnds5P0UgCLD for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 08:20:39 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 554294A321
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0F0D4A418
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:39 -0400 (EDT)
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 81312C05B01E;
- Mon,  8 Apr 2019 12:20:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E7C29C05D3E4;
+ Mon,  8 Apr 2019 12:20:38 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C673860185;
- Mon,  8 Apr 2019 12:20:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D6B6D600C4;
+ Mon,  8 Apr 2019 12:20:28 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -51,15 +51,15 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
  yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
  robin.murphy@arm.com
-Subject: [PATCH v7 08/23] vfio: VFIO_IOMMU_CACHE_INVALIDATE
-Date: Mon,  8 Apr 2019 14:18:56 +0200
-Message-Id: <20190408121911.24103-9-eric.auger@redhat.com>
+Subject: [PATCH v7 09/23] vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+Date: Mon,  8 Apr 2019 14:18:57 +0200
+Message-Id: <20190408121911.24103-10-eric.auger@redhat.com>
 In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 08 Apr 2019 12:20:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 08 Apr 2019 12:20:39 +0000 (UTC)
 Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
  marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -77,104 +77,88 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408121856.VxB8LGSAgWMQK_0BCLfAbZRnFRLvpQONseB5yp1DVFA@z>
+Message-ID: <20190408121857.OPSnrKyS-f5W5Y9IOIDiuprcTwLeBZZpmcZcGB-EcpA@z>
 
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+This patch adds the VFIO_IOMMU_BIND/UNBIND_MSI ioctl which aim
+to pass/withdraw the guest MSI binding to/from the host.
 
-When the guest "owns" the stage 1 translation structures,  the host
-IOMMU driver has no knowledge of caching structure updates unless
-the guest invalidation requests are trapped and passed down to the
-host.
-
-This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
-at propagating guest stage1 IOMMU cache invalidations to the host.
-
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v6 -> v7:
-- Use iommu_capsule struct
-- renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
-  due to checkpatch error related to for_each_dev suffix
+- removed the dev arg
+
+v3 -> v4:
+- add UNBIND
+- unwind on BIND error
 
 v2 -> v3:
-- introduce vfio_iommu_for_each_dev back in this patch
+- adapt to new proto of bind_guest_msi
+- directly use vfio_iommu_for_each_dev
 
 v1 -> v2:
-- s/TLB/CACHE
-- remove vfio_iommu_task usage
-- commit message rewording
+- s/vfio_iommu_type1_guest_msi_binding/vfio_iommu_type1_bind_guest_msi
 ---
- drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       | 13 ++++++++
- 2 files changed, 68 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 64 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 29 +++++++++++++++
+ 2 files changed, 93 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 222e9199edbf..4a6b5a360a5e 100644
+index 4a6b5a360a5e..6df72840fbd9 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -113,6 +113,34 @@ struct vfio_regions {
- #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
- 					(!list_empty(&iommu->domain_list))
+@@ -1718,6 +1718,42 @@ static int vfio_cache_inv_fn(struct device *dev, void *data)
+ 	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
+ }
  
-+struct domain_capsule {
-+	struct iommu_domain *domain;
-+	void *data;
-+};
-+
-+/* iommu->lock must be held */
 +static int
-+vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
-+		      int (*fn)(struct device *dev, void *data),
-+		      void *data)
++vfio_bind_msi(struct vfio_iommu *iommu,
++	      dma_addr_t giova, phys_addr_t gpa, size_t size)
 +{
-+	struct domain_capsule dc = {.data = data};
 +	struct vfio_domain *d;
-+	struct vfio_group *g;
 +	int ret = 0;
 +
++	mutex_lock(&iommu->lock);
++
 +	list_for_each_entry(d, &iommu->domain_list, next) {
-+		dc.domain = d->domain;
-+		list_for_each_entry(g, &d->group_list, next) {
-+			ret = iommu_group_for_each_dev(g->iommu_group,
-+						       &dc, fn);
-+			if (ret)
-+				break;
-+		}
++		ret = iommu_bind_guest_msi(d->domain, giova, gpa, size);
++		if (ret)
++			goto unwind;
 +	}
++	goto unlock;
++unwind:
++	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
++		iommu_unbind_guest_msi(d->domain, giova);
++	}
++unlock:
++	mutex_unlock(&iommu->lock);
 +	return ret;
 +}
 +
- static int put_pfn(unsigned long pfn, int prot);
- 
- /*
-@@ -1681,6 +1709,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
- 	return ret;
- }
- 
-+static int vfio_cache_inv_fn(struct device *dev, void *data)
++static void
++vfio_unbind_msi(struct vfio_iommu *iommu, dma_addr_t giova)
 +{
-+	struct domain_capsule *dc = (struct domain_capsule *)data;
-+	struct vfio_iommu_type1_cache_invalidate *ustruct =
-+		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
++	struct vfio_domain *d;
 +
-+	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		iommu_unbind_guest_msi(d->domain, giova);
++	}
++	mutex_unlock(&iommu->lock);
 +}
 +
  static long vfio_iommu_type1_ioctl(void *iommu_data,
  				   unsigned int cmd, unsigned long arg)
  {
-@@ -1767,6 +1804,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
- 		vfio_detach_pasid_table(iommu);
- 		return 0;
-+	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
-+		struct vfio_iommu_type1_cache_invalidate ustruct;
-+		int ret;
+@@ -1822,6 +1858,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 					    &ustruct);
+ 		mutex_unlock(&iommu->lock);
+ 		return ret;
++	} else if (cmd == VFIO_IOMMU_BIND_MSI) {
++		struct vfio_iommu_type1_bind_msi ustruct;
 +
-+		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
-+				    info);
++		minsz = offsetofend(struct vfio_iommu_type1_bind_msi,
++				    size);
 +
 +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
 +			return -EFAULT;
@@ -182,34 +166,61 @@ index 222e9199edbf..4a6b5a360a5e 100644
 +		if (ustruct.argsz < minsz || ustruct.flags)
 +			return -EINVAL;
 +
-+		mutex_lock(&iommu->lock);
-+		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
-+					    &ustruct);
-+		mutex_unlock(&iommu->lock);
-+		return ret;
++		return vfio_bind_msi(iommu, ustruct.iova, ustruct.gpa,
++				     ustruct.size);
++	} else if (cmd == VFIO_IOMMU_UNBIND_MSI) {
++		struct vfio_iommu_type1_unbind_msi ustruct;
++
++		minsz = offsetofend(struct vfio_iommu_type1_unbind_msi,
++				    iova);
++
++		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (ustruct.argsz < minsz || ustruct.flags)
++			return -EINVAL;
++
++		vfio_unbind_msi(iommu, ustruct.iova);
++		return 0;
  	}
  
  	return -ENOTTY;
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 06db3247702f..b5325552bae0 100644
+index b5325552bae0..69775adda155 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -781,6 +781,19 @@ struct vfio_iommu_type1_attach_pasid_table {
-  */
- #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
+@@ -794,6 +794,35 @@ struct vfio_iommu_type1_cache_invalidate {
+ };
+ #define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
  
 +/**
-+ * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
-+ *			struct vfio_iommu_type1_cache_invalidate)
++ * VFIO_IOMMU_BIND_MSI - _IOWR(VFIO_TYPE, VFIO_BASE + 25,
++ *			struct vfio_iommu_type1_bind_msi)
 + *
-+ * Propagate guest IOMMU cache invalidation to the host.
++ * Pass a stage 1 MSI doorbell mapping to the host so that this
++ * latter can build a nested stage2 mapping
 + */
-+struct vfio_iommu_type1_cache_invalidate {
++struct vfio_iommu_type1_bind_msi {
 +	__u32   argsz;
 +	__u32   flags;
-+	struct iommu_cache_invalidate_info info;
++	__u64	iova;
++	__u64	gpa;
++	__u64	size;
 +};
-+#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
++#define VFIO_IOMMU_BIND_MSI      _IO(VFIO_TYPE, VFIO_BASE + 25)
++
++/**
++ * VFIO_IOMMU_UNBIND_MSI - _IOWR(VFIO_TYPE, VFIO_BASE + 26,
++ *			struct vfio_iommu_type1_unbind_msi)
++ *
++ * Unregister an MSI mapping
++ */
++struct vfio_iommu_type1_unbind_msi {
++	__u32   argsz;
++	__u32   flags;
++	__u64	iova;
++};
++#define VFIO_IOMMU_UNBIND_MSI      _IO(VFIO_TYPE, VFIO_BASE + 26)
 +
  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
