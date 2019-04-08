@@ -1,98 +1,90 @@
-From: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v7 16/23] iommu/smmuv3: Nested mode single MSI doorbell per
-	domain enforcement
-Date: Mon,  8 Apr 2019 14:19:04 +0200
-Message-ID: <20190408121911.24103-17-eric.auger@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v7 17/23] iommu/smmuv3: Implement bind/unbind_guest_msi
+Date: Mon,  8 Apr 2019 14:19:05 +0200
+Message-ID: <20190408121911.24103-18-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20190408121911.24103-1-eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger.pro-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, jacob.jun.pan-VuQAYsv1563Yd54FQh9/CA@public.gmane.org, yi.l.liu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, jean-philippe.brucker-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org
-Cc: peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, vincent.stehle-5wv7dgnIgG8@public.gmane.org, ashok.raj-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-5wv7dgnIgG8@public.gmane.org
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com
+Cc: kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org, vincent.stehle@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In nested mode we enforce the rule that all devices belonging
-to the same iommu_domain share the same msi_domain.
+The bind/unbind_guest_msi() callbacks check the domain
+is NESTED and redirect to the dma-iommu implementation.
 
-Indeed if there were several physical MSI doorbells being used
-within a single iommu_domain, it becomes really difficult to
-resolve the nested stage mapping translating into the correct
-physical doorbell. So let's forbid this situation.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- drivers/iommu/arm-smmu-v3.c | 41 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+
+v6 -> v7:
+- remove device handle argument
+---
+ drivers/iommu/arm-smmu-v3.c | 43 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 4366921d8318..2b2d90d736d6 100644
+index 2b2d90d736d6..8044445bc32a 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1781,6 +1781,37 @@ static void arm_smmu_detach_dev(struct device *dev)
- 	arm_smmu_install_ste_for_dev(fwspec);
+@@ -2248,6 +2248,47 @@ static void arm_smmu_put_resv_regions(struct device *dev,
+ 		kfree(entry);
  }
  
-+static bool arm_smmu_share_msi_domain(struct iommu_domain *domain,
-+				      struct device *dev)
++static int
++arm_smmu_bind_guest_msi(struct iommu_domain *domain,
++			dma_addr_t giova, phys_addr_t gpa, size_t size)
 +{
 +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct irq_domain *irqd = dev_get_msi_domain(dev);
-+	struct arm_smmu_master_data *entry;
-+	unsigned long flags;
-+	bool share = false;
++	struct arm_smmu_device *smmu;
++	int ret = -EINVAL;
 +
-+	if (!irqd)
-+		return true;
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto out;
 +
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(entry, &smmu_domain->devices, list) {
-+		struct irq_domain *d = dev_get_msi_domain(entry->dev);
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto out;
 +
-+		if (!d)
-+			continue;
-+		if (irqd != d) {
-+			dev_info(dev, "Nested mode forbids to attach devices "
-+				 "using different physical MSI doorbells "
-+				 "to the same iommu_domain");
-+			goto unlock;
-+		}
-+	}
-+	share = true;
-+unlock:
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+	return share;
++	ret = iommu_dma_bind_guest_msi(domain, giova, gpa, size);
++out:
++	mutex_unlock(&smmu_domain->init_mutex);
++	return ret;
 +}
 +
- static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
++static void
++arm_smmu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct arm_smmu_device *smmu;
++
++	mutex_lock(&smmu_domain->init_mutex);
++	smmu = smmu_domain->smmu;
++	if (!smmu)
++		goto unlock;
++
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		goto unlock;
++
++	iommu_dma_unbind_guest_msi(domain, giova);
++unlock:
++	mutex_unlock(&smmu_domain->init_mutex);
++}
++
+ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+ 				       struct iommu_pasid_table_config *cfg)
  {
- 	int ret = 0;
-@@ -1819,6 +1850,16 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
- 		ret = -ENXIO;
- 		goto out_unlock;
- 	}
-+	/*
-+	 * In nested mode we must check all devices belonging to the
-+	 * domain share the same physical MSI doorbell. Otherwise nested
-+	 * stage MSI binding is not supported.
-+	 */
-+	if (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED &&
-+		!arm_smmu_share_msi_domain(domain, dev)) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
+@@ -2447,6 +2488,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+ 	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+ 	.cache_invalidate	= arm_smmu_cache_invalidate,
++	.bind_guest_msi		= arm_smmu_bind_guest_msi,
++	.unbind_guest_msi	= arm_smmu_unbind_guest_msi,
+ 	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+ };
  
- 	ste->assigned = true;
- 	master->domain = smmu_domain;
 -- 
 2.20.1
