@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB9EC10F13
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFF1C282CE
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9BA4C21473
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA4C21473
+	by mail.kernel.org (Postfix) with ESMTP id 86DFD2087F
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DFD2087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 457884A3BF;
-	Mon,  8 Apr 2019 08:20:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8A94A483;
+	Mon,  8 Apr 2019 08:20:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HhZblSxRL4J5; Mon,  8 Apr 2019 08:20:16 -0400 (EDT)
+	with ESMTP id Yg+1W5cp5zj6; Mon,  8 Apr 2019 08:20:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F20F94A472;
-	Mon,  8 Apr 2019 08:20:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 217C14A474;
+	Mon,  8 Apr 2019 08:20:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FBEA4A420
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1574A46E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hzT+dVwGMw9v for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 08:20:14 -0400 (EDT)
+ with ESMTP id oGR7NTkTzdLA for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 08:20:21 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D96A84A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2ED984A420
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:21 -0400 (EDT)
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2F36E30833A4;
- Mon,  8 Apr 2019 12:20:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 72720C4EC3;
+ Mon,  8 Apr 2019 12:20:20 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 383D6600C4;
- Mon,  8 Apr 2019 12:19:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA3B92B9DF;
+ Mon,  8 Apr 2019 12:20:14 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -51,15 +51,15 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
  yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
  robin.murphy@arm.com
-Subject: [PATCH v7 06/23] iommu: Introduce bind/unbind_guest_msi
-Date: Mon,  8 Apr 2019 14:18:54 +0200
-Message-Id: <20190408121911.24103-7-eric.auger@redhat.com>
+Subject: [PATCH v7 07/23] vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
+Date: Mon,  8 Apr 2019 14:18:55 +0200
+Message-Id: <20190408121911.24103-8-eric.auger@redhat.com>
 In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 08 Apr 2019 12:20:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Mon, 08 Apr 2019 12:20:20 +0000 (UTC)
 Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
  marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -77,163 +77,148 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408121854._5GALLqCty8F33JPrMdjplZ33wGdVhklWtYyg4Ht3mQ@z>
+Message-ID: <20190408121855.e5Beq3oGR60Mh2WMaMTCKyvJerUrh3u6DZdx-gaApyw@z>
 
-On ARM, MSI are translated by the SMMU. An IOVA is allocated
-for each MSI doorbell. If both the host and the guest are exposed
-with SMMUs, we end up with 2 different IOVAs allocated by each.
-guest allocates an IOVA (gIOVA) to map onto the guest MSI
-doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
-onto the physical doorbell (hDB).
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-So we end up with 2 untied mappings:
-         S1            S2
-gIOVA    ->    gDB
-              hIOVA    ->    hDB
+This patch adds VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE ioctl
+which aims to pass/withdraw the virtual iommu guest configuration
+to/from the VFIO driver downto to the iommu subsystem.
 
-Currently the PCI device is programmed by the host with hIOVA
-as MSI doorbell. So this does not work.
-
-This patch introduces an API to pass gIOVA/gDB to the host so
-that gIOVA can be reused by the host instead of re-allocating
-a new IOVA. So the goal is to create the following nested mapping:
-
-         S1            S2
-gIOVA    ->    gDB     ->    hDB
-
-and program the PCI device with gIOVA MSI doorbell.
-
-In case we have several devices attached to this nested domain
-(devices belonging to the same group), they cannot be isolated
-on guest side either. So they should also end up in the same domain
-on guest side. We will enforce that all the devices attached to
-the host iommu domain use the same physical doorbell and similarly
-a single virtual doorbell mapping gets registered (1 single
-virtual doorbell is used on guest as well).
-
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v6 -> v7:
-- remove the device handle parameter.
-- Add comments saying there can only be a single MSI binding
-  registered per iommu_domain
-v5 -> v6:
--fix compile issue when IOMMU_API is not set
+- add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
 
 v3 -> v4:
-- add unbind
+- restore ATTACH/DETACH
+- add unwind on failure
 
 v2 -> v3:
-- add a struct device handle
----
- drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++++++++++++
- include/linux/iommu.h | 23 +++++++++++++++++++++++
- 2 files changed, 60 insertions(+)
+- s/BIND_PASID_TABLE/SET_PASID_TABLE
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 6d6cb4005ca5..0d160bbd6f81 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1575,6 +1575,43 @@ static void __iommu_detach_device(struct iommu_domain *domain,
- 	trace_detach_device_from_domain(dev);
+v1 -> v2:
+- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+- remove the struct device arg
+---
+ drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 22 ++++++++++++++
+ 2 files changed, 75 insertions(+)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 73652e21efec..222e9199edbf 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1644,6 +1644,43 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+ 	return ret;
  }
+ 
++static void
++vfio_detach_pasid_table(struct vfio_iommu *iommu)
++{
++	struct vfio_domain *d;
++
++	mutex_lock(&iommu->lock);
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		iommu_detach_pasid_table(d->domain);
++	}
++	mutex_unlock(&iommu->lock);
++}
++
++static int
++vfio_attach_pasid_table(struct vfio_iommu *iommu,
++			struct vfio_iommu_type1_attach_pasid_table *ustruct)
++{
++	struct vfio_domain *d;
++	int ret = 0;
++
++	mutex_lock(&iommu->lock);
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		ret = iommu_attach_pasid_table(d->domain, &ustruct->config);
++		if (ret)
++			goto unwind;
++	}
++	goto unlock;
++unwind:
++	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
++		iommu_detach_pasid_table(d->domain);
++	}
++unlock:
++	mutex_unlock(&iommu->lock);
++	return ret;
++}
++
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -1714,6 +1751,22 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 
+ 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+ 			-EFAULT : 0;
++	} else if (cmd == VFIO_IOMMU_ATTACH_PASID_TABLE) {
++		struct vfio_iommu_type1_attach_pasid_table ustruct;
++
++		minsz = offsetofend(struct vfio_iommu_type1_attach_pasid_table,
++				    config);
++
++		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (ustruct.argsz < minsz || ustruct.flags)
++			return -EINVAL;
++
++		return vfio_attach_pasid_table(iommu, &ustruct);
++	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
++		vfio_detach_pasid_table(iommu);
++		return 0;
+ 	}
+ 
+ 	return -ENOTTY;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 02bb7ad6e986..06db3247702f 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -14,6 +14,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
++#include <linux/iommu.h>
+ 
+ #define VFIO_API_VERSION	0
+ 
+@@ -759,6 +760,27 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
  
 +/**
-+ * iommu_bind_guest_msi - Passes the stage1 GIOVA/GPA mapping of a
-+ * virtual doorbell
++ * VFIO_IOMMU_ATTACH_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
++ *			struct vfio_iommu_type1_attach_pasid_table)
 + *
-+ * @domain: iommu domain the stage 1 mapping will be attached to
-+ * @iova: iova allocated by the guest
-+ * @gpa: guest physical address of the virtual doorbell
-+ * @size: granule size used for the mapping
-+ *
-+ * The associated IOVA can be reused by the host to create a nested
-+ * stage2 binding mapping translating into the physical doorbell used
-+ * by the devices attached to the domain.
-+ *
-+ * All devices within the domain must share the same physical doorbell.
-+ * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
++ * Passes the PASID table to the host. Calling ATTACH_PASID_TABLE
++ * while a table is already installed is allowed: it replaces the old
++ * table. DETACH does a comprehensive tear down of the nested mode.
 + */
++struct vfio_iommu_type1_attach_pasid_table {
++	__u32	argsz;
++	__u32	flags;
++	struct iommu_pasid_table_config config;
++};
++#define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
 +
-+int iommu_bind_guest_msi(struct iommu_domain *domain,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size)
-+{
-+	if (unlikely(!domain->ops->bind_guest_msi))
-+		return -ENODEV;
++/**
++ * VFIO_IOMMU_DETACH_PASID_TABLE - - _IOWR(VFIO_TYPE, VFIO_BASE + 23)
++ * Detaches the PASID table
++ */
++#define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
 +
-+	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
-+}
-+EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
-+
-+void iommu_unbind_guest_msi(struct iommu_domain *domain,
-+			    dma_addr_t iova)
-+{
-+	if (unlikely(!domain->ops->unbind_guest_msi))
-+		return;
-+
-+	domain->ops->unbind_guest_msi(domain, iova);
-+}
-+EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
-+
- void iommu_detach_device(struct iommu_domain *domain, struct device *dev)
- {
- 	struct iommu_group *group;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 7c7c6bad1420..a2f3f964ead2 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -192,6 +192,8 @@ struct iommu_resv_region {
-  * @attach_pasid_table: attach a pasid table
-  * @detach_pasid_table: detach the pasid table
-  * @cache_invalidate: invalidate translation caches
-+ * @bind_guest_msi: provides a stage1 giova/gpa MSI doorbell mapping
-+ * @unbind_guest_msi: withdraw a stage1 giova/gpa MSI doorbell mapping
-  * @pgsize_bitmap: bitmap of all possible supported page sizes
-  */
- struct iommu_ops {
-@@ -243,6 +245,10 @@ struct iommu_ops {
- 	int (*cache_invalidate)(struct iommu_domain *domain, struct device *dev,
- 				struct iommu_cache_invalidate_info *inv_info);
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
-+	int (*bind_guest_msi)(struct iommu_domain *domain,
-+			      dma_addr_t giova, phys_addr_t gpa, size_t size);
-+	void (*unbind_guest_msi)(struct iommu_domain *domain, dma_addr_t giova);
-+
- 	unsigned long pgsize_bitmap;
- };
- 
-@@ -356,6 +362,11 @@ extern void iommu_detach_pasid_table(struct iommu_domain *domain);
- extern int iommu_cache_invalidate(struct iommu_domain *domain,
- 				  struct device *dev,
- 				  struct iommu_cache_invalidate_info *inv_info);
-+extern int iommu_bind_guest_msi(struct iommu_domain *domain,
-+				dma_addr_t giova, phys_addr_t gpa, size_t size);
-+extern void iommu_unbind_guest_msi(struct iommu_domain *domain,
-+				   dma_addr_t giova);
-+
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -812,6 +823,18 @@ iommu_cache_invalidate(struct iommu_domain *domain,
- 	return -ENODEV;
- }
- 
-+static inline
-+int iommu_bind_guest_msi(struct iommu_domain *domain,
-+			 dma_addr_t giova, phys_addr_t gpa, size_t size)
-+{
-+	return -ENODEV;
-+}
-+static inline
-+int iommu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
-+{
-+	return -ENODEV;
-+}
-+
- #endif /* CONFIG_IOMMU_API */
- 
- #ifdef CONFIG_IOMMU_DEBUGFS
+ /*
 -- 
 2.20.1
 
