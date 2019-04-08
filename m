@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFF1C282CE
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3EFC10F14
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 86DFD2087F
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DFD2087F
+	by mail.kernel.org (Postfix) with ESMTP id DA26E21473
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Apr 2019 12:20:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA26E21473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8A94A483;
-	Mon,  8 Apr 2019 08:20:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75FD84A484;
+	Mon,  8 Apr 2019 08:20:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yg+1W5cp5zj6; Mon,  8 Apr 2019 08:20:23 -0400 (EDT)
+	with ESMTP id sUslya30XY4Y; Mon,  8 Apr 2019 08:20:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 217C14A474;
-	Mon,  8 Apr 2019 08:20:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 413EF4A420;
+	Mon,  8 Apr 2019 08:20:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1574A46E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 787FA4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oGR7NTkTzdLA for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Apr 2019 08:20:21 -0400 (EDT)
+ with ESMTP id Aoxxq+6bqXPh for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Apr 2019 08:20:29 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2ED984A420
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 554294A321
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Apr 2019 08:20:29 -0400 (EDT)
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 72720C4EC3;
- Mon,  8 Apr 2019 12:20:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 81312C05B01E;
+ Mon,  8 Apr 2019 12:20:28 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-161.ams2.redhat.com [10.36.117.161])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA3B92B9DF;
- Mon,  8 Apr 2019 12:20:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C673860185;
+ Mon,  8 Apr 2019 12:20:20 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -51,15 +51,15 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
  yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
  robin.murphy@arm.com
-Subject: [PATCH v7 07/23] vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
-Date: Mon,  8 Apr 2019 14:18:55 +0200
-Message-Id: <20190408121911.24103-8-eric.auger@redhat.com>
+Subject: [PATCH v7 08/23] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Date: Mon,  8 Apr 2019 14:18:56 +0200
+Message-Id: <20190408121911.24103-9-eric.auger@redhat.com>
 In-Reply-To: <20190408121911.24103-1-eric.auger@redhat.com>
 References: <20190408121911.24103-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 08 Apr 2019 12:20:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Mon, 08 Apr 2019 12:20:28 +0000 (UTC)
 Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
  marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -77,94 +77,104 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190408121855.e5Beq3oGR60Mh2WMaMTCKyvJerUrh3u6DZdx-gaApyw@z>
+Message-ID: <20190408121856.VxB8LGSAgWMQK_0BCLfAbZRnFRLvpQONseB5yp1DVFA@z>
 
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-This patch adds VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE ioctl
-which aims to pass/withdraw the virtual iommu guest configuration
-to/from the VFIO driver downto to the iommu subsystem.
+When the guest "owns" the stage 1 translation structures,  the host
+IOMMU driver has no knowledge of caching structure updates unless
+the guest invalidation requests are trapped and passed down to the
+host.
 
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
+at propagating guest stage1 IOMMU cache invalidations to the host.
+
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v6 -> v7:
-- add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
-
-v3 -> v4:
-- restore ATTACH/DETACH
-- add unwind on failure
+- Use iommu_capsule struct
+- renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
+  due to checkpatch error related to for_each_dev suffix
 
 v2 -> v3:
-- s/BIND_PASID_TABLE/SET_PASID_TABLE
+- introduce vfio_iommu_for_each_dev back in this patch
 
 v1 -> v2:
-- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
-- remove the struct device arg
+- s/TLB/CACHE
+- remove vfio_iommu_task usage
+- commit message rewording
 ---
- drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       | 22 ++++++++++++++
- 2 files changed, 75 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 13 ++++++++
+ 2 files changed, 68 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 73652e21efec..222e9199edbf 100644
+index 222e9199edbf..4a6b5a360a5e 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1644,6 +1644,43 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+@@ -113,6 +113,34 @@ struct vfio_regions {
+ #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+ 					(!list_empty(&iommu->domain_list))
+ 
++struct domain_capsule {
++	struct iommu_domain *domain;
++	void *data;
++};
++
++/* iommu->lock must be held */
++static int
++vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
++		      int (*fn)(struct device *dev, void *data),
++		      void *data)
++{
++	struct domain_capsule dc = {.data = data};
++	struct vfio_domain *d;
++	struct vfio_group *g;
++	int ret = 0;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		dc.domain = d->domain;
++		list_for_each_entry(g, &d->group_list, next) {
++			ret = iommu_group_for_each_dev(g->iommu_group,
++						       &dc, fn);
++			if (ret)
++				break;
++		}
++	}
++	return ret;
++}
++
+ static int put_pfn(unsigned long pfn, int prot);
+ 
+ /*
+@@ -1681,6 +1709,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
  	return ret;
  }
  
-+static void
-+vfio_detach_pasid_table(struct vfio_iommu *iommu)
++static int vfio_cache_inv_fn(struct device *dev, void *data)
 +{
-+	struct vfio_domain *d;
++	struct domain_capsule *dc = (struct domain_capsule *)data;
++	struct vfio_iommu_type1_cache_invalidate *ustruct =
++		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
 +
-+	mutex_lock(&iommu->lock);
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		iommu_detach_pasid_table(d->domain);
-+	}
-+	mutex_unlock(&iommu->lock);
-+}
-+
-+static int
-+vfio_attach_pasid_table(struct vfio_iommu *iommu,
-+			struct vfio_iommu_type1_attach_pasid_table *ustruct)
-+{
-+	struct vfio_domain *d;
-+	int ret = 0;
-+
-+	mutex_lock(&iommu->lock);
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		ret = iommu_attach_pasid_table(d->domain, &ustruct->config);
-+		if (ret)
-+			goto unwind;
-+	}
-+	goto unlock;
-+unwind:
-+	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
-+		iommu_detach_pasid_table(d->domain);
-+	}
-+unlock:
-+	mutex_unlock(&iommu->lock);
-+	return ret;
++	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
 +}
 +
  static long vfio_iommu_type1_ioctl(void *iommu_data,
  				   unsigned int cmd, unsigned long arg)
  {
-@@ -1714,6 +1751,22 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
- 			-EFAULT : 0;
-+	} else if (cmd == VFIO_IOMMU_ATTACH_PASID_TABLE) {
-+		struct vfio_iommu_type1_attach_pasid_table ustruct;
+@@ -1767,6 +1804,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+ 		vfio_detach_pasid_table(iommu);
+ 		return 0;
++	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
++		struct vfio_iommu_type1_cache_invalidate ustruct;
++		int ret;
 +
-+		minsz = offsetofend(struct vfio_iommu_type1_attach_pasid_table,
-+				    config);
++		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
++				    info);
 +
 +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
 +			return -EFAULT;
@@ -172,49 +182,34 @@ index 73652e21efec..222e9199edbf 100644
 +		if (ustruct.argsz < minsz || ustruct.flags)
 +			return -EINVAL;
 +
-+		return vfio_attach_pasid_table(iommu, &ustruct);
-+	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
-+		vfio_detach_pasid_table(iommu);
-+		return 0;
++		mutex_lock(&iommu->lock);
++		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
++					    &ustruct);
++		mutex_unlock(&iommu->lock);
++		return ret;
  	}
  
  	return -ENOTTY;
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 02bb7ad6e986..06db3247702f 100644
+index 06db3247702f..b5325552bae0 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -14,6 +14,7 @@
- 
- #include <linux/types.h>
- #include <linux/ioctl.h>
-+#include <linux/iommu.h>
- 
- #define VFIO_API_VERSION	0
- 
-@@ -759,6 +760,27 @@ struct vfio_iommu_type1_dma_unmap {
- #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
- #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+@@ -781,6 +781,19 @@ struct vfio_iommu_type1_attach_pasid_table {
+  */
+ #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
  
 +/**
-+ * VFIO_IOMMU_ATTACH_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-+ *			struct vfio_iommu_type1_attach_pasid_table)
++ * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
++ *			struct vfio_iommu_type1_cache_invalidate)
 + *
-+ * Passes the PASID table to the host. Calling ATTACH_PASID_TABLE
-+ * while a table is already installed is allowed: it replaces the old
-+ * table. DETACH does a comprehensive tear down of the nested mode.
++ * Propagate guest IOMMU cache invalidation to the host.
 + */
-+struct vfio_iommu_type1_attach_pasid_table {
-+	__u32	argsz;
-+	__u32	flags;
-+	struct iommu_pasid_table_config config;
++struct vfio_iommu_type1_cache_invalidate {
++	__u32   argsz;
++	__u32   flags;
++	struct iommu_cache_invalidate_info info;
 +};
-+#define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
-+
-+/**
-+ * VFIO_IOMMU_DETACH_PASID_TABLE - - _IOWR(VFIO_TYPE, VFIO_BASE + 23)
-+ * Detaches the PASID table
-+ */
-+#define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
++#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
 +
  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
