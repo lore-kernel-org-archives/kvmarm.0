@@ -2,110 +2,59 @@ Return-Path: <SRS0=N2lg=SL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6BCC282CE
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182EFC10F0E
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 09:16:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2EE0E21473
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:38:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE0E21473
+	by mail.kernel.org (Postfix) with ESMTP id 942DC20833
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 09:16:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942DC20833
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A69524A476;
-	Tue,  9 Apr 2019 04:38:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9384A476;
+	Tue,  9 Apr 2019 05:16:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8tynrv-icDp3; Tue,  9 Apr 2019 04:38:12 -0400 (EDT)
+	with ESMTP id yZVSeZRkNXup; Tue,  9 Apr 2019 05:16:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52A454A477;
-	Tue,  9 Apr 2019 04:38:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D24F94A382;
+	Tue,  9 Apr 2019 05:16:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AC5C4A474
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:38:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0E04A382
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 05:16:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qLWtRQJkqsIW for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Apr 2019 04:38:09 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9124A369
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:38:09 -0400 (EDT)
+ with ESMTP id XnUQQdsMelDV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Apr 2019 05:16:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3EED4A36D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 05:16:06 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E48AA78;
- Tue,  9 Apr 2019 01:38:08 -0700 (PDT)
-Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 634C13F557; Tue,  9 Apr 2019 01:38:06 -0700 (PDT)
-Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
-To: Kristina Martsenko <kristina.martsenko@arm.com>,
- Amit Daniel Kachhap <amit.kachhap@arm.com>, James Morse
- <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
- <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
- <f27a3e70-2099-45a6-48e6-481a67e360eb@arm.com>
- <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
- <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: ARM Ltd
-Message-ID: <1c4e4f50-8324-ed78-1bfd-aee05b6d4fc5@arm.com>
-Date: Tue, 9 Apr 2019 09:38:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CFB1374;
+ Tue,  9 Apr 2019 02:16:06 -0700 (PDT)
+Received: from [10.1.215.53] (e121566-lin.cambridge.arm.com [10.1.215.53])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70BD83F59C;
+ Tue,  9 Apr 2019 02:16:05 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] lib: arm: Use correct halt() prototype
+ from smp.h
+To: Andrew Jones <drjones@redhat.com>
+References: <20190408151125.32080-1-alexandru.elisei@arm.com>
+ <20190409074005.6fc5sve4kbpq6e5r@kamzik.brq.redhat.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <3dea090b-9c48-34b2-f004-37661cb71f0e@arm.com>
+Date: Tue, 9 Apr 2019 10:15:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
+In-Reply-To: <20190409074005.6fc5sve4kbpq6e5r@kamzik.brq.redhat.com>
 Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu,
- Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -121,78 +70,65 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190409083804.khCg6PGvf73kwUqnnlw_x_p92Kvx31QzBbhAvmBWQ-U@z>
+Message-ID: <20190409091559.aJ8P_ADnOleEFx-4gvC03H3IC_0bf0vcN99tQpIvr5w@z>
 
-On 08/04/2019 19:39, Kristina Martsenko wrote:
-> On 08/04/2019 14:05, Amit Daniel Kachhap wrote:
->> Hi James,
+On 4/9/19 8:40 AM, Andrew Jones wrote:
+> On Mon, Apr 08, 2019 at 04:11:25PM +0100, Alexandru Elisei wrote:
+>> The prototype for the halt() function is incorrect, because halt() doesn't
+>> take any arguments. Fix it by using the prototype from smp.h.
 >>
->> On 4/6/19 4:07 PM, James Morse wrote:
->>> Hi Amit,
->>>
->>> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
->>>> From: Mark Rutland <mark.rutland@arm.com>
->>>>
->>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
->>>> is a constant value. This works today, as the host HCR_EL2 value is
->>>> always the same, but this will get in the way of supporting extensions
->>>> that require HCR_EL2 bits to be set conditionally for the host.
->>>>
->>>> To allow such features to work without KVM having to explicitly handle
->>>> every possible host feature combination, this patch has KVM save/restore
->>>> for the host HCR when switching to/from a guest HCR. The saving of the
->>>> register is done once during cpu hypervisor initialization state and is
->>>> just restored after switch from guest.
->>>>
->>>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
->>>> kvm_call_hyp and is helpful in non-VHE case.
->>>>
->>>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
->>>> to toggle the TGE bit with a RMW sequence, as we already do in
->>>> __tlb_switch_to_guest_vhe().
->>>>
->>>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
->>>> and guest can now use this field in a common way.
->>>
->>> These HCR_EL2 flags have had me confused for quite a while.
->>> I thought this was preserving the value that head.S or cpufeature.c had set, and with
->>> ptrauth we couldn't know what this register should be anymore, the host flags has to vary.
->>>
->>> Kristina's explanation of it[0], clarified things, and with a bit more digging it appears
->>> we always set API/APK, even if the hardware doesn't support the feature (as its harmless).
->>> So we don't need to vary the host flags...
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  lib/arm/io.c | 5 ++---
+>>  1 file changed, 2 insertions(+), 3 deletions(-)
 >>
->> API/APK is always set for NVHE host mode.
->>>
->>> My question is, what breaks if this patch isn't merged? (the MDCR change is cleanup we can
->>> do because of this HCR change), is this HCR change just cleanup too? If so, can we merge
->>> ptrauth without either, so we only make the change when its needed? (it will cause some
->>> changes in your patch 7, but I can't see where you depend on the host flags).
+>> diff --git a/lib/arm/io.c b/lib/arm/io.c
+>> index 8226b765bdc5..6d3d7afed002 100644
+>> --- a/lib/arm/io.c
+>> +++ b/lib/arm/io.c
+>> @@ -15,11 +15,10 @@
+>>  #include <asm/psci.h>
+>>  #include <asm/spinlock.h>
+>>  #include <asm/io.h>
+>> +#include <asm/smp.h>
+>>  
+>>  #include "io.h"
+>>  
+>> -extern void halt(int code);
+>> -
+>>  static struct spinlock uart_lock;
+>>  /*
+>>   * Use this guess for the uart base in order to make an attempt at
+>> @@ -93,6 +92,6 @@ void exit(int code)
+>>  {
+>>  	chr_testdev_exit(code);
+>>  	psci_system_off();
+>> -	halt(code);
+>> +	halt();
+>>  	__builtin_unreachable();
+>>  }
+>> -- 
+>> 2.17.0
 >>
->> Yes you are right that this patch does not directly effect pointer authentication functionality but contains several optimizations and cleanups such as,
->>
->> * Removes assigning static flags HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS from switch.c so switching functions now are more generic in nature.
->> * Currently the variation in hcr_el2 flags is across modes (VHE/NVHE). Any future conditional change within those modes in host HCR_EL2 may not effect code changes in switch.c
->> * Save of hcr_el2 done at hyp init time so not expensive switching wise.
->>
->> I am fine on posting it separately also.
-> 
-> FWIW I think it makes sense to post the HCR and MDCR patches separately
-> from this series. That should make it clear that pointer auth does not
-> depend on these changes, and should make it easier to evaluate the
-> changes on their own.
-> 
-> Others' opinions are welcome as well.
+> I don't mind this change, because per the code it is the "correct"
+> thing to do. However, I was being a bit tricky here when I wrote it.
+> By changing the prototype to take 'code' as argument we guarantee
+> that 'code' will be in x0/r0 when we halt, giving us a last chance
+> to see it when inspecting the halted unit test state.
+>
+> Anyway, like I said, I'm fine with the cleanup, but the prototype
+> abuse does serve a purpose - maybe just not a good enough purpose
+> to justify the weirdness.
 
-Agreed. I'm quite eager to move forward with this series, and the least
-unrelated changes it makes, the better. Cleanups and optimizations can
-always be merged at a later time.
+Now it makes sense. I didn't think it was intentional, but now that you have
+mentioned it, the same pattern is used by powerpc.
 
-Thanks,
+Perhaps a comment explaining that having different prototypes was on purpose
+would be the best solution?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>
+> Thanks,
+> drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
