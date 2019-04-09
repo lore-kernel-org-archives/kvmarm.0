@@ -2,66 +2,110 @@ Return-Path: <SRS0=N2lg=SL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 113FAC282DA
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6BCC282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:38:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9048E20663
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9048E20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 2EE0E21473
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 08:38:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE0E21473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8DB4A48B;
-	Tue,  9 Apr 2019 04:07:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A69524A476;
+	Tue,  9 Apr 2019 04:38:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PDd3FGaSXz7Y; Tue,  9 Apr 2019 04:07:27 -0400 (EDT)
+	with ESMTP id 8tynrv-icDp3; Tue,  9 Apr 2019 04:38:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3ABB4A47A;
-	Tue,  9 Apr 2019 04:07:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52A454A477;
+	Tue,  9 Apr 2019 04:38:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E4A24A452
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:07:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AC5C4A474
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:38:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hyc6P4fRsC58 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Apr 2019 04:07:24 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B03D44A369
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:07:24 -0400 (EDT)
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 570CAE799314B82CC4BF;
- Tue,  9 Apr 2019 16:07:21 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.408.0; Tue, 9 Apr 2019
- 16:07:12 +0800
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
- <linux-arm-kernel@lists.infradead.org>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
- <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
- <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
- <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <1b398e29-e2d5-2a58-b4ca-c72979a170d8@huawei.com>
-Date: Tue, 9 Apr 2019 16:05:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ with ESMTP id qLWtRQJkqsIW for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Apr 2019 04:38:09 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9124A369
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 04:38:09 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E48AA78;
+ Tue,  9 Apr 2019 01:38:08 -0700 (PDT)
+Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ 634C13F557; Tue,  9 Apr 2019 01:38:06 -0700 (PDT)
+Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
+To: Kristina Martsenko <kristina.martsenko@arm.com>,
+ Amit Daniel Kachhap <amit.kachhap@arm.com>, James Morse
+ <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
+ <f27a3e70-2099-45a6-48e6-481a67e360eb@arm.com>
+ <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
+ <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: ARM Ltd
+Message-ID: <1c4e4f50-8324-ed78-1bfd-aee05b6d4fc5@arm.com>
+Date: Tue, 9 Apr 2019 09:38:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
+In-Reply-To: <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
 Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,92 +117,83 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190409080558.Xli6PtWVIXlQbz6mQyRAOn6zJrokh9JXoaazSTza2bw@z>
+Message-ID: <20190409083804.khCg6PGvf73kwUqnnlw_x_p92Kvx31QzBbhAvmBWQ-U@z>
 
-CgpPbiAyMDE5LzQvOSAyOjQwLCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+IEhpIFplbmh1aSwK
-PiAKPiBPbiAwNC8wOC8yMDE5IDA0OjExIFBNLCBaZW5naHVpIFl1IHdyb3RlOgo+PiBIaSBTdXp1
-a2ksCj4+Cj4+IFRoYW5rcyBmb3IgdGhlIHJlcGx5Lgo+Pgo+IAo+IC4uLgo+IAo+Pj4+IEhpIFN1
-enVraSwKPj4+Pgo+Pj4+IFdoeSBub3QgbWFraW5nIHVzZSBvZiBmYXVsdF9zdXBwb3J0c19zdGFn
-ZTJfaHVnZV9tYXBwaW5nKCk/wqAgTGV0IGl0IGRvCj4+Pj4gc29tZSBjaGVja3MgZm9yIHVzLgo+
-Pj4+Cj4+Pj4gZmF1bHRfc3VwcG9ydHNfc3RhZ2UyX2h1Z2VfbWFwcGluZygpIHdhcyBpbnRlbmRl
-ZCB0byBkbyBhICp0d28tc3RlcCoKPj4+PiBjaGVjayB0byB0ZWxsIHVzIHRoYXQgY2FuIHdlIGNy
-ZWF0ZSBzdGFnZTIgaHVnZSBibG9jayBtYXBwaW5ncywgYW5kIAo+Pj4+IHRoaXMKPj4+PiBjaGVj
-ayBpcyBib3RoIGZvciBodWdldGxiZnMgYW5kIFRIUC7CoCBXaXRoIGNvbW1pdCBhODA4NjhmMzk4
-NTU0ODQyYjE0LAo+Pj4+IHdlIHBhc3MgUEFHRV9TSVpFIGFzICJtYXBfc2l6ZSIgZm9yIG5vcm1h
-bCBzaXplIHBhZ2VzICh3aGljaCB0dXJuZWQgb3V0Cj4+Pj4gdG8gYmUgYWxtb3N0IG1lYW5pbmds
-ZXNzKSwgYW5kIHVuZm9ydHVuYXRlbHkgdGhlIFRIUCBjaGVjayBubyBsb25nZXIKPj4+PiB3b3Jr
-cy4KPj4+Cj4+PiBUaGF0cyBjb3JyZWN0Lgo+Pj4KPj4+Pgo+Pj4+IFNvIHdlIHdhbnQgdG8gcmV3
-b3JrICpUSFAqIGNoZWNrIHByb2Nlc3MuwqAgWW91ciBwYXRjaCBmaXhlcyB0aGUgZmlyc3QKPj4+
-PiBjaGVja2luZy1zdGVwLCBidXQgdGhlIHNlY29uZCBpcyBzdGlsbCBtaXNzZWQsIGFtIEkgd3Jv
-bmc/Cj4+Pgo+Pj4gSXQgZml4ZXMgdGhlIHN0ZXAgZXhwbGljaXRseSBmb3IgdGhlIFRIUCBieSBt
-YWtpbmcgc3VyZSB0aGF0IHRoZSBHUEEgYW5kCj4+PiB0aGUgSFZBIGFyZSBhbGlnbmVkIHRvIHRo
-ZSBtYXAgc2l6ZS4KPj4KPj4gWWVzLCBJIHVuZGVyc3RhbmQgaG93IHlvdXIgcGF0Y2ggaGFkIGZp
-eGVkIHRoZSBpc3N1ZS7CoCBCdXQgd2hhdCBJJ20KPj4gcmVhbGx5IGNvbmNlcm5lZCBhYm91dCBo
-ZXJlIGlzIHRoZSAqc2Vjb25kKiBjaGVja2luZy1zdGVwIGluCj4+IGZhdWx0X3N1cHBvcnRzX3N0
-YWdlMl9odWdlX21hcHBpbmcoKS4KPj4KPj4gV2UgaGF2ZSB0byBjaGVjayBpZiB3ZSBhcmUgbWFw
-cGluZyBhIG5vbi1ibG9jayBhbGlnbmVkIG9yIG5vbi1ibG9jawo+PiBzaXplZCBtZW1zbG90LCBp
-ZiBzbywgd2UgY2FuIG5vdCBjcmVhdGUgYmxvY2sgbWFwcGluZ3MgZm9yIHRoZSBiZWdpbm5pbmcK
-Pj4gYW5kIGVuZCBvZiB0aGlzIG1lbXNsb3QuwqAgVGhpcyBpcyB3aGF0IHRoZSBzZWNvbmQgcGFy
-dCBvZgo+PiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5nKCkgaGFkIGRvbmUuCj4+
-Cj4+IEkgaGF2ZW4ndCBzZWVuIHRoaXMgY2hlY2tpbmctc3RlcCBpbiB5b3VyIHBhdGNoLCBkaWQg
-SSBtaXNzIHNvbWV0aGluZz8KPj4KPiAKPiBJIHNlZS4KPiAKPj4+IEkgZG9uJ3QgdGhpbmsgdGhp
-cyBjYWxscyBmb3IgYSBWTV9CVUdfT04oKS4gSXQgaXMgc2ltcGx5IGEgY2FzZSB3aGVyZQo+Pj4g
-dGhlIEdQQSBpcyBub3QgYWxpZ25lZCB0byBIVkEsIGJ1dCBmb3Igbm9ybWFsIFZNQSB0aGF0IGNv
-dWxkIGJlIG1hZGUgCj4+PiBUSFAuCj4+Pgo+Pj4gV2UgaGFkIHRoaXMgVk1fQlVHX09OKCksIHdo
-aWNoIHdvdWxkIGhhdmUgbmV2ZXIgaGl0IGJlY2F1c2Ugd2Ugd291bGQKPj4+IGhhdmUgc2V0IGZv
-cmNlX3B0ZSBpZiB0aGV5IHdlcmUgbm90IGFsaWduZWQuCj4+Cj4+IFllcywgSSBhZ3JlZS4KPj4K
-Pj4+Pj4gK8KgwqDCoMKgwqDCoMKgIC8qIFNraXAgbWVtc2xvdHMgd2l0aCB1bmFsaWduZWQgSVBB
-IGFuZCB1c2VyIGFkZHJlc3MgKi8KPj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmICgoZ2ZuICYgbWFz
-aykgIT0gKHBmbiAmIG1hc2spKQo+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4g
-ZmFsc2U7Cj4+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocGZuICYgbWFzaykgewo+Pj4+PiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqaXBhcCAmPSBQTURfTUFTSzsKPj4+Pj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX3JlbGVhc2VfcGZuX2NsZWFuKHBmbik7Cj4+Pj4+Cj4+
-Pj4KPj4+PiAtLS04Pi0tLQo+Pj4+Cj4+Pj4gUmV3b3JrIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9o
-dWdlX21hcHBpbmcoKSwgbGV0IGl0IGNoZWNrIFRIUCBhZ2Fpbi4KPj4+Pgo+Pj4+IFNpZ25lZC1v
-ZmYtYnk6IFplbmdodWkgWXUgPHl1emVuZ2h1aUBodWF3ZWkuY29tPgo+Pj4+IC0tLQo+Pj4+IMKg
-wqB2aXJ0L2t2bS9hcm0vbW11LmMgfCAxMSArKysrKysrKysrLQo+Pj4+IMKgwqAxIGZpbGUgY2hh
-bmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Pj4+Cj4+Pj4gZGlmZiAtLWdp
-dCBhL3ZpcnQva3ZtL2FybS9tbXUuYyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+IGluZGV4IDI3
-Yzk1ODMuLjVlMWIyNTggMTAwNjQ0Cj4+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4+Pj4g
-KysrIGIvdmlydC9rdm0vYXJtL21tdS5jCj4+Pj4gQEAgLTE2MzIsNiArMTYzMiwxNSBAQCBzdGF0
-aWMgYm9vbCAKPj4+PiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBr
-dm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4+Pj4gwqDCoMKgwqDCoCB1YWRkcl9lbmQgPSB1YWRk
-cl9zdGFydCArIHNpemU7Cj4+Pj4KPj4+PiDCoMKgwqDCoMKgIC8qCj4+Pj4gK8KgwqDCoMKgICog
-SWYgdGhlIG1lbXNsb3QgaXMgX25vdF8gYmFja2VkIGJ5IGh1Z2V0bGJmcywgdGhlbiBjaGVjayBp
-ZiBpdAo+Pj4+ICvCoMKgwqDCoCAqIGNhbiBiZSBiYWNrZWQgYnkgdHJhbnNwYXJlbnQgaHVnZXBh
-Z2VzLgo+Pj4+ICvCoMKgwqDCoCAqCj4+Pj4gK8KgwqDCoMKgICogQ3VycmVudGx5IG9ubHkgUE1E
-X1NJWkUgVEhQcyBhcmUgc3VwcG9ydGVkLCByZXZpc2l0IGl0IGxhdGVyLgo+Pj4+ICvCoMKgwqDC
-oCAqLwo+Pj4+ICvCoMKgwqAgaWYgKG1hcF9zaXplID09IFBBR0VfU0laRSkKPj4+PiArwqDCoMKg
-wqDCoMKgwqAgbWFwX3NpemUgPSBQTURfU0laRTsKPj4+PiArCj4+Pgo+Pj4gVGhpcyBsb29rcyBo
-YWNraXNoLiBXaGF0IGlzIHdlIHN1cHBvcnQgUFVEX1NJWkUgaHVnZSBwYWdlIGluIHRoZSBmdXR1
-cmUKPj4+ID8KPj4KPj4gWWVzLCB0aGlzIG1pZ2h0IG1ha2UgdGhlIGNvZGUgYSBsaXR0bGUgZGlm
-ZmljdWx0IHRvIHVuZGVyc3RhbmQuIEJ1dCBieQo+PiBkb2luZyBzbywgd2UgZm9sbG93IHRoZSBz
-YW1lIGxvZ2ljIGJlZm9yZSBjb21taXQgYTgwODY4ZjM5ODU1NDg0MmIxNCwKPj4gdGhhdCBzYWlk
-LCB3ZSBkbyB0aGUgdHdvLXN0ZXAgY2hlY2tpbmcgZm9yIG5vcm1hbCBzaXplIHBhZ2VzIGluCj4+
-IGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKSwgdG8gZGVjaWRlIGlmIHdlIGNh
-biBjcmVhdGUgVEhQCj4+IG1hcHBpbmdzIGZvciB0aGVzZSBwYWdlcy4KPj4KPj4gQXMgZm9yIFBV
-RF9TSVpFIFRIUHMsIHRvIGJlIGhvbmVzdCwgSSBoYXZlIG5vIGlkZWEgbm93IDooCj4gCj4gSG93
-IGFib3V0IHRoZSBmb2xsb3dpbmcgZGlmZiA/Cj4gCj4gZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2Fy
-bS9tbXUuYyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+IGluZGV4IDk3YjU0MTcuLjk4ZTVjZWMgMTAw
-NjQ0Cj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4gKysrIGIvdmlydC9rdm0vYXJtL21tdS5j
-Cj4gQEAgLTE3OTEsNyArMTc5MSw4IEBAIHN0YXRpYyBpbnQgdXNlcl9tZW1fYWJvcnQoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1LCAKPiBwaHlzX2FkZHJfdCBmYXVsdF9pcGEsCj4gIMKgwqDCoMKgwqDC
-oMKgwqDCoCAqIGN1cnJlbnRseSBzdXBwb3J0ZWQuIFRoaXMgY29kZSB3aWxsIG5lZWQgdG8gYmUK
-PiAgwqDCoMKgwqDCoMKgwqDCoMKgICogdXBkYXRlZCB0byBzdXBwb3J0IG90aGVyIFRIUCBzaXpl
-cy4KPiAgwqDCoMKgwqDCoMKgwqDCoMKgICovCj4gLcKgwqDCoMKgwqDCoMKgIGlmICh0cmFuc3Bh
-cmVudF9odWdlcGFnZV9hZGp1c3QoJnBmbiwgJmZhdWx0X2lwYSkpCj4gK8KgwqDCoMKgwqDCoMKg
-IGlmIChmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBwaW5ncyhtZW1zbG90LCBodmEsIFBN
-RF9TSVpFKSAmJgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHRyYW5zcGFyZW50X2h1Z2VwYWdl
-X2FkanVzdCgmcGZuLCAmZmF1bHRfaXBhKSkKPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZt
-YV9wYWdlc2l6ZSA9IFBNRF9TSVpFOwo+ICDCoMKgwqDCoCB9CgpJIHRoaW5rIHRoaXMgaXMgZ29v
-ZCBlbm91Z2ggZm9yIHRoZSBpc3N1ZS4KCihPbmUgbWlub3IgY29uY2VybjogV2l0aCB0aGlzIGNo
-YW5nZSwgaXQgc2VlbXMgdGhhdCB3ZSBubyBsb25nZXIgbmVlZAoiZm9yY2VfcHRlIiBhbmQgY2Fu
-IGp1c3QgdXNlICJsb2dnaW5nX2FjdGl2ZSIgaW5zdGVhZC4gQnV0IHRoaXMgaXMgbm90Cm11Y2gg
-cmVsYXRlZCB0byB3aGF0IHdlJ3JlIGZpeGluZy4pCgoKdGhhbmtzLgoKCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 08/04/2019 19:39, Kristina Martsenko wrote:
+> On 08/04/2019 14:05, Amit Daniel Kachhap wrote:
+>> Hi James,
+>>
+>> On 4/6/19 4:07 PM, James Morse wrote:
+>>> Hi Amit,
+>>>
+>>> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
+>>>> From: Mark Rutland <mark.rutland@arm.com>
+>>>>
+>>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>>>> is a constant value. This works today, as the host HCR_EL2 value is
+>>>> always the same, but this will get in the way of supporting extensions
+>>>> that require HCR_EL2 bits to be set conditionally for the host.
+>>>>
+>>>> To allow such features to work without KVM having to explicitly handle
+>>>> every possible host feature combination, this patch has KVM save/restore
+>>>> for the host HCR when switching to/from a guest HCR. The saving of the
+>>>> register is done once during cpu hypervisor initialization state and is
+>>>> just restored after switch from guest.
+>>>>
+>>>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>>>> kvm_call_hyp and is helpful in non-VHE case.
+>>>>
+>>>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>>>> to toggle the TGE bit with a RMW sequence, as we already do in
+>>>> __tlb_switch_to_guest_vhe().
+>>>>
+>>>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>>>> and guest can now use this field in a common way.
+>>>
+>>> These HCR_EL2 flags have had me confused for quite a while.
+>>> I thought this was preserving the value that head.S or cpufeature.c had set, and with
+>>> ptrauth we couldn't know what this register should be anymore, the host flags has to vary.
+>>>
+>>> Kristina's explanation of it[0], clarified things, and with a bit more digging it appears
+>>> we always set API/APK, even if the hardware doesn't support the feature (as its harmless).
+>>> So we don't need to vary the host flags...
+>>
+>> API/APK is always set for NVHE host mode.
+>>>
+>>> My question is, what breaks if this patch isn't merged? (the MDCR change is cleanup we can
+>>> do because of this HCR change), is this HCR change just cleanup too? If so, can we merge
+>>> ptrauth without either, so we only make the change when its needed? (it will cause some
+>>> changes in your patch 7, but I can't see where you depend on the host flags).
+>>
+>> Yes you are right that this patch does not directly effect pointer authentication functionality but contains several optimizations and cleanups such as,
+>>
+>> * Removes assigning static flags HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS from switch.c so switching functions now are more generic in nature.
+>> * Currently the variation in hcr_el2 flags is across modes (VHE/NVHE). Any future conditional change within those modes in host HCR_EL2 may not effect code changes in switch.c
+>> * Save of hcr_el2 done at hyp init time so not expensive switching wise.
+>>
+>> I am fine on posting it separately also.
+> 
+> FWIW I think it makes sense to post the HCR and MDCR patches separately
+> from this series. That should make it clear that pointer auth does not
+> depend on these changes, and should make it easier to evaluate the
+> changes on their own.
+> 
+> Others' opinions are welcome as well.
+
+Agreed. I'm quite eager to move forward with this series, and the least
+unrelated changes it makes, the better. Cleanups and optimizations can
+always be merged at a later time.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
