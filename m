@@ -2,65 +2,60 @@ Return-Path: <SRS0=N2lg=SL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD951C10F0E
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 10:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42008C10F0E
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 10:52:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 687DE20857
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 10:11:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687DE20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C8AEE2084C
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Apr 2019 10:52:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8AEE2084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D93424A481;
-	Tue,  9 Apr 2019 06:11:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F5D4A485;
+	Tue,  9 Apr 2019 06:52:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G0aXzwU6lh1a; Tue,  9 Apr 2019 06:11:42 -0400 (EDT)
+	with ESMTP id 2eb5ZGz9dXRm; Tue,  9 Apr 2019 06:52:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7B434A36C;
-	Tue,  9 Apr 2019 06:11:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C01CB4A3BF;
+	Tue,  9 Apr 2019 06:52:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 063324A36C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 06:11:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41F044A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 06:52:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0QHux9PJkbC2 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Apr 2019 06:11:39 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB0364A369
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 06:11:39 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A082307EA8F;
- Tue,  9 Apr 2019 10:11:39 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EAB03619A0;
- Tue,  9 Apr 2019 10:11:37 +0000 (UTC)
-Date: Tue, 9 Apr 2019 12:11:35 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH] lib: arm: Use correct halt() prototype
- from smp.h
-Message-ID: <20190409101135.g5l6sxr2biflitu3@kamzik.brq.redhat.com>
-References: <20190408151125.32080-1-alexandru.elisei@arm.com>
- <20190409074005.6fc5sve4kbpq6e5r@kamzik.brq.redhat.com>
- <3dea090b-9c48-34b2-f004-37661cb71f0e@arm.com>
+ with ESMTP id 2mR0KuXEnxH6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Apr 2019 06:52:33 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E23E24A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 06:52:32 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E96DA78;
+ Tue,  9 Apr 2019 03:52:32 -0700 (PDT)
+Received: from localhost (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D8063F59C;
+ Tue,  9 Apr 2019 03:52:31 -0700 (PDT)
+Date: Tue, 9 Apr 2019 11:52:29 +0100
+From: Andrew Murray <andrew.murray@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v12 2/8] arm64: KVM: encapsulate kvm_cpu_context in
+ kvm_host_data
+Message-ID: <20190409105228.GA25919@e119886-lin.cambridge.arm.com>
+References: <20190328103731.27264-1-andrew.murray@arm.com>
+ <20190328103731.27264-3-andrew.murray@arm.com>
+ <387fe2b5-683d-f5a4-9aec-f621292429ba@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <3dea090b-9c48-34b2-f004-37661cb71f0e@arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 09 Apr 2019 10:11:39 +0000 (UTC)
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <387fe2b5-683d-f5a4-9aec-f621292429ba@arm.com>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,73 +71,56 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190409101135.vb0ac9TxzsvV1ldBrHkjRRqwGcJejf-nfS1e34tS9k8@z>
+Message-ID: <20190409105229.xdVWuJRq2ZdBwYzXC7SRenaMoHqxyMc6vj1SPS6DxfA@z>
 
-On Tue, Apr 09, 2019 at 10:15:59AM +0100, Alexandru Elisei wrote:
-> On 4/9/19 8:40 AM, Andrew Jones wrote:
-> > On Mon, Apr 08, 2019 at 04:11:25PM +0100, Alexandru Elisei wrote:
-> >> The prototype for the halt() function is incorrect, because halt() doesn't
-> >> take any arguments. Fix it by using the prototype from smp.h.
-> >>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  lib/arm/io.c | 5 ++---
-> >>  1 file changed, 2 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> >> index 8226b765bdc5..6d3d7afed002 100644
-> >> --- a/lib/arm/io.c
-> >> +++ b/lib/arm/io.c
-> >> @@ -15,11 +15,10 @@
-> >>  #include <asm/psci.h>
-> >>  #include <asm/spinlock.h>
-> >>  #include <asm/io.h>
-> >> +#include <asm/smp.h>
-> >>  
-> >>  #include "io.h"
-> >>  
-> >> -extern void halt(int code);
-> >> -
-> >>  static struct spinlock uart_lock;
-> >>  /*
-> >>   * Use this guess for the uart base in order to make an attempt at
-> >> @@ -93,6 +92,6 @@ void exit(int code)
-> >>  {
-> >>  	chr_testdev_exit(code);
-> >>  	psci_system_off();
-> >> -	halt(code);
-> >> +	halt();
-> >>  	__builtin_unreachable();
-> >>  }
-> >> -- 
-> >> 2.17.0
-> >>
-> > I don't mind this change, because per the code it is the "correct"
-> > thing to do. However, I was being a bit tricky here when I wrote it.
-> > By changing the prototype to take 'code' as argument we guarantee
-> > that 'code' will be in x0/r0 when we halt, giving us a last chance
-> > to see it when inspecting the halted unit test state.
-> >
-> > Anyway, like I said, I'm fine with the cleanup, but the prototype
-> > abuse does serve a purpose - maybe just not a good enough purpose
-> > to justify the weirdness.
+On Thu, Mar 28, 2019 at 03:28:37PM +0000, Suzuki K Poulose wrote:
+> On 03/28/2019 10:37 AM, Andrew Murray wrote:
+> > The virt/arm core allocates a kvm_cpu_context_t percpu, at present this is
+> > a typedef to kvm_cpu_context and is used to store host cpu context. The
+> > kvm_cpu_context structure is also used elsewhere to hold vcpu context.
+> > In order to use the percpu to hold additional future host information we
+> > encapsulate kvm_cpu_context in a new structure and rename the typedef and
+> > percpu to match.
+> > 
+> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> > ---
+> >   arch/arm/include/asm/kvm_host.h   |  8 ++++++--
+> >   arch/arm64/include/asm/kvm_asm.h  |  3 ++-
+> >   arch/arm64/include/asm/kvm_host.h | 16 ++++++++++------
+> >   arch/arm64/kernel/asm-offsets.c   |  1 +
+> >   virt/kvm/arm/arm.c                | 14 ++++++++------
+> >   5 files changed, 27 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> > index 770d73257ad9..427c28be6452 100644
+> > --- a/arch/arm/include/asm/kvm_host.h
+> > +++ b/arch/arm/include/asm/kvm_host.h
+> > @@ -150,7 +150,11 @@ struct kvm_cpu_context {
+> >   	u32 cp15[NR_CP15_REGS];
+> >   };
+> > -typedef struct kvm_cpu_context kvm_cpu_context_t;
+> > +struct kvm_host_data {
+> > +	struct kvm_cpu_context host_ctxt;
+> > +};
+> > +
+> > +typedef struct kvm_host_data kvm_host_data_t;
+> >   static inline void kvm_init_host_cpu_context(kvm_cpu_context_t *cpu_ctxt,
+> >   					     int cpu)
 > 
-> Now it makes sense. I didn't think it was intentional, but now that you have
-> mentioned it, the same pattern is used by powerpc.
+> We need to fix this function prototype to accept struct kvm_cpu_context,
+> instead of the now removed kvm_cpu_context_t, to prevent a build break
+> on arm32 ?
 
-No surprise there. I wrote that too, based on the arm code :)
-
-> 
-> Perhaps a comment explaining that having different prototypes was on purpose
-> would be the best solution?
-
-Yes, either a comment explaining the weirdness or your patch to
-remove it would be a good idea in order to avoid future head
-scratching. I'll send a patch that adds comments to both arm and
-powerpc.
+Yes this was a breakage, thanks for pointing this out.
 
 Thanks,
-drew
+
+Andrew Murray
+
+> 
+> With that :
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
