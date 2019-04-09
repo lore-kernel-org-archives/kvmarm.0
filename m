@@ -1,23 +1,23 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v13 7/8] arm64: KVM: avoid isb's by using direct pmxevtyper
- sysreg
-Date: Tue,  9 Apr 2019 20:22:16 +0100
-Message-ID: <20190409192217.23459-8-andrew.murray@arm.com>
+Subject: [PATCH v13 5/8] arm64: KVM: Enable !VHE support for :G/:H perf event
+ modifiers
+Date: Tue,  9 Apr 2019 20:22:14 +0100
+Message-ID: <20190409192217.23459-6-andrew.murray@arm.com>
 References: <20190409192217.23459-1-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76BE04A4B0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D30994A49C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wZTyjekuhfUl for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Apr 2019 15:22:41 -0400 (EDT)
+ with ESMTP id T-mZZHCmTsem for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Apr 2019 15:22:36 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08AF54A4C2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81EE04A48B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:36 -0400 (EDT)
 In-Reply-To: <20190409192217.23459-1-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,137 +32,123 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Upon entering or exiting a guest we may modify multiple PMU counters to
-enable of disable EL0 filtering. We presently do this via the indirect
-PMXEVTYPER_EL0 system register (where the counter we modify is selected
-by PMSELR). With this approach it is necessary to order the writes via
-isb instructions such that we select the correct counter before modifying
-it.
+Enable/disable event counters as appropriate when entering and exiting
+the guest to enable support for guest or host only event counting.
 
-Let's avoid potentially expensive instruction barriers by using the
-direct PMEVTYPER<n>_EL0 registers instead.
+For both VHE and non-VHE we switch the counters between host/guest at
+EL2.
 
-As the change to counter type relates only to EL0 filtering we can rely
-on the implicit instruction barrier which occurs when we transition from
-EL2 to EL1 on entering the guest. On returning to userspace we can, at the
-latest, rely on the implicit barrier between EL2 and EL0. We can also
-depend on the explicit isb in armv8pmu_select_counter to order our write
-against any other kernel changes by the PMU driver to the type register as
-a result of preemption.
+The PMU may be on when we change which counters are enabled however
+we avoid adding an isb as we instead rely on existing context
+synchronisation events: the eret to enter the guest (__guest_enter)
+and eret in kvm_call_hyp for __kvm_vcpu_run_nvhe on returning.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arch/arm64/kvm/pmu.c | 84 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 74 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/hyp/switch.c       |  6 +++++
+ arch/arm64/kvm/pmu.c              | 40 +++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 213465196e6b..a3bfb75f0be9 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -539,6 +539,9 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 
+ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+ void kvm_clr_pmu_events(u32 clr);
++
++void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt);
++bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt);
+ #else
+ static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+ static inline void kvm_clr_pmu_events(u32 clr) {}
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 3563fe655cd5..d1dc40e53f22 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -524,6 +524,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
++	bool pmu_switch_needed;
+ 	u64 exit_code;
+ 
+ 	/*
+@@ -543,6 +544,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	host_ctxt->__hyp_running_vcpu = vcpu;
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
++	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++
+ 	__sysreg_save_state_nvhe(host_ctxt);
+ 
+ 	__activate_vm(kern_hyp_va(vcpu->kvm));
+@@ -589,6 +592,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__debug_switch_to_host(vcpu);
+ 
++	if (pmu_switch_needed)
++		__pmu_switch_to_host(host_ctxt);
++
+ 	/* Returning to host will clear PSR.I, remask PMR if needed */
+ 	if (system_uses_irq_prio_masking())
+ 		gic_write_pmr(GIC_PRIO_IRQOFF);
 diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 3407a529e116..4d55193ccc71 100644
+index 5414b134f99a..48949f0cdba0 100644
 --- a/arch/arm64/kvm/pmu.c
 +++ b/arch/arm64/kvm/pmu.c
-@@ -91,6 +91,74 @@ void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
- 		write_sysreg(pmu->events_host, pmcntenset_el0);
- }
- 
-+#define PMEVTYPER_READ_CASE(idx)				\
-+	case idx:						\
-+		return read_sysreg(pmevtyper##idx##_el0)
-+
-+#define PMEVTYPER_WRITE_CASE(idx)				\
-+	case idx:						\
-+		write_sysreg(val, pmevtyper##idx##_el0);	\
-+		break
-+
-+#define PMEVTYPER_CASES(readwrite)				\
-+	PMEVTYPER_##readwrite##_CASE(0);			\
-+	PMEVTYPER_##readwrite##_CASE(1);			\
-+	PMEVTYPER_##readwrite##_CASE(2);			\
-+	PMEVTYPER_##readwrite##_CASE(3);			\
-+	PMEVTYPER_##readwrite##_CASE(4);			\
-+	PMEVTYPER_##readwrite##_CASE(5);			\
-+	PMEVTYPER_##readwrite##_CASE(6);			\
-+	PMEVTYPER_##readwrite##_CASE(7);			\
-+	PMEVTYPER_##readwrite##_CASE(8);			\
-+	PMEVTYPER_##readwrite##_CASE(9);			\
-+	PMEVTYPER_##readwrite##_CASE(10);			\
-+	PMEVTYPER_##readwrite##_CASE(11);			\
-+	PMEVTYPER_##readwrite##_CASE(12);			\
-+	PMEVTYPER_##readwrite##_CASE(13);			\
-+	PMEVTYPER_##readwrite##_CASE(14);			\
-+	PMEVTYPER_##readwrite##_CASE(15);			\
-+	PMEVTYPER_##readwrite##_CASE(16);			\
-+	PMEVTYPER_##readwrite##_CASE(17);			\
-+	PMEVTYPER_##readwrite##_CASE(18);			\
-+	PMEVTYPER_##readwrite##_CASE(19);			\
-+	PMEVTYPER_##readwrite##_CASE(20);			\
-+	PMEVTYPER_##readwrite##_CASE(21);			\
-+	PMEVTYPER_##readwrite##_CASE(22);			\
-+	PMEVTYPER_##readwrite##_CASE(23);			\
-+	PMEVTYPER_##readwrite##_CASE(24);			\
-+	PMEVTYPER_##readwrite##_CASE(25);			\
-+	PMEVTYPER_##readwrite##_CASE(26);			\
-+	PMEVTYPER_##readwrite##_CASE(27);			\
-+	PMEVTYPER_##readwrite##_CASE(28);			\
-+	PMEVTYPER_##readwrite##_CASE(29);			\
-+	PMEVTYPER_##readwrite##_CASE(30)
-+
-+/*
-+ * Read a value direct from PMEVTYPER<idx>
-+ */
-+static u64 kvm_vcpu_pmu_read_evtype_direct(int idx)
-+{
-+	switch (idx) {
-+	PMEVTYPER_CASES(READ);
-+	default:
-+		WARN_ON(1);
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Write a value direct to PMEVTYPER<idx>
-+ */
-+static void kvm_vcpu_pmu_write_evtype_direct(int idx, u32 val)
-+{
-+	switch (idx) {
-+	PMEVTYPER_CASES(WRITE);
-+	default:
-+		WARN_ON(1);
-+	}
-+}
-+
- /*
-  * Modify ARMv8 PMU events to include EL0 counting
+@@ -5,6 +5,7 @@
   */
-@@ -100,11 +168,9 @@ static void kvm_vcpu_pmu_enable_el0(unsigned long events)
- 	u32 counter;
+ #include <linux/kvm_host.h>
+ #include <linux/perf_event.h>
++#include <asm/kvm_hyp.h>
  
- 	for_each_set_bit(counter, &events, 32) {
--		write_sysreg(counter, pmselr_el0);
--		isb();
--		typer = read_sysreg(pmxevtyper_el0) & ~ARMV8_PMU_EXCLUDE_EL0;
--		write_sysreg(typer, pmxevtyper_el0);
--		isb();
-+		typer = kvm_vcpu_pmu_read_evtype_direct(counter);
-+		typer &= ~ARMV8_PMU_EXCLUDE_EL0;
-+		kvm_vcpu_pmu_write_evtype_direct(counter, typer);
- 	}
+ /*
+  * Given the exclude_{host,guest} attributes, determine if we are going
+@@ -43,3 +44,42 @@ void kvm_clr_pmu_events(u32 clr)
+ 	ctx->pmu_events.events_host &= ~clr;
+ 	ctx->pmu_events.events_guest &= ~clr;
  }
- 
-@@ -117,11 +183,9 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
- 	u32 counter;
- 
- 	for_each_set_bit(counter, &events, 32) {
--		write_sysreg(counter, pmselr_el0);
--		isb();
--		typer = read_sysreg(pmxevtyper_el0) | ARMV8_PMU_EXCLUDE_EL0;
--		write_sysreg(typer, pmxevtyper_el0);
--		isb();
-+		typer = kvm_vcpu_pmu_read_evtype_direct(counter);
-+		typer |= ARMV8_PMU_EXCLUDE_EL0;
-+		kvm_vcpu_pmu_write_evtype_direct(counter, typer);
- 	}
- }
- 
++
++/**
++ * Disable host events, enable guest events
++ */
++bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
++{
++	struct kvm_host_data *host;
++	struct kvm_pmu_events *pmu;
++
++	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
++	pmu = &host->pmu_events;
++
++	if (pmu->events_host)
++		write_sysreg(pmu->events_host, pmcntenclr_el0);
++
++	if (pmu->events_guest)
++		write_sysreg(pmu->events_guest, pmcntenset_el0);
++
++	return (pmu->events_host || pmu->events_guest);
++}
++
++/**
++ * Disable guest events, enable host events
++ */
++void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
++{
++	struct kvm_host_data *host;
++	struct kvm_pmu_events *pmu;
++
++	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
++	pmu = &host->pmu_events;
++
++	if (pmu->events_guest)
++		write_sysreg(pmu->events_guest, pmcntenclr_el0);
++
++	if (pmu->events_host)
++		write_sysreg(pmu->events_host, pmcntenset_el0);
++}
++
 -- 
 2.21.0
