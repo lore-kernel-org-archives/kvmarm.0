@@ -1,23 +1,22 @@
 From: Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v13 5/8] arm64: KVM: Enable !VHE support for :G/:H perf event
- modifiers
-Date: Tue,  9 Apr 2019 20:22:14 +0100
-Message-ID: <20190409192217.23459-6-andrew.murray@arm.com>
+Subject: [PATCH v13 8/8] arm64: docs: document perf event attributes
+Date: Tue,  9 Apr 2019 20:22:17 +0100
+Message-ID: <20190409192217.23459-9-andrew.murray@arm.com>
 References: <20190409192217.23459-1-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D30994A49C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEB684A483
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T-mZZHCmTsem for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Apr 2019 15:22:36 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81EE04A48B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:36 -0400 (EDT)
+ with ESMTP id xzllt-f38tiZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Apr 2019 15:22:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4584F4A486
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Apr 2019 15:22:43 -0400 (EDT)
 In-Reply-To: <20190409192217.23459-1-andrew.murray@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,123 +31,107 @@ To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable/disable event counters as appropriate when entering and exiting
-the guest to enable support for guest or host only event counting.
-
-For both VHE and non-VHE we switch the counters between host/guest at
-EL2.
-
-The PMU may be on when we change which counters are enabled however
-we avoid adding an isb as we instead rely on existing context
-synchronisation events: the eret to enter the guest (__guest_enter)
-and eret in kvm_call_hyp for __kvm_vcpu_run_nvhe on returning.
+The interaction between the exclude_{host,guest} flags,
+exclude_{user,kernel,hv} flags and presence of VHE can result in
+different exception levels being filtered by the ARMv8 PMU. As this
+can be confusing let's document how they work on arm64.
 
 Signed-off-by: Andrew Murray <andrew.murray@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/hyp/switch.c       |  6 +++++
- arch/arm64/kvm/pmu.c              | 40 +++++++++++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+ Documentation/arm64/perf.txt | 85 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
+ create mode 100644 Documentation/arm64/perf.txt
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 213465196e6b..a3bfb75f0be9 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -539,6 +539,9 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u32 clr);
+diff --git a/Documentation/arm64/perf.txt b/Documentation/arm64/perf.txt
+new file mode 100644
+index 000000000000..0d6a7d87d49e
+--- /dev/null
++++ b/Documentation/arm64/perf.txt
+@@ -0,0 +1,85 @@
++Perf Event Attributes
++=====================
 +
-+void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt);
-+bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt);
- #else
- static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
- static inline void kvm_clr_pmu_events(u32 clr) {}
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 3563fe655cd5..d1dc40e53f22 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -524,6 +524,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool pmu_switch_needed;
- 	u64 exit_code;
- 
- 	/*
-@@ -543,6 +544,8 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-+	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++Author: Andrew Murray <andrew.murray@arm.com>
++Date: 2019-03-06
 +
- 	__sysreg_save_state_nvhe(host_ctxt);
- 
- 	__activate_vm(kern_hyp_va(vcpu->kvm));
-@@ -589,6 +592,9 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 	 */
- 	__debug_switch_to_host(vcpu);
- 
-+	if (pmu_switch_needed)
-+		__pmu_switch_to_host(host_ctxt);
++exclude_user
++------------
 +
- 	/* Returning to host will clear PSR.I, remask PMR if needed */
- 	if (system_uses_irq_prio_masking())
- 		gic_write_pmr(GIC_PRIO_IRQOFF);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 5414b134f99a..48949f0cdba0 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -5,6 +5,7 @@
-  */
- #include <linux/kvm_host.h>
- #include <linux/perf_event.h>
-+#include <asm/kvm_hyp.h>
- 
- /*
-  * Given the exclude_{host,guest} attributes, determine if we are going
-@@ -43,3 +44,42 @@ void kvm_clr_pmu_events(u32 clr)
- 	ctx->pmu_events.events_host &= ~clr;
- 	ctx->pmu_events.events_guest &= ~clr;
- }
++This attribute excludes userspace.
 +
-+/**
-+ * Disable host events, enable guest events
-+ */
-+bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
++Userspace always runs at EL0 and thus this attribute will exclude EL0.
 +
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
 +
-+	if (pmu->events_host)
-+		write_sysreg(pmu->events_host, pmcntenclr_el0);
++exclude_kernel
++--------------
 +
-+	if (pmu->events_guest)
-+		write_sysreg(pmu->events_guest, pmcntenset_el0);
++This attribute excludes the kernel.
 +
-+	return (pmu->events_host || pmu->events_guest);
-+}
++The kernel runs at EL2 with VHE and EL1 without. Guest kernels always run
++at EL1.
 +
-+/**
-+ * Disable guest events, enable host events
-+ */
-+void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-+{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
++For the host this attribute will exclude EL1 and additionally EL2 on a VHE
++system.
 +
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
++For the guest this attribute will exclude EL1. Please note that EL2 is
++never counted within a guest.
 +
-+	if (pmu->events_guest)
-+		write_sysreg(pmu->events_guest, pmcntenclr_el0);
 +
-+	if (pmu->events_host)
-+		write_sysreg(pmu->events_host, pmcntenset_el0);
-+}
++exclude_hv
++----------
 +
++This attribute excludes the hypervisor.
++
++For a VHE host this attribute is ignored as we consider the host kernel to
++be the hypervisor.
++
++For a non-VHE host this attribute will exclude EL2 as we consider the
++hypervisor to be any code that runs at EL2 which is predominantly used for
++guest/host transitions.
++
++For the guest this attribute has no effect. Please note that EL2 is
++never counted within a guest.
++
++
++exclude_host / exclude_guest
++----------------------------
++
++These attributes exclude the KVM host and guest, respectively.
++
++The KVM host may run at EL0 (userspace), EL1 (non-VHE kernel) and EL2 (VHE
++kernel or non-VHE hypervisor).
++
++The KVM guest may run at EL0 (userspace) and EL1 (kernel).
++
++Due to the overlapping exception levels between host and guests we cannot
++exclusively rely on the PMU's hardware exception filtering - therefore we
++must enable/disable counting on the entry and exit to the guest. This is
++performed differently on VHE and non-VHE systems.
++
++For non-VHE systems we exclude EL2 for exclude_host - upon entering and
++exiting the guest we disable/enable the event as appropriate based on the
++exclude_host and exclude_guest attributes.
++
++For VHE systems we exclude EL1 for exclude_guest and exclude both EL0,EL2
++for exclude_host. Upon entering and exiting the guest we modify the event
++to include/exclude EL0 as appropriate based on the exclude_host and
++exclude_guest attributes.
++
++The statements above also apply when these attributes are used within a
++non-VHE guest however please note that EL2 is never counted within a guest.
++
++
++Accuracy
++--------
++
++On non-VHE hosts we enable/disable counters on the entry/exit of host/guest
++transition at EL2 - however there is a period of time between
++enabling/disabling the counters and entering/exiting the guest. We are
++able to eliminate counters counting host events on the boundaries of guest
++entry/exit when counting guest events by filtering out EL2 for
++exclude_host. However when using !exclude_hv there is a small blackout
++window at the guest entry/exit where host events are not captured.
++
++On VHE systems there are no blackout windows.
 -- 
 2.21.0
