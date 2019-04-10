@@ -1,28 +1,31 @@
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
-Date: Wed, 10 Apr 2019 12:15:22 +0530
-Message-ID: <4d52c05d-500a-9cd0-4621-6979988ba600@arm.com>
-References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
- <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
- <f27a3e70-2099-45a6-48e6-481a67e360eb@arm.com>
- <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
- <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
- <1c4e4f50-8324-ed78-1bfd-aee05b6d4fc5@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
+ backed by THP
+Date: Wed, 10 Apr 2019 09:39:00 +0100
+Message-ID: <2df077f2-cb2c-0cb3-5c37-520956832f87@arm.com>
+References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
+ <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
+ <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
+ <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
+ <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
+ <1b398e29-e2d5-2a58-b4ca-c72979a170d8@huawei.com>
+ <520e277c-f096-a84b-8405-636b19e4cc46@arm.com>
+ <8bf8e863-93f5-ab44-c0aa-1ad23f91a016@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78F344A36C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 02:45:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A77D74A36C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 04:39:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x5bzjs6ZlyLU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Apr 2019 02:45:29 -0400 (EDT)
+ with ESMTP id 3FbKd2MbN3uH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Apr 2019 04:39:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B5EE4A36B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 02:45:29 -0400 (EDT)
-In-Reply-To: <1c4e4f50-8324-ed78-1bfd-aee05b6d4fc5@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D704A483
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 04:39:05 -0400 (EDT)
+In-Reply-To: <8bf8e863-93f5-ab44-c0aa-1ad23f91a016@huawei.com>
 Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,83 +36,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Hi Mark,
-On 4/9/19 2:08 PM, Marc Zyngier wrote:
-> On 08/04/2019 19:39, Kristina Martsenko wrote:
->> On 08/04/2019 14:05, Amit Daniel Kachhap wrote:
->>> Hi James,
->>>
->>> On 4/6/19 4:07 PM, James Morse wrote:
->>>> Hi Amit,
->>>>
->>>> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
->>>>> From: Mark Rutland <mark.rutland@arm.com>
->>>>>
->>>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
->>>>> is a constant value. This works today, as the host HCR_EL2 value is
->>>>> always the same, but this will get in the way of supporting extensions
->>>>> that require HCR_EL2 bits to be set conditionally for the host.
->>>>>
->>>>> To allow such features to work without KVM having to explicitly handle
->>>>> every possible host feature combination, this patch has KVM save/restore
->>>>> for the host HCR when switching to/from a guest HCR. The saving of the
->>>>> register is done once during cpu hypervisor initialization state and is
->>>>> just restored after switch from guest.
->>>>>
->>>>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
->>>>> kvm_call_hyp and is helpful in non-VHE case.
->>>>>
->>>>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
->>>>> to toggle the TGE bit with a RMW sequence, as we already do in
->>>>> __tlb_switch_to_guest_vhe().
->>>>>
->>>>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
->>>>> and guest can now use this field in a common way.
->>>>
->>>> These HCR_EL2 flags have had me confused for quite a while.
->>>> I thought this was preserving the value that head.S or cpufeature.c had set, and with
->>>> ptrauth we couldn't know what this register should be anymore, the host flags has to vary.
->>>>
->>>> Kristina's explanation of it[0], clarified things, and with a bit more digging it appears
->>>> we always set API/APK, even if the hardware doesn't support the feature (as its harmless).
->>>> So we don't need to vary the host flags...
->>>
->>> API/APK is always set for NVHE host mode.
->>>>
->>>> My question is, what breaks if this patch isn't merged? (the MDCR change is cleanup we can
->>>> do because of this HCR change), is this HCR change just cleanup too? If so, can we merge
->>>> ptrauth without either, so we only make the change when its needed? (it will cause some
->>>> changes in your patch 7, but I can't see where you depend on the host flags).
->>>
->>> Yes you are right that this patch does not directly effect pointer authentication functionality but contains several optimizations and cleanups such as,
->>>
->>> * Removes assigning static flags HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS from switch.c so switching functions now are more generic in nature.
->>> * Currently the variation in hcr_el2 flags is across modes (VHE/NVHE). Any future conditional change within those modes in host HCR_EL2 may not effect code changes in switch.c
->>> * Save of hcr_el2 done at hyp init time so not expensive switching wise.
->>>
->>> I am fine on posting it separately also.
->>
->> FWIW I think it makes sense to post the HCR and MDCR patches separately
->> from this series. That should make it clear that pointer auth does not
->> depend on these changes, and should make it easier to evaluate the
->> changes on their own.
->>
->> Others' opinions are welcome as well.
-> 
-> Agreed. I'm quite eager to move forward with this series, and the least
-> unrelated changes it makes, the better. Cleanups and optimizations can
-> always be merged at a later time.
-yes sure. I will re-spin the patch series shortly.
-
-Thanks,
-Amit D.
-> 
-> Thanks,
-> 
-> 	M.
-> 
+CgpPbiAxMC8wNC8yMDE5IDAzOjIwLCBaZW5naHVpIFl1IHdyb3RlOgo+IAo+IE9uIDIwMTkvNC85
+IDIyOjU5LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+PiBIaSBaZW5naHVpCj4+Cj4+IE9uIDA0
+LzA5LzIwMTkgMDk6MDUgQU0sIFplbmdodWkgWXUgd3JvdGU6Cj4+Pgo+Pj4KPj4+IE9uIDIwMTkv
+NC85IDI6NDAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+Pj4gSGkgWmVuaHVpLAo+Pj4+Cj4+
+Pj4gT24gMDQvMDgvMjAxOSAwNDoxMSBQTSwgWmVuZ2h1aSBZdSB3cm90ZToKPj4+Pj4gSGkgU3V6
+dWtpLAo+Pj4+Pgo+Pj4+PiBUaGFua3MgZm9yIHRoZSByZXBseS4KPj4+Pj4KPj4+Pgo+Pj4+IC4u
+Lgo+Pj4+Cj4+Pj4+Pj4gSGkgU3V6dWtpLAo+Pj4+Pj4+Cj4+Pj4+Pj4gV2h5IG5vdCBtYWtpbmcg
+dXNlIG9mIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKT/CoCBMZXQKPj4+Pj4+
+PiBpdCBkbwo+Pj4+Pj4+IHNvbWUgY2hlY2tzIGZvciB1cy4KPj4+Pj4+Pgo+Pj4+Pj4+IGZhdWx0
+X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKSB3YXMgaW50ZW5kZWQgdG8gZG8gYSAqdHdv
+LXN0ZXAqCj4+Pj4+Pj4gY2hlY2sgdG8gdGVsbCB1cyB0aGF0IGNhbiB3ZSBjcmVhdGUgc3RhZ2Uy
+IGh1Z2UgYmxvY2sgbWFwcGluZ3MsCj4+Pj4+Pj4gYW5kIHRoaXMKPj4+Pj4+PiBjaGVjayBpcyBi
+b3RoIGZvciBodWdldGxiZnMgYW5kIFRIUC7CoCBXaXRoIGNvbW1pdAo+Pj4+Pj4+IGE4MDg2OGYz
+OTg1NTQ4NDJiMTQsCj4+Pj4+Pj4gd2UgcGFzcyBQQUdFX1NJWkUgYXMgIm1hcF9zaXplIiBmb3Ig
+bm9ybWFsIHNpemUgcGFnZXMgKHdoaWNoCj4+Pj4+Pj4gdHVybmVkIG91dAo+Pj4+Pj4+IHRvIGJl
+IGFsbW9zdCBtZWFuaW5nbGVzcyksIGFuZCB1bmZvcnR1bmF0ZWx5IHRoZSBUSFAgY2hlY2sgbm8g
+bG9uZ2VyCj4+Pj4+Pj4gd29ya3MuCj4+Pj4+Pgo+Pj4+Pj4gVGhhdHMgY29ycmVjdC4KPj4+Pj4+
+Cj4+Pj4+Pj4KPj4+Pj4+PiBTbyB3ZSB3YW50IHRvIHJld29yayAqVEhQKiBjaGVjayBwcm9jZXNz
+LsKgIFlvdXIgcGF0Y2ggZml4ZXMgdGhlIGZpcnN0Cj4+Pj4+Pj4gY2hlY2tpbmctc3RlcCwgYnV0
+IHRoZSBzZWNvbmQgaXMgc3RpbGwgbWlzc2VkLCBhbSBJIHdyb25nPwo+Pj4+Pj4KPj4+Pj4+IEl0
+IGZpeGVzIHRoZSBzdGVwIGV4cGxpY2l0bHkgZm9yIHRoZSBUSFAgYnkgbWFraW5nIHN1cmUgdGhh
+dCB0aGUKPj4+Pj4+IEdQQSBhbmQKPj4+Pj4+IHRoZSBIVkEgYXJlIGFsaWduZWQgdG8gdGhlIG1h
+cCBzaXplLgo+Pj4+Pgo+Pj4+PiBZZXMsIEkgdW5kZXJzdGFuZCBob3cgeW91ciBwYXRjaCBoYWQg
+Zml4ZWQgdGhlIGlzc3VlLsKgIEJ1dCB3aGF0IEknbQo+Pj4+PiByZWFsbHkgY29uY2VybmVkIGFi
+b3V0IGhlcmUgaXMgdGhlICpzZWNvbmQqIGNoZWNraW5nLXN0ZXAgaW4KPj4+Pj4gZmF1bHRfc3Vw
+cG9ydHNfc3RhZ2UyX2h1Z2VfbWFwcGluZygpLgo+Pj4+Pgo+Pj4+PiBXZSBoYXZlIHRvIGNoZWNr
+IGlmIHdlIGFyZSBtYXBwaW5nIGEgbm9uLWJsb2NrIGFsaWduZWQgb3Igbm9uLWJsb2NrCj4+Pj4+
+IHNpemVkIG1lbXNsb3QsIGlmIHNvLCB3ZSBjYW4gbm90IGNyZWF0ZSBibG9jayBtYXBwaW5ncyBm
+b3IgdGhlCj4+Pj4+IGJlZ2lubmluZwo+Pj4+PiBhbmQgZW5kIG9mIHRoaXMgbWVtc2xvdC7CoCBU
+aGlzIGlzIHdoYXQgdGhlIHNlY29uZCBwYXJ0IG9mCj4+Pj4+IGZhdWx0X3N1cHBvcnRzX3N0YWdl
+Ml9odWdlX21hcHBpbmcoKSBoYWQgZG9uZS4KPj4+Pj4KPj4+Pj4gSSBoYXZlbid0IHNlZW4gdGhp
+cyBjaGVja2luZy1zdGVwIGluIHlvdXIgcGF0Y2gsIGRpZCBJIG1pc3Mgc29tZXRoaW5nPwo+Pj4+
+Pgo+Pj4+Cj4+Pj4gSSBzZWUuCj4+Pj4KPj4+Pj4+IEkgZG9uJ3QgdGhpbmsgdGhpcyBjYWxscyBm
+b3IgYSBWTV9CVUdfT04oKS4gSXQgaXMgc2ltcGx5IGEgY2FzZSB3aGVyZQo+Pj4+Pj4gdGhlIEdQ
+QSBpcyBub3QgYWxpZ25lZCB0byBIVkEsIGJ1dCBmb3Igbm9ybWFsIFZNQSB0aGF0IGNvdWxkIGJl
+Cj4+Pj4+PiBtYWRlIFRIUC4KPj4+Pj4+Cj4+Pj4+PiBXZSBoYWQgdGhpcyBWTV9CVUdfT04oKSwg
+d2hpY2ggd291bGQgaGF2ZSBuZXZlciBoaXQgYmVjYXVzZSB3ZSB3b3VsZAo+Pj4+Pj4gaGF2ZSBz
+ZXQgZm9yY2VfcHRlIGlmIHRoZXkgd2VyZSBub3QgYWxpZ25lZC4KPj4+Pj4KPj4+Pj4gWWVzLCBJ
+IGFncmVlLgo+Pj4+Pgo+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgLyogU2tpcCBtZW1zbG90cyB3
+aXRoIHVuYWxpZ25lZCBJUEEgYW5kIHVzZXIgYWRkcmVzcyAqLwo+Pj4+Pj4+PiArwqDCoMKgwqDC
+oMKgwqAgaWYgKChnZm4gJiBtYXNrKSAhPSAocGZuICYgbWFzaykpCj4+Pj4+Pj4+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHJldHVybiBmYWxzZTsKPj4+Pj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDC
+oCBpZiAocGZuICYgbWFzaykgewo+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+KmlwYXAgJj0gUE1EX01BU0s7Cj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBr
+dm1fcmVsZWFzZV9wZm5fY2xlYW4ocGZuKTsKPj4+Pj4+Pj4KPj4+Pj4+Pgo+Pj4+Pj4+IC0tLTg+
+LS0tCj4+Pj4+Pj4KPj4+Pj4+PiBSZXdvcmsgZmF1bHRfc3VwcG9ydHNfc3RhZ2UyX2h1Z2VfbWFw
+cGluZygpLCBsZXQgaXQgY2hlY2sgVEhQIGFnYWluLgo+Pj4+Pj4+Cj4+Pj4+Pj4gU2lnbmVkLW9m
+Zi1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+Pj4+Pj4gLS0tCj4+Pj4+
+Pj4gIMKgwqB2aXJ0L2t2bS9hcm0vbW11LmMgfCAxMSArKysrKysrKysrLQo+Pj4+Pj4+ICDCoMKg
+MSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4+Pj4+Pgo+
+Pj4+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11
+LmMKPj4+Pj4+PiBpbmRleCAyN2M5NTgzLi41ZTFiMjU4IDEwMDY0NAo+Pj4+Pj4+IC0tLSBhL3Zp
+cnQva3ZtL2FybS9tbXUuYwo+Pj4+Pj4+ICsrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+Pj4+
+IEBAIC0xNjMyLDYgKzE2MzIsMTUgQEAgc3RhdGljIGJvb2wKPj4+Pj4+PiBmYXVsdF9zdXBwb3J0
+c19zdGFnZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4+
+Pj4+Pj4gIMKgwqDCoMKgwqAgdWFkZHJfZW5kID0gdWFkZHJfc3RhcnQgKyBzaXplOwo+Pj4+Pj4+
+Cj4+Pj4+Pj4gIMKgwqDCoMKgwqAgLyoKPj4+Pj4+PiArwqDCoMKgwqAgKiBJZiB0aGUgbWVtc2xv
+dCBpcyBfbm90XyBiYWNrZWQgYnkgaHVnZXRsYmZzLCB0aGVuIGNoZWNrIGlmIGl0Cj4+Pj4+Pj4g
+K8KgwqDCoMKgICogY2FuIGJlIGJhY2tlZCBieSB0cmFuc3BhcmVudCBodWdlcGFnZXMuCj4+Pj4+
+Pj4gK8KgwqDCoMKgICoKPj4+Pj4+PiArwqDCoMKgwqAgKiBDdXJyZW50bHkgb25seSBQTURfU0la
+RSBUSFBzIGFyZSBzdXBwb3J0ZWQsIHJldmlzaXQgaXQgbGF0ZXIuCj4+Pj4+Pj4gK8KgwqDCoMKg
+ICovCj4+Pj4+Pj4gK8KgwqDCoCBpZiAobWFwX3NpemUgPT0gUEFHRV9TSVpFKQo+Pj4+Pj4+ICvC
+oMKgwqDCoMKgwqDCoCBtYXBfc2l6ZSA9IFBNRF9TSVpFOwo+Pj4+Pj4+ICsKPj4+Pj4+Cj4+Pj4+
+PiBUaGlzIGxvb2tzIGhhY2tpc2guIFdoYXQgaXMgd2Ugc3VwcG9ydCBQVURfU0laRSBodWdlIHBh
+Z2UgaW4gdGhlCj4+Pj4+PiBmdXR1cmUKPj4+Pj4+ID8KPj4+Pj4KPj4+Pj4gWWVzLCB0aGlzIG1p
+Z2h0IG1ha2UgdGhlIGNvZGUgYSBsaXR0bGUgZGlmZmljdWx0IHRvIHVuZGVyc3RhbmQuIEJ1dCBi
+eQo+Pj4+PiBkb2luZyBzbywgd2UgZm9sbG93IHRoZSBzYW1lIGxvZ2ljIGJlZm9yZSBjb21taXQg
+YTgwODY4ZjM5ODU1NDg0MmIxNCwKPj4+Pj4gdGhhdCBzYWlkLCB3ZSBkbyB0aGUgdHdvLXN0ZXAg
+Y2hlY2tpbmcgZm9yIG5vcm1hbCBzaXplIHBhZ2VzIGluCj4+Pj4+IGZhdWx0X3N1cHBvcnRzX3N0
+YWdlMl9odWdlX21hcHBpbmcoKSwgdG8gZGVjaWRlIGlmIHdlIGNhbiBjcmVhdGUgVEhQCj4+Pj4+
+IG1hcHBpbmdzIGZvciB0aGVzZSBwYWdlcy4KPj4+Pj4KPj4+Pj4gQXMgZm9yIFBVRF9TSVpFIFRI
+UHMsIHRvIGJlIGhvbmVzdCwgSSBoYXZlIG5vIGlkZWEgbm93IDooCj4+Pj4KPj4+PiBIb3cgYWJv
+dXQgdGhlIGZvbGxvd2luZyBkaWZmID8KPj4+Pgo+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9h
+cm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiBpbmRleCA5N2I1NDE3Li45OGU1Y2Vj
+IDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+ICsrKyBiL3ZpcnQva3Zt
+L2FybS9tbXUuYwo+Pj4+IEBAIC0xNzkxLDcgKzE3OTEsOCBAQCBzdGF0aWMgaW50IHVzZXJfbWVt
+X2Fib3J0KHN0cnVjdCBrdm1fdmNwdQo+Pj4+ICp2Y3B1LCBwaHlzX2FkZHJfdCBmYXVsdF9pcGEs
+Cj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgICogY3VycmVudGx5IHN1cHBvcnRlZC4gVGhpcyBj
+b2RlIHdpbGwgbmVlZCB0byBiZQo+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIHVwZGF0ZWQg
+dG8gc3VwcG9ydCBvdGhlciBUSFAgc2l6ZXMuCj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgICov
+Cj4+Pj4gLcKgwqDCoMKgwqDCoMKgIGlmICh0cmFuc3BhcmVudF9odWdlcGFnZV9hZGp1c3QoJnBm
+biwgJmZhdWx0X2lwYSkpCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmIChmYXVsdF9zdXBwb3J0c19z
+dGFnZTJfaHVnZV9tYXBwaW5ncyhtZW1zbG90LCBodmEsCj4+Pj4gUE1EX1NJWkUpICYmCj4+Pj4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdHJhbnNwYXJlbnRfaHVnZXBhZ2VfYWRqdXN0KCZwZm4s
+ICZmYXVsdF9pcGEpKQo+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2bWFfcGFnZXNp
+emUgPSBQTURfU0laRTsKPj4+PiAgwqDCoMKgwqDCoCB9Cj4+Pgo+Pj4gSSB0aGluayB0aGlzIGlz
+IGdvb2QgZW5vdWdoIGZvciB0aGUgaXNzdWUuCj4+Pgo+Pj4gKE9uZSBtaW5vciBjb25jZXJuOiBX
+aXRoIHRoaXMgY2hhbmdlLCBpdCBzZWVtcyB0aGF0IHdlIG5vIGxvbmdlciBuZWVkCj4+PiAiZm9y
+Y2VfcHRlIiBhbmQgY2FuIGp1c3QgdXNlICJsb2dnaW5nX2FjdGl2ZSIgaW5zdGVhZC4gQnV0IHRo
+aXMgaXMgbm90Cj4+PiBtdWNoIHJlbGF0ZWQgdG8gd2hhdCB3ZSdyZSBmaXhpbmcuKQo+Pgo+PiBJ
+IHdvdWxkIHN0aWxsIGxlYXZlIHRoZSBmb3JjZV9wdGUgdGhlcmUgdG8gYXZvaWQgY2hlY2tpbmcg
+Zm9yIGEgVEhQIGNhc2UKPj4gaW4gYSBzaXR1YXRpb24gd2hlcmUgd2UgZm9yY2VkIHRvIFBURSBs
+ZXZlbCBtYXBwaW5nIG9uIGEgaHVnZXBhZ2UgYmFja2VkCj4+IFZNQS4gSXQgd291bGQgc2VydmUg
+dG8gYXZvaWQgYW5vdGhlciBjaGVjay4KPiAKPiBIaSBTdXp1a2ksCj4gCj4gWWVzLCBJIGFncmVl
+LCB0aGFua3MuCgpDb29sLCBJIGhhdmUgYSBwYXRjaCB0byBmaXggdGhpcyBwcm9wZXJseSBhbmQg
+dHdvIG90aGVyIHBhdGNoZXMgdG8gY2xlYW4gdXAKYW5kIHVuaWZ5IHRoZSB3YXkgd2UgaGFuZGxl
+IHRoZSBUSFAgYmFja2VkIGh1Z2VwYWdlcy4gV2lsbCBzZW5kIHRoZW0gb3V0IGFmdGVyCmEgYml0
+IG9mIHRlc3RpbmcsIGxhdGVyIHRvZGF5LgoKQ2hlZXJzClN1enVraQpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
+bG1hbi9saXN0aW5mby9rdm1hcm0K
