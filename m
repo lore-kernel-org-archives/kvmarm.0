@@ -2,70 +2,60 @@ Return-Path: <SRS0=4kLF=SM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1E7C10F11
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Apr 2019 12:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA3EC10F14
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Apr 2019 12:43:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B733C20818
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Apr 2019 12:42:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B733C20818
+	by mail.kernel.org (Postfix) with ESMTP id CBD0A20818
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Apr 2019 12:43:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD0A20818
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34D674A433;
-	Wed, 10 Apr 2019 08:42:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 753E84A481;
+	Wed, 10 Apr 2019 08:43:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nsbqt9lXReIP; Wed, 10 Apr 2019 08:42:07 -0400 (EDT)
+	with ESMTP id bCLneqPzH7yc; Wed, 10 Apr 2019 08:43:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E09DB4A47A;
-	Wed, 10 Apr 2019 08:42:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 167EC4A422;
+	Wed, 10 Apr 2019 08:43:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9C454A422
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 075254A422
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TPQUh2Ei103T for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Apr 2019 08:42:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9F24A36D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:05 -0400 (EDT)
+ with ESMTP id iY-q6K-q4M6B for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Apr 2019 08:42:57 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2FF4A36D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:57 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18404A78;
- Wed, 10 Apr 2019 05:42:05 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 264E73F59C;
- Wed, 10 Apr 2019 05:42:03 -0700 (PDT)
-Date: Wed, 10 Apr 2019 13:42:00 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v7 23/27] KVM: arm64/sve: Add pseudo-register for the
- guest's vector lengths
-Message-ID: <20190410124200.GI3567@e103592.cambridge.arm.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-24-git-send-email-Dave.Martin@arm.com>
- <20190404201854.7dzga3ctjj7427hk@kamzik.brq.redhat.com>
- <20190405093603.GM3567@e103592.cambridge.arm.com>
- <20190405101451.xtx7ggyomvrbrpxl@kamzik.brq.redhat.com>
- <20190405125413.GA3567@e103592.cambridge.arm.com>
- <20190405153321.r4ide5n2bkiuflqn@kamzik.brq.redhat.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29532EBD;
+ Wed, 10 Apr 2019 05:42:57 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E97403F59C;
+ Wed, 10 Apr 2019 05:42:55 -0700 (PDT)
+Subject: Re: [PATCH] vfio-pci: Fix MSI IRQ forwarding for without per-vector
+ masking
+To: Leo Yan <leo.yan@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ Will Deacon <Will.Deacon@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Robin Murphy <Robin.Murphy@arm.com>
+References: <20190322052308.28254-1-leo.yan@linaro.org>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <f0ae4e4e-34f1-251e-093c-7950501d4866@arm.com>
+Date: Wed, 10 Apr 2019 13:42:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190405153321.r4ide5n2bkiuflqn@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
- Christoffer Dall <cdall@kernel.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190322052308.28254-1-leo.yan@linaro.org>
+Content-Language: en-US
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,44 +71,76 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190410124200.yEt8vWz3vCqkG4uRF0dlIs8h9MMLCnNCOpgjxHauKPE@z>
+Message-ID: <20190410124234.6FOU0-gWKcA3ejWgnar1VtdcfumrIzRQQ9J9K6xcvDk@z>
 
-On Fri, Apr 05, 2019 at 05:33:21PM +0200, Andrew Jones wrote:
-> On Fri, Apr 05, 2019 at 01:54:13PM +0100, Dave Martin wrote:
+Hi Leo,
 
-[...]
-
-> > If you think the above is enough for ABI documentation purposes, I will
-> > aim to drop the following comment into set_sve_vls():
-> > 
-> > 	/*
-> > 	 * Vector lengths supported by the host can't currently be
-> > 	 * hidden from the guest individually: instead we can only set a
-> > 	 * maxmium via ZCR_EL2.LEN.  So, make sure the available vector
-> > 	 * length match the set requested exactly up to the requested
-> > 	 * maximum:
-> > 	 */
-> > 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> > 		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-> > 			return -EINVAL;
-> > 
-> > Do you think that's enough?
-> >
+On 22/03/2019 05:23, Leo Yan wrote:
+> If MSI doesn't support per-vector masking capability and
+> PCI_MSI_FLAGS_MASKBIT isn't set in message control field, the function
+> vfio_pci_msi_vector_write() will directly bail out for this case and
+> every vector's 'virt_state' keeps setting bit VFIO_PCI_MSI_STATE_MASKED.
 > 
-> That works for me, and I'm glad I now have it understood, because this
-> will be a key piece of the QEMU uesr interface to work out. I.e. we
-> need to be able to provide the user with the current host's VL list
-> up to the max virtualizable VL when queried, allow them to choose a max
-> from that list for a guest, and then commit to that VL sublist for the
-> guest. I'll dive into QEMU on Monday, hopefully I won't drown there.
+> This results in the state maintained in 'virt_state' cannot really
+> reflect the MSI hardware state; finally it will mislead the function
+> vfio_pci_update_msi_entry() to skip IRQ forwarding with below flow:
+> 
+> vfio_pci_update_msi_entry() {
+> 
+>   [...]
+> 
+>   if (msi_is_masked(entry->virt_state) == msi_is_masked(entry->phys_state))
+>       return 0;  ==> skip IRQ forwarding
+> 
+>   [...]
+> }
+> 
+> To fix this issue, when detect PCI_MSI_FLAGS_MASKBIT is not set in the
+> message control field, this patch simply clears bit
+> VFIO_PCI_MSI_STATE_MASKED for all vectors 'virt_state'; at the end
+> vfio_pci_update_msi_entry() can forward MSI IRQ successfully.
+> 
+> Signed-off-by: Leo Yan <leo.yan@linaro.org>
+> ---
+>  vfio/pci.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/vfio/pci.c b/vfio/pci.c
+> index ba971eb..4fd24ac 100644
+> --- a/vfio/pci.c
+> +++ b/vfio/pci.c
+> @@ -363,8 +363,18 @@ static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
+>  	struct vfio_pci_device *pdev = &vdev->pci;
+>  	struct msi_cap_64 *msi_cap_64 = PCI_CAP(&pdev->hdr, pdev->msi.pos);
+>  
+> -	if (!(msi_cap_64->ctrl & PCI_MSI_FLAGS_MASKBIT))
+> +	if (!(msi_cap_64->ctrl & PCI_MSI_FLAGS_MASKBIT)) {
+> +		/*
+> +		 * If MSI doesn't support per-vector masking capability,
+> +		 * simply unmask for all vectors.
+> +		 */
+> +		for (i = 0; i < pdev->msi.nr_entries; i++) {
+> +			entry = &pdev->msi.entries[i];
+> +			msi_set_masked(entry->virt_state, false);
+> +		}
+> +
 
-Agreed.
+This seems like the wrong place for this fix.
+vfio_pci_msi_vector_write() is called every time the guest pokes the MSI
+capability, and checks whether the access was on the Mask Bits Register.
+If the function doesn't support per-vector masking, then the register
+isn't implemented and we shouldn't do anything here.
 
-How to make this user-friendly is a separate problem, provided that the
-kernel provides userspace with sufficient tools to do the job.
+To fix the problem I think we need to set masked(virt_state) properly at
+init time, instead of blindly setting it to true. In fact from the
+guest's point of view, MSIs and MSI-X are unmasked (and disabled) at
+boot, so you could always set masked(virt_state) to false, but it may be
+safer to copy the actual state of the MSI's Mask Bits into virt_state,
+since for MSI, it could be non zero. If per-vector masking isn't
+supported, then the virt state should be false.
 
-Cheers
----Dave
+Thanks,
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
