@@ -1,172 +1,113 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-Date: Wed, 10 Apr 2019 10:20:30 +0800
-Message-ID: <8bf8e863-93f5-ab44-c0aa-1ad23f91a016@huawei.com>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
- <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
- <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
- <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
- <1b398e29-e2d5-2a58-b4ca-c72979a170d8@huawei.com>
- <520e277c-f096-a84b-8405-636b19e4cc46@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [PATCH v8 4/9] KVM: arm/arm64: preserve host HCR_EL2 value
+Date: Wed, 10 Apr 2019 12:14:09 +0530
+Message-ID: <cdeb5b67-55e2-619b-77f7-433316f5b63f@arm.com>
+References: <1554172037-4516-1-git-send-email-amit.kachhap@arm.com>
+ <1554172037-4516-5-git-send-email-amit.kachhap@arm.com>
+ <f27a3e70-2099-45a6-48e6-481a67e360eb@arm.com>
+ <6131d2cb-1062-6331-c2c3-7026081c458a@arm.com>
+ <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <520e277c-f096-a84b-8405-636b19e4cc46@arm.com>
+In-Reply-To: <9a373ede-cdf8-c992-6f4b-352e46e0030a@arm.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, eric.auger@redhat.com, marc.zyngier@arm.com, christoffer.dall@arm.com, zhengxiang9@huawei.com, andrew.murray@arm.com, wanghaibin.wang@huawei.com
+To: Kristina Martsenko <kristina.martsenko@arm.com>, James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Andrew Jones <drjones@redhat.com>, Dave Martin <Dave.Martin@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>, Julien Thierry <julien.thierry@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi,
 
-On 2019/4/9 22:59, Suzuki K Poulose wrote:
-> Hi Zenghui
+On 4/9/19 12:09 AM, Kristina Martsenko wrote:
+> On 08/04/2019 14:05, Amit Daniel Kachhap wrote:
+>> Hi James,
+>>
+>> On 4/6/19 4:07 PM, James Morse wrote:
+>>> Hi Amit,
+>>>
+>>> On 02/04/2019 03:27, Amit Daniel Kachhap wrote:
+>>>> From: Mark Rutland <mark.rutland@arm.com>
+>>>>
+>>>> When restoring HCR_EL2 for the host, KVM uses HCR_HOST_VHE_FLAGS, which
+>>>> is a constant value. This works today, as the host HCR_EL2 value is
+>>>> always the same, but this will get in the way of supporting extensions
+>>>> that require HCR_EL2 bits to be set conditionally for the host.
+>>>>
+>>>> To allow such features to work without KVM having to explicitly handle
+>>>> every possible host feature combination, this patch has KVM save/restore
+>>>> for the host HCR when switching to/from a guest HCR. The saving of the
+>>>> register is done once during cpu hypervisor initialization state and is
+>>>> just restored after switch from guest.
+>>>>
+>>>> For fetching HCR_EL2 during kvm initialisation, a hyp call is made using
+>>>> kvm_call_hyp and is helpful in non-VHE case.
+>>>>
+>>>> For the hyp TLB maintenance code, __tlb_switch_to_host_vhe() is updated
+>>>> to toggle the TGE bit with a RMW sequence, as we already do in
+>>>> __tlb_switch_to_guest_vhe().
+>>>>
+>>>> The value of hcr_el2 is now stored in struct kvm_cpu_context as both host
+>>>> and guest can now use this field in a common way.
+>>>
+>>> These HCR_EL2 flags have had me confused for quite a while.
+>>> I thought this was preserving the value that head.S or cpufeature.c had set, and with
+>>> ptrauth we couldn't know what this register should be anymore, the host flags has to vary.
+>>>
+>>> Kristina's explanation of it[0], clarified things, and with a bit more digging it appears
+>>> we always set API/APK, even if the hardware doesn't support the feature (as its harmless).
+>>> So we don't need to vary the host flags...
+>>
+>> API/APK is always set for NVHE host mode.
+>>>
+>>> My question is, what breaks if this patch isn't merged? (the MDCR change is cleanup we can
+>>> do because of this HCR change), is this HCR change just cleanup too? If so, can we merge
+>>> ptrauth without either, so we only make the change when its needed? (it will cause some
+>>> changes in your patch 7, but I can't see where you depend on the host flags).
+>>
+>> Yes you are right that this patch does not directly effect pointer authentication functionality but contains several optimizations and cleanups such as,
+>>
+>> * Removes assigning static flags HCR_HOST_VHE_FLAGS/HCR_HOST_NVHE_FLAGS from switch.c so switching functions now are more generic in nature.
+>> * Currently the variation in hcr_el2 flags is across modes (VHE/NVHE). Any future conditional change within those modes in host HCR_EL2 may not effect code changes in switch.c
+>> * Save of hcr_el2 done at hyp init time so not expensive switching wise.
+>>
+>> I am fine on posting it separately also.
 > 
-> On 04/09/2019 09:05 AM, Zenghui Yu wrote:
->>
->>
->> On 2019/4/9 2:40, Suzuki K Poulose wrote:
->>> Hi Zenhui,
->>>
->>> On 04/08/2019 04:11 PM, Zenghui Yu wrote:
->>>> Hi Suzuki,
->>>>
->>>> Thanks for the reply.
->>>>
->>>
->>> ...
->>>
->>>>>> Hi Suzuki,
->>>>>>
->>>>>> Why not making use of fault_supports_stage2_huge_mapping()?  Let 
->>>>>> it do
->>>>>> some checks for us.
->>>>>>
->>>>>> fault_supports_stage2_huge_mapping() was intended to do a *two-step*
->>>>>> check to tell us that can we create stage2 huge block mappings, 
->>>>>> and this
->>>>>> check is both for hugetlbfs and THP.  With commit 
->>>>>> a80868f398554842b14,
->>>>>> we pass PAGE_SIZE as "map_size" for normal size pages (which 
->>>>>> turned out
->>>>>> to be almost meaningless), and unfortunately the THP check no longer
->>>>>> works.
->>>>>
->>>>> Thats correct.
->>>>>
->>>>>>
->>>>>> So we want to rework *THP* check process.  Your patch fixes the first
->>>>>> checking-step, but the second is still missed, am I wrong?
->>>>>
->>>>> It fixes the step explicitly for the THP by making sure that the 
->>>>> GPA and
->>>>> the HVA are aligned to the map size.
->>>>
->>>> Yes, I understand how your patch had fixed the issue.  But what I'm
->>>> really concerned about here is the *second* checking-step in
->>>> fault_supports_stage2_huge_mapping().
->>>>
->>>> We have to check if we are mapping a non-block aligned or non-block
->>>> sized memslot, if so, we can not create block mappings for the 
->>>> beginning
->>>> and end of this memslot.  This is what the second part of
->>>> fault_supports_stage2_huge_mapping() had done.
->>>>
->>>> I haven't seen this checking-step in your patch, did I miss something?
->>>>
->>>
->>> I see.
->>>
->>>>> I don't think this calls for a VM_BUG_ON(). It is simply a case where
->>>>> the GPA is not aligned to HVA, but for normal VMA that could be 
->>>>> made THP.
->>>>>
->>>>> We had this VM_BUG_ON(), which would have never hit because we would
->>>>> have set force_pte if they were not aligned.
->>>>
->>>> Yes, I agree.
->>>>
->>>>>>> +        /* Skip memslots with unaligned IPA and user address */
->>>>>>> +        if ((gfn & mask) != (pfn & mask))
->>>>>>> +            return false;
->>>>>>>           if (pfn & mask) {
->>>>>>>               *ipap &= PMD_MASK;
->>>>>>>               kvm_release_pfn_clean(pfn);
->>>>>>>
->>>>>>
->>>>>> ---8>---
->>>>>>
->>>>>> Rework fault_supports_stage2_huge_mapping(), let it check THP again.
->>>>>>
->>>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>>> ---
->>>>>>   virt/kvm/arm/mmu.c | 11 ++++++++++-
->>>>>>   1 file changed, 10 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>>>>> index 27c9583..5e1b258 100644
->>>>>> --- a/virt/kvm/arm/mmu.c
->>>>>> +++ b/virt/kvm/arm/mmu.c
->>>>>> @@ -1632,6 +1632,15 @@ static bool 
->>>>>> fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->>>>>>       uaddr_end = uaddr_start + size;
->>>>>>
->>>>>>       /*
->>>>>> +     * If the memslot is _not_ backed by hugetlbfs, then check if it
->>>>>> +     * can be backed by transparent hugepages.
->>>>>> +     *
->>>>>> +     * Currently only PMD_SIZE THPs are supported, revisit it later.
->>>>>> +     */
->>>>>> +    if (map_size == PAGE_SIZE)
->>>>>> +        map_size = PMD_SIZE;
->>>>>> +
->>>>>
->>>>> This looks hackish. What is we support PUD_SIZE huge page in the 
->>>>> future
->>>>> ?
->>>>
->>>> Yes, this might make the code a little difficult to understand. But by
->>>> doing so, we follow the same logic before commit a80868f398554842b14,
->>>> that said, we do the two-step checking for normal size pages in
->>>> fault_supports_stage2_huge_mapping(), to decide if we can create THP
->>>> mappings for these pages.
->>>>
->>>> As for PUD_SIZE THPs, to be honest, I have no idea now :(
->>>
->>> How about the following diff ?
->>>
->>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>> index 97b5417..98e5cec 100644
->>> --- a/virt/kvm/arm/mmu.c
->>> +++ b/virt/kvm/arm/mmu.c
->>> @@ -1791,7 +1791,8 @@ static int user_mem_abort(struct kvm_vcpu 
->>> *vcpu, phys_addr_t fault_ipa,
->>>            * currently supported. This code will need to be
->>>            * updated to support other THP sizes.
->>>            */
->>> -        if (transparent_hugepage_adjust(&pfn, &fault_ipa))
->>> +        if (fault_supports_stage2_huge_mappings(memslot, hva, 
->>> PMD_SIZE) &&
->>> +            transparent_hugepage_adjust(&pfn, &fault_ipa))
->>>               vma_pagesize = PMD_SIZE;
->>>       }
->>
->> I think this is good enough for the issue.
->>
->> (One minor concern: With this change, it seems that we no longer need
->> "force_pte" and can just use "logging_active" instead. But this is not
->> much related to what we're fixing.)
+> FWIW I think it makes sense to post the HCR and MDCR patches separately
+> from this series. That should make it clear that pointer auth does not
+> depend on these changes, and should make it easier to evaluate the
+> changes on their own.
+ok.
 > 
-> I would still leave the force_pte there to avoid checking for a THP case
-> in a situation where we forced to PTE level mapping on a hugepage backed
-> VMA. It would serve to avoid another check.
+> Others' opinions are welcome as well.
+> 
+>>> I recall Christoffer wanting to keep the restored DAIF register value on guest-exit static
+>>> to avoid extra loads/stores when we know what the value would be. I think the same logic
+>>> applies here.
+>> Yes the saving of host registers once was suggested by Christoffer.
+> 
+> I'm not familiar with this, but James may be referring to
+> kvm_arm_vhe_guest_exit, which restores DAIF to a constant value. It
+> seems like originally the patch saved/restored DAIF [1], but it was
+> decided that a constant value was better.
+Thanks for the pointer. I mis-understood it.
 
-Hi Suzuki,
-
-Yes, I agree, thanks.
-
-
-zenghui
+Thanks,
+Amit D
+> 
+> Thanks,
+> Kristina
+> 
+> [1] https://www.spinics.net/lists/arm-kernel/msg599798.html
+> 
+>>> You mentioned in the cover letter the series has some history to it!
+>>>
+>>>
+>>> Thanks,
+>>>
+>>> James
+>>>
+>>> [0] http://lore.kernel.org/r/7ec2f950-7587-5ecd-6caa-c2fd091ad22c@arm.com
+>>>
+> 
