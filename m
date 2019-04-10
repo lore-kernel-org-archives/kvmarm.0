@@ -1,143 +1,76 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] kvm: arm: Skip stage2 huge mappings for unaligned ipa
- backed by THP
-Date: Wed, 10 Apr 2019 09:39:00 +0100
-Message-ID: <2df077f2-cb2c-0cb3-5c37-520956832f87@arm.com>
-References: <1554203176-3958-1-git-send-email-suzuki.poulose@arm.com>
- <2ea55b9c-09da-c3d0-3616-aa6be85b5a46@huawei.com>
- <a9c084fb-0c84-e632-a192-b361773a0bc8@arm.com>
- <44ffad26-a407-4603-0bb6-145f7290adbe@huawei.com>
- <730c25b4-dbc5-8d8b-514c-4ed8641701ce@arm.com>
- <1b398e29-e2d5-2a58-b4ca-c72979a170d8@huawei.com>
- <520e277c-f096-a84b-8405-636b19e4cc46@arm.com>
- <8bf8e863-93f5-ab44-c0aa-1ad23f91a016@huawei.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH v7 27/27] KVM: arm64/sve: Document KVM API extensions for
+ SVE
+Date: Wed, 10 Apr 2019 13:34:06 +0100
+Message-ID: <20190410123405.GG3567@e103592.cambridge.arm.com>
+References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-28-git-send-email-Dave.Martin@arm.com>
+ <20190404210921.7xz6o56wietd77li@kamzik.brq.redhat.com>
+ <20190405093617.GO3567@e103592.cambridge.arm.com>
+ <20190405103937.quhaxxwkjjdxab6z@kamzik.brq.redhat.com>
+ <20190405130007.GB3567@e103592.cambridge.arm.com>
+ <20190405153804.qnw774e5bsudd2kn@kamzik.brq.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A77D74A36C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 04:39:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3FbKd2MbN3uH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Apr 2019 04:39:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D704A483
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 04:39:05 -0400 (EDT)
-In-Reply-To: <8bf8e863-93f5-ab44-c0aa-1ad23f91a016@huawei.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20190405153804.qnw774e5bsudd2kn@kamzik.brq.redhat.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAxMC8wNC8yMDE5IDAzOjIwLCBaZW5naHVpIFl1IHdyb3RlOgo+IAo+IE9uIDIwMTkvNC85
-IDIyOjU5LCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+PiBIaSBaZW5naHVpCj4+Cj4+IE9uIDA0
-LzA5LzIwMTkgMDk6MDUgQU0sIFplbmdodWkgWXUgd3JvdGU6Cj4+Pgo+Pj4KPj4+IE9uIDIwMTkv
-NC85IDI6NDAsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+Pj4gSGkgWmVuaHVpLAo+Pj4+Cj4+
-Pj4gT24gMDQvMDgvMjAxOSAwNDoxMSBQTSwgWmVuZ2h1aSBZdSB3cm90ZToKPj4+Pj4gSGkgU3V6
-dWtpLAo+Pj4+Pgo+Pj4+PiBUaGFua3MgZm9yIHRoZSByZXBseS4KPj4+Pj4KPj4+Pgo+Pj4+IC4u
-Lgo+Pj4+Cj4+Pj4+Pj4gSGkgU3V6dWtpLAo+Pj4+Pj4+Cj4+Pj4+Pj4gV2h5IG5vdCBtYWtpbmcg
-dXNlIG9mIGZhdWx0X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKT/CoCBMZXQKPj4+Pj4+
-PiBpdCBkbwo+Pj4+Pj4+IHNvbWUgY2hlY2tzIGZvciB1cy4KPj4+Pj4+Pgo+Pj4+Pj4+IGZhdWx0
-X3N1cHBvcnRzX3N0YWdlMl9odWdlX21hcHBpbmcoKSB3YXMgaW50ZW5kZWQgdG8gZG8gYSAqdHdv
-LXN0ZXAqCj4+Pj4+Pj4gY2hlY2sgdG8gdGVsbCB1cyB0aGF0IGNhbiB3ZSBjcmVhdGUgc3RhZ2Uy
-IGh1Z2UgYmxvY2sgbWFwcGluZ3MsCj4+Pj4+Pj4gYW5kIHRoaXMKPj4+Pj4+PiBjaGVjayBpcyBi
-b3RoIGZvciBodWdldGxiZnMgYW5kIFRIUC7CoCBXaXRoIGNvbW1pdAo+Pj4+Pj4+IGE4MDg2OGYz
-OTg1NTQ4NDJiMTQsCj4+Pj4+Pj4gd2UgcGFzcyBQQUdFX1NJWkUgYXMgIm1hcF9zaXplIiBmb3Ig
-bm9ybWFsIHNpemUgcGFnZXMgKHdoaWNoCj4+Pj4+Pj4gdHVybmVkIG91dAo+Pj4+Pj4+IHRvIGJl
-IGFsbW9zdCBtZWFuaW5nbGVzcyksIGFuZCB1bmZvcnR1bmF0ZWx5IHRoZSBUSFAgY2hlY2sgbm8g
-bG9uZ2VyCj4+Pj4+Pj4gd29ya3MuCj4+Pj4+Pgo+Pj4+Pj4gVGhhdHMgY29ycmVjdC4KPj4+Pj4+
-Cj4+Pj4+Pj4KPj4+Pj4+PiBTbyB3ZSB3YW50IHRvIHJld29yayAqVEhQKiBjaGVjayBwcm9jZXNz
-LsKgIFlvdXIgcGF0Y2ggZml4ZXMgdGhlIGZpcnN0Cj4+Pj4+Pj4gY2hlY2tpbmctc3RlcCwgYnV0
-IHRoZSBzZWNvbmQgaXMgc3RpbGwgbWlzc2VkLCBhbSBJIHdyb25nPwo+Pj4+Pj4KPj4+Pj4+IEl0
-IGZpeGVzIHRoZSBzdGVwIGV4cGxpY2l0bHkgZm9yIHRoZSBUSFAgYnkgbWFraW5nIHN1cmUgdGhh
-dCB0aGUKPj4+Pj4+IEdQQSBhbmQKPj4+Pj4+IHRoZSBIVkEgYXJlIGFsaWduZWQgdG8gdGhlIG1h
-cCBzaXplLgo+Pj4+Pgo+Pj4+PiBZZXMsIEkgdW5kZXJzdGFuZCBob3cgeW91ciBwYXRjaCBoYWQg
-Zml4ZWQgdGhlIGlzc3VlLsKgIEJ1dCB3aGF0IEknbQo+Pj4+PiByZWFsbHkgY29uY2VybmVkIGFi
-b3V0IGhlcmUgaXMgdGhlICpzZWNvbmQqIGNoZWNraW5nLXN0ZXAgaW4KPj4+Pj4gZmF1bHRfc3Vw
-cG9ydHNfc3RhZ2UyX2h1Z2VfbWFwcGluZygpLgo+Pj4+Pgo+Pj4+PiBXZSBoYXZlIHRvIGNoZWNr
-IGlmIHdlIGFyZSBtYXBwaW5nIGEgbm9uLWJsb2NrIGFsaWduZWQgb3Igbm9uLWJsb2NrCj4+Pj4+
-IHNpemVkIG1lbXNsb3QsIGlmIHNvLCB3ZSBjYW4gbm90IGNyZWF0ZSBibG9jayBtYXBwaW5ncyBm
-b3IgdGhlCj4+Pj4+IGJlZ2lubmluZwo+Pj4+PiBhbmQgZW5kIG9mIHRoaXMgbWVtc2xvdC7CoCBU
-aGlzIGlzIHdoYXQgdGhlIHNlY29uZCBwYXJ0IG9mCj4+Pj4+IGZhdWx0X3N1cHBvcnRzX3N0YWdl
-Ml9odWdlX21hcHBpbmcoKSBoYWQgZG9uZS4KPj4+Pj4KPj4+Pj4gSSBoYXZlbid0IHNlZW4gdGhp
-cyBjaGVja2luZy1zdGVwIGluIHlvdXIgcGF0Y2gsIGRpZCBJIG1pc3Mgc29tZXRoaW5nPwo+Pj4+
-Pgo+Pj4+Cj4+Pj4gSSBzZWUuCj4+Pj4KPj4+Pj4+IEkgZG9uJ3QgdGhpbmsgdGhpcyBjYWxscyBm
-b3IgYSBWTV9CVUdfT04oKS4gSXQgaXMgc2ltcGx5IGEgY2FzZSB3aGVyZQo+Pj4+Pj4gdGhlIEdQ
-QSBpcyBub3QgYWxpZ25lZCB0byBIVkEsIGJ1dCBmb3Igbm9ybWFsIFZNQSB0aGF0IGNvdWxkIGJl
-Cj4+Pj4+PiBtYWRlIFRIUC4KPj4+Pj4+Cj4+Pj4+PiBXZSBoYWQgdGhpcyBWTV9CVUdfT04oKSwg
-d2hpY2ggd291bGQgaGF2ZSBuZXZlciBoaXQgYmVjYXVzZSB3ZSB3b3VsZAo+Pj4+Pj4gaGF2ZSBz
-ZXQgZm9yY2VfcHRlIGlmIHRoZXkgd2VyZSBub3QgYWxpZ25lZC4KPj4+Pj4KPj4+Pj4gWWVzLCBJ
-IGFncmVlLgo+Pj4+Pgo+Pj4+Pj4+PiArwqDCoMKgwqDCoMKgwqAgLyogU2tpcCBtZW1zbG90cyB3
-aXRoIHVuYWxpZ25lZCBJUEEgYW5kIHVzZXIgYWRkcmVzcyAqLwo+Pj4+Pj4+PiArwqDCoMKgwqDC
-oMKgwqAgaWYgKChnZm4gJiBtYXNrKSAhPSAocGZuICYgbWFzaykpCj4+Pj4+Pj4+ICvCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHJldHVybiBmYWxzZTsKPj4+Pj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDC
-oCBpZiAocGZuICYgbWFzaykgewo+Pj4+Pj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-KmlwYXAgJj0gUE1EX01BU0s7Cj4+Pj4+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBr
-dm1fcmVsZWFzZV9wZm5fY2xlYW4ocGZuKTsKPj4+Pj4+Pj4KPj4+Pj4+Pgo+Pj4+Pj4+IC0tLTg+
-LS0tCj4+Pj4+Pj4KPj4+Pj4+PiBSZXdvcmsgZmF1bHRfc3VwcG9ydHNfc3RhZ2UyX2h1Z2VfbWFw
-cGluZygpLCBsZXQgaXQgY2hlY2sgVEhQIGFnYWluLgo+Pj4+Pj4+Cj4+Pj4+Pj4gU2lnbmVkLW9m
-Zi1ieTogWmVuZ2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+Pj4+Pj4gLS0tCj4+Pj4+
-Pj4gIMKgwqB2aXJ0L2t2bS9hcm0vbW11LmMgfCAxMSArKysrKysrKysrLQo+Pj4+Pj4+ICDCoMKg
-MSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4+Pj4+Pgo+
-Pj4+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11
-LmMKPj4+Pj4+PiBpbmRleCAyN2M5NTgzLi41ZTFiMjU4IDEwMDY0NAo+Pj4+Pj4+IC0tLSBhL3Zp
-cnQva3ZtL2FybS9tbXUuYwo+Pj4+Pj4+ICsrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+Pj4+
-IEBAIC0xNjMyLDYgKzE2MzIsMTUgQEAgc3RhdGljIGJvb2wKPj4+Pj4+PiBmYXVsdF9zdXBwb3J0
-c19zdGFnZTJfaHVnZV9tYXBwaW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4+
-Pj4+Pj4gIMKgwqDCoMKgwqAgdWFkZHJfZW5kID0gdWFkZHJfc3RhcnQgKyBzaXplOwo+Pj4+Pj4+
-Cj4+Pj4+Pj4gIMKgwqDCoMKgwqAgLyoKPj4+Pj4+PiArwqDCoMKgwqAgKiBJZiB0aGUgbWVtc2xv
-dCBpcyBfbm90XyBiYWNrZWQgYnkgaHVnZXRsYmZzLCB0aGVuIGNoZWNrIGlmIGl0Cj4+Pj4+Pj4g
-K8KgwqDCoMKgICogY2FuIGJlIGJhY2tlZCBieSB0cmFuc3BhcmVudCBodWdlcGFnZXMuCj4+Pj4+
-Pj4gK8KgwqDCoMKgICoKPj4+Pj4+PiArwqDCoMKgwqAgKiBDdXJyZW50bHkgb25seSBQTURfU0la
-RSBUSFBzIGFyZSBzdXBwb3J0ZWQsIHJldmlzaXQgaXQgbGF0ZXIuCj4+Pj4+Pj4gK8KgwqDCoMKg
-ICovCj4+Pj4+Pj4gK8KgwqDCoCBpZiAobWFwX3NpemUgPT0gUEFHRV9TSVpFKQo+Pj4+Pj4+ICvC
-oMKgwqDCoMKgwqDCoCBtYXBfc2l6ZSA9IFBNRF9TSVpFOwo+Pj4+Pj4+ICsKPj4+Pj4+Cj4+Pj4+
-PiBUaGlzIGxvb2tzIGhhY2tpc2guIFdoYXQgaXMgd2Ugc3VwcG9ydCBQVURfU0laRSBodWdlIHBh
-Z2UgaW4gdGhlCj4+Pj4+PiBmdXR1cmUKPj4+Pj4+ID8KPj4+Pj4KPj4+Pj4gWWVzLCB0aGlzIG1p
-Z2h0IG1ha2UgdGhlIGNvZGUgYSBsaXR0bGUgZGlmZmljdWx0IHRvIHVuZGVyc3RhbmQuIEJ1dCBi
-eQo+Pj4+PiBkb2luZyBzbywgd2UgZm9sbG93IHRoZSBzYW1lIGxvZ2ljIGJlZm9yZSBjb21taXQg
-YTgwODY4ZjM5ODU1NDg0MmIxNCwKPj4+Pj4gdGhhdCBzYWlkLCB3ZSBkbyB0aGUgdHdvLXN0ZXAg
-Y2hlY2tpbmcgZm9yIG5vcm1hbCBzaXplIHBhZ2VzIGluCj4+Pj4+IGZhdWx0X3N1cHBvcnRzX3N0
-YWdlMl9odWdlX21hcHBpbmcoKSwgdG8gZGVjaWRlIGlmIHdlIGNhbiBjcmVhdGUgVEhQCj4+Pj4+
-IG1hcHBpbmdzIGZvciB0aGVzZSBwYWdlcy4KPj4+Pj4KPj4+Pj4gQXMgZm9yIFBVRF9TSVpFIFRI
-UHMsIHRvIGJlIGhvbmVzdCwgSSBoYXZlIG5vIGlkZWEgbm93IDooCj4+Pj4KPj4+PiBIb3cgYWJv
-dXQgdGhlIGZvbGxvd2luZyBkaWZmID8KPj4+Pgo+Pj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9h
-cm0vbW11LmMgYi92aXJ0L2t2bS9hcm0vbW11LmMKPj4+PiBpbmRleCA5N2I1NDE3Li45OGU1Y2Vj
-IDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS9tbXUuYwo+Pj4+ICsrKyBiL3ZpcnQva3Zt
-L2FybS9tbXUuYwo+Pj4+IEBAIC0xNzkxLDcgKzE3OTEsOCBAQCBzdGF0aWMgaW50IHVzZXJfbWVt
-X2Fib3J0KHN0cnVjdCBrdm1fdmNwdQo+Pj4+ICp2Y3B1LCBwaHlzX2FkZHJfdCBmYXVsdF9pcGEs
-Cj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgICogY3VycmVudGx5IHN1cHBvcnRlZC4gVGhpcyBj
-b2RlIHdpbGwgbmVlZCB0byBiZQo+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIHVwZGF0ZWQg
-dG8gc3VwcG9ydCBvdGhlciBUSFAgc2l6ZXMuCj4+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgICov
-Cj4+Pj4gLcKgwqDCoMKgwqDCoMKgIGlmICh0cmFuc3BhcmVudF9odWdlcGFnZV9hZGp1c3QoJnBm
-biwgJmZhdWx0X2lwYSkpCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmIChmYXVsdF9zdXBwb3J0c19z
-dGFnZTJfaHVnZV9tYXBwaW5ncyhtZW1zbG90LCBodmEsCj4+Pj4gUE1EX1NJWkUpICYmCj4+Pj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdHJhbnNwYXJlbnRfaHVnZXBhZ2VfYWRqdXN0KCZwZm4s
-ICZmYXVsdF9pcGEpKQo+Pj4+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2bWFfcGFnZXNp
-emUgPSBQTURfU0laRTsKPj4+PiAgwqDCoMKgwqDCoCB9Cj4+Pgo+Pj4gSSB0aGluayB0aGlzIGlz
-IGdvb2QgZW5vdWdoIGZvciB0aGUgaXNzdWUuCj4+Pgo+Pj4gKE9uZSBtaW5vciBjb25jZXJuOiBX
-aXRoIHRoaXMgY2hhbmdlLCBpdCBzZWVtcyB0aGF0IHdlIG5vIGxvbmdlciBuZWVkCj4+PiAiZm9y
-Y2VfcHRlIiBhbmQgY2FuIGp1c3QgdXNlICJsb2dnaW5nX2FjdGl2ZSIgaW5zdGVhZC4gQnV0IHRo
-aXMgaXMgbm90Cj4+PiBtdWNoIHJlbGF0ZWQgdG8gd2hhdCB3ZSdyZSBmaXhpbmcuKQo+Pgo+PiBJ
-IHdvdWxkIHN0aWxsIGxlYXZlIHRoZSBmb3JjZV9wdGUgdGhlcmUgdG8gYXZvaWQgY2hlY2tpbmcg
-Zm9yIGEgVEhQIGNhc2UKPj4gaW4gYSBzaXR1YXRpb24gd2hlcmUgd2UgZm9yY2VkIHRvIFBURSBs
-ZXZlbCBtYXBwaW5nIG9uIGEgaHVnZXBhZ2UgYmFja2VkCj4+IFZNQS4gSXQgd291bGQgc2VydmUg
-dG8gYXZvaWQgYW5vdGhlciBjaGVjay4KPiAKPiBIaSBTdXp1a2ksCj4gCj4gWWVzLCBJIGFncmVl
-LCB0aGFua3MuCgpDb29sLCBJIGhhdmUgYSBwYXRjaCB0byBmaXggdGhpcyBwcm9wZXJseSBhbmQg
-dHdvIG90aGVyIHBhdGNoZXMgdG8gY2xlYW4gdXAKYW5kIHVuaWZ5IHRoZSB3YXkgd2UgaGFuZGxl
-IHRoZSBUSFAgYmFja2VkIGh1Z2VwYWdlcy4gV2lsbCBzZW5kIHRoZW0gb3V0IGFmdGVyCmEgYml0
-IG9mIHRlc3RpbmcsIGxhdGVyIHRvZGF5LgoKQ2hlZXJzClN1enVraQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+On Fri, Apr 05, 2019 at 05:38:04PM +0200, Andrew Jones wrote:
+> On Fri, Apr 05, 2019 at 02:00:07PM +0100, Dave Martin wrote:
+> > On Fri, Apr 05, 2019 at 12:39:37PM +0200, Andrew Jones wrote:
+> > > On Fri, Apr 05, 2019 at 10:36:17AM +0100, Dave Martin wrote:
+> > > > On Thu, Apr 04, 2019 at 11:09:21PM +0200, Andrew Jones wrote:
+
+[...]
+
+> > > > > I'm still not sure about EPERM vs. ENOEXEC.
+> > > > 
+> > > > There is no need to distinguish the two: this is just a generic "vcpu in
+> > > > wrong state for this to work" error.  I can't think of another subsystem
+> > > > that uses ENOEXEC for this meaning, but it's established in KVM.
+> > > > 
+> > > > If you can't see a reason why we would need these to be distinct
+> > > > errors (?) then I'm happy for this to be ENOEXEC for all cases.
+> > > > 
+> > > 
+> > > I do see some value in keeping them distinct. I think it's just the use
+> > > of EPERM specifically that bothers me, but I don't have that strong of
+> > > an opinion against its use either. So I'll just shut up :)
+> > 
+> > In an earlier incarnation I had EBADFD, which does kind of mean the
+> > right thing.
+> > 
+> > If there's not a clear way forward, I may leave this all as-is for now
+> > (but I'll remove the explicit documentation for KVM_{GET,SET}_ONE_REG
+> > error codes to give us more flexibility about this in the future, as
+> > discussed).
+> > 
+> > Any objection?
+> 
+> Nope. Let's do that. EBADFD doesn't sound good, because we're using the FD
+> without trouble before and even after we attempt these ioctls. I think
+> EBADFD would indicate that no future ioctl (or read,write) should be
+> expected to work.
+
+OK.  I may also keep some of the error code documentation, but water it
+down a bit to make it clearer that the error codes are indicate and
+arm64-specifc.
+
+We can see how it looks when I have a series to post.
+
+Cheers
+---Dave
