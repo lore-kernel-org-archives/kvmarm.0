@@ -1,102 +1,107 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH] vfio-pci: Fix MSI IRQ forwarding for without per-vector
- masking
-Date: Wed, 10 Apr 2019 13:42:34 +0100
-Message-ID: <f0ae4e4e-34f1-251e-093c-7950501d4866@arm.com>
-References: <20190322052308.28254-1-leo.yan@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v6 09/22] vfio: VFIO_IOMMU_BIND/UNBIND_MSI
+Date: Wed, 10 Apr 2019 15:02:23 +0200
+Message-ID: <2cdd4142-98e5-14de-2f34-264244f24d01@redhat.com>
+References: <20190317172232.1068-1-eric.auger@redhat.com>
+ <20190317172232.1068-10-eric.auger@redhat.com>
+ <20190321170159.38358f38@x1.home>
+ <16931d58-9c88-8cfb-a392-408ea7afdf16@redhat.com>
+ <20190322160947.3f8dacdb@x1.home>
+ <b47128de-88d0-1971-1fbc-86e43439c7ee@redhat.com>
+ <20190403113800.51503693@x1.home>
+ <4b27b707-4917-2c3e-a13c-3b978e850d09@redhat.com>
+ <20190410123531.GA19023@debian>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 075254A422
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iY-q6K-q4M6B for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Apr 2019 08:42:57 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2FF4A36D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Apr 2019 08:42:57 -0400 (EDT)
-In-Reply-To: <20190322052308.28254-1-leo.yan@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190410123531.GA19023@debian>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Leo Yan <leo.yan@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Will Deacon <Will.Deacon@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Robin Murphy <Robin.Murphy@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: =?UTF-8?Q?Vincent_Stehl=c3=a9?= <vincent.stehle@arm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org, jacob.jun.pan@linux.intel.com, yi.l.liu@linux.intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com, christoffer.dall@arm.com, peter.maydell@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Leo,
+Hi Vincent,
 
-On 22/03/2019 05:23, Leo Yan wrote:
-> If MSI doesn't support per-vector masking capability and
-> PCI_MSI_FLAGS_MASKBIT isn't set in message control field, the function
-> vfio_pci_msi_vector_write() will directly bail out for this case and
-> every vector's 'virt_state' keeps setting bit VFIO_PCI_MSI_STATE_MASKED.
+On 4/10/19 2:35 PM, Vincent Stehlé wrote:
+> On Thu, Apr 04, 2019 at 08:55:25AM +0200, Auger Eric wrote:
+>> Hi Marc, Robin, Alex,
+> (..)
+>> Do you think this is a reasonable assumption to consider devices within
+>> the same host iommu group share the same MSI doorbell?
 > 
-> This results in the state maintained in 'virt_state' cannot really
-> reflect the MSI hardware state; finally it will mislead the function
-> vfio_pci_update_msi_entry() to skip IRQ forwarding with below flow:
+> Hi Eric,
 > 
-> vfio_pci_update_msi_entry() {
+> I am not sure this assumption always hold.
 > 
->   [...]
+> Marc, Robin and Alex can correct me, but for example I think the following
+> topology is valid for Arm systems:
 > 
->   if (msi_is_masked(entry->virt_state) == msi_is_masked(entry->phys_state))
->       return 0;  ==> skip IRQ forwarding
+>  +------------+  +------------+
+>  | Endpoint A |  | Endpoint B |
+>  +------------+  +------------+
+>             v     v
+>           /---------\
+>          |  Non-ACS  |
+>          |  Switch   |
+>           \---------/
+>                v
+>        +---------------+
+>        |     PCIe      |
+>        | Root Complex  |
+>        +---------------+
+>                v
+>          +-----------+
+>          |   SMMU    |
+>          +-----------+
+>                v
+>   +--------------------------+
+>   |   System interconnect    |
+>   +--------------------------+
+>         v              v
+>   +-----------+  +-----------+
+>   |   ITS A   |  |   ITS B   |
+>   +-----------+  +-----------+
 > 
->   [...]
-> }
+> All PCIe Endpoints and ITS could be in the same ITS Group 0, meaning
+> devices could send their MSI at any ITS in hardware.
 > 
-> To fix this issue, when detect PCI_MSI_FLAGS_MASKBIT is not set in the
-> message control field, this patch simply clears bit
-> VFIO_PCI_MSI_STATE_MASKED for all vectors 'virt_state'; at the end
-> vfio_pci_update_msi_entry() can forward MSI IRQ successfully.
+> For Linux the two PCIe Endpoints would be in the same iommu group, because
+> the switch in this example does not support ACS.
 > 
-> Signed-off-by: Leo Yan <leo.yan@linaro.org>
-> ---
->  vfio/pci.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+> I think the devicetree msi-map property could be used to "map" the RID of
+> Endpoint A to ITS A and the RID of Endpoint B to ITS B, which would violate
+> the assumption.
 > 
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index ba971eb..4fd24ac 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -363,8 +363,18 @@ static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  	struct msi_cap_64 *msi_cap_64 = PCI_CAP(&pdev->hdr, pdev->msi.pos);
->  
-> -	if (!(msi_cap_64->ctrl & PCI_MSI_FLAGS_MASKBIT))
-> +	if (!(msi_cap_64->ctrl & PCI_MSI_FLAGS_MASKBIT)) {
-> +		/*
-> +		 * If MSI doesn't support per-vector masking capability,
-> +		 * simply unmask for all vectors.
-> +		 */
-> +		for (i = 0; i < pdev->msi.nr_entries; i++) {
-> +			entry = &pdev->msi.entries[i];
-> +			msi_set_masked(entry->virt_state, false);
-> +		}
-> +
+> See the monolithic example in [1], the example system in [2], appendices
+> D, E and F in [3] and the msi-map property in [4].
 
-This seems like the wrong place for this fix.
-vfio_pci_msi_vector_write() is called every time the guest pokes the MSI
-capability, and checks whether the access was on the Mask Bits Register.
-If the function doesn't support per-vector masking, then the register
-isn't implemented and we shouldn't do anything here.
+Thank you for the review & links.
 
-To fix the problem I think we need to set masked(virt_state) properly at
-init time, instead of blindly setting it to true. In fact from the
-guest's point of view, MSIs and MSI-X are unmasked (and disabled) at
-boot, so you could always set masked(virt_state) to false, but it may be
-safer to copy the actual state of the MSI's Mask Bits into virt_state,
-since for MSI, it could be non zero. If per-vector masking isn't
-supported, then the virt state should be false.
+I understand the above topology is perfectly valid. Now the question is:
+is it sufficiently common to care about it?
 
-Thanks,
-Jean
+At the moment VFIO/vIOMMU assignment of devices belonging to the same
+group isn't upstream yet. Work is ongoing by Alex to support it. It uses
+a PCIe-to-PCI bridge on guest side and it looks this topology is not
+supported by the SMMUv3 driver. Then comes the trouble of using several
+ITS in nested mode.
+
+If this topology is sufficiently rare I propose we to do not support it
+in this VFIO/vIOMMU use case. in v7 I introduced a check that aims to
+verify devices attached to the same nested iommu_domain share the same
+msi_domain.
+
+Thanks
+
+Eric
+> 
+> Best regards,
+> Vincent.
+> 
+> [1] https://static.docs.arm.com/100336/0102/corelink_gic600_generic_interrupt_controller_technical_reference_manual_100336_0102_00_en.pdf
+> [2] http://infocenter.arm.com/help/topic/com.arm.doc.den0049d/DEN0049D_IO_Remapping_Table.pdf
+> [3] https://static.docs.arm.com/den0029/50/Q1-DEN0029B_SBSA_5.0.pdf
+> [4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/pci/pci-msi.txt
+> 
