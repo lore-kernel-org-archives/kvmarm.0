@@ -1,151 +1,138 @@
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 2/2] kvm: arm: Unify handling THP backed host memory
-Date: Thu, 11 Apr 2019 16:16:48 +0100
-Message-ID: <1bac514c-e4f0-a609-96ed-f48ef3461da1@arm.com>
-References: <1554909297-6753-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-3-git-send-email-suzuki.poulose@arm.com>
- <c48b2bd4-68e6-dbc0-b010-78a23a889196@huawei.com>
+From: Steven Price <steven.price@arm.com>
+Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
+Date: Thu, 11 Apr 2019 16:31:39 +0100
+Message-ID: <ef3e617e-aa51-88d8-1e06-450febee43a4@arm.com>
+References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
+ <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
+ <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
+ <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
+ <20190315085948.GB10950@e113682-lin.lund.arm.com>
+ <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
+ <101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
+ <662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
+ <1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
+ <0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
+ <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c48b2bd4-68e6-dbc0-b010-78a23a889196@huawei.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, julien.thierry@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, andrew.murray@arm.com, eric.auger@redhat.com, zhengxiang9@huawei.com, wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6280D4A46E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 11:31:44 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id scSwsWUSNJ4q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Apr 2019 11:31:42 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB5244A445
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 11:31:42 -0400 (EDT)
+In-Reply-To: <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
+Content-Language: en-GB
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Heyi Guo <guoheyi@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Zhengui,
-
-On 11/04/2019 02:59, Zenghui Yu wrote:
-> Hi Suzuki,
-> 
-> On 2019/4/10 23:23, Suzuki K Poulose wrote:
->> We support mapping host memory backed by PMD transparent hugepages
->> at stage2 as huge pages. However the checks are now spread across
->> two different places. Let us unify the handling of the THPs to
->> keep the code cleaner (and future proof for PUD THP support).
->> This patch moves transparent_hugepage_adjust() closer to the caller
->> to avoid a forward declaration for fault_supports_stage2_huge_mappings().
->>
->> Also, since we already handle the case where the host VA and the guest
->> PA may not be aligned, the explicit VM_BUG_ON() is not required.
->>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Zneghui Yu <yuzenghui@huawei.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>    virt/kvm/arm/mmu.c | 123 +++++++++++++++++++++++++++--------------------------
->>    1 file changed, 62 insertions(+), 61 deletions(-)
->>
->> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> index 6d73322..714eec2 100644
->> --- a/virt/kvm/arm/mmu.c
->> +++ b/virt/kvm/arm/mmu.c
->> @@ -1380,53 +1380,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->>    	return ret;
->>    }
->>    
->> -static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
->> -{
->> -	kvm_pfn_t pfn = *pfnp;
->> -	gfn_t gfn = *ipap >> PAGE_SHIFT;
->> -	struct page *page = pfn_to_page(pfn);
->> -
->> -	/*
->> -	 * PageTransCompoundMap() returns true for THP and
->> -	 * hugetlbfs. Make sure the adjustment is done only for THP
->> -	 * pages.
->> -	 */
->> -	if (!PageHuge(page) && PageTransCompoundMap(page)) {
->> -		unsigned long mask;
->> -		/*
->> -		 * The address we faulted on is backed by a transparent huge
->> -		 * page.  However, because we map the compound huge page and
->> -		 * not the individual tail page, we need to transfer the
->> -		 * refcount to the head page.  We have to be careful that the
->> -		 * THP doesn't start to split while we are adjusting the
->> -		 * refcounts.
->> -		 *
->> -		 * We are sure this doesn't happen, because mmu_notifier_retry
->> -		 * was successful and we are holding the mmu_lock, so if this
->> -		 * THP is trying to split, it will be blocked in the mmu
->> -		 * notifier before touching any of the pages, specifically
->> -		 * before being able to call __split_huge_page_refcount().
->> -		 *
->> -		 * We can therefore safely transfer the refcount from PG_tail
->> -		 * to PG_head and switch the pfn from a tail page to the head
->> -		 * page accordingly.
->> -		 */
->> -		mask = PTRS_PER_PMD - 1;
->> -		VM_BUG_ON((gfn & mask) != (pfn & mask));
->> -		if (pfn & mask) {
->> -			*ipap &= PMD_MASK;
->> -			kvm_release_pfn_clean(pfn);
->> -			pfn &= ~mask;
->> -			kvm_get_pfn(pfn);
->> -			*pfnp = pfn;
->> -		}
->> -
->> -		return true;
->> -	}
->> -
->> -	return false;
->> -}
->> -
->>    /**
->>     * stage2_wp_ptes - write protect PMD range
->>     * @pmd:	pointer to pmd entry
->> @@ -1677,6 +1630,61 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->>    	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
->>    }
->>    
->> +/*
->> + * Check if the given hva is backed by a transparent huge page (THP)
->> + * and whether it can be mapped using block mapping in stage2. If so, adjust
->> + * the stage2 PFN and IPA accordingly. Only PMD_SIZE THPs are currently
->> + * supported. This will need to be updated to support other THP sizes.
->> + *
->> + * Returns the size of the mapping.
->> + */
->> +static unsigned long
->> +transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->> +			    unsigned long hva, kvm_pfn_t *pfnp,
->> +			    phys_addr_t *ipap)
->> +{
->> +	kvm_pfn_t pfn = *pfnp;
->> +	struct page *page = pfn_to_page(pfn);
->> +
->> +	/*
->> +	 * PageTransCompoundMap() returns true for THP and
->> +	 * hugetlbfs. Make sure the adjustment is done only for THP
->> +	 * pages. Also make sure that the HVA and IPA are sufficiently
->> +	 * aligned and that the  block map is contained within the memslot.
->> +	 */
->> +	if (!PageHuge(page) && PageTransCompoundMap(page) &&
-> 
-> We managed to get here, ensure that we only play with normal size pages
-> and no hugetlbfs pages will be involved.  "!PageHuge(page)" will always
-> return true and we can let it go.
-
-I think that is a bit tricky. If someone ever modifies the user_mem_abort()
-and we end up in getting called with a HugeTLB backed page things could go
-wrong.
-
-I could do remove the check, but would like to add a WARN_ON_ONCE() to make
-sure our assumption is held.
-
-i.e,
-	WARN_ON_ONCE(PageHuge(page));
-
-	if (PageTransCompoundMap(page) &&>> +	 
-fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-
-...
-
-
-Cheers
-Suzuki
+T24gMTEvMDQvMjAxOSAwODoyNywgSGV5aSBHdW8gd3JvdGU6Cj4gSGkgU3RldmUsCj4gCj4gQWZ0
+ZXIgcmVhZGluZyBrZXJuZWwgY29kZSBhYm91dCB0aW1lIGtlZXBpbmcgYW5kIHNvbWV0aGluZyBy
+ZWxhdGVkLCBJJ3ZlCj4gbm90IGdvdCBhIGNsZWFyIHBpY3R1cmUgb2YgaG93IHdlIGNhbiB1c2Ug
+TVNSX0tWTV9XQUxMX0NMT0NLX05FVyB0byBrZWVwCj4gd2FsbCBjbG9jayBpbiBndWVzdCBWTS4K
+PiAKPiAxLiBPbiBYODYsIE1TUl9LVk1fV0FMTF9DTE9DS19ORVcgaXMgb25seSB1c2VkIGJ5IHRo
+ZSBjYWxsYmFjayBvZiBzeXN0ZW0KPiBzdXNwZW5kIGFuZCByZXN1bWU7IEkgZGlkbid0IGZpbmQg
+aXQgdXNlZCBmb3IgcnVudGltZSB3YWxsIGNsb2NrIHJlYWRpbmcuCgpUaGUgTVNSIGlzIG9ubHkg
+dG8gcHJvdmlkZSBhbiBvZmZzZXQgZnJvbSB0aGUgZ3Vlc3QncyB2aWV3IG9mIHN5c3RlbQp0aW1l
+IHRvIHRoZSBhY3R1YWwgd2FsbC1jbG9jayB0aW1lLiBMaWtlIHlvdSBtZW50aW9uIGl0J3MgdXNl
+ZCBvbiByZXN1bWUKdG8gcmVzeW5jaHJvbmlzZSB3aXRoIHdhbGwtY2xvY2sgdGltZS4KCkxvb2tp
+bmcgYXQgdGhpcyBtb3JlIGNhcmVmdWxseSwgSSB0aGluayBJIG1heSBoYXZlIGdvdCBhIGJpdCBj
+b25mdXNlZAp3aXRoIGhvdyB0aGlzIHdvcmtzIG9uIHg4Ni4gQXMgeW91IHNheSBNU1JfS1ZNX1dB
+TExfQ0xPQ0tfTkVXIGlzIG9ubHkKdXNlZCBvbiBib290IChhbmQgc3VzcGVuZC9yZXN1bWUpIHRv
+IHByb3ZpZGUgdGhlIGRpZmZlcmVuY2UgYmV0d2VlbiB0aGUKVFNDIGFuZCB3YWxsLWNsb2NrLgoK
+TVNSX0tWTV9TWVNURU1fVElNRV9ORVcgc2VlbXMgdG8gYmUgdGhlIE1TUiB0aGF0IHByb3ZpZGVz
+IHRoZSBvZmZzZXQKYmV0d2VlbiB0aGUgaG9zdCdzIFRTQyBhbmQgdGhlIGd1ZXN0J3MgdmlldyBv
+ZiB0aW1lLiBJbiBwYXJ0aWN1bGFyIHRoZQpLVk0gcmVxdWVzdCBLVk1fUkVRX0NMT0NLX1VQREFU
+RSBjYXVzZXMgdGhpcyB0byBiZSB1cGRhdGVkLgoKVGhlcmUncyBhIGxvdCBvZiBjb2RlIGluIHRo
+ZXJlIHRvIGRlYWwgd2l0aCBlLmcuIHRoZSBob3N0J3MgVFNDIGdvaW5nCmJhY2t3YXJkcyAoZHVl
+IHRvIGJ1Z2d5IGhhcmR3YXJlLCBidXQgYWxzbyBkdWUgdG8gc3VzcGVuZC9oaWJlcm5hdGUpLgoK
+PiAyLiBUbyB1c2UgdGhlIE1TUiBmb3Igd2FsbCBjbG9jayBzeW5jaHJvbml6YXRpb24sIHNoYWxs
+IHdlIHJlZ2lzdGVyIEtWTQo+IFBWLWNsb2NrIGFzIGEgaGlnaGVyIHJhdGluZyBjbG9jayBzb3Vy
+Y2UsIHNvIHRoYXQgaXQgd2lsbCBiZSBib3VuZCB0bwo+IHRrX2NvcmUudGltZWtlZXBlciBhbmQg
+YmUgcmVhZCBhdCBlYWNoIHRpbWUgb2YgcnVubmluZwo+IHVwZGF0ZV93YWxsX3RpbWUoKSBpbiBl
+YWNoIHRpbWVyIHRpY2s/Cj4KPiAzLiBJZiB0aGUgYWJvdmUgaXMgdHJ1ZSwgaG93IGNhbiB3ZSBr
+ZWVwIHRoZSBwYXJhdmlydHVhbGl6ZWQgd2FsbCBjbG9jawo+IGFsd2F5cyB1cGRhdGVkPyBJcyBp
+dCBhbHdheXMgdHJhcHBlZCB0byB0aGUgaHlwZXJ2aXNvcj8gSSdtIGFmcmFpZCB0aGlzCj4gbWF5
+IGNhdXNlIHBlcmZvcm1hbmNlIGxvc3MuIElmIHRoZXJlIGlzIG5vIHRyYXAgYW5kIHRoZSBkYXRh
+IGlzIHVwZGF0ZWQKPiBieSB0aGUgaHlwZXJ2aXNvciBwZXJpb2RpY2FsbHksIGhvdyBjYW4gd2Ug
+Z3VhcmFudGVlIHRoZSBhY2N1cmFjeT8KCldlIG9idmlvdXNseSBkb24ndCB3YW50IHRvIGJlIG1h
+a2luZyBmcmVxdWVudCBoeXBlcmNhbGxzIChvciBvdGhlcgp0cmFwcykgLSBzbyB0aGUgaWRlYSBp
+cyB0byBwcm92aWRlIHRoZSBndWVzdCB3aXRoIGEgc3RydWN0dXJlIHdoaWNoIGlzCnVwZGF0ZWQg
+d2hlbiB0aGUgaG9zdCBpcyBhd2FyZSBzb21ldGhpbmcgaGFzIGNoYW5nZWQuIFRoZSBndWVzdCB0
+aGVuCnJlYWRzIHRoaXMgc3RydWN0dXJlICh1c2luZyBhIHZlcnNpb24gZmllbGQgdG8gYXZvaWQg
+cmFjZXMgd2l0aCB0aGUKaG9zdCkgYW5kIHVzZXMgaXQgY29tcHV0ZSBpdCdzIG93biB2ZXJzaW9u
+IG9mIHRpbWUuCgo+IE1lYW53aGlsZSBpdCBzZWVtcyBlYXNpZXIgdG8gdXNlIEtWTV9LVk1DTE9D
+S19DVFJMIHRvIGdldCByaWQgb2YgZmFsc2UKPiBwb3NpdGl2ZSBzb2Z0IGxvY2sgcGFuaWMsIGFu
+ZCBndWVzdCBjYW4gcmVseSBvbiBjbnR2Y3QgZm9yIHdhbGwgY2xvY2sKPiB1cGRhdGluZyBhcyBp
+dCBkb2VzIG5vdywgYW5kIGl0IHNlZW1zIG5vdCBkaWZmaWN1bHQgZm9yIHRoZSBoeXBlcnZpc29y
+Cj4gdG8ga2VlcCBjbnR2Y3QgImFsd2F5cyBvbiIgYW5kICJtb25vdG9uaWMiLgo+IAo+IFBsZWFz
+ZSBsZXQgbWUga25vdyBpZiBJIG1pc3Mgc29tZXRoaW5nLgoKWWVzIEknbSBjb21pbmcgYXJvdW5k
+IHRvIHRoYXQgd2F5IG9mIHRoaW5raW5nIC0gYXMgbG9uZyBhcyB0aGUKaHlwZXJ2aXNvciBwcm92
+aWRlcyB0aGUgImFsd2F5cyBvbiIvIm1vbm90b25pYyIgcHJvcGVydGllcyB0aGVuIHJlYWxseQp0
+aGUgb25seSBtaXNzaW5nIGJpdCBpcyBpbmZvcm1pbmcgdGhlIGd1ZXN0IHdoZW4gaXQgd2FzIHBh
+dXNlZCBzbyBpdCBjYW4KImRvIHRoZSByaWdodCB0aGluZyIuIFRoaXMgZG9lcyBhcHBlYXIgdG8g
+YmUgd2hhdCB0aGUgeDg2IGNvZGUgaXMgZG9pbmcsCmJ1dCBJIGhhdmUgdG8gYWRtaXQgSSBzdHJ1
+Z2dsZSB0byBmdWxseSB1bmRlcnN0YW5kIGl0LgoKU3RldmUKCj4gVGhhbmtzLAo+IEhleWkKPiAK
+PiBPbiAyMDE5LzMvMjcgMToxMiwgU3RldmVuIFByaWNlIHdyb3RlOgo+PiBIaSBIZXlpLAo+Pgo+
+PiBPbiAyNi8wMy8yMDE5IDEzOjUzLCBIZXlpIEd1byB3cm90ZToKPj4+IEkgYWxzbyB0ZXN0ZWQg
+c2F2ZS9yZXN0b3JlIG9wZXJhdGlvbnMsIGFuZCBvYnNlcnZlZCB0aGF0IGNsb2NrIGluIGd1ZXN0
+Cj4+PiB3b3VsZCBub3QganVtcCBhZnRlciByZXN0b3JpbmcgZWl0aGVyLiBJZiB3ZSBjb25zaWRl
+ciBndWVzdCBjbG9jayBub3QKPj4+IGJlaW5nIHN5bmNocm9uaXplZCB3aXRoIHJlYWwgd2FsbCBj
+bG9jayBhcyBhbiBpc3N1ZSwgZG9lcyBpdCBtZWFuCj4+PiBzYXZlL3Jlc3RvcmUgZnVuY3Rpb24g
+aGFzIHRoZSBzYW1lIGlzc3VlPwo+PiBCYXNpY2FsbHkgYXQgdGhlIG1vbWVudCB3aGVuIHRoZSBn
+dWVzdCBpc24ndCBydW5uaW5nIHlvdSBoYXZlIGEgY2hvaWNlCj4+IG9mIHR3byBiZWhhdmlvdXJz
+Ogo+Pgo+PiDCoCAxLiBTdG9wIChpLmUuIHNhdmUvcmVzdG9yZSkgQ05UVkNUIC0gdGhpcyBtZWFu
+cyB0aGF0IHRoZSBndWVzdCBzZWVzIG5vCj4+IHRpbWUgb2NjdXIuIElmIHRoZSBndWVzdCBuZWVk
+cyB0byBoYXZlIGEgY29uY2VwdCBvZiB3YWxsLWNsb2NrIHRpbWUKPj4gKGUuZy4gaXQgY29tbXVu
+aWNhdGVzIHdpdGggb3RoZXIgc3lzdGVtcyBvdmVyIGEgbmV0d29yaykgdGhlbiB0aGlzIGNhbgo+
+PiBjYXVzZSBwcm9ibGVtcyAoZS5nLiB0aW1lb3V0cyBtaWdodCBiZSB3cm9uZywgY2VydGlmaWNh
+dGVzIG1pZ2h0IHN0YXJ0Cj4+IGFwcGVhcmluZyB0byBiZSBpbiB0aGUgZnV0dXJlIGV0YykuCj4+
+Cj4+IMKgIDIuIExlYXZlIENOVFZDVCBydW5uaW5nIC0gdGhlIGd1ZXN0IHNlZXMgdGhlIHRpbWUg
+cGFzcyBidXQgaW50ZXJwcmV0cwo+PiB0aGUgdkNQVXMgYXMgZWZmZWN0aXZlbHkgaGF2aW5nIGxv
+Y2tlZCB1cC4gTGludXggd2lsbCB0cmlnZ2VyIHRoZSBzb2Z0Cj4+IGxvY2t1cCB3YXJuaW5nLgo+
+Pgo+PiBUaGVyZSBhcmUgdHdvIHdheXMgb2Ygc29sdmluZyB0aGlzLCB3aGljaCBtYXRjaCB0aGUg
+dHdvIGJlaGF2aW91cnMgYWJvdmU6Cj4+Cj4+IMKgIDEuIFByb3ZpZGUgdGhlIGd1ZXN0IHdpdGgg
+YSB2aWV3IG9mIHdhbGwtY2xvY2sgdGltZS4gVGhlIG9idmlvdXMgd2F5IG9mCj4+IGRvaW5nIHRo
+aXMgaXMgd2l0aCBhIHB2Y2xvY2sgaW1wbGVtZW50YXRpb24gbGlrZSBNU1JfS1ZNX1dBTExfQ0xP
+Q0tfTkVXCj4+IGZvciB4ODYuCj4+Cj4+IMKgIDIuIEluZm9ybSB0aGUgZ3Vlc3QgdG8gaWdub3Jl
+IHRoZSBhcHBhcmVudCAic29mdC1sb2NrdXAiLiBUaGVyZSdzCj4+IGFscmVhZHkgYW4gaW9jdGwg
+Zm9yIHg4NiBmb3IgdGhpczogS1ZNX0tWTUNMT0NLX0NUUkwKPj4KPj4gTXkgcHJlZmVyZW5jZSBp
+cyBmb3Igb3B0aW9uIDEgLSBhcyB0aGlzIGdpdmVzIHRoZSBndWVzdCBhIGdvb2QgdmlldyBvZgo+
+PiBib3RoIHRoZSB0aW1lIHRoYXQgaXQgaXMgYWN0dWFsbHkgZXhlY3V0aW5nICh1c2VmdWwgZm9y
+IGludGVybmFsCj4+IHdhdGNoZG9nIHRpbWVycyBsaWtlIHRoZSBzb2Z0LWxvY2t1cCBvbmUgaW4g
+TGludXgpIGFuZCBtYWludGFpbnMgYSB2aWV3Cj4+IG9mIHdhbGwtY2xvY2sgdGltZSAodXNlZnVs
+IHdoZW4gY29tbXVuaWNhdGluZyB3aXRoIG90aGVyIGV4dGVybmFsCj4+IHNlcnZpY2VzIC0gZS5n
+LiB0aGUgYSBzZXJ2ZXIgb24gdGhlIGludGVybmV0KS4gWW91ciBwYXRjaCB0byBRRU1VCj4+IHBy
+b3ZpZGVzIHRoZSBmaXJzdCBzdGVwIG9mIHRoYXQsIGJ1dCBhcyB5b3UgbWVudGlvbiB0aGVyZSdz
+IG11Y2ggbW9yZQo+PiB0byBkby4KPj4KPj4gT25lIHRoaW5nIEkgaGF2ZW4ndCBpbnZlc3RpZ2F0
+ZWQgaW4gZ3JlYXQgZGV0YWlsIGlzIGhvdyBLVk0gaGFuZGxlcyB0aGUKPj4gdGltZXIgZHVyaW5n
+IHZhcmlvdXMgZm9ybXMgb2Ygc3VzcGVuZC4gSW4gcGFydGljdWxhciBmb3Igc3VzcGVuZCB0eXBl
+cwo+PiBsaWtlIGZ1bGwgaGliZXJuYXRpb24gdGhlIGhvc3QncyBwaHlzaWNhbCBjb3VudGVyIHdp
+bGwganVtcCAocXVpdGUKPj4gcG9zc2libHkgYmFja3dhcmRzKSAtIEkgaGF2ZW4ndCBsb29rZWQg
+aW4gZGV0YWlsIGhvdyBLVk0gcHJlc2VudHMgdGhpcwo+PiB0byB0aGUgZ3Vlc3QuIEhvcGVmdWxs
+eSBub3QgYnkgbWFraW5nIGl0IGdvIGJhY2t3YXJkcyEKPj4KPj4gSSdtIG5vdCBzdXJlIGhvdyBt
+dWNoIHRpbWUgSSdtIGdvaW5nIHRvIGhhdmUgdG8gbG9vayBhdCB0aGlzIGluIHRoZSBuZWFyCj4+
+IGZ1dHVyZSwgYnV0IHBsZWFzZSBrZWVwIG1lIGluIHRoZSBsb29wIGlmIHlvdSBkZWNpZGUgdG8g
+dGFja2xlIGFueSBvZgo+PiB0aGlzLgo+Pgo+PiBUaGFua3MsCj4+Cj4+IFN0ZXZlCj4+Cj4+IC4K
+Pj4KPiAKPiAKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Xwo+IGt2bWFybSBtYWlsaW5nIGxpc3QKPiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cj4g
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0KCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
+aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
+bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
