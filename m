@@ -2,69 +2,61 @@ Return-Path: <SRS0=Fx/F=SN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA519C10F13
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Apr 2019 07:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47802C10F13
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Apr 2019 09:45:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 295F021841
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Apr 2019 07:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295F021841
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id C2D7B2084D
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Apr 2019 09:45:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D7B2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 784E64A4BD;
-	Thu, 11 Apr 2019 03:27:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 307384A4C1;
+	Thu, 11 Apr 2019 05:45:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wZriCoB3cQnB; Thu, 11 Apr 2019 03:27:31 -0400 (EDT)
+	with ESMTP id ym8utd4xluW0; Thu, 11 Apr 2019 05:45:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68CF14A477;
-	Thu, 11 Apr 2019 03:27:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3D5D4A4B0;
+	Thu, 11 Apr 2019 05:45:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E642B4A48B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 03:27:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D33144A4AB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 05:44:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TPpp-POzbsnm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Apr 2019 03:27:28 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE7914A44E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 03:27:27 -0400 (EDT)
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 4E28ACA5DC07DA2741C5;
- Thu, 11 Apr 2019 15:27:23 +0800 (CST)
-Received: from [127.0.0.1] (10.177.31.55) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.408.0; Thu, 11 Apr 2019
- 15:27:17 +0800
-Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
-To: Steven Price <steven.price@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>
-References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
- <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
- <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
- <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
- <20190315085948.GB10950@e113682-lin.lund.arm.com>
- <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
- <101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
- <662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
- <1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
- <0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
-Date: Thu, 11 Apr 2019 15:27:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id Pyn9JMzK-vef for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Apr 2019 05:44:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 996A34A422
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 05:44:58 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCB9A374;
+ Thu, 11 Apr 2019 02:44:57 -0700 (PDT)
+Received: from [10.37.12.253] (unknown [10.37.12.253])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27BD23F59C;
+ Thu, 11 Apr 2019 02:44:54 -0700 (PDT)
+Subject: Re: [PATCH 1/2] kvm: arm: Clean up the checking for huge mapping
+To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org
+References: <1554909297-6753-1-git-send-email-suzuki.poulose@arm.com>
+ <1554909832-7169-1-git-send-email-suzuki.poulose@arm.com>
+ <1554909832-7169-2-git-send-email-suzuki.poulose@arm.com>
+ <529f8515-a069-948b-cb63-96fa35b291a6@huawei.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <ab173598-56a8-f9d3-1165-1bd748c2b8d6@arm.com>
+Date: Thu, 11 Apr 2019 10:47:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-In-Reply-To: <0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
-X-Originating-IP: [10.177.31.55]
-X-CFilter-Loop: Reflected
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <529f8515-a069-948b-cb63-96fa35b291a6@huawei.com>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,82 +68,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190411072716.4JyTubXLsULXl5KGHyr5LXdCRJ0RmO0f_xKiIzBbfCQ@z>
+Message-ID: <20190411094712.6lWsjY7IPPUPkrAquyvZWMBvX7JzY5XdMbEUnb3U-HA@z>
 
-Hi Steve,
-
-After reading kernel code about time keeping and something related, I've not got a clear picture of how we can use MSR_KVM_WALL_CLOCK_NEW to keep wall clock in guest VM.
-
-1. On X86, MSR_KVM_WALL_CLOCK_NEW is only used by the callback of system suspend and resume; I didn't find it used for runtime wall clock reading.
-2. To use the MSR for wall clock synchronization, shall we register KVM PV-clock as a higher rating clock source, so that it will be bound to tk_core.timekeeper and be read at each time of running update_wall_time() in each timer tick?
-3. If the above is true, how can we keep the paravirtualized wall clock always updated? Is it always trapped to the hypervisor? I'm afraid this may cause performance loss. If there is no trap and the data is updated by the hypervisor periodically, how can we guarantee the accuracy?
-
-Meanwhile it seems easier to use KVM_KVMCLOCK_CTRL to get rid of false positive soft lock panic, and guest can rely on cntvct for wall clock updating as it does now, and it seems not difficult for the hypervisor to keep cntvct "always on" and "monotonic".
-
-Please let me know if I miss something.
-
-Thanks,
-Heyi
-
-On 2019/3/27 1:12, Steven Price wrote:
-> Hi Heyi,
->
-> On 26/03/2019 13:53, Heyi Guo wrote:
->> I also tested save/restore operations, and observed that clock in guest
->> would not jump after restoring either. If we consider guest clock not
->> being synchronized with real wall clock as an issue, does it mean
->> save/restore function has the same issue?
-> Basically at the moment when the guest isn't running you have a choice
-> of two behaviours:
->
->   1. Stop (i.e. save/restore) CNTVCT - this means that the guest sees no
-> time occur. If the guest needs to have a concept of wall-clock time
-> (e.g. it communicates with other systems over a network) then this can
-> cause problems (e.g. timeouts might be wrong, certificates might start
-> appearing to be in the future etc).
->
->   2. Leave CNTVCT running - the guest sees the time pass but interprets
-> the vCPUs as effectively having locked up. Linux will trigger the soft
-> lockup warning.
->
-> There are two ways of solving this, which match the two behaviours above:
->
->   1. Provide the guest with a view of wall-clock time. The obvious way of
-> doing this is with a pvclock implementation like MSR_KVM_WALL_CLOCK_NEW
-> for x86.
->
->   2. Inform the guest to ignore the apparent "soft-lockup". There's
-> already an ioctl for x86 for this: KVM_KVMCLOCK_CTRL
->
-> My preference is for option 1 - as this gives the guest a good view of
-> both the time that it is actually executing (useful for internal
-> watchdog timers like the soft-lockup one in Linux) and maintains a view
-> of wall-clock time (useful when communicating with other external
-> services - e.g. the a server on the internet). Your patch to QEMU
-> provides the first step of that, but as you mention there's much more to do.
->
-> One thing I haven't investigated in great detail is how KVM handles the
-> timer during various forms of suspend. In particular for suspend types
-> like full hibernation the host's physical counter will jump (quite
-> possibly backwards) - I haven't looked in detail how KVM presents this
-> to the guest. Hopefully not by making it go backwards!
->
-> I'm not sure how much time I'm going to have to look at this in the near
-> future, but please keep me in the loop if you decide to tackle any of this.
->
-> Thanks,
->
-> Steve
->
-> .
->
-
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMDQvMTEvMjAxOSAwMjo0OCBBTSwgWmVuZ2h1aSBZdSB3cm90ZToKPiAKPiBPbiAyMDE5LzQv
+MTAgMjM6MjMsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4+IElmIHdlIGFyZSBjaGVja2luZyB3
+aGV0aGVyIHRoZSBzdGFnZTIgY2FuIG1hcCBQQUdFX1NJWkUsCj4+IHdlIGRvbid0IGhhdmUgdG8g
+ZG8gdGhlIGJvdW5kYXJ5IGNoZWNrcyBhcyBib3RoIHRoZSBob3N0Cj4+IFZNQSBhbmQgdGhlIGd1
+ZXN0IG1lbXNsb3RzIGFyZSBwYWdlIGFsaWduZWQuIEJhaWwgdGhlIGNhc2UKPj4gZWFzaWx5Lgo+
+Pgo+PiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBhcm0uY29tPgo+PiBD
+YzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4gU2lnbmVkLW9mZi1ieTog
+U3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KPj4gLS0tCj4+IMKgIHZp
+cnQva3ZtL2FybS9tbXUuYyB8IDQgKysrKwo+PiDCoCAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRp
+b25zKCspCj4+Cj4+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9h
+cm0vbW11LmMKPj4gaW5kZXggYTM5ZGNmZC4uNmQ3MzMyMiAxMDA2NDQKPj4gLS0tIGEvdmlydC9r
+dm0vYXJtL21tdS5jCj4+ICsrKyBiL3ZpcnQva3ZtL2FybS9tbXUuYwo+PiBAQCAtMTYyNCw2ICsx
+NjI0LDEwIEBAIHN0YXRpYyBib29sIAo+PiBmYXVsdF9zdXBwb3J0c19zdGFnZTJfaHVnZV9tYXBw
+aW5nKHN0cnVjdCBrdm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4+IMKgwqDCoMKgwqAgaHZhX3Qg
+dWFkZHJfc3RhcnQsIHVhZGRyX2VuZDsKPj4gwqDCoMKgwqDCoCBzaXplX3Qgc2l6ZTsKPj4gK8Kg
+wqDCoCAvKiBUaGUgbWVtc2xvdCBhbmQgdGhlIFZNQSBhcmUgZ3VhcmFudGVlZCB0byBiZSBhbGln
+bmVkIHRvIAo+PiBQQUdFX1NJWkUgKi8KPj4gK8KgwqDCoCBpZiAobWFwX3NpemUgPT0gUEFHRV9T
+SVpFKQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIHRydWU7Cj4+ICsKPj4gwqDCoMKgwqDCoCBz
+aXplID0gbWVtc2xvdC0+bnBhZ2VzICogUEFHRV9TSVpFOwo+PiDCoMKgwqDCoMKgIGdwYV9zdGFy
+dCA9IG1lbXNsb3QtPmJhc2VfZ2ZuIDw8IFBBR0VfU0hJRlQ7Cj4+Cj4gV2UgY2FuIGRvIGEgY29t
+bWVudCBjbGVhbiB1cCBhcyB3ZWxsIGluIHRoaXMgcGF0Y2guCj4gCj4gcy88PCBQQUdFX1NJWkUv
+PDwgUEFHRV9TSElGVC8KClN1cmUsIEkgbWlzc2VkIHRoYXQuIFdpbGwgZml4IGl0IGluIHRoZSBu
+ZXh0IHZlcnNpb24uCgpDaGVlcnMKU3V6dWtpCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
