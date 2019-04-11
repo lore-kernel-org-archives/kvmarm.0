@@ -1,194 +1,109 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/2] kvm: arm: Unify handling THP backed host memory
-Date: Thu, 11 Apr 2019 09:59:06 +0800
-Message-ID: <c48b2bd4-68e6-dbc0-b010-78a23a889196@huawei.com>
-References: <1554909297-6753-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-3-git-send-email-suzuki.poulose@arm.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC] arm/cpu: fix soft lockup panic after resuming from stop
+Date: Thu, 11 Apr 2019 15:27:16 +0800
+Message-ID: <3867fef8-15d9-623c-7bd3-2c673dccf745@huawei.com>
+References: <1552370960-2061-1-git-send-email-guoheyi@huawei.com>
+ <CAFEAcA-29Q-sTg2wLre0GJJCr2gfu89rg0vuTOf7cW5drE4d7Q@mail.gmail.com>
+ <136f773f-9b08-a39b-3ecb-2c00ff290b49@arm.com>
+ <22f57e8a-bdb0-ffeb-ab78-3e9e41cac66b@arm.com>
+ <20190315085948.GB10950@e113682-lin.lund.arm.com>
+ <ff1db661-13c2-50ff-940e-4a1d71bd0309@huawei.com>
+ <101c5f17-9811-e2d0-ff3c-a0e64beee921@arm.com>
+ <662367df-e702-dd0a-da83-f1b448c5f203@huawei.com>
+ <1a315d48-1657-e50b-97ec-ead9c6c459c2@huawei.com>
+ <0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1554909832-7169-3-git-send-email-suzuki.poulose@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, julien.thierry@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, andrew.murray@arm.com, eric.auger@redhat.com, zhengxiang9@huawei.com, wanghaibin.wang@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E642B4A48B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 03:27:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TPpp-POzbsnm for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Apr 2019 03:27:28 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE7914A44E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 03:27:27 -0400 (EDT)
+In-Reply-To: <0e1f903a-d445-6bef-3dfd-6d9f7f6a5f98@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Steven Price <steven.price@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Suzuki,
+Hi Steve,
 
-On 2019/4/10 23:23, Suzuki K Poulose wrote:
-> We support mapping host memory backed by PMD transparent hugepages
-> at stage2 as huge pages. However the checks are now spread across
-> two different places. Let us unify the handling of the THPs to
-> keep the code cleaner (and future proof for PUD THP support).
-> This patch moves transparent_hugepage_adjust() closer to the caller
-> to avoid a forward declaration for fault_supports_stage2_huge_mappings().
-> 
-> Also, since we already handle the case where the host VA and the guest
-> PA may not be aligned, the explicit VM_BUG_ON() is not required.
-> 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> Cc: Zneghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->   virt/kvm/arm/mmu.c | 123 +++++++++++++++++++++++++++--------------------------
->   1 file changed, 62 insertions(+), 61 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 6d73322..714eec2 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1380,53 +1380,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->   	return ret;
->   }
->   
-> -static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
-> -{
-> -	kvm_pfn_t pfn = *pfnp;
-> -	gfn_t gfn = *ipap >> PAGE_SHIFT;
-> -	struct page *page = pfn_to_page(pfn);
-> -
-> -	/*
-> -	 * PageTransCompoundMap() returns true for THP and
-> -	 * hugetlbfs. Make sure the adjustment is done only for THP
-> -	 * pages.
-> -	 */
-> -	if (!PageHuge(page) && PageTransCompoundMap(page)) {
-> -		unsigned long mask;
-> -		/*
-> -		 * The address we faulted on is backed by a transparent huge
-> -		 * page.  However, because we map the compound huge page and
-> -		 * not the individual tail page, we need to transfer the
-> -		 * refcount to the head page.  We have to be careful that the
-> -		 * THP doesn't start to split while we are adjusting the
-> -		 * refcounts.
-> -		 *
-> -		 * We are sure this doesn't happen, because mmu_notifier_retry
-> -		 * was successful and we are holding the mmu_lock, so if this
-> -		 * THP is trying to split, it will be blocked in the mmu
-> -		 * notifier before touching any of the pages, specifically
-> -		 * before being able to call __split_huge_page_refcount().
-> -		 *
-> -		 * We can therefore safely transfer the refcount from PG_tail
-> -		 * to PG_head and switch the pfn from a tail page to the head
-> -		 * page accordingly.
-> -		 */
-> -		mask = PTRS_PER_PMD - 1;
-> -		VM_BUG_ON((gfn & mask) != (pfn & mask));
-> -		if (pfn & mask) {
-> -			*ipap &= PMD_MASK;
-> -			kvm_release_pfn_clean(pfn);
-> -			pfn &= ~mask;
-> -			kvm_get_pfn(pfn);
-> -			*pfnp = pfn;
-> -		}
-> -
-> -		return true;
-> -	}
-> -
-> -	return false;
-> -}
-> -
->   /**
->    * stage2_wp_ptes - write protect PMD range
->    * @pmd:	pointer to pmd entry
-> @@ -1677,6 +1630,61 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->   	       (hva & ~(map_size - 1)) + map_size <= uaddr_end;
->   }
->   
-> +/*
-> + * Check if the given hva is backed by a transparent huge page (THP)
-> + * and whether it can be mapped using block mapping in stage2. If so, adjust
-> + * the stage2 PFN and IPA accordingly. Only PMD_SIZE THPs are currently
-> + * supported. This will need to be updated to support other THP sizes.
-> + *
-> + * Returns the size of the mapping.
-> + */
-> +static unsigned long
-> +transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
-> +			    unsigned long hva, kvm_pfn_t *pfnp,
-> +			    phys_addr_t *ipap)
-> +{
-> +	kvm_pfn_t pfn = *pfnp;
-> +	struct page *page = pfn_to_page(pfn);
-> +
-> +	/*
-> +	 * PageTransCompoundMap() returns true for THP and
-> +	 * hugetlbfs. Make sure the adjustment is done only for THP
-> +	 * pages. Also make sure that the HVA and IPA are sufficiently
-> +	 * aligned and that the  block map is contained within the memslot.
-> +	 */
-> +	if (!PageHuge(page) && PageTransCompoundMap(page) &&
+After reading kernel code about time keeping and something related, I've not got a clear picture of how we can use MSR_KVM_WALL_CLOCK_NEW to keep wall clock in guest VM.
 
-We managed to get here, ensure that we only play with normal size pages
-and no hugetlbfs pages will be involved.  "!PageHuge(page)" will always
-return true and we can let it go.
+1. On X86, MSR_KVM_WALL_CLOCK_NEW is only used by the callback of system suspend and resume; I didn't find it used for runtime wall clock reading.
+2. To use the MSR for wall clock synchronization, shall we register KVM PV-clock as a higher rating clock source, so that it will be bound to tk_core.timekeeper and be read at each time of running update_wall_time() in each timer tick?
+3. If the above is true, how can we keep the paravirtualized wall clock always updated? Is it always trapped to the hypervisor? I'm afraid this may cause performance loss. If there is no trap and the data is updated by the hypervisor periodically, how can we guarantee the accuracy?
 
-> +	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> +		/*
-> +		 * The address we faulted on is backed by a transparent huge
-> +		 * page.  However, because we map the compound huge page and
-> +		 * not the individual tail page, we need to transfer the
-> +		 * refcount to the head page.  We have to be careful that the
-> +		 * THP doesn't start to split while we are adjusting the
-> +		 * refcounts.
-> +		 *
-> +		 * We are sure this doesn't happen, because mmu_notifier_retry
-> +		 * was successful and we are holding the mmu_lock, so if this
-> +		 * THP is trying to split, it will be blocked in the mmu
-> +		 * notifier before touching any of the pages, specifically
-> +		 * before being able to call __split_huge_page_refcount().
-> +		 *
-> +		 * We can therefore safely transfer the refcount from PG_tail
-> +		 * to PG_head and switch the pfn from a tail page to the head
-> +		 * page accordingly.
-> +		 */
-> +		*ipap &= PMD_MASK;
-> +		kvm_release_pfn_clean(pfn);
-> +		pfn &= ~(PTRS_PER_PMD - 1);
-> +		kvm_get_pfn(pfn);
-> +		*pfnp = pfn;
-> +
-> +		return PMD_SIZE;
-> +	}
-> +
-> +	/* Use page mapping if we cannot use block mapping */
-> +	return PAGE_SIZE;
-> +}
-> +
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_memory_slot *memslot, unsigned long hva,
->   			  unsigned long fault_status)
-> @@ -1780,20 +1788,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (mmu_notifier_retry(kvm, mmu_seq))
->   		goto out_unlock;
->   
-> -	if (vma_pagesize == PAGE_SIZE && !force_pte) {
-> -		/*
-> -		 * Only PMD_SIZE transparent hugepages(THP) are
-> -		 * currently supported. This code will need to be
-> -		 * updated to support other THP sizes.
-> -		 *
-> -		 * Make sure the host VA and the guest IPA are sufficiently
-> -		 * aligned and that the block is contained within the memslot.
-> -		 */
-> -		if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
-> -		    transparent_hugepage_adjust(&pfn, &fault_ipa))
-> -			vma_pagesize = PMD_SIZE;
-> -	}
-> -
-> +	/*
-> +	 * If we are not forced to use page mapping, check if we are
-> +	 * backed by a THP and thus use block mapping if possible.
-> +	 */
-> +	if (vma_pagesize == PAGE_SIZE && !force_pte)
-> +		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-> +							   &pfn, &fault_ipa);
->   	if (writable)
->   		kvm_set_pfn_dirty(pfn);
->   
-thanks,
-zenghui
+Meanwhile it seems easier to use KVM_KVMCLOCK_CTRL to get rid of false positive soft lock panic, and guest can rely on cntvct for wall clock updating as it does now, and it seems not difficult for the hypervisor to keep cntvct "always on" and "monotonic".
+
+Please let me know if I miss something.
+
+Thanks,
+Heyi
+
+On 2019/3/27 1:12, Steven Price wrote:
+> Hi Heyi,
+>
+> On 26/03/2019 13:53, Heyi Guo wrote:
+>> I also tested save/restore operations, and observed that clock in guest
+>> would not jump after restoring either. If we consider guest clock not
+>> being synchronized with real wall clock as an issue, does it mean
+>> save/restore function has the same issue?
+> Basically at the moment when the guest isn't running you have a choice
+> of two behaviours:
+>
+>   1. Stop (i.e. save/restore) CNTVCT - this means that the guest sees no
+> time occur. If the guest needs to have a concept of wall-clock time
+> (e.g. it communicates with other systems over a network) then this can
+> cause problems (e.g. timeouts might be wrong, certificates might start
+> appearing to be in the future etc).
+>
+>   2. Leave CNTVCT running - the guest sees the time pass but interprets
+> the vCPUs as effectively having locked up. Linux will trigger the soft
+> lockup warning.
+>
+> There are two ways of solving this, which match the two behaviours above:
+>
+>   1. Provide the guest with a view of wall-clock time. The obvious way of
+> doing this is with a pvclock implementation like MSR_KVM_WALL_CLOCK_NEW
+> for x86.
+>
+>   2. Inform the guest to ignore the apparent "soft-lockup". There's
+> already an ioctl for x86 for this: KVM_KVMCLOCK_CTRL
+>
+> My preference is for option 1 - as this gives the guest a good view of
+> both the time that it is actually executing (useful for internal
+> watchdog timers like the soft-lockup one in Linux) and maintains a view
+> of wall-clock time (useful when communicating with other external
+> services - e.g. the a server on the internet). Your patch to QEMU
+> provides the first step of that, but as you mention there's much more to do.
+>
+> One thing I haven't investigated in great detail is how KVM handles the
+> timer during various forms of suspend. In particular for suspend types
+> like full hibernation the host's physical counter will jump (quite
+> possibly backwards) - I haven't looked in detail how KVM presents this
+> to the guest. Hopefully not by making it go backwards!
+>
+> I'm not sure how much time I'm going to have to look at this in the near
+> future, but please keep me in the loop if you decide to tackle any of this.
+>
+> Thanks,
+>
+> Steve
+>
+> .
+>
