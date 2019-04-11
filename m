@@ -1,25 +1,26 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v13 8/8] arm64: docs: document perf event attributes
-Date: Thu, 11 Apr 2019 18:18:48 +0100
-Message-ID: <20190411171848.GG29081@fuggles.cambridge.arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v13 4/8] arm64: arm_pmu: Add !VHE support for
+ exclude_host/exclude_guest attributes
+Date: Thu, 11 Apr 2019 23:28:04 +0100
+Message-ID: <1cd8d927-6cb9-feed-86ef-cb7598428966@arm.com>
 References: <20190409192217.23459-1-andrew.murray@arm.com>
- <20190409192217.23459-9-andrew.murray@arm.com>
+ <20190409192217.23459-5-andrew.murray@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F904A484
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 13:18:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EE464A48C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 18:25:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7Kn7Wmzv8+qT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Apr 2019 13:18:53 -0400 (EDT)
+ with ESMTP id IVF-cyraD2A6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Apr 2019 18:25:51 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 774064A46F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 13:18:53 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20190409192217.23459-9-andrew.murray@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 25B2B4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 18:25:51 -0400 (EDT)
+In-Reply-To: <20190409192217.23459-5-andrew.murray@arm.com>
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,25 +30,124 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Murray <andrew.murray@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 09, 2019 at 08:22:17PM +0100, Andrew Murray wrote:
-> The interaction between the exclude_{host,guest} flags,
-> exclude_{user,kernel,hv} flags and presence of VHE can result in
-> different exception levels being filtered by the ARMv8 PMU. As this
-> can be confusing let's document how they work on arm64.
+On 04/09/2019 08:22 PM, Andrew Murray wrote:
+> Add support for the :G and :H attributes in perf by handling the
+> exclude_host/exclude_guest event attributes.
+> 
+> We notify KVM of counters that we wish to be enabled or disabled on
+> guest entry/exit and thus defer from starting or stopping events based
+> on their event attributes.
+> 
+> With !VHE we switch the counters between host/guest at EL2. We are able
+> to eliminate counters counting host events on the boundaries of guest
+> entry/exit when using :G by filtering out EL2 for exclude_host. When
+> using !exclude_hv there is a small blackout window at the guest
+> entry/exit where host events are not captured.
 > 
 > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> Acked-by: Will Deacon <will.deacon@arm.com>
 > ---
->  Documentation/arm64/perf.txt | 85 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 85 insertions(+)
->  create mode 100644 Documentation/arm64/perf.txt
 
-Thanks! Hopefully I no longer have to try (and fail) to figure out these
-semantics from the code anymore...
 
-Acked-by: Will Deacon <will.deacon@arm.com>
 
-Will
+>   arch/arm64/kernel/perf_event.c | 43 ++++++++++++++++++++++++++++------
+>   1 file changed, 36 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index cccf4fc86d67..6bb28aaf5aea 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -26,6 +26,7 @@
+>   
+>   #include <linux/acpi.h>
+>   #include <linux/clocksource.h>
+> +#include <linux/kvm_host.h>
+>   #include <linux/of.h>
+>   #include <linux/perf/arm_pmu.h>
+>   #include <linux/platform_device.h>
+> @@ -528,11 +529,21 @@ static inline int armv8pmu_enable_counter(int idx)
+>   
+>   static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+>   {
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = event->hw.idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+> -	armv8pmu_enable_counter(idx);
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_enable_counter(idx - 1);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	kvm_set_pmu_events(counter_bits, attr);
+> +
+> +	/* We rely on the hypervisor switch code to enable guest counters */
+> +	if (!kvm_pmu_counter_deferred(attr)) {
+> +		armv8pmu_enable_counter(idx);
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_enable_counter(idx - 1);
+> +	}
+>   }
+>   
+>   static inline int armv8pmu_disable_counter(int idx)
+> @@ -545,11 +556,21 @@ static inline int armv8pmu_disable_counter(int idx)
+>   static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+>   {
+>   	struct hw_perf_event *hwc = &event->hw;
+> +	struct perf_event_attr *attr = &event->attr;
+>   	int idx = hwc->idx;
+> +	u32 counter_bits = BIT(ARMV8_IDX_TO_COUNTER(idx));
+>   
+>   	if (armv8pmu_event_is_chained(event))
+> -		armv8pmu_disable_counter(idx - 1);
+> -	armv8pmu_disable_counter(idx);
+> +		counter_bits |= BIT(ARMV8_IDX_TO_COUNTER(idx - 1));
+> +
+> +	kvm_clr_pmu_events(counter_bits);
+> +
+> +	/* We rely on the hypervisor switch code to disable guest counters */
+> +	if (!kvm_pmu_counter_deferred(attr)) {
+> +		if (armv8pmu_event_is_chained(event))
+> +			armv8pmu_disable_counter(idx - 1);
+> +		armv8pmu_disable_counter(idx);
+> +	}
+>   }
+>   
+>   static inline int armv8pmu_enable_intens(int idx)
+> @@ -829,11 +850,16 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>   		if (!attr->exclude_kernel)
+>   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+>   	} else {
+> -		if (attr->exclude_kernel)
+> -			config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> -		if (!attr->exclude_hv)
+> +		if (!attr->exclude_hv && !attr->exclude_host)
+>   			config_base |= ARMV8_PMU_INCLUDE_EL2;
+>   	}
+> +
+> +	/*
+> +	 * Filter out !VHE kernels and guest kernels
+> +	 */
+> +	if (attr->exclude_kernel)
+> +		config_base |= ARMV8_PMU_EXCLUDE_EL1;
+> +
+>   	if (attr->exclude_user)
+>   		config_base |= ARMV8_PMU_EXCLUDE_EL0;
+>   
+> @@ -863,6 +889,9 @@ static void armv8pmu_reset(void *info)
+>   		armv8pmu_disable_intens(idx);
+>   	}
+>   
+> +	/* Clear the counters we flip at guest entry/exit */
+> +	kvm_clr_pmu_events(U32_MAX);
+> +
+>   	/*
+>   	 * Initialize & Reset PMNC. Request overflow interrupt for
+>   	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
+> 
+
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
