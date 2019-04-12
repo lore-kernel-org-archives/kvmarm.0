@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 12/14] KVM: Clarify capability requirements for
- KVM_ARM_VCPU_FINALIZE
-Date: Fri, 12 Apr 2019 17:28:16 +0100
-Message-ID: <1555086498-26691-13-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 13/14] KVM: Clarify KVM_{SET,
+ GET}_ONE_REG error code documentation
+Date: Fri, 12 Apr 2019 17:28:17 +0100
+Message-ID: <1555086498-26691-14-git-send-email-Dave.Martin@arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 888F24A4B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8C14A47E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EpTv1n4vCR8u for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55BBF4A4C2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
+ with ESMTP id 1WwUKpSCgM7w for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 12:29:37 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 986534A4B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:36 -0400 (EDT)
 In-Reply-To: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,51 +32,52 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Userspace is only supposed to use KVM_ARM_VCPU_FINALIZE when there
-is some vcpu feature that can actually be finalized.
-
-This means that documenting KVM_ARM_VCPU_FINALIZE as available or
-not depending on the capabilities present is not helpful.
-
-This patch amends the documentation to describe availability in
-terms of which capability is required for each finalizable feature
-instead.
-
-In any case, userspace sees the same error (EINVAL) regardless of
-whether the given feature is not present or KVM_ARM_VCPU_FINALIZE
-is not implemented at all.
-
-No functional change.
-
-Suggested-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
----
- Documentation/virtual/kvm/api.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 68509de..b115b23 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3997,17 +3997,16 @@ userspace should not expect to get any particular value there.
- 
- 4.119 KVM_ARM_VCPU_FINALIZE
- 
--Capability: KVM_CAP_ARM_SVE
- Architectures: arm, arm64
- Type: vcpu ioctl
- Parameters: int feature (in)
- Returns: 0 on success, -1 on error
- Errors:
-   EPERM:     feature not enabled, needs configuration, or already finalized
--  EINVAL:    unknown feature
-+  EINVAL:    feature unknown or not present
- 
- Recognised values for feature:
--  arm64      KVM_ARM_VCPU_SVE
-+  arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
- 
- Finalizes the configuration of the specified vcpu feature.
- 
--- 
-2.1.4
+VGhlIGN1cnJlbnQgZXJyb3IgY29kZSBkb2N1bWVudGF0aW9uIGZvciBLVk1fR0VUX09ORV9SRUcg
+YW5kCktWTV9TRVRfT05FX1JFRyBjb3VsZCBiZSByZWFkIGFzIGltcGx5aW5nIHRoYXQgYWxsIGFy
+Y2hpdGVjdHVyZXMKaW1wbGVtZW50IHRoZXNlIGVycm9yIGNvZGVzLCBvciB0aGF0IEtWTSBndWFy
+YXJudGVlcyB3aGljaCBlcnJvcgpjb2RlIGlzIHJldHVybmVkIGluIGEgcGFydGljdWxhciBzaXR1
+YXRpb24uCgpCZWNhdXNlIHRoaXMgaXMgbm90IHJlYWxseSB0aGUgY2FzZSwgdGhpcyBwYXRjaCB3
+YXRlcnMgZG93biB0aGUKZG9jdW1lbnRhdGlvbiBleHBsaWNpdGx5IHRvIHJlbW92ZSBzdWNoIGd1
+YXJhbnRlZXMuCgpFUEVSTSBpcyBtYXJrZWQgYXMgYXJtNjQtc3BlY2lmaWMsIHNpbmNlIGZvciBu
+b3cgYXJtNjQgcmVhbGx5IGlzCnRoZSBvbmx5IGFyY2hpdGVjdHVyZSB0aGF0IHlpZWxkcyB0aGlz
+IGVycm9yIGNvZGUgZm9yIHRoZQpmaW5hbGl6YXRpb24tcmVxdWlyZWQgY2FzZS4gIEtlZXBpbmcg
+dGhpcyBhcyBhIGRpc3RpbmN0IGVycm9yIGNvZGUKaXMgdXNlZnVsIGhvd2V2ZXIgZm9yIGRlYnVn
+Z2luZyBkdWUgdG8gdGhlIHN0YXRlZnVsbmVzcyBvZiB0aGUgQVBJCmluIHRoaXMgaW5zdGFuY2Uu
+CgpObyBmdW5jdGlvbmFsIGNoYW5nZS4KClN1Z2dlc3RlZC1ieTogQW5kcmV3IEpvbmVzIDxkcmpv
+bmVzQHJlZGhhdC5jb20+CkZpeGVzOiAzOTVmNTYyZjJiNGMgKCJLVk06IERvY3VtZW50IGVycm9y
+cyBmb3IgS1ZNX0dFVF9PTkVfUkVHIGFuZCBLVk1fU0VUX09ORV9SRUciKQpGaXhlczogNTAwMzZh
+ZDA2YjdmICgiS1ZNOiBhcm02NC9zdmU6IERvY3VtZW50IEtWTSBBUEkgZXh0ZW5zaW9ucyBmb3Ig
+U1ZFIikKU2lnbmVkLW9mZi1ieTogRGF2ZSBNYXJ0aW4gPERhdmUuTWFydGluQGFybS5jb20+Ci0t
+LQogRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0IHwgMTQgKysrKysrKysrLS0tLS0K
+IDEgZmlsZSBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0t
+Z2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0IGIvRG9jdW1lbnRhdGlvbi92
+aXJ0dWFsL2t2bS9hcGkudHh0CmluZGV4IGIxMTViMjMuLjc0YzUxYzcgMTAwNjQ0Ci0tLSBhL0Rv
+Y3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dAorKysgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1
+YWwva3ZtL2FwaS50eHQKQEAgLTE4NzMsOCArMTg3MywxMCBAQCBQYXJhbWV0ZXJzOiBzdHJ1Y3Qg
+a3ZtX29uZV9yZWcgKGluKQogUmV0dXJuczogMCBvbiBzdWNjZXNzLCBuZWdhdGl2ZSB2YWx1ZSBv
+biBmYWlsdXJlCiBFcnJvcnM6CiAgwqBFTk9FTlQ6IMKgwqBubyBzdWNoIHJlZ2lzdGVyCi0gwqBF
+UEVSTTogwqDCoMKgcmVnaXN0ZXIgYWNjZXNzIGZvcmJpZGRlbiBmb3IgYXJjaGl0ZWN0dXJlLWRl
+cGVuZGVudCByZWFzb25zCi0gwqBFSU5WQUw6IMKgwqBvdGhlciBlcnJvcnMsIHN1Y2ggYXMgYmFk
+IHNpemUgZW5jb2RpbmcgZm9yIGEga25vd24gcmVnaXN0ZXIKKyDCoEVJTlZBTDogwqDCoGludmFs
+aWQgcmVnaXN0ZXIgSUQsIG9yIG5vIHN1Y2ggcmVnaXN0ZXIKKyDCoEVQRVJNOiDCoMKgwqAoYXJt
+NjQpIHJlZ2lzdGVyIGFjY2VzcyBub3QgYWxsb3dlZCBiZWZvcmUgdmNwdSBmaW5hbGl6YXRpb24K
+KyhUaGVzZSBlcnJvciBjb2RlcyBhcmUgaW5kaWNhdGl2ZSBvbmx5OiBkbyBub3QgcmVseSBvbiBh
+IHNwZWNpZmljIGVycm9yCitjb2RlIGJlaW5nIHJldHVybmVkIGluIGEgc3BlY2lmaWMgc2l0dWF0
+aW9uLikKIAogc3RydWN0IGt2bV9vbmVfcmVnIHsKICAgICAgICBfX3U2NCBpZDsKQEAgLTIyNTgs
+MTAgKzIyNjAsMTIgQEAgQXJjaGl0ZWN0dXJlczogYWxsCiBUeXBlOiB2Y3B1IGlvY3RsCiBQYXJh
+bWV0ZXJzOiBzdHJ1Y3Qga3ZtX29uZV9yZWcgKGluIGFuZCBvdXQpCiBSZXR1cm5zOiAwIG9uIHN1
+Y2Nlc3MsIG5lZ2F0aXZlIHZhbHVlIG9uIGZhaWx1cmUKLUVycm9yczoKK0Vycm9ycyBpbmNsdWRl
+OgogIMKgRU5PRU5UOiDCoMKgbm8gc3VjaCByZWdpc3RlcgotIMKgRVBFUk06IMKgwqDCoHJlZ2lz
+dGVyIGFjY2VzcyBmb3JiaWRkZW4gZm9yIGFyY2hpdGVjdHVyZS1kZXBlbmRlbnQgcmVhc29ucwot
+IMKgRUlOVkFMOiDCoMKgb3RoZXIgZXJyb3JzLCBzdWNoIGFzIGJhZCBzaXplIGVuY29kaW5nIGZv
+ciBhIGtub3duIHJlZ2lzdGVyCisgwqBFSU5WQUw6IMKgwqBpbnZhbGlkIHJlZ2lzdGVyIElELCBv
+ciBubyBzdWNoIHJlZ2lzdGVyCisgwqBFUEVSTTogwqDCoMKgKGFybTY0KSByZWdpc3RlciBhY2Nl
+c3Mgbm90IGFsbG93ZWQgYmVmb3JlIHZjcHUgZmluYWxpemF0aW9uCisoVGhlc2UgZXJyb3IgY29k
+ZXMgYXJlIGluZGljYXRpdmUgb25seTogZG8gbm90IHJlbHkgb24gYSBzcGVjaWZpYyBlcnJvcgor
+Y29kZSBiZWluZyByZXR1cm5lZCBpbiBhIHNwZWNpZmljIHNpdHVhdGlvbi4pCiAKIFRoaXMgaW9j
+dGwgYWxsb3dzIHRvIHJlY2VpdmUgdGhlIHZhbHVlIG9mIGEgc2luZ2xlIHJlZ2lzdGVyIGltcGxl
+bWVudGVkCiBpbiBhIHZjcHUuIFRoZSByZWdpc3RlciB0byByZWFkIGlzIGluZGljYXRlZCBieSB0
+aGUgImlkIiBmaWVsZCBvZiB0aGUKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
+cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
+aW5mby9rdm1hcm0K
