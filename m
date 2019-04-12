@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH 10/14] KVM: arm64/sve: Explain validity checks in set_sve_vls()
-Date: Fri, 12 Apr 2019 17:28:14 +0100
-Message-ID: <1555086498-26691-11-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 12/14] KVM: Clarify capability requirements for
+ KVM_ARM_VCPU_FINALIZE
+Date: Fri, 12 Apr 2019 17:28:16 +0100
+Message-ID: <1555086498-26691-13-git-send-email-Dave.Martin@arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AACAF4A485
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 888F24A4B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IvNfi8oWBsWw for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Apr 2019 12:29:29 -0400 (EDT)
+ with ESMTP id EpTv1n4vCR8u for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 659EE4A4D3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55BBF4A4C2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
 In-Reply-To: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,43 +32,51 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Correct virtualization of SVE relies for correctness on code in
-set_sve_vls() that verifies consistency between the set of vector
-lengths requested by userspace and the set of vector lengths
-available on the host.
+Userspace is only supposed to use KVM_ARM_VCPU_FINALIZE when there
+is some vcpu feature that can actually be finalized.
 
-However, the purpose of this code is not obvious, and not likely to
-be apparent at all to people who do not have detailed knowledge of
-the SVE system-level architecture.
+This means that documenting KVM_ARM_VCPU_FINALIZE as available or
+not depending on the capabilities present is not helpful.
 
-This patch adds a suitable comment to explain what these checks are
-for.
+This patch amends the documentation to describe availability in
+terms of which capability is required for each finalizable feature
+instead.
+
+In any case, userspace sees the same error (EINVAL) regardless of
+whether the given feature is not present or KVM_ARM_VCPU_FINALIZE
+is not implemented at all.
 
 No functional change.
 
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm64/kvm/guest.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ Documentation/virtual/kvm/api.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index f025a2f..7f10d6d 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -266,6 +266,13 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
- 		return -EINVAL;
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 68509de..b115b23 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3997,17 +3997,16 @@ userspace should not expect to get any particular value there.
  
-+	/*
-+	 * Vector lengths supported by the host can't currently be
-+	 * hidden from the guest individually: instead we can only set a
-+	 * maxmium via ZCR_EL2.LEN.  So, make sure the available vector
-+	 * lengths match the set requested exactly up to the requested
-+	 * maximum:
-+	 */
- 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
- 		if (vq_present(&vqs, vq) != sve_vq_available(vq))
- 			return -EINVAL;
+ 4.119 KVM_ARM_VCPU_FINALIZE
+ 
+-Capability: KVM_CAP_ARM_SVE
+ Architectures: arm, arm64
+ Type: vcpu ioctl
+ Parameters: int feature (in)
+ Returns: 0 on success, -1 on error
+ Errors:
+   EPERM:     feature not enabled, needs configuration, or already finalized
+-  EINVAL:    unknown feature
++  EINVAL:    feature unknown or not present
+ 
+ Recognised values for feature:
+-  arm64      KVM_ARM_VCPU_SVE
++  arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+ 
+ Finalizes the configuration of the specified vcpu feature.
+ 
 -- 
 2.1.4
