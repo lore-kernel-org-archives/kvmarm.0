@@ -2,60 +2,65 @@ Return-Path: <SRS0=yTkG=SO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E42C10F0E
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 03:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27455C10F14
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 09:37:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 311BC2083E
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 03:21:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 311BC2083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A331F205F4
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 09:37:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A331F205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D96A74A49C;
-	Thu, 11 Apr 2019 23:21:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15C274A482;
+	Fri, 12 Apr 2019 05:37:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2T9wo1teLXqv; Thu, 11 Apr 2019 23:21:18 -0400 (EDT)
+	with ESMTP id N1FHAWB9Iw4A; Fri, 12 Apr 2019 05:37:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78AB54A4A3;
-	Thu, 11 Apr 2019 23:21:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB514A4C3;
+	Fri, 12 Apr 2019 05:37:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 885834A476
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 23:21:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C64224A482
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 05:37:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fVFmX7OwkHi2 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Apr 2019 23:21:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 145EE4A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Apr 2019 23:21:16 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8495A15AB;
- Thu, 11 Apr 2019 20:21:15 -0700 (PDT)
-Received: from a075553-lin.blr.arm.com (a075553-lin.blr.arm.com [10.162.0.144])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 466CF3F73D;
- Thu, 11 Apr 2019 20:21:11 -0700 (PDT)
-From: Amit Daniel Kachhap <amit.kachhap@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [kvmtool PATCH v9 5/5] KVM: arm/arm64: Add a vcpu feature for pointer
- authentication
-Date: Fri, 12 Apr 2019 08:50:36 +0530
-Message-Id: <1555039236-10608-6-git-send-email-amit.kachhap@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1555039236-10608-1-git-send-email-amit.kachhap@arm.com>
-References: <1555039236-10608-1-git-send-email-amit.kachhap@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>, kvmarm@lists.cs.columbia.edu,
- Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
- Amit Daniel Kachhap <amit.kachhap@arm.com>, Dave Martin <Dave.Martin@arm.com>,
- linux-kernel@vger.kernel.org
+ with ESMTP id ja3YLIvM8-XZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 05:37:16 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0638E4A476
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 05:37:15 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id AF22C68F1E796B373A28;
+ Fri, 12 Apr 2019 17:37:12 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.408.0; Fri, 12 Apr 2019
+ 17:37:04 +0800
+Subject: Re: [PATCH 2/2] kvm: arm: Unify handling THP backed host memory
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ <linux-arm-kernel@lists.infradead.org>
+References: <1554909297-6753-1-git-send-email-suzuki.poulose@arm.com>
+ <1554909832-7169-1-git-send-email-suzuki.poulose@arm.com>
+ <1554909832-7169-3-git-send-email-suzuki.poulose@arm.com>
+ <c48b2bd4-68e6-dbc0-b010-78a23a889196@huawei.com>
+ <1bac514c-e4f0-a609-96ed-f48ef3461da1@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <e5f35fa6-ab8d-695a-6c66-bfb2b2465b2a@huawei.com>
+Date: Fri, 12 Apr 2019 17:34:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
+MIME-Version: 1.0
+In-Reply-To: <1bac514c-e4f0-a609-96ed-f48ef3461da1@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,145 +72,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190412032036.FIkJkLOG4OG42kDeSLOa1F_T_05O0Pt3EKBeFlqZhKw@z>
+Message-ID: <20190412093453.0FEXSZm3amITqPDFtiGJ2X45BB0gYJjCFiiuimz6fkQ@z>
 
-This patch adds a runtime capabality for KVM tool to enable Arm64 8.3
-Pointer Authentication in guest kernel. Two vcpu features
-KVM_ARM_VCPU_PTRAUTH_[ADDRESS/GENERIC] are supplied together to enable
-Pointer Authentication in KVM guest after checking the capability.
-
-Command line options --enable-ptrauth and --disable-ptrauth are added
-to use this feature. However, if those options are not provided then
-also this feature is enabled if host supports this capability.
-
-The macros defined in the headers are not in sync and should be replaced
-from the upstream.
-
-Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
----
-Changes since v8:
-*  Added option --enable-ptrauth and --disable-ptrauth to use ptrauth. Also
-   enable ptrauth if no option provided and Host supports ptrauth. [Dave Martin]
-* The macro definition are not linear as the kvmtool is not synchronised with the
-  kernel changes present in kvmarm/next tree.
-
- arm/aarch32/include/kvm/kvm-cpu-arch.h    |  1 +
- arm/aarch64/include/asm/kvm.h             |  2 ++
- arm/aarch64/include/kvm/kvm-config-arch.h |  6 +++++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    |  2 ++
- arm/include/arm-common/kvm-config-arch.h  |  2 ++
- arm/kvm-cpu.c                             | 11 +++++++++++
- include/linux/kvm.h                       |  2 ++
- 7 files changed, 25 insertions(+), 1 deletion(-)
-
-diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index d28ea67..520ea76 100644
---- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -13,4 +13,5 @@
- #define ARM_CPU_ID		0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
- 
-+#define ARM_VCPU_PTRAUTH_FEATURE	0
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 97c3478..a2546e6 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -102,6 +102,8 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
- #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-+#define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* CPU uses address pointer authentication */
-+#define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* CPU uses generic pointer authentication */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..0279b13 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,7 +8,11 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_BOOLEAN('\0', "enable-ptrauth", &(cfg)->enable_ptrauth,	\
-+			"Enables pointer authentication"),		\
-+	OPT_BOOLEAN('\0', "disable-ptrauth", &(cfg)->disable_ptrauth,	\
-+			"Disables pointer authentication"),
- 
- #include "arm-common/kvm-config-arch.h"
- 
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563..fcc2107 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -17,4 +17,6 @@
- #define ARM_CPU_CTRL		3, 0, 1, 0
- #define ARM_CPU_CTRL_SCTLR_EL1	0
- 
-+#define ARM_VCPU_PTRAUTH_FEATURE	((1UL << KVM_ARM_VCPU_PTRAUTH_ADDRESS) \
-+					| (1UL << KVM_ARM_VCPU_PTRAUTH_GENERIC))
- #endif /* KVM__KVM_CPU_ARCH_H */
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46..1b4287d 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -10,6 +10,8 @@ struct kvm_config_arch {
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
- 	u64		kaslr_seed;
-+	bool		enable_ptrauth;
-+	bool		disable_ptrauth;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
- };
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 7780251..a45a649 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -69,6 +69,17 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	}
- 
- 	/*
-+	 * Always enable Pointer Authentication if requested. If system supports
-+	 * this extension then also enable it by default provided no disable
-+	 * request present.
-+	 */
-+	if ((kvm->cfg.arch.enable_ptrauth) ||
-+		(kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
-+		kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC) &&
-+		!kvm->cfg.arch.disable_ptrauth))
-+			vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
-+
-+	/*
- 	 * If the preferred target ioctl is successful then
- 	 * use preferred target else try each and every target type
- 	 */
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 6d4ea4b..de1033b 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -988,6 +988,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_VM_IPA_SIZE 165
- #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
- #define KVM_CAP_HYPERV_CPUID 167
-+#define KVM_CAP_ARM_PTRAUTH_ADDRESS 169
-+#define KVM_CAP_ARM_PTRAUTH_GENERIC 170
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.7.4
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Ck9uIDIwMTkvNC8xMSAyMzoxNiwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKPiBIaSBaaGVuZ3Vp
+LAo+IAo+IE9uIDExLzA0LzIwMTkgMDI6NTksIFplbmdodWkgWXUgd3JvdGU6Cj4+IEhpIFN1enVr
+aSwKPj4KPj4gT24gMjAxOS80LzEwIDIzOjIzLCBTdXp1a2kgSyBQb3Vsb3NlIHdyb3RlOgo+Pj4g
+V2Ugc3VwcG9ydCBtYXBwaW5nIGhvc3QgbWVtb3J5IGJhY2tlZCBieSBQTUQgdHJhbnNwYXJlbnQg
+aHVnZXBhZ2VzCj4+PiBhdCBzdGFnZTIgYXMgaHVnZSBwYWdlcy4gSG93ZXZlciB0aGUgY2hlY2tz
+IGFyZSBub3cgc3ByZWFkIGFjcm9zcwo+Pj4gdHdvIGRpZmZlcmVudCBwbGFjZXMuIExldCB1cyB1
+bmlmeSB0aGUgaGFuZGxpbmcgb2YgdGhlIFRIUHMgdG8KPj4+IGtlZXAgdGhlIGNvZGUgY2xlYW5l
+ciAoYW5kIGZ1dHVyZSBwcm9vZiBmb3IgUFVEIFRIUCBzdXBwb3J0KS4KPj4+IFRoaXMgcGF0Y2gg
+bW92ZXMgdHJhbnNwYXJlbnRfaHVnZXBhZ2VfYWRqdXN0KCkgY2xvc2VyIHRvIHRoZSBjYWxsZXIK
+Pj4+IHRvIGF2b2lkIGEgZm9yd2FyZCBkZWNsYXJhdGlvbiBmb3IgCj4+PiBmYXVsdF9zdXBwb3J0
+c19zdGFnZTJfaHVnZV9tYXBwaW5ncygpLgo+Pj4KPj4+IEFsc28sIHNpbmNlIHdlIGFscmVhZHkg
+aGFuZGxlIHRoZSBjYXNlIHdoZXJlIHRoZSBob3N0IFZBIGFuZCB0aGUgZ3Vlc3QKPj4+IFBBIG1h
+eSBub3QgYmUgYWxpZ25lZCwgdGhlIGV4cGxpY2l0IFZNX0JVR19PTigpIGlzIG5vdCByZXF1aXJl
+ZC4KPj4+Cj4+PiBDYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4+IENj
+OiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGFybS5jb20+Cj4+PiBDYzogWm5l
+Z2h1aSBZdSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBTdXp1a2kg
+SyBQb3Vsb3NlIDxzdXp1a2kucG91bG9zZUBhcm0uY29tPgo+Pj4gLS0tCj4+PiDCoMKgIHZpcnQv
+a3ZtL2FybS9tbXUuYyB8IDEyMyAKPj4+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCA2MiBpbnNlcnRp
+b25zKCspLCA2MSBkZWxldGlvbnMoLSkKPj4+Cj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJt
+L21tdS5jIGIvdmlydC9rdm0vYXJtL21tdS5jCj4+PiBpbmRleCA2ZDczMzIyLi43MTRlZWMyIDEw
+MDY0NAo+Pj4gLS0tIGEvdmlydC9rdm0vYXJtL21tdS5jCj4+PiArKysgYi92aXJ0L2t2bS9hcm0v
+bW11LmMKPj4+IEBAIC0xMzgwLDUzICsxMzgwLDYgQEAgaW50IGt2bV9waHlzX2FkZHJfaW9yZW1h
+cChzdHJ1Y3Qga3ZtICprdm0sIAo+Pj4gcGh5c19hZGRyX3QgZ3Vlc3RfaXBhLAo+Pj4gwqDCoMKg
+wqDCoMKgIHJldHVybiByZXQ7Cj4+PiDCoMKgIH0KPj4+IC1zdGF0aWMgYm9vbCB0cmFuc3BhcmVu
+dF9odWdlcGFnZV9hZGp1c3Qoa3ZtX3Bmbl90ICpwZm5wLCBwaHlzX2FkZHJfdCAKPj4+ICppcGFw
+KQo+Pj4gLXsKPj4+IC3CoMKgwqAga3ZtX3Bmbl90IHBmbiA9ICpwZm5wOwo+Pj4gLcKgwqDCoCBn
+Zm5fdCBnZm4gPSAqaXBhcCA+PiBQQUdFX1NISUZUOwo+Pj4gLcKgwqDCoCBzdHJ1Y3QgcGFnZSAq
+cGFnZSA9IHBmbl90b19wYWdlKHBmbik7Cj4+PiAtCj4+PiAtwqDCoMKgIC8qCj4+PiAtwqDCoMKg
+wqAgKiBQYWdlVHJhbnNDb21wb3VuZE1hcCgpIHJldHVybnMgdHJ1ZSBmb3IgVEhQIGFuZAo+Pj4g
+LcKgwqDCoMKgICogaHVnZXRsYmZzLiBNYWtlIHN1cmUgdGhlIGFkanVzdG1lbnQgaXMgZG9uZSBv
+bmx5IGZvciBUSFAKPj4+IC3CoMKgwqDCoCAqIHBhZ2VzLgo+Pj4gLcKgwqDCoMKgICovCj4+PiAt
+wqDCoMKgIGlmICghUGFnZUh1Z2UocGFnZSkgJiYgUGFnZVRyYW5zQ29tcG91bmRNYXAocGFnZSkp
+IHsKPj4+IC3CoMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBsb25nIG1hc2s7Cj4+PiAtwqDCoMKgwqDC
+oMKgwqAgLyoKPj4+IC3CoMKgwqDCoMKgwqDCoMKgICogVGhlIGFkZHJlc3Mgd2UgZmF1bHRlZCBv
+biBpcyBiYWNrZWQgYnkgYSB0cmFuc3BhcmVudCBodWdlCj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAq
+IHBhZ2UuwqAgSG93ZXZlciwgYmVjYXVzZSB3ZSBtYXAgdGhlIGNvbXBvdW5kIGh1Z2UgcGFnZSBh
+bmQKPj4+IC3CoMKgwqDCoMKgwqDCoMKgICogbm90IHRoZSBpbmRpdmlkdWFsIHRhaWwgcGFnZSwg
+d2UgbmVlZCB0byB0cmFuc2ZlciB0aGUKPj4+IC3CoMKgwqDCoMKgwqDCoMKgICogcmVmY291bnQg
+dG8gdGhlIGhlYWQgcGFnZS7CoCBXZSBoYXZlIHRvIGJlIGNhcmVmdWwgdGhhdCB0aGUKPj4+IC3C
+oMKgwqDCoMKgwqDCoMKgICogVEhQIGRvZXNuJ3Qgc3RhcnQgdG8gc3BsaXQgd2hpbGUgd2UgYXJl
+IGFkanVzdGluZyB0aGUKPj4+IC3CoMKgwqDCoMKgwqDCoMKgICogcmVmY291bnRzLgo+Pj4gLcKg
+wqDCoMKgwqDCoMKgwqAgKgo+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKiBXZSBhcmUgc3VyZSB0aGlz
+IGRvZXNuJ3QgaGFwcGVuLCBiZWNhdXNlIG1tdV9ub3RpZmllcl9yZXRyeQo+Pj4gLcKgwqDCoMKg
+wqDCoMKgwqAgKiB3YXMgc3VjY2Vzc2Z1bCBhbmQgd2UgYXJlIGhvbGRpbmcgdGhlIG1tdV9sb2Nr
+LCBzbyBpZiB0aGlzCj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIFRIUCBpcyB0cnlpbmcgdG8gc3Bs
+aXQsIGl0IHdpbGwgYmUgYmxvY2tlZCBpbiB0aGUgbW11Cj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAq
+IG5vdGlmaWVyIGJlZm9yZSB0b3VjaGluZyBhbnkgb2YgdGhlIHBhZ2VzLCBzcGVjaWZpY2FsbHkK
+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgICogYmVmb3JlIGJlaW5nIGFibGUgdG8gY2FsbCBfX3NwbGl0
+X2h1Z2VfcGFnZV9yZWZjb3VudCgpLgo+Pj4gLcKgwqDCoMKgwqDCoMKgwqAgKgo+Pj4gLcKgwqDC
+oMKgwqDCoMKgwqAgKiBXZSBjYW4gdGhlcmVmb3JlIHNhZmVseSB0cmFuc2ZlciB0aGUgcmVmY291
+bnQgZnJvbSBQR190YWlsCj4+PiAtwqDCoMKgwqDCoMKgwqDCoCAqIHRvIFBHX2hlYWQgYW5kIHN3
+aXRjaCB0aGUgcGZuIGZyb20gYSB0YWlsIHBhZ2UgdG8gdGhlIGhlYWQKPj4+IC3CoMKgwqDCoMKg
+wqDCoMKgICogcGFnZSBhY2NvcmRpbmdseS4KPj4+IC3CoMKgwqDCoMKgwqDCoMKgICovCj4+PiAt
+wqDCoMKgwqDCoMKgwqAgbWFzayA9IFBUUlNfUEVSX1BNRCAtIDE7Cj4+PiAtwqDCoMKgwqDCoMKg
+wqAgVk1fQlVHX09OKChnZm4gJiBtYXNrKSAhPSAocGZuICYgbWFzaykpOwo+Pj4gLcKgwqDCoMKg
+wqDCoMKgIGlmIChwZm4gJiBtYXNrKSB7Cj4+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqaXBh
+cCAmPSBQTURfTUFTSzsKPj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGt2bV9yZWxlYXNlX3Bm
+bl9jbGVhbihwZm4pOwo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcGZuICY9IH5tYXNrOwo+
+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX2dldF9wZm4ocGZuKTsKPj4+IC3CoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgICpwZm5wID0gcGZuOwo+Pj4gLcKgwqDCoMKgwqDCoMKgIH0KPj4+IC0K
+Pj4+IC3CoMKgwqDCoMKgwqDCoCByZXR1cm4gdHJ1ZTsKPj4+IC3CoMKgwqAgfQo+Pj4gLQo+Pj4g
+LcKgwqDCoCByZXR1cm4gZmFsc2U7Cj4+PiAtfQo+Pj4gLQo+Pj4gwqDCoCAvKioKPj4+IMKgwqDC
+oCAqIHN0YWdlMl93cF9wdGVzIC0gd3JpdGUgcHJvdGVjdCBQTUQgcmFuZ2UKPj4+IMKgwqDCoCAq
+IEBwbWQ6wqDCoMKgIHBvaW50ZXIgdG8gcG1kIGVudHJ5Cj4+PiBAQCAtMTY3Nyw2ICsxNjMwLDYx
+IEBAIHN0YXRpYyBib29sIAo+Pj4gZmF1bHRfc3VwcG9ydHNfc3RhZ2UyX2h1Z2VfbWFwcGluZyhz
+dHJ1Y3Qga3ZtX21lbW9yeV9zbG90ICptZW1zbG90LAo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgKGh2YSAmIH4obWFwX3NpemUgLSAxKSkgKyBtYXBfc2l6ZSA8PSB1YWRkcl9lbmQ7Cj4+
+PiDCoMKgIH0KPj4+ICsvKgo+Pj4gKyAqIENoZWNrIGlmIHRoZSBnaXZlbiBodmEgaXMgYmFja2Vk
+IGJ5IGEgdHJhbnNwYXJlbnQgaHVnZSBwYWdlIChUSFApCj4+PiArICogYW5kIHdoZXRoZXIgaXQg
+Y2FuIGJlIG1hcHBlZCB1c2luZyBibG9jayBtYXBwaW5nIGluIHN0YWdlMi4gSWYgCj4+PiBzbywg
+YWRqdXN0Cj4+PiArICogdGhlIHN0YWdlMiBQRk4gYW5kIElQQSBhY2NvcmRpbmdseS4gT25seSBQ
+TURfU0laRSBUSFBzIGFyZSBjdXJyZW50bHkKPj4+ICsgKiBzdXBwb3J0ZWQuIFRoaXMgd2lsbCBu
+ZWVkIHRvIGJlIHVwZGF0ZWQgdG8gc3VwcG9ydCBvdGhlciBUSFAgc2l6ZXMuCj4+PiArICoKPj4+
+ICsgKiBSZXR1cm5zIHRoZSBzaXplIG9mIHRoZSBtYXBwaW5nLgo+Pj4gKyAqLwo+Pj4gK3N0YXRp
+YyB1bnNpZ25lZCBsb25nCj4+PiArdHJhbnNwYXJlbnRfaHVnZXBhZ2VfYWRqdXN0KHN0cnVjdCBr
+dm1fbWVtb3J5X3Nsb3QgKm1lbXNsb3QsCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHVuc2lnbmVkIGxvbmcgaHZhLCBrdm1fcGZuX3QgKnBmbnAsCj4+PiArwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHBoeXNfYWRkcl90ICppcGFwKQo+Pj4gK3sKPj4+ICvCoMKgwqAg
+a3ZtX3Bmbl90IHBmbiA9ICpwZm5wOwo+Pj4gK8KgwqDCoCBzdHJ1Y3QgcGFnZSAqcGFnZSA9IHBm
+bl90b19wYWdlKHBmbik7Cj4+PiArCj4+PiArwqDCoMKgIC8qCj4+PiArwqDCoMKgwqAgKiBQYWdl
+VHJhbnNDb21wb3VuZE1hcCgpIHJldHVybnMgdHJ1ZSBmb3IgVEhQIGFuZAo+Pj4gK8KgwqDCoMKg
+ICogaHVnZXRsYmZzLiBNYWtlIHN1cmUgdGhlIGFkanVzdG1lbnQgaXMgZG9uZSBvbmx5IGZvciBU
+SFAKPj4+ICvCoMKgwqDCoCAqIHBhZ2VzLiBBbHNvIG1ha2Ugc3VyZSB0aGF0IHRoZSBIVkEgYW5k
+IElQQSBhcmUgc3VmZmljaWVudGx5Cj4+PiArwqDCoMKgwqAgKiBhbGlnbmVkIGFuZCB0aGF0IHRo
+ZcKgIGJsb2NrIG1hcCBpcyBjb250YWluZWQgd2l0aGluIHRoZSBtZW1zbG90Lgo+Pj4gK8KgwqDC
+oMKgICovCj4+PiArwqDCoMKgIGlmICghUGFnZUh1Z2UocGFnZSkgJiYgUGFnZVRyYW5zQ29tcG91
+bmRNYXAocGFnZSkgJiYKPj4KPj4gV2UgbWFuYWdlZCB0byBnZXQgaGVyZSwgZW5zdXJlIHRoYXQg
+d2Ugb25seSBwbGF5IHdpdGggbm9ybWFsIHNpemUgcGFnZXMKPj4gYW5kIG5vIGh1Z2V0bGJmcyBw
+YWdlcyB3aWxsIGJlIGludm9sdmVkLsKgICIhUGFnZUh1Z2UocGFnZSkiIHdpbGwgYWx3YXlzCj4+
+IHJldHVybiB0cnVlIGFuZCB3ZSBjYW4gbGV0IGl0IGdvLgo+IAo+IEkgdGhpbmsgdGhhdCBpcyBh
+IGJpdCB0cmlja3kuIElmIHNvbWVvbmUgZXZlciBtb2RpZmllcyB0aGUgdXNlcl9tZW1fYWJvcnQo
+KQo+IGFuZCB3ZSBlbmQgdXAgaW4gZ2V0dGluZyBjYWxsZWQgd2l0aCBhIEh1Z2VUTEIgYmFja2Vk
+IHBhZ2UgdGhpbmdzIGNvdWxkIGdvCj4gd3JvbmcuCgpUaGF0IHdpbGwgYmUgYmFkLiBJJ20gbm90
+IHN1cmUgaWYgaXQncyBwb3NzaWJsZSBpbiB0aGUgZnV0dXJlLgoKPiBJIGNvdWxkIGRvIHJlbW92
+ZSB0aGUgY2hlY2ssIGJ1dCB3b3VsZCBsaWtlIHRvIGFkZCBhIFdBUk5fT05fT05DRSgpIHRvIG1h
+a2UKPiBzdXJlIG91ciBhc3N1bXB0aW9uIGlzIGhlbGQuCj4gCj4gaS5lLAo+ICDCoMKgwqDCoFdB
+Uk5fT05fT05DRShQYWdlSHVnZShwYWdlKSk7CgpCdXQgdGhpcyBpcyBhIGNhcmVmdWwgYXBwcm9h
+Y2guIEkgdGhpbmsgdGhpcyB3aWxsIGJlIHZhbHVhYmxlIGJvdGggZm9yCmRldmVsb3BlcnMgYW5k
+IHRoZSBjb2RlIGl0c2VsZi4gVGhhbmtzIQoKCnplbmdodWkKCj4gCj4gIMKgwqDCoMKgaWYgKFBh
+Z2VUcmFuc0NvbXBvdW5kTWFwKHBhZ2UpICYmPj4gKyAKPiBmYXVsdF9zdXBwb3J0c19zdGFnZTJf
+aHVnZV9tYXBwaW5nKG1lbXNsb3QsIGh2YSwgUE1EX1NJWkUpKSB7Cj4gCj4gLi4uCj4gCgoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
