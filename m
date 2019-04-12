@@ -1,164 +1,83 @@
-From: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/2] kvm: arm: Unify handling THP backed host memory
-Date: Fri, 12 Apr 2019 17:34:53 +0800
-Message-ID: <e5f35fa6-ab8d-695a-6c66-bfb2b2465b2a@huawei.com>
-References: <1554909297-6753-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-1-git-send-email-suzuki.poulose@arm.com>
- <1554909832-7169-3-git-send-email-suzuki.poulose@arm.com>
- <c48b2bd4-68e6-dbc0-b010-78a23a889196@huawei.com>
- <1bac514c-e4f0-a609-96ed-f48ef3461da1@arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH 00/14] KVM: arm64: SVE cleanups
+Date: Fri, 12 Apr 2019 17:28:04 +0100
+Message-ID: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1bac514c-e4f0-a609-96ed-f48ef3461da1@arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, julien.thierry@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com, andrew.murray@arm.com, eric.auger@redhat.com, zhengxiang9@huawei.com, wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CBF14A4B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:28:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zUkRKlGj-FYb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 12:28:25 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB3404A47E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:28:25 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+This series contains some cleanups applicable to the SVE KVM support
+patches merged into kvmarm/next.  These arose from Andrew Jones'
+review.
 
-On 2019/4/11 23:16, Suzuki K Poulose wrote:
-> Hi Zhengui,
-> 
-> On 11/04/2019 02:59, Zenghui Yu wrote:
->> Hi Suzuki,
->>
->> On 2019/4/10 23:23, Suzuki K Poulose wrote:
->>> We support mapping host memory backed by PMD transparent hugepages
->>> at stage2 as huge pages. However the checks are now spread across
->>> two different places. Let us unify the handling of the THPs to
->>> keep the code cleaner (and future proof for PUD THP support).
->>> This patch moves transparent_hugepage_adjust() closer to the caller
->>> to avoid a forward declaration for 
->>> fault_supports_stage2_huge_mappings().
->>>
->>> Also, since we already handle the case where the host VA and the guest
->>> PA may not be aligned, the explicit VM_BUG_ON() is not required.
->>>
->>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>> Cc: Christoffer Dall <christoffer.dall@arm.com>
->>> Cc: Zneghui Yu <yuzenghui@huawei.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>>    virt/kvm/arm/mmu.c | 123 
->>> +++++++++++++++++++++++++++--------------------------
->>>    1 file changed, 62 insertions(+), 61 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>> index 6d73322..714eec2 100644
->>> --- a/virt/kvm/arm/mmu.c
->>> +++ b/virt/kvm/arm/mmu.c
->>> @@ -1380,53 +1380,6 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, 
->>> phys_addr_t guest_ipa,
->>>        return ret;
->>>    }
->>> -static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t 
->>> *ipap)
->>> -{
->>> -    kvm_pfn_t pfn = *pfnp;
->>> -    gfn_t gfn = *ipap >> PAGE_SHIFT;
->>> -    struct page *page = pfn_to_page(pfn);
->>> -
->>> -    /*
->>> -     * PageTransCompoundMap() returns true for THP and
->>> -     * hugetlbfs. Make sure the adjustment is done only for THP
->>> -     * pages.
->>> -     */
->>> -    if (!PageHuge(page) && PageTransCompoundMap(page)) {
->>> -        unsigned long mask;
->>> -        /*
->>> -         * The address we faulted on is backed by a transparent huge
->>> -         * page.  However, because we map the compound huge page and
->>> -         * not the individual tail page, we need to transfer the
->>> -         * refcount to the head page.  We have to be careful that the
->>> -         * THP doesn't start to split while we are adjusting the
->>> -         * refcounts.
->>> -         *
->>> -         * We are sure this doesn't happen, because mmu_notifier_retry
->>> -         * was successful and we are holding the mmu_lock, so if this
->>> -         * THP is trying to split, it will be blocked in the mmu
->>> -         * notifier before touching any of the pages, specifically
->>> -         * before being able to call __split_huge_page_refcount().
->>> -         *
->>> -         * We can therefore safely transfer the refcount from PG_tail
->>> -         * to PG_head and switch the pfn from a tail page to the head
->>> -         * page accordingly.
->>> -         */
->>> -        mask = PTRS_PER_PMD - 1;
->>> -        VM_BUG_ON((gfn & mask) != (pfn & mask));
->>> -        if (pfn & mask) {
->>> -            *ipap &= PMD_MASK;
->>> -            kvm_release_pfn_clean(pfn);
->>> -            pfn &= ~mask;
->>> -            kvm_get_pfn(pfn);
->>> -            *pfnp = pfn;
->>> -        }
->>> -
->>> -        return true;
->>> -    }
->>> -
->>> -    return false;
->>> -}
->>> -
->>>    /**
->>>     * stage2_wp_ptes - write protect PMD range
->>>     * @pmd:    pointer to pmd entry
->>> @@ -1677,6 +1630,61 @@ static bool 
->>> fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->>>               (hva & ~(map_size - 1)) + map_size <= uaddr_end;
->>>    }
->>> +/*
->>> + * Check if the given hva is backed by a transparent huge page (THP)
->>> + * and whether it can be mapped using block mapping in stage2. If 
->>> so, adjust
->>> + * the stage2 PFN and IPA accordingly. Only PMD_SIZE THPs are currently
->>> + * supported. This will need to be updated to support other THP sizes.
->>> + *
->>> + * Returns the size of the mapping.
->>> + */
->>> +static unsigned long
->>> +transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->>> +                unsigned long hva, kvm_pfn_t *pfnp,
->>> +                phys_addr_t *ipap)
->>> +{
->>> +    kvm_pfn_t pfn = *pfnp;
->>> +    struct page *page = pfn_to_page(pfn);
->>> +
->>> +    /*
->>> +     * PageTransCompoundMap() returns true for THP and
->>> +     * hugetlbfs. Make sure the adjustment is done only for THP
->>> +     * pages. Also make sure that the HVA and IPA are sufficiently
->>> +     * aligned and that the  block map is contained within the memslot.
->>> +     */
->>> +    if (!PageHuge(page) && PageTransCompoundMap(page) &&
->>
->> We managed to get here, ensure that we only play with normal size pages
->> and no hugetlbfs pages will be involved.  "!PageHuge(page)" will always
->> return true and we can let it go.
-> 
-> I think that is a bit tricky. If someone ever modifies the user_mem_abort()
-> and we end up in getting called with a HugeTLB backed page things could go
-> wrong.
+Apart from some minor changes to error codes and checking, these are
+mostly cosmetic / sytlistic changes only.
 
-That will be bad. I'm not sure if it's possible in the future.
+Although straightforward, these changes have not been tested yet:
+I'm posting them now so that reviewers can make a start on them.
 
-> I could do remove the check, but would like to add a WARN_ON_ONCE() to make
-> sure our assumption is held.
-> 
-> i.e,
->      WARN_ON_ONCE(PageHuge(page));
+The patches are based on
+git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+5d8d4af24460 ("arm64: KVM: Fix system register enumeration")
 
-But this is a careful approach. I think this will be valuable both for
-developers and the code itself. Thanks!
+This series in git:
+git://linux-arm.org/linux-dm.git sve-kvm-fixes/v1/head
+http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm-fixes/v1/head
 
+Dave Martin (14):
+  arm64/sve: Clarify vq map semantics
+  KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
+    SVE
+  KVM: arm: Make vcpu finalization stubs into inline functions
+  KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
+    WARNs
+  KVM: arm64/sve: Clean up UAPI register ID definitions
+  KVM: arm64/sve: Miscellaneous tidyups in guest.c
+  KVM: arm64/sve: Make register ioctl access errors more consistent
+  KVM: arm64/sve: WARN when avoiding divide-by-zero in
+    sve_reg_to_region()
+  KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
+  KVM: arm64/sve: Explain validity checks in set_sve_vls()
+  KVM: arm/arm64: Clean up vcpu finalization function parameter naming
+  KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
+  KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
+  KVM: arm64: Clarify access behaviour for out-of-range SVE register
+    slice IDs
 
-zenghui
+ Documentation/virtual/kvm/api.txt | 24 ++++++-----
+ arch/arm/include/asm/kvm_host.h   | 13 ++++--
+ arch/arm64/include/asm/fpsimd.h   |  4 --
+ arch/arm64/include/asm/kvm_host.h |  4 +-
+ arch/arm64/include/uapi/asm/kvm.h | 32 ++++++++++----
+ arch/arm64/kernel/fpsimd.c        |  7 ++-
+ arch/arm64/kvm/guest.c            | 91 +++++++++++++++++++++++----------------
+ arch/arm64/kvm/reset.c            |  6 +--
+ arch/arm64/kvm/sys_regs.c         |  4 +-
+ virt/kvm/arm/arm.c                |  2 +-
+ 10 files changed, 116 insertions(+), 71 deletions(-)
 
-> 
->      if (PageTransCompoundMap(page) &&>> + 
-> fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> 
-> ...
-> 
+-- 
+2.1.4
