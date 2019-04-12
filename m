@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4EEC10F0E
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA97C10F0E
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AE27320869
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE27320869
+	by mail.kernel.org (Postfix) with ESMTP id A9A752077C
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A752077C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56B534A4CA;
-	Fri, 12 Apr 2019 12:29:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 614E54A4E8;
+	Fri, 12 Apr 2019 12:29:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b5Fy8L+L+jCh; Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
+	with ESMTP id bknCreTUKHK3; Fri, 12 Apr 2019 12:29:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324004A485;
-	Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D39A4A4F9;
+	Fri, 12 Apr 2019 12:29:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 620B74A4F3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 888F24A4B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FdBYMgjgdqYm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Apr 2019 12:29:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B64B14A4B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:31 -0400 (EDT)
+ with ESMTP id EpTv1n4vCR8u for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55BBF4A4C2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B2BF165C;
- Fri, 12 Apr 2019 09:29:31 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DAAE61682;
+ Fri, 12 Apr 2019 09:29:33 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 448173F740;
- Fri, 12 Apr 2019 09:29:29 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9799A3F718;
+ Fri, 12 Apr 2019 09:29:31 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 11/14] KVM: arm/arm64: Clean up vcpu finalization function
- parameter naming
-Date: Fri, 12 Apr 2019 17:28:15 +0100
-Message-Id: <1555086498-26691-12-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 12/14] KVM: Clarify capability requirements for
+ KVM_ARM_VCPU_FINALIZE
+Date: Fri, 12 Apr 2019 17:28:16 +0100
+Message-Id: <1555086498-26691-13-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
 In-Reply-To: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
@@ -73,67 +73,54 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190412162815.9uk4oWDjUf5nFUToN0_3ZCq6pgdz76shjxgSfgNeY7o@z>
+Message-ID: <20190412162816.4wLYBagr8SxfT59JNQ_XK63WDUVbmtAVWCJ7JaUKNbM@z>
 
-Currently, the internal vcpu finalization functions use a different
-name ("what") for the feature parameter than the name ("feature")
-used in the documentation.
+Userspace is only supposed to use KVM_ARM_VCPU_FINALIZE when there
+is some vcpu feature that can actually be finalized.
 
-To avoid future confusion, this patch converts everything to use
-the name "feature" consistently.
+This means that documenting KVM_ARM_VCPU_FINALIZE as available or
+not depending on the capabilities present is not helpful.
+
+This patch amends the documentation to describe availability in
+terms of which capability is required for each finalizable feature
+instead.
+
+In any case, userspace sees the same error (EINVAL) regardless of
+whether the given feature is not present or KVM_ARM_VCPU_FINALIZE
+is not implemented at all.
 
 No functional change.
 
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ Documentation/virtual/kvm/api.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 7feddac..fe77543 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -412,7 +412,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	return 0;
- }
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 68509de..b115b23 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3997,17 +3997,16 @@ userspace should not expect to get any particular value there.
  
--static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
- 	return -EINVAL;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6adf08b..7a096fd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -627,7 +627,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
+ 4.119 KVM_ARM_VCPU_FINALIZE
  
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+-Capability: KVM_CAP_ARM_SVE
+ Architectures: arm, arm64
+ Type: vcpu ioctl
+ Parameters: int feature (in)
+ Returns: 0 on success, -1 on error
+ Errors:
+   EPERM:     feature not enabled, needs configuration, or already finalized
+-  EINVAL:    unknown feature
++  EINVAL:    feature unknown or not present
  
--int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what);
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+ Recognised values for feature:
+-  arm64      KVM_ARM_VCPU_SVE
++  arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
  
- #define kvm_arm_vcpu_sve_finalized(vcpu) \
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 8847f38..3402543 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -186,9 +186,9 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
- 	return 0;
- }
+ Finalizes the configuration of the specified vcpu feature.
  
--int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
--	switch (what) {
-+	switch (feature) {
- 	case KVM_ARM_VCPU_SVE:
- 		if (!vcpu_has_sve(vcpu))
- 			return -EINVAL;
 -- 
 2.1.4
 
