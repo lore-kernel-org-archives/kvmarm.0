@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A9AC10F14
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7AAC10F0E
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB12520869
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB12520869
+	by mail.kernel.org (Postfix) with ESMTP id 08F3020869
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Apr 2019 16:29:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F3020869
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 730F04A4C8;
-	Fri, 12 Apr 2019 12:29:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F6B4A4CA;
+	Fri, 12 Apr 2019 12:29:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 711kINSWOAi5; Fri, 12 Apr 2019 12:29:15 -0400 (EDT)
+	with ESMTP id 633iTjYKESc8; Fri, 12 Apr 2019 12:29:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E7F24A4D7;
-	Fri, 12 Apr 2019 12:29:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 530B54A4DB;
+	Fri, 12 Apr 2019 12:29:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 056C94A4B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 854BF4A4A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RSZK5gS3riqa for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Apr 2019 12:29:12 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B814A4C1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:12 -0400 (EDT)
+ with ESMTP id Ft0Jau6iV1dx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Apr 2019 12:29:15 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 140E44A4C1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Apr 2019 12:29:15 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DF2D15AB;
- Fri, 12 Apr 2019 09:29:12 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9410715AD;
+ Fri, 12 Apr 2019 09:29:14 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D78C63F718;
- Fri, 12 Apr 2019 09:29:09 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5AB923F718;
+ Fri, 12 Apr 2019 09:29:12 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 03/14] KVM: arm: Make vcpu finalization stubs into inline
- functions
-Date: Fri, 12 Apr 2019 17:28:07 +0100
-Message-Id: <1555086498-26691-4-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH 04/14] KVM: arm64/sve: sys_regs: Demote redundant
+ vcpu_has_sve() checks to WARNs
+Date: Fri, 12 Apr 2019 17:28:08 +0100
+Message-Id: <1555086498-26691-5-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
 In-Reply-To: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
@@ -73,51 +73,48 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190412162807.wzQNq6OWXf-Kznqsotux3hIfgjBbeDSDMXcUe-g_eQc@z>
+Message-ID: <20190412162808.BvaiPUoxkpEEYSLFzo2ZXM_Wgnha8zOQlu4UerHtQwk@z>
 
-The vcpu finalization stubs kvm_arm_vcpu_finalize() and
-kvm_arm_vcpu_is_finalized() are currently #defines for ARM, which
-limits the type-checking that the compiler can do at runtime.
+Because of the logic in kvm_arm_sys_reg_{get,set}_reg() and
+sve_id_visibility(), we should never call
+{get,set}_id_aa64zfr0_el1() for a vcpu where !vcpu_has_sve(vcpu).
 
-The only reason for them to be #defines was to avoid reliance on
-the definition of struct kvm_vcpu, which is not available here due
-to circular #include problems.  However, because these are stubs
-containing no code, they don't need the definition of struct
-kvm_vcpu after all; only a declaration is needed (which is
-available already).
+To avoid the code giving the impression that it is valid for these
+functions to be called in this situation, and to help the compiler
+make the right optimisation decisions, this patch adds WARN_ON()
+for these cases.
 
-So in the interests of cleanliness, this patch converts them to
-inline functions.
-
-No functional change.
+Given the way the logic is spread out, this seems preferable to
+dropping the checks altogether.
 
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index d956273..7feddac 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -412,7 +412,14 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 09e9b06..7046c76 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1144,7 +1144,7 @@ static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u64 val;
  
--#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
--#define kvm_arm_vcpu_is_finalized(vcpu) true
-+static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
-+{
-+	return true;
-+}
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
  
- #endif /* __ARM_KVM_HOST_H__ */
+ 	val = guest_id_aa64zfr0_el1(vcpu);
+@@ -1159,7 +1159,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ 	int err;
+ 	u64 val;
+ 
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
+ 
+ 	err = reg_from_user(&val, uaddr, id);
 -- 
 2.1.4
 
