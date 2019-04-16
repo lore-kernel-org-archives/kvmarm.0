@@ -1,24 +1,27 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 00/14] KVM: arm64: SVE cleanups
-Date: Mon, 15 Apr 2019 17:22:13 +0200
-Message-ID: <20190415152213.kpxqshmfot525m2j@kamzik.brq.redhat.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH 05/14] KVM: arm64/sve: Clean up UAPI register ID
+ definitions
+Date: Tue, 16 Apr 2019 13:37:34 +0100
+Message-ID: <20190416123734.GN3567@e103592.cambridge.arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
+ <1555086498-26691-6-git-send-email-Dave.Martin@arm.com>
+ <20190415151739.svfcwoybfr5js3wc@kamzik.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B7584A48F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Apr 2019 11:22:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E760F4A506
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:37:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5jAzBz0qw4Ww for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Apr 2019 11:22:19 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D87D4A48D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Apr 2019 11:22:19 -0400 (EDT)
+ with ESMTP id 8x2E19k2qsBz for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Apr 2019 08:37:39 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 912224A4CF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:37:39 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
+In-Reply-To: <20190415151739.svfcwoybfr5js3wc@kamzik.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,65 +31,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
+To: Andrew Jones <drjones@redhat.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 12, 2019 at 05:28:04PM +0100, Dave Martin wrote:
-> This series contains some cleanups applicable to the SVE KVM support
-> patches merged into kvmarm/next.  These arose from Andrew Jones'
-> review.
+On Mon, Apr 15, 2019 at 05:17:39PM +0200, Andrew Jones wrote:
+> On Fri, Apr 12, 2019 at 05:28:09PM +0100, Dave Martin wrote:
+> > Currently, the SVE register ID macros are not all defined in the
+> > same way, and advertise the fact that FFR maps onto the nonexistent
+> > predicate register P16.  This is really just for kernel
+> > convenience, and may lead userspace into bad habits.
+> > 
+> > Instead, this patch masks the ID macro arguments so that
+> > architecturally invalid register numbers will not be passed through
+> > any more, and uses a literal KVM_REG_ARM64_SVE_FFR_BASE macro to
+> > define KVM_REG_ARM64_SVE_FFR(), similarly to the way the _ZREG()
+> > and _PREG() macros are defined.
+> > 
+> > Rather than plugging in magic numbers for the number of Z- and P-
+> > registers and the maximum possible number of register slices, this
+> > patch provides definitions for those too.  Userspace is going to
+> > need them in any case, and it makes sense for them to come from
+> > <uapi/asm/kvm.h>.
+> > 
+> > sve_reg_to_region() uses convenience constants that are defined in
+> > a different way, and also makes use of the fact that the FFR IDs
+> > are really contiguous with the P15 IDs, so this patch retains the
+> > existing convenience constants in guest.c, supplemented with a
+> > couple of sanity checks to check for consistency with with the UAPI
 > 
-> Apart from some minor changes to error codes and checking, these are
-> mostly cosmetic / sytlistic changes only.
-> 
-> Although straightforward, these changes have not been tested yet:
-> I'm posting them now so that reviewers can make a start on them.
-> 
-> The patches are based on
-> git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> 5d8d4af24460 ("arm64: KVM: Fix system register enumeration")
-> 
-> This series in git:
-> git://linux-arm.org/linux-dm.git sve-kvm-fixes/v1/head
-> http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm-fixes/v1/head
-> 
-> Dave Martin (14):
->   arm64/sve: Clarify vq map semantics
->   KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
->     SVE
->   KVM: arm: Make vcpu finalization stubs into inline functions
->   KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
->     WARNs
->   KVM: arm64/sve: Clean up UAPI register ID definitions
->   KVM: arm64/sve: Miscellaneous tidyups in guest.c
->   KVM: arm64/sve: Make register ioctl access errors more consistent
->   KVM: arm64/sve: WARN when avoiding divide-by-zero in
->     sve_reg_to_region()
->   KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
->   KVM: arm64/sve: Explain validity checks in set_sve_vls()
->   KVM: arm/arm64: Clean up vcpu finalization function parameter naming
->   KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
->   KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
->   KVM: arm64: Clarify access behaviour for out-of-range SVE register
->     slice IDs
-> 
->  Documentation/virtual/kvm/api.txt | 24 ++++++-----
->  arch/arm/include/asm/kvm_host.h   | 13 ++++--
->  arch/arm64/include/asm/fpsimd.h   |  4 --
->  arch/arm64/include/asm/kvm_host.h |  4 +-
->  arch/arm64/include/uapi/asm/kvm.h | 32 ++++++++++----
->  arch/arm64/kernel/fpsimd.c        |  7 ++-
->  arch/arm64/kvm/guest.c            | 91 +++++++++++++++++++++++----------------
->  arch/arm64/kvm/reset.c            |  6 +--
->  arch/arm64/kvm/sys_regs.c         |  4 +-
->  virt/kvm/arm/arm.c                |  2 +-
->  10 files changed, 116 insertions(+), 71 deletions(-)
-> 
-> -- 
-> 2.1.4
->
+> s/with with/with/
 
-For the series
+Good spot, thanks.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > header.
+> > 
+> > Fixes: e1c9c98345b3 ("KVM: arm64/sve: Add SVE support to register access ioctl interface")
+> > Suggested-by: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> > ---
+> >  arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++++++++++---------
+> >  arch/arm64/kvm/guest.c            |  9 +++++++++
+> >  2 files changed, 32 insertions(+), 9 deletions(-)
+> >
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks
+---Dave
