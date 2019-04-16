@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C64DC10F13
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Apr 2019 12:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BE1C10F13
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Apr 2019 12:42:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8B71B206BA
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Apr 2019 12:41:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B71B206BA
+	by mail.kernel.org (Postfix) with ESMTP id 0C02A205ED
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Apr 2019 12:42:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C02A205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4374A51D;
-	Tue, 16 Apr 2019 08:41:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F47C4A4FF;
+	Tue, 16 Apr 2019 08:42:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EO8uAyu265tz; Tue, 16 Apr 2019 08:41:49 -0400 (EDT)
+	with ESMTP id ZpwyQ6VvA6xa; Tue, 16 Apr 2019 08:42:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCBEF4A511;
-	Tue, 16 Apr 2019 08:41:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAFF14A511;
+	Tue, 16 Apr 2019 08:42:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 238E04A506
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:41:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 033424A506
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:42:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tRYlvWKdC+GC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Apr 2019 08:41:47 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A4B3E4A4FF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:41:47 -0400 (EDT)
+ with ESMTP id fw0QoAXF6mH6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Apr 2019 08:42:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F9E04A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Apr 2019 08:42:48 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05D38EBD;
- Tue, 16 Apr 2019 05:41:47 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 030E6EBD;
+ Tue, 16 Apr 2019 05:42:48 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 12D553F706;
- Tue, 16 Apr 2019 05:41:44 -0700 (PDT)
-Date: Tue, 16 Apr 2019 13:41:42 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1184E3F706;
+ Tue, 16 Apr 2019 05:42:45 -0700 (PDT)
+Date: Tue, 16 Apr 2019 13:42:43 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 09/14] KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS
- array sizing
-Message-ID: <20190416124142.GO3567@e103592.cambridge.arm.com>
+Subject: Re: [PATCH 13/14] KVM: Clarify KVM_{SET,GET}_ONE_REG error code
+ documentation
+Message-ID: <20190416124243.GP3567@e103592.cambridge.arm.com>
 References: <1555086498-26691-1-git-send-email-Dave.Martin@arm.com>
- <1555086498-26691-10-git-send-email-Dave.Martin@arm.com>
- <20190415152037.d4ewqbxw7fbbbo3b@kamzik.brq.redhat.com>
+ <1555086498-26691-14-git-send-email-Dave.Martin@arm.com>
+ <20190415152132.avwkmmuwolh7juhy@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20190415152037.d4ewqbxw7fbbbo3b@kamzik.brq.redhat.com>
+In-Reply-To: <20190415152132.avwkmmuwolh7juhy@kamzik.brq.redhat.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
  Christoffer Dall <cdall@kernel.org>,
@@ -74,97 +74,100 @@ List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190416124142.qaPxnnF5uyUBNrJpt8EL2YMDfsWLB7pkt5thh_98XZs@z>
+Message-ID: <20190416124243.tqQjQscirFHA5hGfAOce2OZ3jgtTrhQ1ovGh-VlHzwk@z>
 
-On Mon, Apr 15, 2019 at 05:20:37PM +0200, Andrew Jones wrote:
-> On Fri, Apr 12, 2019 at 05:28:13PM +0100, Dave Martin wrote:
-> > A complicated DIV_ROUND_UP() expression is currently written out
-> > explicitly in multiple places in order to specify the size of the
-> > bitmap exchanged with userspace to represent the value of the
-> > KVM_REG_ARM64_SVE_VLS pseudo-register.
-> > 
-> > To make this more readable, this patch replaces these with a single
-> > define.
-> > 
-> > Since the number of words in a bitmap is just the index of the last
-> > word used + 1, this patch expresses the bound that way instead.
-> > This should make it clearer what is being expressed.
-> > 
-> > Since use of DIV_ROUND_UP() was the only reason for including
-> > <linux/kernel.h> in guest.c, this patch removes that #include.
-> > 
+On Mon, Apr 15, 2019 at 05:21:32PM +0200, Andrew Jones wrote:
+> On Fri, Apr 12, 2019 at 05:28:17PM +0100, Dave Martin wrote:
+> > The current error code documentation for KVM_GET_ONE_REG and
+> > KVM_SET_ONE_REG could be read as implying that all architectures
+> > implement these error codes, or that KVM guararntees which error
+> =
+
+> guarantees
+> =
+
+> > code is returned in a particular situation.
+> > =
+
+> > Because this is not really the case, this patch waters down the
+> > documentation explicitly to remove such guarantees.
+> > =
+
+> > EPERM is marked as arm64-specific, since for now arm64 really is
+> > the only architecture that yields this error code for the
+> > finalization-required case.  Keeping this as a distinct error code
+> > is useful however for debugging due to the statefulness of the API
+> > in this instance.
+> > =
+
 > > No functional change.
-> > 
+> > =
+
 > > Suggested-by: Andrew Jones <drjones@redhat.com>
+> > Fixes: 395f562f2b4c ("KVM: Document errors for KVM_GET_ONE_REG and KVM_=
+SET_ONE_REG")
+> > Fixes: 50036ad06b7f ("KVM: arm64/sve: Document KVM API extensions for S=
+VE")
 > > Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 > > ---
-> >  arch/arm64/kvm/guest.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 73044e3..f025a2f 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -23,7 +23,6 @@
-> >  #include <linux/errno.h>
-> >  #include <linux/err.h>
-> >  #include <linux/nospec.h>
-> > -#include <linux/kernel.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/module.h>
-> >  #include <linux/stddef.h>
-> > @@ -209,8 +208,10 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-> >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> >  
-> > +#define SVE_VLS_WORDS (vq_word(SVE_VQ_MAX) + 1)
-> > +
-> >  static bool vq_present(
-> > -	const u64 (*const vqs)[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)],
-> > +	const u64 (*const vqs)[SVE_VLS_WORDS],
-> >  	unsigned int vq)
-> >  {
-> >  	return (*vqs)[vq_word(vq)] & vq_mask(vq);
-> > @@ -219,7 +220,7 @@ static bool vq_present(
-> >  static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  {
-> >  	unsigned int max_vq, vq;
-> > -	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> > +	u64 vqs[SVE_VLS_WORDS];
-> >  
-> >  	if (!vcpu_has_sve(vcpu))
-> >  		return -ENOENT;
-> > @@ -243,7 +244,7 @@ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  {
-> >  	unsigned int max_vq, vq;
-> > -	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
-> > +	u64 vqs[SVE_VLS_WORDS];
-> >  
-> >  	if (!vcpu_has_sve(vcpu))
-> >  		return -ENOENT;
-> > -- 
+> >  Documentation/virtual/kvm/api.txt | 14 +++++++++-----
+> >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > =
+
+> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+> > index b115b23..74c51c7 100644
+> > --- a/Documentation/virtual/kvm/api.txt
+> > +++ b/Documentation/virtual/kvm/api.txt
+> > @@ -1873,8 +1873,10 @@ Parameters: struct kvm_one_reg (in)
+> >  Returns: 0 on success, negative value on failure
+> >  Errors:
+> >   =A0ENOENT: =A0=A0no such register
+> > - =A0EPERM: =A0=A0=A0register access forbidden for architecture-depende=
+nt reasons
+> > - =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known =
+register
+> > + =A0EINVAL: =A0=A0invalid register ID, or no such register
+> > + =A0EPERM: =A0=A0=A0(arm64) register access not allowed before vcpu fi=
+nalization
+> > +(These error codes are indicative only: do not rely on a specific error
+> > +code being returned in a specific situation.)
+> >  =
+
+> >  struct kvm_one_reg {
+> >         __u64 id;
+> > @@ -2258,10 +2260,12 @@ Architectures: all
+> >  Type: vcpu ioctl
+> >  Parameters: struct kvm_one_reg (in and out)
+> >  Returns: 0 on success, negative value on failure
+> > -Errors:
+> > +Errors include:
+> >   =A0ENOENT: =A0=A0no such register
+> > - =A0EPERM: =A0=A0=A0register access forbidden for architecture-depende=
+nt reasons
+> > - =A0EINVAL: =A0=A0other errors, such as bad size encoding for a known =
+register
+> > + =A0EINVAL: =A0=A0invalid register ID, or no such register
+> > + =A0EPERM: =A0=A0=A0(arm64) register access not allowed before vcpu fi=
+nalization
+> > +(These error codes are indicative only: do not rely on a specific error
+> > +code being returned in a specific situation.)
+> >  =
+
+> >  This ioctl allows to receive the value of a single register implemented
+> >  in a vcpu. The register to read is indicated by the "id" field of the
+> > -- =
+
 > > 2.1.4
 > >
-> 
-> This is good, but I wonder if we could define the number of VLS words in
-> the documentation in terms of SVE_VQ_MAX too. Currently it's just the
-> hard coded 8 ("__u64 vector_lengths[8]").
-> 
+> =
+
 > Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-I see your point, but SVE_VQ_MAX isn't really part of the KVM API, so I
-was avoiding it here.
-
-[8] is at least impossible to misinterpret, even if it's not the most
-self-explanatory option.
-
-Is that OK?
-
-Cheers
+Thanks
 ---Dave
 _______________________________________________
 kvmarm mailing list
