@@ -2,65 +2,112 @@ Return-Path: <SRS0=XNJw=ST=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE337C282DA
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Apr 2019 15:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F0D1C282DC
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Apr 2019 15:54:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3816520674
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Apr 2019 15:38:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3816520674
+	by mail.kernel.org (Postfix) with ESMTP id 0965D20835
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Apr 2019 15:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0965D20835
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BD6D4A511;
-	Wed, 17 Apr 2019 11:38:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC4D4A51B;
+	Wed, 17 Apr 2019 11:54:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UKUguXQSdFgZ; Wed, 17 Apr 2019 11:38:10 -0400 (EDT)
+	with ESMTP id Wn5EauDRamix; Wed, 17 Apr 2019 11:54:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BBB74A521;
-	Wed, 17 Apr 2019 11:38:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 338B24A52F;
+	Wed, 17 Apr 2019 11:54:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5414A511
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Apr 2019 11:38:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9EF64A511
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Apr 2019 11:54:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 42gkzBbYaVOI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Apr 2019 11:38:07 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B86F4A4C9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Apr 2019 11:38:07 -0400 (EDT)
+ with ESMTP id S5RS1hVIjpUH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Apr 2019 11:54:42 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28E914A4CA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Apr 2019 11:54:42 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E93C4A78;
- Wed, 17 Apr 2019 08:38:06 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 408363F557;
- Wed, 17 Apr 2019 08:38:05 -0700 (PDT)
-Date: Wed, 17 Apr 2019 16:38:02 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Subject: Re: [kvmtool PATCH v9 5/5] KVM: arm/arm64: Add a vcpu feature for
- pointer authentication
-Message-ID: <20190417153802.GD3567@e103592.cambridge.arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95FF5A78;
+ Wed, 17 Apr 2019 08:54:41 -0700 (PDT)
+Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ 6544E3F557; Wed, 17 Apr 2019 08:54:38 -0700 (PDT)
+Subject: Re: [PATCH v9 1/5] KVM: arm64: Add a vcpu flag to control ptrauth for
+ guest
+To: Dave Martin <Dave.Martin@arm.com>
 References: <1555039236-10608-1-git-send-email-amit.kachhap@arm.com>
- <1555039236-10608-6-git-send-email-amit.kachhap@arm.com>
- <20190416163221.GY3567@e103592.cambridge.arm.com>
- <364bccb9-a818-3cad-1885-724781b99c9e@arm.com>
+ <1555039236-10608-2-git-send-email-amit.kachhap@arm.com>
+ <eeeebc4d-f061-42a5-954d-40161bbed23a@arm.com>
+ <ef1eb326-cd3a-4033-813d-ceae262b4e23@arm.com>
+ <239c5d74-221e-cf8c-2c41-80db016bdc2b@arm.com>
+ <20190417145255.GB3567@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: ARM Ltd
+Message-ID: <a04c6bfd-fd6a-8ff9-a66a-3391af53afb5@arm.com>
+Date: Wed, 17 Apr 2019 16:54:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <364bccb9-a818-3cad-1885-724781b99c9e@arm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
- linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>,
+In-Reply-To: <20190417145255.GB3567@e103592.cambridge.arm.com>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
  Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ Amit Daniel Kachhap <amit.kachhap@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,162 +123,97 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190417153802.6k8fJZ1tpWerfvWy7y-lwIDeySiBDuKPleykcqJhEpg@z>
+Message-ID: <20190417155432.DEnWHvBi2pfclV4R7Bv8h-6TFzp40vA_oCw2ihvPWT0@z>
 
-On Wed, Apr 17, 2019 at 06:06:11PM +0530, Amit Daniel Kachhap wrote:
-> Hi,
+On 17/04/2019 15:52, Dave Martin wrote:
+> On Wed, Apr 17, 2019 at 03:19:11PM +0100, Marc Zyngier wrote:
+>> On 17/04/2019 14:08, Amit Daniel Kachhap wrote:
+>>> Hi,
+>>>
+>>> On 4/17/19 2:05 PM, Marc Zyngier wrote:
+>>>> On 12/04/2019 04:20, Amit Daniel Kachhap wrote:
+>>>>> A per vcpu flag is added to check if pointer authentication is
+>>>>> enabled for the vcpu or not. This flag may be enabled according to
+>>>>> the necessary user policies and host capabilities.
+>>>>>
+>>>>> This patch also adds a helper to check the flag.
+>>>>>
+>>>>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>>>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>>>>> Cc: kvmarm@lists.cs.columbia.edu
+>>>>> ---
+>>>>>
+>>>>> Changes since v8:
+>>>>> * Added a new per vcpu flag which will store Pointer Authentication enable
+>>>>>    status instead of checking them again. [Dave Martin]
+>>>>>
+>>>>>   arch/arm64/include/asm/kvm_host.h | 4 ++++
+>>>>>   1 file changed, 4 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>>> index 9d57cf8..31dbc7c 100644
+>>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>>> @@ -355,10 +355,14 @@ struct kvm_vcpu_arch {
+>>>>>   #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
+>>>>>   #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
+>>>>>   #define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
+>>>>> +#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
+>>>>>   
+>>>>>   #define vcpu_has_sve(vcpu) (system_supports_sve() && \
+>>>>>   			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
+>>>>>   
+>>>>> +#define vcpu_has_ptrauth(vcpu)	\
+>>>>> +			((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
+>>>>> +
+>>>>
+>>>> Just as for SVE, please first check that the system has PTRAUTH.
+>>>> Something like:
+>>>>
+>>>> 		(cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH_ARCH) && \
+>>>> 		 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
+>>>
+>>> In the subsequent patches, vcpu->arch.flags is only set to 
+>>> KVM_ARM64_GUEST_HAS_PTRAUTH when all host capability check conditions 
+>>> matches such as system_supports_address_auth(), 
+>>> system_supports_generic_auth() so doing them again is repetitive in my view.
+>>
+>> It isn't the setting of the flag I care about, but the check of that
+>> flag. Checking a flag for a feature that cannot be used on the running
+>> system should have a zero cost, which isn't the case here.
+>>
+>> Granted, the impact should be minimal and it looks like it mostly happen
+>> on the slow path, but at the very least it would be consistent. So even
+>> if you don't buy my argument about efficiency, please change it in the
+>> name of consistency.
 > 
-> On 4/16/19 10:02 PM, Dave Martin wrote:
-> >On Fri, Apr 12, 2019 at 08:50:36AM +0530, Amit Daniel Kachhap wrote:
-> >>This patch adds a runtime capabality for KVM tool to enable Arm64 8.3
-> >>Pointer Authentication in guest kernel. Two vcpu features
-> >>KVM_ARM_VCPU_PTRAUTH_[ADDRESS/GENERIC] are supplied together to enable
-> >>Pointer Authentication in KVM guest after checking the capability.
-> >>
-> >>Command line options --enable-ptrauth and --disable-ptrauth are added
-> >>to use this feature. However, if those options are not provided then
-> >>also this feature is enabled if host supports this capability.
-> >>
-> >>The macros defined in the headers are not in sync and should be replaced
-> >>from the upstream.
-> >>
-> >>Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> >>---
-> >>Changes since v8:
-> >>*  Added option --enable-ptrauth and --disable-ptrauth to use ptrauth. Also
-> >>    enable ptrauth if no option provided and Host supports ptrauth. [Dave Martin]
-> >>* The macro definition are not linear as the kvmtool is not synchronised with the
-> >>   kernel changes present in kvmarm/next tree.
-> >>
-> >>  arm/aarch32/include/kvm/kvm-cpu-arch.h    |  1 +
-> >>  arm/aarch64/include/asm/kvm.h             |  2 ++
-> >>  arm/aarch64/include/kvm/kvm-config-arch.h |  6 +++++-
-> >>  arm/aarch64/include/kvm/kvm-cpu-arch.h    |  2 ++
-> >>  arm/include/arm-common/kvm-config-arch.h  |  2 ++
-> >>  arm/kvm-cpu.c                             | 11 +++++++++++
-> >>  include/linux/kvm.h                       |  2 ++
-> >>  7 files changed, 25 insertions(+), 1 deletion(-)
-> >>
-> >>diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> >>index d28ea67..520ea76 100644
-> >>--- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> >>+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> >>@@ -13,4 +13,5 @@
-> >>  #define ARM_CPU_ID		0, 0, 0
-> >>  #define ARM_CPU_ID_MPIDR	5
-> >>+#define ARM_VCPU_PTRAUTH_FEATURE	0
-> >>  #endif /* KVM__KVM_CPU_ARCH_H */
-> >>diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-> >>index 97c3478..a2546e6 100644
-> >>--- a/arm/aarch64/include/asm/kvm.h
-> >>+++ b/arm/aarch64/include/asm/kvm.h
-> >>@@ -102,6 +102,8 @@ struct kvm_regs {
-> >>  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
-> >>  #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-> >>  #define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
-> >>+#define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* CPU uses address pointer authentication */
-> >>+#define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* CPU uses generic pointer authentication */
-> >>  struct kvm_vcpu_init {
-> >>  	__u32 target;
-> >>diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-> >>index 04be43d..0279b13 100644
-> >>--- a/arm/aarch64/include/kvm/kvm-config-arch.h
-> >>+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-> >>@@ -8,7 +8,11 @@
-> >>  			"Create PMUv3 device"),				\
-> >>  	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
-> >>  			"Specify random seed for Kernel Address Space "	\
-> >>-			"Layout Randomization (KASLR)"),
-> >>+			"Layout Randomization (KASLR)"),		\
-> >>+	OPT_BOOLEAN('\0', "enable-ptrauth", &(cfg)->enable_ptrauth,	\
-> >>+			"Enables pointer authentication"),		\
-> >>+	OPT_BOOLEAN('\0', "disable-ptrauth", &(cfg)->disable_ptrauth,	\
-> >>+			"Disables pointer authentication"),
-> >>  #include "arm-common/kvm-config-arch.h"
-> >>diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> >>index a9d8563..fcc2107 100644
-> >>--- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> >>+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> >>@@ -17,4 +17,6 @@
-> >>  #define ARM_CPU_CTRL		3, 0, 1, 0
-> >>  #define ARM_CPU_CTRL_SCTLR_EL1	0
-> >>+#define ARM_VCPU_PTRAUTH_FEATURE	((1UL << KVM_ARM_VCPU_PTRAUTH_ADDRESS) \
-> >>+					| (1UL << KVM_ARM_VCPU_PTRAUTH_GENERIC))
-> >>  #endif /* KVM__KVM_CPU_ARCH_H */
-> >>diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-> >>index 5734c46..1b4287d 100644
-> >>--- a/arm/include/arm-common/kvm-config-arch.h
-> >>+++ b/arm/include/arm-common/kvm-config-arch.h
-> >>@@ -10,6 +10,8 @@ struct kvm_config_arch {
-> >>  	bool		aarch32_guest;
-> >>  	bool		has_pmuv3;
-> >>  	u64		kaslr_seed;
-> >>+	bool		enable_ptrauth;
-> >>+	bool		disable_ptrauth;
-> >>  	enum irqchip_type irqchip;
-> >>  	u64		fw_addr;
-> >>  };
-> >>diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> >>index 7780251..a45a649 100644
-> >>--- a/arm/kvm-cpu.c
-> >>+++ b/arm/kvm-cpu.c
-> >>@@ -69,6 +69,17 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >>  	}
-> >>  	/*
-> >>+	 * Always enable Pointer Authentication if requested. If system supports
-> >>+	 * this extension then also enable it by default provided no disable
-> >>+	 * request present.
-> >>+	 */
-> >>+	if ((kvm->cfg.arch.enable_ptrauth) ||
-> >
-> >Nit: redundant ()
-> ok.
-> >
-> >>+		(kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
-> >
-> >Funny indentation?
-> ok will align it.
-> >
-> >>+		kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC) &&
-> >>+		!kvm->cfg.arch.disable_ptrauth))
-> >>+			vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
-> >>+
-> >
-> >Hmm, we have some weird behaviours here: --enable-ptrauth
-> >--disable-ptrauth will result in us trying to enable it, and
-> May be 1 more check can be added here like,
+> One of the annoyances here is there is no single static key for ptrauth.
 > 
-> if (kvm->cfg.arch.enable_ptrauth && kvm->cfg.arch.disable_ptrauth) {
-> 	print_err("Only 1 option should be supplied\n");
+> I'm assuming we don't want to check both static keys (for address and
+> generic auth) on hot paths.
 
-Sure, but we should indicate which actual options conflicted.
+They both just branches, so I don't see why not. Of course, for people
+using a lesser compiler (gcc 4.8 or clang), things will suck. But they
+got it coming anyway.
 
-> 	ret -EINVAL;
-> }
+Thanks,
+
+	M.
+
+> Checking just one of the two possibilities is OK for now, but we need
+> to comment clearly somewhere that that will break if KVM is changed
+> later to expose ptrauth to guests when the host doesn't support both
+> types.
 > 
-> >--enable-ptrauth without the required caps will result in an unhelpful
-> >"Unable to initialise vcpu" error message.  I'm not sure this is a
-> >whole lot worse than the way other options behave today, though.
+> Cheers
+> ---Dave
 > 
-> Since now ptrauth is enabled by default if system supports it even though it
-> is not explicitly requested. so I thought --enable-ptrauth
-> option has to now forcefully enable ptrauth and may cause some error message
-> in failure.
-> Did I interpret something different from your last suggestion[1]?
 
-No, this is what I meant.
 
-> Actually we can skip with --enable-ptrauth and have just 2 option,
-> * By default enable ptrauth if system supports it.
-> * --disable-ptrauth: useful to migrate non-ptrauth guests on ptrauth hosts
-
-I think --enable-ptrauth is still useful: with --disable-ptrauth,
-ptrauth is definitely turned off; with --enable-ptrauth, ptrauth is
-definitely turned on (or we refuse to start the guest at all); with
-neither, ptrauth is on for the guest if the host supports it.
-
-Cheers
----Dave
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
