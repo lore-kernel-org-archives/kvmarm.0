@@ -1,22 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 05/14] KVM: arm64/sve: Clean up UAPI register ID definitions
-Date: Thu, 18 Apr 2019 17:07:02 +0100
-Message-ID: <1555603631-8107-6-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 07/14] KVM: arm64/sve: Make register ioctl access errors
+ more consistent
+Date: Thu, 18 Apr 2019 17:07:04 +0100
+Message-ID: <1555603631-8107-8-git-send-email-Dave.Martin@arm.com>
 References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 76D3C4A541
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C486B4A51B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id StFNsJB8b0KU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:08:10 -0400 (EDT)
+ with ESMTP id tcxGH7UiBeY6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:15 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC0014A551
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B043B4A511
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:14 -0400 (EDT)
 In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,109 +32,170 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, the SVE register ID macros are not all defined in the
-same way, and advertise the fact that FFR maps onto the nonexistent
-predicate register P16.  This is really just for kernel
-convenience, and may lead userspace into bad habits.
+Currently, the way error codes are generated when processing the
+SVE register access ioctls in a bit haphazard.
 
-Instead, this patch masks the ID macro arguments so that
-architecturally invalid register numbers will not be passed through
-any more, and uses a literal KVM_REG_ARM64_SVE_FFR_BASE macro to
-define KVM_REG_ARM64_SVE_FFR(), similarly to the way the _ZREG()
-and _PREG() macros are defined.
+This patch refactors the code so that the behaviour is more
+consistent: now, -EINVAL should be returned only for unrecognised
+register IDs or when some other runtime error occurs.  -ENOENT is
+returned for register IDs that are recognised, but whose
+corresponding register (or slice) does not exist for the vcpu.
 
-Rather than plugging in magic numbers for the number of Z- and P-
-registers and the maximum possible number of register slices, this
-patch provides definitions for those too.  Userspace is going to
-need them in any case, and it makes sense for them to come from
-<uapi/asm/kvm.h>.
+To this end, in {get,set}_sve_reg() we now delegate the
+vcpu_has_sve() check down into {get,set}_sve_vls() and
+sve_reg_to_region().  The KVM_REG_ARM64_SVE_VLS special case is
+picked off first, then sve_reg_to_region() plays the role of
+exhaustively validating or rejecting the register ID and (where
+accepted) computing the applicable register region as before.
 
-sve_reg_to_region() uses convenience constants that are defined in
-a different way, and also makes use of the fact that the FFR IDs
-are really contiguous with the P15 IDs, so this patch retains the
-existing convenience constants in guest.c, supplemented with a
-couple of sanity checks to check for consistency with the UAPI
-header.
+sve_reg_to_region() is rearranged so that -ENOENT or -EPERM is not
+returned prematurely, before checking whether reg->id is in a
+recognised range.
+
+-EPERM is now only returned when an attempt is made to access an
+actually existing register slice on an unfinalized vcpu.
 
 Fixes: e1c9c98345b3 ("KVM: arm64/sve: Add SVE support to register access ioctl interface")
+Fixes: 9033bba4b535 ("KVM: arm64/sve: Add pseudo-register for the guest's vector lengths")
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++++++++++---------
- arch/arm64/kvm/guest.c            |  9 +++++++++
- 2 files changed, 32 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/guest.c | 52 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 6963b7e..2a04ef0 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -35,6 +35,7 @@
- #include <linux/psci.h>
- #include <linux/types.h>
- #include <asm/ptrace.h>
-+#include <asm/sve_context.h>
- 
- #define __KVM_HAVE_GUEST_DEBUG
- #define __KVM_HAVE_IRQ_LINE
-@@ -233,16 +234,29 @@ struct kvm_vcpu_events {
- /* Z- and P-regs occupy blocks at the following offsets within this range: */
- #define KVM_REG_ARM64_SVE_ZREG_BASE	0
- #define KVM_REG_ARM64_SVE_PREG_BASE	0x400
-+#define KVM_REG_ARM64_SVE_FFR_BASE	0x600
- 
--#define KVM_REG_ARM64_SVE_ZREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
--					 KVM_REG_ARM64_SVE_ZREG_BASE |	\
--					 KVM_REG_SIZE_U2048 |		\
--					 ((n) << 5) | (i))
--#define KVM_REG_ARM64_SVE_PREG(n, i)	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
--					 KVM_REG_ARM64_SVE_PREG_BASE |	\
--					 KVM_REG_SIZE_U256 |		\
--					 ((n) << 5) | (i))
--#define KVM_REG_ARM64_SVE_FFR(i)	KVM_REG_ARM64_SVE_PREG(16, i)
-+#define KVM_ARM64_SVE_NUM_ZREGS		__SVE_NUM_ZREGS
-+#define KVM_ARM64_SVE_NUM_PREGS		__SVE_NUM_PREGS
-+
-+#define KVM_ARM64_SVE_MAX_SLICES	32
-+
-+#define KVM_REG_ARM64_SVE_ZREG(n, i)					\
-+	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | KVM_REG_ARM64_SVE_ZREG_BASE | \
-+	 KVM_REG_SIZE_U2048 |						\
-+	 (((n) & (KVM_ARM64_SVE_NUM_ZREGS - 1)) << 5) |			\
-+	 ((i) & (KVM_ARM64_SVE_MAX_SLICES - 1)))
-+
-+#define KVM_REG_ARM64_SVE_PREG(n, i)					\
-+	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | KVM_REG_ARM64_SVE_PREG_BASE | \
-+	 KVM_REG_SIZE_U256 |						\
-+	 (((n) & (KVM_ARM64_SVE_NUM_PREGS - 1)) << 5) |			\
-+	 ((i) & (KVM_ARM64_SVE_MAX_SLICES - 1)))
-+
-+#define KVM_REG_ARM64_SVE_FFR(i)					\
-+	(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | KVM_REG_ARM64_SVE_FFR_BASE | \
-+	 KVM_REG_SIZE_U256 |						\
-+	 ((i) & (KVM_ARM64_SVE_MAX_SLICES - 1)))
- 
- /* Vector lengths pseudo-register: */
- #define KVM_REG_ARM64_SVE_VLS		(KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 4f7b26b..2e449e1 100644
+index f5ff7ae..e45a042 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -325,6 +325,15 @@ static int sve_reg_to_region(struct sve_state_reg_region *region,
+@@ -221,6 +221,9 @@ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	unsigned int max_vq, vq;
+ 	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
  
- 	size_t sve_state_size;
++	if (!vcpu_has_sve(vcpu))
++		return -ENOENT;
++
+ 	if (WARN_ON(!sve_vl_valid(vcpu->arch.sve_max_vl)))
+ 		return -EINVAL;
  
-+	const u64 last_preg_id = KVM_REG_ARM64_SVE_PREG(SVE_NUM_PREGS - 1,
-+							SVE_NUM_SLICES - 1);
+@@ -242,6 +245,9 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	unsigned int max_vq, vq;
+ 	u64 vqs[DIV_ROUND_UP(SVE_VQ_MAX - SVE_VQ_MIN + 1, 64)];
+ 
++	if (!vcpu_has_sve(vcpu))
++		return -ENOENT;
 +
-+	/* Verify that the P-regs and FFR really do have contiguous IDs: */
-+	BUILD_BUG_ON(KVM_REG_ARM64_SVE_FFR(0) != last_preg_id + 1);
+ 	if (kvm_arm_vcpu_sve_finalized(vcpu))
+ 		return -EPERM; /* too late! */
+ 
+@@ -304,7 +310,10 @@ struct sve_state_reg_region {
+ 	unsigned int upad;	/* extra trailing padding in user memory */
+ };
+ 
+-/* Get sanitised bounds for user/kernel SVE register copy */
++/*
++ * Validate SVE register ID and get sanitised bounds for user/kernel SVE
++ * register copy
++ */
+ static int sve_reg_to_region(struct sve_state_reg_region *region,
+ 			     struct kvm_vcpu *vcpu,
+ 			     const struct kvm_one_reg *reg)
+@@ -335,25 +344,30 @@ static int sve_reg_to_region(struct sve_state_reg_region *region,
+ 	/* Verify that we match the UAPI header: */
+ 	BUILD_BUG_ON(SVE_NUM_SLICES != KVM_ARM64_SVE_MAX_SLICES);
+ 
+-	if ((reg->id & SVE_REG_SLICE_MASK) > 0)
+-		return -ENOENT;
+-
+-	vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
+-
+ 	reg_num = (reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
+ 
+ 	if (reg->id >= zreg_id_min && reg->id <= zreg_id_max) {
++		if (!vcpu_has_sve(vcpu) || (reg->id & SVE_REG_SLICE_MASK) > 0)
++			return -ENOENT;
 +
-+	/* Verify that we match the UAPI header: */
-+	BUILD_BUG_ON(SVE_NUM_SLICES != KVM_ARM64_SVE_MAX_SLICES);
++		vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
 +
- 	/* Only the first slice ever exists, for now: */
- 	if ((reg->id & SVE_REG_SLICE_MASK) != 0)
- 		return -ENOENT;
+ 		reqoffset = SVE_SIG_ZREG_OFFSET(vq, reg_num) -
+ 				SVE_SIG_REGS_OFFSET;
+ 		reqlen = KVM_SVE_ZREG_SIZE;
+ 		maxlen = SVE_SIG_ZREG_SIZE(vq);
+ 	} else if (reg->id >= preg_id_min && reg->id <= preg_id_max) {
++		if (!vcpu_has_sve(vcpu) || (reg->id & SVE_REG_SLICE_MASK) > 0)
++			return -ENOENT;
++
++		vq = sve_vq_from_vl(vcpu->arch.sve_max_vl);
++
+ 		reqoffset = SVE_SIG_PREG_OFFSET(vq, reg_num) -
+ 				SVE_SIG_REGS_OFFSET;
+ 		reqlen = KVM_SVE_PREG_SIZE;
+ 		maxlen = SVE_SIG_PREG_SIZE(vq);
+ 	} else {
+-		return -ENOENT;
++		return -EINVAL;
+ 	}
+ 
+ 	sve_state_size = vcpu_sve_state_size(vcpu);
+@@ -369,24 +383,22 @@ static int sve_reg_to_region(struct sve_state_reg_region *region,
+ 
+ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
++	int ret;
+ 	struct sve_state_reg_region region;
+ 	char __user *uptr = (char __user *)reg->addr;
+ 
+-	if (!vcpu_has_sve(vcpu))
+-		return -ENOENT;
+-
+ 	/* Handle the KVM_REG_ARM64_SVE_VLS pseudo-reg as a special case: */
+ 	if (reg->id == KVM_REG_ARM64_SVE_VLS)
+ 		return get_sve_vls(vcpu, reg);
+ 
+-	/* Otherwise, reg is an architectural SVE register... */
++	/* Try to interpret reg ID as an architectural SVE register... */
++	ret = sve_reg_to_region(&region, vcpu, reg);
++	if (ret)
++		return ret;
+ 
+ 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+ 		return -EPERM;
+ 
+-	if (sve_reg_to_region(&region, vcpu, reg))
+-		return -ENOENT;
+-
+ 	if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
+ 			 region.klen) ||
+ 	    clear_user(uptr + region.klen, region.upad))
+@@ -397,24 +409,22 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 
+ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
++	int ret;
+ 	struct sve_state_reg_region region;
+ 	const char __user *uptr = (const char __user *)reg->addr;
+ 
+-	if (!vcpu_has_sve(vcpu))
+-		return -ENOENT;
+-
+ 	/* Handle the KVM_REG_ARM64_SVE_VLS pseudo-reg as a special case: */
+ 	if (reg->id == KVM_REG_ARM64_SVE_VLS)
+ 		return set_sve_vls(vcpu, reg);
+ 
+-	/* Otherwise, reg is an architectural SVE register... */
++	/* Try to interpret reg ID as an architectural SVE register... */
++	ret = sve_reg_to_region(&region, vcpu, reg);
++	if (ret)
++		return ret;
+ 
+ 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
+ 		return -EPERM;
+ 
+-	if (sve_reg_to_region(&region, vcpu, reg))
+-		return -ENOENT;
+-
+ 	if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
+ 			   region.klen))
+ 		return -EFAULT;
 -- 
 2.1.4
