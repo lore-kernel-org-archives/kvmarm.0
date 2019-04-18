@@ -2,52 +2,54 @@ Return-Path: <SRS0=ZrZ1=SU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8271C10F0E
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Apr 2019 16:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C98C10F0E
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Apr 2019 16:08:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 48BC820693
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Apr 2019 16:07:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48BC820693
+	by mail.kernel.org (Postfix) with ESMTP id 1D90221479
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Apr 2019 16:08:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D90221479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A98984A4B0;
-	Thu, 18 Apr 2019 12:07:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA2914A540;
+	Thu, 18 Apr 2019 12:08:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CAT2nePLyijK; Thu, 18 Apr 2019 12:07:21 -0400 (EDT)
+	with ESMTP id WHBNJFmKMDGs; Thu, 18 Apr 2019 12:08:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563114A4D4;
-	Thu, 18 Apr 2019 12:07:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FC994A511;
+	Thu, 18 Apr 2019 12:08:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E538C4A4B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:07:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF0DF4A4FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e-YmVz9j5nTf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:07:18 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8D14A494
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:07:18 -0400 (EDT)
+ with ESMTP id mkNmisE2L2Zb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:00 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 960AB4A494
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:00 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88F5015AB;
- Thu, 18 Apr 2019 09:07:17 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DAE9615AB;
+ Thu, 18 Apr 2019 09:07:59 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 73FBE3F5AF;
- Thu, 18 Apr 2019 09:07:15 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C6D3F3F5AF;
+ Thu, 18 Apr 2019 09:07:57 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 00/14] KVM: arm64: SVE cleanups
-Date: Thu, 18 Apr 2019 17:06:57 +0100
-Message-Id: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 01/14] arm64/sve: Clarify vq map semantics
+Date: Thu, 18 Apr 2019 17:06:58 +0100
+Message-Id: <1555603631-8107-2-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
+In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
+References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
  Christoffer Dall <cdall@kernel.org>,
  Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -70,98 +72,72 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190418160657.Zyq5HD2Qtn2w-7fK2NIm5a2oRmTW9S5gBhOZ_63s-e4@z>
+Message-ID: <20190418160658.rbTLmxrRqT9ImQUB9eGDsbrv1rkorJpWDS0BAy_XAH8@z>
 
-This series contains some cleanups applicable to the SVE KVM support
-patches merged into kvmarm/next.  These arose from Andrew Jones'
-review.
+Currently the meanings of sve_vq_map and the ancillary helpers
+__bit_to_vq() and __vq_to_bit() are not clearly explained.
 
-Apart from some minor changes to error codes and checking, these are
-mostly cosmetic / sytlistic changes only.
+This patch makes the explanatory comment clearer, and removes the
+duplicate comment from fpsimd.h.
 
-The patches are based on
-git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-5d8d4af24460 ("arm64: KVM: Fix system register enumeration")
+The WARN_ON() currently present in __bit_to_vq() confuses the
+intended use of this helper.  Since these are low-level helpers not
+intended for general-purpose use anyway, it is better not to make
+guesses about how these functions will be used: rather, this patch
+removes the WARN_ON() and relies on callers to use the helpers
+sensibly.
 
-This series in git:
-git://linux-arm.org/linux-dm.git sve-kvm-fixes/v2/head
-http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm-fixes/v2/head
+Suggested-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+ arch/arm64/include/asm/fpsimd.h | 4 ----
+ arch/arm64/kernel/fpsimd.c      | 7 ++++++-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-Tested with qemu and kvmtool on ThunderX2, and with kvmtool on the Arm
-Fast model (to exercise SVE support).
-
-Some additional manual testing was done to exercise the updated error
-behaviours when accessing the SVE registers via ioctl.
-
-Dave Martin (14):
-  arm64/sve: Clarify vq map semantics
-  KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
-    SVE
-  KVM: arm: Make vcpu finalization stubs into inline functions
-  KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
-    WARNs
-  KVM: arm64/sve: Clean up UAPI register ID definitions
-  KVM: arm64/sve: Miscellaneous tidyups in guest.c
-  KVM: arm64/sve: Make register ioctl access errors more consistent
-  KVM: arm64/sve: WARN when avoiding divide-by-zero in
-    sve_reg_to_region()
-  KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
-  KVM: arm64/sve: Explain validity checks in set_sve_vls()
-  KVM: arm/arm64: Clean up vcpu finalization function parameter naming
-  KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
-  KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
-  KVM: arm64: Clarify access behaviour for out-of-range SVE register
-    slice IDs
-
- Documentation/virtual/kvm/api.txt | 24 ++++++-----
- arch/arm/include/asm/kvm_host.h   | 13 ++++--
- arch/arm64/include/asm/fpsimd.h   |  4 --
- arch/arm64/include/asm/kvm_host.h |  4 +-
- arch/arm64/include/uapi/asm/kvm.h | 32 ++++++++++----
- arch/arm64/kernel/fpsimd.c        |  7 ++-
- arch/arm64/kvm/guest.c            | 91 +++++++++++++++++++++++----------------
- arch/arm64/kvm/reset.c            |  6 +--
- arch/arm64/kvm/sys_regs.c         |  4 +-
- virt/kvm/arm/arm.c                |  2 +-
- 10 files changed, 116 insertions(+), 71 deletions(-)
-
--- 
-2.1.4
-
-@@@@
-
-Dave Martin (14):
-  arm64/sve: Clarify vq map semantics
-  KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
-    SVE
-  KVM: arm: Make vcpu finalization stubs into inline functions
-  KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
-    WARNs
-  KVM: arm64/sve: Clean up UAPI register ID definitions
-  KVM: arm64/sve: Miscellaneous tidyups in guest.c
-  KVM: arm64/sve: Make register ioctl access errors more consistent
-  KVM: arm64/sve: WARN when avoiding divide-by-zero in
-    sve_reg_to_region()
-  KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
-  KVM: arm64/sve: Explain validity checks in set_sve_vls()
-  KVM: arm/arm64: Clean up vcpu finalization function parameter naming
-  KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
-  KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
-  KVM: arm64: Clarify access behaviour for out-of-range SVE register
-    slice IDs
-
- Documentation/virtual/kvm/api.txt | 34 +++++++++------
- arch/arm/include/asm/kvm_host.h   | 13 ++++--
- arch/arm64/include/asm/fpsimd.h   |  4 --
- arch/arm64/include/asm/kvm_host.h |  4 +-
- arch/arm64/include/uapi/asm/kvm.h | 37 ++++++++++++----
- arch/arm64/kernel/fpsimd.c        |  7 ++-
- arch/arm64/kvm/guest.c            | 89 +++++++++++++++++++++++----------------
- arch/arm64/kvm/reset.c            |  6 +--
- arch/arm64/kvm/sys_regs.c         |  4 +-
- virt/kvm/arm/arm.c                |  2 +-
- 10 files changed, 125 insertions(+), 75 deletions(-)
-
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index ad6d2e4..df62bbd 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -92,7 +92,6 @@ extern u64 read_zcr_features(void);
+ 
+ extern int __ro_after_init sve_max_vl;
+ extern int __ro_after_init sve_max_virtualisable_vl;
+-/* Set of available vector lengths, as vq_to_bit(vq): */
+ extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
+ 
+ /*
+@@ -107,9 +106,6 @@ static inline unsigned int __vq_to_bit(unsigned int vq)
+ 
+ static inline unsigned int __bit_to_vq(unsigned int bit)
+ {
+-	if (WARN_ON(bit >= SVE_VQ_MAX))
+-		bit = SVE_VQ_MAX - 1;
+-
+ 	return SVE_VQ_MAX - bit;
+ }
+ 
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 577296b..56afa40 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -135,10 +135,15 @@ static int sve_default_vl = -1;
+ /* Maximum supported vector length across all CPUs (initially poisoned) */
+ int __ro_after_init sve_max_vl = SVE_VL_MIN;
+ int __ro_after_init sve_max_virtualisable_vl = SVE_VL_MIN;
+-/* Set of available vector lengths, as vq_to_bit(vq): */
++
++/*
++ * Set of available vector lengths,
++ * where length vq encoded as bit __vq_to_bit(vq):
++ */
+ __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
+ /* Set of vector lengths present on at least one cpu: */
+ static __ro_after_init DECLARE_BITMAP(sve_vq_partial_map, SVE_VQ_MAX);
++
+ static void __percpu *efi_sve_state;
+ 
+ #else /* ! CONFIG_ARM64_SVE */
 -- 
 2.1.4
 
