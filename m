@@ -1,181 +1,123 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v9 1/5] KVM: arm64: Add a vcpu flag to control ptrauth for
- guest
-Date: Thu, 18 Apr 2019 09:48:14 +0100
-Message-ID: <bec616ee-2765-4243-2108-84f3230c6aa0@arm.com>
-References: <1555039236-10608-1-git-send-email-amit.kachhap@arm.com>
- <1555039236-10608-2-git-send-email-amit.kachhap@arm.com>
- <eeeebc4d-f061-42a5-954d-40161bbed23a@arm.com>
- <ef1eb326-cd3a-4033-813d-ceae262b4e23@arm.com>
- <239c5d74-221e-cf8c-2c41-80db016bdc2b@arm.com>
- <20190417145255.GB3567@e103592.cambridge.arm.com>
- <a04c6bfd-fd6a-8ff9-a66a-3391af53afb5@arm.com>
- <20190417172010.GE3567@e103592.cambridge.arm.com>
+From: Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v2 00/14] KVM: arm64: SVE cleanups
+Date: Thu, 18 Apr 2019 17:06:57 +0100
+Message-ID: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20190417172010.GE3567@e103592.cambridge.arm.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, Amit Daniel Kachhap <amit.kachhap@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E538C4A4B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:07:19 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id e-YmVz9j5nTf for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:07:18 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8D14A494
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:07:18 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/04/2019 18:20, Dave Martin wrote:
-> On Wed, Apr 17, 2019 at 04:54:32PM +0100, Marc Zyngier wrote:
->> On 17/04/2019 15:52, Dave Martin wrote:
->>> On Wed, Apr 17, 2019 at 03:19:11PM +0100, Marc Zyngier wrote:
->>>> On 17/04/2019 14:08, Amit Daniel Kachhap wrote:
->>>>> Hi,
->>>>>
->>>>> On 4/17/19 2:05 PM, Marc Zyngier wrote:
->>>>>> On 12/04/2019 04:20, Amit Daniel Kachhap wrote:
->>>>>>> A per vcpu flag is added to check if pointer authentication is
->>>>>>> enabled for the vcpu or not. This flag may be enabled according to
->>>>>>> the necessary user policies and host capabilities.
->>>>>>>
->>>>>>> This patch also adds a helper to check the flag.
->>>>>>>
->>>>>>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
->>>>>>> Cc: Mark Rutland <mark.rutland@arm.com>
->>>>>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>>>>>> Cc: Christoffer Dall <christoffer.dall@arm.com>
->>>>>>> Cc: kvmarm@lists.cs.columbia.edu
->>>>>>> ---
->>>>>>>
->>>>>>> Changes since v8:
->>>>>>> * Added a new per vcpu flag which will store Pointer Authentication enable
->>>>>>>    status instead of checking them again. [Dave Martin]
->>>>>>>
->>>>>>>   arch/arm64/include/asm/kvm_host.h | 4 ++++
->>>>>>>   1 file changed, 4 insertions(+)
->>>>>>>
->>>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>>>>> index 9d57cf8..31dbc7c 100644
->>>>>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>>>>> @@ -355,10 +355,14 @@ struct kvm_vcpu_arch {
->>>>>>>   #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
->>>>>>>   #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
->>>>>>>   #define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
->>>>>>> +#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
->>>>>>>   
->>>>>>>   #define vcpu_has_sve(vcpu) (system_supports_sve() && \
->>>>>>>   			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
->>>>>>>   
->>>>>>> +#define vcpu_has_ptrauth(vcpu)	\
->>>>>>> +			((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH)
->>>>>>> +
->>>>>>
->>>>>> Just as for SVE, please first check that the system has PTRAUTH.
->>>>>> Something like:
->>>>>>
->>>>>> 		(cpus_have_const_cap(ARM64_HAS_GENERIC_AUTH_ARCH) && \
->>>>>> 		 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
->>>>>
->>>>> In the subsequent patches, vcpu->arch.flags is only set to 
->>>>> KVM_ARM64_GUEST_HAS_PTRAUTH when all host capability check conditions 
->>>>> matches such as system_supports_address_auth(), 
->>>>> system_supports_generic_auth() so doing them again is repetitive in my view.
->>>>
->>>> It isn't the setting of the flag I care about, but the check of that
->>>> flag. Checking a flag for a feature that cannot be used on the running
->>>> system should have a zero cost, which isn't the case here.
->>>>
->>>> Granted, the impact should be minimal and it looks like it mostly happen
->>>> on the slow path, but at the very least it would be consistent. So even
->>>> if you don't buy my argument about efficiency, please change it in the
->>>> name of consistency.
->>>
->>> One of the annoyances here is there is no single static key for ptrauth.
->>>
->>> I'm assuming we don't want to check both static keys (for address and
->>> generic auth) on hot paths.
->>
->> They both just branches, so I don't see why not. Of course, for people
->> using a lesser compiler (gcc 4.8 or clang), things will suck. But they
->> got it coming anyway.
-> 
-> I seem to recall Christoffer expressing concerns about this at some
-> point: even unconditional branches branches to a fixed address are not
-> free (or even correctly predicted).
+This series contains some cleanups applicable to the SVE KVM support
+patches merged into kvmarm/next.  These arose from Andrew Jones'
+review.
 
-Certainly not free, but likely less expensive than a load followed by a
-conditional branch. And actually, this is not a comparison against a branch,
-but against a nop.
+Apart from some minor changes to error codes and checking, these are
+mostly cosmetic / sytlistic changes only.
 
-> I don't think any compiler can elide static key checks of merge them
-> together.
+The patches are based on
+git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+5d8d4af24460 ("arm64: KVM: Fix system register enumeration")
 
-It is not about eliding them, it is about having a cheap fast path.
+This series in git:
+git://linux-arm.org/linux-dm.git sve-kvm-fixes/v2/head
+http://linux-arm.org/git?p=linux-dm.git;a=shortlog;h=refs/heads/sve-kvm-fixes/v2/head
 
-Compiling this:
+Tested with qemu and kvmtool on ThunderX2, and with kvmtool on the Arm
+Fast model (to exercise SVE support).
 
-bool kvm_hack_test_static_key(struct kvm_vcpu *vcpu)
-{
-	return ((system_supports_address_auth() ||
-		 system_supports_generic_auth()) &&
-		vcpu->arch.flags & (1 << 6));
+Some additional manual testing was done to exercise the updated error
+behaviours when accessing the SVE registers via ioctl.
 
-}
+Dave Martin (14):
+  arm64/sve: Clarify vq map semantics
+  KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
+    SVE
+  KVM: arm: Make vcpu finalization stubs into inline functions
+  KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
+    WARNs
+  KVM: arm64/sve: Clean up UAPI register ID definitions
+  KVM: arm64/sve: Miscellaneous tidyups in guest.c
+  KVM: arm64/sve: Make register ioctl access errors more consistent
+  KVM: arm64/sve: WARN when avoiding divide-by-zero in
+    sve_reg_to_region()
+  KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
+  KVM: arm64/sve: Explain validity checks in set_sve_vls()
+  KVM: arm/arm64: Clean up vcpu finalization function parameter naming
+  KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
+  KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
+  KVM: arm64: Clarify access behaviour for out-of-range SVE register
+    slice IDs
 
-I get:
-
-[...]
-ffff0000100db5c8:       1400000c        b       ffff0000100db5f8 <kvm_hack_test_static_key+0x48>
-ffff0000100db5cc:       d503201f        nop
-ffff0000100db5d0:       14000012        b       ffff0000100db618 <kvm_hack_test_static_key+0x68>
-ffff0000100db5d4:       d503201f        nop
-ffff0000100db5d8:       14000014        b       ffff0000100db628 <kvm_hack_test_static_key+0x78>
-ffff0000100db5dc:       d503201f        nop
-ffff0000100db5e0:       14000017        b       ffff0000100db63c <kvm_hack_test_static_key+0x8c>
-ffff0000100db5e4:       d503201f        nop
-ffff0000100db5e8:       52800000        mov     w0, #0x0                        // #0
-ffff0000100db5ec:       f9400bf3        ldr     x19, [sp, #16]
-ffff0000100db5f0:       a8c27bfd        ldp     x29, x30, [sp], #32
-ffff0000100db5f4:       d65f03c0        ret
-ffff0000100db5f8:       b000ac40        adrp    x0, ffff000011664000 <reset_devices>
-ffff0000100db5fc:       f942a400        ldr     x0, [x0, #1352]
-ffff0000100db600:       b637fe80        tbz     x0, #38, ffff0000100db5d0 <kvm_hack_test_static_key+0x20>
-ffff0000100db604:       f9441660        ldr     x0, [x19, #2088]
-ffff0000100db608:       f9400bf3        ldr     x19, [sp, #16]
-ffff0000100db60c:       53061800        ubfx    w0, w0, #6, #1
-ffff0000100db610:       a8c27bfd        ldp     x29, x30, [sp], #32
-ffff0000100db614:       d65f03c0        ret
-ffff0000100db618:       b000ac40        adrp    x0, ffff000011664000 <reset_devices>
-ffff0000100db61c:       f942a400        ldr     x0, [x0, #1352]
-ffff0000100db620:       b73fff20        tbnz    x0, #39, ffff0000100db604 <kvm_hack_test_static_key+0x54>
-ffff0000100db624:       17ffffed        b       ffff0000100db5d8 <kvm_hack_test_static_key+0x28>
-ffff0000100db628:       b000ac40        adrp    x0, ffff000011664000 <reset_devices>
-ffff0000100db62c:       f942a400        ldr     x0, [x0, #1352]
-ffff0000100db630:       b747fea0        tbnz    x0, #40, ffff0000100db604 <kvm_hack_test_static_key+0x54>
-ffff0000100db634:       14000002        b       ffff0000100db63c <kvm_hack_test_static_key+0x8c>
-ffff0000100db638:       17ffffeb        b       ffff0000100db5e4 <kvm_hack_test_static_key+0x34>
-ffff0000100db63c:       b000ac40        adrp    x0, ffff000011664000 <reset_devices>
-ffff0000100db640:       f942a400        ldr     x0, [x0, #1352]
-ffff0000100db644:       b74ffe00        tbnz    x0, #41, ffff0000100db604 <kvm_hack_test_static_key+0x54>
-ffff0000100db648:       52800000        mov     w0, #0x0                        // #0
-ffff0000100db64c:       17ffffe8        b       ffff0000100db5ec <kvm_hack_test_static_key+0x3c>
-
-Once the initial 4 branches that are there to deal with the pre static 
-keys checks are nop-ed, everything is controlled by the remaining 4
-nops which are turned into branches to ffff0000100db604 if any of the 
-conditions become true.
-
-Which is exactly what we want: a fall through to returning zero without
-doing anything else.
-
-Thanks,
-
-	M.
-
-> Maybe I am misremembering.
-> 
-> Cheers
-> ---Dave
-> 
-
+ Documentation/virtual/kvm/api.txt | 24 ++++++-----
+ arch/arm/include/asm/kvm_host.h   | 13 ++++--
+ arch/arm64/include/asm/fpsimd.h   |  4 --
+ arch/arm64/include/asm/kvm_host.h |  4 +-
+ arch/arm64/include/uapi/asm/kvm.h | 32 ++++++++++----
+ arch/arm64/kernel/fpsimd.c        |  7 ++-
+ arch/arm64/kvm/guest.c            | 91 +++++++++++++++++++++++----------------
+ arch/arm64/kvm/reset.c            |  6 +--
+ arch/arm64/kvm/sys_regs.c         |  4 +-
+ virt/kvm/arm/arm.c                |  2 +-
+ 10 files changed, 116 insertions(+), 71 deletions(-)
 
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
+
+@@@@
+
+Dave Martin (14):
+  arm64/sve: Clarify vq map semantics
+  KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up
+    SVE
+  KVM: arm: Make vcpu finalization stubs into inline functions
+  KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to
+    WARNs
+  KVM: arm64/sve: Clean up UAPI register ID definitions
+  KVM: arm64/sve: Miscellaneous tidyups in guest.c
+  KVM: arm64/sve: Make register ioctl access errors more consistent
+  KVM: arm64/sve: WARN when avoiding divide-by-zero in
+    sve_reg_to_region()
+  KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
+  KVM: arm64/sve: Explain validity checks in set_sve_vls()
+  KVM: arm/arm64: Clean up vcpu finalization function parameter naming
+  KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
+  KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
+  KVM: arm64: Clarify access behaviour for out-of-range SVE register
+    slice IDs
+
+ Documentation/virtual/kvm/api.txt | 34 +++++++++------
+ arch/arm/include/asm/kvm_host.h   | 13 ++++--
+ arch/arm64/include/asm/fpsimd.h   |  4 --
+ arch/arm64/include/asm/kvm_host.h |  4 +-
+ arch/arm64/include/uapi/asm/kvm.h | 37 ++++++++++++----
+ arch/arm64/kernel/fpsimd.c        |  7 ++-
+ arch/arm64/kvm/guest.c            | 89 +++++++++++++++++++++++----------------
+ arch/arm64/kvm/reset.c            |  6 +--
+ arch/arm64/kvm/sys_regs.c         |  4 +-
+ virt/kvm/arm/arm.c                |  2 +-
+ 10 files changed, 125 insertions(+), 75 deletions(-)
+
+-- 
+2.1.4
