@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 10/14] KVM: arm64/sve: Explain validity checks in
- set_sve_vls()
-Date: Thu, 18 Apr 2019 17:07:07 +0100
-Message-ID: <1555603631-8107-11-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 13/14] KVM: Clarify KVM_{SET,
+ GET}_ONE_REG error code documentation
+Date: Thu, 18 Apr 2019 17:07:10 +0100
+Message-ID: <1555603631-8107-14-git-send-email-Dave.Martin@arm.com>
 References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 920BF4A530
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 999DC4A530
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A7FAjH96kZ1D for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:08:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C80104A51B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:21 -0400 (EDT)
+ with ESMTP id ZT-8tJ4WwdUX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:29 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0288A4A561
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:29 -0400 (EDT)
 In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,44 +32,53 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Correct virtualization of SVE relies for correctness on code in
-set_sve_vls() that verifies consistency between the set of vector
-lengths requested by userspace and the set of vector lengths
-available on the host.
-
-However, the purpose of this code is not obvious, and not likely to
-be apparent at all to people who do not have detailed knowledge of
-the SVE system-level architecture.
-
-This patch adds a suitable comment to explain what these checks are
-for.
-
-No functional change.
-
-Suggested-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/kvm/guest.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 5bb909c..3ae2f82 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -264,6 +264,13 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
- 		return -EINVAL;
- 
-+	/*
-+	 * Vector lengths supported by the host can't currently be
-+	 * hidden from the guest individually: instead we can only set a
-+	 * maxmium via ZCR_EL2.LEN.  So, make sure the available vector
-+	 * lengths match the set requested exactly up to the requested
-+	 * maximum:
-+	 */
- 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
- 		if (vq_present(&vqs, vq) != sve_vq_available(vq))
- 			return -EINVAL;
--- 
-2.1.4
+VGhlIGN1cnJlbnQgZXJyb3IgY29kZSBkb2N1bWVudGF0aW9uIGZvciBLVk1fR0VUX09ORV9SRUcg
+YW5kCktWTV9TRVRfT05FX1JFRyBjb3VsZCBiZSByZWFkIGFzIGltcGx5aW5nIHRoYXQgYWxsIGFy
+Y2hpdGVjdHVyZXMKaW1wbGVtZW50IHRoZXNlIGVycm9yIGNvZGVzLCBvciB0aGF0IEtWTSBndWFy
+YW50ZWVzIHdoaWNoIGVycm9yCmNvZGUgaXMgcmV0dXJuZWQgaW4gYSBwYXJ0aWN1bGFyIHNpdHVh
+dGlvbi4KCkJlY2F1c2UgdGhpcyBpcyBub3QgcmVhbGx5IHRoZSBjYXNlLCB0aGlzIHBhdGNoIHdh
+dGVycyBkb3duIHRoZQpkb2N1bWVudGF0aW9uIGV4cGxpY2l0bHkgdG8gcmVtb3ZlIHN1Y2ggZ3Vh
+cmFudGVlcy4KCkVQRVJNIGlzIG1hcmtlZCBhcyBhcm02NC1zcGVjaWZpYywgc2luY2UgZm9yIG5v
+dyBhcm02NCByZWFsbHkgaXMKdGhlIG9ubHkgYXJjaGl0ZWN0dXJlIHRoYXQgeWllbGRzIHRoaXMg
+ZXJyb3IgY29kZSBmb3IgdGhlCmZpbmFsaXphdGlvbi1yZXF1aXJlZCBjYXNlLiAgS2VlcGluZyB0
+aGlzIGFzIGEgZGlzdGluY3QgZXJyb3IgY29kZQppcyB1c2VmdWwgaG93ZXZlciBmb3IgZGVidWdn
+aW5nIGR1ZSB0byB0aGUgc3RhdGVmdWxuZXNzIG9mIHRoZSBBUEkKaW4gdGhpcyBpbnN0YW5jZS4K
+Ck5vIGZ1bmN0aW9uYWwgY2hhbmdlLgoKU3VnZ2VzdGVkLWJ5OiBBbmRyZXcgSm9uZXMgPGRyam9u
+ZXNAcmVkaGF0LmNvbT4KRml4ZXM6IDM5NWY1NjJmMmI0YyAoIktWTTogRG9jdW1lbnQgZXJyb3Jz
+IGZvciBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRfT05FX1JFRyIpCkZpeGVzOiA1MDAzNmFk
+MDZiN2YgKCJLVk06IGFybTY0L3N2ZTogRG9jdW1lbnQgS1ZNIEFQSSBleHRlbnNpb25zIGZvciBT
+VkUiKQpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2
+aWV3ZWQtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPgotLS0KIERvY3VtZW50
+YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCB8IDE0ICsrKysrKysrKy0tLS0tCiAxIGZpbGUgY2hh
+bmdlZCwgOSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3Vt
+ZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0v
+YXBpLnR4dAppbmRleCA1NTE5ZGYwLi44MThhYzk3IDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9u
+L3ZpcnR1YWwva3ZtL2FwaS50eHQKKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGku
+dHh0CkBAIC0xODczLDggKzE4NzMsMTAgQEAgUGFyYW1ldGVyczogc3RydWN0IGt2bV9vbmVfcmVn
+IChpbikKIFJldHVybnM6IDAgb24gc3VjY2VzcywgbmVnYXRpdmUgdmFsdWUgb24gZmFpbHVyZQog
+RXJyb3JzOgogIMKgRU5PRU5UOiDCoMKgbm8gc3VjaCByZWdpc3RlcgotIMKgRVBFUk06IMKgwqDC
+oHJlZ2lzdGVyIGFjY2VzcyBmb3JiaWRkZW4gZm9yIGFyY2hpdGVjdHVyZS1kZXBlbmRlbnQgcmVh
+c29ucwotIMKgRUlOVkFMOiDCoMKgb3RoZXIgZXJyb3JzLCBzdWNoIGFzIGJhZCBzaXplIGVuY29k
+aW5nIGZvciBhIGtub3duIHJlZ2lzdGVyCisgwqBFSU5WQUw6IMKgwqBpbnZhbGlkIHJlZ2lzdGVy
+IElELCBvciBubyBzdWNoIHJlZ2lzdGVyCisgwqBFUEVSTTogwqDCoMKgKGFybTY0KSByZWdpc3Rl
+ciBhY2Nlc3Mgbm90IGFsbG93ZWQgYmVmb3JlIHZjcHUgZmluYWxpemF0aW9uCisoVGhlc2UgZXJy
+b3IgY29kZXMgYXJlIGluZGljYXRpdmUgb25seTogZG8gbm90IHJlbHkgb24gYSBzcGVjaWZpYyBl
+cnJvcgorY29kZSBiZWluZyByZXR1cm5lZCBpbiBhIHNwZWNpZmljIHNpdHVhdGlvbi4pCiAKIHN0
+cnVjdCBrdm1fb25lX3JlZyB7CiAgICAgICAgX191NjQgaWQ7CkBAIC0yMjYwLDEwICsyMjYyLDEy
+IEBAIEFyY2hpdGVjdHVyZXM6IGFsbAogVHlwZTogdmNwdSBpb2N0bAogUGFyYW1ldGVyczogc3Ry
+dWN0IGt2bV9vbmVfcmVnIChpbiBhbmQgb3V0KQogUmV0dXJuczogMCBvbiBzdWNjZXNzLCBuZWdh
+dGl2ZSB2YWx1ZSBvbiBmYWlsdXJlCi1FcnJvcnM6CitFcnJvcnMgaW5jbHVkZToKICDCoEVOT0VO
+VDogwqDCoG5vIHN1Y2ggcmVnaXN0ZXIKLSDCoEVQRVJNOiDCoMKgwqByZWdpc3RlciBhY2Nlc3Mg
+Zm9yYmlkZGVuIGZvciBhcmNoaXRlY3R1cmUtZGVwZW5kZW50IHJlYXNvbnMKLSDCoEVJTlZBTDog
+wqDCoG90aGVyIGVycm9ycywgc3VjaCBhcyBiYWQgc2l6ZSBlbmNvZGluZyBmb3IgYSBrbm93biBy
+ZWdpc3RlcgorIMKgRUlOVkFMOiDCoMKgaW52YWxpZCByZWdpc3RlciBJRCwgb3Igbm8gc3VjaCBy
+ZWdpc3RlcgorIMKgRVBFUk06IMKgwqDCoChhcm02NCkgcmVnaXN0ZXIgYWNjZXNzIG5vdCBhbGxv
+d2VkIGJlZm9yZSB2Y3B1IGZpbmFsaXphdGlvbgorKFRoZXNlIGVycm9yIGNvZGVzIGFyZSBpbmRp
+Y2F0aXZlIG9ubHk6IGRvIG5vdCByZWx5IG9uIGEgc3BlY2lmaWMgZXJyb3IKK2NvZGUgYmVpbmcg
+cmV0dXJuZWQgaW4gYSBzcGVjaWZpYyBzaXR1YXRpb24uKQogCiBUaGlzIGlvY3RsIGFsbG93cyB0
+byByZWNlaXZlIHRoZSB2YWx1ZSBvZiBhIHNpbmdsZSByZWdpc3RlciBpbXBsZW1lbnRlZAogaW4g
+YSB2Y3B1LiBUaGUgcmVnaXN0ZXIgdG8gcmVhZCBpcyBpbmRpY2F0ZWQgYnkgdGhlICJpZCIgZmll
+bGQgb2YgdGhlCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
+Cg==
