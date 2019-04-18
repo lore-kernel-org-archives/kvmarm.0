@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 11/14] KVM: arm/arm64: Clean up vcpu finalization function
- parameter naming
-Date: Thu, 18 Apr 2019 17:07:08 +0100
-Message-ID: <1555603631-8107-12-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 10/14] KVM: arm64/sve: Explain validity checks in
+ set_sve_vls()
+Date: Thu, 18 Apr 2019 17:07:07 +0100
+Message-ID: <1555603631-8107-11-git-send-email-Dave.Martin@arm.com>
 References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A10BE4A51E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 920BF4A530
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4O0QGfenQaC2 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:08:24 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B8EE4A51B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:24 -0400 (EDT)
+ with ESMTP id A7FAjH96kZ1D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:22 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C80104A51B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:21 -0400 (EDT)
 In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,12 +32,17 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently, the internal vcpu finalization functions use a different
-name ("what") for the feature parameter than the name ("feature")
-used in the documentation.
+Correct virtualization of SVE relies for correctness on code in
+set_sve_vls() that verifies consistency between the set of vector
+lengths requested by userspace and the set of vector lengths
+available on the host.
 
-To avoid future confusion, this patch converts everything to use
-the name "feature" consistently.
+However, the purpose of this code is not obvious, and not likely to
+be apparent at all to people who do not have detailed knowledge of
+the SVE system-level architecture.
+
+This patch adds a suitable comment to explain what these checks are
+for.
 
 No functional change.
 
@@ -45,52 +50,26 @@ Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/guest.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 7feddac..fe77543 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -412,7 +412,7 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 5bb909c..3ae2f82 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -264,6 +264,13 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
+ 		return -EINVAL;
  
--static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
- 	return -EINVAL;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6adf08b..7a096fd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -627,7 +627,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
--int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what);
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
- #define kvm_arm_vcpu_sve_finalized(vcpu) \
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 8847f38..3402543 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -186,9 +186,9 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
- {
--	switch (what) {
-+	switch (feature) {
- 	case KVM_ARM_VCPU_SVE:
- 		if (!vcpu_has_sve(vcpu))
++	/*
++	 * Vector lengths supported by the host can't currently be
++	 * hidden from the guest individually: instead we can only set a
++	 * maxmium via ZCR_EL2.LEN.  So, make sure the available vector
++	 * lengths match the set requested exactly up to the requested
++	 * maximum:
++	 */
+ 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
+ 		if (vq_present(&vqs, vq) != sve_vq_available(vq))
  			return -EINVAL;
 -- 
 2.1.4
