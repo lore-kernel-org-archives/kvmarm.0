@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 02/14] KVM: arm/arm64: Demote kvm_arm_init_arch_resources()
- to just set up SVE
-Date: Thu, 18 Apr 2019 17:06:59 +0100
-Message-ID: <1555603631-8107-3-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 04/14] KVM: arm64/sve: sys_regs: Demote redundant
+ vcpu_has_sve() checks to WARNs
+Date: Thu, 18 Apr 2019 17:07:01 +0100
+Message-ID: <1555603631-8107-5-git-send-email-Dave.Martin@arm.com>
 References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB394A51B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E32D34A54A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5rmkjH1tZ615 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:08:02 -0400 (EDT)
+ with ESMTP id 7Z9vMvODug-y for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A80984A4FE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADC1E4A511
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:07 -0400 (EDT)
 In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,76 +32,46 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The introduction of kvm_arm_init_arch_resources() looks like
-premature factoring, since nothing else uses this hook yet and it
-is not clear what will use it in the future.
+Because of the logic in kvm_arm_sys_reg_{get,set}_reg() and
+sve_id_visibility(), we should never call
+{get,set}_id_aa64zfr0_el1() for a vcpu where !vcpu_has_sve(vcpu).
 
-For now, let's not pretend that this is a general thing:
+To avoid the code giving the impression that it is valid for these
+functions to be called in this situation, and to help the compiler
+make the right optimisation decisions, this patch adds WARN_ON()
+for these cases.
 
-This patch simply renames the function to kvm_arm_init_sve(),
-retaining the arm stub version under the new name.
+Given the way the logic is spread out, this seems preferable to
+dropping the checks altogether.
 
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 2 +-
- virt/kvm/arm/arm.c                | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index e80cfc1..d956273 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -54,7 +54,7 @@
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
--static inline int kvm_arm_init_arch_resources(void) { return 0; }
-+static inline int kvm_arm_init_sve(void) { return 0; }
- 
- u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
- int __attribute_const__ kvm_target_cpu(void);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9d57cf8..6adf08b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -59,7 +59,7 @@
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
- extern unsigned int kvm_sve_max_vl;
--int kvm_arm_init_arch_resources(void);
-+int kvm_arm_init_sve(void);
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index f13378d..8847f38 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -110,7 +110,7 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 
- unsigned int kvm_sve_max_vl;
- 
--int kvm_arm_init_arch_resources(void)
-+int kvm_arm_init_sve(void)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 09e9b06..7046c76 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1144,7 +1144,7 @@ static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
  {
- 	if (system_supports_sve()) {
- 		kvm_sve_max_vl = sve_max_virtualisable_vl;
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 9edbf0f..7039c99c 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1682,7 +1682,7 @@ int kvm_arch_init(void *opaque)
- 	if (err)
- 		return err;
+ 	u64 val;
  
--	err = kvm_arm_init_arch_resources();
-+	err = kvm_arm_init_sve();
- 	if (err)
- 		return err;
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
  
+ 	val = guest_id_aa64zfr0_el1(vcpu);
+@@ -1159,7 +1159,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ 	int err;
+ 	u64 val;
+ 
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
+ 
+ 	err = reg_from_user(&val, uaddr, id);
 -- 
 2.1.4
