@@ -1,23 +1,23 @@
 From: Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 13/14] KVM: Clarify KVM_{SET,
- GET}_ONE_REG error code documentation
-Date: Thu, 18 Apr 2019 17:07:10 +0100
-Message-ID: <1555603631-8107-14-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH v2 12/14] KVM: Clarify capability requirements for
+ KVM_ARM_VCPU_FINALIZE
+Date: Thu, 18 Apr 2019 17:07:09 +0100
+Message-ID: <1555603631-8107-13-git-send-email-Dave.Martin@arm.com>
 References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 999DC4A530
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16E334A51E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZT-8tJ4WwdUX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Apr 2019 12:08:29 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0288A4A561
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:29 -0400 (EDT)
+ with ESMTP id mcp7k03a9t2v for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Apr 2019 12:08:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A524A4FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Apr 2019 12:08:26 -0400 (EDT)
 In-Reply-To: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,53 +32,52 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGN1cnJlbnQgZXJyb3IgY29kZSBkb2N1bWVudGF0aW9uIGZvciBLVk1fR0VUX09ORV9SRUcg
-YW5kCktWTV9TRVRfT05FX1JFRyBjb3VsZCBiZSByZWFkIGFzIGltcGx5aW5nIHRoYXQgYWxsIGFy
-Y2hpdGVjdHVyZXMKaW1wbGVtZW50IHRoZXNlIGVycm9yIGNvZGVzLCBvciB0aGF0IEtWTSBndWFy
-YW50ZWVzIHdoaWNoIGVycm9yCmNvZGUgaXMgcmV0dXJuZWQgaW4gYSBwYXJ0aWN1bGFyIHNpdHVh
-dGlvbi4KCkJlY2F1c2UgdGhpcyBpcyBub3QgcmVhbGx5IHRoZSBjYXNlLCB0aGlzIHBhdGNoIHdh
-dGVycyBkb3duIHRoZQpkb2N1bWVudGF0aW9uIGV4cGxpY2l0bHkgdG8gcmVtb3ZlIHN1Y2ggZ3Vh
-cmFudGVlcy4KCkVQRVJNIGlzIG1hcmtlZCBhcyBhcm02NC1zcGVjaWZpYywgc2luY2UgZm9yIG5v
-dyBhcm02NCByZWFsbHkgaXMKdGhlIG9ubHkgYXJjaGl0ZWN0dXJlIHRoYXQgeWllbGRzIHRoaXMg
-ZXJyb3IgY29kZSBmb3IgdGhlCmZpbmFsaXphdGlvbi1yZXF1aXJlZCBjYXNlLiAgS2VlcGluZyB0
-aGlzIGFzIGEgZGlzdGluY3QgZXJyb3IgY29kZQppcyB1c2VmdWwgaG93ZXZlciBmb3IgZGVidWdn
-aW5nIGR1ZSB0byB0aGUgc3RhdGVmdWxuZXNzIG9mIHRoZSBBUEkKaW4gdGhpcyBpbnN0YW5jZS4K
-Ck5vIGZ1bmN0aW9uYWwgY2hhbmdlLgoKU3VnZ2VzdGVkLWJ5OiBBbmRyZXcgSm9uZXMgPGRyam9u
-ZXNAcmVkaGF0LmNvbT4KRml4ZXM6IDM5NWY1NjJmMmI0YyAoIktWTTogRG9jdW1lbnQgZXJyb3Jz
-IGZvciBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRfT05FX1JFRyIpCkZpeGVzOiA1MDAzNmFk
-MDZiN2YgKCJLVk06IGFybTY0L3N2ZTogRG9jdW1lbnQgS1ZNIEFQSSBleHRlbnNpb25zIGZvciBT
-VkUiKQpTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5AYXJtLmNvbT4KUmV2
-aWV3ZWQtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPgotLS0KIERvY3VtZW50
-YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCB8IDE0ICsrKysrKysrKy0tLS0tCiAxIGZpbGUgY2hh
-bmdlZCwgOSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3Vt
-ZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0v
-YXBpLnR4dAppbmRleCA1NTE5ZGYwLi44MThhYzk3IDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9u
-L3ZpcnR1YWwva3ZtL2FwaS50eHQKKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGku
-dHh0CkBAIC0xODczLDggKzE4NzMsMTAgQEAgUGFyYW1ldGVyczogc3RydWN0IGt2bV9vbmVfcmVn
-IChpbikKIFJldHVybnM6IDAgb24gc3VjY2VzcywgbmVnYXRpdmUgdmFsdWUgb24gZmFpbHVyZQog
-RXJyb3JzOgogIMKgRU5PRU5UOiDCoMKgbm8gc3VjaCByZWdpc3RlcgotIMKgRVBFUk06IMKgwqDC
-oHJlZ2lzdGVyIGFjY2VzcyBmb3JiaWRkZW4gZm9yIGFyY2hpdGVjdHVyZS1kZXBlbmRlbnQgcmVh
-c29ucwotIMKgRUlOVkFMOiDCoMKgb3RoZXIgZXJyb3JzLCBzdWNoIGFzIGJhZCBzaXplIGVuY29k
-aW5nIGZvciBhIGtub3duIHJlZ2lzdGVyCisgwqBFSU5WQUw6IMKgwqBpbnZhbGlkIHJlZ2lzdGVy
-IElELCBvciBubyBzdWNoIHJlZ2lzdGVyCisgwqBFUEVSTTogwqDCoMKgKGFybTY0KSByZWdpc3Rl
-ciBhY2Nlc3Mgbm90IGFsbG93ZWQgYmVmb3JlIHZjcHUgZmluYWxpemF0aW9uCisoVGhlc2UgZXJy
-b3IgY29kZXMgYXJlIGluZGljYXRpdmUgb25seTogZG8gbm90IHJlbHkgb24gYSBzcGVjaWZpYyBl
-cnJvcgorY29kZSBiZWluZyByZXR1cm5lZCBpbiBhIHNwZWNpZmljIHNpdHVhdGlvbi4pCiAKIHN0
-cnVjdCBrdm1fb25lX3JlZyB7CiAgICAgICAgX191NjQgaWQ7CkBAIC0yMjYwLDEwICsyMjYyLDEy
-IEBAIEFyY2hpdGVjdHVyZXM6IGFsbAogVHlwZTogdmNwdSBpb2N0bAogUGFyYW1ldGVyczogc3Ry
-dWN0IGt2bV9vbmVfcmVnIChpbiBhbmQgb3V0KQogUmV0dXJuczogMCBvbiBzdWNjZXNzLCBuZWdh
-dGl2ZSB2YWx1ZSBvbiBmYWlsdXJlCi1FcnJvcnM6CitFcnJvcnMgaW5jbHVkZToKICDCoEVOT0VO
-VDogwqDCoG5vIHN1Y2ggcmVnaXN0ZXIKLSDCoEVQRVJNOiDCoMKgwqByZWdpc3RlciBhY2Nlc3Mg
-Zm9yYmlkZGVuIGZvciBhcmNoaXRlY3R1cmUtZGVwZW5kZW50IHJlYXNvbnMKLSDCoEVJTlZBTDog
-wqDCoG90aGVyIGVycm9ycywgc3VjaCBhcyBiYWQgc2l6ZSBlbmNvZGluZyBmb3IgYSBrbm93biBy
-ZWdpc3RlcgorIMKgRUlOVkFMOiDCoMKgaW52YWxpZCByZWdpc3RlciBJRCwgb3Igbm8gc3VjaCBy
-ZWdpc3RlcgorIMKgRVBFUk06IMKgwqDCoChhcm02NCkgcmVnaXN0ZXIgYWNjZXNzIG5vdCBhbGxv
-d2VkIGJlZm9yZSB2Y3B1IGZpbmFsaXphdGlvbgorKFRoZXNlIGVycm9yIGNvZGVzIGFyZSBpbmRp
-Y2F0aXZlIG9ubHk6IGRvIG5vdCByZWx5IG9uIGEgc3BlY2lmaWMgZXJyb3IKK2NvZGUgYmVpbmcg
-cmV0dXJuZWQgaW4gYSBzcGVjaWZpYyBzaXR1YXRpb24uKQogCiBUaGlzIGlvY3RsIGFsbG93cyB0
-byByZWNlaXZlIHRoZSB2YWx1ZSBvZiBhIHNpbmdsZSByZWdpc3RlciBpbXBsZW1lbnRlZAogaW4g
-YSB2Y3B1LiBUaGUgcmVnaXN0ZXIgdG8gcmVhZCBpcyBpbmRpY2F0ZWQgYnkgdGhlICJpZCIgZmll
-bGQgb2YgdGhlCi0tIAoyLjEuNAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+Userspace is only supposed to use KVM_ARM_VCPU_FINALIZE when there
+is some vcpu feature that can actually be finalized.
+
+This means that documenting KVM_ARM_VCPU_FINALIZE as available or
+not depending on the capabilities present is not helpful.
+
+This patch amends the documentation to describe availability in
+terms of which capability is required for each finalizable feature
+instead.
+
+In any case, userspace sees the same error (EINVAL) regardless of
+whether the given feature is not present or KVM_ARM_VCPU_FINALIZE
+is not implemented at all.
+
+No functional change.
+
+Suggested-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+ Documentation/virtual/kvm/api.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 03df379..5519df0 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3999,17 +3999,16 @@ userspace should not expect to get any particular value there.
+ 
+ 4.119 KVM_ARM_VCPU_FINALIZE
+ 
+-Capability: KVM_CAP_ARM_SVE
+ Architectures: arm, arm64
+ Type: vcpu ioctl
+ Parameters: int feature (in)
+ Returns: 0 on success, -1 on error
+ Errors:
+   EPERM:     feature not enabled, needs configuration, or already finalized
+-  EINVAL:    unknown feature
++  EINVAL:    feature unknown or not present
+ 
+ Recognised values for feature:
+-  arm64      KVM_ARM_VCPU_SVE
++  arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+ 
+ Finalizes the configuration of the specified vcpu feature.
+ 
+-- 
+2.1.4
