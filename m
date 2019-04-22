@@ -1,33 +1,13 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 20/68] KVM: arm/arm64: vgic-its: Take the srcu
- lock when parsing the memslots
-Date: Mon, 22 Apr 2019 15:44:28 -0400
-Message-ID: <20190422194516.11634-20-sashal@kernel.org>
-References: <20190422194516.11634-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 09/43] KVM: arm/arm64: vgic-its: Take the srcu lock when parsing the memslots
+Date: Mon, 22 Apr 2019 15:46:53 -0400
+Message-ID: <20190422194727.12495-9-sashal@kernel.org>
+References: <20190422194727.12495-1-sashal@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB6DE4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:45:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U97DYpELGlMS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Apr 2019 15:45:56 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C21A4A331
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:45:56 -0400 (EDT)
-In-Reply-To: <20190422194516.11634-1-sashal@kernel.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Transfer-Encoding: 8bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190422194727.12495-1-sashal@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
@@ -86,10 +66,10 @@ Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index c1071ed888e2..621bb004067e 100644
+index d72b8481f250..dc06f5e40041 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -760,8 +760,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -704,8 +704,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
  	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
  	int esz = GITS_BASER_ENTRY_SIZE(baser);
@@ -100,7 +80,7 @@ index c1071ed888e2..621bb004067e 100644
  
  	switch (type) {
  	case GITS_BASER_TYPE_DEVICE:
-@@ -788,7 +789,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -732,7 +733,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  
  		if (eaddr)
  			*eaddr = addr;
@@ -110,7 +90,7 @@ index c1071ed888e2..621bb004067e 100644
  	}
  
  	/* calculate and check the index into the 1st level */
-@@ -822,7 +824,12 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -766,7 +768,12 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  
  	if (eaddr)
  		*eaddr = indirect_ptr;
