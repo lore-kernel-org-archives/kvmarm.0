@@ -1,166 +1,64 @@
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.0 36/98] KVM: arm/arm64: Fix handling of stage2 huge mappings
-Date: Mon, 22 Apr 2019 15:41:03 -0400
-Message-ID: <20190422194205.10404-36-sashal@kernel.org>
-References: <20190422194205.10404-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 18/68] KVM: arm64: Reset the PMU in preemptible context
+Date: Mon, 22 Apr 2019 15:44:26 -0400
+Message-ID: <20190422194516.11634-18-sashal@kernel.org>
+References: <20190422194516.11634-1-sashal@kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20190422194205.10404-1-sashal@kernel.org>
+In-Reply-To: <20190422194516.11634-1-sashal@kernel.org>
 Sender: stable-owner@vger.kernel.org
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, Zheng Xiang <zhengxiang9@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Sasha Levin <sashal@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-[ Upstream commit 3c3736cd32bf5197aed1410ae826d2d254a5b277 ]
+[ Upstream commit ebff0b0e3d3c862c16c487959db5e0d879632559 ]
 
-We rely on the mmu_notifier call backs to handle the split/merge
-of huge pages and thus we are guaranteed that, while creating a
-block mapping, either the entire block is unmapped at stage2 or it
-is missing permission.
+We've become very cautious to now always reset the vcpu when nothing
+is loaded on the physical CPU. To do so, we now disable preemption
+and do a kvm_arch_vcpu_put() to make sure we have all the state
+in memory (and that it won't be loaded behind out back).
 
-However, we miss a case where the block mapping is split for dirty
-logging case and then could later be made block mapping, if we cancel the
-dirty logging. This not only creates inconsistent TLB entries for
-the pages in the the block, but also leakes the table pages for
-PMD level.
+This now causes issues with resetting the PMU, which calls into perf.
+Perf itself uses mutexes, which clashes with the lack of preemption.
+It is worth realizing that the PMU is fully emulated, and that
+no PMU state is ever loaded on the physical CPU. This means we can
+perfectly reset the PMU outside of the non-preemptible section.
 
-Handle this corner case for the huge mappings at stage2 by
-unmapping the non-huge mapping for the block. This could potentially
-release the upper level table. So we need to restart the table walk
-once we unmap the range.
-
-Fixes : ad361f093c1e31d ("KVM: ARM: Support hugetlbfs backed huge pages")
-Reported-by: Zheng Xiang <zhengxiang9@huawei.com>
-Cc: Zheng Xiang <zhengxiang9@huawei.com>
-Cc: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Fixes: e761a927bc9a ("KVM: arm/arm64: Reset the VCPU without preemption and vcpu state loaded")
+Reported-by: Julien Grall <julien.grall@arm.com>
+Tested-by: Julien Grall <julien.grall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
 ---
- arch/arm/include/asm/stage2_pgtable.h |  2 +
- virt/kvm/arm/mmu.c                    | 59 +++++++++++++++++++--------
- 2 files changed, 45 insertions(+), 16 deletions(-)
+ arch/arm64/kvm/reset.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-index de2089501b8b..9e11dce55e06 100644
---- a/arch/arm/include/asm/stage2_pgtable.h
-+++ b/arch/arm/include/asm/stage2_pgtable.h
-@@ -75,6 +75,8 @@ static inline bool kvm_stage2_has_pud(struct kvm *kvm)
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 18b9a522a2b3..0688816f19e2 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -117,6 +117,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	int ret = -EINVAL;
+ 	bool loaded;
  
- #define S2_PMD_MASK				PMD_MASK
- #define S2_PMD_SIZE				PMD_SIZE
-+#define S2_PUD_MASK				PUD_MASK
-+#define S2_PUD_SIZE				PUD_SIZE
- 
- static inline bool kvm_stage2_has_pmd(struct kvm *kvm)
- {
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 6dccb36465e6..7a0f9eeea68c 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1060,25 +1060,43 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- {
- 	pmd_t *pmd, old_pmd;
- 
-+retry:
- 	pmd = stage2_get_pmd(kvm, cache, addr);
- 	VM_BUG_ON(!pmd);
- 
- 	old_pmd = *pmd;
-+	/*
-+	 * Multiple vcpus faulting on the same PMD entry, can
-+	 * lead to them sequentially updating the PMD with the
-+	 * same value. Following the break-before-make
-+	 * (pmd_clear() followed by tlb_flush()) process can
-+	 * hinder forward progress due to refaults generated
-+	 * on missing translations.
-+	 *
-+	 * Skip updating the page table if the entry is
-+	 * unchanged.
-+	 */
-+	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
-+		return 0;
++	/* Reset PMU outside of the non-preemptible section */
++	kvm_pmu_vcpu_reset(vcpu);
 +
- 	if (pmd_present(old_pmd)) {
- 		/*
--		 * Multiple vcpus faulting on the same PMD entry, can
--		 * lead to them sequentially updating the PMD with the
--		 * same value. Following the break-before-make
--		 * (pmd_clear() followed by tlb_flush()) process can
--		 * hinder forward progress due to refaults generated
--		 * on missing translations.
-+		 * If we already have PTE level mapping for this block,
-+		 * we must unmap it to avoid inconsistent TLB state and
-+		 * leaking the table page. We could end up in this situation
-+		 * if the memory slot was marked for dirty logging and was
-+		 * reverted, leaving PTE level mappings for the pages accessed
-+		 * during the period. So, unmap the PTE level mapping for this
-+		 * block and retry, as we could have released the upper level
-+		 * table in the process.
- 		 *
--		 * Skip updating the page table if the entry is
--		 * unchanged.
-+		 * Normal THP split/merge follows mmu_notifier callbacks and do
-+		 * get handled accordingly.
- 		 */
--		if (pmd_val(old_pmd) == pmd_val(*new_pmd))
--			return 0;
+ 	preempt_disable();
+ 	loaded = (vcpu->cpu != -1);
+ 	if (loaded)
+@@ -164,9 +167,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.reset_state.reset = false;
+ 	}
+ 
+-	/* Reset PMU */
+-	kvm_pmu_vcpu_reset(vcpu);
 -
-+		if (!pmd_thp_or_huge(old_pmd)) {
-+			unmap_stage2_range(kvm, addr & S2_PMD_MASK, S2_PMD_SIZE);
-+			goto retry;
-+		}
- 		/*
- 		 * Mapping in huge pages should only happen through a
- 		 * fault.  If a page is merged into a transparent huge
-@@ -1090,8 +1108,7 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
- 		 * should become splitting first, unmapped, merged,
- 		 * and mapped back in on-demand.
- 		 */
--		VM_BUG_ON(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
--
-+		WARN_ON_ONCE(pmd_pfn(old_pmd) != pmd_pfn(*new_pmd));
- 		pmd_clear(pmd);
- 		kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	} else {
-@@ -1107,6 +1124,7 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
- {
- 	pud_t *pudp, old_pud;
- 
-+retry:
- 	pudp = stage2_get_pud(kvm, cache, addr);
- 	VM_BUG_ON(!pudp);
- 
-@@ -1114,14 +1132,23 @@ static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cac
- 
- 	/*
- 	 * A large number of vcpus faulting on the same stage 2 entry,
--	 * can lead to a refault due to the
--	 * stage2_pud_clear()/tlb_flush(). Skip updating the page
--	 * tables if there is no change.
-+	 * can lead to a refault due to the stage2_pud_clear()/tlb_flush().
-+	 * Skip updating the page tables if there is no change.
- 	 */
- 	if (pud_val(old_pud) == pud_val(*new_pudp))
- 		return 0;
- 
- 	if (stage2_pud_present(kvm, old_pud)) {
-+		/*
-+		 * If we already have table level mapping for this block, unmap
-+		 * the range for this block and retry.
-+		 */
-+		if (!stage2_pud_huge(kvm, old_pud)) {
-+			unmap_stage2_range(kvm, addr & S2_PUD_MASK, S2_PUD_SIZE);
-+			goto retry;
-+		}
-+
-+		WARN_ON_ONCE(kvm_pud_pfn(old_pud) != kvm_pud_pfn(*new_pudp));
- 		stage2_pud_clear(kvm, pudp);
- 		kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	} else {
+ 	/* Default workaround setup is enabled (if supported) */
+ 	if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL)
+ 		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
 -- 
 2.19.1
