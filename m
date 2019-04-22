@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD31C10F11
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Apr 2019 19:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 797D6C10F11
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Apr 2019 19:47:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5EFCE218B0
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Apr 2019 19:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F265C21906
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Apr 2019 19:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1wAYvQ98"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EFCE218B0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1/C1rA7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F265C21906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C13D4A486;
-	Mon, 22 Apr 2019 15:46:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B12BE4A4C5;
+	Mon, 22 Apr 2019 15:47:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hT10JUna0IFM; Mon, 22 Apr 2019 15:45:58 -0400 (EDT)
+	with ESMTP id 27mEljDOH1cS; Mon, 22 Apr 2019 15:47:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E61584A4CF;
-	Mon, 22 Apr 2019 15:45:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DED54A486;
+	Mon, 22 Apr 2019 15:47:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB6DE4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:45:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8671F4A47E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:47:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U97DYpELGlMS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Apr 2019 15:45:56 -0400 (EDT)
+ with ESMTP id HZzZ93uq9UJh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Apr 2019 15:47:42 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C21A4A331
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:45:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 393264A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Apr 2019 15:47:42 -0400 (EDT)
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net
  [73.47.72.35])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D1E08218B0;
- Mon, 22 Apr 2019 19:45:54 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 93C1421902;
+ Mon, 22 Apr 2019 19:47:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1555962355;
- bh=DIfGkywBu9T6LA7GbOyMGG1W1hZ6h9b1erECPu89G/s=;
+ s=default; t=1555962461;
+ bh=kKSg9CKcEJ+JF+KJ8Z7C0kIhnyeUyt4CjM1tQIH4960=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=1wAYvQ984vzNZL2X77ra2gFHNHeEFWdYPoURmf2HM6OCcp2qjf/0uM9EcvZtjQzHy
- vARb83xHR9XBUzQcWr8TILKoE75fru6XPH2d26dUOzbDRmBwJD2Hc9JhZY/23Oo1rm
- pbUJhhAeWSZmut5gFt3iUj6RKCugsFJs/YfIVXZw=
+ b=O1/C1rA7KeOCQ/sK1g3TCnxxQzB80/ItoeytpcyxQ8FIu4tcsSx06LNfO6VAzYN2b
+ WcjNLizmpYhTPzuy3twsCxRvcDH6+fDpC78aB9/8d1p6Ai61U4dhWPJnVBunGmN6Ml
+ QVk1w3j2jIIfqJP2lFTB/lUiQX/Vrjyd+FpX8XdI=
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 20/68] KVM: arm/arm64: vgic-its: Take the srcu
+Subject: [PATCH AUTOSEL 4.14 09/43] KVM: arm/arm64: vgic-its: Take the srcu
  lock when parsing the memslots
-Date: Mon, 22 Apr 2019 15:44:28 -0400
-Message-Id: <20190422194516.11634-20-sashal@kernel.org>
+Date: Mon, 22 Apr 2019 15:46:53 -0400
+Message-Id: <20190422194727.12495-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190422194516.11634-1-sashal@kernel.org>
-References: <20190422194516.11634-1-sashal@kernel.org>
+In-Reply-To: <20190422194727.12495-1-sashal@kernel.org>
+References: <20190422194727.12495-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190422194428.0O01C4lc3KFySdv5xeper_XtOBZdsTjl0hwsEXWWnOI@z>
+Message-ID: <20190422194653.ZsYp_6pgPLCoDjeQlOJ2MiEkx-B-my6MjZOvdhZkFbs@z>
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
@@ -138,10 +138,10 @@ Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index c1071ed888e2..621bb004067e 100644
+index d72b8481f250..dc06f5e40041 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -760,8 +760,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -704,8 +704,9 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  	int l1_tbl_size = GITS_BASER_NR_PAGES(baser) * SZ_64K;
  	u64 indirect_ptr, type = GITS_BASER_TYPE(baser);
  	int esz = GITS_BASER_ENTRY_SIZE(baser);
@@ -152,7 +152,7 @@ index c1071ed888e2..621bb004067e 100644
  
  	switch (type) {
  	case GITS_BASER_TYPE_DEVICE:
-@@ -788,7 +789,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -732,7 +733,8 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  
  		if (eaddr)
  			*eaddr = addr;
@@ -162,7 +162,7 @@ index c1071ed888e2..621bb004067e 100644
  	}
  
  	/* calculate and check the index into the 1st level */
-@@ -822,7 +824,12 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+@@ -766,7 +768,12 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
  
  	if (eaddr)
  		*eaddr = indirect_ptr;
