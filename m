@@ -3,64 +3,109 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D3CC282E1
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 10:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B73A1C10F14
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 10:15:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6710B217D4
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 10:00:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6710B217D4
+	by mail.kernel.org (Postfix) with ESMTP id 452832077C
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 10:15:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452832077C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C95A64A3BB;
-	Tue, 23 Apr 2019 06:00:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C52014A3BB;
+	Tue, 23 Apr 2019 06:15:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ax++mmZyzsEi; Tue, 23 Apr 2019 06:00:56 -0400 (EDT)
+	with ESMTP id yWpYGS9UQ3cN; Tue, 23 Apr 2019 06:15:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28D914A4A9;
-	Tue, 23 Apr 2019 06:00:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A63AC4A480;
+	Tue, 23 Apr 2019 06:15:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 677254A389
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 06:00:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0A54A480
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 06:15:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yuZLpkDiRBZG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Apr 2019 06:00:52 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8253C4A369
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 06:00:52 -0400 (EDT)
+ with ESMTP id z0bPP4JocSDY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Apr 2019 06:15:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AD2E4A3BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 06:15:03 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F28CC374;
- Tue, 23 Apr 2019 03:00:51 -0700 (PDT)
-Received: from big-swifty.misterjones.org (unknown [10.1.36.37])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA5DD3F557;
- Tue, 23 Apr 2019 03:00:49 -0700 (PDT)
-Date: Tue, 23 Apr 2019 11:00:51 +0100
-Message-ID: <861s1tavn0.wl-marc.zyngier@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D00EC374;
+ Tue, 23 Apr 2019 03:15:02 -0700 (PDT)
+Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ B186C3F557; Tue, 23 Apr 2019 03:14:59 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Directly return result from
+ kvm_arch_check_processor_compat()
+To: Sean Christopherson <sean.j.christopherson@intel.com>,
+ James Hogan <jhogan@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+ Joerg Roedel <joro@8bytes.org>, Christoffer Dall <christoffer.dall@arm.com>
+References: <20190420051817.5644-1-sean.j.christopherson@intel.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
-To: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
-Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
-In-Reply-To: <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
-References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
- <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
- <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
- <86zhpc66jl.wl-marc.zyngier@arm.com>
- <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
- <86imvu3uje.wl-marc.zyngier@arm.com>
- <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
 Organization: ARM Ltd
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Cc: kvm@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org,
- xuwei5@huawei.com, guoheyi@huawei.com, kvmarm@lists.cs.columbia.edu
+Message-ID: <0d34d373-5bba-2aac-2213-cf95184aa605@arm.com>
+Date: Tue, 23 Apr 2019 11:14:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190420051817.5644-1-sean.j.christopherson@intel.com>
+Content-Language: en-US
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+ Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,242 +121,31 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190423100051.TILaqtPDj0ppmbFjJ02gqJO2z5cTtrTRy3qjeNCq90w@z>
+Message-ID: <20190423101458.JRPG7hnmYiZrZ0QSpgn_2jNx3MGkvvxgRbdevwU13hQ@z>
 
-On Tue, 23 Apr 2019 08:44:17 +0100,
-"Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
+On 20/04/2019 06:18, Sean Christopherson wrote:
+> Add a wrapper to invoke kvm_arch_check_processor_compat() so that the
+> boilerplate ugliness of checking virtualization support on all CPUs is
+> hidden from the arch specific code.  x86's implementation in particular
+> is quite heinous, as it unnecessarily propagates the out-param pattern
+> into kvm_x86_ops.
 > 
-> Hi, Marc
-
-[...]
-
-> I've learned that there's some implementation problem for the PCIe
-> controller of Hi1616, the processor of D05. The PCIe ACS was not
-> implemented properly and D05 doesn't support VM using pcie vf.
-
-My D05 completely disagrees with you:
-
-root@unassigned-hostname:~# lspci -v
-00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
-	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
-	Flags: fast devsel
-lspci: Unable to load libkmod resources: error -12
-
-00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
-	Subsystem: Red Hat, Inc Virtio network device
-	Flags: bus master, fast devsel, latency 0, IRQ 40
-	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
-	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
-	Expansion ROM at 10000000 [disabled] [size=256K]
-	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
-	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-	Kernel driver in use: virtio-pci
-
-00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
-	Subsystem: Red Hat, Inc Virtio block device
-	Flags: bus master, fast devsel, latency 0, IRQ 41
-	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
-	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
-	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
-	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-	Kernel driver in use: virtio-pci
-
-00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
-	Subsystem: Red Hat, Inc Virtio SCSI
-	Flags: bus master, fast devsel, latency 0, IRQ 42
-	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
-	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
-	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
-	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
-	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
-	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
-	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
-	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
-	Kernel driver in use: virtio-pci
-
-00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
-	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
-	Flags: bus master, fast devsel, latency 0
-	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
-	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
-	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
-	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
-	Capabilities: [100] Advanced Error Reporting
-	Capabilities: [1a0] Transaction Processing Hints
-	Capabilities: [1d0] Access Control Services
-	Kernel driver in use: igbvf
-
-root@unassigned-hostname:~# uptime
- 05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
-
-For something that isn't supposed to work, it is pretty good. So
-please test it and let me know how it fares. At this stage, not
-regressing deployed HW is more important than improving the situation
-on HW that nobody has.
-
+> While the x86 specific issue could be resolved solely by changing
+> kvm_x86_ops, make the change for all architectures as returning a value
+> directly is prettier and technically more robust, e.g. s390 doesn't set
+> the out param, which could lead to subtle breakage in the (highly
+> unlikely) scenario where the out-param was not pre-initialized by the
+> caller.
 > 
-> > 
-> >>
-> >>>
-> >>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
-> >>>> large at all.
-> >>>
-> >>> Sure. But I'm not sure this is a universal figure.
-> >>>
-> >>>>
-> >>>>> Frankly, you want to be careful with that. I'd rather enable them late
-> >>>>> and have a chance of not blocking because of another (virtual)
-> >>>>> interrupt, which saves us the doorbell business.
-> >>>>>
-> >>>>> I wonder if you wouldn't be in a better position by drastically
-> >>>>> reducing halt_poll_ns for vcpu that can have directly injected
-> >>>>> interrupts.
-> >>>>>
-> >>>>
-> >>>> If we set halt_poll_ns to a small value, the chance of
-> >>>> not blocking and vcpu scheduled out becomes larger. The cost
-> >>>> of vcpu scheduled out is quite expensive.
-> >>>> In many cases, one pcpu is assigned to only
-> >>>> one vcpu, and halt_poll_ns is set quite large, to increase
-> >>>> chance of halt_poll process got terminated. This is the
-> >>>> reason we want to set halt_poll_ns large. And We hope vlpi
-> >>>> stop halt_poll process in time.
-> >>>
-> >>> Fair enough. It is certainly realistic to strictly partition the
-> >>> system when GICv4 is in use, so I can see some potential benefit.
-> >>>
-> >>>> Though it will check whether vcpu is runnable again by
-> >>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
-> >>>> However it's somewhat later if halt_poll_ns is larger.
-> >>>>
-> >>>>> In any case, this is something that we should measure, not guess.
-> >>>
-> >>> Please post results of realistic benchmarks that we can reproduce,
-> >>> with and without this change. I'm willing to entertain the idea, but I
-> >>> need more than just a vague number.
-> >>>
-> >>> Thanks,
-> >>>
-> >>> 	M.
-> >>>
-> >>
-> >> I tested it with and without change (patch attached in the last).
-> >> halt_poll_ns is keep default, 500000ns.
-> >> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
-> >> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
-> >>
-> >> netperf result:
-> >> D06 as server, intel 8180 server as client
-> >> with change:
-> >> package 512 bytes - 5400 Mbits/s
-> >> package 64 bytes - 740 Mbits/s
-> >> without change:
-> >> package 512 bytes - 5000 Mbits/s
-> >> package 64 bytes - 710 Mbits/s
-> >>
-> >> Also I have tested D06 as client, intel machine as server,
-> >> with the change, the result remains the same.
-> > 
-> > So anywhere between 4% and 8% improvement. Please post results for D05
-> > once you've found one.
-> > 
-> >>
-> >>
-> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >> index 55fe8e2..0f56904 100644
-> >> --- a/virt/kvm/kvm_main.c
-> >> +++ b/virt/kvm/kvm_main.c
-> >> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> >>  	if (vcpu->halt_poll_ns) {
-> >>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
-> >>
-> >> +#ifdef CONFIG_ARM64
-> >> +		/*
-> >> +		 * When using gicv4, enable doorbell before halt pool wait
-> >> +		 * so that direct vlpi can stop halt poll.
-> >> +		 */
-> >> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
-> >> +			kvm_vgic_v4_enable_doorbell(vcpu);
-> >> +		}
-> >> +#endif
-> >> +
-> > 
-> > Irk. No. You're now leaving doorbells enabled when going back to the
-> > guest, and that's pretty bad as the whole logic relies on doorbells
-> > being disabled if the guest can run.
-> > 
-> > So please try this instead on top of mainline. And it has to be on top
-> > of mainline as we've changed the way timer interrupts work in 5.1 --
-> > see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
-> > 
-
-[...]
-
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index f25aa98a94df..0ae4ad5dcb12 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> >  	bool waited = false;
-> >  	u64 block_ns;
-> >  
-> > +	kvm_arch_vcpu_blocking(vcpu);
-> > +
-> >  	start = cur = ktime_get();
-> >  	if (vcpu->halt_poll_ns) {
-> >  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
-> > @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> >  		} while (single_task_running() && ktime_before(cur, stop));
-> >  	}
-> >  
-> > -	kvm_arch_vcpu_blocking(vcpu);
-> > -
-> >  	for (;;) {
-> >  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
-> >  
-> > @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
-> >  	finish_swait(&vcpu->wq, &wait);
-> >  	cur = ktime_get();
-> >  
-> > -	kvm_arch_vcpu_unblocking(vcpu);
-> >  out:
-> > +	kvm_arch_vcpu_unblocking(vcpu);
-> >  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
-> >  
-> >  	if (!vcpu_valid_wakeup(vcpu))
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > 
+> Opportunistically annotate svm_check_processor_compat() with __init.
 > 
-> I've tested your patch and the results showed as follow:
-> 
-> netperf result:
-> D06 as server, intel 8180 server as client
-> with change:
-> package 512 bytes - 5500 Mbits/s
-> package 64 bytes - 760 Mbits/s
-> without change:
-> package 512 bytes - 5000 Mbits/s
-> package 64 bytes - 710 Mbits/s
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-OK, that's pretty good. Let me know once you've tested it on D05.
-
-Thanks,
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
 	M.
-
 -- 
-Jazz is not dead, it just smell funny.
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
