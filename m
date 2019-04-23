@@ -1,73 +1,53 @@
-From: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH] KVM: Directly return result from
- kvm_arch_check_processor_compat()
-Date: Tue, 23 Apr 2019 10:57:25 +0200
-Message-ID: <20190423105725.73f5680e.cohuck@redhat.com>
-References: <20190420051817.5644-1-sean.j.christopherson@intel.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH AUTOSEL 5.0 29/98] KVM: arm/arm64: Enforce PTE mappings at
+ stage2 when needed
+Date: Tue, 23 Apr 2019 10:27:26 +0100
+Message-ID: <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
+References: <20190422194205.10404-1-sashal@kernel.org>
+ <20190422194205.10404-29-sashal@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D454A476
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 04:57:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YIki2F6D7LvK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Apr 2019 04:57:35 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 233414A36C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 04:57:35 -0400 (EDT)
-In-Reply-To: <20190420051817.5644-1-sean.j.christopherson@intel.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>, David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org, linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>, Christian Borntraeger <borntraeger@de.ibm.com>, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20190422194205.10404-29-sashal@kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: sashal@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: yuzenghui@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 19 Apr 2019 22:18:17 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Hi Sasha,
 
-> Add a wrapper to invoke kvm_arch_check_processor_compat() so that the
-> boilerplate ugliness of checking virtualization support on all CPUs is
-> hidden from the arch specific code.  x86's implementation in particular
-> is quite heinous, as it unnecessarily propagates the out-param pattern
-> into kvm_x86_ops.
+On 04/22/2019 08:40 PM, Sasha Levin wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> While the x86 specific issue could be resolved solely by changing
-> kvm_x86_ops, make the change for all architectures as returning a value
-> directly is prettier and technically more robust, e.g. s390 doesn't set
-> the out param, which could lead to subtle breakage in the (highly
-> unlikely) scenario where the out-param was not pre-initialized by the
-> caller.
+> [ Upstream commit a80868f398554842b14d07060012c06efb57c456 ]
 > 
-> Opportunistically annotate svm_check_processor_compat() with __init.
+> commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> made the checks to skip huge mappings, stricter. However it introduced
+> a bug where we still use huge mappings, ignoring the flag to
+> use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
+> Also, the checks do not cover the PUD huge pages, that was
+> under review during the same period. This patch fixes both
+> the issues.
 > 
-> Tested on VMX only.
-> 
->  arch/mips/kvm/mips.c             | 4 ++--
->  arch/powerpc/kvm/powerpc.c       | 4 ++--
->  arch/s390/include/asm/kvm_host.h | 1 -
->  arch/s390/kvm/kvm-s390.c         | 5 +++++
->  arch/x86/include/asm/kvm_host.h  | 2 +-
->  arch/x86/kvm/svm.c               | 4 ++--
->  arch/x86/kvm/vmx/vmx.c           | 8 ++++----
->  arch/x86/kvm/x86.c               | 4 ++--
->  include/linux/kvm_host.h         | 2 +-
->  virt/kvm/arm/arm.c               | 4 ++--
->  virt/kvm/kvm_main.c              | 9 ++++++---
->  11 files changed, 27 insertions(+), 20 deletions(-)
+> Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
 
-Yes, this does look nicer.
+Please be aware that we need a follow up fix for this patch to fix the
+problem for THP backed memory.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+http://lists.infradead.org/pipermail/linux-arm-kernel/2019-April/645324.html
+
+
+It should appear upstream soon.
+
+
+Cheers
+Suzuki
