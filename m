@@ -6,65 +6,55 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDB9C10F14
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 08:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AD7C10F14
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 09:25:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 520D7214AE
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 08:57:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 520D7214AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id DA396206A3
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Apr 2019 09:25:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA396206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82FD14A4C3;
-	Tue, 23 Apr 2019 04:57:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 298774A4C3;
+	Tue, 23 Apr 2019 05:25:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id osLT0fitggji; Tue, 23 Apr 2019 04:57:37 -0400 (EDT)
+	with ESMTP id nONvvfjtDf7f; Tue, 23 Apr 2019 05:25:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52DB24A476;
-	Tue, 23 Apr 2019 04:57:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D59904A389;
+	Tue, 23 Apr 2019 05:25:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D454A476
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 04:57:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 527954A389
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 05:25:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YIki2F6D7LvK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Apr 2019 04:57:35 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 233414A36C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 04:57:35 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 024C83087924;
- Tue, 23 Apr 2019 08:57:34 +0000 (UTC)
-Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0EA041A91A;
- Tue, 23 Apr 2019 08:57:27 +0000 (UTC)
-Date: Tue, 23 Apr 2019 10:57:25 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH] KVM: Directly return result from
- kvm_arch_check_processor_compat()
-Message-ID: <20190423105725.73f5680e.cohuck@redhat.com>
-In-Reply-To: <20190420051817.5644-1-sean.j.christopherson@intel.com>
-References: <20190420051817.5644-1-sean.j.christopherson@intel.com>
-Organization: Red Hat GmbH
+ with ESMTP id XwYcHe1CZH8I for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Apr 2019 05:25:05 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 568414A380
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Apr 2019 05:25:05 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E9CE374;
+ Tue, 23 Apr 2019 02:25:04 -0700 (PDT)
+Received: from [10.37.12.155] (unknown [10.37.12.155])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47D883F557;
+ Tue, 23 Apr 2019 02:25:03 -0700 (PDT)
+Subject: Re: [PATCH AUTOSEL 5.0 29/98] KVM: arm/arm64: Enforce PTE mappings at
+ stage2 when needed
+To: sashal@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20190422194205.10404-1-sashal@kernel.org>
+ <20190422194205.10404-29-sashal@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
+Date: Tue, 23 Apr 2019 10:27:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 23 Apr 2019 08:57:34 +0000 (UTC)
-Cc: linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
- James Hogan <jhogan@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org,
- linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190422194205.10404-29-sashal@kernel.org>
+Content-Language: en-US
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,51 +66,47 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190423085725.D0AEUAgZxcp9MulCn9CYQcpOklqKAZxfKA_eKQcXbqw@z>
+Message-ID: <20190423092726.VfZlOPNl2tLI_m5ccDhTix6PBu9VKnwic_SEqp6MMM4@z>
 
-On Fri, 19 Apr 2019 22:18:17 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Hi Sasha,
 
-> Add a wrapper to invoke kvm_arch_check_processor_compat() so that the
-> boilerplate ugliness of checking virtualization support on all CPUs is
-> hidden from the arch specific code.  x86's implementation in particular
-> is quite heinous, as it unnecessarily propagates the out-param pattern
-> into kvm_x86_ops.
+On 04/22/2019 08:40 PM, Sasha Levin wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> While the x86 specific issue could be resolved solely by changing
-> kvm_x86_ops, make the change for all architectures as returning a value
-> directly is prettier and technically more robust, e.g. s390 doesn't set
-> the out param, which could lead to subtle breakage in the (highly
-> unlikely) scenario where the out-param was not pre-initialized by the
-> caller.
+> [ Upstream commit a80868f398554842b14d07060012c06efb57c456 ]
 > 
-> Opportunistically annotate svm_check_processor_compat() with __init.
+> commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> made the checks to skip huge mappings, stricter. However it introduced
+> a bug where we still use huge mappings, ignoring the flag to
+> use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
+> Also, the checks do not cover the PUD huge pages, that was
+> under review during the same period. This patch fixes both
+> the issues.
 > 
-> Tested on VMX only.
-> 
->  arch/mips/kvm/mips.c             | 4 ++--
->  arch/powerpc/kvm/powerpc.c       | 4 ++--
->  arch/s390/include/asm/kvm_host.h | 1 -
->  arch/s390/kvm/kvm-s390.c         | 5 +++++
->  arch/x86/include/asm/kvm_host.h  | 2 +-
->  arch/x86/kvm/svm.c               | 4 ++--
->  arch/x86/kvm/vmx/vmx.c           | 8 ++++----
->  arch/x86/kvm/x86.c               | 4 ++--
->  include/linux/kvm_host.h         | 2 +-
->  virt/kvm/arm/arm.c               | 4 ++--
->  virt/kvm/kvm_main.c              | 9 ++++++---
->  11 files changed, 27 insertions(+), 20 deletions(-)
+> Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
 
-Yes, this does look nicer.
+Please be aware that we need a follow up fix for this patch to fix the
+problem for THP backed memory.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+http://lists.infradead.org/pipermail/linux-arm-kernel/2019-April/645324.html
+
+
+It should appear upstream soon.
+
+
+Cheers
+Suzuki
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
