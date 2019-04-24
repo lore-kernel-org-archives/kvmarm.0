@@ -2,92 +2,108 @@ Return-Path: <SRS0=bv25=S2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7592BC10F11
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Apr 2019 14:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7B5C282CE
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Apr 2019 14:29:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EE3AB218FC
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Apr 2019 14:21:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sAm5MXiR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3AB218FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id E99BD20811
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Apr 2019 14:29:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E99BD20811
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 729314A4E8;
-	Wed, 24 Apr 2019 10:21:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8194B4A47A;
+	Wed, 24 Apr 2019 10:29:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id InGqO3RtUf+p; Wed, 24 Apr 2019 10:21:44 -0400 (EDT)
+	with ESMTP id gEwlPp0jNuW8; Wed, 24 Apr 2019 10:29:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D03C4A4A9;
-	Wed, 24 Apr 2019 10:21:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 279104A4BB;
+	Wed, 24 Apr 2019 10:29:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D5BE4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:21:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68EA34A47A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:29:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5rtPWGYjCvos for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Apr 2019 10:21:37 -0400 (EDT)
-Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com
- [209.85.219.196])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64BE24A3B4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:21:37 -0400 (EDT)
-Received: by mail-yb1-f196.google.com with SMTP id a13so996511ybm.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 07:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=XFgiOU+IFpTLzIbSG0pRnLvcmQ+HnbdvSe0p2WFb6Ns=;
- b=sAm5MXiR2N3H1OAr87W5AlZDl/Yr4NBX+L+1U376zVnxPVkaXe9AxIMLZGzcAV3M4R
- aBoOrcLMPh8JL7DTJ7Nre1QpDAodLJaR7MbWjuM7ImeBXypmWV0zDwQu65F+vCtfJKVt
- SqFIdbbiDA/O8tElyJ0mDI04FEkJbUYSZSoRME5bx6yOep9/qAP5S8HyXipjsB2/Xya9
- 0WCpQrgMtZLP7k7V7nNX/nwFJi1665ddjbky3zocbqJPOVKkrlVoLDk153ECc/ATIW9u
- V5PjU5EjXAfQRHZ/HzGXUSDhBybaQRXttaeZi3/z/Do33fs0Bwt/ZE64k9vB54blZ4lL
- J2JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=XFgiOU+IFpTLzIbSG0pRnLvcmQ+HnbdvSe0p2WFb6Ns=;
- b=K60GplxypTfl3qwsGc6X8moaai67G87RXyq/TmkwPg44PwcSNUb8NNFjzSwpSIxsCf
- dchX/eDVyab4UCm8BoNGOUEBc5fPTxm7SWCqmCKOpD5VjtkrQwQu4Fgfg4qvVE/jUsP/
- Uy471MEnG0tX3CKtzuRUVby0GVJVgvhUBPwLYjaTePdod6V2KN7JtBXTnKcd9J3qH4db
- sT2wF2VJG52Rtoq4IhIskdkGwSC8xDEHobn2KpIIsYUSSo0V6i3ibjn5j1DqG0zv/ekv
- kn0pIHo195TDKB/e9Y5LpUnIWfE/7e22BvU4C1iFpHaz/kogkgmIQ2cP6odIOUbeLqvh
- 9rFA==
-X-Gm-Message-State: APjAAAVaTgwxNnZLdiOWCRQyK2Jhaz0vZlLQ/mS6WAqJ/q7L0YUe6Y37
- FsV9LMRUiRbFlg1wGC8woiCLJQ==
-X-Google-Smtp-Source: APXvYqxGuKXBAiAT1SL0myPL/oP9LsFU39gRc6j4K6UaBr3+N14QlWP3EnW3UZK0nc1I7RrhKZySkQ==
-X-Received: by 2002:a25:3745:: with SMTP id e66mr2043860yba.521.1556115696815; 
- Wed, 24 Apr 2019 07:21:36 -0700 (PDT)
-Received: from leoy-ThinkPad-X240s (li931-65.members.linode.com.
- [45.56.113.65])
- by smtp.gmail.com with ESMTPSA id b131sm7213247ywb.103.2019.04.24.07.21.32
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 24 Apr 2019 07:21:35 -0700 (PDT)
-Date: Wed, 24 Apr 2019 22:21:27 +0800
-From: Leo Yan <leo.yan@linaro.org>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Will Deacon <Will.Deacon@arm.com>,
- Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
- Marc Zyngier <Marc.Zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>,
- Robin Murphy <Robin.Murphy@arm.com>
-Subject: Re: [PATCH v4 0/3] vfio-pci: Support INTx mode re-enabling
-Message-ID: <20190424142127.GC8948@leoy-ThinkPad-X240s>
-References: <20190408012719.16158-1-leo.yan@linaro.org>
+ with ESMTP id KJ0LWwMkrPrS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Apr 2019 10:29:30 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2CA64A3BB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:29:29 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4F39D80D;
+ Wed, 24 Apr 2019 07:29:29 -0700 (PDT)
+Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ B526D3F5AF; Wed, 24 Apr 2019 07:29:27 -0700 (PDT)
+Subject: Re: [PATCH v10 2/5] KVM: arm/arm64: context-switch ptrauth registers
+To: Dave Martin <Dave.Martin@arm.com>,
+ Amit Daniel Kachhap <amit.kachhap@arm.com>
+References: <1555994558-26349-1-git-send-email-amit.kachhap@arm.com>
+ <1555994558-26349-3-git-send-email-amit.kachhap@arm.com>
+ <20190424133903.GU3567@e103592.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: ARM Ltd
+Message-ID: <4e475e1f-80f2-372a-2c16-a03ac947525a@arm.com>
+Date: Wed, 24 Apr 2019 15:29:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190408012719.16158-1-leo.yan@linaro.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190424133903.GU3567@e103592.cambridge.arm.com>
+Content-Language: en-US
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,58 +119,150 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190424142127.Y4i_w0F69K8ILRVZQKyJmk-9qwHBGKr0jfrLmfur8R4@z>
+Message-ID: <20190424142926.ziZka4uW6r0EyNC7tAJCWCGspGwCX3yF3nXXtlfK9mk@z>
 
-Hi Will,
+On 24/04/2019 14:39, Dave Martin wrote:
+> On Tue, Apr 23, 2019 at 10:12:35AM +0530, Amit Daniel Kachhap wrote:
+>> From: Mark Rutland <mark.rutland@arm.com>
+>>
+>> When pointer authentication is supported, a guest may wish to use it.
+>> This patch adds the necessary KVM infrastructure for this to work, with
+>> a semi-lazy context switch of the pointer auth state.
+>>
+>> Pointer authentication feature is only enabled when VHE is built
+>> in the kernel and present in the CPU implementation so only VHE code
+>> paths are modified.
+>>
+>> When we schedule a vcpu, we disable guest usage of pointer
+>> authentication instructions and accesses to the keys. While these are
+>> disabled, we avoid context-switching the keys. When we trap the guest
+>> trying to use pointer authentication functionality, we change to eagerly
+>> context-switching the keys, and enable the feature. The next time the
+>> vcpu is scheduled out/in, we start again. However the host key save is
+>> optimized and implemented inside ptrauth instruction/register access
+>> trap.
+>>
+>> Pointer authentication consists of address authentication and generic
+>> authentication, and CPUs in a system might have varied support for
+>> either. Where support for either feature is not uniform, it is hidden
+>> from guests via ID register emulation, as a result of the cpufeature
+>> framework in the host.
+>>
+>> Unfortunately, address authentication and generic authentication cannot
+>> be trapped separately, as the architecture provides a single EL2 trap
+>> covering both. If we wish to expose one without the other, we cannot
+>> prevent a (badly-written) guest from intermittently using a feature
+>> which is not uniformly supported (when scheduled on a physical CPU which
+>> supports the relevant feature). Hence, this patch expects both type of
+>> authentication to be present in a cpu.
+>>
+>> This switch of key is done from guest enter/exit assembly as preparation
+>> for the upcoming in-kernel pointer authentication support. Hence, these
+>> key switching routines are not implemented in C code as they may cause
+>> pointer authentication key signing error in some situations.
+>>
+>> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+>> [Only VHE, key switch in full assembly, vcpu_has_ptrauth checks
+>> , save host key in ptrauth exception trap]
+>> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+>> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Christoffer Dall <christoffer.dall@arm.com>
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> ---
+>> Changes since v9:
+>>
+>> * Removed hardcoding of enum values[Mark Zyngier].
+>> * Changed kvm_ptrauth_asm.h to kvm_ptrauth.h[Mark Zyngier].
+>> * Removed macro __ptrauth_save_state and applied inline [Marc Zyngier].
+>> * Moved kvm_arm_vcpu_ptrauth_setup_lazy, kvm_arm_vcpu_ptrauth_enable and
+>>   kvm_arm_vcpu_ptrauth_disable from *.c to kvm_emulate.h file [Marc Zyngier].
+>> * Added/Modified comments at few places [Marc Zyngier].
+> 
+> [...]
+> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> 
+> [...]
+> 
+>> @@ -1058,9 +1087,11 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>>  					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+>>  					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+>>  					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
+>> -		if (val & ptrauth_mask)
+>> -			kvm_debug("ptrauth unsupported for guests, suppressing\n");
+>> -		val &= ~ptrauth_mask;
+>> +		if (!vcpu_has_ptrauth(vcpu)) {
+>> +			if (val & ptrauth_mask)
+>> +				kvm_debug("ptrauth unsupported for guests, suppressing\n");
+>> +			val &= ~ptrauth_mask;
+>> +		}
+> 
+> Hmmm, didn't spot this before, but this error message no longer makes
+> sense now that KVM _does_ support pointer auth.
+> 
+> Without vcpu_has_ptrauth(vcpu), we should just silently mask out the
+> relevant ID fields now (same as for SVE).
+> 
+> The patch below should achieve that.
+> 
+> --8<--
+> 
+> From c6065122c5cccef57108dff990ce8fb43426f88e Mon Sep 17 00:00:00 2001
+> From: Dave Martin <Dave.Martin@arm.com>
+> Date: Wed, 24 Apr 2019 14:32:29 +0100
+> Subject: [PATCH] KVM: arm64: sys_regs: Remove warning about missing pointer
+>  auth support
+> 
+> KVM does support pointer auth for guests now, so it is
+> inappropriate (and confusing) to print a warning to dmesg when
+> userspace explicitly does not ask for pointer auth to be turned on
+> for a vcpu.
+> 
+> So, just squash the virtual ptrauth ID_AA64ISAR1_EL1 fields when
+> appropriate and remove the warning.
+> 
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 15 +++++----------
+>  1 file changed, 5 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7f06c2e..f599f5e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1082,16 +1082,11 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  
+>  	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
+>  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> -	} else if (id == SYS_ID_AA64ISAR1_EL1) {
+> -		const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+> -					 (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
+> -		if (!vcpu_has_ptrauth(vcpu)) {
+> -			if (val & ptrauth_mask)
+> -				kvm_debug("ptrauth unsupported for guests, suppressing\n");
+> -			val &= ~ptrauth_mask;
+> -		}
+> +	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+> +		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> +			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> +			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+> +			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
+>  	}
+>  
+>  	return val;
+> 
 
-On Mon, Apr 08, 2019 at 09:27:16AM +0800, Leo Yan wrote:
-> When enable vfio-pci mode for NIC driver on Juno board, the IRQ is
-> failed to forward properly from host to guest, finally root caused this
-> issue is related with kvmtool cannot re-enable INTx mode properly.
-> 
-> So the basic working flow to reproduce this issue is as below:
-> 
->     Host             Guest
-> -------------  --------------------
->   INTx mode
->                  MSI enable failed in NIC driver
->                  MSI disable in NIC driver
->                  Switch back to INTx mode --> kvmtool doesn't support
-> 
-> So this patch is to support INTx mode re-enabling; patch 0001 is one
-> minor fixing up for eventfd releasing; patch 0002 introduces a new
-> function vfio_pci_init_intx() which is used to finish INTx one-time
-> initialisation; patch 0003 is the core patch for support INTx mode
-> re-enabling, when kvmtool detects MSI is disabled it rollbacks to INTx
-> mode.
-> 
-> This patch set has been tested on Juno-r2 board.
-> 
-> == Changes for V4 ==
-> * Removed the unnecessary comments in patch 0003 (Jean-Philippe).
-> * Added Jean-Philippe's review tags.
+Since the series isn't in -next yet, I've squashed the above with the
+other nits I had in -queue.
 
-Could you pick up these 3 patches and merge into kvmtool?  All of them
-has been received reviewing tag from Jean-Philippe.  Thanks.
+Thanks,
 
-> == Changes for V3 ==
-> * Add new function vfio_pci_init_intx() for one-time initialisation.
-> * Simplized INTx re-enabling (don't change irq_line anymore at the
->   runtime).
-> 
-> 
-> Leo Yan (3):
->   vfio-pci: Release INTx's unmask eventfd properly
->   vfio-pci: Add new function for INTx one-time initialisation
->   vfio-pci: Re-enable INTx mode when disable MSI/MSIX
-> 
->  include/kvm/vfio.h |  1 +
->  vfio/pci.c         | 95 ++++++++++++++++++++++++++++++----------------
->  2 files changed, 64 insertions(+), 32 deletions(-)
-> 
-> -- 
-> 2.19.1
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
