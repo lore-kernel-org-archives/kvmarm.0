@@ -1,27 +1,27 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v7 11/27] KVM: arm64: Support runtime sysreg visibility
- filtering
-Date: Wed, 24 Apr 2019 14:47:18 +0100
-Message-ID: <20190424134717.GY3567@e103592.cambridge.arm.com>
-References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
- <1553864452-15080-12-git-send-email-Dave.Martin@arm.com>
- <87h8anwxm4.fsf@zen.linaroharston>
+From: Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH v4 0/3] vfio-pci: Support INTx mode re-enabling
+Date: Wed, 24 Apr 2019 22:21:27 +0800
+Message-ID: <20190424142127.GC8948@leoy-ThinkPad-X240s>
+References: <20190408012719.16158-1-leo.yan@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BB574A48D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 09:47:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D5BE4A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:21:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cGCnO43QDNHd for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Apr 2019 09:47:23 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29D414A4B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 09:47:23 -0400 (EDT)
+ with ESMTP id 5rtPWGYjCvos for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Apr 2019 10:21:37 -0400 (EDT)
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com
+ [209.85.219.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64BE24A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:21:37 -0400 (EDT)
+Received: by mail-yb1-f196.google.com with SMTP id a13so996511ybm.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 07:21:37 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <87h8anwxm4.fsf@zen.linaroharston>
+In-Reply-To: <20190408012719.16158-1-leo.yan@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,58 +31,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Will Deacon <Will.Deacon@arm.com>, Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Eric Auger <eric.auger@redhat.com>, Robin Murphy <Robin.Murphy@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 24, 2019 at 09:39:31AM +0000, Alex Benn=E9e wrote:
-> =
+Hi Will,
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
+On Mon, Apr 08, 2019 at 09:27:16AM +0800, Leo Yan wrote:
+> When enable vfio-pci mode for NIC driver on Juno board, the IRQ is
+> failed to forward properly from host to guest, finally root caused this
+> issue is related with kvmtool cannot re-enable INTx mode properly.
+> 
+> So the basic working flow to reproduce this issue is as below:
+> 
+>     Host             Guest
+> -------------  --------------------
+>   INTx mode
+>                  MSI enable failed in NIC driver
+>                  MSI disable in NIC driver
+>                  Switch back to INTx mode --> kvmtool doesn't support
+> 
+> So this patch is to support INTx mode re-enabling; patch 0001 is one
+> minor fixing up for eventfd releasing; patch 0002 introduces a new
+> function vfio_pci_init_intx() which is used to finish INTx one-time
+> initialisation; patch 0003 is the core patch for support INTx mode
+> re-enabling, when kvmtool detects MSI is disabled it rollbacks to INTx
+> mode.
+> 
+> This patch set has been tested on Juno-r2 board.
+> 
+> == Changes for V4 ==
+> * Removed the unnecessary comments in patch 0003 (Jean-Philippe).
+> * Added Jean-Philippe's review tags.
 
-> > Some optional features of the Arm architecture add new system
-> > registers that are not present in the base architecture.
-> >
-> > Where these features are optional for the guest, the visibility of
-> > these registers may need to depend on some runtime configuration,
-> > such as a flag passed to KVM_ARM_VCPU_INIT.
-> =
+Could you pick up these 3 patches and merge into kvmtool?  All of them
+has been received reviewing tag from Jean-Philippe.  Thanks.
 
-> This combined with...
-> > --- a/arch/arm64/kvm/sys_regs.h
-> > +++ b/arch/arm64/kvm/sys_regs.h
-> > @@ -64,8 +64,15 @@ struct sys_reg_desc {
-> >  			const struct kvm_one_reg *reg, void __user *uaddr);
-> >  	int (*set_user)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> >  			const struct kvm_one_reg *reg, void __user *uaddr);
-> > +
-> > +	/* Return mask of REG_* runtime visibility overrides */
-> > +	unsigned int (*visibility)(const struct kvm_vcpu *vcpu,
-> > +				   const struct sys_reg_desc *rd);
-> >  };
-> =
-
-> this makes me wonder what sort of machines will see different register
-> visibility depending on which vcpu you are running on?
-
-Userspace can consciously set KVM_ARM_VCPU_SVE in vcpu_init.features[0]
-for some vcpus and not for others.
-
-For one thing, this is useful for testing how the guest responds to that
-configuration.
-
-This will for example allow Linux's handling of these weird
-configurations to be tested directly rather than by hacking the
-guest kernel to fake it up -- which is what I've had to do up to now.
-
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-
-Thanks!
-
-(Note, Marc already picked the patches into kvmarm/next, so new tags
-won't be applied.  But the review is still appreciated, and if you spot
-any issues I'd certainly like to know :)
-
-Cheers
----Dave
+> == Changes for V3 ==
+> * Add new function vfio_pci_init_intx() for one-time initialisation.
+> * Simplized INTx re-enabling (don't change irq_line anymore at the
+>   runtime).
+> 
+> 
+> Leo Yan (3):
+>   vfio-pci: Release INTx's unmask eventfd properly
+>   vfio-pci: Add new function for INTx one-time initialisation
+>   vfio-pci: Re-enable INTx mode when disable MSI/MSIX
+> 
+>  include/kvm/vfio.h |  1 +
+>  vfio/pci.c         | 95 ++++++++++++++++++++++++++++++----------------
+>  2 files changed, 64 insertions(+), 32 deletions(-)
+> 
+> -- 
+> 2.19.1
+> 
