@@ -1,29 +1,31 @@
-From: Dave P Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 2/5] KVM: arm/arm64: context-switch ptrauth registers
-Date: Wed, 24 Apr 2019 14:30:43 +0000
-Message-ID: <20190424143041.GF17864@e103592.cambridge.arm.com>
-References: <1555994558-26349-1-git-send-email-amit.kachhap@arm.com>
- <1555994558-26349-3-git-send-email-amit.kachhap@arm.com>
- <20190424133903.GU3567@e103592.cambridge.arm.com>
- <4e475e1f-80f2-372a-2c16-a03ac947525a@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v7 13/27] KVM: arm64/sve: Context switch the SVE registers
+Date: Wed, 24 Apr 2019 15:51:32 +0100
+Message-ID: <87d0lbwj63.fsf@zen.linaroharston>
+References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-14-git-send-email-Dave.Martin@arm.com>
+ <20190403200145.c2oep2hbugl7db5t@kamzik.brq.redhat.com>
+ <20190404081008.GY3567@e103592.cambridge.arm.com>
+ <20190404083502.b7a345l2gx3df2zk@kamzik.brq.redhat.com>
+ <20190404083624.GA3567@e103592.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF72C4A480
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:30:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D57A84A47A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:51:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0rzAJNvRRx5a for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Apr 2019 10:30:46 -0400 (EDT)
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
- (mail-eopbgr10079.outbound.protection.outlook.com [40.107.1.79])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D29B4A47A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:30:46 -0400 (EDT)
-In-Reply-To: <4e475e1f-80f2-372a-2c16-a03ac947525a@arm.com>
-Content-Language: en-US
-Content-ID: <D2A58B168B45CC428E0A9CEAA7BD1BB8@eurprd08.prod.outlook.com>
+ with ESMTP id iY8EtdECX5D2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Apr 2019 10:51:34 -0400 (EDT)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 963ED4A46E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 10:51:34 -0400 (EDT)
+Received: by mail-wm1-f65.google.com with SMTP id w15so5470009wmc.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 07:51:34 -0700 (PDT)
+In-reply-to: <20190404083624.GA3567@e103592.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,98 +35,87 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <Marc.Zyngier@arm.com>
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Kristina Martsenko <Kristina.Martsenko@arm.com>, Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>, Amit Kachhap <Amit.Kachhap@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 24, 2019 at 03:29:26PM +0100, Marc Zyngier wrote:
-> On 24/04/2019 14:39, Dave Martin wrote:
-> > On Tue, Apr 23, 2019 at 10:12:35AM +0530, Amit Daniel Kachhap wrote:
-> >> From: Mark Rutland <mark.rutland@arm.com>
-> >>
-> >> When pointer authentication is supported, a guest may wish to use it.
-> >> This patch adds the necessary KVM infrastructure for this to work, with
-> >> a semi-lazy context switch of the pointer auth state.
-> >>
-> >> Pointer authentication feature is only enabled when VHE is built
-> >> in the kernel and present in the CPU implementation so only VHE code
-> >> paths are modified.
-> >>
-> >> When we schedule a vcpu, we disable guest usage of pointer
-> >> authentication instructions and accesses to the keys. While these are
-> >> disabled, we avoid context-switching the keys. When we trap the guest
-> >> trying to use pointer authentication functionality, we change to eagerly
-> >> context-switching the keys, and enable the feature. The next time the
-> >> vcpu is scheduled out/in, we start again. However the host key save is
-> >> optimized and implemented inside ptrauth instruction/register access
-> >> trap.
-> >>
-> >> Pointer authentication consists of address authentication and generic
-> >> authentication, and CPUs in a system might have varied support for
-> >> either. Where support for either feature is not uniform, it is hidden
-> >> from guests via ID register emulation, as a result of the cpufeature
-> >> framework in the host.
-> >>
-> >> Unfortunately, address authentication and generic authentication cannot
-> >> be trapped separately, as the architecture provides a single EL2 trap
-> >> covering both. If we wish to expose one without the other, we cannot
-> >> prevent a (badly-written) guest from intermittently using a feature
-> >> which is not uniformly supported (when scheduled on a physical CPU which
-> >> supports the relevant feature). Hence, this patch expects both type of
-> >> authentication to be present in a cpu.
-> >>
-> >> This switch of key is done from guest enter/exit assembly as preparation
-> >> for the upcoming in-kernel pointer authentication support. Hence, these
-> >> key switching routines are not implemented in C code as they may cause
-> >> pointer authentication key signing error in some situations.
-> >>
-> >> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> >> [Only VHE, key switch in full assembly, vcpu_has_ptrauth checks
-> >> , save host key in ptrauth exception trap]
-> >> Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> >> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-> >> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >> Cc: Christoffer Dall <christoffer.dall@arm.com>
-> >> Cc: kvmarm@lists.cs.columbia.edu
-> >> ---
-> >> Changes since v9:
-> >>
-> >> * Removed hardcoding of enum values[Mark Zyngier].
-> >> * Changed kvm_ptrauth_asm.h to kvm_ptrauth.h[Mark Zyngier].
-> >> * Removed macro __ptrauth_save_state and applied inline [Marc Zyngier].
-> >> * Moved kvm_arm_vcpu_ptrauth_setup_lazy, kvm_arm_vcpu_ptrauth_enable and
-> >>   kvm_arm_vcpu_ptrauth_disable from *.c to kvm_emulate.h file [Marc Zyngier].
-> >> * Added/Modified comments at few places [Marc Zyngier].
-
-[...]
-
-> >  if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
-> >  val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
-> > -} else if (id == SYS_ID_AA64ISAR1_EL1) {
-> > -const u64 ptrauth_mask = (0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> > - (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> > - (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> > - (0xfUL << ID_AA64ISAR1_GPI_SHIFT);
-> > -if (!vcpu_has_ptrauth(vcpu)) {
-> > -if (val & ptrauth_mask)
-> > -kvm_debug("ptrauth unsupported for guests, suppressing\n");
-> > -val &= ~ptrauth_mask;
-> > -}
-> > +} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
-> > +val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> > + (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> > + (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> > + (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
-> >  }
-> >
-> >  return val;
-> >
->
-> Since the series isn't in -next yet, I've squashed the above with the
-> other nits I had in -queue.
-
-Okey doke.
-
-Thanks
----Dave
-IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgQXBy
+IDA0LCAyMDE5IGF0IDEwOjM1OjAyQU0gKzAyMDAsIEFuZHJldyBKb25lcyB3cm90ZToKPj4gT24g
+VGh1LCBBcHIgMDQsIDIwMTkgYXQgMDk6MTA6MDhBTSArMDEwMCwgRGF2ZSBNYXJ0aW4gd3JvdGU6
+Cj4+ID4gT24gV2VkLCBBcHIgMDMsIDIwMTkgYXQgMTA6MDE6NDVQTSArMDIwMCwgQW5kcmV3IEpv
+bmVzIHdyb3RlOgo+PiA+ID4gT24gRnJpLCBNYXIgMjksIDIwMTkgYXQgMDE6MDA6MzhQTSArMDAw
+MCwgRGF2ZSBNYXJ0aW4gd3JvdGU6Cj4+ID4gPiA+IEluIG9yZGVyIHRvIGdpdmUgZWFjaCB2Y3B1
+IGl0cyBvd24gdmlldyBvZiB0aGUgU1ZFIHJlZ2lzdGVycywgdGhpcwo+PiA+ID4gPiBwYXRjaCBh
+ZGRzIGNvbnRleHQgc3RvcmFnZSB2aWEgYSBuZXcgc3ZlX3N0YXRlIHBvaW50ZXIgaW4gc3RydWN0
+Cj4+ID4gPiA+IHZjcHVfYXJjaC4gIEFuIGFkZGl0aW9uYWwgbWVtYmVyIHN2ZV9tYXhfdmwgaXMg
+YWxzbyBhZGRlZCBmb3IgZWFjaAo+PiA+ID4gPiB2Y3B1LCB0byBkZXRlcm1pbmUgdGhlIG1heGlt
+dW0gdmVjdG9yIGxlbmd0aCB2aXNpYmxlIHRvIHRoZSBndWVzdAo+PiA+ID4gPiBhbmQgdGh1cyB0
+aGUgdmFsdWUgdG8gYmUgY29uZmlndXJlZCBpbiBaQ1JfRUwyLkxFTiB3aGlsZSB0aGUgdmNwdQo+
+PiA+ID4gPiBpcyBhY3RpdmUuICBUaGlzIGFsc28gZGV0ZXJtaW5lcyB0aGUgbGF5b3V0IGFuZCBz
+aXplIG9mIHRoZSBzdG9yYWdlCj4+ID4gPiA+IGluIHN2ZV9zdGF0ZSwgd2hpY2ggaXMgcmVhZCBh
+bmQgd3JpdHRlbiBieSB0aGUgc2FtZSBiYWNrZW5kCj4+ID4gPiA+IGZ1bmN0aW9ucyB0aGF0IGFy
+ZSB1c2VkIGZvciBjb250ZXh0LXN3aXRjaGluZyB0aGUgU1ZFIHN0YXRlIGZvcgo+PiA+ID4gPiBo
+b3N0IHRhc2tzLgo+PiA+ID4gPgo+PiA+ID4gPiBPbiBTVkUtZW5hYmxlZCB2Y3B1cywgU1ZFIGFj
+Y2VzcyB0cmFwcyBhcmUgbm93IGhhbmRsZWQgYnkgc3dpdGNoaW5nCj4+ID4gPiA+IGluIHRoZSB2
+Y3B1J3MgU1ZFIGNvbnRleHQgYW5kIGRpc2FibGluZyB0aGUgdHJhcCBiZWZvcmUgcmV0dXJuaW5n
+Cj4+ID4gPiA+IHRvIHRoZSBndWVzdC4gIE9uIG90aGVyIHZjcHVzLCB0aGUgdHJhcCBpcyBub3Qg
+aGFuZGxlZCBhbmQgYW4gZXhpdAo+PiA+ID4gPiBiYWNrIHRvIHRoZSBob3N0IG9jY3Vycywgd2hl
+cmUgdGhlIGhhbmRsZV9zdmUoKSBmYWxsYmFjayBwYXRoCj4+ID4gPiA+IHJlZmxlY3RzIGFuIHVu
+ZGVmaW5lZCBpbnN0cnVjdGlvbiBleGNlcHRpb24gYmFjayB0byB0aGUgZ3Vlc3QsCj4+ID4gPiA+
+IGNvbnNpc3RlbnRseSB3aXRoIHRoZSBiZWhhdmlvdXIgb2Ygbm9uLVNWRS1jYXBhYmxlIGhhcmR3
+YXJlIChhcyB3YXMKPj4gPiA+ID4gZG9uZSB1bmNvbmRpdGlvbmFsbHkgcHJpb3IgdG8gdGhpcyBw
+YXRjaCkuCj4+ID4gPiA+Cj4+ID4gPiA+IE5vIFNWRSBoYW5kbGluZyBpcyBhZGRlZCBvbiBub24t
+VkhFLW9ubHkgcGF0aHMsIHNpbmNlIFZIRSBpcyBhbgo+PiA+ID4gPiBhcmNoaXRlY3R1cmFsIGFu
+ZCBLY29uZmlnIHByZXJlcXVpc2l0ZSBvZiBTVkUuCj4+ID4gPiA+Cj4+ID4gPiA+IFNpZ25lZC1v
+ZmYtYnk6IERhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPgo+PiA+ID4gPiBSZXZpZXdl
+ZC1ieTogSnVsaWVuIFRoaWVycnkgPGp1bGllbi50aGllcnJ5QGFybS5jb20+Cj4+ID4gPiA+IFRl
+c3RlZC1ieTogemhhbmcubGVpIDx6aGFuZy5sZWlAanAuZnVqaXRzdS5jb20+Cj4+ID4gPiA+Cj4+
+ID4gPiA+IC0tLQo+PiA+ID4gPgo+PiA+ID4gPiBDaGFuZ2VzIHNpbmNlIHY1Ogo+PiA+ID4gPgo+
+PiA+ID4gPiAgKiBbSnVsaWVuIFRoaWVycnksIEp1bGllbiBHcmFsbF0gQ29tbWl0IG1lc3NhZ2Ug
+dHlwbyBmaXhlcwo+PiA+ID4gPgo+PiA+ID4gPiAgKiBbTWFyayBSdXRsYW5kXSBSZW5hbWUgdHJh
+cF9jbGFzcyB0byBoc3JfZWMsIGZvciBjb25zaXN0ZW5jeSB3aXRoCj4+ID4gPiA+ICAgIGV4aXN0
+aW5nIGNvZGUuCj4+ID4gPiA+Cj4+ID4gPiA+ICAqIFtNYXJrIFJ1dGxhbmRdIFNpbXBsaWZ5IGNv
+bmRpdGlvbiBmb3IgcmVmdXNpbmcgdG8gaGFuZGxlIGFuCj4+ID4gPiA+ICAgIEZQU0lNRC9TVkUg
+dHJhcCwgdXNpbmcgbXVsdGlwbGUgaWYgKCkgc3RhdGVtZW50cyBmb3IgY2xhcml0eS4gIFRoZQo+
+PiA+ID4gPiAgICBwcmV2aW91cyBjb25kaXRpb24gd2FzIGEgYml0IHRvcnR1b3VzLCBhbmQgaG93
+IHRoYXQgdGhlIHN0YXRpY19rZXkKPj4gPiA+ID4gICAgY2hlY2tzIGhhdmUgYmVlbiBob2lzdGVk
+IG91dCwgaXQgbWFrZXMgbGl0dGxlIGRpZmZlcmVuY2UgdG8gdGhlCj4+ID4gPiA+ICAgIGNvbXBp
+bGVyIGhvdyB3ZSBleHByZXNzIHRoZSBjb25kaXRpb24gaGVyZS4KPj4gPiA+ID4gLS0tCj4+ID4g
+PiA+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggfCAgNiArKysrCj4+ID4gPiA+
+ICBhcmNoL2FybTY0L2t2bS9mcHNpbWQuYyAgICAgICAgICAgfCAgNSArLS0KPj4gPiA+ID4gIGFy
+Y2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyAgICAgICB8IDc1ICsrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrLS0tLS0tLS0tLQo+PiA+ID4gPiAgMyBmaWxlcyBjaGFuZ2VkLCA2NiBpbnNlcnRp
+b25zKCspLCAyMCBkZWxldGlvbnMoLSkKPj4gPiA+ID4KPj4gPiA+ID4gZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
+a3ZtX2hvc3QuaAo+PiA+ID4gPiBpbmRleCAyMmNmNDg0Li40ZmFiZmQyIDEwMDY0NAo+PiA+ID4g
+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4gPiA+ID4gKysrIGIv
+YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+ID4gPiA+IEBAIC0yMjgsNiArMjI4
+LDggQEAgc3RydWN0IHZjcHVfcmVzZXRfc3RhdGUgewo+PiA+ID4gPgo+PiA+ID4gPiAgc3RydWN0
+IGt2bV92Y3B1X2FyY2ggewo+PiA+ID4gPiAgCXN0cnVjdCBrdm1fY3B1X2NvbnRleHQgY3R4dDsK
+Pj4gPiA+ID4gKwl2b2lkICpzdmVfc3RhdGU7Cj4+ID4gPiA+ICsJdW5zaWduZWQgaW50IHN2ZV9t
+YXhfdmw7Cj4+ID4gPiA+Cj4+ID4gPiA+ICAJLyogSFlQIGNvbmZpZ3VyYXRpb24gKi8KPj4gPiA+
+ID4gIAl1NjQgaGNyX2VsMjsKPj4gPiA+ID4gQEAgLTMyMyw2ICszMjUsMTAgQEAgc3RydWN0IGt2
+bV92Y3B1X2FyY2ggewo+PiA+ID4gPiAgCWJvb2wgc3lzcmVnc19sb2FkZWRfb25fY3B1Owo+PiA+
+ID4gPiAgfTsKPj4gPiA+ID4KPj4gPiA+ID4gKy8qIFBvaW50ZXIgdG8gdGhlIHZjcHUncyBTVkUg
+RkZSIGZvciBzdmVfe3NhdmUsbG9hZH1fc3RhdGUoKSAqLwo+PiA+ID4gPiArI2RlZmluZSB2Y3B1
+X3N2ZV9wZmZyKHZjcHUpICgodm9pZCAqKSgoY2hhciAqKSgodmNwdSktPmFyY2guc3ZlX3N0YXRl
+KSArIFwKPj4gPiA+ID4gKwkJCQkgICAgICBzdmVfZmZyX29mZnNldCgodmNwdSktPmFyY2guc3Zl
+X21heF92bCkpKQo+PiA+ID4KPj4gPiA+IE1heWJlIGFuIGlubGluZSBmdW5jdGlvbiBpbnN0ZWFk
+Pwo+PiA+Cj4+ID4gSSB0cmllZCwgYnV0IHRoYXQgcmVxdWlyZXMgdGhlIGRlZmluaXRpb24gb2Yg
+c3RydWN0IGt2bV92Y3B1IHRvIGJlCj4+ID4gdmlzaWJsZS4gIEkgZmFpbGVkIHRvIGdldCB0aGF0
+IGhlcmUgd2l0aG91dCBjaXJjdWxhciAjaW5jbHVkZSBwcm9ibGVtcywKPj4gPiBhbmQgaXQgbG9v
+a2VkIHRyaWNreSB0byBmaXguCj4+Cj4+IEFoLCBPSwo+Pgo+PiA+Cj4+ID4gU2luY2UgdGhpcyBp
+cyBhIHNtYWxsIGJpdCBvZiBjb2RlIHdoaWNoIGlzIHVubGlrZWx5IHRvIGdldCB1c2VkIGJ5Cj4+
+ID4gYWNjaWRlbnQsIEkgZGVjaWRlZCBpdCB3YXMgT0sgdG8ga2VlcCBpdCBhcyBhIG1hY3JvLgo+
+PiA+Cj4+ID4gQ2FuIHlvdSBzZWUgYW5vdGhlciB3YXkgYXJvdW5kIHRoaXM/Cj4+Cj4+IE5vcGUK
+Pgo+IE9LLiAgSWYgc29tZW9uZSBldmVudHVhbGx5IHNvbHZlcyB0aGlzLCBJJ2QgYmUgaGFwcHkg
+dG8gY2hhbmdlIHRvIGFuCj4gaW5saW5lIGZ1bmN0aW9uLgoKSXMgdGhlIGZ1bmN0aW9uIGludGVu
+ZGVkIHRvIGJlIHVzZWQgYnkgbW9yZSBjYWxsIHNpdGVzPyBDdXJyZW50bHkgaW4gdGhlCnRyZWUg
+d2l0aCB0aGlzIHBsdXMgdGhlIHYyIGZpeHVwcyBJIGNhbiBvbmx5IHNlZToKCiAgYXJjaC9hcm02
+NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oOjMzMzojZGVmaW5lIHZjcHVfc3ZlX3BmZnIodmNwdSkg
+KCh2b2lkICopKChjaGFyICopKCh2Y3B1KS0+YXJjaC5zdmVfc3RhdGUpICsgXAogIGFyY2gvYXJt
+NjQva3ZtL2h5cC9zd2l0Y2guYzozODg6CQlzdmVfbG9hZF9zdGF0ZSh2Y3B1X3N2ZV9wZmZyKHZj
+cHUpLAoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
