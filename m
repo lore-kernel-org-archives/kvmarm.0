@@ -1,70 +1,130 @@
-From: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH v10 1/5] KVM: arm64: Add a vcpu flag to control ptrauth
- for guest
-Date: Wed, 24 Apr 2019 14:42:22 +0100
-Message-ID: <20190424134221.GX3567@e103592.cambridge.arm.com>
-References: <1555994558-26349-1-git-send-email-amit.kachhap@arm.com>
- <1555994558-26349-2-git-send-email-amit.kachhap@arm.com>
- <20190423154419.GL3567@e103592.cambridge.arm.com>
- <f9ebe12e-b6df-690b-1279-b7e2709c9e25@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v7 17/27] KVM: arm64: Reject ioctl access to FPSIMD V-regs
+ on SVE vcpus
+Date: Wed, 24 Apr 2019 14:45:28 +0100
+Message-ID: <87ef5rwm87.fsf@zen.linaroharston>
+References: <1553864452-15080-1-git-send-email-Dave.Martin@arm.com>
+ <1553864452-15080-18-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <f9ebe12e-b6df-690b-1279-b7e2709c9e25@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Amit Daniel Kachhap <amit.kachhap@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>, Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C0314A46F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 09:45:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id YF-WP2ti4hSS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Apr 2019 09:45:30 -0400 (EDT)
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com
+ [209.85.221.67])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ADD164A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 09:45:30 -0400 (EDT)
+Received: by mail-wr1-f67.google.com with SMTP id c12so19074634wrt.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 06:45:30 -0700 (PDT)
+In-reply-to: <1553864452-15080-18-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 24, 2019 at 11:27:50AM +0530, Amit Daniel Kachhap wrote:
-> Hi,
-> 
-> On 4/23/19 9:14 PM, Dave Martin wrote:
-> >On Tue, Apr 23, 2019 at 10:12:34AM +0530, Amit Daniel Kachhap wrote:
-> >>A per vcpu flag is added to check if pointer authentication is
-> >>enabled for the vcpu or not. This flag may be enabled according to
-> >>the necessary user policies and host capabilities.
-> >>
-> >>This patch also adds a helper to check the flag.
-> >>
-> >>Reviewed-by: Dave Martin <Dave.Martin@arm.com>
-> >>Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
-> >>Cc: Mark Rutland <mark.rutland@arm.com>
-> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>Cc: Christoffer Dall <christoffer.dall@arm.com>
-> >>Cc: kvmarm@lists.cs.columbia.edu
-> >>---
-> >>Changes since v9:
-> >>
-> >>* Added ptrauth cpufeature static check in vcpu_has_ptrauth [Marc Zyngier].
-> >>
-> >>  arch/arm64/include/asm/kvm_host.h | 5 +++++
-> >>  1 file changed, 5 insertions(+)
-> >>
-> >>diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >>index 7a096fd..7ccac42 100644
-> >>--- a/arch/arm64/include/asm/kvm_host.h
-> >>+++ b/arch/arm64/include/asm/kvm_host.h
-> >>@@ -355,10 +355,15 @@ struct kvm_vcpu_arch {
-> >>  #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
-> >>  #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
-> >>  #define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
-> >>+#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
-> >>  #define vcpu_has_sve(vcpu) (system_supports_sve() && \
-> >>  			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
-> >>+#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
-> >>+				  system_supports_generic_auth()) && \
-> >
-> >Come to think of it, should this be
-> >system_supports_address_auth() _&&_ system_supports_generic_auth()?
-> I thought about it and kept it this way so that the implementation
-> limitation is not introduced in this patch but only in a single place in the
-> 3rd patch where all the documentation and reasoning is present on doing this
-> way.
-
-OK, I think that's reasonable.  Just wanted to check that I wasn't
-missing some subtle issue here.
-
-Cheers
----Dave
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IEluIG9yZGVyIHRv
+IGF2b2lkIHRoZSBwb2ludGxlc3MgY29tcGxleGl0eSBvZiBtYWludGFpbmluZyB0d28gaW9jdGwK
+PiByZWdpc3RlciBhY2Nlc3Mgdmlld3Mgb2YgdGhlIHNhbWUgZGF0YSwgdGhpcyBwYXRjaCBibG9j
+a3MgaW9jdGwKPiBhY2Nlc3MgdG8gdGhlIEZQU0lNRCBWLXJlZ2lzdGVycyBvbiB2Y3B1cyB0aGF0
+IHN1cHBvcnQgU1ZFLgo+Cj4gVGhpcyB3aWxsIG1ha2UgaXQgbW9yZSBzdHJhaWdodGZvcndhcmQg
+dG8gYWRkIFNWRSByZWdpc3RlciBhY2Nlc3MKPiBzdXBwb3J0Lgo+Cj4gU2luY2UgU1ZFIGlzIGFu
+IG9wdC1pbiBmZWF0dXJlIGZvciB1c2Vyc3BhY2UsIHRoaXMgd2lsbCBub3QgYWZmZWN0Cj4gZXhp
+c3RpbmcgdXNlcnMuCj4KPiBTaWduZWQtb2ZmLWJ5OiBEYXZlIE1hcnRpbiA8RGF2ZS5NYXJ0aW5A
+YXJtLmNvbT4KPiBSZXZpZXdlZC1ieTogSnVsaWVuIFRoaWVycnkgPGp1bGllbi50aGllcnJ5QGFy
+bS5jb20+Cj4gVGVzdGVkLWJ5OiB6aGFuZy5sZWkgPHpoYW5nLmxlaUBqcC5mdWppdHN1LmNvbT4K
+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cgo+Cj4g
+LS0tCj4KPiBDaGFuZ2VzIHNpbmNlIHY1Ogo+Cj4gICogUmVmYWN0b3JlZCB0byBjb3BlIHdpdGgg
+dGhlIHJlbW92YWwgb2YgY29yZV9yZWdfc2l6ZV9mcm9tX29mZnNldCgpCj4gICAgKHdoaWNoIHdh
+cyBhZGRlZCBieSBhbm90aGVyIHNlcmllcyB3aGljaCB3aWxsIG5vdyBiZSBoYW5kbGVkCj4gICAg
+aW5kZXBlbmRlbnRseSkuCj4KPiAgICBUaGlzIGxlYXZlcyBzb21lIGR1cGxpY2F0aW9uIGluIHRo
+YXQgd2Ugc3RpbGwgZmlsdGVyIHRoZSBWLXJlZ3Mgb3V0Cj4gICAgaW4gdHdvIHBsYWNlcywgYnV0
+IHRoaXMgbm8gd29yc2UgdGhhbiBvdGhlciBleGlzdGluZyBjb2RlIGluIGd1ZXN0LmMuCj4gICAg
+SSBwbGFuIHRvIHRpZHkgdGhpcyB1cCBpbmRlcGVuZGVudGx5IGxhdGVyIG9uLgo+IC0tLQo+ICBh
+cmNoL2FybTY0L2t2bS9ndWVzdC5jIHwgNDggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tCj4gIDEgZmlsZSBjaGFuZ2VkLCAzNiBpbnNlcnRpb25zKCspLCAx
+MiBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9ndWVzdC5jIGIv
+YXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+IGluZGV4IGEzOTFhNjEuLjc1NmQwZDYgMTAwNjQ0Cj4g
+LS0tIGEvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2d1ZXN0
+LmMKPiBAQCAtNTQsMTIgKzU0LDE5IEBAIGludCBrdm1fYXJjaF92Y3B1X3NldHVwKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkKPiAgCXJldHVybiAwOwo+ICB9Cj4KPiArc3RhdGljIGJvb2wgY29yZV9y
+ZWdfb2Zmc2V0X2lzX3ZyZWcodTY0IG9mZikKPiArewo+ICsJcmV0dXJuIG9mZiA+PSBLVk1fUkVH
+X0FSTV9DT1JFX1JFRyhmcF9yZWdzLnZyZWdzKSAmJgo+ICsJCW9mZiA8IEtWTV9SRUdfQVJNX0NP
+UkVfUkVHKGZwX3JlZ3MuZnBzcik7Cj4gK30KPiArCj4gIHN0YXRpYyB1NjQgY29yZV9yZWdfb2Zm
+c2V0X2Zyb21faWQodTY0IGlkKQo+ICB7Cj4gIAlyZXR1cm4gaWQgJiB+KEtWTV9SRUdfQVJDSF9N
+QVNLIHwgS1ZNX1JFR19TSVpFX01BU0sgfCBLVk1fUkVHX0FSTV9DT1JFKTsKPiAgfQo+Cj4gLXN0
+YXRpYyBpbnQgdmFsaWRhdGVfY29yZV9vZmZzZXQoY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpy
+ZWcpCj4gK3N0YXRpYyBpbnQgdmFsaWRhdGVfY29yZV9vZmZzZXQoY29uc3Qgc3RydWN0IGt2bV92
+Y3B1ICp2Y3B1LAo+ICsJCQkJY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcpCj4gIHsKPiAg
+CXU2NCBvZmYgPSBjb3JlX3JlZ19vZmZzZXRfZnJvbV9pZChyZWctPmlkKTsKPiAgCWludCBzaXpl
+Owo+IEBAIC05MSwxMSArOTgsMTkgQEAgc3RhdGljIGludCB2YWxpZGF0ZV9jb3JlX29mZnNldChj
+b25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKPiAgCQlyZXR1cm4gLUVJTlZBTDsKPiAgCX0K
+Pgo+IC0JaWYgKEtWTV9SRUdfU0laRShyZWctPmlkKSA9PSBzaXplICYmCj4gLQkgICAgSVNfQUxJ
+R05FRChvZmYsIHNpemUgLyBzaXplb2YoX191MzIpKSkKPiAtCQlyZXR1cm4gMDsKPiArCWlmIChL
+Vk1fUkVHX1NJWkUocmVnLT5pZCkgIT0gc2l6ZSB8fAo+ICsJICAgICFJU19BTElHTkVEKG9mZiwg
+c2l6ZSAvIHNpemVvZihfX3UzMikpKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+Cj4gLQlyZXR1cm4g
+LUVJTlZBTDsKPiArCS8qCj4gKwkgKiBUaGUgS1ZNX1JFR19BUk02NF9TVkUgcmVncyBtdXN0IGJl
+IHVzZWQgaW5zdGVhZCBvZgo+ICsJICogS1ZNX1JFR19BUk1fQ09SRSBmb3IgYWNjZXNzaW5nIHRo
+ZSBGUFNJTUQgVi1yZWdpc3RlcnMgb24KPiArCSAqIFNWRS1lbmFibGVkIHZjcHVzOgo+ICsJICov
+Cj4gKwlpZiAodmNwdV9oYXNfc3ZlKHZjcHUpICYmIGNvcmVfcmVnX29mZnNldF9pc192cmVnKG9m
+ZikpCj4gKwkJcmV0dXJuIC1FSU5WQUw7Cj4gKwo+ICsJcmV0dXJuIDA7Cj4gIH0KPgo+ICBzdGF0
+aWMgaW50IGdldF9jb3JlX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBr
+dm1fb25lX3JlZyAqcmVnKQo+IEBAIC0xMTcsNyArMTMyLDcgQEAgc3RhdGljIGludCBnZXRfY29y
+ZV9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qga3ZtX29uZV9yZWcgKnJl
+ZykKPiAgCSAgICAob2ZmICsgKEtWTV9SRUdfU0laRShyZWctPmlkKSAvIHNpemVvZihfX3UzMikp
+KSA+PSBucl9yZWdzKQo+ICAJCXJldHVybiAtRU5PRU5UOwo+Cj4gLQlpZiAodmFsaWRhdGVfY29y
+ZV9vZmZzZXQocmVnKSkKPiArCWlmICh2YWxpZGF0ZV9jb3JlX29mZnNldCh2Y3B1LCByZWcpKQo+
+ICAJCXJldHVybiAtRUlOVkFMOwo+Cj4gIAlpZiAoY29weV90b191c2VyKHVhZGRyLCAoKHUzMiAq
+KXJlZ3MpICsgb2ZmLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpKQo+IEBAIC0xNDIsNyArMTU3LDcg
+QEAgc3RhdGljIGludCBzZXRfY29yZV9yZWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBjb25zdCBz
+dHJ1Y3Qga3ZtX29uZV9yZWcgKnJlZykKPiAgCSAgICAob2ZmICsgKEtWTV9SRUdfU0laRShyZWct
+PmlkKSAvIHNpemVvZihfX3UzMikpKSA+PSBucl9yZWdzKQo+ICAJCXJldHVybiAtRU5PRU5UOwo+
+Cj4gLQlpZiAodmFsaWRhdGVfY29yZV9vZmZzZXQocmVnKSkKPiArCWlmICh2YWxpZGF0ZV9jb3Jl
+X29mZnNldCh2Y3B1LCByZWcpKQo+ICAJCXJldHVybiAtRUlOVkFMOwo+Cj4gIAlpZiAoS1ZNX1JF
+R19TSVpFKHJlZy0+aWQpID4gc2l6ZW9mKHRtcCkpCj4gQEAgLTE5NSwxMyArMjEwLDIyIEBAIGlu
+dCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9yZWdzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3Ry
+dWN0IGt2bV9yZWdzICpyZWdzKQo+ICAJcmV0dXJuIC1FSU5WQUw7Cj4gIH0KPgo+IC1zdGF0aWMg
+aW50IGt2bV9hcm1fY29weV9jb3JlX3JlZ19pbmRpY2VzKHU2NCBfX3VzZXIgKnVpbmRpY2VzKQo+
+ICtzdGF0aWMgaW50IGNvcHlfY29yZV9yZWdfaW5kaWNlcyhjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUsCj4gKwkJCQkgdTY0IF9fdXNlciAqdWluZGljZXMpCj4gIHsKPiAgCXVuc2lnbmVkIGlu
+dCBpOwo+ICAJaW50IG4gPSAwOwo+ICAJY29uc3QgdTY0IGNvcmVfcmVnID0gS1ZNX1JFR19BUk02
+NCB8IEtWTV9SRUdfU0laRV9VNjQgfCBLVk1fUkVHX0FSTV9DT1JFOwo+Cj4gIAlmb3IgKGkgPSAw
+OyBpIDwgc2l6ZW9mKHN0cnVjdCBrdm1fcmVncykgLyBzaXplb2YoX191MzIpOyBpKyspIHsKPiAr
+CQkvKgo+ICsJCSAqIFRoZSBLVk1fUkVHX0FSTTY0X1NWRSByZWdzIG11c3QgYmUgdXNlZCBpbnN0
+ZWFkIG9mCj4gKwkJICogS1ZNX1JFR19BUk1fQ09SRSBmb3IgYWNjZXNzaW5nIHRoZSBGUFNJTUQg
+Vi1yZWdpc3RlcnMgb24KPiArCQkgKiBTVkUtZW5hYmxlZCB2Y3B1czoKPiArCQkgKi8KPiArCQlp
+ZiAodmNwdV9oYXNfc3ZlKHZjcHUpICYmIGNvcmVfcmVnX29mZnNldF9pc192cmVnKGkpKQo+ICsJ
+CQljb250aW51ZTsKPiArCj4gIAkJaWYgKHVpbmRpY2VzKSB7Cj4gIAkJCWlmIChwdXRfdXNlcihj
+b3JlX3JlZyB8IGksIHVpbmRpY2VzKSkKPiAgCQkJCXJldHVybiAtRUZBVUxUOwo+IEBAIC0yMTQs
+OSArMjM4LDkgQEAgc3RhdGljIGludCBrdm1fYXJtX2NvcHlfY29yZV9yZWdfaW5kaWNlcyh1NjQg
+X191c2VyICp1aW5kaWNlcykKPiAgCXJldHVybiBuOwo+ICB9Cj4KPiAtc3RhdGljIHVuc2lnbmVk
+IGxvbmcgbnVtX2NvcmVfcmVncyh2b2lkKQo+ICtzdGF0aWMgdW5zaWduZWQgbG9uZyBudW1fY29y
+ZV9yZWdzKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgewo+IC0JcmV0dXJuIGt2bV9h
+cm1fY29weV9jb3JlX3JlZ19pbmRpY2VzKE5VTEwpOwo+ICsJcmV0dXJuIGNvcHlfY29yZV9yZWdf
+aW5kaWNlcyh2Y3B1LCBOVUxMKTsKPiAgfQo+Cj4gIC8qKgo+IEBAIC0yODEsNyArMzA1LDcgQEAg
+dW5zaWduZWQgbG9uZyBrdm1fYXJtX251bV9yZWdzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAg
+ewo+ICAJdW5zaWduZWQgbG9uZyByZXMgPSAwOwo+Cj4gLQlyZXMgKz0gbnVtX2NvcmVfcmVncygp
+Owo+ICsJcmVzICs9IG51bV9jb3JlX3JlZ3ModmNwdSk7Cj4gIAlyZXMgKz0ga3ZtX2FybV9udW1f
+c3lzX3JlZ19kZXNjcyh2Y3B1KTsKPiAgCXJlcyArPSBrdm1fYXJtX2dldF9md19udW1fcmVncyh2
+Y3B1KTsKPiAgCXJlcyArPSBOVU1fVElNRVJfUkVHUzsKPiBAQCAtMjk4LDcgKzMyMiw3IEBAIGlu
+dCBrdm1fYXJtX2NvcHlfcmVnX2luZGljZXMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1NjQgX191
+c2VyICp1aW5kaWNlcykKPiAgewo+ICAJaW50IHJldDsKPgo+IC0JcmV0ID0ga3ZtX2FybV9jb3B5
+X2NvcmVfcmVnX2luZGljZXModWluZGljZXMpOwo+ICsJcmV0ID0gY29weV9jb3JlX3JlZ19pbmRp
+Y2VzKHZjcHUsIHVpbmRpY2VzKTsKPiAgCWlmIChyZXQpCj4gIAkJcmV0dXJuIHJldDsKPiAgCXVp
+bmRpY2VzICs9IHJldDsKCgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
+dGluZm8va3ZtYXJtCg==
