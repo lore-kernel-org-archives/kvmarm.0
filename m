@@ -1,58 +1,45 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: inject an async abort to host if SEA
- handling failed
-Date: Wed, 24 Apr 2019 08:46:39 +0100
-Message-ID: <06e33e9a-9c77-09bf-d53f-94496cffe8ef@arm.com>
-References: <1556080907-25158-1-git-send-email-gengdongjiu@huawei.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 00/14] KVM: arm64: SVE cleanups
+Date: Wed, 24 Apr 2019 09:21:57 +0000
+Message-ID: <87k1fjwyfe.fsf@zen.linaroharston>
+References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1556080907-25158-1-git-send-email-gengdongjiu@huawei.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Dongjiu Geng <gengdongjiu@huawei.com>, christoffer.dall@arm.com, james.morse@arm.com, julien.thierry@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, zhengxiang9@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 540354A44D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 05:22:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OOL-zSKzY7Q0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Apr 2019 05:21:59 -0400 (EDT)
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
+ [209.85.221.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612724A41C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 05:21:59 -0400 (EDT)
+Received: by mail-wr1-f65.google.com with SMTP id c6so18406573wrm.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Apr 2019 02:21:59 -0700 (PDT)
+In-reply-to: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>, Christoffer Dall <cdall@kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/04/2019 05:41, Dongjiu Geng wrote:
-> If host failed to handle the SEA, KVM should inject an async abort
-> to guest for both SEA data and instruction abort, but it currently
-> only handles the data abort, so correct it.
-> 
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Xiang Zheng <zhengxiang9@huawei.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
->  virt/kvm/arm/mmu.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 27c9583..5882516 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1924,14 +1924,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		/*
->  		 * For RAS the host kernel may handle this abort.
->  		 * There is no need to pass the error into the guest.
-> +		 * If host failed to handle it, inject an async abort
-> +		 * to guest.
->  		 */
-> -		if (!kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
-> -			return 1;
-> -
-> -		if (unlikely(!is_iabt)) {
-> +		if (kvm_handle_guest_sea(fault_ipa, kvm_vcpu_get_hsr(vcpu)))
-
-We've so far excluded instruction aborts from the delivery of a virtual
-SError. You now decide to inject an SError in all cases, but your commit
-message doesn't explain *why* this is a sensible thing to do.
-
-I'm not saying that this patch is wrong (the IABT handling predates RAS
-by several years and was  designed to deal with with badly behaved guest
-rather than flaky HW), but I'd like to understand why you think it is right.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+CkRhdmUgTWFydGluIDxEYXZlLk1hcnRpbkBhcm0uY29tPiB3cml0ZXM6Cgo+IFRoaXMgc2VyaWVz
+IGNvbnRhaW5zIHNvbWUgY2xlYW51cHMgYXBwbGljYWJsZSB0byB0aGUgU1ZFIEtWTSBzdXBwb3J0
+Cj4gcGF0Y2hlcyBtZXJnZWQgaW50byBrdm1hcm0vbmV4dC4gIFRoZXNlIGFyb3NlIGZyb20gQW5k
+cmV3IEpvbmVzJwo+IHJldmlldy4KCkRvZXMgdGhpcyBtZWFuIHRoZXNlIHdvbid0IGdldCBtZXJn
+ZWQgaW50byB0aGUgb3JpZ2luYWwgc2VyaWVzIGJlZm9yZQp0aGUgZmluYWwgbWVyZ2luZyB1cHN0
+cmVhbT8KCjxzbmlwPgoKLS0KQWxleCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNz
+LmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3Rp
+bmZvL2t2bWFybQo=
