@@ -2,64 +2,61 @@ Return-Path: <SRS0=pAxc=S3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E91C10F03
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2BAC282E3
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:15:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9428420678
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:05:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9428420678
+	by mail.kernel.org (Postfix) with ESMTP id 1C95420679
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:15:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C95420679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB694A4AA;
-	Thu, 25 Apr 2019 09:05:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D93104A369;
+	Thu, 25 Apr 2019 09:15:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3BT+cJ+mr6xy; Thu, 25 Apr 2019 09:05:21 -0400 (EDT)
+	with ESMTP id iZk7cxV9nMWo; Thu, 25 Apr 2019 09:15:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A014A3B4;
-	Thu, 25 Apr 2019 09:05:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A57784A445;
+	Thu, 25 Apr 2019 09:15:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFC84A369
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:05:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA76F4A369
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:15:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LuZo6z3nFUS4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Apr 2019 09:05:19 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 893DF4A32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:05:19 -0400 (EDT)
+ with ESMTP id S9KRbTyKRL2p for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Apr 2019 09:15:51 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA7D94A32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:15:51 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C873A78;
- Thu, 25 Apr 2019 06:05:19 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17D883F5C1;
- Thu, 25 Apr 2019 06:05:16 -0700 (PDT)
-Date: Thu, 25 Apr 2019 14:05:14 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 00/14] KVM: arm64: SVE cleanups
-Message-ID: <20190425130514.GB3567@e103592.cambridge.arm.com>
-References: <1555603631-8107-1-git-send-email-Dave.Martin@arm.com>
- <875zr2w9cj.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <875zr2w9cj.fsf@zen.linaroharston>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
- Christoffer Dall <cdall@kernel.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2412415A2;
+ Thu, 25 Apr 2019 06:15:51 -0700 (PDT)
+Received: from big-swifty.misterjones.org (c02v53d0hv2r.cambridge.arm.com
+ [10.1.37.80])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70C5E3F5C1;
+ Thu, 25 Apr 2019 06:15:49 -0700 (PDT)
+Date: Thu, 25 Apr 2019 14:15:53 +0100
+Message-ID: <86tvem9qeu.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Don't emulate virtual timers on userspace
+ ioctls
+In-Reply-To: <20190425125740.238036-1-andre.przywara@arm.com>
+References: <20190425125740.238036-1-andre.przywara@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,46 +69,58 @@ List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190425130514.xJ4jJL-NPK9R_Lbz88vnOgULh0KJL4F0GjmIHzyTgXk@z>
+Message-ID: <20190425131553.qGjEIXl-aU1Ey9PvmXee0YL6HQ3CPjidenYcA7oZly0@z>
 
-On Thu, Apr 25, 2019 at 01:35:56PM +0100, Alex Benn=E9e wrote:
-> =
+On Thu, 25 Apr 2019 13:57:40 +0100,
+Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> When a VCPU never runs before a guest exists, but we set timer registers
+> up via ioctls, the associated hrtimer might never get cancelled.
+> 
+> Since we moved vcpu_load/put into the arch-specific implementations and
+> only have load/put for KVM_RUN, we won't ever have a scheduled hrtimer
+> for emulating a timer when modifying the timer state via an ioctl from
+> user space.  All we need to do is make sure that we pick up the right
+> state when we load the timer state next time userspace calls KVM_RUN
+> again.
+> 
+> We also do not need to worry about this interacting with the bg_timer,
+> because if we were in WFI from the guest, and somehow ended up in a
+> kvm_arm_timer_set_reg, it means that:
+> 
+>  1. the VCPU thread has received a signal,
+>  2. we have called vcpu_load when being scheduled in again,
+>  3. we have called vcpu_put when we returned to userspace for it to issue
+>     another ioctl
+> 
+> And therefore will not have a bg_timer programmed and the event is
+> treated as a spurious wakeup from WFI if userspace decides to run the
+> vcpu again even if there are not virtual interrupts.
+> 
+> This fixes stray virtual timer interrupts triggered by an expiring
+> hrtimer, which happens after a failed live migration, for instance.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Reported-by: Andre Przywara <andre.przywara@arm.com>
+> Tested-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
-> Dave Martin <Dave.Martin@arm.com> writes:
-> =
+Fixes: bee038a674875 ("KVM: arm/arm64: Rework the timer code to use a
+timer_map")
 
-> > This series contains some cleanups applicable to the SVE KVM support
-> > patches merged into kvmarm/next.  These arose from Andrew Jones'
-> > review.
-> >
-> > Apart from some minor changes to error codes and checking, these are
-> > mostly cosmetic / sytlistic changes only.
-> >
-> > The patches are based on
-> > git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> > 5d8d4af24460 ("arm64: KVM: Fix system register enumeration")
-> >
-> > This series in git:
-> > git://linux-arm.org/linux-dm.git sve-kvm-fixes/v2/head
-> > http://linux-arm.org/git?p=3Dlinux-dm.git;a=3Dshortlog;h=3Drefs/heads/s=
-ve-kvm-fixes/v2/head
-> >
-> > Tested with qemu and kvmtool on ThunderX2, and with kvmtool on the Arm
-> > Fast model (to exercise SVE support).
-> =
+Applied to -master.
 
-> These all look good to me:
-> =
+Thanks,
 
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+	M.
 
-Thanks for the review!
-
-Cheers
----Dave
+-- 
+Jazz is not dead, it just smell funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
