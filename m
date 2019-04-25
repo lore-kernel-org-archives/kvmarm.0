@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/5] KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation
-Date: Thu, 25 Apr 2019 14:48:52 +0100
-Message-ID: <20190425134857.26109-2-marc.zyngier@arm.com>
+Subject: [PATCH 2/5] KVM: arm/arm64: vgic-v3: Retire pending interrupts on
+ disabling LPIs
+Date: Thu, 25 Apr 2019 14:48:53 +0100
+Message-ID: <20190425134857.26109-3-marc.zyngier@arm.com>
 References: <20190425134857.26109-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6EAE4A477
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C82174A34E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hu5th-jz7tkL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Apr 2019 09:49:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4265A4A4B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:16 -0400 (EDT)
+ with ESMTP id axhEK6HzLeIY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Apr 2019 09:49:20 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 722424A46F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:19 -0400 (EDT)
 In-Reply-To: <20190425134857.26109-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,36 +32,84 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogV2VpIEh1YW5nIDx3ZWlAcmVkaGF0LmNvbT4KClJlY2VudGx5IHRoZSBnZW5lcmljIHRp
-bWVyIHRlc3Qgb2Yga3ZtLXVuaXQtdGVzdHMgZmFpbGVkIHRvIGNvbXBsZXRlCihzdGFsbGVkKSB3
-aGVuIGEgcGh5c2ljYWwgdGltZXIgaXMgYmVpbmcgdXNlZC4gVGhpcyBpc3N1ZSBpcyBjYXVzZWQK
-YnkgaW5jb3JyZWN0IHVwZGF0ZSBvZiBDTlRQX0NWQUwgd2hlbiBDTlRQX1RWQUwgaXMgYmVpbmcg
-YWNjZXNzZWQsCmludHJvZHVjZWQgYnkgJ0NvbW1pdCA4NDEzNWQzZDE4ZGEgKCJLVk06IGFybS9h
-cm02NDogY29uc29saWRhdGUgYXJjaAp0aW1lciB0cmFwIGhhbmRsZXJzIiknLiBBY2NvcmRpbmcg
-dG8gQXJtIEFSTSwgdGhlIHJlYWQvd3JpdGUgYmVoYXZpb3IKb2YgYWNjZXNzZXMgdG8gdGhlIFRW
-QUwgcmVnaXN0ZXJzIGlzIGV4cGVjdGVkIHRvIGJlOgoKICAqIFJFQUQ6IFRpbWVyVmFsdWUgPSAo
-Q29tcGFyZVZhbHVlIOKAkyAoQ291bnRlciAtIE9mZnNldCkKICAqIFdSSVRFOiBDb21wYXJlVmFs
-dWUgPSAoKENvdW50ZXIgLSBPZmZzZXQpICsgU2lnbihUaW1lclZhbHVlKQoKVGhpcyBwYXRjaCBm
-aXhlcyB0aGUgVFZBTCByZWFkL3dyaXRlIGNvZGUgcGF0aCBhY2NvcmRpbmcgdG8gdGhlCnNwZWNp
-ZmljYXRpb24uCgpGaXhlczogODQxMzVkM2QxOGRhICgiS1ZNOiBhcm0vYXJtNjQ6IGNvbnNvbGlk
-YXRlIGFyY2ggdGltZXIgdHJhcCBoYW5kbGVycyIpClNpZ25lZC1vZmYtYnk6IFdlaSBIdWFuZyA8
-d2VpQHJlZGhhdC5jb20+ClttYXo6IGNvbW1pdCBtZXNzYWdlIHRpZHktdXBdClNpZ25lZC1vZmYt
-Ynk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Ci0tLQogdmlydC9rdm0vYXJt
-L2FyY2hfdGltZXIuYyB8IDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
-MiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jIGIv
-dmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwppbmRleCAzNDE3ZjJkYmMzNjYuLmQ0MzMwOGRjMzYx
-NyAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYworKysgYi92aXJ0L2t2bS9h
-cm0vYXJjaF90aW1lci5jCkBAIC04MTIsNyArODEyLDcgQEAgc3RhdGljIHU2NCBrdm1fYXJtX3Rp
-bWVyX3JlYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCiAJc3dpdGNoICh0cmVnKSB7CiAJY2Fz
-ZSBUSU1FUl9SRUdfVFZBTDoKLQkJdmFsID0ga3ZtX3BoeXNfdGltZXJfcmVhZCgpIC0gdGltZXIt
-PmNudHZvZmYgLSB0aW1lci0+Y250X2N2YWw7CisJCXZhbCA9IHRpbWVyLT5jbnRfY3ZhbCAtIGt2
-bV9waHlzX3RpbWVyX3JlYWQoKSArIHRpbWVyLT5jbnR2b2ZmOwogCQlicmVhazsKIAogCWNhc2Ug
-VElNRVJfUkVHX0NUTDoKQEAgLTg1OCw3ICs4NTgsNyBAQCBzdGF0aWMgdm9pZCBrdm1fYXJtX3Rp
-bWVyX3dyaXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHsKIAlzd2l0Y2ggKHRyZWcpIHsKIAlj
-YXNlIFRJTUVSX1JFR19UVkFMOgotCQl0aW1lci0+Y250X2N2YWwgPSB2YWwgLSBrdm1fcGh5c190
-aW1lcl9yZWFkKCkgLSB0aW1lci0+Y250dm9mZjsKKwkJdGltZXItPmNudF9jdmFsID0ga3ZtX3Bo
-eXNfdGltZXJfcmVhZCgpIC0gdGltZXItPmNudHZvZmYgKyB2YWw7CiAJCWJyZWFrOwogCiAJY2Fz
-ZSBUSU1FUl9SRUdfQ1RMOgotLSAKMi4yMC4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+When disabling LPIs (for example on reset) at the redistributor
+level, it is expected that LPIs that was pending in the CPU
+interface are eventually retired.
+
+Currently, this is not what is happening, and these LPIs will
+stay in the ap_list, eventually being acknowledged by the vcpu
+(which didn't quite expect this behaviour).
+
+The fix is thus to retire these LPIs from the list of pending
+interrupts as we disable LPIs.
+
+Reported-by: Heyi Guo <guoheyi@huawei.com>
+Tested-by: Heyi Guo <guoheyi@huawei.com>
+Fixes: 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as a virtual MSI controller")
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +++
+ virt/kvm/arm/vgic/vgic.c         | 21 +++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h         |  1 +
+ 3 files changed, 25 insertions(+)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 4a12322bf7df..9f4843fe9cda 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -200,6 +200,9 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 
+ 	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
+ 
++	if (was_enabled && !vgic_cpu->lpis_enabled)
++		vgic_flush_pending_lpis(vcpu);
++
+ 	if (!was_enabled && vgic_cpu->lpis_enabled)
+ 		vgic_enable_lpis(vcpu);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 3af69f2a3866..191deccf60bf 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -151,6 +151,27 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	kfree(irq);
+ }
+ 
++void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq, *tmp;
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
++
++	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
++		if (irq->intid >= VGIC_MIN_LPI) {
++			raw_spin_lock(&irq->irq_lock);
++			list_del(&irq->ap_list);
++			irq->vcpu = NULL;
++			raw_spin_unlock(&irq->irq_lock);
++			vgic_put_irq(vcpu->kvm, irq);
++		}
++	}
++
++	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
++}
++
+ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
+ {
+ 	WARN_ON(irq_set_irqchip_state(irq->host_irq,
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index a90024718ca4..abeeffabc456 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -238,6 +238,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
++void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-- 
+2.20.1
