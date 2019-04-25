@@ -2,54 +2,56 @@ Return-Path: <SRS0=pAxc=S3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3A2C4321A
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FAF8C4321A
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3CED420717
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CED420717
+	by mail.kernel.org (Postfix) with ESMTP id BE6D5206C1
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6D5206C1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC77E4A485;
-	Thu, 25 Apr 2019 09:49:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60A254A34E;
+	Thu, 25 Apr 2019 09:49:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6924SCZ61FL8; Thu, 25 Apr 2019 09:49:15 -0400 (EDT)
+	with ESMTP id IP6rs3ziqh+P; Thu, 25 Apr 2019 09:49:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 121954A477;
-	Thu, 25 Apr 2019 09:49:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B6844A49F;
+	Thu, 25 Apr 2019 09:49:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 533484A46F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C82174A34E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bnq5YDl225ct for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Apr 2019 09:49:13 -0400 (EDT)
+ with ESMTP id axhEK6HzLeIY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Apr 2019 09:49:20 -0400 (EDT)
 Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 119C64A36C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 722424A46F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:19 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74A16A78;
- Thu, 25 Apr 2019 06:49:12 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06EB8A78;
+ Thu, 25 Apr 2019 06:49:19 -0700 (PDT)
 Received: from big-swifty.cambridge.arm.com (c02v53d0hv2r.cambridge.arm.com
  [10.1.37.80])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 891AB3F246;
- Thu, 25 Apr 2019 06:49:09 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C85A3F246;
+ Thu, 25 Apr 2019 06:49:15 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 0/5] KVM/ARM updates for 5.1-rc7
-Date: Thu, 25 Apr 2019 14:48:51 +0100
-Message-Id: <20190425134857.26109-1-marc.zyngier@arm.com>
+Subject: [PATCH 2/5] KVM: arm/arm64: vgic-v3: Retire pending interrupts on
+ disabling LPIs
+Date: Thu, 25 Apr 2019 14:48:53 +0100
+Message-Id: <20190425134857.26109-3-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190425134857.26109-1-marc.zyngier@arm.com>
+References: <20190425134857.26109-1-marc.zyngier@arm.com>
 MIME-Version: 1.0
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu,
@@ -69,61 +71,90 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190425134851.oOojm06WAynTqzWjBMa2IRIIJCu2rM-rXSUAH_vv_lM@z>
+Message-ID: <20190425134853.MVdVbr9G7fqs-7tAw9mFohqL1I85ybP7wrJGCy5O6VQ@z>
 
-Paolo, Radim,
+When disabling LPIs (for example on reset) at the redistributor
+level, it is expected that LPIs that was pending in the CPU
+interface are eventually retired.
 
-Here's a bunch of late fixes for 5.1-rc7, which should hopefully be
-the last drop for this cycle.
+Currently, this is not what is happening, and these LPIs will
+stay in the ap_list, eventually being acknowledged by the vcpu
+(which didn't quite expect this behaviour).
 
-Please pull,
+The fix is thus to retire these LPIs from the list of pending
+interrupts as we disable LPIs.
 
-	M.
-
-The following changes since commit 8324c3d518cfd69f2a17866b52c13bf56d3042d8:
-
-  KVM: arm/arm64: Comments cleanup in mmu.c (2019-03-28 13:17:17 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.1-2
-
-for you to fetch changes up to 6bc210003dff7b789efae5bb02a0320dc24dd416:
-
-  KVM: arm/arm64: Don't emulate virtual timers on userspace ioctls (2019-04-25 14:13:31 +0100)
-
-----------------------------------------------------------------
-KVM/ARM fixes for 5.1, take #2:
-
-- Don't try to emulate timers on userspace access
-- Fix unaligned huge mappings, again
-- Properly reset a vcpu that fails to reset(!)
-- Properly retire pending LPIs on reset
-- Fix computation of emulated CNTP_TVAL
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: arm/arm64: Ensure vcpu target is unset on reset failure
-
-Christoffer Dall (1):
-      KVM: arm/arm64: Don't emulate virtual timers on userspace ioctls
-
-Marc Zyngier (1):
-      KVM: arm/arm64: vgic-v3: Retire pending interrupts on disabling LPIs
-
-Suzuki K Poulose (1):
-      kvm: arm: Skip stage2 huge mappings for unaligned ipa backed by THP
-
-Wei Huang (1):
-      KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation
-
- virt/kvm/arm/arch_timer.c        | 17 ++++++++++-------
- virt/kvm/arm/arm.c               | 11 ++++++++---
- virt/kvm/arm/mmu.c               |  6 +++++-
+Reported-by: Heyi Guo <guoheyi@huawei.com>
+Tested-by: Heyi Guo <guoheyi@huawei.com>
+Fixes: 0e4e82f154e3 ("KVM: arm64: vgic-its: Enable ITS emulation as a virtual MSI controller")
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
  virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +++
  virt/kvm/arm/vgic/vgic.c         | 21 +++++++++++++++++++++
  virt/kvm/arm/vgic/vgic.h         |  1 +
- 6 files changed, 48 insertions(+), 11 deletions(-)
+ 3 files changed, 25 insertions(+)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 4a12322bf7df..9f4843fe9cda 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -200,6 +200,9 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 
+ 	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
+ 
++	if (was_enabled && !vgic_cpu->lpis_enabled)
++		vgic_flush_pending_lpis(vcpu);
++
+ 	if (!was_enabled && vgic_cpu->lpis_enabled)
+ 		vgic_enable_lpis(vcpu);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 3af69f2a3866..191deccf60bf 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -151,6 +151,27 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ 	kfree(irq);
+ }
+ 
++void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq, *tmp;
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
++
++	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
++		if (irq->intid >= VGIC_MIN_LPI) {
++			raw_spin_lock(&irq->irq_lock);
++			list_del(&irq->ap_list);
++			irq->vcpu = NULL;
++			raw_spin_unlock(&irq->irq_lock);
++			vgic_put_irq(vcpu->kvm, irq);
++		}
++	}
++
++	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
++}
++
+ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
+ {
+ 	WARN_ON(irq_set_irqchip_state(irq->host_irq,
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index a90024718ca4..abeeffabc456 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -238,6 +238,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu);
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
++void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
