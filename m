@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/5] KVM/ARM updates for 5.1-rc7
-Date: Thu, 25 Apr 2019 14:48:51 +0100
-Message-ID: <20190425134857.26109-1-marc.zyngier@arm.com>
+Subject: [PATCH 1/5] KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation
+Date: Thu, 25 Apr 2019 14:48:52 +0100
+Message-ID: <20190425134857.26109-2-marc.zyngier@arm.com>
+References: <20190425134857.26109-1-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 533484A46F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6EAE4A477
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bnq5YDl225ct for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Apr 2019 09:49:13 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 119C64A36C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:13 -0400 (EDT)
+ with ESMTP id hu5th-jz7tkL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Apr 2019 09:49:16 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4265A4A4B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:16 -0400 (EDT)
+In-Reply-To: <20190425134857.26109-1-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,56 +31,36 @@ To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Paolo, Radim,
-
-Here's a bunch of late fixes for 5.1-rc7, which should hopefully be
-the last drop for this cycle.
-
-Please pull,
-
-	M.
-
-The following changes since commit 8324c3d518cfd69f2a17866b52c13bf56d3042d8:
-
-  KVM: arm/arm64: Comments cleanup in mmu.c (2019-03-28 13:17:17 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.1-2
-
-for you to fetch changes up to 6bc210003dff7b789efae5bb02a0320dc24dd416:
-
-  KVM: arm/arm64: Don't emulate virtual timers on userspace ioctls (2019-04-25 14:13:31 +0100)
-
-----------------------------------------------------------------
-KVM/ARM fixes for 5.1, take #2:
-
-- Don't try to emulate timers on userspace access
-- Fix unaligned huge mappings, again
-- Properly reset a vcpu that fails to reset(!)
-- Properly retire pending LPIs on reset
-- Fix computation of emulated CNTP_TVAL
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: arm/arm64: Ensure vcpu target is unset on reset failure
-
-Christoffer Dall (1):
-      KVM: arm/arm64: Don't emulate virtual timers on userspace ioctls
-
-Marc Zyngier (1):
-      KVM: arm/arm64: vgic-v3: Retire pending interrupts on disabling LPIs
-
-Suzuki K Poulose (1):
-      kvm: arm: Skip stage2 huge mappings for unaligned ipa backed by THP
-
-Wei Huang (1):
-      KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation
-
- virt/kvm/arm/arch_timer.c        | 17 ++++++++++-------
- virt/kvm/arm/arm.c               | 11 ++++++++---
- virt/kvm/arm/mmu.c               |  6 +++++-
- virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 +++
- virt/kvm/arm/vgic/vgic.c         | 21 +++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h         |  1 +
- 6 files changed, 48 insertions(+), 11 deletions(-)
+RnJvbTogV2VpIEh1YW5nIDx3ZWlAcmVkaGF0LmNvbT4KClJlY2VudGx5IHRoZSBnZW5lcmljIHRp
+bWVyIHRlc3Qgb2Yga3ZtLXVuaXQtdGVzdHMgZmFpbGVkIHRvIGNvbXBsZXRlCihzdGFsbGVkKSB3
+aGVuIGEgcGh5c2ljYWwgdGltZXIgaXMgYmVpbmcgdXNlZC4gVGhpcyBpc3N1ZSBpcyBjYXVzZWQK
+YnkgaW5jb3JyZWN0IHVwZGF0ZSBvZiBDTlRQX0NWQUwgd2hlbiBDTlRQX1RWQUwgaXMgYmVpbmcg
+YWNjZXNzZWQsCmludHJvZHVjZWQgYnkgJ0NvbW1pdCA4NDEzNWQzZDE4ZGEgKCJLVk06IGFybS9h
+cm02NDogY29uc29saWRhdGUgYXJjaAp0aW1lciB0cmFwIGhhbmRsZXJzIiknLiBBY2NvcmRpbmcg
+dG8gQXJtIEFSTSwgdGhlIHJlYWQvd3JpdGUgYmVoYXZpb3IKb2YgYWNjZXNzZXMgdG8gdGhlIFRW
+QUwgcmVnaXN0ZXJzIGlzIGV4cGVjdGVkIHRvIGJlOgoKICAqIFJFQUQ6IFRpbWVyVmFsdWUgPSAo
+Q29tcGFyZVZhbHVlIOKAkyAoQ291bnRlciAtIE9mZnNldCkKICAqIFdSSVRFOiBDb21wYXJlVmFs
+dWUgPSAoKENvdW50ZXIgLSBPZmZzZXQpICsgU2lnbihUaW1lclZhbHVlKQoKVGhpcyBwYXRjaCBm
+aXhlcyB0aGUgVFZBTCByZWFkL3dyaXRlIGNvZGUgcGF0aCBhY2NvcmRpbmcgdG8gdGhlCnNwZWNp
+ZmljYXRpb24uCgpGaXhlczogODQxMzVkM2QxOGRhICgiS1ZNOiBhcm0vYXJtNjQ6IGNvbnNvbGlk
+YXRlIGFyY2ggdGltZXIgdHJhcCBoYW5kbGVycyIpClNpZ25lZC1vZmYtYnk6IFdlaSBIdWFuZyA8
+d2VpQHJlZGhhdC5jb20+ClttYXo6IGNvbW1pdCBtZXNzYWdlIHRpZHktdXBdClNpZ25lZC1vZmYt
+Ynk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Ci0tLQogdmlydC9rdm0vYXJt
+L2FyY2hfdGltZXIuYyB8IDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jIGIv
+dmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYwppbmRleCAzNDE3ZjJkYmMzNjYuLmQ0MzMwOGRjMzYx
+NyAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL2FyY2hfdGltZXIuYworKysgYi92aXJ0L2t2bS9h
+cm0vYXJjaF90aW1lci5jCkBAIC04MTIsNyArODEyLDcgQEAgc3RhdGljIHU2NCBrdm1fYXJtX3Rp
+bWVyX3JlYWQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCiAJc3dpdGNoICh0cmVnKSB7CiAJY2Fz
+ZSBUSU1FUl9SRUdfVFZBTDoKLQkJdmFsID0ga3ZtX3BoeXNfdGltZXJfcmVhZCgpIC0gdGltZXIt
+PmNudHZvZmYgLSB0aW1lci0+Y250X2N2YWw7CisJCXZhbCA9IHRpbWVyLT5jbnRfY3ZhbCAtIGt2
+bV9waHlzX3RpbWVyX3JlYWQoKSArIHRpbWVyLT5jbnR2b2ZmOwogCQlicmVhazsKIAogCWNhc2Ug
+VElNRVJfUkVHX0NUTDoKQEAgLTg1OCw3ICs4NTgsNyBAQCBzdGF0aWMgdm9pZCBrdm1fYXJtX3Rp
+bWVyX3dyaXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHsKIAlzd2l0Y2ggKHRyZWcpIHsKIAlj
+YXNlIFRJTUVSX1JFR19UVkFMOgotCQl0aW1lci0+Y250X2N2YWwgPSB2YWwgLSBrdm1fcGh5c190
+aW1lcl9yZWFkKCkgLSB0aW1lci0+Y250dm9mZjsKKwkJdGltZXItPmNudF9jdmFsID0ga3ZtX3Bo
+eXNfdGltZXJfcmVhZCgpIC0gdGltZXItPmNudHZvZmYgKyB2YWw7CiAJCWJyZWFrOwogCiAJY2Fz
+ZSBUSU1FUl9SRUdfQ1RMOgotLSAKMi4yMC4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
+b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
+by9rdm1hcm0K
