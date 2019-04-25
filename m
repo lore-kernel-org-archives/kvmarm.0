@@ -2,60 +2,60 @@ Return-Path: <SRS0=pAxc=S3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40F7C43218
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A42C43218
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 14:03:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8B1F320717
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 13:49:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B1F320717
+	by mail.kernel.org (Postfix) with ESMTP id 3649C206BA
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Apr 2019 14:03:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3649C206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BF294A47A;
-	Thu, 25 Apr 2019 09:49:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D6C64A36C;
+	Thu, 25 Apr 2019 10:03:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w+K8eXZgUCv0; Thu, 25 Apr 2019 09:49:33 -0400 (EDT)
+	with ESMTP id rSXfTNiNG9KY; Thu, 25 Apr 2019 10:03:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B24AD4A4AA;
-	Thu, 25 Apr 2019 09:49:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D6FF4A452;
+	Thu, 25 Apr 2019 10:03:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 729EB4A485
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4E424A36C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 10:03:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OAq0K99Kotr9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Apr 2019 09:49:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9B9B4A4AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 09:49:29 -0400 (EDT)
+ with ESMTP id XD5-hUGdkQ86 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Apr 2019 10:03:06 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6FC4A321
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Apr 2019 10:03:06 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B7BA15A2;
- Thu, 25 Apr 2019 06:49:29 -0700 (PDT)
-Received: from big-swifty.cambridge.arm.com (c02v53d0hv2r.cambridge.arm.com
- [10.1.37.80])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6FD103F246;
- Thu, 25 Apr 2019 06:49:26 -0700 (PDT)
-From: Marc Zyngier <marc.zyngier@arm.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 5/5] KVM: arm/arm64: Don't emulate virtual timers on userspace
- ioctls
-Date: Thu, 25 Apr 2019 14:48:56 +0100
-Message-Id: <20190425134857.26109-6-marc.zyngier@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190425134857.26109-1-marc.zyngier@arm.com>
-References: <20190425134857.26109-1-marc.zyngier@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA709A78;
+ Thu, 25 Apr 2019 07:03:05 -0700 (PDT)
+Received: from fuggles.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55B513F246;
+ Thu, 25 Apr 2019 07:03:04 -0700 (PDT)
+Date: Thu, 25 Apr 2019 15:03:01 +0100
+From: Will Deacon <will.deacon@arm.com>
+To: Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH v4 0/3] vfio-pci: Support INTx mode re-enabling
+Message-ID: <20190425140301.GD23796@fuggles.cambridge.arm.com>
+References: <20190408012719.16158-1-leo.yan@linaro.org>
+ <20190424142127.GC8948@leoy-ThinkPad-X240s>
 MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Heyi Guo <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20190424142127.GC8948@leoy-ThinkPad-X240s>
+User-Agent: Mutt/1.11.1+86 (6f28e57d73f2) ()
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Marc Zyngier <Marc.Zyngier@arm.com>, Robin Murphy <Robin.Murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,87 +71,45 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190425134856.JZy-A4Q9FnoVkHvgJA8UqViuhzPhtd4PjJTlpXkW_uE@z>
+Message-ID: <20190425140301.qqHGd5XDHii2JruXKh70JNakfZ3E5Y6o6fymYcurHyU@z>
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+On Wed, Apr 24, 2019 at 10:21:27PM +0800, Leo Yan wrote:
+> On Mon, Apr 08, 2019 at 09:27:16AM +0800, Leo Yan wrote:
+> > When enable vfio-pci mode for NIC driver on Juno board, the IRQ is
+> > failed to forward properly from host to guest, finally root caused this
+> > issue is related with kvmtool cannot re-enable INTx mode properly.
+> > 
+> > So the basic working flow to reproduce this issue is as below:
+> > 
+> >     Host             Guest
+> > -------------  --------------------
+> >   INTx mode
+> >                  MSI enable failed in NIC driver
+> >                  MSI disable in NIC driver
+> >                  Switch back to INTx mode --> kvmtool doesn't support
+> > 
+> > So this patch is to support INTx mode re-enabling; patch 0001 is one
+> > minor fixing up for eventfd releasing; patch 0002 introduces a new
+> > function vfio_pci_init_intx() which is used to finish INTx one-time
+> > initialisation; patch 0003 is the core patch for support INTx mode
+> > re-enabling, when kvmtool detects MSI is disabled it rollbacks to INTx
+> > mode.
+> > 
+> > This patch set has been tested on Juno-r2 board.
+> > 
+> > == Changes for V4 ==
+> > * Removed the unnecessary comments in patch 0003 (Jean-Philippe).
+> > * Added Jean-Philippe's review tags.
+> 
+> Could you pick up these 3 patches and merge into kvmtool?  All of them
+> has been received reviewing tag from Jean-Philippe.  Thanks.
 
-When a VCPU never runs before a guest exists, but we set timer registers
-up via ioctls, the associated hrtimer might never get cancelled.
+Sorry, I've fallen behind on kvmtool patches recently. I'll make a note
+to queue this lot up tomorrow.
 
-Since we moved vcpu_load/put into the arch-specific implementations and
-only have load/put for KVM_RUN, we won't ever have a scheduled hrtimer
-for emulating a timer when modifying the timer state via an ioctl from
-user space.  All we need to do is make sure that we pick up the right
-state when we load the timer state next time userspace calls KVM_RUN
-again.
+Cheers,
 
-We also do not need to worry about this interacting with the bg_timer,
-because if we were in WFI from the guest, and somehow ended up in a
-kvm_arm_timer_set_reg, it means that:
-
- 1. the VCPU thread has received a signal,
- 2. we have called vcpu_load when being scheduled in again,
- 3. we have called vcpu_put when we returned to userspace for it to issue
-    another ioctl
-
-And therefore will not have a bg_timer programmed and the event is
-treated as a spurious wakeup from WFI if userspace decides to run the
-vcpu again even if there are not virtual interrupts.
-
-This fixes stray virtual timer interrupts triggered by an expiring
-hrtimer, which happens after a failed live migration, for instance.
-
-Fixes: bee038a674875 ("KVM: arm/arm64: Rework the timer code to use a timer_map")
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-Reported-by: Andre Przywara <andre.przywara@arm.com>
-Tested-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/arch_timer.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index d43308dc3617..7fc272ecae16 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -507,6 +507,14 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 
-+	/*
-+	 * Update the timer output so that it is likely to match the
-+	 * state we're about to restore. If the timer expires between
-+	 * this point and the register restoration, we'll take the
-+	 * interrupt anyway.
-+	 */
-+	kvm_timer_update_irq(vcpu, kvm_timer_should_fire(vtimer), vtimer);
-+
- 	/*
- 	 * When using a userspace irqchip with the architected timers and a
- 	 * host interrupt controller that doesn't support an active state, we
-@@ -730,7 +738,6 @@ static void kvm_timer_init_interrupt(void *info)
- int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- {
- 	struct arch_timer_context *timer;
--	bool level;
- 
- 	switch (regid) {
- 	case KVM_REG_ARM_TIMER_CTL:
-@@ -758,10 +765,6 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
- 		return -1;
- 	}
- 
--	level = kvm_timer_should_fire(timer);
--	kvm_timer_update_irq(vcpu, level, timer);
--	timer_emulate(timer);
--
- 	return 0;
- }
- 
--- 
-2.20.1
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
