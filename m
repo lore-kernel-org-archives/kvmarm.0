@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 931A4C43219
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F703C43219
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:07:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 17E9E2084F
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E9E2084F
+	by mail.kernel.org (Postfix) with ESMTP id B40E620675
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:07:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B40E620675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A6754A485;
-	Fri, 26 Apr 2019 11:03:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0DC4A331;
+	Fri, 26 Apr 2019 11:07:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QLfRUDzeDN3e; Fri, 26 Apr 2019 11:03:09 -0400 (EDT)
+	with ESMTP id yM5Dy4R1DztB; Fri, 26 Apr 2019 11:07:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B7F4A48C;
-	Fri, 26 Apr 2019 11:03:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7C64A48C;
+	Fri, 26 Apr 2019 11:07:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A1F94A470
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:03:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 819384A470
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:07:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9YQAT3DukrhX for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Apr 2019 11:03:06 -0400 (EDT)
+ with ESMTP id DLxftz5lbXYB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Apr 2019 11:07:34 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94B094A331
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:03:06 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06C604A331
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:07:34 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 859CB31649AE;
- Fri, 26 Apr 2019 15:03:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 38CEF30ADBAC;
+ Fri, 26 Apr 2019 15:07:33 +0000 (UTC)
 Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ED3B60FD6;
- Fri, 26 Apr 2019 15:03:00 +0000 (UTC)
-Subject: Re: [PATCH v4 2/2] KVM: doc: add API documentation on the
- KVM_REG_ARM_WORKAROUNDS register
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C77F1001DC2;
+ Fri, 26 Apr 2019 15:07:30 +0000 (UTC)
+From: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 1/2] KVM: arm/arm64: Add save/restore support for
+ firmware workaround state
 To: Andre Przywara <andre.przywara@arm.com>
 References: <20190228234334.20456-1-andre.przywara@arm.com>
- <20190228234334.20456-3-andre.przywara@arm.com>
- <60c2e180-03aa-1b9e-f19c-90d890b99d15@redhat.com>
- <20190415133353.04304c45@donnerap.cambridge.arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <c818b9e0-d8de-40f0-7ebc-f2871dfcbeee@redhat.com>
-Date: Fri, 26 Apr 2019 17:02:58 +0200
+ <20190228234334.20456-2-andre.przywara@arm.com>
+ <6f155e8b-b679-d868-865c-6fd6f4ee611a@redhat.com>
+ <20190321173520.554c7e97@donnerap.cambridge.arm.com>
+Message-ID: <7d5c85d0-2a20-ab58-ab87-053365111a97@redhat.com>
+Date: Fri, 26 Apr 2019 17:07:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190415133353.04304c45@donnerap.cambridge.arm.com>
+In-Reply-To: <20190321173520.554c7e97@donnerap.cambridge.arm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 26 Apr 2019 15:03:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 26 Apr 2019 15:07:33 +0000 (UTC)
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
  Dave Martin <dave.martin@arm.com>, Steven Price <steven.price@arm.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -80,108 +80,325 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190426150258.bDWN23bWuypw_UnjmXUuGQRYRYTuS_9L-ALOBR-skRE@z>
+Message-ID: <20190426150728.3DGtdxb_Q-lf4-ocbjkVX8fLC3eDVjyssVWzLtl-4Bo@z>
 
 Hi Andre,
 
-On 4/15/19 2:34 PM, Andre Przywara wrote:
-> On Thu, 21 Mar 2019 13:33:18 +0100
+On 3/21/19 6:35 PM, Andre Przywara wrote:
+> On Thu, 21 Mar 2019 13:54:07 +0100
 > Auger Eric <eric.auger@redhat.com> wrote:
 > 
 > Hi Eric,
 > 
-> many thanks for the feedback, turns out that this description here is
-> somewhat tricky. We only really care about the guest's view, but the
-> various host states (support configured out, disabled on the command line,
-> not supported by firmware, not needed on this CPU) play into this as well.
-> So in my understanding the information presented here does not necessarily
-> copy the information returned by the firmware interface, it just presents
-> what the guest can expect from the firmware interface.
+> many thanks for looking at this!
+> I was about to prepare a new revision.
 > 
-> I tried to reword the description in v5 to address any ambiguities,
-> meanwhile trying to answer your specific questions below.
-> Please have a look at v5 and tell me if that is clearer now.
-> 
+>> Hi Andre,
+>>
 >> On 3/1/19 12:43 AM, Andre Przywara wrote:
->>> Add documentation for the newly defined firmware registers to save and
->>> restore any vulnerability migitation status.  
->> s/migitation/mitigation
+>>> KVM implements the firmware interface for mitigating cache speculation
+>>> vulnerabilities. Guests may use this interface to ensure mitigation is
+>>> active.
+>>> If we want to migrate such a guest to a host with a different support
+>>> level for those workarounds, migration might need to fail, to ensure that
+>>> critical guests don't loose their protection.
+>>>
+>>> Introduce a way for userland to save and restore the workarounds state.
+>>> On restoring we do checks that make sure we don't downgrade our
+>>> mitigation level.
 >>>
 >>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >>> ---
->>>  Documentation/virtual/kvm/arm/psci.txt | 25 +++++++++++++++++++++++++
->>>  1 file changed, 25 insertions(+)
+>>>  arch/arm/include/asm/kvm_emulate.h   |  10 +++
+>>>  arch/arm/include/uapi/asm/kvm.h      |  10 +++
+>>>  arch/arm64/include/asm/kvm_emulate.h |  14 +++
+>>>  arch/arm64/include/uapi/asm/kvm.h    |   9 ++
+>>>  virt/kvm/arm/psci.c                  | 128 +++++++++++++++++++++++----
+>>>  5 files changed, 155 insertions(+), 16 deletions(-)
 >>>
->>> diff --git a/Documentation/virtual/kvm/arm/psci.txt b/Documentation/virtual/kvm/arm/psci.txt
->>> index aafdab887b04..1ed0f0515cd8 100644
->>> --- a/Documentation/virtual/kvm/arm/psci.txt
->>> +++ b/Documentation/virtual/kvm/arm/psci.txt
->>> @@ -28,3 +28,28 @@ The following register is defined:
->>>    - Allows any PSCI version implemented by KVM and compatible with
->>>      v0.2 to be set with SET_ONE_REG
->>>    - Affects the whole VM (even if the register view is per-vcpu)
+>>> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+>>> index 8927cae7c966..663a02d7e6f4 100644
+>>> --- a/arch/arm/include/asm/kvm_emulate.h
+>>> +++ b/arch/arm/include/asm/kvm_emulate.h
+>>> @@ -283,6 +283,16 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>>>  	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
+>>>  }
+>>>  
+>>> +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	return false;
+>>> +}
 >>> +
->>> +* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
->>> +  Holds the state of the firmware controlled workaround to mitigate
->>> +  CVE-2017-5715, as described under SMCCC_ARCH_WORKAROUND_1 in [1].> +  Accepted values are:
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL: Workaround not available.
->>> +      The mitigation status for the guest is unknown.
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL: The workaround HVC call is
->>> +      available to the guest and required for the mitigation.  
->> It is unclear to me why we don't report the actual enable status too as
->> for WA2. Assuming the mitigation is not applied on the source (ie. AVAIL
->> but SMCCC_ARCH_WORKAROUND_1 not called), do we need it on the destination?
-> 
-> In contrast to WORKAROUND_2 this one here is stateless. KVM potentially
-> offers the HVC call and says whether it's needed or not: What the guest
-> makes out of it, is up to the guest's discretion. The guest has to call
-> this HVC every time it wants to mitigate the issue. KVM needs to maintain
-> continuity on migration regarding offering this HVC call and its effect.
-OK that's clear now. Thank you for the explanations.
-> 
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED: The workaround HVC call
->>> +      is available to the guest, but it is not needed on this VCPU.
+>>> +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
+>>> +						      bool flag)
+>>> +{
+>>> +}
 >>> +
->>> +* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
->>> +  Holds the state of the firmware controlled workaround to mitigate
->>> +  CVE-2018-3639, as described under SMCCC_ARCH_WORKAROUND_2 in [1].  
->> This does not really match the terminology used in [1]. At least it is
->> not straightforward to me.
+>>>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+>>> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+>>> index 4602464ebdfb..ba4d2afe65e3 100644
+>>> --- a/arch/arm/include/uapi/asm/kvm.h
+>>> +++ b/arch/arm/include/uapi/asm/kvm.h
+>>> @@ -214,6 +214,16 @@ struct kvm_vcpu_events {
+>>>  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM | KVM_REG_SIZE_U64 | \
+>>>  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+>>>  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED	2
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1  
+>> Would be worth adding a comment saying that values are chosen so that
+>> higher values mean better protection. Otherwise it looks strange
+>> NOT_AVAIL/AVAIL/UNAFFECTED values are not the same for both workarounds.	
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED	(1U << 4)  
+>>
+>>>  
+>>>  /* Device Control API: ARM VGIC */
+>>>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+>>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>>> index d3842791e1c4..c00c17c9adb6 100644
+>>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>>> @@ -348,6 +348,20 @@ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+>>>  	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+>>>  }
+>>>  
+>>> +static inline bool kvm_arm_get_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	return vcpu->arch.workaround_flags & VCPU_WORKAROUND_2_FLAG;
+>>> +}
+>>> +
+>>> +static inline void kvm_arm_set_vcpu_workaround_2_flag(struct kvm_vcpu *vcpu,
+>>> +						      bool flag)
+>>> +{
+>>> +	if (flag)
+>>> +		vcpu->arch.workaround_flags |= VCPU_WORKAROUND_2_FLAG;
+>>> +	else
+>>> +		vcpu->arch.workaround_flags &= ~VCPU_WORKAROUND_2_FLAG;
+>>> +}
+>>> +
+>>>  static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	if (vcpu_mode_is_32bit(vcpu)) {
+>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>>> index 97c3478ee6e7..367e96fe654e 100644
+>>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>>> @@ -225,6 +225,15 @@ struct kvm_vcpu_events {
+>>>  #define KVM_REG_ARM_FW_REG(r)		(KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+>>>  					 KVM_REG_ARM_FW | ((r) & 0xffff))
+>>>  #define KVM_REG_ARM_PSCI_VERSION	KVM_REG_ARM_FW_REG(0)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1	KVM_REG_ARM_FW_REG(1)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL	0
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL	1
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL	0
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN	1
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL	2
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED	3
+>>> +#define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     (1U << 4)
+>>>  
+>>>  /* Device Control API: ARM VGIC */
+>>>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+>>> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+>>> index 9b73d3ad918a..e65664c09b12 100644
+>>> --- a/virt/kvm/arm/psci.c
+>>> +++ b/virt/kvm/arm/psci.c
+>>> @@ -445,42 +445,97 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>>>  
+>>>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -	return 1;		/* PSCI version */
+>>> +	return 3;		/* PSCI version and two workaround registers */
+>>>  }
+>>>  
+>>>  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>>>  {
+>>> -	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices))
+>>> +	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
+>>> +		return -EFAULT;
+>>> +
+>>> +	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
+>>> +		return -EFAULT;
+>>> +
+>>> +	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
+>>>  		return -EFAULT;  
+>> Wouldn't it make sense to have a const array somewhere listing the FW
+>> regs and putting KVM_REG_ARM_FW_REG[i]? Also kvm_arm_get_fw_num_regs
+>> could return the ARRAY_SIZE.
 > 
-> Not really sure what you mean by this, exactly?
+> Yeah, makes sense. I was cowardly pushing this off to the one adding the next firmware register ;-)
 
-Well I meant the SMCCC spec uses the
-NOT_SUPPORTED, NOT_REQUIRED. The difficulty somewhat is each layer has a
-different terminology, SMCC spec, kernel, user and the translation was
-not straightforward to me.
+;-)
 > 
->>> +  Accepted values are:
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL: Workaround not available.
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN: Workaround state unknown.  
->> both included in NOT_SUPPORTED. By the way why did we need to be more
->> precise here? Seems WA1 also has the UNKNOWN state as part of
->> UNSUPPORTED. Why isn't it homogeneous?
+>> vcpu arg is never used actually (not related to this patch).
+>>>  
+>>>  	return 0;
+>>>  }
+>>>  
+>>> +#define KVM_REG_FEATURE_LEVEL_WIDTH	4
+>>> +#define KVM_REG_FEATURE_LEVEL_MASK	(BIT(KVM_REG_FEATURE_LEVEL_WIDTH) - 1)
+>>> +
+>>> +/*
+>>> + * Convert the workaround level into an easy-to-compare number, where higher
+>>> + * values mean better protection.
+>>> + */
+>>> +static int get_kernel_wa_level(u64 regid)
+>>> +{
+>>> +	switch (regid) {
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+>>> +		if (kvm_arm_harden_branch_predictor())
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
+>>> +		else
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+>>> +		switch (kvm_arm_have_ssbd()) {
+>>> +		case KVM_SSBD_FORCE_DISABLE:
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+>>> +		case KVM_SSBD_KERNEL:
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL;
+>>> +		case KVM_SSBD_FORCE_ENABLE:
+>>> +		case KVM_SSBD_MITIGATED:
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED;
+>>> +		case KVM_SSBD_UNKNOWN:
+>>> +		default:
+>>> +			return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	return 0;  
+>> I would rather return -EINVAL although the function is not called for
+>> any invalid reg.
+>>> +}
+>>> +
+>>>  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>  {
+>>> -	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
+>>> -		void __user *uaddr = (void __user *)(long)reg->addr;
+>>> -		u64 val;
+>>> +	void __user *uaddr = (void __user *)(long)reg->addr;
+>>> +	u64 val;
+>>>  
+>>> +	switch (reg->id) {
+>>> +	case KVM_REG_ARM_PSCI_VERSION:
+>>>  		val = kvm_psci_version(vcpu, vcpu->kvm);
+>>> -		if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
+>>> -			return -EFAULT;
+>>> -
+>>> -		return 0;
+>>> +		break;
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+>>> +		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;  
+>> Can get_kernel_wa_level return something outside of
+>> KVM_REG_FEATURE_LEVEL_MASK?
+>>> +		break;
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+>>> +		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;  
+>> same here
+>>> +		if (kvm_arm_have_ssbd() == KVM_SSBD_KERNEL &&> +		    kvm_arm_get_vcpu_workaround_2_flag(vcpu))  
+>> nit: if (val == KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL &&
+>> kvm_arm_get_vcpu_workaround_2_flag(vcpu)).
 > 
-> Most differences originate in the statelessness of WORKAROUND_1. Also we
-> have this information here in the host kernel: NOT_AVAIL is returned when
-> the workaround has been explicitly disabled on the command line, UNKNOWN
-> is used when the workaround has been configured out.
-> We use this to avoid migration to a "worse place": UNKNOWN is never worse
-> than "not available".
+> Yeah, might be better, since we operate in the KVM_REG_ARM_ namespace here.
 > 
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL: Workaround available, and can
->>> +      be disabled by a vCPU. If KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED is
->>> +      set, it is active for this vCPU.
->>> +    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED: Workaround always active  
->> NOT_REQUIRED or 1?
+>>> +			val |= KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED;
+>>> +		break;
+>>> +	default:
+>>> +		return -ENOENT;
+>>>  	}
+>>>  
+>>> -	return -EINVAL;
+>>> +	if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
+>>> +		return -EFAULT;
+>>> +
+>>> +	return 0;
+>>>  }
+>>>  
+>>>  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>  {
+>>> -	if (reg->id == KVM_REG_ARM_PSCI_VERSION) {
+>>> -		void __user *uaddr = (void __user *)(long)reg->addr;
+>>> -		bool wants_02;
+>>> -		u64 val;
+>>> +	void __user *uaddr = (void __user *)(long)reg->addr;
+>>> +	u64 val;
+>>> +	int wa_level;
+>>> +
+>>> +	if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
+>>> +		return -EFAULT;
+>>>  
+>>> -		if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
+>>> -			return -EFAULT;
+>>> +	switch (reg->id) {
+>>> +	case KVM_REG_ARM_PSCI_VERSION:
+>>> +	{
+>>> +		bool wants_02;
+>>>  
+>>>  		wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
+>>>  
+>>> @@ -497,6 +552,47 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>>>  			vcpu->kvm->arch.psci_version = val;
+>>>  			return 0;
+>>>  		}
+>>> +		break;
+>>> +	}
+>>> +
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+>>> +		if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
+>>> +			return -EINVAL;
+>>> +
+>>> +		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;  
+>> not needed
 > 
-> I think we don't care. KVM always offers this HVC call. I think the trick
-> here is that is not the firmware interface, but a description of it. It
-> just tells what the guest is able to call, we don't copy the results of
-> the firmware call in here.
-Yes the confusion came that only the FW spec gets quoted. To understand
-the uapi definition knowledge about the overall mitigation scheme is
-requested.
+> Yeah, I kept it in for symmetry reasons. I was also afraid that someone
+> changes the check above in the future.
+> 
+>>> +
+>>> +		/* For now we only accept the very same workaround level. */
+>>> +		if (get_kernel_wa_level(reg->id) != wa_level)
+>>> +			return -EINVAL;
+>>> +
+>>> +		return 0;
+>>> +
+>>> +	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+>>> +		if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
+>>> +			    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))> +			return -EINVAL;
+>>> +
+>>> +		wa_level = val & KVM_REG_FEATURE_LEVEL_MASK;
+>>> +
+>>> +		if (get_kernel_wa_level(reg->id) < wa_level)
+>>> +			return -EINVAL;
+>>> +  
+>> worth a comment?
+> 
+> True.
+> 
+>>> +		if (kvm_arm_have_ssbd() != KVM_SSBD_KERNEL)
+>>> +			return 0;
+>>> +
+>>> +		switch (wa_level) {
+>>> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
+>>> +			kvm_arm_set_vcpu_workaround_2_flag(vcpu,
+>>> +			    val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED);
+>>> +			break;
+>>> +		case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNAFFECTED:
+>>> +			kvm_arm_set_vcpu_workaround_2_flag(vcpu, true);  
+>> Looks strange to me we enable the flag when unaffected.
+> 
+> UNAFFECTED is the *requested* level here, so the original kernel had it.
+> It means "always active or not needed". We get here if the local kernel
+> has a *switchable* workaround, so we have to make sure it's enabled, to
+> match the original workaround level.
+> Will add a comment before the switch.
+
+Yes that's clear now. I had hard time with the terminology to be honest.
 
 Thanks
 
@@ -191,10 +408,18 @@ Eric
 > Andre.
 > 
 > 
->>> +      or not needed.
+>>
+>>> +			break;
+>>> +		}
 >>> +
->>> +[1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+>>> +		return 0;
+>>> +	default:
+>>> +		return -ENOENT;
+>>>  	}
+>>>  
+>>>  	return -EINVAL;
 >>>   
+>>
 >> Thanks
 >>
 >> Eric
