@@ -1,222 +1,286 @@
-From: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v5 1/3] arm64: KVM: Propagate full Spectre v2 workaround
- state to KVM guests
-Date: Fri, 26 Apr 2019 17:37:47 +0200
-Message-ID: <1fe87bab-2a1d-c48e-9f19-27faef91e5fd@redhat.com>
-References: <20190415111542.119788-1-andre.przywara@arm.com>
- <20190415111542.119788-2-andre.przywara@arm.com>
- <8845fbed-659f-1548-6dfb-fd20164fa44e@arm.com>
+From: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
+Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
+Date: Mon, 29 Apr 2019 10:29:13 +0800
+Message-ID: <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
+References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
+ <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
+ <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
+ <86zhpc66jl.wl-marc.zyngier@arm.com>
+ <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
+ <86imvu3uje.wl-marc.zyngier@arm.com>
+ <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
+ <861s1tavn0.wl-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="gbk"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <8845fbed-659f-1548-6dfb-fd20164fa44e@arm.com>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Steven Price <steven.price@arm.com>, Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Dave Martin <dave.martin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Jeremy Linton <jeremy.linton@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <861s1tavn0.wl-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linuxarm@huawei.com, guoheyi@huawei.com, kvm@vger.kernel.org, xuwei5@huawei.com, wanghaibin.wang@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
 
-On 4/15/19 4:03 PM, Steven Price wrote:
-> On 15/04/2019 12:15, Andre Przywara wrote:
->> Recent commits added the explicit notion of "Not affected" to the state
->> of the Spectre v2 (aka. BP_HARDENING) workaround, where we just had
->> "needed" and "unknown" before.
+
+On 2019/4/23 18:00, Marc Zyngier wrote:
+
+Hi, Marc
+
+> On Tue, 23 Apr 2019 08:44:17 +0100,
+> "Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
 >>
->> Export this knowledge to the rest of the kernel and enhance the existing
->> kvm_arm_harden_branch_predictor() to report this new state as well.
->> Export this new state to guests when they use KVM's firmware interface
->> emulation.
+>> Hi, Marc
+> 
+> [...]
+> 
+>> I've learned that there's some implementation problem for the PCIe
+>> controller of Hi1616, the processor of D05. The PCIe ACS was not
+>> implemented properly and D05 doesn't support VM using pcie vf.
+> 
+> My D05 completely disagrees with you:
+> 
+> root@unassigned-hostname:~# lspci -v
+> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
+> 	Flags: fast devsel
+> lspci: Unable to load libkmod resources: error -12
+> 
+> 00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio network device
+> 	Flags: bus master, fast devsel, latency 0, IRQ 40
+> 	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
+> 	Expansion ROM at 10000000 [disabled] [size=256K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio block device
+> 	Flags: bus master, fast devsel, latency 0, IRQ 41
+> 	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio SCSI
+> 	Flags: bus master, fast devsel, latency 0, IRQ 42
+> 	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
+> 	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
+> 	Flags: bus master, fast devsel, latency 0
+> 	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
+> 	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
+> 	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
+> 	Capabilities: [100] Advanced Error Reporting
+> 	Capabilities: [1a0] Transaction Processing Hints
+> 	Capabilities: [1d0] Access Control Services
+> 	Kernel driver in use: igbvf
+> 
+> root@unassigned-hostname:~# uptime
+>  05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
+> 
+
+I have make a new quirk to fix ACS problem on Hi1616, to enable VM using
+pcie vf.
+
+> For something that isn't supposed to work, it is pretty good. So
+> please test it and let me know how it fares. At this stage, not
+> regressing deployed HW is more important than improving the situation
+> on HW that nobody has.
+> 
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h     | 12 +++++++++---
->>  arch/arm64/include/asm/cpufeature.h |  6 ++++++
->>  arch/arm64/include/asm/kvm_host.h   | 16 ++++++++++++++--
->>  arch/arm64/kernel/cpu_errata.c      | 23 ++++++++++++++++++-----
->>  virt/kvm/arm/psci.c                 | 10 +++++++++-
->>  5 files changed, 56 insertions(+), 11 deletions(-)
+>>>
+>>>>
+>>>>>
+>>>>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
+>>>>>> large at all.
+>>>>>
+>>>>> Sure. But I'm not sure this is a universal figure.
+>>>>>
+>>>>>>
+>>>>>>> Frankly, you want to be careful with that. I'd rather enable them late
+>>>>>>> and have a chance of not blocking because of another (virtual)
+>>>>>>> interrupt, which saves us the doorbell business.
+>>>>>>>
+>>>>>>> I wonder if you wouldn't be in a better position by drastically
+>>>>>>> reducing halt_poll_ns for vcpu that can have directly injected
+>>>>>>> interrupts.
+>>>>>>>
+>>>>>>
+>>>>>> If we set halt_poll_ns to a small value, the chance of
+>>>>>> not blocking and vcpu scheduled out becomes larger. The cost
+>>>>>> of vcpu scheduled out is quite expensive.
+>>>>>> In many cases, one pcpu is assigned to only
+>>>>>> one vcpu, and halt_poll_ns is set quite large, to increase
+>>>>>> chance of halt_poll process got terminated. This is the
+>>>>>> reason we want to set halt_poll_ns large. And We hope vlpi
+>>>>>> stop halt_poll process in time.
+>>>>>
+>>>>> Fair enough. It is certainly realistic to strictly partition the
+>>>>> system when GICv4 is in use, so I can see some potential benefit.
+>>>>>
+>>>>>> Though it will check whether vcpu is runnable again by
+>>>>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
+>>>>>> However it's somewhat later if halt_poll_ns is larger.
+>>>>>>
+>>>>>>> In any case, this is something that we should measure, not guess.
+>>>>>
+>>>>> Please post results of realistic benchmarks that we can reproduce,
+>>>>> with and without this change. I'm willing to entertain the idea, but I
+>>>>> need more than just a vague number.
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> 	M.
+>>>>>
+>>>>
+>>>> I tested it with and without change (patch attached in the last).
+>>>> halt_poll_ns is keep default, 500000ns.
+>>>> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
+>>>> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
+>>>>
+>>>> netperf result:
+>>>> D06 as server, intel 8180 server as client
+>>>> with change:
+>>>> package 512 bytes - 5400 Mbits/s
+>>>> package 64 bytes - 740 Mbits/s
+>>>> without change:
+>>>> package 512 bytes - 5000 Mbits/s
+>>>> package 64 bytes - 710 Mbits/s
+>>>>
+>>>> Also I have tested D06 as client, intel machine as server,
+>>>> with the change, the result remains the same.
+>>>
+>>> So anywhere between 4% and 8% improvement. Please post results for D05
+>>> once you've found one.
+>>>
+>>>>
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 55fe8e2..0f56904 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>  	if (vcpu->halt_poll_ns) {
+>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>>>
+>>>> +#ifdef CONFIG_ARM64
+>>>> +		/*
+>>>> +		 * When using gicv4, enable doorbell before halt pool wait
+>>>> +		 * so that direct vlpi can stop halt poll.
+>>>> +		 */
+>>>> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
+>>>> +			kvm_vgic_v4_enable_doorbell(vcpu);
+>>>> +		}
+>>>> +#endif
+>>>> +
+>>>
+>>> Irk. No. You're now leaving doorbells enabled when going back to the
+>>> guest, and that's pretty bad as the whole logic relies on doorbells
+>>> being disabled if the guest can run.
+>>>
+>>> So please try this instead on top of mainline. And it has to be on top
+>>> of mainline as we've changed the way timer interrupts work in 5.1 --
+>>> see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
+>>>
+> 
+> [...]
+> 
+>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>> index f25aa98a94df..0ae4ad5dcb12 100644
+>>> --- a/virt/kvm/kvm_main.c
+>>> +++ b/virt/kvm/kvm_main.c
+>>> @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  	bool waited = false;
+>>>  	u64 block_ns;
+>>>  
+>>> +	kvm_arch_vcpu_blocking(vcpu);
+>>> +
+>>>  	start = cur = ktime_get();
+>>>  	if (vcpu->halt_poll_ns) {
+>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>> @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  		} while (single_task_running() && ktime_before(cur, stop));
+>>>  	}
+>>>  
+>>> -	kvm_arch_vcpu_blocking(vcpu);
+>>> -
+>>>  	for (;;) {
+>>>  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
+>>>  
+>>> @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  	finish_swait(&vcpu->wq, &wait);
+>>>  	cur = ktime_get();
+>>>  
+>>> -	kvm_arch_vcpu_unblocking(vcpu);
+>>>  out:
+>>> +	kvm_arch_vcpu_unblocking(vcpu);
+>>>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>>>  
+>>>  	if (!vcpu_valid_wakeup(vcpu))
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
 >>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 770d73257ad9..836479e4b340 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -364,7 +364,11 @@ static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
->>  static inline void kvm_arm_vhe_guest_enter(void) {}
->>  static inline void kvm_arm_vhe_guest_exit(void) {}
->>  
->> -static inline bool kvm_arm_harden_branch_predictor(void)
->> +#define KVM_BP_HARDEN_UNKNOWN		-1
->> +#define KVM_BP_HARDEN_NEEDED		0
->> +#define KVM_BP_HARDEN_MITIGATED		1
-> 
-> I find the naming here a little confusing - it's not really clear what
-> "mitigated" means (see below).
-> 
->> +
->> +static inline int kvm_arm_harden_branch_predictor(void)
->>  {
->>  	switch(read_cpuid_part()) {
->>  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
->> @@ -372,10 +376,12 @@ static inline bool kvm_arm_harden_branch_predictor(void)
->>  	case ARM_CPU_PART_CORTEX_A12:
->>  	case ARM_CPU_PART_CORTEX_A15:
->>  	case ARM_CPU_PART_CORTEX_A17:
->> -		return true;
->> +		return KVM_BP_HARDEN_NEEDED;
->>  #endif
->> +	case ARM_CPU_PART_CORTEX_A7:
->> +		return KVM_BP_HARDEN_MITIGATED;
->>  	default:
->> -		return false;
->> +		return KVM_BP_HARDEN_UNKNOWN;
->>  	}
->>  }
->>  
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index 6ccdc97e5d6a..3c5b25c1bda1 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -622,6 +622,12 @@ static inline bool system_uses_irq_prio_masking(void)
->>  	       cpus_have_const_cap(ARM64_HAS_IRQ_PRIO_MASKING);
->>  }
->>  
->> +#define ARM64_BP_HARDEN_UNKNOWN		-1
->> +#define ARM64_BP_HARDEN_NEEDED		0
->> +#define ARM64_BP_HARDEN_MITIGATED	1
->> +
->> +int get_spectre_v2_workaround_state(void);
->> +
->>  #define ARM64_SSBD_UNKNOWN		-1
->>  #define ARM64_SSBD_FORCE_DISABLE	0
->>  #define ARM64_SSBD_KERNEL		1
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index a01fe087e022..bf9a59b7d1ce 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -555,9 +555,21 @@ static inline void kvm_arm_vhe_guest_exit(void)
->>  	isb();
->>  }
->>  
->> -static inline bool kvm_arm_harden_branch_predictor(void)
->> +#define KVM_BP_HARDEN_UNKNOWN		-1
->> +#define KVM_BP_HARDEN_NEEDED		0
->> +#define KVM_BP_HARDEN_MITIGATED		1
->> +
->> +static inline int kvm_arm_harden_branch_predictor(void)
->>  {
->> -	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
->> +	switch (get_spectre_v2_workaround_state()) {
->> +	case ARM64_BP_HARDEN_NEEDED:
->> +		return KVM_BP_HARDEN_NEEDED;
->> +	case ARM64_BP_HARDEN_MITIGATED:
->> +		return KVM_BP_HARDEN_MITIGATED;
->> +	case ARM64_BP_HARDEN_UNKNOWN:
->> +	default:
->> +		return KVM_BP_HARDEN_UNKNOWN;
->> +	}
->>  }
->>  
->>  #define KVM_SSBD_UNKNOWN		-1
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index a1f3188c7be0..7fa23ab09d4e 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -555,6 +555,17 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
->>  static bool __hardenbp_enab = true;
->>  static bool __spectrev2_safe = true;
->>  
->> +int get_spectre_v2_workaround_state(void)
->> +{
->> +	if (__spectrev2_safe)
->> +		return ARM64_BP_HARDEN_MITIGATED;
->> +
->> +	if (!__hardenbp_enab)
->> +		return ARM64_BP_HARDEN_UNKNOWN;
->> +
->> +	return ARM64_BP_HARDEN_NEEDED;
->> +}
->> +
->>  /*
->>   * List of CPUs that do not need any Spectre-v2 mitigation at all.
->>   */
->> @@ -834,13 +845,15 @@ ssize_t cpu_show_spectre_v1(struct device *dev, struct device_attribute *attr,
->>  ssize_t cpu_show_spectre_v2(struct device *dev, struct device_attribute *attr,
->>  		char *buf)
->>  {
->> -	if (__spectrev2_safe)
->> +	switch (get_spectre_v2_workaround_state()) {
->> +	case ARM64_BP_HARDEN_MITIGATED:
->>  		return sprintf(buf, "Not affected\n");
-> 
-> Here "mitigated" means "not affected".
-> 
->> -
->> -	if (__hardenbp_enab)
->> +        case ARM64_BP_HARDEN_NEEDED:
->>  		return sprintf(buf, "Mitigation: Branch predictor hardening\n");
-> 
-> And "harden needed" means mitigated.
-> 
->> -
->> -	return sprintf(buf, "Vulnerable\n");
->> +        case ARM64_BP_HARDEN_UNKNOWN:
->> +	default:
->> +		return sprintf(buf, "Vulnerable\n");
->> +	}
->>  }
->>  
->>  ssize_t cpu_show_spec_store_bypass(struct device *dev,
->> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
->> index 34d08ee63747..1da53e0e38f7 100644
->> --- a/virt/kvm/arm/psci.c
->> +++ b/virt/kvm/arm/psci.c
->> @@ -412,8 +412,16 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>  		feature = smccc_get_arg1(vcpu);
->>  		switch(feature) {
->>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
->> -			if (kvm_arm_harden_branch_predictor())
->> +			switch (kvm_arm_harden_branch_predictor()) {
->> +			case KVM_BP_HARDEN_UNKNOWN:
->> +				break;
->> +			case KVM_BP_HARDEN_NEEDED:
->>  				val = SMCCC_RET_SUCCESS;
->> +				break;
->> +			case KVM_BP_HARDEN_MITIGATED:
->> +				val = SMCCC_RET_NOT_REQUIRED;
-> 
-> Would KVM_BP_HARDEN_NOT_REQUIRED be a more logical name?
-I tend to agree with Steven's comment
-
-But then why not also choosing the same terminology for the uapi:
-KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED?
-
-For the same case we seem to have 3 different terminologies. But maybe I
-miss something.
-
-In the uapi doc, in case the workaround is not needed do we actually
-care to mention the wa is supported?
-
-Thanks
-
-Eric
-> 
-> Steve
-> 
->> +				break;
->> +			}
->>  			break;
->>  		case ARM_SMCCC_ARCH_WORKAROUND_2:
->>  			switch (kvm_arm_have_ssbd()) {
+>> I've tested your patch and the results showed as follow:
 >>
+>> netperf result:
+>> D06 as server, intel 8180 server as client
+>> with change:
+>> package 512 bytes - 5500 Mbits/s
+>> package 64 bytes - 760 Mbits/s
+>> without change:
+>> package 512 bytes - 5000 Mbits/s
+>> package 64 bytes - 710 Mbits/s
 > 
+> OK, that's pretty good. Let me know once you've tested it on D05.
+> 
+> Thanks,
+>
+> 	M.
+>
+
+The average cost of kvm_vgic_v4_enable_doorbell on D05 is 0.74us,
+while it is 0.35us on D06.
+
+netperf result:
+server: D05 vm using 82599 vf,
+client: intel 8180
+5.0.0-rc3, have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN
+if GICv4 is enabled"
+
+with change:
+package 512 bytes - 7150 Mbits/s
+package 64 bytes - 1080 Mbits/s
+without change:
+package 512 bytes - 7050 Mbits/s
+package 64 bytes - 1080 Mbits/s
+
+It seems not work on D05, as the doorbell enable process costs more than
+that on D06.
+
+Thanks,
+Tang
