@@ -1,71 +1,67 @@
-Return-Path: <SRS0=9OIH=S4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Jnhn=S7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F215AC43219
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53527C43218
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Apr 2019 02:29:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7B5AB208C4
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Apr 2019 15:37:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5AB208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id B5E27206BF
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Apr 2019 02:29:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5E27206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED6594A496;
-	Fri, 26 Apr 2019 11:37:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E9CC4A3A5;
+	Sun, 28 Apr 2019 22:29:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lgqNklcUaRiG; Fri, 26 Apr 2019 11:37:55 -0400 (EDT)
+	with ESMTP id OD+Fjjjy7XLH; Sun, 28 Apr 2019 22:29:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4BDA4A48C;
-	Fri, 26 Apr 2019 11:37:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7EE4A494;
+	Sun, 28 Apr 2019 22:29:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B9E54A470
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:37:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C33DA4A47A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Apr 2019 22:29:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ff+AIVLBdEp1 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Apr 2019 11:37:52 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE2FE4A331
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Apr 2019 11:37:52 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D57783099F9F;
- Fri, 26 Apr 2019 15:37:51 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DCA466615;
- Fri, 26 Apr 2019 15:37:49 +0000 (UTC)
-Subject: Re: [PATCH v5 1/3] arm64: KVM: Propagate full Spectre v2 workaround
- state to KVM guests
-To: Steven Price <steven.price@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, Marc Zyngier
- <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-References: <20190415111542.119788-1-andre.przywara@arm.com>
- <20190415111542.119788-2-andre.przywara@arm.com>
- <8845fbed-659f-1548-6dfb-fd20164fa44e@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1fe87bab-2a1d-c48e-9f19-27faef91e5fd@redhat.com>
-Date: Fri, 26 Apr 2019 17:37:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id dPGSyjLWlezw for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 28 Apr 2019 22:29:25 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9DE94A417
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Apr 2019 22:29:24 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 2E17AD19E6B89F133843;
+ Mon, 29 Apr 2019 10:29:22 +0800 (CST)
+Received: from [127.0.0.1] (10.67.78.74) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 29 Apr 2019
+ 10:29:13 +0800
+Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
+To: Marc Zyngier <marc.zyngier@arm.com>
+References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
+ <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
+ <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
+ <86zhpc66jl.wl-marc.zyngier@arm.com>
+ <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
+ <86imvu3uje.wl-marc.zyngier@arm.com>
+ <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
+ <861s1tavn0.wl-marc.zyngier@arm.com>
+From: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
+Message-ID: <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
+Date: Mon, 29 Apr 2019 10:29:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-In-Reply-To: <8845fbed-659f-1548-6dfb-fd20164fa44e@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 26 Apr 2019 15:37:52 +0000 (UTC)
-Cc: Dave Martin <dave.martin@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jeremy Linton <jeremy.linton@arm.com>
+In-Reply-To: <861s1tavn0.wl-marc.zyngier@arm.com>
+X-Originating-IP: [10.67.78.74]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org,
+ xuwei5@huawei.com, guoheyi@huawei.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,203 +77,273 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190426153747.918523FlvFs4aI8NBofnraJpO64gABPaG03TnEbcB-8@z>
+Message-ID: <20190429022913.JcoUcUvSVcErkKF6AQyg0iqD1qvga3jv9HhrszllZ94@z>
 
-Hi Andre,
 
-On 4/15/19 4:03 PM, Steven Price wrote:
-> On 15/04/2019 12:15, Andre Przywara wrote:
->> Recent commits added the explicit notion of "Not affected" to the state
->> of the Spectre v2 (aka. BP_HARDENING) workaround, where we just had
->> "needed" and "unknown" before.
+
+On 2019/4/23 18:00, Marc Zyngier wrote:
+
+Hi, Marc
+
+> On Tue, 23 Apr 2019 08:44:17 +0100,
+> "Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
 >>
->> Export this knowledge to the rest of the kernel and enhance the existing
->> kvm_arm_harden_branch_predictor() to report this new state as well.
->> Export this new state to guests when they use KVM's firmware interface
->> emulation.
+>> Hi, Marc
+> 
+> [...]
+> 
+>> I've learned that there's some implementation problem for the PCIe
+>> controller of Hi1616, the processor of D05. The PCIe ACS was not
+>> implemented properly and D05 doesn't support VM using pcie vf.
+> 
+> My D05 completely disagrees with you:
+> 
+> root@unassigned-hostname:~# lspci -v
+> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
+> 	Flags: fast devsel
+> lspci: Unable to load libkmod resources: error -12
+> 
+> 00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio network device
+> 	Flags: bus master, fast devsel, latency 0, IRQ 40
+> 	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
+> 	Expansion ROM at 10000000 [disabled] [size=256K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio block device
+> 	Flags: bus master, fast devsel, latency 0, IRQ 41
+> 	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
+> 	Subsystem: Red Hat, Inc Virtio SCSI
+> 	Flags: bus master, fast devsel, latency 0, IRQ 42
+> 	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
+> 	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
+> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+> 	Kernel driver in use: virtio-pci
+> 
+> 00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
+> 	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
+> 	Flags: bus master, fast devsel, latency 0
+> 	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
+> 	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
+> 	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
+> 	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
+> 	Capabilities: [100] Advanced Error Reporting
+> 	Capabilities: [1a0] Transaction Processing Hints
+> 	Capabilities: [1d0] Access Control Services
+> 	Kernel driver in use: igbvf
+> 
+> root@unassigned-hostname:~# uptime
+>  05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
+> 
+
+I have make a new quirk to fix ACS problem on Hi1616, to enable VM using
+pcie vf.
+
+> For something that isn't supposed to work, it is pretty good. So
+> please test it and let me know how it fares. At this stage, not
+> regressing deployed HW is more important than improving the situation
+> on HW that nobody has.
+> 
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h     | 12 +++++++++---
->>  arch/arm64/include/asm/cpufeature.h |  6 ++++++
->>  arch/arm64/include/asm/kvm_host.h   | 16 ++++++++++++++--
->>  arch/arm64/kernel/cpu_errata.c      | 23 ++++++++++++++++++-----
->>  virt/kvm/arm/psci.c                 | 10 +++++++++-
->>  5 files changed, 56 insertions(+), 11 deletions(-)
+>>>
+>>>>
+>>>>>
+>>>>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
+>>>>>> large at all.
+>>>>>
+>>>>> Sure. But I'm not sure this is a universal figure.
+>>>>>
+>>>>>>
+>>>>>>> Frankly, you want to be careful with that. I'd rather enable them late
+>>>>>>> and have a chance of not blocking because of another (virtual)
+>>>>>>> interrupt, which saves us the doorbell business.
+>>>>>>>
+>>>>>>> I wonder if you wouldn't be in a better position by drastically
+>>>>>>> reducing halt_poll_ns for vcpu that can have directly injected
+>>>>>>> interrupts.
+>>>>>>>
+>>>>>>
+>>>>>> If we set halt_poll_ns to a small value, the chance of
+>>>>>> not blocking and vcpu scheduled out becomes larger. The cost
+>>>>>> of vcpu scheduled out is quite expensive.
+>>>>>> In many cases, one pcpu is assigned to only
+>>>>>> one vcpu, and halt_poll_ns is set quite large, to increase
+>>>>>> chance of halt_poll process got terminated. This is the
+>>>>>> reason we want to set halt_poll_ns large. And We hope vlpi
+>>>>>> stop halt_poll process in time.
+>>>>>
+>>>>> Fair enough. It is certainly realistic to strictly partition the
+>>>>> system when GICv4 is in use, so I can see some potential benefit.
+>>>>>
+>>>>>> Though it will check whether vcpu is runnable again by
+>>>>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
+>>>>>> However it's somewhat later if halt_poll_ns is larger.
+>>>>>>
+>>>>>>> In any case, this is something that we should measure, not guess.
+>>>>>
+>>>>> Please post results of realistic benchmarks that we can reproduce,
+>>>>> with and without this change. I'm willing to entertain the idea, but I
+>>>>> need more than just a vague number.
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> 	M.
+>>>>>
+>>>>
+>>>> I tested it with and without change (patch attached in the last).
+>>>> halt_poll_ns is keep default, 500000ns.
+>>>> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
+>>>> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
+>>>>
+>>>> netperf result:
+>>>> D06 as server, intel 8180 server as client
+>>>> with change:
+>>>> package 512 bytes - 5400 Mbits/s
+>>>> package 64 bytes - 740 Mbits/s
+>>>> without change:
+>>>> package 512 bytes - 5000 Mbits/s
+>>>> package 64 bytes - 710 Mbits/s
+>>>>
+>>>> Also I have tested D06 as client, intel machine as server,
+>>>> with the change, the result remains the same.
+>>>
+>>> So anywhere between 4% and 8% improvement. Please post results for D05
+>>> once you've found one.
+>>>
+>>>>
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 55fe8e2..0f56904 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>  	if (vcpu->halt_poll_ns) {
+>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>>>
+>>>> +#ifdef CONFIG_ARM64
+>>>> +		/*
+>>>> +		 * When using gicv4, enable doorbell before halt pool wait
+>>>> +		 * so that direct vlpi can stop halt poll.
+>>>> +		 */
+>>>> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
+>>>> +			kvm_vgic_v4_enable_doorbell(vcpu);
+>>>> +		}
+>>>> +#endif
+>>>> +
+>>>
+>>> Irk. No. You're now leaving doorbells enabled when going back to the
+>>> guest, and that's pretty bad as the whole logic relies on doorbells
+>>> being disabled if the guest can run.
+>>>
+>>> So please try this instead on top of mainline. And it has to be on top
+>>> of mainline as we've changed the way timer interrupts work in 5.1 --
+>>> see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
+>>>
+> 
+> [...]
+> 
+>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>> index f25aa98a94df..0ae4ad5dcb12 100644
+>>> --- a/virt/kvm/kvm_main.c
+>>> +++ b/virt/kvm/kvm_main.c
+>>> @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  	bool waited = false;
+>>>  	u64 block_ns;
+>>>  
+>>> +	kvm_arch_vcpu_blocking(vcpu);
+>>> +
+>>>  	start = cur = ktime_get();
+>>>  	if (vcpu->halt_poll_ns) {
+>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>> @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  		} while (single_task_running() && ktime_before(cur, stop));
+>>>  	}
+>>>  
+>>> -	kvm_arch_vcpu_blocking(vcpu);
+>>> -
+>>>  	for (;;) {
+>>>  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
+>>>  
+>>> @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>  	finish_swait(&vcpu->wq, &wait);
+>>>  	cur = ktime_get();
+>>>  
+>>> -	kvm_arch_vcpu_unblocking(vcpu);
+>>>  out:
+>>> +	kvm_arch_vcpu_unblocking(vcpu);
+>>>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>>>  
+>>>  	if (!vcpu_valid_wakeup(vcpu))
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
 >>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 770d73257ad9..836479e4b340 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -364,7 +364,11 @@ static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
->>  static inline void kvm_arm_vhe_guest_enter(void) {}
->>  static inline void kvm_arm_vhe_guest_exit(void) {}
->>  
->> -static inline bool kvm_arm_harden_branch_predictor(void)
->> +#define KVM_BP_HARDEN_UNKNOWN		-1
->> +#define KVM_BP_HARDEN_NEEDED		0
->> +#define KVM_BP_HARDEN_MITIGATED		1
-> 
-> I find the naming here a little confusing - it's not really clear what
-> "mitigated" means (see below).
-> 
->> +
->> +static inline int kvm_arm_harden_branch_predictor(void)
->>  {
->>  	switch(read_cpuid_part()) {
->>  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
->> @@ -372,10 +376,12 @@ static inline bool kvm_arm_harden_branch_predictor(void)
->>  	case ARM_CPU_PART_CORTEX_A12:
->>  	case ARM_CPU_PART_CORTEX_A15:
->>  	case ARM_CPU_PART_CORTEX_A17:
->> -		return true;
->> +		return KVM_BP_HARDEN_NEEDED;
->>  #endif
->> +	case ARM_CPU_PART_CORTEX_A7:
->> +		return KVM_BP_HARDEN_MITIGATED;
->>  	default:
->> -		return false;
->> +		return KVM_BP_HARDEN_UNKNOWN;
->>  	}
->>  }
->>  
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index 6ccdc97e5d6a..3c5b25c1bda1 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -622,6 +622,12 @@ static inline bool system_uses_irq_prio_masking(void)
->>  	       cpus_have_const_cap(ARM64_HAS_IRQ_PRIO_MASKING);
->>  }
->>  
->> +#define ARM64_BP_HARDEN_UNKNOWN		-1
->> +#define ARM64_BP_HARDEN_NEEDED		0
->> +#define ARM64_BP_HARDEN_MITIGATED	1
->> +
->> +int get_spectre_v2_workaround_state(void);
->> +
->>  #define ARM64_SSBD_UNKNOWN		-1
->>  #define ARM64_SSBD_FORCE_DISABLE	0
->>  #define ARM64_SSBD_KERNEL		1
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index a01fe087e022..bf9a59b7d1ce 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -555,9 +555,21 @@ static inline void kvm_arm_vhe_guest_exit(void)
->>  	isb();
->>  }
->>  
->> -static inline bool kvm_arm_harden_branch_predictor(void)
->> +#define KVM_BP_HARDEN_UNKNOWN		-1
->> +#define KVM_BP_HARDEN_NEEDED		0
->> +#define KVM_BP_HARDEN_MITIGATED		1
->> +
->> +static inline int kvm_arm_harden_branch_predictor(void)
->>  {
->> -	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
->> +	switch (get_spectre_v2_workaround_state()) {
->> +	case ARM64_BP_HARDEN_NEEDED:
->> +		return KVM_BP_HARDEN_NEEDED;
->> +	case ARM64_BP_HARDEN_MITIGATED:
->> +		return KVM_BP_HARDEN_MITIGATED;
->> +	case ARM64_BP_HARDEN_UNKNOWN:
->> +	default:
->> +		return KVM_BP_HARDEN_UNKNOWN;
->> +	}
->>  }
->>  
->>  #define KVM_SSBD_UNKNOWN		-1
->> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
->> index a1f3188c7be0..7fa23ab09d4e 100644
->> --- a/arch/arm64/kernel/cpu_errata.c
->> +++ b/arch/arm64/kernel/cpu_errata.c
->> @@ -555,6 +555,17 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
->>  static bool __hardenbp_enab = true;
->>  static bool __spectrev2_safe = true;
->>  
->> +int get_spectre_v2_workaround_state(void)
->> +{
->> +	if (__spectrev2_safe)
->> +		return ARM64_BP_HARDEN_MITIGATED;
->> +
->> +	if (!__hardenbp_enab)
->> +		return ARM64_BP_HARDEN_UNKNOWN;
->> +
->> +	return ARM64_BP_HARDEN_NEEDED;
->> +}
->> +
->>  /*
->>   * List of CPUs that do not need any Spectre-v2 mitigation at all.
->>   */
->> @@ -834,13 +845,15 @@ ssize_t cpu_show_spectre_v1(struct device *dev, struct device_attribute *attr,
->>  ssize_t cpu_show_spectre_v2(struct device *dev, struct device_attribute *attr,
->>  		char *buf)
->>  {
->> -	if (__spectrev2_safe)
->> +	switch (get_spectre_v2_workaround_state()) {
->> +	case ARM64_BP_HARDEN_MITIGATED:
->>  		return sprintf(buf, "Not affected\n");
-> 
-> Here "mitigated" means "not affected".
-> 
->> -
->> -	if (__hardenbp_enab)
->> +        case ARM64_BP_HARDEN_NEEDED:
->>  		return sprintf(buf, "Mitigation: Branch predictor hardening\n");
-> 
-> And "harden needed" means mitigated.
-> 
->> -
->> -	return sprintf(buf, "Vulnerable\n");
->> +        case ARM64_BP_HARDEN_UNKNOWN:
->> +	default:
->> +		return sprintf(buf, "Vulnerable\n");
->> +	}
->>  }
->>  
->>  ssize_t cpu_show_spec_store_bypass(struct device *dev,
->> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
->> index 34d08ee63747..1da53e0e38f7 100644
->> --- a/virt/kvm/arm/psci.c
->> +++ b/virt/kvm/arm/psci.c
->> @@ -412,8 +412,16 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>  		feature = smccc_get_arg1(vcpu);
->>  		switch(feature) {
->>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
->> -			if (kvm_arm_harden_branch_predictor())
->> +			switch (kvm_arm_harden_branch_predictor()) {
->> +			case KVM_BP_HARDEN_UNKNOWN:
->> +				break;
->> +			case KVM_BP_HARDEN_NEEDED:
->>  				val = SMCCC_RET_SUCCESS;
->> +				break;
->> +			case KVM_BP_HARDEN_MITIGATED:
->> +				val = SMCCC_RET_NOT_REQUIRED;
-> 
-> Would KVM_BP_HARDEN_NOT_REQUIRED be a more logical name?
-I tend to agree with Steven's comment
-
-But then why not also choosing the same terminology for the uapi:
-KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED?
-
-For the same case we seem to have 3 different terminologies. But maybe I
-miss something.
-
-In the uapi doc, in case the workaround is not needed do we actually
-care to mention the wa is supported?
-
-Thanks
-
-Eric
-> 
-> Steve
-> 
->> +				break;
->> +			}
->>  			break;
->>  		case ARM_SMCCC_ARCH_WORKAROUND_2:
->>  			switch (kvm_arm_have_ssbd()) {
+>> I've tested your patch and the results showed as follow:
 >>
+>> netperf result:
+>> D06 as server, intel 8180 server as client
+>> with change:
+>> package 512 bytes - 5500 Mbits/s
+>> package 64 bytes - 760 Mbits/s
+>> without change:
+>> package 512 bytes - 5000 Mbits/s
+>> package 64 bytes - 710 Mbits/s
 > 
+> OK, that's pretty good. Let me know once you've tested it on D05.
+> 
+> Thanks,
+>
+> 	M.
+>
+
+The average cost of kvm_vgic_v4_enable_doorbell on D05 is 0.74us,
+while it is 0.35us on D06.
+
+netperf result:
+server: D05 vm using 82599 vf,
+client: intel 8180
+5.0.0-rc3, have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN
+if GICv4 is enabled"
+
+with change:
+package 512 bytes - 7150 Mbits/s
+package 64 bytes - 1080 Mbits/s
+without change:
+package 512 bytes - 7050 Mbits/s
+package 64 bytes - 1080 Mbits/s
+
+It seems not work on D05, as the doorbell enable process costs more than
+that on D06.
+
+Thanks,
+Tang
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
