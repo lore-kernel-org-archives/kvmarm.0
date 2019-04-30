@@ -2,103 +2,61 @@ Return-Path: <SRS0=HqKL=TA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4BDC43219
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Apr 2019 09:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FBCC04AA8
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Apr 2019 09:50:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C34E62080C
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Apr 2019 09:15:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C34E62080C
+	by mail.kernel.org (Postfix) with ESMTP id 16B412080C
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Apr 2019 09:50:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B412080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2000A4A4DB;
-	Tue, 30 Apr 2019 05:15:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 674DA4A4DC;
+	Tue, 30 Apr 2019 05:50:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j5gHaHAugl8q; Tue, 30 Apr 2019 05:15:05 -0400 (EDT)
+	with ESMTP id vXA--Q0PPjZv; Tue, 30 Apr 2019 05:50:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D64334A4DE;
-	Tue, 30 Apr 2019 05:15:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0FCB4A4E6;
+	Tue, 30 Apr 2019 05:50:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 636594A4DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Apr 2019 05:15:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E47C4A4DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Apr 2019 05:50:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rTLhK7qSajTG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Apr 2019 05:15:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA754A47A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Apr 2019 05:15:02 -0400 (EDT)
+ with ESMTP id lzNFkipfa8pX for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Apr 2019 05:50:35 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B224A4D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Apr 2019 05:50:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 20076374;
- Tue, 30 Apr 2019 02:15:02 -0700 (PDT)
-Received: from [10.1.196.92] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 5E4213F5C1; Tue, 30 Apr 2019 02:15:00 -0700 (PDT)
-Subject: Re: [PATCH] arm64: KVM: fix perf cycle counter support for VHE
-To: Andrew Murray <andrew.murray@arm.com>
-References: <20190429191305.21000-1-andrew.murray@arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: ARM Ltd
-Message-ID: <8022b69e-f4aa-cc06-0d5a-5ef980cf0d4a@arm.com>
-Date: Tue, 30 Apr 2019 10:14:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44D7080D;
+ Tue, 30 Apr 2019 02:50:34 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EBDB3F5C1;
+ Tue, 30 Apr 2019 02:50:33 -0700 (PDT)
+Subject: Re: [PATCH kvmtool 05/16] ioport: pci: Move port allocations to PCI
+ devices
+To: Andre Przywara <andre.przywara@arm.com>
+References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
+ <1551947777-13044-6-git-send-email-julien.thierry@arm.com>
+ <20190404144537.6d2343fc@donnerap.cambridge.arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <4fff7a02-8d7f-0b00-bbc4-ddb667c1e302@arm.com>
+Date: Tue, 30 Apr 2019 10:50:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190429191305.21000-1-andrew.murray@arm.com>
+In-Reply-To: <20190404144537.6d2343fc@donnerap.cambridge.arm.com>
 Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Sami.Mujawar@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,34 +72,181 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190430091458.L_roX94v7t2FnOwrO3kdoypWs8BkH6DZDIGvsk0TvrI@z>
+Message-ID: <20190430095030.hlxlibu19duSS0y7hxObywQx-wzkktZ-Rj9VhTuKDU4@z>
 
-[+ Christoffer, James, Julien]
+Hi,
 
-Hi Andrew,
-
-On 29/04/2019 20:13, Andrew Murray wrote:
-> The kvm_vcpu_pmu_{read,write}_evtype_direct functions do not handle
-> the cycle counter use-case, this leads to inaccurate counts and a
-> WARN message when using perf with the cycle counter (-e cycle).
+On 04/04/2019 14:45, Andre Przywara wrote:
+> On Thu, 7 Mar 2019 08:36:06 +0000
+> Julien Thierry <julien.thierry@arm.com> wrote:
 > 
-> Let's fix this by adding a use case for pmccfiltr_el0.
+> Hi,
 > 
-> Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+>> The dynamic ioport allocation with IOPORT_EMPTY is currently only used
+>> by PCI devices. Other devices use fixed ports for which they request
+>> registration to the ioport API.
+>>
+>> PCI ports need to be in the PCI IO space and there is no reason ioport
+>> API should know a PCI port is being allocated and needs to be placed in
+>> PCI IO space. This currently just happens to be the case.
+>>
+>> Move the responsability of dynamic allocation of ioports from the ioport
+>> API to PCI.
+>>
+>> In the future, if other types of devices also need dynamic ioport
+>> allocation, they'll have to figure out the range of ports they are
+>> allowed to use.
+>>
+>> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+>> ---
+>>  hw/pci-shmem.c       |  3 ++-
+>>  hw/vesa.c            |  4 ++--
+>>  include/kvm/ioport.h |  3 ---
+>>  include/kvm/pci.h    |  2 ++
+>>  ioport.c             | 18 ------------------
+>>  pci.c                |  8 ++++++++
+>>  vfio/core.c          |  6 ++++--
+>>  virtio/pci.c         |  3 ++-
+>>  8 files changed, 20 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+>> index f92bc75..a0c5ba8 100644
+>> --- a/hw/pci-shmem.c
+>> +++ b/hw/pci-shmem.c
+>> @@ -357,7 +357,8 @@ int pci_shmem__init(struct kvm *kvm)
+>>  		return 0;
+>>  
+>>  	/* Register MMIO space for MSI-X */
+>> -	r = ioport__register(kvm, IOPORT_EMPTY, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+>> +	r = pci_get_io_port_block(IOPORT_SIZE);
+>> +	r = ioport__register(kvm, r, &shmem_pci__io_ops, IOPORT_SIZE, NULL);
+>>  	if (r < 0)
+>>  		return r;
+>>  	ivshmem_registers = (u16)r;
+>> diff --git a/hw/vesa.c b/hw/vesa.c
+>> index f3c5114..404a8a3 100644
+>> --- a/hw/vesa.c
+>> +++ b/hw/vesa.c
+>> @@ -60,8 +60,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  
+>>  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+>>  		return NULL;
+>> -
+>> -	r = ioport__register(kvm, IOPORT_EMPTY, &vesa_io_ops, IOPORT_SIZE, NULL);
+>> +	r = pci_get_io_space_block(IOPORT_SIZE);
+> 
+> I am confused. This is still registering I/O ports, right? And this
+> (misnamed) function is about MMIO?
+> So should it read r = pci_get_io_port_block(IOPORT_SIZE); ?
+> 
+>> +	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
+>>  	if (r < 0)
+>>  		return ERR_PTR(r);
+>>  
+>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+>> index db52a47..b10fcd5 100644
+>> --- a/include/kvm/ioport.h
+>> +++ b/include/kvm/ioport.h
+>> @@ -14,11 +14,8 @@
+>>  
+>>  /* some ports we reserve for own use */
+>>  #define IOPORT_DBG			0xe0
+>> -#define IOPORT_START			0x6200
+>>  #define IOPORT_SIZE			0x400
+>>  
+>> -#define IOPORT_EMPTY			USHRT_MAX
+>> -
+>>  struct kvm;
+>>  
+>>  struct ioport {
+>> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+>> index a86c15a..bdbd183 100644
+>> --- a/include/kvm/pci.h
+>> +++ b/include/kvm/pci.h
+>> @@ -19,6 +19,7 @@
+>>  #define PCI_CONFIG_DATA		0xcfc
+>>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
+>>  #define PCI_IO_SIZE		0x100
+>> +#define PCI_IOPORT_START	0x6200
+>>  #define PCI_CFG_SIZE		(1ULL << 24)
+>>  
+>>  struct kvm;
+>> @@ -153,6 +154,7 @@ int pci__init(struct kvm *kvm);
+>>  int pci__exit(struct kvm *kvm);
+>>  struct pci_device_header *pci__find_dev(u8 dev_num);
+>>  u32 pci_get_io_space_block(u32 size);
+> 
+> So I think this was already misnamed, but with your new function below
+> becomes utterly confusing. Can we rename this to pci_get_mmio_space_block?
 
-Queued, with
-Fixes: 39e3406a090a ("arm64: KVM: Avoid isb's by using direct pmxevtyper
-sysreg")
+Yes, seems fair enough. I'll add a patch to rename that.
 
-In the future, please cc all the KVM/arm maintainers/reviewers so that
-we do not risk overseeing an important patch.
+> 
+>> +u16 pci_get_io_port_block(u32 size);
+>>  void pci__assign_irq(struct device_header *dev_hdr);
+>>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+>>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size);
+>> diff --git a/ioport.c b/ioport.c
+>> index a6dc65e..a72e403 100644
+>> --- a/ioport.c
+>> +++ b/ioport.c
+>> @@ -16,24 +16,8 @@
+>>  
+>>  #define ioport_node(n) rb_entry(n, struct ioport, node)
+>>  
+>> -DEFINE_MUTEX(ioport_mutex);
+>> -
+>> -static u16			free_io_port_idx; /* protected by ioport_mutex */
+>> -
+>>  static struct rb_root		ioport_tree = RB_ROOT;
+>>  
+>> -static u16 ioport__find_free_port(void)
+>> -{
+>> -	u16 free_port;
+>> -
+>> -	mutex_lock(&ioport_mutex);
+>> -	free_port = IOPORT_START + free_io_port_idx * IOPORT_SIZE;
+>> -	free_io_port_idx++;
+>> -	mutex_unlock(&ioport_mutex);
+>> -
+>> -	return free_port;
+>> -}
+>> -
+>>  static struct ioport *ioport_search(struct rb_root *root, u64 addr)
+>>  {
+>>  	struct rb_int_node *node;
+>> @@ -85,8 +69,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+>>  	int r;
+>>  
+>>  	br_write_lock(kvm);
+>> -	if (port == IOPORT_EMPTY)
+>> -		port = ioport__find_free_port();
+>>  
+>>  	entry = ioport_search(&ioport_tree, port);
+>>  	if (entry) {
+>> diff --git a/pci.c b/pci.c
+>> index 9edefa5..cd749db 100644
+>> --- a/pci.c
+>> +++ b/pci.c
+>> @@ -19,6 +19,14 @@ static u32 pci_config_address_bits;
+>>   * PCI isn't currently supported.)
+>>   */
+>>  static u32 io_space_blocks		= KVM_PCI_MMIO_AREA;
+>> +static u16 io_port_blocks		= PCI_IOPORT_START;
+>> +
+>> +u16 pci_get_io_port_block(u32 size)
+>> +{
+>> +	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
+> 
+> Nit: Can we please have an empty line after the variable declaration?
+> 
+
+We can :) .
 
 Thanks,
 
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
