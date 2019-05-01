@@ -1,24 +1,21 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm64: fix ptrauth ID register masking logic
-Date: Wed, 1 May 2019 17:20:49 +0100
-Message-ID: <5dbccc2a-655b-00d4-a168-e9ff60a455a7@arm.com>
-References: <20190501161008.31498-1-kristina.martsenko@arm.com>
+From: Andrew Murray <andrew.murray@arm.com>
+Subject: [PATCH v5 0/5] KVM: arm/arm64: add support for chained counters
+Date: Wed,  1 May 2019 17:31:26 +0100
+Message-ID: <20190501163131.43175-1-andrew.murray@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C2434A456
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:20:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 438B04A456
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:31:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rPudxzNbYMdX for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 May 2019 12:20:53 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA694A389
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:20:53 -0400 (EDT)
-In-Reply-To: <20190501161008.31498-1-kristina.martsenko@arm.com>
-Content-Language: en-US
+ with ESMTP id 6BhDMB0no4vX for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 May 2019 12:31:41 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE71F4A3B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:31:41 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,46 +25,92 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Kristina Martsenko <kristina.martsenko@arm.com>, Christoffer Dall <christoffer.dall@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Amit Kachhap <amit.kachhap@arm.com>, Dave P Martin <dave.martin@arm.com>, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/05/2019 17:10, Kristina Martsenko wrote:
-> When a VCPU doesn't have pointer auth, we want to hide all four pointer
-> auth ID register fields from the guest, not just one of them.
-> 
-> Fixes: 384b40caa8af ("KVM: arm/arm64: Context-switch ptrauth registers")
-> Reported-by: Andrew Murray <andrew.murray@arm.com>
-> Fsck-up-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9d02643bc601..857b226bcdde 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1088,10 +1088,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
->  		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
->  	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
-> -		val &= ~(0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> -			(0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> -			(0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> -			(0xfUL << ID_AA64ISAR1_GPI_SHIFT);
-> +		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
-> +			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-> +			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
-> +			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
->  	}
->  
->  	return val;
-> 
+ARMv8 provides support for chained PMU counters, where an event type
+of 0x001E is set for odd-numbered counters, the event counter will
+increment by one for each overflow of the preceding even-numbered
+counter. Let's emulate this in KVM by creating a 64 bit perf counter
+when a user chains two emulated counters together.
 
-Applied and pushed to -next. Thanks Andrew for reporting it, and
-Kristina for putting me right!
+Testing has been performed by hard-coding hwc->sample_period in
+__hw_perf_event_init (arm_pmu.c) to a small value, this results in
+regular overflows (for non sampling events). The following command
+was then used to measure chained and non-chained instruction cycles:
 
-	M.
+perf stat -e armv8_pmuv3/long=1,inst_retired/u \
+          -e armv8_pmuv3/long=0,inst_retired/u dd if=/dev/zero bs=1M \
+          count=10 | gzip > /dev/null
+
+The reported values were identical (and for non-chained was in the
+same ballpark when running on a kernel without this patchset). Debug
+was added to verify that the guest received overflow interrupts for
+the chain counter.
+
+For chained events we only support generating an overflow interrupt
+on the high counter. We use the attributes of the low counter to
+determine the attributes of the perf event.
+
+Changes since v4:
+
+ - Track pairs of chained counters with a bitmap instead of using
+   a struct kvm_pmc_pair.
+
+ - Rebase onto kvmarm/queue
+
+Changes since v3:
+
+ - Simplify approach by not creating events lazily and by introducing
+   a struct kvm_pmc_pair to represent the relationship between
+   adjacent counters.
+
+ - Rebase onto v5.1-rc2
+
+Changes since v2:
+
+ - Rebased onto v5.0-rc7
+
+ - Add check for cycle counter in correct patch
+
+ - Minor style, naming and comment changes
+
+ - Extract armv8pmu_evtype_is_chain from arch/arm64/kernel/perf_event.c
+   into a common header that KVM can use
+
+Changes since v1:
+
+ - Rename kvm_pmu_{enable,disable}_counter to reflect that they can
+   operate on multiple counters at once and use these functions where
+   possible
+
+ - Fix bugs with overflow handing, kvm_pmu_get_counter_value did not
+   take into consideration the perf counter value overflowing the low
+   counter
+
+ - Ensure PMCCFILTR_EL0 is used when operating on the cycle counter
+
+ - Rename kvm_pmu_reenable_enabled_{pair, single} and similar
+
+ - Always create perf event disabled to simplify logic elsewhere
+
+ - Move PMCNTENSET_EL0 test to kvm_pmu_enable_counter_mask
+
+
+Andrew Murray (5):
+  KVM: arm/arm64: rename kvm_pmu_{enable/disable}_counter functions
+  KVM: arm/arm64: extract duplicated code to own function
+  KVM: arm/arm64: re-create event when setting counter value
+  arm64: perf: extract chain helper into header
+  KVM: arm/arm64: support chained PMU counters
+
+ arch/arm64/include/asm/perf_event.h |   5 +
+ arch/arm64/kernel/perf_event.c      |   2 +-
+ arch/arm64/kvm/sys_regs.c           |   4 +-
+ include/kvm/arm_pmu.h               |  10 +-
+ virt/kvm/arm/pmu.c                  | 322 +++++++++++++++++++++++-----
+ 5 files changed, 280 insertions(+), 63 deletions(-)
+
 -- 
-Jazz is not dead. It just smells funny...
+2.21.0
