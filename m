@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F93DC04AA8
-	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 09:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A26EC04AA8
+	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 09:48:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F074721743
-	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 09:48:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F074721743
+	by mail.kernel.org (Postfix) with ESMTP id DB3F52177B
+	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 09:48:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3F52177B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B0004A4DE;
-	Wed,  1 May 2019 05:48:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 856D64A518;
+	Wed,  1 May 2019 05:48:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cvJs64v7WZbR; Wed,  1 May 2019 05:48:22 -0400 (EDT)
+	with ESMTP id onnoD56bVela; Wed,  1 May 2019 05:48:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DF164A506;
-	Wed,  1 May 2019 05:48:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49DE34A508;
+	Wed,  1 May 2019 05:48:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45D684A4AD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 05:48:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B92B4A4F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 05:48:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8lwcXvWc1LDU for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 May 2019 05:48:17 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABAC34A4E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 05:48:17 -0400 (EDT)
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id CCCB721BE0C0F1547E36;
- Wed,  1 May 2019 17:48:14 +0800 (CST)
+ with ESMTP id wb8Vh-k3PAi3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 May 2019 05:48:23 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8FDE74A4E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 05:48:22 -0400 (EDT)
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id C6025F73C997A760BED0;
+ Wed,  1 May 2019 17:48:19 +0800 (CST)
 Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 1 May 2019 17:48:08 +0800
+ 14.3.439.0; Wed, 1 May 2019 17:48:10 +0800
 From: Zenghui Yu <yuzenghui@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: [PATCH 2/5] KVM: arm/arm64: Re-factor building the stage2 page table
- entries
-Date: Wed, 1 May 2019 09:44:24 +0000
-Message-ID: <1556703867-22396-3-git-send-email-yuzenghui@huawei.com>
+Subject: [PATCH 5/5] KVM: arm/arm64: Add support for creating PMD contiguous
+ hugepages at stage2
+Date: Wed, 1 May 2019 09:44:27 +0000
+Message-ID: <1556703867-22396-6-git-send-email-yuzenghui@huawei.com>
 X-Mailer: git-send-email 2.6.4.windows.1
 In-Reply-To: <1556703867-22396-1-git-send-email-yuzenghui@huawei.com>
 References: <1556703867-22396-1-git-send-email-yuzenghui@huawei.com>
@@ -71,128 +71,113 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190501094424.oIsewpHStWJJ02C9tgY9A1bxM_ISr3LG0fMTfqDJhJA@z>
+Message-ID: <20190501094427.Ee1mOIfSZSk-dghVh73tkOKP3lNeSr6LWsz7jzfRDdo@z>
 
-As we're going to support creating CONT_{PTE,PMD}_SIZE huge mappings in
-user_mem_abort(), the logic to check vma_pagesize and build page table
-entries will become longer, and looks almost the same (but actually they
-dont). Refactor this part to make it a bit cleaner.
+With this patch, we now support PMD contiguous hugepages at stage2, with
+following additional page size at stage2:
 
-Add contiguous as a parameter of stage2_build_{pmd,pte}, to indicate
-if we're creating contiguous huge mappings.
+                CONT PMD
+                --------
+ 4K granule:      32M
+16K granule:       1G
+64K granule:      16G
 
 Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- virt/kvm/arm/mmu.c | 81 ++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 57 insertions(+), 24 deletions(-)
+ virt/kvm/arm/mmu.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 27c9583..cf8b035 100644
+index fdd6314..7173589 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1616,6 +1616,56 @@ static void kvm_send_hwpoison_signal(unsigned long address,
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+@@ -1125,6 +1125,66 @@ static pte_t *stage2_get_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	return pte_offset_kernel(pmd, addr);
  }
  
-+static pud_t stage2_build_pud(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec)
++static inline pgprot_t pmd_pgprot(pmd_t pmd)
 +{
-+	pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
++	unsigned long pfn = pmd_pfn(pmd);
 +
-+	new_pud = kvm_pud_mkhuge(new_pud);
-+	if (writable)
-+		new_pud = kvm_s2pud_mkwrite(new_pud);
-+
-+	if (needs_exec)
-+		new_pud = kvm_s2pud_mkexec(new_pud);
-+
-+	return new_pud;
++	return __pgprot(pmd_val(pfn_pmd(pfn, __pgprot(0))) ^ pmd_val(pmd));
 +}
 +
-+static pmd_t stage2_build_pmd(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec, bool contiguous)
++static int stage2_set_cont_pmds(struct kvm *kvm, struct kvm_mmu_memory_cache
++				*cache, phys_addr_t addr, const pmd_t *new_pmd)
 +{
-+	pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
++	pmd_t *pmd, old_pmd;
++	unsigned long pfn, dpfn;
++	int i;
++	pgprot_t hugeprot;
++	phys_addr_t baddr;
 +
-+	new_pmd = kvm_pmd_mkhuge(new_pmd);
-+	if (writable)
-+		new_pmd = kvm_s2pmd_mkwrite(new_pmd);
++	/* Start with the first pmd. */
++	addr &= CONT_PMD_MASK;
++	pfn = pmd_pfn(*new_pmd);
++	dpfn = PMD_SIZE >> PAGE_SHIFT;
++	hugeprot = pmd_pgprot(*new_pmd);
 +
-+	if (needs_exec)
-+		new_pmd = kvm_s2pmd_mkexec(new_pmd);
++retry:
++	pmd = stage2_get_pmd(kvm, cache, addr);
++	VM_BUG_ON(!pmd);
 +
-+	if (contiguous)
-+		new_pmd = kvm_s2pmd_mkcont(new_pmd);
++	old_pmd = *pmd;
 +
-+	return new_pmd;
++	/* Skip page table update if there is no change */
++	if (pmd_val(old_pmd) == pmd_val(*new_pmd))
++		return 0;
++
++	/*
++	 * baddr and the following loop is for only one scenario:
++	 * logging cancel ... Can we do it better?
++	 */
++	baddr = addr;
++	for (i = 0; i < CONT_PMDS; i++, pmd++, baddr += PMD_SIZE) {
++		if (pmd_present(*pmd) && !pmd_thp_or_huge(*pmd)) {
++			unmap_stage2_range(kvm, baddr, S2_PMD_SIZE);
++			goto retry;
++		}
++	}
++
++	pmd = stage2_get_pmd(kvm, cache, addr);
++
++	for (i = 0; i < CONT_PMDS; i++, pmd++, addr += PMD_SIZE, pfn += dpfn) {
++		if (pmd_present(old_pmd)) {
++			pmd_clear(pmd);
++			kvm_tlb_flush_vmid_ipa(kvm, addr);
++		} else {
++			get_page(virt_to_page(pmd));
++		}
++
++		kvm_set_pmd(pmd, pfn_pmd(pfn, hugeprot));
++	}
++
++	return 0;
 +}
 +
-+static pte_t stage2_build_pte(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec, bool contiguous)
-+{
-+	pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
-+
-+	if (writable)
-+		new_pte = kvm_s2pte_mkwrite(new_pte);
-+
-+	if (needs_exec)
-+		new_pte = kvm_s2pte_mkexec(new_pte);
-+
-+	if (contiguous)
-+		new_pte = kvm_s2pte_mkcont(new_pte);
-+
-+	return new_pte;
-+}
-+
- static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 					       unsigned long hva,
- 					       unsigned long map_size)
-@@ -1807,38 +1857,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
- 
- 	if (vma_pagesize == PUD_SIZE) {
--		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
--
--		new_pud = kvm_pud_mkhuge(new_pud);
--		if (writable)
--			new_pud = kvm_s2pud_mkwrite(new_pud);
--
--		if (needs_exec)
--			new_pud = kvm_s2pud_mkexec(new_pud);
-+		pud_t new_pud = stage2_build_pud(pfn, mem_type, writable,
-+						 needs_exec);
+ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 			       *cache, phys_addr_t addr, const pmd_t *new_pmd)
+ {
+@@ -1894,6 +1954,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * 3 levels, i.e, PMD is not folded.
+ 	 */
+ 	if (vma_pagesize == CONT_PTE_SIZE || vma_pagesize == PMD_SIZE ||
++	    vma_pagesize == CONT_PMD_SIZE ||
+ 	    (vma_pagesize == PUD_SIZE && kvm_stage2_has_pmd(kvm)))
+ 		gfn = (fault_ipa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
+ 	up_read(&current->mm->mmap_sem);
+@@ -1982,6 +2043,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 						 needs_exec);
  
  		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
- 	} else if (vma_pagesize == PMD_SIZE) {
--		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
--
--		new_pmd = kvm_pmd_mkhuge(new_pmd);
--
--		if (writable)
--			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
--
--		if (needs_exec)
--			new_pmd = kvm_s2pmd_mkexec(new_pmd);
++	} else if (vma_pagesize == CONT_PMD_SIZE) {
 +		pmd_t new_pmd = stage2_build_pmd(pfn, mem_type, writable,
-+						 needs_exec, false);
- 
- 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
- 	} else {
--		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
-+		pte_t new_pte = stage2_build_pte(pfn, mem_type, writable,
-+						 needs_exec, false);
- 
--		if (writable) {
--			new_pte = kvm_s2pte_mkwrite(new_pte);
-+		if (writable)
- 			mark_page_dirty(kvm, gfn);
--		}
--
--		if (needs_exec)
--			new_pte = kvm_s2pte_mkexec(new_pte);
- 
- 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
- 	}
++						 needs_exec, true);
++
++		ret = stage2_set_cont_pmds(kvm, memcache, fault_ipa, &new_pmd);
+ 	} else if (vma_pagesize == PMD_SIZE) {
+ 		pmd_t new_pmd = stage2_build_pmd(pfn, mem_type, writable,
+ 						 needs_exec, false);
 -- 
 1.8.3.1
 
