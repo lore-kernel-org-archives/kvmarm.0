@@ -2,63 +2,57 @@ Return-Path: <SRS0=Vsle=TB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A28EC43219
-	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 10:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D3FC43219
+	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 16:11:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B1E3720835
-	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 10:38:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E3720835
+	by mail.kernel.org (Postfix) with ESMTP id 350D7208C3
+	for <kvmarm@archiver.kernel.org>; Wed,  1 May 2019 16:11:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350D7208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FA254A4BE;
-	Wed,  1 May 2019 06:38:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80B564A4FC;
+	Wed,  1 May 2019 12:11:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tQpOX6EiPQQE; Wed,  1 May 2019 06:38:22 -0400 (EDT)
+	with ESMTP id H-qAHDDEZoLg; Wed,  1 May 2019 12:11:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB5A14A4C5;
-	Wed,  1 May 2019 06:38:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A25E4A4F2;
+	Wed,  1 May 2019 12:11:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CA6C4A4CC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 06:38:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92DF04A4C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:11:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2IncBB6G1bbQ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 May 2019 06:38:18 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 870E64A4AB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 06:38:18 -0400 (EDT)
+ with ESMTP id NzY08Wcy7yjT for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 May 2019 12:11:11 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7474A380
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 May 2019 12:11:11 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBCEB80D;
- Wed,  1 May 2019 03:38:17 -0700 (PDT)
-Received: from [10.1.37.14] (unknown [10.1.37.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF9383F719;
- Wed,  1 May 2019 03:38:14 -0700 (PDT)
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v7 05/23] iommu: Introduce cache_invalidate API
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com, will.deacon@arm.com, robin.murphy@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-6-eric.auger@redhat.com>
-Message-ID: <a9745aef-8686-c761-e3d0-dd0e98a1f5b2@arm.com>
-Date: Wed, 1 May 2019 11:38:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190408121911.24103-6-eric.auger@redhat.com>
-Content-Language: en-US
-Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
- marc.zyngier@arm.com
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA7B4A78;
+ Wed,  1 May 2019 09:11:10 -0700 (PDT)
+Received: from moonbear.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 245663F719;
+ Wed,  1 May 2019 09:11:07 -0700 (PDT)
+From: Kristina Martsenko <kristina.martsenko@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH] KVM: arm64: fix ptrauth ID register masking logic
+Date: Wed,  1 May 2019 17:10:08 +0100
+Message-Id: <20190501161008.31498-1-kristina.martsenko@arm.com>
+X-Mailer: git-send-email 2.11.0
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Amit Kachhap <amit.kachhap@arm.com>, Dave P Martin <dave.martin@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,30 +64,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190501103813.4x153-irqs0uACbqESTtPdLALJ5ip8SVn5qBvBOFbmk@z>
+Message-ID: <20190501161008.pnHrYXJIv3UuPc3fSkPjzgUn8Lr1DQCNVjJBkMzaCOs@z>
 
-On 08/04/2019 13:18, Eric Auger wrote:
-> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			   struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	int ret = 0;
-> +
-> +	if (unlikely(!domain->ops->cache_invalidate))
-> +		return -ENODEV;
-> +
-> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
-> +
-> +	return ret;
+When a VCPU doesn't have pointer auth, we want to hide all four pointer
+auth ID register fields from the guest, not just one of them.
 
-Nit: you don't really need ret
+Fixes: 384b40caa8af ("KVM: arm/arm64: Context-switch ptrauth registers")
+Reported-by: Andrew Murray <andrew.murray@arm.com>
+Fsck-up-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Kristina Martsenko <kristina.martsenko@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-The UAPI looks good to me, so
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9d02643bc601..857b226bcdde 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1088,10 +1088,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 	if (id == SYS_ID_AA64PFR0_EL1 && !vcpu_has_sve(vcpu)) {
+ 		val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+ 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+-		val &= ~(0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+-			(0xfUL << ID_AA64ISAR1_API_SHIFT) |
+-			(0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+-			(0xfUL << ID_AA64ISAR1_GPI_SHIFT);
++		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
++			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
++			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
++			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
+ 	}
+ 
+ 	return val;
+-- 
+2.11.0
 
-Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
