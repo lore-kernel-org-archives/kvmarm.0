@@ -1,53 +1,60 @@
-From: Sasha Levin <sashal@kernel.org>
-Subject: Re: [PATCH AUTOSEL 5.0 29/98] KVM: arm/arm64: Enforce PTE mappings
- at stage2 when needed
-Date: Thu, 2 May 2019 08:50:01 -0400
-Message-ID: <20190502125001.GB11584@sasha-vm>
-References: <20190422194205.10404-1-sashal@kernel.org>
- <20190422194205.10404-29-sashal@kernel.org>
- <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [PATCH v7 05/23] iommu: Introduce cache_invalidate API
+Date: Thu, 2 May 2019 09:46:24 -0700
+Message-ID: <20190502094624.43924be8@jacob-builder>
+References: <20190408121911.24103-1-eric.auger@redhat.com>
+        <20190408121911.24103-6-eric.auger@redhat.com>
+        <a9745aef-8686-c761-e3d0-dd0e98a1f5b2@arm.com>
+        <e5d2fdd6-4ce1-863e-5198-0b05d727a5b6@redhat.com>
+        <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Will Deacon <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "kevin.tian@intel.com" <kevin.tian@intel.com>, Vincent Stehle <Vincent.Stehle@arm.com>, "ashok.raj@intel.com" <ashok.raj@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 23, 2019 at 10:27:26AM +0100, Suzuki K Poulose wrote:
->Hi Sasha,
->
->On 04/22/2019 08:40 PM, Sasha Levin wrote:
->>From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->>[ Upstream commit a80868f398554842b14d07060012c06efb57c456 ]
->>
->>commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
->>made the checks to skip huge mappings, stricter. However it introduced
->>a bug where we still use huge mappings, ignoring the flag to
->>use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
->>
->>Also, the checks do not cover the PUD huge pages, that was
->>under review during the same period. This patch fixes both
->>the issues.
->>
->>Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
->>Reported-by: Zenghui Yu <yuzenghui@huawei.com>
->>Cc: Zenghui Yu <yuzenghui@huawei.com>
->>Cc: Christoffer Dall <christoffer.dall@arm.com>
->>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
->
->Please be aware that we need a follow up fix for this patch to fix the
->problem for THP backed memory.
->
->http://lists.infradead.org/pipermail/linux-arm-kernel/2019-April/645324.html
->
->
->It should appear upstream soon.
+On Thu, 2 May 2019 11:53:34 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-Since it's not upstream yet, I'll drop this patch for now and queue it
-for a later release.
+> On 02/05/2019 07:58, Auger Eric wrote:
+> > Hi Jean-Philippe,
+> > 
+> > On 5/1/19 12:38 PM, Jean-Philippe Brucker wrote:  
+> >> On 08/04/2019 13:18, Eric Auger wrote:  
+> >>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
+> >>> device *dev,
+> >>> +			   struct iommu_cache_invalidate_info
+> >>> *inv_info) +{
+> >>> +	int ret = 0;
+> >>> +
+> >>> +	if (unlikely(!domain->ops->cache_invalidate))
+> >>> +		return -ENODEV;
+> >>> +
+> >>> +	ret = domain->ops->cache_invalidate(domain, dev,
+> >>> inv_info); +
+> >>> +	return ret;  
+> >>
+> >> Nit: you don't really need ret
+> >>
+> >> The UAPI looks good to me, so
+> >>
+> >> Reviewed-by: Jean-Philippe Brucker
+> >> <jean-philippe.brucker@arm.com>  
+> > Just to make sure, do you accept changes proposed by Jacob in
+> > https://lkml.org/lkml/2019/4/29/659 ie.
+> > - the addition of NR_IOMMU_INVAL_GRANU in enum
+> > iommu_inv_granularity and
+> > - the addition of NR_IOMMU_CACHE_TYPE  
+> 
+> Ah sorry, I forgot about that, I'll review the next version. Yes they
+> can be useful (maybe call them IOMMU_INV_GRANU_NR and
+> IOMMU_CACHE_INV_TYPE_NR?). I guess it's legal to export in UAPI values
+> that will change over time, as VFIO also does it in its enums.
+> 
+I am fine with the names. Maybe you can put this patch in your sva/api
+branch once you reviewed it? Having a common branch for common code
+makes life so much easier.
