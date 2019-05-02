@@ -2,73 +2,70 @@ Return-Path: <SRS0=zWKl=TC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4248CC43219
-	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 10:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDF4C43219
+	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 12:56:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C0BF020656
-	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 10:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0BF020656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2AC7C2085A
+	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 12:56:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1CNu64D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC7C2085A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11D674A4FE;
-	Thu,  2 May 2019 06:54:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A57204A4F3;
+	Thu,  2 May 2019 08:56:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HaapWvQ77x7x; Thu,  2 May 2019 06:53:58 -0400 (EDT)
+	with ESMTP id MWI2SEqFUqDr; Thu,  2 May 2019 08:56:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D238D4A4EC;
-	Thu,  2 May 2019 06:53:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 190CA4A4F7;
+	Thu,  2 May 2019 08:56:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 676974A4C3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 06:53:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41FA54A4F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 08:56:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cC61rod8s2H1 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 May 2019 06:53:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7A4B4A4AD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 06:53:56 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29549A78;
- Thu,  2 May 2019 03:53:56 -0700 (PDT)
-Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E6CF3F719;
- Thu,  2 May 2019 03:53:52 -0700 (PDT)
-Subject: Re: [PATCH v7 05/23] iommu: Introduce cache_invalidate API
-To: Auger Eric <eric.auger@redhat.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Will Deacon
- <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-6-eric.auger@redhat.com>
- <a9745aef-8686-c761-e3d0-dd0e98a1f5b2@arm.com>
- <e5d2fdd6-4ce1-863e-5198-0b05d727a5b6@redhat.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
-Date: Thu, 2 May 2019 11:53:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ with ESMTP id CZg8E+ubCG0L for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 May 2019 08:56:50 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D271B4A4AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 08:56:50 -0400 (EDT)
+Received: from localhost (adsl-173-228-226-134.prtc.net [173.228.226.134])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 39FB420449;
+ Thu,  2 May 2019 12:56:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1556801809;
+ bh=yj300TW+fJqT6K6BSGF2jtEG/Xt4a4FDcEA/4LmZcjs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=N1CNu64DdNDI6n6Pd4zvz/PjlpDiFGriUxmGgT0/aEEIlVYPNO5MpTGqG7iTelmKQ
+ JozEqiBnuNmR0hNLn0yOAQTnPD5zKtk6yBqYPUuJl8FJoyUq8mFmzKss3kpaJ/vgJM
+ 2NV/TrbxUU0gmrBBPMtprJNCOepEvFx6dTFGe1Ek=
+Date: Thu, 2 May 2019 08:50:01 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH AUTOSEL 5.0 29/98] KVM: arm/arm64: Enforce PTE mappings
+ at stage2 when needed
+Message-ID: <20190502125001.GB11584@sasha-vm>
+References: <20190422194205.10404-1-sashal@kernel.org>
+ <20190422194205.10404-29-sashal@kernel.org>
+ <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <e5d2fdd6-4ce1-863e-5198-0b05d727a5b6@redhat.com>
-Content-Language: en-US
-Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Vincent Stehle <Vincent.Stehle@arm.com>,
- "ashok.raj@intel.com" <ashok.raj@intel.com>,
- Marc Zyngier <Marc.Zyngier@arm.com>
+Content-Disposition: inline
+In-Reply-To: <e166bc0d-5184-6dda-15ef-2f24d2e42203@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,46 +77,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190502105334.KIYJqMLbS1k8l7j6lGhPJoDH6U9acx8KOHeMAKTwkFE@z>
+Message-ID: <20190502125001.e-6UAE1Ux2Fyz4p4zT0cc-nNVdR7NIzeHFo-ZndHI4o@z>
 
-On 02/05/2019 07:58, Auger Eric wrote:
-> Hi Jean-Philippe,
-> 
-> On 5/1/19 12:38 PM, Jean-Philippe Brucker wrote:
->> On 08/04/2019 13:18, Eric Auger wrote:
->>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
->>> +			   struct iommu_cache_invalidate_info *inv_info)
->>> +{
->>> +	int ret = 0;
->>> +
->>> +	if (unlikely(!domain->ops->cache_invalidate))
->>> +		return -ENODEV;
->>> +
->>> +	ret = domain->ops->cache_invalidate(domain, dev, inv_info);
->>> +
->>> +	return ret;
+On Tue, Apr 23, 2019 at 10:27:26AM +0100, Suzuki K Poulose wrote:
+>Hi Sasha,
+>
+>On 04/22/2019 08:40 PM, Sasha Levin wrote:
+>>From: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> Nit: you don't really need ret
+>>[ Upstream commit a80868f398554842b14d07060012c06efb57c456 ]
 >>
->> The UAPI looks good to me, so
+>>commit 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+>>made the checks to skip huge mappings, stricter. However it introduced
+>>a bug where we still use huge mappings, ignoring the flag to
+>>use PTE mappings, by not reseting the vma_pagesize to PAGE_SIZE.
 >>
->> Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> Just to make sure, do you accept changes proposed by Jacob in
-> https://lkml.org/lkml/2019/4/29/659 ie.
-> - the addition of NR_IOMMU_INVAL_GRANU in enum iommu_inv_granularity and
-> - the addition of NR_IOMMU_CACHE_TYPE
+>>Also, the checks do not cover the PUD huge pages, that was
+>>under review during the same period. This patch fixes both
+>>the issues.
+>>
+>>Fixes : 6794ad5443a2118 ("KVM: arm/arm64: Fix unintended stage 2 PMD mappings")
+>>Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+>>Cc: Zenghui Yu <yuzenghui@huawei.com>
+>>Cc: Christoffer Dall <christoffer.dall@arm.com>
+>>Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
+>
+>Please be aware that we need a follow up fix for this patch to fix the
+>problem for THP backed memory.
+>
+>http://lists.infradead.org/pipermail/linux-arm-kernel/2019-April/645324.html
+>
+>
+>It should appear upstream soon.
 
-Ah sorry, I forgot about that, I'll review the next version. Yes they
-can be useful (maybe call them IOMMU_INV_GRANU_NR and
-IOMMU_CACHE_INV_TYPE_NR?). I guess it's legal to export in UAPI values
-that will change over time, as VFIO also does it in its enums.
+Since it's not upstream yet, I'll drop this patch for now and queue it
+for a later release.
 
+--
 Thanks,
-Jean
+Sasha
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
