@@ -1,75 +1,65 @@
-Return-Path: <SRS0=zWKl=TC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=WQmE=TD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1858FC04AAB
-	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 16:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2400BC43219
+	for <kvmarm@archiver.kernel.org>; Fri,  3 May 2019 09:34:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 961B0208CB
-	for <kvmarm@archiver.kernel.org>; Thu,  2 May 2019 16:43:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 961B0208CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 9E166206DF
+	for <kvmarm@archiver.kernel.org>; Fri,  3 May 2019 09:34:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E166206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAAE44A4F7;
-	Thu,  2 May 2019 12:43:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D8634A4B0;
+	Fri,  3 May 2019 05:34:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cL7Gkwiupumm; Thu,  2 May 2019 12:43:42 -0400 (EDT)
+	with ESMTP id ac-Get72myQt; Fri,  3 May 2019 05:34:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A6F4A4F0;
-	Thu,  2 May 2019 12:43:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 584C54A4F0;
+	Fri,  3 May 2019 05:34:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E725E4A4EB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 12:43:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F40894A4DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 May 2019 05:34:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SYuBzq9guIYP for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 May 2019 12:43:39 -0400 (EDT)
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 484A24A4A3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 May 2019 12:43:39 -0400 (EDT)
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 May 2019 09:43:37 -0700
-X-ExtLoop1: 1
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
- by orsmga002.jf.intel.com with ESMTP; 02 May 2019 09:43:37 -0700
-Date: Thu, 2 May 2019 09:46:24 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v7 05/23] iommu: Introduce cache_invalidate API
-Message-ID: <20190502094624.43924be8@jacob-builder>
-In-Reply-To: <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-6-eric.auger@redhat.com>
- <a9745aef-8686-c761-e3d0-dd0e98a1f5b2@arm.com>
- <e5d2fdd6-4ce1-863e-5198-0b05d727a5b6@redhat.com>
- <6af5ddb7-75ad-7d3f-b303-f6f06adb1bf0@arm.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+ with ESMTP id pZsDhDosYkKu for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 May 2019 05:34:01 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 298564A4B0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 May 2019 05:34:01 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 678A4374;
+ Fri,  3 May 2019 02:34:00 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8D193F557;
+ Fri,  3 May 2019 02:33:58 -0700 (PDT)
+Date: Fri, 3 May 2019 10:33:54 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v5 1/3] arm64: KVM: Propagate full Spectre v2 workaround
+ state to KVM guests
+Message-ID: <20190503103354.0e7fe1f7@donnerap.cambridge.arm.com>
+In-Reply-To: <1fe87bab-2a1d-c48e-9f19-27faef91e5fd@redhat.com>
+References: <20190415111542.119788-1-andre.przywara@arm.com>
+ <20190415111542.119788-2-andre.przywara@arm.com>
+ <8845fbed-659f-1548-6dfb-fd20164fa44e@arm.com>
+ <1fe87bab-2a1d-c48e-9f19-27faef91e5fd@redhat.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Cc: jacob.jun.pan@linux.intel.com,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "ashok.raj@intel.com" <ashok.raj@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Marc Zyngier <Marc.Zyngier@arm.com>, "joro@8bytes.org" <joro@8bytes.org>,
- Will Deacon <Will.Deacon@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- Vincent Stehle <Vincent.Stehle@arm.com>, Robin Murphy <Robin.Murphy@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Dave Martin <dave.martin@arm.com>, Jeremy Linton <jeremy.linton@arm.com>,
+ Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,53 +71,236 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-Message-ID: <20190502164624._yy-TEMFKlfmvO3yR0TQ7T3if_-aXfXGF0TZVCOoNbI@z>
 
-On Thu, 2 May 2019 11:53:34 +0100
-Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+On Fri, 26 Apr 2019 17:37:47 +0200
+Auger Eric <eric.auger@redhat.com> wrote:
 
-> On 02/05/2019 07:58, Auger Eric wrote:
-> > Hi Jean-Philippe,
+Hi,
+
+> Hi Andre,
+> 
+> On 4/15/19 4:03 PM, Steven Price wrote:
+> > On 15/04/2019 12:15, Andre Przywara wrote:  
+> >> Recent commits added the explicit notion of "Not affected" to the state
+> >> of the Spectre v2 (aka. BP_HARDENING) workaround, where we just had
+> >> "needed" and "unknown" before.
+> >>
+> >> Export this knowledge to the rest of the kernel and enhance the existing
+> >> kvm_arm_harden_branch_predictor() to report this new state as well.
+> >> Export this new state to guests when they use KVM's firmware interface
+> >> emulation.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  arch/arm/include/asm/kvm_host.h     | 12 +++++++++---
+> >>  arch/arm64/include/asm/cpufeature.h |  6 ++++++
+> >>  arch/arm64/include/asm/kvm_host.h   | 16 ++++++++++++++--
+> >>  arch/arm64/kernel/cpu_errata.c      | 23 ++++++++++++++++++-----
+> >>  virt/kvm/arm/psci.c                 | 10 +++++++++-
+> >>  5 files changed, 56 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> >> index 770d73257ad9..836479e4b340 100644
+> >> --- a/arch/arm/include/asm/kvm_host.h
+> >> +++ b/arch/arm/include/asm/kvm_host.h
+> >> @@ -364,7 +364,11 @@ static inline void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu) {}
+> >>  static inline void kvm_arm_vhe_guest_enter(void) {}
+> >>  static inline void kvm_arm_vhe_guest_exit(void) {}
+> >>  
+> >> -static inline bool kvm_arm_harden_branch_predictor(void)
+> >> +#define KVM_BP_HARDEN_UNKNOWN		-1
+> >> +#define KVM_BP_HARDEN_NEEDED		0
+> >> +#define KVM_BP_HARDEN_MITIGATED		1  
 > > 
-> > On 5/1/19 12:38 PM, Jean-Philippe Brucker wrote:  
-> >> On 08/04/2019 13:18, Eric Auger wrote:  
-> >>> +int iommu_cache_invalidate(struct iommu_domain *domain, struct
-> >>> device *dev,
-> >>> +			   struct iommu_cache_invalidate_info
-> >>> *inv_info) +{
-> >>> +	int ret = 0;
-> >>> +
-> >>> +	if (unlikely(!domain->ops->cache_invalidate))
-> >>> +		return -ENODEV;
-> >>> +
-> >>> +	ret = domain->ops->cache_invalidate(domain, dev,
-> >>> inv_info); +
-> >>> +	return ret;  
-> >>
-> >> Nit: you don't really need ret
-> >>
-> >> The UAPI looks good to me, so
-> >>
-> >> Reviewed-by: Jean-Philippe Brucker
-> >> <jean-philippe.brucker@arm.com>  
-> > Just to make sure, do you accept changes proposed by Jacob in
-> > https://lkml.org/lkml/2019/4/29/659 ie.
-> > - the addition of NR_IOMMU_INVAL_GRANU in enum
-> > iommu_inv_granularity and
-> > - the addition of NR_IOMMU_CACHE_TYPE  
+> > I find the naming here a little confusing - it's not really clear what
+> > "mitigated" means (see below).
+
+That's indeed slightly confusing, but was modelled after the SSBD
+workaround below, which reads:
+#define KVM_SSBD_UNKNOWN                -1
+#define KVM_SSBD_FORCE_DISABLE          0
+#define KVM_SSBD_KERNEL         1
+#define KVM_SSBD_FORCE_ENABLE           2
+#define KVM_SSBD_MITIGATED              3
+
+I changed the naming (for this and the other derived definitions) to:
+#define KVM_BP_HARDEN_UNKNOWN           -1
+#define KVM_BP_HARDEN_WA_NEEDED         0
+#define KVM_BP_HARDEN_NOT_REQUIRED      1
+
+> >   
+> >> +
+> >> +static inline int kvm_arm_harden_branch_predictor(void)
+> >>  {
+> >>  	switch(read_cpuid_part()) {
+> >>  #ifdef CONFIG_HARDEN_BRANCH_PREDICTOR
+> >> @@ -372,10 +376,12 @@ static inline bool kvm_arm_harden_branch_predictor(void)
+> >>  	case ARM_CPU_PART_CORTEX_A12:
+> >>  	case ARM_CPU_PART_CORTEX_A15:
+> >>  	case ARM_CPU_PART_CORTEX_A17:
+> >> -		return true;
+> >> +		return KVM_BP_HARDEN_NEEDED;
+> >>  #endif
+> >> +	case ARM_CPU_PART_CORTEX_A7:
+> >> +		return KVM_BP_HARDEN_MITIGATED;
+> >>  	default:
+> >> -		return false;
+> >> +		return KVM_BP_HARDEN_UNKNOWN;
+> >>  	}
+> >>  }
+> >>  
+> >> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> >> index 6ccdc97e5d6a..3c5b25c1bda1 100644
+> >> --- a/arch/arm64/include/asm/cpufeature.h
+> >> +++ b/arch/arm64/include/asm/cpufeature.h
+> >> @@ -622,6 +622,12 @@ static inline bool system_uses_irq_prio_masking(void)
+> >>  	       cpus_have_const_cap(ARM64_HAS_IRQ_PRIO_MASKING);
+> >>  }
+> >>  
+> >> +#define ARM64_BP_HARDEN_UNKNOWN		-1
+> >> +#define ARM64_BP_HARDEN_NEEDED		0
+> >> +#define ARM64_BP_HARDEN_MITIGATED	1
+> >> +
+> >> +int get_spectre_v2_workaround_state(void);
+> >> +
+> >>  #define ARM64_SSBD_UNKNOWN		-1
+> >>  #define ARM64_SSBD_FORCE_DISABLE	0
+> >>  #define ARM64_SSBD_KERNEL		1
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index a01fe087e022..bf9a59b7d1ce 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -555,9 +555,21 @@ static inline void kvm_arm_vhe_guest_exit(void)
+> >>  	isb();
+> >>  }
+> >>  
+> >> -static inline bool kvm_arm_harden_branch_predictor(void)
+> >> +#define KVM_BP_HARDEN_UNKNOWN		-1
+> >> +#define KVM_BP_HARDEN_NEEDED		0
+> >> +#define KVM_BP_HARDEN_MITIGATED		1
+> >> +
+> >> +static inline int kvm_arm_harden_branch_predictor(void)
+> >>  {
+> >> -	return cpus_have_const_cap(ARM64_HARDEN_BRANCH_PREDICTOR);
+> >> +	switch (get_spectre_v2_workaround_state()) {
+> >> +	case ARM64_BP_HARDEN_NEEDED:
+> >> +		return KVM_BP_HARDEN_NEEDED;
+> >> +	case ARM64_BP_HARDEN_MITIGATED:
+> >> +		return KVM_BP_HARDEN_MITIGATED;
+> >> +	case ARM64_BP_HARDEN_UNKNOWN:
+> >> +	default:
+> >> +		return KVM_BP_HARDEN_UNKNOWN;
+> >> +	}
+> >>  }
+> >>  
+> >>  #define KVM_SSBD_UNKNOWN		-1
+> >> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> >> index a1f3188c7be0..7fa23ab09d4e 100644
+> >> --- a/arch/arm64/kernel/cpu_errata.c
+> >> +++ b/arch/arm64/kernel/cpu_errata.c
+> >> @@ -555,6 +555,17 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
+> >>  static bool __hardenbp_enab = true;
+> >>  static bool __spectrev2_safe = true;
+> >>  
+> >> +int get_spectre_v2_workaround_state(void)
+> >> +{
+> >> +	if (__spectrev2_safe)
+> >> +		return ARM64_BP_HARDEN_MITIGATED;
+> >> +
+> >> +	if (!__hardenbp_enab)
+> >> +		return ARM64_BP_HARDEN_UNKNOWN;
+> >> +
+> >> +	return ARM64_BP_HARDEN_NEEDED;
+> >> +}
+> >> +
+> >>  /*
+> >>   * List of CPUs that do not need any Spectre-v2 mitigation at all.
+> >>   */
+> >> @@ -834,13 +845,15 @@ ssize_t cpu_show_spectre_v1(struct device *dev, struct device_attribute *attr,
+> >>  ssize_t cpu_show_spectre_v2(struct device *dev, struct device_attribute *attr,
+> >>  		char *buf)
+> >>  {
+> >> -	if (__spectrev2_safe)
+> >> +	switch (get_spectre_v2_workaround_state()) {
+> >> +	case ARM64_BP_HARDEN_MITIGATED:
+> >>  		return sprintf(buf, "Not affected\n");  
+> > 
+> > Here "mitigated" means "not affected".
+> >   
+> >> -
+> >> -	if (__hardenbp_enab)
+> >> +        case ARM64_BP_HARDEN_NEEDED:
+> >>  		return sprintf(buf, "Mitigation: Branch predictor hardening\n");  
+> > 
+> > And "harden needed" means mitigated.
+> >   
+> >> -
+> >> -	return sprintf(buf, "Vulnerable\n");
+> >> +        case ARM64_BP_HARDEN_UNKNOWN:
+> >> +	default:
+> >> +		return sprintf(buf, "Vulnerable\n");
+> >> +	}
+> >>  }
+> >>  
+> >>  ssize_t cpu_show_spec_store_bypass(struct device *dev,
+> >> diff --git a/virt/kvm/arm/psci.c b/virt/kvm/arm/psci.c
+> >> index 34d08ee63747..1da53e0e38f7 100644
+> >> --- a/virt/kvm/arm/psci.c
+> >> +++ b/virt/kvm/arm/psci.c
+> >> @@ -412,8 +412,16 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >>  		feature = smccc_get_arg1(vcpu);
+> >>  		switch(feature) {
+> >>  		case ARM_SMCCC_ARCH_WORKAROUND_1:
+> >> -			if (kvm_arm_harden_branch_predictor())
+> >> +			switch (kvm_arm_harden_branch_predictor()) {
+> >> +			case KVM_BP_HARDEN_UNKNOWN:
+> >> +				break;
+> >> +			case KVM_BP_HARDEN_NEEDED:
+> >>  				val = SMCCC_RET_SUCCESS;
+> >> +				break;
+> >> +			case KVM_BP_HARDEN_MITIGATED:
+> >> +				val = SMCCC_RET_NOT_REQUIRED;  
+> > 
+> > Would KVM_BP_HARDEN_NOT_REQUIRED be a more logical name?  
+> I tend to agree with Steven's comment
 > 
-> Ah sorry, I forgot about that, I'll review the next version. Yes they
-> can be useful (maybe call them IOMMU_INV_GRANU_NR and
-> IOMMU_CACHE_INV_TYPE_NR?). I guess it's legal to export in UAPI values
-> that will change over time, as VFIO also does it in its enums.
+> But then why not also choosing the same terminology for the uapi:
+> KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_UNAFFECTED?
+
+You mean using ..._NOT_REQUIRED here?
+Makes sense, as "unaffected" is different from "not required", and we
+cannot guarantee the first.
+
+> For the same case we seem to have 3 different terminologies. But maybe I
+> miss something.
 > 
-I am fine with the names. Maybe you can put this patch in your sva/api
-branch once you reviewed it? Having a common branch for common code
-makes life so much easier.
+> In the uapi doc, in case the workaround is not needed do we actually
+> care to mention the wa is supported?
+
+I think yes, as it's important to know that a guest could call into the
+"firmware", regardless of the effect.
+
+Cheers,
+Andre.
+
+> Thanks
+> 
+> Eric
+> > 
+> > Steve
+> >   
+> >> +				break;
+> >> +			}
+> >>  			break;
+> >>  		case ARM_SMCCC_ARCH_WORKAROUND_2:
+> >>  			switch (kvm_arm_have_ssbd()) {
+> >>  
+> >   
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
