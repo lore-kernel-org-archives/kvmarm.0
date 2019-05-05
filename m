@@ -1,59 +1,60 @@
-Return-Path: <SRS0=WQmE=TD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Skfd=TF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9B0C04AAA
-	for <kvmarm@archiver.kernel.org>; Fri,  3 May 2019 14:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCB2C004C9
+	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 10:38:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F3C2A205ED
-	for <kvmarm@archiver.kernel.org>; Fri,  3 May 2019 14:28:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C2A205ED
+	by mail.kernel.org (Postfix) with ESMTP id E16912082F
+	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 10:38:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16912082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD8024A56B;
-	Fri,  3 May 2019 10:28:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6F94A36B;
+	Sun,  5 May 2019 06:38:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GznjgKH8O6h9; Fri,  3 May 2019 10:28:08 -0400 (EDT)
+	with ESMTP id v579f8RyZ52g; Sun,  5 May 2019 06:38:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 061764A566;
-	Fri,  3 May 2019 10:28:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A39AC4A3BF;
+	Sun,  5 May 2019 06:38:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 383464A555
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 May 2019 10:28:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 380924A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 06:38:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3o9M63hhUzYk for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 May 2019 10:28:05 -0400 (EDT)
+ with ESMTP id X6wniqm8rn37 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 May 2019 06:38:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E08004A545
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 May 2019 10:28:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 514744A36B
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 06:38:02 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5DCEA1682;
- Fri,  3 May 2019 07:28:05 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A3B383F5C1;
- Fri,  3 May 2019 07:28:03 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Marc Zyngier <marc.zyngier@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v6 3/3] KVM: doc: add API documentation on the
- KVM_REG_ARM_WORKAROUNDS register
-Date: Fri,  3 May 2019 15:27:50 +0100
-Message-Id: <20190503142750.252793-4-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190503142750.252793-1-andre.przywara@arm.com>
-References: <20190503142750.252793-1-andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Jeremy Linton <jeremy.linton@arm.com>,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80E2E374;
+ Sun,  5 May 2019 03:38:01 -0700 (PDT)
+Received: from big-swifty.misterjones.org (usa-sjc-mx-foss1.foss.arm.com
+ [217.140.101.70])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C3EE3F238;
+ Sun,  5 May 2019 03:38:00 -0700 (PDT)
+Date: Sun, 05 May 2019 11:38:13 +0100
+Message-ID: <86lfzl9ofe.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: ARM/gic-v4: deadlock occurred
+In-Reply-To: <9efe0260-4a84-7489-ecdd-2e9561599320@huawei.com>
+References: <9efe0260-4a84-7489-ecdd-2e9561599320@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: linux-kernel@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,63 +66,218 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add documentation for the newly defined firmware registers to save and
-restore any vulnerability mitigation status.
+[+ kvmarm]
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Steven Price <steven.price@arm.com>
----
- Documentation/virtual/kvm/arm/psci.txt | 31 ++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+Hi Heyi,
 
-diff --git a/Documentation/virtual/kvm/arm/psci.txt b/Documentation/virtual/kvm/arm/psci.txt
-index aafdab887b04..559586fc9d37 100644
---- a/Documentation/virtual/kvm/arm/psci.txt
-+++ b/Documentation/virtual/kvm/arm/psci.txt
-@@ -28,3 +28,34 @@ The following register is defined:
-   - Allows any PSCI version implemented by KVM and compatible with
-     v0.2 to be set with SET_ONE_REG
-   - Affects the whole VM (even if the register view is per-vcpu)
-+
-+* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-+  Holds the state of the firmware support to mitigate CVE-2017-5715, as
-+  offered by KVM to the guest via a HVC call. The workaround is described
-+  under SMCCC_ARCH_WORKAROUND_1 in [1].
-+  Accepted values are:
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL: KVM does not offer
-+      firmware support for the workaround. The mitigation status for the
-+      guest is unknown.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL: The workaround HVC call is
-+      available to the guest and required for the mitigation.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED: The workaround HVC call
-+      is available to the guest, but it is not needed on this VCPU.
-+
-+* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-+  Holds the state of the firmware support to mitigate CVE-2018-3639, as
-+  offered by KVM to the guest via a HVC call. The workaround is described
-+  under SMCCC_ARCH_WORKAROUND_2 in [1].
-+  Accepted values are:
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL: A workaround is not
-+      available. KVM does not offer firmware support for the workaround.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN: The workaround state is
-+      unknown. KVM does not offer firmware support for the workaround.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL: The workaround is available,
-+      and can be disabled by a vCPU. If
-+      KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED is set, it is active for
-+      this vCPU.
-+    KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED: The workaround is
-+      always active on this vCPU or it is not needed.
-+
-+[1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+On Sun, 05 May 2019 03:26:18 +0100,
+Heyi Guo <guoheyi@huawei.com> wrote:
+> 
+> Hi folks,
+> 
+> We observed deadlocks after enabling GICv4 and PCI passthrough on
+> ARM64 virtual machines, when not pinning VCPU to physical CPU.
+> 
+> We observed below warnings after enabling lockdep debug in kernel:
+> 
+> [  362.847021] =====================================================
+> [  362.855643] WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
+> [  362.864840] 4.19.34+ #7 Tainted: G        W
+> [  362.872314] -----------------------------------------------------
+> [  362.881034] CPU 0/KVM/51468 [HC0[0]:SC0[0]:HE0:SE1] is trying to acquire:
+> [  362.890504] 00000000659c1dc9 (fs_reclaim){+.+.}, at: fs_reclaim_acquire.part.22+0x0/0x48
+> [  362.901413]
+> [  362.901413] and this task is already holding:
+> [  362.912976] 000000007318873f (&dev->event_map.vlpi_lock){....}, at: its_irq_set_vcpu_affinity+0x134/0x638
+> [  362.928626] which would create a new lock dependency:
+> [  362.936837]  (&dev->event_map.vlpi_lock){....} -> (fs_reclaim){+.+.}
+> [  362.946449]
+> [  362.946449] but this new dependency connects a HARDIRQ-irq-safe lock:
+> [  362.960877]  (&irq_desc_lock_class){-.-.}
+> [  362.960880]
+> [  362.960880] ... which became HARDIRQ-irq-safe at:
+> [  362.981234]   lock_acquire+0xf0/0x258
+> [  362.988337]   _raw_spin_lock+0x54/0x90
+> [  362.995543]   handle_fasteoi_irq+0x2c/0x198
+> [  363.003205]   generic_handle_irq+0x34/0x50
+> [  363.010787]   __handle_domain_irq+0x68/0xc0
+> [  363.018500]   gic_handle_irq+0xf4/0x1e0
+> [  363.025913]   el1_irq+0xc8/0x180
+> [  363.032683]   _raw_spin_unlock_irq+0x40/0x60
+> [  363.040512]   finish_task_switch+0x98/0x258
+> [  363.048254]   __schedule+0x350/0xca8
+> [  363.055359]   schedule+0x40/0xa8
+> [  363.062098]   worker_thread+0xd8/0x410
+> [  363.069340]   kthread+0x134/0x138
+> [  363.076070]   ret_from_fork+0x10/0x18
+> [  363.083111]
+> [  363.083111] to a HARDIRQ-irq-unsafe lock:
+> [  363.095213]  (fs_reclaim){+.+.}
+> [  363.095216]
+> [  363.095216] ... which became HARDIRQ-irq-unsafe at:
+> [  363.114527] ...
+> [  363.114530]   lock_acquire+0xf0/0x258
+> [  363.126269]   fs_reclaim_acquire.part.22+0x3c/0x48
+> [  363.134206]   fs_reclaim_acquire+0x2c/0x38
+> [  363.141363]   kmem_cache_alloc_trace+0x44/0x368
+> [  363.148892]   acpi_os_map_iomem+0x9c/0x208
+> [  363.155934]   acpi_os_map_memory+0x28/0x38
+> [  363.162831]   acpi_tb_acquire_table+0x58/0x8c
+> [  363.170021]   acpi_tb_validate_table+0x34/0x58
+> [  363.177162]   acpi_tb_get_table+0x4c/0x90
+> [  363.183741]   acpi_get_table+0x94/0xc4
+> [  363.190020]   find_acpi_cpu_topology_tag+0x54/0x240
+> [  363.197404]   find_acpi_cpu_topology_package+0x28/0x38
+> [  363.204985]   init_cpu_topology+0xdc/0x1e4
+> [  363.211498]   smp_prepare_cpus+0x2c/0x108
+> [  363.217882]   kernel_init_freeable+0x130/0x508
+> [  363.224699]   kernel_init+0x18/0x118
+> [  363.230624]   ret_from_fork+0x10/0x18
+> [  363.236611]
+> [  363.236611] other info that might help us debug this:
+> [  363.236611]
+> [  363.251604] Chain exists of:
+> [  363.251604]   &irq_desc_lock_class --> &dev->event_map.vlpi_lock --> fs_reclaim
+> [  363.251604]
+> [  363.270508]  Possible interrupt unsafe locking scenario:
+> [  363.270508]
+> [  363.282238]        CPU0                    CPU1
+> [  363.289228]        ----                    ----
+> [  363.296189]   lock(fs_reclaim);
+> [  363.301726]                                local_irq_disable();
+> [  363.310122] lock(&irq_desc_lock_class);
+> [  363.319143] lock(&dev->event_map.vlpi_lock);
+> [  363.328617]   <Interrupt>
+> [  363.333713]     lock(&irq_desc_lock_class);
+> [  363.340414]
+> [  363.340414]  *** DEADLOCK ***
+> [  363.340414]
+> [  363.353682] 5 locks held by CPU 0/KVM/51468:
+> [  363.360412]  #0: 00000000eeb852a5 (&vdev->igate){+.+.}, at: vfio_pci_ioctl+0x2f8/0xed0
+> [  363.370915]  #1: 000000002ab491f7 (lock#9){+.+.}, at: irq_bypass_register_producer+0x6c/0x1d0
+> [  363.382139]  #2: 000000000d9fd5c6 (&its->its_lock){+.+.}, at: kvm_vgic_v4_set_forwarding+0xd0/0x188
+> [  363.396625]  #3: 00000000232bdc47 (&irq_desc_lock_class){-.-.}, at: __irq_get_desc_lock+0x60/0xa0
+> [  363.408486]  #4: 000000007318873f (&dev->event_map.vlpi_lock){....}, at: its_irq_set_vcpu_affinity+0x134/0x638
+> 
+> 
+> Then we found that irq_set_vcpu_affinity() in kernel/irq/manage.c
+> aquires an antomic context by irq_get_desc_lock() at the beginning,
+> but in its_irq_set_vcpu_affinity()
+> (drivers/irqchip/irq-gic-v3-its.c) we are still using mutext_lock,
+> kcalloc, kfree, etc, which we think should be forbidden in atomic
+> context.
+> 
+> Though the issue is observed in 4.19.34, we don't find any related
+> fixes in the mainline yet.
+
+Thanks for the report. Given that you're the only users of GICv4,
+you're bound to find a number of these issues.
+
+Can you try the patch below and let me know whether it helps? This is
+the simplest thing I can think off to paper over the issue, but is
+isn't pretty, and I'm looking at possible alternatives (ideally, we'd
+be able to allocate the map outside of the irqdesc lock, but this
+requires some API change between KVM, the GICv4 layer and the ITS
+code).
+
+Note that I'm travelling for the next two weeks without access to my
+test rig, so I'm relying on you to test this stuff.
+
+Thanks,
+
+	M.
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 7577755bdcf4..18aa04b6a9f4 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -142,7 +142,7 @@ struct event_lpi_map {
+ 	u16			*col_map;
+ 	irq_hw_number_t		lpi_base;
+ 	int			nr_lpis;
+-	struct mutex		vlpi_lock;
++	raw_spinlock_t		vlpi_lock;
+ 	struct its_vm		*vm;
+ 	struct its_vlpi_map	*vlpi_maps;
+ 	int			nr_vlpis;
+@@ -1263,13 +1263,13 @@ static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
+ 	if (!info->map)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.vlpi_lock);
+ 
+ 	if (!its_dev->event_map.vm) {
+ 		struct its_vlpi_map *maps;
+ 
+ 		maps = kcalloc(its_dev->event_map.nr_lpis, sizeof(*maps),
+-			       GFP_KERNEL);
++			       GFP_ATOMIC);
+ 		if (!maps) {
+ 			ret = -ENOMEM;
+ 			goto out;
+@@ -1312,7 +1312,7 @@ static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
+ 	}
+ 
+ out:
+-	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
+ 	return ret;
+ }
+ 
+@@ -1322,7 +1322,7 @@ static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
+ 	u32 event = its_get_event_id(d);
+ 	int ret = 0;
+ 
+-	mutex_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.vlpi_lock);
+ 
+ 	if (!its_dev->event_map.vm ||
+ 	    !its_dev->event_map.vlpi_maps[event].vm) {
+@@ -1334,7 +1334,7 @@ static int its_vlpi_get(struct irq_data *d, struct its_cmd_info *info)
+ 	*info->map = its_dev->event_map.vlpi_maps[event];
+ 
+ out:
+-	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
+ 	return ret;
+ }
+ 
+@@ -1344,7 +1344,7 @@ static int its_vlpi_unmap(struct irq_data *d)
+ 	u32 event = its_get_event_id(d);
+ 	int ret = 0;
+ 
+-	mutex_lock(&its_dev->event_map.vlpi_lock);
++	raw_spin_lock(&its_dev->event_map.vlpi_lock);
+ 
+ 	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d)) {
+ 		ret = -EINVAL;
+@@ -1374,7 +1374,7 @@ static int its_vlpi_unmap(struct irq_data *d)
+ 	}
+ 
+ out:
+-	mutex_unlock(&its_dev->event_map.vlpi_lock);
++	raw_spin_unlock(&its_dev->event_map.vlpi_lock);
+ 	return ret;
+ }
+ 
+@@ -2436,7 +2436,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+ 	dev->event_map.col_map = col_map;
+ 	dev->event_map.lpi_base = lpi_base;
+ 	dev->event_map.nr_lpis = nr_lpis;
+-	mutex_init(&dev->event_map.vlpi_lock);
++	raw_spin_lock_init(&dev->event_map.vlpi_lock);
+ 	dev->device_id = dev_id;
+ 	INIT_LIST_HEAD(&dev->entry);
+ 
+
 -- 
-2.17.1
-
+Jazz is not dead, it just smell funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
