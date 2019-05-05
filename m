@@ -3,51 +3,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBBEC004C9
-	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 11:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD339C004C9
+	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 11:16:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6AEE82087F
-	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 11:07:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AEE82087F
+	by mail.kernel.org (Postfix) with ESMTP id 4DF542087F
+	for <kvmarm@archiver.kernel.org>; Sun,  5 May 2019 11:16:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF542087F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF36B4A4CA;
-	Sun,  5 May 2019 07:07:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC33B4A34E;
+	Sun,  5 May 2019 07:16:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8deEjZrMnJfC; Sun,  5 May 2019 07:07:17 -0400 (EDT)
+	with ESMTP id sFIM4bBJgwdc; Sun,  5 May 2019 07:16:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FF1B4A4A3;
-	Sun,  5 May 2019 07:07:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DDD74A4BF;
+	Sun,  5 May 2019 07:16:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 555364A3A5
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 07:07:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 551D54A34E
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 07:16:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lZMDVHTbK0sG for <kvmarm@lists.cs.columbia.edu>;
- Sun,  5 May 2019 07:07:14 -0400 (EDT)
+ with ESMTP id KYjpeExhYGuT for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 May 2019 07:16:06 -0400 (EDT)
 Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BAA04A331
- for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 07:07:14 -0400 (EDT)
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 526279D4F40EBE4B8746;
- Sun,  5 May 2019 19:07:10 +0800 (CST)
-Received: from [127.0.0.1] (10.177.31.55) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Sun, 5 May 2019
- 19:07:02 +0800
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 981A84005D
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 May 2019 07:16:05 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D86C79973F6A558DD068;
+ Sun,  5 May 2019 19:16:02 +0800 (CST)
+Received: from [127.0.0.1] (10.177.31.55) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Sun, 5 May 2019
+ 19:15:52 +0800
 Subject: Re: ARM/gic-v4: deadlock occurred
 To: Marc Zyngier <marc.zyngier@arm.com>
 References: <9efe0260-4a84-7489-ecdd-2e9561599320@huawei.com>
  <86lfzl9ofe.wl-marc.zyngier@arm.com>
 From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <0b413592-7d98-ebe8-35c5-da330f800326@huawei.com>
-Date: Sun, 5 May 2019 19:07:02 +0800
+Message-ID: <db3bb9c1-8b3a-760d-057f-b8fb6914809b@huawei.com>
+Date: Sun, 5 May 2019 19:15:51 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
  Thunderbird/45.7.1
 MIME-Version: 1.0
@@ -71,9 +71,9 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+BTW since its_irq_set_vcpu_affinity() is already in atomic context, do we really need a separate lock its_dev->event_map.vlpi_lock? I didn't find anywhere outside its_irq_set_vcpu_affinity() call chain acquires this lock.
 
-Appreciate your quick patch :) We'll test it and let you know the result.
+Thanks,
 
 Heyi
 
