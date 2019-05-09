@@ -1,65 +1,64 @@
-Return-Path: <SRS0=Kjqu=TI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=QEDf=TJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FB9C04A6B
-	for <kvmarm@archiver.kernel.org>; Wed,  8 May 2019 18:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC83DC04AB1
+	for <kvmarm@archiver.kernel.org>; Thu,  9 May 2019 07:48:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 05674216C4
-	for <kvmarm@archiver.kernel.org>; Wed,  8 May 2019 18:31:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05674216C4
+	by mail.kernel.org (Postfix) with ESMTP id 53C41208C3
+	for <kvmarm@archiver.kernel.org>; Thu,  9 May 2019 07:48:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C41208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63A8F4A2E7;
-	Wed,  8 May 2019 14:31:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B424A49F;
+	Thu,  9 May 2019 03:48:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gOaeZmJU9Jd5; Wed,  8 May 2019 14:31:46 -0400 (EDT)
+	with ESMTP id yhs2nXOOc+FT; Thu,  9 May 2019 03:48:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 640024A4A3;
-	Wed,  8 May 2019 14:31:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 260744A4A3;
+	Thu,  9 May 2019 03:48:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C9644A2E7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 May 2019 14:31:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E3964A417
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 May 2019 03:48:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Le7CJ1AGtLYV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 May 2019 14:31:42 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 818464A2E4
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 May 2019 14:31:42 -0400 (EDT)
+ with ESMTP id ApQIBWddJVtz for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 May 2019 03:48:54 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72EBF4A319
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 May 2019 03:48:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD66F80D;
- Wed,  8 May 2019 11:31:41 -0700 (PDT)
-Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A02F23F575;
- Wed,  8 May 2019 11:31:38 -0700 (PDT)
-Subject: Re: [PATCH v7 11/23] iommu/arm-smmu-v3: Maintain a SID->device
- structure
-To: Robin Murphy <robin.murphy@arm.com>, Eric Auger <eric.auger@redhat.com>,
- eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, joro@8bytes.org, alex.williamson@redhat.com,
- jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com, will.deacon@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-12-eric.auger@redhat.com>
- <e3b417b7-b69f-0121-fb72-6b6450e1b2f2@arm.com>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <ecb3725c-27c4-944b-b42c-f4e293521f94@arm.com>
-Date: Wed, 8 May 2019 19:31:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <e3b417b7-b69f-0121-fb72-6b6450e1b2f2@arm.com>
-Content-Language: en-US
-Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
- marc.zyngier@arm.com
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7018DA78;
+ Thu,  9 May 2019 00:48:53 -0700 (PDT)
+Received: from big-swifty.misterjones.org (usa-sjc-mx-foss1.foss.arm.com
+ [217.140.101.70])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09E013F7BD;
+ Thu,  9 May 2019 00:48:43 -0700 (PDT)
+Date: Thu, 09 May 2019 08:48:26 +0100
+Message-ID: <868svg9igl.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: ARM/gic-v4: deadlock occurred
+In-Reply-To: <4d60d130-b7ce-96cb-5f8a-11e83329601a@huawei.com>
+References: <9efe0260-4a84-7489-ecdd-2e9561599320@huawei.com>
+ <86lfzl9ofe.wl-marc.zyngier@arm.com>
+ <0b413592-7d98-ebe8-35c5-da330f800326@huawei.com>
+ <86a7fx9lg8.wl-marc.zyngier@arm.com>
+ <4d60d130-b7ce-96cb-5f8a-11e83329601a@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: linux-kernel@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,45 +75,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/05/2019 15:05, Robin Murphy wrote:
-> On 08/04/2019 13:18, Eric Auger wrote:
->> From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->>
->> When handling faults from the event or PRI queue, we need to find the
->> struct device associated to a SID. Add a rb_tree to keep track of SIDs.
+Hi Heyi,
+
+On Wed, 08 May 2019 14:01:48 +0100,
+Heyi Guo <guoheyi@huawei.com> wrote:
 > 
-> Out of curiosity, have you looked at whether an xarray might now be a
-> more efficient option for this?
+> Hi Marc,
+> 
+> The bad news is that though your previous patch fixed the lockdep
+> warnings, we can still reproduce soft lockup panics and some other
+> exceptions... So our issue may not be related with this lock defect.
+> 
+> Most of the call traces are as below, stuck in smp_call_function_many:
+> 
+> [ 6862.660611] watchdog: BUG: soft lockup - CPU#27 stuck for 23s! [CPU 18/KVM:95311]
+> [ 6862.668283] Modules linked in: ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter vport_vxlan vxlan ip6_udp_tunnel udp_tunnel openvswitch nsh nf_nat_ipv6 nf_nat_ipv4 nf_conncount nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ib_isert iscsi_target_mod ib_srpt target_core_mod ib_srp scsi_transport_srp ib_ipoib ib_umad rpcrdma sunrpc rdma_ucm ib_uverbs ib_iser rdma_cm iw_cm ib_cm hns_roce_hw_v2 hns_roce aes_ce_blk crypto_simd ib_core cryptd aes_ce_cipher crc32_ce ghash_ce sha2_ce sha256_arm64 sha1_ce marvell ses enclosure hibmc_drm ttm drm_kms_helper drm sg ixgbe mdio fb_sys_fops syscopyarea hns3 hclge sysfillrect hnae3 sysimgblt sbsa_gwdt vhost_net tun vhost tap ip_tables dm_mod megaraid_sas hisi_sas_v3_hw hisi_sas_main ipmi_si ipmi_devintf ipmi_msghandler br_netfilter xt_sctp
+> [ 6862.668519] irq event stamp: 1670812
+> [ 6862.668526] hardirqs last  enabled at (1670811): [<ffff000008083498>] el1_irq+0xd8/0x180
+> [ 6862.668530] hardirqs last disabled at (1670812): [<ffff000008083448>] el1_irq+0x88/0x180
+> [ 6862.668534] softirqs last  enabled at (1661542): [<ffff000008081d2c>] __do_softirq+0x41c/0x51c
+> [ 6862.668539] softirqs last disabled at (1661535): [<ffff0000080fafc4>] irq_exit+0x18c/0x198
+> [ 6862.668544] CPU: 27 PID: 95311 Comm: CPU 18/KVM Kdump: loaded Tainted: G        W         4.19.36-1.2.141.aarch64 #1
+> [ 6862.668548] Hardware name: Huawei TaiShan 2280 V2/BC82AMDA, BIOS TA BIOS TaiShan 2280 V2 - B900 01/29/2019
+> [ 6862.668551] pstate: 80400009 (Nzcv daif +PAN -UAO)
+> [ 6862.668557] pc : smp_call_function_many+0x360/0x3b8
+> [ 6862.668560] lr : smp_call_function_many+0x320/0x3b8
+> [ 6862.668563] sp : ffff000028f338e0
+> [ 6862.668566] x29: ffff000028f338e0 x28: ffff000009893fb4
+> [ 6862.668575] x27: 0000000000000400 x26: 0000000000000000
+> [ 6862.668583] x25: ffff0000080b1e08 x24: 0000000000000001
+> [ 6862.668591] x23: ffff000009891bc8 x22: ffff000009891bc8
+> [ 6862.668599] x21: ffff805f7d6da408 x20: ffff000009893fb4
+> [ 6862.668608] x19: ffff805f7d6da400 x18: 0000000000000000
+> [ 6862.668616] x17: 0000000000000000 x16: 0000000000000000
+> [ 6862.668624] x15: 0000000000000000 x14: 0000000000000000
+> [ 6862.668632] x13: 0000000000000040 x12: 0000000000000228
+> [ 6862.668640] x11: 0000000000000020 x10: 0000000000000040
+> [ 6862.668648] x9 : 0000000000000000 x8 : 0000000000000010
+> [ 6862.668656] x7 : 0000000000000000 x6 : ffff805f7d329660
+> [ 6862.668664] x5 : ffff000028f33850 x4 : 0000000002000402
+> [ 6862.668673] x3 : 0000000000000000 x2 : ffff803f7f3dc678
+> [ 6862.668681] x1 : 0000000000000003 x0 : 000000000000000a
+> [ 6862.668689] Call trace:
+> [ 6862.668693]  smp_call_function_many+0x360/0x3b8
 
-I hadn't looked into it yet, but it's a welcome distraction.
+This would tend to indicate that one of the CPUs isn't responding to
+the IPI because it has its interrupts disabled, or has crashed badly
+already. Can you check where in smp_call_function_many this is
+hanging? My bet is on the wait loop at the end of the function.
 
-* Searching by SID will be more efficient with xarray (which still is a
-radix tree, with a better API). Rather than O(log2(n)) we walk
-O(log_c(n)) nodes in the worst case, with c = XA_CHUNK_SIZE = 64. We
-don't care about insertion/deletion time.
+You'll need to find out what this unresponsive CPU is doing...
 
-* Memory consumption is worse than rb-tree, when the SID space is a
-little sparse. For PCI devices the three LSBs (function number) might
-not be in use, meaning that 88% of the leaf slots would be unused. And
-it gets worse if the system has lots of bridges, as each bus number
-requires its own xa slot, ie. 98% unused.
+> Any idea is appreciated.
+> 
+> We will find some time and board to test your new patch set, but
+> right now our top priority is to debug the above issue, so it may
+> take some time to get back with the test result. Sorry for that.
 
-  It's not too bad though, and in general I think the distribution of
-SIDs would be good enough to justify using xarray. Plugging in more
-devices would increase the memory consumption fast, but creating virtual
-functions wouldn't. On one machine (TX2, a few discrete PCI cards) I
-need 16 xa slots to store 42 device IDs. That's 16 * 576 bytes = 9 kB,
-versus 42 * 40 bytes = 1.6 kB for the rb-tree. On another machine (x86,
-lots of RC integrated endpoints) I need 18 slots to store 181 device
-IDs, 10 kB vs. 7 kB with the rb-tree.
+No worries, that can wait.
 
-* Using xa would make this code a lot nicer.
+	M.
 
-Shame that we can't store the device pointer directly in the STE though,
-there is already plenty of unused space in there.
-
-Thanks,
-Jean
+-- 
+Jazz is not dead, it just smell funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
