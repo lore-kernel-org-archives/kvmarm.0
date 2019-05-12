@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F0FC04A6B
-	for <kvmarm@archiver.kernel.org>; Sun, 12 May 2019 16:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD4EC04A6B
+	for <kvmarm@archiver.kernel.org>; Sun, 12 May 2019 17:15:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A0C220C01
-	for <kvmarm@archiver.kernel.org>; Sun, 12 May 2019 16:32:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A0C220C01
+	by mail.kernel.org (Postfix) with ESMTP id 514CB20C01
+	for <kvmarm@archiver.kernel.org>; Sun, 12 May 2019 17:15:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514CB20C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F9534A4BE;
-	Sun, 12 May 2019 12:32:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CDC64A4BE;
+	Sun, 12 May 2019 13:15:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WS6KMICGPxsh; Sun, 12 May 2019 12:32:06 -0400 (EDT)
+	with ESMTP id VkbmKALolybk; Sun, 12 May 2019 13:15:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 786774A4CA;
-	Sun, 12 May 2019 12:32:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CF7E4A4CA;
+	Sun, 12 May 2019 13:15:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0EB14A4AA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 12:32:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4EA54A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 13:15:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ny8bOGUPGcRU for <kvmarm@lists.cs.columbia.edu>;
- Sun, 12 May 2019 12:32:03 -0400 (EDT)
-Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com
- [209.85.160.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90C254A36B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 12:32:03 -0400 (EDT)
-Received: by mail-qt1-f194.google.com with SMTP id h1so4367360qtp.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 09:32:03 -0700 (PDT)
+ with ESMTP id u+IiwOkp6Hqo for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 12 May 2019 13:15:20 -0400 (EDT)
+Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com
+ [209.85.222.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 863844A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 13:15:20 -0400 (EDT)
+Received: by mail-qk1-f193.google.com with SMTP id g190so4548052qkf.8
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 May 2019 10:15:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=gWQWmUQnTtpdS1fW9lGpRk2GMG2DyCbjfZMrbY3ehBg=;
- b=lUDKo7iDWkDxPHZjCKmrnytJ0hNcN2Jf2SjFwHinjfPdxjiaQLKN+nHJDpCmfuJeLi
- vBZBPV9YQd2zAp1LPW+lhgBBsmNUQrCLVuN6RFygph8ttUdX/dt611IUNs77QPTOhVXE
- Gic2MbJfnH6ikiffyrLldC739LaaJ2Csv/6t14ABcKWQgEmNR1TlVewRlWHGD8bEPeEt
- b/8SYnDrpPETI9j6oF1pa2P3n/s+hoDGnRNYj8cN7UuqsB4Sg+GnBkXskmP6yRVkayIv
- NQUEv4JYdRujIoif19j4uOnCMLX3i+M0OvUeUjhkfrHlY+YAhUM9c6LZVLaAj1NPXjnU
- zv9A==
-X-Gm-Message-State: APjAAAWkI/dpZ23g+yHJDHjukXkvKHxUp8Bz4B2Mghf2wE/u/uWwrk5d
- SuJ/mrrO9FgGF8bO3fpa+uSe3g==
-X-Google-Smtp-Source: APXvYqzhmWo+UkRgVkqDTpvr2NwI5n1SCQUPFdJ0CANhQ8AuAx0/rktx5J0cdUejuh99dU3DdW4fsQ==
-X-Received: by 2002:aed:3fd8:: with SMTP id w24mr20147558qth.64.1557678723231; 
- Sun, 12 May 2019 09:32:03 -0700 (PDT)
+ bh=Sz6oXhk1MUAcDMqhVgJnZ+u8Zwtmv3OV0JGi1Y8CWDw=;
+ b=gqJIIpz4/4A3kjC/wa4uewd1ZspgaDS0qKrDwsmGebiYumq1esrQerhLm3YwRImAJZ
+ G/vYjDryyZPWzv3IpsOXzHy9wltyJiZ4GkigeUjwSeaKWyANVv4z12qZn7PFc55YCDYA
+ h8KlHSR/QV0sJ9D2CDn8xn+lyLQ549Kgt1HyCDRhFxj24KOn0OdgVRHzRi6+8JjjS0IT
+ ZCUaWjav4xsMAb7T/hbytxdKAPm6JxAnyEU4ygwffD9IdQkgARLdzkqwX3VUTEwNKa5P
+ gjTPRRBQLAS7/kRRq9p+W9qiieRnwMLU+lnc5ilyHB1zqD7wWnAfgcrQaZTmtWbLtHOm
+ TEGQ==
+X-Gm-Message-State: APjAAAXzBAJvCRQrjNDRu9KBUJFvlxlXWlZ8dvpFwXyNCyIws3ZCEX/8
+ abYIKSmiwdpo/UzNHjBWe09bnw==
+X-Google-Smtp-Source: APXvYqxLzieYropX9DXBLnvbsudc9FJW0WQmQVUd/9WRnEbpC2BiYAyAKTnxKUBxw7ns2tMNztADiw==
+X-Received: by 2002:a37:b3c5:: with SMTP id c188mr18807278qkf.97.1557681320186; 
+ Sun, 12 May 2019 10:15:20 -0700 (PDT)
 Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
  [173.76.105.71])
- by smtp.gmail.com with ESMTPSA id h62sm5582800qkd.92.2019.05.12.09.32.01
+ by smtp.gmail.com with ESMTPSA id c32sm6064980qte.2.2019.05.12.10.15.18
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 12 May 2019 09:32:02 -0700 (PDT)
-Date: Sun, 12 May 2019 12:31:59 -0400
+ Sun, 12 May 2019 10:15:19 -0700 (PDT)
+Date: Sun, 12 May 2019 13:15:16 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
 Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-Message-ID: <20190512123022-mutt-send-email-mst@kernel.org>
+Message-ID: <20190512131500-mutt-send-email-mst@kernel.org>
 References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
@@ -127,13 +127,10 @@ On Tue, Jan 15, 2019 at 12:19:52PM +0000, Jean-Philippe Brucker wrote:
 > [5] [PATCH] iommu/of: Fix probe-deferral
 >     https://www.spinics.net/lists/arm-kernel/msg698371.html
 
+For virtio things:
 
-OK this has been in next for a while.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Last time IOMMU maintainers objected. Are objections
-still in force?
-
-If not could we get acks please?
 
 
 > Jean-Philippe Brucker (7):
