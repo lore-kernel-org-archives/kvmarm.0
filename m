@@ -1,74 +1,68 @@
-Return-Path: <SRS0=nnE9=TN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=iDSe=TO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C41E4C46470
-	for <kvmarm@archiver.kernel.org>; Mon, 13 May 2019 14:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0082C04AB7
+	for <kvmarm@archiver.kernel.org>; Tue, 14 May 2019 09:02:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A3922084A
-	for <kvmarm@archiver.kernel.org>; Mon, 13 May 2019 14:40:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3922084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 63A6620862
+	for <kvmarm@archiver.kernel.org>; Tue, 14 May 2019 09:02:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A6620862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A29734A4AA;
-	Mon, 13 May 2019 10:40:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B07494A4F2;
+	Tue, 14 May 2019 05:02:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rpbqQVy1UA8a; Mon, 13 May 2019 10:40:54 -0400 (EDT)
+	with ESMTP id 17P4UWvL+MCZ; Tue, 14 May 2019 05:02:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AECE4A456;
-	Mon, 13 May 2019 10:40:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FC804A418;
+	Tue, 14 May 2019 05:02:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 086BD4A496
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 May 2019 10:40:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B42A14A418
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 May 2019 05:02:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vSsWKPJDv4ZQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 May 2019 10:40:51 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A145A4A3B4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 May 2019 10:40:51 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D2ED30832D1;
- Mon, 13 May 2019 14:40:50 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA5265D722;
- Mon, 13 May 2019 14:40:42 +0000 (UTC)
-Subject: Re: [PATCH v7 12/23] iommu/smmuv3: Get prepared for nested stage
- support
-To: Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-13-eric.auger@redhat.com>
- <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
- <a1099cec-a8ad-6efa-b7e8-77388814f7e2@redhat.com>
- <424fc9bc-f040-d702-5a04-0faef1125989@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <cc13eb29-576f-6816-dafd-dd5a814a6013@redhat.com>
-Date: Mon, 13 May 2019 16:40:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id I2akZBwu3mNl for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 May 2019 05:02:44 -0400 (EDT)
+Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DFFF4A417
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 May 2019 05:02:44 -0400 (EDT)
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 3FDCEC449AF04FC2B0DD;
+ Tue, 14 May 2019 17:02:40 +0800 (CST)
+Received: from [127.0.0.1] (10.67.78.74) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 14 May 2019
+ 17:02:29 +0800
+Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
+From: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
+ <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
+ <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
+ <86zhpc66jl.wl-marc.zyngier@arm.com>
+ <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
+ <86imvu3uje.wl-marc.zyngier@arm.com>
+ <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
+ <861s1tavn0.wl-marc.zyngier@arm.com>
+ <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
+Message-ID: <53a525e5-c9a7-0d98-ff7a-ca5be0ea381a@huawei.com>
+Date: Tue, 14 May 2019 17:02:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-In-Reply-To: <424fc9bc-f040-d702-5a04-0faef1125989@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 13 May 2019 14:40:50 +0000 (UTC)
-Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
- marc.zyngier@arm.com
+In-Reply-To: <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
+X-Originating-IP: [10.67.78.74]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org,
+ xuwei5@huawei.com, guoheyi@huawei.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,141 +74,298 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgUm9iaW4sCgpPbiA1LzEzLzE5IDE6NDMgUE0sIFJvYmluIE11cnBoeSB3cm90ZToKPiBPbiAx
-MC8wNS8yMDE5IDE1OjM0LCBBdWdlciBFcmljIHdyb3RlOgo+PiBIaSBSb2JpbiwKPj4KPj4gT24g
-NS84LzE5IDQ6MjQgUE0sIFJvYmluIE11cnBoeSB3cm90ZToKPj4+IE9uIDA4LzA0LzIwMTkgMTM6
-MTksIEVyaWMgQXVnZXIgd3JvdGU6Cj4+Pj4gVG8gYWxsb3cgbmVzdGVkIHN0YWdlIHN1cHBvcnQs
-IHdlIG5lZWQgdG8gc3RvcmUgYm90aAo+Pj4+IHN0YWdlIDEgYW5kIHN0YWdlIDIgY29uZmlndXJh
-dGlvbnMgKGFuZCByZW1vdmUgdGhlIGZvcm1lcgo+Pj4+IHVuaW9uKS4KPj4+Pgo+Pj4+IEEgbmVz
-dGVkIHNldHVwIGlzIGNoYXJhY3Rlcml6ZWQgYnkgYm90aCBzMV9jZmcgYW5kIHMyX2NmZwo+Pj4+
-IHNldC4KPj4+Pgo+Pj4+IFdlIGludHJvZHVjZSBhIG5ldyBzdGUuYWJvcnQgZmllbGQgdGhhdCB3
-aWxsIGJlIHNldCB1cG9uCj4+Pj4gZ3Vlc3Qgc3RhZ2UxIGNvbmZpZ3VyYXRpb24gcGFzc2luZy4g
-SWYgczFfY2ZnIGlzIE5VTEwgYW5kCj4+Pj4gc3RlLmFib3J0IGlzIHNldCwgdHJhZmZpYyBjYW4n
-dCBwYXNzLiBJZiBzdGUuYWJvcnQgaXMgbm90IHNldCwKPj4+PiBTMSBpcyBieXBhc3NlZC4KPj4+
-Pgo+Pj4+IGFybV9zbW11X3dyaXRlX3N0cnRhYl9lbnQoKSBpcyBtb2RpZmllZCB0byB3cml0ZSBi
-b3RoIHN0YWdlCj4+Pj4gZmllbGRzIGluIHRoZSBTVEUgYW5kIGRlYWwgd2l0aCB0aGUgYWJvcnQg
-ZmllbGQuCj4+Pj4KPj4+PiBJbiBuZXN0ZWQgbW9kZSwgb25seSBzdGFnZSAyIGlzICJmaW5hbGl6
-ZWQiIGFzIHRoZSBob3N0IGRvZXMKPj4+PiBub3Qgb3duL2NvbmZpZ3VyZSB0aGUgc3RhZ2UgMSBj
-b250ZXh0IGRlc2NyaXB0b3IsIGd1ZXN0IGRvZXMuCj4+Pj4KPj4+PiBTaWduZWQtb2ZmLWJ5OiBF
-cmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+Cj4+Pj4KPj4+PiAtLS0KPj4+Pgo+Pj4+
-IHY0IC0+IHY1Ogo+Pj4+IC0gcmVzZXQgc3RlLmFib3J0IG9uIGRldGFjaAo+Pj4+Cj4+Pj4gdjMg
-LT4gdjQ6Cj4+Pj4gLSBzMV9jZmcubmVzdGVkX2Fib3J0IGFuZCBuZXN0ZWRfYnlwYXNzIHJlbW92
-ZWQuCj4+Pj4gLSBzL3N0ZS5uZXN0ZWQvc3RlLmFib3J0Cj4+Pj4gLSBhcm1fc21tdV93cml0ZV9z
-dHJ0YWJfZW50IG1vZGlmaWNhdGlvbnMgd2l0aCBpbnRyb2R1Y3Rpb24KPj4+PiDCoMKgwqAgb2Yg
-bG9jYWwgYWJvcnQsIGJ5cGFzcyBhbmQgdHJhbnNsYXRlIGxvY2FsIHZhcmlhYmxlcwo+Pj4+IC0g
-Y29tbWVudCB1cGRhdGVkCj4+Pj4KPj4+PiB2MSAtPiB2MjoKPj4+PiAtIGludmFsaWRhdGUgdGhl
-IFNURSBiZWZvcmUgbW92aW5nIGZyb20gYSBsaXZlIFNURSBjb25maWcgdG8gYW5vdGhlcgo+Pj4+
-IC0gYWRkIHRoZSBuZXN0ZWRfYWJvcnQgYW5kIG5lc3RlZF9ieXBhc3MgZmllbGRzCj4+Pj4gLS0t
-Cj4+Pj4gwqDCoCBkcml2ZXJzL2lvbW11L2FybS1zbW11LXYzLmMgfCAzNSArKysrKysrKysrKysr
-KysrKysrKy0tLS0tLS0tLS0tLS0tLQo+Pj4+IMKgwqAgMSBmaWxlIGNoYW5nZWQsIDIwIGluc2Vy
-dGlvbnMoKyksIDE1IGRlbGV0aW9ucygtKQo+Pj4+Cj4+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-aW9tbXUvYXJtLXNtbXUtdjMuYyBiL2RyaXZlcnMvaW9tbXUvYXJtLXNtbXUtdjMuYwo+Pj4+IGlu
-ZGV4IDIxZDAyNzY5NTE4MS4uZTIyZTk0NGZmYzA1IDEwMDY0NAo+Pj4+IC0tLSBhL2RyaXZlcnMv
-aW9tbXUvYXJtLXNtbXUtdjMuYwo+Pj4+ICsrKyBiL2RyaXZlcnMvaW9tbXUvYXJtLXNtbXUtdjMu
-Ywo+Pj4+IEBAIC0yMTEsNiArMjExLDcgQEAKPj4+PiDCoMKgICNkZWZpbmUgU1RSVEFCX1NURV8w
-X0NGR19CWVBBU1PCoMKgwqDCoMKgwqDCoCA0Cj4+Pj4gwqDCoCAjZGVmaW5lIFNUUlRBQl9TVEVf
-MF9DRkdfUzFfVFJBTlPCoMKgwqAgNQo+Pj4+IMKgwqAgI2RlZmluZSBTVFJUQUJfU1RFXzBfQ0ZH
-X1MyX1RSQU5TwqDCoMKgIDYKPj4+PiArI2RlZmluZSBTVFJUQUJfU1RFXzBfQ0ZHX05FU1RFRMKg
-wqDCoMKgwqDCoMKgIDcKPj4+PiDCoMKgIMKgICNkZWZpbmUgU1RSVEFCX1NURV8wX1MxRk1UwqDC
-oMKgwqDCoMKgwqAgR0VOTUFTS19VTEwoNSwgNCkKPj4+PiDCoMKgICNkZWZpbmUgU1RSVEFCX1NU
-RV8wX1MxRk1UX0xJTkVBUsKgwqDCoCAwCj4+Pj4gQEAgLTUxNCw2ICs1MTUsNyBAQCBzdHJ1Y3Qg
-YXJtX3NtbXVfc3RydGFiX2VudCB7Cj4+Pj4gwqDCoMKgwqDCoMKgwqAgKiBjb25maWd1cmVkIGFj
-Y29yZGluZyB0byB0aGUgZG9tYWluIHR5cGUuCj4+Pj4gwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiDC
-oMKgwqDCoMKgwqAgYm9vbMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBhc3NpZ25lZDsK
-Pj4+PiArwqDCoMKgIGJvb2zCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYWJvcnQ7Cj4+
-Pj4gwqDCoMKgwqDCoMKgIHN0cnVjdCBhcm1fc21tdV9zMV9jZmfCoMKgwqDCoMKgwqDCoCAqczFf
-Y2ZnOwo+Pj4+IMKgwqDCoMKgwqDCoCBzdHJ1Y3QgYXJtX3NtbXVfczJfY2ZnwqDCoMKgwqDCoMKg
-wqAgKnMyX2NmZzsKPj4+PiDCoMKgIH07Cj4+Pj4gQEAgLTYyOCwxMCArNjMwLDggQEAgc3RydWN0
-IGFybV9zbW11X2RvbWFpbiB7Cj4+Pj4gwqDCoMKgwqDCoMKgIGJvb2zCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgbm9uX3N0cmljdDsKPj4+PiDCoMKgIMKgwqDCoMKgwqAgZW51bSBhcm1f
-c21tdV9kb21haW5fc3RhZ2XCoMKgwqAgc3RhZ2U7Cj4+Pj4gLcKgwqDCoCB1bmlvbiB7Cj4+Pj4g
-LcKgwqDCoMKgwqDCoMKgIHN0cnVjdCBhcm1fc21tdV9zMV9jZmfCoMKgwqAgczFfY2ZnOwo+Pj4+
-IC3CoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgYXJtX3NtbXVfczJfY2ZnwqDCoMKgIHMyX2NmZzsKPj4+
-PiAtwqDCoMKgIH07Cj4+Pj4gK8KgwqDCoCBzdHJ1Y3QgYXJtX3NtbXVfczFfY2ZnwqDCoMKgIHMx
-X2NmZzsKPj4+PiArwqDCoMKgIHN0cnVjdCBhcm1fc21tdV9zMl9jZmfCoMKgwqAgczJfY2ZnOwo+
-Pj4+IMKgwqAgwqDCoMKgwqDCoCBzdHJ1Y3QgaW9tbXVfZG9tYWluwqDCoMKgwqDCoMKgwqAgZG9t
-YWluOwo+Pj4+IMKgwqAgQEAgLTExMDgsMTIgKzExMDgsMTMgQEAgc3RhdGljIHZvaWQgYXJtX3Nt
-bXVfd3JpdGVfc3RydGFiX2VudChzdHJ1Y3QKPj4+PiBhcm1fc21tdV9kZXZpY2UgKnNtbXUsIHUz
-MiBzaWQsCj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIF9fbGU2NCAqZHN0LCBzdHJ1Y3QgYXJtX3NtbXVfc3RydGFiX2VudCAqc3RlKQo+Pj4+IMKg
-wqAgewo+Pj4+IMKgwqDCoMKgwqDCoCAvKgo+Pj4+IC3CoMKgwqDCoCAqIFRoaXMgaXMgaGlkZW91
-c2x5IGNvbXBsaWNhdGVkLCBidXQgd2Ugb25seSByZWFsbHkgY2FyZSBhYm91dAo+Pj4+IC3CoMKg
-wqDCoCAqIHRocmVlIGNhc2VzIGF0IHRoZSBtb21lbnQ6Cj4+Pj4gK8KgwqDCoMKgICogV2UgY2Fy
-ZSBhYm91dCB0aGUgZm9sbG93aW5nIHRyYW5zaXRpb25zOgo+Pj4+IMKgwqDCoMKgwqDCoMKgICoK
-Pj4+PiDCoMKgwqDCoMKgwqDCoCAqIDEuIEludmFsaWQgKGFsbCB6ZXJvKSAtPiBieXBhc3MvZmF1
-bHQgKGluaXQpCj4+Pj4gLcKgwqDCoMKgICogMi4gQnlwYXNzL2ZhdWx0IC0+IHRyYW5zbGF0aW9u
-L2J5cGFzcyAoYXR0YWNoKQo+Pj4+IC3CoMKgwqDCoCAqIDMuIFRyYW5zbGF0aW9uL2J5cGFzcyAt
-PiBieXBhc3MvZmF1bHQgKGRldGFjaCkKPj4+PiArwqDCoMKgwqAgKiAyLiBCeXBhc3MvZmF1bHQg
-LT4gc2luZ2xlIHN0YWdlIHRyYW5zbGF0aW9uL2J5cGFzcyAoYXR0YWNoKQo+Pj4+ICvCoMKgwqDC
-oCAqIDMuIHNpbmdsZSBzdGFnZSBUcmFuc2xhdGlvbi9ieXBhc3MgLT4gYnlwYXNzL2ZhdWx0IChk
-ZXRhY2gpCj4+Pj4gK8KgwqDCoMKgICogNC4gUzIgLT4gUzEgKyBTMiAoYXR0YWNoX3Bhc2lkX3Rh
-YmxlKQo+Pj4+ICvCoMKgwqDCoCAqIDUuIFMxICsgUzIgLT4gUzIgKGRldGFjaF9wYXNpZF90YWJs
-ZSkKPj4+PiDCoMKgwqDCoMKgwqDCoCAqCj4+Pj4gwqDCoMKgwqDCoMKgwqAgKiBHaXZlbiB0aGF0
-IHdlIGNhbid0IHVwZGF0ZSB0aGUgU1RFIGF0b21pY2FsbHkgYW5kIHRoZSBTTU1VCj4+Pj4gwqDC
-oMKgwqDCoMKgwqAgKiBkb2Vzbid0IHJlYWQgdGhlIHRoaW5nIGluIGEgZGVmaW5lZCBvcmRlciwg
-dGhhdCBsZWF2ZXMgdXMKPj4+PiBAQCAtMTEyNCw3ICsxMTI1LDcgQEAgc3RhdGljIHZvaWQgYXJt
-X3NtbXVfd3JpdGVfc3RydGFiX2VudChzdHJ1Y3QKPj4+PiBhcm1fc21tdV9kZXZpY2UgKnNtbXUs
-IHUzMiBzaWQsCj4+Pj4gwqDCoMKgwqDCoMKgwqAgKiAzLiBVcGRhdGUgQ29uZmlnLCBzeW5jCj4+
-Pj4gwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiDCoMKgwqDCoMKgwqAgdTY0IHZhbCA9IGxlNjRfdG9f
-Y3B1KGRzdFswXSk7Cj4+Pj4gLcKgwqDCoCBib29sIHN0ZV9saXZlID0gZmFsc2U7Cj4+Pj4gK8Kg
-wqDCoCBib29sIGFib3J0LCBieXBhc3MsIHRyYW5zbGF0ZSwgc3RlX2xpdmUgPSBmYWxzZTsKPj4+
-PiDCoMKgwqDCoMKgwqAgc3RydWN0IGFybV9zbW11X2NtZHFfZW50IHByZWZldGNoX2NtZCA9IHsK
-Pj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCAub3Bjb2RlwqDCoMKgwqDCoMKgwqAgPSBDTURRX09Q
-X1BSRUZFVENIX0NGRywKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCAucHJlZmV0Y2jCoMKgwqAg
-PSB7Cj4+Pj4gQEAgLTExMzgsMTEgKzExMzksMTEgQEAgc3RhdGljIHZvaWQgYXJtX3NtbXVfd3Jp
-dGVfc3RydGFiX2VudChzdHJ1Y3QKPj4+PiBhcm1fc21tdV9kZXZpY2UgKnNtbXUsIHUzMiBzaWQs
-Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsKPj4+PiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBjYXNlIFNUUlRBQl9TVEVfMF9DRkdfUzFfVFJBTlM6Cj4+Pj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgY2FzZSBTVFJUQUJfU1RFXzBfQ0ZHX1MyX1RSQU5TOgo+Pj4+ICvCoMKgwqDC
-oMKgwqDCoCBjYXNlIFNUUlRBQl9TVEVfMF9DRkdfTkVTVEVEOgo+Pj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgc3RlX2xpdmUgPSB0cnVlOwo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgYnJlYWs7Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgY2FzZSBTVFJUQUJfU1RF
-XzBfQ0ZHX0FCT1JUOgo+Pj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChkaXNhYmxlX2J5
-cGFzcykKPj4+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJyZWFrOwo+Pj4+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJyZWFrOwo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRl
-ZmF1bHQ6Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBCVUcoKTsgLyogU1RFIGNv
-cnJ1cHRpb24gKi8KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9Cj4+Pj4gQEAgLTExNTIsOCAr
-MTE1MywxMyBAQCBzdGF0aWMgdm9pZCBhcm1fc21tdV93cml0ZV9zdHJ0YWJfZW50KHN0cnVjdAo+
-Pj4+IGFybV9zbW11X2RldmljZSAqc21tdSwgdTMyIHNpZCwKPj4+PiDCoMKgwqDCoMKgwqAgdmFs
-ID0gU1RSVEFCX1NURV8wX1Y7Cj4+Pj4gwqDCoCDCoMKgwqDCoMKgIC8qIEJ5cGFzcy9mYXVsdCAq
-Lwo+Pj4+IC3CoMKgwqAgaWYgKCFzdGUtPmFzc2lnbmVkIHx8ICEoc3RlLT5zMV9jZmcgfHwgc3Rl
-LT5zMl9jZmcpKSB7Cj4+Pj4gLcKgwqDCoMKgwqDCoMKgIGlmICghc3RlLT5hc3NpZ25lZCAmJiBk
-aXNhYmxlX2J5cGFzcykKPj4+PiArCj4+Pj4gK8KgwqDCoCBhYm9ydCA9ICghc3RlLT5hc3NpZ25l
-ZCAmJiBkaXNhYmxlX2J5cGFzcykgfHwgc3RlLT5hYm9ydDsKPj4+PiArwqDCoMKgIHRyYW5zbGF0
-ZSA9IHN0ZS0+czFfY2ZnIHx8IHN0ZS0+czJfY2ZnOwo+Pj4+ICvCoMKgwqAgYnlwYXNzID0gIWFi
-b3J0ICYmICF0cmFuc2xhdGU7Cj4+Pj4gKwo+Pj4+ICvCoMKgwqAgaWYgKGFib3J0IHx8IGJ5cGFz
-cykgewo+Pj4+ICvCoMKgwqDCoMKgwqDCoCBpZiAoYWJvcnQpCj4+Pj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCB2YWwgfD0gRklFTERfUFJFUChTVFJUQUJfU1RFXzBfQ0ZHLAo+Pj4+IFNU
-UlRBQl9TVEVfMF9DRkdfQUJPUlQpOwo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVsc2UKPj4+
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZhbCB8PSBGSUVMRF9QUkVQKFNUUlRBQl9T
-VEVfMF9DRkcsCj4+Pj4gU1RSVEFCX1NURV8wX0NGR19CWVBBU1MpOwo+Pj4+IEBAIC0xMTcyLDcg
-KzExNzgsNiBAQCBzdGF0aWMgdm9pZCBhcm1fc21tdV93cml0ZV9zdHJ0YWJfZW50KHN0cnVjdAo+
-Pj4+IGFybV9zbW11X2RldmljZSAqc21tdSwgdTMyIHNpZCwKPj4+PiDCoMKgwqDCoMKgwqAgfQo+
-Pj4+IMKgwqAgwqDCoMKgwqDCoCBpZiAoc3RlLT5zMV9jZmcpIHsKPj4+PiAtwqDCoMKgwqDCoMKg
-wqAgQlVHX09OKHN0ZV9saXZlKTsKPj4+Cj4+PiBIbW0sIEknbSBhIGxpdHRsZSB1bmVhc3kgYWJv
-dXQganVzdCByZW1vdmluZyB0aGVzZSBjaGVja3MgYWx0b2dldGhlciwgYXMKPj4+IHRoZXJlIGFy
-ZSBzdGlsbCBjYXNlcyB3aGVyZSByZXdyaXRpbmcgYSBsaXZlIGVudHJ5IGlzIGJvZ3VzLCB0aGF0
-IHdlJ2QKPj4+IHJlYWxseSBsaWtlIHRvIGtlZXAgY2F0Y2hpbmcuIElzIHRoZSBwcm9ibGVtIHRo
-YXQgaXQncyBoYXJkIHRvIHRlbGwgd2hlbgo+Pj4geW91J3JlICdyZXdyaXRpbmcnIHRoZSBTMiBj
-b25maWcgb2YgYSBuZXN0ZWQgZW50cnkgd2l0aCB0aGUgc2FtZSB0aGluZwo+Pj4gb24gYXR0YWNo
-aW5nL2RldGFjaGluZyBpdHMgUzEgY29udGV4dD8KPj4gTm8sIEkgcmVzdG9yZWQgdGhlIG9yaWdp
-bmFsIGNoZWNrcyBpbiAhbmVzdGVkIG1vZGUgYW5kIGFkZGVkIGEgbmV3IGNoZWNrCj4+IHRvIG1h
-a2Ugc3VyZSB3ZSBuZXZlciB1cGRhdGUgYSBsaXZlIFMxIGluIG5lc3RlZCBtb2RlLiBPbmx5IFMy
-IGNhbiBiZQo+PiBsaXZlLgo+IAo+IFJpZ2h0LCBlaXRoZXIgd2F5IGl0J3MgZmFpcmx5IGVhc3kg
-dG8gZW5mb3JjZSAiIShjZmctPnMxICYmIHN0ZS0+czEpIiwKPiBidXQgd2hhdCBJJ20gcmVhbGx5
-IGNvbmNlcm5lZCBhYm91dCBpcyB0aGF0IGZhY3Qgd2hlcmUgU3RyZWFtIElEcyAob3IKPiBwb3Nz
-aWJseSBQQVNJRFMpIGdldCBtZXNzZWQgdXAgYW5kIHdlIGVuZCB1cCBzaWxlbnRseSB3cml0aW5n
-IGEgbmVzdGVkCj4gY29uZmlnIG92ZXIgYW4gU1RFIHdoaWNoIGhhcHBlbnMgdG8gYWxyZWFkeSBo
-YXZlIGFuIFMyIGNvbmZpZ3VyYXRpb24gZm9yCj4gc29tZSBvdGhlciBkb21haW4gKG9yIHZpY2Ug
-dmVyc2EpLgoKPiAKPiBJIGd1ZXNzIGl0IG1pZ2h0IHN1ZmZpY2UgdG8gdmVyaWZ5IHRoYXQgdGhl
-IFZUVEJScyBtYXRjaCBmb3IgUzI8LT5uZXN0ZWQKPiB0cmFuc2l0aW9ucywgd2hhdCBkbyB5b3Ug
-cmVja29uPwpZZXMgSSBjYW4gdGVzdCB0aGUgU1RFLlMyVFRCIHZhbHVlcyB3aGljaCBzaG91bGQg
-YXJlIGlkZW50aWNhbCBkdXJpbmcKc3VjaCB0cmFuc2l0aW9ucy4KClRoYW5rcwoKRXJpYwo+IAo+
-IFJvYmluLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
-dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
-aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+
+
+On 2019/4/29 10:29, Tangnianyao (ICT) wrote:
+
+Hi, Marc
+
+> On 2019/4/23 18:00, Marc Zyngier wrote:
+> 
+> Hi, Marc
+> 
+>> On Tue, 23 Apr 2019 08:44:17 +0100,
+>> "Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
+>>>
+>>> Hi, Marc
+>>
+>> [...]
+>>
+>>> I've learned that there's some implementation problem for the PCIe
+>>> controller of Hi1616, the processor of D05. The PCIe ACS was not
+>>> implemented properly and D05 doesn't support VM using pcie vf.
+>>
+>> My D05 completely disagrees with you:
+>>
+>> root@unassigned-hostname:~# lspci -v
+>> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+>> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
+>> 	Flags: fast devsel
+>> lspci: Unable to load libkmod resources: error -12
+>>
+>> 00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
+>> 	Subsystem: Red Hat, Inc Virtio network device
+>> 	Flags: bus master, fast devsel, latency 0, IRQ 40
+>> 	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
+>> 	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
+>> 	Expansion ROM at 10000000 [disabled] [size=256K]
+>> 	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
+>> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+>> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+>> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+>> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+>> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+>> 	Kernel driver in use: virtio-pci
+>>
+>> 00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
+>> 	Subsystem: Red Hat, Inc Virtio block device
+>> 	Flags: bus master, fast devsel, latency 0, IRQ 41
+>> 	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
+>> 	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
+>> 	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
+>> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+>> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+>> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+>> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+>> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+>> 	Kernel driver in use: virtio-pci
+>>
+>> 00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
+>> 	Subsystem: Red Hat, Inc Virtio SCSI
+>> 	Flags: bus master, fast devsel, latency 0, IRQ 42
+>> 	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
+>> 	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
+>> 	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
+>> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
+>> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
+>> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
+>> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
+>> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
+>> 	Kernel driver in use: virtio-pci
+>>
+>> 00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
+>> 	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
+>> 	Flags: bus master, fast devsel, latency 0
+>> 	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
+>> 	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
+>> 	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
+>> 	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
+>> 	Capabilities: [100] Advanced Error Reporting
+>> 	Capabilities: [1a0] Transaction Processing Hints
+>> 	Capabilities: [1d0] Access Control Services
+>> 	Kernel driver in use: igbvf
+>>
+>> root@unassigned-hostname:~# uptime
+>>  05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
+>>
+> 
+> I have make a new quirk to fix ACS problem on Hi1616, to enable VM using
+> pcie vf.
+> 
+>> For something that isn't supposed to work, it is pretty good. So
+>> please test it and let me know how it fares. At this stage, not
+>> regressing deployed HW is more important than improving the situation
+>> on HW that nobody has.
+>>
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
+>>>>>>> large at all.
+>>>>>>
+>>>>>> Sure. But I'm not sure this is a universal figure.
+>>>>>>
+>>>>>>>
+>>>>>>>> Frankly, you want to be careful with that. I'd rather enable them late
+>>>>>>>> and have a chance of not blocking because of another (virtual)
+>>>>>>>> interrupt, which saves us the doorbell business.
+>>>>>>>>
+>>>>>>>> I wonder if you wouldn't be in a better position by drastically
+>>>>>>>> reducing halt_poll_ns for vcpu that can have directly injected
+>>>>>>>> interrupts.
+>>>>>>>>
+>>>>>>>
+>>>>>>> If we set halt_poll_ns to a small value, the chance of
+>>>>>>> not blocking and vcpu scheduled out becomes larger. The cost
+>>>>>>> of vcpu scheduled out is quite expensive.
+>>>>>>> In many cases, one pcpu is assigned to only
+>>>>>>> one vcpu, and halt_poll_ns is set quite large, to increase
+>>>>>>> chance of halt_poll process got terminated. This is the
+>>>>>>> reason we want to set halt_poll_ns large. And We hope vlpi
+>>>>>>> stop halt_poll process in time.
+>>>>>>
+>>>>>> Fair enough. It is certainly realistic to strictly partition the
+>>>>>> system when GICv4 is in use, so I can see some potential benefit.
+>>>>>>
+>>>>>>> Though it will check whether vcpu is runnable again by
+>>>>>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
+>>>>>>> However it's somewhat later if halt_poll_ns is larger.
+>>>>>>>
+>>>>>>>> In any case, this is something that we should measure, not guess.
+>>>>>>
+>>>>>> Please post results of realistic benchmarks that we can reproduce,
+>>>>>> with and without this change. I'm willing to entertain the idea, but I
+>>>>>> need more than just a vague number.
+>>>>>>
+>>>>>> Thanks,
+>>>>>>
+>>>>>> 	M.
+>>>>>>
+>>>>>
+>>>>> I tested it with and without change (patch attached in the last).
+>>>>> halt_poll_ns is keep default, 500000ns.
+>>>>> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
+>>>>> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
+>>>>>
+>>>>> netperf result:
+>>>>> D06 as server, intel 8180 server as client
+>>>>> with change:
+>>>>> package 512 bytes - 5400 Mbits/s
+>>>>> package 64 bytes - 740 Mbits/s
+>>>>> without change:
+>>>>> package 512 bytes - 5000 Mbits/s
+>>>>> package 64 bytes - 710 Mbits/s
+>>>>>
+>>>>> Also I have tested D06 as client, intel machine as server,
+>>>>> with the change, the result remains the same.
+>>>>
+>>>> So anywhere between 4% and 8% improvement. Please post results for D05
+>>>> once you've found one.
+>>>>
+>>>>>
+>>>>>
+>>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>>> index 55fe8e2..0f56904 100644
+>>>>> --- a/virt/kvm/kvm_main.c
+>>>>> +++ b/virt/kvm/kvm_main.c
+>>>>> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>>  	if (vcpu->halt_poll_ns) {
+>>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>>>>
+>>>>> +#ifdef CONFIG_ARM64
+>>>>> +		/*
+>>>>> +		 * When using gicv4, enable doorbell before halt pool wait
+>>>>> +		 * so that direct vlpi can stop halt poll.
+>>>>> +		 */
+>>>>> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
+>>>>> +			kvm_vgic_v4_enable_doorbell(vcpu);
+>>>>> +		}
+>>>>> +#endif
+>>>>> +
+>>>>
+>>>> Irk. No. You're now leaving doorbells enabled when going back to the
+>>>> guest, and that's pretty bad as the whole logic relies on doorbells
+>>>> being disabled if the guest can run.
+>>>>
+>>>> So please try this instead on top of mainline. And it has to be on top
+>>>> of mainline as we've changed the way timer interrupts work in 5.1 --
+>>>> see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
+>>>>
+>>
+>> [...]
+>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index f25aa98a94df..0ae4ad5dcb12 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>  	bool waited = false;
+>>>>  	u64 block_ns;
+>>>>  
+>>>> +	kvm_arch_vcpu_blocking(vcpu);
+>>>> +
+>>>>  	start = cur = ktime_get();
+>>>>  	if (vcpu->halt_poll_ns) {
+>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+>>>> @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>  		} while (single_task_running() && ktime_before(cur, stop));
+>>>>  	}
+>>>>  
+>>>> -	kvm_arch_vcpu_blocking(vcpu);
+>>>> -
+>>>>  	for (;;) {
+>>>>  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
+>>>>  
+>>>> @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>>>>  	finish_swait(&vcpu->wq, &wait);
+>>>>  	cur = ktime_get();
+>>>>  
+>>>> -	kvm_arch_vcpu_unblocking(vcpu);
+>>>>  out:
+>>>> +	kvm_arch_vcpu_unblocking(vcpu);
+>>>>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>>>>  
+>>>>  	if (!vcpu_valid_wakeup(vcpu))
+>>>>
+>>>> Thanks,
+>>>>
+>>>> 	M.
+>>>>
+>>>
+>>> I've tested your patch and the results showed as follow:
+>>>
+>>> netperf result:
+>>> D06 as server, intel 8180 server as client
+>>> with change:
+>>> package 512 bytes - 5500 Mbits/s
+>>> package 64 bytes - 760 Mbits/s
+>>> without change:
+>>> package 512 bytes - 5000 Mbits/s
+>>> package 64 bytes - 710 Mbits/s
+>>
+>> OK, that's pretty good. Let me know once you've tested it on D05.
+>>
+>> Thanks,
+>>
+>> 	M.
+>>
+> 
+> The average cost of kvm_vgic_v4_enable_doorbell on D05 is 0.74us,
+> while it is 0.35us on D06.
+> 
+> netperf result:
+> server: D05 vm using 82599 vf,
+> client: intel 8180
+> 5.0.0-rc3, have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN
+> if GICv4 is enabled"
+> 
+> with change:
+> package 512 bytes - 7150 Mbits/s
+> package 64 bytes - 1080 Mbits/s
+> without change:
+> package 512 bytes - 7050 Mbits/s
+> package 64 bytes - 1080 Mbits/s
+> 
+> It seems not work on D05, as the doorbell enable process costs more than
+> that on D06.
+> 
+> Thanks,
+> Tang
+> 
+> 
+> .
+> 
+
+On D05, Hi1616, ACS extended capability was not implemented standardly, it
+has to fix it by making a new quirk. And this change results to about 1.5%
+performance drop on D05, while it improves 5% to 8% on D06. D06 will be
+more commercially used than D05. We think it may be reasonable to change
+this process.
+If you need to verify this process,  you may use our D06 machine. I will
+shows how you can use it with another email. As I know, James.Morse@arm.com
+has ever used it too.
+
+Thanks,
+Tang
+
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
