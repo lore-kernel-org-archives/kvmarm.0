@@ -1,68 +1,61 @@
-Return-Path: <SRS0=iDSe=TO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=1iCv=TP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0082C04AB7
-	for <kvmarm@archiver.kernel.org>; Tue, 14 May 2019 09:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84094C04E53
+	for <kvmarm@archiver.kernel.org>; Wed, 15 May 2019 08:25:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63A6620862
-	for <kvmarm@archiver.kernel.org>; Tue, 14 May 2019 09:02:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A6620862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 02A3D20843
+	for <kvmarm@archiver.kernel.org>; Wed, 15 May 2019 08:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A3D20843
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B07494A4F2;
-	Tue, 14 May 2019 05:02:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F13C4A4F2;
+	Wed, 15 May 2019 04:25:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 17P4UWvL+MCZ; Tue, 14 May 2019 05:02:48 -0400 (EDT)
+	with ESMTP id WxCxe9k8ozT8; Wed, 15 May 2019 04:25:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FC804A418;
-	Tue, 14 May 2019 05:02:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 078924A418;
+	Wed, 15 May 2019 04:25:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B42A14A418
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 May 2019 05:02:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86E6D4A418
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 May 2019 04:25:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I2akZBwu3mNl for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 May 2019 05:02:44 -0400 (EDT)
-Received: from huawei.com (szxga06-in.huawei.com [45.249.212.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DFFF4A417
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 May 2019 05:02:44 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 3FDCEC449AF04FC2B0DD;
- Tue, 14 May 2019 17:02:40 +0800 (CST)
-Received: from [127.0.0.1] (10.67.78.74) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 14 May 2019
- 17:02:29 +0800
-Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
-From: "Tangnianyao (ICT)" <tangnianyao@huawei.com>
-To: Marc Zyngier <marc.zyngier@arm.com>
-References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
- <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
- <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
- <86zhpc66jl.wl-marc.zyngier@arm.com>
- <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
- <86imvu3uje.wl-marc.zyngier@arm.com>
- <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
- <861s1tavn0.wl-marc.zyngier@arm.com>
- <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
-Message-ID: <53a525e5-c9a7-0d98-ff7a-ca5be0ea381a@huawei.com>
-Date: Tue, 14 May 2019 17:02:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.0
+ with ESMTP id vwbsvcXjtCMp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 May 2019 04:25:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 257344A409
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 May 2019 04:25:52 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2253B374;
+ Wed, 15 May 2019 01:25:51 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D34F3F703;
+ Wed, 15 May 2019 01:25:48 -0700 (PDT)
+Subject: Re: [PATCH v6 5/5] KVM: arm/arm64: support chained PMU counters
+To: Andrew Murray <andrew.murray@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Marc Zyngier <marc.zyngier@arm.com>
+References: <20190509153212.24187-1-andrew.murray@arm.com>
+ <20190509153212.24187-6-andrew.murray@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <69f7f607-2a38-41f0-63b8-0419bd5e6e9c@arm.com>
+Date: Wed, 15 May 2019 09:25:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
-X-Originating-IP: [10.67.78.74]
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org,
- xuwei5@huawei.com, guoheyi@huawei.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190509153212.24187-6-andrew.murray@arm.com>
+Content-Language: en-US
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,292 +72,533 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Andrew,
+
+It might be just my personal taste, but I'm not entirely sold on the
+introduction of get/set_perf_event. Having both this and the concept of
+getting the "canonical" pmc feels a bit redundant, or that we're
+hiding/mixing stuff.
+
+In most cases not calling the getter/setter feels simpler, see below.
+
+On 09/05/2019 16:32, Andrew Murray wrote:
+> ARMv8 provides support for chained PMU counters, where an event type
+> of 0x001E is set for odd-numbered counters, the event counter will
+> increment by one for each overflow of the preceding even-numbered
+> counter. Let's emulate this in KVM by creating a 64 bit perf counter
+> when a user chains two emulated counters together.
+> 
+> For chained events we only support generating an overflow interrupt
+> on the high counter. We use the attributes of the low counter to
+> determine the attributes of the perf event.
+> 
+> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
+> ---
+>  include/kvm/arm_pmu.h |   2 +
+>  virt/kvm/arm/pmu.c    | 298 +++++++++++++++++++++++++++++++++++-------
+>  2 files changed, 256 insertions(+), 44 deletions(-)
+> 
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index b73f31baca52..8b434745500a 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -22,6 +22,7 @@
+>  #include <asm/perf_event.h>
+>  
+>  #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+> +#define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+
+Minor nit: I should have pointed that out on the previous version. To me
+it would seem more obvious to use "(ARMV8_PMU_MAX_COUNTERS + 1) / 2"
+rather than shifting right. Granted that anyone reading these sources
+are likely to know that both are equivalent, but logically there are
+half the number of counter pairs than there are counters.
+
+>  
+>  #ifdef CONFIG_KVM_ARM_PMU
+>  
+> @@ -34,6 +35,7 @@ struct kvm_pmc {
+>  struct kvm_pmu {
+>  	int irq_num;
+>  	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+> +	DECLARE_BITMAP(chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+>  	bool ready;
+>  	bool created;
+>  	bool irq_level;
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index ae1e886d4a1a..6cdd9746f071 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -25,6 +25,138 @@
+>  #include <kvm/arm_vgic.h>
+>  
+>  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+> +
+> +#define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+> +
+> +static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> +{
+> +	struct kvm_pmu *pmu;
+> +	struct kvm_vcpu_arch *vcpu_arch;
+> +
+> +	pmc -= pmc->idx;
+> +	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
+> +	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
+> +	return container_of(vcpu_arch, struct kvm_vcpu, arch);
+> +}
+> +
+> +/**
+> + * kvm_pmu_pmc_is_chained - determine if the pmc is chained
+> + * @pmc: The PMU counter pointer
+> + */
+> +static bool kvm_pmu_pmc_is_chained(struct kvm_pmc *pmc)
+> +{
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +
+> +	return test_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> +}
+> +
+> +/**
+> + * kvm_pmu_pmc_is_high_counter - determine if select_idx is a high/low counter
+> + * @select_idx: The counter index
+> + */
+> +static bool kvm_pmu_pmc_is_high_counter(u64 select_idx)
+> +{
+> +	return select_idx & 0x1;
+> +}
+> +
+> +/**
+> + * kvm_pmu_get_canonical_pmc - obtain the canonical pmc
+> + * @pmc: The PMU counter pointer
+> + *
+> + * When a pair of PMCs are chained together we use the low counter (canonical)
+> + * to hold the underlying perf event.
+> + */
+> +static struct kvm_pmc *kvm_pmu_get_canonical_pmc(struct kvm_pmc *pmc)
+> +{
+> +	if (kvm_pmu_pmc_is_chained(pmc) &&
+> +	    kvm_pmu_pmc_is_high_counter(pmc->idx))
+> +		return pmc - 1;
+> +
+> +	return pmc;
+> +}
+> +
+> +/**
+> + * kvm_pmu_idx_has_chain_evtype - determine if the event type is chain
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +static bool kvm_pmu_idx_has_chain_evtype(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	u64 eventsel, reg;
+> +
+> +	select_idx |= 0x1;
+> +
+> +	if (select_idx == ARMV8_PMU_CYCLE_IDX)
+> +		return false;
+> +
+> +	reg = PMEVTYPER0_EL0 + select_idx;
+> +	eventsel = __vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_EVENT;
+> +
+> +	return armv8pmu_evtype_is_chain(eventsel);
+> +}
+> +
+> +/**
+> + * kvm_pmu_get_perf_event - obtain a perf event from a pmc
+> + * @pmc: The PMU counter pointer
+> + *
+> + * When a pair of PMCs are chained together we obtain the perf event in
+> + * the canonical counter.
+> + */
+> +static struct perf_event *kvm_pmu_get_perf_event(struct kvm_pmc *pmc)
+> +{
+> +	return kvm_pmu_get_canonical_pmc(pmc)->perf_event;
+> +}
+> +
+> +/**
+> + * kvm_pmu_set_perf_event - set a perf event to a pmc
+> + * @pmc: The PMU counter pointer
+> + * @perf_event: The perf event
+> + *
+> + * When a pair of PMCs are chained together we set the perf event in
+> + * the canonical counter.
+> + */
+> +static void kvm_pmu_set_perf_event(struct kvm_pmc *pmc,
+> +				   struct perf_event *perf_event)
+> +{
+> +	kvm_pmu_get_canonical_pmc(pmc)->perf_event = perf_event;
+> +}
+> +
+> +/**
+> + * kvm_pmu_get_pair_counter_value - get PMU counter value
+> + * @vcpu: The vcpu pointer
+> + * @pmc: The PMU counter pointer
+> + */
+> +static u64 kvm_pmu_get_pair_counter_value(struct kvm_vcpu *vcpu,
+> +					  struct kvm_pmc *pmc)
+> +{
+> +	u64 counter, counter_high, reg, enabled, running;
+> +	struct perf_event *perf_event = kvm_pmu_get_perf_event(pmc);
+> +
+> +	if (kvm_pmu_pmc_is_chained(pmc)) {
+> +		pmc = kvm_pmu_get_canonical_pmc(pmc);
+> +		reg = PMEVCNTR0_EL0 + pmc->idx;
+> +
+> +		counter = __vcpu_sys_reg(vcpu, reg);
+> +		counter_high = __vcpu_sys_reg(vcpu, reg + 1);
+> +
+> +		counter = lower_32_bits(counter) | (counter_high << 32);
+> +	} else {
+> +		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> +		      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+> +		counter = __vcpu_sys_reg(vcpu, reg);
+> +	}
+> +
+> +	/*
+> +	 * The real counter value is equal to the value of counter register plus
+> +	 * the value perf event counts.
+> +	 */
+> +	if (perf_event)
+
+We don't reference the perf_event before this point and pmc is set to
+the counter that holds the perf event. You could just use
+"pmc->perf_event" here.
+
+> +		counter += perf_event_read_value(perf_event, &enabled,
+> +						 &running);
+> +
+> +	return counter;
+> +}
+> +
+>  /**
+>   * kvm_pmu_get_counter_value - get PMU counter value
+>   * @vcpu: The vcpu pointer
+> @@ -32,20 +164,15 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+>   */
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+> -	u64 counter, reg, enabled, running;
+> +	u64 counter;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>  	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>  
+> -	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+> -	counter = __vcpu_sys_reg(vcpu, reg);
+> +	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+>  
+> -	/* The real counter value is equal to the value of counter register plus
+> -	 * the value perf event counts.
+> -	 */
+> -	if (pmc->perf_event)
+> -		counter += perf_event_read_value(pmc->perf_event, &enabled,
+> -						 &running);
+> +	if (kvm_pmu_pmc_is_chained(pmc) &&
+> +	    kvm_pmu_pmc_is_high_counter(select_idx))
+> +		counter >>= 32;
+>  
+>  	return counter & pmc->bitmask;
+>  }
+> @@ -74,10 +201,12 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>   */
+>  static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>  {
+> -	if (pmc->perf_event) {
+> -		perf_event_disable(pmc->perf_event);
+> -		perf_event_release_kernel(pmc->perf_event);
+> -		pmc->perf_event = NULL;
+> +	struct perf_event *perf_event = kvm_pmu_get_perf_event(pmc);
+> +
+> +	if (perf_event) {
+> +		perf_event_disable(perf_event);
+> +		perf_event_release_kernel(perf_event);
+> +		kvm_pmu_set_perf_event(pmc, NULL);
+>  	}
+>  }
+>  
+> @@ -89,15 +218,27 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>   */
+>  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>  {
+> -	u64 counter, reg;
+> +	u64 counter, counter_low, counter_high, reg;
+>  
+> -	if (pmc->perf_event) {
+> +	if (!kvm_pmu_get_perf_event(pmc))
+> +		return;
+> +
+> +	if (kvm_pmu_pmc_is_chained(pmc)) {
+> +		pmc = kvm_pmu_get_canonical_pmc(pmc);
+> +		counter_low = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+> +		counter_high = kvm_pmu_get_counter_value(vcpu, pmc->idx + 1);
+> +
+> +		reg = PMEVCNTR0_EL0 + pmc->idx;
+> +		__vcpu_sys_reg(vcpu, reg) = counter_low;
+> +		__vcpu_sys_reg(vcpu, reg + 1) = counter_high;
+> +	} else {
 
 
-On 2019/4/29 10:29, Tangnianyao (ICT) wrote:
+What about:
 
-Hi, Marc
+	pmc = kvm_pmu_get_canonical_pmc(pmc);
+	if (!pmc->perf_event)
+		return;
 
-> On 2019/4/23 18:00, Marc Zyngier wrote:
-> 
-> Hi, Marc
-> 
->> On Tue, 23 Apr 2019 08:44:17 +0100,
->> "Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
->>>
->>> Hi, Marc
->>
->> [...]
->>
->>> I've learned that there's some implementation problem for the PCIe
->>> controller of Hi1616, the processor of D05. The PCIe ACS was not
->>> implemented properly and D05 doesn't support VM using pcie vf.
->>
->> My D05 completely disagrees with you:
->>
->> root@unassigned-hostname:~# lspci -v
->> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
->> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
->> 	Flags: fast devsel
->> lspci: Unable to load libkmod resources: error -12
->>
->> 00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio network device
->> 	Flags: bus master, fast devsel, latency 0, IRQ 40
->> 	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
->> 	Expansion ROM at 10000000 [disabled] [size=256K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio block device
->> 	Flags: bus master, fast devsel, latency 0, IRQ 41
->> 	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio SCSI
->> 	Flags: bus master, fast devsel, latency 0, IRQ 42
->> 	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
->> 	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
->> 	Flags: bus master, fast devsel, latency 0
->> 	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
->> 	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
->> 	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
->> 	Capabilities: [100] Advanced Error Reporting
->> 	Capabilities: [1a0] Transaction Processing Hints
->> 	Capabilities: [1d0] Access Control Services
->> 	Kernel driver in use: igbvf
->>
->> root@unassigned-hostname:~# uptime
->>  05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
->>
-> 
-> I have make a new quirk to fix ACS problem on Hi1616, to enable VM using
-> pcie vf.
-> 
->> For something that isn't supposed to work, it is pretty good. So
->> please test it and let me know how it fares. At this stage, not
->> regressing deployed HW is more important than improving the situation
->> on HW that nobody has.
->>
->>>
->>>>
->>>>>
->>>>>>
->>>>>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
->>>>>>> large at all.
->>>>>>
->>>>>> Sure. But I'm not sure this is a universal figure.
->>>>>>
->>>>>>>
->>>>>>>> Frankly, you want to be careful with that. I'd rather enable them late
->>>>>>>> and have a chance of not blocking because of another (virtual)
->>>>>>>> interrupt, which saves us the doorbell business.
->>>>>>>>
->>>>>>>> I wonder if you wouldn't be in a better position by drastically
->>>>>>>> reducing halt_poll_ns for vcpu that can have directly injected
->>>>>>>> interrupts.
->>>>>>>>
->>>>>>>
->>>>>>> If we set halt_poll_ns to a small value, the chance of
->>>>>>> not blocking and vcpu scheduled out becomes larger. The cost
->>>>>>> of vcpu scheduled out is quite expensive.
->>>>>>> In many cases, one pcpu is assigned to only
->>>>>>> one vcpu, and halt_poll_ns is set quite large, to increase
->>>>>>> chance of halt_poll process got terminated. This is the
->>>>>>> reason we want to set halt_poll_ns large. And We hope vlpi
->>>>>>> stop halt_poll process in time.
->>>>>>
->>>>>> Fair enough. It is certainly realistic to strictly partition the
->>>>>> system when GICv4 is in use, so I can see some potential benefit.
->>>>>>
->>>>>>> Though it will check whether vcpu is runnable again by
->>>>>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
->>>>>>> However it's somewhat later if halt_poll_ns is larger.
->>>>>>>
->>>>>>>> In any case, this is something that we should measure, not guess.
->>>>>>
->>>>>> Please post results of realistic benchmarks that we can reproduce,
->>>>>> with and without this change. I'm willing to entertain the idea, but I
->>>>>> need more than just a vague number.
->>>>>>
->>>>>> Thanks,
->>>>>>
->>>>>> 	M.
->>>>>>
->>>>>
->>>>> I tested it with and without change (patch attached in the last).
->>>>> halt_poll_ns is keep default, 500000ns.
->>>>> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
->>>>> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
->>>>>
->>>>> netperf result:
->>>>> D06 as server, intel 8180 server as client
->>>>> with change:
->>>>> package 512 bytes - 5400 Mbits/s
->>>>> package 64 bytes - 740 Mbits/s
->>>>> without change:
->>>>> package 512 bytes - 5000 Mbits/s
->>>>> package 64 bytes - 710 Mbits/s
->>>>>
->>>>> Also I have tested D06 as client, intel machine as server,
->>>>> with the change, the result remains the same.
->>>>
->>>> So anywhere between 4% and 8% improvement. Please post results for D05
->>>> once you've found one.
->>>>
->>>>>
->>>>>
->>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>> index 55fe8e2..0f56904 100644
->>>>> --- a/virt/kvm/kvm_main.c
->>>>> +++ b/virt/kvm/kvm_main.c
->>>>> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>>  	if (vcpu->halt_poll_ns) {
->>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->>>>>
->>>>> +#ifdef CONFIG_ARM64
->>>>> +		/*
->>>>> +		 * When using gicv4, enable doorbell before halt pool wait
->>>>> +		 * so that direct vlpi can stop halt poll.
->>>>> +		 */
->>>>> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
->>>>> +			kvm_vgic_v4_enable_doorbell(vcpu);
->>>>> +		}
->>>>> +#endif
->>>>> +
->>>>
->>>> Irk. No. You're now leaving doorbells enabled when going back to the
->>>> guest, and that's pretty bad as the whole logic relies on doorbells
->>>> being disabled if the guest can run.
->>>>
->>>> So please try this instead on top of mainline. And it has to be on top
->>>> of mainline as we've changed the way timer interrupts work in 5.1 --
->>>> see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
->>>>
->>
->> [...]
->>
->>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>> index f25aa98a94df..0ae4ad5dcb12 100644
->>>> --- a/virt/kvm/kvm_main.c
->>>> +++ b/virt/kvm/kvm_main.c
->>>> @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  	bool waited = false;
->>>>  	u64 block_ns;
->>>>  
->>>> +	kvm_arch_vcpu_blocking(vcpu);
->>>> +
->>>>  	start = cur = ktime_get();
->>>>  	if (vcpu->halt_poll_ns) {
->>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->>>> @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  		} while (single_task_running() && ktime_before(cur, stop));
->>>>  	}
->>>>  
->>>> -	kvm_arch_vcpu_blocking(vcpu);
->>>> -
->>>>  	for (;;) {
->>>>  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
->>>>  
->>>> @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  	finish_swait(&vcpu->wq, &wait);
->>>>  	cur = ktime_get();
->>>>  
->>>> -	kvm_arch_vcpu_unblocking(vcpu);
->>>>  out:
->>>> +	kvm_arch_vcpu_unblocking(vcpu);
->>>>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
->>>>  
->>>>  	if (!vcpu_valid_wakeup(vcpu))
->>>>
->>>> Thanks,
->>>>
->>>> 	M.
->>>>
->>>
->>> I've tested your patch and the results showed as follow:
->>>
->>> netperf result:
->>> D06 as server, intel 8180 server as client
->>> with change:
->>> package 512 bytes - 5500 Mbits/s
->>> package 64 bytes - 760 Mbits/s
->>> without change:
->>> package 512 bytes - 5000 Mbits/s
->>> package 64 bytes - 710 Mbits/s
->>
->> OK, that's pretty good. Let me know once you've tested it on D05.
->>
->> Thanks,
->>
->> 	M.
->>
-> 
-> The average cost of kvm_vgic_v4_enable_doorbell on D05 is 0.74us,
-> while it is 0.35us on D06.
-> 
-> netperf result:
-> server: D05 vm using 82599 vf,
-> client: intel 8180
-> 5.0.0-rc3, have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN
-> if GICv4 is enabled"
-> 
-> with change:
-> package 512 bytes - 7150 Mbits/s
-> package 64 bytes - 1080 Mbits/s
-> without change:
-> package 512 bytes - 7050 Mbits/s
-> package 64 bytes - 1080 Mbits/s
-> 
-> It seems not work on D05, as the doorbell enable process costs more than
-> that on D06.
-> 
-> Thanks,
-> Tang
-> 
-> 
-> .
-> 
+	counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+	if (kvm_pmu_pmc_is_chained(pmc)) {
+		reg = PMEVCNTR0_EL0 + pmc->idx;
 
-On D05, Hi1616, ACS extended capability was not implemented standardly, it
-has to fix it by making a new quirk. And this change results to about 1.5%
-performance drop on D05, while it improves 5% to 8% on D06. D06 will be
-more commercially used than D05. We think it may be reasonable to change
-this process.
-If you need to verify this process,  you may use our D06 machine. I will
-shows how you can use it with another email. As I know, James.Morse@arm.com
-has ever used it too.
+		/* Also update high part of the counter */
+		__vcpu_sys_reg(vcpu, reg + 1) = kvm_pmu_get_counter_value(vcpu,
+pmc->idx + 1);
+	} else {
+		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX ? PMCCNTR_EL0 : PMEVCNTR0_EL0 +
+pmc->idx);
+	}
+
+	/* Update counter register */
+	__vcpu_sys_reg(vcpu, reg) = counter;
+	kvm_pmu_release_perf_event(pmc);
+
+>  		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+>  		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+>  		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+>  		__vcpu_sys_reg(vcpu, reg) = counter;
+> -		kvm_pmu_release_perf_event(pmc);
+>  	}
+> +
+> +	kvm_pmu_release_perf_event(pmc);
+>  }
+>  
+>  /**
+> @@ -115,6 +256,8 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+>  		pmu->pmc[i].idx = i;
+>  		pmu->pmc[i].bitmask = 0xffffffffUL;
+>  	}
+> +
+> +	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+>  }
+>  
+>  /**
+> @@ -154,6 +297,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  	int i;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>  	struct kvm_pmc *pmc;
+> +	struct perf_event *perf_event;
+>  
+>  	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
+>  		return;
+> @@ -163,9 +307,21 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  			continue;
+>  
+>  		pmc = &pmu->pmc[i];
+> -		if (pmc->perf_event) {
+> -			perf_event_enable(pmc->perf_event);
+> -			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> +
+> +		/*
+> +		 * For high counters of chained events we must recreate the
+> +		 * perf event with the long (64bit) attribute set.
+> +		 */
+> +		if (kvm_pmu_pmc_is_chained(pmc) &&
+> +		    kvm_pmu_pmc_is_high_counter(i)) {
+> +			kvm_pmu_create_perf_event(vcpu, i);
+> +			continue;
+> +		}
+> +
+> +		perf_event = kvm_pmu_get_perf_event(&pmu->pmc[i]);
+
+Again, here we know that "pmu->pmc[i]" is a canonical counter.
+"pmu->pmc[i].perf_event" is sufficient.
+
+> +		if (perf_event) {
+> +			perf_event_enable(perf_event);
+> +			if (perf_event->state != PERF_EVENT_STATE_ACTIVE)
+>  				kvm_debug("fail to enable perf event\n");
+>  		}
+>  	}
+> @@ -183,6 +339,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  	int i;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>  	struct kvm_pmc *pmc;
+> +	struct perf_event *perf_event;
+>  
+>  	if (!val)
+>  		return;
+> @@ -192,8 +349,20 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>  			continue;
+>  
+>  		pmc = &pmu->pmc[i];
+> -		if (pmc->perf_event)
+> -			perf_event_disable(pmc->perf_event);
+> +
+> +		/*
+> +		 * For high counters of chained events we must recreate the
+> +		 * perf event with the long (64bit) attribute unset.
+> +		 */
+> +		if (kvm_pmu_pmc_is_chained(pmc) &&
+> +		    kvm_pmu_pmc_is_high_counter(i)) {
+> +			kvm_pmu_create_perf_event(vcpu, i);
+> +			continue;
+> +		}
+> +
+> +		perf_event = kvm_pmu_get_perf_event(&pmu->pmc[i]);
+
+Same thing.
+
+> +		if (perf_event)
+> +			perf_event_disable(perf_event);
+>  	}
+>  }
+>  
+> @@ -281,17 +450,6 @@ void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+>  	kvm_pmu_update_state(vcpu);
+>  }
+>  
+> -static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> -{
+> -	struct kvm_pmu *pmu;
+> -	struct kvm_vcpu_arch *vcpu_arch;
+> -
+> -	pmc -= pmc->idx;
+> -	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
+> -	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
+> -	return container_of(vcpu_arch, struct kvm_vcpu, arch);
+> -}
+> -
+>  /**
+>   * When the perf event overflows, set the overflow status and inform the vcpu.
+>   */
+> @@ -389,13 +547,20 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+>  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> -	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +	struct kvm_pmc *pmc;
+>  	struct perf_event *event;
+>  	struct perf_event_attr attr;
+>  	u64 eventsel, counter, reg, data;
+>  
+> -	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+> +	/*
+> +	 * For chained counters the event type and filtering attributes are
+> +	 * obtained from the low/even counter. We also use this counter to
+> +	 * determine if the event is enabled/disabled.
+> +	 */
+> +	pmc = kvm_pmu_get_canonical_pmc(&pmu->pmc[select_idx]);
+> +
+> +	reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> +	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pmc->idx;
+>  	data = __vcpu_sys_reg(vcpu, reg);
+>  
+>  	kvm_pmu_stop_counter(vcpu, pmc);
+> @@ -403,34 +568,77 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  
+>  	/* Software increment event does't need to be backed by a perf event */
+>  	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
+> -	    select_idx != ARMV8_PMU_CYCLE_IDX)
+> +	    pmc->idx != ARMV8_PMU_CYCLE_IDX)
+>  		return;
+>  
+>  	memset(&attr, 0, sizeof(struct perf_event_attr));
+>  	attr.type = PERF_TYPE_RAW;
+>  	attr.size = sizeof(attr);
+>  	attr.pinned = 1;
+> -	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, select_idx);
+> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
+>  	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
+>  	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
+>  	attr.exclude_hv = 1; /* Don't count EL2 events */
+>  	attr.exclude_host = 1; /* Don't count host events */
+> -	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
+> +	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
+>  		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+>  
+> -	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> -	/* The initial sample period (overflow count) of an event. */
+> -	attr.sample_period = (-counter) & pmc->bitmask;
+> +	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+>  
+> -	event = perf_event_create_kernel_counter(&attr, -1, current,
+> +	if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx)) {
+> +		/**
+> +		 * The initial sample period (overflow count) of an event. For
+> +		 * chained counters we only support overflow interrupts on the
+> +		 * high counter.
+> +		 */
+> +		attr.sample_period = (-counter) & 0xffffffffffffffffUL;
+> +		event = perf_event_create_kernel_counter(&attr, -1, current,
+> +							 kvm_pmu_perf_overflow,
+> +							 pmc + 1);
+> +
+> +		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
+> +			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
+> +	} else {
+> +		/* The initial sample period (overflow count) of an event. */
+> +		attr.sample_period = (-counter) & pmc->bitmask;
+> +		event = perf_event_create_kernel_counter(&attr, -1, current,
+>  						 kvm_pmu_perf_overflow, pmc);
+> +	}
+> +
+>  	if (IS_ERR(event)) {
+>  		pr_err_once("kvm: pmu event creation failed %ld\n",
+>  			    PTR_ERR(event));
+>  		return;
+>  	}
+>  
+> -	pmc->perf_event = event;
+> +	kvm_pmu_set_perf_event(pmc, event);
+
+You set pmc to a canonical counter at the begining of the function, so
+you could do `pmc->perf_event = event`.
+
+> +}
+> +
+> +/**
+> + * kvm_pmu_update_pmc_chained - update chained bitmap
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The number of selected counter
+> + *
+> + * Update the chained bitmap based on the event type written in the
+> + * typer register.
+> + */
+> +static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx)) {
+> +		/*
+> +		 * During promotion from !chained to chained we must ensure
+> +		 * the adjacent counter is stopped and its event destroyed
+> +		 */
+> +		if (!kvm_pmu_pmc_is_chained(pmc))
+> +			kvm_pmu_stop_counter(vcpu, pmc);
+> +
+> +		set_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> +	} else {
+> +		clear_bit(pmc->idx >> 1, vcpu->arch.pmu.chained);
+> +	}
+>  }
+>  
+>  /**
+> @@ -452,6 +660,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+>  
+>  	__vcpu_sys_reg(vcpu, reg) = event_type;
+> +
+> +	kvm_pmu_update_pmc_chained(vcpu, select_idx);
+>  	kvm_pmu_create_perf_event(vcpu, select_idx);
+>  }
+>  
+> 
 
 Thanks,
-Tang
 
-
+-- 
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
