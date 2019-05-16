@@ -1,82 +1,66 @@
-Return-Path: <SRS0=1iCv=TP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=qZbx=TQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B40C04E53
-	for <kvmarm@archiver.kernel.org>; Wed, 15 May 2019 21:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD6DC04AB4
+	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 07:21:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 51C2B2082E
-	for <kvmarm@archiver.kernel.org>; Wed, 15 May 2019 21:42:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C2B2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 85BEF205ED
+	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 07:21:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85BEF205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C188F4A476;
-	Wed, 15 May 2019 17:42:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C08114A369;
+	Thu, 16 May 2019 03:21:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xog6W6LYryFe; Wed, 15 May 2019 17:42:20 -0400 (EDT)
+	with ESMTP id mJNMq+Xx0bxe; Thu, 16 May 2019 03:21:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBA404A477;
-	Wed, 15 May 2019 17:42:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45F8F4A4C3;
+	Thu, 16 May 2019 03:21:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6AD4A4A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 May 2019 17:42:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6028B4A4C9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 03:21:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CQXCBra1n36o for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 May 2019 17:42:18 -0400 (EDT)
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
- [209.85.128.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FD814A36B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 May 2019 17:42:18 -0400 (EDT)
-Received: by mail-wm1-f65.google.com with SMTP id j187so1435781wmj.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 May 2019 14:42:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cK3Y9KxZ958VjTN9/j0HmLvhqtWrqpj1Eiv0iIXluz8=;
- b=NOe78SffOL5j4fPqXXuji3T4KTM3Ofj9PAkXRzRuuNzVTkoX/vjRbvE4yhj6mwvKkN
- w0ugwesC/vworyslT/atoIgi7Qwesg32MrtaUfD8KoiK5V80tJY76dMxmEvfoxenAgh5
- Jzap0aXD+Yniv+E6F9Q0zlCMhSBemxZ6fqKacViYtnOT2Rq7nmIvX3JBQfSRfO1PzBo3
- hfsafjFWkCpS2fO2mMToTzMxtAgpOZDIHJcu6aYcTzPJVZe1Fb48+QV/bdcWjt5f56up
- LQdq5zEMtGAJAlGPc9RhZOkkDJPhMF5gGxSiwrB98rB6yrZTY5ycloQn99VUx1QsFqH5
- fTBA==
-X-Gm-Message-State: APjAAAXGr/x728h823f6ZHgrhkAisPW/dAKsfXOQT4pC92cvz3XzCNG9
- T13TUEXqpNPfvB51wprWu/HW+w==
-X-Google-Smtp-Source: APXvYqxmP3hKGokzzdV6R/wU044EEKCdMwU8XI2vejExX4Tlo4rebHLW3WTheFhtyMVcTqUqCtPCxA==
-X-Received: by 2002:a05:600c:492:: with SMTP id
- d18mr10215934wme.59.1557956537037; 
- Wed, 15 May 2019 14:42:17 -0700 (PDT)
-Received: from [172.10.18.228] (24-113-124-115.wavecable.com. [24.113.124.115])
- by smtp.gmail.com with ESMTPSA id y7sm7019701wrg.45.2019.05.15.14.42.11
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 15 May 2019 14:42:16 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm updates for 5.2
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>
-References: <20190503124427.190206-1-marc.zyngier@arm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8bd20863-f03c-9621-d3ae-10c4da28764d@redhat.com>
-Date: Wed, 15 May 2019 23:42:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- "zhang . lei" <zhang.lei@jp.fujitsu.com>, Julien Grall <julien.grall@arm.com>,
- kvmarm@lists.cs.columbia.edu, Amit Daniel Kachhap <amit.kachhap@arm.com>,
- Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
+ with ESMTP id B1N6XMUf6CRN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 May 2019 03:21:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B41A74A36B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 03:21:53 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F29B21715;
+ Thu, 16 May 2019 00:21:52 -0700 (PDT)
+Received: from big-swifty.misterjones.org (usa-sjc-mx-foss1.foss.arm.com
+ [217.140.101.70])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 632863F71E;
+ Thu, 16 May 2019 00:21:47 -0700 (PDT)
+Date: Thu, 16 May 2019 08:21:21 +0100
+Message-ID: <864l5u7tla.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
+In-Reply-To: <20190515173832.62afdd90@donnerap.cambridge.arm.com>
+References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+ <86o969z42z.wl-marc.zyngier@arm.com>
+ <20190318133040.1cfad9a4@why.wild-wind.fr.eu.org>
+ <20190515173832.62afdd90@donnerap.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: mst@redhat.com, kvm@vger.kernel.org, "Raslan,
+ KarimAllah" <karahmed@amazon.de>, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,13 +77,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 03/05/19 14:43, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-for-v5.2
+Hi Andre,
 
-Pulled, thnaks.  Note that capabilities had to be renumbered to avoid
-conflicts.
+On Wed, 15 May 2019 17:38:32 +0100,
+Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+> On Mon, 18 Mar 2019 13:30:40 +0000
+> Marc Zyngier <marc.zyngier@arm.com> wrote:
+> 
+> Hi,
+> 
+> > On Sun, 17 Mar 2019 19:35:48 +0000
+> > Marc Zyngier <marc.zyngier@arm.com> wrote:
+> > 
+> > [...]
+> > 
+> > > A first approach would be to keep a small cache of the last few
+> > > successful translations for this ITS, cache that could be looked-up by
+> > > holding a spinlock instead. A hit in this cache could directly be
+> > > injected. Any command that invalidates or changes anything (DISCARD,
+> > > INV, INVALL, MAPC with V=0, MAPD with V=0, MOVALL, MOVI) should nuke
+> > > the cache altogether.  
+> > 
+> > And to explain what I meant with this, I've pushed a branch[1] with a
+> > basic prototype. It is good enough to get a VM to boot, but I wouldn't
+> > trust it for anything serious just yet.
+> > 
+> > If anyone feels like giving it a go and check whether it has any
+> > benefit performance wise, please do so.
+> 
+> So I took a stab at the performance aspect, and it took me a while to find
+> something where it actually makes a difference. The trick is to create *a
+> lot* of interrupts. This is my setup now:
+> - GICv3 and ITS
+> - 5.1.0 kernel vs. 5.1.0 plus Marc's rebased "ITS cache" patches on top
+> - 4 VCPU guest on a 4 core machine
+> - passing through a M.2 NVMe SSD (or a USB3 controller) to the guest
+> - running FIO in the guest, with:
+>   - 4K block size, random reads, queue depth 16, 4 jobs (small)
+>   - 1M block size, sequential reads, QD 1, 1 job (big)
+> 
+> For the NVMe disk I see a whopping 19% performance improvement with Marc's
+> series (for the small blocks). For a SATA SSD connected via USB3.0 I still
+> see 6% improvement. For NVMe there were 50,000 interrupts per second on
+> the host, the USB3 setup came only up to 10,000/s. For big blocks (with
+> IRQs in the low thousands/s) the win is less, but still a measurable
+> 3%.
 
-Paolo
+Thanks for having a go at this, and identifying the case where it
+actually matters (I would have hoped that the original reporter would
+have helped with this, but hey, never mind). The results are pretty
+impressive (more so than I anticipated), and I wonder whether we could
+improve things further (50k interrupts/s is not that high -- I get
+more than 100k on some machines just by playing with their sdcard...).
+
+Could you describe how many interrupt sources each device has? The
+reason I'm asking is that the cache size is pretty much hardcoded at
+the moment (4 entries per vcpu), and that could have an impact on
+performance if we keep evicting entries in the cache (note to self:
+add some statistics for that).
+
+Another area where we can improve things is that I think the
+invalidation mechanism is pretty trigger happy (MOVI really doesn't
+need to invalidate the cache). On the other hand, I'm not sure your
+guest does too much of that.
+
+Finally, the single cache spin-lock is bound to be a bottleneck of its
+own at high interrupt rates, and I wonder whether we should move the
+whole thing over to an RCU friendly data structure (the vgic_irq
+structure really isn't that friendly). It'd be good to find out how
+contended that spinlock is on your system.
+
+> Now that I have the setup, I can rerun experiments very quickly (given I
+> don't loose access to the machine), so let me know if someone needs
+> further tests.
+
+Another useful data point would be the delta with bare-metal: how much
+overhead do we have with KVM, with and without this patch series. Oh,
+and for easier comparison, please write it as a table that we can dump
+in the cover letter when I actually post the series! ;-)
+
+Thanks,
+
+	M.
+
+-- 
+Jazz is not dead, it just smell funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
