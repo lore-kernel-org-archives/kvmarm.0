@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D42C04E84
-	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 11:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960FEC04AAF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 11:41:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1BCB82089E
-	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 11:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3185021473
+	for <kvmarm@archiver.kernel.org>; Thu, 16 May 2019 11:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIXB/naS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BCB82089E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="07umikDF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3185021473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4ED54A483;
-	Thu, 16 May 2019 07:40:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8EF94A483;
+	Thu, 16 May 2019 07:41:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gabr-efFdj1G; Thu, 16 May 2019 07:40:50 -0400 (EDT)
+	with ESMTP id 6JUSfMo61QeH; Thu, 16 May 2019 07:41:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F0D4A417;
-	Thu, 16 May 2019 07:40:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C236E4A4CD;
+	Thu, 16 May 2019 07:41:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E46CF4A417
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 07:40:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5955F4A417
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 07:41:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T1U6RvZN5aQv for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 May 2019 07:40:48 -0400 (EDT)
+ with ESMTP id KuzXAoBsXeRQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 May 2019 07:41:20 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D546C4A369
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 07:40:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58FA24A369
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 May 2019 07:41:20 -0400 (EDT)
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net
  [73.47.72.35])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 609C12087E;
- Thu, 16 May 2019 11:40:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9ED6520848;
+ Thu, 16 May 2019 11:41:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1558006848;
- bh=OA6R3iu7JBUXC9yXdeUmfUgtGcgdbZm40IF8v11gb0Q=;
+ s=default; t=1558006879;
+ bh=MC2s3zbRA8iOQPyUGePe0AyGmsVxC+FJgNnwH10foAk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FIXB/naSHEYe9Maib831LdZDmNonX+xKO3dmXAXqrP1vw91uVm3oVZ8HLzf4Do9P7
- kE8yz5kuuc76QT+Q8TEKQCHakLez3PcGe6+N77C+3YxVpTC/SrDZOgGdQxkkbHn80D
- XRWH6qDiVnwQfAsP93/pmKkmy55hb3qtmXFwS0sM=
+ b=07umikDFeoAfnmAjcfDjCuS8X/dnh012/6/mFXsKUVtpW8YB/1rYGML/s7U2MSWOL
+ Nb4kBsq9241QOPYAr9yPnV2oY7+6/NLzLCW2iC6y1Q4cbKo5OKqd2JL90eFJP9+qC6
+ eYwizZyHJ7u/TvNANTFfGaPgQh3QUewaA7ryF2SE=
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 16/25] KVM: arm/arm64: Ensure vcpu target is
+Subject: [PATCH AUTOSEL 4.14 10/16] KVM: arm/arm64: Ensure vcpu target is
  unset on reset failure
-Date: Thu, 16 May 2019 07:40:19 -0400
-Message-Id: <20190516114029.8682-16-sashal@kernel.org>
+Date: Thu, 16 May 2019 07:41:01 -0400
+Message-Id: <20190516114107.8963-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190516114029.8682-1-sashal@kernel.org>
-References: <20190516114029.8682-1-sashal@kernel.org>
+In-Reply-To: <20190516114107.8963-1-sashal@kernel.org>
+References: <20190516114107.8963-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -103,10 +103,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 1415e36fed3db..fef3527af3bd7 100644
+index 32aa88c19b8d5..4154f98b337c5 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -949,7 +949,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+@@ -856,7 +856,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
  			       const struct kvm_vcpu_init *init)
  {
@@ -115,7 +115,7 @@ index 1415e36fed3db..fef3527af3bd7 100644
  	int phys_target = kvm_target_cpu();
  
  	if (init->target != phys_target)
-@@ -984,9 +984,14 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+@@ -891,9 +891,14 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
  	vcpu->arch.target = phys_target;
  
  	/* Now we know what it is, we can reset it. */
