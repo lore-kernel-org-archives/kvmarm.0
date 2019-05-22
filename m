@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E3CC282CE
-	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02F9C282CE
+	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 003F720645
-	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 003F720645
+	by mail.kernel.org (Postfix) with ESMTP id 7836220645
+	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7836220645
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD0C34A4F2;
-	Wed, 22 May 2019 13:47:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 327D84A3A3;
+	Wed, 22 May 2019 13:47:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1LHFDvNEffNy; Wed, 22 May 2019 13:47:28 -0400 (EDT)
+	with ESMTP id FdRjdCKPAS9a; Wed, 22 May 2019 13:47:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F6714A4DF;
-	Wed, 22 May 2019 13:47:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A065C4A4CD;
+	Wed, 22 May 2019 13:47:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A2A94A496
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3EC44A417
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e8BiRuPfHZ58 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 May 2019 13:47:25 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF8E94A4D5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:24 -0400 (EDT)
+ with ESMTP id SenhpuSYRQfO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 May 2019 13:47:28 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D7DC4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:28 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D30E341;
- Wed, 22 May 2019 10:47:24 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 845EA15AB;
+ Wed, 22 May 2019 10:47:27 -0700 (PDT)
 Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B75633F5AF;
- Wed, 22 May 2019 10:47:22 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8A553F5AF;
+ Wed, 22 May 2019 10:47:25 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 1/2] KVM: arm64: Move pmu hyp code under hyp's Makefile to
- avoid instrumentation
-Date: Wed, 22 May 2019 18:47:04 +0100
-Message-Id: <20190522174705.236469-2-james.morse@arm.com>
+Subject: [PATCH v2 2/2] KVM: arm/arm64: Move cc/it checks under hyp's Makefile
+ to avoid instrumentation
+Date: Wed, 22 May 2019 18:47:05 +0100
+Message-Id: <20190522174705.236469-3-james.morse@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190522174705.236469-1-james.morse@arm.com>
 References: <20190522174705.236469-1-james.morse@arm.com>
@@ -69,171 +69,323 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM's pmu.c contains the __hyp_text needed to switch the pmu registers
-between host and guest. Because this isn't covered by the 'hyp' Makefile,
-it can be built with kasan and friends when these are enabled in Kconfig.
+KVM has helpers to handle the condition codes of trapped aarch32
+instructions. These are marked __hyp_text and used from HYP, but they
+aren't built by the 'hyp' Makefile, which has all the runes to avoid ASAN
+and KCOV instrumentation.
 
-When starting a guest, this results in:
-| Kernel panic - not syncing: HYP panic:
-| PS:a00003c9 PC:000083000028ada0 ESR:86000007
-| FAR:000083000028ada0 HPFAR:0000000029df5300 PAR:0000000000000000
-| VCPU:000000004e10b7d6
-| CPU: 0 PID: 3088 Comm: qemu-system-aar Not tainted 5.2.0-rc1 #11026
-| Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development Plat
-| Call trace:
-|  dump_backtrace+0x0/0x200
-|  show_stack+0x20/0x30
-|  dump_stack+0xec/0x158
-|  panic+0x1ec/0x420
-|  panic+0x0/0x420
-| SMP: stopping secondary CPUs
-| Kernel Offset: disabled
-| CPU features: 0x002,25006082
-| Memory Limit: none
-| ---[ end Kernel panic - not syncing: HYP panic:
+Move this code to a new hyp/aarch32.c to avoid a hyp-panic when starting
+an aarch32 guest on a host built with the ASAN/KCOV debug options.
 
-This is caused by functions in pmu.c calling the instrumented
-code, which isn't mapped to hyp. From objdump -r:
-| RELOCATION RECORDS FOR [.hyp.text]:
-| OFFSET           TYPE              VALUE
-| 0000000000000010 R_AARCH64_CALL26  __sanitizer_cov_trace_pc
-| 0000000000000018 R_AARCH64_CALL26  __asan_load4_noabort
-| 0000000000000024 R_AARCH64_CALL26  __asan_load4_noabort
-
-Move the affected code to a new file under 'hyp's Makefile.
-
-Fixes: 3d91befbb3a0 ("arm64: KVM: Enable !VHE support for :G/:H perf event modifiers")
-Cc: Andrew Murray <Andrew.Murray@arm.com>
+Fixes: 021234ef3752f ("KVM: arm64: Make kvm_condition_valid32() accessible from EL2")
+Fixes: 8cebe750c4d9a ("arm64: KVM: Make kvm_skip_instr32 available to HYP")
 Signed-off-by: James Morse <james.morse@arm.com>
 ---
-Changes since v1:
- * Made the two functions static in patch 1, removed the header entries.
+ arch/arm/kvm/hyp/Makefile   |   1 +
+ arch/arm64/kvm/hyp/Makefile |   1 +
+ virt/kvm/arm/aarch32.c      | 121 --------------------------------
+ virt/kvm/arm/hyp/aarch32.c  | 136 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 138 insertions(+), 121 deletions(-)
+ create mode 100644 virt/kvm/arm/hyp/aarch32.c
 
- arch/arm64/include/asm/kvm_host.h |  3 ---
- arch/arm64/kvm/hyp/switch.c       | 39 +++++++++++++++++++++++++++++++
- arch/arm64/kvm/pmu.c              | 38 ------------------------------
- 3 files changed, 39 insertions(+), 41 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 2a8d3f8ca22c..4bcd9c1291d5 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -592,9 +592,6 @@ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u32 clr);
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index d2b5ec9c4b92..ba88b1eca93c 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -11,6 +11,7 @@ CFLAGS_ARMV7VE		   :=$(call cc-option, -march=armv7ve)
  
--void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt);
--bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt);
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/aarch32.o
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+ obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 82d1904328ad..ea710f674cb6 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -10,6 +10,7 @@ KVM=../../../../virt/kvm
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/aarch32.o
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
+ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
+index 5abbe9b3c652..6880236974b8 100644
+--- a/virt/kvm/arm/aarch32.c
++++ b/virt/kvm/arm/aarch32.c
+@@ -25,127 +25,6 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ 
+-/*
+- * stolen from arch/arm/kernel/opcodes.c
+- *
+- * condition code lookup table
+- * index into the table is test code: EQ, NE, ... LT, GT, AL, NV
+- *
+- * bit position in short is condition code: NZCV
+- */
+-static const unsigned short cc_map[16] = {
+-	0xF0F0,			/* EQ == Z set            */
+-	0x0F0F,			/* NE                     */
+-	0xCCCC,			/* CS == C set            */
+-	0x3333,			/* CC                     */
+-	0xFF00,			/* MI == N set            */
+-	0x00FF,			/* PL                     */
+-	0xAAAA,			/* VS == V set            */
+-	0x5555,			/* VC                     */
+-	0x0C0C,			/* HI == C set && Z clear */
+-	0xF3F3,			/* LS == C clear || Z set */
+-	0xAA55,			/* GE == (N==V)           */
+-	0x55AA,			/* LT == (N!=V)           */
+-	0x0A05,			/* GT == (!Z && (N==V))   */
+-	0xF5FA,			/* LE == (Z || (N!=V))    */
+-	0xFFFF,			/* AL always              */
+-	0			/* NV                     */
+-};
 -
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
- #else
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 22b4c335e0b2..8799e0c267d4 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -16,6 +16,7 @@
+-/*
+- * Check if a trapped instruction should have been executed or not.
+- */
+-bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
+-{
+-	unsigned long cpsr;
+-	u32 cpsr_cond;
+-	int cond;
+-
+-	/* Top two bits non-zero?  Unconditional. */
+-	if (kvm_vcpu_get_hsr(vcpu) >> 30)
+-		return true;
+-
+-	/* Is condition field valid? */
+-	cond = kvm_vcpu_get_condition(vcpu);
+-	if (cond == 0xE)
+-		return true;
+-
+-	cpsr = *vcpu_cpsr(vcpu);
+-
+-	if (cond < 0) {
+-		/* This can happen in Thumb mode: examine IT state. */
+-		unsigned long it;
+-
+-		it = ((cpsr >> 8) & 0xFC) | ((cpsr >> 25) & 0x3);
+-
+-		/* it == 0 => unconditional. */
+-		if (it == 0)
+-			return true;
+-
+-		/* The cond for this insn works out as the top 4 bits. */
+-		cond = (it >> 4);
+-	}
+-
+-	cpsr_cond = cpsr >> 28;
+-
+-	if (!((cc_map[cond] >> cpsr_cond) & 1))
+-		return false;
+-
+-	return true;
+-}
+-
+-/**
+- * adjust_itstate - adjust ITSTATE when emulating instructions in IT-block
+- * @vcpu:	The VCPU pointer
+- *
+- * When exceptions occur while instructions are executed in Thumb IF-THEN
+- * blocks, the ITSTATE field of the CPSR is not advanced (updated), so we have
+- * to do this little bit of work manually. The fields map like this:
+- *
+- * IT[7:0] -> CPSR[26:25],CPSR[15:10]
+- */
+-static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
+-{
+-	unsigned long itbits, cond;
+-	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	bool is_arm = !(cpsr & PSR_AA32_T_BIT);
+-
+-	if (is_arm || !(cpsr & PSR_AA32_IT_MASK))
+-		return;
+-
+-	cond = (cpsr & 0xe000) >> 13;
+-	itbits = (cpsr & 0x1c00) >> (10 - 2);
+-	itbits |= (cpsr & (0x3 << 25)) >> 25;
+-
+-	/* Perform ITAdvance (see page A2-52 in ARM DDI 0406C) */
+-	if ((itbits & 0x7) == 0)
+-		itbits = cond = 0;
+-	else
+-		itbits = (itbits << 1) & 0x1f;
+-
+-	cpsr &= ~PSR_AA32_IT_MASK;
+-	cpsr |= cond << 13;
+-	cpsr |= (itbits & 0x1c) << (10 - 2);
+-	cpsr |= (itbits & 0x3) << 25;
+-	*vcpu_cpsr(vcpu) = cpsr;
+-}
+-
+-/**
+- * kvm_skip_instr - skip a trapped instruction and proceed to the next
+- * @vcpu: The vcpu pointer
+- */
+-void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
+-{
+-	bool is_thumb;
+-
+-	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
+-	if (is_thumb && !is_wide_instr)
+-		*vcpu_pc(vcpu) += 2;
+-	else
+-		*vcpu_pc(vcpu) += 4;
+-	kvm_adjust_itstate(vcpu);
+-}
+-
+ /*
+  * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
   */
- 
- #include <linux/arm-smccc.h>
+diff --git a/virt/kvm/arm/hyp/aarch32.c b/virt/kvm/arm/hyp/aarch32.c
+new file mode 100644
+index 000000000000..d31f267961e7
+--- /dev/null
++++ b/virt/kvm/arm/hyp/aarch32.c
+@@ -0,0 +1,136 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Hyp portion of the (not much of an) Emulation layer for 32bit guests.
++ *
++ * Copyright (C) 2012,2013 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * based on arch/arm/kvm/emulate.c
++ * Copyright (C) 2012 - Virtual Open Systems and Columbia University
++ * Author: Christoffer Dall <c.dall@virtualopensystems.com>
++ */
++
 +#include <linux/kvm_host.h>
- #include <linux/types.h>
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
-@@ -505,6 +506,44 @@ static void __hyp_text __set_host_arch_workaround_state(struct kvm_vcpu *vcpu)
- #endif
- }
- 
-+/**
-+ * Disable host events, enable guest events
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_hyp.h>
++
++/*
++ * stolen from arch/arm/kernel/opcodes.c
++ *
++ * condition code lookup table
++ * index into the table is test code: EQ, NE, ... LT, GT, AL, NV
++ *
++ * bit position in short is condition code: NZCV
 + */
-+static bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
++static const unsigned short cc_map[16] = {
++	0xF0F0,			/* EQ == Z set            */
++	0x0F0F,			/* NE                     */
++	0xCCCC,			/* CS == C set            */
++	0x3333,			/* CC                     */
++	0xFF00,			/* MI == N set            */
++	0x00FF,			/* PL                     */
++	0xAAAA,			/* VS == V set            */
++	0x5555,			/* VC                     */
++	0x0C0C,			/* HI == C set && Z clear */
++	0xF3F3,			/* LS == C clear || Z set */
++	0xAA55,			/* GE == (N==V)           */
++	0x55AA,			/* LT == (N!=V)           */
++	0x0A05,			/* GT == (!Z && (N==V))   */
++	0xF5FA,			/* LE == (Z || (N!=V))    */
++	0xFFFF,			/* AL always              */
++	0			/* NV                     */
++};
++
++/*
++ * Check if a trapped instruction should have been executed or not.
++ */
++bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
++	unsigned long cpsr;
++	u32 cpsr_cond;
++	int cond;
 +
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
++	/* Top two bits non-zero?  Unconditional. */
++	if (kvm_vcpu_get_hsr(vcpu) >> 30)
++		return true;
 +
-+	if (pmu->events_host)
-+		write_sysreg(pmu->events_host, pmcntenclr_el0);
++	/* Is condition field valid? */
++	cond = kvm_vcpu_get_condition(vcpu);
++	if (cond == 0xE)
++		return true;
 +
-+	if (pmu->events_guest)
-+		write_sysreg(pmu->events_guest, pmcntenset_el0);
++	cpsr = *vcpu_cpsr(vcpu);
 +
-+	return (pmu->events_host || pmu->events_guest);
++	if (cond < 0) {
++		/* This can happen in Thumb mode: examine IT state. */
++		unsigned long it;
++
++		it = ((cpsr >> 8) & 0xFC) | ((cpsr >> 25) & 0x3);
++
++		/* it == 0 => unconditional. */
++		if (it == 0)
++			return true;
++
++		/* The cond for this insn works out as the top 4 bits. */
++		cond = (it >> 4);
++	}
++
++	cpsr_cond = cpsr >> 28;
++
++	if (!((cc_map[cond] >> cpsr_cond) & 1))
++		return false;
++
++	return true;
 +}
 +
 +/**
-+ * Disable guest events, enable host events
++ * adjust_itstate - adjust ITSTATE when emulating instructions in IT-block
++ * @vcpu:	The VCPU pointer
++ *
++ * When exceptions occur while instructions are executed in Thumb IF-THEN
++ * blocks, the ITSTATE field of the CPSR is not advanced (updated), so we have
++ * to do this little bit of work manually. The fields map like this:
++ *
++ * IT[7:0] -> CPSR[26:25],CPSR[15:10]
 + */
-+static void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
++static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
++	unsigned long itbits, cond;
++	unsigned long cpsr = *vcpu_cpsr(vcpu);
++	bool is_arm = !(cpsr & PSR_AA32_T_BIT);
 +
-+	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	pmu = &host->pmu_events;
++	if (is_arm || !(cpsr & PSR_AA32_IT_MASK))
++		return;
 +
-+	if (pmu->events_guest)
-+		write_sysreg(pmu->events_guest, pmcntenclr_el0);
++	cond = (cpsr & 0xe000) >> 13;
++	itbits = (cpsr & 0x1c00) >> (10 - 2);
++	itbits |= (cpsr & (0x3 << 25)) >> 25;
 +
-+	if (pmu->events_host)
-+		write_sysreg(pmu->events_host, pmcntenset_el0);
++	/* Perform ITAdvance (see page A2-52 in ARM DDI 0406C) */
++	if ((itbits & 0x7) == 0)
++		itbits = cond = 0;
++	else
++		itbits = (itbits << 1) & 0x1f;
++
++	cpsr &= ~PSR_AA32_IT_MASK;
++	cpsr |= cond << 13;
++	cpsr |= (itbits & 0x1c) << (10 - 2);
++	cpsr |= (itbits & 0x3) << 25;
++	*vcpu_cpsr(vcpu) = cpsr;
 +}
 +
- /* Switch to the guest for VHE systems running in EL2 */
- int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 3da94a5bb6b7..e71d00bb5271 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -53,44 +53,6 @@ void kvm_clr_pmu_events(u32 clr)
- 	ctx->pmu_events.events_guest &= ~clr;
- }
- 
--/**
-- * Disable host events, enable guest events
-- */
--bool __hyp_text __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
--{
--	struct kvm_host_data *host;
--	struct kvm_pmu_events *pmu;
--
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
--	pmu = &host->pmu_events;
--
--	if (pmu->events_host)
--		write_sysreg(pmu->events_host, pmcntenclr_el0);
--
--	if (pmu->events_guest)
--		write_sysreg(pmu->events_guest, pmcntenset_el0);
--
--	return (pmu->events_host || pmu->events_guest);
--}
--
--/**
-- * Disable guest events, enable host events
-- */
--void __hyp_text __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
--{
--	struct kvm_host_data *host;
--	struct kvm_pmu_events *pmu;
--
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
--	pmu = &host->pmu_events;
--
--	if (pmu->events_guest)
--		write_sysreg(pmu->events_guest, pmcntenclr_el0);
--
--	if (pmu->events_host)
--		write_sysreg(pmu->events_host, pmcntenset_el0);
--}
--
- #define PMEVTYPER_READ_CASE(idx)				\
- 	case idx:						\
- 		return read_sysreg(pmevtyper##idx##_el0)
++/**
++ * kvm_skip_instr - skip a trapped instruction and proceed to the next
++ * @vcpu: The vcpu pointer
++ */
++void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
++{
++	bool is_thumb;
++
++	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
++	if (is_thumb && !is_wide_instr)
++		*vcpu_pc(vcpu) += 2;
++	else
++		*vcpu_pc(vcpu) += 4;
++	kvm_adjust_itstate(vcpu);
++}
 -- 
 2.20.1
 
