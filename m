@@ -2,58 +2,54 @@ Return-Path: <SRS0=HUCa=TW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA2CC282CE
-	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 16:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C30E6C282CE
+	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F0F3E20675
-	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 16:26:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F3E20675
+	by mail.kernel.org (Postfix) with ESMTP id 4EEF520645
+	for <kvmarm@archiver.kernel.org>; Wed, 22 May 2019 17:47:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EEF520645
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6009D4A4A9;
-	Wed, 22 May 2019 12:26:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97ABC4A4E6;
+	Wed, 22 May 2019 13:47:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kswj67RNeinu; Wed, 22 May 2019 12:26:15 -0400 (EDT)
+	with ESMTP id 18Ag78H9xUOV; Wed, 22 May 2019 13:47:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 047C84A4AA;
-	Wed, 22 May 2019 12:26:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 603E74A417;
+	Wed, 22 May 2019 13:47:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05BA44A4A4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 12:26:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C1294A417
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vMFRzJUfYVNy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 May 2019 12:26:11 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90DC54A321
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 12:26:11 -0400 (EDT)
+ with ESMTP id l5JKX9XO7GnD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 May 2019 13:47:21 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B6904A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 May 2019 13:47:21 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06EFF341;
- Wed, 22 May 2019 09:26:11 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93A4B3F5AF;
- Wed, 22 May 2019 09:26:10 -0700 (PDT)
-Date: Wed, 22 May 2019 17:26:08 +0100
-From: Andrew Murray <andrew.murray@arm.com>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 5/6] KVM: arm/arm64: remove pmc->bitmask
-Message-ID: <20190522162608.GF8268@e119886-lin.cambridge.arm.com>
-References: <20190522153019.18645-1-andrew.murray@arm.com>
- <20190522153019.18645-6-andrew.murray@arm.com>
- <7f84fcac-ee73-d076-f0e3-3b214912daaf@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 687B4341;
+ Wed, 22 May 2019 10:47:20 -0700 (PDT)
+Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1B4F3F5AF;
+ Wed, 22 May 2019 10:47:18 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/2] Move __hyp_text code under no-asan Makefiles
+Date: Wed, 22 May 2019 18:47:03 +0100
+Message-Id: <20190522174705.236469-1-james.morse@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <7f84fcac-ee73-d076-f0e3-3b214912daaf@arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,105 +66,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, May 22, 2019 at 05:07:31PM +0100, Marc Zyngier wrote:
-> On 22/05/2019 16:30, Andrew Murray wrote:
-> > We currently use pmc->bitmask to determine the width of the pmc - however
-> > it's superfluous as the pmc index already describes if the pmc is a cycle
-> > counter or event counter. The architecture clearly describes the widths of
-> > these counters.
-> > 
-> > Let's remove the bitmask to simplify the code.
-> > 
-> > Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> > ---
-> >  include/kvm/arm_pmu.h |  1 -
-> >  virt/kvm/arm/pmu.c    | 15 +++++----------
-> >  2 files changed, 5 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > index b73f31baca52..2f0e28dc5a9e 100644
-> > --- a/include/kvm/arm_pmu.h
-> > +++ b/include/kvm/arm_pmu.h
-> > @@ -28,7 +28,6 @@
-> >  struct kvm_pmc {
-> >  	u8 idx;	/* index into the pmu->pmc array */
-> >  	struct perf_event *perf_event;
-> > -	u64 bitmask;
-> >  };
-> >  
-> >  struct kvm_pmu {
-> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > index ae1e886d4a1a..c4e2bc213617 100644
-> > --- a/virt/kvm/arm/pmu.c
-> > +++ b/virt/kvm/arm/pmu.c
-> > @@ -47,7 +47,10 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> >  						 &running);
-> >  
-> > -	return counter & pmc->bitmask;
-> > +	if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > +		counter = lower_32_bits(counter);
-> > +
-> > +	return counter;
-> >  }
-> >  
-> >  /**
-> > @@ -113,7 +116,6 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
-> >  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-> >  		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
-> >  		pmu->pmc[i].idx = i;
-> > -		pmu->pmc[i].bitmask = 0xffffffffUL;
-> >  	}
-> >  }
-> >  
-> > @@ -348,8 +350,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
-> >   */
-> >  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
-> >  {
-> > -	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > -	struct kvm_pmc *pmc;
-> >  	u64 mask;
-> >  	int i;
-> >  
-> > @@ -368,11 +368,6 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
-> >  		for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++)
-> >  			kvm_pmu_set_counter_value(vcpu, i, 0);
-> >  	}
-> > -
-> > -	if (val & ARMV8_PMU_PMCR_LC) {
-> > -		pmc = &pmu->pmc[ARMV8_PMU_CYCLE_IDX];
-> > -		pmc->bitmask = 0xffffffffffffffffUL;
-> > -	}
-> >  }
-> >  
-> >  static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
-> > @@ -420,7 +415,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  
-> >  	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
-> >  	/* The initial sample period (overflow count) of an event. */
-> > -	attr.sample_period = (-counter) & pmc->bitmask;
-> > +	attr.sample_period = (-counter) & GENMASK(31, 0);
-> 
-> Isn't this the one case where the bitmask actually matters? If we're
-> dealing with the cycle counter, it shouldn't be truncated, right?
+The fancy new pmu code added its __hyp_text code in part of the tree that
+doesn't get covered by the no-asan/no-kcov kconfig decorations.
+This shows up as a hyp-panic on v8.0 hardware when the host kernel is
+built with debug options like kasan.
 
-Ah yes, that should be conditional on idx as well. 
+This same bug has been living happily in the aarch32 emulation code
+since v4.9. (commit 8cebe750c4d9a "arm64: KVM: Make kvm_skip_instr32
+available to HYP"). Patch 2 has the two relevant fixes tag, but won't
+apply cleanly before v4.19 due to the churn.
+
+Fix them both by shuffling the code around.
+
+--
+Changes since v1:
+ * Made the two functions static in patch 1, removed the header entries.
+
 
 Thanks,
 
-Andrew Murray
+James Morse (2):
+  KVM: arm64: Move pmu hyp code under hyp's Makefile to avoid
+    instrumentation
+  KVM: arm/arm64: Move cc/it checks under hyp's Makefile to avoid
+    instrumentation
 
-> 
-> >  
-> >  	event = perf_event_create_kernel_counter(&attr, -1, current,
-> >  						 kvm_pmu_perf_overflow, pmc);
-> > 
-> 
-> Thanks,
-> 
-> 	M.
-> -- 
-> Jazz is not dead. It just smells funny...
+ arch/arm/kvm/hyp/Makefile         |   1 +
+ arch/arm64/include/asm/kvm_host.h |   3 -
+ arch/arm64/kvm/hyp/Makefile       |   1 +
+ arch/arm64/kvm/hyp/switch.c       |  39 +++++++++
+ arch/arm64/kvm/pmu.c              |  38 ---------
+ virt/kvm/arm/aarch32.c            | 121 --------------------------
+ virt/kvm/arm/hyp/aarch32.c        | 136 ++++++++++++++++++++++++++++++
+ 7 files changed, 177 insertions(+), 162 deletions(-)
+ create mode 100644 virt/kvm/arm/hyp/aarch32.c
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
