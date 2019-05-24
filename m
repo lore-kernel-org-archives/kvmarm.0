@@ -1,59 +1,56 @@
-Return-Path: <SRS0=jV2N=TX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=F0YX=TY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303D4C46460
-	for <kvmarm@archiver.kernel.org>; Thu, 23 May 2019 10:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8C7C072B5
+	for <kvmarm@archiver.kernel.org>; Fri, 24 May 2019 09:20:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DCF392175B
-	for <kvmarm@archiver.kernel.org>; Thu, 23 May 2019 10:36:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF392175B
+	by mail.kernel.org (Postfix) with ESMTP id E749B217F9
+	for <kvmarm@archiver.kernel.org>; Fri, 24 May 2019 09:20:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E749B217F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98AEC4A477;
-	Thu, 23 May 2019 06:36:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 408774A4E5;
+	Fri, 24 May 2019 05:20:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lQZQOmR-uEkV; Thu, 23 May 2019 06:35:58 -0400 (EDT)
+	with ESMTP id ahhgOBg9Zsso; Fri, 24 May 2019 05:20:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE7C64A4FA;
-	Thu, 23 May 2019 06:35:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D66494A4C3;
+	Fri, 24 May 2019 05:20:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D594A4FD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 May 2019 06:35:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C422D4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 05:20:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4HHvsIdehKgf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 May 2019 06:35:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC204A508
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 May 2019 06:35:56 -0400 (EDT)
+ with ESMTP id dbftUm4QMsgN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 May 2019 05:20:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE6F34A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 05:20:35 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284E41688;
- Thu, 23 May 2019 03:35:56 -0700 (PDT)
-Received: from usa.arm.com (e107155-lin.cambridge.arm.com [10.1.196.42])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 142383F718;
- Thu, 23 May 2019 03:35:53 -0700 (PDT)
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 15/15][KVMTOOL] kvm: add a vcpu feature for SPEv1 support
-Date: Thu, 23 May 2019 11:35:02 +0100
-Message-Id: <20190523103502.25925-16-sudeep.holla@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190523103502.25925-1-sudeep.holla@arm.com>
-References: <20190523103502.25925-1-sudeep.holla@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
- linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10AE7A78;
+ Fri, 24 May 2019 02:20:35 -0700 (PDT)
+Received: from en101.cambridge.arm.com (en101.cambridge.arm.com [10.1.196.93])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id
+ 407523F703; Fri, 24 May 2019 02:20:33 -0700 (PDT)
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: linux-mm@kvack.org
+Subject: mm/compaction: BUG: NULL pointer dereference
+Date: Fri, 24 May 2019 10:20:19 +0100
+Message-Id: <1558689619-16891-1-git-send-email-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: mhocko@suse.com, kvm@vger.kernel.org, marc.zyngier@arm.com,
+ linux-kernel@vger.kernel.org, cai@lca.pw, akpm@linux-foundation.org,
+ mgorman@techsingularity.net, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,231 +68,126 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is a runtime configurable for KVM tool to enable Statistical
-Profiling Extensions version 1 support in guest kernel. A command line
-option --spe is required to use the same.
+Hi,
 
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
----
- Makefile                                  |  2 +-
- arm/aarch64/arm-cpu.c                     |  2 +
- arm/aarch64/include/asm/kvm.h             |  4 ++
- arm/aarch64/include/kvm/kvm-config-arch.h |  2 +
- arm/aarch64/include/kvm/kvm-cpu-arch.h    |  3 +-
- arm/include/arm-common/kvm-config-arch.h  |  1 +
- arm/include/arm-common/spe.h              |  4 ++
- arm/spe.c                                 | 81 +++++++++++++++++++++++
- include/linux/kvm.h                       |  1 +
- 9 files changed, 98 insertions(+), 2 deletions(-)
- create mode 100644 arm/include/arm-common/spe.h
- create mode 100644 arm/spe.c
+We are hitting NULL pointer dereferences while running stress tests with KVM.
+See splat [0]. The test is to spawn 100 VMs all doing standard debian
+installation (Thanks to Marc's automated scripts, available here [1] ).
+The problem has been reproduced with a better rate of success from 5.1-rc6
+onwards.
 
-diff --git a/Makefile b/Makefile
-index 9e21a4e2b419..b7c7ad8caf20 100644
---- a/Makefile
-+++ b/Makefile
-@@ -158,7 +158,7 @@ endif
- # ARM
- OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
- 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
--			   arm/pmu.o
-+			   arm/pmu.o arm/spe.o
- HDRS_ARM_COMMON		:= arm/include
- ifeq ($(ARCH), arm)
- 	DEFINES		+= -DCONFIG_ARM
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index d7572b7790b1..6ccea033f361 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -6,6 +6,7 @@
- #include "arm-common/gic.h"
- #include "arm-common/timer.h"
- #include "arm-common/pmu.h"
-+#include "arm-common/spe.h"
- 
- #include <linux/byteorder.h>
- #include <linux/types.h>
-@@ -17,6 +18,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
-+	spe__generate_fdt_nodes(fdt, kvm);
- }
- 
- static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 7b7ac0f6cec9..4c9e168de896 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_SPE_V1		7 /* Support guest SPEv1 */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-@@ -306,6 +307,9 @@ struct kvm_vcpu_events {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define KVM_ARM_VCPU_SPE_V1_CTRL	2
-+#define   KVM_ARM_VCPU_SPE_V1_IRQ	0
-+#define   KVM_ARM_VCPU_SPE_V1_INIT	1
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43dfa9b2..9968e1666de5 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "spe", &(cfg)->has_spev1,			\
-+			"Create SPEv1 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563382c6..5abaf9505274 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -8,7 +8,8 @@
- #define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{				\
- 	[0] = ((!!(cpuid) << KVM_ARM_VCPU_POWER_OFF) |				\
- 	       (!!(kvm)->cfg.arch.aarch32_guest << KVM_ARM_VCPU_EL1_32BIT) |	\
--	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3))		\
-+	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3) |		\
-+	       (!!(kvm)->cfg.arch.has_spev1 << KVM_ARM_VCPU_SPE_V1))		\
- }
- 
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..742733e289af 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		has_spev1;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-diff --git a/arm/include/arm-common/spe.h b/arm/include/arm-common/spe.h
-new file mode 100644
-index 000000000000..bcfa40877f6f
---- /dev/null
-+++ b/arm/include/arm-common/spe.h
-@@ -0,0 +1,4 @@
-+
-+#define KVM_ARM_SPEV1_PPI			21
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm);
-diff --git a/arm/spe.c b/arm/spe.c
-new file mode 100644
-index 000000000000..ec03b01a3866
---- /dev/null
-+++ b/arm/spe.c
-@@ -0,0 +1,81 @@
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
-+#include "kvm/util.h"
-+
-+#include "arm-common/gic.h"
-+#include "arm-common/spe.h"
-+
-+#ifdef CONFIG_ARM64
-+static int set_spe_attr(struct kvm *kvm, int vcpu_idx,
-+			struct kvm_device_attr *attr)
-+{
-+	int ret, fd;
-+
-+	fd = kvm->cpus[vcpu_idx]->vcpu_fd;
-+
-+	ret = ioctl(fd, KVM_HAS_DEVICE_ATTR, attr);
-+	if (!ret) {
-+		ret = ioctl(fd, KVM_SET_DEVICE_ATTR, attr);
-+		if (ret)
-+			pr_err("SPE KVM_SET_DEVICE_ATTR failed (%d)\n", ret);
-+	} else {
-+		pr_err("Unsupported SPE on vcpu%d\n", vcpu_idx);
-+	}
-+
-+	return ret;
-+}
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
-+{
-+	const char compatible[] = "arm,statistical-profiling-extension-v1";
-+	int irq = KVM_ARM_SPEV1_PPI;
-+	int i, ret;
-+
-+	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
-+		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-+		cpu_to_fdt32(irq - 16),
-+		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
-+	};
-+
-+	if (!kvm->cfg.arch.has_spev1)
-+		return;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_SPE_V1)) {
-+		pr_info("SPE unsupported\n");
-+		return;
-+	}
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		struct kvm_device_attr spe_attr;
-+
-+		spe_attr = (struct kvm_device_attr){
-+			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
-+			.addr	= (u64)(unsigned long)&irq,
-+			.attr	= KVM_ARM_VCPU_SPE_V1_IRQ,
-+		};
-+
-+		ret = set_spe_attr(kvm, i, &spe_attr);
-+		if (ret)
-+			return;
-+
-+		spe_attr = (struct kvm_device_attr){
-+			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
-+			.attr	= KVM_ARM_VCPU_SPE_V1_INIT,
-+		};
-+
-+		ret = set_spe_attr(kvm, i, &spe_attr);
-+		if (ret)
-+			return;
-+	}
-+
-+	_FDT(fdt_begin_node(fdt, "spe"));
-+	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_end_node(fdt));
-+}
-+#else
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm) { }
-+#endif
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 2fe12b40d503..698bcc2f96e3 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_SPE_V1 173
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.17.1
+The issue is only reproducible with swapping enabled and the entire
+memory is used up, when swapping heavily. Also this issue is only reproducible
+on only one server with 128GB, which has the following memory layout:
 
+[32GB@4GB, hole , 96GB@544GB]
+
+Here is my non-expert analysis of the issue so far.
+
+Under extreme memory pressure, the kswapd could trigger reset_isolation_suitable()
+to figure out the cached values for migrate/free pfn for a zone, by scanning through
+the entire zone. On our server it does so in the range of [ 0x10_0000, 0xa00_0000 ],
+with the following area of holes : [ 0x20_0000, 0x880_0000 ].
+In the failing case, we end up setting the cached migrate pfn as : 0x508_0000, which
+is right in the center of the zone pfn range. i.e ( 0x10_0000 + 0xa00_0000 ) / 2,
+with reset_migrate = 0x88_4e00, reset_free = 0x10_0000.
+
+Now these cached values are used by the fast_isolate_freepages() to find a pfn. However,
+since we cant find anything during the search we fall back to using the page belonging
+to the min_pfn (which is the migrate_pfn), without proper checks to see if that is valid
+PFN or not. This is then passed on to fast_isolate_around() which tries to do :
+set_pageblock_skip(page) on the page which blows up due to an NULL mem_section pointer.
+
+The following patch seems to fix the issue for me, but I am not quite convinced that
+it is the right fix. Thoughts ?
+
+
+diff --git a/mm/compaction.c b/mm/compaction.c
+index 9febc8c..9e1b9ac 100644
+--- a/mm/compaction.c
++++ b/mm/compaction.c
+@@ -1399,7 +1399,7 @@ fast_isolate_freepages(struct compact_control *cc)
+ 				page = pfn_to_page(highest);
+ 				cc->free_pfn = highest;
+ 			} else {
+-				if (cc->direct_compaction) {
++				if (cc->direct_compaction && pfn_valid(min_pfn)) {
+ 					page = pfn_to_page(min_pfn);
+ 					cc->free_pfn = min_pfn;
+ 				}
+
+
+Suzuki
+
+
+[ 0 ] Kernel splat
+ Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008 [47/1825]
+ Mem abort info:
+   ESR = 0x96000004
+   Exception class = DABT (current EL), IL = 32 bits
+   SET = 0, FnV = 0
+   EA = 0, S1PTW = 0
+ Data abort info:
+   ISV = 0, ISS = 0x00000004
+   CM = 0, WnR = 0
+ user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000082f94ae9
+ [0000000000000008] pgd=0000000000000000
+ Internal error: Oops: 96000004 [#1] SMP
+ ...
+ CPU: 10 PID: 6080 Comm: qemu-system-aar Not tainted 510-rc1+ #6
+ Hardware name: AmpereComputing(R) OSPREY EV-883832-X3-0001/OSPREY, BIOS 4819 09/25/2018
+ pstate: 60000005 (nZCv daif -PAN -UAO)
+ pc : set_pfnblock_flags_mask+0x58/0xe8
+ lr : compaction_alloc+0x300/0x950
+ sp : ffff00001fc03010
+ x29: ffff00001fc03010 x28: 0000000000000000 
+ x27: 0000000000000000 x26: ffff000010bf7000 
+ x25: 0000000006445000 x24: 0000000006444e00 
+ x23: ffff7e018f138000 x22: 0000000000000003 
+ x21: 0000000000000001 x20: 0000000006444e00 
+ x19: 0000000000000001 x18: 0000000000000000 
+ x17: 0000000000000000 x16: ffff809f7fe97268 
+ x15: 0000000191138000 x14: 0000000000000000 
+ x13: 0000000000000070 x12: 0000000000000000 
+ x11: ffff00001fc03108 x10: 0000000000000000 
+ x9 : 0000000009222400 x8 : 0000000000000187 
+ x7 : 00000000063c4e00 x6 : 0000000006444e00 
+ x5 : 0000000000080000 x4 : 0000000000000001 
+ x3 : 0000000000000003 x2 : ffff809f7fe92840 
+ x1 : 0000000000000220 x0 : 0000000000000000 
+ Process qemu-system-aar (pid: 6080, stack limit = 0x0000000095070da5)
+ Call trace:
+  set_pfnblock_flags_mask+0x58/0xe8
+  compaction_alloc+0x300/0x950
+  migrate_pages+0x1a4/0xbb0
+  compact_zone+0x750/0xde8
+  compact_zone_order+0xd8/0x118
+  try_to_compact_pages+0xb4/0x290
+  __alloc_pages_direct_compact+0x84/0x1e0
+  __alloc_pages_nodemask+0x5e0/0xe18
+  alloc_pages_vma+0x1cc/0x210
+  do_huge_pmd_anonymous_page+0x108/0x7c8
+  __handle_mm_fault+0xdd4/0x1190
+  handle_mm_fault+0x114/0x1c0
+  __get_user_pages+0x198/0x3c0
+  get_user_pages_unlocked+0xb4/0x1d8
+  __gfn_to_pfn_memslot+0x12c/0x3b8
+  gfn_to_pfn_prot+0x4c/0x60
+  kvm_handle_guest_abort+0x4b0/0xcd8
+  handle_exit+0x140/0x1b8
+  kvm_arch_vcpu_ioctl_run+0x260/0x768
+  kvm_vcpu_ioctl+0x490/0x898
+  do_vfs_ioctl+0xc4/0x898
+  ksys_ioctl+0x8c/0xa0
+  __arm64_sys_ioctl+0x28/0x38
+  el0_svc_common+0x74/0x118
+  el0_svc_handler+0x38/0x78
+  el0_svc+0x8/0xc
+ Code: f8607840 f100001f 8b011401 9a801020 (f9400400) 
+ ---[ end trace af6a35219325a9b6 ]---
+
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/vminstall.git/
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
