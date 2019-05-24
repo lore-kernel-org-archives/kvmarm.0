@@ -1,80 +1,64 @@
-Return-Path: <SRS0=F0YX=TY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=CdlU=TZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C23C072B5
-	for <kvmarm@archiver.kernel.org>; Fri, 24 May 2019 19:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C850C04AB0
+	for <kvmarm@archiver.kernel.org>; Sat, 25 May 2019 09:11:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 13C7B217F9
-	for <kvmarm@archiver.kernel.org>; Fri, 24 May 2019 19:22:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C7B217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id EFA4B2168B
+	for <kvmarm@archiver.kernel.org>; Sat, 25 May 2019 09:11:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA4B2168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=techsingularity.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53FE64A496;
-	Fri, 24 May 2019 15:22:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3545D4A4E5;
+	Sat, 25 May 2019 05:11:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ov5a+lyKh13K; Fri, 24 May 2019 15:22:56 -0400 (EDT)
+	with ESMTP id Tn6QN3cAkys6; Sat, 25 May 2019 05:11:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C6E94A49C;
-	Fri, 24 May 2019 15:22:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AD9B4A4C3;
+	Sat, 25 May 2019 05:11:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB6254A477
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 15:22:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D52444A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 06:39:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1WxJhq25MnQn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 May 2019 15:22:53 -0400 (EDT)
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com
- [209.85.221.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5011A4A389
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 15:22:53 -0400 (EDT)
-Received: by mail-wr1-f65.google.com with SMTP id t4so2775670wrx.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 12:22:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ug4Bl3el14wpTnYvRfqXJCkiW+ZQVz0A+SEzks8ca+c=;
- b=a+KESVXTZqC0nlDtZ1lynsSPNOQkSbbwsAseWhcZ9EWqga/LgKDbeoMatXkoPAhmHO
- qd4qIWdttsonVkU9qvQe/2pbV8jP0NbUev6t0oYf5kHM/SvVDTkVizzvt0BQ9CVH5RHq
- 6U1anq68ycBuyuo3WOhrRi0G1o7SoFzsVdo2lMPcbdlSnayY5yNBqvvaTUKiU6pWP48E
- MycvRkj1L1DsR6HDt5rQwydPAoJeDZg3Yw9lZEBR4FDMiM1T6VD8G6ZpCxu2C8IKs0zq
- Mwvn2eG9dgMMFBPgx8kIfigaBa52KhNvsF2jm6hNOCuvecGy/P0MPYt+IYS3zqebSESM
- 2a3Q==
-X-Gm-Message-State: APjAAAV1MpPwMX3XGObiigb1JcrllaVEyN/Y9bSWQicO4lLwfW0ZgAgt
- bUqs1H7mCfDUHjfzczlsb3dJFw==
-X-Google-Smtp-Source: APXvYqxc9I/gqPCwUGGqH4wF3p5c19c142inhBUwCyjvflRF3Erk2N54jSOBP2OotGkbtC4HE70Ugw==
-X-Received: by 2002:a5d:4b81:: with SMTP id b1mr39369544wrt.217.1558725772192; 
- Fri, 24 May 2019 12:22:52 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n5sm4642955wrj.27.2019.05.24.12.22.51
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 24 May 2019 12:22:51 -0700 (PDT)
-Subject: Re: [PATCH 1/3] MAINTAINERS: KVM: arm/arm64: Remove myself as
- maintainer
-To: Christoffer Dall <christoffer.dall@arm.com>
-References: <20190524144745.227242-1-marc.zyngier@arm.com>
- <20190524144745.227242-2-marc.zyngier@arm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1adc9268-438e-6c24-7883-690960d1c060@redhat.com>
-Date: Fri, 24 May 2019 21:22:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ with ESMTP id BeiBD3pm8gTg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 May 2019 06:39:27 -0400 (EDT)
+Received: from outbound-smtp12.blacknight.com (outbound-smtp12.blacknight.com
+ [46.22.139.17])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 854534A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 06:39:27 -0400 (EDT)
+Received: from mail.blacknight.com (pemlinmail04.blacknight.ie [81.17.254.17])
+ by outbound-smtp12.blacknight.com (Postfix) with ESMTPS id
+ 4C0681C2220
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 May 2019 11:39:26 +0100 (IST)
+Received: (qmail 32417 invoked from network); 24 May 2019 10:39:26 -0000
+Received: from unknown (HELO techsingularity.net)
+ (mgorman@techsingularity.net@[37.228.225.79])
+ by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated);
+ 24 May 2019 10:39:26 -0000
+Date: Fri, 24 May 2019 11:39:24 +0100
+From: Mel Gorman <mgorman@techsingularity.net>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: mm/compaction: BUG: NULL pointer dereference
+Message-ID: <20190524103924.GN18914@techsingularity.net>
+References: <1558689619-16891-1-git-send-email-suzuki.poulose@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190524144745.227242-2-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <1558689619-16891-1-git-send-email-suzuki.poulose@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Mailman-Approved-At: Sat, 25 May 2019 05:11:04 -0400
+Cc: mhocko@suse.com, kvm@vger.kernel.org, marc.zyngier@arm.com,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, cai@lca.pw,
+ akpm@linux-foundation.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,50 +75,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 24/05/19 16:47, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
+On Fri, May 24, 2019 at 10:20:19AM +0100, Suzuki K Poulose wrote:
+> Hi,
 > 
-> I no longer have time to actively review patches and manage the tree and
-> it's time to make that official.
-
-Thanks Christopher for your work, I hope to meet you anyway at KVM Forum!
-
-Paolo
-
-> Huge thanks to the incredible Linux community and all the contributors
-> who have put up with me over the past years.
+> We are hitting NULL pointer dereferences while running stress tests with KVM.
+> See splat [0]. The test is to spawn 100 VMs all doing standard debian
+> installation (Thanks to Marc's automated scripts, available here [1] ).
+> The problem has been reproduced with a better rate of success from 5.1-rc6
+> onwards.
 > 
-> I also take this opportunity to remove the website link to the Columbia
-> web page, as that information is no longer up to date and I don't know
-> who manages that anymore.
+> The issue is only reproducible with swapping enabled and the entire
+> memory is used up, when swapping heavily. Also this issue is only reproducible
+> on only one server with 128GB, which has the following memory layout:
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  MAINTAINERS | 2 --
->  1 file changed, 2 deletions(-)
+> [32GB@4GB, hole , 96GB@544GB]
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5cfbea4ce575..4ba271a8e0ef 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8611,14 +8611,12 @@ F:	arch/x86/include/asm/svm.h
->  F:	arch/x86/kvm/svm.c
->  
->  KERNEL VIRTUAL MACHINE FOR ARM/ARM64 (KVM/arm, KVM/arm64)
-> -M:	Christoffer Dall <christoffer.dall@arm.com>
->  M:	Marc Zyngier <marc.zyngier@arm.com>
->  R:	James Morse <james.morse@arm.com>
->  R:	Julien Thierry <julien.thierry@arm.com>
->  R:	Suzuki K Pouloze <suzuki.poulose@arm.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.cs.columbia.edu
-> -W:	http://systems.cs.columbia.edu/projects/kvm-arm
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
->  S:	Maintained
->  F:	arch/arm/include/uapi/asm/kvm*
+> Here is my non-expert analysis of the issue so far.
+> 
+> Under extreme memory pressure, the kswapd could trigger reset_isolation_suitable()
+> to figure out the cached values for migrate/free pfn for a zone, by scanning through
+> the entire zone. On our server it does so in the range of [ 0x10_0000, 0xa00_0000 ],
+> with the following area of holes : [ 0x20_0000, 0x880_0000 ].
+> In the failing case, we end up setting the cached migrate pfn as : 0x508_0000, which
+> is right in the center of the zone pfn range. i.e ( 0x10_0000 + 0xa00_0000 ) / 2,
+> with reset_migrate = 0x88_4e00, reset_free = 0x10_0000.
+> 
+> Now these cached values are used by the fast_isolate_freepages() to find a pfn. However,
+> since we cant find anything during the search we fall back to using the page belonging
+> to the min_pfn (which is the migrate_pfn), without proper checks to see if that is valid
+> PFN or not. This is then passed on to fast_isolate_around() which tries to do :
+> set_pageblock_skip(page) on the page which blows up due to an NULL mem_section pointer.
+> 
+> The following patch seems to fix the issue for me, but I am not quite convinced that
+> it is the right fix. Thoughts ?
 > 
 
+I think the patch is valid and the alternatives would be unnecessarily
+complicated. During a normal scan for free pages to isolate, there
+is a check for pageblock_pfn_to_page() which uses a pfn_valid check
+for non-contiguous zones in __pageblock_pfn_to_page. Now, while the
+non-contiguous check could be made in the area you highlight, it would be a
+relatively small optimisation that would be unmeasurable overall. However,
+it is definitely the case that if the PFN you highlight is invalid that
+badness happens. If you want to express this as a signed-off patch with
+an adjusted changelog then I'd be happy to add
+
+Reviewed-by: Mel Gorman <mgorman@techsingularity.net>
+
+If you are not comfortable with rewriting the changelog and formatting
+it as a patch then I can do it on your behalf and preserve your
+Signed-off-by. Just let me know.
+
+Thanks for researching this, I think it also applies to other people but
+had not found the time to track it down.
+
+-- 
+Mel Gorman
+SUSE Labs
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
