@@ -2,81 +2,61 @@ Return-Path: <SRS0=Q2PW=T3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A120C04AB3
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 15:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CCEC072B1
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 16:56:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EDBCD217F4
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 15:15:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBCD217F4
+	by mail.kernel.org (Postfix) with ESMTP id AC0BA208C3
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 16:56:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0BA208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 454C64A4C1;
-	Mon, 27 May 2019 11:15:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 182F24A483;
+	Mon, 27 May 2019 12:56:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M1i9V2a3IhsA; Mon, 27 May 2019 11:15:38 -0400 (EDT)
+	with ESMTP id 4VIBSIGOlXvT; Mon, 27 May 2019 12:56:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 493F94A4C3;
-	Mon, 27 May 2019 11:15:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1B64A4E6;
+	Mon, 27 May 2019 12:56:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D004A47E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 11:15:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D95ED4A483
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 12:56:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gg1h+mQXSimE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 May 2019 11:15:36 -0400 (EDT)
-Received: from mail-vk1-f194.google.com (mail-vk1-f194.google.com
- [209.85.221.194])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4A1E4A32E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 11:15:36 -0400 (EDT)
-Received: by mail-vk1-f194.google.com with SMTP id g194so3907187vke.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 08:15:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=S3tITZHYfrewmW5oJlisGGiL7wfHqP1R9OVY9cCC4GU=;
- b=OKjD0E9btF6gPoEO+Paij4uXA/yhJ0nnL+2ED2nTCeVmKaqR1zHPmMsjrXBRC6id9u
- 7t48pNT3x4ncn9lw+87NwOlbzJt5wJbrr1vrtvu1Npijgk3ZRHv+UNnu58CtafAjg+X0
- voBjtDRIY1o0sqa37TGpyhMfOen5+wlN99PwUzw3kRQNs1/dZQ2NkyBlZyLPO6oGJugb
- 5HK8wLrf4wkHasKO/GoUkauCvLLTY5uVZnsvZmZKr6DVsb1DwsY1Rk0OIlOhtQtjuazU
- kTi/2M38s+G1vn0azznNQpcav9PzuJqicqRJp/Hpq4/kTILVCmpy8uJALnaBZ8IxlmtQ
- MoZg==
-X-Gm-Message-State: APjAAAXaWaolTbZK1ESQ7zQMOnkkOof+NSh/uv59b1RrBU6n6rJMhgLt
- J0vwRKuDNAFal+BdM17ZrJt5+Q==
-X-Google-Smtp-Source: APXvYqxJCHIEBYM/VufOiGYY7G560g6K/dg4+SJBDDD3dVA0O70dd9ZnwStYxTkM8qVIYrC3jk8P+g==
-X-Received: by 2002:a1f:7cc7:: with SMTP id x190mr19173038vkc.92.1558970136480; 
- Mon, 27 May 2019 08:15:36 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
- [100.0.197.103])
- by smtp.gmail.com with ESMTPSA id w131sm6373477vsw.7.2019.05.27.08.15.34
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 27 May 2019 08:15:35 -0700 (PDT)
-Date: Mon, 27 May 2019 11:15:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-Message-ID: <20190527111345-mutt-send-email-mst@kernel.org>
-References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
- <20190512123022-mutt-send-email-mst@kernel.org>
- <20190527092604.GB21613@8bytes.org>
+ with ESMTP id NNGrt3ucyPAp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 May 2019 12:56:15 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AC3C4A332
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 12:56:15 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D4C0308FB9D;
+ Mon, 27 May 2019 16:56:14 +0000 (UTC)
+Received: from thuth.com (ovpn-116-235.ams2.redhat.com [10.36.116.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAFE7608A4;
+ Mon, 27 May 2019 16:56:09 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: Remove obsolete address of the FSF
+Date: Mon, 27 May 2019 18:56:06 +0200
+Message-Id: <20190527165606.28295-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190527092604.GB21613@8bytes.org>
-Cc: virtio-dev@lists.oasis-open.org, kevin.tian@intel.com,
- lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com,
- devicetree@vger.kernel.org, linux-pci@vger.kernel.org, jasowang@redhat.com,
- will.deacon@arm.com, robin.murphy@arm.com,
- virtualization@lists.linux-foundation.org, iommu@lists.linux-foundation.org,
- robh+dt@kernel.org, marc.zyngier@arm.com, bhelgaas@google.com,
- frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 27 May 2019 16:56:14 +0000 (UTC)
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,29 +73,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 27, 2019 at 11:26:04AM +0200, Joerg Roedel wrote:
-> On Sun, May 12, 2019 at 12:31:59PM -0400, Michael S. Tsirkin wrote:
-> > OK this has been in next for a while.
-> > 
-> > Last time IOMMU maintainers objected. Are objections
-> > still in force?
-> > 
-> > If not could we get acks please?
-> 
-> No objections against the code, I only hesitated because the Spec was
-> not yet official.
-> 
-> So for the code:
-> 
-> 	Acked-by: Joerg Roedel <jroedel@suse.de>
+The FSF moved from the "Temple Place" to "51 Franklin Street" quite
+a while ago already, so we should not refer to the old address in
+the source code anymore. Anyway, instead of replacing it with the
+new address, let's rather add proper SPDX identifiers here instead.
 
-Last spec patch had a bunch of comments not yet addressed.
-But I do not remember whether comments are just about wording
-or about the host/guest interface as well.
-Jean-Philippe could you remind me please?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ arch/x86/kvm/irq.c        | 10 +---------
+ arch/x86/kvm/irq.h        | 10 +---------
+ arch/x86/kvm/irq_comm.c   |  9 +--------
+ virt/kvm/arm/arch_timer.c | 10 +---------
+ virt/kvm/irqchip.c        | 10 +---------
+ 5 files changed, 5 insertions(+), 44 deletions(-)
 
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index 007bc654f928..4b7b8e44df0f 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * irq.c: API for in kernel interrupt controller
+  * Copyright (c) 2007, Intel Corporation.
+@@ -7,17 +8,8 @@
+  * under the terms and conditions of the GNU General Public License,
+  * version 2, as published by the Free Software Foundation.
+  *
+- * This program is distributed in the hope it will be useful, but WITHOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
+- *
+- * You should have received a copy of the GNU General Public License along with
+- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+- * Place - Suite 330, Boston, MA 02111-1307 USA.
+  * Authors:
+  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+- *
+  */
+ 
+ #include <linux/export.h>
+diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+index fd210cdd4983..a904c9b3b76a 100644
+--- a/arch/x86/kvm/irq.h
++++ b/arch/x86/kvm/irq.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * irq.h: in kernel interrupt controller related definitions
+  * Copyright (c) 2007, Intel Corporation.
+@@ -6,17 +7,8 @@
+  * under the terms and conditions of the GNU General Public License,
+  * version 2, as published by the Free Software Foundation.
+  *
+- * This program is distributed in the hope it will be useful, but WITHOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
+- *
+- * You should have received a copy of the GNU General Public License along with
+- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+- * Place - Suite 330, Boston, MA 02111-1307 USA.
+  * Authors:
+  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+- *
+  */
+ 
+ #ifndef __IRQ_H
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 3cc3b2d130a0..ff95fd893e04 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * irq_comm.c: Common API for in kernel interrupt controller
+  * Copyright (c) 2007, Intel Corporation.
+@@ -6,14 +7,6 @@
+  * under the terms and conditions of the GNU General Public License,
+  * version 2, as published by the Free Software Foundation.
+  *
+- * This program is distributed in the hope it will be useful, but WITHOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
+- *
+- * You should have received a copy of the GNU General Public License along with
+- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+- * Place - Suite 330, Boston, MA 02111-1307 USA.
+  * Authors:
+  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+  *
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 7fc272ecae16..151495d7dec7 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * Copyright (C) 2012 ARM Ltd.
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
+@@ -5,15 +6,6 @@
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  */
+ 
+ #include <linux/cpu.h>
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 79e59e4fa3dc..bcc3fc5d018a 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * irqchip.c: Common API for in kernel interrupt controllers
+  * Copyright (c) 2007, Intel Corporation.
+@@ -8,15 +9,6 @@
+  * under the terms and conditions of the GNU General Public License,
+  * version 2, as published by the Free Software Foundation.
+  *
+- * This program is distributed in the hope it will be useful, but WITHOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
+- *
+- * You should have received a copy of the GNU General Public License along with
+- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+- * Place - Suite 330, Boston, MA 02111-1307 USA.
+- *
+  * This file is derived from virt/kvm/irq_comm.c.
+  *
+  * Authors:
 -- 
-MST
+2.21.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
