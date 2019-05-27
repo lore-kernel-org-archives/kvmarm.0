@@ -1,67 +1,61 @@
-Return-Path: <SRS0=9ge9=T2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Q2PW=T3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C780C46470
-	for <kvmarm@archiver.kernel.org>; Sun, 26 May 2019 16:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD1AC28CBF
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 05:38:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C233820657
-	for <kvmarm@archiver.kernel.org>; Sun, 26 May 2019 16:13:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C233820657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id D8F0C2075B
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 05:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F0C2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 790064A520;
-	Sun, 26 May 2019 12:13:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A78F4A4AA;
+	Mon, 27 May 2019 01:38:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PT97llJEsT23; Sun, 26 May 2019 12:13:01 -0400 (EDT)
+	with ESMTP id WjGOL7PelE08; Mon, 27 May 2019 01:38:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A70D4A4E1;
-	Sun, 26 May 2019 12:13:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF9004A4E8;
+	Mon, 27 May 2019 01:38:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 828274A3A5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 May 2019 12:12:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A72B4A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 01:38:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZENqxH6D+x+U for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 May 2019 12:12:57 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96A8F4A4D5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 May 2019 12:12:57 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E9BF8C056899;
- Sun, 26 May 2019 16:12:56 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB43B191BE;
- Sun, 26 May 2019 16:12:50 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
- yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
- robin.murphy@arm.com
-Subject: [PATCH v8 29/29] vfio: Document nested stage control
-Date: Sun, 26 May 2019 18:10:04 +0200
-Message-Id: <20190526161004.25232-30-eric.auger@redhat.com>
-In-Reply-To: <20190526161004.25232-1-eric.auger@redhat.com>
-References: <20190526161004.25232-1-eric.auger@redhat.com>
+ with ESMTP id 9luE9LjapPv3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 May 2019 01:38:46 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D04B54A332
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 01:38:45 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1783D374;
+ Sun, 26 May 2019 22:38:45 -0700 (PDT)
+Received: from [10.162.40.17] (p8cg001049571a15.blr.arm.com [10.162.40.17])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D7E53F690;
+ Sun, 26 May 2019 22:38:42 -0700 (PDT)
+Subject: Re: [PATCH] mm, compaction: Make sure we isolate a valid PFN
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-mm@kvack.org
+References: <20190524103924.GN18914@techsingularity.net>
+ <1558711908-15688-1-git-send-email-suzuki.poulose@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <8068e2e2-e90d-e8b8-55dc-9dee7d73c5e3@arm.com>
+Date: Mon, 27 May 2019 11:08:54 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Sun, 26 May 2019 16:12:57 +0000 (UTC)
-Cc: marc.zyngier@arm.com, kevin.tian@intel.com, vincent.stehle@arm.com,
- ashok.raj@intel.com
+In-Reply-To: <1558711908-15688-1-git-send-email-suzuki.poulose@arm.com>
+Content-Language: en-US
+Cc: mhocko@suse.com, kvm@vger.kernel.org, marc.zyngier@arm.com,
+ linux-kernel@vger.kernel.org, cai@lca.pw, akpm@linux-foundation.org,
+ mgorman@techsingularity.net, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,120 +72,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-New iotcls were introduced to pass information about guest stage1
-to the host through VFIO. Let's document the nested stage control.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
----
+On 05/24/2019 09:01 PM, Suzuki K Poulose wrote:
+> When we have holes in a normal memory zone, we could endup having
+> cached_migrate_pfns which may not necessarily be valid, under heavy memory
+> pressure with swapping enabled ( via __reset_isolation_suitable(), triggered
+> by kswapd).
+> 
+> Later if we fail to find a page via fast_isolate_freepages(), we may
+> end up using the migrate_pfn we started the search with, as valid
+> page. This could lead to accessing NULL pointer derefernces like below,
+> due to an invalid mem_section pointer.
+> 
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008 [47/1825]
+>  Mem abort info:
+>    ESR = 0x96000004
+>    Exception class = DABT (current EL), IL = 32 bits
+>    SET = 0, FnV = 0
+>    EA = 0, S1PTW = 0
+>  Data abort info:
+>    ISV = 0, ISS = 0x00000004
+>    CM = 0, WnR = 0
+>  user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000082f94ae9
+>  [0000000000000008] pgd=0000000000000000
+>  Internal error: Oops: 96000004 [#1] SMP
+>  ...
+>  CPU: 10 PID: 6080 Comm: qemu-system-aar Not tainted 510-rc1+ #6
+>  Hardware name: AmpereComputing(R) OSPREY EV-883832-X3-0001/OSPREY, BIOS 4819 09/25/2018
+>  pstate: 60000005 (nZCv daif -PAN -UAO)
+>  pc : set_pfnblock_flags_mask+0x58/0xe8
+>  lr : compaction_alloc+0x300/0x950
+>  [...]
+>  Process qemu-system-aar (pid: 6080, stack limit = 0x0000000095070da5)
+>  Call trace:
+>   set_pfnblock_flags_mask+0x58/0xe8
+>   compaction_alloc+0x300/0x950
+>   migrate_pages+0x1a4/0xbb0
+>   compact_zone+0x750/0xde8
+>   compact_zone_order+0xd8/0x118
+>   try_to_compact_pages+0xb4/0x290
+>   __alloc_pages_direct_compact+0x84/0x1e0
+>   __alloc_pages_nodemask+0x5e0/0xe18
+>   alloc_pages_vma+0x1cc/0x210
+>   do_huge_pmd_anonymous_page+0x108/0x7c8
+>   __handle_mm_fault+0xdd4/0x1190
+>   handle_mm_fault+0x114/0x1c0
+>   __get_user_pages+0x198/0x3c0
+>   get_user_pages_unlocked+0xb4/0x1d8
+>   __gfn_to_pfn_memslot+0x12c/0x3b8
+>   gfn_to_pfn_prot+0x4c/0x60
+>   kvm_handle_guest_abort+0x4b0/0xcd8
+>   handle_exit+0x140/0x1b8
+>   kvm_arch_vcpu_ioctl_run+0x260/0x768
+>   kvm_vcpu_ioctl+0x490/0x898
+>   do_vfs_ioctl+0xc4/0x898
+>   ksys_ioctl+0x8c/0xa0
+>   __arm64_sys_ioctl+0x28/0x38
+>   el0_svc_common+0x74/0x118
+>   el0_svc_handler+0x38/0x78
+>   el0_svc+0x8/0xc
+>  Code: f8607840 f100001f 8b011401 9a801020 (f9400400)
+>  ---[ end trace af6a35219325a9b6 ]---
+> 
+> The issue was reported on an arm64 server with 128GB with holes in the zone
+> (e.g, [32GB@4GB, 96GB@544GB]), with a swap device enabled, while running 100 KVM
+> guest instances.
+> 
+> This patch fixes the issue by ensuring that the page belongs to a valid PFN
+> when we fallback to using the lower limit of the scan range upon failure in
+> fast_isolate_freepages().
+> 
+> Fixes: 5a811889de10f1eb ("mm, compaction: use free lists to quickly locate a migration target")
+> Reported-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-v2 -> v3:
-- document the new fault API
-
-v1 -> v2:
-- use the new ioctl names
-- add doc related to fault handling
----
- Documentation/vfio.txt | 83 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
-
-diff --git a/Documentation/vfio.txt b/Documentation/vfio.txt
-index f1a4d3c3ba0b..aab59ddf5ebd 100644
---- a/Documentation/vfio.txt
-+++ b/Documentation/vfio.txt
-@@ -239,6 +239,89 @@ group and can access them as follows::
- 	/* Gratuitous device reset and go... */
- 	ioctl(device, VFIO_DEVICE_RESET);
- 
-+IOMMU Dual Stage Control
-+------------------------
-+
-+Some IOMMUs support 2 stages/levels of translation. "Stage" corresponds to
-+the ARM terminology while "level" corresponds to Intel's VTD terminology. In
-+the following text we use either without distinction.
-+
-+This is useful when the guest is exposed with a virtual IOMMU and some
-+devices are assigned to the guest through VFIO. Then the guest OS can use
-+stage 1 (IOVA -> GPA), while the hypervisor uses stage 2 for VM isolation
-+(GPA -> HPA).
-+
-+The guest gets ownership of the stage 1 page tables and also owns stage 1
-+configuration structures. The hypervisor owns the root configuration structure
-+(for security reason), including stage 2 configuration. This works as long
-+configuration structures and page table format are compatible between the
-+virtual IOMMU and the physical IOMMU.
-+
-+Assuming the HW supports it, this nested mode is selected by choosing the
-+VFIO_TYPE1_NESTING_IOMMU type through:
-+
-+ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
-+
-+This forces the hypervisor to use the stage 2, leaving stage 1 available for
-+guest usage.
-+
-+Once groups are attached to the container, the guest stage 1 translation
-+configuration data can be passed to VFIO by using
-+
-+ioctl(container, VFIO_IOMMU_BIND_PASID_TABLE, &pasid_table_info);
-+
-+This allows to combine guest stage 1 configuration structure along with
-+hypervisor stage 2 configuration structure. stage 1 configuration structures
-+are dependent on the IOMMU type.
-+
-+As the stage 1 translation is fully delegated to the HW, physical events that
-+may occur (especially translation faults), need to be propagated up to
-+the virtualizer and re-injected into the guest.
-+
-+The userspace must be prepared to receive faults. The VFIO-PCI device
-+exposes 2 regions dedicated to HW faults: one read-only "producer" fault
-+region (kernel is the producer and writes into this region) and one
-+write-only "consumer" fault region, type/subtype respectively:
-+- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD
-+- VFIO_REGION_TYPE_NESTED/VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS
-+
-+The producer fault region exposes a VFIO_REGION_INFO_CAP_PRODUCER_FAULT
-+region capability that allows the userspace to retrieve the max fault
-+ABI version supported by the kernel.
-+
-+The ABI version can be negotiated: the userspace writes the version it
-+wants in the consumer region (greater or equal than 1). Once set, the
-+ABI version cannot be changed.
-+
-+Then by using VFIO_DEVICE_SET_IRQS along with the VFIO_PCI_DMA_FAULT_IRQ_INDEX
-+index, the virtualizer can register an eventfd signalled whenever a fault is
-+observed at physical level.
-+
-+The kernel writes the fault records formatted according to the negotiated
-+ABI version in the producer region fault queue. This part of the producer
-+fault region can be mmapped (see VFIO_REGION_INFO_CAP_SPARSE_MMAP result).
-+
-+When the userspace consumes a fault in the queue, it should increment
-+the consumer index to allow new fault records to replace the used ones.
-+The queue size and the entry size can be retrieved in the producer region.
-+The consumer index should never overshoot the producer index as in any
-+other circular buffer scheme. Also it must be less than the queue size
-+otherwise the change is ignored by the kernel.
-+
-+When the guest invalidates stage 1 related caches, invalidations must be
-+forwarded to the host through
-+ioctl(container, VFIO_IOMMU_CACHE_INVALIDATE, &inv_data);
-+Those invalidations can happen at various granularity levels, page, context, ...
-+
-+The ARM SMMU specification introduces another challenge: MSIs are translated by
-+both the virtual SMMU and the physical SMMU. To build a nested mapping for the
-+IOVA programmed into the assigned device, the guest needs to pass its IOVA/MSI
-+doorbell GPA binding to the host. Then the hypervisor can build a nested stage 2
-+binding eventually translating into the physical MSI doorbell.
-+
-+This is achieved by
-+ioctl(container, VFIO_IOMMU_BIND_MSI, &guest_binding);
-+
- VFIO User API
- -------------------------------------------------------------------------------
- 
--- 
-2.20.1
-
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
