@@ -2,58 +2,81 @@ Return-Path: <SRS0=Q2PW=T3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E30C04AB3
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 11:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A120C04AB3
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 15:15:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7EA7720673
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 11:46:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EA7720673
+	by mail.kernel.org (Postfix) with ESMTP id EDBCD217F4
+	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 15:15:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBCD217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E094A379;
-	Mon, 27 May 2019 07:46:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 454C64A4C1;
+	Mon, 27 May 2019 11:15:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VJZpahTapTOL; Mon, 27 May 2019 07:46:28 -0400 (EDT)
+	with ESMTP id M1i9V2a3IhsA; Mon, 27 May 2019 11:15:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68EEA4A4EA;
-	Mon, 27 May 2019 07:46:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 493F94A4C3;
+	Mon, 27 May 2019 11:15:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E02954A4E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 07:46:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D004A47E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 11:15:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uwm4hcvjlT3O for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 May 2019 07:46:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC7494A379
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 07:46:26 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A0E230821DF;
- Mon, 27 May 2019 11:46:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48CEB1001E60;
- Mon, 27 May 2019 11:46:21 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm/arm64: fix emulated ptimer irq injection
-Date: Mon, 27 May 2019 13:46:19 +0200
-Message-Id: <20190527114619.16252-1-drjones@redhat.com>
+ with ESMTP id gg1h+mQXSimE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 May 2019 11:15:36 -0400 (EDT)
+Received: from mail-vk1-f194.google.com (mail-vk1-f194.google.com
+ [209.85.221.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4A1E4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 11:15:36 -0400 (EDT)
+Received: by mail-vk1-f194.google.com with SMTP id g194so3907187vke.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 08:15:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=S3tITZHYfrewmW5oJlisGGiL7wfHqP1R9OVY9cCC4GU=;
+ b=OKjD0E9btF6gPoEO+Paij4uXA/yhJ0nnL+2ED2nTCeVmKaqR1zHPmMsjrXBRC6id9u
+ 7t48pNT3x4ncn9lw+87NwOlbzJt5wJbrr1vrtvu1Npijgk3ZRHv+UNnu58CtafAjg+X0
+ voBjtDRIY1o0sqa37TGpyhMfOen5+wlN99PwUzw3kRQNs1/dZQ2NkyBlZyLPO6oGJugb
+ 5HK8wLrf4wkHasKO/GoUkauCvLLTY5uVZnsvZmZKr6DVsb1DwsY1Rk0OIlOhtQtjuazU
+ kTi/2M38s+G1vn0azznNQpcav9PzuJqicqRJp/Hpq4/kTILVCmpy8uJALnaBZ8IxlmtQ
+ MoZg==
+X-Gm-Message-State: APjAAAXaWaolTbZK1ESQ7zQMOnkkOof+NSh/uv59b1RrBU6n6rJMhgLt
+ J0vwRKuDNAFal+BdM17ZrJt5+Q==
+X-Google-Smtp-Source: APXvYqxJCHIEBYM/VufOiGYY7G560g6K/dg4+SJBDDD3dVA0O70dd9ZnwStYxTkM8qVIYrC3jk8P+g==
+X-Received: by 2002:a1f:7cc7:: with SMTP id x190mr19173038vkc.92.1558970136480; 
+ Mon, 27 May 2019 08:15:36 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+ [100.0.197.103])
+ by smtp.gmail.com with ESMTPSA id w131sm6373477vsw.7.2019.05.27.08.15.34
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 27 May 2019 08:15:35 -0700 (PDT)
+Date: Mon, 27 May 2019 11:15:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
+Message-ID: <20190527111345-mutt-send-email-mst@kernel.org>
+References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
+ <20190512123022-mutt-send-email-mst@kernel.org>
+ <20190527092604.GB21613@8bytes.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 27 May 2019 11:46:25 +0000 (UTC)
-Cc: marc.zyngier@arm.com
+Content-Disposition: inline
+In-Reply-To: <20190527092604.GB21613@8bytes.org>
+Cc: virtio-dev@lists.oasis-open.org, kevin.tian@intel.com,
+ lorenzo.pieralisi@arm.com, tnowicki@caviumnetworks.com,
+ devicetree@vger.kernel.org, linux-pci@vger.kernel.org, jasowang@redhat.com,
+ will.deacon@arm.com, robin.murphy@arm.com,
+ virtualization@lists.linux-foundation.org, iommu@lists.linux-foundation.org,
+ robh+dt@kernel.org, marc.zyngier@arm.com, bhelgaas@google.com,
+ frowand.list@gmail.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,43 +93,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The emulated ptimer needs to track the level changes, otherwise the
-the interrupt will never get deasserted, resulting in the guest getting
-stuck in an interrupt storm if it enables ptimer interrupts. This was
-found with kvm-unit-tests; the ptimer tests hung as soon as interrupts
-were enabled. Typical Linux guests don't have a problem as they prefer
-using the virtual timer.
+On Mon, May 27, 2019 at 11:26:04AM +0200, Joerg Roedel wrote:
+> On Sun, May 12, 2019 at 12:31:59PM -0400, Michael S. Tsirkin wrote:
+> > OK this has been in next for a while.
+> > 
+> > Last time IOMMU maintainers objected. Are objections
+> > still in force?
+> > 
+> > If not could we get acks please?
+> 
+> No objections against the code, I only hesitated because the Spec was
+> not yet official.
+> 
+> So for the code:
+> 
+> 	Acked-by: Joerg Roedel <jroedel@suse.de>
 
-Fixes: bee038a674875 ("KVM: arm/arm64: Rework the timer code to use a timer_map")
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- virt/kvm/arm/arch_timer.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Last spec patch had a bunch of comments not yet addressed.
+But I do not remember whether comments are just about wording
+or about the host/guest interface as well.
+Jean-Philippe could you remind me please?
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 7fc272ecae16..9f5d8cc8b5e5 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -324,10 +324,15 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- static void timer_emulate(struct arch_timer_context *ctx)
- {
- 	bool should_fire = kvm_timer_should_fire(ctx);
-+	struct timer_map map;
-+
-+	get_timer_map(ctx->vcpu, &map);
- 
- 	trace_kvm_timer_emulate(ctx, should_fire);
- 
--	if (should_fire) {
-+	if (ctx == map.emul_ptimer && should_fire != ctx->irq.level) {
-+		kvm_timer_update_irq(ctx->vcpu, !ctx->irq.level, ctx);
-+	} else if (should_fire) {
- 		kvm_timer_update_irq(ctx->vcpu, true, ctx);
- 		return;
- 	}
 -- 
-2.18.1
-
+MST
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
