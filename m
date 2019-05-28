@@ -1,4 +1,4 @@
-Return-Path: <SRS0=Q2PW=T3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=H6Wl=T4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CCEC072B1
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 16:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42DDCC04AB6
+	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 08:18:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AC0BA208C3
-	for <kvmarm@archiver.kernel.org>; Mon, 27 May 2019 16:56:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0BA208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C62692075C
+	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 08:18:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C62692075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 182F24A483;
-	Mon, 27 May 2019 12:56:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CFBC4A4F0;
+	Tue, 28 May 2019 04:18:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4VIBSIGOlXvT; Mon, 27 May 2019 12:56:17 -0400 (EDT)
+	with ESMTP id sKnCp+5Utpnu; Tue, 28 May 2019 04:18:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1B64A4E6;
-	Mon, 27 May 2019 12:56:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40DA04A4E8;
+	Tue, 28 May 2019 04:18:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D95ED4A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 12:56:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B5F4A4C9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 04:18:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NNGrt3ucyPAp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 May 2019 12:56:15 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AC3C4A332
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 May 2019 12:56:15 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D4C0308FB9D;
- Mon, 27 May 2019 16:56:14 +0000 (UTC)
-Received: from thuth.com (ovpn-116-235.ams2.redhat.com [10.36.116.235])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EAFE7608A4;
- Mon, 27 May 2019 16:56:09 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
- kvm@vger.kernel.org
-Subject: [PATCH] KVM: Remove obsolete address of the FSF
-Date: Mon, 27 May 2019 18:56:06 +0200
-Message-Id: <20190527165606.28295-1-thuth@redhat.com>
+ with ESMTP id Ys2w6yWrYxEB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 May 2019 04:18:26 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76AFA4A496
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 04:18:26 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA68C341;
+ Tue, 28 May 2019 01:18:25 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 149EB3F59C;
+ Tue, 28 May 2019 01:18:22 -0700 (PDT)
+Subject: Re: [PATCH v2 07/15] arm64: KVM: split debug save restore across
+ vm/traps activation
+To: Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+References: <20190523103502.25925-1-sudeep.holla@arm.com>
+ <20190523103502.25925-8-sudeep.holla@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <84eba64a-899f-e231-0873-c3ccfeb2201d@arm.com>
+Date: Tue, 28 May 2019 09:18:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 27 May 2019 16:56:14 +0000 (UTC)
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20190523103502.25925-8-sudeep.holla@arm.com>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,151 +74,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The FSF moved from the "Temple Place" to "51 Franklin Street" quite
-a while ago already, so we should not refer to the old address in
-the source code anymore. Anyway, instead of replacing it with the
-new address, let's rather add proper SPDX identifiers here instead.
+Hi Sudeep,
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- arch/x86/kvm/irq.c        | 10 +---------
- arch/x86/kvm/irq.h        | 10 +---------
- arch/x86/kvm/irq_comm.c   |  9 +--------
- virt/kvm/arm/arch_timer.c | 10 +---------
- virt/kvm/irqchip.c        | 10 +---------
- 5 files changed, 5 insertions(+), 44 deletions(-)
+On 23/05/2019 11:34, Sudeep Holla wrote:
+> If we enable profiling buffer controls at EL1 generate a trap exception
+> to EL2, it also changes profiling buffer to use EL1&0 stage 1 translation
+> regime in case of VHE. To support SPE both in the guest and host, we
+> need to first stop profiling and flush the profiling buffers before
+> we activate/switch vm or enable/disable the traps.
+> 
+> In prepartion to do that, lets split the debug save restore functionality
+> into 4 steps:
+> 1. debug_save_host_context - saves the host context
+> 2. debug_restore_guest_context - restore the guest context
+> 3. debug_save_guest_context - saves the guest context
+> 4. debug_restore_host_context - restores the host context
+> 
+> Lets rename existing __debug_switch_to_{host,guest} to make sure it's
+> aligned to the above and just add the place holders for new ones getting
+> added here as we need them to support SPE in guests.
+> 
+> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_hyp.h |  6 ++++--
+>  arch/arm64/kvm/hyp/debug-sr.c    | 25 ++++++++++++++++---------
+>  arch/arm64/kvm/hyp/switch.c      | 12 ++++++++----
+>  3 files changed, 28 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 782955db61dd..1c5ed80fcbda 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -164,8 +164,10 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
+>  void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+>  void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+>  
+> -void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
+> -void __debug_switch_to_host(struct kvm_vcpu *vcpu);
+> +void __debug_save_host_context(struct kvm_vcpu *vcpu);
+> +void __debug_restore_guest_context(struct kvm_vcpu *vcpu);
+> +void __debug_save_guest_context(struct kvm_vcpu *vcpu);
+> +void __debug_restore_host_context(struct kvm_vcpu *vcpu);
+>  
+>  void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+>  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index fa51236ebcb3..618884df1dc4 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -149,20 +149,13 @@ static void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+>  	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
+>  }
+>  
+> -void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+> +void __hyp_text __debug_restore_guest_context(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *host_ctxt;
+>  	struct kvm_cpu_context *guest_ctxt;
+>  	struct kvm_guest_debug_arch *host_dbg;
+>  	struct kvm_guest_debug_arch *guest_dbg;
+>  
+> -	/*
+> -	 * Non-VHE: Disable and flush SPE data generation
+> -	 * VHE: The vcpu can run, but it can't hide.
+> -	 */
+> -	if (!has_vhe())
+> -		__debug_save_spe_nvhe(&vcpu->arch.host_debug_state.pmscr_el1);
+> -
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
+>  
+> @@ -175,7 +168,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>  	__debug_restore_state(vcpu, guest_dbg, guest_ctxt);
+>  }
+>  
+> -void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
+> +void __hyp_text __debug_restore_host_context(struct kvm_vcpu *vcpu)
 
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 007bc654f928..4b7b8e44df0f 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-only
- /*
-  * irq.c: API for in kernel interrupt controller
-  * Copyright (c) 2007, Intel Corporation.
-@@ -7,17 +8,8 @@
-  * under the terms and conditions of the GNU General Public License,
-  * version 2, as published by the Free Software Foundation.
-  *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-- * Place - Suite 330, Boston, MA 02111-1307 USA.
-  * Authors:
-  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
-- *
-  */
- 
- #include <linux/export.h>
-diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-index fd210cdd4983..a904c9b3b76a 100644
---- a/arch/x86/kvm/irq.h
-+++ b/arch/x86/kvm/irq.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
- /*
-  * irq.h: in kernel interrupt controller related definitions
-  * Copyright (c) 2007, Intel Corporation.
-@@ -6,17 +7,8 @@
-  * under the terms and conditions of the GNU General Public License,
-  * version 2, as published by the Free Software Foundation.
-  *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-- * Place - Suite 330, Boston, MA 02111-1307 USA.
-  * Authors:
-  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
-- *
-  */
- 
- #ifndef __IRQ_H
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 3cc3b2d130a0..ff95fd893e04 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-only
- /*
-  * irq_comm.c: Common API for in kernel interrupt controller
-  * Copyright (c) 2007, Intel Corporation.
-@@ -6,14 +7,6 @@
-  * under the terms and conditions of the GNU General Public License,
-  * version 2, as published by the Free Software Foundation.
-  *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-- * Place - Suite 330, Boston, MA 02111-1307 USA.
-  * Authors:
-  *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
-  *
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 7fc272ecae16..151495d7dec7 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-only
- /*
-  * Copyright (C) 2012 ARM Ltd.
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-@@ -5,15 +6,6 @@
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write to the Free Software
-- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-  */
- 
- #include <linux/cpu.h>
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 79e59e4fa3dc..bcc3fc5d018a 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-only
- /*
-  * irqchip.c: Common API for in kernel interrupt controllers
-  * Copyright (c) 2007, Intel Corporation.
-@@ -8,15 +9,6 @@
-  * under the terms and conditions of the GNU General Public License,
-  * version 2, as published by the Free Software Foundation.
-  *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-- * Place - Suite 330, Boston, MA 02111-1307 USA.
-- *
-  * This file is derived from virt/kvm/irq_comm.c.
-  *
-  * Authors:
+In the current state of the sources, __debug_switch_to_host() seems to
+save the guest debug state before restoring the host's:
+
+	__debug_save_state(vcpu, guest_dbg, guest_ctxt);
+
+Since you're splitting the switch_to into save/restore operations, it
+feels like this would fit better __debug_save_guest_context() (currently
+empty) rather than __debug_restore_host_context().
+
+Cheers,
+
 -- 
-2.21.0
-
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
