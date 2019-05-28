@@ -2,75 +2,66 @@ Return-Path: <SRS0=H6Wl=T4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CBBC04AB6
-	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 09:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C86BEC04AB6
+	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 10:11:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AC781208C3
-	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 09:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC781208C3
+	by mail.kernel.org (Postfix) with ESMTP id 540C020883
+	for <kvmarm@archiver.kernel.org>; Tue, 28 May 2019 10:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540C020883
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13CC24A4C9;
-	Tue, 28 May 2019 05:18:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37C44A4C9;
+	Tue, 28 May 2019 06:11:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yJM0oIidKi0h; Tue, 28 May 2019 05:18:55 -0400 (EDT)
+	with ESMTP id 6UkpAY4NplRb; Tue, 28 May 2019 06:11:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3E954A4E8;
-	Tue, 28 May 2019 05:18:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 829A34A4E8;
+	Tue, 28 May 2019 06:11:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8CD94A4C9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 05:18:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A4C414A4C9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 06:11:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dTVP0HUDq-iB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 May 2019 05:18:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BEFE4A32E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 05:18:53 -0400 (EDT)
+ with ESMTP id 8S481AjDQw8x for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 May 2019 06:11:36 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 075D54A496
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 May 2019 06:11:36 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E8B3341;
- Tue, 28 May 2019 02:18:52 -0700 (PDT)
-Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B0993F59C;
- Tue, 28 May 2019 02:18:48 -0700 (PDT)
-Subject: Re: [PATCH v7 0/7] Add virtio-iommu driver
-To: "Michael S. Tsirkin" <mst@redhat.com>, Joerg Roedel <joro@8bytes.org>
-References: <20190115121959.23763-1-jean-philippe.brucker@arm.com>
- <20190512123022-mutt-send-email-mst@kernel.org>
- <20190527092604.GB21613@8bytes.org>
- <20190527111345-mutt-send-email-mst@kernel.org>
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <99ff5494-bfdf-f4ef-b2d2-c177add385c6@arm.com>
-Date: Tue, 28 May 2019 10:18:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E041341;
+ Tue, 28 May 2019 03:11:35 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.72.51.249])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B45033F59C;
+ Tue, 28 May 2019 03:11:33 -0700 (PDT)
+Date: Tue, 28 May 2019 11:11:31 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Subject: Re: [kvmtool PATCH v10 5/5] KVM: arm/arm64: Add a vcpu feature for
+ pointer authentication
+Message-ID: <20190528101128.GB28398@e103592.cambridge.arm.com>
+References: <1555994558-26349-1-git-send-email-amit.kachhap@arm.com>
+ <1555994558-26349-6-git-send-email-amit.kachhap@arm.com>
+ <20190423154625.GP3567@e103592.cambridge.arm.com>
+ <3b7bafc9-5d6a-7845-ef1f-577ea59000e2@arm.com>
+ <20190424134120.GW3567@e103592.cambridge.arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190527111345-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>,
- "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- Marc Zyngier <Marc.Zyngier@arm.com>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "jasowang@redhat.com" <jasowang@redhat.com>, Will Deacon <Will.Deacon@arm.com>,
- Robin Murphy <Robin.Murphy@arm.com>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>,
- "frowand.list@gmail.com" <frowand.list@gmail.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Disposition: inline
+In-Reply-To: <20190424134120.GW3567@e103592.cambridge.arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Cc: Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, Kristina Martsenko <kristina.martsenko@arm.com>,
+ Ramana Radhakrishnan <ramana.radhakrishnan@arm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,34 +78,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/05/2019 16:15, Michael S. Tsirkin wrote:
-> On Mon, May 27, 2019 at 11:26:04AM +0200, Joerg Roedel wrote:
->> On Sun, May 12, 2019 at 12:31:59PM -0400, Michael S. Tsirkin wrote:
->>> OK this has been in next for a while.
->>>
->>> Last time IOMMU maintainers objected. Are objections
->>> still in force?
->>>
->>> If not could we get acks please?
->>
->> No objections against the code, I only hesitated because the Spec was
->> not yet official.
->>
->> So for the code:
->>
->> 	Acked-by: Joerg Roedel <jroedel@suse.de>
+On Wed, Apr 24, 2019 at 02:41:21PM +0100, Dave Martin wrote:
+> On Wed, Apr 24, 2019 at 12:32:22PM +0530, Amit Daniel Kachhap wrote:
+> > Hi,
+> > 
+> > On 4/23/19 9:16 PM, Dave Martin wrote:
+
+[...]
+
+> > >>diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> > >>index 7780251..acd1d5f 100644
+> > >>--- a/arm/kvm-cpu.c
+> > >>+++ b/arm/kvm-cpu.c
+> > >>@@ -68,6 +68,18 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+> > >>  		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
+> > >>  	}
+> > >>+	/* Check Pointer Authentication command line arguments. */
+> > >>+	if (kvm->cfg.arch.enable_ptrauth && kvm->cfg.arch.disable_ptrauth)
+> > >>+		die("Both enable-ptrauth and disable-ptrauth option cannot be present");
+> > >
+> > >Preferably, print the leading dashes, the same as the user would see
+> > >on the command line (e.g., --enable-ptrauth, --disable-ptrauth).
+> > >
+> > >For brevity, we could write something like:
+> > >
+> > >		die("--enable-ptrauth conflicts with --disable-ptrauth");
+
+[...]
+
+> > >>@@ -106,8 +118,12 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+> > >>  			die("Unable to find matching target");
+> > >>  	}
+> > >>-	if (err || target->init(vcpu))
+> > >>-		die("Unable to initialise vcpu");
+> > >>+	if (err || target->init(vcpu)) {
+> > >>+		if (kvm->cfg.arch.enable_ptrauth)
+> > >>+			die("Unable to initialise vcpu with pointer authentication feature");
+> > >
+> > >We don't special-case this error message for any other feature yet:
+> > >there are a variety of reasons why we might have failed, so suggesting
+> > >that the failure is something to do with ptrauth may be misleading to
+> > >the user.
+> > >
+> > >If we want to be more informative, we could do something like the
+> > >following:
+> > >
+> > >	bool supported;
+> > >
+> > >	supported = kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+> > >		    kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC);
+> > >
+> > >	if (kvm->cfg.arch.enable_ptrauth && !supported)
+> > >		die("--enable-ptrauth not supported on this host");
+> > >
+> > >	if (supported && !kvm->cfg.arch.disable_ptrauth)
+> > >		vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
+> > >
+> > >	/* ... */
+> > >
+> > >	if (err || target->init(vcpu))
+> > >		die("Unable to initialise vcpu");
+> > >
+> > >We don't do this for any other feature today, but since it helps the
+> > >user to understand what went wrong it's probably a good idea.
+> > Yes this is more clear. As Mark has picked the core guest ptrauth patches. I
+> > will post this changes as standalone.
 > 
-> Last spec patch had a bunch of comments not yet addressed.
-> But I do not remember whether comments are just about wording
-> or about the host/guest interface as well.
-> Jean-Philippe could you remind me please?
+> Sounds good.  (I also need to do that separately for SVE...)
 
-It's mostly wording, but there is a small change in the config space
-layout and two new feature bits. I'll send a new version of the driver
-when possible.
+Were you planning to repost this?
 
-Thanks,
-Jean
+Alternatively, I can fix up the diagnostic messages discussed here and
+post it together with the SVE support.  I'll do that locally for now,
+but let me know what you plan to do.  I'd like to get the SVE support
+posted soon so that people can test it.
+
+Cheers
+---Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
