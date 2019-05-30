@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6880DC28CC2
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7967C28CC0
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2E6B025C88
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E6B025C88
+	by mail.kernel.org (Postfix) with ESMTP id 8CB0A25C8C
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB0A25C8C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA8404A501;
-	Thu, 30 May 2019 11:14:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44CB14A4AA;
+	Thu, 30 May 2019 11:14:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LK2UAlGQ4E0L; Thu, 30 May 2019 11:14:23 -0400 (EDT)
+	with ESMTP id ipU7soH-KXh7; Thu, 30 May 2019 11:14:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C974A4F7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FAC24A50C;
 	Thu, 30 May 2019 11:14:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7EB4A4F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 66C684A4C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c57sPSCNmipT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 May 2019 11:14:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E32694A4FD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:18 -0400 (EDT)
+ with ESMTP id Xeoxx7SVFQdR for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 May 2019 11:14:21 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F23024A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:20 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CAB5165C;
- Thu, 30 May 2019 08:14:18 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74780341;
+ Thu, 30 May 2019 08:14:20 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E2E493F59C;
- Thu, 30 May 2019 08:14:16 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CA8013F59C;
+ Thu, 30 May 2019 08:14:18 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool v3 8/9] arm64: Add SVE support
-Date: Thu, 30 May 2019 16:13:13 +0100
-Message-Id: <1559229194-3036-9-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH kvmtool v3 9/9] arm64: Select SVE vector lengths via the
+ command line
+Date: Thu, 30 May 2019 16:13:14 +0100
+Message-Id: <1559229194-3036-10-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
 In-Reply-To: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
 References: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
@@ -73,150 +74,182 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch adds --enable-sve/--disable-sve command line options to
-allow the user to control whether the Scalable Vector Extension is
-made available to the guest.
+In order to support use cases such as migration, it may be
+important in some situations to restrict the set of SVE vector
+lengths available to the guest.  It can also be useful to observe
+the behaviour of guest OSes with different vector lengths.
 
-This requires use of the new KVM_ARM_VCPU_FINALIZE ioctl before the
-vcpu is runnable, so a new hook kvm_cpu__configure_features() is
-added to provide an appropriate place to do this work.
+To enable testing and experimentation for such configurations, this
+patch adds a command-line option to allow setting of the set of
+vector lengths to be made available to the guest.
 
-By default, SVE is enabled for the guest if the host supports it.
+For now, the setting is global: no means is offered to configure
+individual guest vcpus independently of each other.
+
+By default all vector lengths that the host can support are given
+to the guest, as before.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- arm/aarch32/include/kvm/kvm-cpu-arch.h    |  4 +++
- arm/aarch64/include/kvm/kvm-config-arch.h |  6 ++++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    |  1 +
- arm/aarch64/kvm-cpu.c                     | 41 +++++++++++++++++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h  |  2 ++
- arm/kvm-cpu.c                             |  3 +++
- 6 files changed, 56 insertions(+), 1 deletion(-)
+ arm/aarch64/include/kvm/kvm-config-arch.h |  8 +++-
+ arm/aarch64/kvm-cpu.c                     | 80 ++++++++++++++++++++++++++++++-
+ arm/include/arm-common/kvm-config-arch.h  |  1 +
+ 3 files changed, 87 insertions(+), 2 deletions(-)
 
-diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index 01983f0..780e0e2 100644
---- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -15,5 +15,9 @@
- 
- static inline void kvm_cpu__select_features(struct kvm *kvm,
- 					    struct kvm_vcpu_init *init) { }
-+static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-+{
-+	return 0;
-+}
- 
- #endif /* KVM__KVM_CPU_ARCH_H */
 diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index fe1699d..41e9d05 100644
+index 41e9d05..a996612 100644
 --- a/arm/aarch64/include/kvm/kvm-config-arch.h
 +++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -12,7 +12,11 @@
- 	OPT_BOOLEAN('\0', "enable-ptrauth", &(cfg)->enable_ptrauth,	\
- 			"Enable pointer authentication for the guest"),	\
- 	OPT_BOOLEAN('\0', "disable-ptrauth", &(cfg)->disable_ptrauth,	\
--			"Disable pointer authentication for the guest"),
-+			"Disable pointer authentication for the guest"), \
-+	OPT_BOOLEAN('\0', "enable-sve", &(cfg)->enable_sve,		\
-+			"Enable SVE for the guest"),			\
-+	OPT_BOOLEAN('\0', "disable-sve", &(cfg)->disable_sve,		\
-+			"Disable SVE for the guest"),
+@@ -1,6 +1,8 @@
+ #ifndef KVM__KVM_CONFIG_ARCH_H
+ #define KVM__KVM_CONFIG_ARCH_H
+ 
++int sve_vls_parser(const struct option *opt, const char *arg, int unset);
++
+ #define ARM_OPT_ARCH_RUN(cfg)						\
+ 	OPT_BOOLEAN('\0', "aarch32", &(cfg)->aarch32_guest,		\
+ 			"Run AArch32 guest"),				\
+@@ -16,7 +18,11 @@
+ 	OPT_BOOLEAN('\0', "enable-sve", &(cfg)->enable_sve,		\
+ 			"Enable SVE for the guest"),			\
+ 	OPT_BOOLEAN('\0', "disable-sve", &(cfg)->disable_sve,		\
+-			"Disable SVE for the guest"),
++			"Disable SVE for the guest"),			\
++	OPT_CALLBACK('\0', "sve-vls", &(cfg)->sve_vqs,			\
++		     "comma-separated list of vector lengths, in 128-bit units", \
++		     "Set of vector lengths to enable for the guest",	\
++		     sve_vls_parser, NULL),
  
  #include "arm-common/kvm-config-arch.h"
  
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index e6875fc..8dfb82e 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -18,5 +18,6 @@
- #define ARM_CPU_CTRL_SCTLR_EL1	0
- 
- void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
-+int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
- 
- #endif /* KVM__KVM_CPU_ARCH_H */
 diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 08e4fd5..cdfb22e 100644
+index cdfb22e..2c624c3 100644
 --- a/arm/aarch64/kvm-cpu.c
 +++ b/arm/aarch64/kvm-cpu.c
-@@ -152,9 +152,50 @@ static void select_ptrauth_feature(struct kvm *kvm, struct kvm_vcpu_init *init)
- 	}
- }
+@@ -1,8 +1,13 @@
++#include <errno.h>
++#include <stdio.h>
++#include <string.h>
++
+ #include "kvm/kvm-cpu.h"
+ #include "kvm/kvm.h"
+ #include "kvm/virtio.h"
  
-+static void select_sve_feature(struct kvm *kvm, struct kvm_vcpu_init *init)
+ #include <asm/ptrace.h>
++#include <asm/sigcontext.h>
+ 
+ #define COMPAT_PSR_F_BIT	0x00000040
+ #define COMPAT_PSR_I_BIT	0x00000080
+@@ -12,6 +17,65 @@
+ #define SCTLR_EL1_E0E_MASK	(1 << 24)
+ #define SCTLR_EL1_EE_MASK	(1 << 25)
+ 
++/*
++ * Work around old kernel headers that lack these definitions in
++ * <asm/sigcontext.h>:
++ */
++#ifndef SVE_VQ_MIN
++#define SVE_VQ_MIN 1
++#endif
++
++#ifndef SVE_VQ_MAX
++#define SVE_VQ_MAX 512
++#endif
++
++int sve_vls_parser(const struct option *opt, const char *arg, int unset)
 +{
-+	bool supported;
++	size_t offset = 0;
++	int vq, n, t;
++	u64 (*vqs)[(SVE_VQ_MAX + 1 - SVE_VQ_MIN + 63) / 64];
++	u64 **cfg_vqs = opt->value;
 +
-+	if (kvm->cfg.arch.enable_sve && kvm->cfg.arch.disable_sve)
-+		die("--enable-sve conflicts with --disable-sve");
-+
-+	supported = kvm__supports_extension(kvm, KVM_CAP_ARM_SVE);
-+
-+	if (kvm->cfg.arch.enable_sve && !supported)
-+		die("--enable-sve not supported on this host");
-+
-+	/* Default SVE to on if available and not explicitly disabled */
-+	if (supported && !kvm->cfg.arch.disable_sve) {
-+		kvm->cfg.arch.enable_sve = true;
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
-+	}
-+}
-+
- void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
- {
- 	select_ptrauth_feature(kvm, init);
-+	select_sve_feature(kvm, init);
-+}
-+
-+static int configure_sve(struct kvm_cpu *vcpu)
-+{
-+	int feature = KVM_ARM_VCPU_SVE;
-+
-+	if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_FINALIZE, &feature)) {
-+		pr_err("KVM_ARM_VCPU_FINALIZE: %s", strerror(errno));
++	if (*cfg_vqs) {
++		pr_err("sve-vls: SVE vector lengths set may only be specified once");
 +		return -1;
 +	}
 +
++	vqs = calloc(1, sizeof *vqs);
++	if (!vqs)
++		die("%s", strerror(ENOMEM));
++
++	offset = 0;
++	while (arg[offset]) {
++		n = -1;
++
++		t = sscanf(arg + offset,
++			   offset == 0 ? "%i%n" : ",%i%n",
++			   &vq, &n);
++		if (t == EOF || t < 1 || n <= 0) {
++			pr_err("sve-vls: Comma-separated list of vector lengths required");
++			goto error;
++		}
++
++		if (vq < SVE_VQ_MIN || vq > SVE_VQ_MAX) {
++			pr_err("sve-vls: Invalid vector length %d", vq);
++			goto error;
++		}
++
++		vq -= SVE_VQ_MIN;
++		(*vqs)[vq / 64] |= (u64)1 << (vq % 64);
++
++		offset += n;
++	}
++
++	*cfg_vqs = *vqs;
 +	return 0;
++
++error:
++	free(vqs);
++	return -1;
 +}
 +
-+int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-+{
-+	if (vcpu->kvm->cfg.arch.enable_sve)
-+		if (configure_sve(vcpu))
-+			return -1;
+ static __u64 __core_reg_id(__u64 offset)
+ {
+ 	__u64 id = KVM_REG_ARM64 | KVM_REG_ARM_CORE | offset;
+@@ -180,6 +244,16 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
+ static int configure_sve(struct kvm_cpu *vcpu)
+ {
+ 	int feature = KVM_ARM_VCPU_SVE;
++	struct kvm_one_reg r = {
++		.id = KVM_REG_ARM64_SVE_VLS,
++		.addr = (u64)vcpu->kvm->cfg.arch.sve_vqs,
++	};
 +
-+	return 0;
- }
++	if (vcpu->kvm->cfg.arch.sve_vqs)
++		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &r)) {
++			pr_err("Cannot set requested SVE vector lengths");
++			return -1;
++		}
  
- void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
+ 	if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_FINALIZE, &feature)) {
+ 		pr_err("KVM_ARM_VCPU_FINALIZE: %s", strerror(errno));
+@@ -191,9 +265,13 @@ static int configure_sve(struct kvm_cpu *vcpu)
+ 
+ int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
+ {
+-	if (vcpu->kvm->cfg.arch.enable_sve)
++	if (vcpu->kvm->cfg.arch.enable_sve) {
+ 		if (configure_sve(vcpu))
+ 			return -1;
++	} else {
++		if (vcpu->kvm->cfg.arch.sve_vqs)
++			pr_warning("SVE vector lengths ignored");
++	}
+ 
+ 	return 0;
+ }
 diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 1b4287d..40e3d1f 100644
+index 40e3d1f..b45201f 100644
 --- a/arm/include/arm-common/kvm-config-arch.h
 +++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -10,6 +10,8 @@ struct kvm_config_arch {
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
+@@ -12,6 +12,7 @@ struct kvm_config_arch {
  	u64		kaslr_seed;
-+	bool		enable_sve;
-+	bool		disable_sve;
+ 	bool		enable_sve;
+ 	bool		disable_sve;
++	u64		*sve_vqs;
  	bool		enable_ptrauth;
  	bool		disable_ptrauth;
  	enum irqchip_type irqchip;
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 1652f6f..554414f 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -124,6 +124,9 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	vcpu->cpu_compatible	= target->compatible;
- 	vcpu->is_running	= true;
- 
-+	if (kvm_cpu__configure_features(vcpu))
-+		die("Unable to configure requested vcpu features");
-+
- 	return vcpu;
- }
- 
 -- 
 2.1.4
 
