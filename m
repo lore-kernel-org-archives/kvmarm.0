@@ -2,52 +2,54 @@ Return-Path: <SRS0=SFjg=T6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 036B9C28CC0
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650A4C28CC0
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7F31625C57
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:13:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F31625C57
+	by mail.kernel.org (Postfix) with ESMTP id 278C825C5F
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278C825C5F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1A434A4EC;
-	Thu, 30 May 2019 11:13:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9A044A4C2;
+	Thu, 30 May 2019 11:14:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M24BjCs5Ms4d; Thu, 30 May 2019 11:13:27 -0400 (EDT)
+	with ESMTP id 8JoJvvv96g8p; Thu, 30 May 2019 11:14:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6991A4A49F;
-	Thu, 30 May 2019 11:13:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94C294A4E1;
+	Thu, 30 May 2019 11:14:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E7F94A3A3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:13:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD8C34A49F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IaMJ+o8lfg-c for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 May 2019 11:13:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DB1B4A32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:13:23 -0400 (EDT)
+ with ESMTP id d4AZw-gekCqD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 May 2019 11:14:05 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B28F4A32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:05 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8D30341;
- Thu, 30 May 2019 08:13:22 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD521341;
+ Thu, 30 May 2019 08:14:04 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2AA253F59C;
- Thu, 30 May 2019 08:13:21 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 12E773F59C;
+ Thu, 30 May 2019 08:14:02 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool v3 0/9] arm64: Pointer Authentication and SVE support
-Date: Thu, 30 May 2019 16:13:05 +0100
-Message-Id: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH kvmtool v3 1/9] update_headers.sh: Add missing shell quoting
+Date: Thu, 30 May 2019 16:13:06 +0100
+Message-Id: <1559229194-3036-2-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
+In-Reply-To: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
+References: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
 Cc: Christoffer Dall <cdall@kernel.org>, Marc Zyngier <marc.zyngier@arm.com>,
  Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>,
  Kristina Martsenko <kristina.martsenko@arm.com>,
@@ -71,69 +73,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series, based on kvmtool master [1], implements basic support for
-pointer authentication and SVE for guests.
+update_headers.sh can break if the current working directory has a
+funny name or if something odd is passed for LINUX_ROOT.
 
-A git tree is also available [2].
+In the interest of cleanliness, quote where appropriate.
 
-For pointer auth, I include Amit's v10 patch [3], with some additional
-refactoring to sit nicely alongside SVE, and some cosmetic / diagnostic
-tidyups discussed during review on-list.  (I've kept the extra changes
-separate for easier review, but they could be folded if desired.)
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+---
+ util/update_headers.sh | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-[Maintainer note: I'd like Amit to comment on my changes on top of his
-pointer auth patch, but the first 4 patches just re-sync headers and
-could be pulled earlier if you feel like it.]
-
-
-This series has been tested against Linux v5.2-rc1.
-
-If people have a strong view on the --sve-vls parameter, I'd be
-interested to discuss what that should look like.  Since this is
-primarily a debug/experimentation option, the current implementation is
-probably good enough though.
-
-[1] 
-git://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git master
-https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/log/
-eaeaf60808d6 ("virtio/blk: Avoid taking pointer to packed struct")
-
-[2] [PATCH v10 3/5] KVM: arm64: Add userspace flag to enable pointer authentication
-https://lore.kernel.org/linux-arm-kernel/1555994558-26349-6-git-send-email-amit.kachhap@arm.com/
-
-[3]
-git://linux-arm.org/kvmtool-dm.git sve/v3/head
-http://linux-arm.org/git?p=kvmtool-dm.git;a=shortlog;h=refs/heads/sve/v3/head
-
-
-Amit Daniel Kachhap (1):
-  KVM: arm/arm64: Add a vcpu feature for pointer authentication
-
-Dave Martin (8):
-  update_headers.sh: Add missing shell quoting
-  update_headers.sh: Cleanly report failure on error
-  update_headers.sh: arm64: Copy sve_context.h if available
-  update_headers: Sync kvm UAPI headers with linux v5.1-rc1
-  arm/arm64: Factor out ptrauth vcpu feature setup
-  arm64: Make ptrauth enable/disable diagnostics more user-friendly
-  arm64: Add SVE support
-  arm64: Select SVE vector lengths via the command line
-
- arm/aarch32/include/kvm/kvm-cpu-arch.h    |   7 ++
- arm/aarch64/include/asm/kvm.h             |  43 +++++++++
- arm/aarch64/include/asm/sve_context.h     |  53 +++++++++++
- arm/aarch64/include/kvm/kvm-config-arch.h |  16 +++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h    |   3 +
- arm/aarch64/kvm-cpu.c                     | 148 ++++++++++++++++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h  |   5 +
- arm/kvm-cpu.c                             |   5 +
- include/linux/kvm.h                       |  15 ++-
- powerpc/include/asm/kvm.h                 |  48 ++++++++++
- util/update_headers.sh                    |  25 +++--
- x86/include/asm/kvm.h                     |   1 +
- 12 files changed, 360 insertions(+), 9 deletions(-)
- create mode 100644 arm/aarch64/include/asm/sve_context.h
-
+diff --git a/util/update_headers.sh b/util/update_headers.sh
+index 2d93646..4ba1b9f 100755
+--- a/util/update_headers.sh
++++ b/util/update_headers.sh
+@@ -11,17 +11,17 @@ if [ "$#" -ge 1 ]
+ then
+ 	LINUX_ROOT="$1"
+ else
+-	LINUX_ROOT=/lib/modules/$(uname -r)/source
++	LINUX_ROOT="/lib/modules/$(uname -r)/source"
+ fi
+ 
+-if [ ! -d $LINUX_ROOT/include/uapi/linux ]
++if [ ! -d "$LINUX_ROOT/include/uapi/linux" ]
+ then
+ 	echo "$LINUX_ROOT does not seem to be valid Linux source tree."
+ 	echo "usage: $0 [path-to-Linux-source-tree]"
+ 	exit 1
+ fi
+ 
+-cp $LINUX_ROOT/include/uapi/linux/kvm.h include/linux
++cp -- "$LINUX_ROOT/include/uapi/linux/kvm.h" include/linux
+ 
+ for arch in arm arm64 mips powerpc x86
+ do
+@@ -30,6 +30,6 @@ do
+ 		arm64) KVMTOOL_PATH=arm/aarch64 ;;
+ 		*) KVMTOOL_PATH=$arch ;;
+ 	esac
+-	cp $LINUX_ROOT/arch/$arch/include/uapi/asm/kvm.h \
+-		$KVMTOOL_PATH/include/asm
++	cp -- "$LINUX_ROOT/arch/$arch/include/uapi/asm/kvm.h" \
++		"$KVMTOOL_PATH/include/asm"
+ done
 -- 
 2.1.4
 
