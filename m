@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85500C28CC0
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875BCC28CC2
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4B8F025C76
-	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B8F025C76
+	by mail.kernel.org (Postfix) with ESMTP id 4EB1F25C76
+	for <kvmarm@archiver.kernel.org>; Thu, 30 May 2019 15:14:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EB1F25C76
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E68584A4C3;
-	Thu, 30 May 2019 11:14:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06BC74A4F4;
+	Thu, 30 May 2019 11:14:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1bht13zbloHW; Thu, 30 May 2019 11:14:10 -0400 (EDT)
+	with ESMTP id LxZrXglA9vDG; Thu, 30 May 2019 11:14:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE3614A4E5;
-	Thu, 30 May 2019 11:14:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE5834A500;
+	Thu, 30 May 2019 11:14:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF214A4AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC9CF4A4F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i9qdYTr0C2K3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 May 2019 11:14:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 696E04A32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:07 -0400 (EDT)
+ with ESMTP id nR9fMaNAXRjU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 May 2019 11:14:09 -0400 (EDT)
+Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CA054A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 May 2019 11:14:09 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1BEE15AD;
- Thu, 30 May 2019 08:14:06 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12693341;
+ Thu, 30 May 2019 08:14:09 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 26EEC3F59C;
- Thu, 30 May 2019 08:14:05 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3B8153F59C;
+ Thu, 30 May 2019 08:14:07 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool v3 2/9] update_headers.sh: Cleanly report failure on
- error
-Date: Thu, 30 May 2019 16:13:07 +0100
-Message-Id: <1559229194-3036-3-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH kvmtool v3 3/9] update_headers.sh: arm64: Copy sve_context.h
+ if available
+Date: Thu, 30 May 2019 16:13:08 +0100
+Message-Id: <1559229194-3036-4-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
 In-Reply-To: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
 References: <1559229194-3036-1-git-send-email-Dave.Martin@arm.com>
@@ -74,32 +74,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If in intermediate step fails, update_headers.sh blindly continues
-and may return success status.
+The SVE KVM support for arm64 includes the additional backend
+header <asm/sve_context.h> from <asm/kvm.h>.
 
-To avoid errors going unnoticed when driving this script, exit and
-report failure status as soon as something goes wrong.  For good
-measure, also fail on expansion of undefined shell variables to aid
-future maintainers.
+So update this header if it is available.
+
+To avoid creating a sudden dependency on a specific minimum kernel
+version, ignore the header if the source kernel tree doesn't have
+it.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 ---
- util/update_headers.sh | 2 ++
- 1 file changed, 2 insertions(+)
+ util/update_headers.sh | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/util/update_headers.sh b/util/update_headers.sh
-index 4ba1b9f..a7e21b8 100755
+index a7e21b8..90d3ead 100755
 --- a/util/update_headers.sh
 +++ b/util/update_headers.sh
-@@ -7,6 +7,8 @@
- # using the lib/modules/`uname -r`/source link.
- ########################################################################
+@@ -25,11 +25,22 @@ fi
  
-+set -ue
+ cp -- "$LINUX_ROOT/include/uapi/linux/kvm.h" include/linux
+ 
++unset KVMTOOL_PATH
 +
- if [ "$#" -ge 1 ]
- then
- 	LINUX_ROOT="$1"
++copy_arm64 () {
++	local src=$LINUX_ROOT/arch/$arch/include/uapi/asm/sve_context.h
++
++	if [ -e "$src" ]
++	then
++		cp -- "$src" "$KVMTOOL_PATH/include/asm"
++	fi
++}
++
+ for arch in arm arm64 mips powerpc x86
+ do
+ 	case "$arch" in
+ 		arm) KVMTOOL_PATH=arm/aarch32 ;;
+-		arm64) KVMTOOL_PATH=arm/aarch64 ;;
++		arm64) KVMTOOL_PATH=arm/aarch64; copy_arm64 ;;
+ 		*) KVMTOOL_PATH=$arch ;;
+ 	esac
+ 	cp -- "$LINUX_ROOT/arch/$arch/include/uapi/asm/kvm.h" \
 -- 
 2.1.4
 
