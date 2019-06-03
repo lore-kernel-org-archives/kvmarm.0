@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE9CAC282CE
-	for <kvmarm@archiver.kernel.org>; Mon,  3 Jun 2019 22:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69119C04AB5
+	for <kvmarm@archiver.kernel.org>; Mon,  3 Jun 2019 22:32:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A348826AD3
-	for <kvmarm@archiver.kernel.org>; Mon,  3 Jun 2019 22:32:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A348826AD3
+	by mail.kernel.org (Postfix) with ESMTP id 2994026301
+	for <kvmarm@archiver.kernel.org>; Mon,  3 Jun 2019 22:32:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2994026301
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58DF84A3B4;
-	Mon,  3 Jun 2019 18:32:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9044A2E7;
+	Mon,  3 Jun 2019 18:32:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ybejVlcyWDmY; Mon,  3 Jun 2019 18:32:18 -0400 (EDT)
+	with ESMTP id AaRjhsvcMEPi; Mon,  3 Jun 2019 18:32:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 363444A418;
-	Mon,  3 Jun 2019 18:32:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4E04A418;
+	Mon,  3 Jun 2019 18:32:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DFE24A3B4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jun 2019 18:32:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 108154A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jun 2019 18:32:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Em0B4XxSnVxa for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Jun 2019 18:32:16 -0400 (EDT)
+ with ESMTP id ENOPTkfoe1BZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Jun 2019 18:32:32 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 783E94A369
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jun 2019 18:32:16 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB10640217
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jun 2019 18:32:31 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CC2D530C0DED;
- Mon,  3 Jun 2019 22:32:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3321B81E00;
+ Mon,  3 Jun 2019 22:32:31 +0000 (UTC)
 Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C188E1001DE0;
- Mon,  3 Jun 2019 22:32:14 +0000 (UTC)
-Date: Mon, 3 Jun 2019 16:32:14 -0600
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 237BD6090E;
+ Mon,  3 Jun 2019 22:32:25 +0000 (UTC)
+Date: Mon, 3 Jun 2019 16:32:25 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v8 05/29] iommu: Add a timeout parameter for PRQ response
-Message-ID: <20190603163214.483884a7@x1.home>
-In-Reply-To: <20190526161004.25232-6-eric.auger@redhat.com>
+Subject: Re: [PATCH v8 22/29] vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE
+Message-ID: <20190603163225.0d227810@x1.home>
+In-Reply-To: <20190526161004.25232-23-eric.auger@redhat.com>
 References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-6-eric.auger@redhat.com>
+ <20190526161004.25232-23-eric.auger@redhat.com>
 Organization: Red Hat
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 03 Jun 2019 22:32:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Mon, 03 Jun 2019 22:32:31 +0000 (UTC)
 Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
  kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com,
  linux-kernel@vger.kernel.org, marc.zyngier@arm.com,
@@ -78,97 +78,152 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 26 May 2019 18:09:40 +0200
+On Sun, 26 May 2019 18:09:57 +0200
 Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 > 
-> When an IO page request is processed outside IOMMU subsystem, response
-> can be delayed or lost. Add a tunable setup parameter such that user can
-> choose the timeout for IOMMU to track pending page requests.
-> 
-> This timeout mechanism is a basic safety net which can be implemented in
-> conjunction with credit based or device level page response exception
-> handling.
+> This patch adds VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE ioctl
+> which aims to pass/withdraw the virtual iommu guest configuration
+> to/from the VFIO driver downto to the iommu subsystem.
 > 
 > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
->  .../admin-guide/kernel-parameters.txt         |  8 +++++
->  drivers/iommu/iommu.c                         | 29 +++++++++++++++++++
->  2 files changed, 37 insertions(+)
+> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 138f6664b2e2..b43f0893d252 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -1813,6 +1813,14 @@
->  			1 - Bypass the IOMMU for DMA.
->  			unset - Use value of CONFIG_IOMMU_DEFAULT_PASSTHROUGH.
->  
-> +	iommu.prq_timeout=
-> +			Timeout in seconds to wait for page response
-> +			of a pending page request.
-> +			Format: <integer>
-> +			Default: 10
-> +			0 - no timeout tracking
-> +			1 to 100 - allowed range
-> +
->  	io7=		[HW] IO7 for Marvel based alpha systems
->  			See comment before marvel_specify_io7 in
->  			arch/alpha/kernel/core_marvel.c.
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 13b301cfb10f..64e87d56f471 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -45,6 +45,19 @@ static unsigned int iommu_def_domain_type = IOMMU_DOMAIN_DMA;
->  #endif
->  static bool iommu_dma_strict __read_mostly = true;
->  
-> +/*
-> + * Timeout to wait for page response of a pending page request. This is
-> + * intended as a basic safty net in case a pending page request is not
-> + * responded for an exceptionally long time. Device may also implement
-> + * its own protection mechanism against this exception.
-> + * Units are in jiffies with a range between 1 - 100 seconds equivalent.
-> + * Default to 10 seconds.
-> + * Setting 0 means no timeout tracking.
-> + */
-> +#define IOMMU_PAGE_RESPONSE_MAX_TIMEOUT (HZ * 100)
-> +#define IOMMU_PAGE_RESPONSE_DEF_TIMEOUT (HZ * 10)
-> +static unsigned long prq_timeout = IOMMU_PAGE_RESPONSE_DEF_TIMEOUT;
-> +
->  struct iommu_group {
->  	struct kobject kobj;
->  	struct kobject *devices_kobj;
-> @@ -157,6 +170,22 @@ static int __init iommu_dma_setup(char *str)
+> ---
+> v6 -> v7:
+> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
+> 
+> v3 -> v4:
+> - restore ATTACH/DETACH
+> - add unwind on failure
+> 
+> v2 -> v3:
+> - s/BIND_PASID_TABLE/SET_PASID_TABLE
+> 
+> v1 -> v2:
+> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
+> - remove the struct device arg
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       | 22 ++++++++++++++
+>  2 files changed, 75 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 3ddc375e7063..b2d609d6fe83 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1758,6 +1758,43 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>  	return ret;
 >  }
->  early_param("iommu.strict", iommu_dma_setup);
 >  
-> +static int __init iommu_set_prq_timeout(char *str)
+> +static void
+> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
 > +{
-> +	unsigned long timeout;
+> +	struct vfio_domain *d;
 > +
-> +	if (!str)
-> +		return -EINVAL;
-> +	timeout = simple_strtoul(str, NULL, 0);
-> +	timeout = timeout * HZ;
-> +	if (timeout > IOMMU_PAGE_RESPONSE_MAX_TIMEOUT)
-> +		return -EINVAL;
-> +	prq_timeout = timeout;
+> +	mutex_lock(&iommu->lock);
 > +
-> +	return 0;
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		iommu_detach_pasid_table(d->domain);
+> +	}
+> +	mutex_unlock(&iommu->lock);
 > +}
-> +early_param("iommu.prq_timeout", iommu_set_prq_timeout);
 > +
->  static ssize_t iommu_group_attr_show(struct kobject *kobj,
->  				     struct attribute *__attr, char *buf)
+> +static int
+> +vfio_attach_pasid_table(struct vfio_iommu *iommu,
+> +			struct vfio_iommu_type1_attach_pasid_table *ustruct)
+> +{
+> +	struct vfio_domain *d;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		ret = iommu_attach_pasid_table(d->domain, &ustruct->config);
+> +		if (ret)
+> +			goto unwind;
+> +	}
+> +	goto unlock;
+> +unwind:
+> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+> +		iommu_detach_pasid_table(d->domain);
+> +	}
+> +unlock:
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
 >  {
+> @@ -1828,6 +1865,22 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  
+>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>  			-EFAULT : 0;
+> +	} else if (cmd == VFIO_IOMMU_ATTACH_PASID_TABLE) {
+> +		struct vfio_iommu_type1_attach_pasid_table ustruct;
+> +
+> +		minsz = offsetofend(struct vfio_iommu_type1_attach_pasid_table,
+> +				    config);
+> +
+> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (ustruct.argsz < minsz || ustruct.flags)
+> +			return -EINVAL;
+> +
+> +		return vfio_attach_pasid_table(iommu, &ustruct);
+> +	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+> +		vfio_detach_pasid_table(iommu);
+> +		return 0;
+>  	}
+>  
+>  	return -ENOTTY;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 8f10748dac79..4316dd8cb5b5 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -14,6 +14,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/ioctl.h>
+> +#include <linux/iommu.h>
+>  
+>  #define VFIO_API_VERSION	0
+>  
+> @@ -763,6 +764,27 @@ struct vfio_iommu_type1_dma_unmap {
+>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>  
+> +/**
+> + * VFIO_IOMMU_ATTACH_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
+> + *			struct vfio_iommu_type1_attach_pasid_table)
+> + *
+> + * Passes the PASID table to the host. Calling ATTACH_PASID_TABLE
+> + * while a table is already installed is allowed: it replaces the old
+> + * table. DETACH does a comprehensive tear down of the nested mode.
+> + */
+> +struct vfio_iommu_type1_attach_pasid_table {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +	struct iommu_pasid_table_config config;
+> +};
+> +#define VFIO_IOMMU_ATTACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
+> +
+> +/**
+> + * VFIO_IOMMU_DETACH_PASID_TABLE - - _IOWR(VFIO_TYPE, VFIO_BASE + 23)
+> + * Detaches the PASID table
+> + */
+> +#define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
 
-It doesn't seem to make much sense to include this patch without also
-including "iommu: handle page response timeout".  Was that one lost?
-Dropped?  Lives elsewhere?  Thanks,
-
-Alex
+I'm tempted to suggest a "SET" rather than ATTACH/DETACH interface so
+this could be done in one ioctl and make use of the flags provided.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
