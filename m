@@ -2,50 +2,51 @@ Return-Path: <SRS0=jSi8=UD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464CCC282CE
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 13:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EE2C282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 14:28:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D17DC2258C
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 13:53:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D17DC2258C
+	by mail.kernel.org (Postfix) with ESMTP id 87D85249A0
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 14:28:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D85249A0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5153A4A4FD;
-	Tue,  4 Jun 2019 09:53:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D74974A509;
+	Tue,  4 Jun 2019 10:28:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hrnAX-44eN9w; Tue,  4 Jun 2019 09:53:34 -0400 (EDT)
+	with ESMTP id wLq88WpmVIcQ; Tue,  4 Jun 2019 10:28:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D3C24A501;
-	Tue,  4 Jun 2019 09:53:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A244A4E5;
+	Tue,  4 Jun 2019 10:28:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3BAA4A4FA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 09:53:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D6704A4E5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 10:28:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zLh6wTykHJgd for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 09:53:30 -0400 (EDT)
+ with ESMTP id Cph+oZnkjVhB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 10:28:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C45374A4F1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 09:53:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4405B4A4CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 10:28:36 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E5E4341;
- Tue,  4 Jun 2019 06:53:29 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90838341;
+ Tue,  4 Jun 2019 07:28:35 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 5A74F3F690; Tue,  4 Jun 2019 06:53:28 -0700 (PDT)
+ 5B8DF3F690; Tue,  4 Jun 2019 07:28:34 -0700 (PDT)
 Subject: Re: KVM Arm Device passthrough and linux-rt
+From: Marc Zyngier <marc.zyngier@arm.com>
 To: Steven Rostedt <rostedt@goodmis.org>, Julien Grall <julien.grall@arm.com>
 References: <26832850-37ee-ae07-08ca-cc3e90978867@arm.com>
  <20190604091607.2e87eb36@oasis.local.home>
-From: Marc Zyngier <marc.zyngier@arm.com>
+ <f2fbc06b-373f-ee2a-b111-ea40848dc1c5@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  mQINBE6Jf0UBEADLCxpix34Ch3kQKA9SNlVQroj9aHAEzzl0+V8jrvT9a9GkK+FjBOIQz4KE
@@ -90,12 +91,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  hApihi08gwvP5G9fNGKQyRETePEtEAWt0b7dOqMzYBYGRVr7uS4uT6WP7fzOwAJC4lU7ZYWZ
  yVshCa0IvTtp1085RtT3qhh9mobkcZ+7cQOY+Tx2RGXS9WeOh2jZjdoWUv6CevXNQyOUXMM=
 Organization: ARM Ltd
-Message-ID: <f2fbc06b-373f-ee2a-b111-ea40848dc1c5@arm.com>
-Date: Tue, 4 Jun 2019 14:53:26 +0100
+Message-ID: <68c8af25-3712-f259-6f52-c259bb61a66d@arm.com>
+Date: Tue, 4 Jun 2019 15:28:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190604091607.2e87eb36@oasis.local.home>
+In-Reply-To: <f2fbc06b-373f-ee2a-b111-ea40848dc1c5@arm.com>
 Content-Language: en-US
 Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, julia@ni.com,
  linux-rt-users <linux-rt-users@vger.kernel.org>,
@@ -117,34 +118,142 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/06/2019 14:16, Steven Rostedt wrote:
-> On Tue, 4 Jun 2019 13:58:51 +0100
-> Julien Grall <julien.grall@arm.com> wrote:
-> 
->> This is happening because vgic_v2_fold_lr_state() is expected
->> to be called with interrupt disabled. However, some of the path
->> (e.g eventfd) will take a spinlock.
+On 04/06/2019 14:53, Marc Zyngier wrote:
+> On 04/06/2019 14:16, Steven Rostedt wrote:
+>> On Tue, 4 Jun 2019 13:58:51 +0100
+>> Julien Grall <julien.grall@arm.com> wrote:
 >>
->> The spinlock is from the waitqueue, so using a raw_spin_lock cannot
->> even be considered.
+>>> This is happening because vgic_v2_fold_lr_state() is expected
+>>> to be called with interrupt disabled. However, some of the path
+>>> (e.g eventfd) will take a spinlock.
+>>>
+>>> The spinlock is from the waitqueue, so using a raw_spin_lock cannot
+>>> even be considered.
+>>>
+>>> Do you have any input on how this could be solved?
 >>
->> Do you have any input on how this could be solved?
+>> What's the reason that vgic_v2_fold_lr_state() expects interrupts to be
+>> disabled?
 > 
-> What's the reason that vgic_v2_fold_lr_state() expects interrupts to be
-> disabled?
+> That's to prevent the injection of an interrupt firing on the same CPU
+> while we're saving the corresponding vcpu interrupt context, among other
+> things (the whole guest exit path runs with interrupt disabled in order
+> to avoid this kind of thing).
+> 
+> One possibility would be to accumulate the set of interrupt that require
+> resampling (which is bound to be small, the number of LRs at most) and
+> call kvm_notify_acked_irq on that set once interrupts are re-enabled.
+> 
+> I'll have a look...
 
-That's to prevent the injection of an interrupt firing on the same CPU
-while we're saving the corresponding vcpu interrupt context, among other
-things (the whole guest exit path runs with interrupt disabled in order
-to avoid this kind of thing).
+Julien,
 
-One possibility would be to accumulate the set of interrupt that require
-resampling (which is bound to be small, the number of LRs at most) and
-call kvm_notify_acked_irq on that set once interrupts are re-enabled.
+Here's what I have in mind, compile-tested only. Please let me know how
+it fares on your setup...
 
-I'll have a look...
+Thanks,
 
 	M.
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index c36c86f1ec9a..9e587f5d90fa 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -307,6 +307,10 @@ struct vgic_cpu {
+ 	unsigned int used_lrs;
+ 	struct vgic_irq private_irqs[VGIC_NR_PRIVATE_IRQS];
+ 
++	/* SPIs to be resampled by SW at EOI time */
++	u16		spi_notify[VGIC_V2_MAX_LRS];
++	int		spi_notify_count;
++
+ 	raw_spinlock_t ap_list_lock;	/* Protects the ap_list */
+ 
+ 	/*
+@@ -371,6 +375,7 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
++void kvm_vgic_process_resample(struct kvm_vcpu *vcpu);
+ void kvm_vgic_reset_mapped_irq(struct kvm_vcpu *vcpu, u32 vintid);
+ 
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 7eeebe5e9da2..a95c46b2d723 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -827,6 +827,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		guest_exit();
+ 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+ 
++		/*
++		 * Now that interrupts are enabled, signal interrupts
++		 * that require SW resampling.
++		 */
++		kvm_vgic_process_resample(vcpu);
++
+ 		/* Exit types that need handling before we can be preempted */
+ 		handle_exit_early(vcpu, run, ret);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index d91a8938aa7c..9953e1742d65 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -79,8 +79,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		/* Notify fds when the guest EOI'ed a level-triggered SPI */
+ 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+-			kvm_notify_acked_irq(vcpu->kvm, 0,
+-					     intid - VGIC_NR_PRIVATE_IRQS);
++			vgic_cpu->spi_notify[vgic_cpu->spi_notify_count++] = intid;
+ 
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 9f87e58dbd4a..54b1e4ea5cfa 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -69,8 +69,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+ 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+-			kvm_notify_acked_irq(vcpu->kvm, 0,
+-					     intid - VGIC_NR_PRIVATE_IRQS);
++			vgic_cpu->spi_notify[vgic_cpu->spi_notify_count++] = intid;
+ 
+ 		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+ 		if (!irq)	/* An LPI could have been unmapped. */
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 191deccf60bf..baa6aa494e86 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -880,6 +880,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	WARN_ON(vgic_v4_flush_hwstate(vcpu));
+ 
++	vcpu->arch.vgic_cpu.spi_notify_count = 0;
++
+ 	/*
+ 	 * If there are no virtual interrupts active or pending for this
+ 	 * VCPU, then there is no work to do and we can bail out without
+@@ -908,6 +910,16 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 		vgic_restore_state(vcpu);
+ }
+ 
++void kvm_vgic_process_resample(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	int i;
++
++	for (i = 0; i < vgic_cpu->spi_notify_count; i++)
++		kvm_notify_acked_irq(vcpu->kvm, 0,
++				     vgic_cpu->spi_notify[i] - VGIC_NR_PRIVATE_IRQS);
++}
++
+ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+ {
+ 	if (unlikely(!vgic_initialized(vcpu->kvm)))
+
 -- 
 Jazz is not dead. It just smells funny...
 _______________________________________________
