@@ -6,65 +6,74 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9672C282CE
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 16:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922B7C282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 17:17:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7FC1520851
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 16:11:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC1520851
+	by mail.kernel.org (Postfix) with ESMTP id 27DFD2075B
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 17:17:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DFD2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C064A4F4;
-	Tue,  4 Jun 2019 12:11:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EBA34A536;
+	Tue,  4 Jun 2019 13:17:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xkp9ZL0geLTn; Tue,  4 Jun 2019 12:11:56 -0400 (EDT)
+	with ESMTP id LozS8ja+WRcg; Tue,  4 Jun 2019 13:17:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4C64A503;
-	Tue,  4 Jun 2019 12:11:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29BCC4A51C;
+	Tue,  4 Jun 2019 13:17:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4C24A503
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 12:11:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 171BD4A515
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 13:17:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oE4XTEt5kXpZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 12:11:55 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C6564A51E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 12:11:55 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0EB493001757;
- Tue,  4 Jun 2019 16:11:27 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E74A1001DFD;
- Tue,  4 Jun 2019 16:11:11 +0000 (UTC)
-Subject: Re: [PATCH v8 28/29] vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-29-eric.auger@redhat.com>
- <20190603163130.3f7497ba@x1.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7ba39c76-0b4d-b94f-c516-6414189698f6@redhat.com>
-Date: Tue, 4 Jun 2019 18:11:10 +0200
+ with ESMTP id 3q5sBIcaJV+v for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 13:17:52 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E96B4A509
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 13:17:52 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id f10so889073wmb.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jun 2019 10:17:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A/EDhzrByl8EmK23RXYavhkj6RV6VhNBEEWmOK2O4oc=;
+ b=Ddchm137irwglpaeTUtvBJ1fFbQX8mf3QN+AEGshv+WBH2HnzgNl+r75EIiGqpV9WQ
+ JL8kQH8jkhJXwsQ4RoZuP4eipletFQyfKF7HwqUbxZUpE76njQqiObpXwr+izNbvIQHM
+ GJ5t2RyT5AFBKPePko4v1fo/X8ha396d7OZvf+HSKt5jQ9TAzJs02OKdNSsauq1fJLNP
+ TmodsRz3rOqH3zb4FrMPW/0Q7HdqHtFqByKOtzis5abYd2Ug06pJCoXfuCw9I88p96Uq
+ LOO9iRdDH+LL8Vs9YeM5m8bLPp4uic6GIkuF5iyzaRa+TIx/CnrAxbm4ak5BaENgqI62
+ 7ncg==
+X-Gm-Message-State: APjAAAU/liQZ+Cg/fjZqxFqnq7wnrzsXpXgfCkO6VvOZJtgC5HvcPmnR
+ DzSPkkRzd/zuFk7NX4iwZQ0laj2IsKfFFw==
+X-Google-Smtp-Source: APXvYqx+np2IkHDkhaheW56dj7UzGI3V8HfcXIRPNsM16CncIwMSIOta7YXPQ2f8Kt7odr80mUAbNQ==
+X-Received: by 2002:a1c:b782:: with SMTP id h124mr6812624wmf.20.1559668671392; 
+ Tue, 04 Jun 2019 10:17:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617?
+ ([2001:b07:6468:f312:657f:501:149f:5617])
+ by smtp.gmail.com with ESMTPSA id s11sm13805336wro.17.2019.06.04.10.17.50
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 04 Jun 2019 10:17:50 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Remove obsolete address of the FSF
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
+ <rkrcmar@redhat.com>, kvm@vger.kernel.org
+References: <20190527165606.28295-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <77810fca-3492-2170-c350-bad35cfdc5e6@redhat.com>
+Date: Tue, 4 Jun 2019 19:17:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190603163130.3f7497ba@x1.home>
+In-Reply-To: <20190527165606.28295-1-thuth@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 04 Jun 2019 16:11:49 +0000 (UTC)
-Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
- kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com,
- linux-kernel@vger.kernel.org, marc.zyngier@arm.com,
- iommu@lists.linux-foundation.org, yi.l.liu@intel.com, vincent.stehle@arm.com,
- robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,112 +90,154 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+On 27/05/19 18:56, Thomas Huth wrote:
+> The FSF moved from the "Temple Place" to "51 Franklin Street" quite
+> a while ago already, so we should not refer to the old address in
+> the source code anymore. Anyway, instead of replacing it with the
+> new address, let's rather add proper SPDX identifiers here instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  arch/x86/kvm/irq.c        | 10 +---------
+>  arch/x86/kvm/irq.h        | 10 +---------
+>  arch/x86/kvm/irq_comm.c   |  9 +--------
+>  virt/kvm/arm/arch_timer.c | 10 +---------
+>  virt/kvm/irqchip.c        | 10 +---------
+>  5 files changed, 5 insertions(+), 44 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+> index 007bc654f928..4b7b8e44df0f 100644
+> --- a/arch/x86/kvm/irq.c
+> +++ b/arch/x86/kvm/irq.c
+> @@ -1,3 +1,4 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * irq.c: API for in kernel interrupt controller
+>   * Copyright (c) 2007, Intel Corporation.
+> @@ -7,17 +8,8 @@
+>   * under the terms and conditions of the GNU General Public License,
+>   * version 2, as published by the Free Software Foundation.
+>   *
+> - * This program is distributed in the hope it will be useful, but WITHOUT
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License along with
+> - * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+> - * Place - Suite 330, Boston, MA 02111-1307 USA.
+>   * Authors:
+>   *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+> - *
+>   */
+>  
+>  #include <linux/export.h>
+> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+> index fd210cdd4983..a904c9b3b76a 100644
+> --- a/arch/x86/kvm/irq.h
+> +++ b/arch/x86/kvm/irq.h
+> @@ -1,3 +1,4 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+>  /*
+>   * irq.h: in kernel interrupt controller related definitions
+>   * Copyright (c) 2007, Intel Corporation.
+> @@ -6,17 +7,8 @@
+>   * under the terms and conditions of the GNU General Public License,
+>   * version 2, as published by the Free Software Foundation.
+>   *
+> - * This program is distributed in the hope it will be useful, but WITHOUT
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License along with
+> - * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+> - * Place - Suite 330, Boston, MA 02111-1307 USA.
+>   * Authors:
+>   *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+> - *
+>   */
+>  
+>  #ifndef __IRQ_H
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 3cc3b2d130a0..ff95fd893e04 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -1,3 +1,4 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * irq_comm.c: Common API for in kernel interrupt controller
+>   * Copyright (c) 2007, Intel Corporation.
+> @@ -6,14 +7,6 @@
+>   * under the terms and conditions of the GNU General Public License,
+>   * version 2, as published by the Free Software Foundation.
+>   *
+> - * This program is distributed in the hope it will be useful, but WITHOUT
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License along with
+> - * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+> - * Place - Suite 330, Boston, MA 02111-1307 USA.
+>   * Authors:
+>   *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
+>   *
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 7fc272ecae16..151495d7dec7 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -1,3 +1,4 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * Copyright (C) 2012 ARM Ltd.
+>   * Author: Marc Zyngier <marc.zyngier@arm.com>
+> @@ -5,15 +6,6 @@
+>   * This program is free software; you can redistribute it and/or modify
+>   * it under the terms of the GNU General Public License version 2 as
+>   * published by the Free Software Foundation.
+> - *
+> - * This program is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> - * GNU General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU General Public License
+> - * along with this program; if not, write to the Free Software
+> - * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+>   */
+>  
+>  #include <linux/cpu.h>
+> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+> index 79e59e4fa3dc..bcc3fc5d018a 100644
+> --- a/virt/kvm/irqchip.c
+> +++ b/virt/kvm/irqchip.c
+> @@ -1,3 +1,4 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * irqchip.c: Common API for in kernel interrupt controllers
+>   * Copyright (c) 2007, Intel Corporation.
+> @@ -8,15 +9,6 @@
+>   * under the terms and conditions of the GNU General Public License,
+>   * version 2, as published by the Free Software Foundation.
+>   *
+> - * This program is distributed in the hope it will be useful, but WITHOUT
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License along with
+> - * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+> - * Place - Suite 330, Boston, MA 02111-1307 USA.
+> - *
+>   * This file is derived from virt/kvm/irq_comm.c.
+>   *
+>   * Authors:
+> 
 
-On 6/4/19 12:31 AM, Alex Williamson wrote:
-> On Sun, 26 May 2019 18:10:03 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> Add a new VFIO_PCI_DMA_FAULT_IRQ_INDEX index. This allows to
->> set/unset an eventfd that will be triggered when DMA translation
->> faults are detected at physical level when the nested mode is used.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/vfio/pci/vfio_pci.c       |  3 +++
->>  drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
->>  include/uapi/linux/vfio.h         |  1 +
->>  3 files changed, 23 insertions(+)
-> 
-> 
-> Note that I suggested to Intel folks trying to add a GVT-g page
-> flipping eventfd to convert to device specific interrupts the same way
-> we added device specific regions:
-> 
-> https://patchwork.kernel.org/patch/10962337/
-> 
-> I'd probably suggest the same here so we can optionally expose it when
-> supported.  Thanks,
+Queued, thanks.
 
-Agreed, I will follow the other thread.
-
-Thanks
-
-Eric
-> 
-> Alex
-> 
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index a9c8af2a774a..65a1e6814f5c 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
->> @@ -746,6 +746,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
->>  			return 1;
->>  	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
->>  		return 1;
->> +	} else if (irq_type == VFIO_PCI_DMA_FAULT_IRQ_INDEX) {
->> +		return 1;
->>  	}
->>  
->>  	return 0;
->> @@ -1082,6 +1084,7 @@ static long vfio_pci_ioctl(void *device_data,
->>  		switch (info.index) {
->>  		case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
->>  		case VFIO_PCI_REQ_IRQ_INDEX:
->> +		case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
->>  			break;
->>  		case VFIO_PCI_ERR_IRQ_INDEX:
->>  			if (pci_is_pcie(vdev->pdev))
->> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
->> index 1c46045b0e7f..28a96117daf3 100644
->> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->> @@ -622,6 +622,18 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
->>  					       count, flags, data);
->>  }
->>  
->> +static int vfio_pci_set_dma_fault_trigger(struct vfio_pci_device *vdev,
->> +					  unsigned index, unsigned start,
->> +					  unsigned count, uint32_t flags,
->> +					  void *data)
->> +{
->> +	if (index != VFIO_PCI_DMA_FAULT_IRQ_INDEX || start != 0 || count > 1)
->> +		return -EINVAL;
->> +
->> +	return vfio_pci_set_ctx_trigger_single(&vdev->dma_fault_trigger,
->> +					       count, flags, data);
->> +}
->> +
->>  int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->>  			    unsigned index, unsigned start, unsigned count,
->>  			    void *data)
->> @@ -671,6 +683,13 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->>  			break;
->>  		}
->>  		break;
->> +	case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
->> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
->> +			func = vfio_pci_set_dma_fault_trigger;
->> +			break;
->> +		}
->> +		break;
->>  	}
->>  
->>  	if (!func)
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 13e041b84d48..66b6b08c4a38 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -559,6 +559,7 @@ enum {
->>  	VFIO_PCI_MSIX_IRQ_INDEX,
->>  	VFIO_PCI_ERR_IRQ_INDEX,
->>  	VFIO_PCI_REQ_IRQ_INDEX,
->> +	VFIO_PCI_DMA_FAULT_IRQ_INDEX,
->>  	VFIO_PCI_NUM_IRQS
->>  };
->>  
-> 
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
