@@ -2,106 +2,65 @@ Return-Path: <SRS0=jSi8=UD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956FEC28CC3
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB784C28CC3
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:23:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3AF3524088
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF3524088
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 624CB245F5
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:23:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 624CB245F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99D8D4A369;
-	Tue,  4 Jun 2019 05:01:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD54C4A4E6;
+	Tue,  4 Jun 2019 05:23:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g5xF8G-iuglC; Tue,  4 Jun 2019 05:01:32 -0400 (EDT)
+	with ESMTP id gIIxxbciWsJY; Tue,  4 Jun 2019 05:23:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA984A3A3;
-	Tue,  4 Jun 2019 05:01:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 874194A4A4;
+	Tue,  4 Jun 2019 05:23:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 065C84A369
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:01:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CFEA04A36B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:23:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I+c2FcNvQDMR for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 05:01:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED864A331
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:01:29 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6F97A78;
- Tue,  4 Jun 2019 02:01:28 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 23BFD3F740; Tue,  4 Jun 2019 02:01:26 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Viresh Kumar <viresh.kumar@linaro.org>
-References: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
- <20190604084349.prnnvjvjaeuhsmgs@mbp>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: ARM Ltd
-Message-ID: <9a7681c3-f09e-8b8d-35d7-051268ce6d54@arm.com>
-Date: Tue, 4 Jun 2019 10:01:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id 2WIzHoJiALHm for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 05:23:11 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1E6E4A332
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:23:11 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C49D930C3194;
+ Tue,  4 Jun 2019 09:23:05 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90BE7619C3;
+ Tue,  4 Jun 2019 09:23:03 +0000 (UTC)
+Date: Tue, 4 Jun 2019 11:23:01 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Filter out invalid core register IDs in
+ KVM_GET_REG_LIST
+Message-ID: <20190604092301.26vbijfoapl4whp6@kamzik.brq.redhat.com>
+References: <1559580727-13444-1-git-send-email-Dave.Martin@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190604084349.prnnvjvjaeuhsmgs@mbp>
-Content-Language: en-US
-Cc: Vincent Guittot <vincent.guittot@linaro.org>,
- Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <1559580727-13444-1-git-send-email-Dave.Martin@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 04 Jun 2019 09:23:10 +0000 (UTC)
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
+ stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -118,28 +77,171 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/06/2019 09:43, Catalin Marinas wrote:
-> On Tue, Jun 04, 2019 at 10:13:19AM +0530, Viresh Kumar wrote:
->> We currently get following compilation warning:
->>
->> arch/arm64/kvm/guest.c: In function 'set_sve_vls':
->> arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
->> arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
+On Mon, Jun 03, 2019 at 05:52:07PM +0100, Dave Martin wrote:
+> Since commit d26c25a9d19b ("arm64: KVM: Tighten guest core register
+> access from userspace"), KVM_{GET,SET}_ONE_REG rejects register IDs
+> that do not correspond to a single underlying architectural register.
 > 
-> Since the vq_present() function does not modify the vqs array, I don't
-> understand why this warning. Compiler bug?
+> KVM_GET_REG_LIST was not changed to match however: instead, it
+> simply yields a list of 32-bit register IDs that together cover the
+> whole kvm_regs struct.  This means that if userspace tries to use
+> the resulting list of IDs directly to drive calls to KVM_*_ONE_REG,
+> some of those calls will now fail.
+> 
+> This was not the intention.  Instead, iterating KVM_*_ONE_REG over
+> the list of IDs returned by KVM_GET_REG_LIST should be guaranteed
+> to work.
+> 
+> This patch fixes the problem by splitting validate_core_offset()
+> into a backend core_reg_size_from_offset() which does all of the
+> work except for checking that the size field in the register ID
+> matches, and kvm_arm_copy_reg_indices() and num_core_regs() are
+> converted to use this to enumerate the valid offsets.
+> 
+> kvm_arm_copy_reg_indices() now also sets the register ID size field
+> appropriately based on the value returned, so the register ID
+> supplied to userspace is fully qualified for use with the register
+> access ioctls.
 
-Yeah, I'm a bit puzzled by that one. Also checked with clang, which is
-usually much more picky about things, but it didn't complain.
+Ah yes, I've seen this issue, but hadn't gotten around to fixing it.
 
-We could drop the const without much harm, but I really wish we weed out
-these ancient compilers...
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: d26c25a9d19b ("arm64: KVM: Tighten guest core register access from userspace")
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> 
+> ---
+> 
+> Changes since v3:
+
+Hmm, I didn't see a v1-v3.
+
+> 
+>  * Rebased onto v5.2-rc1.
+> 
+>  * Tested with qemu by migrating from one qemu instance to another on
+>    ThunderX2.
+
+One of the reasons I was slow to fix this is because QEMU doesn't care
+about the core registers when it uses KVM_GET_REG_LIST. It just completely
+skips all core reg indices, so it never finds out that they're invalid.
+And kvmtool doesn't use KVM_GET_REG_LIST at all. But it's certainly good
+to fix this.
+
+> 
+> ---
+>  arch/arm64/kvm/guest.c | 53 +++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 40 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 3ae2f82..6527c76 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -70,10 +70,8 @@ static u64 core_reg_offset_from_id(u64 id)
+>  	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
+>  }
+>  
+> -static int validate_core_offset(const struct kvm_vcpu *vcpu,
+> -				const struct kvm_one_reg *reg)
+> +static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
+>  {
+> -	u64 off = core_reg_offset_from_id(reg->id);
+>  	int size;
+>  
+>  	switch (off) {
+> @@ -103,8 +101,7 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+>  		return -EINVAL;
+>  	}
+>  
+> -	if (KVM_REG_SIZE(reg->id) != size ||
+> -	    !IS_ALIGNED(off, size / sizeof(__u32)))
+> +	if (!IS_ALIGNED(off, size / sizeof(__u32)))
+>  		return -EINVAL;
+>  
+>  	/*
+> @@ -115,6 +112,21 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+>  	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
+>  		return -EINVAL;
+>  
+> +	return size;
+> +}
+> +
+> +static int validate_core_offset(const struct kvm_vcpu *vcpu,
+> +				const struct kvm_one_reg *reg)
+> +{
+> +	u64 off = core_reg_offset_from_id(reg->id);
+> +	int size = core_reg_size_from_offset(vcpu, off);
+> +
+> +	if (size < 0)
+> +		return -EINVAL;
+> +
+> +	if (KVM_REG_SIZE(reg->id) != size)
+> +		return -EINVAL;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -453,19 +465,34 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
+>  {
+>  	unsigned int i;
+>  	int n = 0;
+> -	const u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
+>  
+>  	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
+> -		/*
+> -		 * The KVM_REG_ARM64_SVE regs must be used instead of
+> -		 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
+> -		 * SVE-enabled vcpus:
+> -		 */
+> -		if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(i))
+> +		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
+> +		int size = core_reg_size_from_offset(vcpu, i);
+> +
+> +		if (size < 0)
+> +			continue;
+> +
+> +		switch (size) {
+> +		case sizeof(__u32):
+> +			reg |= KVM_REG_SIZE_U32;
+> +			break;
+> +
+> +		case sizeof(__u64):
+> +			reg |= KVM_REG_SIZE_U64;
+> +			break;
+> +
+> +		case sizeof(__uint128_t):
+> +			reg |= KVM_REG_SIZE_U128;
+> +			break;
+> +
+> +		default:
+> +			WARN_ON(1);
+>  			continue;
+> +		}
+>  
+>  		if (uindices) {
+> -			if (put_user(core_reg | i, uindices))
+> +			if (put_user(reg, uindices))
+>  				return -EFAULT;
+>  			uindices++;
+>  		}
+> -- 
+> 2.1.4
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+I've also tested this using a kvm selftests test I wrote. I haven't posted
+that test yet because it needs some cleanup and I planned on getting back
+to that when getting back to fixing this issue. Anyway, before this patch
+every other 64-bit core reg index is invalid (because its indexing 32-bits
+but claiming a size of 64), all fp regs are invalid, and we were even
+providing a couple indices that mapped to struct padding. After this patch
+everything is right with the world.
+
+Tested-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
