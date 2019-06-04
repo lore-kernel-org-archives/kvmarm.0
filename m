@@ -2,58 +2,89 @@ Return-Path: <SRS0=jSi8=UD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BBAC28CC3
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2422C282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:32:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C231D24619
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:26:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C231D24619
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 45F5520645
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 09:32:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jxJdMBDI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45F5520645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DDE74A4E6;
-	Tue,  4 Jun 2019 05:26:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2C0F4A4EC;
+	Tue,  4 Jun 2019 05:32:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XBWltaclGVMX; Tue,  4 Jun 2019 05:26:45 -0400 (EDT)
+	with ESMTP id tedLWtwePr+u; Tue,  4 Jun 2019 05:31:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E87434A417;
-	Tue,  4 Jun 2019 05:26:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A6264A483;
+	Tue,  4 Jun 2019 05:31:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C69A4A409
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:26:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88D3D4A417
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:31:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RM6wMjeJtCYC for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 05:26:44 -0400 (EDT)
-Received: from foss.arm.com (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F10784A36B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:26:43 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D819A78;
- Tue,  4 Jun 2019 02:26:43 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.72.51.249])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C62673F246;
- Tue,  4 Jun 2019 02:26:41 -0700 (PDT)
-Date: Tue, 4 Jun 2019 10:26:39 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Viresh Kumar <viresh.kumar@linaro.org>
+ with ESMTP id a2+LalfCW+wG for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 05:31:57 -0400 (EDT)
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com
+ [209.85.215.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FC654A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 05:31:57 -0400 (EDT)
+Received: by mail-pg1-f193.google.com with SMTP id a3so2618713pgb.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jun 2019 02:31:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=MimY8E6RzMP+Xm09/RStVcP0kJblyDIRLMNiKjGKR1U=;
+ b=jxJdMBDIJRCbNIZuMnUELhdpEn41VADNgzlplcmAXJynP+m5d5YB4HbguZiv5hotqh
+ l9w0GY8FrukKhQunBoGC3tAk0TlFur1DY+UTBOFMtEibcehQBzR0/478UnelnBdK/V6A
+ civ0aWuPhTj2Lwrl6dlU8QQhiKIrTdiBTJx5LpmBsvNbpvea8RzLiWd+RM62SI1//lOZ
+ yUk4JVITz3zKEWBmVqO8Y91afvJI7gLRH7sNlStVxUs/iSwo5FYEqRV3GrEhSEkLmf7U
+ pI79hFjf/o2dlic8f0PYj/PwMYEMLQwYNb+R9/B1m1R3PcNiX5lysTh/prELjaTBLH7G
+ 7OvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=MimY8E6RzMP+Xm09/RStVcP0kJblyDIRLMNiKjGKR1U=;
+ b=KHrFWLiqcSSZvyQanHsi1RTzAO/L/VahzaScNRbwxNY2vscuvBuDrBOHYWGjERRj/b
+ LKa6X4dE0YorGrYrhE7TUiNWHO8EXry5Fkp76Den3wVG/nGxy1xi4LWyrdcOvtJhHyZ2
+ szbqe3ZAVx8AFYifr434sSI3862Ze9SMz8gBK5QoGB3BmuZwfC18cGDKCcOjrngbFIb5
+ fQhfbFfBF8s5c/pyG4JdS5iWARepQECQhTCfepzzCD7YEyRN6xYIn/OC8VD40iCiCj5d
+ 4bfBkrdoQq/nmNsSWSXSAXcIEblHjkYxuEZt/QD/ugJHGePbqADVmtC3zZDTLeu6W3ZF
+ 1KAQ==
+X-Gm-Message-State: APjAAAVyHUGGGjDBwhwb0iKuqG6mJCRrgXdQr44859YhaP4DPZKHacAP
+ yJ14QE+nH+kJpkUBoSgS6uoEZA==
+X-Google-Smtp-Source: APXvYqzkBCd15WCdDavN2+OthVD2LAb86dzXlH0Ye+ZreCxe0UdK/8MuhKMRME3oQVp6Fs1Cw+s2oQ==
+X-Received: by 2002:aa7:92da:: with SMTP id k26mr36714866pfa.70.1559640716355; 
+ Tue, 04 Jun 2019 02:31:56 -0700 (PDT)
+Received: from localhost ([122.172.66.84])
+ by smtp.gmail.com with ESMTPSA id b16sm17600287pfd.12.2019.06.04.02.31.55
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 04 Jun 2019 02:31:55 -0700 (PDT)
+Date: Tue, 4 Jun 2019 15:01:53 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
-Message-ID: <20190604092639.GS28398@e103592.cambridge.arm.com>
+Message-ID: <20190604093153.2pzv55knl6axugrv@vireshk-i7>
 References: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
  <20190604084349.prnnvjvjaeuhsmgs@mbp>
  <20190604085545.hsmxfqkpt2cbrhtw@vireshk-i7>
+ <20190604092639.GS28398@e103592.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20190604085545.hsmxfqkpt2cbrhtw@vireshk-i7>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20190604092639.GS28398@e103592.cambridge.arm.com>
+User-Agent: NeoMutt/20180716-391-311a52
 Cc: Vincent Guittot <vincent.guittot@linaro.org>,
  Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
@@ -74,79 +105,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jun 04, 2019 at 02:25:45PM +0530, Viresh Kumar wrote:
-> On 04-06-19, 09:43, Catalin Marinas wrote:
-> > On Tue, Jun 04, 2019 at 10:13:19AM +0530, Viresh Kumar wrote:
-> > > We currently get following compilation warning:
-> > > 
-> > > arch/arm64/kvm/guest.c: In function 'set_sve_vls':
-> > > arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
-> > > arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
-> > 
-> > Since the vq_present() function does not modify the vqs array, I don't
-> > understand why this warning. Compiler bug?
-> 
-> Probably yes. Also marking array argument to functions as const is a
-> right thing to do, to declare that the function wouldn't change the
-> array values.
-> 
-> I tried a recent toolchain and this doesn't happen anymore.
-> 
-> Sorry for the noise.
+On 04-06-19, 10:26, Dave Martin wrote:
+> I'm in two minds about whether this is worth fixing, but if you want to
+> post a patch to remove the extra const (or convert vq_present() to a
+> macro), I'll take a look at it.
 
-Sparse is already warning about this, but I had dismissed it as a false
-positive.
+This patch already does what you are asking for (remove the extra
+const), isn't it ?
 
-I think this is an instance of disallowing implicit conversions of the
-form
+I looked at my textbook (The C programming Language, By Brian W.
+Kernighan and Dennis M. Ritchie.) and it says:
 
-	T ** -> T const **
+"
+The const declaration can also be used with array arguments, to
+indicate that the function does not change that array:
 
-because this allows a const pointer to be silently de-consted, e.g.:
+int strlen(const char[]);
+"
 
-static const T bar;
+and so this patch isn't necessary for sure.
 
-void foo(T const **p)
-{
-	*p = &bar;
-}
-
-T *baz(void)
-{
-	T *q; 
-	foo(&q);
-	return q;
-}
-
-
-I _suspect_ that what's going on here is that the compiler is
-eliminating a level of indirection during inlining (i.e. converting
-pass-by-reference to direct access, which is precisely what I wanted
-to happen).  This removes the potentially invalid behaviour as a
-side-effect.
-
-This relies on the compiler optimising / analysing the code
-aggressively enough though.
-
-So, I don't have a problem with dropping the extra extra const, e.g.:
-
-static bool vq_present(
-	u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
-	unsigned int vq)
-
-Since this function is static and only used very locally, I don't see a
-big risk: the only reason for the extra const was to check that
-vq_present() doesn't modify vqs when it shouldn't.  But it's a trivial
-function, and the intent is pretty clear without the extra type
-modifier.
-
-
-I'm in two minds about whether this is worth fixing, but if you want to
-post a patch to remove the extra const (or convert vq_present() to a
-macro), I'll take a look at it.
-
-Cheers
----Dave
+-- 
+viresh
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
