@@ -2,93 +2,93 @@ Return-Path: <SRS0=jSi8=UD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82076C282CE
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 08:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F00D8C282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 08:40:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 18F4D24515
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 08:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D9BE24AE7
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 08:40:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J8sz4rTe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18F4D24515
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R/1BYv8O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9BE24AE7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA834A319;
-	Tue,  4 Jun 2019 04:35:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F328D4A4EC;
+	Tue,  4 Jun 2019 04:40:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FWxOmHiAuTNd; Tue,  4 Jun 2019 04:35:03 -0400 (EDT)
+	with ESMTP id doDtVVuJGZvs; Tue,  4 Jun 2019 04:40:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 675504A3B2;
-	Tue,  4 Jun 2019 04:35:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 038B84A319;
+	Tue,  4 Jun 2019 04:40:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9CB04A4C1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 00:43:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 296704A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 04:40:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nsLI2EyDKFMU for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 00:43:48 -0400 (EDT)
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com
- [209.85.210.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B5D934A4AA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 00:43:48 -0400 (EDT)
-Received: by mail-pf1-f193.google.com with SMTP id a23so11903248pff.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Jun 2019 21:43:48 -0700 (PDT)
+ with ESMTP id LDGaeJ+F54LV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 04:39:58 -0400 (EDT)
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com
+ [209.85.214.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 225234A319
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 04:39:58 -0400 (EDT)
+Received: by mail-pl1-f193.google.com with SMTP id s24so7919294plr.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jun 2019 01:39:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zkepnFRWjo+2i9EzIxBtZYocaRmAxYlop81Nj4rH8DI=;
- b=J8sz4rTevobviVKwm+dLsHY0zZAT9dT0y9oQKyafTlFYIXFXc0sZ/DS6ZSOiJpH4ci
- KWIWCxBwVCaPaC6geJvwYMf++4HvY7OTCHRLscuRijfmR+cSNydwyg5D7V0LxdI+LGJj
- VoIsuIUSlisSzGAnZPF1DUqV6SKLx89VTa4WQfp3wugLav54sY7mHjBqxF+0JGokf+x5
- vAXrGc2v1k5D8fJriujqAgW3MBU+vh7xu/kdqnI+obXgP0yWUAbhuhkTIFIKQ3sLgrpa
- LHfdBBRDqAXOzJ4d5JHexjtnNKCmImiX9N+T5AaQoeIXuM7pSq+BGNA0pB/V9nTjcFod
- Ax6w==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=9jjhf1qdL2MafkChBuP3uS+RTNrDWf6uQ5f116KCA2c=;
+ b=R/1BYv8OoEAUiLPx6NI4JKkrBSSi/SSZ5etYBe7bvAN6vIDmwNO+lHDRdqjVBNQjin
+ H+9WJUbycCX09ft7jeo1RwSbBmS/JbGjhw2h0nRODdNdmH2j8+p3X5/IqSREmbTVYdKh
+ jYtr0D6CiWKVJUltZDsvR7Li9ljJdTLEdRCN5BAtnMAw5NgyzB/DuLTgAPN63NPEUBGG
+ oyiGOxYJMfgKa5dqaxEUCGya8yjW1QQeKvcqk8RrenqYLcWWqMxyupGv5nxxmdXsdigZ
+ 8blPkPcHVDXb3yCSelTiJssCWLyxfOWrMfblAEJgCmw7bgfdpkELrwDmK6oQxpemZ4Wi
+ 6nGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zkepnFRWjo+2i9EzIxBtZYocaRmAxYlop81Nj4rH8DI=;
- b=cwyHTZPU9BxOWq8hheYn9TzMmKVl/f4qpUS5NegZGCauhGcew4oiX+wNcyFnB9sRAW
- 3E8WzvU8v9JaPe/DBnbMNueBvp84UnfRBXvKqaM+BA/2vmUg2yor/0bBqKpmyg3eN2BF
- kE5enCv4fw8rMWfsILSL1/oItqcQcMswBZdvKjzruBH9R0RtOyYUm9BxF0D216AZJDc1
- sAg3uwsAr+297GnjB4bloM5YpKj524FQp/hzZYzdcOmXCaEOfyootYrpHmYXAohd1fAd
- enXPk1XXi4hcxvVFYX25Jxp/UQXlUOCX8EcPiBsyOstirdby36x7JWPtQUaW0sVg1eOl
- Iy+A==
-X-Gm-Message-State: APjAAAXaydvA3nMFk0Ejf6BnkT7XZyf3N1zL8Q+EpZvU2JVgtfdQ7VzX
- CdFp74ETekCy+j/MHrCtuuCw2Q==
-X-Google-Smtp-Source: APXvYqyrbfVVhnHOSNRF/Ni0Um7ccZKTk5f7Qfxx4j3T7CrtwO7Q4cK+39lbl+3EGYtoAYqA4PM09w==
-X-Received: by 2002:a17:90a:ff03:: with SMTP id
- ce3mr34487977pjb.81.1559623427427; 
- Mon, 03 Jun 2019 21:43:47 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=9jjhf1qdL2MafkChBuP3uS+RTNrDWf6uQ5f116KCA2c=;
+ b=ku1AbaUyMaf4kRx6uDVKmSmnpHBZDYbT7Klg9sbkvm9C6QAbZE22DOLnY8+u+6y/Cm
+ 8rJ5usavSa8xu1NBxnDq1tO0+0gDcQnj30RfxaCdQM7RRJIVL7oKG2h30zxsW+tktAJR
+ E5Pjntdcz/ZHZcvporqAd9spx6R+G+cwty5+0SR2H14tpB6/d1z8tcULNHTtQ52R0Eep
+ NyAArjBC7/Fdrc8i5JCyXjJnzrewFpZcnZH3Ii5o+HzLQ+iD6AroAYVWsAYeOAO9ad36
+ EDOIaUcsAwLT5o4NqmMkno69Zx333N5aw028Wghv3oras0HILxQ6BTdGTvKdeOESJ1Rc
+ AXQA==
+X-Gm-Message-State: APjAAAUR9IUMfhzOoDGEpLrEfpdxlLHQOIone4XiFsWKS/O+pqi9UU/A
+ GCBg570DiLBKATs68Fj8kZlLVg==
+X-Google-Smtp-Source: APXvYqwTQEAPd18gZqeEmzC2WFCpS0mvDpNCW4MkbXVyYBl0A48wQeEqLgL0pHs3OD8tbWfxvM6LQg==
+X-Received: by 2002:a17:902:7591:: with SMTP id
+ j17mr35215640pll.200.1559637596920; 
+ Tue, 04 Jun 2019 01:39:56 -0700 (PDT)
 Received: from localhost ([122.172.66.84])
- by smtp.gmail.com with ESMTPSA id q17sm24195389pfq.74.2019.06.03.21.43.46
+ by smtp.gmail.com with ESMTPSA id z17sm4656763pfn.44.2019.06.04.01.39.55
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 03 Jun 2019 21:43:46 -0700 (PDT)
+ Tue, 04 Jun 2019 01:39:56 -0700 (PDT)
+Date: Tue, 4 Jun 2019 14:09:54 +0530
 From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Dave Martin <Dave.Martin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
- James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>,
- Suzuki K Pouloze <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>
-Subject: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
-Date: Tue,  4 Jun 2019 10:13:19 +0530
-Message-Id: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
-X-Mailer: git-send-email 2.21.0.rc0.269.g1a574e7a288b
+To: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
+Message-ID: <20190604083954.wf2q4h75uhx525yb@vireshk-i7>
+References: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
+ <0adbeaff-bb5e-54cc-292e-62cb9f73cf50@arm.com>
 MIME-Version: 1.0
-X-Mailman-Approved-At: Tue, 04 Jun 2019 04:35:02 -0400
-Cc: Viresh Kumar <viresh.kumar@linaro.org>,
- Vincent Guittot <vincent.guittot@linaro.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <0adbeaff-bb5e-54cc-292e-62cb9f73cf50@arm.com>
+User-Agent: NeoMutt/20180716-391-311a52
+Cc: Vincent Guittot <vincent.guittot@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,37 +105,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We currently get following compilation warning:
+On 04-06-19, 09:30, Marc Zyngier wrote:
+> On 04/06/2019 05:43, Viresh Kumar wrote:
+> > We currently get following compilation warning:
+> > 
+> > arch/arm64/kvm/guest.c: In function 'set_sve_vls':
+> > arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
+> > arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
+> 
+> Using which toolchain? My GCC 8.3.0 doesn't say anything.
 
-arch/arm64/kvm/guest.c: In function 'set_sve_vls':
-arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
-arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
+I haven't updated mine since a long time it seems :)
 
-The argument can't be const, as it is copied at runtime using
-copy_from_user(). Drop const from the prototype of vq_present().
+aarch64-linux-gnu-gcc (Linaro GCC 4.9-2015.05) 4.9.3 20150413 (prerelease)
 
-Fixes: 9033bba4b535 ("KVM: arm64/sve: Add pseudo-register for the guest's vector lengths")
-Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
----
- arch/arm64/kvm/guest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3ae2f82fca46..78f5a4f45e0a 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -209,7 +209,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
- 
- static bool vq_present(
--	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
-+	u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
- 	unsigned int vq)
- {
- 	return (*vqs)[vq_word(vq)] & vq_mask(vq);
 -- 
-2.21.0.rc0.269.g1a574e7a288b
-
+viresh
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
