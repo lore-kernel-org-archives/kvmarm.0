@@ -2,73 +2,57 @@ Return-Path: <SRS0=jSi8=UD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD72AC282CE
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 15:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB60C282CE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 16:01:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6585520717
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 15:47:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6585520717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 1212B2053B
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jun 2019 16:01:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1212B2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAF4B4A3B4;
-	Tue,  4 Jun 2019 11:47:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 876524A51F;
+	Tue,  4 Jun 2019 12:01:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zUjgiUvwvG8D; Tue,  4 Jun 2019 11:47:25 -0400 (EDT)
+	with ESMTP id o3jeWMNfOohE; Tue,  4 Jun 2019 12:01:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B50C84A51F;
-	Tue,  4 Jun 2019 11:47:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1BD84A4C2;
+	Tue,  4 Jun 2019 12:01:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C0704A510
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 11:47:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 598184A4FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 09:50:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zzbc6L6ddvD8 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jun 2019 11:47:23 -0400 (EDT)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60FDF4A50F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 11:47:23 -0400 (EDT)
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 04 Jun 2019 08:47:20 -0700
-X-ExtLoop1: 1
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
- by fmsmga004.fm.intel.com with ESMTP; 04 Jun 2019 08:47:19 -0700
-Date: Tue, 4 Jun 2019 08:50:24 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [PATCH v8 05/29] iommu: Add a timeout parameter for PRQ response
-Message-ID: <20190604085024.596696c3@jacob-builder>
-In-Reply-To: <13428eef-9b95-0f79-bebf-317a2205673a@arm.com>
-References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-6-eric.auger@redhat.com>
- <20190603163214.483884a7@x1.home>
- <13428eef-9b95-0f79-bebf-317a2205673a@arm.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+ with ESMTP id FsMxxnqLdS18 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jun 2019 09:50:53 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [146.0.238.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16DF24A4F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jun 2019 09:50:53 -0400 (EDT)
+Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
+ (envelope-from <bigeasy@linutronix.de>)
+ id 1hY9pw-0001pl-94; Tue, 04 Jun 2019 15:50:48 +0200
+Date: Tue, 4 Jun 2019 15:50:48 +0200
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Julien Grall <julien.grall@arm.com>
+Subject: Re: KVM Arm Device passthrough and linux-rt
+Message-ID: <20190604135047.5bwclgkvvr642ucj@linutronix.de>
+References: <26832850-37ee-ae07-08ca-cc3e90978867@arm.com>
 MIME-Version: 1.0
-Cc: jacob.jun.pan@linux.intel.com,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- "ashok.raj@intel.com" <ashok.raj@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Marc Zyngier <Marc.Zyngier@arm.com>, "joro@8bytes.org" <joro@8bytes.org>,
- Will Deacon <Will.Deacon@arm.com>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Vincent Stehle <Vincent.Stehle@arm.com>, Robin Murphy <Robin.Murphy@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Content-Disposition: inline
+In-Reply-To: <26832850-37ee-ae07-08ca-cc3e90978867@arm.com>
+User-Agent: NeoMutt/20180716
+X-Mailman-Approved-At: Tue, 04 Jun 2019 12:01:22 -0400
+Cc: linux-rt-users <linux-rt-users@vger.kernel.org>, julia@ni.com,
+ Marc Zyngier <marc.zyngier@arm.com>, Steven Rostedt <rostedt@goodmis.org>,
+ kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,22 +69,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 4 Jun 2019 11:52:18 +0100
-Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
+On 2019-06-04 13:58:51 [+0100], Julien Grall wrote:
+> Hi,
+Hi,
 
-> On 03/06/2019 23:32, Alex Williamson wrote:
-> > It doesn't seem to make much sense to include this patch without
-> > also including "iommu: handle page response timeout".  Was that one
-> > lost? Dropped?  Lives elsewhere?  
+> This is happening because vgic_v2_fold_lr_state() is expected
+> to be called with interrupt disabled. However, some of the path
+> (e.g eventfd) will take a spinlock.
 > 
-> The first 7 patches come from my sva/api branch, where I had forgotten
-> to add the "handle page response timeout" patch. I added it back,
-> probably after Eric sent this version. But I don't think the patch is
-> ready for upstream, as we still haven't decided how to proceed with
-> timeouts. Patches 6 and 7 are for debugging, I don't know if they
-> should go upstream.
-Yeah, we can wait until we all agree on timeouts. It was introduced for
-a basic safeguard against unresponsive guests.
+> The spinlock is from the waitqueue, so using a raw_spin_lock cannot
+> even be considered.
+> 
+> Do you have any input on how this could be solved?
+
+There is swair (init_swait_queue_head() and friends) in case that works
+for you.
+
+> Cheers,
+
+Sebastian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
