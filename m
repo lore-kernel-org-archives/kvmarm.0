@@ -2,67 +2,62 @@ Return-Path: <SRS0=SHHE=UG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB17C2BCA1
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D28ADC2BCA1
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:42:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 00CE1212F5
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:30:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CE1212F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 6BF2F2083D
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:42:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF2F2083D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8426E4A4F3;
-	Fri,  7 Jun 2019 10:30:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9C74A380;
+	Fri,  7 Jun 2019 10:42:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yzk636Bt+U5b; Fri,  7 Jun 2019 10:30:01 -0400 (EDT)
+	with ESMTP id 105gtyIwkB1a; Fri,  7 Jun 2019 10:42:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67F8A4A36B;
-	Fri,  7 Jun 2019 10:30:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACAF44A4A9;
+	Fri,  7 Jun 2019 10:42:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ACFBD4A36B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:30:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8D464A36B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:42:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BmByvicfzhOo for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 10:29:59 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B17794A369
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:29:59 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BBDB230832F4;
- Fri,  7 Jun 2019 14:29:46 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79CE26AD23;
- Fri,  7 Jun 2019 14:29:44 +0000 (UTC)
-Subject: Re: [PATCH 3/8] KVM: arm/arm64: vgic-its: Cache successful MSI->LPI
- translation
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190606165455.162478-1-marc.zyngier@arm.com>
- <20190606165455.162478-4-marc.zyngier@arm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <1bf286d1-7c81-0337-66e7-6701627476c7@redhat.com>
-Date: Fri, 7 Jun 2019 16:29:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id 4PXvmt5lNPtp for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jun 2019 10:42:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 745B14A3B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:42:35 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CE78337;
+ Fri,  7 Jun 2019 07:42:35 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05C733F71A;
+ Fri,  7 Jun 2019 07:42:33 -0700 (PDT)
+Date: Fri, 7 Jun 2019 15:42:31 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Viresh Kumar <viresh.kumar@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
+Message-ID: <20190607144229.GF28398@e103592.cambridge.arm.com>
+References: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
+ <20190604095915.GW28398@e103592.cambridge.arm.com>
+ <20190607060037.eaof3hllyombxlhc@vireshk-i7>
 MIME-Version: 1.0
-In-Reply-To: <20190606165455.162478-4-marc.zyngier@arm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 07 Jun 2019 14:29:52 +0000 (UTC)
-Cc: "Raslan, KarimAllah" <karahmed@amazon.de>
+Content-Disposition: inline
+In-Reply-To: <20190607060037.eaof3hllyombxlhc@vireshk-i7>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Cc: Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,84 +74,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 6/6/19 6:54 PM, Marc Zyngier wrote:
-> On a successful translation, preserve the parameters in the LPI
-> translation cache. Each translation is reusing the last slot
-> in the list, naturally evincting the least recently used entry.
-evicting
+On Fri, Jun 07, 2019 at 11:30:37AM +0530, Viresh Kumar wrote:
+> On 04-06-19, 10:59, Dave Martin wrote:
+> > On Tue, Jun 04, 2019 at 10:13:19AM +0530, Viresh Kumar wrote:
+> > > We currently get following compilation warning:
+> > > 
+> > > arch/arm64/kvm/guest.c: In function 'set_sve_vls':
+> > > arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
+> > > arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
+> > > 
+> > > The argument can't be const, as it is copied at runtime using
+> > > copy_from_user(). Drop const from the prototype of vq_present().
+> > > 
+> > > Fixes: 9033bba4b535 ("KVM: arm64/sve: Add pseudo-register for the guest's vector lengths")
+> > > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+> > > ---
+> > >  arch/arm64/kvm/guest.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > > index 3ae2f82fca46..78f5a4f45e0a 100644
+> > > --- a/arch/arm64/kvm/guest.c
+> > > +++ b/arch/arm64/kvm/guest.c
+> > > @@ -209,7 +209,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+> > >  
+> > >  static bool vq_present(
+> > > -	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
+> > > +	u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
+> > >  	unsigned int vq)
+> > >  {
+> > >  	return (*vqs)[vq_word(vq)] & vq_mask(vq);
+> > 
+> > Ack, but maybe this should just be converted to a macro?
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 41 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 5758504fd934..bc370b6c5afa 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -538,6 +538,45 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
->  	return 0;
->  }
->  
-> +static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-> +				       u32 devid, u32 eventid,
-> +				       struct vgic_irq *irq)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_translation_cache_entry *cte;
-> +	unsigned long flags;
-> +
-> +	/* Do not cache a directly injected interrupt */
-> +	if (irq->hw)
-> +		return;
-> +
-> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-> +
-> +	/* Always reuse the last entry (LRU policy) */
-> +	cte = list_last_entry(&dist->lpi_translation_cache,
-> +			      typeof(*cte), entry);
-> +
-> +	/*
-> +	 * Caching the translation implies having an extra reference
-> +	 * to the interrupt, so drop the potential reference on what
-> +	 * was in the cache, and increment it on the new interrupt.
-> +	 */
-> +	if (cte->irq)
-> +		__vgic_put_lpi_locked(kvm, cte->irq);
-> +
-> +	vgic_get_irq_kref(irq);
-> +
-> +	cte->db		= its->vgic_its_base + GITS_TRANSLATER;
-> +	cte->devid	= devid;
-> +	cte->eventid	= eventid;
-> +	cte->irq	= irq;
-> +
-> +	/* Move the new translation to the head of the list */
-> +	list_move(&cte->entry, &dist->lpi_translation_cache);
-> +
-> +	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-> +}
-> +
->  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
->  			 u32 devid, u32 eventid, struct vgic_irq **irq)
->  {
-> @@ -558,6 +597,8 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
->  	if (!vcpu->arch.vgic_cpu.lpis_enabled)
->  		return -EBUSY;
->  
-> +	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
-> +
->  	*irq = ite->irq;
->  	return 0;
->  }
-> 
-Otherwise looks good to me.
+> I will send a patch with that if that's what you want.
 
-Thanks
+I think this would solve the problem and simplify the code a bit at the
+same time.
 
-Eric
+So go for it.
+
+Cheers
+---Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
