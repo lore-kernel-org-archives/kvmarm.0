@@ -2,52 +2,54 @@ Return-Path: <SRS0=SHHE=UG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8809CC2BCA1
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 089FBC2BCA1
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 15:05:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 21DE02083D
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 14:49:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DE02083D
+	by mail.kernel.org (Postfix) with ESMTP id 8D559208C3
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 15:04:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D559208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ECD94A4A4;
-	Fri,  7 Jun 2019 10:49:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 180354A4C0;
+	Fri,  7 Jun 2019 11:04:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1XsogtFTfqQI; Fri,  7 Jun 2019 10:49:17 -0400 (EDT)
+	with ESMTP id CN1zN90RKu+l; Fri,  7 Jun 2019 11:04:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61CBE4A4BE;
-	Fri,  7 Jun 2019 10:49:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5ABD4A3BF;
+	Fri,  7 Jun 2019 11:04:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 068164A4A3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:49:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCAAB4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 11:04:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TVaNQ-CtQRG6 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 10:49:14 -0400 (EDT)
+ with ESMTP id U8a9tRw3V1mk for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jun 2019 11:04:55 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F3AD4A36B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 10:49:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68DF54A331
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 11:04:55 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 444F6337;
- Fri,  7 Jun 2019 07:49:14 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFFE5499;
+ Fri,  7 Jun 2019 08:04:54 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 090553F71A; Fri,  7 Jun 2019 07:49:12 -0700 (PDT)
-Subject: Re: [PATCH 4/8] KVM: arm/arm64: vgic-its: Add kvm parameter to
- vgic_its_free_collection
+ A5E183F71A; Fri,  7 Jun 2019 08:04:53 -0700 (PDT)
+Subject: Re: [PATCH 1/8] KVM: arm/arm64: vgic: Add LPI translation cache
+ definition
 To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, 
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20190606165455.162478-1-marc.zyngier@arm.com>
- <20190606165455.162478-5-marc.zyngier@arm.com>
- <42b2f7fe-60e1-90b2-bc8a-515dc17f9d9c@redhat.com>
+ <20190606165455.162478-2-marc.zyngier@arm.com>
+ <7b4a5bc3-8168-50bb-e2aa-3ff081199d04@redhat.com>
+ <856ab7bd-3ba1-e10e-1bf5-7a821c753a53@arm.com>
+ <f0c1c30a-2f95-4a74-9f8b-deac2cb2c37e@redhat.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -94,12 +96,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <af5a8e30-917b-f985-8873-509578fa9a01@arm.com>
-Date: Fri, 7 Jun 2019 15:49:11 +0100
+Message-ID: <982e80a0-d421-55f7-ee1e-55e9eee7b7f2@arm.com>
+Date: Fri, 7 Jun 2019 16:04:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <42b2f7fe-60e1-90b2-bc8a-515dc17f9d9c@redhat.com>
+In-Reply-To: <f0c1c30a-2f95-4a74-9f8b-deac2cb2c37e@redhat.com>
 Content-Language: en-US
 Cc: "Raslan, KarimAllah" <karahmed@amazon.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -118,20 +120,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 07/06/2019 15:29, Auger Eric wrote:
+On 07/06/2019 15:15, Auger Eric wrote:
 > Hi Marc,
-> On 6/6/19 6:54 PM, Marc Zyngier wrote:
->> As we are going to perform some VM-wide operations when freeing
->> a collection, add the kvm pointer to vgic_its_free_collection.
+> On 6/7/19 2:44 PM, Marc Zyngier wrote:
+>> Hi Eric,
 >>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Eventually do you use that commit in subsequent patches?
+>> On 07/06/2019 13:09, Auger Eric wrote:
+>>> Hi Marc,
 
-Ah! That's a leftover of a previous version, where I was pointlessly
-invalidating the cache on MAPC with V=0. You're absolutely right, this
-patch is completely useless!
+[...]
 
-Thanks,
+>>>> +#define LPI_CACHE_SIZE(kvm)	(atomic_read(&(kvm)->online_vcpus) * 4)
+>>> Couldn't the cache be a function of the number of allocated lpis. We
+>>> could realloc the list accordingly. I miss why it is rather dependent on
+>>> the number of vcpus and not on the number of assigned devices/MSIs?
+>>
+>> How do you find out about the number of LPIs? That's really for the
+>> guest to decide what it wants to do. Also, KVM itself doesn't have much
+>> of a clue about the number of assigned devices or their MSI capability.
+>> That's why I've suggested that userspace could be involved here.
+> 
+> Can't we setup an heuristic based on dist->lpi_list_count incremented on
+> vgic_add_lpi() used on MAPI/MAPTI? Of course not all of them are
+> assigned device ones. But currently the cache is being used for all LPIs
+> including those triggered through the user space injection (KVM_SIGNAL_MSI).
+
+I'm happy to grow the cache on MAPI, but that doesn't solve the real
+problem: how do we cap it to a value that is "good enough"?
+
+> Otherwise there is an existing interface between KVM and VFIO that may
+> be leveraged to pass info between both?
+
+Same thing. The problem is in defining the limit. I guess only people
+deploying real workloads can tell us what is a reasonable default, and
+we can also make that a tuneable parameter...
 
 	M.
 -- 
