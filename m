@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF613C468BD
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 11:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A347C2BCA1
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 11:27:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A5EB8207E0
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 11:27:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5EB8207E0
+	by mail.kernel.org (Postfix) with ESMTP id E4A0C207E0
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 11:27:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A0C207E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DA1F4A528;
-	Fri,  7 Jun 2019 07:27:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F284A51F;
+	Fri,  7 Jun 2019 07:27:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vgR9zGtfeKdW; Fri,  7 Jun 2019 07:27:28 -0400 (EDT)
+	with ESMTP id YUhUKVhjplz1; Fri,  7 Jun 2019 07:27:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D6B4A50B;
-	Fri,  7 Jun 2019 07:27:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A95D4A50F;
+	Fri,  7 Jun 2019 07:27:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3094A504
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 07:27:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C63E4A51E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 07:27:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n4XED2ylNgXx for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 07:27:25 -0400 (EDT)
+ with ESMTP id Uwgc66tVO1+m for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jun 2019 07:27:28 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 562C84A4F4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 07:27:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D49454A521
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 07:27:27 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 185086CC;
- Fri,  7 Jun 2019 04:27:25 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88D8E707;
+ Fri,  7 Jun 2019 04:27:26 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3DCDA3F246;
- Fri,  7 Jun 2019 04:29:04 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AD1BB3F246;
+ Fri,  7 Jun 2019 04:29:05 -0700 (PDT)
 From: Dave Martin <Dave.Martin@arm.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool v4 7/8] arm/arm64: Factor out ptrauth vcpu feature
- setup
-Date: Fri,  7 Jun 2019 12:26:28 +0100
-Message-Id: <1559906789-20936-8-git-send-email-Dave.Martin@arm.com>
+Subject: [PATCH kvmtool v4 8/8] arm64: Add SVE support
+Date: Fri,  7 Jun 2019 12:26:29 +0100
+Message-Id: <1559906789-20936-9-git-send-email-Dave.Martin@arm.com>
 X-Mailer: git-send-email 2.1.4
 In-Reply-To: <1559906789-20936-1-git-send-email-Dave.Martin@arm.com>
 References: <1559906789-20936-1-git-send-email-Dave.Martin@arm.com>
@@ -74,87 +73,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In the interest of readability, factor out the vcpu feature setup
-for ptrauth into a separate function.
+This patch enables the Scalable Vector Extension for the guest when
+the host supports it.
 
-Also, because aarch32 doesn't have this feature or the related
-command line options anyway, move the actual code into aarch64/.
-
-Since ARM_VCPU_PTRAUTH_FEATURE is only there to make the ptrauth
-feature setup code compile on arm, it is no longer needed: inline
-and remove it.
+This requires use of the new KVM_ARM_VCPU_FINALIZE ioctl before the
+vcpu is runnable, so a new hook kvm_cpu__configure_features() is
+added to provide an appropriate place to do this work.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+
 ---
- arm/aarch32/include/kvm/kvm-cpu-arch.h |  3 ++-
- arm/aarch64/include/kvm/kvm-cpu-arch.h |  3 +--
- arm/aarch64/kvm-cpu.c                  | 10 ++++++++++
- arm/kvm-cpu.c                          |  5 +----
- 4 files changed, 14 insertions(+), 7 deletions(-)
+
+Changes since v3:
+
+ * Drop command-line options and simply default SVE to on where
+   supported.
+---
+ arm/aarch32/include/kvm/kvm-cpu-arch.h |  4 ++++
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
+ arm/aarch64/kvm-cpu.c                  | 18 ++++++++++++++++++
+ arm/kvm-cpu.c                          |  3 +++
+ 4 files changed, 26 insertions(+)
 
 diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index 3ec6f03..01983f0 100644
+index 01983f0..780e0e2 100644
 --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
 +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -13,6 +13,7 @@
- #define ARM_CPU_ID		0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
+@@ -15,5 +15,9 @@
  
--#define ARM_VCPU_PTRAUTH_FEATURE	0
-+static inline void kvm_cpu__select_features(struct kvm *kvm,
-+					    struct kvm_vcpu_init *init) { }
+ static inline void kvm_cpu__select_features(struct kvm *kvm,
+ 					    struct kvm_vcpu_init *init) { }
++static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
++{
++	return 0;
++}
  
  #endif /* KVM__KVM_CPU_ARCH_H */
 diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index 9fa99fb..e6875fc 100644
+index e6875fc..8dfb82e 100644
 --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
 +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -17,7 +17,6 @@
- #define ARM_CPU_CTRL		3, 0, 1, 0
+@@ -18,5 +18,6 @@
  #define ARM_CPU_CTRL_SCTLR_EL1	0
  
--#define ARM_VCPU_PTRAUTH_FEATURE	((1UL << KVM_ARM_VCPU_PTRAUTH_ADDRESS) \
--					| (1UL << KVM_ARM_VCPU_PTRAUTH_GENERIC))
-+void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
+ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
++int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
  
  #endif /* KVM__KVM_CPU_ARCH_H */
 diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 0aaefaf..8c29a21 100644
+index 8c29a21..9f3e858 100644
 --- a/arm/aarch64/kvm-cpu.c
 +++ b/arm/aarch64/kvm-cpu.c
-@@ -128,6 +128,16 @@ static void reset_vcpu_aarch64(struct kvm_cpu *vcpu)
+@@ -136,6 +136,24 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_PTRAUTH_ADDRESS;
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_PTRAUTH_GENERIC;
  	}
- }
- 
-+void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
-+{
-+	/* Enable pointer authentication if available */
-+	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
-+	    kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC)) {
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_PTRAUTH_ADDRESS;
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_PTRAUTH_GENERIC;
-+	}
++
++	/* Enable SVE if available */
++	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
++		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
 +}
 +
++int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
++{
++	if (kvm__supports_extension(vcpu->kvm, KVM_CAP_ARM_SVE)) {
++		int feature = KVM_ARM_VCPU_SVE;
++
++		if (ioctl(vcpu->vcpu_fd, KVM_ARM_VCPU_FINALIZE, &feature)) {
++			pr_err("KVM_ARM_VCPU_FINALIZE: %s", strerror(errno));
++			return -1;
++		}
++	}
++
++	return 0;
+ }
+ 
  void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu)
- {
- 	if (vcpu->kvm->cfg.arch.aarch32_guest)
 diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index fff8494..1652f6f 100644
+index 1652f6f..554414f 100644
 --- a/arm/kvm-cpu.c
 +++ b/arm/kvm-cpu.c
-@@ -68,10 +68,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
- 	}
+@@ -124,6 +124,9 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	vcpu->cpu_compatible	= target->compatible;
+ 	vcpu->is_running	= true;
  
--	/* Enable pointer authentication if available */
--	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
--	    kvm__supports_extension(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC))
--			vcpu_init.features[0] |= ARM_VCPU_PTRAUTH_FEATURE;
-+	kvm_cpu__select_features(kvm, &vcpu_init);
++	if (kvm_cpu__configure_features(vcpu))
++		die("Unable to configure requested vcpu features");
++
+ 	return vcpu;
+ }
  
- 	/*
- 	 * If the preferred target ioctl is successful then
 -- 
 2.1.4
 
