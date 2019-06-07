@@ -3,72 +3,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507CBC2BCA1
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 12:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2188AC2BCA1
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 12:48:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D7773208C3
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 12:47:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7773208C3
+	by mail.kernel.org (Postfix) with ESMTP id D881E208C3
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 12:48:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D881E208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6E94A4E6;
-	Fri,  7 Jun 2019 08:47:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 729E74A4E6;
+	Fri,  7 Jun 2019 08:48:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7JngfBfbUT9g; Fri,  7 Jun 2019 08:47:52 -0400 (EDT)
+	with ESMTP id kvAPEqTApYYb; Fri,  7 Jun 2019 08:48:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D094A389;
-	Fri,  7 Jun 2019 08:47:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49C854A418;
+	Fri,  7 Jun 2019 08:48:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A587F4A389
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 08:47:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 222C54A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 08:48:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zxhzeqFkcPKA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 08:47:49 -0400 (EDT)
+ with ESMTP id OZfvjYnH-0qH for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jun 2019 08:48:33 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AA764A331
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 08:47:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D54644A389
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 08:48:33 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 226E53EF;
- Fri,  7 Jun 2019 05:47:49 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 77A82499;
+ Fri,  7 Jun 2019 05:48:33 -0700 (PDT)
 Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E0D640151;
- Fri,  7 Jun 2019 05:47:47 -0700 (PDT)
-Subject: Re: [PATCH v8 25/29] vfio-pci: Add a new VFIO_REGION_TYPE_NESTED
- region type
-To: Auger Eric <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 734AA40151;
+ Fri,  7 Jun 2019 05:48:31 -0700 (PDT)
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+To: Eric Auger <eric.auger@redhat.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Will Deacon
+ <Will.Deacon@arm.com>, Robin Murphy <Robin.Murphy@arm.com>
 References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-26-eric.auger@redhat.com>
- <20190603163159.31e7ae23@x1.home>
- <9c1ea2db-5ba0-3cf5-3b38-2c4a125460e6@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
 From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <6a640710-bb9d-8923-cfef-e57786ed699f@arm.com>
-Date: Fri, 7 Jun 2019 13:47:22 +0100
+Message-ID: <63b37149-1f74-bca1-35ea-5e849c0c2bbb@arm.com>
+Date: Fri, 7 Jun 2019 13:48:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <9c1ea2db-5ba0-3cf5-3b38-2c4a125460e6@redhat.com>
+In-Reply-To: <20190526161004.25232-27-eric.auger@redhat.com>
 Content-Language: en-US
-Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "ashok.raj@intel.com" <ashok.raj@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Marc Zyngier <Marc.Zyngier@arm.com>, "joro@8bytes.org" <joro@8bytes.org>,
- Will Deacon <Will.Deacon@arm.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
- Vincent Stehle <Vincent.Stehle@arm.com>, Robin Murphy <Robin.Murphy@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ Vincent Stehle <Vincent.Stehle@arm.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,41 +83,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 07/06/2019 09:28, Auger Eric wrote:
->>> +static const struct vfio_pci_fault_abi fault_abi_versions[] = {
->>> +	[0] = {
->>> +		.entry_size = sizeof(struct iommu_fault),
->>> +	},
->>> +};
->>> +
->>> +#define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)
->>
->> This looks like it's leading to some dangerous complicated code to
->> support multiple user selected ABIs.  How many ABIs do we plan to
->> support?  The region capability also exposes a type, sub-type, and
->> version.  How much of this could be exposed that way?  ie. if we need
->> to support multiple versions, expose multiple regions.
-> 
-> This is something that was discussed earlier and suggested by
-> Jean-Philippe that we may need to support several versions of the ABI
-> (typicallu when adding PRI support).
-> Exposing multiple region is an interesting idea and I will explore that
-> direction.
+On 26/05/2019 17:10, Eric Auger wrote:
+> +int vfio_pci_iommu_dev_fault_handler(struct iommu_fault_event *evt, void *data)
+> +{
+> +	struct vfio_pci_device *vdev = (struct vfio_pci_device *) data;
+> +	struct vfio_region_fault_prod *prod_region =
+> +		(struct vfio_region_fault_prod *)vdev->fault_pages;
+> +	struct vfio_region_fault_cons *cons_region =
+> +		(struct vfio_region_fault_cons *)(vdev->fault_pages + 2 * PAGE_SIZE);
+> +	struct iommu_fault *new =
+> +		(struct iommu_fault *)(vdev->fault_pages + prod_region->offset +
+> +			prod_region->prod * prod_region->entry_size);
+> +	int prod, cons, size;
+> +
+> +	mutex_lock(&vdev->fault_queue_lock);
+> +
+> +	if (!vdev->fault_abi)
+> +		goto unlock;
+> +
+> +	prod = prod_region->prod;
+> +	cons = cons_region->cons;
+> +	size = prod_region->nb_entries;
+> +
+> +	if (CIRC_SPACE(prod, cons, size) < 1)
+> +		goto unlock;
+> +
+> +	*new = evt->fault;
 
-At the moment the ABI support errors and PRI. We're considering setting
-the fault report structure to 64 or 128 bytes (see "[PATCH v2 2/4]
-iommu: Introduce device fault data"). 64-byte allows for 2 additional
-fields before we have to introduce a new ABI version, while 128 byte
-should last us a while.
-
-But that's for adding new fields to existing fault types. It's probably
-a good idea to have different region types in VFIO for different fault
-types, since userspace isn't necessarily prepared to deal with them. For
-example right now userspace doesn't have a method to complete
-recoverable faults, so we can't add them to the queue.
+Could you check fault.type and return an error if it's not UNRECOV here?
+If the fault is recoverable (very unlikely since the PRI capability is
+disabled, but allowed) and we return an error here, then the caller
+takes care of completing the fault. If we forward it to the guest
+instead, the producer will wait indefinitely for a response.
 
 Thanks,
 Jean
+
+> +	prod = (prod + 1) % size;
+> +	prod_region->prod = prod;
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +
+> +	mutex_lock(&vdev->igate);
+> +	if (vdev->dma_fault_trigger)
+> +		eventfd_signal(vdev->dma_fault_trigger, 1);
+> +	mutex_unlock(&vdev->igate);
+> +	return 0;
+> +
+> +unlock:
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +	return -EINVAL;
+> +}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
