@@ -2,96 +2,98 @@ Return-Path: <SRS0=SHHE=UG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.3 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3A9C28CC3
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 06:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF61C28CC3
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 06:53:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED24020825
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 06:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CEEE208C3
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 06:53:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I+DO+bXX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED24020825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="F/Hv+9K1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CEEE208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B4454A380;
-	Fri,  7 Jun 2019 02:00:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5A294A4EA;
+	Fri,  7 Jun 2019 02:53:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wzWH9QNWTMqB; Fri,  7 Jun 2019 02:00:45 -0400 (EDT)
+	with ESMTP id 7AORxh2ELvUu; Fri,  7 Jun 2019 02:53:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 225404A4DF;
-	Fri,  7 Jun 2019 02:00:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1DB4A4DF;
+	Fri,  7 Jun 2019 02:53:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D88F44A4DF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 02:00:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7D624A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jun 2019 23:47:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UByEq5qOKXuG for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 02:00:42 -0400 (EDT)
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com
- [209.85.214.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AFA874A380
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 02:00:42 -0400 (EDT)
-Received: by mail-pl1-f195.google.com with SMTP id s24so393530plr.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jun 2019 23:00:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=sNeYqqj7A5jsZjI23KJv1FicJVOUSHOJooPoBup8FeM=;
- b=I+DO+bXX3/U0c5/tJe9YZdOfd9awmUKsKrvLQ6RM5e7ZPbpVdNQ6p467NhbVoMoarQ
- ZTrXnuYi/GBo+EETAJBGN7Pbc4eyxedjJgINnFW2Ljv5sN9z7vOHs6OG+Gfjx+nUFata
- r/SNJ3fb38yconRfVgfs5zO505iUUyDV4G/jHwXknqC1Y7Z1U8rC0v+rvDJyZqa/2SDY
- dFJFBnKgq948wzi26ZcXJ+LY/RNrc3C7DV8bcYap3C5SQTdSlGOwcqCDiElfo5zU+Fni
- UXim+fepv1U8X+0j4guVpm6nZtJBCDBnu6scNE5hLkz6jskKt97gH5ftrO8QkfNEvFqD
- KgJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=sNeYqqj7A5jsZjI23KJv1FicJVOUSHOJooPoBup8FeM=;
- b=ArK6EcQk65+wuJTyyZ3GFCmoY159yJA7aH9S6ZAeu3OiKJ521bnAk5HJwY3D58YXWO
- U7AGXoJE18thyKAkDL2HH1JrVpDKhkVcAYGnHX/TJdHE8EldzDkXZNIfKNG2wzSm3B1E
- wOQBy9BGMz5L5rnT0i5HNib3DARB9fJMNf83ZHft5W3aGR8JRcvVcuPE5H8Win3bKjj+
- 0XmAfXux79ZOhGd36zKmnUdx/QXoNVf6lBm3TerEMSPUxqUn6mkgv8PMACzW9lTYkpst
- CH3ScZPFRELVlWzlYyB5lyxPHgD9ViM3ldsYuxbe+UkJE0WHpYdOuGzhvhWHlrn6BFMp
- ItXg==
-X-Gm-Message-State: APjAAAWC/MzykSMXh9h3bnYDNm47p4yf76rTbzQiso1BbxFJM1f9rekj
- KbOG8ftcBeLVHNaJlTBlmzSU3A==
-X-Google-Smtp-Source: APXvYqxOAWcArkn2cVZZlioTLt/qQbVmliWaDP7qBUla76loZRkDUMwoTY7MzTYQenlQtRiEFq12yQ==
-X-Received: by 2002:a17:902:6a4:: with SMTP id
- 33mr53039518plh.338.1559887241528; 
- Thu, 06 Jun 2019 23:00:41 -0700 (PDT)
-Received: from localhost ([122.172.66.84])
- by smtp.gmail.com with ESMTPSA id s42sm1593160pjc.5.2019.06.06.23.00.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Jun 2019 23:00:40 -0700 (PDT)
-Date: Fri, 7 Jun 2019 11:30:37 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Drop 'const' from argument of vq_present()
-Message-ID: <20190607060037.eaof3hllyombxlhc@vireshk-i7>
-References: <699121e5c938c6f4b7b14a7e2648fa15af590a4a.1559623368.git.viresh.kumar@linaro.org>
- <20190604095915.GW28398@e103592.cambridge.arm.com>
+ with ESMTP id 4CA28MobKoLT for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jun 2019 23:47:37 -0400 (EDT)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B8BF4A389
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jun 2019 23:47:37 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1559879257; x=1591415257;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-id:content-transfer-encoding: mime-version;
+ bh=f7lUzX077j1bK+7o5EYCdBbsguKVU9Cl/73eEhYfufY=;
+ b=F/Hv+9K1rip4ShMRQ0xBIoEBBC9AJp+TtVaTnxweQaO0GHiiVt4o1YfO
+ RCIMiNMaNOjS6AKZur7GqwZsyzPlHlPsKMFBnImUGJEXRKVeaPCKN9ddy
+ BH2UwrVJmuV5q6PPvIMzxWfvBAtZQQjMNZ2noHungzMn1g79wZ5D2+1ES w=;
+X-IronPort-AV: E=Sophos;i="5.60,561,1549929600"; d="scan'208";a="405435519"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.124.125.6])
+ by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP;
+ 07 Jun 2019 03:47:36 +0000
+Received: from EX13MTAUEA001.ant.amazon.com
+ (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+ by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS
+ id AE93FA2494; Fri,  7 Jun 2019 03:47:33 +0000 (UTC)
+Received: from EX13D01EUB003.ant.amazon.com (10.43.166.248) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 7 Jun 2019 03:47:32 +0000
+Received: from EX13D02UWC004.ant.amazon.com (10.43.162.236) by
+ EX13D01EUB003.ant.amazon.com (10.43.166.248) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 7 Jun 2019 03:47:31 +0000
+Received: from EX13D02UWC004.ant.amazon.com ([10.43.162.236]) by
+ EX13D02UWC004.ant.amazon.com ([10.43.162.236]) with mapi id 15.00.1367.000;
+ Fri, 7 Jun 2019 03:47:30 +0000
+From: "Saidi, Ali" <alisaidi@amazon.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu"
+ <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/8] KVM: arm/arm64: vgic: Add LPI translation cache
+ definition
+Thread-Topic: [PATCH 1/8] KVM: arm/arm64: vgic: Add LPI translation cache
+ definition
+Thread-Index: AQHVHIi1OiXXp0Fy/EqmaDNzW4giDKaPOpGA
+Date: Fri, 7 Jun 2019 03:47:29 +0000
+Message-ID: <3698E5F4-6E33-4175-9EA0-7CB961705264@amazon.com>
+References: <20190606165455.162478-1-marc.zyngier@arm.com>
+ <20190606165455.162478-2-marc.zyngier@arm.com>
+In-Reply-To: <20190606165455.162478-2-marc.zyngier@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.160.73]
+Content-ID: <C746183BA199164FBEAB119812CB66A1@amazon.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190604095915.GW28398@e103592.cambridge.arm.com>
-User-Agent: NeoMutt/20180716-391-311a52
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Precedence: Bulk
+X-Mailman-Approved-At: Fri, 07 Jun 2019 02:53:39 -0400
+Cc: "Raslan, KarimAllah" <karahmed@amazon.de>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
-Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -100,51 +102,18 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04-06-19, 10:59, Dave Martin wrote:
-> On Tue, Jun 04, 2019 at 10:13:19AM +0530, Viresh Kumar wrote:
-> > We currently get following compilation warning:
-> > 
-> > arch/arm64/kvm/guest.c: In function 'set_sve_vls':
-> > arch/arm64/kvm/guest.c:262:18: warning: passing argument 1 of 'vq_present' from incompatible pointer type
-> > arch/arm64/kvm/guest.c:212:13: note: expected 'const u64 (* const)[8]' but argument is of type 'u64 (*)[8]'
-> > 
-> > The argument can't be const, as it is copied at runtime using
-> > copy_from_user(). Drop const from the prototype of vq_present().
-> > 
-> > Fixes: 9033bba4b535 ("KVM: arm64/sve: Add pseudo-register for the guest's vector lengths")
-> > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
-> > ---
-> >  arch/arm64/kvm/guest.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 3ae2f82fca46..78f5a4f45e0a 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -209,7 +209,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> >  
-> >  static bool vq_present(
-> > -	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
-> > +	u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
-> >  	unsigned int vq)
-> >  {
-> >  	return (*vqs)[vq_word(vq)] & vq_mask(vq);
-> 
-> Ack, but maybe this should just be converted to a macro?
-
-I will send a patch with that if that's what you want.
-
-Thanks.
-
--- 
-viresh
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+DQrvu79PbiA2LzYvMTksIDExOjU1IEFNLCAiTWFyYyBaeW5naWVyIiA8bWFyYy56eW5naWVyQGFy
+bS5jb20+IHdyb3RlOg0KDQogICAgQWRkIHRoZSBiYXNpYyBkYXRhIHN0cnVjdHVyZSB0aGF0IGV4
+cHJlc3NlcyBhbiBNU0kgdG8gTFBJDQogICAgdHJhbnNsYXRpb24gYXMgd2VsbCBhcyB0aGUgYWxs
+b2NhdGlvbi9yZWxlYXNlIGhvb2tzLg0KICAgIA0KICAgIFRIZSBzaXplIG9mIHRoZSBjYWNoZSBp
+cyBhcmJpdHJhcmlseSBkZWZpbmVkIGFzIDQqbnJfdmNwdXMuDQoNCkEgY2FjaGUgc2l6ZSBvZiA4
+L3ZDUFUgc2hvdWxkIHJlc3VsdCBpbiBjYWNoZSBoaXRzIGluIG1vc3QgY2FzZXMgYW5kIDE2L3ZD
+UFUgd2lsbCBwcmV0dHkgbXVjaCBhbHdheXMgcmVzdWx0IGluIGEgY2FjaGUgaGl0Lg0KDQpBbGkN
+Cg0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1h
+cm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0
+cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
