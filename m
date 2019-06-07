@@ -2,69 +2,77 @@ Return-Path: <SRS0=SHHE=UG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB51EC2BCA1
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 16:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E72C468BD
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 17:40:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4347E2064A
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 16:29:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4347E2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C9FE9208C0
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jun 2019 17:40:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9FE9208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E5114A4EA;
-	Fri,  7 Jun 2019 12:29:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DFBF4A4FE;
+	Fri,  7 Jun 2019 13:40:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9irSb33wBKdh; Fri,  7 Jun 2019 12:29:55 -0400 (EDT)
+	with ESMTP id p1dU3norYNMS; Fri,  7 Jun 2019 13:39:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D68C4A4F2;
-	Fri,  7 Jun 2019 12:29:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D715A4A4F2;
+	Fri,  7 Jun 2019 13:39:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 668D44A4EA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 12:29:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C58DA4A47A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 13:39:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3XAHuPuOOWrY for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jun 2019 12:29:52 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEDD74A4D5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 12:29:52 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 702B630872DE;
- Fri,  7 Jun 2019 16:29:42 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C93318CFA6;
- Fri,  7 Jun 2019 16:29:33 +0000 (UTC)
-Date: Fri, 7 Jun 2019 10:29:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v8 25/29] vfio-pci: Add a new VFIO_REGION_TYPE_NESTED
- region type
-Message-ID: <20190607102931.0bf2dfe0@x1.home>
-In-Reply-To: <9c1ea2db-5ba0-3cf5-3b38-2c4a125460e6@redhat.com>
+ with ESMTP id WVjLx5zGNzxS for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jun 2019 13:39:57 -0400 (EDT)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13D984A3B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jun 2019 13:39:56 -0400 (EDT)
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 07 Jun 2019 10:39:55 -0700
+X-ExtLoop1: 1
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+ by orsmga002.jf.intel.com with ESMTP; 07 Jun 2019 10:39:55 -0700
+Date: Fri, 7 Jun 2019 10:43:01 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+Message-ID: <20190607104301.6b1bbd74@jacob-builder>
+In-Reply-To: <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
 References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-26-eric.auger@redhat.com>
- <20190603163159.31e7ae23@x1.home>
- <9c1ea2db-5ba0-3cf5-3b38-2c4a125460e6@redhat.com>
-Organization: Red Hat
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 07 Jun 2019 16:29:49 +0000 (UTC)
-Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
- kvm@vger.kernel.org, joro@8bytes.org, will.deacon@arm.com,
- linux-kernel@vger.kernel.org, marc.zyngier@arm.com,
- iommu@lists.linux-foundation.org, yi.l.liu@intel.com, vincent.stehle@arm.com,
- robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: jacob.jun.pan@linux.intel.com,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Marc Zyngier <Marc.Zyngier@arm.com>, "joro@8bytes.org" <joro@8bytes.org>,
+ Will Deacon <Will.Deacon@arm.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Vincent Stehle <Vincent.Stehle@arm.com>, Robin Murphy <Robin.Murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,222 +89,152 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 7 Jun 2019 10:28:06 +0200
-Auger Eric <eric.auger@redhat.com> wrote:
+On Fri, 7 Jun 2019 11:28:13 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-> Hi Alex,
-> 
-> On 6/4/19 12:31 AM, Alex Williamson wrote:
-> > On Sun, 26 May 2019 18:10:00 +0200
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >   
-> >> This patch adds two new regions aiming to handle nested mode
-> >> translation faults.
+> On 06/06/2019 21:29, Jacob Pan wrote:
+> >>>>>> iommu_unregister_device_fault_handler(&vdev->pdev->dev);      
+> >>>>>
+> >>>>>
+> >>>>> But this can fail if there are pending faults which leaves a
+> >>>>> device reference and then the system is broken :(      
+> >>>> This series only features unrecoverable errors and for those the
+> >>>> unregistration cannot fail. Now unrecoverable errors were added I
+> >>>> admit this is confusing. We need to sort this out or clean the
+> >>>> dependencies.    
+> >>> As Alex pointed out in 4/29, we can make
+> >>> iommu_unregister_device_fault_handler() never fail and clean up
+> >>> all the pending faults in the host IOMMU belong to that device.
+> >>> But the problem is that if a fault, such as PRQ, has already been
+> >>> injected into the guest, the page response may come back after
+> >>> handler is unregistered and registered again.    
 > >>
-> >> The first region (two host kernel pages) is read-only from the
-> >> user-space perspective. The first page contains an header
-> >> that provides information about the circular buffer located in the
-> >> second page. The circular buffer is put in a different page in
-> >> the prospect to be mmappable.
+> >> I'm trying to figure out if that would be harmful in any way. I
+> >> guess it can be a bit nasty if we handle the page response right
+> >> after having injected a new page request that uses the same PRGI.
+> >> In any other case we discard the page response, but here we
+> >> forward it to the endpoint and:
 > >>
-> >> The max user API version supported by the kernel is returned
-> >> through a dedicated fault region capability.
-> >>
-> >> The prod header contains
-> >> - the user API version in use (potentially inferior to the one
-> >>   returned in the capability),
-> >> - the offset of the queue within the region,
-> >> - the producer index relative to the start of the queue
-> >> - the max number of fault records,
-> >> - the size of each record.
-> >>
-> >> The second region is write-only from the user perspective. It
-> >> contains the version of the requested fault ABI and the consumer
-> >> index that is updated by the userspace each time this latter has
-> >> consumed fault records.
-> >>
-> >> The natural order of operation for the userspace is:
-> >> - retrieve the highest supported fault ABI version
-> >> - set the requested fault ABI version in the consumer region
-> >>
-> >> Until the ABI version is not set by the userspace, the kernel
-> >> cannot return a comprehensive set of information inside the
-> >> prod header (entry size and number of entries in the fault queue).  
-> > 
-> > It's not clear to me why two regions are required for this.  If the
-> > first page is not mmap capable, why does it need to be read-only?  If
-> > it were not read-only couldn't the fields of the second region also fit
-> > within this first page?  If you wanted to deal with an mmap capable
-> > writeable region, it could just be yet a 3rd page in the first region.  
-> I thought it would be clearer for the userspace to have 2 separate
-> regions, one for the producer and one for the consumer. Otherwise I will
-> need to specify which fields are read-only or write-only. But this may
-> be more self-contained in a single region.
-
-We need to figure out read vs write anyway, but separating them to
-separate regions just for that seems unnecessary.  How many regions do
-we expect to require for a single feature?
-
-> >   
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v4 -> v5
-> >> - check cons is not null in vfio_pci_check_cons_fault
-> >>
-> >> v3 -> v4:
-> >> - use 2 separate regions, respectively in read and write modes
-> >> - add the version capability
-> >> ---
-> >>  drivers/vfio/pci/vfio_pci.c         | 105 ++++++++++++++++++++++++++++
-> >>  drivers/vfio/pci/vfio_pci_private.h |  17 +++++
-> >>  drivers/vfio/pci/vfio_pci_rdwr.c    |  73 +++++++++++++++++++
-> >>  include/uapi/linux/vfio.h           |  42 +++++++++++
-> >>  4 files changed, 237 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> >> index cab71da46f4a..f75f61127277 100644
-> >> --- a/drivers/vfio/pci/vfio_pci.c
-> >> +++ b/drivers/vfio/pci/vfio_pci.c
-> >> @@ -261,6 +261,106 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
-> >>  	return ret;
-> >>  }
+> >> * If the response status is success, endpoint retries the
+> >> translation. The guest probably hasn't had time to handle the new
+> >> page request and translation will fail, which may lead the endpoint
+> >> to give up (two unsuccessful translation requests). Or send a new
+> >> request
 > >>  
-> >> +void vfio_pci_fault_release(struct vfio_pci_device *vdev,
-> >> +			    struct vfio_pci_region *region)
-> >> +{
-> >> +}
-> >> +
-> >> +static const struct vfio_pci_fault_abi fault_abi_versions[] = {
-> >> +	[0] = {
-> >> +		.entry_size = sizeof(struct iommu_fault),
-> >> +	},
-> >> +};
-> >> +
-> >> +#define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)  
-> > 
-> > This looks like it's leading to some dangerous complicated code to
-> > support multiple user selected ABIs.  How many ABIs do we plan to
-> > support?  The region capability also exposes a type, sub-type, and
-> > version.  How much of this could be exposed that way?  ie. if we need
-> > to support multiple versions, expose multiple regions.  
+> > Good point, there shouldn't be any harm if the page response is a
+> > "fake" success. In fact it could happen in the normal operation when
+> > PRQs to two devices share the same non-leaf translation structure.
+> > The worst case is just a retry. I am not aware of the retry limit,
+> > is it in the PCIe spec? I cannot find it.  
 > 
-> This is something that was discussed earlier and suggested by
-> Jean-Philippe that we may need to support several versions of the ABI
-> (typicallu when adding PRI support).
-> Exposing multiple region is an interesting idea and I will explore that
-> direction.
-> >   
-> >> +
-> >> +static int vfio_pci_fault_prod_add_capability(struct vfio_pci_device *vdev,
-> >> +		struct vfio_pci_region *region, struct vfio_info_cap *caps)
-> >> +{
-> >> +	struct vfio_region_info_cap_fault cap = {
-> >> +		.header.id = VFIO_REGION_INFO_CAP_PRODUCER_FAULT,
-> >> +		.header.version = 1,
-> >> +		.version = NR_FAULT_ABIS,
-> >> +	};
-> >> +	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
-> >> +}
-> >> +
-> >> +static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
-> >> +	.rw		= vfio_pci_fault_cons_rw,
-> >> +	.release	= vfio_pci_fault_release,
-> >> +};
-> >> +
-> >> +static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
-> >> +	.rw		= vfio_pci_fault_prod_rw,
-> >> +	.release	= vfio_pci_fault_release,
-> >> +	.add_capability = vfio_pci_fault_prod_add_capability,
-> >> +};
-> >> +
-> >> +static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
-> >> +{
-> >> +	struct vfio_region_fault_prod *header;
-> >> +	int ret;
-> >> +
-> >> +	mutex_init(&vdev->fault_queue_lock);
-> >> +
-> >> +	vdev->fault_pages = kzalloc(3 * PAGE_SIZE, GFP_KERNEL);
-> >> +	if (!vdev->fault_pages)
-> >> +		return -ENOMEM;
-> >> +
-> >> +	ret = vfio_pci_register_dev_region(vdev,
-> >> +		VFIO_REGION_TYPE_NESTED,
-> >> +		VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD,
-> >> +		&vfio_pci_fault_prod_regops, 2 * PAGE_SIZE,
-> >> +		VFIO_REGION_INFO_FLAG_READ, vdev->fault_pages);  
-> > 
-> > If mmap isn't supported yet, why are we pushing the queue out to the
-> > 2nd page?  We're just wasting space.  vfio_region_fault_prod.offset
-> > allows us to relocate it when/if it is mmap capable.  
-> OK. mmap capability is introduced in 27/29 though.
-> >   
-> >> +	if (ret)
-> >> +		goto out;
-> >> +
-> >> +	ret = vfio_pci_register_dev_region(vdev,
-> >> +		VFIO_REGION_TYPE_NESTED,
-> >> +		VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS,
-> >> +		&vfio_pci_fault_cons_regops,
-> >> +		sizeof(struct vfio_region_fault_cons),
-> >> +		VFIO_REGION_INFO_FLAG_WRITE,
-> >> +		vdev->fault_pages + 2 * PAGE_SIZE);  
-> > 
-> > What's the remaining (PAGE_SIZE - sizeof(struct vfio_region_fault_cons))
-> > bytes used for?  
-> They are not used.
-
-So we probably don't want to allocate a full page for it.  Seems little
-reason to separate by pages when mmap is not supported anyway.
- 
-> >> +	if (ret)
-> >> +		goto out;
-> >> +
-> >> +	header = (struct vfio_region_fault_prod *)vdev->fault_pages;
-> >> +	header->version = -1;
-> >> +	header->offset = PAGE_SIZE;
-> >> +	return 0;
-> >> +out:
-> >> +	kfree(vdev->fault_pages);
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +int vfio_pci_check_cons_fault(struct vfio_pci_device *vdev,
-> >> +			     struct vfio_region_fault_cons *cons_header)
-> >> +{
-> >> +	struct vfio_region_fault_prod *prod_header =
-> >> +		(struct vfio_region_fault_prod *)vdev->fault_pages;
-> >> +
-> >> +	if (cons_header->version > NR_FAULT_ABIS)
-> >> +		return -EINVAL;
-> >> +
-> >> +	if (!vdev->fault_abi) {
-> >> +		vdev->fault_abi = cons_header->version;
-> >> +		prod_header->entry_size =
-> >> +			fault_abi_versions[vdev->fault_abi - 1].entry_size;
-> >> +		prod_header->nb_entries = PAGE_SIZE / prod_header->entry_size;  
-> > 
-> > Is this sufficient for 4K hosts?  Clearly a 64K host has 16x the number
-> > of entries, so if this is a heuristic the results are vastly different.  
-> This series only deals with unrecoverable errors. We don't expect many
-> of them so I did not consider the need to have a more complicated
-> heuristic. Now if we consider the PRI use case we need to reconsider the
-> size of the fault queue. If this feature is introduced later with a new
-> region type, then we can handle this later?
+> I don't think so, it's the implementation's choice. In general I don't
+> think devices will have a retry limit, but it doesn't seem like the
+> PCI spec prevents them from implementing one either. It could be
+> useful to stop retrying after a certain number of faults, for
+> preventing livelocks when the OS doesn't fix up the page tables and
+> the device would just repeat the fault indefinitely.
 > 
-> Practically the event queue size is set by the guest SMMUv3 driver and
-> trapped at the SMMUV3 QEMU device level. So we could communicate this
-> info through IOMMU MR notifiers but that's a rather complicated chain
-> and I would rather avoid that complexity if not necessary.
+> > I think we should just document it, similar to having a spurious
+> > interrupt. The PRQ trace event should capture that as well.
+> >   
+> >> * otherwise the endpoint won't retry the access, and could also
+> >> disable PRI if the status is failure.
+> >>  
+> > That would be true regardless this race condition with handler
+> > registration. So should be fine.  
+> 
+> We do give an invalid response for the old PRG (because of
+> unregistering), but also for the new one, which has a different
+> address that the guest might be able to page in and would normally
+> return success.
+> 
+> >>> We need a way to reject such page response belong
+> >>> to the previous life of the handler. Perhaps a sync call to the
+> >>> guest with your fault queue eventfd? I am not sure.    
+> >>
+> >> We could simply expect the device driver not to send any page
+> >> response after unregistering the fault handler. Is there any
+> >> reason VFIO would need to unregister and re-register the fault
+> >> handler on a live guest? 
+> > There is no reason for VFIO to unregister and register again, I was
+> > just thinking from security perspective. Someone could write a VFIO
+> > app do this attack. But I agree the damage is within the device,
+> > may get PRI disabled as a result.  
+> 
+> Yes I think the damage would always be contained within the
+> misbehaving software
+> 
+> > So it seems we agree on the following:
+> > - iommu_unregister_device_fault_handler() will never fail
+> > - iommu driver cleans up all pending faults when handler is
+> > unregistered
+> > - assume device driver or guest not sending more page response
+> > _after_ handler is unregistered.
+> > - system will tolerate rare spurious response
+> > 
+> > Sounds right?  
+> 
+> Yes, I'll add that to the fault series
+Hold on a second please, I think we need more clarifications. Ashok
+pointed out to me that the spurious response can be harmful to other
+devices when it comes to mdev, where PRQ group id is not per PASID,
+device may reuse the group number and receiving spurious page response
+can confuse the entire PF. Having spurious page response is also not
+abiding the PCIe spec. exactly.
 
-I'd hope that this interface accounts for both errors and page mapping
-requests and that things like queue size are specified in the user
-interface to account for these sorts of differences.  Thanks,
+We have two options here:
+1. unregister handler will get -EBUSY if outstanding fault exists.
+	-PROs: block offending device unbind only, eventually timeout
+	will clear.
+	-CONs: flooded faults can prevent clearing
+2. unregister handle will block until all faults are clear in the host.
+   Never fails unregistration
+	-PROs: simple flow for VFIO, no need to worry about device
+	holding reference.
+	-CONs: spurious page response may come from
+	misbehaving/malicious guest if guest does unregister and
+	register back to back.
+It seems the only way to prevent spurious page response is to introduce
+a SW token or sequence# for each PRQ that needs a response. I still
+think option 2 is good.
 
-Alex
+Consider the following time line:
+decoding
+ PR#: page request
+ G#:  group #
+ P#:  PASID
+ S#:  sequence #
+ A#:  address
+ PS#: page response
+ (F): Fail
+ (S): Success
+
+# Dev		Host		VFIO/QEMU	Guest
+===========================================================	
+1				<-reg(handler)
+2 PR1G1S1A1	->		inject	->	PR1G1S1A1
+3 PR2G1S2A2	->		inject	->	PR2G1S2A2
+4.				<-unreg(handler)
+5.	<-PR1G1S1A1(F)			| 
+6.	<-PR2G1S2A2(F)			V
+7.				<-unreg(handler)
+8.				<-reg(handler)
+9 PR3G1S3A1	->		inject	->	PR3G1S3A1
+10.						<-PS1G1S1A1
+11.		<reject S1>
+11.		<accept S3>			<-PS3G1S3A1
+12.PS3G1S3A1(S)
+
+The spurious page response comes in at step 10 where the guest sends
+response for the request in step 1. But since the sequence # is 1, host
+IOMMU driver will reject it. At step 11, we accept page response for
+the matching sequence # then respond SUCCESS to the device.
+
+So would it be OK to add this sequence# to iommu_fault and page
+response, or could event reuse the time stamp for that purpose.
+
+
+Jacob
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
