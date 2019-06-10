@@ -2,58 +2,56 @@ Return-Path: <SRS0=ZPOc=UJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C26C31E40
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 16:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B34C31E40
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 16:24:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E66220820
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 16:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E66220820
+	by mail.kernel.org (Postfix) with ESMTP id 58B9D20859
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 16:24:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B9D20859
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA9F84A508;
-	Mon, 10 Jun 2019 12:05:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFCA74A520;
+	Mon, 10 Jun 2019 12:24:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iJioW-EBGRep; Mon, 10 Jun 2019 12:05:29 -0400 (EDT)
+	with ESMTP id Ywje7KWgeK1g; Mon, 10 Jun 2019 12:24:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FBA34A509;
-	Mon, 10 Jun 2019 12:05:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 745824A4F7;
+	Mon, 10 Jun 2019 12:24:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D2254A507
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 12:05:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02E0D4A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 12:24:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3R7U2hnUggqG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jun 2019 12:05:27 -0400 (EDT)
+ with ESMTP id Iq5pMifBUG-g for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jun 2019 12:24:37 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 599F34A4F7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 12:05:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9344A509
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 12:24:37 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2011344;
- Mon, 10 Jun 2019 09:05:26 -0700 (PDT)
-Received: from [10.1.196.93] (en101.cambridge.arm.com [10.1.196.93])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E941F3F246;
- Mon, 10 Jun 2019 09:05:25 -0700 (PDT)
-Subject: Re: [PATCH v8 6/6] KVM: arm/arm64: support chained PMU counters
-To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com
-References: <20190522153019.18645-1-andrew.murray@arm.com>
- <20190522153019.18645-7-andrew.murray@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <72be95b6-e34b-2a04-d503-10399da09afc@arm.com>
-Date: Mon, 10 Jun 2019 17:05:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10BDA337;
+ Mon, 10 Jun 2019 09:24:37 -0700 (PDT)
+Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5C183F246;
+ Mon, 10 Jun 2019 09:24:35 -0700 (PDT)
+From: James Morse <james.morse@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/6] KVM: arm64: Account host/guest SError more precisely
+ (Neoverse-N1 #1349291)
+Date: Mon, 10 Jun 2019 17:24:21 +0100
+Message-Id: <20190610162427.115910-1-james.morse@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190522153019.18645-7-andrew.murray@arm.com>
-Content-Language: en-US
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,69 +63,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Andrew,
+Hello,
 
-> @@ -398,27 +531,43 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->   
->   	/* Software increment event does't need to be backed by a perf event */
->   	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR &&
-> -	    select_idx != ARMV8_PMU_CYCLE_IDX)
-> +	    pmc->idx != ARMV8_PMU_CYCLE_IDX)
->   		return;
->   
->   	memset(&attr, 0, sizeof(struct perf_event_attr));
->   	attr.type = PERF_TYPE_RAW;
->   	attr.size = sizeof(attr);
->   	attr.pinned = 1;
-> -	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, select_idx);
-> +	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
->   	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
->   	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
->   	attr.exclude_hv = 1; /* Don't count EL2 events */
->   	attr.exclude_host = 1; /* Don't count host events */
-> -	attr.config = (select_idx == ARMV8_PMU_CYCLE_IDX) ?
-> +	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
->   		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
->   
-> -	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
-> -	/* The initial sample period (overflow count) of an event. */
-> -	attr.sample_period = (-counter) & GENMASK(31, 0);
-> +	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> +
-> +	if (kvm_pmu_idx_has_chain_evtype(vcpu, pmc->idx)) {
-> +		/**
-> +		 * The initial sample period (overflow count) of an event. For
-> +		 * chained counters we only support overflow interrupts on the
-> +		 * high counter.
-> +		 */
-> +		attr.sample_period = (-counter) & GENMASK(63, 0);
-> +		event = perf_event_create_kernel_counter(&attr, -1, current,
-> +							 kvm_pmu_perf_overflow,
-> +							 pmc + 1);
->   
-> -	event = perf_event_create_kernel_counter(&attr, -1, current,
-> +		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
-> +			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
-> +	} else {
-> +		/* The initial sample period (overflow count) of an event. */
-> +		attr.sample_period = (-counter) & GENMASK(31, 0);
-> +		event = perf_event_create_kernel_counter(&attr, -1, current,
->   						 kvm_pmu_perf_overflow, pmc);
-> +	}
-> +
+This series started as a workaround for Neoverse-N1 #1349291, but has
+become an improvement in RAS error accounting for KVM on arm64.
 
-If this was the Cycle counter and t he PMCR_LC was set, shouldn't we be using
-64bit mask here ? We fall back to using the Cycle counter in 64bit mode for
-"normal" (read guest) kernel. So shouldn't we reflect that here ?
+Neoverse-N1 affected by #1349291 may report an Uncontained RAS Errors
+as Unrecoverable. [0] This is the difference between killing the thread and
+killing the machine.
+The workaround is to treat all Unrecoverable SError as Uncontained.
+The arch code's SError handling already does this, due to its nascent
+kernel-first support.
 
-Rest looks fine to me.
+So only KVM needs some work as it has its own SError handling as we want
+KVM to handle guest:SError and the host to handle host:SError.
 
-Suzuki
+Instead of working around the errata in KVM, we account SError as precisely
+as we can instead. This means moving the ESB-instruction into the guest-exit
+vectors, and deferring guest-entry if there is an SError pending. (so that the
+host's existing handling takes it).
+
+
+Changes since v1:
+ * Squashed v1:patch5 into v2:patch4. v1:patch6 to be posted separately.
+ * Dropped all the performance numbers.
+ * Added patch1, making the ESB macro emit a nop if the kconfig feature
+   is disabled.
+ * Tried to formalise the indirect vectors preamble a little more to
+   make changes easier to review
+ * Added preamble size checks to the invalid vector entries.
+ * Pulled the size check out as a macro now there are two invocations.
+
+Thanks,
+
+James
+
+[0] account-required: https://developer.arm.com/docs/sden885747/latest/arm-neoverse-n1-mp050-software-developer-errata-notice
+
+[v1] https://lore.kernel.org/linux-arm-kernel/20190604144551.188107-1-james.morse@arm.com/
+
+James Morse (6):
+  arm64: assember: Switch ESB-instruction with a vanilla nop if
+    !ARM64_HAS_RAS
+  KVM: arm64: Abstract the size of the HYP vectors pre-amble
+  KVM: arm64: Make indirect vectors preamble behaviour symmetric
+  KVM: arm64: Consume pending SError as early as possible
+  KVM: arm64: Defer guest entry when an asynchronous exception is
+    pending
+  arm64: Update silicon-errata.txt for Neoverse-N1 #1349291
+
+ Documentation/arm64/silicon-errata.txt |  1 +
+ arch/arm64/include/asm/assembler.h     |  4 ++++
+ arch/arm64/include/asm/kvm_asm.h       |  6 ++++++
+ arch/arm64/kernel/traps.c              |  4 ++++
+ arch/arm64/kvm/hyp/entry.S             | 19 +++++++++++++---
+ arch/arm64/kvm/hyp/hyp-entry.S         | 30 +++++++++++++++++++++-----
+ arch/arm64/kvm/va_layout.c             |  7 +++---
+ 7 files changed, 59 insertions(+), 12 deletions(-)
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
