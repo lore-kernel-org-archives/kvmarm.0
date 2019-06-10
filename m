@@ -2,59 +2,75 @@ Return-Path: <SRS0=ZPOc=UJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F59C282DD
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 11:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175EAC468C1
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 12:45:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7A4732085A
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 11:39:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4732085A
+	by mail.kernel.org (Postfix) with ESMTP id A264F20862
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 12:45:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A264F20862
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7DFE4A513;
-	Mon, 10 Jun 2019 07:39:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE434A510;
+	Mon, 10 Jun 2019 08:45:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D39YNYU+kL4d; Mon, 10 Jun 2019 07:39:14 -0400 (EDT)
+	with ESMTP id 6nvQhvYsTdMH; Mon, 10 Jun 2019 08:45:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C46E4A50B;
-	Mon, 10 Jun 2019 07:39:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4574A512;
+	Mon, 10 Jun 2019 08:45:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBD054A505
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 07:39:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79EC04A50C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 08:45:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TWIbren6kgtH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jun 2019 07:39:12 -0400 (EDT)
+ with ESMTP id ZjtcZNt4iNZR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jun 2019 08:45:31 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E454A4E6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 07:39:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E71CA4A4E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 08:45:30 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0842D337;
- Mon, 10 Jun 2019 04:39:12 -0700 (PDT)
-Received: from fuggles.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB7753F557;
- Mon, 10 Jun 2019 04:40:52 -0700 (PDT)
-Date: Mon, 10 Jun 2019 12:39:08 +0100
-From: Will Deacon <will.deacon@arm.com>
-To: Andrew Murray <andrew.murray@arm.com>
-Subject: Re: [PATCH v8 4/6] arm64: perf: extract chain helper into header
-Message-ID: <20190610113908.GE15979@fuggles.cambridge.arm.com>
-References: <20190522153019.18645-1-andrew.murray@arm.com>
- <20190522153019.18645-5-andrew.murray@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37699337;
+ Mon, 10 Jun 2019 05:45:30 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7430B3F557;
+ Mon, 10 Jun 2019 05:45:28 -0700 (PDT)
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+ <20190607104301.6b1bbd74@jacob-builder>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+Date: Mon, 10 Jun 2019 13:45:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190522153019.18645-5-andrew.murray@arm.com>
-User-Agent: Mutt/1.11.1+86 (6f28e57d73f2) ()
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190607104301.6b1bbd74@jacob-builder>
+Content-Language: en-US
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ Vincent Stehle <Vincent.Stehle@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ Robin Murphy <Robin.Murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,54 +87,133 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, May 22, 2019 at 04:30:17PM +0100, Andrew Murray wrote:
-> The ARMv8 Performance Monitors Extension includes an architectural
-> event type named CHAIN which allows for chaining counters together.
-> 
-> Let's extract the test for this event into a header file such that
-> other users, such as KVM (for PMU emulation) can make use of.
-> 
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/perf_event.h | 5 +++++
->  arch/arm64/kernel/perf_event.c      | 2 +-
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-> index c593761ba61c..cd13f3fd1055 100644
-> --- a/arch/arm64/include/asm/perf_event.h
-> +++ b/arch/arm64/include/asm/perf_event.h
-> @@ -219,6 +219,11 @@
->  #define ARMV8_PMU_USERENR_CR	(1 << 2) /* Cycle counter can be read at EL0 */
->  #define ARMV8_PMU_USERENR_ER	(1 << 3) /* Event counter can be read at EL0 */
->  
-> +static inline bool armv8pmu_evtype_is_chain(u64 evtype)
-> +{
-> +	return (evtype == ARMV8_PMUV3_PERFCTR_CHAIN);
-> +}
-> +
->  #ifdef CONFIG_PERF_EVENTS
->  struct pt_regs;
->  extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> index 314b1adedf06..265bd835a724 100644
-> --- a/arch/arm64/kernel/perf_event.c
-> +++ b/arch/arm64/kernel/perf_event.c
-> @@ -879,7 +879,7 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
->  static int armv8pmu_filter_match(struct perf_event *event)
->  {
->  	unsigned long evtype = event->hw.config_base & ARMV8_PMU_EVTYPE_EVENT;
-> -	return evtype != ARMV8_PMUV3_PERFCTR_CHAIN;
-> +	return !armv8pmu_evtype_is_chain(evtype);
+On 07/06/2019 18:43, Jacob Pan wrote:
+>>> So it seems we agree on the following:
+>>> - iommu_unregister_device_fault_handler() will never fail
+>>> - iommu driver cleans up all pending faults when handler is
+>>> unregistered
+>>> - assume device driver or guest not sending more page response
+>>> _after_ handler is unregistered.
+>>> - system will tolerate rare spurious response
+>>>
+>>> Sounds right?  
+>>
+>> Yes, I'll add that to the fault series
+> Hold on a second please, I think we need more clarifications. Ashok
+> pointed out to me that the spurious response can be harmful to other
+> devices when it comes to mdev, where PRQ group id is not per PASID,
+> device may reuse the group number and receiving spurious page response
+> can confuse the entire PF. 
 
-Acked-by: Will Deacon <will.deacon@arm.com>
+I don't understand how mdev differs from the non-mdev situation (but I
+also still don't fully get how mdev+PASID will be implemented). Is the
+following the case you're worried about?
 
-Although if the definition of armv8pmu_evtype_is_chain() isn't going to
-get any more complicated than a single evtype comparison, I'm not sure it's
-worth this abstraction, to be honest.
+  M#: mdev #
 
-Will
+# Dev         Host        mdev drv       VFIO/QEMU        Guest
+====================================================================
+1                     <- reg(handler)
+2 PR1 G1 P1    ->         M1 PR1 G1        inject ->     M1 PR1 G1
+3                     <- unreg(handler)
+4       <- PS1 G1 P1 (F)      |
+5                        unreg(handler)
+6                     <- reg(handler)
+7 PR2 G1 P1    ->         M2 PR2 G1        inject ->     M2 PR2 G1
+8                                                     <- M1 PS1 G1
+9         accept ??    <- PS1 G1 P1
+10                                                    <- M2 PS2 G1
+11        accept       <- PS2 G1 P1
+
+
+Step 2 injects PR1 for mdev#1. Step 4 auto-responds to PR1. Between
+steps 5 and 6, we re-allocate PASID #1 for mdev #2. At step 7, we inject
+PR2 for mdev #2. Step 8 is the spurious Page Response for PR1.
+
+But I don't think step 9 is possible, because the mdev driver knows that
+mdev #1 isn't using PASID #1 anymore. If the configuration is valid at
+all (a page response channel still exists for mdev #1), then mdev #1 now
+has a different PASID, e.g. #2, and step 9 would be "<- PS1 G1 P2" which
+is rejected by iommu.c (no such pending page request). And step 11 will
+be accepted.
+
+If PASIDs are allocated through VCMD, then the situation seems similar:
+at step 2 you inject "M1 PR1 G1 P1" into the guest, and at step 8 the
+spurious response is "M1 PS1 G1 P1". If mdev #1 doesn't have PASID #1
+anymore, then the mdev driver can check that the PASID is invalid and
+can reject the page response.
+
+> Having spurious page response is also not
+> abiding the PCIe spec. exactly.
+
+We are following the PCI spec though, in that we don't send page
+responses for PRGIs that aren't in flight.
+
+> We have two options here:
+> 1. unregister handler will get -EBUSY if outstanding fault exists.
+> 	-PROs: block offending device unbind only, eventually timeout
+> 	will clear.
+> 	-CONs: flooded faults can prevent clearing
+> 2. unregister handle will block until all faults are clear in the host.
+>    Never fails unregistration
+
+Here the host completes the faults itself or wait for a response from
+the guest? I'm slightly confused by the word "blocking". I'd rather we
+don't introduce an uninterruptible sleep in the IOMMU core, since it's
+unlikely to ever finish if we rely on the guest to complete things.
+
+> 	-PROs: simple flow for VFIO, no need to worry about device
+> 	holding reference.
+> 	-CONs: spurious page response may come from
+> 	misbehaving/malicious guest if guest does unregister and
+> 	register back to back.
+
+> It seems the only way to prevent spurious page response is to introduce
+> a SW token or sequence# for each PRQ that needs a response. I still
+> think option 2 is good.
+> 
+> Consider the following time line:
+> decoding
+>  PR#: page request
+>  G#:  group #
+>  P#:  PASID
+>  S#:  sequence #
+>  A#:  address
+>  PS#: page response
+>  (F): Fail
+>  (S): Success
+> 
+> # Dev		Host		VFIO/QEMU	Guest
+> ===========================================================	
+> 1				<-reg(handler)
+> 2 PR1G1S1A1	->		inject	->	PR1G1S1A1
+> 3 PR2G1S2A2	->		inject	->	PR2G1S2A2
+> 4.				<-unreg(handler)
+> 5.	<-PR1G1S1A1(F)			| 
+> 6.	<-PR2G1S2A2(F)			V
+> 7.				<-unreg(handler)
+> 8.				<-reg(handler)
+> 9 PR3G1S3A1	->		inject	->	PR3G1S3A1
+> 10.						<-PS1G1S1A1
+> 11.		<reject S1>
+> 11.		<accept S3>			<-PS3G1S3A1
+> 12.PS3G1S3A1(S)
+> 
+> The spurious page response comes in at step 10 where the guest sends
+> response for the request in step 1. But since the sequence # is 1, host
+> IOMMU driver will reject it. At step 11, we accept page response for
+> the matching sequence # then respond SUCCESS to the device.
+> 
+> So would it be OK to add this sequence# to iommu_fault and page
+> response, or could event reuse the time stamp for that purpose.
+
+With a PV interface we can do what we want, but it can't work with an
+IOMMU emulation that only has 9 bits for the PRGI. I suppose we can add
+the sequence number but we'll have to handle the case where it isn't
+present in the page response (ie. accept it anyway).
+
+Thanks,
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
