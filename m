@@ -1,65 +1,92 @@
-Return-Path: <SRS0=IwiB=UI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ZPOc=UJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6374FC28EBD
-	for <kvmarm@archiver.kernel.org>; Sun,  9 Jun 2019 17:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D16C468C1
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 06:06:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D1D13206BB
-	for <kvmarm@archiver.kernel.org>; Sun,  9 Jun 2019 17:40:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D13206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 96C2020820
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 06:06:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JivEgBVu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96C2020820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2E14A4A9;
-	Sun,  9 Jun 2019 13:40:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E55224A516;
+	Mon, 10 Jun 2019 02:06:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vkzoiu1jCEK4; Sun,  9 Jun 2019 13:40:29 -0400 (EDT)
+	with ESMTP id TPF9HnETu5Y9; Mon, 10 Jun 2019 02:06:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBD454A4BE;
-	Sun,  9 Jun 2019 13:40:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2EF74A4E1;
+	Mon, 10 Jun 2019 02:06:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC6544A4BE
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Jun 2019 13:40:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F1D14A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 02:06:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pv+CCJ4LGzS8 for <kvmarm@lists.cs.columbia.edu>;
- Sun,  9 Jun 2019 13:40:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32AE94A4A9
- for <kvmarm@lists.cs.columbia.edu>; Sun,  9 Jun 2019 13:40:26 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C8CD308218D;
- Sun,  9 Jun 2019 17:40:25 +0000 (UTC)
-Received: from ultra.random (ovpn-120-29.rdu2.redhat.com [10.10.120.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA72119729;
- Sun,  9 Jun 2019 17:40:24 +0000 (UTC)
-Date: Sun, 9 Jun 2019 13:40:24 -0400
-From: Andrea Arcangeli <aarcange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Reference count on pages held in secondary MMUs
-Message-ID: <20190609174024.GA4785@redhat.com>
-References: <20190609081805.GC21798@e113682-lin.lund.arm.com>
- <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
+ with ESMTP id vWx8wNIwWwTe for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jun 2019 02:06:41 -0400 (EDT)
+Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com
+ [209.85.210.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33AD54A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 02:06:41 -0400 (EDT)
+Received: by mail-pf1-f193.google.com with SMTP id t16so4621727pfe.11
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 09 Jun 2019 23:06:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/Dkvj991Uhw/1cfRgxPNcyrHB69xx77ySHEyTXjhqvA=;
+ b=JivEgBVuc6FZ4RjN29MeUE/bi4q5QoB1acpQCvG8UpXZhGQxck6vFiqw3+HjTh4Z5W
+ 2K4vQW/5irgR3BnFrr6hbyNMNs+TGlC5gFHh39gF46VAA6T3UWprM0IpMfaexBbj7klS
+ C0Urd0dp0FU36novirPjriUnM1bK4c4qYvHL5ciE28lX6N/I6tkzuWewsiYx41IgwElK
+ 8EN8i0ved+yvkXSHOyHWnRxljY31ztw1L4wSWA9XJg4P1lxb+WrzDxCzsVGJ9b6EpCpr
+ lNF96CTDQxEDstXRPOrYiz/mixGYEg9zIzZHwEFO467O4vSldUCZJuNfgCWnHkneFL4s
+ oaew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/Dkvj991Uhw/1cfRgxPNcyrHB69xx77ySHEyTXjhqvA=;
+ b=P+to+lhqhRsY+SE9EDCBDgCoZr6JyQbBrMklEFXJt2+4fa1E/jAxK68rXr8aH68sot
+ H4KdcabH2WeILUj+t2KdxRT+fwmoRKIkLdjLjULSGyMTuzoDRU2G9Bf1PDd9mvoBMe17
+ j+RCb3EghHRzrowrHlm6VIpZ0zkILA0lOnbhyO69MgTR8YwgPWROGJgzYqfo2SWPnEzv
+ KuegnKUTg4vrAV9MCxP4CBfbscuCycqzAlSLJCG8c76WW3d8hp1ipYvXSlHitI7ou6KY
+ hc/8O2KplwUScltlOmbVg3ahFD4oLRRj+TSslHb5qjgyz8U0+EtOXtuEeLz6Wc80ZoUB
+ oong==
+X-Gm-Message-State: APjAAAXuAa7fPoziffnhnI0Df/WoVZb1RNsOABlLreSr8rmNnIw4PENN
+ zb5ed5sa3WHWcWGKPZz8F4ilIQ==
+X-Google-Smtp-Source: APXvYqwLbTkJ83xIZQSN0X41sV2Qx5mmIUMQI8suaFwh1ovaQIunxZGLx5yEKCwIgFShFJqoprwhXg==
+X-Received: by 2002:a62:2643:: with SMTP id m64mr70607053pfm.46.1560146800022; 
+ Sun, 09 Jun 2019 23:06:40 -0700 (PDT)
+Received: from localhost ([122.172.66.84])
+ by smtp.gmail.com with ESMTPSA id 26sm9290214pfi.147.2019.06.09.23.06.38
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 09 Jun 2019 23:06:38 -0700 (PDT)
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Dave Martin <Dave.Martin@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ James Morse <james.morse@arm.com>, Julien Thierry <julien.thierry@arm.com>,
+ Suzuki K Pouloze <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>
+Subject: [PATCH V2] KVM: arm64: Implement vq_present() as a macro
+Date: Mon, 10 Jun 2019 11:36:33 +0530
+Message-Id: <7c2590c4d8cc95cd40bbb05c0d0c5e2b0735a16b.1560145715.git.viresh.kumar@linaro.org>
+X-Mailer: git-send-email 2.21.0.rc0.269.g1a574e7a288b
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Sun, 09 Jun 2019 17:40:25 +0000 (UTC)
-Cc: Jerome Glisse <jglisse@redhat.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Viresh Kumar <viresh.kumar@linaro.org>,
+ Vincent Guittot <vincent.guittot@linaro.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,139 +103,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello,
+This routine is a one-liner and doesn't really need to be function and
+should be rather implemented as a macro.
 
-On Sun, Jun 09, 2019 at 11:37:19AM +0200, Paolo Bonzini wrote:
-> On 09/06/19 10:18, Christoffer Dall wrote:
-> > In some sense, we are thus maintaining a 'hidden', or internal,
-> > reference to the page, which is not counted anywhere.
-> > 
-> > I am wondering if it would be equally valid to take a reference on the
-> > page, and remove that reference when unmapping via MMU notifiers, and if
-> > so, if there would be any advantages/drawbacks in doing so?
-> 
-> If I understand correctly, I think the MMU notifier would not fire if
-> you took an actual reference; the page would be pinned in memory and
-> could not be swapped out.
+Suggested-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+---
+V1->V2:
+- The previous implementation was fixing a compilation error that
+  occurred only with old compilers (from 2015) due to a bug in the
+  compiler itself.
 
-MMU notifiers still fires, the refcount is simple and can be dropped
-also in the mmu notifier invalidate and in fact Jerome also thinks
-like me that we should eventually optimize away the FOLL_GET and not
-take the refcount in the first place, but a whole different chapter is
-dedicated on the set_page_dirty_lock crash on MAP_SHARED mappings
-after long term GUP pins. So since you're looking into how to handle
-the page struct in the MMU notifier it's worth mentioning the issues
-related to set_page_dirty too.
+- Dave suggested to rather implement this as a macro which made more
+  sense.
 
-To achieve the cleanest writeback fix to avoid crashes in
-set_page_dirty_lock on long term secondary MMU mappings that supports
-MMU notifier like KVM shadow MMU, the ideal is to mark the page dirty
-before establishing a writable the mapping in the secondary MMU like
-in the model below.
+ arch/arm64/kvm/guest.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-The below solution works also for those secondary MMU that are like a
-TLB and if there are two concurrent invalidates on the same page
-invoked at the same time (a potential problem Jerome noticed), you
-don't know which come out first and you would risk to call
-set_page_dirty twice, which would be still potentially kernel crashing
-(even if only a theoretical issue like O_DIRECT). So the below model
-will solve that and it's also valid for KVM/vhost accelleration,
-despite KVM can figure out how to issue a single set_page_dirty call
-for each spte that gets invalidated by concurrent invalidates on the
-same page because it has shadow pagetables and it's not just a TLB.
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 3ae2f82fca46..a429ed36a6a0 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -207,13 +207,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 
+ #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+ #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+-
+-static bool vq_present(
+-	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
+-	unsigned int vq)
+-{
+-	return (*vqs)[vq_word(vq)] & vq_mask(vq);
+-}
++#define vq_present(vqs, vq) ((*(vqs))[vq_word(vq)] & vq_mask(vq))
+ 
+ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+-- 
+2.21.0.rc0.269.g1a574e7a288b
 
-  access = FOLL_WRITE|FOLL_GET
-
-repeat:
-  page = gup(access)
-  put_page(page)
-
-  spin_lock(mmu_notifier_lock);
-  if (race with invalidate) {
-    spin_unlock..
-    goto repeat;
-  }
-  if (access == FOLL_WRITE)
-    set_page_dirty(page)
-  establish writable mapping in secondary MMU on page
-  spin_unlock
-
-The above solves the crash in set_page_dirty_lock without having to
-modify any filesystem, it should work theoretically safer than the
-O_DIRECT short term GUP pin.
-
-With regard to KVM this should be enough, but we also look for a crash
-avoidance solution for those devices that cannot support the MMU
-notifier for short and long term GUP pins.
-
-There's lots of work going on on linux-mm, to try to let those devices
-support writeback in a safe way (also with stable pages so all fs
-integrity checks will pass) using bounce buffer if a long term GUP pin
-is detected by the filesystem. In addition there's other work to make
-the short term GUP pin theoretically safe by delaying the writeback
-for the short window the GUP pin is taken by O_DIRECT, so it becomes
-theoretically safe too (currently it's only practically safe).
-
-However I'm not sure if the long term GUP pins really needs to support
-writeback.
-
-To do a coherent snapshot without talking to the device so that it
-stops writing to the whole mapping, one should write protect the
-memory, but it can't be write protected without MMU notifier
-support.. The VM already wrprotect the MAP_SHARED pages before writing
-them out to provide stable pages, but that's just not going to work
-with a long term GUP pin that mapped the page as writable in the
-device.
-
-To make a practical example: if the memory under long term GUP pin
-would be a KVM guest physical memory mapped in MAP_SHARED with
-vfio/iommu device assignment and if the device or iommu can't support
-the MMU notifier, there's no value in the filesystem being able to
-flush the guest physical memory to disk periodically, because if the
-write-able GUP pin can't be dropped first, it's impossible to take a
-coherent snapshot of the guest physical memory while the device can
-still write anywhere in the KVM guest physical memory. Whatever gets
-written by the complex logic that will do the bounce buffers would be
-just useless for this use case. If the system crashed, you couldn't
-possibly start a new guest and pretend that whatever got written was a
-coherent snapshot of the guest physical memory. To take a coherent
-snapshot KVM needs to tell the device to stop writing, and only then
-flush the dirty data in the MAP_SHARED to disk, just calling mprotect
-won't be enough because that won't get rid of the device writable
-mapping associated with the long term GUP pin. But if it has to do
-that, it can also tell the device to temporarily drop the iommu
-mapping, drop all the GUP pins and to re-take the GUP pins and remap
-the guest in the iommu only after the data already hit the disk, to
-mark all pages dirty again. So I suppose lots of other use cases would
-work like this.
-
-If the data written by the device through the long term GUP pin,
-doesn't need to be coherent (perhaps if the data is structured like a
-rotating debug logfile) or if it's coherent down to the smallest size
-the device can write with its DMA, then there would be some value in
-being able to flush the data without stopping the device from writing
-to it.
-
-Overall it might be just enough to keep things simpler in the kernel
-filesystems and define that long term GUP pins without MMU notifier,
-don't ever get written to disk until the GUP pin is dropped, so all
-GUP pin will work the same and the O_DIRECT solution can be applied to
-long term GUP pins too. Any device requiring a long term GUP pin to
-operate, requires some special setup with root capability so among the
-other special things it does, its userland could also orchestrate
-periodic unpinning, to flush the MAP_SHARED dirty data to disk, if the
-data written by the device through the long term GUP pin cannot be
-lost after a power loss or a kernel crash.
-
-Either that or it'd be interesting to know exactly what are the uses
-cases that requires long term GUP pinned MAP_SHARED pages to remain
-writeback capable, to justify the additional kernel complexity that
-such filesystem solution requires. Currently those same use cases would
-tend to be kernel crashing, so I suppose they're not very common use
-cases to begin with.
-
-Thanks,
-Andrea
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
