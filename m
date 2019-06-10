@@ -2,106 +2,78 @@ Return-Path: <SRS0=ZPOc=UJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5293DC31E40
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 17:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 374A5C4321A
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 21:28:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DFC4C20859
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 17:01:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC4C20859
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B29A72082E
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jun 2019 21:28:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29A72082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64A624A51F;
-	Mon, 10 Jun 2019 13:01:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 165524A4DF;
+	Mon, 10 Jun 2019 17:28:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RlGyCVASAQ4Z; Mon, 10 Jun 2019 13:01:29 -0400 (EDT)
+	with ESMTP id FfAPa7E6P9Ua; Mon, 10 Jun 2019 17:28:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F06C4A50C;
-	Mon, 10 Jun 2019 13:01:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FC814A4EB;
+	Mon, 10 Jun 2019 17:28:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 195AD4A4DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 13:01:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BB964A4EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 17:28:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kb7psSWfSg6W for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jun 2019 13:01:26 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F514A4D5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 13:01:26 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EA7B337;
- Mon, 10 Jun 2019 10:01:26 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 548623F246; Mon, 10 Jun 2019 10:01:25 -0700 (PDT)
-Subject: Re: [PATCH v2 5/6] KVM: arm64: Defer guest entry when an asynchronous
- exception is pending
-To: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-References: <20190610162427.115910-1-james.morse@arm.com>
- <20190610162427.115910-6-james.morse@arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <66f28d7f-0690-dd1f-f371-93dfb1827a9e@arm.com>
-Date: Mon, 10 Jun 2019 18:01:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ with ESMTP id nMV9e8y7Mqmr for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jun 2019 17:28:28 -0400 (EDT)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 187BE4A4DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jun 2019 17:28:28 -0400 (EDT)
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Jun 2019 14:28:26 -0700
+X-ExtLoop1: 1
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+ by orsmga005.jf.intel.com with ESMTP; 10 Jun 2019 14:28:26 -0700
+Date: Mon, 10 Jun 2019 14:31:34 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+Message-ID: <20190610143134.7bff96e9@jacob-builder>
+In-Reply-To: <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+ <20190607104301.6b1bbd74@jacob-builder>
+ <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190610162427.115910-6-james.morse@arm.com>
-Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ Vincent Stehle <Vincent.Stehle@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ jacob.jun.pan@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+ Robin Murphy <Robin.Murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -118,83 +90,158 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 10/06/2019 17:24, James Morse wrote:
-> SError that occur during world-switch's entry to the guest will be
-> accounted to the guest, as the exception is masked until we enter the
-> guest... but we want to attribute the SError as precisely as possible.
-> 
-> Reading DISR_EL1 before guest entry requires free registers, and using
-> ESB+DISR_EL1 to consume and read back the ESR would leave KVM holding
-> a host SError... We would rather leave the SError pending and let the
-> host take it once we exit world-switch. To do this, we need to defer
-> guest-entry if an SError is pending.
-> 
-> Read the ISR to see if SError (or an IRQ) is pending. If so fake an
-> exit. Place this check between __guest_enter()'s save of the host
-> registers, and restore of the guest's. SError that occur between
-> here and the ERET into the guest must have affected the guest's
-> registers, which we can naturally attribute to the guest.
-> 
-> The DSB is needed to ensure any previous writes have been done before
-> we read ISR_EL1. On systems without the v8.2 RAS extensions this
-> doesn't give us anything as we can't contain errors, and the ESR bits
-> to describe the severity are all implementation-defined. Replace
-> this with a nop for these systems.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
-> Changes since v1:
->  * Squashed later dsb/nop patch in here
-> 
->  arch/arm64/kvm/hyp/entry.S | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index 7863ec5266e2..a5a4254314a1 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -17,6 +17,7 @@
->  
->  #include <linux/linkage.h>
->  
-> +#include <asm/alternative.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/assembler.h>
->  #include <asm/fpsimdmacros.h>
-> @@ -63,6 +64,19 @@ ENTRY(__guest_enter)
->  	// Store the host regs
->  	save_callee_saved_regs x1
->  
-> +	// Now the host state is stored if we have a pending RAS SError it must
-> +	// affect the host. If any asyncronous exception is pending we defer
+On Mon, 10 Jun 2019 13:45:02 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-nit: asynchronous
-
-> +	// the guest entry. The DSB isn't necessary before v8.2 as any SError
-> +	// would be fatal.
-> +alternative_if ARM64_HAS_RAS_EXTN
-> +	dsb	nshst
-> +alternative_else_nop_endif
-> +	mrs	x1, isr_el1
-
-I guess this suffers from the same issue as in your other patch (the MSR
-can complete before the completion of the DSB).
-
-> +	cbz	x1,  1f
-> +	mov	x0, #ARM_EXCEPTION_IRQ
-> +	ret
-> +
-> +1:
->  	add	x18, x0, #VCPU_CONTEXT
->  
->  	// Macro ptrauth_switch_to_guest format:
+> On 07/06/2019 18:43, Jacob Pan wrote:
+> >>> So it seems we agree on the following:
+> >>> - iommu_unregister_device_fault_handler() will never fail
+> >>> - iommu driver cleans up all pending faults when handler is
+> >>> unregistered
+> >>> - assume device driver or guest not sending more page response
+> >>> _after_ handler is unregistered.
+> >>> - system will tolerate rare spurious response
+> >>>
+> >>> Sounds right?    
+> >>
+> >> Yes, I'll add that to the fault series  
+> > Hold on a second please, I think we need more clarifications. Ashok
+> > pointed out to me that the spurious response can be harmful to other
+> > devices when it comes to mdev, where PRQ group id is not per PASID,
+> > device may reuse the group number and receiving spurious page
+> > response can confuse the entire PF.   
 > 
+> I don't understand how mdev differs from the non-mdev situation (but I
+> also still don't fully get how mdev+PASID will be implemented). Is the
+> following the case you're worried about?
+> 
+>   M#: mdev #
+> 
+> # Dev         Host        mdev drv       VFIO/QEMU        Guest
+> ====================================================================
+> 1                     <- reg(handler)
+> 2 PR1 G1 P1    ->         M1 PR1 G1        inject ->     M1 PR1 G1
+> 3                     <- unreg(handler)
+> 4       <- PS1 G1 P1 (F)      |
+> 5                        unreg(handler)
+> 6                     <- reg(handler)
+> 7 PR2 G1 P1    ->         M2 PR2 G1        inject ->     M2 PR2 G1
+> 8                                                     <- M1 PS1 G1
+> 9         accept ??    <- PS1 G1 P1
+> 10                                                    <- M2 PS2 G1
+> 11        accept       <- PS2 G1 P1
+> 
+Not really. I am not worried about PASID reuse or unbind. Just within
+the same PASID bind lifetime of a single mdev, back to back
+register/unregister fault handler.
+After Step 4, device will think G1 is done. Device could reuse G1 for
+the next PR, if we accept PS1 in step 9, device will terminate G1 before
+the real G1 PS arrives in Step 11. The real G1 PS might have a
+different response code. Then we just drop the PS in Step 11?
 
-Thanks,
+If the device does not reuse G1 immediately, the spurious response to
+G1 will get dropped no issue there.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Step 2 injects PR1 for mdev#1. Step 4 auto-responds to PR1. Between
+> steps 5 and 6, we re-allocate PASID #1 for mdev #2. At step 7, we
+> inject PR2 for mdev #2. Step 8 is the spurious Page Response for PR1.
+> 
+> But I don't think step 9 is possible, because the mdev driver knows
+> that mdev #1 isn't using PASID #1 anymore. If the configuration is
+> valid at all (a page response channel still exists for mdev #1), then
+> mdev #1 now has a different PASID, e.g. #2, and step 9 would be "<-
+> PS1 G1 P2" which is rejected by iommu.c (no such pending page
+> request). And step 11 will be accepted.
+> 
+> If PASIDs are allocated through VCMD, then the situation seems
+> similar: at step 2 you inject "M1 PR1 G1 P1" into the guest, and at
+> step 8 the spurious response is "M1 PS1 G1 P1". If mdev #1 doesn't
+> have PASID #1 anymore, then the mdev driver can check that the PASID
+> is invalid and can reject the page response.
+> 
+> > Having spurious page response is also not
+> > abiding the PCIe spec. exactly.  
+> 
+> We are following the PCI spec though, in that we don't send page
+> responses for PRGIs that aren't in flight.
+> 
+You are right, the worst case of the spurious PS is to terminate the
+group prematurely. Need to know the scope of the HW damage in case of mdev
+where group IDs can be shared among mdevs belong to the same PF.
+
+> > We have two options here:
+> > 1. unregister handler will get -EBUSY if outstanding fault exists.
+> > 	-PROs: block offending device unbind only, eventually
+> > timeout will clear.
+> > 	-CONs: flooded faults can prevent clearing
+> > 2. unregister handle will block until all faults are clear in the
+> > host. Never fails unregistration  
+> 
+> Here the host completes the faults itself or wait for a response from
+> the guest? I'm slightly confused by the word "blocking". I'd rather we
+> don't introduce an uninterruptible sleep in the IOMMU core, since it's
+> unlikely to ever finish if we rely on the guest to complete things.
+> 
+No uninterruptible sleep, I meant unregister_handler is a sync call.
+But no wait for guest's response.
+> > 	-PROs: simple flow for VFIO, no need to worry about device
+> > 	holding reference.
+> > 	-CONs: spurious page response may come from
+> > 	misbehaving/malicious guest if guest does unregister and
+> > 	register back to back.  
+> 
+> > It seems the only way to prevent spurious page response is to
+> > introduce a SW token or sequence# for each PRQ that needs a
+> > response. I still think option 2 is good.
+> > 
+> > Consider the following time line:
+> > decoding
+> >  PR#: page request
+> >  G#:  group #
+> >  P#:  PASID
+> >  S#:  sequence #
+> >  A#:  address
+> >  PS#: page response
+> >  (F): Fail
+> >  (S): Success
+> > 
+> > # Dev		Host		VFIO/QEMU	Guest
+> > ===========================================================	
+> > 1				<-reg(handler)
+> > 2 PR1G1S1A1	->		inject	->
+> > PR1G1S1A1 3 PR2G1S2A2	->
+> > inject	->	PR2G1S2A2 4.
+> > <-unreg(handler) 5.	<-PR1G1S1A1(F)			| 
+> > 6.	<-PR2G1S2A2(F)			V
+> > 7.				<-unreg(handler)
+> > 8.				<-reg(handler)
+> > 9 PR3G1S3A1	->		inject	->
+> > PR3G1S3A1 10.
+> > <-PS1G1S1A1 11.		<reject S1>
+> > 11.		<accept S3>			<-PS3G1S3A1
+> > 12.PS3G1S3A1(S)
+> > 
+> > The spurious page response comes in at step 10 where the guest sends
+> > response for the request in step 1. But since the sequence # is 1,
+> > host IOMMU driver will reject it. At step 11, we accept page
+> > response for the matching sequence # then respond SUCCESS to the
+> > device.
+> > 
+> > So would it be OK to add this sequence# to iommu_fault and page
+> > response, or could event reuse the time stamp for that purpose.  
+> 
+> With a PV interface we can do what we want, but it can't work with an
+> IOMMU emulation that only has 9 bits for the PRGI. I suppose we can
+> add the sequence number but we'll have to handle the case where it
+> isn't present in the page response (ie. accept it anyway).
+> 
+For VT-d emulation, we might be able to use the private data as
+sequence# in vIOMMU. Keep the real private data in the host. Need Yi's
+input. If private data is not present, then accept it anyway.
+
+> Thanks,
+> Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
