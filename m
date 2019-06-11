@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D24FC0650E
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA97EC46477
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5FFF921773
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFF921773
+	by mail.kernel.org (Postfix) with ESMTP id 8BF7A2089E
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF7A2089E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0823E4A51A;
-	Tue, 11 Jun 2019 13:04:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 448CB4A526;
+	Tue, 11 Jun 2019 13:04:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3G7wpexLnCLL; Tue, 11 Jun 2019 13:04:01 -0400 (EDT)
+	with ESMTP id rAh+OosNYBXp; Tue, 11 Jun 2019 13:04:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAA5C4A526;
-	Tue, 11 Jun 2019 13:03:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 064D94A528;
+	Tue, 11 Jun 2019 13:04:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20B0B4A536
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:03:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2EB4A52B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:03:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ERl8-NmHI5uW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jun 2019 13:03:57 -0400 (EDT)
+ with ESMTP id gwgFBgOY7CkN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jun 2019 13:03:58 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58ECF4A4D5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:03:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 081E54A541
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:03:58 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DBD1EBD;
- Tue, 11 Jun 2019 10:03:56 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1404FEC;
+ Tue, 11 Jun 2019 10:03:57 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A30143F73C;
- Tue, 11 Jun 2019 10:03:54 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 530743F73C;
+ Tue, 11 Jun 2019 10:03:56 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 5/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
- translation cache on disabling LPIs
-Date: Tue, 11 Jun 2019 18:03:32 +0100
-Message-Id: <20190611170336.121706-6-marc.zyngier@arm.com>
+Subject: [PATCH v2 6/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
+ translation cache on vgic teardown
+Date: Tue, 11 Jun 2019 18:03:33 +0100
+Message-Id: <20190611170336.121706-7-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611170336.121706-1-marc.zyngier@arm.com>
 References: <20190611170336.121706-1-marc.zyngier@arm.com>
@@ -71,31 +71,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If a vcpu disables LPIs at its redistributor level, we need to make sure
-we won't pend more interrupts. For this, we need to invalidate the LPI
-translation cache.
+In order to avoid leaking vgic_irq structures on teardown, we need to
+drop all references to LPIs before deallocating the cache itself.
+
+This is done by invalidating the cache on vgic teardown.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-its.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 936962abc38d..cb60da48810d 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -192,8 +192,10 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 5254bb762e1b..0aa0cbbc3af6 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -1739,6 +1739,8 @@ void vgic_lpi_translation_cache_destroy(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_translation_cache_entry *cte, *tmp;
  
- 	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
- 
--	if (was_enabled && !vgic_cpu->lpis_enabled)
-+	if (was_enabled && !vgic_cpu->lpis_enabled) {
- 		vgic_flush_pending_lpis(vcpu);
-+		vgic_its_invalidate_cache(vcpu->kvm);
-+	}
- 
- 	if (!was_enabled && vgic_cpu->lpis_enabled)
- 		vgic_enable_lpis(vcpu);
++	vgic_its_invalidate_cache(kvm);
++
+ 	list_for_each_entry_safe(cte, tmp,
+ 				 &dist->lpi_translation_cache, entry) {
+ 		list_del(&cte->entry);
 -- 
 2.20.1
 
