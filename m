@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2C3C4321A
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9A6C06508
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B0FCF20896
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FCF20896
+	by mail.kernel.org (Postfix) with ESMTP id D7A4421734
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jun 2019 17:04:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A4421734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1A84A52A;
-	Tue, 11 Jun 2019 13:04:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FE294A517;
+	Tue, 11 Jun 2019 13:04:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yyqxt+6q265o; Tue, 11 Jun 2019 13:04:05 -0400 (EDT)
+	with ESMTP id kCBlLgVxJ4at; Tue, 11 Jun 2019 13:04:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FB3C4A546;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BC484A53B;
 	Tue, 11 Jun 2019 13:04:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 881184A507
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A071D4A536
  for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:04:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0GDSxeXwz1uG for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id EmMuuNx2ZORY for <kvmarm@lists.cs.columbia.edu>;
  Tue, 11 Jun 2019 13:04:03 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C7E4A505
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:04:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB904A4EE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jun 2019 13:04:01 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C54CC11B3;
- Tue, 11 Jun 2019 10:04:02 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 21131106F;
+ Tue, 11 Jun 2019 10:04:01 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56A513F73C;
- Tue, 11 Jun 2019 10:04:01 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A61783F73C;
+ Tue, 11 Jun 2019 10:03:59 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v2 9/9] KVM: arm/arm64: vgic-irqfd: Implement
- kvm_arch_set_irq_inatomic
-Date: Tue, 11 Jun 2019 18:03:36 +0100
-Message-Id: <20190611170336.121706-10-marc.zyngier@arm.com>
+Subject: [PATCH v2 8/9] KVM: arm/arm64: vgic-its: Check the LPI translation
+ cache on MSI injection
+Date: Tue, 11 Jun 2019 18:03:35 +0100
+Message-Id: <20190611170336.121706-9-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611170336.121706-1-marc.zyngier@arm.com>
 References: <20190611170336.121706-1-marc.zyngier@arm.com>
@@ -71,80 +71,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we have a cache of MSI->LPI translations, it is pretty
-easy to implement kvm_arch_set_irq_inatomic (this cache can be
-parsed without sleeping).
-
-Hopefully, this will improve some LPI-heavy workloads.
+When performing an MSI injection, let's first check if the translation
+is already in the cache. If so, let's inject it quickly without
+going through the whole translation process.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-irqfd.c | 36 ++++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 36 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h     |  1 +
+ 2 files changed, 37 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
-index 99e026d2dade..9f203ed8c8f3 100644
---- a/virt/kvm/arm/vgic/vgic-irqfd.c
-+++ b/virt/kvm/arm/vgic/vgic-irqfd.c
-@@ -77,6 +77,15 @@ int kvm_set_routing_entry(struct kvm *kvm,
- 	return r;
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 62932458476a..83d80ec33473 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -577,6 +577,20 @@ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+ 	return irq;
  }
  
-+static void kvm_populate_msi(struct kvm_kernel_irq_routing_entry *e,
-+			     struct kvm_msi *msi)
++static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
++					     u32 devid, u32 eventid)
 +{
-+	msi->address_lo = e->msi.address_lo;
-+	msi->address_hi = e->msi.address_hi;
-+	msi->data = e->msi.data;
-+	msi->flags = e->msi.flags;
-+	msi->devid = e->msi.devid;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq;
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	irq = __vgic_its_check_cache(dist, db, devid, eventid);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++
++	return irq;
 +}
- /**
-  * kvm_set_msi: inject the MSI corresponding to the
-  * MSI routing entry
-@@ -90,21 +99,36 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- {
- 	struct kvm_msi msi;
- 
--	msi.address_lo = e->msi.address_lo;
--	msi.address_hi = e->msi.address_hi;
--	msi.data = e->msi.data;
--	msi.flags = e->msi.flags;
--	msi.devid = e->msi.devid;
--
- 	if (!vgic_has_its(kvm))
- 		return -ENODEV;
- 
- 	if (!level)
- 		return -1;
- 
-+	kvm_populate_msi(e, &msi);
- 	return vgic_its_inject_msi(kvm, &msi);
++
+ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 				       u32 devid, u32 eventid,
+ 				       struct vgic_irq *irq)
+@@ -736,6 +750,25 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	return 0;
  }
  
-+/**
-+ * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-+ *
-+ * Currently only direct MSI injecton is supported.
-+ */
-+int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-+			      struct kvm *kvm, int irq_source_id, int level,
-+			      bool line_status)
++int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
 +{
-+	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
-+		struct kvm_msi msi;
++	struct vgic_irq *irq;
++	unsigned long flags;
++	phys_addr_t db;
 +
-+		kvm_populate_msi(e, &msi);
-+		if (!vgic_its_inject_cached_translation(kvm, &msi))
-+			return 0;
-+	}
++	db = (u64)msi->address_hi << 32 | msi->address_lo;
++	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
 +
-+	return -EWOULDBLOCK;
++	if (!irq)
++		return -1;
++
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	irq->pending_latch = true;
++	vgic_queue_irq_unlock(kvm, irq, flags);
++
++	return 0;
 +}
 +
- int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
- {
- 	struct kvm_irq_routing_entry *entries;
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+@@ -747,6 +780,9 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ 	struct vgic_its *its;
+ 	int ret;
+ 
++	if (!vgic_its_inject_cached_translation(kvm, msi))
++		return 1;
++
+ 	its = vgic_msi_to_its(kvm, msi);
+ 	if (IS_ERR(its))
+ 		return PTR_ERR(its);
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 072f810dc441..ad6eba1e2beb 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -317,6 +317,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
++int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi);
+ void vgic_lpi_translation_cache_init(struct kvm *kvm);
+ void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
+ void vgic_its_invalidate_cache(struct kvm *kvm);
 -- 
 2.20.1
 
