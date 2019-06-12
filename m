@@ -2,54 +2,63 @@ Return-Path: <SRS0=uW/I=UL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 330E7C31E46
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C994C31E46
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D0CD520896
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:44:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CD520896
+	by mail.kernel.org (Postfix) with ESMTP id 2A2FB20684
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A2FB20684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D03A4A528;
-	Wed, 12 Jun 2019 08:44:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BDA34A523;
+	Wed, 12 Jun 2019 08:48:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0V0qBpzVcnnb; Wed, 12 Jun 2019 08:44:57 -0400 (EDT)
+	with ESMTP id fLAnjFSL85-a; Wed, 12 Jun 2019 08:48:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CB64A51E;
-	Wed, 12 Jun 2019 08:44:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 348B74A520;
+	Wed, 12 Jun 2019 08:48:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 520CD4A4FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:44:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57DA14A4FB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:48:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b173egcZxmst for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jun 2019 08:44:54 -0400 (EDT)
+ with ESMTP id wFjJzk1o9cnT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jun 2019 08:48:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F314A4F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:44:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E296B4A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:48:09 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 525FD28;
- Wed, 12 Jun 2019 05:44:54 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 68A863F246;
- Wed, 12 Jun 2019 05:44:53 -0700 (PDT)
-From: Dave Martin <Dave.Martin@arm.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 REPOST] KVM: arm64: Filter out invalid core register IDs in
- KVM_GET_REG_LIST
-Date: Wed, 12 Jun 2019 13:44:49 +0100
-Message-Id: <1560343489-22906-1-git-send-email-Dave.Martin@arm.com>
-X-Mailer: git-send-email 2.1.4
-Cc: Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org,
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80036337;
+ Wed, 12 Jun 2019 05:48:09 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 39D8E3F246;
+ Wed, 12 Jun 2019 05:48:07 -0700 (PDT)
+Subject: Re: [PATCH v1 1/5] KVM: arm/arm64: Remove kvm_mmio_emulate tracepoint
+To: Zenghui Yu <yuzenghui@huawei.com>
+References: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
+ <1560330526-15468-2-git-send-email-yuzenghui@huawei.com>
+From: James Morse <james.morse@arm.com>
+Message-ID: <e915c19a-51df-be88-ea3a-7c9a211f4518@arm.com>
+Date: Wed, 12 Jun 2019 13:48:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <1560330526-15468-2-git-send-email-yuzenghui@huawei.com>
+Content-Language: en-GB
+Cc: acme@redhat.com, kvm@vger.kernel.org, marc.zyngier@arm.com,
+ catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org,
+ acme@kernel.org, linuxarm@huawei.com, linux-perf-users@vger.kernel.org,
+ peterz@infradead.org, alexander.shishkin@linux.intel.com, mingo@redhat.com,
+ xiexiangyou@huawei.com, ganapatrao.kulkarni@cavium.com, namhyung@kernel.org,
+ jolsa@redhat.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -62,145 +71,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since commit d26c25a9d19b ("arm64: KVM: Tighten guest core register
-access from userspace"), KVM_{GET,SET}_ONE_REG rejects register IDs
-that do not correspond to a single underlying architectural register.
+Hi,
 
-KVM_GET_REG_LIST was not changed to match however: instead, it
-simply yields a list of 32-bit register IDs that together cover the
-whole kvm_regs struct.  This means that if userspace tries to use
-the resulting list of IDs directly to drive calls to KVM_*_ONE_REG,
-some of those calls will now fail.
+On 12/06/2019 10:08, Zenghui Yu wrote:
+> In current KVM/ARM code, no one will invoke trace_kvm_mmio_emulate().
+> Remove this TRACE_EVENT definition.
 
-This was not the intention.  Instead, iterating KVM_*_ONE_REG over
-the list of IDs returned by KVM_GET_REG_LIST should be guaranteed
-to work.
+Oooer. We can't just go removing these things, they are visible to user-space.
 
-This patch fixes the problem by splitting validate_core_offset()
-into a backend core_reg_size_from_offset() which does all of the
-work except for checking that the size field in the register ID
-matches, and kvm_arm_copy_reg_indices() and num_core_regs() are
-converted to use this to enumerate the valid offsets.
+I recall an article on this: https://lwn.net/Articles/737530/
+"Another attempt to address the tracepoint ABI problem"
 
-kvm_arm_copy_reg_indices() now also sets the register ID size field
-appropriately based on the value returned, so the register ID
-supplied to userspace is fully qualified for use with the register
-access ioctls.
+I agree this is orphaned, it was added by commit 45e96ea6b369 ("KVM: ARM: Handle I/O
+aborts"), but there never was a caller.
 
-Cc: stable@vger.kernel.org
-Fixes: d26c25a9d19b ("arm64: KVM: Tighten guest core register access from userspace")
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Tested-by: Andrew Jones <drjones@redhat.com>
----
+The problem with removing it is /sys/kernel/debug/tracing/events/kvm/kvm_mmio_emulate
+disappears. Any program relying on that being present (but useless) is now broken.
 
-This is just a repost of [1], with Andrew Jones' reviewer tags added.
 
-[1] [PATCH] KVM: arm64: Filter out invalid core register IDs in KVM_GET_REG_LIST
-https://lists.cs.columbia.edu/pipermail/kvmarm/2019-June/036093.html
+Thanks,
 
- arch/arm64/kvm/guest.c | 53 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 40 insertions(+), 13 deletions(-)
+James
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3ae2f82..6527c76 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -70,10 +70,8 @@ static u64 core_reg_offset_from_id(u64 id)
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
- }
- 
--static int validate_core_offset(const struct kvm_vcpu *vcpu,
--				const struct kvm_one_reg *reg)
-+static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
- {
--	u64 off = core_reg_offset_from_id(reg->id);
- 	int size;
- 
- 	switch (off) {
-@@ -103,8 +101,7 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 	}
- 
--	if (KVM_REG_SIZE(reg->id) != size ||
--	    !IS_ALIGNED(off, size / sizeof(__u32)))
-+	if (!IS_ALIGNED(off, size / sizeof(__u32)))
- 		return -EINVAL;
- 
- 	/*
-@@ -115,6 +112,21 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
- 	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
- 		return -EINVAL;
- 
-+	return size;
-+}
-+
-+static int validate_core_offset(const struct kvm_vcpu *vcpu,
-+				const struct kvm_one_reg *reg)
-+{
-+	u64 off = core_reg_offset_from_id(reg->id);
-+	int size = core_reg_size_from_offset(vcpu, off);
-+
-+	if (size < 0)
-+		return -EINVAL;
-+
-+	if (KVM_REG_SIZE(reg->id) != size)
-+		return -EINVAL;
-+
- 	return 0;
- }
- 
-@@ -453,19 +465,34 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
- {
- 	unsigned int i;
- 	int n = 0;
--	const u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
- 
- 	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
--		/*
--		 * The KVM_REG_ARM64_SVE regs must be used instead of
--		 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
--		 * SVE-enabled vcpus:
--		 */
--		if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(i))
-+		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
-+		int size = core_reg_size_from_offset(vcpu, i);
-+
-+		if (size < 0)
-+			continue;
-+
-+		switch (size) {
-+		case sizeof(__u32):
-+			reg |= KVM_REG_SIZE_U32;
-+			break;
-+
-+		case sizeof(__u64):
-+			reg |= KVM_REG_SIZE_U64;
-+			break;
-+
-+		case sizeof(__uint128_t):
-+			reg |= KVM_REG_SIZE_U128;
-+			break;
-+
-+		default:
-+			WARN_ON(1);
- 			continue;
-+		}
- 
- 		if (uindices) {
--			if (put_user(core_reg | i, uindices))
-+			if (put_user(reg, uindices))
- 				return -EFAULT;
- 			uindices++;
- 		}
--- 
-2.1.4
+
+> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+> index 204d210..8b7dff2 100644
+> --- a/virt/kvm/arm/trace.h
+> +++ b/virt/kvm/arm/trace.h
+> @@ -114,27 +114,6 @@
+>  		  __entry->type, __entry->vcpu_idx, __entry->irq_num, __entry->level)
+>  );
+>  
+> -TRACE_EVENT(kvm_mmio_emulate,
+> -	TP_PROTO(unsigned long vcpu_pc, unsigned long instr,
+> -		 unsigned long cpsr),
+> -	TP_ARGS(vcpu_pc, instr, cpsr),
+> -
+> -	TP_STRUCT__entry(
+> -		__field(	unsigned long,	vcpu_pc		)
+> -		__field(	unsigned long,	instr		)
+> -		__field(	unsigned long,	cpsr		)
+> -	),
+> -
+> -	TP_fast_assign(
+> -		__entry->vcpu_pc		= vcpu_pc;
+> -		__entry->instr			= instr;
+> -		__entry->cpsr			= cpsr;
+> -	),
+> -
+> -	TP_printk("Emulate MMIO at: 0x%08lx (instr: %08lx, cpsr: %08lx)",
+> -		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
+> -);
+> -
+>  TRACE_EVENT(kvm_unmap_hva_range,
+>  	TP_PROTO(unsigned long start, unsigned long end),
+>  	TP_ARGS(start, end),
+> 
 
 _______________________________________________
 kvmarm mailing list
