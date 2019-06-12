@@ -2,61 +2,63 @@ Return-Path: <SRS0=uW/I=UL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A2FC31E47
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 09:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CB7C31E46
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D46562063F
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 09:15:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D46562063F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 0973D20896
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 09:53:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0973D20896
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AB8D4A512;
-	Wed, 12 Jun 2019 05:15:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 643774A51A;
+	Wed, 12 Jun 2019 05:53:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id U2fTiM1PQKwQ; Wed, 12 Jun 2019 05:15:08 -0400 (EDT)
+	with ESMTP id vMfGCCEOI-zW; Wed, 12 Jun 2019 05:53:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A09184A542;
-	Wed, 12 Jun 2019 05:15:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECA1C4A4EE;
+	Wed, 12 Jun 2019 05:53:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF6D54A4EE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 05:15:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4445A4A4EE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 05:53:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I0eHrIGAszL7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jun 2019 05:15:03 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B5FD4A4FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 05:15:03 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id EF3EA12D63526C173D19;
- Wed, 12 Jun 2019 17:11:50 +0800 (CST)
-Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 12 Jun 2019 17:11:42 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-perf-users@vger.kernel.org>
-Subject: [PATCH v1 0/5] perf kvm: Add stat support on arm64
-Date: Wed, 12 Jun 2019 09:08:41 +0000
-Message-ID: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.6.4.windows.1
-MIME-Version: 1.0
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com,
- acme@kernel.org, linuxarm@huawei.com, acme@redhat.com, peterz@infradead.org,
- alexander.shishkin@linux.intel.com, mingo@redhat.com,
- ganapatrao.kulkarni@cavium.com, namhyung@kernel.org, jolsa@redhat.com,
- xiexiangyou@huawei.com
+ with ESMTP id 28Nef-4vEe7k for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jun 2019 05:52:36 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8BE04A4E6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 05:52:36 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A76B28;
+ Wed, 12 Jun 2019 02:52:36 -0700 (PDT)
+Received: from big-swifty.misterjones.org (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDC4C3F246;
+ Wed, 12 Jun 2019 02:54:15 -0700 (PDT)
+Date: Wed, 12 Jun 2019 10:52:25 +0100
+Message-ID: <86ef3zgmg6.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH v2 1/9] KVM: arm/arm64: vgic: Add LPI translation cache
+ definition
+In-Reply-To: <54c8547a-51fb-8ae5-975f-261d3934221a@arm.com>
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-2-marc.zyngier@arm.com>
+ <54c8547a-51fb-8ae5-975f-261d3934221a@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: kvm@vger.kernel.org, "Raslan,
+ KarimAllah" <karahmed@amazon.de>, "Saidi, Ali" <alisaidi@amazon.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,65 +75,164 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-'perf kvm stat report/record' generates a statistical analysis of KVM
-events and can be used to analyze guest exit reasons. This series tries
-to add stat support on arm64 (Port perf-kvm-stat to arm64 - this is
-already supported on x86).
+Hi Julien,
 
-"record" enables recording of two pair of tracepoints:
- - "kvm:kvm_entry" and "kvm:kvm_exit"
- - "kvm:kvm_trap_enter" and "kvm:kvm_trap_exit"
-"report" reports statistical analysis of guest exit&trap events.
+On Wed, 12 Jun 2019 09:16:21 +0100,
+Julien Thierry <julien.thierry@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 11/06/2019 18:03, Marc Zyngier wrote:
+> > Add the basic data structure that expresses an MSI to LPI
+> > translation as well as the allocation/release hooks.
+> > 
+> > THe size of the cache is arbitrarily defined as 4*nr_vcpus.
+> >
+> 
+> The size has been arbitrarily changed to 16*nr_vcpus :) .
 
-To record kvm events on the host:
- # perf kvm stat record -a
+Well spotted! ;-)
 
-To report kvm VM EXIT events:
- # perf kvm stat report --event=vmexit
+> 
+> Nit: The*
 
-To report kvm VM TRAP (synchronous exceptions) events:
- # perf kvm stat report --event=trap
+Ah, usual lazy finger on the Shift key... One day I'll learn to type.
 
-More information can be found at tools/perf/Documentation/perf-kvm.txt.
+> 
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> >  include/kvm/arm_vgic.h        |  3 +++
+> >  virt/kvm/arm/vgic/vgic-init.c |  5 ++++
+> >  virt/kvm/arm/vgic/vgic-its.c  | 49 +++++++++++++++++++++++++++++++++++
+> >  virt/kvm/arm/vgic/vgic.h      |  2 ++
+> >  4 files changed, 59 insertions(+)
+> > 
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index c36c86f1ec9a..ca7bcf52dc85 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -260,6 +260,9 @@ struct vgic_dist {
+> >  	struct list_head	lpi_list_head;
+> >  	int			lpi_list_count;
+> >  
+> > +	/* LPI translation cache */
+> > +	struct list_head	lpi_translation_cache;
+> > +
+> >  	/* used by vgic-debug */
+> >  	struct vgic_state_iter *iter;
+> >  
+> > diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> > index 3bdb31eaed64..c7c4c77dd430 100644
+> > --- a/virt/kvm/arm/vgic/vgic-init.c
+> > +++ b/virt/kvm/arm/vgic/vgic-init.c
+> > @@ -64,6 +64,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
+> >  	struct vgic_dist *dist = &kvm->arch.vgic;
+> >  
+> >  	INIT_LIST_HEAD(&dist->lpi_list_head);
+> > +	INIT_LIST_HEAD(&dist->lpi_translation_cache);
+> >  	raw_spin_lock_init(&dist->lpi_list_lock);
+> >  }
+> >  
+> > @@ -305,6 +306,7 @@ int vgic_init(struct kvm *kvm)
+> >  	}
+> >  
+> >  	if (vgic_has_its(kvm)) {
+> > +		vgic_lpi_translation_cache_init(kvm);
+> >  		ret = vgic_v4_init(kvm);
+> >  		if (ret)
+> >  			goto out;
+> > @@ -346,6 +348,9 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+> >  		INIT_LIST_HEAD(&dist->rd_regions);
+> >  	}
+> >  
+> > +	if (vgic_has_its(kvm))
+> > +		vgic_lpi_translation_cache_destroy(kvm);
+> > +
+> >  	if (vgic_supports_direct_msis(kvm))
+> >  		vgic_v4_teardown(kvm);
+> >  }
+> > diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> > index 44ceaccb18cf..ce9bcddeb7f1 100644
+> > --- a/virt/kvm/arm/vgic/vgic-its.c
+> > +++ b/virt/kvm/arm/vgic/vgic-its.c
+> > @@ -149,6 +149,14 @@ struct its_ite {
+> >  	u32 event_id;
+> >  };
+> >  
+> > +struct vgic_translation_cache_entry {
+> > +	struct list_head	entry;
+> > +	phys_addr_t		db;
+> > +	u32			devid;
+> > +	u32			eventid;
+> > +	struct vgic_irq		*irq;
+> > +};
+> > +
+> >  /**
+> >   * struct vgic_its_abi - ITS abi ops and settings
+> >   * @cte_esz: collection table entry size
+> > @@ -1668,6 +1676,45 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
+> >  	return ret;
+> >  }
+> >  
+> > +/* Default is 16 cached LPIs per vcpu */
+> > +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
+> > +
+> > +void vgic_lpi_translation_cache_init(struct kvm *kvm)
+> > +{
+> > +	struct vgic_dist *dist = &kvm->arch.vgic;
+> > +	unsigned int sz;
+> > +	int i;
+> > +
+> > +	if (!list_empty(&dist->lpi_translation_cache))
+> > +		return;
+> > +
+> > +	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
+> > +
+> > +	for (i = 0; i < sz; i++) {
+> > +		struct vgic_translation_cache_entry *cte;
+> > +
+> > +		/* An allocation failure is not fatal */
+> > +		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
+> > +		if (WARN_ON(!cte))
+> > +			break;
+> > +
+> > +		INIT_LIST_HEAD(&cte->entry);
+> > +		list_add(&cte->entry, &dist->lpi_translation_cache);
+> 
+> Going through the series, it looks like this list is either empty
+> (before the cache init) or has a fixed number
+> (LPI_DEFAULT_PCPU_CACHE_SIZE * nr_cpus) of entries.
 
-* Patch 1-2 touch KVM/ARM side, with #1 is cleanup and #2 is preparation
-  for perf-kvm-stat support.
-* Patch 3-5 touch perf side.
-* Patch 3 adds support for get_cpuid() function on arm64. *RFC!*
-* Patch 4 adds support for perf-kvm-stat on arm64, with VM-EXIT events.
-* Patch 5 adds support to report TRAP-EVENT events.
+Well, it could also fail when allocating one of the entry, meaning we
+can have an allocation ranging from 0 to (LPI_DEFAULT_PCPU_CACHE_SIZE
+* nr_cpus) entries.
 
-Any suggestions, comments and test results will be appreciated.
+> And the list never grows nor shrinks throughout the series, so it
+> seems odd to be using a list here.
+> 
+> Is there a reason for not using a dynamically allocated array instead of
+> the list? (does list_move() provide a big perf advantage over swapping
+> the data from one array entry to another? Or is there some other
+> facility I am missing?
+
+The idea was to make the LRU policy cheap, on the assumption that
+list_move (which is only a couple of pointer updates) is cheaper than
+a memmove if you want to keep the array ordered. If we exclude the
+list head, we end-up with 24 bytes per entry to move down to make room
+for the new entry at the head of the array. For large caches that miss
+very often, this will hurt badly. But is that really a problem? I
+don't know.
+
+We could allocate an array as you suggest, and use a linked list
+inside the array. Or something else. I'm definitely open to
+suggestion!
 
 Thanks,
-zenghui
 
----
-
-Zenghui Yu (5):
-  KVM: arm/arm64: Remove kvm_mmio_emulate tracepoint
-  KVM: arm/arm64: Adjust entry/exit and trap related tracepoints
-  perf tools arm64: Add support for get_cpuid() function
-  perf,kvm/arm64: Add stat support on arm64
-  perf,kvm/arm64: perf-kvm-stat to report VM TRAP
-
- arch/arm64/kvm/handle_exit.c                     |   3 +
- arch/arm64/kvm/trace.h                           |  35 +++++++
- tools/perf/arch/arm64/Makefile                   |   2 +
- tools/perf/arch/arm64/util/Build                 |   1 +
- tools/perf/arch/arm64/util/aarch64_guest_exits.h |  91 +++++++++++++++++
- tools/perf/arch/arm64/util/header.c              |  74 +++++++++-----
- tools/perf/arch/arm64/util/kvm-stat.c            | 125 +++++++++++++++++++++++
- virt/kvm/arm/arm.c                               |   4 +-
- virt/kvm/arm/trace.h                             |  42 ++------
- 9 files changed, 317 insertions(+), 60 deletions(-)
- create mode 100644 tools/perf/arch/arm64/util/aarch64_guest_exits.h
- create mode 100644 tools/perf/arch/arm64/util/kvm-stat.c
+	M.
 
 -- 
-1.8.3.1
-
-
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
