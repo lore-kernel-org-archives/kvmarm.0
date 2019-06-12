@@ -2,64 +2,55 @@ Return-Path: <SRS0=uW/I=UL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3000EC31E48
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330E7C31E46
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:45:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B0A2B208C4
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:28:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A2B208C4
+	by mail.kernel.org (Postfix) with ESMTP id D0CD520896
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jun 2019 12:44:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CD520896
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00CED4A525;
-	Wed, 12 Jun 2019 08:28:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D03A4A528;
+	Wed, 12 Jun 2019 08:44:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W2HgZWCNPMmw; Wed, 12 Jun 2019 08:28:29 -0400 (EDT)
+	with ESMTP id 0V0qBpzVcnnb; Wed, 12 Jun 2019 08:44:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6F24A51E;
-	Wed, 12 Jun 2019 08:28:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8CB64A51E;
+	Wed, 12 Jun 2019 08:44:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DFC04A4FB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:28:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 520CD4A4FB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:44:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TUS+-8toomTT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jun 2019 08:28:26 -0400 (EDT)
+ with ESMTP id b173egcZxmst for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jun 2019 08:44:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA604A4F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:28:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F314A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jun 2019 08:44:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E37B928;
- Wed, 12 Jun 2019 05:28:25 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F03F13F246;
- Wed, 12 Jun 2019 05:30:07 -0700 (PDT)
-Subject: Re: [PATCH v2 1/9] KVM: arm/arm64: vgic: Add LPI translation cache
- definition
-From: Julien Thierry <julien.thierry@arm.com>
-To: Marc Zyngier <marc.zyngier@arm.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-2-marc.zyngier@arm.com>
- <54c8547a-51fb-8ae5-975f-261d3934221a@arm.com>
- <86ef3zgmg6.wl-marc.zyngier@arm.com>
- <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
-Message-ID: <29cdb9f5-86c6-e86f-3827-4426a4fa8ac1@arm.com>
-Date: Wed, 12 Jun 2019 13:28:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
-Content-Language: en-US
-Cc: "Raslan, KarimAllah" <karahmed@amazon.de>,
- linux-arm-kernel@lists.infradead.org, "Saidi, Ali" <alisaidi@amazon.com>,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 525FD28;
+ Wed, 12 Jun 2019 05:44:54 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 68A863F246;
+ Wed, 12 Jun 2019 05:44:53 -0700 (PDT)
+From: Dave Martin <Dave.Martin@arm.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v4 REPOST] KVM: arm64: Filter out invalid core register IDs in
+ KVM_GET_REG_LIST
+Date: Wed, 12 Jun 2019 13:44:49 +0100
+Message-Id: <1560343489-22906-1-git-send-email-Dave.Martin@arm.com>
+X-Mailer: git-send-email 2.1.4
+Cc: Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,163 +62,146 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Since commit d26c25a9d19b ("arm64: KVM: Tighten guest core register
+access from userspace"), KVM_{GET,SET}_ONE_REG rejects register IDs
+that do not correspond to a single underlying architectural register.
 
+KVM_GET_REG_LIST was not changed to match however: instead, it
+simply yields a list of 32-bit register IDs that together cover the
+whole kvm_regs struct.  This means that if userspace tries to use
+the resulting list of IDs directly to drive calls to KVM_*_ONE_REG,
+some of those calls will now fail.
 
-On 12/06/2019 11:58, Julien Thierry wrote:
-> 
-> 
-> On 12/06/2019 10:52, Marc Zyngier wrote:
->> Hi Julien,
->>
->> On Wed, 12 Jun 2019 09:16:21 +0100,
->> Julien Thierry <julien.thierry@arm.com> wrote:
->>>
->>> Hi Marc,
->>>
->>> On 11/06/2019 18:03, Marc Zyngier wrote:
->>>> Add the basic data structure that expresses an MSI to LPI
->>>> translation as well as the allocation/release hooks.
->>>>
->>>> THe size of the cache is arbitrarily defined as 4*nr_vcpus.
->>>>
->>>
->>> The size has been arbitrarily changed to 16*nr_vcpus :) .
->>
->> Well spotted! ;-)
->>
->>>
->>> Nit: The*
->>
->> Ah, usual lazy finger on the Shift key... One day I'll learn to type.
->>
->>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  include/kvm/arm_vgic.h        |  3 +++
->>>>  virt/kvm/arm/vgic/vgic-init.c |  5 ++++
->>>>  virt/kvm/arm/vgic/vgic-its.c  | 49 +++++++++++++++++++++++++++++++++++
->>>>  virt/kvm/arm/vgic/vgic.h      |  2 ++
->>>>  4 files changed, 59 insertions(+)
->>>>
-> 
-> [...]
-> 
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 44ceaccb18cf..ce9bcddeb7f1 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -149,6 +149,14 @@ struct its_ite {
->>>>  	u32 event_id;
->>>>  };
->>>>  
->>>> +struct vgic_translation_cache_entry {
->>>> +	struct list_head	entry;
->>>> +	phys_addr_t		db;
->>>> +	u32			devid;
->>>> +	u32			eventid;
->>>> +	struct vgic_irq		*irq;
->>>> +};
->>>> +
->>>>  /**
->>>>   * struct vgic_its_abi - ITS abi ops and settings
->>>>   * @cte_esz: collection table entry size
->>>> @@ -1668,6 +1676,45 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
->>>>  	return ret;
->>>>  }
->>>>  
->>>> +/* Default is 16 cached LPIs per vcpu */
->>>> +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
->>>> +
->>>> +void vgic_lpi_translation_cache_init(struct kvm *kvm)
->>>> +{
->>>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>>> +	unsigned int sz;
->>>> +	int i;
->>>> +
->>>> +	if (!list_empty(&dist->lpi_translation_cache))
->>>> +		return;
->>>> +
->>>> +	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
->>>> +
->>>> +	for (i = 0; i < sz; i++) {
->>>> +		struct vgic_translation_cache_entry *cte;
->>>> +
->>>> +		/* An allocation failure is not fatal */
->>>> +		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
->>>> +		if (WARN_ON(!cte))
->>>> +			break;
->>>> +
->>>> +		INIT_LIST_HEAD(&cte->entry);
->>>> +		list_add(&cte->entry, &dist->lpi_translation_cache);
->>>
->>> Going through the series, it looks like this list is either empty
->>> (before the cache init) or has a fixed number
->>> (LPI_DEFAULT_PCPU_CACHE_SIZE * nr_cpus) of entries.
->>
->> Well, it could also fail when allocating one of the entry, meaning we
->> can have an allocation ranging from 0 to (LPI_DEFAULT_PCPU_CACHE_SIZE
->> * nr_cpus) entries.
->>
->>> And the list never grows nor shrinks throughout the series, so it
->>> seems odd to be using a list here.
->>>
->>> Is there a reason for not using a dynamically allocated array instead of
->>> the list? (does list_move() provide a big perf advantage over swapping
->>> the data from one array entry to another? Or is there some other
->>> facility I am missing?
->>
->> The idea was to make the LRU policy cheap, on the assumption that
->> list_move (which is only a couple of pointer updates) is cheaper than
->> a memmove if you want to keep the array ordered. If we exclude the
->> list head, we end-up with 24 bytes per entry to move down to make room
->> for the new entry at the head of the array. For large caches that miss
->> very often, this will hurt badly. But is that really a problem? I
->> don't know.
->>
-> 
-> Yes, I realized afterwards that the LRU uses the fact you can easily
-> move list entries without modifying the rest of the list.
-> 
->> We could allocate an array as you suggest, and use a linked list
->> inside the array. Or something else. I'm definitely open to
->> suggestion!
-> 
-> If it there turns out to be some benefit to just you a fixed array, we
-> could use a simple ring buffer. Have one pointer on the most recently
-> inserted entry (and we know the next insertion will take place on the
-> entry "just before" it) and one pointer on the least recently used entry
-> (which gets moved when the most recently inserted catches up to it) so
-> we know where to stop when looping. We don't really have to worry about
-> the "ring buffer" full case since that means we just overwrite the LRU
-> and move the pointer.
-> 
-> This might prove a bit more efficient when looping over the cache
-> entries compared to the list. However, I have no certainty of actual
-> performance gain from that and the current implementation has the
-> benefit of being simple.
-> 
-> Let me know if you decide to give the ring buffer approach a try.
-> 
-> Otherwise there's always the option to add even more complex structure
-> with a hashtable + linked list using hashes and tags to lookup the
-> entries. But keeping things simple for now seems reasonable (also, it
-> avoids having to think about what to use as hash and tag :D ).
-> 
+This was not the intention.  Instead, iterating KVM_*_ONE_REG over
+the list of IDs returned by KVM_GET_REG_LIST should be guaranteed
+to work.
 
-Acutally, still not a good approach for when there is a cache hit and we
-want to move a entry to the most recently used position.
+This patch fixes the problem by splitting validate_core_offset()
+into a backend core_reg_size_from_offset() which does all of the
+work except for checking that the size field in the register ID
+matches, and kvm_arm_copy_reg_indices() and num_core_regs() are
+converted to use this to enumerate the valid offsets.
 
-List seems like the best approach in terms of keeping it simple.
+kvm_arm_copy_reg_indices() now also sets the register ID size field
+appropriately based on the value returned, so the register ID
+supplied to userspace is fully qualified for use with the register
+access ioctls.
 
-Sorry for the noise.
+Cc: stable@vger.kernel.org
+Fixes: d26c25a9d19b ("arm64: KVM: Tighten guest core register access from userspace")
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Tested-by: Andrew Jones <drjones@redhat.com>
+---
 
+This is just a repost of [1], with Andrew Jones' reviewer tags added.
+
+[1] [PATCH] KVM: arm64: Filter out invalid core register IDs in KVM_GET_REG_LIST
+https://lists.cs.columbia.edu/pipermail/kvmarm/2019-June/036093.html
+
+ arch/arm64/kvm/guest.c | 53 +++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 3ae2f82..6527c76 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -70,10 +70,8 @@ static u64 core_reg_offset_from_id(u64 id)
+ 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
+ }
+ 
+-static int validate_core_offset(const struct kvm_vcpu *vcpu,
+-				const struct kvm_one_reg *reg)
++static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
+ {
+-	u64 off = core_reg_offset_from_id(reg->id);
+ 	int size;
+ 
+ 	switch (off) {
+@@ -103,8 +101,7 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (KVM_REG_SIZE(reg->id) != size ||
+-	    !IS_ALIGNED(off, size / sizeof(__u32)))
++	if (!IS_ALIGNED(off, size / sizeof(__u32)))
+ 		return -EINVAL;
+ 
+ 	/*
+@@ -115,6 +112,21 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+ 	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
+ 		return -EINVAL;
+ 
++	return size;
++}
++
++static int validate_core_offset(const struct kvm_vcpu *vcpu,
++				const struct kvm_one_reg *reg)
++{
++	u64 off = core_reg_offset_from_id(reg->id);
++	int size = core_reg_size_from_offset(vcpu, off);
++
++	if (size < 0)
++		return -EINVAL;
++
++	if (KVM_REG_SIZE(reg->id) != size)
++		return -EINVAL;
++
+ 	return 0;
+ }
+ 
+@@ -453,19 +465,34 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
+ {
+ 	unsigned int i;
+ 	int n = 0;
+-	const u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
+ 
+ 	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
+-		/*
+-		 * The KVM_REG_ARM64_SVE regs must be used instead of
+-		 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
+-		 * SVE-enabled vcpus:
+-		 */
+-		if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(i))
++		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
++		int size = core_reg_size_from_offset(vcpu, i);
++
++		if (size < 0)
++			continue;
++
++		switch (size) {
++		case sizeof(__u32):
++			reg |= KVM_REG_SIZE_U32;
++			break;
++
++		case sizeof(__u64):
++			reg |= KVM_REG_SIZE_U64;
++			break;
++
++		case sizeof(__uint128_t):
++			reg |= KVM_REG_SIZE_U128;
++			break;
++
++		default:
++			WARN_ON(1);
+ 			continue;
++		}
+ 
+ 		if (uindices) {
+-			if (put_user(core_reg | i, uindices))
++			if (put_user(reg, uindices))
+ 				return -EFAULT;
+ 			uindices++;
+ 		}
 -- 
-Julien Thierry
+2.1.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
