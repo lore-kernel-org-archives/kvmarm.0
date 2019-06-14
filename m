@@ -2,58 +2,79 @@ Return-Path: <SRS0=GJXN=UN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EFCCC31E44
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Jun 2019 12:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F6EC31E4B
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Jun 2019 13:18:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1CCD4208CA
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Jun 2019 12:08:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CCD4208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 0BEE820850
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Jun 2019 13:18:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BEE820850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54CFC4A483;
-	Fri, 14 Jun 2019 08:08:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FCCE4A51E;
+	Fri, 14 Jun 2019 09:18:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ltESMsca6GaI; Fri, 14 Jun 2019 08:08:36 -0400 (EDT)
+	with ESMTP id 7NucRppI+KG0; Fri, 14 Jun 2019 09:18:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B8D4A4FD;
-	Fri, 14 Jun 2019 08:08:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E00F4A510;
+	Fri, 14 Jun 2019 09:18:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC3074A4A4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jun 2019 08:08:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E366E4A4F3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jun 2019 09:17:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eW1V8cB3D46e for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Jun 2019 08:08:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 657544A483
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jun 2019 08:08:34 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0D2F2B;
- Fri, 14 Jun 2019 05:08:33 -0700 (PDT)
-Received: from [10.1.196.93] (en101.cambridge.arm.com [10.1.196.93])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECDC73F246;
- Fri, 14 Jun 2019 05:08:32 -0700 (PDT)
-Subject: Re: [PATCH v9 5/5] KVM: arm/arm64: support chained PMU counters
-To: andrew.murray@arm.com, christoffer.dall@arm.com, marc.zyngier@arm.com
-References: <20190612190450.7085-1-andrew.murray@arm.com>
- <20190612190450.7085-6-andrew.murray@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <3586de02-c64b-a9cd-1397-7e844a119625@arm.com>
-Date: Fri, 14 Jun 2019 13:08:31 +0100
+ with ESMTP id 0EijnYjWMOn5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Jun 2019 09:17:57 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7234F4A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jun 2019 09:17:57 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B8B3356EA;
+ Fri, 14 Jun 2019 13:17:40 +0000 (UTC)
+Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7366A54696;
+ Fri, 14 Jun 2019 13:17:28 +0000 (UTC)
+Subject: Re: [PATCH v8 23/29] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+To: "Liu, Yi L" <yi.l.liu@intel.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+ "will.deacon@arm.com" <will.deacon@arm.com>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-24-eric.auger@redhat.com>
+ <A2975661238FB949B60364EF0F2C257439EFB432@SHSMSX104.ccr.corp.intel.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8d36cf34-a89b-6587-08e9-99242e2f34dc@redhat.com>
+Date: Fri, 14 Jun 2019 15:17:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190612190450.7085-6-andrew.murray@arm.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439EFB432@SHSMSX104.ccr.corp.intel.com>
 Content-Language: en-US
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 14 Jun 2019 13:17:51 +0000 (UTC)
+Cc: "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>,
+ "vincent.stehle@arm.com" <vincent.stehle@arm.com>, "Raj,
+ Ashok" <ashok.raj@intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,29 +86,174 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Liu,
 
-
-On 12/06/2019 20:04, Andrew Murray wrote:
-> ARMv8 provides support for chained PMU counters, where an event type
-> of 0x001E is set for odd-numbered counters, the event counter will
-> increment by one for each overflow of the preceding even-numbered
-> counter. Let's emulate this in KVM by creating a 64 bit perf counter
-> when a user chains two emulated counters together.
+On 6/14/19 2:38 PM, Liu, Yi L wrote:
+> Hi Eric,
 > 
-> For chained events we only support generating an overflow interrupt
-> on the high counter. We use the attributes of the low counter to
-> determine the attributes of the perf event.
+>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>> Sent: Monday, May 27, 2019 12:10 AM
+>> Subject: [PATCH v8 23/29] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+>>
+>> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+>>
+>> When the guest "owns" the stage 1 translation structures,  the host IOMMU driver
+>> has no knowledge of caching structure updates unless the guest invalidation
+>> requests are trapped and passed down to the host.
+>>
+>> This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims at
+>> propagating guest stage1 IOMMU cache invalidations to the host.
+>>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v6 -> v7:
+>> - Use iommu_capsule struct
+>> - renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
+>>   due to checkpatch error related to for_each_dev suffix
+>>
+>> v2 -> v3:
+>> - introduce vfio_iommu_for_each_dev back in this patch
+>>
+>> v1 -> v2:
+>> - s/TLB/CACHE
+>> - remove vfio_iommu_task usage
+>> - commit message rewording
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++++++++
+>>  include/uapi/linux/vfio.h       | 13 ++++++++
+>>  2 files changed, 68 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index b2d609d6fe83..6fda4fbc9bfa 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -120,6 +120,34 @@ struct vfio_regions {
+>>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>>  					(!list_empty(&iommu->domain_list))
+>>
+>> +struct domain_capsule {
+>> +	struct iommu_domain *domain;
+>> +	void *data;
+>> +};
+>> +
+>> +/* iommu->lock must be held */
+>> +static int
+>> +vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
+>> +		      int (*fn)(struct device *dev, void *data),
+>> +		      void *data)
+>> +{
+>> +	struct domain_capsule dc = {.data = data};
+>> +	struct vfio_domain *d;
+>> +	struct vfio_group *g;
+>> +	int ret = 0;
+>> +
+>> +	list_for_each_entry(d, &iommu->domain_list, next) {
+>> +		dc.domain = d->domain;
+>> +		list_for_each_entry(g, &d->group_list, next) {
+>> +			ret = iommu_group_for_each_dev(g->iommu_group,
+>> +						       &dc, fn);
+>> +			if (ret)
+>> +				break;
+>> +		}
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>>  static int put_pfn(unsigned long pfn, int prot);
+>>
+>>  /*
+>> @@ -1795,6 +1823,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
+>>  	return ret;
+>>  }
+>>
+>> +static int vfio_cache_inv_fn(struct device *dev, void *data) {
+>> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+>> +	struct vfio_iommu_type1_cache_invalidate *ustruct =
+>> +		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
+>> +
+>> +	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info); }
+>> +
+>>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  				   unsigned int cmd, unsigned long arg)  { @@ -
+>> 1881,6 +1918,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
+>>  		vfio_detach_pasid_table(iommu);
+>>  		return 0;
+>> +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
+>> +		struct vfio_iommu_type1_cache_invalidate ustruct;
+>> +		int ret;
+>> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
+>> +				    info);
+>> +
+>> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (ustruct.argsz < minsz || ustruct.flags)
 > 
-> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-> Reviewed-by: Julien Thierry <julien.thierry@arm.com>
+> May remove the flags field?
+> 
+>> +			return -EINVAL;
+>> +
+>> +		mutex_lock(&iommu->lock);
+>> +		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
+>> +					    &ustruct);
+>> +		mutex_unlock(&iommu->lock);
+>> +		return ret;
+>>  	}
+>>
+>>  	return -ENOTTY;
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h index
+>> 4316dd8cb5b5..055aa9b9745a 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -785,6 +785,19 @@ struct vfio_iommu_type1_attach_pasid_table {
+>>   */
+>>  #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
+>>
+>> +/**
+>> + * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
+>> + *			struct vfio_iommu_type1_cache_invalidate)
+>> + *
+>> + * Propagate guest IOMMU cache invalidation to the host.
+>> + */
+>> +struct vfio_iommu_type1_cache_invalidate {
+>> +	__u32   argsz;
+>> +	__u32   flags;
+> 
+> Looks like there is no more usage on "flags". is it?
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Agreed. However all the other vfio structs embed it.
+vfio_iommu_type1_dma_unmap (VFIO_IOMMU_UNMAP_DMA) or
+vfio_iommu_type1_info (VFIO_IOMMU_GET_INFO) also feature it and do not
+use it either if I am not wrong.
+
+So I guess flags is a common pattern for the API and somehow allows to
+extend the API if needed. So I would be inclined to keep it, no?
+
+Thanks
+
+Eric
+> 
+> Regards,
+> Yi Liu
+> 
+>> +	struct iommu_cache_invalidate_info info; };
+>> +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
+>> +
+>>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>>
+>>  /*
+>> --
+>> 2.20.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
