@@ -1,94 +1,68 @@
-Return-Path: <SRS0=zS8b=UP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=wAvJ=UQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4444EC31E50
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Jun 2019 20:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 465BAC31E57
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 11:19:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CA79620657
-	for <kvmarm@archiver.kernel.org>; Sun, 16 Jun 2019 20:05:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA79620657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C52762087F
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 11:19:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52762087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D40D4A4CA;
-	Sun, 16 Jun 2019 16:05:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242324A511;
+	Mon, 17 Jun 2019 07:19:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UFX2Oggc+M7P; Sun, 16 Jun 2019 16:04:59 -0400 (EDT)
+	with ESMTP id qe05ojL6m0jN; Mon, 17 Jun 2019 07:19:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09C6D4A518;
-	Sun, 16 Jun 2019 16:04:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD10B4A4E5;
+	Mon, 17 Jun 2019 07:19:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02E7C4A4CA
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Jun 2019 16:04:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 225F84A483
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 07:19:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-kK8JAlyEPM for <kvmarm@lists.cs.columbia.edu>;
- Sun, 16 Jun 2019 16:04:54 -0400 (EDT)
-Received: from mail-qk1-f195.google.com (mail-qk1-f195.google.com
- [209.85.222.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ED664A4A9
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Jun 2019 16:04:54 -0400 (EDT)
-Received: by mail-qk1-f195.google.com with SMTP id l128so4999915qke.2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 16 Jun 2019 13:04:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=MSqaCoMGco6P2zrSK37/hWJH9CXgQkBw2hzb1U1jzNw=;
- b=ayCVU5JHE6iIt84v4LFiBKOV5R0/ZLgBWzUEePSB41r2Am9k76Qua5YvU/9wIG9nIQ
- Ys7WcHa6hWYVctgMjWruDfc7FLjlVTA+huKiRw3t+inyU1Q25X3tm04U9d/fdDIcypc2
- 0uDg9Rm4oq0BfYE7L5r4BEdq9eEvQdcm9kBCsUrain5zEqw0Y1Dp0AgW9JsbwcB598Sn
- LYcXeZUcqArB/cYcVVpNTqQ18OQhb5LXPodkZkKDp8TvWxT7ByTadiigubJFCH9YlOE1
- dCnqXOtANO91y+Q8Y8CR0b4SP7ES1PfeVHzHhBmWe/iC1+5nbqSbqABi+WtMJzPJKxwi
- RJ4w==
-X-Gm-Message-State: APjAAAUNrnngL47rn6p34sSMPJkXfpvXOcDqpdbfvh7THFZPNyQGQvsP
- cKHyOsDxl7BFoIisgd5/+Gl0Bw==
-X-Google-Smtp-Source: APXvYqzk8vjSAyBVM9AEC2sCcZJe/bhI9soeo5hRV28lwc5eEPs3dYN+S5Bd7YkUw5B0eEUJ+IVZrA==
-X-Received: by 2002:ae9:c21a:: with SMTP id j26mr65498831qkg.310.1560715494165; 
- Sun, 16 Jun 2019 13:04:54 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
- [100.0.197.103])
- by smtp.gmail.com with ESMTPSA id w51sm4943466qth.18.2019.06.16.13.04.51
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sun, 16 Jun 2019 13:04:53 -0700 (PDT)
-Date: Sun, 16 Jun 2019 16:04:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [virtio-dev] Re: [PATCH v8 2/7] dt-bindings: virtio: Add
- virtio-pci-iommu node
-Message-ID: <20190616154841-mutt-send-email-mst@kernel.org>
-References: <20190530170929.19366-1-jean-philippe.brucker@arm.com>
- <20190530170929.19366-3-jean-philippe.brucker@arm.com>
- <20190530133523-mutt-send-email-mst@kernel.org>
- <c3cd5dba-123d-e808-98b1-731ac2d4b950@arm.com>
+ with ESMTP id Lp7Q0CuTScgO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jun 2019 07:19:36 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 616F44A409
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 07:19:36 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0179344;
+ Mon, 17 Jun 2019 04:19:35 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78CB23F246;
+ Mon, 17 Jun 2019 04:21:18 -0700 (PDT)
+Subject: Re: [PATCH v1 2/5] KVM: arm/arm64: Adjust entry/exit and trap related
+ tracepoints
+To: Zenghui Yu <yuzenghui@huawei.com>
+References: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
+ <1560330526-15468-3-git-send-email-yuzenghui@huawei.com>
+ <977f8f8c-72b4-0287-4b1c-47a0d6f1fd6e@arm.com>
+ <e78a9798-cce3-a360-37c3-0ad359944b85@huawei.com>
+From: James Morse <james.morse@arm.com>
+Message-ID: <4d16d690-e93b-7b89-3251-aa4bd8489715@arm.com>
+Date: Mon, 17 Jun 2019 12:19:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <c3cd5dba-123d-e808-98b1-731ac2d4b950@arm.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>,
- "tnowicki@caviumnetworks.com" <tnowicki@caviumnetworks.com>,
- "frowand.list@gmail.com" <frowand.list@gmail.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "robh+dt@kernel.org" <robh+dt@kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "bhelgaas@google.com" <bhelgaas@google.com>,
- Robin Murphy <Robin.Murphy@arm.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "bauerman@linux.ibm.com" <bauerman@linux.ibm.com>
+In-Reply-To: <e78a9798-cce3-a360-37c3-0ad359944b85@huawei.com>
+Content-Language: en-GB
+Cc: acme@redhat.com, kvm@vger.kernel.org, marc.zyngier@arm.com,
+ catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org,
+ acme@kernel.org, linux-perf-users@vger.kernel.org, peterz@infradead.org,
+ alexander.shishkin@linux.intel.com, mingo@redhat.com, linuxarm@huawei.com,
+ ganapatrao.kulkarni@cavium.com, namhyung@kernel.org, jolsa@redhat.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ xiexiangyou@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,76 +74,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, May 31, 2019 at 12:13:47PM +0100, Jean-Philippe Brucker wrote:
-> On 30/05/2019 18:45, Michael S. Tsirkin wrote:
-> > On Thu, May 30, 2019 at 06:09:24PM +0100, Jean-Philippe Brucker wrote:
-> >> Some systems implement virtio-iommu as a PCI endpoint. The operating
-> >> system needs to discover the relationship between IOMMU and masters long
-> >> before the PCI endpoint gets probed. Add a PCI child node to describe the
-> >> virtio-iommu device.
-> >>
-> >> The virtio-pci-iommu is conceptually split between a PCI programming
-> >> interface and a translation component on the parent bus. The latter
-> >> doesn't have a node in the device tree. The virtio-pci-iommu node
-> >> describes both, by linking the PCI endpoint to "iommus" property of DMA
-> >> master nodes and to "iommu-map" properties of bus nodes.
-> >>
-> >> Reviewed-by: Rob Herring <robh@kernel.org>
-> >> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> >> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> > 
-> > So this is just an example right?
-> > We are not defining any new properties or anything like that.
-> 
-> Yes it's just an example. The properties already exist but it's good to
-> describe how to put them together for this particular case, because
-> there isn't a precedent describing the topology for an IOMMU that
-> appears on the PCI bus.
-> 
-> > I think down the road for non dt platforms we want to put this
-> > info in the config space of the device. I do not think ACPI
-> > is the best option for this since not all systems have it.
-> > But that can wait.
-> 
-> There is the probe order problem - PCI needs this info before starting
-> to probe devices on the bus.
-
-
-This isn't all that special - it's pretty common for
-IOMMUs to be pci devices. The solution is to have the device on
-bus 0. For example, add it with
-
-DECLARE_PCI_FIXUP_EARLY
-or
-DECLARE_PCI_FIXUP_CLASS_EARLY
-
-in e.g.
-arch/x86/kernel/quirks.c
-or
-drivers/pci/quirks.c
-
-You can also use the configuration access capability
-if there's need to access the device before its memory is
-enabled.
-
-> Maybe we could store the info in a separate
-> memory region, that is referenced on the command-line and that the guest
-> can read early.
-> 
-> Thanks,
-> Jean
-
-The point is to avoid command line hacks. Devices should be
-self describing.
-
--- 
-MST
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgWmVuZ2h1aSwKCk9uIDEzLzA2LzIwMTkgMTI6MjgsIFplbmdodWkgWXUgd3JvdGU6Cj4gT24g
+MjAxOS82LzEyIDIwOjQ5LCBKYW1lcyBNb3JzZSB3cm90ZToKPj4gT24gMTIvMDYvMjAxOSAxMDow
+OCwgWmVuZ2h1aSBZdSB3cm90ZToKPj4+IEN1cnJlbnRseSwgd2UgdXNlIHRyYWNlX2t2bV9leGl0
+KCkgdG8gcmVwb3J0IGV4Y2VwdGlvbiB0eXBlIChlLmcuLAo+Pj4gIklSUSIsICJUUkFQIikgYW5k
+IGV4Y2VwdGlvbiBjbGFzcyAoRVNSX0VMeCdzIGJpdFszMToyNl0pIHRvZ2V0aGVyLgo+Pj4gQnV0
+IGhhcmR3YXJlIG9ubHkgc2F2ZXMgdGhlIGV4aXQgY2xhc3MgdG8gRVNSX0VMeCBvbiBzeW5jaHJv
+bm91cwo+Pj4gZXhjZXB0aW9ucywgbm90IG9uIGFzeW5jaHJvbm91cyBleGNlcHRpb25zLiBXaGVu
+IHRoZSBndWVzdCBleGl0cwo+Pj4gZHVlIHRvIGV4dGVybmFsIGludGVycnVwdHMsIHdlIHdpbGwg
+Z2V0IHRyYWNpbmcgb3V0cHV0IGxpa2U6Cj4+Pgo+Pj4gwqDCoMKgwqAia3ZtX2V4aXQ6IElSUTog
+SFNSX0VDOiAweDAwMDAgKFVOS05PV04pLCBQQzogMHhmZmZmODcyNTllMzAiCj4+Pgo+Pj4gT2J2
+aW91c2x5LCAiSFNSX0VDIiBoZXJlIGlzIG1lYW5pbmdsZXNzLgoKPj4gSSBhc3N1bWUgd2UgZG8g
+aXQgdGhpcyB3YXkgc28gdGhlcmUgaXMgb25seSBvbmUgZ3Vlc3QtZXhpdCB0cmFjZXBvaW50IHRo
+YXQgY2F0Y2hlcyBhbGwKPj4gZXhpdHMuCj4+IEkgZG9uJ3QgdGhpbmsgaXRzIGEgcHJvYmxlbSBp
+ZiB1c2VyLXNwYWNlIGhhcyB0byBrbm93IHRoZSBFQyBpc24ndCBzZXQgZm9yIGFzeW5jaHJvbm91
+cwo+PiBleGNlcHRpb25zLCB0aGlzIGlzIGEgcHJvcGVydHkgb2YgdGhlIGFyY2hpdGVjdHVyZSBh
+bmQgYW55dGhpbmcgdXNpbmcgdGhlc2UgdHJhY2UtcG9pbnRzCj4+IGlzIGFscmVhZHkgYXJjaCBz
+cGVjaWZpYy4KCj4gQWN0dWFsbHksICpubyogcHJvYmxlbSBpbiBjdXJyZW50IGltcGxlbWVudGF0
+aW9uLCBhbmQgSSdtIE9LIHRvIHN0aWxsCj4ga2VlcCB0aGUgRUMgaW4gdHJhY2Vfa3ZtX2V4aXQo
+KS7CoCBXaGF0IEkgcmVhbGx5IHdhbnQgdG8gZG8gaXMgYWRkaW5nIHRoZQo+IEVDIGluIHRyYWNl
+X3RyYXBfZW50ZXIgKHRoZSBuZXcgdHJhY2Vwb2ludCksIHdpbGwgZXhwbGFpbiBpdCBsYXRlci4K
+Cgo+Pj4gVGhpcyBwYXRjaCBzcGxpdHMgImV4aXQiIGFuZCAidHJhcCIgZXZlbnRzIGJ5IGFkZGlu
+ZyB0d28gdHJhY2Vwb2ludHMKPj4+IGV4cGxpY2l0bHkgaW4gaGFuZGxlX3RyYXBfZXhjZXB0aW9u
+cygpLiBMZXQgdHJhY2Vfa3ZtX2V4aXQoKSByZXBvcnQgVk0KPj4+IGV4aXQgZXZlbnRzLCBhbmQg
+dHJhY2Vfa3ZtX3RyYXBfZXhpdCgpIHJlcG9ydCBWTSB0cmFwIGV2ZW50cy4KPj4+Cj4+PiBUaGVz
+ZSB0cmFjZXBvaW50cyBhcmUgYWRqdXN0ZWQgYWxzbyBpbiBwcmVwYXJhdGlvbiBmb3Igc3VwcG9y
+dGluZwo+Pj4gJ3BlcmYga3ZtIHN0YXQnIG9uIGFybTY0Lgo+Pgo+PiBCZWNhdXNlIHRoZSBleGlz
+dGluZyB0cmFjZXBvaW50cyBhcmUgQUJJLCBJIGRvbid0IHRoaW5rIHdlIGNhbiBjaGFuZ2UgdGhl
+bS4KPj4KPj4gV2UgY2FuIGFkZCBuZXcgb25lcyBpZiB0aGVyZSBpcyBzb21ldGhpbmcgdGhhdCBh
+IHVzZXIgcmVhc29uYWJseSBuZWVkcyB0byB0cmFjZSwgYW5kIGNhbid0Cj4+IGJlIGRvbmUgYW55
+IG90aGVyIHdheS4KPj4KPj4gV2hhdCBjYW4ndCAncGVyZiBrdm0gc3RhdCcgZG8gd2l0aCB0aGUg
+ZXhpc3RpbmcgdHJhY2UgcG9pbnRzPwoKPiBGaXJzdCwgaG93IGRvZXMgJ3BlcmYga3ZtIHN0YXQn
+IGludGVyYWN0IHdpdGggdHJhY2Vwb2ludHM/CgpTdGFydCBhdCB0aGUgYmVnaW5uaW5nLCBnb29k
+IGlkZWEuIChJJ3ZlIG5ldmVyIHVzZWQgdGhpcyB0aGluZyEpCgoKPiBXZSBoYXZlIHRocmVlIGhh
+bmRsZXJzIGZvciBhIHNwZWNpZmljIGV2ZW50IChlLmcuLCAiVk0tRVhJVCIpIC0tCj4gImlzX2Jl
+Z2luX2V2ZW50IiwgImlzX2VuZF9ldmVudCIsICJkZWNvZGVfa2V5Ii4gVGhlIGZpcnN0IHR3byBo
+YW5kbGVycwo+IG1ha2UgdXNlIG9mIHR3byBleGlzdGluZyB0cmFjZXBvaW50cyAoImt2bTprdm1f
+ZXhpdCIgJiAia3ZtOmt2bV9lbnRyeSIpCj4gdG8gY2hlY2sgd2hlbiB0aGUgVk0tRVhJVCBldmVu
+dHMgc3RhcnRlZC9lbmRlZCwgdGh1cyB0aGUgdGltZSBkaWZmZXJlbmNlCj4gc3RhdHMsIGV2ZW50
+IHN0YXJ0L2VuZCB0aW1lIGV0Yy4gY2FuIGJlIGNhbGN1bGF0ZWQuCgo+ICJpc19iZWdpbl9ldmVu
+dCIgaGFuZGxlciBnZXRzIGEgKmtleSogZnJvbSB0aGUgInJldCIgZmllbGQgKGV4aXRfY29kZSkK
+PiBvZiAia3ZtOmt2bV9leGl0IiBwYXlsb2FkLCBhbmQgImRlY29kZV9rZXkiIGhhbmRsZXIgbWFr
+ZXMgdXNlIG9mIHRoZQo+ICprZXkqIHRvIGZpbmQgb3V0IHRoZSByZWFzb24gZm9yIHRoZSBWTS1F
+WElUIGV2ZW50LiBPZiBjb3Vyc2Ugd2Ugc2hvdWxkCj4gbWFpbnRhaW4gdGhlIG1hcHBpbmcgYmV0
+d2VlbiBleGl0X2NvZGUgYW5kIGV4aXRfcmVhc29uIGluIHVzZXJzcGFjZS4KCkludGVycHJldGlu
+ZyAncmV0JyBpcyBnb2luZyB0byBnZXQgdHJpY2t5IGlmIHdlIGNoYW5nZSB0aG9zZSB2YWx1ZXMg
+b24gYSB3aGltLiBJdHMKaW50ZXJuYWwgdG8gdGhlIEtWTSBhcmNoIGNvZGUuCgoKPiBUaGVzZSBh
+cmUgYWxsIHdoYXQgKnBhdGNoICM0KiBoYWQgZG9uZSwgIzQgaXMgYSBzaW1wbGUgcGF0Y2ggdG8g
+cmV2aWV3IQoKPiBPaCwgd2UgY2FuIGFsc28gc2V0ICJ2Y3B1X2lkX3N0ciIgdG8gYWNoaWV2ZSBw
+ZXIgdmNwdSBldmVudCByZWNvcmQsIGJ1dAo+IGN1cnJlbnRseSwgd2Ugb25seSBoYXZlIHRoZSAi
+dmNwdV9wYyIgZmllbGQgaW4gImt2bTprdm1fZW50cnkiLCB3aXRob3V0Cj4gc29tZXRoaW5nIGxp
+a2UgInZjcHVfaWQiLgoKSGVoLCBzbyBmcm9tIHRoZSB0cmFjZS1wb2ludCBkYXRhLCB5b3UgY2Fu
+J3Qga25vdyB3aGljaCBvbiBpcyB2Y3B1LTAgYW5kIHdoaWNoIGlzIHZjcHUtMS4KCgo+IE9LLCBu
+ZXh0IGNvbWVzIHRoZSBtb3JlIGltcG9ydGFudCBxdWVzdGlvbiAtIHdoYXQgc2hvdWxkL2NhbiB3
+ZSBkbyB0bwo+IHRoZSB0cmFjZXBvaW50cyBpbiBwcmVwYXJhdGlvbiBvZiAncGVyZiBrdm0gc3Rh
+dCcgb24gYXJtNjQ/Cj4gCj4gRnJvbSB0aGUgYXJ0aWNsZSB5b3UndmUgcHJvdmlkZWQsIGl0J3Mg
+Y2xlYXIgdGhhdCB3ZSBjYW4ndCByZW1vdmUgdGhlIEVDCj4gZnJvbSB0cmFjZV9rdm1fZXhpdCgp
+LiBCdXQgY2FuIHdlIGFkZCBzb21ldGhpbmcgbGlrZSAidmNwdV9pZCIgaW50bwo+IChhdCBsZWFz
+dCkgdHJhY2Vfa3ZtX2VudHJ5KCksIGp1c3QgbGlrZSB3aGF0IHRoaXMgcGF0Y2ggaGFzIGRvbmU/
+CgpBZGRpbmcgc29tZXRoaW5nIGlzIHN0aWxsIGxpa2VseSB0byBicmVhayBhIGJhZGx5IHdyaXR0
+ZW4gdXNlci1zcGFjZSB0aGF0IGlzIHRyeWluZyB0bwpwYXJzZSB0aGUgdHJhY2UgaW5mb3JtYXRp
+b24uIEEgcmVnZXggcGlja2luZyBvdXQgdGhlIGxhc3QgYXJndW1lbnQgd2lsbCBub3cgZ2V0IGEK
+ZGlmZmVyZW50IHZhbHVlLgoKCj4gSWYgbm90LCB3aGljaCBtZWFucyB3ZSBoYXZlIHRvIGtlZXAg
+dGhlIGV4aXN0aW5nIHRyYWNlcG9pbnRzIHRvdGFsbHkKPiB1bmNoYW5nZWQsIHRoZW4gJ3BlcmYg
+a3ZtIHN0YXQnIHdpbGwgaGF2ZSBubyB3YXkgdG8gcmVjb3JkL3JlcG9ydCBwZXIKPiB2Y3B1IFZN
+LUVYSVQgZXZlbnRzIChvdGhlciBhcmNoIGxpa2UgWDg2LCBwb3dlcnBjLCBzMzkwIGV0Yy4gaGF2
+ZSB0aGlzCj4gY2FwYWJpbGl0eSwgaWYgSSB1bmRlcnN0YW5kIGl0IGNvcnJlY3RseSkuCgpXZWxs
+LCB5b3UgZ2V0IHRoZSBldmVudHMsIGJ1dCB5b3UgZG9uJ3Qga25vdyB3aGljaCB2Q1BVIGlzIHdo
+aWNoLiBZb3UgY2FuIG1hcCB0aGlzIGJhY2sgdG8KdGhlIHBpZCBvZiB0aGUgaG9zdCB0aHJlYWQg
+YXNzdW1pbmcgdXNlci1zcGFjZSBpc24ndCBtb3ZpbmcgdmNwdSBiZXR3ZWVuIGhvc3QgdGhyZWFk
+cy4KCklmIHdlJ3JlIHJlYWxseSBzdHVjazogQWRkaW5nIHRyYWNlcG9pbnRzIHRvIEtWTS1jb3Jl
+J3MgdmNwdSBnZXQvcHV0LCB0aGF0IGV4cG9ydCB0aGUKdmNwdV9pZCB3b3VsZCBsZXQgeW91IG1h
+cCBwaWQtPnZjcHVfaWQsIHdoaWNoIHlvdSBjYW4gdGhlbiB1c2UgZm9yIHRoZSBiYXRjaCBvZiBl
+bnRlci9leGl0CmV2ZW50cyB0aGF0IGNvbWUgYmVmb3JlIGEgZmluYWwgdmNwdSBwdXQuCmdyZXBw
+aW5nICJ2cHVfaWQiIHNob3dzIHBlcmYgaGFzIGEgbWFwcGluZyBmb3Igd2hpY2ggYXJjaC1zcGVj
+aWZpYyBhcmd1bWVudCBpbiBlbnRlci9leGl0CmlzIHRoZSB2Y3B1LWlkLiBEb25lIHdpdGggdGhp
+cyBjb3JlLWNvZGUgbWFwcGluZywgeW91IGNvdWxkIGRyb3AgdGhhdCBjb2RlLi4uCgpCdXQgSSdk
+IGJlIGEgbGl0dGxlIG5lcnZvdXMgYWRkaW5nIGEgbmV3IHRyYWNlLXBvaW50IHRvIHdvcmsgYXJv
+dW5kIGFuIEFCSSBwcm9ibGVtLCBhcyB3ZQptYXkgaGF2ZSBqdXN0IG1vdmVkIHRoZSBBQkkgcHJv
+YmxlbSEgKFdoYXQgZG9lcyBhIHVzZXIgb2YgYSB2Y3B1X3B1dCB0cmFjZXBvaW50IHJlYWxseSBu
+ZWVkPykKCgo+IEFzIGZvciBUUkFQIGV2ZW50cywgc2hvdWxkIHdlIGNvbnNpZGVyIGFkZGluZyB0
+d28gbmV3IHRyYWNlcG9pbnRzIC0tCj4gImt2bV90cmFwX2VudGVyIiBhbmQgImt2bV90cmFwX2V4
+aXQiLCB0byBrZWVwIHRyYWNraW5nIG9mIHRoZSB0cmFwCj4gaGFuZGxpbmcgcHJvY2Vzcz8gV2Ug
+c2hvdWxkIGFsc28gcmVjb3JkIHRoZSBFQyBpbiAia3ZtX3RyYXBfZW50ZXIiLCB3aGljaCB3aWxs
+IGJlIHVzZWQgYXMKPiAqa2V5KiBpbiBUUkFQIGV2ZW50J3MgImlzX2JlZ2luX2V2ZW50IiBoYW5k
+bGVyLgoKVGhlIEVDIGNhbid0IGNoYW5nZSBiZXR3ZWVuIHRyYWNlX2t2bV9leGl0KCkgYW5kIGhh
+bmRsZV9leGl0KCksIHNvIHlvdSBhbHJlYWR5IGhhdmUgdGhpcy4KCldoYXQgYXJlIHRoZSAndHJh
+cCcgdHJhY2UgcG9pbnRzIG5lZWRlZCBmb3I/IFlvdSBnZXQgdGhlIHRpbWluZyBhbmQgJ2V4Y2Vw
+dGlvbiBjbGFzcycgZnJvbQp0aGUgZ3Vlc3QgZW50ZXIvZXhpdCB0cmFjZXBvaW50cy4gV2hhdCBh
+Ym91dCBoYW5kbGVfZXhpdCgpIGNhbid0IHlvdSB3b3JrIG91dCBmcm9tIHRoaXM/CgoKPiBQYXRj
+aCAjNSB0ZWxscyB1cyB0aGUgd2hvbGUgc3RvcnksIGl0J3Mgc2ltcGxlIHRvby4KCihJIG9ubHkg
+c2tpbW1lZCB0aGUgcGVyZiBwYXRjaGVzLCBJJ2xsIGdvIGJhY2sgbm93IHRoYXQgSSBrbm93IGEg
+bGl0dGxlIG1vcmUgYWJvdXQgd2hhdAp5b3UncmUgZG9pbmcpCgoKPiBXaGF0IGRvIHlvdSBzdWdn
+ZXN0PwoKV2UgY2FuIGV4cGxvcmUgdGhlIHZjcHVfbG9hZCgpL3ZjcHVfcHV0KCkgdHJhY2UgaWRl
+YSwgKGl0IG1heSBub3Qgd29yayBmb3Igc29tZSBvdGhlcgpyZWFzb24pLiBJJ2QgbGlrZSB0byB1
+bmRlcnN0YW5kIHdoYXQgdGhlICd0cmFwJyB0cmFjZXBvaW50cyBhcmUgbmVlZGVkIGZvci4KCgpU
+aGFua3MsCgpKYW1lcwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
+cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
