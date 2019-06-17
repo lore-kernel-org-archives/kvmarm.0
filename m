@@ -8,77 +8,76 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D65C31E5C
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC38C31E5B
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:11:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B6C3820861
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:11:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26E9220833
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:11:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RoQtqypU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C3820861
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lM9V28lH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E9220833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C564A4C0;
-	Mon, 17 Jun 2019 18:11:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1E044A528;
+	Mon, 17 Jun 2019 18:11:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JIrjnqXn9rgH; Mon, 17 Jun 2019 18:11:50 -0400 (EDT)
+	with ESMTP id ne77n0JxUTi0; Mon, 17 Jun 2019 18:11:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8E524A528;
-	Mon, 17 Jun 2019 18:11:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2109F4A523;
+	Mon, 17 Jun 2019 18:11:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDC354A519
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:11:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A48C84A506
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:11:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mMMQ6JXc1avV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jun 2019 18:11:49 -0400 (EDT)
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com
- [209.85.214.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD3794A512
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:11:48 -0400 (EDT)
-Received: by mail-pl1-f195.google.com with SMTP id bh12so4754012plb.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 15:11:48 -0700 (PDT)
+ with ESMTP id 1UGtfLguXkYQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jun 2019 18:11:55 -0400 (EDT)
+Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com
+ [209.85.215.196])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A1D24A50D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:11:54 -0400 (EDT)
+Received: by mail-pg1-f196.google.com with SMTP id s21so6499865pga.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 15:11:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=yPilZaF4h/dGO9ftIHQBkXDAqkrv70KGQtrlQh5r36Y=;
- b=RoQtqypU7XfqeDUuJTl9JPFyZrZZzgzKkIFcFpho0mpTztJ5TmiJZ/9vEwGfEnxb9e
- rGMzDmo1IzgXXocOONgm7tIG2TRoFtCwxnQyKxVlb8Ai0eX68cqInfAqmQ4TEOGFzi2E
- pzbZiJnZjyz8VhqMmg34AFoT+7MzpZiFZUfxw52Uft7/HF+dDbd0HTyYR5NxNPGpjGML
- kB+VPbtos4BpM5RCptwCoWxzFoceIUPRXf1i9lyePk2iTgrxX71pyXIuHH3CbXRpZ45f
- 5rss8EqI+xTICq9zmkDGhNDOMeD+KlihLEeY8tFPjIkMgXJRNS3+H0naOTtQnBC3TC0j
- 08GA==
+ bh=p6XDrWIXPxwiC0WkVplyBA2eip53/d0wLoTT+kG56h8=;
+ b=lM9V28lHz+IBkY5VdI0s8iO+vLMAs40MpqbH7p8o1V0kN4h5BVAps6MhzWd47/5wqS
+ 5a12SMTuwq6I9MuodRL4pZkKfq7Kv4WDPsN63pkUZJAtLWVL3fdWGGc0tS9cpupi6eGU
+ fNtSYFIYvpYDVEd7NfZh03N9Nxq2UR/jwFxWL4YubGBUny9kkKwYxVJ/i9XJhPiq+5Yy
+ xoO58VJx7oQax+iuOVcR/gGOszW6LoPHu/claYKKs+tZyLfyXrIONhj9JDOjHUang8Zm
+ a4L39eESo/iOuqAxSGpNucGJSSfP6xYK1JPFc+7t9oYNpOqCsyfsJFGQ4Fs1a0+CgPl/
+ uPfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=yPilZaF4h/dGO9ftIHQBkXDAqkrv70KGQtrlQh5r36Y=;
- b=CrruONe4nNpZ8xOchHbm6dwPwav4VShBuvyasFexRDeBZ/nTdgtjWInw89FaNI2YP8
- bRRjAYBpViE7uSp/fIJNWEsRFFVkxHRs/rHj/4zG0L620mj4/eHYL75qpnegTe1yspvF
- bKzPYgJDtZCpKGyW1weFL3yglwGCiBoWPF9K4RRK+yRy0R43VqQBPo/mxd3IUp52BFiS
- F3UUBxpsiMUD6PSIN7H3x5RarZS9V1+PDbwSP8QcP3UecL9O6Pp3tYz4zkEUpfJMQhZg
- KIDE/VM8rDoCg2o4AmCkc+EovVCIsEzhlwSr/eQA4aufGNI7UmS3WsxgJgTfwrIQkmr9
- SoYA==
-X-Gm-Message-State: APjAAAXqco8PgtRsmsdw7vCrsY3hkNLXg2bJdgVnLIBOdfU4OcYDgtiv
- uhMgLTt6j+1fpjwfAFOZEco=
-X-Google-Smtp-Source: APXvYqyvjkhT468Ci5X7M8XFTgeGEw8UMyMykIYVL/LmE+BwBN5QhccOaUr2KIjvOt+ToLsBrrpIjQ==
-X-Received: by 2002:a17:902:42d:: with SMTP id
- 42mr105482899ple.228.1560809507937; 
- Mon, 17 Jun 2019 15:11:47 -0700 (PDT)
+ bh=p6XDrWIXPxwiC0WkVplyBA2eip53/d0wLoTT+kG56h8=;
+ b=KDsHKwMaEYpfKv+D2yTuvQ8/QVxgu3Ott5opT3KjOInQSV8xbdDxUKJpCd8yMKO5LW
+ FJlUHCLOKZbD/a7y4kwzqJ3zEAmDj6H6ePJ4yZYKd3QLdGRp/QlF6GDzkuzeB+daP5iV
+ Ja0qqOIAP9Kt26EiKHfM1vlG6ocX0oRYb/paHlTZTP3wSeqdsCc6H1LOxlf3Gb0Zo6xl
+ Ur+POlWK0MXl+q/GJF5WSXwmlrXE4JOeVOO6vegxUKklPVtGViJewNqrLbKUAs442/P4
+ yDguSosknj/AoNIgwEKGFzahdsTAAURIVlL9y+RXb1g3RvEbJeVtPHQRXQX13udQYvsx
+ A+6w==
+X-Gm-Message-State: APjAAAXNQqBT05obbLGo6b2Gq+Onnnz3I2ZI2jx4008ybUydxdSEvvrI
+ yNeY6mSiLgU0P0Niw/uDkkU=
+X-Google-Smtp-Source: APXvYqyxYiqJ9jSGW3jhLESovzpKr5QifimBTtn4hfhm7oQhnRbpIKEXlU7NCDDsQg7EH82JV4+iqw==
+X-Received: by 2002:a62:764d:: with SMTP id r74mr95168317pfc.110.1560809513044; 
+ Mon, 17 Jun 2019 15:11:53 -0700 (PDT)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
- by smtp.gmail.com with ESMTPSA id s129sm12551020pfb.186.2019.06.17.15.11.45
+ by smtp.gmail.com with ESMTPSA id s129sm12551020pfb.186.2019.06.17.15.11.50
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 15:11:47 -0700 (PDT)
+ Mon, 17 Jun 2019 15:11:52 -0700 (PDT)
 From: Florian Fainelli <f.fainelli@gmail.com>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v6 3/6] ARM: Replace memory function for kasan
-Date: Mon, 17 Jun 2019 15:11:31 -0700
-Message-Id: <20190617221134.9930-4-f.fainelli@gmail.com>
+Subject: [PATCH v6 5/6] ARM: Initialize the mapping of KASan shadow memory
+Date: Mon, 17 Jun 2019 15:11:33 -0700
+Message-Id: <20190617221134.9930-6-f.fainelli@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190617221134.9930-1-f.fainelli@gmail.com>
 References: <20190617221134.9930-1-f.fainelli@gmail.com>
@@ -115,188 +114,502 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Andrey Ryabinin <aryabinin@virtuozzo.com>
 
-Functions like memset/memmove/memcpy do a lot of memory accesses.
-If bad pointer passed to one of these function it is important
-to catch this. Compiler's instrumentation cannot do this since
-these functions are written in assembly.
+This patch initializes KASan shadow region's page table and memory.
+There are two stage for KASan initializing:
+1. At early boot stage the whole shadow region is mapped to just
+   one physical page (kasan_zero_page). It's finished by the function
+   kasan_early_init which is called by __mmap_switched(arch/arm/kernel/
+   head-common.S)
+             ---Andrey Ryabinin <aryabinin@virtuozzo.com>
 
-KASan replaces memory functions with manually instrumented variants.
-Original functions declared as weak symbols so strong definitions
-in mm/kasan/kasan.c could replace them. Original functions have aliases
-with '__' prefix in name, so we could call non-instrumented variant
-if needed.
+2. After the calling of paging_init, we use kasan_zero_page as zero
+   shadow for some memory that KASan don't need to track, and we alloc
+   new shadow space for the other memory that KASan need to track. These
+   issues are finished by the function kasan_init which is call by
+   setup_arch.
+            ---Andrey Ryabinin <aryabinin@virtuozzo.com>
 
-We must use __memcpy/__memset to replace memcpy/memset when we copy
-.data to RAM and when we clear .bss, because kasan_early_init can't
-be called before the initialization of .data and .bss.
+3. Add support arm LPAE
+   If LPAE is enabled, KASan shadow region's mapping table need be copyed
+   in pgd_alloc function.
+            ---Abbott Liu <liuwenliang@huawei.com>
 
+4. Change kasan_pte_populate,kasan_pmd_populate,kasan_pud_populate,
+   kasan_pgd_populate from .meminit.text section to .init.text section.
+           ---Reported by: Florian Fainelli <f.fainelli@gmail.com>
+           ---Signed off by: Abbott Liu <liuwenliang@huawei.com>
+
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Co-Developed-by: Abbott Liu <liuwenliang@huawei.com>
 Reported-by: Russell King - ARM Linux <linux@armlinux.org.uk>
+Reported-by: Florian Fainelli <f.fainelli@gmail.com>
 Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- arch/arm/boot/compressed/decompress.c |  2 ++
- arch/arm/boot/compressed/libfdt_env.h |  2 ++
- arch/arm/include/asm/string.h         | 17 +++++++++++++++++
- arch/arm/kernel/head-common.S         |  4 ++--
- arch/arm/lib/memcpy.S                 |  3 +++
- arch/arm/lib/memmove.S                |  5 ++++-
- arch/arm/lib/memset.S                 |  3 +++
- 7 files changed, 33 insertions(+), 3 deletions(-)
+ arch/arm/include/asm/kasan.h       |  35 ++++
+ arch/arm/include/asm/pgalloc.h     |   7 +-
+ arch/arm/include/asm/thread_info.h |   4 +
+ arch/arm/kernel/head-common.S      |   3 +
+ arch/arm/kernel/setup.c            |   2 +
+ arch/arm/mm/Makefile               |   3 +
+ arch/arm/mm/kasan_init.c           | 301 +++++++++++++++++++++++++++++
+ arch/arm/mm/pgd.c                  |  14 ++
+ 8 files changed, 367 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm/include/asm/kasan.h
+ create mode 100644 arch/arm/mm/kasan_init.c
 
-diff --git a/arch/arm/boot/compressed/decompress.c b/arch/arm/boot/compressed/decompress.c
-index aa075d8372ea..3794fae5f818 100644
---- a/arch/arm/boot/compressed/decompress.c
-+++ b/arch/arm/boot/compressed/decompress.c
-@@ -47,8 +47,10 @@ extern char * strchrnul(const char *, int);
- #endif
- 
- #ifdef CONFIG_KERNEL_XZ
-+#ifndef CONFIG_KASAN
- #define memmove memmove
- #define memcpy memcpy
-+#endif
- #include "../../../../lib/decompress_unxz.c"
- #endif
- 
-diff --git a/arch/arm/boot/compressed/libfdt_env.h b/arch/arm/boot/compressed/libfdt_env.h
-index b36c0289a308..8091efc21407 100644
---- a/arch/arm/boot/compressed/libfdt_env.h
-+++ b/arch/arm/boot/compressed/libfdt_env.h
-@@ -19,4 +19,6 @@ typedef __be64 fdt64_t;
- #define fdt64_to_cpu(x)		be64_to_cpu(x)
- #define cpu_to_fdt64(x)		cpu_to_be64(x)
- 
-+#undef memset
-+
- #endif
-diff --git a/arch/arm/include/asm/string.h b/arch/arm/include/asm/string.h
-index 111a1d8a41dd..1f9016bbf153 100644
---- a/arch/arm/include/asm/string.h
-+++ b/arch/arm/include/asm/string.h
-@@ -15,15 +15,18 @@ extern char * strchr(const char * s, int c);
- 
- #define __HAVE_ARCH_MEMCPY
- extern void * memcpy(void *, const void *, __kernel_size_t);
-+extern void *__memcpy(void *dest, const void *src, __kernel_size_t n);
- 
- #define __HAVE_ARCH_MEMMOVE
- extern void * memmove(void *, const void *, __kernel_size_t);
-+extern void *__memmove(void *dest, const void *src, __kernel_size_t n);
- 
- #define __HAVE_ARCH_MEMCHR
- extern void * memchr(const void *, int, __kernel_size_t);
- 
- #define __HAVE_ARCH_MEMSET
- extern void * memset(void *, int, __kernel_size_t);
-+extern void *__memset(void *s, int c, __kernel_size_t n);
- 
- #define __HAVE_ARCH_MEMSET32
- extern void *__memset32(uint32_t *, uint32_t v, __kernel_size_t);
-@@ -39,4 +42,18 @@ static inline void *memset64(uint64_t *p, uint64_t v, __kernel_size_t n)
- 	return __memset64(p, v, n * 8, v >> 32);
- }
- 
-+
-+
-+#if defined(CONFIG_KASAN) && !defined(__SANITIZE_ADDRESS__)
-+
+diff --git a/arch/arm/include/asm/kasan.h b/arch/arm/include/asm/kasan.h
+new file mode 100644
+index 000000000000..1801f4d30993
+--- /dev/null
++++ b/arch/arm/include/asm/kasan.h
+@@ -0,0 +1,35 @@
 +/*
-+ * For files that not instrumented (e.g. mm/slub.c) we
-+ * should use not instrumented version of mem* functions.
++ * arch/arm/include/asm/kasan.h
++ *
++ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
++ * Author: Andrey Ryabinin <ryabinin.a.a@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
 + */
 +
-+#define memcpy(dst, src, len) __memcpy(dst, src, len)
-+#define memmove(dst, src, len) __memmove(dst, src, len)
-+#define memset(s, c, n) __memset(s, c, n)
++#ifndef __ASM_KASAN_H
++#define __ASM_KASAN_H
++
++#ifdef CONFIG_KASAN
++
++#include <asm/kasan_def.h>
++
++#define KASAN_SHADOW_SCALE_SHIFT 3
++
++/*
++ * Compiler uses shadow offset assuming that addresses start
++ * from 0. Kernel addresses don't start from 0, so shadow
++ * for kernel really starts from 'compiler's shadow offset' +
++ * ('kernel address space start' >> KASAN_SHADOW_SCALE_SHIFT)
++ */
++
++extern void kasan_init(void);
++
++#else
++static inline void kasan_init(void) { }
++#endif
++
++#endif
+diff --git a/arch/arm/include/asm/pgalloc.h b/arch/arm/include/asm/pgalloc.h
+index 17ab72f0cc4e..6cf45c249136 100644
+--- a/arch/arm/include/asm/pgalloc.h
++++ b/arch/arm/include/asm/pgalloc.h
+@@ -50,8 +50,11 @@ static inline void pud_populate(struct mm_struct *mm, pud_t *pud, pmd_t *pmd)
+  */
+ #define pmd_alloc_one(mm,addr)		({ BUG(); ((pmd_t *)2); })
+ #define pmd_free(mm, pmd)		do { } while (0)
+-#define pud_populate(mm,pmd,pte)	BUG()
+-
++#ifndef CONFIG_KASAN
++#define pud_populate(mm, pmd, pte)	BUG()
++#else
++#define pud_populate(mm, pmd, pte)	do { } while (0)
++#endif
+ #endif	/* CONFIG_ARM_LPAE */
+ 
+ extern pgd_t *pgd_alloc(struct mm_struct *mm);
+diff --git a/arch/arm/include/asm/thread_info.h b/arch/arm/include/asm/thread_info.h
+index 286eb61c632b..fae2fa993e86 100644
+--- a/arch/arm/include/asm/thread_info.h
++++ b/arch/arm/include/asm/thread_info.h
+@@ -16,7 +16,11 @@
+ #include <asm/fpstate.h>
+ #include <asm/page.h>
+ 
++#ifdef CONFIG_KASAN
++#define THREAD_SIZE_ORDER	2
++#else
+ #define THREAD_SIZE_ORDER	1
++#endif
+ #define THREAD_SIZE		(PAGE_SIZE << THREAD_SIZE_ORDER)
+ #define THREAD_START_SP		(THREAD_SIZE - 8)
+ 
+diff --git a/arch/arm/kernel/head-common.S b/arch/arm/kernel/head-common.S
+index 6e3b9179806b..5db2a094a44c 100644
+--- a/arch/arm/kernel/head-common.S
++++ b/arch/arm/kernel/head-common.S
+@@ -115,6 +115,9 @@ __mmap_switched:
+ 	str	r8, [r2]			@ Save atags pointer
+ 	cmp	r3, #0
+ 	strne	r10, [r3]			@ Save control register values
++#ifdef CONFIG_KASAN
++	bl	kasan_early_init
++#endif
+ 	mov	lr, #0
+ 	b	start_kernel
+ ENDPROC(__mmap_switched)
+diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
+index 5d78b6ac0429..71c27f3c3ed4 100644
+--- a/arch/arm/kernel/setup.c
++++ b/arch/arm/kernel/setup.c
+@@ -61,6 +61,7 @@
+ #include <asm/unwind.h>
+ #include <asm/memblock.h>
+ #include <asm/virt.h>
++#include <asm/kasan.h>
+ 
+ #include "atags.h"
+ 
+@@ -1133,6 +1134,7 @@ void __init setup_arch(char **cmdline_p)
+ 	early_ioremap_reset();
+ 
+ 	paging_init(mdesc);
++	kasan_init();
+ 	request_standard_resources(mdesc);
+ 
+ 	if (mdesc->restart)
+diff --git a/arch/arm/mm/Makefile b/arch/arm/mm/Makefile
+index 432302911d6e..1c937135c9c4 100644
+--- a/arch/arm/mm/Makefile
++++ b/arch/arm/mm/Makefile
+@@ -112,3 +112,6 @@ obj-$(CONFIG_CACHE_L2X0_PMU)	+= cache-l2x0-pmu.o
+ obj-$(CONFIG_CACHE_XSC3L2)	+= cache-xsc3l2.o
+ obj-$(CONFIG_CACHE_TAUROS2)	+= cache-tauros2.o
+ obj-$(CONFIG_CACHE_UNIPHIER)	+= cache-uniphier.o
++
++KASAN_SANITIZE_kasan_init.o    := n
++obj-$(CONFIG_KASAN)            += kasan_init.o
+diff --git a/arch/arm/mm/kasan_init.c b/arch/arm/mm/kasan_init.c
+new file mode 100644
+index 000000000000..a7122b28fffa
+--- /dev/null
++++ b/arch/arm/mm/kasan_init.c
+@@ -0,0 +1,301 @@
++/*
++ * This file contains kasan initialization code for ARM.
++ *
++ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
++ * Author: Andrey Ryabinin <ryabinin.a.a@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ */
++
++#include <linux/kasan.h>
++#include <linux/kernel.h>
++#include <linux/memblock.h>
++#include <linux/start_kernel.h>
++#include <asm/cputype.h>
++#include <asm/highmem.h>
++#include <asm/mach/map.h>
++#include <asm/memory.h>
++#include <asm/page.h>
++#include <asm/pgalloc.h>
++#include <asm/pgtable.h>
++#include <asm/procinfo.h>
++#include <asm/proc-fns.h>
++#include <asm/tlbflush.h>
++#include <asm/cp15.h>
++#include <linux/sched/task.h>
++
++#include "mm.h"
++
++static pgd_t tmp_pgd_table[PTRS_PER_PGD] __initdata __aligned(1ULL << 14);
++
++pmd_t tmp_pmd_table[PTRS_PER_PMD] __page_aligned_bss;
++
++static __init void *kasan_alloc_block(size_t size, int node)
++{
++	return memblock_alloc_try_nid(size, size, __pa(MAX_DMA_ADDRESS),
++				      MEMBLOCK_ALLOC_KASAN, node);
++}
++
++static void __init kasan_early_pmd_populate(unsigned long start,
++					unsigned long end, pud_t *pud)
++{
++	unsigned long addr;
++	unsigned long next;
++	pmd_t *pmd;
++
++	pmd = pmd_offset(pud, start);
++	for (addr = start; addr < end;) {
++		pmd_populate_kernel(&init_mm, pmd, kasan_early_shadow_pte);
++		next = pmd_addr_end(addr, end);
++		addr = next;
++		flush_pmd_entry(pmd);
++		pmd++;
++	}
++}
++
++static void __init kasan_early_pud_populate(unsigned long start,
++				unsigned long end, pgd_t *pgd)
++{
++	unsigned long addr;
++	unsigned long next;
++	pud_t *pud;
++
++	pud = pud_offset(pgd, start);
++	for (addr = start; addr < end;) {
++		next = pud_addr_end(addr, end);
++		kasan_early_pmd_populate(addr, next, pud);
++		addr = next;
++		pud++;
++	}
++}
++
++void __init kasan_map_early_shadow(pgd_t *pgdp)
++{
++	int i;
++	unsigned long start = KASAN_SHADOW_START;
++	unsigned long end = KASAN_SHADOW_END;
++	unsigned long addr;
++	unsigned long next;
++	pgd_t *pgd;
++
++	for (i = 0; i < PTRS_PER_PTE; i++)
++		set_pte_at(&init_mm, KASAN_SHADOW_START + i*PAGE_SIZE,
++			&kasan_early_shadow_pte[i], pfn_pte(
++				virt_to_pfn(kasan_early_shadow_page),
++				__pgprot(_L_PTE_DEFAULT | L_PTE_DIRTY
++					| L_PTE_XN)));
++
++	pgd = pgd_offset_k(start);
++	for (addr = start; addr < end;) {
++		next = pgd_addr_end(addr, end);
++		kasan_early_pud_populate(addr, next, pgd);
++		addr = next;
++		pgd++;
++	}
++}
++
++extern struct proc_info_list *lookup_processor_type(unsigned int);
++
++void __init kasan_early_init(void)
++{
++	struct proc_info_list *list;
++
++	/*
++	 * locate processor in the list of supported processor
++	 * types.  The linker builds this table for us from the
++	 * entries in arch/arm/mm/proc-*.S
++	 */
++	list = lookup_processor_type(read_cpuid_id());
++	if (list) {
++#ifdef MULTI_CPU
++		processor = *list->proc;
++#endif
++	}
++
++	BUILD_BUG_ON((KASAN_SHADOW_END - (1UL << 29)) != KASAN_SHADOW_OFFSET);
++	kasan_map_early_shadow(swapper_pg_dir);
++}
++
++static void __init clear_pgds(unsigned long start,
++			unsigned long end)
++{
++	for (; start && start < end; start += PMD_SIZE)
++		pmd_clear(pmd_off_k(start));
++}
++
++pte_t * __init kasan_pte_populate(pmd_t *pmd, unsigned long addr, int node)
++{
++	pte_t *pte = pte_offset_kernel(pmd, addr);
++
++	if (pte_none(*pte)) {
++		pte_t entry;
++		void *p = kasan_alloc_block(PAGE_SIZE, node);
++
++		if (!p)
++			return NULL;
++		entry = pfn_pte(virt_to_pfn(p),
++			__pgprot(pgprot_val(PAGE_KERNEL)));
++		set_pte_at(&init_mm, addr, pte, entry);
++	}
++	return pte;
++}
++
++pmd_t * __init kasan_pmd_populate(pud_t *pud, unsigned long addr, int node)
++{
++	pmd_t *pmd = pmd_offset(pud, addr);
++
++	if (pmd_none(*pmd)) {
++		void *p = kasan_alloc_block(PAGE_SIZE, node);
++
++		if (!p)
++			return NULL;
++		pmd_populate_kernel(&init_mm, pmd, p);
++	}
++	return pmd;
++}
++
++pud_t * __init kasan_pud_populate(pgd_t *pgd, unsigned long addr, int node)
++{
++	pud_t *pud = pud_offset(pgd, addr);
++
++	if (pud_none(*pud)) {
++		void *p = kasan_alloc_block(PAGE_SIZE, node);
++
++		if (!p)
++			return NULL;
++		pr_err("populating pud addr %lx\n", addr);
++		pud_populate(&init_mm, pud, p);
++	}
++	return pud;
++}
++
++pgd_t * __init kasan_pgd_populate(unsigned long addr, int node)
++{
++	pgd_t *pgd = pgd_offset_k(addr);
++
++	if (pgd_none(*pgd)) {
++		void *p = kasan_alloc_block(PAGE_SIZE, node);
++
++		if (!p)
++			return NULL;
++		pgd_populate(&init_mm, pgd, p);
++	}
++	return pgd;
++}
++
++static int __init create_mapping(unsigned long start, unsigned long end,
++				int node)
++{
++	unsigned long addr = start;
++	pgd_t *pgd;
++	pud_t *pud;
++	pmd_t *pmd;
++	pte_t *pte;
++
++	pr_info("populating shadow for %lx, %lx\n", start, end);
++
++	for (; addr < end; addr += PAGE_SIZE) {
++		pgd = kasan_pgd_populate(addr, node);
++		if (!pgd)
++			return -ENOMEM;
++
++		pud = kasan_pud_populate(pgd, addr, node);
++		if (!pud)
++			return -ENOMEM;
++
++		pmd = kasan_pmd_populate(pud, addr, node);
++		if (!pmd)
++			return -ENOMEM;
++
++		pte = kasan_pte_populate(pmd, addr, node);
++		if (!pte)
++			return -ENOMEM;
++	}
++	return 0;
++}
++
++
++void __init kasan_init(void)
++{
++	struct memblock_region *reg;
++	u64 orig_ttbr0;
++	int i;
++
++	/*
++	 * We are going to perform proper setup of shadow memory.
++	 * At first we should unmap early shadow (clear_pgds() call bellow).
++	 * However, instrumented code couldn't execute without shadow memory.
++	 * tmp_pgd_table and tmp_pmd_table used to keep early shadow mapped
++	 * until full shadow setup will be finished.
++	 */
++	orig_ttbr0 = get_ttbr0();
++
++#ifdef CONFIG_ARM_LPAE
++	memcpy(tmp_pmd_table,
++		pgd_page_vaddr(*pgd_offset_k(KASAN_SHADOW_START)),
++		sizeof(tmp_pmd_table));
++	memcpy(tmp_pgd_table, swapper_pg_dir, sizeof(tmp_pgd_table));
++	set_pgd(&tmp_pgd_table[pgd_index(KASAN_SHADOW_START)],
++		__pgd(__pa(tmp_pmd_table) | PMD_TYPE_TABLE | L_PGD_SWAPPER));
++	set_ttbr0(__pa(tmp_pgd_table));
++#else
++	memcpy(tmp_pgd_table, swapper_pg_dir, sizeof(tmp_pgd_table));
++	set_ttbr0((u64)__pa(tmp_pgd_table));
++#endif
++	flush_cache_all();
++	local_flush_bp_all();
++	local_flush_tlb_all();
++
++	clear_pgds(KASAN_SHADOW_START, KASAN_SHADOW_END);
++
++	kasan_populate_early_shadow(kasan_mem_to_shadow((void *)VMALLOC_START),
++				    kasan_mem_to_shadow((void *)-1UL) + 1);
++
++	for_each_memblock(memory, reg) {
++		void *start = __va(reg->base);
++		void *end = __va(reg->base + reg->size);
++
++		if (reg->base + reg->size > arm_lowmem_limit)
++			end = __va(arm_lowmem_limit);
++		if (start >= end)
++			break;
++
++		create_mapping((unsigned long)kasan_mem_to_shadow(start),
++			(unsigned long)kasan_mem_to_shadow(end),
++			NUMA_NO_NODE);
++	}
++
++	/*1.the module's global variable is in MODULES_VADDR ~ MODULES_END,
++	 *  so we need mapping.
++	 *2.PKMAP_BASE ~ PKMAP_BASE+PMD_SIZE's shadow and MODULES_VADDR
++	 *  ~ MODULES_END's shadow is in the same PMD_SIZE, so we cant
++	 *  use kasan_populate_zero_shadow.
++	 */
++	create_mapping(
++		(unsigned long)kasan_mem_to_shadow((void *)MODULES_VADDR),
++
++		(unsigned long)kasan_mem_to_shadow((void *)(PKMAP_BASE +
++							PMD_SIZE)),
++		NUMA_NO_NODE);
++
++	/*
++	 * KAsan may reuse the contents of kasan_early_shadow_pte directly, so
++	 * we should make sure that it maps the zero page read-only.
++	 */
++	for (i = 0; i < PTRS_PER_PTE; i++)
++		set_pte_at(&init_mm, KASAN_SHADOW_START + i*PAGE_SIZE,
++			&kasan_early_shadow_pte[i],
++			pfn_pte(virt_to_pfn(kasan_early_shadow_page),
++				__pgprot(pgprot_val(PAGE_KERNEL)
++					| L_PTE_RDONLY)));
++	memset(kasan_early_shadow_page, 0, PAGE_SIZE);
++	set_ttbr0(orig_ttbr0);
++	flush_cache_all();
++	local_flush_bp_all();
++	local_flush_tlb_all();
++	pr_info("Kernel address sanitizer initialized\n");
++	init_task.kasan_depth = 0;
++}
+diff --git a/arch/arm/mm/pgd.c b/arch/arm/mm/pgd.c
+index a1606d950251..30c70f4ef1b9 100644
+--- a/arch/arm/mm/pgd.c
++++ b/arch/arm/mm/pgd.c
+@@ -64,6 +64,20 @@ pgd_t *pgd_alloc(struct mm_struct *mm)
+ 	new_pmd = pmd_alloc(mm, new_pud, 0);
+ 	if (!new_pmd)
+ 		goto no_pmd;
++#ifdef CONFIG_KASAN
++	/*
++	 *Copy PMD table for KASAN shadow mappings.
++	 */
++	init_pgd = pgd_offset_k(TASK_SIZE);
++	init_pud = pud_offset(init_pgd, TASK_SIZE);
++	init_pmd = pmd_offset(init_pud, TASK_SIZE);
++	new_pmd = pmd_offset(new_pud, TASK_SIZE);
++	memcpy(new_pmd, init_pmd,
++		(pmd_index(MODULES_VADDR)-pmd_index(TASK_SIZE))
++		* sizeof(pmd_t));
++	clean_dcache_area(new_pmd, PTRS_PER_PMD*sizeof(pmd_t));
 +#endif
 +
  #endif
-diff --git a/arch/arm/kernel/head-common.S b/arch/arm/kernel/head-common.S
-index 997b02302c31..6e3b9179806b 100644
---- a/arch/arm/kernel/head-common.S
-+++ b/arch/arm/kernel/head-common.S
-@@ -99,7 +99,7 @@ __mmap_switched:
-  THUMB(	ldmia	r4!, {r0, r1, r2, r3} )
-  THUMB(	mov	sp, r3 )
- 	sub	r2, r2, r1
--	bl	memcpy				@ copy .data to RAM
-+	bl	__memcpy			@ copy .data to RAM
- #endif
  
-    ARM(	ldmia	r4!, {r0, r1, sp} )
-@@ -107,7 +107,7 @@ __mmap_switched:
-  THUMB(	mov	sp, r3 )
- 	sub	r2, r1, r0
- 	mov	r1, #0
--	bl	memset				@ clear .bss
-+	bl	__memset			@ clear .bss
- 
- 	ldmia	r4, {r0, r1, r2, r3}
- 	str	r9, [r0]			@ Save processor ID
-diff --git a/arch/arm/lib/memcpy.S b/arch/arm/lib/memcpy.S
-index 4a6997bb4404..a90423194606 100644
---- a/arch/arm/lib/memcpy.S
-+++ b/arch/arm/lib/memcpy.S
-@@ -61,6 +61,8 @@
- 
- /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
- 
-+.weak memcpy
-+ENTRY(__memcpy)
- ENTRY(mmiocpy)
- ENTRY(memcpy)
- 
-@@ -68,3 +70,4 @@ ENTRY(memcpy)
- 
- ENDPROC(memcpy)
- ENDPROC(mmiocpy)
-+ENDPROC(__memcpy)
-diff --git a/arch/arm/lib/memmove.S b/arch/arm/lib/memmove.S
-index d70304cb2cd0..aabacbe33c32 100644
---- a/arch/arm/lib/memmove.S
-+++ b/arch/arm/lib/memmove.S
-@@ -27,12 +27,14 @@
-  * occurring in the opposite direction.
-  */
- 
-+.weak memmove
-+ENTRY(__memmove)
- ENTRY(memmove)
- 	UNWIND(	.fnstart			)
- 
- 		subs	ip, r0, r1
- 		cmphi	r2, ip
--		bls	memcpy
-+		bls	__memcpy
- 
- 		stmfd	sp!, {r0, r4, lr}
- 	UNWIND(	.fnend				)
-@@ -225,3 +227,4 @@ ENTRY(memmove)
- 18:		backward_copy_shift	push=24	pull=8
- 
- ENDPROC(memmove)
-+ENDPROC(__memmove)
-diff --git a/arch/arm/lib/memset.S b/arch/arm/lib/memset.S
-index 5593a45e0a8c..c328d701b7a1 100644
---- a/arch/arm/lib/memset.S
-+++ b/arch/arm/lib/memset.S
-@@ -16,6 +16,8 @@
- 	.text
- 	.align	5
- 
-+.weak memset
-+ENTRY(__memset)
- ENTRY(mmioset)
- ENTRY(memset)
- UNWIND( .fnstart         )
-@@ -135,6 +137,7 @@ UNWIND( .fnstart            )
- UNWIND( .fnend   )
- ENDPROC(memset)
- ENDPROC(mmioset)
-+ENDPROC(__memset)
- 
- ENTRY(__memset32)
- UNWIND( .fnstart         )
+ 	if (!vectors_high()) {
 -- 
 2.17.1
 
