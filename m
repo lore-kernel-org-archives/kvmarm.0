@@ -2,63 +2,54 @@ Return-Path: <SRS0=wAvJ=UQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C996DC31E5D
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 18:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC80C31E5B
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 19:01:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 57D72208E4
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 18:07:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D72208E4
+	by mail.kernel.org (Postfix) with ESMTP id 284CB206B7
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 19:01:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 284CB206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F384A50D;
-	Mon, 17 Jun 2019 14:07:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B46F4A4EA;
+	Mon, 17 Jun 2019 15:01:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H59YltPVqa0D; Mon, 17 Jun 2019 14:07:04 -0400 (EDT)
+	with ESMTP id 2JV3tCuNfz3g; Mon, 17 Jun 2019 15:01:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A1324A50E;
-	Mon, 17 Jun 2019 14:07:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 361A34A50D;
+	Mon, 17 Jun 2019 15:01:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D94874A509
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 14:07:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B03A4A4EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 15:01:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JZumOdqYSvKQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jun 2019 14:07:01 -0400 (EDT)
+ with ESMTP id yPVDTuYFiD1d for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Jun 2019 15:01:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7534A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 14:07:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6C8C4A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 15:01:14 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E642B28;
- Mon, 17 Jun 2019 11:07:00 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 66E013F246;
- Mon, 17 Jun 2019 11:07:00 -0700 (PDT)
-Date: Mon, 17 Jun 2019 19:06:58 +0100
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EDCE2B;
+ Mon, 17 Jun 2019 12:01:14 -0700 (PDT)
+Received: from e119886-lin.cambridge.arm.com (unknown [10.37.6.20])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EA623F246;
+ Mon, 17 Jun 2019 12:01:12 -0700 (PDT)
 From: Andrew Murray <andrew.murray@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v9 4/5] KVM: arm/arm64: remove pmc->bitmask
-Message-ID: <20190617180658.GN20984@e119886-lin.cambridge.arm.com>
-References: <20190612190450.7085-1-andrew.murray@arm.com>
- <20190612190450.7085-5-andrew.murray@arm.com>
- <6a8e4fdd-d8cf-f3fb-55cd-2d06805b0eb9@arm.com>
- <20190613093957.GG49779@e119886-lin.cambridge.arm.com>
- <5e18d747-1d82-8eed-ef1c-de86c5b3a7e7@arm.com>
- <20190617154311.GM20984@e119886-lin.cambridge.arm.com>
- <f3ea8075-b395-9fa4-afba-771011f62b59@arm.com>
+To: Christoffer Dall <christoffer.dall@arm.com>,
+ Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v10 0/5] KVM: arm/arm64: add support for chained counters
+Date: Mon, 17 Jun 2019 20:01:00 +0100
+Message-Id: <20190617190105.4662-1-andrew.murray@arm.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <f3ea8075-b395-9fa4-afba-771011f62b59@arm.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,59 +66,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 17, 2019 at 05:33:40PM +0100, Suzuki K Poulose wrote:
-> 
-> 
-> On 17/06/2019 16:43, Andrew Murray wrote:
-> > On Thu, Jun 13, 2019 at 05:50:43PM +0100, Suzuki K Poulose wrote:
-> > > 
-> > > 
-> > > On 13/06/2019 10:39, Andrew Murray wrote:
-> > > > On Thu, Jun 13, 2019 at 08:30:51AM +0100, Julien Thierry wrote:
-> 
-> > > > > > index ae1e886d4a1a..88ce24ae0b45 100644
-> > > > > > --- a/virt/kvm/arm/pmu.c
-> > > > > > +++ b/virt/kvm/arm/pmu.c
-> > > > > > @@ -47,7 +47,10 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > > > >    		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> > > > > >    						 &running);
-> > > > > > -	return counter & pmc->bitmask;
-> > > > > > +	if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > > > > > +		counter = lower_32_bits(counter);
-> > > > > 
-> > > > > Shouldn't this depend on PMCR.LC as well? If PMCR.LC is clear we only
-> > > > > want the lower 32bits of the cycle counter.
-> > > > 
-> > > > Yes that's correct. The hunk should look like this:
-> > > > 
-> > > > -       return counter & pmc->bitmask;
-> > > > +       if (!(select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > > +             __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC))
-> > > > +               counter = lower_32_bits(counter);
-> > > > +
-> > > > +       return counter;
-> > > 
-> > > May be you could add a macro :
-> > > 
-> > > #define vcpu_pmu_counter_is_64bit(vcpu, idx) ?
-> > 
-> > Yes I think a helper would be useful - though I'd prefer the name
-> > 'kvm_pmu_idx_is_long_cycle_counter'. This seems a little clearer as
-> > you could otherwise argue that a chained counter is also 64 bits.
-> 
-> When you get to add 64bit PMU counter (v8.5), this would be handy. So
-> having it de-coupled from the cycle counter may be a good idea. Anyways,
-> I leave that to you.
+ARMv8 provides support for chained PMU counters, where an event type
+of 0x001E is set for odd-numbered counters, the event counter will
+increment by one for each overflow of the preceding even-numbered
+counter. Let's emulate this in KVM by creating a 64 bit perf counter
+when a user chains two emulated counters together.
 
-Yes that thought crossed my mind. I'll take your suggestion afterall.
+Testing has been performed by hard-coding hwc->sample_period in
+__hw_perf_event_init (arm_pmu.c) to a small value, this results in
+regular overflows (for non sampling events). The following command
+was then used to measure chained and non-chained instruction cycles:
 
-Thanks,
+perf stat -e armv8_pmuv3/long=1,inst_retired/u \
+          -e armv8_pmuv3/long=0,inst_retired/u dd if=/dev/zero bs=1M \
+          count=10 | gzip > /dev/null
 
-Andrew Murray
+The reported values were identical (and for non-chained was in the
+same ballpark when running on a kernel without this patchset). Debug
+was added to verify that the guest received overflow interrupts for
+the chain counter.
 
-> 
-> Cheers
-> Suzuki
+The test was also repeated using the cycle counter (cycle:u).
+
+For chained events we only support generating an overflow interrupt
+on the high counter. We use the attributes of the low counter to
+determine the attributes of the perf event.
+
+Changes since v9:
+
+ - Ensure only 32 bits of cycle counter is returned when !PMCR_LC
+
+ - Add a helper to test for 64 bit counters (e.g. long cycle counter)
+
+ - Rename kvm_pmu_pmc_is_high_counter to kvm_pmu_idx_is_high_counter to
+   reflect arguments passed to it
+
+Changes since v8:
+
+ - Correctly calculate the sample_period for the cycle counter
+
+ - Drop "arm64: perf: extract chain helper into header" patch
+
+Changes since v7:
+
+ - Remove pmc->bitmask
+
+ - Remove a couple of instances of using kvm_pmu_get_canonical_pmc
+   when not needed
+
+ - Remove unused perf_event variable
+
+Changes since v6:
+
+ - Drop kvm_pmu_{get,set}_perf_event
+
+ - Avoid duplicate work by using kvm_pmu_get_pair_counter_value inside
+   kvm_pmu_stop_counter
+
+ - Use GENMASK for 64bit mask
+
+Changes since v5:
+
+ - Use kvm_pmu_pmc_is_high_counter instead of open coding
+
+ - Rename kvm_pmu_event_is_chained to kvm_pmu_idx_has_chain_evtype
+
+ - Use kvm_pmu_get_canonical_pmc only where needed and reintroduce
+   the kvm_pmu_{set, get}_perf_event functions
+
+ - Drop masking of counter in kvm_pmu_get_pair_counter_value
+
+ - Only initialise pmc once in kvm_pmu_create_perf_event and other
+   minor changes.
+
+Changes since v4:
+
+ - Track pairs of chained counters with a bitmap instead of using
+   a struct kvm_pmc_pair.
+
+ - Rebase onto kvmarm/queue
+
+Changes since v3:
+
+ - Simplify approach by not creating events lazily and by introducing
+   a struct kvm_pmc_pair to represent the relationship between
+   adjacent counters.
+
+ - Rebase onto v5.1-rc2
+
+Changes since v2:
+
+ - Rebased onto v5.0-rc7
+
+ - Add check for cycle counter in correct patch
+
+ - Minor style, naming and comment changes
+
+ - Extract armv8pmu_evtype_is_chain from arch/arm64/kernel/perf_event.c
+   into a common header that KVM can use
+
+Changes since v1:
+
+ - Rename kvm_pmu_{enable,disable}_counter to reflect that they can
+   operate on multiple counters at once and use these functions where
+   possible
+
+ - Fix bugs with overflow handing, kvm_pmu_get_counter_value did not
+   take into consideration the perf counter value overflowing the low
+   counter
+
+ - Ensure PMCCFILTR_EL0 is used when operating on the cycle counter
+
+ - Rename kvm_pmu_reenable_enabled_{pair, single} and similar
+
+ - Always create perf event disabled to simplify logic elsewhere
+
+ - Move PMCNTENSET_EL0 test to kvm_pmu_enable_counter_mask
+
+
+Andrew Murray (5):
+  KVM: arm/arm64: rename kvm_pmu_{enable/disable}_counter functions
+  KVM: arm/arm64: extract duplicated code to own function
+  KVM: arm/arm64: re-create event when setting counter value
+  KVM: arm/arm64: remove pmc->bitmask
+  KVM: arm/arm64: support chained PMU counters
+
+ arch/arm64/kvm/sys_regs.c |   4 +-
+ include/kvm/arm_pmu.h     |  11 +-
+ virt/kvm/arm/pmu.c        | 350 ++++++++++++++++++++++++++++++--------
+ 3 files changed, 291 insertions(+), 74 deletions(-)
+
+-- 
+2.21.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
