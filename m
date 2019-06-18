@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6D4C31E5D
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47636C31E5E
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED43621479
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED43621479
+	by mail.kernel.org (Postfix) with ESMTP id 0DBF921479
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:18:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DBF921479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9D44A535;
-	Tue, 18 Jun 2019 11:18:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAB144A50C;
+	Tue, 18 Jun 2019 11:18:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZdyBZKUHYrN6; Tue, 18 Jun 2019 11:18:03 -0400 (EDT)
+	with ESMTP id m-S5uFYaYnwt; Tue, 18 Jun 2019 11:18:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AD6A4A4FD;
-	Tue, 18 Jun 2019 11:18:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6E14A52A;
+	Tue, 18 Jun 2019 11:18:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6813C4A524
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:18:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22DCD4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:18:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tb22soQ6nj9o for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jun 2019 11:17:59 -0400 (EDT)
+ with ESMTP id T6DB6ZKZg2J3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jun 2019 11:18:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 256A74A4FB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:17:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7DF94A4FD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:18:00 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D32652B;
- Tue, 18 Jun 2019 08:17:58 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93DC1360;
+ Tue, 18 Jun 2019 08:18:00 -0700 (PDT)
 Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF45E3F718;
- Tue, 18 Jun 2019 08:17:57 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74DE63F718;
+ Tue, 18 Jun 2019 08:17:59 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 2/6] KVM: arm64: Abstract the size of the HYP vectors
- pre-amble
-Date: Tue, 18 Jun 2019 16:17:34 +0100
-Message-Id: <20190618151738.258983-3-james.morse@arm.com>
+Subject: [PATCH v3 3/6] KVM: arm64: Make indirect vectors preamble behaviour
+ symmetric
+Date: Tue, 18 Jun 2019 16:17:35 +0100
+Message-Id: <20190618151738.258983-4-james.morse@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190618151738.258983-1-james.morse@arm.com>
 References: <20190618151738.258983-1-james.morse@arm.com>
@@ -70,116 +70,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The EL2 vector hardening feature causes KVM to generate vectors for
-each type of CPU present in the system. The generated sequences already
-do some of the early guest-exit work (i.e. saving registers). To avoid
-duplication the generated vectors branch to the original vector just
-after the preamble. This size is hard coded.
+The KVM indirect vectors support is a little complicated. Different CPUs
+may use different exception vectors for KVM that are generated at boot.
+Adding new instructions involves checking all the possible combinations
+do the right thing.
 
-Adding new instructions to the HYP vector causes strange side effects,
-which are difficult to debug as the affected code is patched in at
-runtime.
+To make changes here easier to review lets state what we expect of the
+preamble:
+  1. The first vector run, must always run the preamble.
+  2. Patching the head or tail of the vector shouldn't remove
+     preamble instructions.
 
-Add KVM_VECTOR_PREAMBLE to tell kvm_patch_vector_branch() how big
-the preamble is. The valid_vect macro can then validate this at
-build time.
+Today, this is easy as we only have one instruction in the preamble.
+Change the unpatched tail of the indirect vector so that it always
+runs this, regardless of patching.
 
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Signed-off-by: James Morse <james.morse@arm.com>
-
 ---
-Changes since v1:
- * Use AARCH64_INSN_SIZE
- * Add preamble build check to invalid_vect too
+New for v2.
 ---
- arch/arm64/include/asm/kvm_asm.h |  6 ++++++
- arch/arm64/kvm/hyp/hyp-entry.S   | 18 +++++++++++++++++-
- arch/arm64/kvm/va_layout.c       |  7 +++----
- 3 files changed, 26 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp/hyp-entry.S | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index ff73f5462aca..96c2d79063aa 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -41,6 +41,12 @@
- 	{ARM_EXCEPTION_TRAP, 		"TRAP"		},	\
- 	{ARM_EXCEPTION_HYP_GONE,	"HYP_GONE"	}
- 
-+/*
-+ * Size of the HYP vectors preamble. kvm_patch_vector_branch() generates code
-+ * that jumps over this.
-+ */
-+#define KVM_VECTOR_PREAMBLE	(1 * AARCH64_INSN_SIZE)
-+
- #ifndef __ASSEMBLY__
- 
- #include <linux/mm.h>
 diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 2b1e686772bf..c7f9d5e271a9 100644
+index c7f9d5e271a9..5f0412f124a3 100644
 --- a/arch/arm64/kvm/hyp/hyp-entry.S
 +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -227,17 +227,32 @@ ENDPROC(\label)
- 
- 	.align 11
- 
-+.macro check_preamble_length start, end
-+/* kvm_patch_vector_branch() generates code that jumps over the preamble. */
-+.if ((\end-\start) != KVM_VECTOR_PREAMBLE)
-+	.error "KVM vector preamble length mismatch"
-+.endif
-+.endm
-+
- .macro valid_vect target
- 	.align 7
-+661:
- 	stp	x0, x1, [sp, #-16]!
-+662:
- 	b	\target
-+
-+check_preamble_length 661b, 662b
- .endm
- 
- .macro invalid_vect target
- 	.align 7
-+661:
- 	b	\target
-+662:
- 	ldp	x0, x1, [sp], #16
- 	b	\target
-+
-+check_preamble_length 661b, 662b
- .endm
- 
- ENTRY(__kvm_hyp_vector)
-@@ -282,7 +297,8 @@ ENDPROC(__kvm_hyp_vector)
-  * movk	x0, #((addr >> 32) & 0xffff), lsl #32
-  * br	x0
+@@ -286,7 +286,7 @@ ENDPROC(__kvm_hyp_vector)
+ /*
+  * The default sequence is to directly branch to the KVM vectors,
+  * using the computed offset. This applies for VHE as well as
+- * !ARM64_HARDEN_EL2_VECTORS.
++ * !ARM64_HARDEN_EL2_VECTORS. The first vector must always run the preamble.
   *
-- * Where addr = kern_hyp_va(__kvm_hyp_vector) + vector-offset + 4.
-+ * Where:
-+ * addr = kern_hyp_va(__kvm_hyp_vector) + vector-offset + KVM_VECTOR_PREAMBLE.
+  * For ARM64_HARDEN_EL2_VECTORS configurations, this gets replaced
+  * with:
+@@ -302,8 +302,8 @@ ENDPROC(__kvm_hyp_vector)
   * See kvm_patch_vector_branch for details.
   */
  alternative_cb	kvm_patch_vector_branch
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index c712a7376bc1..58b3a91db892 100644
---- a/arch/arm64/kvm/va_layout.c
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -181,11 +181,10 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
- 	addr |= ((u64)origptr & GENMASK_ULL(10, 7));
- 
- 	/*
--	 * Branch to the second instruction in the vectors in order to
--	 * avoid the initial store on the stack (which we already
--	 * perform in the hardening vectors).
-+	 * Branch over the preamble in order to avoid the initial store on
-+	 * the stack (which we already perform in the hardening vectors).
- 	 */
--	addr += AARCH64_INSN_SIZE;
-+	addr += KVM_VECTOR_PREAMBLE;
- 
- 	/* stp x0, x1, [sp, #-16]! */
- 	insn = aarch64_insn_gen_load_store_pair(AARCH64_INSN_REG_0,
+-	b	__kvm_hyp_vector + (1b - 0b)
+-	nop
++	stp	x0, x1, [sp, #-16]!
++	b	__kvm_hyp_vector + (1b - 0b + KVM_VECTOR_PREAMBLE)
+ 	nop
+ 	nop
+ 	nop
 -- 
 2.20.1
 
