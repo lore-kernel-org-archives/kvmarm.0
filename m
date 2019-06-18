@@ -1,100 +1,80 @@
-Return-Path: <SRS0=wAvJ=UQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=HYBR=UR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF25C31E5C
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C0CC31E51
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 14:05:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 26D8D2080A
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Jun 2019 22:12:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyDwQXzN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26D8D2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 434F721855
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 14:05:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434F721855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0D0F4A521;
-	Mon, 17 Jun 2019 18:12:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89A9E4A4F3;
+	Tue, 18 Jun 2019 10:05:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vdzu3lQV7GxO; Mon, 17 Jun 2019 18:12:32 -0400 (EDT)
+	with ESMTP id rDwaqyUWinPo; Tue, 18 Jun 2019 10:05:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 652764A4C0;
-	Mon, 17 Jun 2019 18:12:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495954A4F6;
+	Tue, 18 Jun 2019 10:05:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 871904A4A3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:12:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8994A483
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 10:05:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IZ5oaSD7j+w2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jun 2019 18:12:30 -0400 (EDT)
-Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com
- [209.85.215.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E0A94A483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 18:12:30 -0400 (EDT)
-Received: by mail-pg1-f193.google.com with SMTP id v11so6522698pgl.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jun 2019 15:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=7DrG5+RQG0FCVM4nQANaF2hEes9VxzWs9d/hV5PsNqg=;
- b=XyDwQXzNnEij5TW9Icqwv/CiWNVb5T+NWkPGhFjfrSpTK2s8KmaXHMuwW5UXiSQy/Y
- hsHRRWSHbDpn/fZmM9n89xSTJEFW15xamSdjj2kfvj48wHQDBul+Teb7O076bKCSS2nZ
- C5GncPJXbGCAQEsP5eT/pDsHSal7Xkd5Wefa0xjxYnidkLCQwAC9QI+Ki0snnNa4XWRp
- Pq8+H1mOEkReVCWrjLpMYIpWKAKFRrymvAFDjDYH2IMUvA2ORvMBSwjmPZZDmQZE42rT
- Bz2t0TaVE4AQZkIvPvy7Yhy7Bi+gvFSdHRvbnLGkjpYFFkQRgTfOG9lC6rXugAz3SflF
- G7gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=7DrG5+RQG0FCVM4nQANaF2hEes9VxzWs9d/hV5PsNqg=;
- b=lJZ5dBiC2Fsl+qBBuemp5ZQPD5QPu9xC6DkRvvVOZrS7TXIr2RKQFDCuG24c7JIpI8
- Crw3uBoLoLUQTcKutsLxHNgP37WbNCd9uSKszhUy5j2H6JGmDUWdosg8YqWw7m3vGpk8
- +L83hZe0rfCazJbi2SoeT9kBWBJAHJLs27wJSWgAjYz1soNAWg6nbvao5bniAegWmmE/
- CGHnqekdg4Nc4qjiBi0kAkCjVVsnBxeqVjgr1jwcEGS3bbAmSRNG0jctlUanYbmgAe67
- c1+nAvFcZfugIzMXKdJYSKtCFHamOMmpXV9NY6uQG7n40Ts8W1NrFJ2mESEUXp4f8a4Z
- qSRA==
-X-Gm-Message-State: APjAAAVktJPLPBlSLLQw8H5DWVP41NbBGtg8qf0edBgf8AIsQb5MQTJy
- 9unsb8i1fPKOE/PnJycD1n0=
-X-Google-Smtp-Source: APXvYqzALF9X8zx3ACx38xgnCez+oxMQ0D3gKMg8/imffldM/5SvhkikVjpppW+WO/yVXbAhtFw/vQ==
-X-Received: by 2002:a62:1d11:: with SMTP id d17mr24476871pfd.249.1560809510618; 
- Mon, 17 Jun 2019 15:11:50 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
- by smtp.gmail.com with ESMTPSA id s129sm12551020pfb.186.2019.06.17.15.11.48
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 17 Jun 2019 15:11:49 -0700 (PDT)
-From: Florian Fainelli <f.fainelli@gmail.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v6 4/6] ARM: Define the virtual space of KASan's shadow region
-Date: Mon, 17 Jun 2019 15:11:32 -0700
-Message-Id: <20190617221134.9930-5-f.fainelli@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190617221134.9930-1-f.fainelli@gmail.com>
-References: <20190617221134.9930-1-f.fainelli@gmail.com>
-Cc: alexandre.belloni@bootlin.com, mhocko@suse.com, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, dhowells@redhat.com,
- yamada.masahiro@socionext.com, ryabinin.a.a@gmail.com, glider@google.com,
- kvmarm@lists.cs.columbia.edu, Florian Fainelli <f.fainelli@gmail.com>,
- corbet@lwn.net, Abbott Liu <liuwenliang@huawei.com>, daniel.lezcano@linaro.org,
- linux@armlinux.org.uk, kasan-dev@googlegroups.com,
- bcm-kernel-feedback-list@broadcom.com,
- Andrey Ryabinin <aryabinin@virtuozzo.com>, keescook@chromium.org,
- arnd@arndb.de, marc.zyngier@arm.com, andre.przywara@arm.com,
- philip@cog.systems, jinb.park7@gmail.com, tglx@linutronix.de,
- dvyukov@google.com, nico@fluxnic.net, gregkh@linuxfoundation.org,
- ard.biesheuvel@linaro.org, linux-doc@vger.kernel.org, geert@linux-m68k.org,
- rob@landley.net, pombredanne@nexb.com, akpm@linux-foundation.org,
- thgarnie@google.com, kirill.shutemov@linux.intel.com
+ with ESMTP id d4SSAF3yXk7r for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jun 2019 10:05:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 198AB4A47E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 10:05:07 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A69A2B;
+ Tue, 18 Jun 2019 07:05:07 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AA0E3F718;
+ Tue, 18 Jun 2019 07:05:05 -0700 (PDT)
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+ <20190607104301.6b1bbd74@jacob-builder>
+ <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+ <20190610143134.7bff96e9@jacob-builder>
+ <905f130b-02dc-6971-8d5b-ce87d9bc96a4@arm.com>
+ <20190612115358.0d90b322@jacob-builder>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <77405d39-81a4-d9a8-5d35-27602199867a@arm.com>
+Date: Tue, 18 Jun 2019 15:04:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190612115358.0d90b322@jacob-builder>
+Content-Language: en-US
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ Vincent Stehle <Vincent.Stehle@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Liu,
+ Yi L" <yi.l.liu@intel.com>, Robin Murphy <Robin.Murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,242 +86,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Abbott Liu <liuwenliang@huawei.com>
+On 12/06/2019 19:53, Jacob Pan wrote:
+>>> You are right, the worst case of the spurious PS is to terminate the
+>>> group prematurely. Need to know the scope of the HW damage in case
+>>> of mdev where group IDs can be shared among mdevs belong to the
+>>> same PF.  
+>>
+>> But from the IOMMU fault API point of view, the full page request is
+>> identified by both PRGI and PASID. Given that each mdev has its own
+>> set of PASIDs, it should be easy to isolate page responses per mdev.
+>>
+> On Intel platform, devices sending page request with private data must
+> receive page response with matching private data. If we solely depend
+> on PRGI and PASID, we may send stale private data to the device in
+> those incorrect page response. Since private data may represent PF
+> device wide contexts, the consequence of sending page response with
+> wrong private data may affect other mdev/PASID.
+> 
+> One solution we are thinking to do is to inject the sequence #(e.g.
+> ktime raw mono clock) as vIOMMU private data into to the guest. Guest
+> would return this fake private data in page response, then host will
+> send page response back to the device that matches PRG1 and PASID and
+> private_data.
+> 
+> This solution does not expose HW context related private data to the
+> guest but need to extend page response in iommu uapi.
+> 
+> /**
+>  * struct iommu_page_response - Generic page response information
+>  * @version: API version of this structure
+>  * @flags: encodes whether the corresponding fields are valid
+>  *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
+>  * @pasid: Process Address Space ID
+>  * @grpid: Page Request Group Index
+>  * @code: response code from &enum iommu_page_response_code
+>  * @private_data: private data for the matching page request
+>  */
+> struct iommu_page_response {
+> #define IOMMU_PAGE_RESP_VERSION_1	1
+> 	__u32	version;
+> #define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
+> #define IOMMU_PAGE_RESP_PRIVATE_DATA	(1 << 1)
+> 	__u32	flags;
+> 	__u32	pasid;
+> 	__u32	grpid;
+> 	__u32	code;
+> 	__u32	padding;
+> 	__u64	private_data[2];
+> };
+> 
+> There is also the change needed for separating storage for the real and
+> fake private data.
+> 
+> Sorry for the last minute change, did not realize the HW implications.
+> 
+> I see this as a future extension due to limited testing, 
 
-Define KASAN_SHADOW_OFFSET,KASAN_SHADOW_START and KASAN_SHADOW_END for arm
-kernel address sanitizer.
+I'm wondering how we deal with:
+(1) old userspace that won't fill the new private_data field in
+page_response. A new kernel still has to support it.
+(2) old kernel that won't recognize the new PRIVATE_DATA flag. Currently
+iommu_page_response() rejects page responses with unknown flags.
 
-     +----+ 0xffffffff
-     |    |
-     |    |
-     |    |
-     +----+ CONFIG_PAGE_OFFSET
-     |    |     |    | |->  module virtual address space area.
-     |    |/
-     +----+ MODULE_VADDR = KASAN_SHADOW_END
-     |    |     |    | |-> the shadow area of kernel virtual address.
-     |    |/
-     +----+ TASK_SIZE(start of kernel space) = KASAN_SHADOW_START  the
-     |    |\  shadow address of MODULE_VADDR
-     |    | ---------------------+
-     |    |                      |
-     +    + KASAN_SHADOW_OFFSET  |-> the user space area. Kernel address
-     |    |                      |    sanitizer do not use this space.
-     |    | ---------------------+
-     |    |/
-     ------ 0
+I guess we'll need a two-way negotiation, where userspace queries
+whether the kernel supports the flag (2), and the kernel learns whether
+it should expect the private data to come back (1).
 
-1)KASAN_SHADOW_OFFSET:
-  This value is used to map an address to the corresponding shadow
-address by the following formula:
-shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
+> perhaps for
+> now, can you add paddings similar to page request? Make it 64B as well.
 
-2)KASAN_SHADOW_START
-  This value is the MODULE_VADDR's shadow address. It is the start
-of kernel virtual space.
+I don't think padding is necessary, because iommu_page_response is sent
+by userspace to the kernel, unlike iommu_fault which is allocated by
+userspace and filled by the kernel.
 
-3)KASAN_SHADOW_END
-  This value is the 0x100000000's shadow address. It is the end of
-kernel addresssanitizer's shadow area. It is also the start of the
-module area.
+Page response looks a lot more like existing VFIO mechanisms, so I
+suppose we'll wrap the iommu_page_response structure and include an
+argsz parameter at the top:
 
-When enable kasan, the definition of TASK_SIZE is not an an 8-bit
-rotated constant, so we need to modify the TASK_SIZE access code
-in the *.s file.
+	struct vfio_iommu_page_response {
+		u32 argsz;
+		struct iommu_page_response pr;
+	};
 
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
-Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
----
- arch/arm/include/asm/kasan_def.h | 64 ++++++++++++++++++++++++++++++++
- arch/arm/include/asm/memory.h    |  5 +++
- arch/arm/kernel/entry-armv.S     |  5 ++-
- arch/arm/kernel/entry-common.S   |  9 +++--
- arch/arm/mm/mmu.c                |  7 +++-
- 5 files changed, 84 insertions(+), 6 deletions(-)
- create mode 100644 arch/arm/include/asm/kasan_def.h
+	struct vfio_iommu_page_response vpr = {
+		.argsz = sizeof(vpr),
+		.pr = ...
+		...
+	};
 
-diff --git a/arch/arm/include/asm/kasan_def.h b/arch/arm/include/asm/kasan_def.h
-new file mode 100644
-index 000000000000..7b7f42435146
---- /dev/null
-+++ b/arch/arm/include/asm/kasan_def.h
-@@ -0,0 +1,64 @@
-+/*
-+ *  arch/arm/include/asm/kasan_def.h
-+ *
-+ *  Copyright (c) 2018 Huawei Technologies Co., Ltd.
-+ *
-+ *  Author: Abbott Liu <liuwenliang@huawei.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#ifndef __ASM_KASAN_DEF_H
-+#define __ASM_KASAN_DEF_H
-+
-+#ifdef CONFIG_KASAN
-+
-+/*
-+ *    +----+ 0xffffffff
-+ *    |    |
-+ *    |    |
-+ *    |    |
-+ *    +----+ CONFIG_PAGE_OFFSET
-+ *    |    |\
-+ *    |    | |->  module virtual address space area.
-+ *    |    |/
-+ *    +----+ MODULE_VADDR = KASAN_SHADOW_END
-+ *    |    |\
-+ *    |    | |-> the shadow area of kernel virtual address.
-+ *    |    |/
-+ *    +----+ TASK_SIZE(start of kernel space) = KASAN_SHADOW_START  the
-+ *    |    |\  shadow address of MODULE_VADDR
-+ *    |    | ---------------------+
-+ *    |    |                      |
-+ *    +    + KASAN_SHADOW_OFFSET  |-> the user space area. Kernel address
-+ *    |    |                      |    sanitizer do not use this space.
-+ *    |    | ---------------------+
-+ *    |    |/
-+ *    ------ 0
-+ *
-+ *1)KASAN_SHADOW_OFFSET:
-+ *    This value is used to map an address to the corresponding shadow
-+ * address by the following formula:
-+ * shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
-+ *
-+ * 2)KASAN_SHADOW_START
-+ *     This value is the MODULE_VADDR's shadow address. It is the start
-+ * of kernel virtual space.
-+ *
-+ * 3) KASAN_SHADOW_END
-+ *   This value is the 0x100000000's shadow address. It is the end of
-+ * kernel addresssanitizer's shadow area. It is also the start of the
-+ * module area.
-+ *
-+ */
-+
-+#define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1<<29))
-+
-+#define KASAN_SHADOW_START      ((KASAN_SHADOW_END >> 3) + KASAN_SHADOW_OFFSET)
-+
-+#define KASAN_SHADOW_END        (UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
-+
-+#endif
-+#endif
-diff --git a/arch/arm/include/asm/memory.h b/arch/arm/include/asm/memory.h
-index ed8fd0d19a3e..6e099a5458db 100644
---- a/arch/arm/include/asm/memory.h
-+++ b/arch/arm/include/asm/memory.h
-@@ -21,6 +21,7 @@
- #ifdef CONFIG_NEED_MACH_MEMORY_H
- #include <mach/memory.h>
- #endif
-+#include <asm/kasan_def.h>
- 
- /* PAGE_OFFSET - the virtual address of the start of the kernel image */
- #define PAGE_OFFSET		UL(CONFIG_PAGE_OFFSET)
-@@ -31,7 +32,11 @@
-  * TASK_SIZE - the maximum size of a user space task.
-  * TASK_UNMAPPED_BASE - the lower boundary of the mmap VM area
-  */
-+#ifndef CONFIG_KASAN
- #define TASK_SIZE		(UL(CONFIG_PAGE_OFFSET) - UL(SZ_16M))
-+#else
-+#define TASK_SIZE		(KASAN_SHADOW_START)
-+#endif
- #define TASK_UNMAPPED_BASE	ALIGN(TASK_SIZE / 3, SZ_16M)
- 
- /*
-diff --git a/arch/arm/kernel/entry-armv.S b/arch/arm/kernel/entry-armv.S
-index ce4aea57130a..c3ca3b96f22a 100644
---- a/arch/arm/kernel/entry-armv.S
-+++ b/arch/arm/kernel/entry-armv.S
-@@ -183,7 +183,7 @@ ENDPROC(__und_invalid)
- 
- 	get_thread_info tsk
- 	ldr	r0, [tsk, #TI_ADDR_LIMIT]
--	mov	r1, #TASK_SIZE
-+	ldr	r1, =TASK_SIZE
- 	str	r1, [tsk, #TI_ADDR_LIMIT]
- 	str	r0, [sp, #SVC_ADDR_LIMIT]
- 
-@@ -437,7 +437,8 @@ ENDPROC(__fiq_abt)
- 	@ if it was interrupted in a critical region.  Here we
- 	@ perform a quick test inline since it should be false
- 	@ 99.9999% of the time.  The rest is done out of line.
--	cmp	r4, #TASK_SIZE
-+	ldr	r0, =TASK_SIZE
-+	cmp	r4, r0
- 	blhs	kuser_cmpxchg64_fixup
- #endif
- #endif
-diff --git a/arch/arm/kernel/entry-common.S b/arch/arm/kernel/entry-common.S
-index f7649adef505..0dfa3153d633 100644
---- a/arch/arm/kernel/entry-common.S
-+++ b/arch/arm/kernel/entry-common.S
-@@ -53,7 +53,8 @@ __ret_fast_syscall:
-  UNWIND(.cantunwind	)
- 	disable_irq_notrace			@ disable interrupts
- 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
--	cmp	r2, #TASK_SIZE
-+	ldr	r1, =TASK_SIZE
-+	cmp	r2, r1
- 	blne	addr_limit_check_failed
- 	ldr	r1, [tsk, #TI_FLAGS]		@ re-check for syscall tracing
- 	tst	r1, #_TIF_SYSCALL_WORK | _TIF_WORK_MASK
-@@ -90,7 +91,8 @@ __ret_fast_syscall:
- #endif
- 	disable_irq_notrace			@ disable interrupts
- 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
--	cmp	r2, #TASK_SIZE
-+	ldr     r1, =TASK_SIZE
-+	cmp     r2, r1
- 	blne	addr_limit_check_failed
- 	ldr	r1, [tsk, #TI_FLAGS]		@ re-check for syscall tracing
- 	tst	r1, #_TIF_SYSCALL_WORK | _TIF_WORK_MASK
-@@ -131,7 +133,8 @@ ret_slow_syscall:
- 	disable_irq_notrace			@ disable interrupts
- ENTRY(ret_to_user_from_irq)
- 	ldr	r2, [tsk, #TI_ADDR_LIMIT]
--	cmp	r2, #TASK_SIZE
-+	ldr     r1, =TASK_SIZE
-+	cmp	r2, r1
- 	blne	addr_limit_check_failed
- 	ldr	r1, [tsk, #TI_FLAGS]
- 	tst	r1, #_TIF_WORK_MASK
-diff --git a/arch/arm/mm/mmu.c b/arch/arm/mm/mmu.c
-index f3ce34113f89..3ae33c2dc1ad 100644
---- a/arch/arm/mm/mmu.c
-+++ b/arch/arm/mm/mmu.c
-@@ -1256,9 +1256,14 @@ static inline void prepare_page_table(void)
- 	/*
- 	 * Clear out all the mappings below the kernel image.
- 	 */
--	for (addr = 0; addr < MODULES_VADDR; addr += PMD_SIZE)
-+	for (addr = 0; addr < TASK_SIZE; addr += PMD_SIZE)
- 		pmd_clear(pmd_off_k(addr));
- 
-+#ifdef CONFIG_KASAN
-+	/*TASK_SIZE ~ MODULES_VADDR is the KASAN's shadow area -- skip over it*/
-+	addr = MODULES_VADDR;
-+#endif
-+
- #ifdef CONFIG_XIP_KERNEL
- 	/* The XIP kernel is mapped in the module area -- skip over it */
- 	addr = ((unsigned long)_exiprom + PMD_SIZE - 1) & PMD_MASK;
--- 
-2.17.1
+	ioctl(devfd, VFIO_IOMMU_PAGE_RESPONSE, &vpr);
 
+In that case supporting private data can be done by simply appending a
+field at the end (plus the negotiation above).
+
+Thanks,
+Jean
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
