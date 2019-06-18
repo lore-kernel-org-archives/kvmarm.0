@@ -2,60 +2,56 @@ Return-Path: <SRS0=HYBR=UR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9306EC31E5B
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E9C31E5B
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:17:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5621421479
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5621421479
+	by mail.kernel.org (Postfix) with ESMTP id A66B0213F2
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jun 2019 15:17:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66B0213F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2B934A4FB;
-	Tue, 18 Jun 2019 11:05:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20DA34A519;
+	Tue, 18 Jun 2019 11:17:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id moXqBzBNZ690; Tue, 18 Jun 2019 11:05:35 -0400 (EDT)
+	with ESMTP id e2-ecKLjITPx; Tue, 18 Jun 2019 11:17:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 836B34A4FD;
-	Tue, 18 Jun 2019 11:05:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E844A4FD;
+	Tue, 18 Jun 2019 11:17:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B804A4FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:05:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF4484A4FA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:17:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aPZl6W4Eu+AL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jun 2019 11:05:32 -0400 (EDT)
+ with ESMTP id auDzXzcz9VSH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jun 2019 11:17:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8A04A47A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:05:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77AFB4A47A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jun 2019 11:17:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27C852B;
- Tue, 18 Jun 2019 08:05:32 -0700 (PDT)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EB583F718;
- Tue, 18 Jun 2019 08:05:31 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: arm64: Skip more of the SError vaxorcism
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-References: <20190610163034.116151-1-james.morse@arm.com>
- <1d806015-bbad-c2dd-2ff6-2a5bdb73e117@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BDB32B;
+ Tue, 18 Jun 2019 08:17:54 -0700 (PDT)
+Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F02A33F718;
+ Tue, 18 Jun 2019 08:17:52 -0700 (PDT)
 From: James Morse <james.morse@arm.com>
-Message-ID: <beb104a9-b7bb-399a-7f41-3072d5e0c001@arm.com>
-Date: Tue, 18 Jun 2019 16:05:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v3 0/6] KVM: arm64: Account host/guest SError more precisely
+ (Neoverse-N1 #1349291)
+Date: Tue, 18 Jun 2019 16:17:32 +0100
+Message-Id: <20190618151738.258983-1-james.morse@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <1d806015-bbad-c2dd-2ff6-2a5bdb73e117@arm.com>
-Content-Language: en-GB
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,84 +68,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hello,
 
-On 10/06/2019 17:58, Marc Zyngier wrote:
-> On 10/06/2019 17:30, James Morse wrote:
->> During __guest_exit() we need to consume any SError left pending by the
->> guest so it doesn't contaminate the host. With v8.2 we use the
->> ESB-instruction. For systems without v8.2, we use dsb+isb and unmask
->> SError. We do this on every guest exit.
->>
->> Use the same dsb+isr_el1 trick, this lets us know if an SError is pending
->> after the dsb, allowing us to skip the isb and self-synchronising PSTATE
->> write if its not.
->>
->> This means SError remains masked during KVM's world-switch, so any SError
->> that occurs during this time is reported by the host, instead of causing
->> a hyp-panic.
-> 
-> Ah, that'd be pretty good.
+This series started as a workaround for Neoverse-N1 #1349291, but has
+become an improvement in RAS error accounting for KVM on arm64.
 
-I'll add a patch to re-mask it so this intent is clear, and the behaviour/performance
-stuff is done in separate patches.
+Neoverse-N1 affected by #1349291 may report an Uncontained RAS Error
+as Unrecoverable. [0] This is the difference between killing the thread and
+killing the machine.
+The workaround is to treat all Unrecoverable SError as Uncontained.
+The arch code's SError handling already does this, due to its nascent
+kernel-first support.
 
+So only KVM needs some work as it has its own SError handling as we want
+KVM to handle guest:SError and the host to handle host:SError.
 
->> If you give gcc likely()/unlikely() hints in an if() condition, it
->> shuffles the generated assembly so that the likely case is immediately
->> after the branch. Lets do the same here.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> ---
->> This patch was previously posted as part of:
->> [v1] https://lore.kernel.org/linux-arm-kernel/20190604144551.188107-1-james.morse@arm.com/
->>
->>  arch/arm64/kvm/hyp/entry.S | 14 ++++++++++----
->>  1 file changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
->> index a5a4254314a1..c2de1a1faaf4 100644
->> --- a/arch/arm64/kvm/hyp/entry.S
->> +++ b/arch/arm64/kvm/hyp/entry.S
->> @@ -161,18 +161,24 @@ alternative_if ARM64_HAS_RAS_EXTN
->>  	orr	x0, x0, #(1<<ARM_EXIT_WITH_SERROR_BIT)
->>  1:	ret
->>  alternative_else
->> -	// If we have a pending asynchronous abort, now is the
->> -	// time to find out. From your VAXorcist book, page 666:
->> +	dsb	sy		// Synchronize against in-flight ld/st
->> +	mrs	x2, isr_el1
-> 
-> The CPU is allowed to perform a system register access before the DSB
-> completes if it doesn't have a side effect. Reading ISR_EL1 doesn't have
-> such side effect, so you could end-up missing the abort. An ISB after
-> DSB should cure that,
+Instead of working around the errata in KVM, we account SError as precisely
+as we can instead. This means moving the ESB-instruction into the guest-exit
+vectors, and deferring guest-entry if there is an SError pending. (so that the
+host's existing handling takes it).
 
-... bother ...
+Change since v2:
+ * Added isb after the dsb to prevent an early read of ISR_EL1.
 
-
-> but you'll need to verify that it doesn't make
-> things much worse than what we already have.
-
-Retested with isb in both patches, and Robin's better assembly.
-
-This still saves the self-synchronising pstate modification, (of which we'd need two if we
-want to keep SError masked over the rest of world-switch)
-
-On Xgene:
-| 5.2.0-rc2-00006-g9b94314 mean:3215 stddev:45
-| 5.2.0-rc2-00007-g5d37b0b mean:3176 stddev:30
-| with this patch 1.23% faster
-
-On Seattle:
-| 5.2.0-rc2-00006-g9b9431445730 mean:4474 stddev:10
-| 5.2.0-rc2-00007-g5d37b0b5dd65 mean:4410 stddev:27
-| with this patch: 1.44% faster
-
+Changes since v1:
+ * Squashed v1:patch5 into v2:patch4. v1:patch6 to be posted separately.
+ * Dropped all the performance numbers.
+ * Added patch1, making the ESB macro emit a nop if the kconfig feature
+   is disabled.
+ * Tried to formalise the indirect vectors preamble a little more to
+   make changes easier to review
+ * Added preamble size checks to the invalid vector entries.
+ * Pulled the size check out as a macro now there are two invocations.
 
 Thanks,
 
 James
+
+
+[0] account-required: https://developer.arm.com/docs/sden885747/latest/arm-neoverse-n1-mp050-software-developer-errata-notice
+
+[v1] https://lore.kernel.org/linux-arm-kernel/20190604144551.188107-1-james.morse@arm.com/
+
+James Morse (6):
+  arm64: assember: Switch ESB-instruction with a vanilla nop if
+    !ARM64_HAS_RAS
+  KVM: arm64: Abstract the size of the HYP vectors pre-amble
+  KVM: arm64: Make indirect vectors preamble behaviour symmetric
+  KVM: arm64: Consume pending SError as early as possible
+  KVM: arm64: Defer guest entry when an asynchronous exception is
+    pending
+  arm64: Update silicon-errata.txt for Neoverse-N1 #1349291
+
+ Documentation/arm64/silicon-errata.txt |  1 +
+ arch/arm64/include/asm/assembler.h     |  4 ++++
+ arch/arm64/include/asm/kvm_asm.h       |  6 ++++++
+ arch/arm64/kernel/traps.c              |  4 ++++
+ arch/arm64/kvm/hyp/entry.S             | 20 ++++++++++++++---
+ arch/arm64/kvm/hyp/hyp-entry.S         | 30 +++++++++++++++++++++-----
+ arch/arm64/kvm/va_layout.c             |  7 +++---
+ 7 files changed, 60 insertions(+), 12 deletions(-)
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
