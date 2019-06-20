@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601F4C43613
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Jun 2019 13:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68B9C48BE3
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Jun 2019 13:06:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 25B082083B
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Jun 2019 13:06:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25B082083B
+	by mail.kernel.org (Postfix) with ESMTP id 9B9D22082C
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Jun 2019 13:06:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B9D22082C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C54E74A511;
-	Thu, 20 Jun 2019 09:06:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 307834A50E;
+	Thu, 20 Jun 2019 09:06:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YAH7GfF6VjUg; Thu, 20 Jun 2019 09:06:33 -0400 (EDT)
+	with ESMTP id sHELkmbk-7mI; Thu, 20 Jun 2019 09:06:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C67494A4F6;
-	Thu, 20 Jun 2019 09:06:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEFFE4A52C;
+	Thu, 20 Jun 2019 09:06:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C9034A4D5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jun 2019 09:06:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53C3F4A507
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jun 2019 09:06:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ggbAtxkaPqfb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Jun 2019 09:06:30 -0400 (EDT)
+ with ESMTP id sOSJwGy48srx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Jun 2019 09:06:32 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F5264A409
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jun 2019 09:06:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E7724A4DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jun 2019 09:06:31 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 317B7C0A;
- Thu, 20 Jun 2019 06:06:29 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA0D5360;
+ Thu, 20 Jun 2019 06:06:30 -0700 (PDT)
 Received: from e108454-lin.cambridge.arm.com (e108454-lin.cambridge.arm.com
  [10.1.196.50])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D122C3F718;
- Thu, 20 Jun 2019 06:06:27 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 659053F73F;
+ Thu, 20 Jun 2019 06:06:29 -0700 (PDT)
 From: Julien Grall <julien.grall@arm.com>
 To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [RFC v2 04/14] arm64/mm: Move the variable lock and tlb_flush_pending
- to asid_info
-Date: Thu, 20 Jun 2019 14:05:58 +0100
-Message-Id: <20190620130608.17230-5-julien.grall@arm.com>
+Subject: [RFC v2 05/14] arm64/mm: Remove dependency on MM in new_context
+Date: Thu, 20 Jun 2019 14:05:59 +0100
+Message-Id: <20190620130608.17230-6-julien.grall@arm.com>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190620130608.17230-1-julien.grall@arm.com>
 References: <20190620130608.17230-1-julien.grall@arm.com>
@@ -71,87 +70,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The variables lock and tlb_flush_pending holds information for a given
-ASID allocator. So move them to the asid_info structure.
+The function new_context will be part of a generic ASID allocator. At
+the moment, the MM structure is only used to fetch the ASID.
+
+To remove the dependency on MM, it is possible to just pass a pointer to
+the current ASID.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
 ---
- arch/arm64/mm/context.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ arch/arm64/mm/context.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index 7883347ece52..6457a9310fe4 100644
+index 6457a9310fe4..a9cc59288b08 100644
 --- a/arch/arm64/mm/context.c
 +++ b/arch/arm64/mm/context.c
-@@ -27,8 +27,6 @@
- #include <asm/smp.h>
- #include <asm/tlbflush.h>
- 
--static DEFINE_RAW_SPINLOCK(cpu_asid_lock);
--
- static struct asid_info
- {
- 	atomic64_t	generation;
-@@ -36,6 +34,9 @@ static struct asid_info
- 	atomic64_t __percpu	*active;
- 	u64 __percpu		*reserved;
- 	u32			bits;
-+	raw_spinlock_t		lock;
-+	/* Which CPU requires context flush on next call */
-+	cpumask_t		flush_pending;
- } asid_info;
- 
- #define active_asid(info, cpu)	*per_cpu_ptr((info)->active, cpu)
-@@ -44,8 +45,6 @@ static struct asid_info
- static DEFINE_PER_CPU(atomic64_t, active_asids);
- static DEFINE_PER_CPU(u64, reserved_asids);
- 
--static cpumask_t tlb_flush_pending;
--
- #define ASID_MASK(info)			(~GENMASK((info)->bits - 1, 0))
- #define ASID_FIRST_VERSION(info)	(1UL << ((info)->bits))
- 
-@@ -124,7 +123,7 @@ static void flush_context(struct asid_info *info)
- 	 * Queue a TLB invalidation for each CPU to perform on next
- 	 * context-switch
- 	 */
--	cpumask_setall(&tlb_flush_pending);
-+	cpumask_setall(&info->flush_pending);
+@@ -151,10 +151,10 @@ static bool check_update_reserved_asid(struct asid_info *info, u64 asid,
+ 	return hit;
  }
  
- static bool check_update_reserved_asid(struct asid_info *info, u64 asid,
-@@ -233,7 +232,7 @@ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
- 				     old_active_asid, asid))
- 		goto switch_mm_fastpath;
+-static u64 new_context(struct asid_info *info, struct mm_struct *mm)
++static u64 new_context(struct asid_info *info, atomic64_t *pasid)
+ {
+ 	static u32 cur_idx = 1;
+-	u64 asid = atomic64_read(&mm->context.id);
++	u64 asid = atomic64_read(pasid);
+ 	u64 generation = atomic64_read(&info->generation);
  
--	raw_spin_lock_irqsave(&cpu_asid_lock, flags);
-+	raw_spin_lock_irqsave(&info->lock, flags);
+ 	if (asid != 0) {
+@@ -236,7 +236,7 @@ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
  	/* Check that our ASID belongs to the current generation. */
  	asid = atomic64_read(&mm->context.id);
  	if ((asid ^ atomic64_read(&info->generation)) >> info->bits) {
-@@ -241,11 +240,11 @@ void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
+-		asid = new_context(info, mm);
++		asid = new_context(info, &mm->context.id);
  		atomic64_set(&mm->context.id, asid);
  	}
  
--	if (cpumask_test_and_clear_cpu(cpu, &tlb_flush_pending))
-+	if (cpumask_test_and_clear_cpu(cpu, &info->flush_pending))
- 		local_flush_tlb_all();
- 
- 	atomic64_set(&active_asid(info, cpu), asid);
--	raw_spin_unlock_irqrestore(&cpu_asid_lock, flags);
-+	raw_spin_unlock_irqrestore(&info->lock, flags);
- 
- switch_mm_fastpath:
- 
-@@ -288,6 +287,8 @@ static int asids_init(void)
- 	info->active = &active_asids;
- 	info->reserved = &reserved_asids;
- 
-+	raw_spin_lock_init(&info->lock);
-+
- 	pr_info("ASID allocator initialised with %lu entries\n",
- 		NUM_USER_ASIDS(info));
- 	return 0;
 -- 
 2.11.0
 
