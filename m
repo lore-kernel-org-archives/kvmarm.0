@@ -4,52 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCA0C48BE3
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54204C43613
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2D4721530
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D4721530
+	by mail.kernel.org (Postfix) with ESMTP id 1B55921530
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B55921530
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78D9C4A4E6;
-	Fri, 21 Jun 2019 05:40:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6D954A3BF;
+	Fri, 21 Jun 2019 05:40:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ukYzRQ-Jk9FT; Fri, 21 Jun 2019 05:40:47 -0400 (EDT)
+	with ESMTP id koeORnnWpu8e; Fri, 21 Jun 2019 05:40:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD284A577;
-	Fri, 21 Jun 2019 05:40:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1AD44A521;
+	Fri, 21 Jun 2019 05:40:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB5C4A520
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F85D4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id btbQ86QIJ5OV for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Jun 2019 05:40:39 -0400 (EDT)
+ with ESMTP id Lww9njYqDgCy for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Jun 2019 05:40:40 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 492794A50F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6241E4A55C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:37 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12BE1142F;
- Fri, 21 Jun 2019 02:40:34 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3301814FF;
+ Fri, 21 Jun 2019 02:40:37 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B322A3F246;
- Fri, 21 Jun 2019 02:40:32 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3A863F246;
+ Fri, 21 Jun 2019 02:40:35 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 52/59] KVM: arm64: nv: vgic: Allow userland to set VGIC
- maintenance IRQ
-Date: Fri, 21 Jun 2019 10:38:36 +0100
-Message-Id: <20190621093843.220980-53-marc.zyngier@arm.com>
+Subject: [PATCH 54/59] KVM: arm64: nv: Add nested GICv3 tracepoints
+Date: Fri, 21 Jun 2019 10:38:38 +0100
+Message-Id: <20190621093843.220980-55-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -71,128 +69,207 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-The VGIC maintenance IRQ signals various conditions about the LRs, when
-the GIC's virtualization extension is used.
-So far we didn't need it, but nested virtualization needs to know about
-this interrupt, so add a userland interface to setup the IRQ number.
-The architecture mandates that it must be a PPI, on top of that this code
-only exports a per-device option, so the PPI is the same on all VCPUs.
+Adding tracepoints to be able to peek into the shadow LRs used when
+running a guest guest.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-[added some bits of documentation]
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- .../virtual/kvm/devices/arm-vgic-v3.txt       |  9 ++++++++
- arch/arm/include/uapi/asm/kvm.h               |  1 +
- arch/arm64/include/uapi/asm/kvm.h             |  1 +
- include/kvm/arm_vgic.h                        |  3 +++
- virt/kvm/arm/vgic/vgic-kvm-device.c           | 22 +++++++++++++++++++
- 5 files changed, 36 insertions(+)
+ virt/kvm/arm/vgic/vgic-nested-trace.h | 137 ++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3-nested.c    |  12 ++-
+ 2 files changed, 148 insertions(+), 1 deletion(-)
+ create mode 100644 virt/kvm/arm/vgic/vgic-nested-trace.h
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-index ff290b43c8e5..c70e8f2e0c9c 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-@@ -249,3 +249,12 @@ Groups:
-   Errors:
-     -EINVAL: vINTID is not multiple of 32 or
-      info field is not VGIC_LEVEL_INFO_LINE_LEVEL
+diff --git a/virt/kvm/arm/vgic/vgic-nested-trace.h b/virt/kvm/arm/vgic/vgic-nested-trace.h
+new file mode 100644
+index 000000000000..69f4ec031e7c
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic-nested-trace.h
+@@ -0,0 +1,137 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(_TRACE_VGIC_NESTED_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_VGIC_NESTED_H
 +
-+  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
-+    The attr field of kvm_device_attr encodes the following values:
-+    bits:     | 31   ....    5 | 4  ....  0 |
-+    values:   |      RES0      |   vINTID   |
++#include <linux/tracepoint.h>
 +
-+    The vINTID specifies which interrupt is generated when the vGIC
-+    must generate a maintenance interrupt. This must be a PPI.
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
 +
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 4602464ebdfb..a6af45645a6d 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -233,6 +233,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 563e2a8bae93..8e1c6ffe1b59 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -295,6 +295,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 17d32c2797c0..95c6232663c3 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -229,6 +229,9 @@ struct vgic_dist {
++#define SLR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT,	\
++	(__entry->orig_lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_create_shadow_lrs,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs, u64 *orig_lrs),
++	TP_ARGS(vcpu, nr_lr, lrs, orig_lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++		__array(	u64,	orig_lrs,	16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++		memcpy(__entry->orig_lrs, orig_lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)",
++		  __entry->nr_lr,
++		  SLR_ENTRY_VALS(0), SLR_ENTRY_VALS(1), SLR_ENTRY_VALS(2),
++		  SLR_ENTRY_VALS(3), SLR_ENTRY_VALS(4), SLR_ENTRY_VALS(5),
++		  SLR_ENTRY_VALS(6), SLR_ENTRY_VALS(7), SLR_ENTRY_VALS(8),
++		  SLR_ENTRY_VALS(9), SLR_ENTRY_VALS(10), SLR_ENTRY_VALS(11),
++		  SLR_ENTRY_VALS(12), SLR_ENTRY_VALS(13), SLR_ENTRY_VALS(14),
++		  SLR_ENTRY_VALS(15))
++);
++
++#define LR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_put_nested,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs),
++	TP_ARGS(vcpu, nr_lr, lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu",
++		  __entry->nr_lr,
++		  LR_ENTRY_VALS(0), LR_ENTRY_VALS(1), LR_ENTRY_VALS(2),
++		  LR_ENTRY_VALS(3), LR_ENTRY_VALS(4), LR_ENTRY_VALS(5),
++		  LR_ENTRY_VALS(6), LR_ENTRY_VALS(7), LR_ENTRY_VALS(8),
++		  LR_ENTRY_VALS(9), LR_ENTRY_VALS(10), LR_ENTRY_VALS(11),
++		  LR_ENTRY_VALS(12), LR_ENTRY_VALS(13), LR_ENTRY_VALS(14),
++		  LR_ENTRY_VALS(15))
++);
++
++TRACE_EVENT(vgic_nested_hw_emulate,
++	TP_PROTO(int lr, u64 lr_val, u32 l1_intid),
++	TP_ARGS(lr, lr_val, l1_intid),
++
++	TP_STRUCT__entry(
++		__field(	int,	lr		)
++		__field(	u64,	lr_val		)
++		__field(	u32,	l1_intid	)
++	),
++
++	TP_fast_assign(
++		__entry->lr		= lr;
++		__entry->lr_val		= lr_val;
++		__entry->l1_intid	= l1_intid;
++	),
++
++	TP_printk("lr: %d LR %llx L1 INTID: %u\n",
++		  __entry->lr, __entry->lr_val, __entry->l1_intid)
++);
++
++#endif /* _TRACE_VGIC_NESTED_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm/vgic
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE vgic-nested-trace
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
+diff --git a/virt/kvm/arm/vgic/vgic-v3-nested.c b/virt/kvm/arm/vgic/vgic-v3-nested.c
+index 7c5f82ae68e0..ec838b7be6dc 100644
+--- a/virt/kvm/arm/vgic/vgic-v3-nested.c
++++ b/virt/kvm/arm/vgic/vgic-v3-nested.c
+@@ -13,6 +13,9 @@
  
- 	int			nr_spis;
+ #include "vgic.h"
  
-+	/* The GIC maintenance IRQ for nested hypervisors. */
-+	u32			maint_irq;
++#define CREATE_TRACE_POINTS
++#include "vgic-nested-trace.h"
 +
- 	/* base addresses in guest physical address space: */
- 	gpa_t			vgic_dist_base;		/* distributor */
- 	union {
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 44419679f91a..dfb1d7cc66b3 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -241,6 +241,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 			     VGIC_NR_PRIVATE_IRQS, uaddr);
- 		break;
+ static inline struct vgic_v3_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
+ {
+ 	return &vcpu->arch.vgic_cpu.nested_vgic_v3;
+@@ -118,6 +121,8 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
+ 		s_cpu_if->vgic_lr[i] = lr;
  	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+
-+		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
-+		break;
-+	}
- 	}
  
- 	return r;
-@@ -627,6 +633,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 		reg = tmp32;
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+		u32 val;
-+
-+		if (get_user(val, uaddr))
-+			return -EFAULT;
-+
-+		/* Must be a PPI. */
-+		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
-+			return -EINVAL;
-+
-+		dev->kvm->arch.vgic.maint_irq = val;
-+
-+		return 0;
-+	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		int ret;
++	trace_vgic_create_shadow_lrs(vcpu, kvm_vgic_global_state.nr_lr,
++				     s_cpu_if->vgic_lr, cpu_if->vgic_lr);
+ 	s_cpu_if->used_lrs = kvm_vgic_global_state.nr_lr;
+ }
  
-@@ -712,6 +733,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
- 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+@@ -162,8 +167,10 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 			continue; /* oh well, the guest hyp is broken */
+ 
+ 		lr = __gic_v3_get_lr(i);
+-		if (!(lr & ICH_LR_STATE))
++		if (!(lr & ICH_LR_STATE)) {
++			trace_vgic_nested_hw_emulate(i, lr, l1_irq);
+ 			irq->active = false;
++		}
+ 
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -194,6 +201,9 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 
+ 	__vgic_v3_save_state(vcpu_shadow_if(vcpu));
+ 
++	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr,
++			      vcpu_shadow_if(vcpu)->vgic_lr);
++
+ 	/*
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
 -- 
 2.20.1
 
