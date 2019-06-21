@@ -2,53 +2,54 @@ Return-Path: <SRS0=LUtr=UU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3025EC48BE3
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21170C48BE0
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EADBF21530
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EADBF21530
+	by mail.kernel.org (Postfix) with ESMTP id DB55F20673
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB55F20673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A05684A515;
-	Fri, 21 Jun 2019 05:39:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E024A32E;
+	Fri, 21 Jun 2019 05:39:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nSd-+B9Re616; Fri, 21 Jun 2019 05:39:47 -0400 (EDT)
+	with ESMTP id s-Z+ygTPMGL4; Fri, 21 Jun 2019 05:39:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91E924A514;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC2084A525;
 	Fri, 21 Jun 2019 05:39:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD1E4A4FD
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 813EF4A507
  for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id APXM2nTlB4va for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id hg-cNPpstJ88 for <kvmarm@lists.cs.columbia.edu>;
  Fri, 21 Jun 2019 05:39:45 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1902A4A319
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81D724A527
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:42 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0D1614FF;
- Fri, 21 Jun 2019 02:39:43 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54252142F;
+ Fri, 21 Jun 2019 02:39:42 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CAF63F246;
- Fri, 21 Jun 2019 02:39:42 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F3ADA3F246;
+ Fri, 21 Jun 2019 02:39:40 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 20/59] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
-Date: Fri, 21 Jun 2019 10:38:04 +0100
-Message-Id: <20190621093843.220980-21-marc.zyngier@arm.com>
+Subject: [PATCH 19/59] KVM: arm64: nv: Trap SPSR_EL1,
+ ELR_EL1 and VBAR_EL1 from virtual EL2
+Date: Fri, 21 Jun 2019 10:38:03 +0100
+Message-Id: <20190621093843.220980-20-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -72,63 +73,72 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-For the same reason we trap virtual memory register accesses in virtual
-EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
-access EL1 system register state instead of the virtual EL2 one.
+For the same reason we trap virtual memory register accesses at virtual
+EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+introduces the HCR_EL2.NV1 bit to be able to trap on those register
+accesses in EL1. Do not set this bit until the whole nesting support is
+completed.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 3 ++-
- arch/arm64/kvm/hyp/switch.c      | 2 ++
- arch/arm64/kvm/sys_regs.c        | 2 +-
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b2e363ac624d..48e15af2bece 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -278,12 +278,13 @@
- #define CPTR_EL2_TFP_SHIFT 10
- 
- /* Hyp Coprocessor Trap Register */
--#define CPTR_EL2_TCPAC	(1 << 31)
-+#define CPTR_EL2_TCPAC	(1U << 31)
- #define CPTR_EL2_TTA	(1 << 20)
- #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
- #define CPTR_EL2_TZ	(1 << 8)
- #define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
- #define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
-+#define CPTR_EL2_E2H_TCPAC	(1U << 31)
- 
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_TPMS		(1 << 14)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 791b26570347..62359c7c3d6b 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -108,6 +108,8 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
- 		val &= ~CPACR_EL1_FPEN;
- 		__activate_traps_fpsimd32(vcpu);
- 	}
-+	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-+		val |= CPTR_EL2_E2H_TCPAC;
- 
- 	write_sysreg(val, cpacr_el1);
- 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7fc87657382d..1d1312425cf2 100644
+index 0464d8e29cba..7fc87657382d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1773,7 +1773,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_UNALLOCATED(7,7),
+@@ -1606,6 +1606,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
- 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
--	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-+	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
- 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
- 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
- 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
++static bool access_elr(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu->arch.ctxt.gp_regs.elr_el1 = p->regval;
++	else
++		p->regval = vcpu->arch.ctxt.gp_regs.elr_el1;
++
++	return true;
++}
++
++static bool access_spsr(struct kvm_vcpu *vcpu,
++			struct sys_reg_params *p,
++			const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1] = p->regval;
++	else
++		p->regval = vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1];
++
++	return true;
++}
++
+ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+@@ -1761,6 +1785,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	PTRAUTH_KEY(APDB),
+ 	PTRAUTH_KEY(APGA),
+ 
++	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL1), access_elr},
++
+ 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+ 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+@@ -1789,7 +1816,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+ 
+-	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.20.1
 
