@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DDAC43613
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E3EC43613
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7C7F521530
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7F521530
+	by mail.kernel.org (Postfix) with ESMTP id 4BEA921530
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BEA921530
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31E684A521;
-	Fri, 21 Jun 2019 05:40:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 545C34A418;
+	Fri, 21 Jun 2019 05:40:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j9-qlgkpJhH2; Fri, 21 Jun 2019 05:40:50 -0400 (EDT)
+	with ESMTP id B2sRzZcuB-J9; Fri, 21 Jun 2019 05:40:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3F34A53A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E20354A520;
 	Fri, 21 Jun 2019 05:40:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C348A4A331
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C352C4A369
  for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vw7m5dnVAbyY for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id u2VOQKLQPICL for <kvmarm@lists.cs.columbia.edu>;
  Fri, 21 Jun 2019 05:40:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8FA34A4F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F094A567
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:40 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC3381478;
- Fri, 21 Jun 2019 02:40:38 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51752142F;
+ Fri, 21 Jun 2019 02:40:40 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 685523F246;
- Fri, 21 Jun 2019 02:40:37 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F176A3F246;
+ Fri, 21 Jun 2019 02:40:38 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 55/59] arm64: KVM: nv: Add handling of EL2-specific timer
- registers
-Date: Fri, 21 Jun 2019 10:38:39 +0100
-Message-Id: <20190621093843.220980-56-marc.zyngier@arm.com>
+Subject: [PATCH 56/59] arm64: KVM: nv: Honor SCTLR_EL2.SPAN on entering vEL2
+Date: Fri, 21 Jun 2019 10:38:40 +0100
+Message-Id: <20190621093843.220980-57-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -70,111 +69,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add the required handling for EL2 and EL02 registers, as
-well as EL1 registers used in the E2H context.
+On entering vEL2, we must honor the SCTLR_EL2.SPAN bit so that
+PSTATE.PAN reflect the expected setting.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ba3bcd29c02d..0bd6a66b621e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1361,20 +1361,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index c406fd688b9f..e37af2749b38 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -127,9 +127,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 				enum exception_type type)
+ {
++	u64 spsr = *vcpu_cpsr(vcpu);
++
+ 	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
  
- 	switch (reg) {
- 	case SYS_CNTP_TVAL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
+-	vcpu_write_sys_reg(vcpu, *vcpu_cpsr(vcpu), SPSR_EL2);
++	vcpu_write_sys_reg(vcpu, spsr, SPSR_EL2);
+ 	vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+ 	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
+ 
+@@ -137,6 +139,15 @@ static void enter_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	/* On an exception, PSTATE.SP becomes 1 */
+ 	*vcpu_cpsr(vcpu) = PSR_MODE_EL2h;
+ 	*vcpu_cpsr(vcpu) |= PSR_A_BIT | PSR_F_BIT | PSR_I_BIT | PSR_D_BIT;
 +
- 	case SYS_AARCH32_CNTP_TVAL:
-+	case SYS_CNTP_TVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_TVAL;
- 		break;
-+
-+	case SYS_CNTV_TVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHP_TVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
-+	case SYS_CNTHV_TVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_TVAL;
-+		break;
-+
- 	case SYS_CNTP_CTL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CTL:
-+	case SYS_CNTP_CTL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CTL;
- 		break;
-+
-+	case SYS_CNTV_CTL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHP_CTL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+
-+	case SYS_CNTHV_CTL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CTL;
-+		break;
-+		
- 	case SYS_CNTP_CVAL_EL0:
-+		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-+			tmr = TIMER_HPTIMER;
-+		else
-+			tmr = TIMER_PTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_AARCH32_CNTP_CVAL:
-+	case SYS_CNTP_CVAL_EL02:
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CVAL;
- 		break;
-+
-+	case SYS_CNTV_CVAL_EL02:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHP_CVAL_EL2:
-+		tmr = TIMER_HPTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
-+	case SYS_CNTHV_CVAL_EL2:
-+		tmr = TIMER_HVTIMER;
-+		treg = TIMER_REG_CVAL;
-+		break;
-+
- 	case SYS_CNTVOFF_EL2:
- 		tmr = TIMER_VTIMER;
- 		treg = TIMER_REG_VOFF;
++	/*
++	 * If SPAN is clear, set the PAN bit on exception entry
++	 * if SPAN is set, copy the PAN bit across
++	 */
++	if (!(vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EL1_SPAN))
++		*vcpu_cpsr(vcpu) |= PSR_PAN_BIT;
++	else
++		*vcpu_cpsr(vcpu) |= (spsr & PSR_PAN_BIT);
+ }
+ 
+ /*
 -- 
 2.20.1
 
