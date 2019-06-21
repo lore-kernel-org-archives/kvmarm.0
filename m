@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3424DC4646C
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A84AEC43613
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EECE321530
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EECE321530
+	by mail.kernel.org (Postfix) with ESMTP id 6F34221530
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:39:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F34221530
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92F194A4F7;
-	Fri, 21 Jun 2019 05:39:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A8C4A332;
+	Fri, 21 Jun 2019 05:39:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DrIhVe4iBLGy; Fri, 21 Jun 2019 05:39:20 -0400 (EDT)
+	with ESMTP id x+tGJogdPpM5; Fri, 21 Jun 2019 05:39:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4B0A4A50C;
-	Fri, 21 Jun 2019 05:39:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B969C4A50F;
+	Fri, 21 Jun 2019 05:39:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56BFC4A32E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 549AB4A4E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UDiuW-Vnd1oS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 21 Jun 2019 05:39:16 -0400 (EDT)
+ with ESMTP id ulSe8Lm-duCI for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 21 Jun 2019 05:39:19 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10B424A319
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDF684A4F3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:39:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8118147A;
- Fri, 21 Jun 2019 02:39:15 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5139E14F6;
+ Fri, 21 Jun 2019 02:39:17 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 637FE3F246;
- Fri, 21 Jun 2019 02:39:14 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECFD83F246;
+ Fri, 21 Jun 2019 02:39:15 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 02/59] KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
-Date: Fri, 21 Jun 2019 10:37:46 +0100
-Message-Id: <20190621093843.220980-3-marc.zyngier@arm.com>
+Subject: [PATCH 03/59] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Date: Fri, 21 Jun 2019 10:37:47 +0100
+Message-Id: <20190621093843.220980-4-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -70,81 +70,116 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Having __load_guest_stage2 in kvm_hyp.h is quickly going to trigger
-a circular include problem. In order to avoid this, let's move
-it to kvm_mmu.h, where it will be a better fit anyway.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-In the process, drop the __hyp_text annotation, which doesn't help
-as the function is marked as __always_inline.
+Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+CPU has the ARMv8.3 nested virtualization capability.
 
+This will be used to support nested virtualization in KVM.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 18 ------------------
- arch/arm64/include/asm/kvm_mmu.h | 17 +++++++++++++++++
- 2 files changed, 17 insertions(+), 18 deletions(-)
+ .../admin-guide/kernel-parameters.txt         |  4 +++
+ arch/arm64/include/asm/cpucaps.h              |  3 ++-
+ arch/arm64/include/asm/sysreg.h               |  1 +
+ arch/arm64/kernel/cpufeature.c                | 26 +++++++++++++++++++
+ 4 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index ce99c2daff04..e8044f265824 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -21,7 +21,6 @@
- #include <linux/compiler.h>
- #include <linux/kvm_host.h>
- #include <asm/alternative.h>
--#include <asm/kvm_mmu.h>
- #include <asm/sysreg.h>
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 138f6664b2e2..202bb2115d83 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2046,6 +2046,10 @@
+ 			[KVM,ARM] Allow use of GICv4 for direct injection of
+ 			LPIs.
  
- #define __hyp_text __section(.hyp.text) notrace
-@@ -116,22 +115,5 @@ void deactivate_traps_vhe_put(void);
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
- 
--/*
-- * Must be called from hyp code running at EL2 with an updated VTTBR
-- * and interrupts disabled.
-- */
--static __always_inline void __hyp_text __load_guest_stage2(struct kvm *kvm)
--{
--	write_sysreg(kvm->arch.vtcr, vtcr_el2);
--	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
--
--	/*
--	 * ARM erratum 1165522 requires the actual execution of the above
--	 * before we can switch to the EL1/EL0 translation regime used by
--	 * the guest.
--	 */
--	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
--}
--
- #endif /* __ARM64_KVM_HYP_H__ */
- 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index ebeefcf835e8..3120ef948fa4 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -614,5 +614,22 @@ static __always_inline u64 kvm_get_vttbr(struct kvm *kvm)
- 	return kvm_phys_to_vttbr(baddr) | vmid_field | cnp;
- }
- 
-+/*
-+ * Must be called from hyp code running at EL2 with an updated VTTBR
-+ * and interrupts disabled.
-+ */
-+static __always_inline void __load_guest_stage2(struct kvm *kvm)
-+{
-+	write_sysreg(kvm->arch.vtcr, vtcr_el2);
-+	write_sysreg(kvm_get_vttbr(kvm), vttbr_el2);
++	kvm-arm.nested=
++			[KVM,ARM] Allow nested virtualization in KVM/ARM.
++			Default is 0 (disabled)
 +
-+	/*
-+	 * ARM erratum 1165522 requires the actual execution of the above
-+	 * before we can switch to the EL1/EL0 translation regime used by
-+	 * the guest.
-+	 */
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
+ 	kvm-intel.ept=	[KVM,Intel] Disable extended page tables
+ 			(virtualized MMU) support on capable Intel chips.
+ 			Default is 1 (enabled)
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index 33401ebc187c..faa13c1f1f65 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -63,7 +63,8 @@
+ #define ARM64_HAS_IRQ_PRIO_MASKING		42
+ #define ARM64_HAS_DCPODP			43
+ #define ARM64_WORKAROUND_1463225		44
++#define ARM64_HAS_NESTED_VIRT			45
+ 
+-#define ARM64_NCAPS				45
++#define ARM64_NCAPS				46
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 434cf53d527b..f3ca7e4796ab 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -693,6 +693,7 @@
+ /* id_aa64mmfr2 */
+ #define ID_AA64MMFR2_FWB_SHIFT		40
+ #define ID_AA64MMFR2_AT_SHIFT		32
++#define ID_AA64MMFR2_NV_SHIFT		24
+ #define ID_AA64MMFR2_LVA_SHIFT		16
+ #define ID_AA64MMFR2_IESB_SHIFT		12
+ #define ID_AA64MMFR2_LSM_SHIFT		8
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 80babf451519..2f8e7d4e8e45 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -224,6 +224,7 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr1[] = {
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr2[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_FWB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_AT_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_NV_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_LVA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_IESB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR2_LSM_SHIFT, 4, 0),
+@@ -1161,6 +1162,21 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
+ 	if (!alternative_is_applied(ARM64_HAS_VIRT_HOST_EXTN))
+ 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+ }
++
++static bool nested_param;
++static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
++				    int scope)
++{
++	return has_cpuid_feature(cap, scope) &&
++		nested_param;
 +}
 +
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
++static int __init kvmarm_nested_cfg(char *buf)
++{
++	return strtobool(buf, &nested_param);
++}
++
++early_param("kvm-arm.nested", kvmarm_nested_cfg);
+ #endif
+ 
+ static void cpu_has_fwb(const struct arm64_cpu_capabilities *__unused)
+@@ -1331,6 +1347,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = runs_at_el2,
+ 		.cpu_enable = cpu_copy_el2regs,
+ 	},
++	{
++		.desc = "Nested Virtualization Support",
++		.capability = ARM64_HAS_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_NV_SHIFT,
++		.min_field_value = 1,
++	},
+ #endif	/* CONFIG_ARM64_VHE */
+ 	{
+ 		.desc = "32-bit EL0 Support",
 -- 
 2.20.1
 
