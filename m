@@ -4,51 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E8CC48BE3
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCA0C48BE3
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6CBA821655
-	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBA821655
+	by mail.kernel.org (Postfix) with ESMTP id C2D4721530
+	for <kvmarm@archiver.kernel.org>; Fri, 21 Jun 2019 09:40:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D4721530
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 231D64A555;
-	Fri, 21 Jun 2019 05:40:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78D9C4A4E6;
+	Fri, 21 Jun 2019 05:40:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xd+YsCHZvcIQ; Fri, 21 Jun 2019 05:40:45 -0400 (EDT)
+	with ESMTP id ukYzRQ-Jk9FT; Fri, 21 Jun 2019 05:40:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74B764A573;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD284A577;
 	Fri, 21 Jun 2019 05:40:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A304A4FD
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB5C4A520
  for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7ytUwet6gxz2 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id btbQ86QIJ5OV for <kvmarm@lists.cs.columbia.edu>;
  Fri, 21 Jun 2019 05:40:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEDBA4A520
- for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 492794A50F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 21 Jun 2019 05:40:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E49F14F6;
- Fri, 21 Jun 2019 02:40:35 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12BE1142F;
+ Fri, 21 Jun 2019 02:40:34 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com
  (filthy-habits.cambridge.arm.com [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49B313F246;
- Fri, 21 Jun 2019 02:40:34 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B322A3F246;
+ Fri, 21 Jun 2019 02:40:32 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 53/59] KVM: arm64: nv: Implement maintenance interrupt
- forwarding
-Date: Fri, 21 Jun 2019 10:38:37 +0100
-Message-Id: <20190621093843.220980-54-marc.zyngier@arm.com>
+Subject: [PATCH 52/59] KVM: arm64: nv: vgic: Allow userland to set VGIC
+ maintenance IRQ
+Date: Fri, 21 Jun 2019 10:38:36 +0100
+Message-Id: <20190621093843.220980-53-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -70,158 +71,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When we take a maintenance interrupt, we need to decide whether
-it is generated on an action from the guest, or if it is something
-that needs to be forwarded to the guest hypervisor.
+From: Andre Przywara <andre.przywara@arm.com>
 
+The VGIC maintenance IRQ signals various conditions about the LRs, when
+the GIC's virtualization extension is used.
+So far we didn't need it, but nested virtualization needs to know about
+this interrupt, so add a userland interface to setup the IRQ number.
+The architecture mandates that it must be a PPI, on top of that this code
+only exports a per-device option, so the PPI is the same on all VCPUs.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+[added some bits of documentation]
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/nested.c            |  2 +-
- virt/kvm/arm/vgic/vgic-init.c      | 30 ++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3-nested.c | 25 +++++++++++++++++++++----
- 3 files changed, 52 insertions(+), 5 deletions(-)
+ .../virtual/kvm/devices/arm-vgic-v3.txt       |  9 ++++++++
+ arch/arm/include/uapi/asm/kvm.h               |  1 +
+ arch/arm64/include/uapi/asm/kvm.h             |  1 +
+ include/kvm/arm_vgic.h                        |  3 +++
+ virt/kvm/arm/vgic/vgic-kvm-device.c           | 22 +++++++++++++++++++
+ 5 files changed, 36 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index df2db9ab7cfb..ab61f0f30ee6 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -545,7 +545,7 @@ bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
- 	bool imo = __vcpu_sys_reg(vcpu, HCR_EL2) & HCR_IMO;
- 	bool fmo = __vcpu_sys_reg(vcpu, HCR_EL2) & HCR_FMO;
+diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+index ff290b43c8e5..c70e8f2e0c9c 100644
+--- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
++++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+@@ -249,3 +249,12 @@ Groups:
+   Errors:
+     -EINVAL: vINTID is not multiple of 32 or
+      info field is not VGIC_LEVEL_INFO_LINE_LEVEL
++
++  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
++    The attr field of kvm_device_attr encodes the following values:
++    bits:     | 31   ....    5 | 4  ....  0 |
++    values:   |      RES0      |   vINTID   |
++
++    The vINTID specifies which interrupt is generated when the vGIC
++    must generate a maintenance interrupt. This must be a PPI.
++
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 4602464ebdfb..a6af45645a6d 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -233,6 +233,7 @@ struct kvm_vcpu_events {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 563e2a8bae93..8e1c6ffe1b59 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -295,6 +295,7 @@ struct kvm_vcpu_events {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 17d32c2797c0..95c6232663c3 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -229,6 +229,9 @@ struct vgic_dist {
  
--	WARN(imo != fmo, "Separate virtual IRQ/FIQ settings not supported\n");
-+	WARN_ONCE(imo != fmo, "Separate virtual IRQ/FIQ settings not supported\n");
+ 	int			nr_spis;
  
- 	return nested_virt_in_use(vcpu) && imo && fmo && !is_hyp_ctxt(vcpu);
- }
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 3bdb31eaed64..ec54bc8d5126 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -17,9 +17,11 @@
- #include <linux/uaccess.h>
- #include <linux/interrupt.h>
- #include <linux/cpu.h>
-+#include <linux/irq.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include "vgic.h"
- 
- /*
-@@ -240,6 +242,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
-+	if (nested_virt_in_use(vcpu)) {
-+		/* FIXME: remove this hack */
-+		if (vcpu->kvm->arch.vgic.maint_irq == 0)
-+			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
-+		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
-+					 vcpu);
-+		if (ret)
-+			return ret;
++	/* The GIC maintenance IRQ for nested hypervisors. */
++	u32			maint_irq;
++
+ 	/* base addresses in guest physical address space: */
+ 	gpa_t			vgic_dist_base;		/* distributor */
+ 	union {
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+index 44419679f91a..dfb1d7cc66b3 100644
+--- a/virt/kvm/arm/vgic/vgic-kvm-device.c
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -241,6 +241,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 			     VGIC_NR_PRIVATE_IRQS, uaddr);
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++
++		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
++		break;
 +	}
-+
- 	/*
- 	 * If we are creating a VCPU with a GICv3 we must also register the
- 	 * KVM io device for the redistributor that belongs to this VCPU.
-@@ -455,12 +467,23 @@ static int vgic_init_cpu_dying(unsigned int cpu)
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- {
-+	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
-+
- 	/*
- 	 * We cannot rely on the vgic maintenance interrupt to be
- 	 * delivered synchronously. This means we can only use it to
- 	 * exit the VM, and we perform the handling of EOIed
- 	 * interrupts on the exit path (see vgic_fold_lr_state).
- 	 */
-+
-+	/* If not nested, deactivate */
-+	if (!vcpu || !vgic_state_is_nested(vcpu)) {
-+		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
-+		return IRQ_HANDLED;
-+	}
-+
-+	/* Assume nested from now */
-+	vgic_v3_handle_nested_maint_irq(vcpu);
- 	return IRQ_HANDLED;
- }
- 
-@@ -531,6 +554,13 @@ int kvm_vgic_hyp_init(void)
- 		return ret;
  	}
  
-+	ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
-+				    kvm_get_running_vcpus());
-+	if (ret) {
-+		kvm_err("Error setting vcpu affinity\n");
-+		goto out_free_irq;
+ 	return r;
+@@ -627,6 +633,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 		reg = tmp32;
+ 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++		u32 val;
++
++		if (get_user(val, uaddr))
++			return -EFAULT;
++
++		/* Must be a PPI. */
++		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
++			return -EINVAL;
++
++		dev->kvm->arch.vgic.maint_irq = val;
++
++		return 0;
 +	}
-+
- 	ret = cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
- 				"kvm/arm/vgic:starting",
- 				vgic_init_cpu_starting, vgic_init_cpu_dying);
-diff --git a/virt/kvm/arm/vgic/vgic-v3-nested.c b/virt/kvm/arm/vgic/vgic-v3-nested.c
-index c917d49e4a14..7c5f82ae68e0 100644
---- a/virt/kvm/arm/vgic/vgic-v3-nested.c
-+++ b/virt/kvm/arm/vgic/vgic-v3-nested.c
-@@ -172,10 +172,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	unsigned long flags;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+ 		int ret;
  
- 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
- 	vgic_v3_create_shadow_lr(vcpu);
- 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
-+
-+	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->line_level || irq->active)
-+		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+				      IRQCHIP_STATE_ACTIVE, true);
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	vgic_put_irq(vcpu->kvm, irq);
- }
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -190,11 +200,14 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	 */
- 	vgic_v3_fixup_shadow_lr_state(vcpu);
- 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
-+	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+			      IRQCHIP_STATE_ACTIVE, false);
- }
- 
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	bool state;
- 
- 	/*
- 	 * If we exit a nested VM with a pending maintenance interrupt from the
-@@ -202,8 +215,12 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- 	 * can re-sync the appropriate LRs and sample level triggered interrupts
- 	 * again.
- 	 */
--	if (vgic_state_is_nested(vcpu) &&
--	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
--	    vgic_v3_get_misr(vcpu))
--		kvm_inject_nested_irq(vcpu);
-+	if (!vgic_state_is_nested(vcpu))
-+		return;
-+
-+	state  = cpu_if->vgic_hcr & ICH_HCR_EN;
-+	state &= vgic_v3_get_misr(vcpu);
-+
-+	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+			    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
- }
+@@ -712,6 +733,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 		return vgic_v3_has_attr_regs(dev, attr);
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
 -- 
 2.20.1
 
