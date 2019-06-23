@@ -1,67 +1,87 @@
-Return-Path: <SRS0=kIky=UV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=jLK7=UW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26747C43613
-	for <kvmarm@archiver.kernel.org>; Sat, 22 Jun 2019 19:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BF9C43613
+	for <kvmarm@archiver.kernel.org>; Sun, 23 Jun 2019 16:35:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 96BF8206B7
-	for <kvmarm@archiver.kernel.org>; Sat, 22 Jun 2019 19:11:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96BF8206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 212AE206BA
+	for <kvmarm@archiver.kernel.org>; Sun, 23 Jun 2019 16:35:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WoTik3i7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 212AE206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0D8E4A4BE;
-	Sat, 22 Jun 2019 15:11:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A38C74A580;
+	Sun, 23 Jun 2019 12:35:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IchVVegKf9tC; Sat, 22 Jun 2019 15:11:42 -0400 (EDT)
+	with ESMTP id M2kTebJEBc+f; Sun, 23 Jun 2019 12:35:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26EF4A557;
-	Sat, 22 Jun 2019 15:11:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BD1E4A574;
+	Sun, 23 Jun 2019 12:35:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAE234A4BE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Jun 2019 15:11:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB7214A571
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Jun 2019 12:35:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OBv6nAD9tEHU for <kvmarm@lists.cs.columbia.edu>;
- Sat, 22 Jun 2019 15:11:39 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E62E64A4A4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Jun 2019 15:11:38 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 3Pn+OWqyq28Y for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 23 Jun 2019 12:35:50 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E6974A54C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Jun 2019 12:35:50 -0400 (EDT)
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
+ [209.85.128.44])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 066EBB5BA;
- Sat, 22 Jun 2019 19:11:38 +0000 (UTC)
-Received: from ultra.random (ovpn-125-188.rdu2.redhat.com [10.10.125.188])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2D6608A7;
- Sat, 22 Jun 2019 19:11:37 +0000 (UTC)
-Date: Sat, 22 Jun 2019 15:11:36 -0400
-From: Andrea Arcangeli <aarcange@redhat.com>
-To: Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: Reference count on pages held in secondary MMUs
-Message-ID: <20190622191136.GB32455@redhat.com>
-References: <20190609081805.GC21798@e113682-lin.lund.arm.com>
- <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
- <20190609174024.GA4785@redhat.com>
- <20190611115132.GB5318@e113682-lin.lund.arm.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id B6675214C6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Jun 2019 16:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1561307749;
+ bh=f4wzwRqVtnbeGMbGLTUq9DbopFJOpD4awTGdr8HMu0c=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=WoTik3i7uVOtG9x3r9i96Ag9GXjA5+USAyJht8X/qBPra0PBApIG8JI9f6E8NDiSi
+ CHO/c4Hsn/R99/LCKEtYzlnwWDJLEtQdF65WJ9f4axQZIsz8xhsXyuPzsiaPPUciq0
+ ifLAnqxrMbQFdaTEKtPF9Oo8vcgcRee+CxrRPVIA=
+Received: by mail-wm1-f44.google.com with SMTP id s15so10958621wmj.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 23 Jun 2019 09:35:48 -0700 (PDT)
+X-Gm-Message-State: APjAAAU0Ryc8FeXt1ledP5r8MHl7ajkqskX+J+96ZwxEoZzi9BZ1a6ri
+ 49g0i9YezdZAYPNGxfTBFIa5v0+O9/wy9HzfpT0=
+X-Google-Smtp-Source: APXvYqytV0iot533SQYILeur1ABvpdvSmQ61FQnlhf7mWoX4c7AKw6SIGZCm/OWATKrhGhf7ydEFv29PmbNlV0vRGhM=
+X-Received: by 2002:a7b:cd84:: with SMTP id y4mr12259887wmj.79.1561307747231; 
+ Sun, 23 Jun 2019 09:35:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190611115132.GB5318@e113682-lin.lund.arm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Sat, 22 Jun 2019 19:11:38 +0000 (UTC)
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jerome Glisse <jglisse@redhat.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <20190321163623.20219-1-julien.grall@arm.com>
+ <20190321163623.20219-12-julien.grall@arm.com>
+ <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
+ <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
+ <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
+ <CAJF2gTStSR7Jmu7=HaO5Wxz=Zn8A5-RD8ktori3oKEhM9vozAA@mail.gmail.com>
+ <20190621141606.GF18954@arrakis.emea.arm.com>
+In-Reply-To: <20190621141606.GF18954@arrakis.emea.arm.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Mon, 24 Jun 2019 00:35:35 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
+Message-ID: <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
+Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
+ separate file
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: aou@eecs.berkeley.edu, Marc Zyngier <marc.zyngier@arm.com>,
+ Anup Patel <anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, rppt@linux.ibm.com, hch@infradead.org,
+ Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
+ Palmer Dabbelt <palmer@sifive.com>, gary@garyguo.net, paul.walmsley@sifive.com,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,294 +98,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello Christoffer,
+Thx Catalin,
 
-On Tue, Jun 11, 2019 at 01:51:32PM +0200, Christoffer Dall wrote:
-> Sorry, what does this mean?  Do you mean that we can either do:
-> 
->   on_vm_s2_fault() {
->       page = gup();
->       map_page_in_s2_mmu();
->       put_page();
->   }
-> 
->   mmu_notifier_invalidate() {
->       unmap_page_in_s2_mmu();
->   }
-> 
-> or
-> 
->   on_vm_s2_fault() {
->       page = gup();
->       map_page_in_s2_mmu();
->   }
-> 
->   mmu_notifier_invalidate() {
->       unmap_page_in_s2_mmu();
->       put_page();
->   }
+On Fri, Jun 21, 2019 at 10:16 PM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> On Wed, Jun 19, 2019 at 07:51:03PM +0800, Guo Ren wrote:
+> > On Wed, Jun 19, 2019 at 4:54 PM Julien Grall <julien.grall@arm.com> wrote:
+> > > On 6/19/19 9:07 AM, Guo Ren wrote:
+> > > > Move arm asid allocator code in a generic one is a agood idea, I've
+> > > > made a patchset for C-SKY and test is on processing, See:
+> > > > https://lore.kernel.org/linux-csky/1560930553-26502-1-git-send-email-guoren@kernel.org/
+> > > >
+> > > > If you plan to seperate it into generic one, I could co-work with you.
+> > >
+> > > Was the ASID allocator work out of box on C-Sky?
+> >
+> > Almost done, but one question:
+> > arm64 remove the code in switch_mm:
+> >   cpumask_clear_cpu(cpu, mm_cpumask(prev));
+> >   cpumask_set_cpu(cpu, mm_cpumask(next));
+> >
+> > Why? Although arm64 cache operations could affect all harts with CTC
+> > method of interconnect, I think we should keep these code for
+> > primitive integrity in linux. Because cpu_bitmap is in mm_struct
+> > instead of mm->context.
+>
+> We didn't have a use for this in the arm64 code, so no point in
+> maintaining the mm_cpumask. On some arm32 systems (ARMv6) with no
+> hardware broadcast of some TLB/cache operations, we use it to track
+> where the task has run to issue IPI for TLB invalidation or some
+> deferred I-cache invalidation.
+The operation of set/clear mm_cpumask was removed in arm64 compared to
+arm32. It seems no side effect on current arm64 system, but from
+software meaning it's wrong.
+I think we should keep mm_cpumask just like arm32.
 
-Yes both work, refcounting always works.
+>
+> (there was also a potential optimisation on arm64 to avoid broadcast
+> TLBI if the task only ran on a single CPU but Will found that was rarely
+> the case on an SMP system because of rebalancing happening during
+> execve(), ending up with two bits set in the mm_cpumask)
+>
+> The way you use it on csky is different from how it is done on arm. It
+> seems to clear the mask for the scheduled out (prev) task but this
+> wouldn't work on arm(64) since the TLB still contains prev entries
+> tagged with the scheduled out ASID. Whether it matters, I guess it
+> depends on the specifics of your hardware.
+Sorry for the mistake quote, what I mean is what is done in arm32:
+clear all bits of mm->cpu_mask in new_context(), and set back one by
+one. Here is my patch:
+https://lore.kernel.org/linux-csky/CAJF2gTQ0xQtQY1t-g9FgWaxfDXppMkFooCQzTFy7+ouwUfyA6w@mail.gmail.com/T/#m2ed464d2dfb45ac6f5547fb3936adf2da456cb65
 
-> > and in fact Jerome also thinks
-> > like me that we should eventually optimize away the FOLL_GET and not
-> > take the refcount in the first place, 
-> 
-> So if I understood the above correct, the next point is that there are
-> advantages to avoiding keeping the extra reference on that page, because
-> we have problematic race conditions related to set_page_dirty(), and we
-> can reduce the problem of race conditions further by not getting a
-> reference on the page at all when going GUP as part of a KVM fault?
+>
+> While the algorithm may seem fairly generic, the semantics have a few
+> corner cases specific to each architecture. See [1] for a description of
+> the semantics we need on arm64 (CnP is a feature where the hardware
+> threads of the same core can share the TLB; the original algorithm
+> violated the requirements when this feature was enabled).
+C-SKY SMP is only one hart per core, but here is a patch [1] with my
+thought on SMT duplicate tlb flush:
+[1] https://lore.kernel.org/linux-csky/1561305869-18872-1-git-send-email-guoren@kernel.org/T/#u
 
-You could still keep the extra reference until the
-invalidate.
+For TLA+ model, I still need some learning before I could talk with you.
 
-The set_page_dirty however if you do in the context of the secondary
-MMU fault (i.e. atomically with the mapping of the page in the
-secondary MMU, with respect of MMU notifier invalidates), it solves
-the whole problem with the ->mkwrite/mkclean and then you can keep a
-GUP long term pin fully safely already. That is a solution that always
-works and becomes guaranteed by design by the MMU notifier not to
-interfere with the _current_ writeback code in the filesystem. It also
-already provides stable pages.
+>
+> BTW, if you find the algorithm fairly straightforward ;), see this
+> bug-fix which took a formal model to identify: a8ffaaa060b8 ("arm64:
+> asid: Do not replace active_asids if already 0").
+I think it's one fo the cases that other archs also could get benefit
+from arm's asid allocator code.
+Btw, Is this detected by arm's aisd allocator TLA+ model ? Or a real
+bug report ?
 
-> Can you explain, or provide a pointer to, the root cause of the
-> problem with holding a reference on the page and setting it dirty?
+--
+Best Regards
+ Guo Ren
 
-The filesystem/VM doesn't possibly expect set_page_dirty to be called
-again after it called page_mkclean. Supposedly a wrprotect fault
-should have been generated if somebody tried to write to the page
-under writeback, so page_mkwrite should have run again before you
-could have called set_page_dirty.
-
-Instead page_mkclean failed to get rid of the long term GUP obtained
-with FOLL_WRITE because it simply can't ask the device to release it
-without MMU notifier, so the device can later still call
-set_page_dirty despite page_mkclean already run.
-
-> > but a whole different chapter is
-> > dedicated on the set_page_dirty_lock crash on MAP_SHARED mappings
-> > after long term GUP pins. So since you're looking into how to handle
-> > the page struct in the MMU notifier it's worth mentioning the issues
-> > related to set_page_dirty too.
-> 
-> Is there some background info on the "set_page_dirty_lock crash on
-> MAP_SHARED" ?  I'm having trouble following this without the background.
-
-Jan Kara leaded the topic explained all the details on this filesystem
-issue at the LSF-MM and also last year.
-
-Which is what makes me think there can't be too many uses cases that
-require writback to work while long term GUP pin allow some device to
-write to the pages at any given time, if nobody requires this to be
-urgently fixed.
-
-You can find coverage on lwn and on linux-mm.
-
-> 
-> > 
-> > To achieve the cleanest writeback fix to avoid crashes in
-> > set_page_dirty_lock on long term secondary MMU mappings that supports
-> > MMU notifier like KVM shadow MMU, the ideal is to mark the page dirty
-> > before establishing a writable the mapping in the secondary MMU like
-> > in the model below.
-> > 
-> > The below solution works also for those secondary MMU that are like a
-> > TLB and if there are two concurrent invalidates on the same page
-> > invoked at the same time (a potential problem Jerome noticed), you
-> > don't know which come out first and you would risk to call
-> > set_page_dirty twice, which would be still potentially kernel crashing
-> > (even if only a theoretical issue like O_DIRECT).
-> 
-> Why is it problematic to call set_page_dirty() twice?  I thought that at
-> worst it would only lead to writing out data to disk unnecessarily ?
-
-According to Jerome, after the first set_page_dirty returns, writeback
-could start before the second set_page_dirty has been called. So if
-there are additional random later invalidates the next ones shouldn't
-call set_page_dirty again.
-
-The problem is if you call set_page_dirty in the invalidate, you've
-also to make sure set_page_dirty is being called only once.
-
-There can be concurrent invalidates for the same page running at the
-same time, while the page fault there is only one that runs atomically
-with respect to the mmu notifier invalidates (under whatever lock that
-serializes the MMU notifier invalidates vs the secondary MMU page fault).
-
-If you call set_page_dirty twice in a row, you again open the window
-for the writeback to have already called ->page_mkclean on the page
-after the first set_page_dirty, so the second set_page_dirty will
-then crash.
-
-You can enforce to call it only once if you have sptes (shadow
-pagetables) like in KVM has, so this is not an issue for KVM.
-
-> I am also not familiar with a problem related to KVM and O_DIRECT, so
-> I'm having trouble keeping up here as well :(
-
-There's no problem in KVM and O_DIRECT.
-
-There's a problem in O_DIRECT itself regardless if it's qemu or any
-other app using it: just the time window is too low to be
-noticeable. It's still a corollary of why we can't run two
-set_page_dirty per page, if there are concurrent MMU notifier
-invalidates.
-
-> > So the below model
-> > will solve that and it's also valid for KVM/vhost accelleration,
-> > despite KVM can figure out how to issue a single set_page_dirty call
-> > for each spte that gets invalidated by concurrent invalidates on the
-> > same page because it has shadow pagetables and it's not just a TLB.
-> > 
-> >   access = FOLL_WRITE|FOLL_GET
-> > 
-> > repeat:
-> >   page = gup(access)
-> >   put_page(page)
-> > 
-> >   spin_lock(mmu_notifier_lock);
-> >   if (race with invalidate) {
-> >     spin_unlock..
-> >     goto repeat;
-> >   }
-> >   if (access == FOLL_WRITE)
-> >     set_page_dirty(page)
-> >   establish writable mapping in secondary MMU on page
-> >   spin_unlock
-> > 
-> > The above solves the crash in set_page_dirty_lock without having to
-> > modify any filesystem, it should work theoretically safer than the
-> > O_DIRECT short term GUP pin.
-> 
-> That is not exactly how we do things today on the arm64 side.  We do
-> something that looks like:
-
-The above is the model that solves all problems with writeback
-page_mkclean/mkwrite, provides stable pages to current filesystems,
-regardless of lowlevel implementation details of the mmu notifier
-methods.
-
-For KVM all models works not only the above one because we have sptes
-to disambiguate which is the first invalidate that has to run
-set_page_dirty.
-
-> 
->   /*
->    * user_mem_abort is our function for a secondary MMU fault that
->    * resolves to a memslot.
->    */
->   user_mem_abort() {
->       page = gup(access, &writable);
->       spin_lock(&kvm->mmu_lock);
->       if (mmu_notifier_retry(kvm, mmu_seq))
->           goto out; /* run the VM again and see what happens */
-> 
->       if (writable)
->           kvm_set_pfn_dirty(page_to_pfn(page));
->       stage2_set_pte(); /* establish_writable mapping in secondary MMU on page */
-> 
->   out:
->       spin_unlock(&kvm_mmu_lock);
->       put_page(page);
->   }
-> 
-> Should we rework this to address the race you are refering to, and are
-> other architectures already safe against this?
-
-Actually it seems you mark the page dirty exactly where I suggested
-above: i.e. atomically with the secondary MMU mapping establishment
-with respect to the mmu notifier invalidates.
-
-I don't see any problem with the above (well you need to have a way to
-track if you run stage2_set_pte or if you taken "goto out" but the
-above is pseudocode).
-
-There's a problem however in kvm_set_pfn_dirty common code, it should
-call set_page_dirty not SetPageDirty or it won't do anything in the
-MAP_SHARED filebacked case. The current code is perfectly ok for anon and
-MAP_PRIVATE write=1 cases.
-
-However FOLL_TOUCH in gup already either calls set_page_dirty or it
-marks the linux pte as dirty, so that's working around the lack of
-set_page_dirty... I wonder if we could just rely on the set_page_dirty
-in gup with FOLL_TOUCH and drop SetPageDirty as a whole in KVM in fact.
-
-> > With regard to KVM this should be enough, but we also look for a crash
-> > avoidance solution for those devices that cannot support the MMU
-> > notifier for short and long term GUP pins.
-> 
-> Sorry, can you define short and long term GUP pins, and do we have
-> current examples of both?
-
-Long term as in mm/gup.c:FOLL_LONGTERM, means you expect to call some
-get_user_pages with FOLL_GET and not release the refcount immediately
-after I/O completion, the page could remain indefinitely pinned,
-virt example: vfio device assignment.
-
-The most common example of short term GUP (i.e. default behavior of
-GPU) is O_DIRECT. I/O completion takes short time (depends on the
-buffer size of course.. could be 1TB of buffer I/O) but it's still
-going to be released ASAP.
-
-> > There's lots of work going on on linux-mm, to try to let those devices
-> > support writeback in a safe way (also with stable pages so all fs
-> > integrity checks will pass) using bounce buffer if a long term GUP pin
-> > is detected by the filesystem. In addition there's other work to make
-> > the short term GUP pin theoretically safe by delaying the writeback
-> > for the short window the GUP pin is taken by O_DIRECT, so it becomes
-> > theoretically safe too (currently it's only practically safe).
-> > 
-> > However I'm not sure if the long term GUP pins really needs to support
-> > writeback.
-> > 
-> 
-> I don't think I understand the distinction between a long term GUP pin
-> that supports writeback vs. a short term GUP pin.  My question was
-> whether or not the pin could be dropped at the time the mapping was torn
-> down, or if it has to be done at the same time the mapping is
-> established, for things to work properly wrt. the semantics of memory
-> behavior of the rest of the kernel.
-
-Yes sorry, the question about the refcounting was just trivial to
-answer: it always works, you can drop the refcount anywhere.
-
-I just thought if there was any doubt on the refcounting issue which
-had an immediate black and white answer, it was safer to raise
-awareness about the much more troubling and subtle issues with
-set_page_dirty caused by GUP refcounts.
-
-> I'm not sure if we're talking about the same thing here, or if you're
-> explaining a different scenario?
-
-Simply KVM secondary MMU fault has to mark the page dirty somehow
-(either in gup itself or in the fault or in the invalidates) in
-addition to dealing the refcount. That's the connection.
-
-However this set_page_dirty issue needs solution that works both for
-short term GPU pins that can't use mmu notifier (O_DIRECT), long term
-GUP pins that can't use mmu notifier (vfio) and the MMU notifier
-mappings (KVM page fault, whose refcount can be implicitly hold on by
-the MMU notifier itself and in turn the put_page can go anywhere).
-
-The solution to the O_DIRECT gup pin is also highly connected with the
-GUP refcounting, because the solution is to alter the refcount so that
-the filesystem learns that there's a special refcounting and
-->page_mkclean can be then deferred as long as the special refcount is
-hold by O_DIRECT. I argue the same special refcount can be also hold
-by long term GUP pins and the MMU notifier KVM page fault case (which
-will either drop FOLL_GET ideally) so we can defer the page_mkwrite
-indefinitely for long term GUP pins too (there will be no deferred
-write in MMU Notifier case because ->page_mkclean invokes the MMU
-notifier invalidates).
-
-If one wants to flush to disk the dirty MAP_SHARED periodically the
-device needs to be told to drop the refcounts and stop writing to the
-memory. If the device isn't told to stop writing to the memory what
-comes out is only coherent at 512 bytes units or maybe less anyway.
-
-Thanks,
-Andrea
+ML: https://lore.kernel.org/linux-csky/
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
