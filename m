@@ -2,60 +2,60 @@ Return-Path: <SRS0=87+N=UX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659DBC43613
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 13:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE28C43613
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 15:07:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D3FF42133F
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 13:08:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FF42133F
+	by mail.kernel.org (Postfix) with ESMTP id 1DC7420645
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 15:07:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DC7420645
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 581A84A4E6;
-	Mon, 24 Jun 2019 09:08:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48B864A4E9;
+	Mon, 24 Jun 2019 11:07:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h4OxTcz06Wle; Mon, 24 Jun 2019 09:08:14 -0400 (EDT)
+	with ESMTP id TjFuAKjZmMnv; Mon, 24 Jun 2019 11:07:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D13F4A445;
-	Mon, 24 Jun 2019 09:08:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC164A4EA;
+	Mon, 24 Jun 2019 11:07:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AF54A2E5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 09:08:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BA5D4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 11:07:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k-ufNPVj4Wpf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Jun 2019 09:08:11 -0400 (EDT)
+ with ESMTP id Y+gcO0eiWgZJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Jun 2019 11:07:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A495B4A445
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 09:08:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AF0B4A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 11:07:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4F0C4344;
- Mon, 24 Jun 2019 06:08:11 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC5173F71E;
- Mon, 24 Jun 2019 06:08:09 -0700 (PDT)
-Date: Mon, 24 Jun 2019 14:08:07 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 09/59] KVM: arm64: nv: Add nested virt VCPU primitives
- for vEL2 VCPU state
-Message-ID: <20190624130807.GS2790@e103592.cambridge.arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CB8D344;
+ Mon, 24 Jun 2019 08:07:53 -0700 (PDT)
+Received: from [192.168.1.34] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DE383F71E;
+ Mon, 24 Jun 2019 08:07:51 -0700 (PDT)
+Subject: Re: [PATCH 15/59] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-10-marc.zyngier@arm.com>
+ <20190621093843.220980-16-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <a64c85c3-0230-d9d0-aea6-b8a4196e62b2@arm.com>
+Date: Mon, 24 Jun 2019 16:07:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190621093843.220980-10-marc.zyngier@arm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190621093843.220980-16-marc.zyngier@arm.com>
+Content-Language: en-US
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,58 +72,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 21, 2019 at 10:37:53AM +0100, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
+
+
+On 06/21/2019 10:37 AM, Marc Zyngier wrote:
+> Extract the direct HW accessors for later reuse.
 > 
-> When running a nested hypervisor we commonly have to figure out if
-> the VCPU mode is running in the context of a guest hypervisor or guest
-> guest, or just a normal guest.
-> 
-> Add convenient primitives for this.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h | 55 ++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
+>  arch/arm64/kvm/sys_regs.c | 247 +++++++++++++++++++++-----------------
+>  1 file changed, 139 insertions(+), 108 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 39ffe41855bc..8f201ea56f6e 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -191,6 +191,61 @@ static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
->  		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2b8734f75a09..e181359adadf 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -182,99 +182,161 @@ const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+>  	return entry;
 >  }
 >  
-> +static inline bool vcpu_mode_el2_ctxt(const struct kvm_cpu_context *ctxt)
+> +static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
 > +{
-> +	unsigned long cpsr = ctxt->gp_regs.regs.pstate;
-> +	u32 mode;
+> +	/*
+> +	 * System registers listed in the switch are not saved on every
+> +	 * exit from the guest but are only saved on vcpu_put.
+> +	 *
+> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+> +	 * should never be listed below, because the guest cannot modify its
+> +	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
+> +	 * thread when emulating cross-VCPU communication.
+> +	 */
+> +	switch (reg) {
+> +	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
+> +	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
+> +	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
+> +	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
+> +	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+> +	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+> +	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
+> +	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+> +	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+> +	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+> +	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
+> +	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
+> +	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
+> +	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
+> +	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
+> +	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
+> +	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
+> +	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
+> +	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
+> +	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
+> +	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
+> +	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
+> +	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
+> +	default:		return false;
+> +	}
 > +
-> +	if (cpsr & PSR_MODE32_BIT)
-> +		return false;
+> +	return true;
+> +}
 > +
-> +	mode = cpsr & PSR_MODE_MASK;
+> +static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+> +{
+> +	/*
+> +	 * System registers listed in the switch are not restored on every
+> +	 * entry to the guest but are only restored on vcpu_load.
+> +	 *
+> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+> +	 * should never be listed below, because the the MPIDR should only be
+> +	 * set once, before running the VCPU, and never changed later.
+> +	 */
+> +	switch (reg) {
+> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
+> +	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
+> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
+> +	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
+> +	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+> +	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+> +	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
+> +	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+> +	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+> +	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
+> +	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
+> +	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
+> +	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
+> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
+> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
+> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
+> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
+> +	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
+> +	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
+> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
+> +	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
+> +	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
+> +	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
+> +	default:		return false;
+> +	}
 > +
-> +	return mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t;
+> +	return true;
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+> -	u64 val;
+> +	u64 val = 0x8badf00d8badf00d;
+>  
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> -		goto immediate_read;
+> +		goto memory_read;
+>  
+>  	if (unlikely(sysreg_is_el2(reg))) {
+>  		const struct el2_sysreg_map *el2_reg;
+>  
+>  		if (!is_hyp_ctxt(vcpu))
+> -			goto immediate_read;
+> +			goto memory_read;
+>  
+>  		switch (reg) {
+> +		case ELR_EL2:
+> +			return read_sysreg_el1(SYS_ELR);
 
-We could also treat PSR_MODE32_BIT and PSR_MODE_MASK as a single field,
-similarly as in the next patch, say:
+Hmmm, This change feels a bit out of place.
 
-	switch (ctxt->gp_regs.regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
-	case PSR_MODE_EL2h:
-	case PSR_MODE_EL2t:
-		return true;
-	}
+Also, patch 13 added ELR_EL2 and SP_EL2 to the switch cases for physical
+sysreg accesses. Now ELR_EL2 is moved out of the main switch cases and
+SP_EL2 is completely omitted.
 
-	return false;
+I'd say either patch 13 needs to be reworked or there is a separate
+patch that should be extracted from this patch to have an intermediate
+state, or the commit message on this patch should be more detailed.
 
-(This is blatant bikeshedding...)
+Cheers,
 
-[...]
-
-Cheers
----Dave
+-- 
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
