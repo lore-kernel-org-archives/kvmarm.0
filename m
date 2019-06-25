@@ -6,56 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0444C48BD5
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 08:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F492C48BD4
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 11:50:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63758215EA
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 08:49:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63758215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 2739F214DA
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 11:50:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2739F214DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97DD44A4A9;
-	Tue, 25 Jun 2019 04:48:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DAD64A3A5;
+	Tue, 25 Jun 2019 07:50:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EuG3aZxu+qrM; Tue, 25 Jun 2019 04:48:58 -0400 (EDT)
+	with ESMTP id skIj8S4XyA2L; Tue, 25 Jun 2019 07:50:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 370B64A445;
-	Tue, 25 Jun 2019 04:48:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42DBA4A479;
+	Tue, 25 Jun 2019 07:50:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F6754A409
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 04:48:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C344A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 07:50:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 62RXe-lChF6S for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jun 2019 04:48:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 207A34A331
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 04:48:55 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88A232B;
- Tue, 25 Jun 2019 01:48:54 -0700 (PDT)
-Received: from [10.37.8.194] (unknown [10.37.8.194])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8E5D03F718;
- Tue, 25 Jun 2019 01:48:52 -0700 (PDT)
-Subject: Re: [PATCH 16/59] KVM: arm64: nv: Save/Restore vEL2 sysregs
+ with ESMTP id 1zaw0uPtXOYm for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jun 2019 07:50:38 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A3A64A36B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 07:50:37 -0400 (EDT)
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D2A5EB1D8DF8C982AA7F;
+ Tue, 25 Jun 2019 19:50:32 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
+ 19:50:26 +0800
+Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
+ MSI->LPI translation
 To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-17-marc.zyngier@arm.com>
-From: Julien Thierry <julien.thierry@arm.com>
-Message-ID: <800f3e9a-5b67-951b-34c2-60367c0697f9@arm.com>
-Date: Tue, 25 Jun 2019 09:48:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
+ <kvm@vger.kernel.org>
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-8-marc.zyngier@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
+Date: Tue, 25 Jun 2019 19:50:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-17-marc.zyngier@arm.com>
+In-Reply-To: <20190611170336.121706-8-marc.zyngier@arm.com>
 Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: "Raslan, KarimAllah" <karahmed@amazon.de>, "Saidi,
+ Ali" <alisaidi@amazon.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,132 +71,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Marc,
 
-
-On 06/21/2019 10:38 AM, Marc Zyngier wrote:
-> From: Andre Przywara <andre.przywara@arm.com>
+On 2019/6/12 1:03, Marc Zyngier wrote:
+> On a successful translation, preserve the parameters in the LPI
+> translation cache. Each translation is reusing the last slot
+> in the list, naturally evincting the least recently used entry.
 > 
-> Whenever we need to restore the guest's system registers to the CPU, we
-> now need to take care of the EL2 system registers as well. Most of them
-> are accessed via traps only, but some have an immediate effect and also
-> a guest running in VHE mode would expect them to be accessible via their
-> EL1 encoding, which we do not trap.
-> 
-> Split the current __sysreg_{save,restore}_el1_state() functions into
-> handling common sysregs, then differentiate between the guest running in
-> vEL2 and vEL1.
-> 
-> For vEL2 we write the virtual EL2 registers with an identical format directly
-> into their EL1 counterpart, and translate the few registers that have a
-> different format for the same effect on the execution when running a
-> non-VHE guest guest hypervisor.
-> 
->   [ Commit message reworked and many bug fixes applied by Marc Zyngier
->     and Christoffer Dall. ]
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > ---
->  arch/arm64/kvm/hyp/sysreg-sr.c | 160 +++++++++++++++++++++++++++++++--
->  1 file changed, 153 insertions(+), 7 deletions(-)
+>   virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 86 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 62866a68e852..2abb9c3ff24f 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-
-[...]
-
-> @@ -124,10 +167,91 @@ static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0],	tpidrro_el0);
->  }
->  
-> -static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> +static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
->  {
-> +	u64 val;
+> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> index 0aa0cbbc3af6..62932458476a 100644
+> --- a/virt/kvm/arm/vgic/vgic-its.c
+> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> @@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+>   	return 0;
+>   }
+>   
+> +static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+> +					       phys_addr_t db,
+> +					       u32 devid, u32 eventid)
+> +{
+> +	struct vgic_translation_cache_entry *cte;
+> +	struct vgic_irq *irq = NULL;
 > +
-> +	write_sysreg(read_cpuid_id(),			vpidr_el2);
->  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
-> -	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
-> +	write_sysreg_el1(ctxt->sys_regs[MAIR_EL2],	SYS_MAIR);
-> +	write_sysreg_el1(ctxt->sys_regs[VBAR_EL2],	SYS_VBAR);
-> +	write_sysreg_el1(ctxt->sys_regs[CONTEXTIDR_EL2],SYS_CONTEXTIDR);
-> +	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL2],	SYS_AMAIR);
-> +
-> +	if (__vcpu_el2_e2h_is_set(ctxt)) {
+> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
 > +		/*
-> +		 * In VHE mode those registers are compatible between
-> +		 * EL1 and EL2.
+> +		 * If we hit a NULL entry, there is nothing after this
+> +		 * point.
 > +		 */
-> +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL2],	SYS_SCTLR);
-> +		write_sysreg_el1(ctxt->sys_regs[CPTR_EL2],	SYS_CPACR);
-> +		write_sysreg_el1(ctxt->sys_regs[TTBR0_EL2],	SYS_TTBR0);
-> +		write_sysreg_el1(ctxt->sys_regs[TTBR1_EL2],	SYS_TTBR1);
-> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL2],	SYS_TCR);
-> +		write_sysreg_el1(ctxt->sys_regs[CNTHCTL_EL2],	SYS_CNTKCTL);
-> +	} else {
-> +		write_sysreg_el1(translate_sctlr(ctxt->sys_regs[SCTLR_EL2]),
-> +				 SYS_SCTLR);
-> +		write_sysreg_el1(translate_cptr(ctxt->sys_regs[CPTR_EL2]),
-> +				 SYS_CPACR);
-> +		write_sysreg_el1(translate_ttbr0(ctxt->sys_regs[TTBR0_EL2]),
-> +				 SYS_TTBR0);
-> +		write_sysreg_el1(translate_tcr(ctxt->sys_regs[TCR_EL2]),
-> +				 SYS_TCR);
-> +		write_sysreg_el1(translate_cnthctl(ctxt->sys_regs[CNTHCTL_EL2]),
-> +				 SYS_CNTKCTL);
+> +		if (!cte->irq)
+> +			break;
+> +
+> +		if (cte->db == db &&
+> +		    cte->devid == devid &&
+> +		    cte->eventid == eventid) {
+> +			/*
+> +			 * Move this entry to the head, as it is the
+> +			 * most recently used.
+> +			 */
+> +			list_move(&cte->entry, &dist->lpi_translation_cache);
+
+Only for performance reasons: if we hit at the "head" of the list, we
+don't need to do a list_move().
+In our tests, we found that a single list_move() takes nearly (sometimes
+even more than) one microsecond, for some unknown reason...
+
+
+Thanks,
+zenghui
+
+> +			irq = cte->irq;
+> +			break;
+> +		}
 > +	}
 > +
-> +	/*
-> +	 * These registers can be modified behind our back by a fault
-> +	 * taken inside vEL2. Save them, always.
-> +	 */
-> +	write_sysreg_el1(ctxt->sys_regs[ESR_EL2],	SYS_ESR);
-> +	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL2],	SYS_AFSR0);
-> +	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL2],	SYS_AFSR1);
-> +	write_sysreg_el1(ctxt->sys_regs[FAR_EL2],	SYS_FAR);
-> +	write_sysreg(ctxt->sys_regs[SP_EL2],		sp_el1);
-> +	write_sysreg_el1(ctxt->sys_regs[ELR_EL2],	SYS_ELR);
-> +
-> +	val = __fixup_spsr_el2_write(ctxt, ctxt->sys_regs[SPSR_EL2]);
-> +	write_sysreg_el1(val,	SYS_SPSR);
+> +	return irq;
 > +}
 > +
-> +static void __hyp_text __sysreg_restore_vel1_state(struct kvm_cpu_context *ctxt)
+> +static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+> +				       u32 devid, u32 eventid,
+> +				       struct vgic_irq *irq)
 > +{
-> +	u64 mpidr;
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	struct vgic_translation_cache_entry *cte;
+> +	unsigned long flags;
+> +	phys_addr_t db;
 > +
-> +	if (has_vhe()) {
-> +		struct kvm_vcpu *vcpu;
+> +	/* Do not cache a directly injected interrupt */
+> +	if (irq->hw)
+> +		return;
 > +
-> +		/*
-> +		 * Warning: this hack only works on VHE, because we only
-> +		 * call this with the *guest* context, which is part of
-> +		 * struct kvm_vcpu. On a host context, you'd get pure junk.
-> +		 */
-> +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+> +
+> +	if (unlikely(list_empty(&dist->lpi_translation_cache)))
+> +		goto out;
+> +
+> +	/*
+> +	 * We could have raced with another CPU caching the same
+> +	 * translation behind our back, so let's check it is not in
+> +	 * already
+> +	 */
+> +	db = its->vgic_its_base + GITS_TRANSLATER;
+> +	if (__vgic_its_check_cache(dist, db, devid, eventid))
+> +		goto out;
+> +
+> +	/* Always reuse the last entry (LRU policy) */
+> +	cte = list_last_entry(&dist->lpi_translation_cache,
+> +			      typeof(*cte), entry);
+> +
+> +	/*
+> +	 * Caching the translation implies having an extra reference
+> +	 * to the interrupt, so drop the potential reference on what
+> +	 * was in the cache, and increment it on the new interrupt.
+> +	 */
+> +	if (cte->irq)
+> +		__vgic_put_lpi_locked(kvm, cte->irq);
+> +
+> +	vgic_get_irq_kref(irq);
+> +
+> +	cte->db		= db;
+> +	cte->devid	= devid;
+> +	cte->eventid	= eventid;
+> +	cte->irq	= irq;
+> +
+> +	/* Move the new translation to the head of the list */
+> +	list_move(&cte->entry, &dist->lpi_translation_cache);
+> +
+> +out:
+> +	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+> +}
+> +
+>   void vgic_its_invalidate_cache(struct kvm *kvm)
+>   {
+>   	struct vgic_dist *dist = &kvm->arch.vgic;
+> @@ -589,6 +673,8 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+>   	if (!vcpu->arch.vgic_cpu.lpis_enabled)
+>   		return -EBUSY;
+>   
+> +	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
+> +
+>   	*irq = ite->irq;
+>   	return 0;
+>   }
+> 
 
-This seems very fragile, just to find out whether the guest has hyp
-capabilities. It would be at least nice to make sure this is indeed a
-guest context.
-
-The *clean* way to do it could be to have a pointer to kvm_vcpu in the
-kvm_cpu_context which would be NULL for host contexts.
-
-Otherwise, I'm under the impression that for a host context,
-ctxt->sys_reg[HCR_EL2] == 0 and that this would also be true for a guest
-without nested virt capability. Could we use something like that here?
-
-Cheers,
-
-Julien
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
