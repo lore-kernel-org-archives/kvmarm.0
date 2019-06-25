@@ -1,62 +1,82 @@
-Return-Path: <SRS0=87+N=UX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=xcs2=UY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8DAC48BE9
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 15:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CF6C48BD6
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 07:25:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 04E52205C9
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Jun 2019 15:47:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E52205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C254C2085A
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 07:25:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C254C2085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80DA74A4FD;
-	Mon, 24 Jun 2019 11:47:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F009E4A4EA;
+	Tue, 25 Jun 2019 03:25:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F97dvu32tujI; Mon, 24 Jun 2019 11:47:55 -0400 (EDT)
+	with ESMTP id S0cyW5yVCDUE; Tue, 25 Jun 2019 03:25:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDDEB4A4E9;
-	Mon, 24 Jun 2019 11:47:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A6954A4DF;
+	Tue, 25 Jun 2019 03:25:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 219D44A409
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 11:47:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D2264A4CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 03:25:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FuwYhrjzBbTt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Jun 2019 11:47:52 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4497C4A3BF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jun 2019 11:47:52 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E766C2B;
- Mon, 24 Jun 2019 08:47:51 -0700 (PDT)
-Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04FF83F71E;
- Mon, 24 Jun 2019 08:47:50 -0700 (PDT)
-Subject: Re: [PATCH 07/59] KVM: arm64: nv: Add EL2 system registers to vcpu
- context
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-8-marc.zyngier@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <83f3352a-0a9d-3373-87b8-162f2648dc88@arm.com>
-Date: Mon, 24 Jun 2019 16:47:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-8-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+ with ESMTP id Yhj+Bda63Kck for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jun 2019 03:25:37 -0400 (EDT)
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com
+ [209.85.214.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B57094A2E7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 03:25:37 -0400 (EDT)
+Received: by mail-pl1-f194.google.com with SMTP id g4so8330341plb.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 00:25:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Z3WWGekE9WOmOiZaVOcy0eK3dDuIi2y2iQU5uOWyNfM=;
+ b=pbRP2dBdTIbSA6ba/Tj62mCAIyieR/q9mQIu5fUsobN7uUjGecGwOnja3coFlzga5g
+ JuARDYZ010EdMX4xYlzrSMQ4+/SQIHD3KjGhPsHGyfg7x4R8i3dkdUaOVKceJbA05G2b
+ SBPt3sl3NQkkekYUCC4WTyuNyC9PGrzQAkQrBRX+eghMZp7Y82zRvlqwdMmm5Jr33Pvg
+ qhLW0cCqnLqfbEnVE5Te3D8Gd2UBk91G5dEcjde61wg3cUF4Z+2VkWKjydr6pzA1hfoD
+ awGqwd/UETHwzWLE0N6jaW/vechDRjOSNaa8gN/Fvx/GcmdfzJor3Jdj3kkwBv1gz7qV
+ Y1iA==
+X-Gm-Message-State: APjAAAWn0NLA1Dv6XMAA64YS8HueFyEV90ymeza5OVFt1pNrCX9NwGv1
+ XQa+iN+IF0CVUlwFI3bvpprp2g==
+X-Google-Smtp-Source: APXvYqyyNFqs8lEkqeWGIhFL1bL0p1mZU4/eLR8SPEZ1IWEPKLjr4nvS7kG+gigCSnFaxi9vTjiBWQ==
+X-Received: by 2002:a17:902:b187:: with SMTP id
+ s7mr61161997plr.309.1561447536395; 
+ Tue, 25 Jun 2019 00:25:36 -0700 (PDT)
+Received: from localhost (220-132-236-182.HINET-IP.hinet.net.
+ [220.132.236.182])
+ by smtp.gmail.com with ESMTPSA id k6sm15713401pfi.12.2019.06.25.00.25.35
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 25 Jun 2019 00:25:35 -0700 (PDT)
+Date: Tue, 25 Jun 2019 00:25:35 -0700 (PDT)
+X-Google-Original-Date: Mon, 24 Jun 2019 23:55:16 PDT (-0700)
+Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
+ separate file
+In-Reply-To: <20190624104006.lvm32nahemaqklxc@willie-the-truck>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: will@kernel.org
+Message-ID: <mhng-9933e914-263f-4bb9-9bc5-3a75957e7da0@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Cc: julien.grall@arm.com, aou@eecs.berkeley.edu, Arnd Bergmann <arnd@arndb.de>,
+ marc.zyngier@arm.com, catalin.marinas@arm.com,
+ Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
+ rppt@linux.ibm.com, Christoph Hellwig <hch@infradead.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Anup Patel <Anup.Patel@wdc.com>,
+ guoren@kernel.org, gary@garyguo.net, Paul Walmsley <paul.walmsley@sifive.com>,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,310 +88,117 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 6/21/19 10:37 AM, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+On Mon, 24 Jun 2019 03:40:07 PDT (-0700), will@kernel.org wrote:
+> On Thu, Jun 20, 2019 at 05:33:03PM +0800, Guo Ren wrote:
+>> On Wed, Jun 19, 2019 at 8:39 PM Will Deacon <will.deacon@arm.com> wrote:
+>> >
+>> > On Wed, Jun 19, 2019 at 08:18:04PM +0800, Guo Ren wrote:
+>> > > On Wed, Jun 19, 2019 at 5:12 PM Will Deacon <will.deacon@arm.com> wrote:
+>> > > > This is one place where I'd actually prefer not to go down the route of
+>> > > > making the code generic. Context-switching and low-level TLB management
+>> > > > is deeply architecture-specific and I worry that by trying to make this
+>> > > > code common, we run the real risk of introducing subtle bugs on some
+>> > > > architecture every time it is changed.
+>> > > "Add generic asid code" and "move arm's into generic" are two things.
+>> > > We could do
+>> > > first and let architecture's maintainer to choose.
+>> >
+>> > If I understand the proposal being discussed, it involves basing that
+>> > generic ASID allocation code around the arm64 implementation which I don't
+>> > necessarily think is a good starting point.
+>> ...
+>> >
+>> > > > Furthermore, the algorithm we use
+>> > > > on arm64 is designed to scale to large systems using DVM and may well be
+>> > > > too complex and/or sub-optimal for architectures with different system
+>> > > > topologies or TLB invalidation mechanisms.
+>> > > It's just a asid algorithm not very complex and there is a callback
+>> > > for architecture to define their
+>> > > own local hart tlb flush. Seems it has nothing with DVM or tlb
+>> > > broadcast mechanism.
+>> >
+>> > I'm pleased that you think the algorithm is not very complex, but I'm also
+>> > worried that you might not have fully understood some of its finer details.
+>> I understand your concern about my less understanding of asid
+>> technology. Here is
+>> my short-description of arm64 asid allocator: (If you find anything
+>> wrong, please
+>> correct me directly, thx :)
 >
-> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-> addition, executing the following instructions in EL1 will trap to EL2:
-> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
-> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
-> ARM v8.3. The only instruction that was not undef is eret.
+> The complexity mainly comes from the fact that this thing runs concurrently
+> with itself without synchronization on the fast-path. Coupled with the
+> need to use the same ASID for all threads of a task, you end up in fiddly
+> situations where rollover can occur on one CPU whilst another CPU is trying
+> to schedule a thread of a task that already has threads running in
+> userspace.
 >
-> This patch sets up a handler for EL2 registers and SP_EL1 register
-> accesses at EL1. The host hypervisor keeps those register values in
-> memory, and will emulate their behavior.
+> However, it's architecture-specific whether or not you care about that
+> scenario.
 >
-> This patch doesn't set the NV bit yet. It will be set in a later patch
-> once nested virtualization support is completed.
+>> > The reason I mention DVM and TLB broadcasting is because, depending on
+>> > the mechanisms in your architecture relating to those, it may be strictly
+>> > required that all concurrently running threads of a process have the same
+>> > ASID at any given point in time, or it may be that you really don't care.
+>> >
+>> > If you don't care, then the arm64 allocator is over-engineered and likely
+>> > inefficient for your system. If you do care, then it's worth considering
+>> > whether a lock is sufficient around the allocator if you don't expect high
+>> > core counts. Another possibility is that you end up using only one ASID and
+>> > invalidating the local TLB on every context switch. Yet another design
+>> > would be to manage per-cpu ASID pools.
+
+FWIW: right now we don't have any implementations that support ASIDs, so we're
+really not ready to make these sort of decisions because we just don't know
+what systems are going to look like.  While it's a fun intellectual exercise to
+try to design an allocator that would work acceptably on systems of various
+shapes, there's no way to test this for performance or correctness right now so
+I wouldn't be comfortable taking anything.  If you're really interested, the
+right place to start is the RTL
+
+    https://github.com/chipsalliance/rocket-chip/blob/master/src/main/scala/rocket/TLB.scala#L19
+
+This is essentially the same problem we have for our spinlocks -- maybe start
+with the TLB before doing a whole new pipeline, though :)
+
+>> I'll keep my system use the same ASID for SMP + IOMMU :P
 >
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 37 +++++++++++++++-
->  arch/arm64/include/asm/sysreg.h   | 50 ++++++++++++++++++++-
->  arch/arm64/kvm/sys_regs.c         | 74 ++++++++++++++++++++++++++++---
->  3 files changed, 154 insertions(+), 7 deletions(-)
+> You will want a separate allocator for that:
 >
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4bcd9c1291d5..2d4290d2513a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -173,12 +173,47 @@ enum vcpu_sysreg {
->  	APGAKEYLO_EL1,
->  	APGAKEYHI_EL1,
->  
-> -	/* 32bit specific registers. Keep them at the end of the range */
-> +	/* 32bit specific registers. */
->  	DACR32_EL2,	/* Domain Access Control Register */
->  	IFSR32_EL2,	/* Instruction Fault Status Register */
->  	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
->  	DBGVCR32_EL2,	/* Debug Vector Catch Register */
->  
-> +	/* EL2 registers sorted ascending by Op0, Op1, CRn, CRm, Op2 */
-> +	FIRST_EL2_SYSREG,
-> +	VPIDR_EL2 = FIRST_EL2_SYSREG,
-> +			/* Virtualization Processor ID Register */
-> +	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
-> +	SCTLR_EL2,	/* System Control Register (EL2) */
-> +	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
-> +	HCR_EL2,	/* Hypervisor Configuration Register */
-> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
-> +	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
-> +	HSTR_EL2,	/* Hypervisor System Trap Register */
-> +	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-> +	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
-> +	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
-> +	TCR_EL2,	/* Translation Control Register (EL2) */
-> +	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
-> +	VTCR_EL2,	/* Virtualization Translation Control Register */
-> +	SPSR_EL2,	/* EL2 saved program status register */
-> +	ELR_EL2,	/* EL2 exception link register */
-> +	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
-> +	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
-> +	ESR_EL2,	/* Exception Syndrome Register (EL2) */
-> +	FAR_EL2,	/* Hypervisor IPA Fault Address Register */
-> +	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
-> +	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
-> +	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
-> +	VBAR_EL2,	/* Vector Base Address Register (EL2) */
-> +	RVBAR_EL2,	/* Reset Vector Base Address Register */
-> +	RMR_EL2,	/* Reset Management Register */
-> +	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
-> +	TPIDR_EL2,	/* EL2 Software Thread ID Register */
-> +	CNTVOFF_EL2,	/* Counter-timer Virtual Offset register */
-> +	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
-> +	SP_EL2,		/* EL2 Stack Pointer */
-> +
->  	NR_SYS_REGS	/* Nothing after this line! */
->  };
->  
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index f3ca7e4796ab..8b95f2c42c3d 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -411,17 +411,49 @@
->  
->  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
->  
-> +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
-> +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
-> +
-> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
-> +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
-> +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
-> +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
-> +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
-> +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
-> +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
-> +
->  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
-> +
-> +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
-> +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
-> +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-> +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-> +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-> +
->  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
-> +
->  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
->  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-> +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
-> +
->  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-> +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
-> +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
->  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
->  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
->  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
->  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
->  
-> -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
-> +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
-> +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
-> +
-> +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
-> +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
-> +
-> +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
-> +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
-> +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
-> +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
->  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
->  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
->  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
-> @@ -463,23 +495,37 @@
->  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
->  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
->  
-> +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
-> +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
-> +
-> +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
-> +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
-> +
->  /* VHE encodings for architectural EL0/1 system registers */
->  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
->  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
->  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
-> +
->  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
->  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
->  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
-> +
->  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
->  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
-> +
->  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
->  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
->  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
-> +
->  #define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
-> +
->  #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
->  #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
-> +
->  #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
-> +
->  #define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
-> +
->  #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
->  #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
->  #define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
-> @@ -488,6 +534,8 @@
->  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
->  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
->  
-> +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_DSSBS	(_BITUL(44))
->  #define SCTLR_ELx_ENIA	(_BITUL(31))
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index adb8a7e9c8e4..e81be6debe07 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -184,6 +184,18 @@ static u32 get_ccsidr(u32 csselr)
->  	return ccsidr;
->  }
->  
-> +static bool access_rw(struct kvm_vcpu *vcpu,
-> +		      struct sys_reg_params *p,
-> +		      const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-> +	else
-> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
->   */
-> @@ -394,12 +406,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
->  			    struct sys_reg_params *p,
->  			    const struct sys_reg_desc *r)
->  {
-> -	if (p->is_write) {
-> -		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-> +	access_rw(vcpu, p, r);
-> +	if (p->is_write)
->  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
-> -	} else {
-> -		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> -	}
->  
->  	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
->  
-> @@ -1354,6 +1363,19 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	.set_user = set_raz_id_reg,		\
->  }
->  
-> +static bool access_sp_el1(struct kvm_vcpu *vcpu,
-> +			  struct sys_reg_params *p,
-> +			  const struct sys_reg_desc *r)
-> +{
-> +	/* SP_EL1 is NOT maintained in sys_regs array */
-> +	if (p->is_write)
-> +		vcpu->arch.ctxt.gp_regs.sp_el1 = p->regval;
-> +	else
-> +		p->regval = vcpu->arch.ctxt.gp_regs.sp_el1;
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -1646,9 +1668,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	 */
->  	{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
-I have to admit I haven't gone through all the patches, or maybe this is part of
-the bits that will be added at a later date, but some of the reset values seem
-incorrect according to ARM DDI 0487D.a. I'll comment below the relevant registers.
->  
-> +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
-> +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_SCTLR_EL2), access_rw, reset_val, SCTLR_EL2, 0 },
-Some bits are RES1 for SCTLR_EL2.
-> +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
-> +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
-> +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, 0 },
-Some bits are RES1 for CPTR_EL2 if HCR_EL2.E2H == 0, which the reset value for
-HCR_EL2 seems to imply.
-> +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
-> +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
-> +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, 0 },
-Same here, bits 31 and 23 are RES1 for TCR_EL2 when HCR_EL2.E2H == 0.
-> +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
-> +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
-> +
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-> +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
-> +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-> +
->  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-> +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
-> +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
-> +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
->  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
-> +
-> +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
-> +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
-> +	{ SYS_DESC(SYS_RMR_EL2), access_rw, reset_val, RMR_EL2, 0 },
-Bit AA64 [0] for RMR_EL2 is RAO/WI for EL2 cannot aarch32, which is what the
-patches seem to enforce.
-> +
-> +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
-> +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
-> +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
-> +
-> +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
->  };
->  
->  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+> https://lkml.kernel.org/r/20190610184714.6786-2-jean-philippe.brucker@arm.com
+>
+>> Yes, there are two styles of asid allocator: per-cpu ASID (MIPS) or
+>> same ASID (ARM).
+>> If the CPU couldn't support cache/tlb coherency maintian in hardware,
+>> it should use
+>> per-cpu ASID style because IPI is expensive and per-cpu ASID style
+>> need more software
+>> mechanism to improve performance (eg: delay cache flush). From software view the
+>> same ASID is clearer and easier to build bigger system with more TLB caches.
+>>
+>> I think the same ASID style is a more sensible choice for modern
+>> processor and let it be
+>> one of generic is reasonable.
+>
+> I'm not sure I agree. x86, for example, is better off using a different
+> algorithm for allocating its PCIDs.
+>
+>> > So rather than blindly copying the arm64 code, I suggest sitting down and
+>> > designing something that fits to your architecture instead. You may end up
+>> > with something that is both simpler and more efficient.
+>> In fact, riscv folks have discussed a lot about arm's asid allocator
+>> and I learned
+>> a lot from the discussion:
+>> https://lore.kernel.org/linux-riscv/20190327100201.32220-1-anup.patel@wdc.com/
+>
+> If you require all threads of the same process to have the same ASID, then
+> that patch looks broken to me.
+>
+> Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
