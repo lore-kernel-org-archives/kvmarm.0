@@ -2,61 +2,61 @@ Return-Path: <SRS0=hM/U=UZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59609C48BD3
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 12:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CA6C48BD3
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 15:04:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDABB20663
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 12:16:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDABB20663
+	by mail.kernel.org (Postfix) with ESMTP id 55B7420645
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 15:04:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B7420645
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FB444A50A;
-	Wed, 26 Jun 2019 08:16:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADEBD4A4F6;
+	Wed, 26 Jun 2019 11:04:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jJkrko1BEdiJ; Wed, 26 Jun 2019 08:16:18 -0400 (EDT)
+	with ESMTP id 2U4JTsO9spnk; Wed, 26 Jun 2019 11:04:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5BA34A4CA;
-	Wed, 26 Jun 2019 08:16:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 288CB4A4FA;
+	Wed, 26 Jun 2019 11:04:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3619B4A4CA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 08:16:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69C334A4F6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 11:04:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G0tg+7vJX3L3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jun 2019 08:16:15 -0400 (EDT)
+ with ESMTP id OojS-WyG55sK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jun 2019 11:04:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4043E4A49F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 08:16:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 846314A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 11:04:13 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B65D1360;
- Wed, 26 Jun 2019 05:16:14 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46C4C3F718;
- Wed, 26 Jun 2019 05:16:14 -0700 (PDT)
-Date: Wed, 26 Jun 2019 14:16:13 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: Reference count on pages held in secondary MMUs
-Message-ID: <20190626121612.GB29851@e113682-lin.lund.arm.com>
-References: <20190609081805.GC21798@e113682-lin.lund.arm.com>
- <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
- <20190609174024.GA4785@redhat.com>
- <20190611115132.GB5318@e113682-lin.lund.arm.com>
- <20190622191136.GB32455@redhat.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 033012B;
+ Wed, 26 Jun 2019 08:04:13 -0700 (PDT)
+Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E3D73F706;
+ Wed, 26 Jun 2019 08:04:12 -0700 (PDT)
+Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-14-marc.zyngier@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+Date: Wed, 26 Jun 2019 16:04:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190622191136.GB32455@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jerome Glisse <jglisse@redhat.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <20190621093843.220980-14-marc.zyngier@arm.com>
+Content-Language: en-US
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,332 +73,283 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Jun 22, 2019 at 03:11:36PM -0400, Andrea Arcangeli wrote:
-> Hello Christoffer,
-> 
-> On Tue, Jun 11, 2019 at 01:51:32PM +0200, Christoffer Dall wrote:
-> > Sorry, what does this mean?  Do you mean that we can either do:
-> > 
-> >   on_vm_s2_fault() {
-> >       page = gup();
-> >       map_page_in_s2_mmu();
-> >       put_page();
-> >   }
-> > 
-> >   mmu_notifier_invalidate() {
-> >       unmap_page_in_s2_mmu();
-> >   }
-> > 
-> > or
-> > 
-> >   on_vm_s2_fault() {
-> >       page = gup();
-> >       map_page_in_s2_mmu();
-> >   }
-> > 
-> >   mmu_notifier_invalidate() {
-> >       unmap_page_in_s2_mmu();
-> >       put_page();
-> >   }
-> 
-> Yes both work, refcounting always works.
-> 
-> > > and in fact Jerome also thinks
-> > > like me that we should eventually optimize away the FOLL_GET and not
-> > > take the refcount in the first place, 
-> > 
-> > So if I understood the above correct, the next point is that there are
-> > advantages to avoiding keeping the extra reference on that page, because
-> > we have problematic race conditions related to set_page_dirty(), and we
-> > can reduce the problem of race conditions further by not getting a
-> > reference on the page at all when going GUP as part of a KVM fault?
-> 
-> You could still keep the extra reference until the
-> invalidate.
-> 
-> The set_page_dirty however if you do in the context of the secondary
-> MMU fault (i.e. atomically with the mapping of the page in the
-> secondary MMU, with respect of MMU notifier invalidates), it solves
-> the whole problem with the ->mkwrite/mkclean and then you can keep a
-> GUP long term pin fully safely already. That is a solution that always
-> works and becomes guaranteed by design by the MMU notifier not to
-> interfere with the _current_ writeback code in the filesystem. It also
-> already provides stable pages.
-> 
-
-Ok.
-
-> > Can you explain, or provide a pointer to, the root cause of the
-> > problem with holding a reference on the page and setting it dirty?
-> 
-> The filesystem/VM doesn't possibly expect set_page_dirty to be called
-> again after it called page_mkclean. Supposedly a wrprotect fault
-> should have been generated if somebody tried to write to the page
-> under writeback, so page_mkwrite should have run again before you
-> could have called set_page_dirty.
-> 
-> Instead page_mkclean failed to get rid of the long term GUP obtained
-> with FOLL_WRITE because it simply can't ask the device to release it
-> without MMU notifier, so the device can later still call
-> set_page_dirty despite page_mkclean already run.
-> 
-
-I see, I'm now able to link this to recent articles on LWN.
-
-> > > but a whole different chapter is
-> > > dedicated on the set_page_dirty_lock crash on MAP_SHARED mappings
-> > > after long term GUP pins. So since you're looking into how to handle
-> > > the page struct in the MMU notifier it's worth mentioning the issues
-> > > related to set_page_dirty too.
-> > 
-> > Is there some background info on the "set_page_dirty_lock crash on
-> > MAP_SHARED" ?  I'm having trouble following this without the background.
-> 
-> Jan Kara leaded the topic explained all the details on this filesystem
-> issue at the LSF-MM and also last year.
-> 
-> Which is what makes me think there can't be too many uses cases that
-> require writback to work while long term GUP pin allow some device to
-> write to the pages at any given time, if nobody requires this to be
-> urgently fixed.
-> 
-> You can find coverage on lwn and on linux-mm.
-> 
-> > 
-> > > 
-> > > To achieve the cleanest writeback fix to avoid crashes in
-> > > set_page_dirty_lock on long term secondary MMU mappings that supports
-> > > MMU notifier like KVM shadow MMU, the ideal is to mark the page dirty
-> > > before establishing a writable the mapping in the secondary MMU like
-> > > in the model below.
-> > > 
-> > > The below solution works also for those secondary MMU that are like a
-> > > TLB and if there are two concurrent invalidates on the same page
-> > > invoked at the same time (a potential problem Jerome noticed), you
-> > > don't know which come out first and you would risk to call
-> > > set_page_dirty twice, which would be still potentially kernel crashing
-> > > (even if only a theoretical issue like O_DIRECT).
-> > 
-> > Why is it problematic to call set_page_dirty() twice?  I thought that at
-> > worst it would only lead to writing out data to disk unnecessarily ?
-> 
-> According to Jerome, after the first set_page_dirty returns, writeback
-> could start before the second set_page_dirty has been called. So if
-> there are additional random later invalidates the next ones shouldn't
-> call set_page_dirty again.
-> 
-> The problem is if you call set_page_dirty in the invalidate, you've
-> also to make sure set_page_dirty is being called only once.
-> 
-> There can be concurrent invalidates for the same page running at the
-> same time, while the page fault there is only one that runs atomically
-> with respect to the mmu notifier invalidates (under whatever lock that
-> serializes the MMU notifier invalidates vs the secondary MMU page fault).
-> 
-> If you call set_page_dirty twice in a row, you again open the window
-> for the writeback to have already called ->page_mkclean on the page
-> after the first set_page_dirty, so the second set_page_dirty will
-> then crash.
-> 
-> You can enforce to call it only once if you have sptes (shadow
-> pagetables) like in KVM has, so this is not an issue for KVM.
-> 
-
-Makes sense.  The key for my understanding was that an atomic
-relationship between the page fault and the mmu notifier has to be
-enforced.
-
-> > I am also not familiar with a problem related to KVM and O_DIRECT, so
-> > I'm having trouble keeping up here as well :(
-> 
-> There's no problem in KVM and O_DIRECT.
-> 
-> There's a problem in O_DIRECT itself regardless if it's qemu or any
-> other app using it: just the time window is too low to be
-> noticeable. It's still a corollary of why we can't run two
-> set_page_dirty per page, if there are concurrent MMU notifier
-> invalidates.
-> 
-> > > So the below model
-> > > will solve that and it's also valid for KVM/vhost accelleration,
-> > > despite KVM can figure out how to issue a single set_page_dirty call
-> > > for each spte that gets invalidated by concurrent invalidates on the
-> > > same page because it has shadow pagetables and it's not just a TLB.
-> > > 
-> > >   access = FOLL_WRITE|FOLL_GET
-> > > 
-> > > repeat:
-> > >   page = gup(access)
-> > >   put_page(page)
-> > > 
-> > >   spin_lock(mmu_notifier_lock);
-> > >   if (race with invalidate) {
-> > >     spin_unlock..
-> > >     goto repeat;
-> > >   }
-> > >   if (access == FOLL_WRITE)
-> > >     set_page_dirty(page)
-> > >   establish writable mapping in secondary MMU on page
-> > >   spin_unlock
-> > > 
-> > > The above solves the crash in set_page_dirty_lock without having to
-> > > modify any filesystem, it should work theoretically safer than the
-> > > O_DIRECT short term GUP pin.
-> > 
-> > That is not exactly how we do things today on the arm64 side.  We do
-> > something that looks like:
-> 
-> The above is the model that solves all problems with writeback
-> page_mkclean/mkwrite, provides stable pages to current filesystems,
-> regardless of lowlevel implementation details of the mmu notifier
-> methods.
-> 
-> For KVM all models works not only the above one because we have sptes
-> to disambiguate which is the first invalidate that has to run
-> set_page_dirty.
-> 
-> > 
-> >   /*
-> >    * user_mem_abort is our function for a secondary MMU fault that
-> >    * resolves to a memslot.
-> >    */
-> >   user_mem_abort() {
-> >       page = gup(access, &writable);
-> >       spin_lock(&kvm->mmu_lock);
-> >       if (mmu_notifier_retry(kvm, mmu_seq))
-> >           goto out; /* run the VM again and see what happens */
-> > 
-> >       if (writable)
-> >           kvm_set_pfn_dirty(page_to_pfn(page));
-> >       stage2_set_pte(); /* establish_writable mapping in secondary MMU on page */
-> > 
-> >   out:
-> >       spin_unlock(&kvm_mmu_lock);
-> >       put_page(page);
-> >   }
-> > 
-> > Should we rework this to address the race you are refering to, and are
-> > other architectures already safe against this?
-> 
-> Actually it seems you mark the page dirty exactly where I suggested
-> above: i.e. atomically with the secondary MMU mapping establishment
-> with respect to the mmu notifier invalidates.
-> 
-> I don't see any problem with the above (well you need to have a way to
-> track if you run stage2_set_pte or if you taken "goto out" but the
-> above is pseudocode).
-> 
-> There's a problem however in kvm_set_pfn_dirty common code, it should
-> call set_page_dirty not SetPageDirty or it won't do anything in the
-> MAP_SHARED filebacked case. The current code is perfectly ok for anon and
-> MAP_PRIVATE write=1 cases.
-> 
-> However FOLL_TOUCH in gup already either calls set_page_dirty or it
-> marks the linux pte as dirty, so that's working around the lack of
-> set_page_dirty... I wonder if we could just rely on the set_page_dirty
-> in gup with FOLL_TOUCH and drop SetPageDirty as a whole in KVM in fact.
-> 
-
-I may have misled you with my use of 'gup()' as a function above.  In
-reality we use the gfn_to_pfn_prot() wrapper, which means there are
-several things going on:
-
-First, it appears we only do pte_mkdirty with FOLL_TOUCH if we also set
-FOLL_WRITE.  This seems to be confimed by the commentary on
-get_user_pages, which says that set_page_dirty() must be called if a
-page is written to, and the page is found without FOLL_WRITE.
-
-Second, KVM first attempts a __get_user_pages_fast(), and if that fails
-does get_user_pages_unlocked(), but only sets FOLL_WRITE as part of a
-write fauult.  If the page is nevertheless mapped writable, I think we
-still need the subsequent set_page_dirty() when a write fault happens on
-the secondary mmu.
-
-So I take it you'll send a patch addressing the SetPageDirty to
-set_page_dirty problem?
-
-
-> > > With regard to KVM this should be enough, but we also look for a crash
-> > > avoidance solution for those devices that cannot support the MMU
-> > > notifier for short and long term GUP pins.
-> > 
-> > Sorry, can you define short and long term GUP pins, and do we have
-> > current examples of both?
-> 
-> Long term as in mm/gup.c:FOLL_LONGTERM, means you expect to call some
-> get_user_pages with FOLL_GET and not release the refcount immediately
-> after I/O completion, the page could remain indefinitely pinned,
-> virt example: vfio device assignment.
-> 
-> The most common example of short term GUP (i.e. default behavior of
-> GPU) is O_DIRECT. I/O completion takes short time (depends on the
-> buffer size of course.. could be 1TB of buffer I/O) but it's still
-> going to be released ASAP.
-> 
-> > > There's lots of work going on on linux-mm, to try to let those devices
-> > > support writeback in a safe way (also with stable pages so all fs
-> > > integrity checks will pass) using bounce buffer if a long term GUP pin
-> > > is detected by the filesystem. In addition there's other work to make
-> > > the short term GUP pin theoretically safe by delaying the writeback
-> > > for the short window the GUP pin is taken by O_DIRECT, so it becomes
-> > > theoretically safe too (currently it's only practically safe).
-> > > 
-> > > However I'm not sure if the long term GUP pins really needs to support
-> > > writeback.
-> > > 
-> > 
-> > I don't think I understand the distinction between a long term GUP pin
-> > that supports writeback vs. a short term GUP pin.  My question was
-> > whether or not the pin could be dropped at the time the mapping was torn
-> > down, or if it has to be done at the same time the mapping is
-> > established, for things to work properly wrt. the semantics of memory
-> > behavior of the rest of the kernel.
-> 
-> Yes sorry, the question about the refcounting was just trivial to
-> answer: it always works, you can drop the refcount anywhere.
-> 
-> I just thought if there was any doubt on the refcounting issue which
-> had an immediate black and white answer, it was safer to raise
-> awareness about the much more troubling and subtle issues with
-> set_page_dirty caused by GUP refcounts.
-> 
-
-I understand, and thanks for doing that.  I just had to put the pieces
-together on my end.
-
-> > I'm not sure if we're talking about the same thing here, or if you're
-> > explaining a different scenario?
-> 
-> Simply KVM secondary MMU fault has to mark the page dirty somehow
-> (either in gup itself or in the fault or in the invalidates) in
-> addition to dealing the refcount. That's the connection.
-> 
-> However this set_page_dirty issue needs solution that works both for
-> short term GPU pins that can't use mmu notifier (O_DIRECT), long term
-> GUP pins that can't use mmu notifier (vfio) and the MMU notifier
-> mappings (KVM page fault, whose refcount can be implicitly hold on by
-> the MMU notifier itself and in turn the put_page can go anywhere).
-> 
-> The solution to the O_DIRECT gup pin is also highly connected with the
-> GUP refcounting, because the solution is to alter the refcount so that
-> the filesystem learns that there's a special refcounting and
-> ->page_mkclean can be then deferred as long as the special refcount is
-> hold by O_DIRECT. I argue the same special refcount can be also hold
-> by long term GUP pins and the MMU notifier KVM page fault case (which
-> will either drop FOLL_GET ideally) so we can defer the page_mkwrite
-> indefinitely for long term GUP pins too (there will be no deferred
-> write in MMU Notifier case because ->page_mkclean invokes the MMU
-> notifier invalidates).
-> 
-> If one wants to flush to disk the dirty MAP_SHARED periodically the
-> device needs to be told to drop the refcounts and stop writing to the
-> memory. If the device isn't told to stop writing to the memory what
-> comes out is only coherent at 512 bytes units or maybe less anyway.
-> 
-
-Thanks for the clarification.
-
-    Christoffer
+On 6/21/19 10:37 AM, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
+>
+> KVM internally uses accessor functions when reading or writing the
+> guest's system registers. This takes care of accessing either the stored
+> copy or using the "live" EL1 system registers when the host uses VHE.
+>
+> With the introduction of virtual EL2 we add a bunch of EL2 system
+> registers, which now must also be taken care of:
+> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+>   revert to the stored version of that, and not use the CPU's copy.
+> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+>   also use the stored version, since the CPU carries the EL1 copy.
+> - Some EL2 system registers are supposed to affect the current execution
+>   of the system, so we need to put them into their respective EL1
+>   counterparts. For this we need to define a mapping between the two.
+>   This is done using the newly introduced struct el2_sysreg_map.
+> - Some EL2 system registers have a different format than their EL1
+>   counterpart, so we need to translate them before writing them to the
+>   CPU. This is done using an (optional) translate function in the map.
+> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+>   which need some separate handling.
+>
+> All of these cases are now wrapped into the existing accessor functions,
+> so KVM users wouldn't need to care whether they access EL2 or EL1
+> registers and also which state the guest is in.
+>
+> This handles what was formerly known as the "shadow state" dynamically,
+> without requiring a separate copy for each vCPU EL.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   6 +
+>  arch/arm64/include/asm/kvm_host.h    |   5 +
+>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
+>  3 files changed, 174 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c43aac5fed69..f37006b6eec4 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+>  
+> +u64 translate_tcr(u64 tcr);
+> +u64 translate_cptr(u64 tcr);
+> +u64 translate_sctlr(u64 tcr);
+> +u64 translate_ttbr0(u64 tcr);
+> +u64 translate_cnthctl(u64 tcr);
+> +
+>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2d4290d2513a..dae9c42a7219 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+> +static inline bool sysreg_is_el2(int reg)
+> +{
+> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
+> +}
+> +
+>  /* 32bit mapping */
+>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 693dd063c9c2..d024114da162 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+>  	return false;
+>  }
+>  
+> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+> +{
+> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
+> +		<< TCR_IPS_SHIFT;
+> +}
+> +
+> +u64 translate_tcr(u64 tcr)
+> +{
+> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+> +	       (tcr & TCR_EL2_TG0_MASK) |
+> +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> +	       (tcr & TCR_EL2_T0SZ_MASK);
+> +}
+> +
+> +u64 translate_cptr(u64 cptr_el2)
+> +{
+> +	u64 cpacr_el1 = 0;
+> +
+> +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> +		cpacr_el1 |= CPACR_EL1_FPEN;
+> +	if (cptr_el2 & CPTR_EL2_TTA)
+> +		cpacr_el1 |= CPACR_EL1_TTA;
+> +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> +		cpacr_el1 |= CPACR_EL1_ZEN;
+> +
+> +	return cpacr_el1;
+> +}
+> +
+> +u64 translate_sctlr(u64 sctlr)
+> +{
+> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+> +	return sctlr | BIT(20);
+> +}
+> +
+> +u64 translate_ttbr0(u64 ttbr0)
+> +{
+> +	/* Force ASID to 0 (ASID 0 or RES0) */
+> +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> +}
+> +
+> +u64 translate_cnthctl(u64 cnthctl)
+> +{
+> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
+> +}
+> +
+> +#define EL2_SYSREG(el2, el1, translate)	\
+> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
+> +#define PURE_EL2_SYSREG(el2) \
+> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
+> +/*
+> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
+> + * The translate function can be NULL, when the register layout is identical.
+> + */
+> +struct el2_sysreg_map {
+> +	int sysreg;	/* EL2 register index into the array above */
+> +	int mapping;	/* associated EL1 register */
+> +	u64 (*translate)(u64 value);
+> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
+> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
+> +	PURE_EL2_SYSREG( HCR_EL2 ),
+> +	PURE_EL2_SYSREG( MDCR_EL2 ),
+> +	PURE_EL2_SYSREG( HSTR_EL2 ),
+> +	PURE_EL2_SYSREG( HACR_EL2 ),
+> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
+> +	PURE_EL2_SYSREG( VTCR_EL2 ),
+> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
+> +	PURE_EL2_SYSREG( RMR_EL2 ),
+> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
+> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
+> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
+> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
+> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
+> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
+> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
+> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
+> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
+> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
+> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
+> +};
+> +
+> +static
+> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+> +					     int reg)
+> +{
+> +	const struct el2_sysreg_map *entry;
+> +
+> +	if (!sysreg_is_el2(reg))
+> +		return NULL;
+> +
+> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
+> +	if (entry->sysreg == __INVALID_SYSREG__)
+> +		return NULL;
+> +
+> +	return entry;
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+> +
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_read;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_read;
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/*
+> +			 * If this register does not have an EL1 counterpart,
+> +			 * then read the stored EL2 version.
+> +			 */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				goto immediate_read;
+> +
+> +			/* Get the current version of the EL1 counterpart. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_read;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not saved on every
+>  	 * exit from the guest but are only saved on vcpu_put.
+> @@ -114,6 +245,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
+>  	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
+>  	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
+> +	case SP_EL2:		return read_sysreg(sp_el1);
+From ARM DDI 0487D.b, section Behavior when HCR_EL2.NV == 1: "Reads or writes to
+any allocated and implemented System register or Special-purpose register named
+*_EL2, *_EL02, or *_EL12 in the MRS or MSR instruction, other than SP_EL2, are
+trapped to EL2 rather than being UNDEFINED" (page D5-2480). My interpretation of
+the text is that attempted reads of SP_EL2 from virtual EL2 cause an undefined
+instruction exception.
+> +	case ELR_EL2:		return read_sysreg_el1(SYS_ELR);
+>  	}
+>  
+>  immediate_read:
+> @@ -125,6 +258,34 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_write;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_write;
+> +
+> +		/* Store the EL2 version in the sysregs array. */
+> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/* Does this register have an EL1 counterpart? */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				return;
+> +
+> +			if (!vcpu_el2_e2h_is_set(vcpu) &&
+> +			    el2_reg->translate)
+> +				val = el2_reg->translate(val);
+> +
+> +			/* Redirect this to the EL1 version of the register. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_write;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not restored on every
+>  	 * entry to the guest but are only restored on vcpu_load.
+> @@ -157,6 +318,8 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
+>  	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
+>  	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
+> +	case SP_EL2:		write_sysreg(val, sp_el1);		return;
+> +	case ELR_EL2:		write_sysreg_el1(val, SYS_ELR);		return;
+>  	}
+>  
+>  immediate_write:
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
