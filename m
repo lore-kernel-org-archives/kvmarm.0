@@ -6,57 +6,61 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB1AC4646B
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 07:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DFAC4646B
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 07:56:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69D50208E3
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 07:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D50208E3
+	by mail.kernel.org (Postfix) with ESMTP id D41C120B7C
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 07:56:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D41C120B7C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB4CA4A50F;
-	Wed, 26 Jun 2019 03:23:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3487D4A4C0;
+	Wed, 26 Jun 2019 03:56:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7F+HCoKl5Z-w; Wed, 26 Jun 2019 03:23:13 -0400 (EDT)
+	with ESMTP id Xgu+RL-4XCHD; Wed, 26 Jun 2019 03:56:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1924A4C0;
-	Wed, 26 Jun 2019 03:23:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E29494A4FB;
+	Wed, 26 Jun 2019 03:56:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD0EC4A4C1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 03:23:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E743C4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 03:56:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CHby7ezS3WmJ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jun 2019 03:23:10 -0400 (EDT)
+ with ESMTP id asrIjGnqONSl for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jun 2019 03:56:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E944A3A5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 03:23:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A78F4A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 03:56:00 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 252582B;
- Wed, 26 Jun 2019 00:23:10 -0700 (PDT)
-Received: from [10.37.8.13] (unknown [10.37.8.13])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 298C73F246;
- Wed, 26 Jun 2019 00:23:07 -0700 (PDT)
-Subject: Re: [PATCH 28/59] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit
- setting
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-29-marc.zyngier@arm.com>
-From: Julien Thierry <julien.thierry@arm.com>
-Message-ID: <c2e2095a-8619-12df-845c-78dbf04efefe@arm.com>
-Date: Wed, 26 Jun 2019 08:23:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-29-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9CCB02B;
+ Wed, 26 Jun 2019 00:55:59 -0700 (PDT)
+Received: from big-swifty.misterjones.org (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 636C93F246;
+ Wed, 26 Jun 2019 00:55:56 -0700 (PDT)
+Date: Wed, 26 Jun 2019 08:55:49 +0100
+Message-ID: <86a7e4pypm.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
+ MSI->LPI translation
+In-Reply-To: <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-8-marc.zyngier@arm.com>
+ <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
+ <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
+ <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: kvm@vger.kernel.org, "Raslan,
+ KarimAllah" <karahmed@amazon.de>, "Saidi, Ali" <alisaidi@amazon.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,55 +77,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 06/21/2019 10:38 AM, Marc Zyngier wrote:
-> From: Jintack Lim <jintack@cs.columbia.edu>
+On Tue, 25 Jun 2019 17:00:54 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
-> virtual HCR_EL2.NV bit is set.
+> Hi Marc,
 > 
-> This is for recursive nested virtualization.
+> On 2019/6/25 20:31, Marc Zyngier wrote:
+> > Hi Zenghui,
+> > 
+> > On 25/06/2019 12:50, Zenghui Yu wrote:
+> >> Hi Marc,
+> >> 
+> >> On 2019/6/12 1:03, Marc Zyngier wrote:
+> >>> On a successful translation, preserve the parameters in the LPI
+> >>> translation cache. Each translation is reusing the last slot
+> >>> in the list, naturally evincting the least recently used entry.
+> >>> 
+> >>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >>> ---
+> >>>    virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
+> >>>    1 file changed, 86 insertions(+)
+> >>> 
+> >>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+> >>> index 0aa0cbbc3af6..62932458476a 100644
+> >>> --- a/virt/kvm/arm/vgic/vgic-its.c
+> >>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+> >>> @@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+> >>>    	return 0;
+> >>>    }
+> >>>    +static struct vgic_irq *__vgic_its_check_cache(struct
+> >>> vgic_dist *dist,
+> >>> +					       phys_addr_t db,
+> >>> +					       u32 devid, u32 eventid)
+> >>> +{
+> >>> +	struct vgic_translation_cache_entry *cte;
+> >>> +	struct vgic_irq *irq = NULL;
+> >>> +
+> >>> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
+> >>> +		/*
+> >>> +		 * If we hit a NULL entry, there is nothing after this
+> >>> +		 * point.
+> >>> +		 */
+> >>> +		if (!cte->irq)
+> >>> +			break;
+> >>> +
+> >>> +		if (cte->db == db &&
+> >>> +		    cte->devid == devid &&
+> >>> +		    cte->eventid == eventid) {
+> >>> +			/*
+> >>> +			 * Move this entry to the head, as it is the
+> >>> +			 * most recently used.
+> >>> +			 */
+> >>> +			list_move(&cte->entry, &dist->lpi_translation_cache);
+> >> 
+> >> Only for performance reasons: if we hit at the "head" of the list, we
+> >> don't need to do a list_move().
+> >> In our tests, we found that a single list_move() takes nearly (sometimes
+> >> even more than) one microsecond, for some unknown reason...
+> > 
+> > Huh... That's odd.
+> > 
+> > Can you narrow down under which conditions this happens? I'm not sure if
+> > checking for the list head would be more efficient, as you end-up
+> > fetching the head anyway. Can you try replacing this line with:
+> > 
+> > 	if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
+> > 		list_move(&cte->entry, &dist->lpi_translation_cache);
+> > 
+> > and let me know whether it helps?
 > 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/kvm/sys_regs.c        | 19 +++++++++++++++++--
->  2 files changed, 18 insertions(+), 2 deletions(-)
+> It helps. With this change, the overhead of list_move() is gone.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index d21486274eeb..55f4525c112c 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -24,6 +24,7 @@
->  
->  /* Hyp Configuration Register (HCR) bits */
->  #define HCR_FWB		(UL(1) << 46)
-> +#define HCR_NV1		(UL(1) << 43)
->  #define HCR_NV		(UL(1) << 42)
->  #define HCR_API		(UL(1) << 41)
->  #define HCR_APK		(UL(1) << 40)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0f74b9277a86..beadebcfc888 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -473,8 +473,10 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
->  	if (el12_reg(p) && forward_nv_traps(vcpu))
->  		return false;
->  
-> -	if (!el12_reg(p) && forward_vm_traps(vcpu, p))
-> -		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +	if (!el12_reg(p) && forward_vm_traps(vcpu, p)) {
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +		return false;
+> We run 16 4-vcpu VMs on the host, each with a vhost-user nic, and run
+> "iperf" in pairs between them.  It's likely to hit at the head of the
+> cache list in our tests.
+> With this change, the sys% utilization of vhostdpfwd threads will
+> decrease by about 10%.  But I don't know the reason exactly (I haven't
+> found any clues in code yet, in implementation of list_move...).
 
-I feel like this change is actually intended to be part of the previous
-patch.
+list_move is rather simple, and shouldn't be too hard to execute
+quickly. The only contention I can imagine is that as the cache line
+is held by multiple CPUs, the update to the list pointers causes an
+invalidation to be sent to other CPUs, leading to a slower update.
 
-Cheers,
+But it remains that 500ns is a pretty long time (that's 1000 cycles on
+a 2GHz CPU). It'd be interesting to throw perf at this and see shows
+up. It would give us a clue about what is going on here.
 
-Julien
+Thanks,
+
+	M.
+
+-- 
+Jazz is not dead, it just smells funny.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
