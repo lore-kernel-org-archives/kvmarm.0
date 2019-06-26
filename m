@@ -6,63 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6758C4646B
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 03:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A550FC4646B
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 05:31:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6F3632082F
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 03:55:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F3632082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 3590E2080C
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 05:31:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3590E2080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B93684A4A9;
-	Tue, 25 Jun 2019 23:55:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72BBF4A50F;
+	Wed, 26 Jun 2019 01:31:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xc0inFLzJ2p3; Tue, 25 Jun 2019 23:55:35 -0400 (EDT)
+	with ESMTP id mpI4o46ZSi93; Wed, 26 Jun 2019 01:31:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D4A84A4FC;
-	Tue, 25 Jun 2019 23:55:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 235B34A4FC;
+	Wed, 26 Jun 2019 01:31:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EAB14A4A9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 23:55:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BAD4A4C0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 01:31:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7P9Ij8frS-00 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jun 2019 23:55:33 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE8C44A3A5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 23:55:32 -0400 (EDT)
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 1FC7BE4B79234D7E47FC;
- Wed, 26 Jun 2019 11:55:29 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Jun 2019
- 11:55:22 +0800
-Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
- MSI->LPI translation
-From: Zenghui Yu <yuzenghui@huawei.com>
+ with ESMTP id RRHlAbpYh8kB for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jun 2019 01:31:15 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 168A54A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jun 2019 01:31:15 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53F592B;
+ Tue, 25 Jun 2019 22:31:14 -0700 (PDT)
+Received: from [10.37.8.13] (unknown [10.37.8.13])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA5A33F246;
+ Tue, 25 Jun 2019 22:33:01 -0700 (PDT)
+Subject: Re: [PATCH 26/59] KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit
+ setting
 To: Marc Zyngier <marc.zyngier@arm.com>,
- <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
- <kvm@vger.kernel.org>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-8-marc.zyngier@arm.com>
- <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
- <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
- <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
-Message-ID: <dd1b71c0-46fb-29f2-2fbc-2689c22ca8d7@huawei.com>
-Date: Wed, 26 Jun 2019 11:54:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-27-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <8ad1b436-9325-2abb-648d-2cd3a3c9b113@arm.com>
+Date: Wed, 26 Jun 2019 06:31:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
+In-Reply-To: <20190621093843.220980-27-marc.zyngier@arm.com>
 Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: "Raslan, KarimAllah" <karahmed@amazon.de>, "Saidi,
- Ali" <alisaidi@amazon.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,69 +68,135 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMTkvNi8yNiAwOjAwLCBaZW5naHVpIFl1IHdyb3RlOgo+IEhpIE1hcmMsCj4gCj4gT24g
-MjAxOS82LzI1IDIwOjMxLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IEhpIFplbmdodWksCj4+Cj4+
-IE9uIDI1LzA2LzIwMTkgMTI6NTAsIFplbmdodWkgWXUgd3JvdGU6Cj4+PiBIaSBNYXJjLAo+Pj4K
-Pj4+IE9uIDIwMTkvNi8xMiAxOjAzLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+Pj4gT24gYSBzdWNj
-ZXNzZnVsIHRyYW5zbGF0aW9uLCBwcmVzZXJ2ZSB0aGUgcGFyYW1ldGVycyBpbiB0aGUgTFBJCj4+
-Pj4gdHJhbnNsYXRpb24gY2FjaGUuIEVhY2ggdHJhbnNsYXRpb24gaXMgcmV1c2luZyB0aGUgbGFz
-dCBzbG90Cj4+Pj4gaW4gdGhlIGxpc3QsIG5hdHVyYWxseSBldmluY3RpbmcgdGhlIGxlYXN0IHJl
-Y2VudGx5IHVzZWQgZW50cnkuCj4+Pj4KPj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIg
-PG1hcmMuenluZ2llckBhcm0uY29tPgo+Pj4+IC0tLQo+Pj4+IMKgwqAgdmlydC9rdm0vYXJtL3Zn
-aWMvdmdpYy1pdHMuYyB8IDg2IAo+Pj4+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKwo+Pj4+IMKgwqAgMSBmaWxlIGNoYW5nZWQsIDg2IGluc2VydGlvbnMoKykKPj4+Pgo+Pj4+
-IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWl0cy5jIAo+Pj4+IGIvdmlydC9r
-dm0vYXJtL3ZnaWMvdmdpYy1pdHMuYwo+Pj4+IGluZGV4IDBhYTBjYmJjM2FmNi4uNjI5MzI0NTg0
-NzZhIDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaXRzLmMKPj4+PiAr
-KysgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWl0cy5jCj4+Pj4gQEAgLTU0Niw2ICs1NDYsOTAg
-QEAgc3RhdGljIHVuc2lnbmVkIGxvbmcgCj4+Pj4gdmdpY19tbWlvX3JlYWRfaXRzX2lkcmVncyhz
-dHJ1Y3Qga3ZtICprdm0sCj4+Pj4gwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+Pj4+IMKgwqAgfQo+
-Pj4+ICtzdGF0aWMgc3RydWN0IHZnaWNfaXJxICpfX3ZnaWNfaXRzX2NoZWNrX2NhY2hlKHN0cnVj
-dCB2Z2ljX2Rpc3QgKmRpc3QsCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgcGh5c19hZGRyX3QgZGIsCj4+Pj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdTMyIGRldmlkLCB1MzIgZXZl
-bnRpZCkKPj4+PiArewo+Pj4+ICvCoMKgwqAgc3RydWN0IHZnaWNfdHJhbnNsYXRpb25fY2FjaGVf
-ZW50cnkgKmN0ZTsKPj4+PiArwqDCoMKgIHN0cnVjdCB2Z2ljX2lycSAqaXJxID0gTlVMTDsKPj4+
-PiArCj4+Pj4gK8KgwqDCoCBsaXN0X2Zvcl9lYWNoX2VudHJ5KGN0ZSwgJmRpc3QtPmxwaV90cmFu
-c2xhdGlvbl9jYWNoZSwgZW50cnkpIHsKPj4+PiArwqDCoMKgwqDCoMKgwqAgLyoKPj4+PiArwqDC
-oMKgwqDCoMKgwqDCoCAqIElmIHdlIGhpdCBhIE5VTEwgZW50cnksIHRoZXJlIGlzIG5vdGhpbmcg
-YWZ0ZXIgdGhpcwo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogcG9pbnQuCj4+Pj4gK8KgwqDCoMKg
-wqDCoMKgwqAgKi8KPj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKCFjdGUtPmlycSkKPj4+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsKPj4+PiArCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlm
-IChjdGUtPmRiID09IGRiICYmCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY3RlLT5kZXZp
-ZCA9PSBkZXZpZCAmJgo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGN0ZS0+ZXZlbnRpZCA9
-PSBldmVudGlkKSB7Cj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyoKPj4+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgICogTW92ZSB0aGlzIGVudHJ5IHRvIHRoZSBoZWFkLCBhcyBpdCBp
-cyB0aGUKPj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogbW9zdCByZWNlbnRseSB1c2Vk
-Lgo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBsaXN0X21vdmUoJmN0ZS0+ZW50cnksICZkaXN0LT5scGlfdHJhbnNsYXRpb25fY2Fj
-aGUpOwo+Pj4KPj4+IE9ubHkgZm9yIHBlcmZvcm1hbmNlIHJlYXNvbnM6IGlmIHdlIGhpdCBhdCB0
-aGUgImhlYWQiIG9mIHRoZSBsaXN0LCB3ZQo+Pj4gZG9uJ3QgbmVlZCB0byBkbyBhIGxpc3RfbW92
-ZSgpLgo+Pj4gSW4gb3VyIHRlc3RzLCB3ZSBmb3VuZCB0aGF0IGEgc2luZ2xlIGxpc3RfbW92ZSgp
-IHRha2VzIG5lYXJseSAoc29tZXRpbWVzCj4+PiBldmVuIG1vcmUgdGhhbikgb25lIG1pY3Jvc2Vj
-b25kLCBmb3Igc29tZSB1bmtub3duIHJlYXNvbi4uLgoKcy9vbmUgbWljcm9zZWNvbmQvNTAwIG5h
-bm9zZWNvbmRzLwooSSBnb3QgdGhlIHZhbHVlIG9mIENOVEZSUSB3cm9uZywgc29ycnkuKQoKPj4K
-Pj4gSHVoLi4uIFRoYXQncyBvZGQuCj4+Cj4+IENhbiB5b3UgbmFycm93IGRvd24gdW5kZXIgd2hp
-Y2ggY29uZGl0aW9ucyB0aGlzIGhhcHBlbnM/IEknbSBub3Qgc3VyZSBpZgo+PiBjaGVja2luZyBm
-b3IgdGhlIGxpc3QgaGVhZCB3b3VsZCBiZSBtb3JlIGVmZmljaWVudCwgYXMgeW91IGVuZC11cAo+
-PiBmZXRjaGluZyB0aGUgaGVhZCBhbnl3YXkuIENhbiB5b3UgdHJ5IHJlcGxhY2luZyB0aGlzIGxp
-bmUgd2l0aDoKPj4KPj4gwqDCoMKgwqBpZiAoIWxpc3RfaXNfZmlyc3QoJmN0ZS0+ZW50cnksICZk
-aXN0LT5scGlfdHJhbnNsYXRpb25fY2FjaGUpKQo+PiDCoMKgwqDCoMKgwqDCoCBsaXN0X21vdmUo
-JmN0ZS0+ZW50cnksICZkaXN0LT5scGlfdHJhbnNsYXRpb25fY2FjaGUpOwo+Pgo+PiBhbmQgbGV0
-IG1lIGtub3cgd2hldGhlciBpdCBoZWxwcz8KPiAKPiBJdCBoZWxwcy4gV2l0aCB0aGlzIGNoYW5n
-ZSwgdGhlIG92ZXJoZWFkIG9mIGxpc3RfbW92ZSgpIGlzIGdvbmUuCj4gCj4gV2UgcnVuIDE2IDQt
-dmNwdSBWTXMgb24gdGhlIGhvc3QsIGVhY2ggd2l0aCBhIHZob3N0LXVzZXIgbmljLCBhbmQgcnVu
-Cj4gImlwZXJmIiBpbiBwYWlycyBiZXR3ZWVuIHRoZW0uwqAgSXQncyBsaWtlbHkgdG8gaGl0IGF0
-IHRoZSBoZWFkIG9mIHRoZQo+IGNhY2hlIGxpc3QgaW4gb3VyIHRlc3RzLgo+IFdpdGggdGhpcyBj
-aGFuZ2UsIHRoZSBzeXMlIHV0aWxpemF0aW9uIG9mIHZob3N0ZHBmd2QgdGhyZWFkcyB3aWxsCj4g
-ZGVjcmVhc2UgYnkgYWJvdXQgMTAlLsKgIEJ1dCBJIGRvbid0IGtub3cgdGhlIHJlYXNvbiBleGFj
-dGx5IChJIGhhdmVuJ3QKPiBmb3VuZCBhbnkgY2x1ZXMgaW4gY29kZSB5ZXQsIGluIGltcGxlbWVu
-dGF0aW9uIG9mIGxpc3RfbW92ZS4uLikuCj4gCj4gCj4gVGhhbmtzLAo+IHplbmdodWkKPiAKPiAK
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
-YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
-LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+
+
+On 06/21/2019 10:38 AM, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
+> coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
+> 
+> In addition to EL2 register accesses, setting NV bit will also make EL12
+> register accesses trap to EL2. To emulate this for the virtual EL2,
+> forword traps due to EL12 register accessses to the virtual EL2 if the
+> virtual HCR_EL2.NV bit is set.
+> 
+> This is for recursive nested virtualization.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [Moved code to emulate-nested.c]
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h    |  1 +
+>  arch/arm64/include/asm/kvm_nested.h |  2 ++
+>  arch/arm64/kvm/emulate-nested.c     | 28 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/handle_exit.c        |  6 ++++++
+>  arch/arm64/kvm/sys_regs.c           | 18 ++++++++++++++++++
+>  5 files changed, 55 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 48e15af2bece..d21486274eeb 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -24,6 +24,7 @@
+>  
+>  /* Hyp Configuration Register (HCR) bits */
+>  #define HCR_FWB		(UL(1) << 46)
+> +#define HCR_NV		(UL(1) << 42)
+>  #define HCR_API		(UL(1) << 41)
+>  #define HCR_APK		(UL(1) << 40)
+>  #define HCR_TEA		(UL(1) << 37)
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 645e5e11b749..61e71d0d2151 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -11,5 +11,7 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>  }
+>  
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+> +extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+> +extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+>  
+>  #endif /* __ARM64_KVM_NESTED_H */
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index f829b8b04dc8..c406fd688b9f 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -24,6 +24,27 @@
+>  
+>  #include "trace.h"
+>  
+> +bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
+
+Should this one be static?
+
+> +{
+> +	bool control_bit_set;
+> +
+> +	if (!nested_virt_in_use(vcpu))
+> +		return false;
+> +
+> +	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
+> +	if (!vcpu_mode_el2(vcpu) && control_bit_set) {
+> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+> +bool forward_nv_traps(struct kvm_vcpu *vcpu)
+> +{
+> +	return forward_traps(vcpu, HCR_NV);
+> +}
+> +
+> +
+>  /* This is borrowed from get_except_vector in inject_fault.c */
+>  static u64 get_el2_except_vector(struct kvm_vcpu *vcpu,
+>  		enum exception_type type)
+> @@ -55,6 +76,13 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+>  	u64 spsr, elr, mode;
+>  	bool direct_eret;
+>  
+> +	/*
+> +	 * Forward this trap to the virtual EL2 if the virtual
+> +	 * HCR_EL2.NV bit is set and this is coming from !EL2.
+> +	 */
+> +	if (forward_nv_traps(vcpu))
+> +		return;
+> +
+>  	/*
+>  	 * Going through the whole put/load motions is a waste of time
+>  	 * if this is a VHE guest hypervisor returning to its own
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 39602a4c1d61..7e8b1ec1d251 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -72,6 +72,12 @@ static int handle_smc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  {
+>  	int ret;
+>  
+> +	/*
+> +	 * Forward this trapped smc instruction to the virtual EL2.
+> +	 */
+> +	if ((vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_TSC) && forward_nv_traps(vcpu))
+
+Not sure I understand why this would be only when the guest hyp also has
+NV set.
+
+If the guest hyp requested to trap smc instructions and that we received
+one while in vel1, shouldn't we always forward it to the guest hyp to
+let it implement the smc response the way it wants?
+
+Cheers,
+
+Julien
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
