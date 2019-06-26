@@ -1,48 +1,49 @@
-Return-Path: <SRS0=xcs2=UY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=hM/U=UZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1760FC48BD4
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 16:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6758C4646B
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 03:55:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A0457208CB
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jun 2019 16:02:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0457208CB
+	by mail.kernel.org (Postfix) with ESMTP id 6F3632082F
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jun 2019 03:55:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F3632082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F9064A4FB;
-	Tue, 25 Jun 2019 12:02:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B93684A4A9;
+	Tue, 25 Jun 2019 23:55:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bv9OOMHOIqF5; Tue, 25 Jun 2019 12:02:00 -0400 (EDT)
+	with ESMTP id Xc0inFLzJ2p3; Tue, 25 Jun 2019 23:55:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01E034A4A3;
-	Tue, 25 Jun 2019 12:02:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D4A84A4FC;
+	Tue, 25 Jun 2019 23:55:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3B84A49F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 12:01:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EAB14A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 23:55:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4YKXLaheb6d2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jun 2019 12:01:57 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 066124A32E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 12:01:57 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 5CF3AEA899F81CF85AC9;
- Wed, 26 Jun 2019 00:01:53 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Jun 2019
- 00:01:45 +0800
+ with ESMTP id 7P9Ij8frS-00 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jun 2019 23:55:33 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE8C44A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jun 2019 23:55:32 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 1FC7BE4B79234D7E47FC;
+ Wed, 26 Jun 2019 11:55:29 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Jun 2019
+ 11:55:22 +0800
 Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
  MSI->LPI translation
+From: Zenghui Yu <yuzenghui@huawei.com>
 To: Marc Zyngier <marc.zyngier@arm.com>,
  <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <kvm@vger.kernel.org>
@@ -50,13 +51,13 @@ References: <20190611170336.121706-1-marc.zyngier@arm.com>
  <20190611170336.121706-8-marc.zyngier@arm.com>
  <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
  <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
-Date: Wed, 26 Jun 2019 00:00:54 +0800
+ <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
+Message-ID: <dd1b71c0-46fb-29f2-2fbc-2689c22ca8d7@huawei.com>
+Date: Wed, 26 Jun 2019 11:54:55 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
  Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
+In-Reply-To: <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
 Content-Language: en-US
 X-Originating-IP: [10.184.12.158]
 X-CFilter-Loop: Reflected
@@ -73,93 +74,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 2019/6/25 20:31, Marc Zyngier wrote:
-> Hi Zenghui,
-> 
-> On 25/06/2019 12:50, Zenghui Yu wrote:
->> Hi Marc,
->>
->> On 2019/6/12 1:03, Marc Zyngier wrote:
->>> On a successful translation, preserve the parameters in the LPI
->>> translation cache. Each translation is reusing the last slot
->>> in the list, naturally evincting the least recently used entry.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>    virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 86 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 0aa0cbbc3af6..62932458476a 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
->>>    	return 0;
->>>    }
->>>    
->>> +static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
->>> +					       phys_addr_t db,
->>> +					       u32 devid, u32 eventid)
->>> +{
->>> +	struct vgic_translation_cache_entry *cte;
->>> +	struct vgic_irq *irq = NULL;
->>> +
->>> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
->>> +		/*
->>> +		 * If we hit a NULL entry, there is nothing after this
->>> +		 * point.
->>> +		 */
->>> +		if (!cte->irq)
->>> +			break;
->>> +
->>> +		if (cte->db == db &&
->>> +		    cte->devid == devid &&
->>> +		    cte->eventid == eventid) {
->>> +			/*
->>> +			 * Move this entry to the head, as it is the
->>> +			 * most recently used.
->>> +			 */
->>> +			list_move(&cte->entry, &dist->lpi_translation_cache);
->>
->> Only for performance reasons: if we hit at the "head" of the list, we
->> don't need to do a list_move().
->> In our tests, we found that a single list_move() takes nearly (sometimes
->> even more than) one microsecond, for some unknown reason...
-> 
-> Huh... That's odd.
-> 
-> Can you narrow down under which conditions this happens? I'm not sure if
-> checking for the list head would be more efficient, as you end-up
-> fetching the head anyway. Can you try replacing this line with:
-> 
-> 	if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
-> 		list_move(&cte->entry, &dist->lpi_translation_cache);
-> 
-> and let me know whether it helps?
-
-It helps. With this change, the overhead of list_move() is gone.
-
-We run 16 4-vcpu VMs on the host, each with a vhost-user nic, and run
-"iperf" in pairs between them.  It's likely to hit at the head of the
-cache list in our tests.
-With this change, the sys% utilization of vhostdpfwd threads will
-decrease by about 10%.  But I don't know the reason exactly (I haven't
-found any clues in code yet, in implementation of list_move...).
-
-
-Thanks,
-zenghui
-
-
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Ck9uIDIwMTkvNi8yNiAwOjAwLCBaZW5naHVpIFl1IHdyb3RlOgo+IEhpIE1hcmMsCj4gCj4gT24g
+MjAxOS82LzI1IDIwOjMxLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IEhpIFplbmdodWksCj4+Cj4+
+IE9uIDI1LzA2LzIwMTkgMTI6NTAsIFplbmdodWkgWXUgd3JvdGU6Cj4+PiBIaSBNYXJjLAo+Pj4K
+Pj4+IE9uIDIwMTkvNi8xMiAxOjAzLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+Pj4gT24gYSBzdWNj
+ZXNzZnVsIHRyYW5zbGF0aW9uLCBwcmVzZXJ2ZSB0aGUgcGFyYW1ldGVycyBpbiB0aGUgTFBJCj4+
+Pj4gdHJhbnNsYXRpb24gY2FjaGUuIEVhY2ggdHJhbnNsYXRpb24gaXMgcmV1c2luZyB0aGUgbGFz
+dCBzbG90Cj4+Pj4gaW4gdGhlIGxpc3QsIG5hdHVyYWxseSBldmluY3RpbmcgdGhlIGxlYXN0IHJl
+Y2VudGx5IHVzZWQgZW50cnkuCj4+Pj4KPj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIg
+PG1hcmMuenluZ2llckBhcm0uY29tPgo+Pj4+IC0tLQo+Pj4+IMKgwqAgdmlydC9rdm0vYXJtL3Zn
+aWMvdmdpYy1pdHMuYyB8IDg2IAo+Pj4+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKwo+Pj4+IMKgwqAgMSBmaWxlIGNoYW5nZWQsIDg2IGluc2VydGlvbnMoKykKPj4+Pgo+Pj4+
+IGRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWl0cy5jIAo+Pj4+IGIvdmlydC9r
+dm0vYXJtL3ZnaWMvdmdpYy1pdHMuYwo+Pj4+IGluZGV4IDBhYTBjYmJjM2FmNi4uNjI5MzI0NTg0
+NzZhIDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljL3ZnaWMtaXRzLmMKPj4+PiAr
+KysgYi92aXJ0L2t2bS9hcm0vdmdpYy92Z2ljLWl0cy5jCj4+Pj4gQEAgLTU0Niw2ICs1NDYsOTAg
+QEAgc3RhdGljIHVuc2lnbmVkIGxvbmcgCj4+Pj4gdmdpY19tbWlvX3JlYWRfaXRzX2lkcmVncyhz
+dHJ1Y3Qga3ZtICprdm0sCj4+Pj4gwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+Pj4+IMKgwqAgfQo+
+Pj4+ICtzdGF0aWMgc3RydWN0IHZnaWNfaXJxICpfX3ZnaWNfaXRzX2NoZWNrX2NhY2hlKHN0cnVj
+dCB2Z2ljX2Rpc3QgKmRpc3QsCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgcGh5c19hZGRyX3QgZGIsCj4+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdTMyIGRldmlkLCB1MzIgZXZl
+bnRpZCkKPj4+PiArewo+Pj4+ICvCoMKgwqAgc3RydWN0IHZnaWNfdHJhbnNsYXRpb25fY2FjaGVf
+ZW50cnkgKmN0ZTsKPj4+PiArwqDCoMKgIHN0cnVjdCB2Z2ljX2lycSAqaXJxID0gTlVMTDsKPj4+
+PiArCj4+Pj4gK8KgwqDCoCBsaXN0X2Zvcl9lYWNoX2VudHJ5KGN0ZSwgJmRpc3QtPmxwaV90cmFu
+c2xhdGlvbl9jYWNoZSwgZW50cnkpIHsKPj4+PiArwqDCoMKgwqDCoMKgwqAgLyoKPj4+PiArwqDC
+oMKgwqDCoMKgwqDCoCAqIElmIHdlIGhpdCBhIE5VTEwgZW50cnksIHRoZXJlIGlzIG5vdGhpbmcg
+YWZ0ZXIgdGhpcwo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgICogcG9pbnQuCj4+Pj4gK8KgwqDCoMKg
+wqDCoMKgwqAgKi8KPj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKCFjdGUtPmlycSkKPj4+PiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsKPj4+PiArCj4+Pj4gK8KgwqDCoMKgwqDCoMKgIGlm
+IChjdGUtPmRiID09IGRiICYmCj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY3RlLT5kZXZp
+ZCA9PSBkZXZpZCAmJgo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGN0ZS0+ZXZlbnRpZCA9
+PSBldmVudGlkKSB7Cj4+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyoKPj4+PiArwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgICogTW92ZSB0aGlzIGVudHJ5IHRvIHRoZSBoZWFkLCBhcyBpdCBp
+cyB0aGUKPj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogbW9zdCByZWNlbnRseSB1c2Vk
+Lgo+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPj4+PiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBsaXN0X21vdmUoJmN0ZS0+ZW50cnksICZkaXN0LT5scGlfdHJhbnNsYXRpb25fY2Fj
+aGUpOwo+Pj4KPj4+IE9ubHkgZm9yIHBlcmZvcm1hbmNlIHJlYXNvbnM6IGlmIHdlIGhpdCBhdCB0
+aGUgImhlYWQiIG9mIHRoZSBsaXN0LCB3ZQo+Pj4gZG9uJ3QgbmVlZCB0byBkbyBhIGxpc3RfbW92
+ZSgpLgo+Pj4gSW4gb3VyIHRlc3RzLCB3ZSBmb3VuZCB0aGF0IGEgc2luZ2xlIGxpc3RfbW92ZSgp
+IHRha2VzIG5lYXJseSAoc29tZXRpbWVzCj4+PiBldmVuIG1vcmUgdGhhbikgb25lIG1pY3Jvc2Vj
+b25kLCBmb3Igc29tZSB1bmtub3duIHJlYXNvbi4uLgoKcy9vbmUgbWljcm9zZWNvbmQvNTAwIG5h
+bm9zZWNvbmRzLwooSSBnb3QgdGhlIHZhbHVlIG9mIENOVEZSUSB3cm9uZywgc29ycnkuKQoKPj4K
+Pj4gSHVoLi4uIFRoYXQncyBvZGQuCj4+Cj4+IENhbiB5b3UgbmFycm93IGRvd24gdW5kZXIgd2hp
+Y2ggY29uZGl0aW9ucyB0aGlzIGhhcHBlbnM/IEknbSBub3Qgc3VyZSBpZgo+PiBjaGVja2luZyBm
+b3IgdGhlIGxpc3QgaGVhZCB3b3VsZCBiZSBtb3JlIGVmZmljaWVudCwgYXMgeW91IGVuZC11cAo+
+PiBmZXRjaGluZyB0aGUgaGVhZCBhbnl3YXkuIENhbiB5b3UgdHJ5IHJlcGxhY2luZyB0aGlzIGxp
+bmUgd2l0aDoKPj4KPj4gwqDCoMKgwqBpZiAoIWxpc3RfaXNfZmlyc3QoJmN0ZS0+ZW50cnksICZk
+aXN0LT5scGlfdHJhbnNsYXRpb25fY2FjaGUpKQo+PiDCoMKgwqDCoMKgwqDCoCBsaXN0X21vdmUo
+JmN0ZS0+ZW50cnksICZkaXN0LT5scGlfdHJhbnNsYXRpb25fY2FjaGUpOwo+Pgo+PiBhbmQgbGV0
+IG1lIGtub3cgd2hldGhlciBpdCBoZWxwcz8KPiAKPiBJdCBoZWxwcy4gV2l0aCB0aGlzIGNoYW5n
+ZSwgdGhlIG92ZXJoZWFkIG9mIGxpc3RfbW92ZSgpIGlzIGdvbmUuCj4gCj4gV2UgcnVuIDE2IDQt
+dmNwdSBWTXMgb24gdGhlIGhvc3QsIGVhY2ggd2l0aCBhIHZob3N0LXVzZXIgbmljLCBhbmQgcnVu
+Cj4gImlwZXJmIiBpbiBwYWlycyBiZXR3ZWVuIHRoZW0uwqAgSXQncyBsaWtlbHkgdG8gaGl0IGF0
+IHRoZSBoZWFkIG9mIHRoZQo+IGNhY2hlIGxpc3QgaW4gb3VyIHRlc3RzLgo+IFdpdGggdGhpcyBj
+aGFuZ2UsIHRoZSBzeXMlIHV0aWxpemF0aW9uIG9mIHZob3N0ZHBmd2QgdGhyZWFkcyB3aWxsCj4g
+ZGVjcmVhc2UgYnkgYWJvdXQgMTAlLsKgIEJ1dCBJIGRvbid0IGtub3cgdGhlIHJlYXNvbiBleGFj
+dGx5IChJIGhhdmVuJ3QKPiBmb3VuZCBhbnkgY2x1ZXMgaW4gY29kZSB5ZXQsIGluIGltcGxlbWVu
+dGF0aW9uIG9mIGxpc3RfbW92ZS4uLikuCj4gCj4gCj4gVGhhbmtzLAo+IHplbmdodWkKPiAKPiAK
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
