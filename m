@@ -2,90 +2,86 @@ Return-Path: <SRS0=ia35=U5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D65A3C5B57E
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 10:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54748C5B57E
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 15:19:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 419F020663
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 10:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C46E8206E0
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 15:19:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="nR9mggtS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 419F020663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="pVCmD1l5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C46E8206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66C344A4DF;
-	Sun, 30 Jun 2019 06:50:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DB624A503;
+	Sun, 30 Jun 2019 11:19:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@web.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gq6bghosQxva; Sun, 30 Jun 2019 06:50:07 -0400 (EDT)
+	with ESMTP id wX2rPAactvmk; Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A074A508;
-	Sun, 30 Jun 2019 06:50:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E484A4D5;
+	Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA324A4DF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 06:50:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03BBA4A417
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X6q8XD9OQyvZ for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jun 2019 06:50:04 -0400 (EDT)
-Received: from mout.web.de (mout.web.de [212.227.15.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 561F54A47E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 06:50:04 -0400 (EDT)
+ with ESMTP id 3IM1C32SljPa for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 30 Jun 2019 11:19:08 -0400 (EDT)
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 723884A3B4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 11:19:08 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1561891801;
- bh=wFUVo4i7n+V3Z5o09v/i2Qwehi6NSg2qJtEb/OiNCgc=;
- h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
- b=nR9mggtSOXhESNthWFcWTDWau1Ap7SzcL9NOc6l0rMUvK7rhmiOs8RKtzJQ3JAJve
- np/CBdU6ZtMl/z/UH03CTlFp8YG8CNVMqVB1u3/XjmNwZgbCcA89zpCHUoHBLM91qa
- TA69I3NhirWNaRLgsBN9+9Y0zo3oPn94RzZ9VZj8=
+ s=dbaedf251592; t=1561907945;
+ bh=1hzO1yqzuoU2fg4Q62rIyXmu6NICF9gBDI9a9A6JwII=;
+ h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+ b=pVCmD1l5uDu3WLPNPKm/whdFq6I0+2mJNVv/+ad2kSC6P529pHX4kSqudpJNreQGd
+ MrP/bI1lNh5Kijk8L+jAKocefQV6loNePWpyepm54aBe62NVJEZtIoWTrPDybuVm2t
+ 1Q5SEKGqGi+A+DP/uhV68DuM3vMlXEWSopvmchI0=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MHdwC-1hgS0a3mQO-003KpV; Sun, 30
- Jun 2019 12:50:01 +0200
-Subject: Re: KVM works on RPi4
+Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LkPmd-1iFIWo0xdj-00cUJS; Sun, 30
+ Jun 2019 17:19:05 +0200
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
 From: Jan Kiszka <jan.kiszka@web.de>
-To: Marc Zyngier <marc.zyngier@arm.com>
-References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
- <20190629234232.484ca3c0@why> <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
- <3f6ea07b-975b-3d66-e12d-f0a9cadb83a9@web.de>
-Message-ID: <cbbeb948-23e5-97d9-2410-ef804ae2b80d@web.de>
-Date: Sun, 30 Jun 2019 12:49:59 +0200
+Subject: [PATCH] kvm: arm: Promote KVM_ARM_TARGET_CORTEX_A7 to generic V7 core
+Message-ID: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
+Date: Sun, 30 Jun 2019 17:19:04 +0200
 User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
  Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-In-Reply-To: <3f6ea07b-975b-3d66-e12d-f0a9cadb83a9@web.de>
 Content-Language: en-US
-X-Provags-ID: V03:K1:axysJ3BelgeJrbLFQ8BBG8UY7QGR1050x54XqjETZMZD02IviWJ
- MC9UyM0mJDLQJN1a+SphIUtRpFvnN7RKKxJ0h56JWv/hyzz1zPJtRMcjW8/ygQLwBoXT9r9
- egKzDx9C4b11Y4b8t7L2JLhzQcO/KyMjkiVM0QEFgHznWT799eD3Ji0U31yRkV/32/b4Ua8
- WZv7gBQ1PSa/X5s3y0j6w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Kxg4aAPUBfY=:/s9EBv0nEhlobcqldkBP7p
- qFM+SFzLEy7zJaFdcufGsRFZ9cHxOaeg7Ox9RfAsvqN4dyiJr3iHUU61ToFU4AaXpcuf7MD2l
- DnN+FDDjroDqDvTHApM5pf3brdUnDm69WQEqVWxgHt+14PVoel7R5nA7wTC3CDx8jyXThJV2g
- I+81HP9g7/kmRRLvKf2cNjyhk2jidlWv0JLig46w5A/4VKZ8jS49w/uEKQuDv7G5l6WZl9CxS
- YtvPla9GVVd93jtPQuTwu2t1MuyeNPZH2mNermX3zJsWdRa7Bo5pI4E6coF9ye/JEXFdslb13
- qbojWD9VhHkyZ6TcZhW2qNw5vcRgtKeJOLg5+bVR76euR9JlwsfdnyFZgmIC8qX8JtZLbP6hx
- HcncaZGXM+dh2XzXkw2fFnZfW3iprXEEaIpO3JNN3smvwyfnKdU6o1wV7IfHnqaP5lNkN5Mr+
- j0POBMN8IgSly7kGjTh9zx4Xtal0aqrhXpt2fCGWtlGKf0xmjrvUp1BE1x1kxCqw2dwSr/VTh
- /xE0OHlrR2GF1wzFuBCc8IllH6rwhQ1S5L0hlU/vcCYPn1dYTITTkUXynwr0kzDhiRfWQqQ8t
- 0hVQQczQNwfH55zXHEfZ86VkxcvW5zeSGejSJov+4XqhlIr7d9oKv8BQOl5KKmWHina8wRIQU
- auh1xxaF7A0eODPd662VT6h41rXDUtK070L3Wm4/c6gY490HZhnh0fwFCXvaGsoWMtrzZvcMk
- rkj7X4+JzVgoP7BnWtWV9SN6K0Uk2ydUTp/GC+27gKYo8XXoxCw7rMXz0cHG1lokPENbfkEVN
- AWUrpfzQ5BpZE/uFtSNJDG/GfBy+fbK+0TLSacVa5cQd7gAIJqC9xrn4R0LcfI9HVjPqIgmPy
- 3YO//+OsrCIvwW8kROLoRi9tLZqRHWD12TOhdphTXQZrMFCdmSapfmaFDgibLT5hHmmhYBM/q
- L1JuGZRSXUGEtu3XwwEL9j3lpZdyCguKjKFVs8pyBRO5b7Ee+4/rtpjNjxJe3u5u12wkqYm4Y
- 9ARTUdR32tT5Wc1maPv58Y5YbBbSfh7rEhqoXzswggh+JtS0ezIjZS+fqVyEBpwCNvhAgQxae
- lxX3y/RxlleFJ2Qn+QzTFEILuflTNQXoFO5
-Cc: kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
+X-Provags-ID: V03:K1:S/S0poinZh/eiAEBjJJ0x7oxvYcEnjk1BZhcitM7MWJPf1wBfWi
+ NFNdMcBhXkBPLCP4AHhDp7SNb4R8VWOkRuz15H1J5qoRkj1QfHWZjPo5WiU2+PX7nN2kbm1
+ 0N7LKvU23eSq2fAKgp0QNYpPFXgyUMP/url3E2b60JSJoNNOh+JtyzvSVtBydpgau7ZDbRr
+ YK2ude4yZhRZjSUrvlNWw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gLP2ToO4w7w=:ON/U2A/drwShL7xPSuBFGP
+ A/OvLkrdrrtCntIWy6CCzL9bTvacCA2vlT1paz9PNJfWJjoxYQiOBfKkDyUg8s+dk4gDe9pcn
+ FeaAi74ZfjTFbkISsKoAOz9HZfHSeOLyU4aZDjJrIXntVOpYaFjVkYUg0tS2RfVYcChon3VOg
+ z4FpRFUjRGKHjBEB1NbfY6pjQo4//fiqPbZZAxjG28Gj5qrNdYNN4lQHZGFSzz3navIdcVt9k
+ fSycbG4kqZ3Nj1eit9E+Ce/rrUrdZ7o9qKdVg679wR0ABAj1iUHZ+f+EQIKBppUX1kGOFpCy2
+ jg0NO0NiUNcbgex2bDC5Wqqk9aLWoHuX/YKhWBInNVUHofzgp0T5bvYA2qV7q9BpYJsoxsmxP
+ D+5ledQi3cT2GoXrSGqlucRwit3Q06ZPBEG5ytsdiUP1q1jrTGSU4YFXsLwyEnPFRSqJry0gi
+ 8jAFlsHek9ue80tJyUJHwWfKPktomHhlY8OXy/3rkNE5d1OE18RY5WiTiA6/28zC8xnKyaVT2
+ hT2t5StbfutwE1yuS0q3Qmebpn57biad4sQRy90fE9dyb1wEWxfYPR92s/jCEeoD4GPAwoyDf
+ RCFsDI4QxN0n7AbOvfGCpjdOq6J3zMsl5VWvHGY+YyOINfj7RYS2SsBMKrcSea6TlPz4okhcd
+ RjEs05GyrBRnWzBaaRqPNe0C1VSgKhiRn68AnW1c7GGoutF+UpfT3LNrjekNd//y5lgCqg7Wn
+ 08HtkRS78Urt51jYf+AIUp2TJqFPsXpYDtVBRjBWr3k2f5K17G58U+u89gnlDiohuIaaPw1nh
+ BUpQwgP9Vj9lXv6l6GPQZTHcPxJdrIFHjhFOY3n26Hq1HYi4rVUUmIq99nDUlMyO/GiTRZdHs
+ Rce2WEprzXH+QCFrA93HdId4t23jgXsYYXfWI/UAbi004uUL5yELObz29kaeRb6cETAG9i3Qa
+ 0CqryFNu/r/2IyyyA6ZsOfHXdJdt/xdPZKE29xLC/0R8HmP0+I0+nkF+tbEBKcGVHhOhjjWIj
+ JEnvebU01s7akPL+9fM/OCcXRLQUEernPwqboJRIUBI5KyW8kDRVnsTn/watvgi5nrtomCVZj
+ 38FbLOt7v8f57n/cNtZZcC0IRSah8TT0LWo
+Cc: kvm <kvm@vger.kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,51 +93,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMzAuMDYuMTkgMTI6MTgsIEphbiBLaXN6a2Egd3JvdGU6Cj4gT24gMzAuMDYuMTkgMTE6MzQs
-IEphbiBLaXN6a2Egd3JvdGU6Cj4+IE9uIDMwLjA2LjE5IDAwOjQyLCBNYXJjIFp5bmdpZXIgd3Jv
-dGU6Cj4+PiBPbiBTYXQsIDI5IEp1biAyMDE5IDE5OjA5OjM3ICswMjAwCj4+PiBKYW4gS2lzemth
-IDxqYW4ua2lzemthQHdlYi5kZT4gd3JvdGU6Cj4+Pj4gSG93ZXZlciwgYXMgdGhlIFJhc3BiZXJy
-eSBrZXJuZWwgaXMgbm90IHlldCByZWFkeSBmb3IgNjQtYml0IChhbmQKPj4+PiB1cHN0cmVhbSBp
-cyBub3QgaW4gc2lnaHQpLCBJIGhhZCB0byB1c2UgbGVnYWN5IDMyLWJpdCBtb2RlLiBBbmQgdGhl
-cmUgd2UKPj4+PiBzdHVtYmxlIG92ZXIgdGhlIGNvcmUgZGV0ZWN0aW9uLiBUaGlzIGxpdHRsZSBw
-YXRjaCBtYWRlIGl0IHdvcmssIHRob3VnaDoKPj4+Pgo+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL2Fy
-bS9rdm0vZ3Vlc3QuYyBiL2FyY2gvYXJtL2t2bS9ndWVzdC5jCj4+Pj4gaW5kZXggMmI4ZGU4ODVi
-MmJmLi4wMTYwNmFhZDczY2MgMTAwNjQ0Cj4+Pj4gLS0tIGEvYXJjaC9hcm0va3ZtL2d1ZXN0LmMK
-Pj4+PiArKysgYi9hcmNoL2FybS9rdm0vZ3Vlc3QuYwo+Pj4+IEBAIC0yOTAsNiArMjkwLDcgQEAg
-aW50IF9fYXR0cmlidXRlX2NvbnN0X18ga3ZtX3RhcmdldF9jcHUodm9pZCkKPj4+PiDCoMKgwqDC
-oMKgIGNhc2UgQVJNX0NQVV9QQVJUX0NPUlRFWF9BNzoKPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAg
-cmV0dXJuIEtWTV9BUk1fVEFSR0VUX0NPUlRFWF9BNzsKPj4+PiDCoMKgwqDCoMKgIGNhc2UgQVJN
-X0NQVV9QQVJUX0NPUlRFWF9BMTU6Cj4+Pj4gK8KgwqDCoCBjYXNlIEFSTV9DUFVfUEFSVF9DT1JU
-RVhfQTcyOgo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gS1ZNX0FSTV9UQVJHRVRfQ09S
-VEVYX0ExNTsKPj4+PiDCoMKgwqDCoMKgIGRlZmF1bHQ6Cj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKg
-IHJldHVybiAtRUlOVkFMOwo+Pj4+Cj4+Pj4gVGhhdCByYWlzZXMgdGhlIHF1ZXN0aW9uIGlmIHRo
-aXMgaXMgaGFjayBvciBhIHZhbGlkIGNoYW5nZSBhbmQgaWYgdGhlcmUKPj4+PiBpcyBnZW5lcmFs
-IGludGVyZXN0IGluIG1hcHBpbmcgNjQtYml0IGNvcmVzIG9uIDMyLWJpdCBpZiB0aGV5IGhhcHBl
-biB0bwo+Pj4+IHJ1biBpbiAzMi1iaXQgbW9kZS4KPj4+Cj4+PiBUaGUgcmVhbCB0aGluZyB0byBk
-byBoZXJlIHdvdWxkIGJlIHRvIG1vdmUgdG8gYSBnZW5lcmljIHRhcmdldCwgbXVjaAo+Pj4gbGlr
-ZSB3ZSBkaWQgb24gdGhlIDY0Yml0IHNpZGUuIENvdWxkIHlvdSBpbnZlc3RpZ2F0ZSB0aGF0IGlu
-c3RlYWQ/IEl0Cj4+PiB3b3VsZCBhbHNvIGFsbG93IEtWTSB0byBiZSB1c2VkIG9uIG90aGVyIDMy
-Yml0IGNvcmVzIHN1Y2ggYXMKPj4+IEExMi9BMTcvQTMyLgo+Pgo+PiBZb3UgbWVhbiBzb21ldGhp
-bmcgbGlrZSBLVk1fQVJNX1RBUkdFVF9HRU5FUklDX1Y4PyBOZWVkIHRvIHN0dWR5IHRoYXQuLi4K
-Pj4KPgo+IEhtbSwgbG9va2luZyBhdCB3aGF0IEtWTV9BUk1fVEFSR0VUX0NPUlRFWF9BNyBhbmQg
-Li4uX0ExNSBkaWZmZXJlbnRpYXRlcywgSQo+IGZvdW5kIG5vdGhpbmcgc28gZmFyOgo+Cj4ga3Zt
-X3Jlc2V0X3ZjcHU6Cj4gIMKgwqDCoMKgwqDCoMKgIHN3aXRjaCAodmNwdS0+YXJjaC50YXJnZXQp
-IHsKPiAgwqDCoMKgwqDCoMKgwqAgY2FzZSBLVk1fQVJNX1RBUkdFVF9DT1JURVhfQTc6Cj4gIMKg
-wqDCoMKgwqDCoMKgIGNhc2UgS1ZNX0FSTV9UQVJHRVRfQ09SVEVYX0ExNToKPiAgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJlc2V0X3JlZ3MgPSAmY29ydGV4YV9yZWdzX3Jlc2V0Owo+
-ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdmNwdS0+YXJjaC5taWRyID0gcmVhZF9j
-cHVpZF9pZCgpOwo+ICDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4KPiBB
-bmQgYXJjaC9hcm0va3ZtL2NvcHJvY19hMTUuYyBsb29rcyBsaWtlIGEgY29weSBvZiBjb3Byb2Nf
-YTcuYywganVzdCB3aXRoIHNvbWUKPiBzeW1ib2xzIHJlbmFtZWQuCgpPSywgZm91bmQgaXQ6IFRo
-ZSByZXNldCB2YWx1ZXMgb2YgU0NUTFIgZGlmZmVyLCBpbiBvbmUgYml0LiBBMTUgc3RhcnRzIHdp
-dGgKYnJhbmNoIHByZWRpY3Rpb24gKDExKSBvZmYsIEE3IHdpdGggdGhhdCBmZWF0dXJlIGVuYWJs
-ZWQuIFF1aXRlIHNvbWUgYm9pbGVycGxhdGUKY29kZSBmb3IgbWFuYWdpbmcgYSBzaW5nbGUgYml0
-LgoKRm9yIGEgZ2VuZXJpYyB0YXJnZXQsIGNhbiB3ZSBzaW1wbHkgYXNzdW1lIEExNSByZXNldCBi
-ZWhhdmlvdXI/CgpKYW4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
-dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+From: Jan Kiszka <jan.kiszka@siemens.com>
+
+The only difference between the currently supported A15 and A7 target
+cores is the reset state of bit 11 in SCTLR. This bit is RES1 or RAO/WI
+in other ARM cores, including ARMv8 ones. By promoting A7 to a generic
+default target, this allows to use yet unsupported core types. E.g.,
+this enables KVM on the A72 of the RPi4.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ arch/arm/include/uapi/asm/kvm.h                |  1 +
+ arch/arm/kvm/Makefile                          |  2 +-
+ arch/arm/kvm/{coproc_a7.c => coproc_generic.c} | 18 +++++++++---------
+ arch/arm/kvm/guest.c                           |  4 +---
+ arch/arm/kvm/reset.c                           |  5 +----
+ 5 files changed, 13 insertions(+), 17 deletions(-)
+ rename arch/arm/kvm/{coproc_a7.c => coproc_generic.c} (70%)
+
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 4602464ebdfb..e0c5bbec3d3d 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -70,6 +70,7 @@ struct kvm_regs {
+ /* Supported Processor Types */
+ #define KVM_ARM_TARGET_CORTEX_A15	0
+ #define KVM_ARM_TARGET_CORTEX_A7	1
++#define KVM_ARM_TARGET_GENERIC_V7	KVM_ARM_TARGET_CORTEX_A7
+ #define KVM_ARM_NUM_TARGETS		2
+
+ /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index 531e59f5be9c..d959f89135d6 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -21,7 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += handle_exit.o guest.o emulate.o reset.o
+-obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
++obj-y += coproc.o coproc_a15.o coproc_generic.o   vgic-v3-coproc.o
+ obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+ obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+ obj-y += $(KVM)/arm/aarch32.o
+diff --git a/arch/arm/kvm/coproc_a7.c b/arch/arm/kvm/coproc_generic.c
+similarity index 70%
+rename from arch/arm/kvm/coproc_a7.c
+rename to arch/arm/kvm/coproc_generic.c
+index 40f643e1e05c..b32a541ad7bf 100644
+--- a/arch/arm/kvm/coproc_a7.c
++++ b/arch/arm/kvm/coproc_generic.c
+@@ -15,28 +15,28 @@
+ #include "coproc.h"
+
+ /*
+- * Cortex-A7 specific CP15 registers.
++ * Generic CP15 registers.
+  * CRn denotes the primary register number, but is copied to the CRm in the
+  * user space API for 64-bit register access in line with the terminology used
+  * in the ARM ARM.
+  * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and with 64-bit
+  *            registers preceding 32-bit ones.
+  */
+-static const struct coproc_reg a7_regs[] = {
++static const struct coproc_reg generic_regs[] = {
+ 	/* SCTLR: swapped by interrupt.S. */
+ 	{ CRn( 1), CRm( 0), Op1( 0), Op2( 0), is32,
+ 			access_vm_reg, reset_val, c1_SCTLR, 0x00C50878 },
+ };
+
+-static struct kvm_coproc_target_table a7_target_table = {
+-	.target = KVM_ARM_TARGET_CORTEX_A7,
+-	.table = a7_regs,
+-	.num = ARRAY_SIZE(a7_regs),
++static struct kvm_coproc_target_table generic_target_table = {
++	.target = KVM_ARM_TARGET_GENERIC_V7,
++	.table = generic_regs,
++	.num = ARRAY_SIZE(generic_regs),
+ };
+
+-static int __init coproc_a7_init(void)
++static int __init coproc_generic_init(void)
+ {
+-	kvm_register_target_coproc_table(&a7_target_table);
++	kvm_register_target_coproc_table(&generic_target_table);
+ 	return 0;
+ }
+-late_initcall(coproc_a7_init);
++late_initcall(coproc_generic_init);
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index 684cf64b4033..d33a24e70f49 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -275,12 +275,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ int __attribute_const__ kvm_target_cpu(void)
+ {
+ 	switch (read_cpuid_part()) {
+-	case ARM_CPU_PART_CORTEX_A7:
+-		return KVM_ARM_TARGET_CORTEX_A7;
+ 	case ARM_CPU_PART_CORTEX_A15:
+ 		return KVM_ARM_TARGET_CORTEX_A15;
+ 	default:
+-		return -EINVAL;
++		return KVM_ARM_TARGET_GENERIC_V7;
+ 	}
+ }
+
+diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+index eb4174f6ebbd..d6e07500bab4 100644
+--- a/arch/arm/kvm/reset.c
++++ b/arch/arm/kvm/reset.c
+@@ -43,13 +43,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	struct kvm_regs *reset_regs;
+
+ 	switch (vcpu->arch.target) {
+-	case KVM_ARM_TARGET_CORTEX_A7:
+-	case KVM_ARM_TARGET_CORTEX_A15:
++	default:
+ 		reset_regs = &cortexa_regs_reset;
+ 		vcpu->arch.midr = read_cpuid_id();
+ 		break;
+-	default:
+-		return -ENODEV;
+ 	}
+
+ 	/* Reset core registers */
+--
+2.16.4
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
