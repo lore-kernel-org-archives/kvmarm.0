@@ -2,88 +2,89 @@ Return-Path: <SRS0=ia35=U5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B4F4C5B576
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 04:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A6CC5B57E
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 09:34:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B732A2089C
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 04:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4FAE20659
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 09:34:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="j72oOEAi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B732A2089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="GWYiWnjk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4FAE20659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BAB44A483;
-	Sun, 30 Jun 2019 00:30:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213B54A506;
+	Sun, 30 Jun 2019 05:34:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@web.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZDIBN-kDYMnN; Sun, 30 Jun 2019 00:30:03 -0400 (EDT)
+	with ESMTP id Y1rMXTyebgF0; Sun, 30 Jun 2019 05:34:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 643C44A4FA;
-	Sun, 30 Jun 2019 00:30:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E3DC4A4C1;
+	Sun, 30 Jun 2019 05:34:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE994A47E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 00:30:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0294A4C1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 05:34:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xmlptOLTKLqO for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jun 2019 00:30:01 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9C084A47A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 00:30:00 -0400 (EDT)
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
- [209.85.128.50])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 90BCE217F5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 04:29:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1561868999;
- bh=cQSFOfkpKMob0CUu8153N6DUVyC3npdxm62i1j4VpIw=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=j72oOEAif2V94f0mwKfr5J/PRx+YFli4yICxddcq/LIiS7JQ+YKk1YGF4PSgQDKL7
- IMJd+IOSbwJSo6k5b1N04qP590P8btcmtnruiRG/EpAmzvilpIrTFErZtfqeXBnnsi
- 04dlqRLB1LypljThQz/jstMx1/Gu9frEnC0Vy7yo=
-Received: by mail-wm1-f50.google.com with SMTP id f17so12497748wme.2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Jun 2019 21:29:59 -0700 (PDT)
-X-Gm-Message-State: APjAAAVvtuxjeRGc1I3X+f7Rog5YIyp+udfikmV/3o7vEU2zz7vtbO7e
- m02Q3B27FJ3O0jwP5TsEhUKZv0fVi7bKt8ctR5M=
-X-Google-Smtp-Source: APXvYqykrDoGZznjGRXJXJkVCBwA9280hX7gYGYy3Dbo1kbGt1iT4Zj+H8TCZ/zglBC8rdfd2ydmBM/xQE7cDlA9Xmo=
-X-Received: by 2002:a1c:6545:: with SMTP id z66mr12063849wmb.77.1561868998022; 
- Sat, 29 Jun 2019 21:29:58 -0700 (PDT)
+ with ESMTP id KHGrl-s8gQ1c for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 30 Jun 2019 05:34:30 -0400 (EDT)
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 636304A4A4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 05:34:30 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1561887267;
+ bh=7JfDrC9uP9c3hnWWgcrZIsPj6pfmHbWDcl5DMU+xFH4=;
+ h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+ b=GWYiWnjkxOwZqVVMX23ffnq49RJmi6tb7czBzVnotcJ9o9Kzoe6K5NQQoWwzsV+vj
+ kVMhF5kLn6/cFOToOnEN+h6MR55RYE1Jp+DYDqtBhgaAMTrDtGNtaFmY5AYA8JeVkW
+ w7QiD8696adFP82BPYqzFykL4mFELoIIIgNAp23Q=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MhlT9-1hvd0C1NnX-00MuWQ; Sun, 30
+ Jun 2019 11:34:27 +0200
+Subject: Re: KVM works on RPi4
+To: Marc Zyngier <marc.zyngier@arm.com>
+References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
+ <20190629234232.484ca3c0@why>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
+Date: Sun, 30 Jun 2019 11:34:25 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+ Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-References: <20190321163623.20219-1-julien.grall@arm.com>
- <20190321163623.20219-12-julien.grall@arm.com>
- <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
- <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
- <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
- <CAJF2gTStSR7Jmu7=HaO5Wxz=Zn8A5-RD8ktori3oKEhM9vozAA@mail.gmail.com>
- <20190621141606.GF18954@arrakis.emea.arm.com>
- <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
- <20190624153820.GH29120@arrakis.emea.arm.com>
-In-Reply-To: <20190624153820.GH29120@arrakis.emea.arm.com>
-From: Guo Ren <guoren@kernel.org>
-Date: Sun, 30 Jun 2019 12:29:46 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
-Message-ID: <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
-Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
- separate file
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: aou@eecs.berkeley.edu, Marc Zyngier <marc.zyngier@arm.com>,
- Anup Patel <anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
- linux-kernel@vger.kernel.org, rppt@linux.ibm.com, hch@infradead.org,
- Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
- Palmer Dabbelt <palmer@sifive.com>, gary@garyguo.net, paul.walmsley@sifive.com,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190629234232.484ca3c0@why>
+Content-Language: en-US
+X-Provags-ID: V03:K1:tyRIyK9SNwr5ypgeQQsNhbL9DVzUZo/Ya6rlq54GMLJKiiRWh7D
+ ARU9W0m1TJtH1mRGdCdo/LIxT6XmMBAMqPkHMh3NQbYaXwSS+EJPKJLXUmG09NAMU+7PGnG
+ UZEhjhHhs1ghDR4tfxeTuHPtecwF56EJspp9i4idfr0N025+o+IoGfCn16v3oT6tARGRfq8
+ sp+Cee1edjotk5yVg4LKg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FubqFI9F6s0=:WvGcBqr+FAmFglGaVzebEK
+ WHPLtzq3vErPW+vL3gUgL/9UnbZ7CUByd2UC0hbi3meqe9VPdD+3csSw69g35gkphiciVDyOO
+ TtHcW/6r9lxPl44ECLJsD/h7pfl4nNm2q/NVEELkDBsyiT/k65tLp4PabBmFF9/Ee7ED3o2iL
+ PYCkVL5Jb2tWGUnjGRg/JjBG2T4luuyBZKBSDavR3t9+XDR6RW89rJ0Gp/7er71IsHeajP4h6
+ pAmSz13CNISHFbGZ9kOyTWbBdeWZTmu/ngU10KrJXqnHmM1riIHD8+FtFVGiZKBUrV3AFBHou
+ +1SGxkMUVxY731xEmqEgSUJPRLTSf8ZlG8CERnKNe2gqNWTJDt8fwJv2GBour21X0S7Dd09qp
+ wlB88lOH7tNK1K3ZUQU755ytw3YToD7Os995VfMHIi87sj5QP9PAbtTUkCraKV/MRhKtKgxvL
+ Nmp38B/20Dcl1DN/bTxraEyaGyAIlt0snVw8blK3duGipvNin3mpiJ9yA7L/fErXNQwPVZRHr
+ +XvwyByUCpKReE1terSEvbkYUhxNak/h7k4w6iCoUKxWypQIpzQ5zgaXbwzLmCFXh+gzmpwTO
+ xaFMSyqHQ/RcsXM9Q4tEVQeMFig9OBtCUM6pHp2OY8X/xjMpTpO4ZQh4ugC1lxcosLx9H1ggw
+ yq8EJww9bPgpWghalZNJMz3Wq+UxgoNGcwXTfKgJ7dZNXpxk+D4jzHBOzBkUxrHjAj7hWd88L
+ wM8EOyUWb4f5NEJqrIA41Z4KVJmOdDkMu+Q8/kU7bGDrHtv1CfrEuiDiDZ/uwTok8iWYfLdE1
+ J28nfxFTqqCkFAHLqlQ7vh0PEWmz8bQ+Fagk6OkL0FGN8lHAJ9QNemBlhVU7F013NqnmO3EZV
+ SpBmXsRIW7XZKlWZClOBGKdUDjiuMUglzehLZ7A7QFSA01hI44ZSJWcLNqtcXAPQ2e55Nc0B+
+ JZoiVlMl/Xl7yIT/OzNx86/fYmpID9DLxnR6UHCWmZPVKk1SvbEi0FJhlFl4t6Qp7Pp+iX2Bk
+ oncQZa7w5OK6GFy8RFrBpwKbrPUMxSQ0u9JhtPM/rU7EEWBVYqPJeUigvdso7P95LmJGUQBXG
+ 7Kx56vI9Vy+1lFSw6M6f/rVK+D0kREkq+2u
+Cc: kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,47 +96,86 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marinas,
-
-Thx for the reply
-
-On Mon, Jun 24, 2019 at 11:38 PM Catalin Marinas
-<catalin.marinas@arm.com> wrote:
+On 30.06.19 00:42, Marc Zyngier wrote:
+> On Sat, 29 Jun 2019 19:09:37 +0200
+> Jan Kiszka <jan.kiszka@web.de> wrote:
 >
-> On Mon, Jun 24, 2019 at 12:35:35AM +0800, Guo Ren wrote:
-> > On Fri, Jun 21, 2019 at 10:16 PM Catalin Marinas
-> > <catalin.marinas@arm.com> wrote:
-> > > BTW, if you find the algorithm fairly straightforward ;), see this
-> > > bug-fix which took a formal model to identify: a8ffaaa060b8 ("arm64:
-> > > asid: Do not replace active_asids if already 0").
-> [...]
-> > Btw, Is this detected by arm's aisd allocator TLA+ model ? Or a real
-> > bug report ?
+> Hi Jan,
 >
-> This specific bug was found by the TLA+ model checker (at the time we
-> were actually tracking down another bug with multi-threaded CPU sharing
-> the TLB, bug also confirmed by the formal model).
-Could you tell me the ref-link about "another bug with multi-threaded
-CPU sharing the TLB" ?
+>> Hi all,
+>>
+>> just got KVM running on the Raspberry Pi4. Seems they now embedded all
+>> required logic into that new SoC.
+>
+> Yeah, someone saw the light and decided to enter the 21st century by
+> attaching a GICv2 to the thing. Who knows, they may plug a GICv3 and a
+> SMMU in 2050 at that rate! ;-)
+>
 
-In my concept, the multi-core asid mechanism is also applicable to
-multi-thread shared TLB, but it will generate redundant tlbflush. From
-the software design logic, multi-threaded is treated as multi-cores
-without error, but performance is not optimized. So in my RFC PATCH:
-[1], I try to reduce multi-threads' tlbflush in one CPU core with the
-fixed cpu ID bitmap hypothesis.
+Optimistic.
 
-1: https://lore.kernel.org/linux-csky/CAJF2gTQ0xQtQY1t-g9FgWaxfDXppMkFooCQzTFy7+ouwUfyA6w@mail.gmail.com/T/#m2ed464d2dfb45ac6f5547fb3936adf2da456cb65
---
-Best Regards
- Guo Ren
+>> However, as the Raspberry kernel is not yet ready for 64-bit (and
+>> upstream is not in sight), I had to use legacy 32-bit mode. And there we
+>> stumble over the core detection. This little patch made it work, though:
+>>
+>> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+>> index 2b8de885b2bf..01606aad73cc 100644
+>> --- a/arch/arm/kvm/guest.c
+>> +++ b/arch/arm/kvm/guest.c
+>> @@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
+>>   	case ARM_CPU_PART_CORTEX_A7:
+>>   		return KVM_ARM_TARGET_CORTEX_A7;
+>>   	case ARM_CPU_PART_CORTEX_A15:
+>> +	case ARM_CPU_PART_CORTEX_A72:
+>>   		return KVM_ARM_TARGET_CORTEX_A15;
+>>   	default:
+>>   		return -EINVAL;
+>>
+>> That raises the question if this is hack or a valid change and if there
+>> is general interest in mapping 64-bit cores on 32-bit if they happen to
+>> run in 32-bit mode.
+>
+> The real thing to do here would be to move to a generic target, much
+> like we did on the 64bit side. Could you investigate that instead? It
+> would also allow KVM to be used on other 32bit cores such as
+> A12/A17/A32.
 
-ML: https://lore.kernel.org/linux-csky/
+You mean something like KVM_ARM_TARGET_GENERIC_V8? Need to study that...
+
+>
+> Although some would argue that the *real* real thing to do would be "rm
+> -rf arch/arm/kvm" and be done with it, but that's a discussion for next
+> week... ;-)
+>
+>> Jan
+>>
+>> PS: The RPi device tree lacks description of the GICH maintenance
+>> interrupts. Seems KVM is fine without that - because it has the
+>> information hard-coded or because it can live without that interrupt?
+>
+> Nah, it really should have an interrupt here. You can end-up in
+> situation where new virtual interrupts are delayed until the next
+> natural exit if you don't get a maintenance interrupt. Feels like a bug.
+
+Probably just in their DT. How can I check if the maintenance IRQ is working?
+
+>
+> Anyway, if you know of any effort to get a 64bit kernel on that thing,
+> I'm interested in helping. I bought one on Monday, but didn't get a
+> change to do any hacking on it just yet...
+
+I played with compiling the rpi kernel for 64-bit. Lots of pieces from the
+graphic drivers are falling from the truck, but you can make it build at least.
+Not that it boots so far or gives any early messages. Probably that is the reason:
+
+https://github.com/raspberrypi/linux/issues/3032
+
+Jan
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
