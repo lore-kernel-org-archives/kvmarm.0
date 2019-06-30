@@ -1,57 +1,89 @@
-Return-Path: <SRS0=NTVD=U4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ia35=U5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF47EC5B57B
-	for <kvmarm@archiver.kernel.org>; Sat, 29 Jun 2019 22:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B4F4C5B576
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 04:30:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 75F9E2086D
-	for <kvmarm@archiver.kernel.org>; Sat, 29 Jun 2019 22:42:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F9E2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B732A2089C
+	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 04:30:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="j72oOEAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B732A2089C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC45B4A4F0;
-	Sat, 29 Jun 2019 18:42:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BAB44A483;
+	Sun, 30 Jun 2019 00:30:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7ZCzBkFaSt-b; Sat, 29 Jun 2019 18:42:44 -0400 (EDT)
+	with ESMTP id ZDIBN-kDYMnN; Sun, 30 Jun 2019 00:30:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79AC34A4F6;
-	Sat, 29 Jun 2019 18:42:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 643C44A4FA;
+	Sun, 30 Jun 2019 00:30:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E26664A4EC
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Jun 2019 18:42:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE994A47E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 00:30:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A0eTbUc61M4S for <kvmarm@lists.cs.columbia.edu>;
- Sat, 29 Jun 2019 18:42:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7D64A479
- for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Jun 2019 18:42:41 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA799344;
- Sat, 29 Jun 2019 15:42:40 -0700 (PDT)
-Received: from why (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 118E73F246;
- Sat, 29 Jun 2019 15:42:39 -0700 (PDT)
-Date: Sat, 29 Jun 2019 23:42:32 +0100
-From: Marc Zyngier <marc.zyngier@arm.com>
-To: Jan Kiszka <jan.kiszka@web.de>
-Subject: Re: KVM works on RPi4
-Message-ID: <20190629234232.484ca3c0@why>
-In-Reply-To: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
-References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
-Organization: ARM Ltd
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id xmlptOLTKLqO for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 30 Jun 2019 00:30:01 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9C084A47A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 00:30:00 -0400 (EDT)
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
+ [209.85.128.50])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 90BCE217F5
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 04:29:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1561868999;
+ bh=cQSFOfkpKMob0CUu8153N6DUVyC3npdxm62i1j4VpIw=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=j72oOEAif2V94f0mwKfr5J/PRx+YFli4yICxddcq/LIiS7JQ+YKk1YGF4PSgQDKL7
+ IMJd+IOSbwJSo6k5b1N04qP590P8btcmtnruiRG/EpAmzvilpIrTFErZtfqeXBnnsi
+ 04dlqRLB1LypljThQz/jstMx1/Gu9frEnC0Vy7yo=
+Received: by mail-wm1-f50.google.com with SMTP id f17so12497748wme.2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 29 Jun 2019 21:29:59 -0700 (PDT)
+X-Gm-Message-State: APjAAAVvtuxjeRGc1I3X+f7Rog5YIyp+udfikmV/3o7vEU2zz7vtbO7e
+ m02Q3B27FJ3O0jwP5TsEhUKZv0fVi7bKt8ctR5M=
+X-Google-Smtp-Source: APXvYqykrDoGZznjGRXJXJkVCBwA9280hX7gYGYy3Dbo1kbGt1iT4Zj+H8TCZ/zglBC8rdfd2ydmBM/xQE7cDlA9Xmo=
+X-Received: by 2002:a1c:6545:: with SMTP id z66mr12063849wmb.77.1561868998022; 
+ Sat, 29 Jun 2019 21:29:58 -0700 (PDT)
 MIME-Version: 1.0
-Cc: kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
+References: <20190321163623.20219-1-julien.grall@arm.com>
+ <20190321163623.20219-12-julien.grall@arm.com>
+ <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
+ <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
+ <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
+ <CAJF2gTStSR7Jmu7=HaO5Wxz=Zn8A5-RD8ktori3oKEhM9vozAA@mail.gmail.com>
+ <20190621141606.GF18954@arrakis.emea.arm.com>
+ <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
+ <20190624153820.GH29120@arrakis.emea.arm.com>
+In-Reply-To: <20190624153820.GH29120@arrakis.emea.arm.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Sun, 30 Jun 2019 12:29:46 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
+Message-ID: <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
+Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
+ separate file
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: aou@eecs.berkeley.edu, Marc Zyngier <marc.zyngier@arm.com>,
+ Anup Patel <anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, rppt@linux.ibm.com, hch@infradead.org,
+ Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
+ Palmer Dabbelt <palmer@sifive.com>, gary@garyguo.net, paul.walmsley@sifive.com,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,67 +100,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 29 Jun 2019 19:09:37 +0200
-Jan Kiszka <jan.kiszka@web.de> wrote:
+Hi Marinas,
 
-Hi Jan,
+Thx for the reply
 
-> Hi all,
-> 
-> just got KVM running on the Raspberry Pi4. Seems they now embedded all
-> required logic into that new SoC.
+On Mon, Jun 24, 2019 at 11:38 PM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> On Mon, Jun 24, 2019 at 12:35:35AM +0800, Guo Ren wrote:
+> > On Fri, Jun 21, 2019 at 10:16 PM Catalin Marinas
+> > <catalin.marinas@arm.com> wrote:
+> > > BTW, if you find the algorithm fairly straightforward ;), see this
+> > > bug-fix which took a formal model to identify: a8ffaaa060b8 ("arm64:
+> > > asid: Do not replace active_asids if already 0").
+> [...]
+> > Btw, Is this detected by arm's aisd allocator TLA+ model ? Or a real
+> > bug report ?
+>
+> This specific bug was found by the TLA+ model checker (at the time we
+> were actually tracking down another bug with multi-threaded CPU sharing
+> the TLB, bug also confirmed by the formal model).
+Could you tell me the ref-link about "another bug with multi-threaded
+CPU sharing the TLB" ?
 
-Yeah, someone saw the light and decided to enter the 21st century by
-attaching a GICv2 to the thing. Who knows, they may plug a GICv3 and a
-SMMU in 2050 at that rate! ;-)
+In my concept, the multi-core asid mechanism is also applicable to
+multi-thread shared TLB, but it will generate redundant tlbflush. From
+the software design logic, multi-threaded is treated as multi-cores
+without error, but performance is not optimized. So in my RFC PATCH:
+[1], I try to reduce multi-threads' tlbflush in one CPU core with the
+fixed cpu ID bitmap hypothesis.
 
-> However, as the Raspberry kernel is not yet ready for 64-bit (and
-> upstream is not in sight), I had to use legacy 32-bit mode. And there we
-> stumble over the core detection. This little patch made it work, though:
-> 
-> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-> index 2b8de885b2bf..01606aad73cc 100644
-> --- a/arch/arm/kvm/guest.c
-> +++ b/arch/arm/kvm/guest.c
-> @@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
->  	case ARM_CPU_PART_CORTEX_A7:
->  		return KVM_ARM_TARGET_CORTEX_A7;
->  	case ARM_CPU_PART_CORTEX_A15:
-> +	case ARM_CPU_PART_CORTEX_A72:
->  		return KVM_ARM_TARGET_CORTEX_A15;
->  	default:
->  		return -EINVAL;
-> 
-> That raises the question if this is hack or a valid change and if there
-> is general interest in mapping 64-bit cores on 32-bit if they happen to
-> run in 32-bit mode.
+1: https://lore.kernel.org/linux-csky/CAJF2gTQ0xQtQY1t-g9FgWaxfDXppMkFooCQzTFy7+ouwUfyA6w@mail.gmail.com/T/#m2ed464d2dfb45ac6f5547fb3936adf2da456cb65
+--
+Best Regards
+ Guo Ren
 
-The real thing to do here would be to move to a generic target, much
-like we did on the 64bit side. Could you investigate that instead? It
-would also allow KVM to be used on other 32bit cores such as
-A12/A17/A32.
-
-Although some would argue that the *real* real thing to do would be "rm
--rf arch/arm/kvm" and be done with it, but that's a discussion for next
-week... ;-)
-
-> Jan
-> 
-> PS: The RPi device tree lacks description of the GICH maintenance
-> interrupts. Seems KVM is fine without that - because it has the
-> information hard-coded or because it can live without that interrupt?
-
-Nah, it really should have an interrupt here. You can end-up in
-situation where new virtual interrupts are delayed until the next
-natural exit if you don't get a maintenance interrupt. Feels like a bug.
-
-Anyway, if you know of any effort to get a 64bit kernel on that thing,
-I'm interested in helping. I bought one on Monday, but didn't get a
-change to do any hacking on it just yet...
-
-Thanks,
-
-	M.
+ML: https://lore.kernel.org/linux-csky/
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
