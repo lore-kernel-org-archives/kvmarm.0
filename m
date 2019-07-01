@@ -2,61 +2,72 @@ Return-Path: <SRS0=uL1D=U6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12868C0650E
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 09:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5639AC0650E
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 09:17:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 98EE5213F2
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 09:10:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EE5213F2
+	by mail.kernel.org (Postfix) with ESMTP id E437B213F2
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 09:17:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E437B213F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F24C24A4EB;
-	Mon,  1 Jul 2019 05:10:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D0654A389;
+	Mon,  1 Jul 2019 05:17:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KwEXk5Qek6pA; Mon,  1 Jul 2019 05:10:41 -0400 (EDT)
+	with ESMTP id sYCgHbbYO55E; Mon,  1 Jul 2019 05:17:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ADCA4A36B;
-	Mon,  1 Jul 2019 05:10:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 034854A418;
+	Mon,  1 Jul 2019 05:17:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 315EC4A36B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 05:10:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC8A4A379
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 05:17:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rm+Y+cGXx4HG for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Jul 2019 05:10:38 -0400 (EDT)
+ with ESMTP id fBlJWbId+uah for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Jul 2019 05:17:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F1BE4A331
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 05:10:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36BEB4A36B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 05:17:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B88F9CFC;
- Mon,  1 Jul 2019 02:10:37 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D5883F718;
- Mon,  1 Jul 2019 02:10:36 -0700 (PDT)
-Subject: Re: [PATCH 39/59] KVM: arm64: nv: Move last_vcpu_ran to be per s2 mmu
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-40-marc.zyngier@arm.com>
-From: Julien Thierry <julien.thierry@arm.com>
-Message-ID: <d38630df-2191-0a9e-3063-fb162bec6d9a@arm.com>
-Date: Mon, 1 Jul 2019 10:10:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1A8BCFC;
+ Mon,  1 Jul 2019 02:17:16 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ 62CC23F718; Mon,  1 Jul 2019 02:17:14 -0700 (PDT)
+Date: Mon, 1 Jul 2019 10:17:12 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Guo Ren <guoren@kernel.org>
+Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
+ separate file
+Message-ID: <20190701091711.GA21774@arrakis.emea.arm.com>
+References: <20190321163623.20219-1-julien.grall@arm.com>
+ <20190321163623.20219-12-julien.grall@arm.com>
+ <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
+ <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
+ <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
+ <CAJF2gTStSR7Jmu7=HaO5Wxz=Zn8A5-RD8ktori3oKEhM9vozAA@mail.gmail.com>
+ <20190621141606.GF18954@arrakis.emea.arm.com>
+ <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
+ <20190624153820.GH29120@arrakis.emea.arm.com>
+ <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-40-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Content-Disposition: inline
+In-Reply-To: <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: aou@eecs.berkeley.edu, Marc Zyngier <marc.zyngier@arm.com>,
+ Anup Patel <anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
+ linux-kernel@vger.kernel.org, rppt@linux.ibm.com, hch@infradead.org,
+ Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
+ Palmer Dabbelt <palmer@sifive.com>, gary@garyguo.net, paul.walmsley@sifive.com,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,284 +84,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 21/06/2019 10:38, Marc Zyngier wrote:
-> last_vcpu_ran has to be per s2 mmu now that we can have multiple S2
-> per VM. Let's take this opportunity to perform some cleanup.
+On Sun, Jun 30, 2019 at 12:29:46PM +0800, Guo Ren wrote:
+> On Mon, Jun 24, 2019 at 11:38 PM Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > On Mon, Jun 24, 2019 at 12:35:35AM +0800, Guo Ren wrote:
+> > > On Fri, Jun 21, 2019 at 10:16 PM Catalin Marinas
+> > > <catalin.marinas@arm.com> wrote:
+> > > > BTW, if you find the algorithm fairly straightforward ;), see this
+> > > > bug-fix which took a formal model to identify: a8ffaaa060b8 ("arm64:
+> > > > asid: Do not replace active_asids if already 0").
+> > [...]
+> > > Btw, Is this detected by arm's aisd allocator TLA+ model ? Or a real
+> > > bug report ?
+> >
+> > This specific bug was found by the TLA+ model checker (at the time we
+> > were actually tracking down another bug with multi-threaded CPU sharing
+> > the TLB, bug also confirmed by the formal model).
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  6 +++---
->  arch/arm/include/asm/kvm_mmu.h    |  2 +-
->  arch/arm64/include/asm/kvm_host.h |  6 +++---
->  arch/arm64/include/asm/kvm_mmu.h  |  2 +-
->  arch/arm64/kvm/nested.c           | 13 ++++++-------
->  virt/kvm/arm/arm.c                | 22 ++++------------------
->  virt/kvm/arm/mmu.c                | 26 ++++++++++++++++++++------
->  7 files changed, 38 insertions(+), 39 deletions(-)
+> Could you tell me the ref-link about "another bug with multi-threaded
+> CPU sharing the TLB" ?
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index b821eb2383ad..cc761610e41e 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -63,15 +63,15 @@ struct kvm_s2_mmu {
->  	pgd_t *pgd;
->  	phys_addr_t pgd_phys;
->  
-> +	/* The last vcpu id that ran on each physical CPU */
-> +	int __percpu *last_vcpu_ran;
-> +
->  	struct kvm *kvm;
->  };
->  
->  struct kvm_arch {
->  	struct kvm_s2_mmu mmu;
->  
-> -	/* The last vcpu id that ran on each physical CPU */
-> -	int __percpu *last_vcpu_ran;
-> -
->  	/* Stage-2 page table */
->  	pgd_t *pgd;
->  	phys_addr_t pgd_phys;
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index afabf1fd1d17..7a6e9008ed45 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -52,7 +52,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->  void free_hyp_pgds(void);
->  
->  void stage2_unmap_vm(struct kvm *kvm);
-> -int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
-> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
->  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index cc238de170d2..b71a7a237f95 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -104,6 +104,9 @@ struct kvm_s2_mmu {
->  	 * >0: Somebody is actively using this.
->  	 */
->  	atomic_t refcnt;
-> +
-> +	/* The last vcpu id that ran on each physical CPU */
-> +	int __percpu *last_vcpu_ran;
->  };
->  
->  static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> @@ -124,9 +127,6 @@ struct kvm_arch {
->  	/* VTCR_EL2 value for this VM */
->  	u64    vtcr;
->  
-> -	/* The last vcpu id that ran on each physical CPU */
-> -	int __percpu *last_vcpu_ran;
-> -
->  	/* The maximum number of vCPUs depends on the used GIC model */
->  	int max_vcpus;
->  
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index f4c5ac5eb95f..53103607065a 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -169,7 +169,7 @@ void free_hyp_pgds(void);
->  
->  void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
->  void stage2_unmap_vm(struct kvm *kvm);
-> -int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
-> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
->  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
->  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  			  phys_addr_t pa, unsigned long size, bool writable);
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 8880033fb6e0..09afafbdc8fe 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -52,18 +52,17 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  			 GFP_KERNEL | __GFP_ZERO);
->  
->  	if (tmp) {
-> -		if (tmp != kvm->arch.nested_mmus)
-> +		if (tmp != kvm->arch.nested_mmus) {
->  			kfree(kvm->arch.nested_mmus);
-> +			kvm->arch.nested_mmus = NULL;
-> +			kvm->arch.nested_mmus_size = 0;
-> +		}
->  
-> -		tmp[num_mmus - 1].kvm = kvm;
-> -		atomic_set(&tmp[num_mmus - 1].refcnt, 0);
-> -		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 1]);
-> +		ret = kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]);
->  		if (ret)
->  			goto out;
->  
-> -		tmp[num_mmus - 2].kvm = kvm;
-> -		atomic_set(&tmp[num_mmus - 2].refcnt, 0);
-> -		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 2]);
-> +		ret = kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2]);
->  		if (ret) {
->  			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
->  			goto out;
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index bcca27d5c481..e8b584b79847 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -99,29 +99,21 @@ void kvm_arch_check_processor_compat(void *rtn)
->  	*(int *)rtn = 0;
->  }
->  
-> -
->  /**
->   * kvm_arch_init_vm - initializes a VM data structure
->   * @kvm:	pointer to the KVM struct
->   */
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
-> -	int ret, cpu;
-> +	int ret;
->  
->  	ret = kvm_arm_setup_stage2(kvm, type);
->  	if (ret)
->  		return ret;
->  
-> -	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
-> -	if (!kvm->arch.last_vcpu_ran)
-> -		return -ENOMEM;
-> -
-> -	for_each_possible_cpu(cpu)
-> -		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
-> -
-> -	ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
-> +	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu);
->  	if (ret)
-> -		goto out_fail_alloc;
-> +		return ret;
->  
->  	/* Mark the initial VMID generation invalid */
->  	kvm->arch.mmu.vmid.vmid_gen = 0;
-> @@ -142,9 +134,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	return ret;
->  out_free_stage2_pgd:
->  	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> -out_fail_alloc:
-> -	free_percpu(kvm->arch.last_vcpu_ran);
-> -	kvm->arch.last_vcpu_ran = NULL;
->  	return ret;
->  }
->  
-> @@ -174,9 +163,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  
->  	kvm_vgic_destroy(kvm);
->  
-> -	free_percpu(kvm->arch.last_vcpu_ran);
-> -	kvm->arch.last_vcpu_ran = NULL;
-> -
->  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->  		if (kvm->vcpus[i]) {
->  			kvm_arch_vcpu_free(kvm->vcpus[i]);
-> @@ -359,7 +345,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	if (nested_virt_in_use(vcpu))
->  		kvm_vcpu_load_hw_mmu(vcpu);
->  
-> -	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
-> +	last_ran = this_cpu_ptr(vcpu->arch.hw_mmu->last_vcpu_ran);
->  	cpu_data = this_cpu_ptr(&kvm_host_data);
->  
->  	/*
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 94d400e7af57..6a7cba077bce 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -903,8 +903,9 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->  }
->  
->  /**
-> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
-> - * @mmu:	The stage 2 mmu struct pointer
-> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
-> + * @kvm:	The pointer to the KVM structure
-> + * @mmu:	The pointer to the s2 MMU structure
->   *
->   * Allocates only the stage-2 HW PGD level table(s) of size defined by
->   * stage2_pgd_size(mmu->kvm).
-> @@ -912,10 +913,11 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->   * Note we don't need locking here as this is only called when the VM is
->   * created, which can only be done once.
->   */
-> -int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
-> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->  {
->  	phys_addr_t pgd_phys;
->  	pgd_t *pgd;
-> +	int cpu;
->  
->  	if (mmu->pgd != NULL) {
->  		kvm_err("kvm_arch already initialized?\n");
-> @@ -923,18 +925,28 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
->  	}
->  
->  	/* Allocate the HW PGD, making sure that each page gets its own refcount */
-> -	pgd = alloc_pages_exact(stage2_pgd_size(mmu->kvm), GFP_KERNEL | __GFP_ZERO);
-> +	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
->  	if (!pgd)
->  		return -ENOMEM;
->  
->  	pgd_phys = virt_to_phys(pgd);
-> -	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(mmu->kvm)))
-> +	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
->  		return -EINVAL;
->  
-> +	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
-> +	if (!mmu->last_vcpu_ran) {
-> +		free_pages_exact(pgd, stage2_pgd_size(kvm));
-> +		return -ENOMEM;
-> +	}
-> +
-> +	mmu->kvm = kvm;
+> In my concept, the multi-core asid mechanism is also applicable to
+> multi-thread shared TLB, but it will generate redundant tlbflush. From
+> the software design logic, multi-threaded is treated as multi-cores
+> without error, but performance is not optimized.
 
-If we're initializing this here, we probably want to get rid of the
-assignment in kvm_arch_init_vm().
+From the ASID reservation/allocation perspective, the mechanism is the
+same between multi-threaded with a shared TLB and multi-core. On arm64,
+a local_flush_tlb_all() on a thread invalidates the TLB for the other
+threads of the same core.
 
->  	mmu->pgd = pgd;
->  	mmu->pgd_phys = pgd_phys;
->  	mmu->vmid.vmid_gen = 0;
->  
-> +	for_each_possible_cpu(cpu)
-> +		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+The actual problem with multi-threaded CPUs is a lot more subtle.
+Digging some internal email from 1.5 years ago and pasting it below
+(where "current ASID algorithm" refers to the one prior to the fix and
+CnP - Common Not Private - means shared TLBs on a multi-threaded CPU):
 
-Nit: I'd suggest putting that right after the allocation of last_vcpu_ran.
 
-> +
->  	kvm_init_s2_mmu(mmu);
+The current ASID roll-over algorithm allows for a small window where
+active_asids for a CPU (P1) is different from the actual ASID in TTBR0.
+This can lead to a roll-over on a different CPU (P2) allocating an ASID
+(for a different task) which is still hardware-active on P1.
 
-Hmm, now we have kvm_init_stage2_mmu() and an arch (arm or arm64)
-specific kvm_init_s2_mmu()...
+A TLBI on a CPU (or a peer CPU with CnP) does not guarantee that all the
+entries corresponding to a valid TTBRx are removed as they can still be
+speculatively loaded immediately after TLBI.
 
-If we want to keep the s2 mmu structure different for arm and arm64, I'd
-suggest at least renaming kvm_init_s2_mmu() so the distinction with
-kvm_init_stage2_mmu() is clearer.
+While having two different page tables with the same ASID on different
+CPUs should be fine without CnP, it becomes problematic when CnP is
+enabled:
 
->  
->  	return 0;
-> @@ -1021,8 +1033,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  	spin_unlock(&kvm->mmu_lock);
->  
->  	/* Free the HW pgd, one page at a time */
-> -	if (pgd)
-> +	if (pgd) {
->  		free_pages_exact(pgd, stage2_pgd_size(kvm));
-> +		free_percpu(mmu->last_vcpu_ran);
-> +	}
->  }
->  
->  static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
-> 
+P1                                      P2
+--                                      --
+TTBR0.BADDR = T1
+TTBR0.ASID = A1
+check_and_switch_context(T2,A2)
+  asid_maps[P1] = A2
+  goto fastpath
+                                        check_and_switch_context(T3,A0)
+                                          new_context
+                                            ASID roll-over allocates A1
+                                              since it is not active
+                                          TLBI ALL
+speculate TTBR0.ASID = A1 entry
+                                          TTBR0.BADDR = T3
+                                          TTBR0.ASID = A1
+  TTBR0.BADDR = T2
+  TTBR0.ASID = A2
 
-Cheers,
+After this, the common TLB on P1 and P2 (CnP) contains entries
+corresponding to the old T1 and A1. Task T3 using the same ASID A1 can
+hit such entries. (T1,A1) will eventually be removed from the TLB on the
+next context switch on P1 since tlb_flush_pending was set but this is
+not guaranteed to happen.
+
+
+The fix on arm64 (as part of 5ffdfaedfa0a - "arm64: mm: Support Common
+Not Private translations") was to set the reserved TTBR0 in
+check_and_switch_context(), preventing speculative loads into the TLB
+being tagged with the wrong ASID. So this is specific to the ARM CPUs
+behaviour w.r.t. speculative TLB loads, it may not be the case (yet) for
+your architecture.
 
 -- 
-Julien Thierry
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
