@@ -1,87 +1,63 @@
-Return-Path: <SRS0=ia35=U5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=uL1D=U6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54748C5B57E
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 15:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9061DC06510
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 08:03:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C46E8206E0
-	for <kvmarm@archiver.kernel.org>; Sun, 30 Jun 2019 15:19:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="pVCmD1l5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C46E8206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTP id 182FD20673
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Jul 2019 08:03:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 182FD20673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DB624A503;
-	Sun, 30 Jun 2019 11:19:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F2D4A4C1;
+	Mon,  1 Jul 2019 04:03:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@web.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wX2rPAactvmk; Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
+	with ESMTP id bAeWEbm3VzwQ; Mon,  1 Jul 2019 04:03:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E484A4D5;
-	Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A4F4A49F;
+	Mon,  1 Jul 2019 04:03:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03BBA4A417
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 11:19:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75B964A49F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 04:03:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3IM1C32SljPa for <kvmarm@lists.cs.columbia.edu>;
- Sun, 30 Jun 2019 11:19:08 -0400 (EDT)
-Received: from mout.web.de (mout.web.de [212.227.15.4])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 723884A3B4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 30 Jun 2019 11:19:08 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1561907945;
- bh=1hzO1yqzuoU2fg4Q62rIyXmu6NICF9gBDI9a9A6JwII=;
- h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
- b=pVCmD1l5uDu3WLPNPKm/whdFq6I0+2mJNVv/+ad2kSC6P529pHX4kSqudpJNreQGd
- MrP/bI1lNh5Kijk8L+jAKocefQV6loNePWpyepm54aBe62NVJEZtIoWTrPDybuVm2t
- 1Q5SEKGqGi+A+DP/uhV68DuM3vMlXEWSopvmchI0=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0LkPmd-1iFIWo0xdj-00cUJS; Sun, 30
- Jun 2019 17:19:05 +0200
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
-From: Jan Kiszka <jan.kiszka@web.de>
-Subject: [PATCH] kvm: arm: Promote KVM_ARM_TARGET_CORTEX_A7 to generic V7 core
-Message-ID: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
-Date: Sun, 30 Jun 2019 17:19:04 +0200
-User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
- Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
+ with ESMTP id LR8mgBj2+cAz for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Jul 2019 04:03:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F400940A52
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Jul 2019 04:03:11 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41CA72B;
+ Mon,  1 Jul 2019 01:03:11 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECB0D3F718;
+ Mon,  1 Jul 2019 01:03:09 -0700 (PDT)
+Subject: Re: [PATCH 38/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page
+ tables
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-39-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <d17216b4-59c7-5993-85d0-6ee7aa532852@arm.com>
+Date: Mon, 1 Jul 2019 09:03:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190621093843.220980-39-marc.zyngier@arm.com>
 Content-Language: en-US
-X-Provags-ID: V03:K1:S/S0poinZh/eiAEBjJJ0x7oxvYcEnjk1BZhcitM7MWJPf1wBfWi
- NFNdMcBhXkBPLCP4AHhDp7SNb4R8VWOkRuz15H1J5qoRkj1QfHWZjPo5WiU2+PX7nN2kbm1
- 0N7LKvU23eSq2fAKgp0QNYpPFXgyUMP/url3E2b60JSJoNNOh+JtyzvSVtBydpgau7ZDbRr
- YK2ude4yZhRZjSUrvlNWw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gLP2ToO4w7w=:ON/U2A/drwShL7xPSuBFGP
- A/OvLkrdrrtCntIWy6CCzL9bTvacCA2vlT1paz9PNJfWJjoxYQiOBfKkDyUg8s+dk4gDe9pcn
- FeaAi74ZfjTFbkISsKoAOz9HZfHSeOLyU4aZDjJrIXntVOpYaFjVkYUg0tS2RfVYcChon3VOg
- z4FpRFUjRGKHjBEB1NbfY6pjQo4//fiqPbZZAxjG28Gj5qrNdYNN4lQHZGFSzz3navIdcVt9k
- fSycbG4kqZ3Nj1eit9E+Ce/rrUrdZ7o9qKdVg679wR0ABAj1iUHZ+f+EQIKBppUX1kGOFpCy2
- jg0NO0NiUNcbgex2bDC5Wqqk9aLWoHuX/YKhWBInNVUHofzgp0T5bvYA2qV7q9BpYJsoxsmxP
- D+5ledQi3cT2GoXrSGqlucRwit3Q06ZPBEG5ytsdiUP1q1jrTGSU4YFXsLwyEnPFRSqJry0gi
- 8jAFlsHek9ue80tJyUJHwWfKPktomHhlY8OXy/3rkNE5d1OE18RY5WiTiA6/28zC8xnKyaVT2
- hT2t5StbfutwE1yuS0q3Qmebpn57biad4sQRy90fE9dyb1wEWxfYPR92s/jCEeoD4GPAwoyDf
- RCFsDI4QxN0n7AbOvfGCpjdOq6J3zMsl5VWvHGY+YyOINfj7RYS2SsBMKrcSea6TlPz4okhcd
- RjEs05GyrBRnWzBaaRqPNe0C1VSgKhiRn68AnW1c7GGoutF+UpfT3LNrjekNd//y5lgCqg7Wn
- 08HtkRS78Urt51jYf+AIUp2TJqFPsXpYDtVBRjBWr3k2f5K17G58U+u89gnlDiohuIaaPw1nh
- BUpQwgP9Vj9lXv6l6GPQZTHcPxJdrIFHjhFOY3n26Hq1HYi4rVUUmIq99nDUlMyO/GiTRZdHs
- Rce2WEprzXH+QCFrA93HdId4t23jgXsYYXfWI/UAbi004uUL5yELObz29kaeRb6cETAG9i3Qa
- 0CqryFNu/r/2IyyyA6ZsOfHXdJdt/xdPZKE29xLC/0R8HmP0+I0+nkF+tbEBKcGVHhOhjjWIj
- JEnvebU01s7akPL+9fM/OCcXRLQUEernPwqboJRIUBI5KyW8kDRVnsTn/watvgi5nrtomCVZj
- 38FbLOt7v8f57n/cNtZZcC0IRSah8TT0LWo
-Cc: kvm <kvm@vger.kernel.org>
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,133 +74,137 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
 
-The only difference between the currently supported A15 and A7 target
-cores is the reset state of bit 11 in SCTLR. This bit is RES1 or RAO/WI
-in other ARM cores, including ARMv8 ones. By promoting A7 to a generic
-default target, this allows to use yet unsupported core types. E.g.,
-this enables KVM on the A72 of the RPi4.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
----
- arch/arm/include/uapi/asm/kvm.h                |  1 +
- arch/arm/kvm/Makefile                          |  2 +-
- arch/arm/kvm/{coproc_a7.c => coproc_generic.c} | 18 +++++++++---------
- arch/arm/kvm/guest.c                           |  4 +---
- arch/arm/kvm/reset.c                           |  5 +----
- 5 files changed, 13 insertions(+), 17 deletions(-)
- rename arch/arm/kvm/{coproc_a7.c => coproc_generic.c} (70%)
+On 21/06/2019 10:38, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+> stage 2 page table for the guest hypervisor.
+> 
+> Note: A bunch of the code in mmu.c relating to MMU notifiers is
+> currently dealt with in an extremely abrupt way, for example by clearing
+> out an entire shadow stage-2 table. This will be handled in a more
+> efficient way using the reverse mapping feature in a later version of
+> the patch series.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+>  arch/arm64/include/asm/kvm_nested.h |  3 +++
+>  arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++
+>  virt/kvm/arm/arm.c                  |  4 ++-
+>  virt/kvm/arm/mmu.c                  | 42 +++++++++++++++++++++++------
+>  5 files changed, 82 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 32bcaa1845dc..f4c5ac5eb95f 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -163,6 +163,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>  			   void __iomem **haddr);
+>  int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>  			     void **haddr);
+> +void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
+> +			    phys_addr_t addr, phys_addr_t end);
+>  void free_hyp_pgds(void);
+>  
+>  void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+> @@ -171,6 +173,7 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable);
+> +void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+>  
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 052d46d96201..3b415bc76ced 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -48,6 +48,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>  extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>  				    struct kvm_s2_trans *trans);
+>  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+> +extern void kvm_nested_s2_wp(struct kvm *kvm);
+> +extern void kvm_nested_s2_clear(struct kvm *kvm);
+> +extern void kvm_nested_s2_flush(struct kvm *kvm);
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 023027fa2db5..8880033fb6e0 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -456,6 +456,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+>  	return kvm_inject_nested_sync(vcpu, esr_el2);
+>  }
+>  
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_wp(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_clear(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_flush(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+>  /*
+>   * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+>   * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 4e3cbfa1ecbe..bcca27d5c481 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1005,8 +1005,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>  	 * guest MMU is turned off and flush the caches as needed.
+>  	 */
+> -	if (vcpu->arch.has_run_once)
+> +	if (vcpu->arch.has_run_once) {
+>  		stage2_unmap_vm(vcpu->kvm);
+> +		kvm_nested_s2_clear(vcpu->kvm);
 
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-index 4602464ebdfb..e0c5bbec3d3d 100644
---- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -70,6 +70,7 @@ struct kvm_regs {
- /* Supported Processor Types */
- #define KVM_ARM_TARGET_CORTEX_A15	0
- #define KVM_ARM_TARGET_CORTEX_A7	1
-+#define KVM_ARM_TARGET_GENERIC_V7	KVM_ARM_TARGET_CORTEX_A7
- #define KVM_ARM_NUM_TARGETS		2
+The comment above kvm_nested_s2_clear() states that kvm->mmu_lock needs
+to be taken, but in this state it isn't (stage2_unmap_vm() acquies the
+lock and releases it).
 
- /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index 531e59f5be9c..d959f89135d6 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -21,7 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+Cheers,
 
- obj-y += kvm-arm.o init.o interrupts.o
- obj-y += handle_exit.o guest.o emulate.o reset.o
--obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
-+obj-y += coproc.o coproc_a15.o coproc_generic.o   vgic-v3-coproc.o
- obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
- obj-y += $(KVM)/arm/aarch32.o
-diff --git a/arch/arm/kvm/coproc_a7.c b/arch/arm/kvm/coproc_generic.c
-similarity index 70%
-rename from arch/arm/kvm/coproc_a7.c
-rename to arch/arm/kvm/coproc_generic.c
-index 40f643e1e05c..b32a541ad7bf 100644
---- a/arch/arm/kvm/coproc_a7.c
-+++ b/arch/arm/kvm/coproc_generic.c
-@@ -15,28 +15,28 @@
- #include "coproc.h"
-
- /*
-- * Cortex-A7 specific CP15 registers.
-+ * Generic CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in the
-  * user space API for 64-bit register access in line with the terminology used
-  * in the ARM ARM.
-  * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and with 64-bit
-  *            registers preceding 32-bit ones.
-  */
--static const struct coproc_reg a7_regs[] = {
-+static const struct coproc_reg generic_regs[] = {
- 	/* SCTLR: swapped by interrupt.S. */
- 	{ CRn( 1), CRm( 0), Op1( 0), Op2( 0), is32,
- 			access_vm_reg, reset_val, c1_SCTLR, 0x00C50878 },
- };
-
--static struct kvm_coproc_target_table a7_target_table = {
--	.target = KVM_ARM_TARGET_CORTEX_A7,
--	.table = a7_regs,
--	.num = ARRAY_SIZE(a7_regs),
-+static struct kvm_coproc_target_table generic_target_table = {
-+	.target = KVM_ARM_TARGET_GENERIC_V7,
-+	.table = generic_regs,
-+	.num = ARRAY_SIZE(generic_regs),
- };
-
--static int __init coproc_a7_init(void)
-+static int __init coproc_generic_init(void)
- {
--	kvm_register_target_coproc_table(&a7_target_table);
-+	kvm_register_target_coproc_table(&generic_target_table);
- 	return 0;
- }
--late_initcall(coproc_a7_init);
-+late_initcall(coproc_generic_init);
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64b4033..d33a24e70f49 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -275,12 +275,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	switch (read_cpuid_part()) {
--	case ARM_CPU_PART_CORTEX_A7:
--		return KVM_ARM_TARGET_CORTEX_A7;
- 	case ARM_CPU_PART_CORTEX_A15:
- 		return KVM_ARM_TARGET_CORTEX_A15;
- 	default:
--		return -EINVAL;
-+		return KVM_ARM_TARGET_GENERIC_V7;
- 	}
- }
-
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index eb4174f6ebbd..d6e07500bab4 100644
---- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -43,13 +43,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	struct kvm_regs *reset_regs;
-
- 	switch (vcpu->arch.target) {
--	case KVM_ARM_TARGET_CORTEX_A7:
--	case KVM_ARM_TARGET_CORTEX_A15:
-+	default:
- 		reset_regs = &cortexa_regs_reset;
- 		vcpu->arch.midr = read_cpuid_id();
- 		break;
--	default:
--		return -ENODEV;
- 	}
-
- 	/* Reset core registers */
---
-2.16.4
+-- 
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
