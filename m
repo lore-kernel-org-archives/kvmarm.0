@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A89CC06510
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Jul 2019 12:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15644C06513
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Jul 2019 12:54:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A52A52183F
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Jul 2019 12:37:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A52A52183F
+	by mail.kernel.org (Postfix) with ESMTP id A653F208C4
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Jul 2019 12:54:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A653F208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16D614A4F6;
-	Tue,  2 Jul 2019 08:37:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12B094A4EB;
+	Tue,  2 Jul 2019 08:54:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Te5Xxpdj+n2b; Tue,  2 Jul 2019 08:37:41 -0400 (EDT)
+	with ESMTP id DX8kdQvNPV7O; Tue,  2 Jul 2019 08:54:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F36404A4CA;
-	Tue,  2 Jul 2019 08:37:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0C4C4A389;
+	Tue,  2 Jul 2019 08:54:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 941B64A389
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jul 2019 08:37:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD23D4A389
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jul 2019 08:54:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x0tqMxJjBhta for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Jul 2019 08:37:37 -0400 (EDT)
+ with ESMTP id 3+fLYgUWS7Ps for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Jul 2019 08:54:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D11940A52
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jul 2019 08:37:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4CA40A52
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jul 2019 08:54:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4B76344;
- Tue,  2 Jul 2019 05:37:36 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8ACBB3F703;
- Tue,  2 Jul 2019 05:37:35 -0700 (PDT)
-Subject: Re: [PATCH 44/59] KVM: arm64: nv: Trap and emulate TLBI instructions
- from virtual EL2
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86BF2344;
+ Tue,  2 Jul 2019 05:54:38 -0700 (PDT)
+Received: from [10.1.31.185] (unknown [10.1.31.185])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5AB993F703;
+ Tue,  2 Jul 2019 05:54:36 -0700 (PDT)
+Subject: Re: [PATCH 23/59] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+To: Julien Thierry <julien.thierry@arm.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-45-marc.zyngier@arm.com>
-From: Julien Thierry <julien.thierry@arm.com>
-Message-ID: <f12d61fd-d280-108c-d015-030ec8ca1a47@arm.com>
-Date: Tue, 2 Jul 2019 13:37:33 +0100
+ <20190621093843.220980-24-marc.zyngier@arm.com>
+ <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <1ba3a46e-d8cd-d6c9-c1dc-2fe9ad309497@arm.com>
+Date: Tue, 2 Jul 2019 13:54:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-45-marc.zyngier@arm.com>
+In-Reply-To: <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
 Content-Language: en-US
 Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -75,570 +75,134 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
+On 6/25/19 3:19 PM, Julien Thierry wrote:
+>
+> On 06/21/2019 10:38 AM, Marc Zyngier wrote:
+>> From: Jintack Lim <jintack.lim@linaro.org>
+>>
+>> Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+>> they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_nested.h |  2 ++
+>>  arch/arm64/kvm/Makefile             |  1 +
+>>  arch/arm64/kvm/handle_exit.c        | 13 +++++++++-
+>>  arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+>>  4 files changed, 54 insertions(+), 1 deletion(-)
+>>  create mode 100644 arch/arm64/kvm/nested.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>> index 8a3d121a0b42..645e5e11b749 100644
+>> --- a/arch/arm64/include/asm/kvm_nested.h
+>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>> @@ -10,4 +10,6 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>>  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
+>>  }
+>>  
+>> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>> +
+>>  #endif /* __ARM64_KVM_NESTED_H */
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 9e450aea7db6..f11bd8b0d837 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -36,4 +36,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+>>  
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += nested.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate-nested.o
+>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+>> index e348c15c81bc..ddba212fd6ec 100644
+>> --- a/arch/arm64/kvm/handle_exit.c
+>> +++ b/arch/arm64/kvm/handle_exit.c
+>> @@ -127,7 +127,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>   */
+>>  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>  {
+>> -	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
+>> +	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
+>> +
+>> +	if (nested_virt_in_use(vcpu)) {
+>> +		int ret = handle_wfx_nested(vcpu, is_wfe);
+>> +
+>> +		if (ret < 0 && ret != -EINVAL)
+>> +			return ret;
+>> +		else if (ret >= 0)
+>> +			return ret;
+> I think you can simplify this:
+>
+> 	if (ret != -EINVAL)
+> 		return ret;
 
-On 21/06/2019 10:38, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
-> 
-> When supporting nested virtualization a guest hypervisor executing TLBI
-> instructions must be trapped and emulated by the host hypervisor,
-> because the guest hypervisor can only affect physical TLB entries
-> relating to its own execution environment (virtual EL2 in EL1) but not
-> to the nested guests as required by the semantics of the instructions
-> and TLBI instructions might also result in updates (invalidations) to
-> shadow page tables.
-> 
-> This patch does several things.
-> 
-> 1. List and define all TLBI system instructions to emulate.
-> 
-> 2. Emulate TLBI ALLE2(IS) instruction executed in the virtual EL2. Since
-> we emulate the virtual EL2 in the EL1, we invalidate EL1&0 regime stage
-> 1 TLB entries with setting vttbr_el2 having the VMID of the virtual EL2.
-> 
-> 3. Emulate TLBI VAE2* instruction executed in the virtual EL2. Based on the
-> same principle as TLBI ALLE2 instruction, we can simply emulate those
-> instructions by executing corresponding VAE1* instructions with the
-> virtual EL2's VMID assigned by the host hypervisor.
-> 
-> Note that we are able to emulate TLBI ALLE2IS precisely by only
-> invalidating stage 1 TLB entries via TLBI VMALL1IS instruction, but to
-> make it simeple, we reuse the existing function, __kvm_tlb_flush_vmid(),
-> which invalidates both of stage 1 and 2 TLB entries.
-> 
-> 4. TLBI ALLE1(IS) instruction invalidates all EL1&0 regime stage 1 and 2
-> TLB entries (on all PEs in the same Inner Shareable domain). To emulate
-> these instructions, we first need to clear all the mappings in the
-> shadow page tables since executing those instructions implies the change
-> of mappings in the stage 2 page tables maintained by the guest
-> hypervisor.  We then need to invalidate all EL1&0 regime stage 1 and 2
-> TLB entries of all VMIDs, which are assigned by the host hypervisor, for
-> this VM.
-> 
-> 5. Based on the same principle as TLBI ALLE1(IS) emulation, we clear the
-> mappings in the shadow stage-2 page tables and invalidate TLB entries.
-> But this time we do it only for the current VMID from the guest
-> hypervisor's perspective, not for all VMIDs.
-> 
-> 6. Based on the same principle as TLBI ALLE1(IS) and TLBI VMALLS12E1(IS)
-> emulation, we clear the mappings in the shadow stage-2 page tables and
-> invalidate TLB entries. We do it only for one mapping for the current
-> VMID from the guest hypervisor's view.
-> 
-> 7. Forward system instruction traps to the virtual EL2 if a
-> corresponding bit in the virtual HCR_EL2 is set.
-> 
-> 8. Even though a guest hypervisor can execute TLBI instructions that are
-> accesible at EL1 without trap, it's wrong; All those TLBI instructions
-> work based on current VMID, and when running a guest hypervisor current
-> VMID is the one for itself, not the one from the virtual vttbr_el2. So
-> letting a guest hypervisor execute those TLBI instructions results in
-> invalidating its own TLB entries and leaving invalid TLB entries
-> unhandled.
-> 
-> Therefore we trap and emulate those TLBI instructions. The emulation is
-> simple; we find a shadow VMID mapped to the virtual vttbr_el2, set it in
-> the physical vttbr_el2, then execute the same instruction in EL2.
-> 
-> We don't set HCR_EL2.TTLB bit yet.
-> 
->   [ Changes performed by Marc Zynger:
-> 
->     The TLBI handling code more or less directly execute the same
->     instruction that has been trapped (with an EL2->EL1 conversion
->     in the case of an EL2 TLBI), but that's unfortunately not enough:
-> 
->     - TLBIs must be upgraded to the Inner Shareable domain to account
->       for vcpu migration, just like we already have with HCR_EL2.FB.
-> 
->     - The DSB instruction that synchronises these must thus be on
->       the Inner Shareable domain as well.
-> 
->     - Prior to executing the TLBI, we need another DSB ISHST to make
->       sure that the update to the page tables is now visible.
-> 
->       Ordering of system instructions fixed
-> 
->     - The current TLB invalidation code is pretty buggy, as it assume a
->       page mapping. On the contrary, it is likely that TLB invalidation
->       will cover more than a single page, and the size should be decided
->       by the guests configuration (and not the host's).
-> 
->       Since we don't cache the guest mapping sizes in the shadow PT yet,
->       let's assume the worse case (a block mapping) and invalidate that.
-> 
->       Take this opportunity to fix the decoding of the parameter (it
->       isn't a straight IPA).
-> 
->     - In general, we always emulate local TBL invalidations as being
->       as upgraded to the Inner Shareable domain so that we can easily
->       deal with vcpu migration. This is consistent with the fact that
->       we set HCR_EL2.FB when running non-nested VMs.
-> 
->       So let's emulate TLBI ALLE2 as ALLE2IS.
->   ]
-> 
->   [ Changes performed by Christoffer Dall:
-> 
->     Sometimes when we are invalidating the TLB for a certain S2 MMU
->     context, this context can also have EL2 context associated with it
->     and we have to invalidate this too.
->   ]
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h |   2 +
->  arch/arm64/include/asm/sysreg.h  |  36 ++++++
->  arch/arm64/kvm/hyp/tlb.c         |  81 +++++++++++++
->  arch/arm64/kvm/sys_regs.c        | 201 +++++++++++++++++++++++++++++++
->  virt/kvm/arm/mmu.c               |  18 ++-
->  5 files changed, 337 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 1cfa4d2cf772..9cb9ab066ebc 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -67,6 +67,8 @@ extern void __kvm_flush_vm_context(void);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa);
->  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
->  extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
-> +extern void __kvm_tlb_vae2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
-> +extern void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding);
->  
->  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
->  extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index b3a8d21c07b3..e0912ececd92 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -553,6 +553,42 @@
->  #define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
->  #define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
->  
-> +/* TLBI instructions */
-> +#define TLBI_Op0	1
-> +#define TLBI_Op1_EL1	0	/* Accessible from EL1 or higher */
-> +#define TLBI_Op1_EL2	4	/* Accessible from EL2 or higher */
-> +#define TLBI_CRn	8
-> +#define tlbi_insn_el1(CRm, Op2)	sys_insn(TLBI_Op0, TLBI_Op1_EL1, TLBI_CRn, (CRm), (Op2))
-> +#define tlbi_insn_el2(CRm, Op2)	sys_insn(TLBI_Op0, TLBI_Op1_EL2, TLBI_CRn, (CRm), (Op2))
-> +
-> +#define OP_TLBI_VMALLE1IS	tlbi_insn_el1(3, 0)
-> +#define OP_TLBI_VAE1IS		tlbi_insn_el1(3, 1)
-> +#define OP_TLBI_ASIDE1IS	tlbi_insn_el1(3, 2)
-> +#define OP_TLBI_VAAE1IS		tlbi_insn_el1(3, 3)
-> +#define OP_TLBI_VALE1IS		tlbi_insn_el1(3, 5)
-> +#define OP_TLBI_VAALE1IS	tlbi_insn_el1(3, 7)
-> +#define OP_TLBI_VMALLE1		tlbi_insn_el1(7, 0)
-> +#define OP_TLBI_VAE1		tlbi_insn_el1(7, 1)
-> +#define OP_TLBI_ASIDE1		tlbi_insn_el1(7, 2)
-> +#define OP_TLBI_VAAE1		tlbi_insn_el1(7, 3)
-> +#define OP_TLBI_VALE1		tlbi_insn_el1(7, 5)
-> +#define OP_TLBI_VAALE1		tlbi_insn_el1(7, 7)
-> +
-> +#define OP_TLBI_IPAS2E1IS	tlbi_insn_el2(0, 1)
-> +#define OP_TLBI_IPAS2LE1IS	tlbi_insn_el2(0, 5)
-> +#define OP_TLBI_ALLE2IS		tlbi_insn_el2(3, 0)
-> +#define OP_TLBI_VAE2IS		tlbi_insn_el2(3, 1)
-> +#define OP_TLBI_ALLE1IS		tlbi_insn_el2(3, 4)
-> +#define OP_TLBI_VALE2IS		tlbi_insn_el2(3, 5)
-> +#define OP_TLBI_VMALLS12E1IS	tlbi_insn_el2(3, 6)
-> +#define OP_TLBI_IPAS2E1		tlbi_insn_el2(4, 1)
-> +#define OP_TLBI_IPAS2LE1	tlbi_insn_el2(4, 5)
-> +#define OP_TLBI_ALLE2		tlbi_insn_el2(7, 0)
-> +#define OP_TLBI_VAE2		tlbi_insn_el2(7, 1)
-> +#define OP_TLBI_ALLE1		tlbi_insn_el2(7, 4)
-> +#define OP_TLBI_VALE2		tlbi_insn_el2(7, 5)
-> +#define OP_TLBI_VMALLS12E1	tlbi_insn_el2(7, 6)
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_DSSBS	(_BITUL(44))
->  #define SCTLR_ELx_ENIA	(_BITUL(31))
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 779405db3fb3..026afbf1a697 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -205,3 +205,84 @@ void __hyp_text __kvm_flush_vm_context(void)
->  	asm volatile("ic ialluis" : : );
->  	dsb(ish);
->  }
-> +
-> +void __hyp_text __kvm_tlb_vae2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest()(mmu, &cxt);
-> +
-> +	/*
-> +	 * Execute the EL1 version of TLBI VAE2* instruction, forcing
-> +	 * an upgrade to the Inner Shareable domain in order to
-> +	 * perform the invalidation on all CPUs.
-> +	 */
-> +	switch (sys_encoding) {
-> +	case OP_TLBI_VAE2:
-> +	case OP_TLBI_VAE2IS:
-> +		__tlbi(vae1is, va);
-> +		break;
-> +	case OP_TLBI_VALE2:
-> +	case OP_TLBI_VALE2IS:
-> +		__tlbi(vale1is, va);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	dsb(ish);
-> +	isb();
-> +
-> +	__tlb_switch_to_host()(&cxt);
-> +}
-> +
-> +void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest()(mmu, &cxt);
-> +
-> +	/*
-> +	 * Execute the same instruction as the guest hypervisor did,
-> +	 * expanding the scope of local TLB invalidations to the Inner
-> +	 * Shareable domain so that it takes place on all CPUs. This
-> +	 * is equivalent to having HCR_EL2.FB set.
-> +	 */
-> +	switch (sys_encoding) {
-> +	case OP_TLBI_VMALLE1:
-> +	case OP_TLBI_VMALLE1IS:
-> +		__tlbi(vmalle1is);
-> +		break;
-> +	case OP_TLBI_VAE1:
-> +	case OP_TLBI_VAE1IS:
-> +		__tlbi(vae1is, val);
-> +		break;
-> +	case OP_TLBI_ASIDE1:
-> +	case OP_TLBI_ASIDE1IS:
-> +		__tlbi(aside1is, val);
-> +		break;
-> +	case OP_TLBI_VAAE1:
-> +	case OP_TLBI_VAAE1IS:
-> +		__tlbi(vaae1is, val);
-> +		break;
-> +	case OP_TLBI_VALE1:
-> +	case OP_TLBI_VALE1IS:
-> +		__tlbi(vale1is, val);
-> +		break;
-> +	case OP_TLBI_VAALE1:
-> +	case OP_TLBI_VAALE1IS:
-> +		__tlbi(vaale1is, val);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	dsb(ish);
-> +	isb();
-> +
-> +	__tlb_switch_to_host()(&cxt);
-> +}
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 102419b837e8..0343682fe47f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1661,6 +1661,11 @@ static bool forward_at_traps(struct kvm_vcpu *vcpu)
->  	return forward_traps(vcpu, HCR_AT);
->  }
->  
-> +static bool forward_ttlb_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	return forward_traps(vcpu, HCR_TTLB);
-> +}
-> +
->  /* This function is to support the recursive nested virtualization */
->  static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
->  {
-> @@ -2251,6 +2256,174 @@ static bool handle_s12w(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return handle_s12(vcpu, p, r, true);
->  }
->  
-> +static bool handle_alle2is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	/*
-> +	 * To emulate invalidating all EL2 regime stage 1 TLB entries for all
-> +	 * PEs, executing TLBI VMALLE1IS is enough. But reuse the existing
-> +	 * interface for the simplicity; invalidating stage 2 entries doesn't
-> +	 * affect the correctness.
-> +	 */
-> +	kvm_call_hyp(__kvm_tlb_flush_vmid, &vcpu->kvm->arch.mmu);
-> +	return true;
-> +}
-> +
-> +static bool handle_vae2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +		       const struct sys_reg_desc *r)
-> +{
-> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-> +
-> +	/*
-> +	 * Based on the same principle as TLBI ALLE2 instruction emulation, we
-> +	 * emulate TLBI VAE2* instructions by executing corresponding TLBI VAE1*
-> +	 * instructions with the virtual EL2's VMID assigned by the host
-> +	 * hypervisor.
-> +	 */
-> +	kvm_call_hyp(__kvm_tlb_vae2, &vcpu->kvm->arch.mmu,
-> +		     p->regval, sys_encoding);
-> +	return true;
-> +}
-> +
-> +static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	struct kvm_s2_mmu *mmu = &vcpu->kvm->arch.mmu;
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	/*
-> +	 * Clear all mappings in the shadow page tables and invalidate the stage
-> +	 * 1 and 2 TLB entries via kvm_tlb_flush_vmid_ipa().
-> +	 */
-> +	kvm_nested_s2_clear(vcpu->kvm);
-> +
-> +	if (mmu->vmid.vmid_gen) {
-> +		/*
-> +		 * Invalidate the stage 1 and 2 TLB entries for the host OS
-> +		 * in a VM only if there is one.
-> +		 */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +	}
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +				const struct sys_reg_desc *r)
-> +{
-> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(vcpu->kvm));
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(vcpu->kvm));
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			     const struct sys_reg_desc *r)
-> +{
-> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +	u64 base_addr;
-> +	int max_size;
-> +
-> +	/*
-> +	 * We drop a number of things from the supplied value:
-> +	 *
-> +	 * - NS bit: we're non-secure only.
-> +	 *
-> +	 * - TTL field: We already have the granule size from the
-> +	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
-> +	 *   guest's S2PT.
-> +	 *
-> +	 * - IPA[51:48]: We don't support 52bit IPA just yet...
-> +	 *
-> +	 * And of course, adjust the IPA to be on an actual address.
-> +	 */
-> +	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
-> +
-> +	/* Compute the maximum extent of the invalidation */
-> +	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
-> +	case VTCR_EL2_TG0_4K:
-> +		max_size = SZ_1G;
-> +		break;
-> +	case VTCR_EL2_TG0_16K:
-> +		max_size = SZ_32M;
-> +		break;
-> +	case VTCR_EL2_TG0_64K:
-> +		/*
-> +		 * No, we do not support 52bit IPA in nested yet. Once
-> +		 * we do, this should be 4TB.
-> +		 */
-> +		/* FIXME: remove the 52bit PA support from the IDregs */
-> +		max_size = SZ_512M;
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
+And handle_wfx_nested can only return -EINVAL or 1 (from
+kvm_inject_nested_sync), so the condition is not only complicated, but also
+misleading.
 
-For lookup_s2_mmu(), sometimes we take kvm->lock, sometimes we take
-kvm->mmu_lock instead (without the other being taken). The comment above
-lookup_s2_mmu() suggest kvm->lock is the one that should be taken, but
-I'm not sure which is the correct one.
+Thanks,
 
-Should the code here be something like the following?
+Alex
 
-	mutex_lock(&vcpu->kvm->lock);
-
-	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-	if (!mmu)
-		mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-
-	if (mmu) {
-		spin_lock(&vcpu->kvm->mmu_lock);
-		kvm_unmap_stage2_range(...);
-		spin_unlock(&vcpu->kvm_mmu_lock);
-	}
-	mutex_unlock(&vcpu->kvm->lock);
-
-
-Overall, there seems to be other places where lookup_s2_mmu() is called
-only with kvm->mmu_lock taken instead of kvm->lock. Should the comment
-be fixed to kvm->mmu_lock and callers taking only kvm->lock (i.e.
-creation/destruction of s2_mmu) be updated?
-
-
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-> +
-> +	/*
-> +	 * TODO: Revisit this comment:
-> +	 *
-> +	 * If we can't find a shadow VMID, it is either the virtual
-> +	 * VMID is for the host OS or the nested VM having the virtual
-> +	 * VMID is never executed. (Note that we create a showdow VMID
-> +	 * when entering a VM.) For the former, we can flush TLB
-> +	 * entries belonging to the host OS in a VM. For the latter, we
-> +	 * don't have to do anything. Since we can't differentiate
-> +	 * between those cases, just do what we can do for the former.
-> +	 */
-> +
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_call_hyp(__kvm_tlb_el1_instr,
-> +			     mmu, p->regval, sys_encoding);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-> +	if (mmu)
-> +		kvm_call_hyp(__kvm_tlb_el1_instr,
-> +			     mmu, p->regval, sys_encoding);
-> +	mutex_unlock(&vcpu->kvm->lock);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * AT instruction emulation
->   *
-> @@ -2333,12 +2506,40 @@ static struct sys_reg_desc sys_insn_descs[] = {
->  	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
->  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->  
-> +	SYS_INSN_TO_DESC(TLBI_VMALLE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ASIDE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAAE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAALE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ASIDE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAAE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAALE1, handle_tlbi_el1, forward_ttlb_traps),
-> +
->  	SYS_INSN_TO_DESC(AT_S1E2R, handle_s1e2, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S1E2W, handle_s1e2, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E1R, handle_s12r, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E1W, handle_s12w, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E0R, handle_s12r, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E0W, handle_s12w, forward_nv_traps),
-> +
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2E1IS, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2LE1IS, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE2IS, handle_alle2is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE2IS, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE1IS, handle_alle1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE2IS, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLS12E1IS, handle_vmalls12e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2E1, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2LE1, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE2, handle_alle2is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE2, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE1, handle_alle1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE2, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLS12E1, handle_vmalls12e1is, forward_nv_traps),
->  };
->  
->  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 6a7cba077bce..0ea79e543b29 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -51,7 +51,23 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->   */
->  void kvm_flush_remote_tlbs(struct kvm *kvm)
->  {
-> -	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> +
-> +	if (mmu == &kvm->arch.mmu) {
-> +		/*
-> +		 * For a normal (i.e. non-nested) guest, flush entries for the
-> +		 * given VMID *
-> +		 */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +	} else {
-> +		/*
-> +		 * When supporting nested virtualization, we can have multiple
-> +		 * VMIDs in play for each VCPU in the VM, so it's really not
-> +		 * worth it to try to quiesce the system and flush all the
-> +		 * VMIDs that may be in use, instead just nuke the whole thing.
-> +		 */
-> +		kvm_call_hyp(__kvm_flush_vm_context);
-> +	}
->  }
->  
->  static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
-> 
-
-Cheers,
-
--- 
-Julien Thierry
+>
+> Cheers,
+>
+> Julien
+>
+>
+>> +	}
+>> +
+>> +	if (is_wfe) {
+>>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+>>  		vcpu->stat.wfe_exit_stat++;
+>>  		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
+>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+>> new file mode 100644
+>> index 000000000000..3872e3cf1691
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/nested.c
+>> @@ -0,0 +1,39 @@
+>> +/*
+>> + * Copyright (C) 2017 - Columbia University and Linaro Ltd.
+>> + * Author: Jintack Lim <jintack.lim@linaro.org>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include <linux/kvm.h>
+>> +#include <linux/kvm_host.h>
+>> +
+>> +#include <asm/kvm_emulate.h>
+>> +
+>> +/*
+>> + * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+>> + * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+>> + * handle this.
+>> + */
+>> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+>> +{
+>> +	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+>> +
+>> +	if (vcpu_mode_el2(vcpu))
+>> +		return -EINVAL;
+>> +
+>> +	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
+>> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
+>> +
+>> +	return -EINVAL;
+>> +}
+>>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
