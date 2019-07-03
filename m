@@ -4,57 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225F9C0650E
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 16:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D9BC0650E
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 16:27:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AE0AA2187F
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 16:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0AA2187F
+	by mail.kernel.org (Postfix) with ESMTP id D1DFE218A4
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 16:27:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DFE218A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18C534A51B;
-	Wed,  3 Jul 2019 12:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68B4D4A4EB;
+	Wed,  3 Jul 2019 12:27:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mwbQDUXGkmeQ; Wed,  3 Jul 2019 12:24:18 -0400 (EDT)
+	with ESMTP id oqBKM33QU6cX; Wed,  3 Jul 2019 12:27:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B474A4FF;
-	Wed,  3 Jul 2019 12:24:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C5E4A4FF;
+	Wed,  3 Jul 2019 12:27:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F0614A501
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 12:24:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A89014A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 12:27:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NwBQTqgwJpx1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Jul 2019 12:24:16 -0400 (EDT)
+ with ESMTP id JbP8UnpK+PLi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Jul 2019 12:27:10 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 476B54A4EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 12:24:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EDB04A4EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 12:27:10 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF569344;
- Wed,  3 Jul 2019 09:24:15 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF292344;
+ Wed,  3 Jul 2019 09:27:09 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0EFF3F718;
- Wed,  3 Jul 2019 09:24:14 -0700 (PDT)
-Date: Wed, 3 Jul 2019 17:24:12 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E05F3F718;
+ Wed,  3 Jul 2019 09:27:09 -0700 (PDT)
+Date: Wed, 3 Jul 2019 17:27:07 +0100
 From: Dave Martin <Dave.Martin@arm.com>
 To: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH 04/59] KVM: arm64: nv: Introduce nested virtualization
  VCPU feature
-Message-ID: <20190703162412.GU2790@e103592.cambridge.arm.com>
+Message-ID: <20190703162706.GV2790@e103592.cambridge.arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
  <20190621093843.220980-5-marc.zyngier@arm.com>
- <20190624114329.GO2790@e103592.cambridge.arm.com>
- <5bd65cc0-89a1-0849-2041-b6016d58e4f2@arm.com>
+ <20190624112851.GM2790@e103592.cambridge.arm.com>
+ <01e61a51-5bf0-8943-6f68-7a5cea59f093@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <5bd65cc0-89a1-0849-2041-b6016d58e4f2@arm.com>
+In-Reply-To: <01e61a51-5bf0-8943-6f68-7a5cea59f093@arm.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Cc: linux-arm-kernel@lists.infradead.org,
  Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu,
@@ -75,8 +75,8 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 03, 2019 at 12:56:51PM +0100, Marc Zyngier wrote:
-> On 24/06/2019 12:43, Dave Martin wrote:
+On Wed, Jul 03, 2019 at 12:53:58PM +0100, Marc Zyngier wrote:
+> On 24/06/2019 12:28, Dave Martin wrote:
 > > On Fri, Jun 21, 2019 at 10:37:48AM +0100, Marc Zyngier wrote:
 > >> From: Christoffer Dall <christoffer.dall@arm.com>
 > >>
@@ -91,9 +91,28 @@ On Wed, Jul 03, 2019 at 12:56:51PM +0100, Marc Zyngier wrote:
 > >> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> > 
-> > [...]
-> > 
+> >>  arch/arm/include/asm/kvm_nested.h   |  9 +++++++++
+> >>  arch/arm64/include/asm/kvm_nested.h | 13 +++++++++++++
+> >>  arch/arm64/include/uapi/asm/kvm.h   |  1 +
+> >>  3 files changed, 23 insertions(+)
+> >>  create mode 100644 arch/arm/include/asm/kvm_nested.h
+> >>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
+> >>
+> >> diff --git a/arch/arm/include/asm/kvm_nested.h b/arch/arm/include/asm/kvm_nested.h
+> >> new file mode 100644
+> >> index 000000000000..124ff6445f8f
+> >> --- /dev/null
+> >> +++ b/arch/arm/include/asm/kvm_nested.h
+> >> @@ -0,0 +1,9 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0 */
+> >> +#ifndef __ARM_KVM_NESTED_H
+> >> +#define __ARM_KVM_NESTED_H
+> >> +
+> >> +#include <linux/kvm_host.h>
+> >> +
+> >> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu) { return false; }
+> >> +
+> >> +#endif /* __ARM_KVM_NESTED_H */
 > >> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
 > >> new file mode 100644
 > >> index 000000000000..8a3d121a0b42
@@ -111,21 +130,41 @@ On Wed, Jul 03, 2019 at 12:56:51PM +0100, Marc Zyngier wrote:
 > >> +	return cpus_have_const_cap(ARM64_HAS_NESTED_VIRT) &&
 > >> +		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
 > >> +}
+> >> +
+> >> +#endif /* __ARM64_KVM_NESTED_H */
+> >> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> >> index d819a3e8b552..563e2a8bae93 100644
+> >> --- a/arch/arm64/include/uapi/asm/kvm.h
+> >> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> >> @@ -106,6 +106,7 @@ struct kvm_regs {
+> >>  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+> >>  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+> >>  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+> >> +#define KVM_ARM_VCPU_NESTED_VIRT	7 /* Support nested virtualization */
 > > 
-> > Also, is it worth having a vcpu->arch.flags flag for this, similarly to
-> > SVE and ptrauth?
+> > This seems weirdly named:
+> > 
+> > Isn't the feature we're exposing here really EL2?  In that case, the
+> > feature the guest gets with this flag enabled is plain virtualisation,
+> > possibly with the option to nest further.
+> > 
+> > Does the guest also get nested virt (i.e., recursively nested virt from
+> > the host's PoV) as a side effect, or would require an explicit extra
+> > flag?
 > 
-> What would we expose through this flag?
+> So far, there is no extra flag to describe further nesting, and it
+> directly comes from EL2 being emulated. I don't mind renaming this to
+> KVM_ARM_VCPU_HAS_EL2, or something similar... Whether we want userspace
+> to control the exposure of the nesting capability (i.e. EL2 with
+> ARMv8.3-NV) is another question.
 
-Nothing new, put possibly more efficient to access.
+Agreed.
 
-AFAIK, test_bit() always results in an explicit load, whereas
-vcpu->arch.flags is just a variable, which we already access on some hot
-paths.  So the compiler can read it once and cache it, with a bit of
-luck.
+KVM_ARM_VCPU_HAS_EL2 seems a reasonable name to me.
 
-For flags that are fixed after vcpu init, or flags that are only read/
-written by the vcpu thread itself, this should work fine.
+If we have have an internal flag in vcpu_arch.flags we could call that
+something different (i.e., keep the NESTED_VIRT naming) if it's natural
+to do so.
 
 Cheers
 ---Dave
