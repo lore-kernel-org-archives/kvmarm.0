@@ -2,60 +2,66 @@ Return-Path: <SRS0=95sP=VA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32708C06513
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 17:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC549C0650E
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 17:46:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C360821881
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 17:43:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C360821881
+	by mail.kernel.org (Postfix) with ESMTP id 69BD321881
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Jul 2019 17:46:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BD321881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 587984A508;
-	Wed,  3 Jul 2019 13:43:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4F1E4A4F7;
+	Wed,  3 Jul 2019 13:46:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SQ9l9Km5nQb8; Wed,  3 Jul 2019 13:43:01 -0400 (EDT)
+	with ESMTP id 2mf2NsSbeVwV; Wed,  3 Jul 2019 13:46:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8AC4A528;
-	Wed,  3 Jul 2019 13:43:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA9A4A508;
+	Wed,  3 Jul 2019 13:46:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C64A4A508
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 13:42:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 285704A4F9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 13:46:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SUO5gAABJZ1b for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Jul 2019 13:42:58 -0400 (EDT)
+ with ESMTP id ZWDIE6B3Pvu3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Jul 2019 13:46:12 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2192D4A4F7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 13:42:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F384A4F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 13:46:12 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6D40344;
- Wed,  3 Jul 2019 10:42:57 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3F961344;
+ Wed,  3 Jul 2019 10:46:12 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2BF4F3F718;
- Wed,  3 Jul 2019 10:42:56 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 723E93F718;
+ Wed,  3 Jul 2019 10:46:10 -0700 (PDT)
+Date: Wed, 3 Jul 2019 18:46:08 +0100
 From: Dave Martin <Dave.Martin@arm.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64/sve: Fix vq_present() macro to yield a bool
-Date: Wed,  3 Jul 2019 18:42:50 +0100
-Message-Id: <1562175770-10952-1-git-send-email-Dave.Martin@arm.com>
-X-Mailer: git-send-email 2.1.4
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
- Christoffer Dall <cdall@kernel.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Julien Grall <julien.grall@arm.com>, Viresh Kumar <viresh.kumar@linaro.org>,
- linux-arm-kernel@lists.infradead.org
+To: "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+Subject: Re: [PATCH V3] KVM: arm64: Implement vq_present() as a macro
+Message-ID: <20190703174605.GX2790@e103592.cambridge.arm.com>
+References: <be823e68faffc82a6f621c16ce1bd45990d92791.1560160681.git.viresh.kumar@linaro.org>
+ <8898674D84E3B24BA3A2D289B872026A78BA95D6@G01JPEXMBKW03>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <8898674D84E3B24BA3A2D289B872026A78BA95D6@G01JPEXMBKW03>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Cc: "Okamoto, Takayuki" <tokamoto@jp.fujitsu.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, 'Viresh Kumar' <viresh.kumar@linaro.org>,
+ Will Deacon <will.deacon@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, "Mizuma,
+ Masayoshi" <masayoshi.mizuma@fujitsu.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "Indoh, Takao" <indou.takao@fujitsu.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,72 +73,53 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Zhang Lei <zhang.lei@jp.fujitsu.com>
-
-The original implementation of vq_present() relied on aggressive
-inlining in order for the compiler to know that the code is
-correct, due to some const-casting issues.  This was causing sparse
-and clang to complain, while GCC compiled cleanly.
-
-Commit 0c529ff789bc addressed this problem, but since vq_present()
-is no longer a function, there is now no implicit casting of the
-returned value to the return type (bool).
-
-In set_sve_vls(), this uncast bit value is compared against a bool,
-and so may spuriously compare as unequal when both are nonzero.  As
-a result, KVM may reject valid SVE vector length configurations as
-invalid, and vice versa.
-
-Fix it by forcing the returned value to a bool.
-
-Signed-off-by: Zhang Lei <zhang.lei@jp.fujitsu.com>
-Fixes: 0c529ff789bc ("KVM: arm64: Implement vq_present() as a macro")
-Signed-off-by: Dave Martin <Dave.Martin@arm.com> [commit message rewrite]
-Cc: Viresh Kumar <viresh.kumar@linaro.org>
-
----
-
-Posting this under Zhang Lei's authorship, due to the need to turn this
-fix around quickly.  The fix is as per the original suggestion [1].
-
-Originally observed with the QEMU KVM SVE support under review:
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04945.html
-
-Bug reproduced and fix tested on the Arm Fast Model, with
-http://linux-arm.org/git?p=kvmtool-dm.git;a=shortlog;h=refs/heads/sve/v3/head
-(After rerunning util/update_headers.sh.)
-
-(the --sve-vls command line argument was removed in v4 of the
-kvmtool patches).
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-July/664633.html
----
- arch/arm64/kvm/guest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index c2afa79..dfd6264 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -208,7 +208,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 
- #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
- #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
--#define vq_present(vqs, vq) ((vqs)[vq_word(vq)] & vq_mask(vq))
-+#define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
- 
- static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
--- 
-2.1.4
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gV2VkLCBKdWwgMDMsIDIwMTkgYXQgMTI6MDQ6MTFQTSArMDAwMCwgWmhhbmcsIExlaSB3cm90
+ZToKPiBIaSBndXlzLAo+IAo+IEkgY2FuJ3Qgc3RhcnQgdXAgS1ZNIGd1ZXN0IG9zIHdpdGggU1ZF
+IGZlYXR1cmUgd2l0aCB5b3VyIHBhdGNoLgo+IFRoZSBlcnJvciBtZXNzYWdlIGlzIAo+IHFlbXUt
+c3lzdGVtLWFhcmNoNjQ6IGt2bV9pbml0X3ZjcHUgZmFpbGVkOiBJbnZhbGlkIGFyZ3VtZW50Lgo+
+IAo+IE15IHRlc3QgZW52aXJvbWVudC4KPiBrZXJuZWwgIGxpbnV4LTUuMi1yYzYKPiBxZW11ICBb
+UWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzE0XSB0YXJnZXQvYXJtL2t2bTogZW5hYmxlIFNWRSBp
+biBndWVzdHMgaHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIw
+MTktMDYvbXNnMDQ5NDUuaHRtbAo+IEtWTSBzdGFydCB1cCBvcHRpb24KPiAtbWFjaGluZSB2aXJ0
+LGdpYy12ZXJzaW9uPWhvc3QsYWNjZWw9a3ZtIFwKPiAtY3B1IGhvc3QgXAo+IC1tYWNoaW5lIHR5
+cGU9dmlydCBcCj4gLW5vZ3JhcGhpYyBcCj4gLXNtcCAxNiBcIC1tIDQwOTYgXAo+IC1kcml2ZSBp
+Zj1ub25lLGZpbGU9L3Jvb3QvaW1hZ2UucWNvdzIsaWQ9aGQwLGZvcm1hdD1xY293MiBcCj4gLWRl
+dmljZSB2aXJ0aW8tYmxrLWRldmljZSxkcml2ZT1oZDAgXAo+IC1uZXRkZXYgdXNlcixpZD1teW5l
+dDAscmVzdHJpY3Q9b2ZmLGhvc3Rmd2Q9dGNwOjozODAwMS06MjIgXAo+IC1kZXZpY2UgdmlydGlv
+LW5ldC1kZXZpY2UsbmV0ZGV2PW15bmV0MCBcCj4gLWJpb3MgL3Jvb3QvUUVNVV9FRkkuZmQKPiAK
+PiBzdmVfdnFfYXZhaWxhYmxlIGZ1bmN0aW9uJ3MgcmV0dXJuIHZhbHVlJyB0eXBlIGlzIGJvb2wu
+Cj4gQnV0IHZxX3ByZXNlbnQgaXMgbWFjcm8sIHNvIHRoZSB2YWx1ZSBpcyBub3Qgb25seSBUUlVF
+LCBGQUxTRSBidXQgYWxzbyBzb21lIG51bWJlcnMuCj4gU28gSXQgZmFpbGVkIGF0IAo+IGlmICh2
+cV9wcmVzZW50KHZxcywgdnEpICE9IHN2ZV92cV9hdmFpbGFibGUodnEpKS4KPiBJIHRoaW5rIGl0
+IGlzIG5lc3NhcnkgdG8gbWFrZSB2cV9wcmVzZW50IG1hY3JvJ3MgdmFsdWUgb25seSBUUlVFIGFu
+ZCBGQUxTRS4KPiAKPiBhcmNoL2FybTY0L2t2bS9ndWVzdC5jCj4gc3RhdGljIGludCBzZXRfc3Zl
+X3ZscyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVn
+KQo+IAlmb3IgKHZxID0gU1ZFX1ZRX01JTjsgdnEgPD0gbWF4X3ZxOyArK3ZxKQo+IAkJaWYgKHZx
+X3ByZXNlbnQodnFzLCB2cSkgIT0gc3ZlX3ZxX2F2YWlsYWJsZSh2cSkp44CALy8gSXQgZmFpbGVk
+IGF0IGhlcmUuCj4gCQkJcmV0dXJuIC1FSU5WQUw7Cj4gCj4gTXkgcGF0Y2ggYXMgZm9sbG93cy4K
+PiBJIGhhdmUgc3RhcnRlZCB1cCBLVk0gZ3Vlc3Qgb3Mgc3VjY2Vzc2Z1bGx5IHdpdGggU1ZFIGZl
+YXR1cmUgd2l0aCB0aGlzIHBhdGNoLgo+IAo+IENvdWxkIHlvdSByZXZpZXcgYW5kIG1lcmdlIG15
+IHBhdGNoPwoKWy4uLl0KClRoYW5rcyBmb3IgcmVwb3J0aW5nIHRoaXMhICBJdCBsb29rcyBsaWtl
+IHdlIGRpZG4ndCByZWFsaXNlIHdlIGRyb3BwZWQKdGhlIGltcGxpY2l0IGNhc3QgdG8gYm9vbCB3
+aGVuIHRoZSByZXN1bHQgd2FzIHJldHVybmVkIGZyb20gdGhlIG9yaWdpbmFsCnZlcnNpb24gb2Yg
+dnFfcHJlc2VudCgpLgoKWW91ciBmaXggbG9va3Mgc2Vuc2libGUgdG8gbWUuCgpGb3IgdGhlIGZ1
+dHVyZSwgc2VlIERvY3VtZW50YXRpb24vcHJvY2Vzcy9zdWJtaXR0aW5nLXBhdGNoZXMucnN0IGZv
+cgpndWlkYW5jZSBvbiBob3cgdG8gcHJlcGFyZSBhIHBhdGNoIGZvciBzdWJtaXNzaW9uLgoKSG93
+ZXZlciwgZHVlIHRvIHRoZSBmYWN0IHRoYXQgd2UncmUgYWxyZWFkeSBhdCAtcmM3IEkndmUgd3Jp
+dHRlbiBhCmNvbW1pdCBtZXNzYWdlIGZvciB0aGUgcGF0Y2ggYW5kIHJlcG9zdGVkIFsxXS4gIFNp
+bmNlIHRoZSBmaXggaXMgeW91cnMsCkknbGwga2VlcCB5b3VyIGF1dGhvcnNoaXAgYW5kIFMtby1C
+LgoKUGxlYXNlIHJldGVzdCB3aGVuIHlvdSBjYW4gKHRob3VnaCB0aGUgZGlmZiBzaG91bGQgYmUg
+dGhlIHNhbWUpLgoKTm90ZSwgeW91ciBtYWlsIHNlZW1zIHRvIGJlIGNvcnJ1cHRlZCwgYnV0IHNp
+bmNlIHRoZSBkaWZmIGlzIGEgb25lLWxpbmUKZml4LCBJJ20gcHJldHR5IGNvbmZpZGVudCBJIGRl
+Y29kZWQgaXQgY29ycmVjdGx5LiAgSWYgYW55dGhpbmcgbG9va3MKd3JvbmcsIHBsZWFzZSBsZXQg
+bWUga25vdy4KClsuLi5dCgpDaGVlcnMKLS0tRGF2ZQoKClsxXSBbUEFUQ0hdIEtWTTogYXJtNjQv
+c3ZlOiBGaXggdnFfcHJlc2VudCgpIG1hY3JvIHRvIHlpZWxkIGEgYm9vbApodHRwOi8vbGlzdHMu
+aW5mcmFkZWFkLm9yZy9waXBlcm1haWwvbGludXgtYXJtLWtlcm5lbC8yMDE5LUp1bHkvNjY0NzQ1
+Lmh0bWwKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
+YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
+dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
