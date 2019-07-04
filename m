@@ -4,52 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9E4C0651F
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 15:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B60FDC0651F
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 15:15:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E821218A6
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 15:05:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E821218A6
+	by mail.kernel.org (Postfix) with ESMTP id 5265520659
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 15:15:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5265520659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01E64A369;
-	Thu,  4 Jul 2019 11:05:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9F0C4A4E8;
+	Thu,  4 Jul 2019 11:15:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7sk2vClOwJ7R; Thu,  4 Jul 2019 11:05:42 -0400 (EDT)
+	with ESMTP id VBALeRXkj4bK; Thu,  4 Jul 2019 11:15:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20C3F4A418;
-	Thu,  4 Jul 2019 11:05:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B7684A445;
+	Thu,  4 Jul 2019 11:15:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04CFA4A332
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 11:05:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 854F24A369
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 11:15:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GecIX2TICqwJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jul 2019 11:05:39 -0400 (EDT)
+ with ESMTP id SifoS-X+JHKp for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jul 2019 11:15:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 111E24005D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 11:05:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1F554A332
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 11:15:54 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0F9E28;
- Thu,  4 Jul 2019 08:05:38 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E8282B;
+ Thu,  4 Jul 2019 08:15:54 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- B61143F738; Thu,  4 Jul 2019 08:05:37 -0700 (PDT)
-Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
+ 610313F703; Thu,  4 Jul 2019 08:15:53 -0700 (PDT)
+Subject: Re: [PATCH 15/59] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
 To: Alexandru Elisei <alexandru.elisei@arm.com>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-14-marc.zyngier@arm.com>
- <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+ <20190621093843.220980-16-marc.zyngier@arm.com>
+ <2935ccb4-2fac-a618-0f04-15a3c1759a46@arm.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -96,12 +94,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <9209a8e4-ab0d-9c9e-4207-0649b84ba806@arm.com>
-Date: Thu, 4 Jul 2019 16:05:36 +0100
+Message-ID: <89b7a64e-3f71-bfb3-3959-5edf838352fb@arm.com>
+Date: Thu, 4 Jul 2019 16:15:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+In-Reply-To: <2935ccb4-2fac-a618-0f04-15a3c1759a46@arm.com>
 Content-Language: en-US
 Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -115,252 +113,174 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 26/06/2019 16:04, Alexandru Elisei wrote:
-> On 6/21/19 10:37 AM, Marc Zyngier wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
->>
->> KVM internally uses accessor functions when reading or writing the
->> guest's system registers. This takes care of accessing either the stored
->> copy or using the "live" EL1 system registers when the host uses VHE.
->>
->> With the introduction of virtual EL2 we add a bunch of EL2 system
->> registers, which now must also be taken care of:
->> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->>   revert to the stored version of that, and not use the CPU's copy.
->> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->>   also use the stored version, since the CPU carries the EL1 copy.
->> - Some EL2 system registers are supposed to affect the current execution
->>   of the system, so we need to put them into their respective EL1
->>   counterparts. For this we need to define a mapping between the two.
->>   This is done using the newly introduced struct el2_sysreg_map.
->> - Some EL2 system registers have a different format than their EL1
->>   counterpart, so we need to translate them before writing them to the
->>   CPU. This is done using an (optional) translate function in the map.
->> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
->>   which need some separate handling.
->>
->> All of these cases are now wrapped into the existing accessor functions,
->> so KVM users wouldn't need to care whether they access EL2 or EL1
->> registers and also which state the guest is in.
->>
->> This handles what was formerly known as the "shadow state" dynamically,
->> without requiring a separate copy for each vCPU EL.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_emulate.h |   6 +
->>  arch/arm64/include/asm/kvm_host.h    |   5 +
->>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
->>  3 files changed, 174 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index c43aac5fed69..f37006b6eec4 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
->>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
->>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
->>  
->> +u64 translate_tcr(u64 tcr);
->> +u64 translate_cptr(u64 tcr);
->> +u64 translate_sctlr(u64 tcr);
->> +u64 translate_ttbr0(u64 tcr);
->> +u64 translate_cnthctl(u64 tcr);
->> +
->>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
->>  {
->>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 2d4290d2513a..dae9c42a7219 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
->>  	NR_SYS_REGS	/* Nothing after this line! */
->>  };
->>  
->> +static inline bool sysreg_is_el2(int reg)
->> +{
->> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
->> +}
->> +
->>  /* 32bit mapping */
->>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
->>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 693dd063c9c2..d024114da162 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->>  	return false;
->>  }
->>  
->> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
->> +{
->> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
->> +		<< TCR_IPS_SHIFT;
->> +}
->> +
->> +u64 translate_tcr(u64 tcr)
->> +{
->> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
->> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
->> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
->> +	       (tcr & TCR_EL2_TG0_MASK) |
->> +	       (tcr & TCR_EL2_ORGN0_MASK) |
->> +	       (tcr & TCR_EL2_IRGN0_MASK) |
->> +	       (tcr & TCR_EL2_T0SZ_MASK);
->> +}
->> +
->> +u64 translate_cptr(u64 cptr_el2)
->> +{
->> +	u64 cpacr_el1 = 0;
->> +
->> +	if (!(cptr_el2 & CPTR_EL2_TFP))
->> +		cpacr_el1 |= CPACR_EL1_FPEN;
->> +	if (cptr_el2 & CPTR_EL2_TTA)
->> +		cpacr_el1 |= CPACR_EL1_TTA;
->> +	if (!(cptr_el2 & CPTR_EL2_TZ))
->> +		cpacr_el1 |= CPACR_EL1_ZEN;
->> +
->> +	return cpacr_el1;
->> +}
->> +
->> +u64 translate_sctlr(u64 sctlr)
->> +{
->> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
->> +	return sctlr | BIT(20);
->> +}
->> +
->> +u64 translate_ttbr0(u64 ttbr0)
->> +{
->> +	/* Force ASID to 0 (ASID 0 or RES0) */
->> +	return ttbr0 & ~GENMASK_ULL(63, 48);
->> +}
->> +
->> +u64 translate_cnthctl(u64 cnthctl)
->> +{
->> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
->> +}
->> +
->> +#define EL2_SYSREG(el2, el1, translate)	\
->> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
->> +#define PURE_EL2_SYSREG(el2) \
->> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
->> +/*
->> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
->> + * The translate function can be NULL, when the register layout is identical.
->> + */
->> +struct el2_sysreg_map {
->> +	int sysreg;	/* EL2 register index into the array above */
->> +	int mapping;	/* associated EL1 register */
->> +	u64 (*translate)(u64 value);
->> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
->> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
->> +	PURE_EL2_SYSREG( HCR_EL2 ),
->> +	PURE_EL2_SYSREG( MDCR_EL2 ),
->> +	PURE_EL2_SYSREG( HSTR_EL2 ),
->> +	PURE_EL2_SYSREG( HACR_EL2 ),
->> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
->> +	PURE_EL2_SYSREG( VTCR_EL2 ),
->> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
->> +	PURE_EL2_SYSREG( RMR_EL2 ),
->> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
->> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
->> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
->> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
->> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
->> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
->> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
->> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
->> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
->> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
->> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
->> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
->> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
->> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
->> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
->> +};
->> +
->> +static
->> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
->> +					     int reg)
->> +{
->> +	const struct el2_sysreg_map *entry;
->> +
->> +	if (!sysreg_is_el2(reg))
->> +		return NULL;
->> +
->> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
->> +	if (entry->sysreg == __INVALID_SYSREG__)
->> +		return NULL;
->> +
->> +	return entry;
->> +}
->> +
->>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->>  {
->> +
->>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
->>  		goto immediate_read;
->>  
->> +	if (unlikely(sysreg_is_el2(reg))) {
->> +		const struct el2_sysreg_map *el2_reg;
->> +
->> +		if (!is_hyp_ctxt(vcpu))
->> +			goto immediate_read;
->> +
->> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
->> +		if (el2_reg) {
->> +			/*
->> +			 * If this register does not have an EL1 counterpart,
->> +			 * then read the stored EL2 version.
->> +			 */
->> +			if (el2_reg->mapping == __INVALID_SYSREG__)
->> +				goto immediate_read;
->> +
->> +			/* Get the current version of the EL1 counterpart. */
->> +			reg = el2_reg->mapping;
->> +		}
->> +	} else {
->> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
->> +		if (unlikely(is_hyp_ctxt(vcpu)))
->> +			goto immediate_read;
->> +	}
->> +
->>  	/*
->>  	 * System registers listed in the switch are not saved on every
->>  	 * exit from the guest but are only saved on vcpu_put.
->> @@ -114,6 +245,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->>  	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
->>  	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
->>  	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
->> +	case SP_EL2:		return read_sysreg(sp_el1);
-> From ARM DDI 0487D.b, section Behavior when HCR_EL2.NV == 1: "Reads or writes to
-> any allocated and implemented System register or Special-purpose register named
-> *_EL2, *_EL02, or *_EL12 in the MRS or MSR instruction, other than SP_EL2, are
-> trapped to EL2 rather than being UNDEFINED" (page D5-2480). My interpretation of
-> the text is that attempted reads of SP_EL2 from virtual EL2 cause an undefined
-> instruction exception.
-
-Sure. Nonetheless, the virtual EL2 has a stack pointer, accessible via
-SP_EL1 when it is loaded on the CPU. Somehow, this gets dropped later in
-the series (which is a bit wrong). I definitely should bring it back.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjcvMDYvMjAxOSAxMDoyMSwgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPiBPbiA2LzIxLzE5
+IDEwOjM3IEFNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4+IEV4dHJhY3QgdGhlIGRpcmVjdCBIVyBh
+Y2Nlc3NvcnMgZm9yIGxhdGVyIHJldXNlLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdp
+ZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgo+PiAtLS0KPj4gIGFyY2gvYXJtNjQva3ZtL3N5c19y
+ZWdzLmMgfCAyNDcgKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0KPj4gIDEg
+ZmlsZSBjaGFuZ2VkLCAxMzkgaW5zZXJ0aW9ucygrKSwgMTA4IGRlbGV0aW9ucygtKQo+Pgo+PiBk
+aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJtNjQva3ZtL3N5
+c19yZWdzLmMKPj4gaW5kZXggMmI4NzM0Zjc1YTA5Li5lMTgxMzU5YWRhZGYgMTAwNjQ0Cj4+IC0t
+LSBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lz
+X3JlZ3MuYwo+PiBAQCAtMTgyLDk5ICsxODIsMTYxIEBAIGNvbnN0IHN0cnVjdCBlbDJfc3lzcmVn
+X21hcCAqZmluZF9lbDJfc3lzcmVnKGNvbnN0IHN0cnVjdCBlbDJfc3lzcmVnX21hcCAqbWFwLAo+
+PiAgCXJldHVybiBlbnRyeTsKPj4gIH0KPj4gIAo+PiArc3RhdGljIGJvb2wgX192Y3B1X3JlYWRf
+c3lzX3JlZ19mcm9tX2NwdShpbnQgcmVnLCB1NjQgKnZhbCkKPj4gK3sKPj4gKwkvKgo+PiArCSAq
+IFN5c3RlbSByZWdpc3RlcnMgbGlzdGVkIGluIHRoZSBzd2l0Y2ggYXJlIG5vdCBzYXZlZCBvbiBl
+dmVyeQo+PiArCSAqIGV4aXQgZnJvbSB0aGUgZ3Vlc3QgYnV0IGFyZSBvbmx5IHNhdmVkIG9uIHZj
+cHVfcHV0Lgo+PiArCSAqCj4+ICsJICogTm90ZSB0aGF0IE1QSURSX0VMMSBmb3IgdGhlIGd1ZXN0
+IGlzIHNldCBieSBLVk0gdmlhIFZNUElEUl9FTDIgYnV0Cj4+ICsJICogc2hvdWxkIG5ldmVyIGJl
+IGxpc3RlZCBiZWxvdywgYmVjYXVzZSB0aGUgZ3Vlc3QgY2Fubm90IG1vZGlmeSBpdHMKPj4gKwkg
+KiBvd24gTVBJRFJfRUwxIGFuZCBNUElEUl9FTDEgaXMgYWNjZXNzZWQgZm9yIFZDUFUgQSBmcm9t
+IFZDUFUgQidzCj4+ICsJICogdGhyZWFkIHdoZW4gZW11bGF0aW5nIGNyb3NzLVZDUFUgY29tbXVu
+aWNhdGlvbi4KPj4gKwkgKi8KPj4gKwlzd2l0Y2ggKHJlZykgewo+PiArCWNhc2UgQ1NTRUxSX0VM
+MToJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX0NTU0VMUl9FTDEpOwlicmVhazsKPj4gKwljYXNl
+IFNDVExSX0VMMToJCSp2YWwgPSByZWFkX3N5c3JlZ19zKFNZU19TQ1RMUl9FTDEyKTsJYnJlYWs7
+Cj4+ICsJY2FzZSBBQ1RMUl9FTDE6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhTWVNfQUNUTFJfRUwx
+KTsJYnJlYWs7Cj4+ICsJY2FzZSBDUEFDUl9FTDE6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhTWVNf
+Q1BBQ1JfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgVFRCUjBfRUwxOgkJKnZhbCA9IHJlYWRfc3lz
+cmVnX3MoU1lTX1RUQlIwX0VMMTIpOwlicmVhazsKPj4gKwljYXNlIFRUQlIxX0VMMToJCSp2YWwg
+PSByZWFkX3N5c3JlZ19zKFNZU19UVEJSMV9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBUQ1JfRUwx
+OgkJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX1RDUl9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBF
+U1JfRUwxOgkJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX0VTUl9FTDEyKTsJYnJlYWs7Cj4+ICsJ
+Y2FzZSBBRlNSMF9FTDE6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhTWVNfQUZTUjBfRUwxMik7CWJy
+ZWFrOwo+PiArCWNhc2UgQUZTUjFfRUwxOgkJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX0FGU1Ix
+X0VMMTIpOwlicmVhazsKPj4gKwljYXNlIEZBUl9FTDE6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhT
+WVNfRkFSX0VMMTIpOwlicmVhazsKPj4gKwljYXNlIE1BSVJfRUwxOgkJKnZhbCA9IHJlYWRfc3lz
+cmVnX3MoU1lTX01BSVJfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgVkJBUl9FTDE6CQkqdmFsID0g
+cmVhZF9zeXNyZWdfcyhTWVNfVkJBUl9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBDT05URVhUSURS
+X0VMMToJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX0NPTlRFWFRJRFJfRUwxMik7YnJlYWs7Cj4+
+ICsJY2FzZSBUUElEUl9FTDA6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhTWVNfVFBJRFJfRUwwKTsJ
+YnJlYWs7Cj4+ICsJY2FzZSBUUElEUlJPX0VMMDoJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX1RQ
+SURSUk9fRUwwKTsJYnJlYWs7Cj4+ICsJY2FzZSBUUElEUl9FTDE6CQkqdmFsID0gcmVhZF9zeXNy
+ZWdfcyhTWVNfVFBJRFJfRUwxKTsJYnJlYWs7Cj4+ICsJY2FzZSBBTUFJUl9FTDE6CQkqdmFsID0g
+cmVhZF9zeXNyZWdfcyhTWVNfQU1BSVJfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgQ05US0NUTF9F
+TDE6CSp2YWwgPSByZWFkX3N5c3JlZ19zKFNZU19DTlRLQ1RMX0VMMTIpOwlicmVhazsKPj4gKwlj
+YXNlIFBBUl9FTDE6CQkqdmFsID0gcmVhZF9zeXNyZWdfcyhTWVNfUEFSX0VMMSk7CWJyZWFrOwo+
+PiArCWNhc2UgREFDUjMyX0VMMjoJKnZhbCA9IHJlYWRfc3lzcmVnX3MoU1lTX0RBQ1IzMl9FTDIp
+OwlicmVhazsKPj4gKwljYXNlIElGU1IzMl9FTDI6CSp2YWwgPSByZWFkX3N5c3JlZ19zKFNZU19J
+RlNSMzJfRUwyKTsJYnJlYWs7Cj4+ICsJY2FzZSBEQkdWQ1IzMl9FTDI6CSp2YWwgPSByZWFkX3N5
+c3JlZ19zKFNZU19EQkdWQ1IzMl9FTDIpOwlicmVhazsKPj4gKwlkZWZhdWx0OgkJcmV0dXJuIGZh
+bHNlOwo+PiArCX0KPj4gKwo+PiArCXJldHVybiB0cnVlOwo+PiArfQo+PiArCj4+ICtzdGF0aWMg
+Ym9vbCBfX3ZjcHVfd3JpdGVfc3lzX3JlZ190b19jcHUodTY0IHZhbCwgaW50IHJlZykKPj4gK3sK
+Pj4gKwkvKgo+PiArCSAqIFN5c3RlbSByZWdpc3RlcnMgbGlzdGVkIGluIHRoZSBzd2l0Y2ggYXJl
+IG5vdCByZXN0b3JlZCBvbiBldmVyeQo+PiArCSAqIGVudHJ5IHRvIHRoZSBndWVzdCBidXQgYXJl
+IG9ubHkgcmVzdG9yZWQgb24gdmNwdV9sb2FkLgo+PiArCSAqCj4+ICsJICogTm90ZSB0aGF0IE1Q
+SURSX0VMMSBmb3IgdGhlIGd1ZXN0IGlzIHNldCBieSBLVk0gdmlhIFZNUElEUl9FTDIgYnV0Cj4+
+ICsJICogc2hvdWxkIG5ldmVyIGJlIGxpc3RlZCBiZWxvdywgYmVjYXVzZSB0aGUgdGhlIE1QSURS
+IHNob3VsZCBvbmx5IGJlCj4+ICsJICogc2V0IG9uY2UsIGJlZm9yZSBydW5uaW5nIHRoZSBWQ1BV
+LCBhbmQgbmV2ZXIgY2hhbmdlZCBsYXRlci4KPj4gKwkgKi8KPj4gKwlzd2l0Y2ggKHJlZykgewo+
+PiArCWNhc2UgQ1NTRUxSX0VMMToJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfQ1NTRUxSX0VMMSk7
+CWJyZWFrOwo+PiArCWNhc2UgU0NUTFJfRUwxOgkJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfU0NU
+TFJfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgQUNUTFJfRUwxOgkJd3JpdGVfc3lzcmVnX3ModmFs
+LCBTWVNfQUNUTFJfRUwxKTsJYnJlYWs7Cj4+ICsJY2FzZSBDUEFDUl9FTDE6CQl3cml0ZV9zeXNy
+ZWdfcyh2YWwsIFNZU19DUEFDUl9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBUVEJSMF9FTDE6CQl3
+cml0ZV9zeXNyZWdfcyh2YWwsIFNZU19UVEJSMF9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBUVEJS
+MV9FTDE6CQl3cml0ZV9zeXNyZWdfcyh2YWwsIFNZU19UVEJSMV9FTDEyKTsJYnJlYWs7Cj4+ICsJ
+Y2FzZSBUQ1JfRUwxOgkJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfVENSX0VMMTIpOwlicmVhazsK
+Pj4gKwljYXNlIEVTUl9FTDE6CQl3cml0ZV9zeXNyZWdfcyh2YWwsIFNZU19FU1JfRUwxMik7CWJy
+ZWFrOwo+PiArCWNhc2UgQUZTUjBfRUwxOgkJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfQUZTUjBf
+RUwxMik7CWJyZWFrOwo+PiArCWNhc2UgQUZTUjFfRUwxOgkJd3JpdGVfc3lzcmVnX3ModmFsLCBT
+WVNfQUZTUjFfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgRkFSX0VMMToJCXdyaXRlX3N5c3JlZ19z
+KHZhbCwgU1lTX0ZBUl9FTDEyKTsJYnJlYWs7Cj4+ICsJY2FzZSBNQUlSX0VMMToJCXdyaXRlX3N5
+c3JlZ19zKHZhbCwgU1lTX01BSVJfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgVkJBUl9FTDE6CQl3
+cml0ZV9zeXNyZWdfcyh2YWwsIFNZU19WQkFSX0VMMTIpOwlicmVhazsKPj4gKwljYXNlIENPTlRF
+WFRJRFJfRUwxOgl3cml0ZV9zeXNyZWdfcyh2YWwsIFNZU19DT05URVhUSURSX0VMMTIpO2JyZWFr
+Owo+PiArCWNhc2UgVFBJRFJfRUwwOgkJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNfVFBJRFJfRUww
+KTsJYnJlYWs7Cj4+ICsJY2FzZSBUUElEUlJPX0VMMDoJd3JpdGVfc3lzcmVnX3ModmFsLCBTWVNf
+VFBJRFJST19FTDApOwlicmVhazsKPj4gKwljYXNlIFRQSURSX0VMMToJCXdyaXRlX3N5c3JlZ19z
+KHZhbCwgU1lTX1RQSURSX0VMMSk7CWJyZWFrOwo+PiArCWNhc2UgQU1BSVJfRUwxOgkJd3JpdGVf
+c3lzcmVnX3ModmFsLCBTWVNfQU1BSVJfRUwxMik7CWJyZWFrOwo+PiArCWNhc2UgQ05US0NUTF9F
+TDE6CXdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX0NOVEtDVExfRUwxMik7CWJyZWFrOwo+PiArCWNh
+c2UgUEFSX0VMMToJCXdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX1BBUl9FTDEpOwlicmVhazsKPj4g
+KwljYXNlIERBQ1IzMl9FTDI6CXdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX0RBQ1IzMl9FTDIpOwli
+cmVhazsKPj4gKwljYXNlIElGU1IzMl9FTDI6CXdyaXRlX3N5c3JlZ19zKHZhbCwgU1lTX0lGU1Iz
+Ml9FTDIpOwlicmVhazsKPj4gKwljYXNlIERCR1ZDUjMyX0VMMjoJd3JpdGVfc3lzcmVnX3ModmFs
+LCBTWVNfREJHVkNSMzJfRUwyKTsJYnJlYWs7Cj4+ICsJZGVmYXVsdDoJCXJldHVybiBmYWxzZTsK
+Pj4gKwl9Cj4+ICsKPj4gKwlyZXR1cm4gdHJ1ZTsKPj4gK30KPj4gKwo+PiAgdTY0IHZjcHVfcmVh
+ZF9zeXNfcmVnKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IHJlZykKPj4gIHsKPj4g
+LQl1NjQgdmFsOwo+PiArCXU2NCB2YWwgPSAweDhiYWRmMDBkOGJhZGYwMGQ7Cj4+ICAKPj4gIAlp
+ZiAoIXZjcHUtPmFyY2guc3lzcmVnc19sb2FkZWRfb25fY3B1KQo+PiAtCQlnb3RvIGltbWVkaWF0
+ZV9yZWFkOwo+PiArCQlnb3RvIG1lbW9yeV9yZWFkOwo+PiAgCj4+ICAJaWYgKHVubGlrZWx5KHN5
+c3JlZ19pc19lbDIocmVnKSkpIHsKPj4gIAkJY29uc3Qgc3RydWN0IGVsMl9zeXNyZWdfbWFwICpl
+bDJfcmVnOwo+PiAgCj4+ICAJCWlmICghaXNfaHlwX2N0eHQodmNwdSkpCj4+IC0JCQlnb3RvIGlt
+bWVkaWF0ZV9yZWFkOwo+PiArCQkJZ290byBtZW1vcnlfcmVhZDsKPj4gIAo+PiAgCQlzd2l0Y2gg
+KHJlZykgewo+PiArCQljYXNlIEVMUl9FTDI6Cj4+ICsJCQlyZXR1cm4gcmVhZF9zeXNyZWdfZWwx
+KFNZU19FTFIpOwo+PiAgCQljYXNlIFNQU1JfRUwyOgo+PiAgCQkJdmFsID0gcmVhZF9zeXNyZWdf
+ZWwxKFNZU19TUFNSKTsKPj4gIAkJCXJldHVybiBfX2ZpeHVwX3Nwc3JfZWwyX3JlYWQoJnZjcHUt
+PmFyY2guY3R4dCwgdmFsKTsKPj4gIAkJfQo+PiAgCj4+ICAJCWVsMl9yZWcgPSBmaW5kX2VsMl9z
+eXNyZWcobmVzdGVkX3N5c3JlZ19tYXAsIHJlZyk7Cj4+IC0JCWlmIChlbDJfcmVnKSB7Cj4+IC0J
+CQkvKgo+PiAtCQkJICogSWYgdGhpcyByZWdpc3RlciBkb2VzIG5vdCBoYXZlIGFuIEVMMSBjb3Vu
+dGVycGFydCwKPj4gLQkJCSAqIHRoZW4gcmVhZCB0aGUgc3RvcmVkIEVMMiB2ZXJzaW9uLgo+PiAt
+CQkJICovCj4+IC0JCQlpZiAoZWwyX3JlZy0+bWFwcGluZyA9PSBfX0lOVkFMSURfU1lTUkVHX18p
+Cj4+IC0JCQkJZ290byBpbW1lZGlhdGVfcmVhZDsKPj4gLQo+PiAtCQkJLyogR2V0IHRoZSBjdXJy
+ZW50IHZlcnNpb24gb2YgdGhlIEVMMSBjb3VudGVycGFydC4gKi8KPj4gLQkJCXJlZyA9IGVsMl9y
+ZWctPm1hcHBpbmc7Cj4+IC0JCX0KPj4gLQl9IGVsc2Ugewo+PiAtCQkvKiBFTDEgcmVnaXN0ZXIg
+Y2FuJ3QgYmUgb24gdGhlIENQVSBpZiB0aGUgZ3Vlc3QgaXMgaW4gdkVMMi4gKi8KPj4gLQkJaWYg
+KHVubGlrZWx5KGlzX2h5cF9jdHh0KHZjcHUpKSkKPj4gLQkJCWdvdG8gaW1tZWRpYXRlX3JlYWQ7
+Cj4+ICsJCUJVR19PTighZWwyX3JlZyk7Cj4+ICsKPj4gKwkJLyoKPj4gKwkJICogSWYgdGhpcyBy
+ZWdpc3RlciBkb2VzIG5vdCBoYXZlIGFuIEVMMSBjb3VudGVycGFydCwKPj4gKwkJICogdGhlbiBy
+ZWFkIHRoZSBzdG9yZWQgRUwyIHZlcnNpb24uCj4+ICsJCSAqLwo+PiArCQlpZiAoZWwyX3JlZy0+
+bWFwcGluZyA9PSBfX0lOVkFMSURfU1lTUkVHX18pCj4+ICsJCQlnb3RvIG1lbW9yeV9yZWFkOwo+
+PiArCj4+ICsJCWlmICghdmNwdV9lbDJfZTJoX2lzX3NldCh2Y3B1KSAmJgo+PiArCQkgICAgZWwy
+X3JlZy0+dHJhbnNsYXRlKQo+PiArCQkJZ290byBtZW1vcnlfcmVhZDsKPiAKPiBOaXQ6IHRoZSBj
+b25kaXRpb24gY2FuIGJlIHdyaXR0ZW4gb24gb25lIGxpbmUuCj4gCj4gVGhpcyBjb25kaXRpb24g
+d2Fzbid0IHByZXNlbnQgaW4gcGF0Y2ggMTMgd2hpY2ggaW50cm9kdWNlZCBFTDIgcmVnaXN0ZXIK
+PiBoYW5kbGluZywgYW5kIEknbSBzdHJ1Z2dsaW5nIHRvIHVuZGVyc3RhbmQgd2hhdCBpdCBkb2Vz
+LiBBcyBJIHVuZGVyc3RhbmQgdGhlCj4gY29kZSwgdGhpcyBjb25kaXRpb24gYmFzaWNhbGx5IHRy
+YW5zbGF0ZXMgaW50bzoKPiAKPiAtIGlmIHRoZSByZWdpc3RlciBpcyBvbmUgb2YgU0NUTFJfRUwy
+LCBUVEJSMF9FTDIsIENQVFJfRUwyIG9yIFRDUl9FTDIsIHRoZW4gcmVhZAo+IGl0IGZyb20gbWVt
+b3J5Lgo+IAo+IC0gaWYgdGhlIHJlZ2lzdGVyIGlzIGFuIEVMMiByZWdpc3RlciB3aG9zZSB2YWx1
+ZSBpcyB3cml0dGVuIHVubW9kaWZpZWQgdG8gdGhlCj4gY29ycmVzcG9uZGluZyBFTDEgcmVnaXN0
+ZXIsIHRoZW4gcmVhZCB0aGUgY29ycmVzcG9uZGluZyBFTDEgcmVnaXN0ZXIgYW5kIHJldHVybgo+
+IHRoYXQgdmFsdWUuCj4gCj4gTG9va2luZyBhdCB2Y3B1X3dyaXRlX3N5c19yZWcsIHRoZSB2YWx1
+ZXMgZm9yIHRoZSBFTDIgcmVnaXN0ZXJzIGFyZSBhbHdheXMgc2F2ZWQKPiBpbiBtZW1vcnkuIFRo
+ZSBndWVzdCBpcyBhIG5vbi12aGUgZ3Vlc3QsIHNvIHdyaXRlcyB0byBFTDEgcmVnaXN0ZXJzIHNo
+b3VsZG4ndCBiZQo+IHJlZmxlY3RlZCBpbiB0aGUgY29ycmVzcG9uZGluZyBFTDIgcmVnaXN0ZXIu
+IEkgdGhpbmsgaXQncyBzYWZlIHRvIGFsd2F5cyByZXR1cm4KPiB0aGUgdmFsdWUgZnJvbSBtZW1v
+cnkuCj4gCj4gSSB0cmllZCB0ZXN0aW5nIHRoaXMgd2l0aCB0aGUgZm9sbG93aW5nIHBhdGNoOgo+
+IAo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIGIvYXJjaC9hcm02NC9r
+dm0vc3lzX3JlZ3MuYwo+IGluZGV4IDEyMzVhODhlYzU3NS4uMjdkMzliYjk1NjRkIDEwMDY0NAo+
+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPiArKysgYi9hcmNoL2FybTY0L2t2bS9z
+eXNfcmVncy5jCj4gQEAgLTI5MCw2ICsyOTAsOSBAQCB1NjQgdmNwdV9yZWFkX3N5c19yZWcoY29u
+c3Qgc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQgcmVnKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBlbDJfcmVnID0gZmluZF9lbDJfc3lzcmVnKG5lc3RlZF9zeXNyZWdfbWFwLCBy
+ZWcpOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBCVUdfT04oIWVsMl9yZWcpOwo+
+IMKgCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKCF2Y3B1X2VsMl9lMmhfaXNf
+c2V0KHZjcHUpKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBnb3RvIG1lbW9yeV9yZWFkOwo+ICsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+LyoKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIElmIHRoaXMgcmVnaXN0ZXIg
+ZG9lcyBub3QgaGF2ZSBhbiBFTDEgY291bnRlcnBhcnQsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgKiB0aGVuIHJlYWQgdGhlIHN0b3JlZCBFTDIgdmVyc2lvbi4KPiBAQCAtMjk3
+LDEwICszMDAsNiBAQCB1NjQgdmNwdV9yZWFkX3N5c19yZWcoY29uc3Qgc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1LCBpbnQgcmVnKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoZWwy
+X3JlZy0+bWFwcGluZyA9PSBfX0lOVkFMSURfU1lTUkVHX18pCj4gwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnb3RvIG1lbW9yeV9yZWFkOwo+IMKgCj4gLcKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKCF2Y3B1X2VsMl9lMmhfaXNfc2V0KHZjcHUp
+ICYmCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlbDJfcmVnLT50cmFu
+c2xhdGUpCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdv
+dG8gbWVtb3J5X3JlYWQ7Cj4gLQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiBH
+ZXQgdGhlIGN1cnJlbnQgdmVyc2lvbiBvZiB0aGUgRUwxIGNvdW50ZXJwYXJ0LiAqLwo+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZWcgPSBlbDJfcmVnLT5tYXBwaW5nOwo+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBXQVJOX09OKCFfX3ZjcHVfcmVhZF9zeXNfcmVnX2Zy
+b21fY3B1KHJlZywgJnZhbCkpOwo+IAo+IEkga25vdyBpdCdzIG5vdCBjb25jbHVzaXZlLCBidXQg
+SSB3YXMgYWJsZSB0byBib290IGEgTDIgZ3Vlc3QgdW5kZXIgYSBMMSBub24tdmhlCj4gaHlwZXJ2
+aXNvci4KCkFuZCBub3cgeW91IGNhbid0IHByb3Blcmx5IGhhbmRsZSB0aGUgdGVycmlibGUgQVJN
+djguMyBidXNpbmVzcyBvZgpTUFNSX0VMMSBiZWluZyBjaGFuZ2VkIGJlaGluZCB5b3VyIGJhY2sg
+aWYgeW91IGdldCBhbiBleGNlcHRpb24gYXQgdkVMMgp0byB2RUwyIG9uIG5vbi1WSEUuIFRvIGhh
+bmRsZSB0aGlzLCB5b3UgbmVlZCBib3RoIHRoZSBsaXZlIHN5c3RlbQpyZWdpc3RlciBhbmQgdGhl
+IG1lbW9yeSBiYWNrdXAgKHNlZSBfX2ZpeHVwX3Nwc3JfZWwyX3JlYWQgYW5kIGNvKS4KCk1vcmUg
+Z2VuZXJhbGx5LCBzb21lIHJlZ2lzdGVycyBjYW4gYmUgbW9kaWZpZWQgYmVoaW5kIHlvdXIgYmFj
+ay4gVGhhdCdzCkVMUiwgU1BTUiwgRkFSLCBFU1IuICBBbnl0aGluZyByZWxhdGVkIHRvIHRha2lu
+ZyBhbiBleGNlcHRpb24uIE5vLCB0aGlzCmNhbid0IGJlIG9ic2VydmVkIHdpdGggS1ZNIGJlY2F1
+c2Ugd2UgZG9uJ3QgYWxsb3cgZXhjZXB0aW9uIHRvIGJlIHRha2VuCmF0IEVMMiBpbiB0aGUgYWJz
+ZW5jZSBvZiBSQVMgZXJyb3JzLgoKVGhhbmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJ
+dCBqdXN0IHNtZWxscyBmdW5ueS4uLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
