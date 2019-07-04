@@ -4,61 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6334CC0650E
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 08:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCC7C0650E
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 09:01:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E4E18218A3
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 08:35:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E18218A3
+	by mail.kernel.org (Postfix) with ESMTP id 6646E218A3
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 09:01:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6646E218A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 703214A417;
-	Thu,  4 Jul 2019 04:35:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4EAE4A1FA;
+	Thu,  4 Jul 2019 05:01:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id beBd9o5IP+tQ; Thu,  4 Jul 2019 04:35:08 -0400 (EDT)
+	with ESMTP id xKcTWvnVC4-r; Thu,  4 Jul 2019 05:01:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213E54A4E9;
-	Thu,  4 Jul 2019 04:35:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86AD94A32E;
+	Thu,  4 Jul 2019 05:01:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FBD54A417
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 04:35:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B08784A1FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 05:01:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PKvX+8Q7LgBK for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jul 2019 04:35:05 -0400 (EDT)
+ with ESMTP id iT1F7taI6gLp for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jul 2019 05:01:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFE94A1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 04:35:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F4AB40217
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 05:01:22 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38F39344;
- Thu,  4 Jul 2019 01:35:05 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 876A3344;
+ Thu,  4 Jul 2019 02:01:21 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B9F413F703;
- Thu,  4 Jul 2019 01:35:03 -0700 (PDT)
-Date: Thu, 4 Jul 2019 09:35:01 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Viresh Kumar <viresh.kumar@linaro.org>
-Subject: Re: [PATCH] KVM: arm64/sve: Fix vq_present() macro to yield a bool
-Message-ID: <20190704083459.GY2790@e103592.cambridge.arm.com>
-References: <1562175770-10952-1-git-send-email-Dave.Martin@arm.com>
- <20190704030252.4gzvoh4rxdmmddu5@vireshk-i7>
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2FE073F703;
+ Thu,  4 Jul 2019 02:01:20 -0700 (PDT)
+Date: Thu, 4 Jul 2019 10:01:17 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Julien Thierry <julien.thierry@arm.com>
+Subject: Re: [PATCH 52/59] KVM: arm64: nv: vgic: Allow userland to set VGIC
+ maintenance IRQ
+Message-ID: <20190704100117.7bba090b@donnerap.cambridge.arm.com>
+In-Reply-To: <23223923-125c-4d9b-eee9-071a4cf3de2a@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-53-marc.zyngier@arm.com>
+ <23223923-125c-4d9b-eee9-071a4cf3de2a@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190704030252.4gzvoh4rxdmmddu5@vireshk-i7>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
- Christoffer Dall <cdall@kernel.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu,
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Dave Martin <Dave.Martin@arm.com>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -76,77 +75,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 04, 2019 at 08:32:52AM +0530, Viresh Kumar wrote:
-> On 03-07-19, 18:42, Dave Martin wrote:
-> > From: Zhang Lei <zhang.lei@jp.fujitsu.com>
+On Thu, 4 Jul 2019 08:38:20 +0100
+Julien Thierry <julien.thierry@arm.com> wrote:
+
+> On 21/06/2019 10:38, Marc Zyngier wrote:
+> > From: Andre Przywara <andre.przywara@arm.com>
 > > 
-> > The original implementation of vq_present() relied on aggressive
-> > inlining in order for the compiler to know that the code is
-> > correct, due to some const-casting issues.  This was causing sparse
-> > and clang to complain, while GCC compiled cleanly.
+> > The VGIC maintenance IRQ signals various conditions about the LRs, when
+> > the GIC's virtualization extension is used.
+> > So far we didn't need it, but nested virtualization needs to know about
+> > this interrupt, so add a userland interface to setup the IRQ number.
+> > The architecture mandates that it must be a PPI, on top of that this code
+> > only exports a per-device option, so the PPI is the same on all VCPUs.
 > > 
-> > Commit 0c529ff789bc addressed this problem, but since vq_present()
-> > is no longer a function, there is now no implicit casting of the
-> > returned value to the return type (bool).
-> > 
-> > In set_sve_vls(), this uncast bit value is compared against a bool,
-> > and so may spuriously compare as unequal when both are nonzero.  As
-> > a result, KVM may reject valid SVE vector length configurations as
-> > invalid, and vice versa.
-> > 
-> > Fix it by forcing the returned value to a bool.
-> > 
-> > Signed-off-by: Zhang Lei <zhang.lei@jp.fujitsu.com>
-> > Fixes: 0c529ff789bc ("KVM: arm64: Implement vq_present() as a macro")
-> > Signed-off-by: Dave Martin <Dave.Martin@arm.com> [commit message rewrite]
-> > Cc: Viresh Kumar <viresh.kumar@linaro.org>
-> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > [added some bits of documentation]
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > > ---
+> >  .../virtual/kvm/devices/arm-vgic-v3.txt       |  9 ++++++++
+> >  arch/arm/include/uapi/asm/kvm.h               |  1 +
+> >  arch/arm64/include/uapi/asm/kvm.h             |  1 +
+> >  include/kvm/arm_vgic.h                        |  3 +++
+> >  virt/kvm/arm/vgic/vgic-kvm-device.c           | 22 +++++++++++++++++++
+> >  5 files changed, 36 insertions(+)
 > > 
-> > Posting this under Zhang Lei's authorship, due to the need to turn this
-> > fix around quickly.  The fix is as per the original suggestion [1].
-> > 
-> > Originally observed with the QEMU KVM SVE support under review:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04945.html
-> > 
-> > Bug reproduced and fix tested on the Arm Fast Model, with
-> > http://linux-arm.org/git?p=kvmtool-dm.git;a=shortlog;h=refs/heads/sve/v3/head
-> > (After rerunning util/update_headers.sh.)
-> > 
-> > (the --sve-vls command line argument was removed in v4 of the
-> > kvmtool patches).
-> > 
-> > [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-July/664633.html
-> > ---
-> >  arch/arm64/kvm/guest.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index c2afa79..dfd6264 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -208,7 +208,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  
-> >  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
-> >  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> > -#define vq_present(vqs, vq) ((vqs)[vq_word(vq)] & vq_mask(vq))
-> > +#define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
-> >  
-> >  static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >  {
+> > diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > index ff290b43c8e5..c70e8f2e0c9c 100644
+> > --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> > @@ -249,3 +249,12 @@ Groups:
+> >    Errors:
+> >      -EINVAL: vINTID is not multiple of 32 or
+> >       info field is not VGIC_LEVEL_INFO_LINE_LEVEL
+> > +
+> > +  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
+> > +    The attr field of kvm_device_attr encodes the following values:
+> > +    bits:     | 31   ....    5 | 4  ....  0 |
+> > +    values:   |      RES0      |   vINTID   |
+> > +
+> > +    The vINTID specifies which interrupt is generated when the vGIC
+> > +    must generate a maintenance interrupt. This must be a PPI.
+> > +  
 > 
-> It was a really nice bug :)
+> Something seems off. The documentation suggests that the value of the
+> attribute will be between 0-15 (and other values will be masked down to
+> a value between 0 and 15).
+
+Where does that happen? The mask is [4:0], so 5 bits, that should be enough for PPIs as well.
+We could add a line to the documentation to stress that this is an interrupt ID as seen by the virtual GIC, if that helps.
+
+Cheers,
+Andre.
+
+> However, in the code the value should be
+> between 16 and 32 (PPI INTID) and other values are rejected.
 > 
-> Reviewed-by: Viresh Kumar <viresh.kumar@linaro.org>
+> Am I reading this wrong?
+> 
+> Cheers,
+> 
+> Julien
+> 
+> > diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> > index 4602464ebdfb..a6af45645a6d 100644
+> > --- a/arch/arm/include/uapi/asm/kvm.h
+> > +++ b/arch/arm/include/uapi/asm/kvm.h
+> > @@ -233,6 +233,7 @@ struct kvm_vcpu_events {
+> >  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+> >  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+> >  #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
+> > +#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
+> >  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+> >  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+> >  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 563e2a8bae93..8e1c6ffe1b59 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -295,6 +295,7 @@ struct kvm_vcpu_events {
+> >  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+> >  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+> >  #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
+> > +#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
+> >  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+> >  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+> >  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > index 17d32c2797c0..95c6232663c3 100644
+> > --- a/include/kvm/arm_vgic.h
+> > +++ b/include/kvm/arm_vgic.h
+> > @@ -229,6 +229,9 @@ struct vgic_dist {
+> >  
+> >  	int			nr_spis;
+> >  
+> > +	/* The GIC maintenance IRQ for nested hypervisors. */
+> > +	u32			maint_irq;
+> > +
+> >  	/* base addresses in guest physical address space: */
+> >  	gpa_t			vgic_dist_base;		/* distributor */
+> >  	union {
+> > diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> > index 44419679f91a..dfb1d7cc66b3 100644
+> > --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> > +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> > @@ -241,6 +241,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+> >  			     VGIC_NR_PRIVATE_IRQS, uaddr);
+> >  		break;
+> >  	}
+> > +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
+> > +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> > +
+> > +		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
+> > +		break;
+> > +	}
+> >  	}
+> >  
+> >  	return r;
+> > @@ -627,6 +633,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+> >  		reg = tmp32;
+> >  		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+> >  	}
+> > +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
+> > +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> > +		u32 val;
+> > +
+> > +		if (get_user(val, uaddr))
+> > +			return -EFAULT;
+> > +
+> > +		/* Must be a PPI. */
+> > +		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
+> > +			return -EINVAL;
+> > +
+> > +		dev->kvm->arch.vgic.maint_irq = val;
+> > +
+> > +		return 0;
+> > +	}
+> >  	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+> >  		int ret;
+> >  
+> > @@ -712,6 +733,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+> >  	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+> >  		return vgic_v3_has_attr_regs(dev, attr);
+> >  	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+> > +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+> >  		return 0;
+> >  	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+> >  		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> >   
+> 
 
-Thanks for the quick review!
-
-Maybe it makes sense to write equality comparisons on bools as !x == !y
-to be more defensive against this kind of thing.  Anyway, probably best
-to leave this as-is while the dust settles.
-
-Cheers
----Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
