@@ -2,95 +2,62 @@ Return-Path: <SRS0=oQwk=VB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA30FC5B578
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 03:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70496C0650E
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 07:38:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C144218A4
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 03:03:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sIoi5eLA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C144218A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 0883C2133F
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Jul 2019 07:38:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0883C2133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA5C34A52E;
-	Wed,  3 Jul 2019 23:03:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 609A44A4FE;
+	Thu,  4 Jul 2019 03:38:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mqgtj0PbLjKK; Wed,  3 Jul 2019 23:03:02 -0400 (EDT)
+	with ESMTP id MY9M4Pe9R4xO; Thu,  4 Jul 2019 03:38:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E404A512;
-	Wed,  3 Jul 2019 23:03:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 931224A512;
+	Thu,  4 Jul 2019 03:38:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D79AF4A512
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 23:03:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3432A4A4FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 03:38:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6gm1Q9n4zfeA for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Jul 2019 23:02:58 -0400 (EDT)
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com
- [209.85.214.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E80C94A4C0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Jul 2019 23:02:57 -0400 (EDT)
-Received: by mail-pl1-f195.google.com with SMTP id 9so2281507ple.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Jul 2019 20:02:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=sTyi3iR7jCQEvPxbK8BvR4ttAJnxbQR239LUB66iAhw=;
- b=sIoi5eLAtErLcyWaGKCZPpvRw6qDchu67+af937tNVrygSPa938aKBuPkQKCVhNKG2
- oPJWZO/yTItjz3HsIjSKgZos83+uXXtBay3X7cc+z2898g+oGx2s+A/oLso/adx8w3E2
- pa9khEXpvG+YnS4WPoQ/kvXewSRhQITwyOtqfv6G4JlwFwOqt7fC6BJVZEsRfbhmIBMP
- Z2DgYlFJMbg4E6px2lBu5mZ/BOdq0l9V+tIgqgo9xcHaYXC2ikm3sQfcfvXOaZMKDC2R
- VXyB6L9u/FMpv+QbnLdNkLcPE33UnR0DMkrOwYd4NUI2TXwldR4/TxEcGlsVivQTgNhg
- tJHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=sTyi3iR7jCQEvPxbK8BvR4ttAJnxbQR239LUB66iAhw=;
- b=FvWGn7yd0lppNKtetsPPWRV/Jp1eu+V8m9qLSrMq9zZPZ9zw5msn4TZTW6G919hcfG
- w/tvuj2evRxYhACK0E0Ie9z0OCnrOPamRj/1J041L5yO3fgAEaj0tGprwgJ/kVyUyaKD
- BXL+HQ/VHMWOmgv9HbnGJhwFZKHYIDX0hSjsyxD7mwONXIuROG8fQZ+oQqmQECDPIOoJ
- nzys/JEZqhX7zL/2JjNbtb+Vh+S8+6D6yCi/bDtRKhGVy8dpelKo6ULbiVWzGyD0+fw+
- CqjsMaSEGIFgrdSIntkj5abqysGR0H2A+vW0MI5dYqftW1RjWIkF6K6hnjZy6JhIjCGN
- u9Kw==
-X-Gm-Message-State: APjAAAXO/gENqMKL0502SO8c9FEXbARYQlGhXiMzmFsKtMTZ5jToZ7r5
- 6N3KyIOR6ICJSYJTUARCuNaQQw==
-X-Google-Smtp-Source: APXvYqzkj47IBLLAis02KF5EQOJCt0lQoi5aUBJqMTCt+0NdKbWEmwsRT4Wgfx80LGdiSNq0hlOBww==
-X-Received: by 2002:a17:902:760a:: with SMTP id
- k10mr43054314pll.83.1562209376887; 
- Wed, 03 Jul 2019 20:02:56 -0700 (PDT)
-Received: from localhost ([122.172.21.205])
- by smtp.gmail.com with ESMTPSA id i7sm3468537pjk.24.2019.07.03.20.02.54
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 03 Jul 2019 20:02:55 -0700 (PDT)
-Date: Thu, 4 Jul 2019 08:32:52 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Subject: Re: [PATCH] KVM: arm64/sve: Fix vq_present() macro to yield a bool
-Message-ID: <20190704030252.4gzvoh4rxdmmddu5@vireshk-i7>
-References: <1562175770-10952-1-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id 3HeAPSkX+mis for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jul 2019 03:38:23 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83DE54A4D5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jul 2019 03:38:23 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E82C8344;
+ Thu,  4 Jul 2019 00:38:22 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DE013F703;
+ Thu,  4 Jul 2019 00:38:21 -0700 (PDT)
+Subject: Re: [PATCH 52/59] KVM: arm64: nv: vgic: Allow userland to set VGIC
+ maintenance IRQ
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-53-marc.zyngier@arm.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <23223923-125c-4d9b-eee9-071a4cf3de2a@arm.com>
+Date: Thu, 4 Jul 2019 08:38:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1562175770-10952-1-git-send-email-Dave.Martin@arm.com>
-User-Agent: NeoMutt/20180716-391-311a52
-Cc: Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
- Christoffer Dall <cdall@kernel.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190621093843.220980-53-marc.zyngier@arm.com>
+Content-Language: en-US
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,70 +74,147 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 03-07-19, 18:42, Dave Martin wrote:
-> From: Zhang Lei <zhang.lei@jp.fujitsu.com>
-> 
-> The original implementation of vq_present() relied on aggressive
-> inlining in order for the compiler to know that the code is
-> correct, due to some const-casting issues.  This was causing sparse
-> and clang to complain, while GCC compiled cleanly.
-> 
-> Commit 0c529ff789bc addressed this problem, but since vq_present()
-> is no longer a function, there is now no implicit casting of the
-> returned value to the return type (bool).
-> 
-> In set_sve_vls(), this uncast bit value is compared against a bool,
-> and so may spuriously compare as unequal when both are nonzero.  As
-> a result, KVM may reject valid SVE vector length configurations as
-> invalid, and vice versa.
-> 
-> Fix it by forcing the returned value to a bool.
-> 
-> Signed-off-by: Zhang Lei <zhang.lei@jp.fujitsu.com>
-> Fixes: 0c529ff789bc ("KVM: arm64: Implement vq_present() as a macro")
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com> [commit message rewrite]
-> Cc: Viresh Kumar <viresh.kumar@linaro.org>
-> 
-> ---
-> 
-> Posting this under Zhang Lei's authorship, due to the need to turn this
-> fix around quickly.  The fix is as per the original suggestion [1].
-> 
-> Originally observed with the QEMU KVM SVE support under review:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04945.html
-> 
-> Bug reproduced and fix tested on the Arm Fast Model, with
-> http://linux-arm.org/git?p=kvmtool-dm.git;a=shortlog;h=refs/heads/sve/v3/head
-> (After rerunning util/update_headers.sh.)
-> 
-> (the --sve-vls command line argument was removed in v4 of the
-> kvmtool patches).
-> 
-> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-July/664633.html
-> ---
->  arch/arm64/kvm/guest.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index c2afa79..dfd6264 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -208,7 +208,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  
->  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
->  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
-> -#define vq_present(vqs, vq) ((vqs)[vq_word(vq)] & vq_mask(vq))
-> +#define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
->  
->  static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  {
 
-It was a really nice bug :)
 
-Reviewed-by: Viresh Kumar <viresh.kumar@linaro.org>
+On 21/06/2019 10:38, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
+> 
+> The VGIC maintenance IRQ signals various conditions about the LRs, when
+> the GIC's virtualization extension is used.
+> So far we didn't need it, but nested virtualization needs to know about
+> this interrupt, so add a userland interface to setup the IRQ number.
+> The architecture mandates that it must be a PPI, on top of that this code
+> only exports a per-device option, so the PPI is the same on all VCPUs.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> [added some bits of documentation]
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  .../virtual/kvm/devices/arm-vgic-v3.txt       |  9 ++++++++
+>  arch/arm/include/uapi/asm/kvm.h               |  1 +
+>  arch/arm64/include/uapi/asm/kvm.h             |  1 +
+>  include/kvm/arm_vgic.h                        |  3 +++
+>  virt/kvm/arm/vgic/vgic-kvm-device.c           | 22 +++++++++++++++++++
+>  5 files changed, 36 insertions(+)
+> 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> index ff290b43c8e5..c70e8f2e0c9c 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+> @@ -249,3 +249,12 @@ Groups:
+>    Errors:
+>      -EINVAL: vINTID is not multiple of 32 or
+>       info field is not VGIC_LEVEL_INFO_LINE_LEVEL
+> +
+> +  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
+> +    The attr field of kvm_device_attr encodes the following values:
+> +    bits:     | 31   ....    5 | 4  ....  0 |
+> +    values:   |      RES0      |   vINTID   |
+> +
+> +    The vINTID specifies which interrupt is generated when the vGIC
+> +    must generate a maintenance interrupt. This must be a PPI.
+> +
+
+Something seems off. The documentation suggests that the value of the
+attribute will be between 0-15 (and other values will be masked down to
+a value between 0 and 15). However, in the code the value should be
+between 16 and 32 (PPI INTID) and other values are rejected.
+
+Am I reading this wrong?
+
+Cheers,
+
+Julien
+
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 4602464ebdfb..a6af45645a6d 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -233,6 +233,7 @@ struct kvm_vcpu_events {
+>  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+>  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+>  #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
+> +#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+>  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 563e2a8bae93..8e1c6ffe1b59 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -295,6 +295,7 @@ struct kvm_vcpu_events {
+>  #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+>  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+>  #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
+> +#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+>  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+>  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 17d32c2797c0..95c6232663c3 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -229,6 +229,9 @@ struct vgic_dist {
+>  
+>  	int			nr_spis;
+>  
+> +	/* The GIC maintenance IRQ for nested hypervisors. */
+> +	u32			maint_irq;
+> +
+>  	/* base addresses in guest physical address space: */
+>  	gpa_t			vgic_dist_base;		/* distributor */
+>  	union {
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index 44419679f91a..dfb1d7cc66b3 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -241,6 +241,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+>  			     VGIC_NR_PRIVATE_IRQS, uaddr);
+>  		break;
+>  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +
+> +		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
+> +		break;
+> +	}
+>  	}
+>  
+>  	return r;
+> @@ -627,6 +633,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+>  		reg = tmp32;
+>  		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+>  	}
+> +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
+> +		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+> +		u32 val;
+> +
+> +		if (get_user(val, uaddr))
+> +			return -EFAULT;
+> +
+> +		/* Must be a PPI. */
+> +		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
+> +			return -EINVAL;
+> +
+> +		dev->kvm->arch.vgic.maint_irq = val;
+> +
+> +		return 0;
+> +	}
+>  	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
+>  		int ret;
+>  
+> @@ -712,6 +733,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>  	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+>  		return vgic_v3_has_attr_regs(dev, attr);
+>  	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+> +	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+>  		return 0;
+>  	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+>  		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+> 
 
 -- 
-viresh
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
