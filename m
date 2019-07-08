@@ -6,59 +6,60 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D50C606AC
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jul 2019 13:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDEFC606AF
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jul 2019 13:18:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 53D8020861
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Jul 2019 13:14:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D8020861
+	by mail.kernel.org (Postfix) with ESMTP id D71B52086D
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Jul 2019 13:18:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D71B52086D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jonmasters.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D24F54A53D;
-	Mon,  8 Jul 2019 09:14:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33BD24A538;
+	Mon,  8 Jul 2019 09:18:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tFyyHUwuLn6B; Mon,  8 Jul 2019 09:14:31 -0400 (EDT)
+	with ESMTP id dZmpRPv+ZZHN; Mon,  8 Jul 2019 09:17:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C6714A534;
-	Mon,  8 Jul 2019 09:14:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEE364A52E;
+	Mon,  8 Jul 2019 09:17:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 258054A529
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jul 2019 09:14:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E61C34A529
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jul 2019 09:17:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GyGZqdylNC71 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jul 2019 09:14:29 -0400 (EDT)
+ with ESMTP id 2ZTFZV7z7OP9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jul 2019 09:17:56 -0400 (EDT)
 Received: from edison.jonmasters.org (edison.jonmasters.org [173.255.233.168])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07E3C4A518
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jul 2019 09:14:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C82EB4A518
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jul 2019 09:17:56 -0400 (EDT)
 Received: from boston.jonmasters.org ([50.195.43.97]
  helo=tonnant.bos.jonmasters.org)
  by edison.jonmasters.org with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <jcm@jonmasters.org>)
- id 1hkTTQ-0006Ap-1p; Mon, 08 Jul 2019 13:14:28 +0000
-To: Marc Zyngier <marc.zyngier@arm.com>, Mark Rutland <mark.rutland@arm.com>
+ id 1hkTWk-0006CH-LQ; Mon, 08 Jul 2019 13:17:55 +0000
+To: Mark Rutland <mark.rutland@arm.com>
 References: <7dd77cea-d673-269a-044f-4df269db7e5e@jonmasters.org>
  <20190708114716.GA33099@lakrids.cambridge.arm.com>
  <de6f5ca5-9485-620f-b748-9a38e9a4a0ba@jonmasters.org>
- <57b7e837-7dba-3735-fd1f-56ded26cc98b@arm.com>
+ <20190708130952.GB33099@lakrids.cambridge.arm.com>
 From: Jon Masters <jcm@jonmasters.org>
-Message-ID: <f7fa2a63-c44d-e215-6d9e-23d33ece8c63@jonmasters.org>
-Date: Mon, 8 Jul 2019 09:14:19 -0400
+Message-ID: <0d132022-2160-5309-200d-dc820d8a8235@jonmasters.org>
+Date: Mon, 8 Jul 2019 09:17:45 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <57b7e837-7dba-3735-fd1f-56ded26cc98b@arm.com>
+In-Reply-To: <20190708130952.GB33099@lakrids.cambridge.arm.com>
 Content-Language: en-US
 X-SA-Exim-Connect-IP: 50.195.43.97
 X-SA-Exim-Mail-From: jcm@jonmasters.org
 Subject: Re: FYI: Possible HPFAR_EL2 corruption (LPAE guests on AArch64 hosts)
 X-SA-Exim-Version: 4.2.1 (built Sun, 08 Nov 2009 07:31:22 +0000)
 X-SA-Exim-Scanned: Yes (on edison.jonmasters.org)
-Cc: kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org"
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu,
+ "linux-arm-kernel@lists.infradead.org"
  <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -76,25 +77,12 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 7/8/19 9:04 AM, Marc Zyngier wrote:
-
-> [Adding myself to the cc-list, for real this time! ;-)]
-
-Hehe
-
-> On 08/07/2019 13:16, Jon Masters wrote:
->> Hi Mark,
->>
->> Thanks for adding the CCs. See below for more.
->>
+On 7/8/19 9:09 AM, Mark Rutland wrote:
+> [Adding Marc for real this time]
+> 
+> On Mon, Jul 08, 2019 at 08:16:25AM -0400, Jon Masters wrote:
 >> On 7/8/19 7:47 AM, Mark Rutland wrote:
 >>> On Sun, Jul 07, 2019 at 11:39:46PM -0400, Jon Masters wrote:
->>>> Hi all,
->>>
->>> Hi Jon,
->>>
->>> [adding Marc and the kvm-arm list]
->>>
 >>>> TLDR: We think $subject may be a hardware errata and we are
 >>>> investigating. I was asked to drop a note to share my initial analysis
 >>>> in case others have been experiencing similar problems with 32-bit VMs.
@@ -153,15 +141,13 @@ Hehe
 >> Yeah. But only for certain faults - seems to be specifically for stage 1
 >> page table walks that cause a trap to stage 2.
 > 
-> Do we know for sure this is limited to the guest using LPAE? I
-> appreciate that this is the configuration you're running in, but it
-> would be an interesting data point to work out what is happening with
-> small descriptors.
+> Ok. It sounds like we could write a small guest to trigger that
+> deliberately with some pre-allocated page tables placed above a 4GiB
+> IPA.
 
-It appears to be so, yea. I believe it's a truncation errata on this
-platform (X-Gene1), and the vendor is currently investigating for us.
+Yea, indeed. It's funny what you realize as you're writing emails about
+it - was thinking that earlier :) Ok, that sounds like fun.
 
->>
 >>> e.g. if you return to the guest without fixing the fault, do you always
 >>> see the truncation when taking the fault again?
 >>
@@ -179,22 +165,18 @@ platform (X-Gene1), and the vendor is currently investigating for us.
 >> that the guest userspace/kernel tried to load. Hence an AT won't work,
 >> unless I'm missing something. My first thought had been to do that.
 > 
-> Ah, that's the bit I was missing: S1PTW not completing in S2 because of
-> the access flag. Duh.
+> My bad; I thought a failed AT reported the relevant IPA when it failed
+> as a result of a stage-2 fault, but I see now that it does not.
 
-:)
+Random aside - it would be great if there were an AT variant that did :)
 
-> Random idea: an option (although not a desirable one) would be to change
-> the way we handle page aging on the host by forcing an unmap at S2
-> instead of twiddling the access flag. Does this change anything on your
-> system?
+> I don't think that we can reliably walk the guest's Stage-1 tables
+> without trapping TLB invalidations (and/or stopping all vCPUs), so
+> that's rather unfortunate.
 
-Well now, that's an interesting idea. If I get chance today, I'll try.
-
-(I'm kinda getting close to punting this to the vendor...it resulted in
-a couple of all nighters last week trying to figure what the heck was
-going on. BUT I do want to figure out what could be an actually
-upstreamable quirk since Fedora is relying on this hardware)
+Indeed. In the Fedora case, it's only a single vCPU in each guest so
+they effectively already do that (and hence my test hack "works") but
+that's another thing that would need to be handled for a real fix.
 
 Jon.
 _______________________________________________
