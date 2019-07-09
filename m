@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B603C73C46
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3D7C73C41
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C2CF7216E3
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CF7216E3
+	by mail.kernel.org (Postfix) with ESMTP id 2FFC3214AF
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFC3214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68FC14A523;
-	Tue,  9 Jul 2019 08:25:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3154A52A;
+	Tue,  9 Jul 2019 08:25:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R6ylcr9k1+Iq; Tue,  9 Jul 2019 08:25:30 -0400 (EDT)
+	with ESMTP id zlYEWivuCBoE; Tue,  9 Jul 2019 08:25:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5168F4A547;
-	Tue,  9 Jul 2019 08:25:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79E044A547;
+	Tue,  9 Jul 2019 08:25:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C31AC4A53D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 609C84A543
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4hGRf0sk5HvL for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jul 2019 08:25:26 -0400 (EDT)
+ with ESMTP id lg0INedJAyiE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jul 2019 08:25:30 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 787534A550
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D5DA4A515
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:30 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C08F150C;
- Tue,  9 Jul 2019 05:25:26 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E8BE1515;
+ Tue,  9 Jul 2019 05:25:30 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (unknown [10.1.197.61])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6014C3F59C;
- Tue,  9 Jul 2019 05:25:24 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 638713F59C;
+ Tue,  9 Jul 2019 05:25:28 -0700 (PDT)
 From: Marc Zyngier <marc.zyngier@arm.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 03/18] KVM: arm64: Make indirect vectors preamble behaviour
- symmetric
-Date: Tue,  9 Jul 2019 13:24:52 +0100
-Message-Id: <20190709122507.214494-4-marc.zyngier@arm.com>
+Subject: [PATCH 05/18] KVM: arm64: Defer guest entry when an asynchronous
+ exception is pending
+Date: Tue,  9 Jul 2019 13:24:54 +0100
+Message-Id: <20190709122507.214494-6-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190709122507.214494-1-marc.zyngier@arm.com>
 References: <20190709122507.214494-1-marc.zyngier@arm.com>
@@ -74,51 +74,67 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: James Morse <james.morse@arm.com>
 
-The KVM indirect vectors support is a little complicated. Different CPUs
-may use different exception vectors for KVM that are generated at boot.
-Adding new instructions involves checking all the possible combinations
-do the right thing.
+SError that occur during world-switch's entry to the guest will be
+accounted to the guest, as the exception is masked until we enter the
+guest... but we want to attribute the SError as precisely as possible.
 
-To make changes here easier to review lets state what we expect of the
-preamble:
-  1. The first vector run, must always run the preamble.
-  2. Patching the head or tail of the vector shouldn't remove
-     preamble instructions.
+Reading DISR_EL1 before guest entry requires free registers, and using
+ESB+DISR_EL1 to consume and read back the ESR would leave KVM holding
+a host SError... We would rather leave the SError pending and let the
+host take it once we exit world-switch. To do this, we need to defer
+guest-entry if an SError is pending.
 
-Today, this is easy as we only have one instruction in the preamble.
-Change the unpatched tail of the indirect vector so that it always
-runs this, regardless of patching.
+Read the ISR to see if SError (or an IRQ) is pending. If so fake an
+exit. Place this check between __guest_enter()'s save of the host
+registers, and restore of the guest's. SError that occur between
+here and the eret into the guest must have affected the guest's
+registers, which we can naturally attribute to the guest.
+
+The dsb is needed to ensure any previous writes have been done before
+we read ISR_EL1. On systems without the v8.2 RAS extensions this
+doesn't give us anything as we can't contain errors, and the ESR bits
+to describe the severity are all implementation-defined. Replace
+this with a nop for these systems.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/entry.S | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 318a2f3996fc..a911b8ffc0f3 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -275,7 +275,7 @@ ENDPROC(__kvm_hyp_vector)
- /*
-  * The default sequence is to directly branch to the KVM vectors,
-  * using the computed offset. This applies for VHE as well as
-- * !ARM64_HARDEN_EL2_VECTORS.
-+ * !ARM64_HARDEN_EL2_VECTORS. The first vector must always run the preamble.
-  *
-  * For ARM64_HARDEN_EL2_VECTORS configurations, this gets replaced
-  * with:
-@@ -291,8 +291,8 @@ ENDPROC(__kvm_hyp_vector)
-  * See kvm_patch_vector_branch for details.
-  */
- alternative_cb	kvm_patch_vector_branch
--	b	__kvm_hyp_vector + (1b - 0b)
--	nop
-+	stp	x0, x1, [sp, #-16]!
-+	b	__kvm_hyp_vector + (1b - 0b + KVM_VECTOR_PREAMBLE)
- 	nop
- 	nop
- 	nop
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index fb2e218ce0c7..ebc8eb247bc9 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -6,6 +6,7 @@
+ 
+ #include <linux/linkage.h>
+ 
++#include <asm/alternative.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/assembler.h>
+ #include <asm/fpsimdmacros.h>
+@@ -52,6 +53,20 @@ ENTRY(__guest_enter)
+ 	// Store the host regs
+ 	save_callee_saved_regs x1
+ 
++	// Now the host state is stored if we have a pending RAS SError it must
++	// affect the host. If any asynchronous exception is pending we defer
++	// the guest entry. The DSB isn't necessary before v8.2 as any SError
++	// would be fatal.
++alternative_if ARM64_HAS_RAS_EXTN
++	dsb	nshst
++	isb
++alternative_else_nop_endif
++	mrs	x1, isr_el1
++	cbz	x1,  1f
++	mov	x0, #ARM_EXCEPTION_IRQ
++	ret
++
++1:
+ 	add	x18, x0, #VCPU_CONTEXT
+ 
+ 	// Macro ptrauth_switch_to_guest format:
 -- 
 2.20.1
 
