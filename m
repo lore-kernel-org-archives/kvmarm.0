@@ -2,63 +2,58 @@ Return-Path: <SRS0=/6PO=VG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E60C606DA
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 09:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70293C73C44
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E6ABE2080C
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 09:59:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6ABE2080C
+	by mail.kernel.org (Postfix) with ESMTP id 038DC21707
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Jul 2019 12:25:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 038DC21707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0D94A543;
-	Tue,  9 Jul 2019 05:59:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 640114A541;
+	Tue,  9 Jul 2019 08:25:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zh5gR+-soqHo; Tue,  9 Jul 2019 05:59:12 -0400 (EDT)
+	with ESMTP id k7K3JS2X6jyU; Tue,  9 Jul 2019 08:25:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A86D4A540;
-	Tue,  9 Jul 2019 05:59:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB4784A53E;
+	Tue,  9 Jul 2019 08:25:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 430E34A53D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 05:59:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CF464A53D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r4m8Im7L2ufV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jul 2019 05:59:09 -0400 (EDT)
+ with ESMTP id HeJLwB7GCdCk for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jul 2019 08:25:20 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C28B04A530
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 05:59:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B48644A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jul 2019 08:25:20 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D0AE28;
- Tue,  9 Jul 2019 02:59:09 -0700 (PDT)
-Received: from [10.1.196.217] (unassigned-hostname.cambridge.arm.com
- [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67F323F738;
- Tue,  9 Jul 2019 02:59:08 -0700 (PDT)
-Subject: Re: [PATCH 40/59] KVM: arm64: nv: Don't always start an S2 MMU search
- from the beginning
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-41-marc.zyngier@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ccb11c22-0aa9-7e6a-98b2-acdfa0603eb0@arm.com>
-Date: Tue, 9 Jul 2019 10:59:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29AE52B;
+ Tue,  9 Jul 2019 05:25:20 -0700 (PDT)
+Received: from filthy-habits.cambridge.arm.com (unknown [10.1.197.61])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CA153F59C;
+ Tue,  9 Jul 2019 05:25:18 -0700 (PDT)
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [GIT PULL] KVM/arm updates for Linux 5.3
+Date: Tue,  9 Jul 2019 13:24:49 +0100
+Message-Id: <20190709122507.214494-1-marc.zyngier@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-41-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>, Steven Price <steven.price@arm.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,72 +70,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> Starting a S2 MMU search from the beginning all the time means that
-> we're potentially nuking a useful context (like we'd potentially
-> have on a !VHE KVM guest).
->
-> Instead, let's always start the search from the point *after* the
-> last allocated context. This should ensure that alternating between
-> two EL1 contexts will not result in nuking the whole S2 each time.
->
-> lookup_s2_mmu now has a chance to provide a hit.
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/nested.c           | 14 ++++++++++++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index b71a7a237f95..b7c44adcdbf3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -123,6 +123,7 @@ struct kvm_arch {
->  	 */
->  	struct kvm_s2_mmu *nested_mmus;
->  	size_t nested_mmus_size;
-> +	int nested_mmus_next;
+Radim, Paolo,
 
-For consistency, shouldn't nested_mmus_next be zero initialized in
-kvm_init_nested (arch/arm64/kvm/nested.c), like nested_mmus and
-nested_mmus_size? Not a big deal either way, since struct kvm is allocated using
-vzalloc.
+This is the (slightly delayed) KVM/arm updates for 5.3. This time
+around, some PMU emulation improvements, the ability to save/restore
+the Spectre mitigation state, better SError handling that double as
+the workaround for a N1 erratum, a 32bit fix for a corrupted MPIDR,
+and yet another pre-NV cleanup.
 
->  really
->  	/* VTCR_EL2 value for this VM */
->  	u64    vtcr;
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 09afafbdc8fe..214d59019935 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -363,14 +363,24 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
->  	if (s2_mmu)
->  		goto out;
->  
-> -	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> -		s2_mmu = &kvm->arch.nested_mmus[i];
-> +	/*
-> +	 * Make sure we don't always search from the same point, or we
-> +	 * will always reuse a potentially active context, leaving
-> +	 * free contexts unused.
-> +	 */
-> +	for (i = kvm->arch.nested_mmus_next;
-> +	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
-> +	     i++) {
-> +		s2_mmu = &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
->  
->  		if (atomic_read(&s2_mmu->refcnt) == 0)
->  			break;
->  	}
->  	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
->  
-> +	/* Set the scene for the next search */
-> +	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
-> +
->  	if (kvm_s2_mmu_valid(s2_mmu)) {
->  		/* Clear the old state */
->  		kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
+Please pull,
+
+	M.
+
+The following changes since commit 4b972a01a7da614b4796475f933094751a295a2f:
+
+  Linux 5.2-rc6 (2019-06-22 16:01:36 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-5.3
+
+for you to fetch changes up to 1e0cf16cdad1ba53e9eeee8746fe57de42f20c97:
+
+  KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register (2019-07-08 16:29:48 +0100)
+
+----------------------------------------------------------------
+KVM/arm updates for 5.3
+
+- Add support for chained PMU counters in guests
+- Improve SError handling
+- Handle Neoverse N1 erratum #1349291
+- Allow side-channel mitigation status to be migrated
+- Standardise most AArch64 system register accesses to msr_s/mrs_s
+- Fix host MPIDR corruption on 32bit
+
+----------------------------------------------------------------
+Andre Przywara (3):
+      arm64: KVM: Propagate full Spectre v2 workaround state to KVM guests
+      KVM: arm/arm64: Add save/restore support for firmware workaround state
+      KVM: doc: Add API documentation on the KVM_REG_ARM_WORKAROUNDS register
+
+Andrew Murray (5):
+      KVM: arm/arm64: Rename kvm_pmu_{enable/disable}_counter functions
+      KVM: arm/arm64: Extract duplicated code to own function
+      KVM: arm/arm64: Re-create event when setting counter value
+      KVM: arm/arm64: Remove pmc->bitmask
+      KVM: arm/arm64: Support chained PMU counters
+
+Dave Martin (1):
+      KVM: arm64: Migrate _elx sysreg accessors to msr_s/mrs_s
+
+James Morse (8):
+      arm64: assembler: Switch ESB-instruction with a vanilla nop if !ARM64_HAS_RAS
+      KVM: arm64: Abstract the size of the HYP vectors pre-amble
+      KVM: arm64: Make indirect vectors preamble behaviour symmetric
+      KVM: arm64: Consume pending SError as early as possible
+      KVM: arm64: Defer guest entry when an asynchronous exception is pending
+      arm64: Update silicon-errata.txt for Neoverse-N1 #1349291
+      KVM: arm64: Re-mask SError after the one instruction window
+      KVM: arm64: Skip more of the SError vaxorcism
+
+Marc Zyngier (1):
+      KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register
+
+ Documentation/arm64/silicon-errata.txt   |   1 +
+ Documentation/virtual/kvm/arm/psci.txt   |  31 +++
+ arch/arm/include/asm/kvm_emulate.h       |  10 +
+ arch/arm/include/asm/kvm_host.h          |  18 +-
+ arch/arm/include/asm/kvm_hyp.h           |  13 +-
+ arch/arm/include/uapi/asm/kvm.h          |  12 ++
+ arch/arm64/include/asm/assembler.h       |   4 +
+ arch/arm64/include/asm/cpufeature.h      |   6 +
+ arch/arm64/include/asm/kvm_asm.h         |   6 +
+ arch/arm64/include/asm/kvm_emulate.h     |  30 ++-
+ arch/arm64/include/asm/kvm_host.h        |  23 +-
+ arch/arm64/include/asm/kvm_hyp.h         |  50 +----
+ arch/arm64/include/asm/sysreg.h          |  35 +++-
+ arch/arm64/include/uapi/asm/kvm.h        |  10 +
+ arch/arm64/kernel/cpu_errata.c           |  23 +-
+ arch/arm64/kernel/traps.c                |   4 +
+ arch/arm64/kvm/hyp/entry.S               |  36 +++-
+ arch/arm64/kvm/hyp/hyp-entry.S           |  30 ++-
+ arch/arm64/kvm/hyp/switch.c              |  14 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c           |  78 +++----
+ arch/arm64/kvm/hyp/tlb.c                 |  12 +-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   2 +-
+ arch/arm64/kvm/regmap.c                  |   4 +-
+ arch/arm64/kvm/sys_regs.c                |  60 +++---
+ arch/arm64/kvm/va_layout.c               |   7 +-
+ include/kvm/arm_pmu.h                    |  11 +-
+ virt/kvm/arm/arch_timer.c                |  24 +--
+ virt/kvm/arm/arm.c                       |   3 +-
+ virt/kvm/arm/pmu.c                       | 350 +++++++++++++++++++++++++------
+ virt/kvm/arm/psci.c                      | 149 +++++++++++--
+ 30 files changed, 775 insertions(+), 281 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
