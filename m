@@ -2,58 +2,78 @@ Return-Path: <SRS0=LlKa=VH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C1E4C74A2B
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 17:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E77C74A30
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 17:06:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D132520665
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 17:02:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D132520665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 5299820665
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 17:06:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5299820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76FA84A4E1;
-	Wed, 10 Jul 2019 13:02:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D049B4A4E1;
+	Wed, 10 Jul 2019 13:06:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id n+M0l0Buy96Q; Wed, 10 Jul 2019 13:02:42 -0400 (EDT)
+	with ESMTP id FKdXoS-sFoAP; Wed, 10 Jul 2019 13:06:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42DCA4A53C;
-	Wed, 10 Jul 2019 13:02:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4B904A52E;
+	Wed, 10 Jul 2019 13:06:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6E624A4E1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 13:02:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F5CC4A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 13:06:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HBxsLgduRg3N for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jul 2019 13:02:39 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47AC94A4C1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 13:02:39 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0A3A344;
- Wed, 10 Jul 2019 10:02:38 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F16C3F246;
- Wed, 10 Jul 2019 10:02:38 -0700 (PDT)
-Date: Wed, 10 Jul 2019 18:02:35 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexander Graf <graf@amazon.com>
+ with ESMTP id ZMVbJnk6yVtJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Jul 2019 13:06:35 -0400 (EDT)
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com
+ [209.85.128.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A7CD4A4C1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 13:06:35 -0400 (EDT)
+Received: by mail-wm1-f66.google.com with SMTP id v19so3028813wmj.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 10:06:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SuU894j2CqbQVv4bnyUW2+R4vG8fuhuKA/J00hF+rLg=;
+ b=Ytl+p9rCWmmwz9hzar1pSPhaTFyAksG8czeooElS+WjYZa3MtzCQMQ/bK/WIf3oYbO
+ Vv+3kvs3xcgI828XFlp8Oh4+GH0wfKERKNAQ0JYYAs1EfGdpIL8j2ttrhpgbBFuWHjba
+ yP5MJVeNnKUwiMNlMl1Ov/dfkfzgWRaVZgDPU1eTRbHVWVE7CaAZmbhNjkLp4aa2Zn6g
+ CMWzBsvVZPmkeGmEdFe802NoJYm4cSkXrT6VtjYsPwN5CZCE/KuON9ht0+3Of8nA02bR
+ 3gjGVS3FyGzph4v0qLwY3/qhTfr33Mp3elKXEyhZxh2joCyjf1YoW5t0kxetnNrbgR6r
+ djFQ==
+X-Gm-Message-State: APjAAAUeMF1Jgjp2P5S1bfDNXvuQwFmCeHBOoup2Qfi0lnyZXLuFVpIT
+ 7R4wbCvjzdKE5OTEEN6Flf6XeibKgFk=
+X-Google-Smtp-Source: APXvYqxb+rtpI9aVwVTc6cdO7+RFuhsGOwpHABF0Jid8dPtXLKobZgZewcHJIAdGJh1w9sh7/ty/zA==
+X-Received: by 2002:a1c:a01a:: with SMTP id j26mr6345399wme.112.1562778394142; 
+ Wed, 10 Jul 2019 10:06:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
+ ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+ by smtp.gmail.com with ESMTPSA id b203sm3130748wmd.41.2019.07.10.10.06.33
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 10 Jul 2019 10:06:33 -0700 (PDT)
 Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-Message-ID: <20190710180235.25c54b84@donnerap.cambridge.arm.com>
-In-Reply-To: <20190710132724.28350-1-graf@amazon.com>
+To: Andre Przywara <andre.przywara@arm.com>, Alexander Graf <graf@amazon.com>
 References: <20190710132724.28350-1-graf@amazon.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+ <20190710180235.25c54b84@donnerap.cambridge.arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
+Date: Wed, 10 Jul 2019 19:06:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <20190710180235.25c54b84@donnerap.cambridge.arm.com>
+Content-Language: en-US
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,59 +90,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 10 Jul 2019 15:27:24 +0200
-Alexander Graf <graf@amazon.com> wrote:
-
-Hi,
-
-> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-> It just pokes basic functionality. I've mostly written it to familiarize myself
-> with the device, but I suppose having the test around does not hurt, as it also
-> exercises the GIC SPI interrupt path.
+On 10/07/19 19:02, Andre Przywara wrote:
+>> + * This test verifies whether the emulated PL031 behaves
+>> correctly.
+> ^^^^^^^^
 > 
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> ---
->  arm/Makefile.common |   1 +
->  arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h   |   1 +
->  3 files changed, 229 insertions(+)
->  create mode 100644 arm/pl031.c
+> While I appreciate the effort and like the fact that this actually
+> triggers an SPI, I wonder if this actually belongs into
+> kvm-unit-tests. After all this just test a device purely emulated in
+> (QEMU) userland, so it's not really KVM related.
 > 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index f0c4b5d..b8988f2 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
->  tests-common += $(TEST_DIR)/gic.flat
->  tests-common += $(TEST_DIR)/psci.flat
->  tests-common += $(TEST_DIR)/sieve.flat
-> +tests-common += $(TEST_DIR)/pl031.flat
->  
->  tests-all = $(tests-common) $(tests)
->  all: directories $(tests-all)
-> diff --git a/arm/pl031.c b/arm/pl031.c
-> new file mode 100644
-> index 0000000..a364a1a
-> --- /dev/null
-> +++ b/arm/pl031.c
-> @@ -0,0 +1,227 @@
-> +/*
-> + * Verify PL031 functionality
-> + *
-> + * This test verifies whether the emulated PL031 behaves correctly.
+> What is the general opinion on this? Don't we care about this
+> hair-splitting as long as it helps testing? Do we even want to extend
+> kvm-unit-tests coverage to more emulated devices, for instance
+> virtio?
 
-                                     ^^^^^^^^
+I agree that it would belong more in qtest, but tests in not exactly the
+right place is better than no tests.
 
-While I appreciate the effort and like the fact that this actually triggers an SPI, I wonder if this actually belongs into kvm-unit-tests.
-After all this just test a device purely emulated in (QEMU) userland, so it's not really KVM related.
-
-What is the general opinion on this?
-Don't we care about this hair-splitting as long as it helps testing?
-Do we even want to extend kvm-unit-tests coverage to more emulated devices, for instance virtio?
-
-Cheers,
-Andre.
-
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
