@@ -2,59 +2,108 @@ Return-Path: <SRS0=LlKa=VH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B9CC74A2B
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 14:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD60C74A21
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:07:50 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8EA8320651
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 14:37:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA8320651
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9C1EC20844
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:07:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pzrqcAew"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C1EC20844
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE804A547;
-	Wed, 10 Jul 2019 10:37:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B9C4A53D;
+	Wed, 10 Jul 2019 12:07:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@oracle.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ePDZBb0g+LRI; Wed, 10 Jul 2019 10:37:23 -0400 (EDT)
+	with ESMTP id yqPZr0uQkMcc; Wed, 10 Jul 2019 12:07:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48D844A549;
-	Wed, 10 Jul 2019 10:37:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0CC24A542;
+	Wed, 10 Jul 2019 12:07:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 853654A545
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 10:37:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04A384A533
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:07:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V0MPLb4EmyIh for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jul 2019 10:37:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA9EC4A544
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 10:37:20 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7250E2B;
- Wed, 10 Jul 2019 07:37:20 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB7823F71F;
- Wed, 10 Jul 2019 07:37:19 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To: Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org
-References: <20190710132724.28350-1-graf@amazon.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <02d19c57-a9d1-bef8-8a57-e289156c9f8a@arm.com>
-Date: Wed, 10 Jul 2019 15:37:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ with ESMTP id XeI7tDzXYc8d for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Jul 2019 12:07:44 -0400 (EDT)
+Received: from aserp2120.oracle.com (aserp2120.oracle.com [141.146.126.78])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B66A24A506
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:07:44 -0400 (EDT)
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6AG3pPd062869;
+ Wed, 10 Jul 2019 16:07:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=BE1yB3fPvpdXk97fgYAyuiJ4zekQnI+c6hQabHQPTaU=;
+ b=pzrqcAewAbQuxiFqeWXeY399fUqp88GBhnaMqtbEgm+QV62iOnQIaSMzix5Eb38Qqx41
+ sxb7R6tHbMwnfKe/Wggo/ySXe9gPI0lgtNy+6ZOlmKauXcOAQ6fnpQ1pwRGfVG1LmYVT
+ b2U3hOAt/b5PuD11vTzYISnR5BQ+7JkJg5MignUHI+LzWXV5dLC4w72pgDOxcRZEaE73
+ iPhLLAGS41CbYJAwZdUl90A8E6cpitlKt6DWLPnLxi/FJv4PE+20XMeCK5xWYk732At/
+ IxPvuPCXfXeYZ9qh6YrPKFSW5rUu42qOJa4a61w6siEg4bT/FeS3j3beoKjirg5DeM6D lQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2tjkkpu59s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 10 Jul 2019 16:07:28 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6AG3Cs8134548;
+ Wed, 10 Jul 2019 16:05:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2tmwgxk18c-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 10 Jul 2019 16:05:27 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6AG5O3P003424;
+ Wed, 10 Jul 2019 16:05:24 GMT
+Received: from [10.159.239.91] (/10.159.239.91)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 10 Jul 2019 09:05:23 -0700
+Subject: Re: [RFC PATCH v2 0/3] Support CPU hotplug for ARM64
+To: Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>,
+ Xiongfeng Wang <wangxiongfeng2@huawei.com>
+References: <1561776155-38975-1-git-send-email-wangxiongfeng2@huawei.com>
+ <82879258-46a7-a6e9-ee54-fc3692c1cdc3@arm.com>
+ <51cc9a5c-9968-c4b1-0bc7-870f44a3a761@oracle.com>
+ <06ef13e1-fffe-d4a2-721e-f666f331fb3c@arm.com>
+From: Maran Wilson <maran.wilson@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <d65c2aca-470f-177d-57cf-6375c989054c@oracle.com>
+Date: Wed, 10 Jul 2019 09:05:22 -0700
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190710132724.28350-1-graf@amazon.com>
+In-Reply-To: <06ef13e1-fffe-d4a2-721e-f666f331fb3c@arm.com>
 Content-Language: en-US
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907100182
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314
+ signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907100182
+Cc: jonathan.cameron@huawei.com, john.garry@huawei.com, rjw@rjwysocki.net,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ huawei.libin@huawei.com, guohanjun@huawei.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,293 +115,91 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 7/10/19 2:27 PM, Alexander Graf wrote:
-> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-> It just pokes basic functionality. I've mostly written it to familiarize myself
-> with the device, but I suppose having the test around does not hurt, as it also
-> exercises the GIC SPI interrupt path.
+On 7/10/2019 2:15 AM, Marc Zyngier wrote:
+> On 09/07/2019 20:06, Maran Wilson wrote:
+>> On 7/5/2019 3:12 AM, James Morse wrote:
+>>> Hi guys,
+>>>
+>>> (CC: +kvmarm list)
+>>>
+>>> On 29/06/2019 03:42, Xiongfeng Wang wrote:
+>>>> This patchset mark all the GICC node in MADT as possible CPUs even though it
+>>>> is disabled. But only those enabled GICC node are marked as present CPUs.
+>>>> So that kernel will initialize some CPU related data structure in advance before
+>>>> the CPU is actually hot added into the system. This patchset also implement
+>>>> 'acpi_(un)map_cpu()' and 'arch_(un)register_cpu()' for ARM64. These functions are
+>>>> needed to enable CPU hotplug.
+>>>>
+>>>> To support CPU hotplug, we need to add all the possible GICC node in MADT
+>>>> including those CPUs that are not present but may be hot added later. Those
+>>>> CPUs are marked as disabled in GICC nodes.
+>>> ... what do you need this for?
+>>>
+>>> (The term cpu-hotplug in the arm world almost never means hot-adding a new package/die to
+>>> the platform, we usually mean taking CPUs online/offline for power management. e.g.
+>>> cpuhp_offline_cpu_device())
+>>>
+>>> It looks like you're adding support for hot-adding a new package/die to the platform ...
+>>> but only for virtualisation.
+>>>
+>>> I don't see why this is needed for virtualisation. The in-kernel irqchip needs to know
+>>> these vcpu exist before you can enter the guest for the first time. You can't create them
+>>> late. At best you're saving the host scheduling a vcpu that is offline. Is this really a
+>>> problem?
+>>>
+>>> If we moved PSCI support to user-space, you could avoid creating host vcpu threads until
+>>> the guest brings the vcpu online, which would solve that problem, and save the host
+>>> resources for the thread too. (and its acpi/dt agnostic)
+>>>
+>>> I don't see the difference here between booting the guest with 'maxcpus=1', and bringing
+>>> the vcpu online later. The only real difference seems to be moving the can-be-online
+>>> policy into the hypervisor/VMM...
+>> Isn't that an important distinction from a cloud service provider's
+>> perspective?
+>>
+>> As far as I understand it, you also need CPU hotplug capabilities to
+>> support things like Kata runtime under Kubernetes. i.e. when
+>> implementing your containers in the form of light weight VMs for the
+>> additional security ... and the orchestration layer cannot determine
+>> ahead of time how much CPU/memory resources are going to be needed to
+>> run the pod(s).
+> Why would it be any different? You can pre-allocate your vcpus, leave
+> them parked until some external agent decides to signal the container
+> that it it can use another bunch of CPUs. At that point, the container
+> must actively boot these vcpus (they aren't going to come up by magic).
 >
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> ---
->  arm/Makefile.common |   1 +
->  arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h   |   1 +
->  3 files changed, 229 insertions(+)
->  create mode 100644 arm/pl031.c
->
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index f0c4b5d..b8988f2 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
->  tests-common += $(TEST_DIR)/gic.flat
->  tests-common += $(TEST_DIR)/psci.flat
->  tests-common += $(TEST_DIR)/sieve.flat
-> +tests-common += $(TEST_DIR)/pl031.flat
->  
->  tests-all = $(tests-common) $(tests)
->  all: directories $(tests-all)
-> diff --git a/arm/pl031.c b/arm/pl031.c
-> new file mode 100644
-> index 0000000..a364a1a
-> --- /dev/null
-> +++ b/arm/pl031.c
-> @@ -0,0 +1,227 @@
-> +/*
-> + * Verify PL031 functionality
-> + *
-> + * This test verifies whether the emulated PL031 behaves correctly.
-> + *
-> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
-> + * Author: Alexander Graf <graf@amazon.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <asm/processor.h>
-> +#include <asm/io.h>
-> +#include <asm/gic.h>
-> +
-> +static u32 cntfrq;
-> +
-> +#define PL031_BASE 0x09010000
-> +#define PL031_IRQ 2
-> +
-> +struct pl031_regs {
-> +	uint32_t dr;	/* Data Register */
-> +	uint32_t mr;	/* Match Register */
-> +	uint32_t lr;	/* Load Register */
-> +	union {
-> +		uint8_t cr;	/* Control Register */
-> +		uint32_t cr32;
-> +	};
-> +	union {
-> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-> +		uint32_t imsc32;
-> +	};
-> +	union {
-> +		uint8_t ris;	/* Raw Interrupt Status */
-> +		uint32_t ris32;
-> +	};
-> +	union {
-> +		uint8_t mis;	/* Masked Interrupt Status */
-> +		uint32_t mis32;
-> +	};
-> +	union {
-> +		uint8_t icr;	/* Interrupt Clear Register */
-> +		uint32_t icr32;
-> +	};
-> +	uint32_t reserved[1008];
-> +	uint32_t periph_id[4];
-> +	uint32_t pcell_id[4];
-> +};
-> +
-> +static struct pl031_regs *pl031 = (void*)PL031_BASE;
-> +static void *gic_ispendr;
-> +static void *gic_isenabler;
-> +static bool irq_triggered;
-> +
-> +static int check_id(void)
-> +{
-> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id); i++)
-> +		if (id[i] != readl(&pl031->periph_id[i]))
-> +			return 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int check_ro(void)
-> +{
-> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-> +			    offsetof(struct pl031_regs, mis),
-> +			    offsetof(struct pl031_regs, periph_id[0]),
-> +			    offsetof(struct pl031_regs, periph_id[1]),
-> +			    offsetof(struct pl031_regs, periph_id[2]),
-> +			    offsetof(struct pl031_regs, periph_id[3]),
-> +			    offsetof(struct pl031_regs, pcell_id[0]),
-> +			    offsetof(struct pl031_regs, pcell_id[1]),
-> +			    offsetof(struct pl031_regs, pcell_id[2]),
-> +			    offsetof(struct pl031_regs, pcell_id[3]) };
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-> +		uint32_t before32;
-> +		uint16_t before16;
-> +		uint8_t before8;
-> +		void *addr = (void*)pl031 + offs[i];
-> +		uint32_t poison = 0xdeadbeefULL;
-> +
-> +		before8 = readb(addr);
-> +		before16 = readw(addr);
-> +		before32 = readl(addr);
-> +
-> +		writeb(poison, addr);
-> +		writew(poison, addr);
-> +		writel(poison, addr);
-> +
-> +		if (before8 != readb(addr))
-> +			return 1;
-> +		if (before16 != readw(addr))
-> +			return 1;
-> +		if (before32 != readl(addr))
-> +			return 1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int check_rtc_freq(void)
-> +{
-> +	uint32_t seconds_to_wait = 2;
-> +	uint32_t before = readl(&pl031->dr);
-> +	uint64_t before_tick = read_sysreg(cntpct_el0);
-> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-> +
-> +	/* Wait for 2 seconds */
-> +	while (read_sysreg(cntpct_el0) < target_tick) ;
-> +
-> +	if (readl(&pl031->dr) != before + seconds_to_wait)
-> +		return 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static bool gic_irq_pending(void)
-> +{
-> +	return readl(gic_ispendr + 4) & (1 << (SPI(PL031_IRQ) - 32));
-> +}
-> +
-> +static void gic_irq_unmask(void)
-> +{
-> +	writel(1 << (SPI(PL031_IRQ) - 32), gic_isenabler + 4);
-> +}
-> +
-> +static void irq_handler(struct pt_regs *regs)
-> +{
-> +	u32 irqstat = gic_read_iar();
-> +	u32 irqnr = gic_iar_irqnr(irqstat);
-> +
-> +	if (irqnr != GICC_INT_SPURIOUS)
-> +		gic_write_eoir(irqstat);
-> +
-> +	if (irqnr == SPI(PL031_IRQ)) {
-> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-> +
-> +		/* Writing any value should clear IRQ status */
-> +		writel(0x80000000ULL, &pl031->icr);
-> +
-> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-> +		irq_triggered = true;
-> +	} else {
-> +		report_info("Unexpected interrupt: %d\n", irqnr);
-> +		return;
-> +	}
-> +}
-> +
-> +static int check_rtc_irq(void)
-> +{
-> +	uint32_t seconds_to_wait = 1;
-> +	uint32_t before = readl(&pl031->dr);
-> +	uint64_t before_tick = read_sysreg(cntpct_el0);
-> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-> +
-> +	report_info("Checking IRQ trigger (MR)");
-> +
-> +	irq_triggered = false;
-> +
-> +	/* Fire IRQ in 1 second */
-> +	writel(before + seconds_to_wait, &pl031->mr);
-> +
-> +	install_irq_handler(EL1H_IRQ, irq_handler);
-> +
-> +	/* Wait until 2 seconds are over */
-> +	while (read_sysreg(cntpct_el0) < target_tick) ;
-> +
-> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-> +
-> +	/* Mask the IRQ so that it gets delivered */
-> +	writel(1, &pl031->imsc);
-> +	report("  RTC IRQ pending now", gic_irq_pending());
-> +
-> +	/* Enable retrieval of IRQ */
-> +	gic_irq_unmask();
-> +	local_irq_enable();
-> +
-> +	report("  IRQ triggered", irq_triggered);
-> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-> +	if (!irq_triggered) {
-> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
-> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
-> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-> +	}
-> +
-> +	local_irq_disable();
-> +	return 0;
-> +}
-> +
-> +static void rtc_irq_init(void)
-> +{
-> +	gic_enable_defaults();
-> +
-> +	switch (gic_version()) {
-> +	case 2:
-> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-> +		break;
-> +	case 3:
-> +		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
-> +		gic_isenabler = gicv3_sgi_base() + GICD_ISENABLER;
-> +		break;
-> +	}
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	cntfrq = get_cntfrq();
-> +	rtc_irq_init();
+> Given that you must have sized your virtual platform to deal with the
+> maximum set of resources you anticipate (think of the GIC
+> redistributors, for example), I really wonder what you gain here.
 
-The PL031 device might be generated by QEMU by default, but KVM-unit-tests can
-also be run under kvmtool, which doesn't include such a device.
-
-I suggest that you first check that the device is in the fdt, and skip the tests
-entirely if it's not present. There's an example in the timer.c test about how
-to find a device by using its compatible string. And as Marc suggested, you can
-also use the fdt to get the device properties.
+Maybe I'm not following the alternative proposal completely, but 
+wouldn't a guest VM (who happens to be in control of its OS) be able to 
+add/online vCPU resources without approval from the VMM this way?
 
 Thanks,
-Alex
-> +
-> +	report("Periph/PCell IDs match", !check_id());
-> +	report("R/O fields are R/O", !check_ro());
-> +	report("RTC ticks at 1HZ", !check_rtc_freq());
-> +	report("RTC IRQ not pending yet", !gic_irq_pending());
-> +	check_rtc_irq();
-> +
-> +	return report_summary();
-> +}
-> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> index f6dfb90..1fc10a0 100644
-> --- a/lib/arm/asm/gic.h
-> +++ b/lib/arm/asm/gic.h
-> @@ -41,6 +41,7 @@
->  #include <asm/gic-v3.h>
->  
->  #define PPI(irq)			((irq) + 16)
-> +#define SPI(irq)			((irq) + GIC_FIRST_SPI)
->  
->  #ifndef __ASSEMBLY__
->  #include <asm/cpumask.h>
+-Maran
+
+>> Thanks,
+>> -Maran
+>>
+>>> I think physical package/die hotadd is a much bigger, uglier problem than doing the same
+>>> under virtualisation. Its best to do this on real hardware first so we don't miss
+>>> something. (cpu-topology, numa, memory, errata, timers?)
+>>> I'm worried that doing virtualisation first means the firmware-requirements for physical
+>>> hotadd stuff is "whatever Qemu does".
+> For sure, I want to model the virtualization side after the actual HW,
+> and not the other way around. Live reconfiguration of the interrupt
+> topology (and thus the whole memory map) will certainly be challenging.
+>
+> Thanks,
+>
+> 	M.
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
