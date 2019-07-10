@@ -2,108 +2,62 @@ Return-Path: <SRS0=LlKa=VH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD60C74A21
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55338C74A2E
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:23:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9C1EC20844
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:07:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pzrqcAew"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C1EC20844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id DC6CA20651
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Jul 2019 16:23:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC6CA20651
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B9C4A53D;
-	Wed, 10 Jul 2019 12:07:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2D14A548;
+	Wed, 10 Jul 2019 12:23:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yqPZr0uQkMcc; Wed, 10 Jul 2019 12:07:47 -0400 (EDT)
+	with ESMTP id oB-OQacQDQb9; Wed, 10 Jul 2019 12:23:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0CC24A542;
-	Wed, 10 Jul 2019 12:07:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 504BA4A53D;
+	Wed, 10 Jul 2019 12:23:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04A384A533
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:07:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34B104A53E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:23:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XeI7tDzXYc8d for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jul 2019 12:07:44 -0400 (EDT)
-Received: from aserp2120.oracle.com (aserp2120.oracle.com [141.146.126.78])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B66A24A506
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:07:44 -0400 (EDT)
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6AG3pPd062869;
- Wed, 10 Jul 2019 16:07:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=BE1yB3fPvpdXk97fgYAyuiJ4zekQnI+c6hQabHQPTaU=;
- b=pzrqcAewAbQuxiFqeWXeY399fUqp88GBhnaMqtbEgm+QV62iOnQIaSMzix5Eb38Qqx41
- sxb7R6tHbMwnfKe/Wggo/ySXe9gPI0lgtNy+6ZOlmKauXcOAQ6fnpQ1pwRGfVG1LmYVT
- b2U3hOAt/b5PuD11vTzYISnR5BQ+7JkJg5MignUHI+LzWXV5dLC4w72pgDOxcRZEaE73
- iPhLLAGS41CbYJAwZdUl90A8E6cpitlKt6DWLPnLxi/FJv4PE+20XMeCK5xWYk732At/
- IxPvuPCXfXeYZ9qh6YrPKFSW5rUu42qOJa4a61w6siEg4bT/FeS3j3beoKjirg5DeM6D lQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2tjkkpu59s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jul 2019 16:07:28 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6AG3Cs8134548;
- Wed, 10 Jul 2019 16:05:27 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2tmwgxk18c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 10 Jul 2019 16:05:27 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6AG5O3P003424;
- Wed, 10 Jul 2019 16:05:24 GMT
-Received: from [10.159.239.91] (/10.159.239.91)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 10 Jul 2019 09:05:23 -0700
-Subject: Re: [RFC PATCH v2 0/3] Support CPU hotplug for ARM64
-To: Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>,
- Xiongfeng Wang <wangxiongfeng2@huawei.com>
-References: <1561776155-38975-1-git-send-email-wangxiongfeng2@huawei.com>
- <82879258-46a7-a6e9-ee54-fc3692c1cdc3@arm.com>
- <51cc9a5c-9968-c4b1-0bc7-870f44a3a761@oracle.com>
- <06ef13e1-fffe-d4a2-721e-f666f331fb3c@arm.com>
-From: Maran Wilson <maran.wilson@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <d65c2aca-470f-177d-57cf-6375c989054c@oracle.com>
-Date: Wed, 10 Jul 2019 09:05:22 -0700
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ with ESMTP id KRVfHn+-ZpVw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Jul 2019 12:23:24 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 243AF4A503
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jul 2019 12:23:24 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0968344;
+ Wed, 10 Jul 2019 09:23:23 -0700 (PDT)
+Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6C953F246;
+ Wed, 10 Jul 2019 09:23:22 -0700 (PDT)
+Subject: Re: [PATCH 46/59] KVM: arm64: nv: arch_timer: Support hyp timer
+ emulation
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-47-marc.zyngier@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <88430a00-27fb-30a4-4564-56b26ba25a84@arm.com>
+Date: Wed, 10 Jul 2019 17:23:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <06ef13e1-fffe-d4a2-721e-f666f331fb3c@arm.com>
+In-Reply-To: <20190621093843.220980-47-marc.zyngier@arm.com>
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907100182
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314
- signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907100182
-Cc: jonathan.cameron@huawei.com, john.garry@huawei.com, rjw@rjwysocki.net,
- linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
- huawei.libin@huawei.com, guohanjun@huawei.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,91 +69,475 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 7/10/2019 2:15 AM, Marc Zyngier wrote:
-> On 09/07/2019 20:06, Maran Wilson wrote:
->> On 7/5/2019 3:12 AM, James Morse wrote:
->>> Hi guys,
->>>
->>> (CC: +kvmarm list)
->>>
->>> On 29/06/2019 03:42, Xiongfeng Wang wrote:
->>>> This patchset mark all the GICC node in MADT as possible CPUs even though it
->>>> is disabled. But only those enabled GICC node are marked as present CPUs.
->>>> So that kernel will initialize some CPU related data structure in advance before
->>>> the CPU is actually hot added into the system. This patchset also implement
->>>> 'acpi_(un)map_cpu()' and 'arch_(un)register_cpu()' for ARM64. These functions are
->>>> needed to enable CPU hotplug.
->>>>
->>>> To support CPU hotplug, we need to add all the possible GICC node in MADT
->>>> including those CPUs that are not present but may be hot added later. Those
->>>> CPUs are marked as disabled in GICC nodes.
->>> ... what do you need this for?
->>>
->>> (The term cpu-hotplug in the arm world almost never means hot-adding a new package/die to
->>> the platform, we usually mean taking CPUs online/offline for power management. e.g.
->>> cpuhp_offline_cpu_device())
->>>
->>> It looks like you're adding support for hot-adding a new package/die to the platform ...
->>> but only for virtualisation.
->>>
->>> I don't see why this is needed for virtualisation. The in-kernel irqchip needs to know
->>> these vcpu exist before you can enter the guest for the first time. You can't create them
->>> late. At best you're saving the host scheduling a vcpu that is offline. Is this really a
->>> problem?
->>>
->>> If we moved PSCI support to user-space, you could avoid creating host vcpu threads until
->>> the guest brings the vcpu online, which would solve that problem, and save the host
->>> resources for the thread too. (and its acpi/dt agnostic)
->>>
->>> I don't see the difference here between booting the guest with 'maxcpus=1', and bringing
->>> the vcpu online later. The only real difference seems to be moving the can-be-online
->>> policy into the hypervisor/VMM...
->> Isn't that an important distinction from a cloud service provider's
->> perspective?
->>
->> As far as I understand it, you also need CPU hotplug capabilities to
->> support things like Kata runtime under Kubernetes. i.e. when
->> implementing your containers in the form of light weight VMs for the
->> additional security ... and the orchestration layer cannot determine
->> ahead of time how much CPU/memory resources are going to be needed to
->> run the pod(s).
-> Why would it be any different? You can pre-allocate your vcpus, leave
-> them parked until some external agent decides to signal the container
-> that it it can use another bunch of CPUs. At that point, the container
-> must actively boot these vcpus (they aren't going to come up by magic).
+On 6/21/19 10:38 AM, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
 >
-> Given that you must have sized your virtual platform to deal with the
-> maximum set of resources you anticipate (think of the GIC
-> redistributors, for example), I really wonder what you gain here.
+> Emulating EL2 also means emulating the EL2 timers. To do so, we expand
+> our timer framework to deal with at most 4 timers. At any given time,
+> two timers are using the HW timers, and the two others are purely
+> emulated.
+>
+> The role of deciding which is which at any given time is left to a
+> mapping function which is called every time we need to make such a
+> decision.
+>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_emulate.h |   2 +
+>  include/kvm/arm_arch_timer.h       |   5 ++
+>  include/kvm/arm_vgic.h             |   1 +
+>  virt/kvm/arm/arch_timer.c          | 122 ++++++++++++++++++++++++++++-
+>  virt/kvm/arm/trace.h               |   6 +-
+>  virt/kvm/arm/vgic/vgic.c           |  15 ++++
+>  6 files changed, 147 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 6b7644a383f6..865ce545b465 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -333,4 +333,6 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>  
+>  static inline void vcpu_ptrauth_setup_lazy(struct kvm_vcpu *vcpu) {}
+>  
+> +static inline bool is_hyp_ctxt(struct kvm_vcpu *vcpu) { return false; }
+> +
+>  #endif /* __ARM_KVM_EMULATE_H__ */
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index d120e6c323e7..3a5d9255120e 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -13,6 +13,8 @@
+>  enum kvm_arch_timers {
+>  	TIMER_PTIMER,
+>  	TIMER_VTIMER,
+> +	TIMER_HVTIMER,
+> +	TIMER_HPTIMER,
+>  	NR_KVM_TIMERS
+>  };
+>  
+> @@ -54,6 +56,7 @@ struct arch_timer_context {
+>  struct timer_map {
+>  	struct arch_timer_context *direct_vtimer;
+>  	struct arch_timer_context *direct_ptimer;
+> +	struct arch_timer_context *emul_vtimer;
+>  	struct arch_timer_context *emul_ptimer;
+>  };
+>  
+> @@ -98,6 +101,8 @@ bool kvm_arch_timer_get_input_level(int vintid);
+>  #define vcpu_get_timer(v,t)	(&vcpu_timer(v)->timers[(t)])
+>  #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_VTIMER])
+>  #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_PTIMER])
+> +#define vcpu_hvtimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_HVTIMER])
+> +#define vcpu_hptimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_HPTIMER])
+>  
+>  #define arch_timer_ctx_index(ctx)	((ctx) - vcpu_timer((ctx)->vcpu)->timers)
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index c36c86f1ec9a..7fc3b413b3de 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -355,6 +355,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
+>  			  u32 vintid, bool (*get_input_level)(int vindid));
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+> +int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
+>  
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 089441a07ed7..3d84c240071d 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -15,6 +15,7 @@
+>  #include <asm/arch_timer.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_hyp.h>
+> +#include <asm/kvm_nested.h>
+>  
+>  #include <kvm/arm_vgic.h>
+>  #include <kvm/arm_arch_timer.h>
+> @@ -39,6 +40,16 @@ static const struct kvm_irq_level default_vtimer_irq = {
+>  	.level	= 1,
+>  };
+>  
+> +static const struct kvm_irq_level default_hptimer_irq = {
+> +	.irq	= 26,
+> +	.level	= 1,
+> +};
+> +
+> +static const struct kvm_irq_level default_hvtimer_irq = {
+> +	.irq	= 28,
+> +	.level	= 1,
+> +};
+> +
+>  static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
+>  static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  				 struct arch_timer_context *timer_ctx);
+> @@ -58,13 +69,27 @@ u64 kvm_phys_timer_read(void)
+>  
+>  static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
+>  {
+> -	if (has_vhe()) {
+> +	if (nested_virt_in_use(vcpu)) {
+> +		if (is_hyp_ctxt(vcpu)) {
+> +			map->direct_vtimer = vcpu_hvtimer(vcpu);
+> +			map->direct_ptimer = vcpu_hptimer(vcpu);
+> +			map->emul_vtimer = vcpu_vtimer(vcpu);
+> +			map->emul_ptimer = vcpu_ptimer(vcpu);
+> +		} else {
+> +			map->direct_vtimer = vcpu_vtimer(vcpu);
+> +			map->direct_ptimer = vcpu_ptimer(vcpu);
+> +			map->emul_vtimer = vcpu_hvtimer(vcpu);
+> +			map->emul_ptimer = vcpu_hptimer(vcpu);
+> +		}
+> +	} else if (has_vhe()) {
+>  		map->direct_vtimer = vcpu_vtimer(vcpu);
+>  		map->direct_ptimer = vcpu_ptimer(vcpu);
+> +		map->emul_vtimer = NULL;
+>  		map->emul_ptimer = NULL;
+>  	} else {
+>  		map->direct_vtimer = vcpu_vtimer(vcpu);
+>  		map->direct_ptimer = NULL;
+> +		map->emul_vtimer = NULL;
+>  		map->emul_ptimer = vcpu_ptimer(vcpu);
+>  	}
+>  
+> @@ -237,9 +262,11 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  
+>  		switch (index) {
+>  		case TIMER_VTIMER:
+> +		case TIMER_HVTIMER:
+>  			cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
+>  			break;
+>  		case TIMER_PTIMER:
+> +		case TIMER_HPTIMER:
+>  			cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
+>  			break;
+>  		case NR_KVM_TIMERS:
+> @@ -270,6 +297,7 @@ bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
+>  
+>  	return kvm_timer_should_fire(map.direct_vtimer) ||
+>  	       kvm_timer_should_fire(map.direct_ptimer) ||
+> +	       kvm_timer_should_fire(map.emul_vtimer) ||
+>  	       kvm_timer_should_fire(map.emul_ptimer);
+>  }
+>  
+> @@ -349,6 +377,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> +	case TIMER_HVTIMER:
+>  		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
+>  		ctx->cnt_cval = read_sysreg_el0(SYS_CNTV_CVAL);
+>  
+> @@ -358,6 +387,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
+>  
+>  		break;
+>  	case TIMER_PTIMER:
+> +	case TIMER_HPTIMER:
+>  		ctx->cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
+>  		ctx->cnt_cval = read_sysreg_el0(SYS_CNTP_CVAL);
+>  
+> @@ -395,6 +425,7 @@ static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (!kvm_timer_irq_can_fire(map.direct_vtimer) &&
+>  	    !kvm_timer_irq_can_fire(map.direct_ptimer) &&
+> +	    !kvm_timer_irq_can_fire(map.emul_vtimer) &&
+>  	    !kvm_timer_irq_can_fire(map.emul_ptimer))
+>  		return;
+>  
+> @@ -428,11 +459,13 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+>  
+>  	switch (index) {
+>  	case TIMER_VTIMER:
+> +	case TIMER_HVTIMER:
+>  		write_sysreg_el0(ctx->cnt_cval, SYS_CNTV_CVAL);
+>  		isb();
+>  		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTV_CTL);
+>  		break;
+>  	case TIMER_PTIMER:
+> +	case TIMER_HPTIMER:
+>  		write_sysreg_el0(ctx->cnt_cval, SYS_CNTP_CVAL);
+>  		isb();
+>  		write_sysreg_el0(ctx->cnt_ctl, SYS_CNTP_CTL);
+> @@ -519,6 +552,40 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
+>  		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
+>  }
+>  
+> +static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
+> +					      struct timer_map *map)
+> +{
+> +	int hw, ret;
+> +
+> +	if (!irqchip_in_kernel(vcpu->kvm))
+> +		return;
+> +
+> +	/*
+> +	 * We only ever unmap the vtimer irq on a VHE system that runs nested
+> +	 * virtualization, in which case we have both a valid emul_vtimer,
+> +	 * emul_ptimer, direct_vtimer, and direct_ptimer.
+> +	 *
+> +	 * Since this is called from kvm_timer_vcpu_load(), a change between
+> +	 * vEL2 and vEL1/0 will have just happened, and the timer_map will
+> +	 * represent this, and therefore we switch the emul/direct mappings
+> +	 * below.
+> +	 */
+> +	hw = kvm_vgic_get_map(vcpu, map->direct_vtimer->irq.irq);
+> +	if (hw < 0) {
+> +		kvm_vgic_unmap_phys_irq(vcpu, map->emul_vtimer->irq.irq);
+> +		kvm_vgic_unmap_phys_irq(vcpu, map->emul_ptimer->irq.irq);
+> +
+> +		ret = kvm_vgic_map_phys_irq(vcpu,
+> +					    map->direct_vtimer->host_timer_irq,
+> +					    map->direct_vtimer->irq.irq,
+> +					    kvm_arch_timer_get_input_level);
+> +		ret = kvm_vgic_map_phys_irq(vcpu,
+> +					    map->direct_ptimer->host_timer_irq,
+> +					    map->direct_ptimer->irq.irq,
+> +					    kvm_arch_timer_get_input_level);
+> +	}
+> +}
+> +
+>  void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> @@ -530,6 +597,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  	get_timer_map(vcpu, &map);
+>  
+>  	if (static_branch_likely(&has_gic_active_state)) {
+> +		kvm_timer_vcpu_load_nested_switch(vcpu, &map);
 
-Maybe I'm not following the alternative proposal completely, but 
-wouldn't a guest VM (who happens to be in control of its OS) be able to 
-add/online vCPU resources without approval from the VMM this way?
+Would it be possible for this be a conditional call that depends on
+nested_virt_in_use(vcpu), since that's the only situation where we change the
+direct_vtimer when we switch from vEL1 to vEL2 or viceversa?
 
 Thanks,
--Maran
-
->> Thanks,
->> -Maran
->>
->>> I think physical package/die hotadd is a much bigger, uglier problem than doing the same
->>> under virtualisation. Its best to do this on real hardware first so we don't miss
->>> something. (cpu-topology, numa, memory, errata, timers?)
->>> I'm worried that doing virtualisation first means the firmware-requirements for physical
->>> hotadd stuff is "whatever Qemu does".
-> For sure, I want to model the virtualization side after the actual HW,
-> and not the other way around. Live reconfiguration of the interrupt
-> topology (and thus the whole memory map) will certainly be challenging.
->
-> Thanks,
->
-> 	M.
-
+Alex
+> +
+>  		kvm_timer_vcpu_load_gic(map.direct_vtimer);
+>  		if (map.direct_ptimer)
+>  			kvm_timer_vcpu_load_gic(map.direct_ptimer);
+> @@ -545,6 +614,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>  	if (map.direct_ptimer)
+>  		timer_restore_state(map.direct_ptimer);
+>  
+> +	if (map.emul_vtimer)
+> +		timer_emulate(map.emul_vtimer);
+>  	if (map.emul_ptimer)
+>  		timer_emulate(map.emul_ptimer);
+>  }
+> @@ -589,6 +660,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  	 * In any case, we re-schedule the hrtimer for the physical timer when
+>  	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
+>  	 */
+> +	if (map.emul_vtimer)
+> +		soft_timer_cancel(&map.emul_vtimer->hrtimer);
+>  	if (map.emul_ptimer)
+>  		soft_timer_cancel(&map.emul_ptimer->hrtimer);
+>  
+> @@ -649,10 +722,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  	 */
+>  	vcpu_vtimer(vcpu)->cnt_ctl = 0;
+>  	vcpu_ptimer(vcpu)->cnt_ctl = 0;
+> +	vcpu_hvtimer(vcpu)->cnt_ctl = 0;
+> +	vcpu_hptimer(vcpu)->cnt_ctl = 0;
+>  
+>  	if (timer->enabled) {
+>  		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
+>  		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
+> +		kvm_timer_update_irq(vcpu, false, vcpu_hvtimer(vcpu));
+> +		kvm_timer_update_irq(vcpu, false, vcpu_hptimer(vcpu));
+>  
+>  		if (irqchip_in_kernel(vcpu->kvm)) {
+>  			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
+> @@ -661,6 +738,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> +	if (map.emul_vtimer)
+> +		soft_timer_cancel(&map.emul_vtimer->hrtimer);
+>  	if (map.emul_ptimer)
+>  		soft_timer_cancel(&map.emul_ptimer->hrtimer);
+>  
+> @@ -691,30 +770,46 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> +	struct arch_timer_context *hvtimer = vcpu_hvtimer(vcpu);
+> +	struct arch_timer_context *hptimer = vcpu_hptimer(vcpu);
+>  
+>  	/* Synchronize cntvoff across all vtimers of a VM. */
+>  	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
+>  	ptimer->cntvoff = 0;
+> +	hvtimer->cntvoff = 0;
+> +	hptimer->cntvoff = 0;
+>  
+>  	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+>  	timer->bg_timer.function = kvm_bg_timer_expire;
+>  
+>  	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+>  	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> +	hrtimer_init(&hvtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+> +	hrtimer_init(&hptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+>  	vtimer->hrtimer.function = kvm_hrtimer_expire;
+>  	ptimer->hrtimer.function = kvm_hrtimer_expire;
+> +	hvtimer->hrtimer.function = kvm_hrtimer_expire;
+> +	hptimer->hrtimer.function = kvm_hrtimer_expire;
+>  
+>  	vtimer->irq.irq = default_vtimer_irq.irq;
+>  	ptimer->irq.irq = default_ptimer_irq.irq;
+> +	hvtimer->irq.irq = default_hvtimer_irq.irq;
+> +	hptimer->irq.irq = default_hptimer_irq.irq;
+>  
+>  	vtimer->host_timer_irq = host_vtimer_irq;
+>  	ptimer->host_timer_irq = host_ptimer_irq;
+> +	hvtimer->host_timer_irq = host_vtimer_irq;
+> +	hptimer->host_timer_irq = host_ptimer_irq;
+>  
+>  	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
+>  	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
+> +	hvtimer->host_timer_irq_flags = host_vtimer_irq_flags;
+> +	hptimer->host_timer_irq_flags = host_ptimer_irq_flags;
+>  
+>  	vtimer->vcpu = vcpu;
+>  	ptimer->vcpu = vcpu;
+> +	hvtimer->vcpu = vcpu;
+> +	hptimer->vcpu = vcpu;
+>  }
+>  
+>  static void kvm_timer_init_interrupt(void *info)
+> @@ -997,7 +1092,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+>  
+>  static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+>  {
+> -	int vtimer_irq, ptimer_irq;
+> +	int vtimer_irq, ptimer_irq, hvtimer_irq, hptimer_irq;
+>  	int i, ret;
+>  
+>  	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
+> @@ -1010,9 +1105,21 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
+>  	if (ret)
+>  		return false;
+>  
+> +	hvtimer_irq = vcpu_hvtimer(vcpu)->irq.irq;
+> +	ret = kvm_vgic_set_owner(vcpu, hvtimer_irq, vcpu_hvtimer(vcpu));
+> +	if (ret)
+> +		return false;
+> +
+> +	hptimer_irq = vcpu_hptimer(vcpu)->irq.irq;
+> +	ret = kvm_vgic_set_owner(vcpu, hptimer_irq, vcpu_hptimer(vcpu));
+> +	if (ret)
+> +		return false;
+> +
+>  	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
+>  		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
+> -		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
+> +		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq ||
+> +		    vcpu_hvtimer(vcpu)->irq.irq != hvtimer_irq ||
+> +		    vcpu_hptimer(vcpu)->irq.irq != hptimer_irq)
+>  			return false;
+>  	}
+>  
+> @@ -1028,6 +1135,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
+>  		timer = vcpu_vtimer(vcpu);
+>  	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
+>  		timer = vcpu_ptimer(vcpu);
+> +	else if (vintid == vcpu_hvtimer(vcpu)->irq.irq)
+> +		timer = vcpu_hvtimer(vcpu);
+> +	else if (vintid == vcpu_hptimer(vcpu)->irq.irq)
+> +		timer = vcpu_hptimer(vcpu);
+>  	else
+>  		BUG();
+>  
+> @@ -1109,6 +1220,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
+>  		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
+> +		/* TODO: Add support for hv/hp timers */
+>  	}
+>  }
+>  
+> @@ -1119,6 +1231,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+>  	int irq;
+>  
+> +	/* TODO: Add support for hv/hp timers */
+> +
+>  	if (!irqchip_in_kernel(vcpu->kvm))
+>  		return -EINVAL;
+>  
+> @@ -1151,6 +1265,8 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	struct arch_timer_context *timer;
+>  	int irq;
+>  
+> +	/* TODO: Add support for hv/hp timers */
+> +
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+>  		timer = vcpu_vtimer(vcpu);
+> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+> index 204d210d01c2..3b08cc0376f4 100644
+> --- a/virt/kvm/arm/trace.h
+> +++ b/virt/kvm/arm/trace.h
+> @@ -271,6 +271,7 @@ TRACE_EVENT(kvm_get_timer_map,
+>  		__field(	unsigned long,		vcpu_id	)
+>  		__field(	int,			direct_vtimer	)
+>  		__field(	int,			direct_ptimer	)
+> +		__field(	int,			emul_vtimer	)
+>  		__field(	int,			emul_ptimer	)
+>  	),
+>  
+> @@ -279,14 +280,17 @@ TRACE_EVENT(kvm_get_timer_map,
+>  		__entry->direct_vtimer		= arch_timer_ctx_index(map->direct_vtimer);
+>  		__entry->direct_ptimer =
+>  			(map->direct_ptimer) ? arch_timer_ctx_index(map->direct_ptimer) : -1;
+> +		__entry->emul_vtimer =
+> +			(map->emul_vtimer) ? arch_timer_ctx_index(map->emul_vtimer) : -1;
+>  		__entry->emul_ptimer =
+>  			(map->emul_ptimer) ? arch_timer_ctx_index(map->emul_ptimer) : -1;
+>  	),
+>  
+> -	TP_printk("VCPU: %ld, dv: %d, dp: %d, ep: %d",
+> +	TP_printk("VCPU: %ld, dv: %d, dp: %d, ev: %d, ep: %d",
+>  		  __entry->vcpu_id,
+>  		  __entry->direct_vtimer,
+>  		  __entry->direct_ptimer,
+> +		  __entry->emul_vtimer,
+>  		  __entry->emul_ptimer)
+>  );
+>  
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 191deccf60bf..1c5b4dbd33e4 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -569,6 +569,21 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
+>  	return 0;
+>  }
+>  
+> +int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid)
+> +{
+> +	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
+> +	unsigned long flags;
+> +	int ret = -1;
+> +
+> +	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +	if (irq->hw)
+> +		ret = irq->hwintid;
+> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +
+> +	vgic_put_irq(vcpu->kvm, irq);
+> +	return ret;
+> +}
+> +
+>  /**
+>   * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
+>   *
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
