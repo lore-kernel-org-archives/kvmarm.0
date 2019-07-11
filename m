@@ -2,91 +2,64 @@ Return-Path: <SRS0=dYxC=VI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B853C74A4B
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 10:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACB7C74A35
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 11:50:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7242208E4
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 10:07:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nOUvVPeS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7242208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	by mail.kernel.org (Postfix) with ESMTP id 09A8D2166E
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 11:50:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A8D2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9974A506;
-	Thu, 11 Jul 2019 06:07:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76A204A530;
+	Thu, 11 Jul 2019 07:50:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E+RRF0taZdiN; Thu, 11 Jul 2019 06:07:56 -0400 (EDT)
+	with ESMTP id DgnBWf-LarJQ; Thu, 11 Jul 2019 07:50:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7612D4A541;
-	Thu, 11 Jul 2019 06:07:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B44A4A515;
+	Thu, 11 Jul 2019 07:50:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA1DD4A4FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 05:59:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 495374A515
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 07:50:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gUYbaHZtXJPE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jul 2019 05:59:14 -0400 (EDT)
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com
- [207.171.190.10])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C3364A369
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 05:59:14 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1562839154; x=1594375154;
- h=subject:to:cc:references:from:message-id:date:
- mime-version:in-reply-to:content-transfer-encoding;
- bh=W+BY+BDHpadPTc6gpQ0QnhWpwEB27thoesZOWy03oIw=;
- b=nOUvVPeStvn0seGqfERbfs8TskcxJaQY7aL5LeKsIA65KUZa2/m1+Uy/
- r82I7NA3g7R7nBHgusm13gsCQPoeH8DtFTXtdAAO5naN6bNEtn8AnbKjC
- 1uOdyNEdCv3jvrl3/eHjuhwcBO36wWZ79JBvUq0BqzCmPpGhJLSmjDzlH A=;
-X-IronPort-AV: E=Sophos;i="5.62,478,1554768000"; d="scan'208";a="810609096"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO
- email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com) ([10.47.22.38])
- by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP;
- 11 Jul 2019 09:59:11 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
- by email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com (Postfix) with ESMTPS
- id 66878A209B; Thu, 11 Jul 2019 09:59:11 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 11 Jul 2019 09:59:10 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.30) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 11 Jul 2019 09:59:09 +0000
-Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To: Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-References: <20190710132724.28350-1-graf@amazon.com>
- <20190710180235.25c54b84@donnerap.cambridge.arm.com>
- <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
- <1537a9f2-9d23-97dd-b195-8239b263d5db@amazon.com>
- <8c88eb2e-b401-42c7-f04f-2162f26af32c@redhat.com>
- <20190711104200.254073fb@donnerap.cambridge.arm.com>
-From: Alexander Graf <graf@amazon.com>
-Message-ID: <e1ea413e-a809-2a42-3888-204d7c037ab3@amazon.com>
-Date: Thu, 11 Jul 2019 11:59:07 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.2
+ with ESMTP id f2bROHSStGtC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 07:50:14 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47F6B4A501
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 07:50:14 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3D882308427C;
+ Thu, 11 Jul 2019 11:50:13 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 64597600CD;
+ Thu, 11 Jul 2019 11:50:03 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+ yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
+ robin.murphy@arm.com
+Subject: [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+Date: Thu, 11 Jul 2019 13:49:45 +0200
+Message-Id: <20190711114959.15675-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190711104200.254073fb@donnerap.cambridge.arm.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.30]
-X-ClientProxiedBy: EX13D07UWB001.ant.amazon.com (10.43.161.238) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-X-Mailman-Approved-At: Thu, 11 Jul 2019 06:07:52 -0400
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 11 Jul 2019 11:50:13 +0000 (UTC)
+Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
+ marc.zyngier@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,51 +71,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3. The VFIO part is submitted separately.
+
+The IOMMU API is extended to support 3 new API functionalities:
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
+3) invalidate stage 1 related caches
+
+3) is also used for SVA use case [1].
+
+Then those capabilities gets implemented in the SMMUv3 driver.
+
+The virtualizer passes information through the VFIO user API
+which cascades them to the iommu subsystem. This allows the guest
+to own stage 1 tables and context descriptors (so-called PASID
+table) while the host owns stage 2 tables and main configuration
+structures (STE).
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+
+References:
+[1] [PATCH v4 00/22]  Shared virtual address IOMMU and VT-d support
+
+History:
+
+v8 -> v9:
+- rebase on 5.3
+- split iommu/vfio parts
+
+v6 -> v8:
+- Implement VFIO-PCI device specific interrupt framework
+
+v7 -> v8:
+- rebase on top of v5.2-rc1 and especially
+  8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+- dynamic alloc of s1_cfg/s2_cfg
+- __arm_smmu_tlb_inv_asid/s1_range_nosync
+- check there is no HW MSI regions
+- asid invalidation using pasid extended struct (change in the uapi)
+- add s1_live/s2_live checks
+- move check about support of nested stages in domain finalise
+- fixes in error reporting according to the discussion with Robin
+- reordered the patches to have first iommu/smmuv3 patches and then
+  VFIO patches
+
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens in
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
 
 
-On 11.07.19 11:42, Andre Przywara wrote:
-> On Thu, 11 Jul 2019 09:52:42 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> Hi,
-> 
->> On 11/07/19 07:49, Alexander Graf wrote:
->>>> I agree that it would belong more in qtest, but tests in not exactly the
->>>> right place is better than no tests.
->>>
->>> The problem with qtest is that it tests QEMU device models from a QEMU
->>> internal view.
->>
->> Not really: fundamentally it tests QEMU device models with stimuli that
->> come from another process in the host, rather than code that runs in a
->> guest.  It does have hooks into QEMU's internal view (mostly to
->> intercept interrupts and advance the clocks), but the main feature of
->> the protocol is the ability to do memory reads and writes.
->>
->>> I am much more interested in the guest visible side of things. If
->>> kvmtool wanted to implement a PL031, it should be able to execute the
->>> same test that we run against QEMU, no?
-> 
-> One of the design goals of kvmtool is to get away with as little emulation
-> as possible, in favour of paravirtualisation (so it's just virtio and not
-> IDE/flash). So a hardware RTC emulation sounds dispensable in this context.
+Eric Auger (11):
+  iommu: Introduce bind/unbind_guest_msi
+  iommu/smmuv3: Dynamically allocate s1_cfg and s2_cfg
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Introduce __arm_smmu_tlb_inv_asid/s1_range_nosync
+  iommu/smmuv3: Implement cache_invalidate
+  dma-iommu: Implement NESTED_MSI cookie
+  iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+  iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+    regions
+  iommu/smmuv3: Implement bind/unbind_guest_msi
+  iommu/smmuv3: Report non recoverable faults
 
-The main reason to have a PL031 exposed to a VM is to make OVMF happy, 
-so that it can provide wall clock time runtime services. I suppose that 
-sooner or later you may want to run OVMF in kvmtool as well, no?
+Jacob Pan (1):
+  iommu: Introduce attach/detach_pasid_table API
 
-The alternative to the PL031 here is to do a PV interface, yes. I'm not 
-really convinced that that would be any easier though. The PL031 is a 
-very trivial device. The only real downside is that it will wrap around 
-in 2038.
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3: Maintain a SID->device structure
 
+Yi L Liu (1):
+  iommu: Introduce cache_invalidate API
 
-Alex
+ drivers/iommu/arm-smmu-v3.c | 817 ++++++++++++++++++++++++++++++++----
+ drivers/iommu/dma-iommu.c   | 139 +++++-
+ drivers/iommu/iommu.c       |  66 +++
+ include/linux/dma-iommu.h   |  16 +
+ include/linux/iommu.h       |  52 +++
+ include/uapi/linux/iommu.h  | 161 +++++++
+ 6 files changed, 1162 insertions(+), 89 deletions(-)
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
