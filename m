@@ -2,79 +2,81 @@ Return-Path: <SRS0=dYxC=VI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB980C74A4B
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 07:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556F7C74A4B
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 08:51:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6E8D4208E4
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 07:52:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8D4208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id D5F21208E4
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 08:51:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s+p5Rqsk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F21208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDADE4A4A9;
-	Thu, 11 Jul 2019 03:52:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E2BE4A4CD;
+	Thu, 11 Jul 2019 04:51:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yF+mIUtPUhJW; Thu, 11 Jul 2019 03:52:48 -0400 (EDT)
+	with ESMTP id 9VqFRx43dxAW; Thu, 11 Jul 2019 04:51:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5A474A4DF;
-	Thu, 11 Jul 2019 03:52:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E24C14A4DF;
+	Thu, 11 Jul 2019 04:51:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FEE64A4BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 03:52:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8F2E4A4CA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 04:51:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pttHkdsSF1Wu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jul 2019 03:52:45 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E5ED4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 03:52:45 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id p13so5114557wru.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 00:52:45 -0700 (PDT)
+ with ESMTP id av798ZGIgax4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 04:51:22 -0400 (EDT)
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com
+ [209.85.167.193])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C0624A49C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 04:51:22 -0400 (EDT)
+Received: by mail-oi1-f193.google.com with SMTP id t76so3905314oih.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 01:51:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=k/zX7qRMlJI8fUYktt5/frIONjiVDpZRrgUUq3EkUTc=;
+ b=s+p5Rqsk09xdh4xS0WW1f/H4FX3ewk3iHV3RN01z+R3dZhbTECk4DovbE5aSicjP1J
+ jwKXyuonvUvH9IoB+hOY4ff0IkyqGiYn4pxGDbF3yb/GyzMIXohihhNAEI2mEOokYQvQ
+ jhLhtPqDv3/rkhuoALCCdFHi3hCn4l1Tt5kWirDEL0v7Xrrj9kIMQmOL4NBkef493ivh
+ 0q4+hngG4T0asJ5oDFOc/FPhwhj7ehsqjwEZZOpQ4EPofT4ObRq84QOEsTpEx62v44Ll
+ xGe+96g+swpR5I7BVk1zNb7ZGkpxbkgLEC3elu+RkrqH8C2f7FGzgWjCCICopT3HHxLD
+ e2pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0eQT9U+ySDhN1Rp7c4eWQ7uBiGRgy3zkrcnHUZ9sazo=;
- b=gWB/l4RqSuZAh4xf9j19Dcr+GA5iTogqTmt/FucCDIjNswQs099yD2v0O++aW1jPGE
- /QebQ4/HDytII6jrC6au6Go1QUGIp1MM0TSILoWk8fLcBtbdIY8+4dYgG2vcYECw09ub
- BLchxEKZIQzbE1T+X4bICqv7t7hkLo+eUM9Kai+8d03efrbh9MqIDi2cS9Ah9rfiP++r
- o87SxeGNcXFR0PLf7a2lZuAr2K1V5PAoJDcKkfVRYALfNu8pZu1csd8Lxsmskuwd0/JH
- i023IKEmmzJAl3+RtyfSDv6qWsQfAE4juwa9DjRsWYkRGNJPkv/gZOamC/IXOBEbBFlC
- jbJw==
-X-Gm-Message-State: APjAAAUYt+Hr1iKNn++tpuodQDH0eqxz/uXOo2VGE6VbtHT6NiW4vXOY
- ANjpQB4jg8+6V2qXSb0K4lIfboh6hF8=
-X-Google-Smtp-Source: APXvYqzczFDh0c/gcZge3Wef96/ux6nizriw1jHvvaR0X6MGlzhO9gsosffCTmt+HhncNDC8NZeZ6w==
-X-Received: by 2002:adf:ed41:: with SMTP id u1mr3098151wro.162.1562831564315; 
- Thu, 11 Jul 2019 00:52:44 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id f204sm5014690wme.18.2019.07.11.00.52.43
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 00:52:43 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To: Alexander Graf <graf@amazon.com>, Andre Przywara <andre.przywara@arm.com>
-References: <20190710132724.28350-1-graf@amazon.com>
- <20190710180235.25c54b84@donnerap.cambridge.arm.com>
- <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
- <1537a9f2-9d23-97dd-b195-8239b263d5db@amazon.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c88eb2e-b401-42c7-f04f-2162f26af32c@redhat.com>
-Date: Thu, 11 Jul 2019 09:52:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=k/zX7qRMlJI8fUYktt5/frIONjiVDpZRrgUUq3EkUTc=;
+ b=sJbJ9leN0viC1ZueQAXqQqbRymB0x8Br++7GcT/ANc8lk1X/Ft48a70r1FyuVu5ydp
+ Y7wAyXg5MWHCx2szXewKf9FvVnnIGA2VFg4+uKmf9wN/i2qPVfIB59I/XKxtJw9TfKwF
+ iNnJhCXErJRACl9n96E8pw+BXknWwsLuIzoKO3sGe7M7ZdrsepHvhIZACJy/xzod6zXO
+ 4cWtdRH8tXiRCsvFhXbFLFhvVsauH0S+2MML/NqjlFYP/XXVhb4r1YxXgD9g6EpFvKo6
+ TEHBMePDczWAwj99cUkGfH4LY01615sYwlq5BwIQZqICQK+Kwgl9Ls6yNIOPqnjw9o+K
+ DCDA==
+X-Gm-Message-State: APjAAAWC1vIiNPuLZULekOe2PaZIYlP8SDzKlrI7UtSs+Qs1v7doRkdA
+ r559qUAT4wRP09VlTWnSpWmh/6HNSTTtZ4+7vGZpTQ==
+X-Google-Smtp-Source: APXvYqwN36w+hCesmo+OCwkoa7l8eUf1QaX3sqrlCqwBWedZ6AgvlD2qKx9fLYO82J5xohKuC9GzDxOHWqaxAbCxvEo=
+X-Received: by 2002:a05:6808:d4:: with SMTP id t20mr65327oic.170.1562835081962; 
+ Thu, 11 Jul 2019 01:51:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1537a9f2-9d23-97dd-b195-8239b263d5db@amazon.com>
-Content-Language: en-US
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+References: <20190710132724.28350-1-graf@amazon.com>
+In-Reply-To: <20190710132724.28350-1-graf@amazon.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 11 Jul 2019 09:51:10 +0100
+Message-ID: <CAFEAcA81mQ780H5EY8uV6AvbXzeZA60eCHoE_n9yzeZgw+ru4w@mail.gmail.com>
+Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
+To: Alexander Graf <graf@amazon.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, kvm-devel <kvm@vger.kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,41 +93,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/07/19 07:49, Alexander Graf wrote:
->> I agree that it would belong more in qtest, but tests in not exactly the
->> right place is better than no tests.
-> 
-> The problem with qtest is that it tests QEMU device models from a QEMU
-> internal view.
+On Wed, 10 Jul 2019 at 14:35, Alexander Graf <graf@amazon.com> wrote:
+>
+> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+> It just pokes basic functionality. I've mostly written it to familiarize myself
+> with the device, but I suppose having the test around does not hurt, as it also
+> exercises the GIC SPI interrupt path.
 
-Not really: fundamentally it tests QEMU device models with stimuli that
-come from another process in the host, rather than code that runs in a
-guest.  It does have hooks into QEMU's internal view (mostly to
-intercept interrupts and advance the clocks), but the main feature of
-the protocol is the ability to do memory reads and writes.
 
-> I am much more interested in the guest visible side of things. If
-> kvmtool wanted to implement a PL031, it should be able to execute the
-> same test that we run against QEMU, no?
+Have you tested this against a real hardware pl031? I appreciate
+that the scaffolding to let you do that is probably pretty
+painful, but it would be interesting to test, because I'm
+not really all that confident in the accuracy of QEMU's
+pl031 model. (Notably there are some places where it absolutely
+does not work like the real h/w; in some ways it's a bit
+like "a pl031 that some imaginary firmware has initialized
+and enabled"...)
 
-Well, kvmtool could also implement the qtest protocol; perhaps it should
-(probably as a different executable that shares the device models with
-the main kvmtool executable).  There would still be issues in reusing
-code from the QEMU tests, since it has references to QEMU command line
-options.
-
-> If kvm-unit-test is the wrong place for it, we would probably want to
-> have a separate testing framework for guest side unit tests targeting
-> emulated devices.
-> 
-> Given how nice the kvm-unit-test framework is though, I'd rather rename
-> it to "virt-unit-test" than reinvent the wheel :).
-
-Definitely, or even just "hwtest". :)  With my QEMU hat I would prefer
-the test to be a qtest, but with my kvm-unit-tests hat on I see no
-reason to reject this test.  Sorry if this was not clear.
-
-Paolo
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
