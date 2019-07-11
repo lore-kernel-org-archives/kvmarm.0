@@ -2,79 +2,145 @@ Return-Path: <SRS0=lVnl=VJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FFAC742B1
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 09:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2CDC742BB
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 12:55:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 90F642166E
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 09:19:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D443820863
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 12:55:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ESdtm/N4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F642166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QtY5LSfY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D443820863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 127154A53C;
-	Fri, 12 Jul 2019 05:19:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12FA84A4FA;
+	Fri, 12 Jul 2019 08:55:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
+	(fail, message has been altered) header.i=@broadcom.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oEvrk3KMDpts; Fri, 12 Jul 2019 05:19:54 -0400 (EDT)
+	with ESMTP id jXmgGtfA+Zlt; Fri, 12 Jul 2019 08:55:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FBCA4A516;
-	Fri, 12 Jul 2019 05:19:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 302B74A529;
+	Fri, 12 Jul 2019 08:55:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 50C224A516
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 05:19:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C5A54A502
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 13:00:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CCD5B5-UqMXE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jul 2019 05:19:52 -0400 (EDT)
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F17284A4EA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 05:19:51 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1562923191; x=1594459191;
- h=from:to:cc:subject:date:message-id:mime-version;
- bh=LWHBz0SXs21KNm8cdEH/yPSg9EsuzjCCxxmRa6sgvcw=;
- b=ESdtm/N4p7hwK+w4Ca0P80KUtjwJqUeIfFzZcPfYWB7BgQwiq8cD0wWe
- DG+hWx91eQyYWn7xigecPOYLbkHSI3zKxMoWCdim8Zfup0EzsrnwSWowP
- dgBYA9F0UzW01DGmVHR0KFmfRbmrbOCgrZK5S9I+NWR9L9SFAXGySZlxs I=;
-X-IronPort-AV: E=Sophos;i="5.62,481,1554768000"; d="scan'208";a="741478283"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO
- email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.124.125.2])
- by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP;
- 12 Jul 2019 09:19:50 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
- by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS
- id BF68FA2134; Fri, 12 Jul 2019 09:19:48 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 12 Jul 2019 09:19:48 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.20) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 12 Jul 2019 09:19:45 +0000
-From: Alexander Graf <graf@amazon.com>
-To: <kvm@vger.kernel.org>
-Subject: [PATCH kvm-unit-tests v2] arm: Add PL031 test
-Date: Fri, 12 Jul 2019 11:19:38 +0200
-Message-ID: <20190712091938.492-1-graf@amazon.com>
-X-Mailer: git-send-email 2.17.1
+ with ESMTP id WskeibShE9Nz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 13:00:29 -0400 (EDT)
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com
+ [209.85.215.194])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEE214A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 13:00:28 -0400 (EDT)
+Received: by mail-pg1-f194.google.com with SMTP id q4so3227881pgj.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 10:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=broadcom.com; s=google;
+ h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=GU/67RfZIGaVv3I1gykKW+OAEzbKYvssQxM3jRxvovg=;
+ b=QtY5LSfYEvpupp4jevn4Y2xXMuduFeEnqLGM4nvdKFwQSJw4rCnq7IY6Mkn2JlUVsJ
+ zICi81PVvBFWPsRhbQ+/T29JbwpyABA2BNqkCU6QYLdJLrjV5oYVutBWUKpBtgVDENRw
+ 98AuoF+gzRf8vEtDCYMUJ+dZ6Vx9hAE2ErxBA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=GU/67RfZIGaVv3I1gykKW+OAEzbKYvssQxM3jRxvovg=;
+ b=Z36cEJV8HmpUrrd9GhIwhMWMZ2U5dfp7savHQOjsu53qJfxxJDybHU/V1h6AKdk2ng
+ JQHmjLTrqg1bi3aMawHgkJXHt7OxwX2hS521ZGU5jZKrJSOFpipAotPiDemleIQw1H/a
+ Sy3vhPerYRZG750zxeahHoM/6fcOM/IcTQugjJZRhlum1GChbrye87fSj2SV68MENPc5
+ tf2aX36hT7u8QEAIYZK3QacqQLPbJvlz+G//RtfeoFAH+gAKD1UKh8dC3fW3gEUq+yCP
+ SnHPinXUt5FctBEiCZ/a3+P0bmqOxgcZbSRNElgR3q0pzhmztSWcw2s3gsaajG9VSGsD
+ OTkw==
+X-Gm-Message-State: APjAAAVCWV+XWK7JXD9ndeFEaiMQxvaOKWv302LwfrLP9C3pxa1nNKTY
+ ZlpR/lH+RR4faNtGtZyteZ3HNA==
+X-Google-Smtp-Source: APXvYqwGhoEYKDDfuMlPsdi0PmR11605QNQVDKDRZbg0XiTefEm9hfAXshYIUX8kqkFFYG+E73koJA==
+X-Received: by 2002:a17:90a:d998:: with SMTP id
+ d24mr5929058pjv.89.1562864427900; 
+ Thu, 11 Jul 2019 10:00:27 -0700 (PDT)
+Received: from [10.67.49.31] ([192.19.223.252])
+ by smtp.gmail.com with ESMTPSA id r13sm7233865pfr.25.2019.07.11.10.00.19
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 11 Jul 2019 10:00:27 -0700 (PDT)
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Florian Fainelli <f.fainelli@gmail.com>, Arnd Bergmann <arnd@arndb.de>
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <CACRpkdbqW2kJNdPi6JPupaHA_qRTWG-MsUxeCz0c38MRujOSSA@mail.gmail.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=florian.fainelli@broadcom.com; prefer-encrypt=mutual; keydata=
+ mQENBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAG0MEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPokB
+ xAQQAQgArgUCXJvPrRcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFrZXktdXNh
+ Z2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2RpbmdAcGdw
+ LmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29tLmNvbQUb
+ AwAAAAMWAgEFHgEAAAAEFQgJCgAKCRCBMbXEKbxmoE4DB/9JySDRt/ArjeOHOwGA2sLR1DV6
+ Mv6RuStiefNvJ14BRfMkt9EV/dBp9CsI+slwj9/ZlBotQXlAoGr4uivZvcnQ9dWDjTExXsRJ
+ WcBwUlSUPYJc/kPWFnTxF8JFBNMIQSZSR2dBrDqRP0UWYJ5XaiTbVRpd8nka9BQu4QB8d/Bx
+ VcEJEth3JF42LSF9DPZlyKUTHOj4l1iZ/Gy3AiP9jxN50qol9OT37adOJXGEbix8zxoCAn2W
+ +grt1ickvUo95hYDxE6TSj4b8+b0N/XT5j3ds1wDd/B5ZzL9fgBjNCRzp8McBLM5tXIeTYu9
+ mJ1F5OW89WvDTwUXtT19P1r+qRqKuQENBFPAG8EBCACsa+9aKnvtPjGAnO1mn1hHKUBxVML2
+ C3HQaDp5iT8Q8A0ab1OS4akj75P8iXYfZOMVA0Lt65taiFtiPT7pOZ/yc/5WbKhsPE9dwysr
+ vHjHL2gP4q5vZV/RJduwzx8v9KrMZsVZlKbvcvUvgZmjG9gjPSLssTFhJfa7lhUtowFof0fA
+ q3Zy+vsy5OtEe1xs5kiahdPb2DZSegXW7DFg15GFlj+VG9WSRjSUOKk+4PCDdKl8cy0LJs+r
+ W4CzBB2ARsfNGwRfAJHU4Xeki4a3gje1ISEf+TVxqqLQGWqNsZQ6SS7jjELaB/VlTbrsUEGR
+ 1XfIn/sqeskSeQwJiFLeQgj3ABEBAAGJAkEEGAECASsFAlPAG8IFGwwAAADAXSAEGQEIAAYF
+ AlPAG8EACgkQk2AGqJgvD1UNFQgAlpN5/qGxQARKeUYOkL7KYvZFl3MAnH2VeNTiGFoVzKHO
+ e7LIwmp3eZ6GYvGyoNG8cOKrIPvXDYGdzzfwxVnDSnAE92dv+H05yanSUv/2HBIZa/LhrPmV
+ hXKgD27XhQjOHRg0a7qOvSKx38skBsderAnBZazfLw9OukSnrxXqW/5pe3mBHTeUkQC8hHUD
+ Cngkn95nnLXaBAhKnRfzFqX1iGENYRH3Zgtis7ZvodzZLfWUC6nN8LDyWZmw/U9HPUaYX8qY
+ MP0n039vwh6GFZCqsFCMyOfYrZeS83vkecAwcoVh8dlHdke0rnZk/VytXtMe1u2uc9dUOr68
+ 7hA+Z0L5IQAKCRCBMbXEKbxmoLoHCACXeRGHuijOmOkbyOk7x6fkIG1OXcb46kokr2ptDLN0
+ Ky4nQrWp7XBk9ls/9j5W2apKCcTEHONK2312uMUEryWI9BlqWnawyVL1LtyxLLpwwsXVq5m5
+ sBkSqma2ldqBu2BHXZg6jntF5vzcXkqG3DCJZ2hOldFPH+czRwe2OOsiY42E/w7NUyaN6b8H
+ rw1j77+q3QXldOw/bON361EusWHdbhcRwu3WWFiY2ZslH+Xr69VtYAoMC1xtDxIvZ96ps9ZX
+ pUPJUqHJr8QSrTG1/zioQH7j/4iMJ07MMPeQNkmj4kGQOdTcsFfDhYLDdCE5dj5WeE6fYRxE
+ Q3up0ArDSP1L
+Message-ID: <0ba50ae2-be09-f633-ab1f-860e8b053882@broadcom.com>
+Date: Thu, 11 Jul 2019 10:00:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-Originating-IP: [10.43.160.20]
-X-ClientProxiedBy: EX13D01UWB004.ant.amazon.com (10.43.161.157) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Andre Przywara <andre.przywara@arm.com>
+In-Reply-To: <CACRpkdbqW2kJNdPi6JPupaHA_qRTWG-MsUxeCz0c38MRujOSSA@mail.gmail.com>
+Content-Language: en-US
+X-Mailman-Approved-At: Fri, 12 Jul 2019 08:55:26 -0400
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, mhocko@suse.com,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Jonathan Corbet <corbet@lwn.net>, liuwenliang@huawei.com,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev@googlegroups.com,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, philip@cog.systems,
+ jinb.park7@gmail.com, Thomas Gleixner <tglx@linutronix.de>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Nicolas Pitre <nico@fluxnic.net>, Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Rob Landley <rob@landley.net>, Philippe Ombredanne <pombredanne@nexb.com>,
+ Andrew Morton <akpm@linux-foundation.org>, thgarnie@google.com,
+ kirill.shutemov@linux.intel.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,325 +157,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-It just pokes basic functionality. I've mostly written it to familiarize myself
-with the device, but I suppose having the test around does not hurt, as it also
-exercises the GIC SPI interrupt path.
+On 7/2/19 2:06 PM, Linus Walleij wrote:
+> Hi Florian,
+> 
+> On Tue, Jun 18, 2019 at 12:11 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+> 
+>> Abbott submitted a v5 about a year ago here:
+>>
+>> and the series was not picked up since then, so I rebased it against
+>> v5.2-rc4 and re-tested it on a Brahma-B53 (ARMv8 running AArch32 mode)
+>> and Brahma-B15, both LPAE and test-kasan is consistent with the ARM64
+>> counter part.
+>>
+>> We were in a fairly good shape last time with a few different people
+>> having tested it, so I am hoping we can get that included for 5.4 if
+>> everything goes well.
+> 
+> Thanks for picking this up. I was trying out KASan in the past,
+> got sidetracked and honestly lost interest a bit because it was
+> boring. But I do realize that it is really neat, so I will try to help
+> out with some review and test on a bunch of hardware I have.
+> 
+> At one point I even had this running on the ARMv4 SA1100
+> (no joke!) and if I recall correctly, I got stuck because of things
+> that might very well have been related to using a very fragile
+> Arm testchip that later broke down completely in the l2cache
+> when we added the spectre/meltdown fixes.
 
-Signed-off-by: Alexander Graf <graf@amazon.com>
+A blast from the past!
 
----
+> 
+> I start reviewing and testing.
 
-v1 -> v2:
+Great, thanks a lot for taking a look. FYI, I will be on holiday from
+July 19th till August 12th, if you think you have more feedback between
+now and then, I can try to pick it up and submit a v7 with that feedback
+addressed, or it will happen when I return, or you can pick it up if you
+refer, all options are possible!
 
-  - Use FDT to find base, irq and existence
-  - Put isb after timer read
-  - Use dist_base for gicv3
----
- arm/Makefile.common |   1 +
- arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h   |   1 +
- 3 files changed, 267 insertions(+)
- create mode 100644 arm/pl031.c
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f0c4b5d..b8988f2 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
- tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
- tests-common += $(TEST_DIR)/sieve.flat
-+tests-common += $(TEST_DIR)/pl031.flat
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/pl031.c b/arm/pl031.c
-new file mode 100644
-index 0000000..d975937
---- /dev/null
-+++ b/arm/pl031.c
-@@ -0,0 +1,265 @@
-+/*
-+ * Verify PL031 functionality
-+ *
-+ * This test verifies whether the emulated PL031 behaves correctly.
-+ *
-+ * Copyright 2019 Amazon.com, Inc. or its affiliates.
-+ * Author: Alexander Graf <graf@amazon.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <devicetree.h>
-+#include <asm/processor.h>
-+#include <asm/io.h>
-+#include <asm/gic.h>
-+
-+struct pl031_regs {
-+	uint32_t dr;	/* Data Register */
-+	uint32_t mr;	/* Match Register */
-+	uint32_t lr;	/* Load Register */
-+	union {
-+		uint8_t cr;	/* Control Register */
-+		uint32_t cr32;
-+	};
-+	union {
-+		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-+		uint32_t imsc32;
-+	};
-+	union {
-+		uint8_t ris;	/* Raw Interrupt Status */
-+		uint32_t ris32;
-+	};
-+	union {
-+		uint8_t mis;	/* Masked Interrupt Status */
-+		uint32_t mis32;
-+	};
-+	union {
-+		uint8_t icr;	/* Interrupt Clear Register */
-+		uint32_t icr32;
-+	};
-+	uint32_t reserved[1008];
-+	uint32_t periph_id[4];
-+	uint32_t pcell_id[4];
-+};
-+
-+static u32 cntfrq;
-+static struct pl031_regs *pl031;
-+static int pl031_irq;
-+static void *gic_ispendr;
-+static void *gic_isenabler;
-+static bool irq_triggered;
-+
-+static uint64_t read_timer(void)
-+{
-+	uint64_t r = read_sysreg(cntpct_el0);
-+	isb();
-+
-+	return r;
-+}
-+
-+static int check_id(void)
-+{
-+	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id); i++)
-+		if (id[i] != readl(&pl031->periph_id[i]))
-+			return 1;
-+
-+	return 0;
-+}
-+
-+static int check_ro(void)
-+{
-+	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-+			    offsetof(struct pl031_regs, mis),
-+			    offsetof(struct pl031_regs, periph_id[0]),
-+			    offsetof(struct pl031_regs, periph_id[1]),
-+			    offsetof(struct pl031_regs, periph_id[2]),
-+			    offsetof(struct pl031_regs, periph_id[3]),
-+			    offsetof(struct pl031_regs, pcell_id[0]),
-+			    offsetof(struct pl031_regs, pcell_id[1]),
-+			    offsetof(struct pl031_regs, pcell_id[2]),
-+			    offsetof(struct pl031_regs, pcell_id[3]) };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-+		uint32_t before32;
-+		uint16_t before16;
-+		uint8_t before8;
-+		void *addr = (void*)pl031 + offs[i];
-+		uint32_t poison = 0xdeadbeefULL;
-+
-+		before8 = readb(addr);
-+		before16 = readw(addr);
-+		before32 = readl(addr);
-+
-+		writeb(poison, addr);
-+		writew(poison, addr);
-+		writel(poison, addr);
-+
-+		if (before8 != readb(addr))
-+			return 1;
-+		if (before16 != readw(addr))
-+			return 1;
-+		if (before32 != readl(addr))
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int check_rtc_freq(void)
-+{
-+	uint32_t seconds_to_wait = 2;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = read_timer();
-+	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-+
-+	/* Wait for 2 seconds */
-+	while (read_timer() < target_tick) ;
-+
-+	if (readl(&pl031->dr) != before + seconds_to_wait)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static bool gic_irq_pending(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
-+}
-+
-+static void gic_irq_unmask(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
-+}
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+
-+	if (irqnr == pl031_irq) {
-+		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-+		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-+
-+		/* Writing any value should clear IRQ status */
-+		writel(0x80000000ULL, &pl031->icr);
-+
-+		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-+		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-+		irq_triggered = true;
-+	} else {
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+		return;
-+	}
-+}
-+
-+static int check_rtc_irq(void)
-+{
-+	uint32_t seconds_to_wait = 1;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = read_timer();
-+	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-+
-+	report_info("Checking IRQ trigger (MR)");
-+
-+	irq_triggered = false;
-+
-+	/* Fire IRQ in 1 second */
-+	writel(before + seconds_to_wait, &pl031->mr);
-+
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+
-+	/* Wait until 2 seconds are over */
-+	while (read_timer() < target_tick) ;
-+
-+	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-+
-+	/* Mask the IRQ so that it gets delivered */
-+	writel(1, &pl031->imsc);
-+	report("  RTC IRQ pending now", gic_irq_pending());
-+
-+	/* Enable retrieval of IRQ */
-+	gic_irq_unmask();
-+	local_irq_enable();
-+
-+	report("  IRQ triggered", irq_triggered);
-+	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-+	if (!irq_triggered) {
-+		report_info("  RTC RIS: %x", readl(&pl031->ris));
-+		report_info("  RTC MIS: %x", readl(&pl031->mis));
-+		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-+		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-+	}
-+
-+	local_irq_disable();
-+	return 0;
-+}
-+
-+static void rtc_irq_init(void)
-+{
-+	gic_enable_defaults();
-+
-+	switch (gic_version()) {
-+	case 2:
-+		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-+		break;
-+	case 3:
-+		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
-+		break;
-+	}
-+}
-+
-+static int rtc_fdt_init(void)
-+{
-+	const struct fdt_property *prop;
-+	const void *fdt = dt_fdt();
-+	int node, len;
-+	u32 *data;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
-+	if (node < 0)
-+		return -1;
-+
-+	prop = fdt_get_property(fdt, node, "interrupts", &len);
-+	assert(prop && len == (3 * sizeof(u32)));
-+	data = (u32 *)prop->data;
-+	assert(data[0] == 0); /* SPI */
-+	pl031_irq = SPI(fdt32_to_cpu(data[1]));
-+
-+	prop = fdt_get_property(fdt, node, "reg", &len);
-+	assert(prop && len == (2 * sizeof(u64)));
-+	data = (u32 *)prop->data;
-+	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
-+
-+	return 0;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	cntfrq = get_cntfrq();
-+	rtc_irq_init();
-+	if (rtc_fdt_init()) {
-+		report_skip("Skipping PL031 tests. No device present.");
-+		return 0;
-+	}
-+
-+	report("Periph/PCell IDs match", !check_id());
-+	report("R/O fields are R/O", !check_ro());
-+	report("RTC ticks at 1HZ", !check_rtc_freq());
-+	report("RTC IRQ not pending yet", !gic_irq_pending());
-+	check_rtc_irq();
-+
-+	return report_summary();
-+}
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..1fc10a0 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -41,6 +41,7 @@
- #include <asm/gic-v3.h>
- 
- #define PPI(irq)			((irq) + 16)
-+#define SPI(irq)			((irq) + GIC_FIRST_SPI)
- 
- #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
+@Arnd, should we squash your patches in as well?
 -- 
-2.17.1
-
+Florian
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
