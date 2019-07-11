@@ -2,82 +2,64 @@ Return-Path: <SRS0=dYxC=VI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE5FC74A54
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 13:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8606C74A54
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 13:56:42 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 720E521019
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 13:40:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 720E521019
+	by mail.kernel.org (Postfix) with ESMTP id 694CB20872
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 13:56:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694CB20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF9D54A4EA;
-	Thu, 11 Jul 2019 09:40:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4D614A4E5;
+	Thu, 11 Jul 2019 09:56:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0mYgNaAaW1w1; Thu, 11 Jul 2019 09:40:33 -0400 (EDT)
+	with ESMTP id ZSylmG+rNWiq; Thu, 11 Jul 2019 09:56:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10EB14A4F7;
-	Thu, 11 Jul 2019 09:40:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8947D4A4E8;
+	Thu, 11 Jul 2019 09:56:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 614014A4F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:40:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 039354A4DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:56:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rutmpc5sloah for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jul 2019 09:40:22 -0400 (EDT)
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com
- [209.85.221.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 887A14A4CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:40:22 -0400 (EDT)
-Received: by mail-wr1-f43.google.com with SMTP id g17so6360251wrr.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 06:40:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FnSXGXReWdj1dwt4PqYkheiL50PJemd4VIlhtbzAQt8=;
- b=T5dau7uRSXFvChH+bturOjV4jx020bU0rgJ20o7XYVtsY7OrvuaLVaNuGSHDzU2tT7
- 8kOONTvFxVgTTR/GkXlHnDObb4CQqunetNOnDuc4ZSRAGPGTSbTeLBAzUUqvtS0KFHTd
- q+p6KXdNK7fMVjDecrmZwLIUrOJ+4AeTVEdQfp5wyoqtTqajw8pV48SHoUcZLPLwnxvt
- oJJlktolpCHBf9g5FcZYELF9eMZVM+WxHp1XwMZ2bu0JKzsFaCtdMu8C7vpx4j8Tv77p
- 0dEuhpEMxxu9u693rjCeEPTp9n3Z2xYRHs/t+7QsRH0FS+H50n9H0yCxWyC14soM5fzM
- 9bfg==
-X-Gm-Message-State: APjAAAUpEyCb7JtzdojId9vzWdTjsL5AFxucG2g+qHn9HyXZneA0u+Hp
- +s2JpTs4X+EXU1BBwQWaMCqm2A==
-X-Google-Smtp-Source: APXvYqyShV9fbckDIWGQ0EkgfblduUbng9/MP66ZdhXZaEdrkN9dkmEju62XgU7X98NYyExpOgwWZA==
-X-Received: by 2002:adf:e843:: with SMTP id d3mr5517125wrn.249.1562852421455; 
- Thu, 11 Jul 2019 06:40:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab?
- ([2001:b07:6468:f312:d066:6881:ec69:75ab])
- by smtp.gmail.com with ESMTPSA id e3sm5300954wrt.93.2019.07.11.06.40.19
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 06:40:20 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm updates for Linux 5.3
-To: Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>
-References: <20190709122507.214494-1-marc.zyngier@arm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7f0bdfc0-d450-5466-ba0f-34c52d872e91@redhat.com>
-Date: Thu, 11 Jul 2019 15:40:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ with ESMTP id 3WQigaKh1rKI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 09:56:37 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F26FF4A4CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:56:36 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 02D6F308626C;
+ Thu, 11 Jul 2019 13:56:36 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0BCF960A97;
+ Thu, 11 Jul 2019 13:56:26 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+ yi.l.liu@intel.com, jean-philippe.brucker@arm.com, will.deacon@arm.com,
+ robin.murphy@arm.com
+Subject: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+Date: Thu, 11 Jul 2019 15:56:14 +0200
+Message-Id: <20190711135625.20684-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190709122507.214494-1-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>, Steven Price <steven.price@arm.com>,
- Sudeep Holla <sudeep.holla@arm.com>, Dave Martin <Dave.Martin@arm.com>,
- linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 11 Jul 2019 13:56:36 +0000 (UTC)
+Cc: kevin.tian@intel.com, vincent.stehle@arm.com, ashok.raj@intel.com,
+ marc.zyngier@arm.com, tina.zhang@intel.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,12 +76,131 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/07/19 14:24, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-5.3
+This series brings the VFIO part of HW nested paging support
+in the SMMUv3.
 
-Pulled, thanks!
+The series depends on:
+[PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+(https://www.spinics.net/lists/kernel/msg3187714.html)
 
-Paolo
+3 new IOCTLs are introduced that allow the userspace to
+1) pass the guest stage 1 configuration
+2) pass stage 1 MSI bindings
+3) invalidate stage 1 related caches
+
+They map onto the related new IOMMU API functions.
+
+We introduce the capability to register specific interrupt
+indexes (see [1]). A new DMA_FAULT interrupt index allows to register
+an eventfd to be signaled whenever a stage 1 related fault
+is detected at physical level. Also a specific region allows
+to expose the fault records to the user space.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+
+It series includes Tina's patch steming from
+[1] "[RFC PATCH v2 1/3] vfio: Use capability chains to handle device
+specific irq" plus patches originally contributed by Yi.
+
+History:
+
+v8 -> v9:
+- introduce specific irq framework
+- single fault region
+- iommu_unregister_device_fault_handler failure case not handled
+  yet.
+
+v7 -> v8:
+- rebase on top of v5.2-rc1 and especially
+  8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+- dynamic alloc of s1_cfg/s2_cfg
+- __arm_smmu_tlb_inv_asid/s1_range_nosync
+- check there is no HW MSI regions
+- asid invalidation using pasid extended struct (change in the uapi)
+- add s1_live/s2_live checks
+- move check about support of nested stages in domain finalise
+- fixes in error reporting according to the discussion with Robin
+- reordered the patches to have first iommu/smmuv3 patches and then
+  VFIO patches
+
+v6 -> v7:
+- removed device handle from bind/unbind_guest_msi
+- added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+  enforcement"
+- added few uapi comments as suggested by Jean, Jacop and Alex
+
+v5 -> v6:
+- Fix compilation issue when CONFIG_IOMMU_API is unset
+
+v4 -> v5:
+- fix bug reported by Vincent: fault handler unregistration now happens in
+  vfio_pci_release
+- IOMMU_FAULT_PERM_* moved outside of struct definition + small
+  uapi changes suggested by Kean-Philippe (except fetch_addr)
+- iommu: introduce device fault report API: removed the PRI part.
+- see individual logs for more details
+- reset the ste abort flag on detach
+
+v3 -> v4:
+- took into account Alex, jean-Philippe and Robin's comments on v3
+- rework of the smmuv3 driver integration
+- add tear down ops for msi binding and PASID table binding
+- fix S1 fault propagation
+- put fault reporting patches at the beginning of the series following
+  Jean-Philippe's request
+- update of the cache invalidate and fault API uapis
+- VFIO fault reporting rework with 2 separate regions and one mmappable
+  segment for the fault queue
+- moved to PATCH
+
+v2 -> v3:
+- When registering the S1 MSI binding we now store the device handle. This
+  addresses Robin's comment about discimination of devices beonging to
+  different S1 groups and using different physical MSI doorbells.
+- Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+  set the eventfd and expose the faults through an mmappable fault region
+
+v1 -> v2:
+- Added the fault reporting capability
+- asid properly passed on invalidation (fix assignment of multiple
+  devices)
+- see individual change logs for more info
+
+
+Eric Auger (8):
+  vfio: VFIO_IOMMU_SET_MSI_BINDING
+  vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
+  vfio/pci: Register an iommu fault handler
+  vfio/pci: Allow to mmap the fault queue
+  vfio: Add new IRQ for DMA fault reporting
+  vfio/pci: Add framework for custom interrupt indices
+  vfio/pci: Register and allow DMA FAULT IRQ signaling
+  vfio: Document nested stage control
+
+Liu, Yi L (2):
+  vfio: VFIO_IOMMU_SET_PASID_TABLE
+  vfio: VFIO_IOMMU_CACHE_INVALIDATE
+
+Tina Zhang (1):
+  vfio: Use capability chains to handle device specific irq
+
+ Documentation/vfio.txt              |  77 ++++++++
+ drivers/vfio/pci/vfio_pci.c         | 283 ++++++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_intrs.c   |  62 ++++++
+ drivers/vfio/pci/vfio_pci_private.h |  24 +++
+ drivers/vfio/pci/vfio_pci_rdwr.c    |  45 +++++
+ drivers/vfio/vfio_iommu_type1.c     | 166 ++++++++++++++++
+ include/uapi/linux/vfio.h           | 109 ++++++++++-
+ 7 files changed, 747 insertions(+), 19 deletions(-)
+
+-- 
+2.20.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
