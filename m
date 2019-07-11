@@ -2,112 +2,91 @@ Return-Path: <SRS0=dYxC=VI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16BBC74A51
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 09:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F09DC74A4B
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 10:07:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6021C21019
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 09:52:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6021C21019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id E70AE208E4
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 10:07:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="otF2lq3q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70AE208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E80FD4A501;
-	Thu, 11 Jul 2019 05:52:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD9C4A49C;
+	Thu, 11 Jul 2019 06:07:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3iKQNrewBhnL; Thu, 11 Jul 2019 05:52:32 -0400 (EDT)
+	with ESMTP id lnow3e4D-abS; Thu, 11 Jul 2019 06:07:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D2E4A503;
-	Thu, 11 Jul 2019 05:52:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3914A518;
+	Thu, 11 Jul 2019 06:07:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 130E34A4FB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 05:52:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEC844A52E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 01:49:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 13jGJPex9MFQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jul 2019 05:52:29 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ECCB4A4FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 05:52:29 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14791337;
- Thu, 11 Jul 2019 02:52:29 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 343EF3F71F; Thu, 11 Jul 2019 02:52:28 -0700 (PDT)
+ with ESMTP id BDKy5mbZZ1Cr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 01:49:54 -0400 (EDT)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com
+ [207.171.184.29])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DD7E4A4FF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 01:49:54 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1562824194; x=1594360194;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=wHeGT4hyzwEYhrwtHzWbpeS08ZRBQe5s5SLIUut76AM=;
+ b=otF2lq3qInyQoPQm4w5N8mnKDK40g0EhVx92kBaiS0iji9dWxKKCd+9g
+ 8pwYS3lk6jg8J35bPrCXoyNdhrIhhTXiCl7Ydr65dpnyuxtt9lY0BzWlU
+ yXnk6kdYuvqa3V1xPKXGTk2Znyz+mpxRTT+8GPbcii4yB7xhZjxfj5+jb k=;
+X-IronPort-AV: E=Sophos;i="5.62,476,1554768000"; d="scan'208";a="684877205"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO
+ email-inbound-relay-1e-62350142.us-east-1.amazon.com) ([10.47.22.34])
+ by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP;
+ 11 Jul 2019 05:49:51 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+ by email-inbound-relay-1e-62350142.us-east-1.amazon.com (Postfix) with ESMTPS
+ id EBF12A2402; Thu, 11 Jul 2019 05:49:49 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 11 Jul 2019 05:49:49 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.144) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 11 Jul 2019 05:49:47 +0000
 Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To: Andre Przywara <andre.przywara@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Andre Przywara
+ <andre.przywara@arm.com>
 References: <20190710132724.28350-1-graf@amazon.com>
  <20190710180235.25c54b84@donnerap.cambridge.arm.com>
  <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
- <1537a9f2-9d23-97dd-b195-8239b263d5db@amazon.com>
- <8c88eb2e-b401-42c7-f04f-2162f26af32c@redhat.com>
- <20190711104200.254073fb@donnerap.cambridge.arm.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <75578652-0396-d349-3d81-da7190e2d714@arm.com>
-Date: Thu, 11 Jul 2019 10:52:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+From: Alexander Graf <graf@amazon.com>
+Message-ID: <1537a9f2-9d23-97dd-b195-8239b263d5db@amazon.com>
+Date: Thu, 11 Jul 2019 07:49:45 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190711104200.254073fb@donnerap.cambridge.arm.com>
+In-Reply-To: <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
 Content-Language: en-US
-Cc: Alexander Graf <graf@amazon.com>, kvmarm@lists.cs.columbia.edu,
+X-Originating-IP: [10.43.162.144]
+X-ClientProxiedBy: EX13D19UWC002.ant.amazon.com (10.43.162.179) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+X-Mailman-Approved-At: Thu, 11 Jul 2019 06:07:52 -0400
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
-Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -116,45 +95,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/07/2019 10:42, Andre Przywara wrote:
-> On Thu, 11 Jul 2019 09:52:42 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> Hi,
-> 
->> On 11/07/19 07:49, Alexander Graf wrote:
->>>> I agree that it would belong more in qtest, but tests in not exactly the
->>>> right place is better than no tests.  
->>>
->>> The problem with qtest is that it tests QEMU device models from a QEMU
->>> internal view.  
->>
->> Not really: fundamentally it tests QEMU device models with stimuli that
->> come from another process in the host, rather than code that runs in a
->> guest.  It does have hooks into QEMU's internal view (mostly to
->> intercept interrupts and advance the clocks), but the main feature of
->> the protocol is the ability to do memory reads and writes.
->>
->>> I am much more interested in the guest visible side of things. If
->>> kvmtool wanted to implement a PL031, it should be able to execute the
->>> same test that we run against QEMU, no?  
-> 
-> One of the design goals of kvmtool is to get away with as little emulation
-> as possible, in favour of paravirtualisation (so it's just virtio and not
-> IDE/flash). So a hardware RTC emulation sounds dispensable in this context.
 
-Funnily enough, kvmtool does have a RTC emulation (MC146818). The
-support code in Linux is so braindead that I gave up on it about 5 years
-ago.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+On 10.07.19 19:06, Paolo Bonzini wrote:
+> On 10/07/19 19:02, Andre Przywara wrote:
+>>> + * This test verifies whether the emulated PL031 behaves
+>>> correctly.
+>> ^^^^^^^^
+>>
+>> While I appreciate the effort and like the fact that this actually
+>> triggers an SPI, I wonder if this actually belongs into
+>> kvm-unit-tests. After all this just test a device purely emulated in
+>> (QEMU) userland, so it's not really KVM related.
+>>
+>> What is the general opinion on this? Don't we care about this
+>> hair-splitting as long as it helps testing? Do we even want to extend
+>> kvm-unit-tests coverage to more emulated devices, for instance
+>> virtio?
+> 
+> I agree that it would belong more in qtest, but tests in not exactly the
+> right place is better than no tests.
+
+The problem with qtest is that it tests QEMU device models from a QEMU 
+internal view.
+
+I am much more interested in the guest visible side of things. If 
+kvmtool wanted to implement a PL031, it should be able to execute the 
+same test that we run against QEMU, no?
+
+If kvm-unit-test is the wrong place for it, we would probably want to 
+have a separate testing framework for guest side unit tests targeting 
+emulated devices.
+
+Given how nice the kvm-unit-test framework is though, I'd rather rename 
+it to "virt-unit-test" than reinvent the wheel :).
+
+
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
