@@ -2,84 +2,86 @@ Return-Path: <SRS0=dYxC=VI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092F8C31E42
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 16:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454B3C31E41
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 16:55:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8ACCF2171F
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 16:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5B7E216C8
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Jul 2019 16:55:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VE858to2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ACCF2171F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oFX9gEXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B7E216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E82474A52D;
-	Thu, 11 Jul 2019 12:54:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 445D94A515;
+	Thu, 11 Jul 2019 12:55:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q9-iibhndg08; Thu, 11 Jul 2019 12:54:17 -0400 (EDT)
+	with ESMTP id tHkjCKSoY8O7; Thu, 11 Jul 2019 12:55:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4A494A532;
-	Thu, 11 Jul 2019 12:54:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A624A52D;
+	Thu, 11 Jul 2019 12:55:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 778A24A52F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 12:54:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E683E4A502
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 12:55:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Vncj-wwNXis6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Jul 2019 12:54:15 -0400 (EDT)
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com
- [209.85.221.68])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B0A44A52D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 12:54:15 -0400 (EDT)
-Received: by mail-wr1-f68.google.com with SMTP id c2so3870082wrm.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:54:15 -0700 (PDT)
+ with ESMTP id m2zkcNi0ik47 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jul 2019 12:55:16 -0400 (EDT)
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com
+ [209.85.221.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA0934A4EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 12:55:15 -0400 (EDT)
+Received: by mail-wr1-f66.google.com with SMTP id x4so7063464wrt.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jul 2019 09:55:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=NesWXuGbkASvqkB3OfHXJkarfZRKXQiML61VfYbpfEw=;
- b=VE858to2y7ZF+Yho6XDdzelgR7kQDjL4jiugFGdBeGx66hyP15ePL8ltL11wvW7IMw
- rjuLr3ip9sXleNjnR0pKFBQTRbGImm6L7qCJy0z81Jn6sHSFCJjgzGrP67Ul5n3CPtwD
- CzIHOI3K61AHNyNoUAOZ0pzNxQmgTDbJW+FBiNPlxPOb7DiqxgrReUbfigk5dPI8cPp/
- irSBolZvC3tkywfQncRHDp2IenZ1VnlIHTNqvGN8hfLzWISdPsF9E6oGjTYQ7203Cai2
- YbIlgvUDy9/2zLTYRKwKV5789L/Qx+uEu7ItJmpUNCen4ZX464uMO0qbRzOKdAja2I2A
- fWtQ==
+ bh=cW9evuaNHUhu3xKoRblEDbGLej8PzYak53HB5pCVWjU=;
+ b=oFX9gEXDAQ3+H/vT4H26l4Ol50OZG1qDmtkSHrTXHzx+qOSDK2mcRQyEeqpEms1luc
+ x2NseAhAxqROgC5+GS1WF3rEVZsiNMXy08Dli2EK8K27ulNcLYG2riP7T5Jzd+vde0hP
+ zIN7Lrge3OAkn/fwJmsI623UMVTf2l7xhGSijG+Jwofa1MH7yz/tvXF/m9mfhPUNhwd/
+ +DIFuDo3ryRGyAmP26G4/B+x+VANns65dIwMXh6eXc1zojM8dY5rskKyYm7Ap/gOHyD4
+ VIILEo9QuerSBwvNtsSaGEUsL+JEIpj31DYOiNVe/9JDVKZLqTL4F7UqQcOriKmJL2dk
+ jqHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=NesWXuGbkASvqkB3OfHXJkarfZRKXQiML61VfYbpfEw=;
- b=SyK1/cw0zR6Dg+yjsDElZVXPWBRhEwJUyi8EBL7IxlfwMiVCOB1alr+kcThSz+RRm/
- yXNQjT2P5nmnVjZkVEV5cXYbcXikT+dimjNh3gO3Ofx4r/xkeXpY0k84R84bjsVnDwN4
- wupiLdx/u3IBn1ODEjqPYYk3YoIaSBacnOHba9s1Vs6vbHTjNuiQuzm8+9BFVRMs5Opz
- 0hPIMMbhd6/zNnJ+3bOTuKi9t9XZa/94e08mPac4jtiZNmVoazG+tmzKw1sW9o3gf1VB
- U++iNRBuuf0ukk6rtNr+F7l+EMu9NzO3fOqvjcxV5wef0dGcfn54q74EV0vbC2wUFrOd
- L3Gw==
-X-Gm-Message-State: APjAAAVLGIiLtLTu1qK/8doD7/NpEyExqT8U01fjWGmwa1zpicq4E84A
- apMlmvUUt5bLYGgA0BgqxtE=
-X-Google-Smtp-Source: APXvYqxvQMOsPbq3fIdc8FXV42JE16f8lykhebXezEpi2QhaD/xtj/HV+Ano6Jw7WoDgSdzUkOiTFw==
-X-Received: by 2002:adf:e941:: with SMTP id m1mr6267917wrn.279.1562864054220; 
- Thu, 11 Jul 2019 09:54:14 -0700 (PDT)
+ bh=cW9evuaNHUhu3xKoRblEDbGLej8PzYak53HB5pCVWjU=;
+ b=DWNMke+AHWzYR+y7mQW7f6/5u/Im1cDi4WbUrBh+AI/cyGFn+KmZyd3vYTW8DE2bFr
+ iVuz5ewAoNYmt0GcuMpoXjaEBeyh1mjkK+epT1dv1YqhV57z5evPHk6Dk7s9ma9kRJzA
+ NbFlSrUBspArrNVNdDnuWLfc2SL4yjy4sq85ACzMcgPMDBvRms+cyMZPo7QJKG//x3ki
+ 06v1gBt4qltUsxlvbxkSIIv9KuaHp4/X4UGWStVuvLuw6lNsRW2V5h/WINH3dGiZOwXK
+ mOAL9j5dcXkulLe/0SsOu5A2nM7oqsQWWLxt2wx15pOPSbKK7ggWOYepvijcJrnKO2If
+ a0dg==
+X-Gm-Message-State: APjAAAWDNtwbFFBOGbBOYecARwcRvOHyBcftFDRW8t2G/UiILTlR+UAT
+ nesdKvMzBBT6J7vjFUckETM=
+X-Google-Smtp-Source: APXvYqyncqqeYoQxQNe4SwOZib3N1XzDI9ZUbBKHw4G85RoUNi5/s+EyoU18m/cNEEfjGlW4PRNmIg==
+X-Received: by 2002:a5d:4a46:: with SMTP id v6mr6165469wrs.105.1562864114874; 
+ Thu, 11 Jul 2019 09:55:14 -0700 (PDT)
 Received: from [10.67.49.31] ([192.19.223.252])
- by smtp.googlemail.com with ESMTPSA id d16sm4577249wrv.55.2019.07.11.09.54.01
+ by smtp.googlemail.com with ESMTPSA id n5sm5189493wmi.21.2019.07.11.09.54.54
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 11 Jul 2019 09:54:13 -0700 (PDT)
-Subject: Re: [PATCH v6 2/6] ARM: Disable instrumentation for some code
-To: Linus Walleij <linus.walleij@linaro.org>
+ Thu, 11 Jul 2019 09:55:14 -0700 (PDT)
+Subject: Re: [PATCH v6 1/6] ARM: Add TTBR operator for kasan_init
+To: Linus Walleij <linus.walleij@linaro.org>,
+ Russell King <rmk+kernel@armlinux.org.uk>
 References: <20190617221134.9930-1-f.fainelli@gmail.com>
- <20190617221134.9930-3-f.fainelli@gmail.com>
- <CACRpkdb3P6oQTK9FGUkMj4kax8us3rKH6c36pX=HD1_wMqcoJQ@mail.gmail.com>
+ <20190617221134.9930-2-f.fainelli@gmail.com>
+ <CACRpkdZGqiiax2m5L1y3=Enw0Q5cLc-idAQNae34uenf-drHDw@mail.gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
@@ -136,12 +138,12 @@ Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
  caxTGgc5zzQHeX67eMzrGomG3ZnIxmd1sAbgvJUDaD2GrYlulfwGWwWyTNbWRvMighVdPkSF
  6XFgQaosWxkV0OELLy2N485YrTr2Uq64VKyxpncLh50e2RnyAJ9Za0Dx0yyp44iD1OvHtkEI
  M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
-Message-ID: <aa45795c-7fa1-ebb8-5d26-cce4c8a60e1a@gmail.com>
-Date: Thu, 11 Jul 2019 09:53:51 -0700
+Message-ID: <0ad02a64-9470-936c-1db9-0079c0926cfb@gmail.com>
+Date: Thu, 11 Jul 2019 09:54:50 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CACRpkdb3P6oQTK9FGUkMj4kax8us3rKH6c36pX=HD1_wMqcoJQ@mail.gmail.com>
+In-Reply-To: <CACRpkdZGqiiax2m5L1y3=Enw0Q5cLc-idAQNae34uenf-drHDw@mail.gmail.com>
 Content-Language: en-US
 Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, mhocko@suse.com,
  Catalin Marinas <catalin.marinas@arm.com>,
@@ -182,32 +184,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 7/2/19 2:56 PM, Linus Walleij wrote:
+On 7/2/19 2:03 PM, Linus Walleij wrote:
+> Hi Florian!
+> 
+> thanks for your patch!
+> 
 > On Tue, Jun 18, 2019 at 12:11 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
 > 
->> @@ -236,7 +236,8 @@ static int unwind_pop_register(struct unwind_ctrl_block *ctrl,
->>                 if (*vsp >= (unsigned long *)ctrl->sp_high)
->>                         return -URC_FAILURE;
+>> From: Abbott Liu <liuwenliang@huawei.com>
 >>
->> -       ctrl->vrs[reg] = *(*vsp)++;
->> +       ctrl->vrs[reg] = READ_ONCE_NOCHECK(*(*vsp));
->> +       (*vsp)++;
+>> The purpose of this patch is to provide set_ttbr0/get_ttbr0 to
+>> kasan_init function. The definitions of cp15 registers should be in
+>> arch/arm/include/asm/cp15.h rather than arch/arm/include/asm/kvm_hyp.h,
+>> so move them.
+>>
+>> Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+>> Reported-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Abbott Liu <liuwenliang@huawei.com>
+>> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 > 
-> I would probably even put in a comment here so it is clear why we
-> do this. Passers-by may not know that READ_ONCE_NOCHECK() is
-> even related to KASan.
+>> +#include <linux/stringify.h>
+> 
+> What is this for? I think it can be dropped.
 
-Makes sense, I will add that, thanks!
+Indeed, that can be dropped came from an earlier version of the patch.
 
 > 
-> Other than that,
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> This stuff adding a whole bunch of accessors:
 > 
-> Yours,
-> Linus Walleij
+>> +static inline void set_par(u64 val)
+>> +{
+>> +       if (IS_ENABLED(CONFIG_ARM_LPAE))
+>> +               write_sysreg(val, PAR_64);
+>> +       else
+>> +               write_sysreg(val, PAR_32);
+>> +}
 > 
+> Can we put that in a separate patch since it is not
+> adding any users, so this is a pure refactoring patch for
+> the current code?
 
-
+Sure, that makes sense, first move all definitions, then add helper
+functions, finally make use of them.
 -- 
 Florian
 _______________________________________________
