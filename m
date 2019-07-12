@@ -2,78 +2,88 @@ Return-Path: <SRS0=lVnl=VJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B713C742A5
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2575AC742AC
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:29:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 33FC32064B
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:23:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A108121019
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:29:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="gyUhg1vs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FC32064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IJPqjmHY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A108121019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C70DA4A53D;
-	Fri, 12 Jul 2019 04:23:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EA9F4A53C;
+	Fri, 12 Jul 2019 04:29:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.de
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tL+8hpVlIKBR; Fri, 12 Jul 2019 04:23:01 -0400 (EDT)
+	with ESMTP id 1l+HLQP4805d; Fri, 12 Jul 2019 04:29:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0478E4A502;
-	Fri, 12 Jul 2019 04:23:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B93C34A4C1;
+	Fri, 12 Jul 2019 04:29:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 689394A4BE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:23:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F13774A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:29:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7S8Lx4HjEiOZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jul 2019 04:22:59 -0400 (EDT)
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03BBE4A4A9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:22:58 -0400 (EDT)
+ with ESMTP id nbeTcl1fZqJO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jul 2019 04:29:22 -0400 (EDT)
+Received: from smtp-fw-9101.amazon.com (smtp-fw-9101.amazon.com
+ [207.171.184.25])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 244CA4A319
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:29:21 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1562919778; x=1594455778;
- h=from:to:cc:subject:date:message-id;
- bh=2GHXvodd5mYiOI7g2dcIp8dLyBwMPtlaooER9mc1rHw=;
- b=gyUhg1vsaIObtkpZPaaVVpaxpkwOoilN48zS4zmf1/WpGmnvERXfrHGP
- hbrxp580FhpbN98lvIxaQdW3MpmppEWgpPaxNNiV7ON4TraQzn5J3wL+9
- V3yhqCOzqdjbonazKrK4zF9dQmFEWD1OOxtARQnS0Ym4UdCWTetSN6PXM 8=;
-X-IronPort-AV: E=Sophos;i="5.62,481,1554768000"; d="scan'208";a="404647834"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-1a-af6a10df.us-east-1.amazon.com) ([10.124.125.6])
- by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
- 12 Jul 2019 08:22:57 +0000
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com
- (iad7-ws-svc-lb50-vlan3.amazon.com [10.0.93.214])
- by email-inbound-relay-1a-af6a10df.us-east-1.amazon.com (Postfix) with ESMTPS
- id 8BFEEA252A; Fri, 12 Jul 2019 08:22:53 +0000 (UTC)
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com (localhost [127.0.0.1])
- by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
- x6C8MoPk016257; Fri, 12 Jul 2019 10:22:50 +0200
-Received: (from karahmed@localhost)
- by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Submit) id
- x6C8MnRH016242; Fri, 12 Jul 2019 10:22:49 +0200
-From: KarimAllah Ahmed <karahmed@amazon.de>
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH] KVM: arm/arm64: Properly check for MMIO regions
-Date: Fri, 12 Jul 2019 10:22:08 +0200
-Message-Id: <1562919728-642-1-git-send-email-karahmed@amazon.de>
-X-Mailer: git-send-email 2.7.4
-Cc: KarimAllah Ahmed <karahmed@amazon.de>, Marc Zyngier <marc.zyngier@arm.com>,
- kvmarm@lists.cs.columbia.edu
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1562920162; x=1594456162;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=OEmdDLvFS0lvD5vL1UH7GzmD2FbqMFbnj7N2c9BGtD4=;
+ b=IJPqjmHYh6qlsgRwUT+wzzoYzPQSGZhd8QGPpczvCAlanyz63AnSBeBT
+ Cui0COCytbj0gcgKKBXJuZHYd17d0nzAO9EhZ9nPzCqSJVBpDoyJIGU9k
+ 30cDrEFXB7lwTQWiUmiYXcSzsEyDhS2nKrzqXDTeP49eEew2aPAsfw8BE w=;
+X-IronPort-AV: E=Sophos;i="5.62,481,1554768000"; d="scan'208";a="815799163"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO
+ email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com) ([10.47.22.34])
+ by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP;
+ 12 Jul 2019 08:29:21 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+ by email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com (Postfix) with ESMTPS
+ id BFA12A2554; Fri, 12 Jul 2019 08:29:20 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 12 Jul 2019 08:29:19 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.88) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 12 Jul 2019 08:29:17 +0000
+Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
+To: Marc Zyngier <marc.zyngier@arm.com>, <kvm@vger.kernel.org>
+References: <20190710132724.28350-1-graf@amazon.com>
+ <212cc76d-0d67-cb75-5f7f-d707778bbeff@arm.com>
+From: Alexander Graf <graf@amazon.com>
+Message-ID: <d2c7d9e4-c6e2-8437-66ae-b7d221090b5f@amazon.com>
+Date: Fri, 12 Jul 2019 10:29:15 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <212cc76d-0d67-cb75-5f7f-d707778bbeff@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.88]
+X-ClientProxiedBy: EX13P01UWA001.ant.amazon.com (10.43.160.213) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
-Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -82,106 +92,374 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Valid RAM can live outside kernel control (e.g. using "mem=" command-line
-parameter). This memory can still be used as valid guest memory for KVM. So
-ensure that we validate that this memory is definitely not "RAM" before
-assuming that it is an MMIO region.
 
-One way to use memory outside kernel control is:
 
-1- Pass 'mem=' in the kernel command-line to limit the amount of memory managed
-   by the kernel.
-2- Map this physical memory you want to give to the guest with:
-   mmap("/dev/mem", physical_address_offset, ..)
-3- Use the user-space virtual address as the "userspace_addr" field in
-   KVM_SET_USER_MEMORY_REGION ioctl.
+On 10.07.19 16:25, Marc Zyngier wrote:
+> Hi Alex,
+> 
+> I don't know much about pl031, so my comments are pretty general...
+> 
+> On 10/07/2019 14:27, Alexander Graf wrote:
+>> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+>> It just pokes basic functionality. I've mostly written it to familiarize myself
+>> with the device, but I suppose having the test around does not hurt, as it also
+>> exercises the GIC SPI interrupt path.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>> ---
+>>   arm/Makefile.common |   1 +
+>>   arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
+>>   lib/arm/asm/gic.h   |   1 +
+>>   3 files changed, 229 insertions(+)
+>>   create mode 100644 arm/pl031.c
+>>
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index f0c4b5d..b8988f2 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>>   tests-common += $(TEST_DIR)/gic.flat
+>>   tests-common += $(TEST_DIR)/psci.flat
+>>   tests-common += $(TEST_DIR)/sieve.flat
+>> +tests-common += $(TEST_DIR)/pl031.flat
+>>   
+>>   tests-all = $(tests-common) $(tests)
+>>   all: directories $(tests-all)
+>> diff --git a/arm/pl031.c b/arm/pl031.c
+>> new file mode 100644
+>> index 0000000..a364a1a
+>> --- /dev/null
+>> +++ b/arm/pl031.c
+>> @@ -0,0 +1,227 @@
+>> +/*
+>> + * Verify PL031 functionality
+>> + *
+>> + * This test verifies whether the emulated PL031 behaves correctly.
+>> + *
+>> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
+>> + * Author: Alexander Graf <graf@amazon.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2.
+>> + */
+>> +#include <libcflat.h>
+>> +#include <asm/processor.h>
+>> +#include <asm/io.h>
+>> +#include <asm/gic.h>
+>> +
+>> +static u32 cntfrq;
+>> +
+>> +#define PL031_BASE 0x09010000
+>> +#define PL031_IRQ 2
+> 
+> Does the unit test framework have a way to extract this from the firmware tables?
+> That'd be much nicer...
 
-One of the limitations of the current /dev/mem for ARM is that it would map
-this memory as uncached without this patch:
-https://lkml.org/lkml/2019/7/11/684
+It does, I've moved it to that now :).
 
-This work is similar to the work done on x86 here:
-https://lkml.org/lkml/2019/1/31/933
+> 
+>> +
+>> +struct pl031_regs {
+>> +	uint32_t dr;	/* Data Register */
+>> +	uint32_t mr;	/* Match Register */
+>> +	uint32_t lr;	/* Load Register */
+>> +	union {
+>> +		uint8_t cr;	/* Control Register */
+>> +		uint32_t cr32;
+>> +	};
+>> +	union {
+>> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
+>> +		uint32_t imsc32;
+>> +	};
+>> +	union {
+>> +		uint8_t ris;	/* Raw Interrupt Status */
+>> +		uint32_t ris32;
+>> +	};
+>> +	union {
+>> +		uint8_t mis;	/* Masked Interrupt Status */
+>> +		uint32_t mis32;
+>> +	};
+>> +	union {
+>> +		uint8_t icr;	/* Interrupt Clear Register */
+>> +		uint32_t icr32;
+>> +	};
+>> +	uint32_t reserved[1008];
+>> +	uint32_t periph_id[4];
+>> +	uint32_t pcell_id[4];
+>> +};
+>> +
+>> +static struct pl031_regs *pl031 = (void*)PL031_BASE;
+>> +static void *gic_ispendr;
+>> +static void *gic_isenabler;
+>> +static bool irq_triggered;
+>> +
+>> +static int check_id(void)
+>> +{
+>> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
+>> +	int i;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(id); i++)
+>> +		if (id[i] != readl(&pl031->periph_id[i]))
+>> +			return 1;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int check_ro(void)
+>> +{
+>> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
+>> +			    offsetof(struct pl031_regs, mis),
+>> +			    offsetof(struct pl031_regs, periph_id[0]),
+>> +			    offsetof(struct pl031_regs, periph_id[1]),
+>> +			    offsetof(struct pl031_regs, periph_id[2]),
+>> +			    offsetof(struct pl031_regs, periph_id[3]),
+>> +			    offsetof(struct pl031_regs, pcell_id[0]),
+>> +			    offsetof(struct pl031_regs, pcell_id[1]),
+>> +			    offsetof(struct pl031_regs, pcell_id[2]),
+>> +			    offsetof(struct pl031_regs, pcell_id[3]) };
+>> +	int i;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
+>> +		uint32_t before32;
+>> +		uint16_t before16;
+>> +		uint8_t before8;
+>> +		void *addr = (void*)pl031 + offs[i];
+>> +		uint32_t poison = 0xdeadbeefULL;
+>> +
+>> +		before8 = readb(addr);
+>> +		before16 = readw(addr);
+>> +		before32 = readl(addr);
+>> +
+>> +		writeb(poison, addr);
+>> +		writew(poison, addr);
+>> +		writel(poison, addr);
+>> +
+>> +		if (before8 != readb(addr))
+>> +			return 1;
+>> +		if (before16 != readw(addr))
+>> +			return 1;
+>> +		if (before32 != readl(addr))
+>> +			return 1;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int check_rtc_freq(void)
+>> +{
+>> +	uint32_t seconds_to_wait = 2;
+>> +	uint32_t before = readl(&pl031->dr);
+>> +	uint64_t before_tick = read_sysreg(cntpct_el0);
+> 
+> Hmmm. See below.
+> 
+>> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
+>> +
+>> +	/* Wait for 2 seconds */
+>> +	while (read_sysreg(cntpct_el0) < target_tick) ;
+> 
+> Careful here. The control dependency saves you, but in general we want
+> to guarantee some stronger ordering when it comes to the counter. The
+> Linux kernel has the following:
+> 
+> /*
+>   * Ensure that reads of the counter are treated the same as memory reads
+>   * for the purposes of ordering by subsequent memory barriers.
+>   *
+>   * This insanity brought to you by speculative system register reads,
+>   * out-of-order memory accesses, sequence locks and Thomas Gleixner.
+>   *
+>   * http://lists.infradead.org/pipermail/linux-arm-kernel/2019-February/631195.html
+>   */
+> #define arch_counter_enforce_ordering(val) do {                         \
+>          u64 tmp, _val = (val);                                          \
+>                                                                          \
+>          asm volatile(                                                   \
+>          "       eor     %0, %1, %1\n"                                   \
+>          "       add     %0, sp, %0\n"                                   \
+>          "       ldr     xzr, [%0]"                                      \
+>          : "=r" (tmp) : "r" (_val));                                     \
+> } while (0)
+> 
+> static __always_inline u64 __arch_counter_get_cntpct_stable(void)
+> {
+>          u64 cnt;
+> 
+>          isb();
+>          cnt = arch_timer_reg_read_stable(cntpct_el0);
+>          arch_counter_enforce_ordering(cnt);
+>          return cnt;
+> }
+> 
+> The initial ISB prevents the counter read from being reordered with earlier
+> instructions, while the fake memory dependency enforces ordering with
+> subsequent memory accesses. You're welcome ;-).
 
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Julien Thierry <julien.thierry@arm.com>
-Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
----
- virt/kvm/arm/mmu.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+Do we really care enough in this case? It seems a bit overkill. The 
+worst thing that happens is that we wiggle around the 2 second mark a 
+bit and don't hit it right on the spot, no?
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 06180c9..2105134 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -8,6 +8,7 @@
- #include <linux/kvm_host.h>
- #include <linux/io.h>
- #include <linux/hugetlb.h>
-+#include <linux/memblock.h>
- #include <linux/sched/signal.h>
- #include <trace/events/kvm.h>
- #include <asm/pgalloc.h>
-@@ -89,7 +90,7 @@ static void kvm_flush_dcache_pud(struct kvm *kvm,
- 
- static bool kvm_is_device_pfn(unsigned long pfn)
- {
--	return !pfn_valid(pfn);
-+	return !memblock_is_memory(__pfn_to_phys(pfn));
- }
- 
- /**
-@@ -949,6 +950,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
- 	do {
- 		struct vm_area_struct *vma = find_vma(current->mm, hva);
- 		hva_t vm_start, vm_end;
-+		gpa_t gpa;
- 
- 		if (!vma || vma->vm_start >= reg_end)
- 			break;
-@@ -959,11 +961,14 @@ static void stage2_unmap_memslot(struct kvm *kvm,
- 		vm_start = max(hva, vma->vm_start);
- 		vm_end = min(reg_end, vma->vm_end);
- 
--		if (!(vma->vm_flags & VM_PFNMAP)) {
--			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
--			unmap_stage2_range(kvm, gpa, vm_end - vm_start);
--		}
- 		hva = vm_end;
-+
-+		if ((vma->vm_flags & VM_PFNMAP) &&
-+		    !memblock_is_memory(__pfn_to_phys(vma->vm_pgoff)))
-+			continue;
-+
-+		gpa = addr + (vm_start - memslot->userspace_addr);
-+		unmap_stage2_range(kvm, gpa, vm_end - vm_start);
- 	} while (hva < reg_end);
- }
- 
-@@ -2329,7 +2334,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		vm_start = max(hva, vma->vm_start);
- 		vm_end = min(reg_end, vma->vm_end);
- 
--		if (vma->vm_flags & VM_PFNMAP) {
-+		if ((vma->vm_flags & VM_PFNMAP) &&
-+		    !memblock_is_memory(__pfn_to_phys(vma->vm_pgoff))) {
- 			gpa_t gpa = mem->guest_phys_addr +
- 				    (vm_start - mem->userspace_addr);
- 			phys_addr_t pa;
--- 
-2.7.4
+> 
+>> +
+>> +	if (readl(&pl031->dr) != before + seconds_to_wait)
+>> +		return 1;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static bool gic_irq_pending(void)
+>> +{
+>> +	return readl(gic_ispendr + 4) & (1 << (SPI(PL031_IRQ) - 32));
+> 
+> nit: you may want to make the offset depend on the interrupt itself...
 
+Yes, definitely :).
+
+> 
+>> +}
+>> +
+>> +static void gic_irq_unmask(void)
+>> +{
+>> +	writel(1 << (SPI(PL031_IRQ) - 32), gic_isenabler + 4);
+>> +}
+>> +
+>> +static void irq_handler(struct pt_regs *regs)
+>> +{
+>> +	u32 irqstat = gic_read_iar();
+> 
+> GICv3 requires a DSB SY after reading IAR. Is that included in gic_read_iar()?
+
+Looks like it:
+
+static inline u32 gicv3_read_iar(void)
+{
+         u64 irqstat;
+         asm volatile("mrs_s %0, " xstr(ICC_IAR1_EL1) : "=r" (irqstat));
+         dsb(sy);
+         return (u64)irqstat;
+}
+
+Looks like Andre reviewed the code that introduced the GIC logic well :).
+
+> 
+>> +	u32 irqnr = gic_iar_irqnr(irqstat);
+>> +
+>> +	if (irqnr != GICC_INT_SPURIOUS)
+>> +		gic_write_eoir(irqstat);
+> 
+> You can always EOI spurious. Are you guaranteed to be in EOImode==0?
+> If not, you'd need an extra write to DIR. Also, this needs an ISB
+
+I copied that bit from the timer test. I'll be happy to remove the 
+spurious check though.
+
+We have the following in gicv3_enable_defaults() which IIUC clears the 
+EOImode bit, right?
+
+         writel(GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | 
+GICD_CTLR_ENABLE_G1,
+                dist + GICD_CTLR);
+
+> for GICv3.
+
+The ISB is there already:
+
+static inline void gicv3_write_eoir(u32 irq)
+{
+         asm volatile("msr_s " xstr(ICC_EOIR1_EL1) ", %0" : : "r" 
+((u64)irq));
+         isb();
+}
+
+> 
+>> +
+>> +	if (irqnr == SPI(PL031_IRQ)) {
+>> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
+>> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
+>> +
+>> +		/* Writing any value should clear IRQ status */
+>> +		writel(0x80000000ULL, &pl031->icr);
+>> +
+>> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
+>> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
+>> +		irq_triggered = true;
+>> +	} else {
+>> +		report_info("Unexpected interrupt: %d\n", irqnr);
+>> +		return;
+>> +	}
+>> +}
+>> +
+>> +static int check_rtc_irq(void)
+>> +{
+>> +	uint32_t seconds_to_wait = 1;
+>> +	uint32_t before = readl(&pl031->dr);
+>> +	uint64_t before_tick = read_sysreg(cntpct_el0);
+> 
+> Same problem as above.
+> 
+>> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
+>> +
+>> +	report_info("Checking IRQ trigger (MR)");
+>> +
+>> +	irq_triggered = false;
+>> +
+>> +	/* Fire IRQ in 1 second */
+>> +	writel(before + seconds_to_wait, &pl031->mr);
+>> +
+>> +	install_irq_handler(EL1H_IRQ, irq_handler);
+>> +
+>> +	/* Wait until 2 seconds are over */
+>> +	while (read_sysreg(cntpct_el0) < target_tick) ;
+>> +
+>> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
+>> +
+>> +	/* Mask the IRQ so that it gets delivered */
+>> +	writel(1, &pl031->imsc);
+>> +	report("  RTC IRQ pending now", gic_irq_pending());
+>> +
+>> +	/* Enable retrieval of IRQ */
+>> +	gic_irq_unmask();
+>> +	local_irq_enable();
+>> +
+>> +	report("  IRQ triggered", irq_triggered);
+>> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
+>> +	if (!irq_triggered) {
+>> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
+>> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
+>> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
+>> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
+>> +	}
+>> +
+>> +	local_irq_disable();
+>> +	return 0;
+>> +}
+>> +
+>> +static void rtc_irq_init(void)
+>> +{
+>> +	gic_enable_defaults();
+>> +
+>> +	switch (gic_version()) {
+>> +	case 2:
+>> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+>> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+>> +		break;
+>> +	case 3:
+>> +		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
+>> +		gic_isenabler = gicv3_sgi_base() + GICD_ISENABLER;
+> 
+> This only points to SGIs and PPIs. How does it work on GICv3?
+> Let me guess: you haven't tested it... ;-)
+
+I tested it, then it failed, then I forgot about it :)
+
+I take it that on GICv3, SPIs live somewhere else?
+
+
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
