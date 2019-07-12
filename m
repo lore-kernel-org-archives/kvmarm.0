@@ -2,103 +2,75 @@ Return-Path: <SRS0=lVnl=VJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F175FC742A5
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B713C742A5
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:23:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6CB792084B
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:03:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CB792084B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 33FC32064B
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Jul 2019 08:23:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="gyUhg1vs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FC32064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE99D4A533;
-	Fri, 12 Jul 2019 04:03:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C70DA4A53D;
+	Fri, 12 Jul 2019 04:23:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@amazon.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KnVd8vQkFmtG; Fri, 12 Jul 2019 04:03:20 -0400 (EDT)
+	with ESMTP id tL+8hpVlIKBR; Fri, 12 Jul 2019 04:23:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5F44A534;
-	Fri, 12 Jul 2019 04:03:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0478E4A502;
+	Fri, 12 Jul 2019 04:23:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 283774A502
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:03:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 689394A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:23:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0x68lUpZP-WV for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jul 2019 04:03:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 292AE4A4F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:03:17 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8508D337;
- Fri, 12 Jul 2019 01:03:16 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 11D7D3F59C; Fri, 12 Jul 2019 01:03:15 -0700 (PDT)
-Subject: Re: KVM: arm64: Update kvm_arm_exception_class and esr_class_str for
- new EC
-To: Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-References: <e6e8cd90-d309-7f1a-c8d1-85aa03fe0dfb@huawei.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <ff38bfbd-7fd9-6df4-4878-26cc7fca0a67@arm.com>
-Date: Fri, 12 Jul 2019 09:03:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <e6e8cd90-d309-7f1a-c8d1-85aa03fe0dfb@huawei.com>
-Content-Language: en-US
+ with ESMTP id 7S8Lx4HjEiOZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jul 2019 04:22:59 -0400 (EDT)
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03BBE4A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jul 2019 04:22:58 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+ t=1562919778; x=1594455778;
+ h=from:to:cc:subject:date:message-id;
+ bh=2GHXvodd5mYiOI7g2dcIp8dLyBwMPtlaooER9mc1rHw=;
+ b=gyUhg1vsaIObtkpZPaaVVpaxpkwOoilN48zS4zmf1/WpGmnvERXfrHGP
+ hbrxp580FhpbN98lvIxaQdW3MpmppEWgpPaxNNiV7ON4TraQzn5J3wL+9
+ V3yhqCOzqdjbonazKrK4zF9dQmFEWD1OOxtARQnS0Ym4UdCWTetSN6PXM 8=;
+X-IronPort-AV: E=Sophos;i="5.62,481,1554768000"; d="scan'208";a="404647834"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-1a-af6a10df.us-east-1.amazon.com) ([10.124.125.6])
+ by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
+ 12 Jul 2019 08:22:57 +0000
+Received: from u54e1ad5160425a4b64ea.ant.amazon.com
+ (iad7-ws-svc-lb50-vlan3.amazon.com [10.0.93.214])
+ by email-inbound-relay-1a-af6a10df.us-east-1.amazon.com (Postfix) with ESMTPS
+ id 8BFEEA252A; Fri, 12 Jul 2019 08:22:53 +0000 (UTC)
+Received: from u54e1ad5160425a4b64ea.ant.amazon.com (localhost [127.0.0.1])
+ by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
+ x6C8MoPk016257; Fri, 12 Jul 2019 10:22:50 +0200
+Received: (from karahmed@localhost)
+ by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Submit) id
+ x6C8MnRH016242; Fri, 12 Jul 2019 10:22:49 +0200
+From: KarimAllah Ahmed <karahmed@amazon.de>
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm/arm64: Properly check for MMIO regions
+Date: Fri, 12 Jul 2019 10:22:08 +0200
+Message-Id: <1562919728-642-1-git-send-email-karahmed@amazon.de>
+X-Mailer: git-send-email 2.7.4
+Cc: KarimAllah Ahmed <karahmed@amazon.de>, Marc Zyngier <marc.zyngier@arm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,25 +82,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 12/07/2019 08:12, Zenghui Yu wrote:
-> Hi,
-> 
-> I noticed that we've added two ESR exception classes for new hardware
-> extensions - ESR_ELx_EC_SVE and ESR_ELx_EC_PAC.  Should we also update
-> "kvm_arm_exception_class" and "esr_class_str" for these two EC, which
-> might be useful for debug in the future?
-Yes. Please send a patch (or two)!
+Valid RAM can live outside kernel control (e.g. using "mem=" command-line
+parameter). This memory can still be used as valid guest memory for KVM. So
+ensure that we validate that this memory is definitely not "RAM" before
+assuming that it is an MMIO region.
 
-Thanks,
+One way to use memory outside kernel control is:
 
-	M.
+1- Pass 'mem=' in the kernel command-line to limit the amount of memory managed
+   by the kernel.
+2- Map this physical memory you want to give to the guest with:
+   mmap("/dev/mem", physical_address_offset, ..)
+3- Use the user-space virtual address as the "userspace_addr" field in
+   KVM_SET_USER_MEMORY_REGION ioctl.
+
+One of the limitations of the current /dev/mem for ARM is that it would map
+this memory as uncached without this patch:
+https://lkml.org/lkml/2019/7/11/684
+
+This work is similar to the work done on x86 here:
+https://lkml.org/lkml/2019/1/31/933
+
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Julien Thierry <julien.thierry@arm.com>
+Cc: Suzuki K Pouloze <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
+---
+ virt/kvm/arm/mmu.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 06180c9..2105134 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -8,6 +8,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/io.h>
+ #include <linux/hugetlb.h>
++#include <linux/memblock.h>
+ #include <linux/sched/signal.h>
+ #include <trace/events/kvm.h>
+ #include <asm/pgalloc.h>
+@@ -89,7 +90,7 @@ static void kvm_flush_dcache_pud(struct kvm *kvm,
+ 
+ static bool kvm_is_device_pfn(unsigned long pfn)
+ {
+-	return !pfn_valid(pfn);
++	return !memblock_is_memory(__pfn_to_phys(pfn));
+ }
+ 
+ /**
+@@ -949,6 +950,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+ 	do {
+ 		struct vm_area_struct *vma = find_vma(current->mm, hva);
+ 		hva_t vm_start, vm_end;
++		gpa_t gpa;
+ 
+ 		if (!vma || vma->vm_start >= reg_end)
+ 			break;
+@@ -959,11 +961,14 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+ 		vm_start = max(hva, vma->vm_start);
+ 		vm_end = min(reg_end, vma->vm_end);
+ 
+-		if (!(vma->vm_flags & VM_PFNMAP)) {
+-			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
+-			unmap_stage2_range(kvm, gpa, vm_end - vm_start);
+-		}
+ 		hva = vm_end;
++
++		if ((vma->vm_flags & VM_PFNMAP) &&
++		    !memblock_is_memory(__pfn_to_phys(vma->vm_pgoff)))
++			continue;
++
++		gpa = addr + (vm_start - memslot->userspace_addr);
++		unmap_stage2_range(kvm, gpa, vm_end - vm_start);
+ 	} while (hva < reg_end);
+ }
+ 
+@@ -2329,7 +2334,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		vm_start = max(hva, vma->vm_start);
+ 		vm_end = min(reg_end, vma->vm_end);
+ 
+-		if (vma->vm_flags & VM_PFNMAP) {
++		if ((vma->vm_flags & VM_PFNMAP) &&
++		    !memblock_is_memory(__pfn_to_phys(vma->vm_pgoff))) {
+ 			gpa_t gpa = mem->guest_phys_addr +
+ 				    (vm_start - mem->userspace_addr);
+ 			phys_addr_t pa;
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
