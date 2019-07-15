@@ -2,63 +2,64 @@ Return-Path: <SRS0=W8aC=VM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18022C76191
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 14:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C1AC7618F
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 16:42:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC9A20861
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 14:44:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FC9A20861
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id B434D2067C
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 16:42:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B434D2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E2534A51F;
-	Mon, 15 Jul 2019 10:44:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24ECE4A51B;
+	Mon, 15 Jul 2019 12:42:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LdkALEpzyKUa; Mon, 15 Jul 2019 10:44:52 -0400 (EDT)
+	with ESMTP id RCS21xfYxYty; Mon, 15 Jul 2019 12:42:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5C9A4A389;
-	Mon, 15 Jul 2019 10:44:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0403E4A512;
+	Mon, 15 Jul 2019 12:42:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0C2D4A389
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 10:44:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A7B4A512
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 12:42:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rLPceuZYBGk2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jul 2019 10:44:50 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 401C74A319
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 10:44:50 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90D3C28;
- Mon, 15 Jul 2019 07:44:49 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 714D23F59C;
- Mon, 15 Jul 2019 07:44:48 -0700 (PDT)
-Date: Mon, 15 Jul 2019 15:44:46 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: James Morse <james.morse@arm.com>
-Subject: Re: [RFC] Add virtual SDEI support in qemu
-Message-ID: <20190715144446.GK56232@lakrids.cambridge.arm.com>
-References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
- <20190715134059.GJ2790@e103592.cambridge.arm.com>
- <20190715134848.GI56232@lakrids.cambridge.arm.com>
- <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
+ with ESMTP id 62-HC6jjWHZO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jul 2019 12:42:40 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 912244A418
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 12:42:40 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 90FFE59467;
+ Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC7B01001DDA;
+ Mon, 15 Jul 2019 16:42:37 +0000 (UTC)
+Date: Mon, 15 Jul 2019 18:42:35 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH kvm-unit-tests v2] arm: Add PL031 test
+Message-ID: <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
+References: <20190712091938.492-1-graf@amazon.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <4daefb19-6c15-f82c-31e9-1ae035d45bd5@arm.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, qemu-arm@nongnu.org,
- Guoheyi <guoheyi@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20190712091938.492-1-graf@amazon.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,58 +76,347 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 15, 2019 at 03:26:39PM +0100, James Morse wrote:
-> On 15/07/2019 14:48, Mark Rutland wrote:
-> > On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
-> >> One option (suggested to me by James Morse) would be to allow userspace
-> >> to disable in the in-kernel PSCI implementation and provide its own
-> >> PSCI to the guest via SMC -- in which case userspace that wants to
-> >> implement SDEI would have to implement PSCI as well.
-> > 
-> > I think this would be the best approach, since it puts userspace in
-> > charge of everything.
-> > 
-> > However, this interacts poorly with FW-based mitigations that we
-> > implement in hyp. I suspect we'd probably need a mechanism to delegate
-> > that responsibility back to the kernel, and figure out if that has any
-> > interaction with thigns that got punted to userspace...
+On Fri, Jul 12, 2019 at 11:19:38AM +0200, Alexander Graf wrote:
+> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+> It just pokes basic functionality. I've mostly written it to familiarize myself
+> with the device, but I suppose having the test around does not hurt, as it also
+> exercises the GIC SPI interrupt path.
 > 
-> This has come up before:
-> https://lore.kernel.org/r/59C139D0.3040507@arm.com
+> Signed-off-by: Alexander Graf <graf@amazon.com>
 > 
-> I agree Qemu should opt-in to this, it needs to be a feature that is enabled.
+> ---
 > 
-> I had an early version of something like this for testing SDEI before
-> there was firmware available. The review feedback from Christoffer was
-> that it should include HVC and SMC, their immediates, and shouldn't be
-> tied to SMC-CC ranges.
+> v1 -> v2:
 > 
-> I think this should be a catch-all as Heyi describes to deliver
-> 'unhandled SMC/HVC' to user-space as hypercall exits. We should
-> include the immediate in the struct.
+>   - Use FDT to find base, irq and existence
+>   - Put isb after timer read
+>   - Use dist_base for gicv3
+> ---
+>  arm/Makefile.common |   1 +
+>  arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
+>  lib/arm/asm/gic.h   |   1 +
+>  3 files changed, 267 insertions(+)
+>  create mode 100644 arm/pl031.c
 > 
-> We can allow Qemu to disable the in-kernel PSCI implementation, which
-> would let it be done in user-space via this catch-all mechanism. (PSCI
-> in user-space has come up on another thread recently). The in-kernel
-> PSCI needs to be default-on for backwards compatibility.
-> 
-> As Mark points out, the piece that's left is the 'arch workaround'
-> stuff. We always need to handle these in the kernel. I don't think
-> these should be routed-back, they should be un-obtainable by
-> user-space.
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index f0c4b5d..b8988f2 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>  tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  tests-common += $(TEST_DIR)/sieve.flat
+> +tests-common += $(TEST_DIR)/pl031.flat
 
-Sure; I meant that those should be handled in the kernel rather than
-going to host userspace and back.
+Makefile.common is for both arm32 and arm64, but this code is only
+compilable on arm64. As there's no reason for it to be arm64 only,
+then ideally we'd modify the code to allow compiling and running
+on both, but otherwise we need to move this to Makefile.arm64.
 
-I was suggesting was that userspace would opt into taking ownership of
-all HVC calls, then explicitly opt-in to the kernel handling specific
-(sets of) calls.
+>  
+>  tests-all = $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/arm/pl031.c b/arm/pl031.c
+> new file mode 100644
+> index 0000000..d975937
+> --- /dev/null
+> +++ b/arm/pl031.c
+> @@ -0,0 +1,265 @@
+> +/*
+> + * Verify PL031 functionality
+> + *
+> + * This test verifies whether the emulated PL031 behaves correctly.
+> + *
+> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
+> + * Author: Alexander Graf <graf@amazon.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <libcflat.h>
+> +#include <devicetree.h>
+> +#include <asm/processor.h>
+> +#include <asm/io.h>
+> +#include <asm/gic.h>
+> +
+> +struct pl031_regs {
+> +	uint32_t dr;	/* Data Register */
+> +	uint32_t mr;	/* Match Register */
+> +	uint32_t lr;	/* Load Register */
+> +	union {
+> +		uint8_t cr;	/* Control Register */
+> +		uint32_t cr32;
+> +	};
+> +	union {
+> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
+> +		uint32_t imsc32;
+> +	};
+> +	union {
+> +		uint8_t ris;	/* Raw Interrupt Status */
+> +		uint32_t ris32;
+> +	};
+> +	union {
+> +		uint8_t mis;	/* Masked Interrupt Status */
+> +		uint32_t mis32;
+> +	};
+> +	union {
+> +		uint8_t icr;	/* Interrupt Clear Register */
+> +		uint32_t icr32;
+> +	};
+> +	uint32_t reserved[1008];
+> +	uint32_t periph_id[4];
+> +	uint32_t pcell_id[4];
+> +};
+> +
+> +static u32 cntfrq;
+> +static struct pl031_regs *pl031;
+> +static int pl031_irq;
+> +static void *gic_ispendr;
+> +static void *gic_isenabler;
+> +static bool irq_triggered;
+> +
+> +static uint64_t read_timer(void)
+> +{
+> +	uint64_t r = read_sysreg(cntpct_el0);
+> +	isb();
+> +
+> +	return r;
+> +}
+> +
+> +static int check_id(void)
+> +{
+> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id); i++)
+> +		if (id[i] != readl(&pl031->periph_id[i]))
+> +			return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_ro(void)
+> +{
+> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
+> +			    offsetof(struct pl031_regs, mis),
+> +			    offsetof(struct pl031_regs, periph_id[0]),
+> +			    offsetof(struct pl031_regs, periph_id[1]),
+> +			    offsetof(struct pl031_regs, periph_id[2]),
+> +			    offsetof(struct pl031_regs, periph_id[3]),
+> +			    offsetof(struct pl031_regs, pcell_id[0]),
+> +			    offsetof(struct pl031_regs, pcell_id[1]),
+> +			    offsetof(struct pl031_regs, pcell_id[2]),
+> +			    offsetof(struct pl031_regs, pcell_id[3]) };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
+> +		uint32_t before32;
+> +		uint16_t before16;
+> +		uint8_t before8;
+> +		void *addr = (void*)pl031 + offs[i];
+> +		uint32_t poison = 0xdeadbeefULL;
+> +
+> +		before8 = readb(addr);
+> +		before16 = readw(addr);
+> +		before32 = readl(addr);
+> +
+> +		writeb(poison, addr);
+> +		writew(poison, addr);
+> +		writel(poison, addr);
+> +
+> +		if (before8 != readb(addr))
+> +			return 1;
+> +		if (before16 != readw(addr))
+> +			return 1;
+> +		if (before32 != readl(addr))
+> +			return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_rtc_freq(void)
+> +{
+> +	uint32_t seconds_to_wait = 2;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_timer();
+> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
+> +
+> +	/* Wait for 2 seconds */
+> +	while (read_timer() < target_tick) ;
+> +
+> +	if (readl(&pl031->dr) != before + seconds_to_wait)
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool gic_irq_pending(void)
+> +{
+> +	uint32_t offset = (pl031_irq / 32) * 4;
+> +
+> +	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
+> +}
+> +
+> +static void gic_irq_unmask(void)
+> +{
+> +	uint32_t offset = (pl031_irq / 32) * 4;
+> +
+> +	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
+> +}
+> +
+> +static void irq_handler(struct pt_regs *regs)
+> +{
+> +	u32 irqstat = gic_read_iar();
+> +	u32 irqnr = gic_iar_irqnr(irqstat);
+> +
+> +	gic_write_eoir(irqstat);
+> +
+> +	if (irqnr == pl031_irq) {
+> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
+> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
+> +
+> +		/* Writing any value should clear IRQ status */
+> +		writel(0x80000000ULL, &pl031->icr);
+> +
+> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
+> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
+> +		irq_triggered = true;
+> +	} else {
+> +		report_info("Unexpected interrupt: %d\n", irqnr);
+> +		return;
+> +	}
+> +}
+> +
+> +static int check_rtc_irq(void)
+> +{
+> +	uint32_t seconds_to_wait = 1;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_timer();
+> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
+> +
+> +	report_info("Checking IRQ trigger (MR)");
+> +
+> +	irq_triggered = false;
+> +
+> +	/* Fire IRQ in 1 second */
+> +	writel(before + seconds_to_wait, &pl031->mr);
+> +
+> +	install_irq_handler(EL1H_IRQ, irq_handler);
+> +
+> +	/* Wait until 2 seconds are over */
+> +	while (read_timer() < target_tick) ;
+> +
+> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
+> +
+> +	/* Mask the IRQ so that it gets delivered */
+> +	writel(1, &pl031->imsc);
+> +	report("  RTC IRQ pending now", gic_irq_pending());
+> +
+> +	/* Enable retrieval of IRQ */
+> +	gic_irq_unmask();
+> +	local_irq_enable();
+> +
+> +	report("  IRQ triggered", irq_triggered);
+> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
+> +	if (!irq_triggered) {
+> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
+> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
+> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
+> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
+> +	}
+> +
+> +	local_irq_disable();
+> +	return 0;
+> +}
+> +
+> +static void rtc_irq_init(void)
+> +{
+> +	gic_enable_defaults();
+> +
+> +	switch (gic_version()) {
+> +	case 2:
+> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+> +		break;
+> +	case 3:
+> +		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
+> +		break;
+> +	}
+> +}
+> +
+> +static int rtc_fdt_init(void)
+> +{
+> +	const struct fdt_property *prop;
+> +	const void *fdt = dt_fdt();
+> +	int node, len;
+> +	u32 *data;
+> +
+> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
+> +	if (node < 0)
+> +		return -1;
+> +
+> +	prop = fdt_get_property(fdt, node, "interrupts", &len);
+> +	assert(prop && len == (3 * sizeof(u32)));
+> +	data = (u32 *)prop->data;
+> +	assert(data[0] == 0); /* SPI */
+> +	pl031_irq = SPI(fdt32_to_cpu(data[1]));
 
-There are probably issues with that, but I suspect defining "all
-undandled calls" will be problematic otherwise.
+Nit: Ideally we'd add some more devicetree API to get interrupts. With
+that, and the existing devicetree API, we could remove all low-level fdt
+related code in this function.
+
+> +
+> +	prop = fdt_get_property(fdt, node, "reg", &len);
+> +	assert(prop && len == (2 * sizeof(u64)));
+> +	data = (u32 *)prop->data;
+> +	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
+
+This works because we currently ID map all the physical memory. I usually
+try to remember to use an ioremap in these cases anyway though.
+
+> +
+> +	return 0;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	cntfrq = get_cntfrq();
+> +	rtc_irq_init();
+> +	if (rtc_fdt_init()) {
+> +		report_skip("Skipping PL031 tests. No device present.");
+> +		return 0;
+> +	}
+> +
+> +	report("Periph/PCell IDs match", !check_id());
+> +	report("R/O fields are R/O", !check_ro());
+> +	report("RTC ticks at 1HZ", !check_rtc_freq());
+> +	report("RTC IRQ not pending yet", !gic_irq_pending());
+> +	check_rtc_irq();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index f6dfb90..1fc10a0 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -41,6 +41,7 @@
+>  #include <asm/gic-v3.h>
+>  
+>  #define PPI(irq)			((irq) + 16)
+> +#define SPI(irq)			((irq) + GIC_FIRST_SPI)
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/cpumask.h>
+> -- 
+> 2.17.1
+>
+
+I only reviewed with respect to the framework, but other than couple
+things I pointed out it looks good to me.
 
 Thanks,
-Mark.
+drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
