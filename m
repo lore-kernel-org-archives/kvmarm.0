@@ -2,70 +2,59 @@ Return-Path: <SRS0=W8aC=VM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF969C7618F
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 12:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 324CFC7618F
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 13:41:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 55094206B8
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 12:49:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55094206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id BB7D32086C
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 13:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB7D32086C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4A3C4A417;
-	Mon, 15 Jul 2019 08:49:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BC234A51E;
+	Mon, 15 Jul 2019 09:41:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gLuRZPYHQr9k; Mon, 15 Jul 2019 08:49:04 -0400 (EDT)
+	with ESMTP id Jqt4pXRhZ-aD; Mon, 15 Jul 2019 09:41:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D9104A4E1;
-	Mon, 15 Jul 2019 08:49:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8327A4A4FD;
+	Mon, 15 Jul 2019 09:41:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8493B4A418
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 08:49:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00F134A4FD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 09:41:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nCqz+wUyMDWd for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jul 2019 08:49:01 -0400 (EDT)
-Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C50C4A417
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 08:49:01 -0400 (EDT)
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id EEE895BDD5044EDA5ADB;
- Mon, 15 Jul 2019 20:48:56 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 15 Jul 2019
- 20:48:49 +0800
-Subject: Re: ARM/gic-v4: deadlock occurred
-To: Marc Zyngier <marc.zyngier@arm.com>
-References: <9efe0260-4a84-7489-ecdd-2e9561599320@huawei.com>
- <86lfzl9ofe.wl-marc.zyngier@arm.com>
- <0b413592-7d98-ebe8-35c5-da330f800326@huawei.com>
- <86a7fx9lg8.wl-marc.zyngier@arm.com>
- <4d60d130-b7ce-96cb-5f8a-11e83329601a@huawei.com>
- <868svg9igl.wl-marc.zyngier@arm.com>
- <dbbf516d-3326-a948-8617-db6b6ec0ceed@huawei.com>
- <20190713123704.2d8a308c@why>
- <2697d96e-8f84-6a45-521a-d2270b6be1eb@huawei.com>
- <a2f51bcf-3a31-7b60-6790-78bf3fa940b2@arm.com>
- <4051528c-e282-1a04-5fa6-befd147bdbf5@huawei.com>
- <d9015d8b-45d9-bd39-a451-1932518710e8@arm.com>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <e7f01ea8-c906-ad9f-56e7-5808abbfd67b@huawei.com>
-Date: Mon, 15 Jul 2019 20:48:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ with ESMTP id LpOHJmEofGeO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jul 2019 09:41:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96BED4A3A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 09:41:03 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 242E228;
+ Mon, 15 Jul 2019 06:41:03 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 390B03F71F;
+ Mon, 15 Jul 2019 06:41:02 -0700 (PDT)
+Date: Mon, 15 Jul 2019 14:41:00 +0100
+From: Dave Martin <Dave.Martin@arm.com>
+To: Guoheyi <guoheyi@huawei.com>
+Subject: Re: [RFC] Add virtual SDEI support in qemu
+Message-ID: <20190715134059.GJ2790@e103592.cambridge.arm.com>
+References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <d9015d8b-45d9-bd39-a451-1932518710e8@arm.com>
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-Cc: linux-kernel@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>
+Content-Disposition: inline
+In-Reply-To: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,114 +66,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Sat, Jul 13, 2019 at 05:53:57PM +0800, Guoheyi wrote:
+> Hi folks,
+> 
+> Do it make sense to implement virtual SDEI in qemu? So that we can have the
+> standard way for guest to handle NMI watchdog, RAS events and something else
+> which involves SDEI in a physical ARM64 machine.
+> 
+> My basic idea is like below:
+> 
+> 1. Change a few lines of code in kvm to allow unhandled SMC invocations
+> (like SDEI) to be sent to qemu, with exit reason of KVM_EXIT_HYPERCALL, so
+> we don't need to add new API.
 
-On 2019/7/15 19:13, Marc Zyngier wrote:
-> On 15/07/2019 11:43, Guoheyi wrote:
->>
->> On 2019/7/15 17:07, Marc Zyngier wrote:
->>> On 15/07/2019 07:32, Guoheyi wrote:
->>>> Hi Marc,
->>>>
->>>> The issue only occurs after applying the vlpi_map_rework patches, and we
->>>> can see the patches only affect VM; it changes its_create_device() a
->>>> little so it may affect host booting in some ways, so I took the lazy
->>>> way to send it out for some insights.
->>>>
->>>> I am suspecting below code; if alloc_lpis == false, what will happen?
->>> If !alloc_lpis, then we don't allocate the lpi_map, which is the
->>> intended effect.
->>>
->>>> Anyway, I will investigate more on this.
->>>>
->>>>
->>>> 	if  (alloc_lpis)  {
->>>> 		lpi_map  =  its_lpi_alloc(nvecs,  &lpi_base,  &nr_lpis);
->>>> 		if  (lpi_map)
->>>> 			col_map  =  kcalloc(nr_lpis,  sizeof(*col_map),
->>>> 					GFP_KERNEL);
->>>> 	}  else  {
->>>> 		col_map  =  kcalloc(nr_ites,  sizeof(*col_map),  GFP_KERNEL);
->>>> 		nr_lpis  =  0;
->>>> 		lpi_base  =  0;
->>>> 	}
->>>> 	if  (its->is_v4)
->>>> 		vlpi_map  =  kcalloc(nr_lpis,  sizeof(*vlpi_map),  GFP_KERNEL);
->>>>
->>>> 	if  (!dev  ||  !itt  ||   !col_map  ||  (!lpi_map  &&  alloc_lpis)  ||
->>>> 	(!vlpi_map  &&  its->is_v4))  {
->>>> 		kfree(dev);
->>>> 		kfree(itt);
->>>> 		kfree(lpi_map);
->>>> 		kfree(col_map);
->>>> 		kfree(vlpi_map);
->>>> 		return  NULL;
->>>> 	}
->>> How does this relate to the patch posted in this discussion? The
->>> proposed changes turn the locking from a mutex into a raw_spinlock.
->> I'm testing the patchset in
->> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=irq/vlpi-map-rework,
->> not only the patch posted in the mail directly. The first patch
->> *"**irqchip/gic-v3-its: Make vlpi_map allocations atomic" works well in
->> our internal tree, and my new testing is against the other 3 patches in
->> your vlpi-map-rework branch, as I promised. I'm sorry if I didn't state
->> this clearly.
-> Ah, I had completely forgot about this branch. As I said, it is
-> completely untested. I'll see if I can get some brain bandwidth in the
-> next couple of weeks to get back to it...
-Yes, a bit too long ago...
+So long as KVM_EXIT_HYPERCALL reports sufficient information so that
+userspace can identify the cause as an SMC and retrieve the SMC
+immediate field, this seems feasible.
 
-And finally I found the panic is caused by this patch: 
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=irq/vlpi-map-rework&id=fe3dd7e06ee0e82bade4f2a107ef6422e5c9021e
+For its own SMCCC APIs, KVM exclusively uses HVC, so rerouting SMC to
+userspace shouldn't conflict.
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c 
-b/drivers/irqchip/irq-gic-v3-its.c
-index 18aa04b..6f55886 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -2458,6 +2458,8 @@ static void its_free_device(struct its_device 
-*its_dev)
-      list_del(&its_dev->entry);
-      raw_spin_unlock_irqrestore(&its_dev->its->lock, flags);
-      kfree(its_dev->itt);
-+    kfree(its_dev->event_map.lpi_map);
-+    kfree(its_dev->event_map.col_map);
-      kfree(its_dev);
-  }
+This bouncing of SMCs to userspace would need to be opt-in, otherwise
+old userspace would see exits that it doesn't know what to do with.
 
-This patch causes double free for both lpi_map and col_map in 
-its_irq_domain_free():
+> 2. qemu handles supported SDEI calls just as the spec says for what a
+> hypervisor should do for a guest OS.
+> 
+> 3. For interrupts bound to hypervisor, qemu should stop injecting the IRQ to
+> guest through KVM, but jump to the registered event handler directly,
+> including context saving and restoring. Some interrupts like virtual timer
+> are handled by kvm directly, so we may refuse to bind such interrupts to
+> SDEI events.
 
-         if (!its_dev->shared &&
-             bitmap_empty(its_dev->event_map.lpi_map,
-                          its_dev->event_map.nr_lpis)) {
-its_lpi_free(its_dev->event_map.lpi_map, ----> 
-its_dev->event_map.lpi_map is freed
-                              its_dev->event_map.lpi_base,
-                              its_dev->event_map.nr_lpis);
-                 kfree(its_dev->event_map.col_map);                ----> 
-its_dev->event_map.col_map is freed
+Something like that.
 
-                 /* Unmap device/itt */
-                 its_send_mapd(its_dev, 0);
-                 its_free_device(its_dev);                         ----> 
-lpi_map and col_map are freed again
-         }
+Interactions between SDEI and PSCI would need some thought: for example,
+after PSCI_CPU_ON, the newly online cpu needs to have SDEs masked.
 
-Thanks,
+One option (suggested to me by James Morse) would be to allow userspace
+to disable in the in-kernel PSCI implementation and provide its own
+PSCI to the guest via SMC -- in which case userspace that wants to
+implement SDEI would have to implement PSCI as well.
 
-Heyi
+There may be reasons why this wouldn't work ... I haven't thought about
+it in depth.
 
->
-> Thanks,
->
-> 	M.
-
-
+Cheers
+---Dave
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
