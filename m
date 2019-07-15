@@ -2,64 +2,62 @@ Return-Path: <SRS0=W8aC=VM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C1AC7618F
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 16:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF6EC7618F
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 17:06:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B434D2067C
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 16:42:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B434D2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 5E2D42080A
+	for <kvmarm@archiver.kernel.org>; Mon, 15 Jul 2019 17:06:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2D42080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24ECE4A51B;
-	Mon, 15 Jul 2019 12:42:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEE574A525;
+	Mon, 15 Jul 2019 13:06:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RCS21xfYxYty; Mon, 15 Jul 2019 12:42:44 -0400 (EDT)
+	with ESMTP id 9a636E62oeBg; Mon, 15 Jul 2019 13:06:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0403E4A512;
-	Mon, 15 Jul 2019 12:42:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 735464A4E8;
+	Mon, 15 Jul 2019 13:06:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A7B4A512
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 12:42:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 434D54A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 13:06:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 62-HC6jjWHZO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Jul 2019 12:42:40 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 912244A418
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 12:42:40 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 90FFE59467;
- Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CC7B01001DDA;
- Mon, 15 Jul 2019 16:42:37 +0000 (UTC)
-Date: Mon, 15 Jul 2019 18:42:35 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH kvm-unit-tests v2] arm: Add PL031 test
-Message-ID: <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
-References: <20190712091938.492-1-graf@amazon.com>
+ with ESMTP id 0QSKBrE7MggY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Jul 2019 13:06:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFC14A418
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Jul 2019 13:06:31 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D06328;
+ Mon, 15 Jul 2019 10:06:31 -0700 (PDT)
+Received: from [10.1.196.50] (e108454-lin.cambridge.arm.com [10.1.196.50])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A41773F59C;
+ Mon, 15 Jul 2019 10:06:29 -0700 (PDT)
+Subject: Re: [RFC v2 14/14] kvm/arm: Align the VMID allocation with the arm64
+ ASID one
+To: James Morse <james.morse@arm.com>
+References: <20190620130608.17230-1-julien.grall@arm.com>
+ <20190620130608.17230-15-julien.grall@arm.com>
+ <39d47f54-459f-ce07-91c0-0158896a6783@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Message-ID: <4d926abe-9cdb-536d-43ee-7f14a84b0246@arm.com>
+Date: Mon, 15 Jul 2019 18:06:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190712091938.492-1-graf@amazon.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <39d47f54-459f-ce07-91c0-0158896a6783@arm.com>
+Content-Language: en-US
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,352 +69,197 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 12, 2019 at 11:19:38AM +0200, Alexander Graf wrote:
-> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-> It just pokes basic functionality. I've mostly written it to familiarize myself
-> with the device, but I suppose having the test around does not hurt, as it also
-> exercises the GIC SPI interrupt path.
+On 03/07/2019 18:36, James Morse wrote:
+> Hi Julien,
+
+Hi James,
+
+> On 20/06/2019 14:06, Julien Grall wrote:
+>> At the moment, the VMID algorithm will send an SGI to all the CPUs to
+>> force an exit and then broadcast a full TLB flush and I-Cache
+>> invalidation.
+>>
+>> This patch re-use the new ASID allocator. The
+>> benefits are:
+>>      - CPUs are not forced to exit at roll-over. Instead the VMID will be
+>>      marked reserved and the context will be flushed at next exit. This
+>>      will reduce the IPIs traffic.
+>>      - Context invalidation is now per-CPU rather than broadcasted.
 > 
-> Signed-off-by: Alexander Graf <graf@amazon.com>
+> + Catalin has a model of the asid-allocator.
+
+That's a good point :).
+
 > 
-> ---
 > 
-> v1 -> v2:
+>> With the new algo, the code is now adapted:
+>>      - The function __kvm_flush_vm_context() has been renamed to
+>>      __kvm_flush_cpu_vmid_context and now only flushing the current CPU context.
+>>      - The call to update_vttbr() will be done with preemption disabled
+>>      as the new algo requires to store information per-CPU.
+>>      - The TLBs associated to EL1 will be flushed when booting a CPU to
+>>      deal with stale information. This was previously done on the
+>>      allocation of the first VMID of a new generation.
+>>
+>> The measurement was made on a Seattle based SoC (8 CPUs), with the
+>> number of VMID limited to 4-bit. The test involves running concurrently 40
+>> guests with 2 vCPUs. Each guest will then execute hackbench 5 times
+>> before exiting.
 > 
->   - Use FDT to find base, irq and existence
->   - Put isb after timer read
->   - Use dist_base for gicv3
-> ---
->  arm/Makefile.common |   1 +
->  arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/gic.h   |   1 +
->  3 files changed, 267 insertions(+)
->  create mode 100644 arm/pl031.c
+>> diff --git a/arch/arm64/include/asm/kvm_asid.h b/arch/arm64/include/asm/kvm_asid.h
+>> new file mode 100644
+>> index 000000000000..8b586e43c094
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/kvm_asid.h
+>> @@ -0,0 +1,8 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +#ifndef __ARM64_KVM_ASID_H__
+>> +#define __ARM64_KVM_ASID_H__
+>> +
+>> +#include <asm/asid.h>
+>> +
+>> +#endif /* __ARM64_KVM_ASID_H__ */
+>> +
+>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>> index ff73f5462aca..06821f548c0f 100644
+>> --- a/arch/arm64/include/asm/kvm_asm.h
+>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>> @@ -62,7 +62,7 @@ extern char __kvm_hyp_init_end[];
+>>   
+>>   extern char __kvm_hyp_vector[];
+>>   
+>> -extern void __kvm_flush_vm_context(void);
+>> +extern void __kvm_flush_cpu_vmid_context(void);
+>>   extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
 > 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index f0c4b5d..b8988f2 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
->  tests-common += $(TEST_DIR)/gic.flat
->  tests-common += $(TEST_DIR)/psci.flat
->  tests-common += $(TEST_DIR)/sieve.flat
-> +tests-common += $(TEST_DIR)/pl031.flat
+> As we've got a __kvm_tlb_flush_local_vmid(), would __kvm_tlb_flush_local_all() fit in
+> better? (This mirrors local_flush_tlb_all() too)
 
-Makefile.common is for both arm32 and arm64, but this code is only
-compilable on arm64. As there's no reason for it to be arm64 only,
-then ideally we'd modify the code to allow compiling and running
-on both, but otherwise we need to move this to Makefile.arm64.
+I am happy with the renaming here.
 
->  
->  tests-all = $(tests-common) $(tests)
->  all: directories $(tests-all)
-> diff --git a/arm/pl031.c b/arm/pl031.c
-> new file mode 100644
-> index 0000000..d975937
-> --- /dev/null
-> +++ b/arm/pl031.c
-> @@ -0,0 +1,265 @@
-> +/*
-> + * Verify PL031 functionality
-> + *
-> + * This test verifies whether the emulated PL031 behaves correctly.
-> + *
-> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
-> + * Author: Alexander Graf <graf@amazon.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <devicetree.h>
-> +#include <asm/processor.h>
-> +#include <asm/io.h>
-> +#include <asm/gic.h>
-> +
-> +struct pl031_regs {
-> +	uint32_t dr;	/* Data Register */
-> +	uint32_t mr;	/* Match Register */
-> +	uint32_t lr;	/* Load Register */
-> +	union {
-> +		uint8_t cr;	/* Control Register */
-> +		uint32_t cr32;
-> +	};
-> +	union {
-> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-> +		uint32_t imsc32;
-> +	};
-> +	union {
-> +		uint8_t ris;	/* Raw Interrupt Status */
-> +		uint32_t ris32;
-> +	};
-> +	union {
-> +		uint8_t mis;	/* Masked Interrupt Status */
-> +		uint32_t mis32;
-> +	};
-> +	union {
-> +		uint8_t icr;	/* Interrupt Clear Register */
-> +		uint32_t icr32;
-> +	};
-> +	uint32_t reserved[1008];
-> +	uint32_t periph_id[4];
-> +	uint32_t pcell_id[4];
-> +};
-> +
-> +static u32 cntfrq;
-> +static struct pl031_regs *pl031;
-> +static int pl031_irq;
-> +static void *gic_ispendr;
-> +static void *gic_isenabler;
-> +static bool irq_triggered;
-> +
-> +static uint64_t read_timer(void)
-> +{
-> +	uint64_t r = read_sysreg(cntpct_el0);
-> +	isb();
-> +
-> +	return r;
-> +}
-> +
-> +static int check_id(void)
-> +{
-> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id); i++)
-> +		if (id[i] != readl(&pl031->periph_id[i]))
-> +			return 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int check_ro(void)
-> +{
-> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-> +			    offsetof(struct pl031_regs, mis),
-> +			    offsetof(struct pl031_regs, periph_id[0]),
-> +			    offsetof(struct pl031_regs, periph_id[1]),
-> +			    offsetof(struct pl031_regs, periph_id[2]),
-> +			    offsetof(struct pl031_regs, periph_id[3]),
-> +			    offsetof(struct pl031_regs, pcell_id[0]),
-> +			    offsetof(struct pl031_regs, pcell_id[1]),
-> +			    offsetof(struct pl031_regs, pcell_id[2]),
-> +			    offsetof(struct pl031_regs, pcell_id[3]) };
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-> +		uint32_t before32;
-> +		uint16_t before16;
-> +		uint8_t before8;
-> +		void *addr = (void*)pl031 + offs[i];
-> +		uint32_t poison = 0xdeadbeefULL;
-> +
-> +		before8 = readb(addr);
-> +		before16 = readw(addr);
-> +		before32 = readl(addr);
-> +
-> +		writeb(poison, addr);
-> +		writew(poison, addr);
-> +		writel(poison, addr);
-> +
-> +		if (before8 != readb(addr))
-> +			return 1;
-> +		if (before16 != readw(addr))
-> +			return 1;
-> +		if (before32 != readl(addr))
-> +			return 1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int check_rtc_freq(void)
-> +{
-> +	uint32_t seconds_to_wait = 2;
-> +	uint32_t before = readl(&pl031->dr);
-> +	uint64_t before_tick = read_timer();
-> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-> +
-> +	/* Wait for 2 seconds */
-> +	while (read_timer() < target_tick) ;
-> +
-> +	if (readl(&pl031->dr) != before + seconds_to_wait)
-> +		return 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static bool gic_irq_pending(void)
-> +{
-> +	uint32_t offset = (pl031_irq / 32) * 4;
-> +
-> +	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
-> +}
-> +
-> +static void gic_irq_unmask(void)
-> +{
-> +	uint32_t offset = (pl031_irq / 32) * 4;
-> +
-> +	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
-> +}
-> +
-> +static void irq_handler(struct pt_regs *regs)
-> +{
-> +	u32 irqstat = gic_read_iar();
-> +	u32 irqnr = gic_iar_irqnr(irqstat);
-> +
-> +	gic_write_eoir(irqstat);
-> +
-> +	if (irqnr == pl031_irq) {
-> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-> +
-> +		/* Writing any value should clear IRQ status */
-> +		writel(0x80000000ULL, &pl031->icr);
-> +
-> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-> +		irq_triggered = true;
-> +	} else {
-> +		report_info("Unexpected interrupt: %d\n", irqnr);
-> +		return;
-> +	}
-> +}
-> +
-> +static int check_rtc_irq(void)
-> +{
-> +	uint32_t seconds_to_wait = 1;
-> +	uint32_t before = readl(&pl031->dr);
-> +	uint64_t before_tick = read_timer();
-> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-> +
-> +	report_info("Checking IRQ trigger (MR)");
-> +
-> +	irq_triggered = false;
-> +
-> +	/* Fire IRQ in 1 second */
-> +	writel(before + seconds_to_wait, &pl031->mr);
-> +
-> +	install_irq_handler(EL1H_IRQ, irq_handler);
-> +
-> +	/* Wait until 2 seconds are over */
-> +	while (read_timer() < target_tick) ;
-> +
-> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-> +
-> +	/* Mask the IRQ so that it gets delivered */
-> +	writel(1, &pl031->imsc);
-> +	report("  RTC IRQ pending now", gic_irq_pending());
-> +
-> +	/* Enable retrieval of IRQ */
-> +	gic_irq_unmask();
-> +	local_irq_enable();
-> +
-> +	report("  IRQ triggered", irq_triggered);
-> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-> +	if (!irq_triggered) {
-> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
-> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
-> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-> +	}
-> +
-> +	local_irq_disable();
-> +	return 0;
-> +}
-> +
-> +static void rtc_irq_init(void)
-> +{
-> +	gic_enable_defaults();
-> +
-> +	switch (gic_version()) {
-> +	case 2:
-> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-> +		break;
-> +	case 3:
-> +		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
-> +		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
-> +		break;
-> +	}
-> +}
-> +
-> +static int rtc_fdt_init(void)
-> +{
-> +	const struct fdt_property *prop;
-> +	const void *fdt = dt_fdt();
-> +	int node, len;
-> +	u32 *data;
-> +
-> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
-> +	if (node < 0)
-> +		return -1;
-> +
-> +	prop = fdt_get_property(fdt, node, "interrupts", &len);
-> +	assert(prop && len == (3 * sizeof(u32)));
-> +	data = (u32 *)prop->data;
-> +	assert(data[0] == 0); /* SPI */
-> +	pl031_irq = SPI(fdt32_to_cpu(data[1]));
+> 
+> 
+>>   extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+>>   extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 4bcd9c1291d5..7ef45b7da4eb 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -68,8 +68,8 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+>>   void __extended_idmap_trampoline(phys_addr_t boot_pgd, phys_addr_t idmap_start);
+>>   
+>>   struct kvm_vmid {
+>> -	/* The VMID generation used for the virt. memory system */
+>> -	u64    vmid_gen;
+>> +	/* The ASID used for the ASID allocator */
+>> +	atomic64_t asid;
+> 
+> Can we call this 'id' as happens in mm_context_t? (calling it asid is confusing)
 
-Nit: Ideally we'd add some more devicetree API to get interrupts. With
-that, and the existing devicetree API, we could remove all low-level fdt
-related code in this function.
+I am fine with this suggestion.
 
-> +
-> +	prop = fdt_get_property(fdt, node, "reg", &len);
-> +	assert(prop && len == (2 * sizeof(u64)));
-> +	data = (u32 *)prop->data;
-> +	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
+> 
+>>   	u32    vmid;
+> 
+> Can we filter out the generation bits in kvm_get_vttbr() in the same way the arch code
+> does in cpu_do_switch_mm().
+> 
+> I think this saves writing back a cached pre-filtered version every time, or needing
+> special hooks to know when the value changed. (so we can remove this variable)
 
-This works because we currently ID map all the physical memory. I usually
-try to remember to use an ioremap in these cases anyway though.
+[...]
 
-> +
-> +	return 0;
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	cntfrq = get_cntfrq();
-> +	rtc_irq_init();
-> +	if (rtc_fdt_init()) {
-> +		report_skip("Skipping PL031 tests. No device present.");
-> +		return 0;
-> +	}
-> +
-> +	report("Periph/PCell IDs match", !check_id());
-> +	report("R/O fields are R/O", !check_ro());
-> +	report("RTC ticks at 1HZ", !check_rtc_freq());
-> +	report("RTC IRQ not pending yet", !gic_irq_pending());
-> +	check_rtc_irq();
-> +
-> +	return report_summary();
-> +}
-> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> index f6dfb90..1fc10a0 100644
-> --- a/lib/arm/asm/gic.h
-> +++ b/lib/arm/asm/gic.h
-> @@ -41,6 +41,7 @@
->  #include <asm/gic-v3.h>
->  
->  #define PPI(irq)			((irq) + 16)
-> +#define SPI(irq)			((irq) + GIC_FIRST_SPI)
->  
->  #ifndef __ASSEMBLY__
->  #include <asm/cpumask.h>
-> -- 
-> 2.17.1
->
+>> +static void vmid_update_ctxt(void *ctxt)
+>>   {
+>> +	struct kvm_vmid *vmid = ctxt;
+>> +	u64 asid = atomic64_read(&vmid->asid);
+> 
+>> +	vmid->vmid = asid & ((1ULL << kvm_get_vmid_bits()) - 1);
+> 
+> I don't like having to poke this through the asid-allocator as a kvm-specific hack. Can we
+> do it in kvm_get_vttbr()?
 
-I only reviewed with respect to the framework, but other than couple
-things I pointed out it looks good to me.
+I will have a look.
 
-Thanks,
-drew
+> 
+> 
+>>   }
+> 
+>> @@ -487,48 +467,11 @@ static bool need_new_vmid_gen(struct kvm_vmid *vmid)
+> 
+> (git made a mess of the diff here... squashed to just the new code:)
+> 
+>>   static void update_vmid(struct kvm_vmid *vmid)
+>>   {
+> 
+>> +	int cpu = get_cpu();
+>>   
+>> +	asid_check_context(&vmid_info, &vmid->asid, cpu, vmid);
+>>   
+>> +	put_cpu();
+> 
+> If we're calling update_vmid() in a pre-emptible context, aren't we already doomed?
+
+Yes we are. This made me realize that Linux-RT replaced the preempt_disable() in 
+the caller by migrate_disable(). The latter will prevent the task to move to 
+another CPU but allow preemption.
+
+This patch will likely makes things awfully broken for Linux-RT. I will have a 
+look to see if we can call this from preempt notifier.
+
+> 
+> Could we use smp_processor_id() instead.
+> 
+> 
+>>   }
+> 
+> 
+>> @@ -1322,6 +1271,8 @@ static void cpu_init_hyp_mode(void *dummy)
+>>   
+>>   	__cpu_init_hyp_mode(pgd_ptr, hyp_stack_ptr, vector_ptr);
+>>   	__cpu_init_stage2();
+> 
+> 
+>> +	kvm_call_hyp(__kvm_flush_cpu_vmid_context);
+> 
+> I think we only need to do this for VHE systems too. cpu_hyp_reinit() only does the call
+> to cpu_init_hyp_mode() if !is_kernel_in_hyp_mode().
+
+I guess you mean we need to do this for VHE system. If so, I agree that 
+cpu_init_hyp_mode() is not the best place. I will move it to cpu_hyp_reinit().
+
+> 
+> 
+>>   }
+>>   
+>>   static void cpu_hyp_reset(void)
+>> @@ -1429,6 +1380,17 @@ static inline void hyp_cpu_pm_exit(void)
+>>   
+>>   static int init_common_resources(void)
+>>   {
+>> +	/*
+>> +	 * Initialize the ASID allocator telling it to allocate a single
+>> +	 * VMID per VM.
+>> +	 */
+>> +	if (asid_allocator_init(&vmid_info, kvm_get_vmid_bits(), 1,
+>> +				vmid_flush_cpu_ctxt, vmid_update_ctxt))
+>> +		panic("Failed to initialize VMID allocator\n");
+> 
+> Couldn't we return an error instead? The asid allocator is needed for user-space, its
+> pointless to keep running if it fails. The same isn't true here. (and it would make it
+> easier to debug what went wrong!)
+
+Fair point. I will update the next version.
+
+Cheers,
+
+-- 
+Julien Grall
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
