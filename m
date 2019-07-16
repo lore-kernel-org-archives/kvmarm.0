@@ -2,61 +2,62 @@ Return-Path: <SRS0=eCDF=VN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A46B3C7618F
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 15:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34879C76192
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 16:35:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3E04A2173B
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 15:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E04A2173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id B3F94206C2
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 16:35:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F94206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E8C4A541;
-	Tue, 16 Jul 2019 11:18:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7E14A539;
+	Tue, 16 Jul 2019 12:35:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kOHbkT6SmSxQ; Tue, 16 Jul 2019 11:18:13 -0400 (EDT)
+	with ESMTP id 6oN7kpvgWpDz; Tue, 16 Jul 2019 12:35:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E2754A53E;
-	Tue, 16 Jul 2019 11:18:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A56D54A53F;
+	Tue, 16 Jul 2019 12:35:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 657634A53D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 11:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 160364A533
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 12:35:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9cTIm8BMroBM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jul 2019 11:18:11 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B58E74A53C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 11:18:10 -0400 (EDT)
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 500C491AD3FBB4DAFBEF;
- Tue, 16 Jul 2019 23:18:06 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 16 Jul 2019
- 23:17:59 +0800
-Subject: Re: BUG: KASAN: slab-out-of-bounds in
- kvm_pmu_get_canonical_pmc+0x48/0x78
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <kvmarm@lists.cs.columbia.edu>
-References: <644e3455-ea6d-697a-e452-b58961341381@huawei.com>
-Message-ID: <f9d5d18a-7631-f3e2-d73a-21d8eee183f1@huawei.com>
-Date: Tue, 16 Jul 2019 23:14:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ with ESMTP id 1roTAWAoL97c for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jul 2019 12:35:21 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61AEA4A51F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 12:35:21 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7BB02B;
+ Tue, 16 Jul 2019 09:35:20 -0700 (PDT)
+Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E02943F71A;
+ Tue, 16 Jul 2019 09:35:19 -0700 (PDT)
+Subject: Re: [PATCH 53/59] KVM: arm64: nv: Implement maintenance interrupt
+ forwarding
+To: Marc Zyngier <marc.zyngier@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-54-marc.zyngier@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <432dedcf-620e-4de1-3d22-9527665276b2@arm.com>
+Date: Tue, 16 Jul 2019 17:35:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <644e3455-ea6d-697a-e452-b58961341381@huawei.com>
+In-Reply-To: <20190621093843.220980-54-marc.zyngier@arm.com>
 Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org,
- kasan-dev@googlegroups.com
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,92 +69,170 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ck9uIDIwMTkvNy8xNiAyMzowNSwgWmVuZ2h1aSBZdSB3cm90ZToKPiBIaSBmb2xrcywKPiAKPiBS
-dW5uaW5nIHRoZSBsYXRlc3Qga2VybmVsIHdpdGggS0FTQU4gZW5hYmxlZCwgd2Ugd2lsbCBoaXQg
-dGhlIGZvbGxvd2luZwo+IEtBU0FOIEJVRyBkdXJpbmcgZ3Vlc3QncyBib290IHByb2Nlc3MuCj4g
-Cj4gSSdtIGluIGNvbW1pdCA5NjM3ZDUxNzM0N2U4MGVlMmZlMWM1ZDhjZTQ1YmExYjg4ZDhiNWNk
-Lgo+IAo+IEFueSBwcm9ibGVtcyBpbiB0aGUgY2hhaW5lZCBQTVUgY29kZT8gT3IganVzdCBhIGZh
-bHNlIHBvc2l0aXZlPwo+IAo+IC0tLTg8LS0tCj4gCj4gW8KgIDY1NC43MDYyNjhdIAo+ID09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PQo+IFvCoCA2NTQuNzA2MjgwXSBCVUc6IEtBU0FOOiBzbGFiLW91dC1vZi1ib3VuZHMgaW4g
-Cj4ga3ZtX3BtdV9nZXRfY2Fub25pY2FsX3BtYysweDQ4LzB4NzgKPiBbwqAgNjU0LjcwNjI4Nl0g
-UmVhZCBvZiBzaXplIDggYXQgYWRkciBmZmZmODAxZDZjOGZlYTM4IGJ5IHRhc2sgCj4gcWVtdS1r
-dm0vMjMyNjgKPiAKPiBbwqAgNjU0LjcwNjI5Nl0gQ1BVOiAyIFBJRDogMjMyNjggQ29tbTogcWVt
-dS1rdm0gTm90IHRhaW50ZWQgNS4yLjArICMxNzgKPiBbwqAgNjU0LjcwNjMwMV0gSGFyZHdhcmUg
-bmFtZTogSHVhd2VpIFRhaVNoYW4gMjI4MCAvQkMxMVNQQ0QsIEJJT1MgMS41OCAKPiAxMC8yNC8y
-MDE4Cj4gW8KgIDY1NC43MDYzMDVdIENhbGwgdHJhY2U6Cj4gW8KgIDY1NC43MDYzMTFdwqAgZHVt
-cF9iYWNrdHJhY2UrMHgwLzB4MjM4Cj4gW8KgIDY1NC43MDYzMTddwqAgc2hvd19zdGFjaysweDI0
-LzB4MzAKPiBbwqAgNjU0LjcwNjMyNV3CoCBkdW1wX3N0YWNrKzB4ZTAvMHgxMzQKPiBbwqAgNjU0
-LjcwNjMzMl3CoCBwcmludF9hZGRyZXNzX2Rlc2NyaXB0aW9uKzB4ODAvMHg0MDgKPiBbwqAgNjU0
-LjcwNjMzOF3CoCBfX2thc2FuX3JlcG9ydCsweDE2NC8weDFhMAo+IFvCoCA2NTQuNzA2MzQzXcKg
-IGthc2FuX3JlcG9ydCsweGMvMHgxOAo+IFvCoCA2NTQuNzA2MzQ4XcKgIF9fYXNhbl9sb2FkOCsw
-eDg4LzB4YjAKPiBbwqAgNjU0LjcwNjM1M13CoCBrdm1fcG11X2dldF9jYW5vbmljYWxfcG1jKzB4
-NDgvMHg3OAoKSSBub3RpY2VkIHRoYXQgd2Ugd2lsbCB1c2UgInBtYy0+aWR4IiBhbmQgdGhlICJj
-aGFpbmVkIiBiaXRtYXAgdG8KZGV0ZXJtaW5lIGlmIHRoZSBwbWMgaXMgY2hhaW5lZCwgaW4ga3Zt
-X3BtdV9wbWNfaXNfY2hhaW5lZCgpLgoKU2hvdWxkIHdlIGluaXRpYWxpemUgdGhlIGlkeCBhbmQg
-dGhlIGJpdG1hcCBhcHByb3ByaWF0ZWx5IGJlZm9yZQpkb2luZyBrdm1fcG11X3N0b3BfY291bnRl
-cigpPyAgTGlrZToKCgpkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3BtdS5jIGIvdmlydC9rdm0v
-YXJtL3BtdS5jCmluZGV4IDNkZDgyMzguLmNmMzExOWEgMTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL2Fy
-bS9wbXUuYworKysgYi92aXJ0L2t2bS9hcm0vcG11LmMKQEAgLTIyNCwxMiArMjI0LDEyIEBAIHZv
-aWQga3ZtX3BtdV92Y3B1X3Jlc2V0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKICAJaW50IGk7CiAg
-CXN0cnVjdCBrdm1fcG11ICpwbXUgPSAmdmNwdS0+YXJjaC5wbXU7CgorCWJpdG1hcF96ZXJvKHZj
-cHUtPmFyY2gucG11LmNoYWluZWQsIEFSTVY4X1BNVV9NQVhfQ09VTlRFUl9QQUlSUyk7CisKICAJ
-Zm9yIChpID0gMDsgaSA8IEFSTVY4X1BNVV9NQVhfQ09VTlRFUlM7IGkrKykgewotCQlrdm1fcG11
-X3N0b3BfY291bnRlcih2Y3B1LCAmcG11LT5wbWNbaV0pOwogIAkJcG11LT5wbWNbaV0uaWR4ID0g
-aTsKKwkJa3ZtX3BtdV9zdG9wX2NvdW50ZXIodmNwdSwgJnBtdS0+cG1jW2ldKTsKICAJfQotCi0J
-Yml0bWFwX3plcm8odmNwdS0+YXJjaC5wbXUuY2hhaW5lZCwgQVJNVjhfUE1VX01BWF9DT1VOVEVS
-X1BBSVJTKTsKICB9CgogIC8qKgoKClRoYW5rcywKemVuZ2h1aQoKPiBbwqAgNjU0LjcwNjM1OF3C
-oCBrdm1fcG11X3N0b3BfY291bnRlcisweDI4LzB4MTE4Cj4gW8KgIDY1NC43MDYzNjNdwqAga3Zt
-X3BtdV92Y3B1X3Jlc2V0KzB4NjAvMHhhOAo+IFvCoCA2NTQuNzA2MzY5XcKgIGt2bV9yZXNldF92
-Y3B1KzB4MzAvMHg0ZDgKPiBbwqAgNjU0LjcwNjM3Nl3CoCBrdm1fYXJjaF92Y3B1X2lvY3RsKzB4
-YTA0LzB4YzE4Cj4gW8KgIDY1NC43MDYzODFdwqAga3ZtX3ZjcHVfaW9jdGwrMHgxN2MvMHhkZTgK
-PiBbwqAgNjU0LjcwNjM4N13CoCBkb192ZnNfaW9jdGwrMHgxNTAvMHhhZjgKPiBbwqAgNjU0Ljcw
-NjM5Ml3CoCBrc3lzX2lvY3RsKzB4ODQvMHhiOAo+IFvCoCA2NTQuNzA2Mzk3XcKgIF9fYXJtNjRf
-c3lzX2lvY3RsKzB4NGMvMHg2MAo+IFvCoCA2NTQuNzA2NDAzXcKgIGVsMF9zdmNfY29tbW9uLmNv
-bnN0cHJvcC4wKzB4YjQvMHgyMDgKPiBbwqAgNjU0LjcwNjQwOV3CoCBlbDBfc3ZjX2hhbmRsZXIr
-MHgzYy8weGE4Cj4gW8KgIDY1NC43MDY0MTRdwqAgZWwwX3N2YysweDgvMHhjCj4gCj4gW8KgIDY1
-NC43MDY0MjJdIEFsbG9jYXRlZCBieSB0YXNrIDIzMjY4Ogo+IFvCoCA2NTQuNzA2NDI5XcKgIF9f
-a2FzYW5fa21hbGxvYy5pc3JhLjArMHhkMC8weDE4MAo+IFvCoCA2NTQuNzA2NDM1XcKgIGthc2Fu
-X3NsYWJfYWxsb2MrMHgxNC8weDIwCj4gW8KgIDY1NC43MDY0NDBdwqAga21lbV9jYWNoZV9hbGxv
-YysweDE3Yy8weDRhOAo+IFvCoCA2NTQuNzA2NDQ1XcKgIGt2bV9hcmNoX3ZjcHVfY3JlYXRlKzB4
-YTAvMHgxMzAKPiBbwqAgNjU0LjcwNjQ1MV3CoCBrdm1fdm1faW9jdGwrMHg4NDQvMHgxMjE4Cj4g
-W8KgIDY1NC43MDY0NTZdwqAgZG9fdmZzX2lvY3RsKzB4MTUwLzB4YWY4Cj4gW8KgIDY1NC43MDY0
-NjFdwqAga3N5c19pb2N0bCsweDg0LzB4YjgKPiBbwqAgNjU0LjcwNjQ2Nl3CoCBfX2FybTY0X3N5
-c19pb2N0bCsweDRjLzB4NjAKPiBbwqAgNjU0LjcwNjQ3Ml3CoCBlbDBfc3ZjX2NvbW1vbi5jb25z
-dHByb3AuMCsweGI0LzB4MjA4Cj4gW8KgIDY1NC43MDY0NzhdwqAgZWwwX3N2Y19oYW5kbGVyKzB4
-M2MvMHhhOAo+IFvCoCA2NTQuNzA2NDgyXcKgIGVsMF9zdmMrMHg4LzB4Ywo+IAo+IFvCoCA2NTQu
-NzA2NDkwXSBGcmVlZCBieSB0YXNrIDA6Cj4gW8KgIDY1NC43MDY0OTNdIChzdGFjayBpcyBub3Qg
-YXZhaWxhYmxlKQo+IAo+IFvCoCA2NTQuNzA2NTAxXSBUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdz
-IHRvIHRoZSBvYmplY3QgYXQgZmZmZjgwMWQ2YzhmYzAxMAo+ICDCoHdoaWNoIGJlbG9uZ3MgdG8g
-dGhlIGNhY2hlIGt2bV92Y3B1IG9mIHNpemUgMTA3ODQKPiBbwqAgNjU0LjcwNjUwN10gVGhlIGJ1
-Z2d5IGFkZHJlc3MgaXMgbG9jYXRlZCA4IGJ5dGVzIHRvIHRoZSByaWdodCBvZgo+ICDCoDEwNzg0
-LWJ5dGUgcmVnaW9uIFtmZmZmODAxZDZjOGZjMDEwLCBmZmZmODAxZDZjOGZlYTMwKQo+IFvCoCA2
-NTQuNzA2NTEwXSBUaGUgYnVnZ3kgYWRkcmVzcyBiZWxvbmdzIHRvIHRoZSBwYWdlOgo+IFvCoCA2
-NTQuNzA2NTE2XSBwYWdlOmZmZmY3ZTAwNzViMjNmMDAgcmVmY291bnQ6MSBtYXBjb3VudDowIAo+
-IG1hcHBpbmc6ZmZmZjgwMWRiMjU3ZTQ4MCBpbmRleDoweDAgY29tcG91bmRfbWFwY291bnQ6IDAK
-PiBbwqAgNjU0LjcwNjUyNF0gZmxhZ3M6IDB4ZmZmZmUwMDAwMDEwMjAwKHNsYWJ8aGVhZCkKPiBb
-wqAgNjU0LjcwNjUzMl0gcmF3OiAwZmZmZmUwMDAwMDEwMjAwIGZmZmY4MDFkYjI1ODZlZTAgZmZm
-ZjgwMWRiMjU4NmVlMCAKPiBmZmZmODAxZGIyNTdlNDgwCj4gW8KgIDY1NC43MDY1MzhdIHJhdzog
-MDAwMDAwMDAwMDAwMDAwMCAwMDAwMDAwMDAwMDEwMDAxIDAwMDAwMDAxZmZmZmZmZmYgCj4gMDAw
-MDAwMDAwMDAwMDAwMAo+IFvCoCA2NTQuNzA2NTQyXSBwYWdlIGR1bXBlZCBiZWNhdXNlOiBrYXNh
-bjogYmFkIGFjY2VzcyBkZXRlY3RlZAo+IAo+IFvCoCA2NTQuNzA2NTQ5XSBNZW1vcnkgc3RhdGUg
-YXJvdW5kIHRoZSBidWdneSBhZGRyZXNzOgo+IFvCoCA2NTQuNzA2NTU0XcKgIGZmZmY4MDFkNmM4
-ZmU5MDA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIAo+IDAwIDAwIDAw
-Cj4gW8KgIDY1NC43MDY1NjBdwqAgZmZmZjgwMWQ2YzhmZTk4MDogMDAgMDAgMDAgMDAgMDAgMDAg
-MDAgMDAgMDAgMDAgMDAgMDAgMDAgCj4gMDAgMDAgMDAKPiBbwqAgNjU0LjcwNjU2NV0gPmZmZmY4
-MDFkNmM4ZmVhMDA6IDAwIDAwIDAwIDAwIDAwIDAwIGZjIGZjIGZjIGZjIGZjIGZjIGZjIAo+IGZj
-IGZjIGZjCj4gW8KgIDY1NC43MDY1NjhdwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgXgo+IFvCoCA2
-NTQuNzA2NTczXcKgIGZmZmY4MDFkNmM4ZmVhODA6IGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZjIGZj
-IGZjIGZjIGZjIGZjIAo+IGZjIGZjIGZjCj4gW8KgIDY1NC43MDY1NzhdwqAgZmZmZjgwMWQ2Yzhm
-ZWIwMDogZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgZmMgCj4gZmMgZmMgZmMK
-PiBbwqAgNjU0LjcwNjU4Ml0gCj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
-cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
-aW5mby9rdm1hcm0K
+On 6/21/19 10:38 AM, Marc Zyngier wrote:
+> When we take a maintenance interrupt, we need to decide whether
+> it is generated on an action from the guest, or if it is something
+> that needs to be forwarded to the guest hypervisor.
+>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/nested.c            |  2 +-
+>  virt/kvm/arm/vgic/vgic-init.c      | 30 ++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-v3-nested.c | 25 +++++++++++++++++++++----
+>  3 files changed, 52 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index df2db9ab7cfb..ab61f0f30ee6 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -545,7 +545,7 @@ bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
+>  	bool imo = __vcpu_sys_reg(vcpu, HCR_EL2) & HCR_IMO;
+>  	bool fmo = __vcpu_sys_reg(vcpu, HCR_EL2) & HCR_FMO;
+>  
+> -	WARN(imo != fmo, "Separate virtual IRQ/FIQ settings not supported\n");
+> +	WARN_ONCE(imo != fmo, "Separate virtual IRQ/FIQ settings not supported\n");
+>  
+>  	return nested_virt_in_use(vcpu) && imo && fmo && !is_hyp_ctxt(vcpu);
+>  }
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 3bdb31eaed64..ec54bc8d5126 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -17,9 +17,11 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/cpu.h>
+> +#include <linux/irq.h>
+>  #include <linux/kvm_host.h>
+>  #include <kvm/arm_vgic.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+>  #include "vgic.h"
+>  
+>  /*
+> @@ -240,6 +242,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+>  	if (!irqchip_in_kernel(vcpu->kvm))
+>  		return 0;
+>  
+> +	if (nested_virt_in_use(vcpu)) {
+> +		/* FIXME: remove this hack */
+> +		if (vcpu->kvm->arch.vgic.maint_irq == 0)
+> +			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
+> +		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
+> +					 vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	/*
+>  	 * If we are creating a VCPU with a GICv3 we must also register the
+>  	 * KVM io device for the redistributor that belongs to this VCPU.
+> @@ -455,12 +467,23 @@ static int vgic_init_cpu_dying(unsigned int cpu)
+>  
+>  static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+>  {
+> +	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
+> +
+>  	/*
+>  	 * We cannot rely on the vgic maintenance interrupt to be
+>  	 * delivered synchronously. This means we can only use it to
+>  	 * exit the VM, and we perform the handling of EOIed
+>  	 * interrupts on the exit path (see vgic_fold_lr_state).
+>  	 */
+> +
+> +	/* If not nested, deactivate */
+> +	if (!vcpu || !vgic_state_is_nested(vcpu)) {
+> +		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
+> +		return IRQ_HANDLED;
+> +	}
+> +
+> +	/* Assume nested from now */
+> +	vgic_v3_handle_nested_maint_irq(vcpu);
+>  	return IRQ_HANDLED;
+>  }
+>  
+> @@ -531,6 +554,13 @@ int kvm_vgic_hyp_init(void)
+>  		return ret;
+>  	}
+>  
+> +	ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
+> +				    kvm_get_running_vcpus());
+> +	if (ret) {
+> +		kvm_err("Error setting vcpu affinity\n");
+> +		goto out_free_irq;
+> +	}
+> +
+>  	ret = cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+>  				"kvm/arm/vgic:starting",
+>  				vgic_init_cpu_starting, vgic_init_cpu_dying);
+> diff --git a/virt/kvm/arm/vgic/vgic-v3-nested.c b/virt/kvm/arm/vgic/vgic-v3-nested.c
+> index c917d49e4a14..7c5f82ae68e0 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3-nested.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3-nested.c
+> @@ -172,10 +172,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+>  void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	struct vgic_irq *irq;
+> +	unsigned long flags;
+>  
+>  	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
+>  	vgic_v3_create_shadow_lr(vcpu);
+>  	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
+> +
+> +	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
+> +	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +	if (irq->line_level || irq->active)
+> +		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
+> +				      IRQCHIP_STATE_ACTIVE, true);
+> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +	vgic_put_irq(vcpu->kvm, irq);
+>  }
+>  
+>  void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+> @@ -190,11 +200,14 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+>  	 */
+>  	vgic_v3_fixup_shadow_lr_state(vcpu);
+>  	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
+> +	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
+> +			      IRQCHIP_STATE_ACTIVE, false);
+>  }
+>  
+>  void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
+> +	bool state;
+>  
+>  	/*
+>  	 * If we exit a nested VM with a pending maintenance interrupt from the
+> @@ -202,8 +215,12 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+>  	 * can re-sync the appropriate LRs and sample level triggered interrupts
+>  	 * again.
+>  	 */
+> -	if (vgic_state_is_nested(vcpu) &&
+> -	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
+> -	    vgic_v3_get_misr(vcpu))
+> -		kvm_inject_nested_irq(vcpu);
+> +	if (!vgic_state_is_nested(vcpu))
+> +		return;
+
+Isn't this redundant with the same check in vgic_maintenance_handler?
+
+Thanks,
+Alex
+> +
+> +	state  = cpu_if->vgic_hcr & ICH_HCR_EN;
+> +	state &= vgic_v3_get_misr(vcpu);
+> +
+> +	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> +			    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
+>  }
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
