@@ -6,49 +6,47 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E995C76192
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 08:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04AF1C76188
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 32EED20659
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 08:32:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32EED20659
+	by mail.kernel.org (Postfix) with ESMTP id 8FD502173B
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Jul 2019 08:47:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD502173B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A47D34A540;
-	Tue, 16 Jul 2019 04:32:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05D6C4A534;
+	Tue, 16 Jul 2019 04:47:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YJBCg3RXKpnh; Tue, 16 Jul 2019 04:32:51 -0400 (EDT)
+	with ESMTP id 6w0d6LuZl6mg; Tue, 16 Jul 2019 04:46:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 573554A532;
-	Tue, 16 Jul 2019 04:32:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8434A536;
+	Tue, 16 Jul 2019 04:46:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 19A3D4A532
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 04:32:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3334A534
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 04:46:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GMiGU7xjFkS6 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jul 2019 04:32:48 -0400 (EDT)
+ with ESMTP id TBtTXtx7fBuY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jul 2019 04:46:55 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F864A4E9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 04:32:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7A6E4A4E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jul 2019 04:46:55 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 165122B;
- Tue, 16 Jul 2019 01:32:48 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 59DFA2B;
+ Tue, 16 Jul 2019 01:46:55 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 0A3F83F59C; Tue, 16 Jul 2019 01:32:45 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 0/3] Support CPU hotplug for ARM64
-To: Jia He <jiakernel2@gmail.com>, Maran Wilson <maran.wilson@oracle.com>,
- James Morse <james.morse@arm.com>, Xiongfeng Wang <wangxiongfeng2@huawei.com>
-References: <1561776155-38975-1-git-send-email-wangxiongfeng2@huawei.com>
- <82879258-46a7-a6e9-ee54-fc3692c1cdc3@arm.com>
- <51cc9a5c-9968-c4b1-0bc7-870f44a3a761@oracle.com>
- <06ef13e1-fffe-d4a2-721e-f666f331fb3c@arm.com>
- <1a7b2f39-ca77-5b5f-cbb5-6356e51b0d7a@gmail.com>
+ 66B973F59C; Tue, 16 Jul 2019 01:46:54 -0700 (PDT)
+Subject: Re: [RFC] Add virtual SDEI support in qemu
+To: Dave Martin <Dave.Martin@arm.com>, Mark Rutland <mark.rutland@arm.com>
+References: <1b0aa6b2-80b1-a72e-6849-7323c3b9c6bc@huawei.com>
+ <20190715134059.GJ2790@e103592.cambridge.arm.com>
+ <20190715134848.GI56232@lakrids.cambridge.arm.com>
+ <20190716083050.GK2790@e103592.cambridge.arm.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -95,17 +93,15 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <682936cd-139e-64d5-9ab2-4ebd09e89e3d@arm.com>
-Date: Tue, 16 Jul 2019 09:32:44 +0100
+Message-ID: <c2de59be-eded-b846-fc4d-24348732016c@arm.com>
+Date: Tue, 16 Jul 2019 09:46:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1a7b2f39-ca77-5b5f-cbb5-6356e51b0d7a@gmail.com>
+In-Reply-To: <20190716083050.GK2790@e103592.cambridge.arm.com>
 Content-Language: en-US
-Cc: guohanjun@huawei.com, john.garry@huawei.com, rjw@rjwysocki.net,
- linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
- huawei.libin@huawei.com, jonathan.cameron@huawei.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Guoheyi <guoheyi@huawei.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,101 +118,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Jia,
-
-On 16/07/2019 08:59, Jia He wrote:
-> Hi Marc
+On 16/07/2019 09:30, Dave Martin wrote:
+> On Mon, Jul 15, 2019 at 02:48:49PM +0100, Mark Rutland wrote:
+>> On Mon, Jul 15, 2019 at 02:41:00PM +0100, Dave Martin wrote:
 > 
-> On 2019/7/10 17:15, Marc Zyngier wrote:
->> On 09/07/2019 20:06, Maran Wilson wrote:
->>> On 7/5/2019 3:12 AM, James Morse wrote:
->>>> Hi guys,
->>>>
->>>> (CC: +kvmarm list)
->>>>
->>>> On 29/06/2019 03:42, Xiongfeng Wang wrote:
->>>>> This patchset mark all the GICC node in MADT as possible CPUs even though it
->>>>> is disabled. But only those enabled GICC node are marked as present CPUs.
->>>>> So that kernel will initialize some CPU related data structure in advance before
->>>>> the CPU is actually hot added into the system. This patchset also implement
->>>>> 'acpi_(un)map_cpu()' and 'arch_(un)register_cpu()' for ARM64. These functions are
->>>>> needed to enable CPU hotplug.
->>>>>
->>>>> To support CPU hotplug, we need to add all the possible GICC node in MADT
->>>>> including those CPUs that are not present but may be hot added later. Those
->>>>> CPUs are marked as disabled in GICC nodes.
->>>> ... what do you need this for?
->>>>
->>>> (The term cpu-hotplug in the arm world almost never means hot-adding a new package/die to
->>>> the platform, we usually mean taking CPUs online/offline for power management. e.g.
->>>> cpuhp_offline_cpu_device())
->>>>
->>>> It looks like you're adding support for hot-adding a new package/die to the platform ...
->>>> but only for virtualisation.
->>>>
->>>> I don't see why this is needed for virtualisation. The in-kernel irqchip needs to know
->>>> these vcpu exist before you can enter the guest for the first time. You can't create them
->>>> late. At best you're saving the host scheduling a vcpu that is offline. Is this really a
->>>> problem?
->>>>
->>>> If we moved PSCI support to user-space, you could avoid creating host vcpu threads until
->>>> the guest brings the vcpu online, which would solve that problem, and save the host
->>>> resources for the thread too. (and its acpi/dt agnostic)
->>>>
->>>> I don't see the difference here between booting the guest with 'maxcpus=1', and bringing
->>>> the vcpu online later. The only real difference seems to be moving the can-be-online
->>>> policy into the hypervisor/VMM...
->>> Isn't that an important distinction from a cloud service provider's
->>> perspective?
+> [...]
+> 
+>>> So long as KVM_EXIT_HYPERCALL reports sufficient information so that
+>>> userspace can identify the cause as an SMC and retrieve the SMC
+>>> immediate field, this seems feasible.
 >>>
->>> As far as I understand it, you also need CPU hotplug capabilities to
->>> support things like Kata runtime under Kubernetes. i.e. when
->>> implementing your containers in the form of light weight VMs for the
->>> additional security ... and the orchestration layer cannot determine
->>> ahead of time how much CPU/memory resources are going to be needed to
->>> run the pod(s).
->> Why would it be any different? You can pre-allocate your vcpus, leave
->> them parked until some external agent decides to signal the container
->> that it it can use another bunch of CPUs. At that point, the container
->> must actively boot these vcpus (they aren't going to come up by magic).
+>>> For its own SMCCC APIs, KVM exclusively uses HVC, so rerouting SMC to
+>>> userspace shouldn't conflict.
 >>
->> Given that you must have sized your virtual platform to deal with the
->> maximum set of resources you anticipate (think of the GIC
->> redistributors, for example), I really wonder what you gain here.
-> I agree with your point in GIC aspect. It will mess up things if it makes
+>> Be _very_ careful here! In systems without EL3 (and without NV), SMC
+>> UNDEFs rather than trapping to EL2. Given that, we shouldn't build a
+>> hypervisor ABI that depends on SMC.
 > 
-> GIC resource hotpluggable in qemu.
+> Good point.  I was hoping that was all ancient history by now, but if
+> not...
 
-It is far worse than just a mess. You'd need to come up with a way to
-place your redistributors in memory, and tell the running guest where
-these redistributors are. Currently, there is no method to describe such
-changes to the address space, and I certainly don't want QEMU to invent
-one. This needs to be modeled after what would happen on real HW.
-
-> But it also would be better that vmm
-> 
-> only startup limited vcpu thread resource.
-> 
-> How about:
-> 
-> 1. qemu only starts only N vcpu thread (-smp N, maxcpus=M)
-> 
-> 2. qemu reserves the GIC resource with maxium M vcpu number
-
-Note that this implies actually initializing M vcpus in the VM. You may
-not have created the corresponding (M - N) threads, but the vcpus will
-exist. Can you please quantify how much you'd save by doing that?
-
-> 3. when qmp cmd cpu hotplug-add is triggerred, send a GED event to guest kernel
-> 
-> 4. guest kernel recv it and trigger the acpi plug process.
-> 
-> Currently ACPI_CPU_HOTPLUG is enabled for Kconfig but completely not workable.
-
-Well, there so far *zero* CPU_HOTPLUG in the arm64 kernel other than
-getting CPUs in and out of PSCI.
-
-Thanks,
+Unfortunately, XGene-1 is still a thing...
 
 	M.
 -- 
