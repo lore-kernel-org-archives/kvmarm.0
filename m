@@ -2,61 +2,54 @@ Return-Path: <SRS0=U5fj=VO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A3BC76192
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7DEC76192
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:32:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C1A3121743
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:19:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A3121743
+	by mail.kernel.org (Postfix) with ESMTP id 3552221849
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3552221849
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 336494A56B;
-	Wed, 17 Jul 2019 06:19:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3EC4A52C;
+	Wed, 17 Jul 2019 06:32:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bdooMfvf-HHl; Wed, 17 Jul 2019 06:19:49 -0400 (EDT)
+	with ESMTP id pB5BCh8fqMbA; Wed, 17 Jul 2019 06:32:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF6144A55E;
-	Wed, 17 Jul 2019 06:19:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9A34A561;
+	Wed, 17 Jul 2019 06:32:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52A2D4A560
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:19:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA3E84A52C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:32:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qmiXAz5b7tOp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jul 2019 06:19:45 -0400 (EDT)
+ with ESMTP id U2iXNvtkv3BQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jul 2019 06:32:34 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 679D04A55C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:19:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DCAF4A528
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:32:34 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C88F428;
- Wed, 17 Jul 2019 03:19:44 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F31903F71A;
- Wed, 17 Jul 2019 03:19:43 -0700 (PDT)
-Subject: Re: [PATCH 55/59] arm64: KVM: nv: Add handling of EL2-specific timer
- registers
-To: Marc Zyngier <marc.zyngier@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-56-marc.zyngier@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9dca3fa9-e02b-ad4a-f9d0-0d637177b932@arm.com>
-Date: Wed, 17 Jul 2019 11:19:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-56-marc.zyngier@arm.com>
-Content-Language: en-US
-Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B648628;
+ Wed, 17 Jul 2019 03:32:33 -0700 (PDT)
+Received: from e112298-lin.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3B0EF3F71A;
+ Wed, 17 Jul 2019 03:32:32 -0700 (PDT)
+From: Julien Thierry <julien.thierry@arm.com>
+To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] MAINTAINERS: Update my email address
+Date: Wed, 17 Jul 2019 11:32:15 +0100
+Message-Id: <1563359535-2762-1-git-send-email-julien.thierry@arm.com>
+X-Mailer: git-send-email 1.9.1
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,122 +61,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> Add the required handling for EL2 and EL02 registers, as
-> well as EL1 registers used in the E2H context.
+My @arm.com address will stop working in a couple of weeks. Update
+MAINTAINERS and .mailmap files with an address I'll have access to.
 
-Shouldn't that be "[..] EL0 registers used in E2H context"?
+Signed-off-by: Julien Thierry <julien.thierry@arm.com>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-Thanks,
-Alex
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index ba3bcd29c02d..0bd6a66b621e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1361,20 +1361,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  
->  	switch (reg) {
->  	case SYS_CNTP_TVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_TVAL:
-> +	case SYS_CNTP_TVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_TVAL;
->  		break;
-> +
-> +	case SYS_CNTV_TVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_TVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_TVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_CNTP_CTL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CTL:
-> +	case SYS_CNTP_CTL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CTL;
->  		break;
-> +
-> +	case SYS_CNTV_CTL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CTL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CTL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +		
->  	case SYS_CNTP_CVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CVAL:
-> +	case SYS_CNTP_CVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CVAL;
->  		break;
-> +
-> +	case SYS_CNTV_CVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_CNTVOFF_EL2:
->  		tmr = TIMER_VTIMER;
->  		treg = TIMER_REG_VOFF;
+diff --git a/.mailmap b/.mailmap
+index 0fef932..468bced8 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -116,6 +116,7 @@ John Stultz <johnstul@us.ibm.com>
+ Juha Yrjola <at solidboot.com>
+ Juha Yrjola <juha.yrjola@nokia.com>
+ Juha Yrjola <juha.yrjola@solidboot.com>
++Julien Thierry <julien.thierry.kdev@gmail.com> <julien.thierry@arm.com>
+ Kay Sievers <kay.sievers@vrfy.org>
+ Kenneth W Chen <kenneth.w.chen@intel.com>
+ Konstantin Khlebnikov <koct9i@gmail.com> <k.khlebnikov@samsung.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 91d8700..9525601 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8808,7 +8808,7 @@ F:	arch/x86/kvm/svm.c
+ KERNEL VIRTUAL MACHINE FOR ARM/ARM64 (KVM/arm, KVM/arm64)
+ M:	Marc Zyngier <marc.zyngier@arm.com>
+ R:	James Morse <james.morse@arm.com>
+-R:	Julien Thierry <julien.thierry@arm.com>
++R:	Julien Thierry <julien.thierry.kdev@gmail.com>
+ R:	Suzuki K Pouloze <suzuki.poulose@arm.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ L:	kvmarm@lists.cs.columbia.edu
+-- 
+1.9.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
