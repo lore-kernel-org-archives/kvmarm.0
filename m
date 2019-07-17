@@ -2,54 +2,71 @@ Return-Path: <SRS0=U5fj=VO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7DEC76192
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3109C76186
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 11:37:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3552221849
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 10:32:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3552221849
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 9BC55217F9
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 11:37:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyYLGrvD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC55217F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3EC4A52C;
-	Wed, 17 Jul 2019 06:32:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 391B34A560;
+	Wed, 17 Jul 2019 07:37:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pB5BCh8fqMbA; Wed, 17 Jul 2019 06:32:36 -0400 (EDT)
+	with ESMTP id 9lJSPx4Mb46A; Wed, 17 Jul 2019 07:37:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9A34A561;
-	Wed, 17 Jul 2019 06:32:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27FDB4A54C;
+	Wed, 17 Jul 2019 07:37:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA3E84A52C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:32:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A9E84A54C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 07:37:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U2iXNvtkv3BQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jul 2019 06:32:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DCAF4A528
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 06:32:34 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B648628;
- Wed, 17 Jul 2019 03:32:33 -0700 (PDT)
-Received: from e112298-lin.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3B0EF3F71A;
- Wed, 17 Jul 2019 03:32:32 -0700 (PDT)
-From: Julien Thierry <julien.thierry@arm.com>
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] MAINTAINERS: Update my email address
-Date: Wed, 17 Jul 2019 11:32:15 +0100
-Message-Id: <1563359535-2762-1-git-send-email-julien.thierry@arm.com>
-X-Mailer: git-send-email 1.9.1
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org
+ with ESMTP id B2TjUrmZ5Own for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jul 2019 07:37:47 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F08704A541
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 07:37:46 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 83C0321743;
+ Wed, 17 Jul 2019 11:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1563363466;
+ bh=tq+6xuI8SQMUzIcpH5lQylstA6fY9G03SjvpF49Mn2E=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=LyYLGrvDiM18pUehSMqkl7EfV7nTxu+TP8iz9zuDkbtis9IhHbLdioUOrimvCYnj5
+ fBlgIMDcyBjdbOcwuu8f3bV3+ZlarDx4fL9xPPmh0krBOFae8O3tRwJKqorg0FEC2r
+ gLsjYOdU7afjfIpVmRacn61BGofcHdODOgtn5qGk=
+Date: Wed, 17 Jul 2019 12:37:40 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] MAINTAINERS: Update my email address to @kernel.org
+Message-ID: <20190717113739.ffw43htk5vtt5bfr@willie-the-truck>
+References: <20190716174308.17147-1-marc.zyngier@arm.com>
+ <20190717064315.tn26dss343iv33oj@willie-the-truck>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20190717064315.tn26dss343iv33oj@willie-the-truck>
+User-Agent: NeoMutt/20170113 (1.7.2)
+Cc: Jason Cooper <jason@lakedaemon.net>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Russell King <linux@arm.linux.org.uk>, maz@kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,49 +78,42 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-My @arm.com address will stop working in a couple of weeks. Update
-MAINTAINERS and .mailmap files with an address I'll have access to.
+On Wed, Jul 17, 2019 at 07:43:15AM +0100, Will Deacon wrote:
+> On Tue, Jul 16, 2019 at 06:43:08PM +0100, Marc Zyngier wrote:
+> > I will soon lose access to my @arm.com email address, so let's
+> > update the MAINTAINERS file to point to my @kernel.org address,
+> > as well as .mailmap for good measure.
+> > 
+> > Note that my @arm.com address will still work, but someone else
+> > will be reading whatever is sent there. Don't say you didn't know!
+> > 
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> > 
+> > Notes:
+> >     Yes, I'm sending this from my ARM address. That's intentional.
+> >     I'll probably send it as part of a pull request later in the
+> >     cycle, but that's just so that people know what is coming.
+> > 
+> >  .mailmap    | 1 +
+> >  MAINTAINERS | 8 ++++----
+> >  2 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> Let's see if you manage a better job of getting people to use your new
+> address than I have:
+> 
+> Acked-by: Will Deacon <will@kernel.org>
 
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
----
- .mailmap    | 1 +
- MAINTAINERS | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Actually, since there's another change from Julien, I'll just pick both of
+these up via the arm64 tree for -rc2 along with the vdso fixes we've got
+kicking around.
 
-diff --git a/.mailmap b/.mailmap
-index 0fef932..468bced8 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -116,6 +116,7 @@ John Stultz <johnstul@us.ibm.com>
- Juha Yrjola <at solidboot.com>
- Juha Yrjola <juha.yrjola@nokia.com>
- Juha Yrjola <juha.yrjola@solidboot.com>
-+Julien Thierry <julien.thierry.kdev@gmail.com> <julien.thierry@arm.com>
- Kay Sievers <kay.sievers@vrfy.org>
- Kenneth W Chen <kenneth.w.chen@intel.com>
- Konstantin Khlebnikov <koct9i@gmail.com> <k.khlebnikov@samsung.com>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 91d8700..9525601 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8808,7 +8808,7 @@ F:	arch/x86/kvm/svm.c
- KERNEL VIRTUAL MACHINE FOR ARM/ARM64 (KVM/arm, KVM/arm64)
- M:	Marc Zyngier <marc.zyngier@arm.com>
- R:	James Morse <james.morse@arm.com>
--R:	Julien Thierry <julien.thierry@arm.com>
-+R:	Julien Thierry <julien.thierry.kdev@gmail.com>
- R:	Suzuki K Pouloze <suzuki.poulose@arm.com>
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
- L:	kvmarm@lists.cs.columbia.edu
--- 
-1.9.1
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
