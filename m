@@ -2,67 +2,56 @@ Return-Path: <SRS0=U5fj=VO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2201C76192
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 11:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA65C76186
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 12:22:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5D351205ED
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 11:44:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="sF4zAqvm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D351205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 3B2D321848
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Jul 2019 12:22:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B2D321848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E88284A537;
-	Wed, 17 Jul 2019 07:43:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B77634A528;
+	Wed, 17 Jul 2019 08:22:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hVrwrcSEUV9s; Wed, 17 Jul 2019 07:43:56 -0400 (EDT)
+	with ESMTP id iLqvGcOCboRK; Wed, 17 Jul 2019 08:22:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14A24A563;
-	Wed, 17 Jul 2019 07:43:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A55354A563;
+	Wed, 17 Jul 2019 08:22:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 705BF4A541
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 07:43:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B05744A53C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 08:22:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UCP5fH5hTgf6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jul 2019 07:43:55 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D6244A537
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 07:43:55 -0400 (EDT)
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A238C205ED;
- Wed, 17 Jul 2019 11:43:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1563363834;
- bh=Ujtx3Yha188ZjWZa6A3epObXGpp/EmAPbG0aCvh0hUw=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=sF4zAqvmS1GOoCXb71KZmXkfYymheU+qLMsE9UIanxBBCZOX3qAu1IIxAwyaNTPrE
- Awwwh5k1BVH9siPw9Vnf45AniBX4Sc25DuCQLCEKcTEcMxsHkfM58nep+vvM0LdEaw
- qNmgpVcNV2rbWgTXOHq3ozGAiVrH0/vigfSGLxwI=
-Date: Wed, 17 Jul 2019 12:43:49 +0100
-From: Will Deacon <will@kernel.org>
-To: Julien Thierry <julien.thierry@arm.com>
-Subject: Re: [PATCH] MAINTAINERS: Update my email address
-Message-ID: <20190717114349.vegt6yyu577kynd4@willie-the-truck>
-References: <1563359535-2762-1-git-send-email-julien.thierry@arm.com>
+ with ESMTP id YoINlN4jVSzf for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jul 2019 08:22:42 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDBF24A528
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 08:22:41 -0400 (EDT)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id C6F9858E1C3A77E076A8;
+ Wed, 17 Jul 2019 20:22:38 +0800 (CST)
+Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 17 Jul 2019 20:22:31 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH] KVM: arm/arm64: Assign pmc->idx before kvm_pmu_stop_counter()
+Date: Wed, 17 Jul 2019 12:20:19 +0000
+Message-ID: <1563366019-31200-1-git-send-email-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.6.4.windows.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <1563359535-2762-1-git-send-email-julien.thierry@arm.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,19 +68,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 17, 2019 at 11:32:15AM +0100, Julien Thierry wrote:
-> My @arm.com address will stop working in a couple of weeks. Update
-> MAINTAINERS and .mailmap files with an address I'll have access to.
-> 
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> ---
->  .mailmap    | 1 +
->  MAINTAINERS | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+We use "pmc->idx" and the "chained" bitmap to determine if the pmc is
+chained, in kvm_pmu_pmc_is_chained().  But idx might be uninitialized
+(and random) when we doing this decision, through a KVM_ARM_VCPU_INIT
+ioctl -> kvm_pmu_vcpu_reset(). And the test_bit() against this random
+idx will potentially hit a KASAN BUG [1].
 
-I'll pick this up at -rc1.
+Fix it by moving the assignment of idx before kvm_pmu_stop_counter().
 
-Will
+[1] https://www.spinics.net/lists/kvm-arm/msg36700.html
+
+Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+Suggested-by: Andrew Murray <andrew.murray@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ virt/kvm/arm/pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 3dd8238..521bfdd 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -225,8 +225,8 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+ 
+ 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
+-		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
+ 		pmu->pmc[i].idx = i;
++		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
+ 	}
+ 
+ 	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+-- 
+1.8.3.1
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
