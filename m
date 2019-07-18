@@ -2,63 +2,93 @@ Return-Path: <SRS0=vMTE=VP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3E3C7618F
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 02:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D64F4C76191
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 07:51:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 354872173B
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 02:02:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 354872173B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 67303208C0
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 07:51:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67303208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arndb.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9100D4A56F;
-	Wed, 17 Jul 2019 22:02:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7AF4A56F;
+	Thu, 18 Jul 2019 03:51:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 43H0T8dp+md2; Wed, 17 Jul 2019 22:02:00 -0400 (EDT)
+	with ESMTP id J3xKjlYnuwse; Thu, 18 Jul 2019 03:51:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AB734A555;
-	Wed, 17 Jul 2019 22:02:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E6D4A570;
+	Thu, 18 Jul 2019 03:51:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE30C4A555
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 22:01:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D7894A56E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 03:51:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jfXmLK0OSaoS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jul 2019 22:01:56 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E63C24A52A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jul 2019 22:01:55 -0400 (EDT)
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id B923175E6D083B2475B5;
- Thu, 18 Jul 2019 10:01:52 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Thu, 18 Jul 2019
- 10:01:46 +0800
-Subject: Re: [PATCH] KVM: arm/arm64: Assign pmc->idx before
- kvm_pmu_stop_counter()
-To: Marc Zyngier <maz@kernel.org>, Julien Thierry <julien.thierry@arm.com>,
- <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>
-References: <1563366019-31200-1-git-send-email-yuzenghui@huawei.com>
- <01fa98c1-8274-445c-5e04-219372920ba2@arm.com>
- <26b64d48-5ff9-7d62-bc44-601fdcc43223@kernel.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <ae65afd1-fd9a-280f-285f-543b1fa246f3@huawei.com>
-Date: Thu, 18 Jul 2019 09:59:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ with ESMTP id QI7mj2vIJ1Pb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jul 2019 03:51:18 -0400 (EDT)
+Received: from mail-qt1-f195.google.com (mail-qt1-f195.google.com
+ [209.85.160.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AD5E4A560
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 03:51:18 -0400 (EDT)
+Received: by mail-qt1-f195.google.com with SMTP id k10so26261307qtq.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 00:51:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AMIbdcIyPjXgBsFnQdrxIvDXu584wusUv2Znj2VCflY=;
+ b=k6pP16aS5ITMgxfA4YeUfndA8UuuNRaAD7zD2wKB7bdyefg9qe7y5+6kQEFbJxItoy
+ g+GmK2dGKSddniKuCwvLunIkVx3U8M2NJjCru3z5D6ZWNJWEJWtTKWrW/bFe6h0bTMFD
+ TE3nFTAKQvKR2Z+ZHy3AIzEe6FgBegJ/ynwzDibjQICLPviUargGi+5lUQzmzmmhIFuJ
+ 4KylvkDCkFOTQJLdOV9RS+qOrhZR6hqY91p3SH+JoUYN/HBebAhU7yDbsR+KwhMeO6do
+ B7dOWsahpV2JCORe5LxnHTpw1FlUjE5Y8OV4cxl6YYNBqgtqP0mc8w/BDIhHBLlfjgP4
+ pw3Q==
+X-Gm-Message-State: APjAAAV3MQD6Kh4jspY8OLz1jggyoXC2uYR/sYyJlU+ZUEQmYgxiDGu4
+ HAI/q8SNFkV+A9M3ByOfYCVcuzjbgas7VyT98Ck=
+X-Google-Smtp-Source: APXvYqyzjKBdgrNsfXbtaWuBwJsPbX/hOAYTtfb23UeIC61bLsX6rwes0aTlraCVeKg7z22IOXq9fA3u8pg4isBRck0=
+X-Received: by 2002:ac8:5311:: with SMTP id t17mr30079223qtn.304.1563436278053; 
+ Thu, 18 Jul 2019 00:51:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <26b64d48-5ff9-7d62-bc44-601fdcc43223@kernel.org>
-Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org
+References: <20190617221134.9930-1-f.fainelli@gmail.com>
+ <CACRpkdbqW2kJNdPi6JPupaHA_qRTWG-MsUxeCz0c38MRujOSSA@mail.gmail.com>
+ <0ba50ae2-be09-f633-ab1f-860e8b053882@broadcom.com>
+In-Reply-To: <0ba50ae2-be09-f633-ab1f-860e8b053882@broadcom.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Thu, 18 Jul 2019 09:51:01 +0200
+Message-ID: <CAK8P3a2QBQrBU+bBBL20kR+qJfmspCNjiw05jHTa-q6EDfodMg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] KASan for arm
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Michal Hocko <mhocko@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Linus Walleij <linus.walleij@linaro.org>, David Howells <dhowells@redhat.com>,
+ Masahiro Yamada <yamada.masahiro@socionext.com>,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Alexander Potapenko <glider@google.com>, kvmarm@lists.cs.columbia.edu,
+ Florian Fainelli <f.fainelli@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Abbott Liu <liuwenliang@huawei.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, kasan-dev <kasan-dev@googlegroups.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+ Kees Cook <keescook@chromium.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>,
+ Philippe Ombredanne <pombredanne@nexb.com>, Jinbum Park <jinb.park7@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Dmitry Vyukov <dvyukov@google.com>,
+ Nicolas Pitre <nico@fluxnic.net>, Greg KH <gregkh@linuxfoundation.org>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Rob Landley <rob@landley.net>, philip@cog.systems,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Thomas Garnier <thgarnie@google.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,84 +100,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Julien, Marc,
+On Thu, Jul 11, 2019 at 7:00 PM Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+> On 7/2/19 2:06 PM, Linus Walleij wrote:
 
-On 2019/7/17 23:00, Marc Zyngier wrote:
-> On 17/07/2019 14:44, Julien Thierry wrote:
->> Hi Zenghui,
->>
->> On 17/07/2019 13:20, Zenghui Yu wrote:
->>> We use "pmc->idx" and the "chained" bitmap to determine if the pmc is
->>> chained, in kvm_pmu_pmc_is_chained().  But idx might be uninitialized
->>> (and random) when we doing this decision, through a KVM_ARM_VCPU_INIT
->>> ioctl -> kvm_pmu_vcpu_reset(). And the test_bit() against this random
->>> idx will potentially hit a KASAN BUG [1].
->>>
->>> Fix it by moving the assignment of idx before kvm_pmu_stop_counter().
->>>
->>> [1] https://www.spinics.net/lists/kvm-arm/msg36700.html
->>>
->>> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
->>> Suggested-by: Andrew Murray <andrew.murray@arm.com>
->>> Cc: Marc Zyngier <maz@kernel.org>
->>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>> ---
->>>   virt/kvm/arm/pmu.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->>> index 3dd8238..521bfdd 100644
->>> --- a/virt/kvm/arm/pmu.c
->>> +++ b/virt/kvm/arm/pmu.c
->>> @@ -225,8 +225,8 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
->>>   	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->>>   
->>>   	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
->>> -		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
->>>   		pmu->pmc[i].idx = i;
->>
->> Yes, this is kind of a static property that should really be part of a
->> "kvm_pmu_vcpu_init()" or "kvm_pmu_vcpu_create()" and is not expected to
->> be modified across resets...
->>
->> There is no such function at the time and I'm unsure whether this
->> warrants creating that separate function (I would still suggest creating
->> it to make things clearer).
-> 
-> Yup, that's pretty bad, now that you mention it. I'd be all for the
-> introduction of kvm_pmu_vcpu_init(), given that we already have
-> kvm_pmu_vcpu_destroy().
-> 
->>
->>> +		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
->>
->> Whatever other opinions are on splitting pmu_vcpu_init/reset, that
->> change makes sense and fixes the issue:
->>
->> Acked-by: Julien Thierry <julien.thierry@arm.com>
->>
->>>   	}
->>>   
->>>   	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
->>>
->>
->> Cheers,
->>
-> 
-> Zenghui, could you please update your patch to take the above into account?
+>
+> Great, thanks a lot for taking a look. FYI, I will be on holiday from
+> July 19th till August 12th, if you think you have more feedback between
+> now and then, I can try to pick it up and submit a v7 with that feedback
+> addressed, or it will happen when I return, or you can pick it up if you
+> refer, all options are possible!
+>
+> @Arnd, should we squash your patches in as well?
 
-Sure. I will send a v2 with the new subject (may be "KVM: arm/arm64:
-Introduce kvm_pmu_vcpu_init() to ...").
+Yes, please do. I don't remember if I sent you all of them already,
+here is the list of patches that I have applied locally on top of your
+series to get a clean randconfig build:
 
-Thanks for your suggestions!
+123c3262f872 KASAN: push back KASAN_STACK to clang-10
+d63dd9e2afd9 [HACK] ARM: disable KASAN+XIP_KERNEL
+879eb3c22240 kasan: increase 32-bit stack frame warning limit
+053555034bdf kasan: disable CONFIG_KASAN_STACK with clang on arm32
+6c1a78a448c2 ARM: fix kasan link failures
 
-
-zenghui
-
+      Arnd
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
