@@ -2,58 +2,99 @@ Return-Path: <SRS0=vMTE=VP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FA5C76191
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 08:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC30C76191
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 12:13:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 963C321783
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 08:17:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963C321783
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 232A021783
+	for <kvmarm@archiver.kernel.org>; Thu, 18 Jul 2019 12:13:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=semihalf-com.20150623.gappssmtp.com header.i=@semihalf-com.20150623.gappssmtp.com header.b="DcSpgzgh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232A021783
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=semihalf.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 176C74A578;
-	Thu, 18 Jul 2019 04:17:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7DF4A580;
+	Thu, 18 Jul 2019 08:13:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, body has been altered)
+	header.i=@semihalf-com.20150623.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6+EP2Dh3jA2Q; Thu, 18 Jul 2019 04:17:55 -0400 (EDT)
+	with ESMTP id 2GLYXDdczbdK; Thu, 18 Jul 2019 08:13:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F053A4A557;
-	Thu, 18 Jul 2019 04:17:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17C314A56E;
+	Thu, 18 Jul 2019 08:13:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BC114A557
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 04:17:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4A54A560
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 08:13:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OqgGN2i1Cox1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jul 2019 04:17:51 -0400 (EDT)
-Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D3914A554
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 04:17:51 -0400 (EDT)
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id DC0A470A26760DD399DD;
- Thu, 18 Jul 2019 16:17:47 +0800 (CST)
-Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 18 Jul 2019 16:17:39 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH v2] KVM: arm/arm64: Introduce kvm_pmu_vcpu_init() to setup PMU
- counter idx
-Date: Thu, 18 Jul 2019 08:15:10 +0000
-Message-ID: <1563437710-30756-1-git-send-email-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.6.4.windows.1
+ with ESMTP id BEnagNT-1k29 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jul 2019 08:13:51 -0400 (EDT)
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com
+ [209.85.214.195])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1074A4A557
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 08:13:51 -0400 (EDT)
+Received: by mail-pl1-f195.google.com with SMTP id ay6so13805575plb.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jul 2019 05:13:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=semihalf-com.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Lqim8cBq9tlk96YYqrrFQPc+Rm9PqCHq89w4uYrBwbI=;
+ b=DcSpgzghi1z0ahmD8mttNXftqTYrjqzpvAGfLJsQegerSrvM+id54/ktKxXPwEtdTO
+ 0IETjZ+AkQiQMg9Jm3DPeowObfBKf014t4vECp0myCOl3MT2nS3A0PY/6ARXGDeGEESa
+ xDVFDm3I9Et1GN4xty0CI4fVvqYmaO+duTcq4mNyP59J1uj95uZsSsjnnkAAL+RZWmb4
+ vBCbDWDZn6HIAu22NDP6OTNKKepmEj2p5LuaVdjScTKufI7eXsJT21acLRgn8oRD4H78
+ +YLkCx2JBj08tnJ62MKeFfUFPhD+v+iyPDP6AHMAWC9sR0PgAHaJRtOe2/43QJcLN/Bn
+ EDMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Lqim8cBq9tlk96YYqrrFQPc+Rm9PqCHq89w4uYrBwbI=;
+ b=GroeBNiSO8YpmFdPqrl3s6FAb9/UkfuzSXWpmu6UhPIEiMyjXHzVD0ZVt5WYeUscI2
+ MZnT0iHWE43LzTF8bAU8HlaLve7a1abVcj4ox5fuk4cTqR4/+QX00w6KLft8ji5O2SrQ
+ TxP3BST/RpAGjgm/4/eHNM1nejbSnH0SQOhvQi4X36JxF3gR8zj2CvzHiX+ZQKCzeyJB
+ K+/RayKCWrqqR/3qXM97SUQzr6y6vepsniBYVmL2CMXiAWg4MJXDyWKctCnx5aLPUfV8
+ NWfCKNXBp6wY9lhsymigvRm4yEtFWN0gxQystJFDWexTbBOEHjHdE+ZUccqocTEj6ous
+ 4AGw==
+X-Gm-Message-State: APjAAAVqaj5mRfKH+1bKy3ix7GkTAcUr251ZGfEWH77goI4G8AGpjhv/
+ Bgl4MMvmfFjkYh+Te11W5a0=
+X-Google-Smtp-Source: APXvYqwkaAhDka9SpU0k6CiLguKvS50QF/Y0p7hZZX/72vQP6fspU5RZltA/TOoKiGdZ0kAm/lpN3g==
+X-Received: by 2002:a17:902:7d8b:: with SMTP id
+ a11mr49300554plm.306.1563452030024; 
+ Thu, 18 Jul 2019 05:13:50 -0700 (PDT)
+Received: from [10.0.0.22] (31-172-191-173.noc.fibertech.net.pl.
+ [31.172.191.173])
+ by smtp.googlemail.com with ESMTPSA id f12sm22865693pgq.52.2019.07.18.05.13.47
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 18 Jul 2019 05:13:49 -0700 (PDT)
+Subject: Re: [PATCH 43/59] KVM: arm64: nv: Trap and emulate AT instructions
+ from virtual EL2
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-44-marc.zyngier@arm.com>
+ <4cd8b175-7676-0d3b-2853-365a346e1302@arm.com>
+From: Tomasz Nowicki <tn@semihalf.com>
+Message-ID: <852db652-5318-113b-083c-baf12eb58593@semihalf.com>
+Date: Thu, 18 Jul 2019 14:13:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Firefox/60.0 Thunderbird/60.7.2
 MIME-Version: 1.0
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org
+In-Reply-To: <4cd8b175-7676-0d3b-2853-365a346e1302@arm.com>
+Content-Language: en-GB
+Cc: Andre Przywara <andre.przywara@arm.com>, Dave Martin <Dave.Martin@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,120 +106,118 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We use "pmc->idx" and the "chained" bitmap to determine if the pmc is
-chained, in kvm_pmu_pmc_is_chained().  But idx might be uninitialized
-(and random) when we doing this decision, through a KVM_ARM_VCPU_INIT
-ioctl -> kvm_pmu_vcpu_reset(). And the test_bit() against this random
-idx will potentially hit a KASAN BUG [1].
+Hello Alex,
 
-In general, idx is the static property of a PMU counter that is not
-expected to be modified across resets, as suggested by Julien.  It
-looks more reasonable if we can setup the PMU counter idx for a vcpu
-in its creation time. Introduce a new function - kvm_pmu_vcpu_init()
-for this basic setup. Oh, and the KASAN BUG will get fixed this way.
+On 09.07.2019 15:20, Alexandru Elisei wrote:
+> On 6/21/19 10:38 AM, Marc Zyngier wrote:
+>> From: Jintack Lim <jintack.lim@linaro.org>
+>>
+>> When supporting nested virtualization a guest hypervisor executing AT
+>> instructions must be trapped and emulated by the host hypervisor,
+>> because untrapped AT instructions operating on S1E1 will use the wrong
+>> translation regieme (the one used to emulate virtual EL2 in EL1 instead
+> 
+> I think that should be "regime".
+> 
+>> of virtual EL1) and AT instructions operating on S12 will not work from
+>> EL1.
+>>
+>> This patch does several things.
+>>
+>> 1. List and define all AT system instructions to emulate and document
+>> the emulation design.
+>>
+>> 2. Implement AT instruction handling logic in EL2. This will be used to
+>> emulate AT instructions executed in the virtual EL2.
+>>
+>> AT instruction emulation works by loading the proper processor
+>> context, which depends on the trapped instruction and the virtual
+>> HCR_EL2, to the EL1 virtual memory control registers and executing AT
+>> instructions. Note that ctxt->hw_sys_regs is expected to have the
+>> proper processor context before calling the handling
+>> function(__kvm_at_insn) implemented in this patch.
+>>
+>> 4. Emulate AT S1E[01] instructions by issuing the same instructions in
+>> EL2. We set the physical EL1 registers, NV and NV1 bits as described in
+>> the AT instruction emulation overview.
+> 
+> Is item number 3 missing, or is that the result of an unfortunate typo?
+> 
+>>
+>> 5. Emulate AT A12E[01] instructions in two steps: First, do the stage-1
+>> translation by reusing the existing AT emulation functions.  Second, do
+>> the stage-2 translation by walking the guest hypervisor's stage-2 page
+>> table in software. Record the translation result to PAR_EL1.
+>>
+>> 6. Emulate AT S1E2 instructions by issuing the corresponding S1E1
+>> instructions in EL2. We set the physical EL1 registers and the HCR_EL2
+>> register as described in the AT instruction emulation overview.
+>>
+>> 7. Forward system instruction traps to the virtual EL2 if the corresponding
+>> virtual AT bit is set in the virtual HCR_EL2.
+>>
+>>    [ Much logic above has been reworked by Marc Zyngier ]
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_arm.h |   2 +
+>>   arch/arm64/include/asm/kvm_asm.h |   2 +
+>>   arch/arm64/include/asm/sysreg.h  |  17 +++
+>>   arch/arm64/kvm/hyp/Makefile      |   1 +
+>>   arch/arm64/kvm/hyp/at.c          | 217 +++++++++++++++++++++++++++++++
+>>   arch/arm64/kvm/hyp/switch.c      |  13 +-
+>>   arch/arm64/kvm/sys_regs.c        | 202 +++++++++++++++++++++++++++-
+>>   7 files changed, 450 insertions(+), 4 deletions(-)
+>>   create mode 100644 arch/arm64/kvm/hyp/at.c
+>>
 
-[1] https://www.spinics.net/lists/kvm-arm/msg36700.html
+[...]
 
-Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
-Suggested-by: Andrew Murray <andrew.murray@arm.com>
-Suggested-by: Julien Thierry <julien.thierry@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
+>> +
+>> +void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>> +{
+>> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+>> +	struct mmu_config config;
+>> +	struct kvm_s2_mmu *mmu;
+>> +
+>> +	/*
+>> +	 * We can only get here when trapping from vEL2, so we're
+>> +	 * translating a guest guest VA.
+>> +	 *
+>> +	 * FIXME: Obtaining the S2 MMU for a a guest guest is horribly
+>> +	 * racy, and we may not find it.
+>> +	 */
+>> +	spin_lock(&vcpu->kvm->mmu_lock);
+>> +
+>> +	mmu = lookup_s2_mmu(vcpu->kvm,
+>> +			    vcpu_read_sys_reg(vcpu, VTTBR_EL2),
+>> +			    vcpu_read_sys_reg(vcpu, HCR_EL2));
+>  From ARM DDI 0487D.b, the description for AT S1E1R (page C5-467, it's the same
+> for the other at s1e{0,1}* instructions):
+> 
+> [..] Performs stage 1 address translation, with permisions as if reading from
+> the given virtual address from EL1, or from EL2 [..], using the following
+> translation regime:
+> - If HCR_EL2.{E2H,TGE} is {1, 1}, the EL2&0 translation regime, accessed from EL2.
+> 
+> If the guest is VHE, I don't think there's any need to switch mmus. The AT
+> instruction will use the physical EL1&0 translation regime already on the
+> hardware (assuming host HCR_EL2.TGE == 0), which is the vEL2&0 regime for the
+> guest hypervisor.
 
-Changes since v1:
- - Introduce kvm_pmu_vcpu_init() in vcpu's creation time, move the
-   assignment of pmc->idx into it.
- - Thus change the subject. The old one is "KVM: arm/arm64: Assign
-   pmc->idx before kvm_pmu_stop_counter()".
+Here we want to run AT for L2 (guest guest) EL1&0 regime and not the L1 
+(guest hypervisor) so we have to lookup and switch to nested VM MMU 
+context. Or did I miss your point?
 
-Julien, I haven't collected your Acked-by into this version. If you're
-still happy with the change, please Ack again. Thanks!
-
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/arm.c    |  2 ++
- virt/kvm/arm/pmu.c    | 18 +++++++++++++++---
- 3 files changed, 19 insertions(+), 3 deletions(-)
-
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 16c769a..6db0304 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -34,6 +34,7 @@ struct kvm_pmu {
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
-@@ -71,6 +72,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- {
- 	return 0;
- }
-+static inline void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index f645c0f..c704fa6 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -340,6 +340,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- 	/* Set up the timer */
- 	kvm_timer_vcpu_init(vcpu);
- 
-+	kvm_pmu_vcpu_init(vcpu);
-+
- 	kvm_arm_reset_debug_ptr(vcpu);
- 
- 	return kvm_vgic_vcpu_init(vcpu);
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 3dd8238..362a018 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -215,6 +215,20 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
- }
- 
- /**
-+ * kvm_pmu_vcpu_init - assign pmu counter idx for cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ */
-+void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+
-+	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
-+		pmu->pmc[i].idx = i;
-+}
-+
-+/**
-  * kvm_pmu_vcpu_reset - reset pmu state for cpu
-  * @vcpu: The vcpu pointer
-  *
-@@ -224,10 +238,8 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- 	int i;
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 
--	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-+	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
- 		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
--		pmu->pmc[i].idx = i;
--	}
- 
- 	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
- }
--- 
-1.8.3.1
-
-
+Thanks,
+Tomasz
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
