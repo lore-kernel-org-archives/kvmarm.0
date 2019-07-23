@@ -1,74 +1,61 @@
-Return-Path: <SRS0=7WLz=VT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=tngP=VU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86722C7618F
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jul 2019 16:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E3AC7618E
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Jul 2019 08:17:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0EF3C21901
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Jul 2019 16:38:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF3C21901
+	by mail.kernel.org (Postfix) with ESMTP id 43C0E20449
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Jul 2019 08:17:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C0E20449
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6183E4A4FC;
-	Mon, 22 Jul 2019 12:38:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF46F4A521;
+	Tue, 23 Jul 2019 04:17:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xNjm-2cMl3xX; Mon, 22 Jul 2019 12:38:23 -0400 (EDT)
+	with ESMTP id PRMfZ1taP-bh; Tue, 23 Jul 2019 04:17:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5645E4A530;
-	Mon, 22 Jul 2019 12:38:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22DEC4A552;
+	Tue, 23 Jul 2019 04:17:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 685B94A52D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jul 2019 12:38:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 712F14A542
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jul 2019 04:17:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gsoHaL25+fxt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jul 2019 12:38:17 -0400 (EDT)
+ with ESMTP id y8g3Ax1iCLJM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Jul 2019 04:17:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70D6C4A4FC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jul 2019 12:38:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 780974A521
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jul 2019 04:17:14 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E72BF28;
- Mon, 22 Jul 2019 09:38:16 -0700 (PDT)
-Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 4C3953F694; Mon, 22 Jul 2019 09:38:14 -0700 (PDT)
-Date: Mon, 22 Jul 2019 17:38:12 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Guo Ren <guoren@kernel.org>
-Subject: Re: [PATCH RFC 11/14] arm64: Move the ASID allocator code in a
- separate file
-Message-ID: <20190722163811.GJ60625@arrakis.emea.arm.com>
-References: <0dfe120b-066a-2ac8-13bc-3f5a29e2caa3@arm.com>
- <CAJF2gTTXHHgDboaexdHA284y6kNZVSjLis5-Q2rDnXCxr4RSmA@mail.gmail.com>
- <c871a5ae-914f-a8bb-9474-1dcfec5d45bf@arm.com>
- <CAJF2gTStSR7Jmu7=HaO5Wxz=Zn8A5-RD8ktori3oKEhM9vozAA@mail.gmail.com>
- <20190621141606.GF18954@arrakis.emea.arm.com>
- <CAJF2gTTVUToRkRtxTmtWDotMGXy5YQCpL1h_2neTBuN3e6oz1w@mail.gmail.com>
- <20190624153820.GH29120@arrakis.emea.arm.com>
- <CAJF2gTRUzHUNV+nzECUp5n2L1akdy=Aovb6tSd+PNVnpasBrqw@mail.gmail.com>
- <20190701091711.GA21774@arrakis.emea.arm.com>
- <CAJF2gTTEbhA-pZCPGuUNqXT9F-vk8fSTyNJyEOpn=QE=toAN3g@mail.gmail.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF7CD344;
+ Tue, 23 Jul 2019 01:17:13 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F2393F71F;
+ Tue, 23 Jul 2019 01:17:12 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: arm/arm64: Introduce kvm_pmu_vcpu_init() to setup
+ PMU counter idx
+To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <1563437710-30756-1-git-send-email-yuzenghui@huawei.com>
+From: Julien Thierry <julien.thierry@arm.com>
+Message-ID: <f3f6f9a9-9735-e253-7b5b-3ccf97619a16@arm.com>
+Date: Tue, 23 Jul 2019 09:17:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAJF2gTTEbhA-pZCPGuUNqXT9F-vk8fSTyNJyEOpn=QE=toAN3g@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: aou@eecs.berkeley.edu, Marc Zyngier <marc.zyngier@arm.com>,
- Anup Patel <anup.Patel@wdc.com>, Will Deacon <will.deacon@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- linux-csky@vger.kernel.org, rppt@linux.ibm.com, hch@infradead.org,
- Atish Patra <Atish.Patra@wdc.com>, Julien Grall <julien.grall@arm.com>,
- Palmer Dabbelt <palmer@sifive.com>, gary@garyguo.net, paul.walmsley@sifive.com,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1563437710-30756-1-git-send-email-yuzenghui@huawei.com>
+Content-Language: en-US
+Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,20 +72,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jul 16, 2019 at 11:31:27AM +0800, Guo Ren wrote:
-> I saw arm64 to prevent speculation by temporarily setting TTBR0.el1 to
-> a zero page table. Is that used to prevent speculative execution user
-> space code or just prevent ld/st in copy_use_* ?
+Hi Zenghui,
 
-Only to prevent explicit ld/st from user. On ARMv8.1+, we don't normally
-use the TTBR0 trick but rather disable user space access using the PAN
-(privileged access never) feature. However, I don't think PAN disables
-speculative accesses, only explicit loads/stores. Also, with ARMv8.2
-Linux uses the LDTR/STTR instructions in copy_*_user() which don't need
-to disable PAN explicitly.
+On 18/07/2019 09:15, Zenghui Yu wrote:
+> We use "pmc->idx" and the "chained" bitmap to determine if the pmc is
+> chained, in kvm_pmu_pmc_is_chained().  But idx might be uninitialized
+> (and random) when we doing this decision, through a KVM_ARM_VCPU_INIT
+> ioctl -> kvm_pmu_vcpu_reset(). And the test_bit() against this random
+> idx will potentially hit a KASAN BUG [1].
+> 
+> In general, idx is the static property of a PMU counter that is not
+> expected to be modified across resets, as suggested by Julien.  It
+> looks more reasonable if we can setup the PMU counter idx for a vcpu
+> in its creation time. Introduce a new function - kvm_pmu_vcpu_init()
+> for this basic setup. Oh, and the KASAN BUG will get fixed this way.
+> 
+> [1] https://www.spinics.net/lists/kvm-arm/msg36700.html
+> 
+> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+> Suggested-by: Andrew Murray <andrew.murray@arm.com>
+> Suggested-by: Julien Thierry <julien.thierry@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
+> 
+> Changes since v1:
+>  - Introduce kvm_pmu_vcpu_init() in vcpu's creation time, move the
+>    assignment of pmc->idx into it.
+>  - Thus change the subject. The old one is "KVM: arm/arm64: Assign
+>    pmc->idx before kvm_pmu_stop_counter()".
+> 
+> Julien, I haven't collected your Acked-by into this version. If you're
+> still happy with the change, please Ack again. Thanks!
+> 
+
+Thanks for making the change. This looks good to me:
+
+Acked-by: Julien Thierry <julien.thierry@arm.com>
+
+Thanks,
+
+Julien
+
+>  include/kvm/arm_pmu.h |  2 ++
+>  virt/kvm/arm/arm.c    |  2 ++
+>  virt/kvm/arm/pmu.c    | 18 +++++++++++++++---
+>  3 files changed, 19 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 16c769a..6db0304 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -34,6 +34,7 @@ struct kvm_pmu {
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+>  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+> +void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val);
+> @@ -71,6 +72,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>  {
+>  	return 0;
+>  }
+> +static inline void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val) {}
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index f645c0f..c704fa6 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -340,6 +340,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  	/* Set up the timer */
+>  	kvm_timer_vcpu_init(vcpu);
+>  
+> +	kvm_pmu_vcpu_init(vcpu);
+> +
+>  	kvm_arm_reset_debug_ptr(vcpu);
+>  
+>  	return kvm_vgic_vcpu_init(vcpu);
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 3dd8238..362a018 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -215,6 +215,20 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>  }
+>  
+>  /**
+> + * kvm_pmu_vcpu_init - assign pmu counter idx for cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + */
+> +void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+> +{
+> +	int i;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +
+> +	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+> +		pmu->pmc[i].idx = i;
+> +}
+> +
+> +/**
+>   * kvm_pmu_vcpu_reset - reset pmu state for cpu
+>   * @vcpu: The vcpu pointer
+>   *
+> @@ -224,10 +238,8 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+>  	int i;
+>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>  
+> -	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
+> +	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>  		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
+> -		pmu->pmc[i].idx = i;
+> -	}
+>  
+>  	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+>  }
+> 
 
 -- 
-Catalin
+Julien Thierry
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
