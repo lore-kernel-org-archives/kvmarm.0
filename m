@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2975EC7618B
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Jul 2019 11:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9D4C7618B
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Jul 2019 11:20:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B5F852190F
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Jul 2019 11:09:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F852190F
+	by mail.kernel.org (Postfix) with ESMTP id DA1592190F
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Jul 2019 11:20:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1592190F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB634A522;
-	Wed, 24 Jul 2019 07:09:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 435454A579;
+	Wed, 24 Jul 2019 07:20:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RI4UxrwK3zyf; Wed, 24 Jul 2019 07:09:38 -0400 (EDT)
+	with ESMTP id VUkH0LB3wIrN; Wed, 24 Jul 2019 07:20:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25E484A527;
-	Wed, 24 Jul 2019 07:09:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D7BF4A586;
+	Wed, 24 Jul 2019 07:20:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 311F14A522
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jul 2019 07:09:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F4784A572
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jul 2019 07:20:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pv81M9jF+XRI for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jul 2019 07:09:36 -0400 (EDT)
+ with ESMTP id qenEyWIlmO8V for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Jul 2019 07:20:47 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F39204A4E9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jul 2019 07:09:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD7464A562
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jul 2019 07:20:46 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A53FD337;
- Wed, 24 Jul 2019 04:09:35 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FBB8337;
+ Wed, 24 Jul 2019 04:20:46 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 020013F71A; Wed, 24 Jul 2019 04:09:34 -0700 (PDT)
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: vgic-its: Introduce multiple LPI
- translation caches
+ DA6C13F71A; Wed, 24 Jul 2019 04:20:45 -0700 (PDT)
+Subject: Re: [PATCH 2/3] KVM: arm/arm64: vgic-its: Do not execute invalidate
+ MSI-LPI translation cache on movi command
 To: Xiangyou Xie <xiexiangyou@huawei.com>
 References: <20190724090437.49952-1-xiexiangyou@huawei.com>
- <20190724090437.49952-2-xiexiangyou@huawei.com>
+ <20190724090437.49952-3-xiexiangyou@huawei.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -92,12 +92,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <a8b74b25-8c92-4aad-f94d-8371126798ef@arm.com>
-Date: Wed, 24 Jul 2019 12:09:32 +0100
+Message-ID: <cb0aad13-6928-820a-1592-b3345c87f9c8@arm.com>
+Date: Wed, 24 Jul 2019 12:20:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190724090437.49952-2-xiexiangyou@huawei.com>
+In-Reply-To: <20190724090437.49952-3-xiexiangyou@huawei.com>
 Content-Language: en-US
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org
@@ -117,31 +117,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Xiangyou,
-
 On 24/07/2019 10:04, Xiangyou Xie wrote:
-> Because dist->lpi_list_lock is a perVM lock, when a virtual machine
-> is configured with multiple virtual NIC devices and receives
-> network packets at the same time, dist->lpi_list_lock will become
-> a performance bottleneck.
+> It is not necessary to invalidate the lpi translation cache when the
+> virtual machine executes the movi instruction to adjust the affinity of
+> the interrupt. Irqbalance will adjust the interrupt affinity in a short
+> period of time to achieve the purpose of interrupting load balancing,
+> but this does not affect the contents of the lpi translation cache.
 
-I'm sorry, but you'll have to show me some real numbers before I
-consider any of this. There is a reason why the original series still
-isn't in mainline, and that's because people don't post any numbers.
-Adding more patches is not going to change that small fact.
+What does irqbalance have to do with it? We're dealing with the GIC
+architecture here, not with userspace.
 
-> This patch increases the number of lpi_translation_cache to eight,
-> hashes the cpuid that executes irqfd_wakeup, and chooses which
-> lpi_translation_cache to use.
+If the guest issues a MOVI command to a RD where GICR_CTLR.EnableLPI is
+0, and that we use an existing cached translation, we are going to make
+the interrupt pending for that RD. This is direct violation of the
+architecture, which says:
 
-So you've now switched to a per-cache lock, meaning that the rest of the
-ITS code can manipulate the the lpi_list without synchronization with
-the caches. Have you worked out all the possible races? Also, how does
-this new lock class fits in the whole locking hierarchy?
+"LPI support is disabled. Any doorbell interrupt generated as a result
+of a write to a virtual LPI register must be discarded, and any ITS
+translation requests or commands involving LPIs in this Redistributor
+are ignored."
 
-If you want something that is actually scalable, do it the right way.
-Use a better data structure than a list, switch to using RCU rather than
-the current locking strategy. But your current approach looks quite fragile.
+So the interrupt cannot be made pending. No IFs, no BUTs. If you really
+want to optimize it, check that the target RD is actually enabled and
+only invalidate in this particular case.
+
+Your guest would have to have a rate of MOVI that is comparable to that
+of the interrupts for it to show on any radar though...
 
 Thanks,
 
