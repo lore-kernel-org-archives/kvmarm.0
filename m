@@ -2,64 +2,90 @@ Return-Path: <SRS0=xsle=VW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1D6C7618B
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 10:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78715C7618B
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:12:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C32D3218D4
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 10:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C32D3218D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id EADD4229F3
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:12:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VGTfK9sU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EADD4229F3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32FF04A56D;
-	Thu, 25 Jul 2019 06:01:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 436EB4A57A;
+	Thu, 25 Jul 2019 08:12:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3oN89UDTuAT4; Thu, 25 Jul 2019 06:01:55 -0400 (EDT)
+	with ESMTP id sIVXvPevMxRa; Thu, 25 Jul 2019 08:12:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC1FC4A58D;
-	Thu, 25 Jul 2019 06:01:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 297CB4A57D;
+	Thu, 25 Jul 2019 08:12:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A70094A57D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 06:01:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 411C04A574
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:12:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jYhbkGFWvbS7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jul 2019 06:01:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED0814A56D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 06:01:52 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 740D4344;
- Thu, 25 Jul 2019 03:01:52 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AF4B3F694;
- Thu, 25 Jul 2019 03:01:51 -0700 (PDT)
-Date: Thu, 25 Jul 2019 11:01:48 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 0/9] KVM: arm/arm64: vgic: ITS translation cache
-Message-ID: <20190725110148.792e2706@donnerap.cambridge.arm.com>
-In-Reply-To: <a757bac1-41d1-8ce5-9393-ac2e8a5e1114@arm.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190723121424.0b632efa@donnerap.cambridge.arm.com>
- <a757bac1-41d1-8ce5-9393-ac2e8a5e1114@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+ with ESMTP id 2qgerRZs73f7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jul 2019 08:12:37 -0400 (EDT)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com
+ [207.171.184.29])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70F4C4A54C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:12:35 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1564056757; x=1595592757;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=Ab1CWKE+OztaUGMWuWyRMVWvhP5S22Y2ZduWwOWxgdY=;
+ b=VGTfK9sUk9iv1MGUZUrF/cZ8o1CDaPMrQyKv4vUWRiPbTxZNu+oNNwvU
+ JlH5NyCE06g6xg7nSJmWPTxwzOAX1V9Vq2e3Iotf8piTiffcImHPxyvFd
+ pnJ93F3prBSevOc71SQxGA8SsdHK86cLJ/4Y9OLIvLTyBMqZ0YP6ig4fN s=;
+X-IronPort-AV: E=Sophos;i="5.64,306,1559520000"; d="scan'208";a="687871196"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO
+ email-inbound-relay-1d-9ec21598.us-east-1.amazon.com) ([10.47.22.34])
+ by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP;
+ 25 Jul 2019 12:12:27 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+ by email-inbound-relay-1d-9ec21598.us-east-1.amazon.com (Postfix) with ESMTPS
+ id E59CCA2636; Thu, 25 Jul 2019 12:12:24 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 25 Jul 2019 12:12:24 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.30) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 25 Jul 2019 12:12:22 +0000
+Subject: Re: [PATCH kvm-unit-tests v2] arm: Add PL031 test
+To: Andrew Jones <drjones@redhat.com>
+References: <20190712091938.492-1-graf@amazon.com>
+ <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
+From: Alexander Graf <graf@amazon.com>
+Message-ID: <02a38777-3ec0-0354-8d49-d8ce337e5660@amazon.com>
+Date: Thu, 25 Jul 2019 14:12:19 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-Cc: "Raslan, KarimAllah" <karahmed@amazon.de>, "Saidi,
- Ali" <alisaidi@amazon.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.30]
+X-ClientProxiedBy: EX13D24UWA004.ant.amazon.com (10.43.160.233) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
-Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -68,130 +94,98 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 25 Jul 2019 09:50:18 +0100
-Marc Zyngier <marc.zyngier@arm.com> wrote:
 
-Hi Marc,
 
-> On 23/07/2019 12:14, Andre Przywara wrote:
-> > On Tue, 11 Jun 2019 18:03:27 +0100
-> > Marc Zyngier <marc.zyngier@arm.com> wrote:
-> > 
-> > Hi,
-> >   
-> >> It recently became apparent[1] that our LPI injection path is not as
-> >> efficient as it could be when injecting interrupts coming from a VFIO
-> >> assigned device.
-> >>
-> >> Although the proposed patch wasn't 100% correct, it outlined at least
-> >> two issues:
-> >>
-> >> (1) Injecting an LPI from VFIO always results in a context switch to a
-> >>     worker thread: no good
-> >>
-> >> (2) We have no way of amortising the cost of translating a DID+EID pair
-> >>     to an LPI number
-> >>
-> >> The reason for (1) is that we may sleep when translating an LPI, so we
-> >> do need a context process. A way to fix that is to implement a small
-> >> LPI translation cache that could be looked up from an atomic
-> >> context. It would also solve (2).
-> >>
-> >> This is what this small series proposes. It implements a very basic
-> >> LRU cache of pre-translated LPIs, which gets used to implement
-> >> kvm_arch_set_irq_inatomic. The size of the cache is currently
-> >> hard-coded at 16 times the number of vcpus, a number I have picked
-> >> under the influence of Ali Saidi. If that's not enough for you, blame
-> >> me, though.
-> >>
-> >> Does it work? well, it doesn't crash, and is thus perfect. More
-> >> seriously, I don't really have a way to benchmark it directly, so my
-> >> observations are only indirect:
-> >>
-> >> On a TX2 system, I run a 4 vcpu VM with an Ethernet interface passed
-> >> to it directly. From the host, I inject interrupts using debugfs. In
-> >> parallel, I look at the number of context switch, and the number of
-> >> interrupts on the host. Without this series, I get the same number for
-> >> both IRQ and CS (about half a million of each per second is pretty
-> >> easy to reach). With this series, the number of context switches drops
-> >> to something pretty small (in the low 2k), while the number of
-> >> interrupts stays the same.
-> >>
-> >> Yes, this is a pretty rubbish benchmark, what did you expect? ;-)
-> >>
-> >> So I'm putting this out for people with real workloads to try out and
-> >> report what they see.  
-> > 
-> > So I gave that a shot with some benchmarks. As expected, it is quite hard
-> > to show an improvement with just one guest running, although we could show
-> > a 103%(!) improvement of the memcached QPS score in one experiment when
-> > running it in a guest with an external load generator.  
+On 15.07.19 18:42, Andrew Jones wrote:
+> On Fri, Jul 12, 2019 at 11:19:38AM +0200, Alexander Graf wrote:
+>> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+>> It just pokes basic functionality. I've mostly written it to familiarize myself
+>> with the device, but I suppose having the test around does not hurt, as it also
+>> exercises the GIC SPI interrupt path.
+>>
+>> Signed-off-by: Alexander Graf <graf@amazon.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>>
+>>    - Use FDT to find base, irq and existence
+>>    - Put isb after timer read
+>>    - Use dist_base for gicv3
+>> ---
+>>   arm/Makefile.common |   1 +
+>>   arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
+>>   lib/arm/asm/gic.h   |   1 +
+>>   3 files changed, 267 insertions(+)
+>>   create mode 100644 arm/pl031.c
+>>
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index f0c4b5d..b8988f2 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>>   tests-common += $(TEST_DIR)/gic.flat
+>>   tests-common += $(TEST_DIR)/psci.flat
+>>   tests-common += $(TEST_DIR)/sieve.flat
+>> +tests-common += $(TEST_DIR)/pl031.flat
 > 
-> Is that a fluke or something that you have been able to reproduce
-> consistently? Because doubling the performance of anything is something
-> I have a hard time believing in... ;-)
+> Makefile.common is for both arm32 and arm64, but this code is only
+> compilable on arm64. As there's no reason for it to be arm64 only,
+> then ideally we'd modify the code to allow compiling and running
+> on both, but otherwise we need to move this to Makefile.arm64.
 
-Me too. I didn't do this particular test, but it seems that at least in
-this particular setup the results were reproducible. AFAICS the parameters
-for memcached were just tuned to reduce variation. The test was run three
-times on a TX2, with a variation of +/- 5%. The average number (Memcached
-QPS SLA) was 180539 with this series, and 89076 without it.
-This benchmark setup is reported to be very latency sensitive, with high
-I/O requirements, so the observed scheduling improvement of this series
-would quite plausibly show a dramatic effect in a guest.
+D'oh. Sorry, I completely missed that bit. Of course we want to test on 
+32bit ARM as well! I'll fix it up :).
 
-> > Throwing more users into the game showed a significant improvement:
-> > 
-> > Benchmark 1: kernel compile/FIO: Compiling a kernel on the host, while
-> > letting a guest run FIO with 4K randreads from a passed-through NVMe SSD:
-> > The IOPS with this series improved by 27% compared to pure mainline,
-> > reaching 80% of the host value. Kernel compilation time improved by 8.5%
-> > compared to mainline.  
+
+[...]
+
+>> +static int rtc_fdt_init(void)
+>> +{
+>> +	const struct fdt_property *prop;
+>> +	const void *fdt = dt_fdt();
+>> +	int node, len;
+>> +	u32 *data;
+>> +
+>> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
+>> +	if (node < 0)
+>> +		return -1;
+>> +
+>> +	prop = fdt_get_property(fdt, node, "interrupts", &len);
+>> +	assert(prop && len == (3 * sizeof(u32)));
+>> +	data = (u32 *)prop->data;
+>> +	assert(data[0] == 0); /* SPI */
+>> +	pl031_irq = SPI(fdt32_to_cpu(data[1]));
 > 
-> OK, that's interesting. I guess that's the effect of not unnecessarily
-> disrupting the scheduling with one extra context-switch per interrupt.
+> Nit: Ideally we'd add some more devicetree API to get interrupts. With
+> that, and the existing devicetree API, we could remove all low-level fdt
+> related code in this function.
 
-That's my understanding as well. The machine had four cores, the guest
-four VCPUs, FIO in that guest was told to use four jobs. The kernel
-was compiling with make -j5. So yes, the scheduler is quite busy here, and
-I would expect any relief there to benefit performance.
+Well, we probably want some really high level fdt API that can traverse 
+reg properly to map bus regs into physical addresses. As long as we 
+don't have all that magic, I see little point in inventing anything that 
+looks more sophisticated but doesn't actually take the difficult 
+problems into account :).
 
-> > Benchmark 2: FIO/FIO: Running FIO on a passed through SATA SSD in one
-> > guest, and FIO on a passed through NVMe SSD in another guest, at the same
-> > time:
-> > The IOPS with this series improved by 23% for the NVMe and 34% for the
-> > SATA disk, compared to pure mainline.  
 > 
-> I guess that's the same thing. Not context-switching means more
-> available resource to other processes in the system.
-
-Yes. These were again four VCPU guests with a 4-job FIO in each.
-
-And for the records, using FIO with just "read" and a blocksize of
-1MB didn't show any effects: the numbers were basically the same as bare
-metal, in every case.
-I would attribute this to the number of interrupts being far too low to
-show an impact.
-
-> > So judging from these results, I think this series is a significant
-> > improvement, which justifies it to be merged, to receive wider testing.
-> > 
-> > It would be good if others could also do performance experiments and post
-> > their results.  
+>> +
+>> +	prop = fdt_get_property(fdt, node, "reg", &len);
+>> +	assert(prop && len == (2 * sizeof(u64)));
+>> +	data = (u32 *)prop->data;
+>> +	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
 > 
-> Wishful thinking...
-> 
-> Anyway, I'll repost the series shortly now that Eric has gone through it.
+> This works because we currently ID map all the physical memory. I usually
+> try to remember to use an ioremap in these cases anyway though.
 
-Thanks! Feel free to add my Tested-by: at an appropriate place.
+Great idea - it allows me to get rid of a bit of casting too.
 
-Cheers,
-Andre.
+
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
