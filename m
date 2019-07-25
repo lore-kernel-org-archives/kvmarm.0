@@ -2,83 +2,70 @@ Return-Path: <SRS0=xsle=VW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04DE8C7618B
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A498C7618B
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:33:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87F8E229F3
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:17:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="i5hkOEls"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87F8E229F3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
+	by mail.kernel.org (Postfix) with ESMTP id 196B522BF5
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 12:33:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 196B522BF5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 187A24A574;
-	Thu, 25 Jul 2019 08:17:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AB1B4A57A;
+	Thu, 25 Jul 2019 08:33:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id t2OYj3wiHaVK; Thu, 25 Jul 2019 08:17:46 -0400 (EDT)
+	with ESMTP id crpdsy0tVYlF; Thu, 25 Jul 2019 08:33:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B970A4A5A0;
-	Thu, 25 Jul 2019 08:17:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 551584A58B;
+	Thu, 25 Jul 2019 08:33:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E31644A57A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:17:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D01454A57D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:33:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jI6eiD8m9ycu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jul 2019 08:17:44 -0400 (EDT)
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A38654A574
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:17:44 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
- t=1564057064; x=1595593064;
- h=from:to:cc:subject:date:message-id:mime-version;
- bh=r81dyOFKPSGGNehBmRRG7/fXUQBk5bkvGSYvxKK7R2s=;
- b=i5hkOElsDW7GKhzjiDQ82OTGVFkokULGubRTPIjAb8jwKYA5uVZNl4s9
- 38Ck7bVBRppORhCaH1H8fWiX0WF/iMv+4f22uXcoV6gEYASqroIpp2eM1
- A5k2ibg4oXmcMC8c9I9CKraxWS2UbQkTvMZDKL3dDHqGh6ldXgpKn0oDr 8=;
-X-IronPort-AV: E=Sophos;i="5.64,306,1559520000"; d="scan'208";a="412362690"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com) ([10.124.125.6])
- by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP;
- 25 Jul 2019 12:17:43 +0000
-Received: from EX13MTAUWC001.ant.amazon.com
- (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
- by email-inbound-relay-2a-d0be17ee.us-west-2.amazon.com (Postfix) with ESMTPS
- id 3E3B9A2829; Thu, 25 Jul 2019 12:17:42 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 25 Jul 2019 12:17:41 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.25) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 25 Jul 2019 12:17:39 +0000
-From: Alexander Graf <graf@amazon.com>
-To: <kvm@vger.kernel.org>
-Subject: [PATCH kvm-unit-tests v3] arm: Add PL031 test
-Date: Thu, 25 Jul 2019 14:17:32 +0200
-Message-ID: <20190725121732.19217-1-graf@amazon.com>
-X-Mailer: git-send-email 2.17.1
+ with ESMTP id K1iyPtt0yC9I for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jul 2019 08:33:49 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C8844A57A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 08:33:49 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BB266330265;
+ Thu, 25 Jul 2019 12:33:48 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20C8160606;
+ Thu, 25 Jul 2019 12:33:46 +0000 (UTC)
+Date: Thu, 25 Jul 2019 14:33:44 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH kvm-unit-tests v2] arm: Add PL031 test
+Message-ID: <20190725123344.4lmeopzyl4jdnsp7@kamzik.brq.redhat.com>
+References: <20190712091938.492-1-graf@amazon.com>
+ <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
+ <02a38777-3ec0-0354-8d49-d8ce337e5660@amazon.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.160.25]
-X-ClientProxiedBy: EX13D04UWA002.ant.amazon.com (10.43.160.31) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Precedence: Bulk
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre
- Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Content-Disposition: inline
+In-Reply-To: <02a38777-3ec0-0354-8d49-d8ce337e5660@amazon.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Thu, 25 Jul 2019 12:33:48 +0000 (UTC)
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Andre Przywara <andre.przywara@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
+Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -92,328 +79,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-It just pokes basic functionality. I've mostly written it to familiarize myself
-with the device, but I suppose having the test around does not hurt, as it also
-exercises the GIC SPI interrupt path.
+On Thu, Jul 25, 2019 at 02:12:19PM +0200, Alexander Graf wrote:
+> 
+> 
+> On 15.07.19 18:42, Andrew Jones wrote:
+> > On Fri, Jul 12, 2019 at 11:19:38AM +0200, Alexander Graf wrote:
+> > > This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+> > > It just pokes basic functionality. I've mostly written it to familiarize myself
+> > > with the device, but I suppose having the test around does not hurt, as it also
+> > > exercises the GIC SPI interrupt path.
+> > > 
+> > > Signed-off-by: Alexander Graf <graf@amazon.com>
+> > > 
+> > > ---
+> > > 
+> > > v1 -> v2:
+> > > 
+> > >    - Use FDT to find base, irq and existence
+> > >    - Put isb after timer read
+> > >    - Use dist_base for gicv3
+> > > ---
+> > >   arm/Makefile.common |   1 +
+> > >   arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
+> > >   lib/arm/asm/gic.h   |   1 +
+> > >   3 files changed, 267 insertions(+)
+> > >   create mode 100644 arm/pl031.c
+> > > 
+> > > diff --git a/arm/Makefile.common b/arm/Makefile.common
+> > > index f0c4b5d..b8988f2 100644
+> > > --- a/arm/Makefile.common
+> > > +++ b/arm/Makefile.common
+> > > @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+> > >   tests-common += $(TEST_DIR)/gic.flat
+> > >   tests-common += $(TEST_DIR)/psci.flat
+> > >   tests-common += $(TEST_DIR)/sieve.flat
+> > > +tests-common += $(TEST_DIR)/pl031.flat
+> > 
+> > Makefile.common is for both arm32 and arm64, but this code is only
+> > compilable on arm64. As there's no reason for it to be arm64 only,
+> > then ideally we'd modify the code to allow compiling and running
+> > on both, but otherwise we need to move this to Makefile.arm64.
+> 
+> D'oh. Sorry, I completely missed that bit. Of course we want to test on
+> 32bit ARM as well! I'll fix it up :).
+> 
+> 
+> [...]
+> 
+> > > +static int rtc_fdt_init(void)
+> > > +{
+> > > +	const struct fdt_property *prop;
+> > > +	const void *fdt = dt_fdt();
+> > > +	int node, len;
+> > > +	u32 *data;
+> > > +
+> > > +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
+> > > +	if (node < 0)
+> > > +		return -1;
+> > > +
+> > > +	prop = fdt_get_property(fdt, node, "interrupts", &len);
+> > > +	assert(prop && len == (3 * sizeof(u32)));
+> > > +	data = (u32 *)prop->data;
+> > > +	assert(data[0] == 0); /* SPI */
+> > > +	pl031_irq = SPI(fdt32_to_cpu(data[1]));
+> > 
+> > Nit: Ideally we'd add some more devicetree API to get interrupts. With
+> > that, and the existing devicetree API, we could remove all low-level fdt
+> > related code in this function.
+> 
+> Well, we probably want some really high level fdt API that can traverse reg
+> properly to map bus regs into physical addresses. As long as we don't have
+> all that magic,
 
-Signed-off-by: Alexander Graf <graf@amazon.com>
+We do have much of that magic already. Skim through lib/devicetree.h to
+see what's available.
 
----
+> I see little point in inventing anything that looks more
+> sophisticated but doesn't actually take the difficult problems into account
+> :).
 
-v1 -> v2:
+Well, for this case, the "interrupts" decoding isn't difficult and could
+be shared among other devices if we added it to devicetree.c. And the
+reg decoding below to get the base address is already supported by the
+devicetree API.
 
-  - Use FDT to find base, irq and existence
-  - Put isb after timer read
-  - Use dist_base for gicv3
+All that said, it's just a nit that I won't insist on though, because it's
+hard enough to get unit test contributors without asking that they also
+contribute to the framework.
 
-v2 -> v3
+> 
+> > 
+> > > +
+> > > +	prop = fdt_get_property(fdt, node, "reg", &len);
+> > > +	assert(prop && len == (2 * sizeof(u64)));
+> > > +	data = (u32 *)prop->data;
+> > > +	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
+> > 
+> > This works because we currently ID map all the physical memory. I usually
+> > try to remember to use an ioremap in these cases anyway though.
+> 
+> Great idea - it allows me to get rid of a bit of casting too.
+>
 
-  - Enable compilation on 32bit ARM target
-  - Use ioremap
----
- arm/Makefile.common |   1 +
- arm/pl031.c         | 263 ++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h   |   1 +
- 3 files changed, 265 insertions(+)
- create mode 100644 arm/pl031.c
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f0c4b5d..b8988f2 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
- tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
- tests-common += $(TEST_DIR)/sieve.flat
-+tests-common += $(TEST_DIR)/pl031.flat
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/pl031.c b/arm/pl031.c
-new file mode 100644
-index 0000000..febc56e
---- /dev/null
-+++ b/arm/pl031.c
-@@ -0,0 +1,263 @@
-+/*
-+ * Verify PL031 functionality
-+ *
-+ * This test verifies whether the emulated PL031 behaves correctly.
-+ *
-+ * Copyright 2019 Amazon.com, Inc. or its affiliates.
-+ * Author: Alexander Graf <graf@amazon.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <devicetree.h>
-+#include <asm/processor.h>
-+#include <asm/io.h>
-+#include <asm/gic.h>
-+
-+struct pl031_regs {
-+	uint32_t dr;	/* Data Register */
-+	uint32_t mr;	/* Match Register */
-+	uint32_t lr;	/* Load Register */
-+	union {
-+		uint8_t cr;	/* Control Register */
-+		uint32_t cr32;
-+	};
-+	union {
-+		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-+		uint32_t imsc32;
-+	};
-+	union {
-+		uint8_t ris;	/* Raw Interrupt Status */
-+		uint32_t ris32;
-+	};
-+	union {
-+		uint8_t mis;	/* Masked Interrupt Status */
-+		uint32_t mis32;
-+	};
-+	union {
-+		uint8_t icr;	/* Interrupt Clear Register */
-+		uint32_t icr32;
-+	};
-+	uint32_t reserved[1008];
-+	uint32_t periph_id[4];
-+	uint32_t pcell_id[4];
-+};
-+
-+static u32 cntfrq;
-+static struct pl031_regs *pl031;
-+static int pl031_irq;
-+static void *gic_ispendr;
-+static void *gic_isenabler;
-+static bool irq_triggered;
-+
-+static int check_id(void)
-+{
-+	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id); i++)
-+		if (id[i] != readl(&pl031->periph_id[i]))
-+			return 1;
-+
-+	return 0;
-+}
-+
-+static int check_ro(void)
-+{
-+	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-+			    offsetof(struct pl031_regs, mis),
-+			    offsetof(struct pl031_regs, periph_id[0]),
-+			    offsetof(struct pl031_regs, periph_id[1]),
-+			    offsetof(struct pl031_regs, periph_id[2]),
-+			    offsetof(struct pl031_regs, periph_id[3]),
-+			    offsetof(struct pl031_regs, pcell_id[0]),
-+			    offsetof(struct pl031_regs, pcell_id[1]),
-+			    offsetof(struct pl031_regs, pcell_id[2]),
-+			    offsetof(struct pl031_regs, pcell_id[3]) };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-+		uint32_t before32;
-+		uint16_t before16;
-+		uint8_t before8;
-+		void *addr = (void*)pl031 + offs[i];
-+		uint32_t poison = 0xdeadbeefULL;
-+
-+		before8 = readb(addr);
-+		before16 = readw(addr);
-+		before32 = readl(addr);
-+
-+		writeb(poison, addr);
-+		writew(poison, addr);
-+		writel(poison, addr);
-+
-+		if (before8 != readb(addr))
-+			return 1;
-+		if (before16 != readw(addr))
-+			return 1;
-+		if (before32 != readl(addr))
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int check_rtc_freq(void)
-+{
-+	uint32_t seconds_to_wait = 2;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = get_cntvct();
-+	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-+
-+	/* Wait for 2 seconds */
-+	while (get_cntvct() < target_tick) ;
-+
-+	if (readl(&pl031->dr) != before + seconds_to_wait)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static bool gic_irq_pending(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
-+}
-+
-+static void gic_irq_unmask(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
-+}
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+
-+	if (irqnr == pl031_irq) {
-+		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-+		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-+
-+		/* Writing any value should clear IRQ status */
-+		writel(0x80000000ULL, &pl031->icr);
-+
-+		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-+		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-+		irq_triggered = true;
-+	} else {
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+		return;
-+	}
-+}
-+
-+static int check_rtc_irq(void)
-+{
-+	uint32_t seconds_to_wait = 1;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = get_cntvct();
-+	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-+
-+	report_info("Checking IRQ trigger (MR)");
-+
-+	irq_triggered = false;
-+
-+	/* Fire IRQ in 1 second */
-+	writel(before + seconds_to_wait, &pl031->mr);
-+
-+#ifdef __aarch64__
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+#else
-+	install_exception_handler(EXCPTN_IRQ, irq_handler);
-+#endif
-+
-+	/* Wait until 2 seconds are over */
-+	while (get_cntvct() < target_tick) ;
-+
-+	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-+
-+	/* Mask the IRQ so that it gets delivered */
-+	writel(1, &pl031->imsc);
-+	report("  RTC IRQ pending now", gic_irq_pending());
-+
-+	/* Enable retrieval of IRQ */
-+	gic_irq_unmask();
-+	local_irq_enable();
-+
-+	report("  IRQ triggered", irq_triggered);
-+	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-+	if (!irq_triggered) {
-+		report_info("  RTC RIS: %x", readl(&pl031->ris));
-+		report_info("  RTC MIS: %x", readl(&pl031->mis));
-+		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-+		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-+	}
-+
-+	local_irq_disable();
-+	return 0;
-+}
-+
-+static void rtc_irq_init(void)
-+{
-+	gic_enable_defaults();
-+
-+	switch (gic_version()) {
-+	case 2:
-+		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-+		break;
-+	case 3:
-+		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
-+		break;
-+	}
-+}
-+
-+static int rtc_fdt_init(void)
-+{
-+	const struct fdt_property *prop;
-+	const void *fdt = dt_fdt();
-+	int node, len;
-+	u32 *data;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
-+	if (node < 0)
-+		return -1;
-+
-+	prop = fdt_get_property(fdt, node, "interrupts", &len);
-+	assert(prop && len == (3 * sizeof(u32)));
-+	data = (u32 *)prop->data;
-+	assert(data[0] == 0); /* SPI */
-+	pl031_irq = SPI(fdt32_to_cpu(data[1]));
-+
-+	prop = fdt_get_property(fdt, node, "reg", &len);
-+	assert(prop && len == (2 * sizeof(u64)));
-+	data = (u32 *)prop->data;
-+	pl031 = ioremap((uint64_t)fdt32_to_cpu(data[0]) << 32 |
-+				  fdt32_to_cpu(data[1]),
-+			fdt32_to_cpu(data[3]));
-+
-+	return 0;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	cntfrq = get_cntfrq();
-+	rtc_irq_init();
-+	if (rtc_fdt_init()) {
-+		report_skip("Skipping PL031 tests. No device present.");
-+		return 0;
-+	}
-+
-+	report("Periph/PCell IDs match", !check_id());
-+	report("R/O fields are R/O", !check_ro());
-+	report("RTC ticks at 1HZ", !check_rtc_freq());
-+	report("RTC IRQ not pending yet", !gic_irq_pending());
-+	check_rtc_irq();
-+
-+	return report_summary();
-+}
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..1fc10a0 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -41,6 +41,7 @@
- #include <asm/gic-v3.h>
- 
- #define PPI(irq)			((irq) + 16)
-+#define SPI(irq)			((irq) + GIC_FIRST_SPI)
- 
- #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
--- 
-2.17.1
-
+Thanks,
+drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
