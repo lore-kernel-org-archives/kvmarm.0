@@ -2,52 +2,49 @@ Return-Path: <SRS0=xsle=VW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 394E9C7618B
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 08:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E171EC7618B
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 08:50:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B847722BEF
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 08:24:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B847722BEF
+	by mail.kernel.org (Postfix) with ESMTP id 7FEC322BF5
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 08:50:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FEC322BF5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C5CA4A5BE;
-	Thu, 25 Jul 2019 04:24:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04C094A5BE;
+	Thu, 25 Jul 2019 04:50:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RFCNx6HrnB-A; Thu, 25 Jul 2019 04:24:50 -0400 (EDT)
+	with ESMTP id iWOVGJRIKaV4; Thu, 25 Jul 2019 04:50:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD5A14A5B9;
-	Thu, 25 Jul 2019 04:24:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33D304A5A3;
+	Thu, 25 Jul 2019 04:50:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 533784A591
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 04:24:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97E364A5A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 04:50:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RFEBImZBmZ0q for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jul 2019 04:24:47 -0400 (EDT)
+ with ESMTP id Ve1CxaVY1AFt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jul 2019 04:50:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B760A4A56A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 04:24:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF35D4A578
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 04:50:21 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39008344;
- Thu, 25 Jul 2019 01:24:47 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9005B344;
+ Thu, 25 Jul 2019 01:50:21 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
  by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 2AF833F694; Thu, 25 Jul 2019 01:24:45 -0700 (PDT)
-Subject: Re: [PATCH v2 9/9] KVM: arm/arm64: vgic-irqfd: Implement
- kvm_arch_set_irq_inatomic
-To: Auger Eric <eric.auger@redhat.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ 9F1113F694; Thu, 25 Jul 2019 01:50:20 -0700 (PDT)
+Subject: Re: [PATCH v2 0/9] KVM: arm/arm64: vgic: ITS translation cache
+To: Andre Przywara <andre.przywara@arm.com>
 References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-10-marc.zyngier@arm.com>
- <a63b08b8-9539-09b4-1060-7c0d2f2eacac@redhat.com>
+ <20190723121424.0b632efa@donnerap.cambridge.arm.com>
 From: Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -94,15 +91,16 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <24382fce-e165-4e79-1703-d019efcdf6e8@arm.com>
-Date: Thu, 25 Jul 2019 09:24:38 +0100
+Message-ID: <a757bac1-41d1-8ce5-9393-ac2e8a5e1114@arm.com>
+Date: Thu, 25 Jul 2019 09:50:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <a63b08b8-9539-09b4-1060-7c0d2f2eacac@redhat.com>
+In-Reply-To: <20190723121424.0b632efa@donnerap.cambridge.arm.com>
 Content-Language: en-US
 Cc: "Raslan, KarimAllah" <karahmed@amazon.de>, "Saidi,
- Ali" <alisaidi@amazon.com>
+ Ali" <alisaidi@amazon.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -119,97 +117,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 23/07/2019 16:14, Auger Eric wrote:
-> Hi Marc,
+Hi Andre,
+
+On 23/07/2019 12:14, Andre Przywara wrote:
+> On Tue, 11 Jun 2019 18:03:27 +0100
+> Marc Zyngier <marc.zyngier@arm.com> wrote:
 > 
-> On 6/11/19 7:03 PM, Marc Zyngier wrote:
->> Now that we have a cache of MSI->LPI translations, it is pretty
->> easy to implement kvm_arch_set_irq_inatomic (this cache can be
->> parsed without sleeping).
+> Hi,
+> 
+>> It recently became apparent[1] that our LPI injection path is not as
+>> efficient as it could be when injecting interrupts coming from a VFIO
+>> assigned device.
 >>
->> Hopefully, this will improve some LPI-heavy workloads.
+>> Although the proposed patch wasn't 100% correct, it outlined at least
+>> two issues:
 >>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-irqfd.c | 36 ++++++++++++++++++++++++++++------
->>  1 file changed, 30 insertions(+), 6 deletions(-)
+>> (1) Injecting an LPI from VFIO always results in a context switch to a
+>>     worker thread: no good
 >>
->> diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
->> index 99e026d2dade..9f203ed8c8f3 100644
->> --- a/virt/kvm/arm/vgic/vgic-irqfd.c
->> +++ b/virt/kvm/arm/vgic/vgic-irqfd.c
->> @@ -77,6 +77,15 @@ int kvm_set_routing_entry(struct kvm *kvm,
->>  	return r;
->>  }
->>  
->> +static void kvm_populate_msi(struct kvm_kernel_irq_routing_entry *e,
->> +			     struct kvm_msi *msi)
->> +{
->> +	msi->address_lo = e->msi.address_lo;
->> +	msi->address_hi = e->msi.address_hi;
->> +	msi->data = e->msi.data;
->> +	msi->flags = e->msi.flags;
->> +	msi->devid = e->msi.devid;
->> +}
->>  /**
->>   * kvm_set_msi: inject the MSI corresponding to the
-> s/:/ -
->>   * MSI routing entry
->> @@ -90,21 +99,36 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->>  {
->>  	struct kvm_msi msi;
->>  
->> -	msi.address_lo = e->msi.address_lo;
->> -	msi.address_hi = e->msi.address_hi;
->> -	msi.data = e->msi.data;
->> -	msi.flags = e->msi.flags;
->> -	msi.devid = e->msi.devid;
->> -
->>  	if (!vgic_has_its(kvm))
->>  		return -ENODEV;
->>  
->>  	if (!level)
->>  		return -1;
->>  
->> +	kvm_populate_msi(e, &msi);
->>  	return vgic_its_inject_msi(kvm, &msi);
->>  }
->>  
->> +/**
->> + * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-> s/:/ -
->> + *
->> + * Currently only direct MSI injecton is supported.
-> injection
->> + */
->> +int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
->> +			      struct kvm *kvm, int irq_source_id, int level,
->> +			      bool line_status)
->> +{
->> +	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
->> +		struct kvm_msi msi;
->> +
->> +		kvm_populate_msi(e, &msi);
->> +		if (!vgic_its_inject_cached_translation(kvm, &msi))
->> +			return 0;
-> if this fails since its->enabled is false we will re-attempt the
-> injection though the normal injection path but that's not a big deal.
+>> (2) We have no way of amortising the cost of translating a DID+EID pair
+>>     to an LPI number
+>>
+>> The reason for (1) is that we may sleep when translating an LPI, so we
+>> do need a context process. A way to fix that is to implement a small
+>> LPI translation cache that could be looked up from an atomic
+>> context. It would also solve (2).
+>>
+>> This is what this small series proposes. It implements a very basic
+>> LRU cache of pre-translated LPIs, which gets used to implement
+>> kvm_arch_set_irq_inatomic. The size of the cache is currently
+>> hard-coded at 16 times the number of vcpus, a number I have picked
+>> under the influence of Ali Saidi. If that's not enough for you, blame
+>> me, though.
+>>
+>> Does it work? well, it doesn't crash, and is thus perfect. More
+>> seriously, I don't really have a way to benchmark it directly, so my
+>> observations are only indirect:
+>>
+>> On a TX2 system, I run a 4 vcpu VM with an Ethernet interface passed
+>> to it directly. From the host, I inject interrupts using debugfs. In
+>> parallel, I look at the number of context switch, and the number of
+>> interrupts on the host. Without this series, I get the same number for
+>> both IRQ and CS (about half a million of each per second is pretty
+>> easy to reach). With this series, the number of context switches drops
+>> to something pretty small (in the low 2k), while the number of
+>> interrupts stays the same.
+>>
+>> Yes, this is a pretty rubbish benchmark, what did you expect? ;-)
+>>
+>> So I'm putting this out for people with real workloads to try out and
+>> report what they see.
+> 
+> So I gave that a shot with some benchmarks. As expected, it is quite hard
+> to show an improvement with just one guest running, although we could show
+> a 103%(!) improvement of the memcached QPS score in one experiment when
+> running it in a guest with an external load generator.
 
-Yeah, I wouldn't worry about that. If there is a screaming device, so be
-it. The guest should know better...
+Is that a fluke or something that you have been able to reproduce
+consistently? Because doubling the performance of anything is something
+I have a hard time believing in... ;-)
 
->> +	}
->> +
->> +	return -EWOULDBLOCK;
->> +}
->> +
->>  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
->>  {
->>  	struct kvm_irq_routing_entry *entries;
->>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Throwing more users into the game showed a significant improvement:
+> 
+> Benchmark 1: kernel compile/FIO: Compiling a kernel on the host, while
+> letting a guest run FIO with 4K randreads from a passed-through NVMe SSD:
+> The IOPS with this series improved by 27% compared to pure mainline,
+> reaching 80% of the host value. Kernel compilation time improved by 8.5%
+> compared to mainline.
 
-Thanks Eric.
+OK, that's interesting. I guess that's the effect of not unnecessarily
+disrupting the scheduling with one extra context-switch per interrupt.
+
+> 
+> Benchmark 2: FIO/FIO: Running FIO on a passed through SATA SSD in one
+> guest, and FIO on a passed through NVMe SSD in another guest, at the same
+> time:
+> The IOPS with this series improved by 23% for the NVMe and 34% for the
+> SATA disk, compared to pure mainline.
+
+I guess that's the same thing. Not context-switching means more
+available resource to other processes in the system.
+
+> So judging from these results, I think this series is a significant
+> improvement, which justifies it to be merged, to receive wider testing.
+> 
+> It would be good if others could also do performance experiments and post
+> their results.
+
+Wishful thinking...
+
+Anyway, I'll repost the series shortly now that Eric has gone through it.
+
+Thanks,
 
 	M.
 -- 
