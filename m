@@ -2,70 +2,61 @@ Return-Path: <SRS0=z813=VX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F276C41514
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 14:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8862BC7618F
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 22:58:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9908221850
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 14:17:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1RDkCJU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9908221850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0D35821994
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 22:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D35821994
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D5DD4A4F6;
-	Fri, 26 Jul 2019 10:17:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 683444A55C;
+	Fri, 26 Jul 2019 18:58:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-X-Amavis-Alert: BAD HEADER SECTION, Header field occurs more than once: "To"
-	occurs 3 times
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SGuzm3nkMukU; Fri, 26 Jul 2019 10:17:20 -0400 (EDT)
+	with ESMTP id jRIMdQwiq2nF; Fri, 26 Jul 2019 18:58:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4996F4A520;
-	Fri, 26 Jul 2019 10:17:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 552C04A53F;
+	Fri, 26 Jul 2019 18:58:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B2E64A4F9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 10:17:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E5EC4A52F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 18:58:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-X-Amavis-Alert: BAD HEADER SECTION, Header field occurs more than once: "To"
- occurs 3 times
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ru-ioZnKCez9 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jul 2019 10:17:18 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 288AC4A4F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 10:17:18 -0400 (EDT)
-Received: from localhost (unknown [23.100.24.84])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id CC75E229F9;
- Fri, 26 Jul 2019 14:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1564150637;
- bh=7vvR0BPXIOyC4A1NG2CnAxtG+FxJl2p9/zLtQ0tDJjg=;
- h=Date:From:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
- b=Q1RDkCJU70Z/xZBGobrvvAdrIS+2oiiAuLkUCcDFE60oBdiXbjbfmzT+y6IVzb/3y
- w+4GiyLDpAI9q40n2jReHXlX1dyW0aQMU0wqMxT7yJSvhXb82rykozXdoTr1NIDnqy
- VA7y7l79oD4JUHoRkTB8IhjOeX8F7LX8Ln4AnpbQ=
-Date: Fri, 26 Jul 2019 14:17:16 +0000
-From: Sasha Levin <sashal@kernel.org>
-To: Sasha Levin <sashal@kernel.org>
-To: Anders Roxell <anders.roxell@linaro.org>
-To: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [PATCH 1/2] arm64: KVM: regmap: Mark expected switch fall-through
-In-Reply-To: <20190726112705.19000-1-anders.roxell@linaro.org>
-References: <20190726112705.19000-1-anders.roxell@linaro.org>
-Message-Id: <20190726141716.CC75E229F9@mail.kernel.org>
-Cc: , stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id xschhcOfC7hM for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jul 2019 18:58:47 -0400 (EDT)
+Received: from Galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2CB24A51C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 18:58:46 -0400 (EDT)
+Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
+ by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+ (Exim 4.80) (envelope-from <tglx@linutronix.de>)
+ id 1hr9Ad-00042J-5J; Sat, 27 Jul 2019 00:58:40 +0200
+Date: Sat, 27 Jul 2019 00:58:38 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: KVM Arm64 and Linux-RT issues
+In-Reply-To: <cd310858-2c0f-6af1-bf82-ee1e01a2cfb8@arm.com>
+Message-ID: <alpine.DEB.2.21.1907270053360.1791@nanos.tec.linutronix.de>
+References: <b9867c43-7fe3-5d64-9939-b1a7ab7f1061@arm.com>
+ <cd310858-2c0f-6af1-bf82-ee1e01a2cfb8@arm.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+MIME-Version: 1.0
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required, ALL_TRUSTED=-1,
+ SHORTCIRCUIT=-0.0001
+Cc: "linux-rt-users@vger.kernel.org" <linux-rt-users@vger.kernel.org>,
+ "bigeasy@linutronix.de" <bigeasy@linutronix.de>,
+ Julien Grall <julien.grall@arm.com>, anna-maria@linutronix.de,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,46 +68,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Wed, 24 Jul 2019, Marc Zyngier wrote:
+> On 23/07/2019 18:58, Julien Grall wrote:
+> It really feels like a change in hrtimer_cancel semantics. From what I
+> understand, this is used to avoid racing against the softirq, but boy it
+> breaks things.
+> 
+> If this cannot be avoided, this means we can't cancel the background
+> timer (which is used to emulate the vcpu timer while it is blocked
+> waiting for an interrupt), then we must move this canceling to the point
+> where the vcpu is unblocked (instead of scheduled), which may have some
+> side effects -- I'll have a look.
+> 
+> But that's not the only problem: We also have hrtimers used to emulate
+> timers while the vcpu is running, and these timers are canceled in
+> kvm_timer_vcpu_put(), which is also called from a preempt notifier.
+> Unfortunately, I don't have a reasonable solution for that (other than
+> putting this hrtimer_cancel in a workqueue and start chasing the
+> resulting races).
 
-[This is an automated email]
+The fix is simple. See below. We'll add that to the next RT release. That
+will take a while as I'm busy with posting RT stuff for upstream :)
 
-This commit has been processed because it contains a "Fixes:" tag,
-fixing commit: a892819560c4 KVM: arm64: Prepare to handle deferred save/restore of 32-bit registers.
-
-The bot has tested the following trees: v5.2.2, v5.1.19, v4.19.60.
-
-v5.2.2: Failed to apply! Possible dependencies:
-    fdec2a9ef853 ("KVM: arm64: Migrate _elx sysreg accessors to msr_s/mrs_s")
-
-v5.1.19: Failed to apply! Possible dependencies:
-    73433762fcae ("KVM: arm64/sve: System register context switch and access support")
-    be604c616ca7 ("arm64: sysreg: Make mrs_s and msr_s macros work with Clang and LTO")
-    fdec2a9ef853 ("KVM: arm64: Migrate _elx sysreg accessors to msr_s/mrs_s")
-
-v4.19.60: Failed to apply! Possible dependencies:
-    84135d3d18da ("KVM: arm/arm64: consolidate arch timer trap handlers")
-    8a411b060f82 ("KVM: arm/arm64: Remove arch timer workqueue")
-    9e01dc76be6a ("KVM: arm/arm64: arch_timer: Assign the phys timer on VHE systems")
-    accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming")
-    bd7d95cafb49 ("arm64: KVM: Consistently advance singlestep when emulating instructions")
-    e604dd5d45c7 ("KVM: arm/arm64: timer: Rework data structures for multiple timers")
-    fdec2a9ef853 ("KVM: arm64: Migrate _elx sysreg accessors to msr_s/mrs_s")
-
-
-NOTE: The patch will not be queued to stable trees until it is upstream.
-
-How should we proceed with this patch?
-
---
 Thanks,
-Sasha
+
+	tglx
+
+8<------------
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -80,7 +80,7 @@ static inline bool userspace_irqchip(str
+ static void soft_timer_start(struct hrtimer *hrt, u64 ns)
+ {
+ 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
+-		      HRTIMER_MODE_ABS);
++		      HRTIMER_MODE_ABS_HARD);
+ }
+ 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
