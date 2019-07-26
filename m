@@ -1,69 +1,61 @@
-Return-Path: <SRS0=xsle=VW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=z813=VX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA84C7618B
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 16:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A02C76191
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 12:30:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 02D03218F0
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Jul 2019 16:38:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02D03218F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 4530722ADA
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 12:30:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4530722ADA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B78A4A5B4;
-	Thu, 25 Jul 2019 12:38:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1B6C4A621;
+	Fri, 26 Jul 2019 08:30:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vGPVmS6eEqbr; Thu, 25 Jul 2019 12:38:27 -0400 (EDT)
+	with ESMTP id rqqCo7-BLI5o; Fri, 26 Jul 2019 08:30:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB9684A5F5;
-	Thu, 25 Jul 2019 12:38:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60E714A615;
+	Fri, 26 Jul 2019 08:30:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEEEB4A5DB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 12:38:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67BC54A5E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 08:30:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id We8zFwVvFYIy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jul 2019 12:38:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12DE94A5A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jul 2019 12:38:26 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6DF51307D977;
- Thu, 25 Jul 2019 16:38:25 +0000 (UTC)
-Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BD7D60C18;
- Thu, 25 Jul 2019 16:38:22 +0000 (UTC)
-Subject: Re: [PATCH v3 06/10] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
- translation cache on ITS disable
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20190725153543.24386-1-maz@kernel.org>
- <20190725153543.24386-7-maz@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7c464951-7892-6407-bc83-1607bac2b4ca@redhat.com>
-Date: Thu, 25 Jul 2019 18:38:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190725153543.24386-7-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 25 Jul 2019 16:38:25 +0000 (UTC)
-Cc: Marc Zyngier <marc.zyngier@arm.com>,
- Andre Przywara <Andre.Przywara@arm.com>, "Raslan,
- KarimAllah" <karahmed@amazon.de>, "Saidi, Ali" <alisaidi@amazon.com>
+ with ESMTP id Cj237PaLo7Oe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jul 2019 08:30:48 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDBBB4A5E4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 08:30:48 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 499B7337;
+ Fri, 26 Jul 2019 05:30:48 -0700 (PDT)
+Received: from big-swifty.misterjones.org (unknown [10.37.13.61])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C4A13F694;
+ Fri, 26 Jul 2019 05:30:46 -0700 (PDT)
+Date: Fri, 26 Jul 2019 13:30:44 +0100
+Message-ID: <86ef2dnfkb.wl-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+To: Anders Roxell <anders.roxell@linaro.org>
+Subject: Re: [PATCH 1/2] arm64: KVM: regmap: Mark expected switch fall-through
+In-Reply-To: <20190726112705.19000-1-anders.roxell@linaro.org>
+References: <20190726112705.19000-1-anders.roxell@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,43 +67,73 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 7/25/19 5:35 PM, Marc Zyngier wrote:
-> From: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> If an ITS gets disabled, we need to make sure that further interrupts
-> won't hit in the cache. For that, we invalidate the translation cache
-> when the ITS is disabled.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  virt/kvm/arm/vgic/vgic-its.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 09a179820816..05406bd92ce9 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1597,6 +1597,8 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->  		goto out;
->  
->  	its->enabled = !!(val & GITS_CTLR_ENABLE);
-> +	if (!its->enabled)
-> +		vgic_its_invalidate_cache(kvm);
->  
->  	/*
->  	 * Try to process any pending commands. This function bails out early
-> 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgQW5kZXJzLAoKT24gRnJpLCAyNiBKdWwgMjAxOSAxMjoyNzowNSArMDEwMCwKQW5kZXJzIFJv
+eGVsbCA8YW5kZXJzLnJveGVsbEBsaW5hcm8ub3JnPiB3cm90ZToKPiAKPiBXaGVuIGZhbGwtdGhy
+b3VnaCB3YXJuaW5ncyB3YXMgZW5hYmxlZCBieSBkZWZhdWx0LCBjb21taXQgZDkzNTEyZWYwZjBl
+Cj4gKCJNYWtlZmlsZTogR2xvYmFsbHkgZW5hYmxlIGZhbGwtdGhyb3VnaCB3YXJuaW5nIiksIHRo
+ZSBmb2xsb3dpbmcKPiB3YXJuaW5ncyB3YXMgc3RhcnRpbmcgdG8gc2hvdyB1cDoKPiAKPiBJbiBm
+aWxlIGluY2x1ZGVkIGZyb20gLi4vYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fZW11bGF0ZS5o
+OjE5LAo+ICAgICAgICAgICAgICAgICAgZnJvbSAuLi9hcmNoL2FybTY0L2t2bS9yZWdtYXAuYzox
+MzoKPiAuLi9hcmNoL2FybTY0L2t2bS9yZWdtYXAuYzogSW4gZnVuY3Rpb24g4oCYdmNwdV93cml0
+ZV9zcHNyMzLigJk6Cj4gLi4vYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faHlwLmg6MzE6Mzog
+d2FybmluZzogdGhpcyBzdGF0ZW1lbnQgbWF5IGZhbGwKPiAgdGhyb3VnaCBbLVdpbXBsaWNpdC1m
+YWxsdGhyb3VnaD1dCj4gICAgYXNtIHZvbGF0aWxlKEFMVEVSTkFUSVZFKF9fbXNyX3MociMjbnZo
+LCAiJXgwIiksIFwKPiAgICBefn4KPiAuLi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9oeXAu
+aDo0NjozMTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvIOKAmHdyaXRlX3N5c3JlZ19lbHji
+gJkKPiAgI2RlZmluZSB3cml0ZV9zeXNyZWdfZWwxKHYscikgd3JpdGVfc3lzcmVnX2VseCh2LCBy
+LCBfRUwxLCBfRUwxMikKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fgo+IC4uL2FyY2gvYXJtNjQva3ZtL3JlZ21hcC5jOjE4MDozOiBub3RlOiBpbiBleHBh
+bnNpb24gb2YgbWFjcm8g4oCYd3JpdGVfc3lzcmVnX2VsMeKAmQo+ICAgIHdyaXRlX3N5c3JlZ19l
+bDEodiwgU1lTX1NQU1IpOwo+ICAgIF5+fn5+fn5+fn5+fn5+fn4KPiAuLi9hcmNoL2FybTY0L2t2
+bS9yZWdtYXAuYzoxODE6Mjogbm90ZTogaGVyZQo+ICAgY2FzZSBLVk1fU1BTUl9BQlQ6Cj4gICBe
+fn5+Cj4gSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4uL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1
+dHlwZS5oOjEzMiwKPiAgICAgICAgICAgICAgICAgIGZyb20gLi4vYXJjaC9hcm02NC9pbmNsdWRl
+L2FzbS9jYWNoZS5oOjgsCj4gICAgICAgICAgICAgICAgICBmcm9tIC4uL2luY2x1ZGUvbGludXgv
+Y2FjaGUuaDo2LAo+ICAgICAgICAgICAgICAgICAgZnJvbSAuLi9pbmNsdWRlL2xpbnV4L3ByaW50
+ay5oOjksCj4gICAgICAgICAgICAgICAgICBmcm9tIC4uL2luY2x1ZGUvbGludXgva2VybmVsLmg6
+MTUsCj4gICAgICAgICAgICAgICAgICBmcm9tIC4uL2luY2x1ZGUvYXNtLWdlbmVyaWMvYnVnLmg6
+MTgsCj4gICAgICAgICAgICAgICAgICBmcm9tIC4uL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vYnVn
+Lmg6MjYsCj4gICAgICAgICAgICAgICAgICBmcm9tIC4uL2luY2x1ZGUvbGludXgvYnVnLmg6NSwK
+PiAgICAgICAgICAgICAgICAgIGZyb20gLi4vaW5jbHVkZS9saW51eC9tbWRlYnVnLmg6NSwKPiAg
+ICAgICAgICAgICAgICAgIGZyb20gLi4vaW5jbHVkZS9saW51eC9tbS5oOjksCj4gICAgICAgICAg
+ICAgICAgICBmcm9tIC4uL2FyY2gvYXJtNjQva3ZtL3JlZ21hcC5jOjExOgo+IC4uL2FyY2gvYXJt
+NjQvaW5jbHVkZS9hc20vc3lzcmVnLmg6ODM3OjI6IHdhcm5pbmc6IHRoaXMgc3RhdGVtZW50IG1h
+eSBmYWxsCj4gIHRocm91Z2ggWy1XaW1wbGljaXQtZmFsbHRocm91Z2g9XQo+ICAgYXNtIHZvbGF0
+aWxlKCJtc3IgIiBfX3N0cmluZ2lmeShyKSAiLCAleDAiICBcCj4gICBefn4KPiAuLi9hcmNoL2Fy
+bTY0L2t2bS9yZWdtYXAuYzoxODI6Mzogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvIOKAmHdy
+aXRlX3N5c3JlZ+KAmQo+ICAgIHdyaXRlX3N5c3JlZyh2LCBzcHNyX2FidCk7Cj4gICAgXn5+fn5+
+fn5+fn5+Cj4gLi4vYXJjaC9hcm02NC9rdm0vcmVnbWFwLmM6MTgzOjI6IG5vdGU6IGhlcmUKPiAg
+IGNhc2UgS1ZNX1NQU1JfVU5EOgo+ICAgXn5+fgo+IAo+IFJld29yayB0byBhZGQgYSAnYnJlYWs7
+JyBpbiB0aGUgc3dpY2gtY2FzZSBzaW5jZSBpdCBkaWRuJ3QgaGF2ZSB0aGF0Lgo+IFRoYXQgYWxz
+byBtYWRlIHRoZSBjb21waWxlciBoYXBweSBhbmQgZGlkbid0IHdhcm4gYWJvdXQgZmFsbC10aHJv
+dWdoLgo+IAo+IENjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnICMgdjMuMTYrCgpFcm0uLi4gQXJl
+IHlvdSBzdXJlIGFib3V0IHRoYXQ/IEhlcmUncyB3aGF0IEkgaGF2ZToKCiQgZ2l0IGRlc2NyaWJl
+IC0tY29udGFpbnMgIGE4OTI4MTk1NjBjNAprdm0tYXJtLWZvci12NC4xN340NAokIGdpdCBkZXNj
+cmliZSAtLWNvbnRhaW5zIC0tbWF0Y2g9J3YqJyBhODkyODE5NTYwYzQKdjQuMTctcmMxfjcyXjJ+
+MzZeMn40NAoKCj4gRml4ZXM6IGE4OTI4MTk1NjBjNCAoIktWTTogYXJtNjQ6IFByZXBhcmUgdG8g
+aGFuZGxlIGRlZmVycmVkIHNhdmUvcmVzdG9yZSBvZiAzMi1iaXQgcmVnaXN0ZXJzIikKPiBTaWdu
+ZWQtb2ZmLWJ5OiBBbmRlcnMgUm94ZWxsIDxhbmRlcnMucm94ZWxsQGxpbmFyby5vcmc+Cj4gLS0t
+Cj4gIGFyY2gvYXJtNjQva3ZtL3JlZ21hcC5jIHwgNSArKysrKwo+ICAxIGZpbGUgY2hhbmdlZCwg
+NSBpbnNlcnRpb25zKCspCj4gCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3JlZ21hcC5j
+IGIvYXJjaC9hcm02NC9rdm0vcmVnbWFwLmMKPiBpbmRleCAwZDYwZTRmMGFmNjYuLmE5MDAxODFl
+Mzg2NyAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9yZWdtYXAuYwo+ICsrKyBiL2FyY2gv
+YXJtNjQva3ZtL3JlZ21hcC5jCj4gQEAgLTE3OCwxMyArMTc4LDE4IEBAIHZvaWQgdmNwdV93cml0
+ZV9zcHNyMzIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1bnNpZ25lZCBsb25nIHYpCj4gIAlzd2l0
+Y2ggKHNwc3JfaWR4KSB7Cj4gIAljYXNlIEtWTV9TUFNSX1NWQzoKPiAgCQl3cml0ZV9zeXNyZWdf
+ZWwxKHYsIFNZU19TUFNSKTsKPiArCQlicmVhazsKPiAgCWNhc2UgS1ZNX1NQU1JfQUJUOgo+ICAJ
+CXdyaXRlX3N5c3JlZyh2LCBzcHNyX2FidCk7Cj4gKwkJYnJlYWs7Cj4gIAljYXNlIEtWTV9TUFNS
+X1VORDoKPiAgCQl3cml0ZV9zeXNyZWcodiwgc3Bzcl91bmQpOwo+ICsJCWJyZWFrOwo+ICAJY2Fz
+ZSBLVk1fU1BTUl9JUlE6Cj4gIAkJd3JpdGVfc3lzcmVnKHYsIHNwc3JfaXJxKTsKPiArCQlicmVh
+azsKPiAgCWNhc2UgS1ZNX1NQU1JfRklROgo+ICAJCXdyaXRlX3N5c3JlZyh2LCBzcHNyX2ZpcSk7
+Cj4gKwkJYnJlYWs7Cj4gIAl9Cj4gIH0KCk90aGVyd2lzZSBsb29rcyBsaWtlIHRoZSByaWdodCBm
+aXggdG8gbWUuIExldCBtZSBrbm93IHdoYXQgeW91IHRoaW5rCmFib3V0IHRoZSBGaXhlczogdGFn
+IChubyBuZWVkIHRvIHJlc2VuZCBmb3IgdGhhdCkuCgpUaGFua3MsCgoJTS4KCi0tIApKYXp6IGlz
+IG5vdCBkZWFkLCBpdCBqdXN0IHNtZWxscyBmdW5ueS4KX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
+dGluZm8va3ZtYXJtCg==
