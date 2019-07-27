@@ -1,62 +1,64 @@
-Return-Path: <SRS0=z813=VX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=tpUV=VY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8862BC7618F
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 22:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11515C7618F
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Jul 2019 02:56:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0D35821994
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Jul 2019 22:58:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D35821994
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linutronix.de
+	by mail.kernel.org (Postfix) with ESMTP id 898382086D
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Jul 2019 02:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898382086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 683444A55C;
-	Fri, 26 Jul 2019 18:58:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE73B4A55E;
+	Fri, 26 Jul 2019 22:56:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jRIMdQwiq2nF; Fri, 26 Jul 2019 18:58:50 -0400 (EDT)
+	with ESMTP id K1JnTElwiA7x; Fri, 26 Jul 2019 22:56:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 552C04A53F;
-	Fri, 26 Jul 2019 18:58:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A60914A51B;
+	Fri, 26 Jul 2019 22:56:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E5EC4A52F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 18:58:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29E3B4A51B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 22:56:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xschhcOfC7hM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jul 2019 18:58:47 -0400 (EDT)
-Received: from Galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2CB24A51C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 18:58:46 -0400 (EDT)
-Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
- by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
- (Exim 4.80) (envelope-from <tglx@linutronix.de>)
- id 1hr9Ad-00042J-5J; Sat, 27 Jul 2019 00:58:40 +0200
-Date: Sat, 27 Jul 2019 00:58:38 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: KVM Arm64 and Linux-RT issues
-In-Reply-To: <cd310858-2c0f-6af1-bf82-ee1e01a2cfb8@arm.com>
-Message-ID: <alpine.DEB.2.21.1907270053360.1791@nanos.tec.linutronix.de>
-References: <b9867c43-7fe3-5d64-9939-b1a7ab7f1061@arm.com>
- <cd310858-2c0f-6af1-bf82-ee1e01a2cfb8@arm.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ with ESMTP id BcGlkZ-hId53 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jul 2019 22:56:13 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A87D64A4AA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 22:56:13 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 64AC312BCB15B6E8DB67;
+ Sat, 27 Jul 2019 10:56:10 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Sat, 27 Jul 2019
+ 10:55:59 +0800
+Subject: Re: [PATCH] KVM: arm64: Update kvm_arm_exception_class and
+ esr_class_str for new EC
+To: James Morse <james.morse@arm.com>, <marc.zyngier@arm.com>
+References: <1562992854-972-1-git-send-email-yuzenghui@huawei.com>
+ <e009aceb-9d23-1a58-8186-4883ab98bd45@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3e3029b5-74b2-693f-b4ab-5876baee3414@huawei.com>
+Date: Sat, 27 Jul 2019 10:54:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required, ALL_TRUSTED=-1,
- SHORTCIRCUIT=-0.0001
-Cc: "linux-rt-users@vger.kernel.org" <linux-rt-users@vger.kernel.org>,
- "bigeasy@linutronix.de" <bigeasy@linutronix.de>,
- Julien Grall <julien.grall@arm.com>, anna-maria@linutronix.de,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <e009aceb-9d23-1a58-8186-4883ab98bd45@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, Dave.Martin@arm.com,
+ amit.kachhap@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,48 +70,99 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 24 Jul 2019, Marc Zyngier wrote:
-> On 23/07/2019 18:58, Julien Grall wrote:
-> It really feels like a change in hrtimer_cancel semantics. From what I
-> understand, this is used to avoid racing against the softirq, but boy it
-> breaks things.
+Hi,
+
+I noticed Marc had applied this patch in his kvmarm tree, with the
+updated commit message.  Thanks Marc :)
+
+On 2019/7/25 20:48, James Morse wrote:
+> Hi,
 > 
-> If this cannot be avoided, this means we can't cancel the background
-> timer (which is used to emulate the vcpu timer while it is blocked
-> waiting for an interrupt), then we must move this canceling to the point
-> where the vcpu is unblocked (instead of scheduled), which may have some
-> side effects -- I'll have a look.
+> On 13/07/2019 05:40, Zenghui Yu wrote:
+>> We've added two ESR exception classes for new ARM hardware extensions:
+>> ESR_ELx_EC_PAC and ESR_ELx_EC_SVE.
+>>
+>> This patch updates "kvm_arm_exception_class" for these two EC, which the
 > 
-> But that's not the only problem: We also have hrtimers used to emulate
-> timers while the vcpu is running, and these timers are canceled in
-> kvm_timer_vcpu_put(), which is also called from a preempt notifier.
-> Unfortunately, I don't have a reasonable solution for that (other than
-> putting this hrtimer_cancel in a workqueue and start chasing the
-> resulting races).
+>> new EC will be parsed in kvm_exit trace events (for guest's usage of
+> 
+> new EC will be visible to user-space via kvm_exit() trace events... ?
+> 
+> 
+>> Pointer Authentication and Scalable Vector Extension).  The same updates
+>> to "esr_class_str" for ESR_ELx_EC_PAC, by which we can get more accurate
+>> debug info.
+> 
+> Its accurate either way round. This stops the trace-point print from printing the EC in
+> hex, instead giving it a name, like we do for all the others.
 
-The fix is simple. See below. We'll add that to the next RT release. That
-will take a while as I'm busy with posting RT stuff for upstream :)
+So this should be "readable".
 
-Thanks,
+>>   Trivial changes, update them in one go.
+> 
+> (I don't think this bit needs to go in the git-log!)
+> 
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index a8b205e..ddf9d76 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -316,9 +316,10 @@
+>>   
+>>   #define kvm_arm_exception_class \
+>>   	ECN(UNKNOWN), ECN(WFx), ECN(CP15_32), ECN(CP15_64), ECN(CP14_MR), \
+>> -	ECN(CP14_LS), ECN(FP_ASIMD), ECN(CP10_ID), ECN(CP14_64), ECN(SVC64), \
+>> -	ECN(HVC64), ECN(SMC64), ECN(SYS64), ECN(IMP_DEF), ECN(IABT_LOW), \
+>> -	ECN(IABT_CUR), ECN(PC_ALIGN), ECN(DABT_LOW), ECN(DABT_CUR), \
+>> +	ECN(CP14_LS), ECN(FP_ASIMD), ECN(CP10_ID), ECN(PAC), ECN(CP14_64), \
+>> +	ECN(SVC64), ECN(HVC64), ECN(SMC64), ECN(SYS64), ECN(SVE), \
+>> +	ECN(IMP_DEF), ECN(IABT_LOW), ECN(IABT_CUR), \
+>> +	ECN(PC_ALIGN), ECN(DABT_LOW), ECN(DABT_CUR), \
+>>   	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
+>>   	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
+>>   	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
+> 
+> Do we need to add:
+> ESR_ELx_EC_ILL
+> ESR_ELx_EC_HVC32
+> ESR_ELx_EC_SMC32
 
-	tglx
+I think they're needed.  But these three EC are not included into
+kvm_arm_exception_class at the time it was introduced, I don't know
+the reason.
 
-8<------------
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -80,7 +80,7 @@ static inline bool userspace_irqchip(str
- static void soft_timer_start(struct hrtimer *hrt, u64 ns)
- {
- 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
--		      HRTIMER_MODE_ABS);
-+		      HRTIMER_MODE_ABS_HARD);
- }
- 
+> (I don't see how any of the _CUR entries could ever happen as these EC originally come
+> from ESR_EL2, but they're harmless)
+
+(I agree with you.)
+
+>> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+>> index 8c03456..969e156 100644
+>> --- a/arch/arm64/kernel/traps.c
+>> +++ b/arch/arm64/kernel/traps.c
+>> @@ -734,6 +734,7 @@ asmlinkage void __exception do_sysinstr(unsigned int esr, struct pt_regs *regs)
+>>   	[ESR_ELx_EC_CP14_LS]		= "CP14 LDC/STC",
+>>   	[ESR_ELx_EC_FP_ASIMD]		= "ASIMD",
+>>   	[ESR_ELx_EC_CP10_ID]		= "CP10 MRC/VMRS",
+>> +	[ESR_ELx_EC_PAC]		= "PAC",
+>>   	[ESR_ELx_EC_CP14_64]		= "CP14 MCRR/MRRC",
+>>   	[ESR_ELx_EC_ILL]		= "PSTATE.IL",
+>>   	[ESR_ELx_EC_SVC32]		= "SVC (AArch32)",
+> 
+> 
+> Reviewed-by: James Morse <james.morse@arm.com>
+
+Thanks for your reviewing!
+
+
+Zenghui
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
