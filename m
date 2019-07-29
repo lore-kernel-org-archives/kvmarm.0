@@ -1,88 +1,55 @@
-Return-Path: <SRS0=RR3A=VZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=m0cG=V2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E09C7618B
-	for <kvmarm@archiver.kernel.org>; Sun, 28 Jul 2019 10:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8261DC7618B
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jul 2019 09:29:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 173B52075B
-	for <kvmarm@archiver.kernel.org>; Sun, 28 Jul 2019 10:21:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W5dFTmZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173B52075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 1268020693
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Jul 2019 09:29:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1268020693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 985E04A561;
-	Sun, 28 Jul 2019 06:21:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 670B94A528;
+	Mon, 29 Jul 2019 05:29:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FEI2APfosDlb; Sun, 28 Jul 2019 06:21:18 -0400 (EDT)
+	with ESMTP id YGgN0QWcvoS6; Mon, 29 Jul 2019 05:29:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCCF34A56A;
-	Sun, 28 Jul 2019 06:21:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2757D4A539;
+	Mon, 29 Jul 2019 05:29:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ED384A4F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 10:11:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F6C64A528
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jul 2019 05:29:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZvQguycAqmFk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jul 2019 10:11:18 -0400 (EDT)
-Received: from mail-lf1-f67.google.com (mail-lf1-f67.google.com
- [209.85.167.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F060F4A4DF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 10:11:17 -0400 (EDT)
-Received: by mail-lf1-f67.google.com with SMTP id h28so37146718lfj.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jul 2019 07:11:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=5375/eYD+teVgs8myc08Hg0r4foVjCEWpzZlGZgwvTY=;
- b=W5dFTmZfHWiAh/QWhQxjIPcVlNfiJWhuNNjmAytEgYyXT/M5s/PyhdTIrFzAvwXyoE
- pr6e5ZqoL2hR3i71NfQa0ojOcbxeOFQEihAwZoU5nJttafjiuEFu1DcbNJ39bqyCJwzh
- t5dHWLjmYNC1zDBvBrvkaRre1fnBCW94ycYUQVla3kVzz6MPum8OsqFweDQnwbMEk2dv
- XIsncO8K9r/BszhJhHeQhK7tc6AzDqBrbLCmYZ0CEQNXuS6Ap0JMN/faMtHLeOne/TJ0
- D0YizyvxI2PPGJ5MT7yAAVLcabdPqNfqcZxNjcPR31vWPGuqqXpKmaaijvMYvcDhTDYK
- aSvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=5375/eYD+teVgs8myc08Hg0r4foVjCEWpzZlGZgwvTY=;
- b=ag0G65mLPr0UDVR8cc3p9MmgVUafzyUNBiT+56lsWSUSu8gTbIlwR45ubL+ZP8Cj/l
- yp3G6mQQf5kAIG7IygyBP8521sdKUVHdPrLOos1WfRZYFm4dVv2lDxNyiGN/q/PUnSl3
- Z4ZotVynU5ffHIplHsy5oLdp8OXZzXJUdeXDi6yqND4GGrME1v1Y2GF/Zhf+370TwnHJ
- NswRlsdTOpBzdJggkjc84SPl3JTGs31QeziF1tVrpgGFYRMCmYN8NyDdxGCktFWpF0uP
- Qga3syQITmv3f1bzO1M646Up0Cx5b3mPufoxiH93ds8zYyNuEFvGDFZVUzljPWQutVoJ
- n8vA==
-X-Gm-Message-State: APjAAAVAeL6D6oveqdmmX1CPHV8QZrK89UAX1GHXngvtPbGarzs00VMH
- vHbNNqZAD7V2mb0+P4RC+tgxW8CfsP1e3ci2xR5EgA==
-X-Google-Smtp-Source: APXvYqzMgQAbRUdF6wQfNbEPaSg6/IktcAeJvaYlRdgeSXtPSwva+MvNu1bwGkYWd6Rni5sD4rhYSBUiheJB1QWdbtU=
-X-Received: by 2002:ac2:46d5:: with SMTP id p21mr11936228lfo.133.1564150276602; 
- Fri, 26 Jul 2019 07:11:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190726112710.19051-1-anders.roxell@linaro.org>
- <86d0hxnfif.wl-marc.zyngier@arm.com>
-In-Reply-To: <86d0hxnfif.wl-marc.zyngier@arm.com>
-From: Anders Roxell <anders.roxell@linaro.org>
-Date: Fri, 26 Jul 2019 16:11:05 +0200
-Message-ID: <CADYN=9KmNwsP7TDkf30xCa8ARVzQ_q=-v8cwkFueQ+NT-9JdyQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] arm64: KVM: hyp: debug-sr: Mark expected switch
- fall-through
-To: Marc Zyngier <marc.zyngier@arm.com>
-X-Mailman-Approved-At: Sun, 28 Jul 2019 06:21:14 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+ with ESMTP id 2GEuymvlsCnW for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jul 2019 05:29:08 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB62F4A4E8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jul 2019 05:29:08 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 580A9344;
+ Mon, 29 Jul 2019 02:29:08 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
+ [10.1.196.217])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 805E63F694;
+ Mon, 29 Jul 2019 02:29:07 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
+ waiting for interrupt
+Date: Mon, 29 Jul 2019 10:28:52 +0100
+Message-Id: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,140 +61,49 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gRnJpLCAyNiBKdWwgMjAxOSBhdCAxNDozMSwgTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJA
-YXJtLmNvbT4gd3JvdGU6Cj4KPiBPbiBGcmksIDI2IEp1bCAyMDE5IDEyOjI3OjEwICswMTAwLAo+
-IEFuZGVycyBSb3hlbGwgPGFuZGVycy5yb3hlbGxAbGluYXJvLm9yZz4gd3JvdGU6Cj4gPgo+ID4g
-V2hlbiBmYWxsLXRocm91Z2ggd2FybmluZ3Mgd2FzIGVuYWJsZWQgYnkgZGVmYXVsdCB0aGUgZm9s
-bG93aW5nIHdhcm5pbmdzCj4gPiB3YXMgc3RhcnRpbmcgdG8gc2hvdyB1cDoKPiA+Cj4gPiAuLi9h
-cmNoL2FybTY0L2t2bS9oeXAvZGVidWctc3IuYzogSW4gZnVuY3Rpb24g4oCYX19kZWJ1Z19zYXZl
-X3N0YXRl4oCZOgo+ID4gLi4vYXJjaC9hcm02NC9rdm0vaHlwL2RlYnVnLXNyLmM6MjA6MTk6IHdh
-cm5pbmc6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsCj4gPiAgdGhyb3VnaCBbLVdpbXBsaWNpdC1m
-YWxsdGhyb3VnaD1dCj4gPiAgIGNhc2UgMTU6IHB0clsxNV0gPSByZWFkX2RlYnVnKHJlZywgMTUp
-OyAgIFwKPiA+IC4uL2FyY2gvYXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jOjExMzoyOiBub3RlOiBp
-biBleHBhbnNpb24gb2YgbWFjcm8g4oCYc2F2ZV9kZWJ1Z+KAmQo+ID4gICBzYXZlX2RlYnVnKGRi
-Zy0+ZGJnX2JjciwgZGJnYmNyLCBicnBzKTsKPiA+ICAgXn5+fn5+fn5+fgo+ID4gLi4vYXJjaC9h
-cm02NC9rdm0vaHlwL2RlYnVnLXNyLmM6MjE6Mjogbm90ZTogaGVyZQo+ID4gICBjYXNlIDE0OiBw
-dHJbMTRdID0gcmVhZF9kZWJ1ZyhyZWcsIDE0KTsgICBcCj4gPiAgIF5+fn4KPiA+IC4uL2FyY2gv
-YXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jOjExMzoyOiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFj
-cm8g4oCYc2F2ZV9kZWJ1Z+KAmQo+ID4gICBzYXZlX2RlYnVnKGRiZy0+ZGJnX2JjciwgZGJnYmNy
-LCBicnBzKTsKPiA+ICAgXn5+fn5+fn5+fgo+ID4gLi4vYXJjaC9hcm02NC9rdm0vaHlwL2RlYnVn
-LXNyLmM6MjE6MTk6IHdhcm5pbmc6IHRoaXMgc3RhdGVtZW50IG1heSBmYWxsCj4gPiAgdGhyb3Vn
-aCBbLVdpbXBsaWNpdC1mYWxsdGhyb3VnaD1dCj4gPiAgIGNhc2UgMTQ6IHB0clsxNF0gPSByZWFk
-X2RlYnVnKHJlZywgMTQpOyAgIFwKPiA+IC4uL2FyY2gvYXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5j
-OjExMzoyOiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g4oCYc2F2ZV9kZWJ1Z+KAmQo+ID4g
-ICBzYXZlX2RlYnVnKGRiZy0+ZGJnX2JjciwgZGJnYmNyLCBicnBzKTsKPiA+ICAgXn5+fn5+fn5+
-fgo+ID4gLi4vYXJjaC9hcm02NC9rdm0vaHlwL2RlYnVnLXNyLmM6MjI6Mjogbm90ZTogaGVyZQo+
-ID4gICBjYXNlIDEzOiBwdHJbMTNdID0gcmVhZF9kZWJ1ZyhyZWcsIDEzKTsgICBcCj4gPiAgIF5+
-fn4KPiA+IC4uL2FyY2gvYXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jOjExMzoyOiBub3RlOiBpbiBl
-eHBhbnNpb24gb2YgbWFjcm8g4oCYc2F2ZV9kZWJ1Z+KAmQo+ID4gICBzYXZlX2RlYnVnKGRiZy0+
-ZGJnX2JjciwgZGJnYmNyLCBicnBzKTsKPiA+ICAgXn5+fn5+fn5+fgo+ID4KPiA+IFJld29yayB0
-byBhZGQgYSAnYnJlYWs7JyB3aGVyZSB0aGUgY29tcGlsZXIgd2FybmVkIGFib3V0Cj4gPiBmYWxs
-LXRocm91Z2guCj4KPiBUaGF0J3Mgbm90IHdoYXQgdGhpcyBwYXRjaCBkb2VzLCBJJ20gYWZyYWlk
-LgoKdXJnaCBJJ20gc29ycnkuClNlbmRpbmcgYSB2MiBzaG9ydGx5LgoKPgo+IFRoYW5rcywKPgo+
-ICAgICAgICAgTS4KPgo+ID4KPiA+IEZpeGVzOiBkOTM1MTJlZjBmMGUgKCJNYWtlZmlsZTogR2xv
-YmFsbHkgZW5hYmxlIGZhbGwtdGhyb3VnaCB3YXJuaW5nIikKPiA+IFNpZ25lZC1vZmYtYnk6IEFu
-ZGVycyBSb3hlbGwgPGFuZGVycy5yb3hlbGxAbGluYXJvLm9yZz4KPiA+IC0tLQo+ID4gIGFyY2gv
-YXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jIHwgMzAgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDMwIGluc2VydGlvbnMoKykKPiA+Cj4gPiBkaWZmIC0t
-Z2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL2RlYnVnLXNyLmMgYi9hcmNoL2FybTY0L2t2bS9oeXAv
-ZGVidWctc3IuYwo+ID4gaW5kZXggMjY3ODFkYTNhZDNlLi4wZmM5ODcyYTE0NjcgMTAwNjQ0Cj4g
-PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvZGVidWctc3IuYwo+ID4gKysrIGIvYXJjaC9hcm02
-NC9rdm0vaHlwL2RlYnVnLXNyLmMKPiA+IEBAIC0xOCw0MCArMTgsNzAgQEAKPiA+ICAjZGVmaW5l
-IHNhdmVfZGVidWcocHRyLHJlZyxucikgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIHN3aXRjaCAobnIpIHsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDE1OiAgICAg
-ICAgcHRyWzE1XSA9IHJlYWRfZGVidWcocmVnLCAxNSk7ICAgICAgICAgICAgICAgICAgXAo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMTQ6ICAgICAgICBwdHJbMTRdID0gcmVhZF9k
-ZWJ1ZyhyZWcsIDE0KTsgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgLyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgY2FzZSAxMzogICAgICAgIHB0clsxM10gPSByZWFkX2RlYnVnKHJlZywgMTMpOyAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2gg
-Ki8gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDEyOiAgICAg
-ICAgcHRyWzEyXSA9IHJlYWRfZGVidWcocmVnLCAxMik7ICAgICAgICAgICAgICAgICAgXAo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMTE6ICAgICAgICBwdHJbMTFdID0gcmVhZF9k
-ZWJ1ZyhyZWcsIDExKTsgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgLyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgY2FzZSAxMDogICAgICAgIHB0clsxMF0gPSByZWFkX2RlYnVnKHJlZywgMTApOyAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2gg
-Ki8gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDk6ICAgICAg
-ICAgcHRyWzldID0gcmVhZF9kZWJ1ZyhyZWcsIDkpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgODogICAgICAgICBwdHJbOF0gPSByZWFkX2Rl
-YnVnKHJlZywgOCk7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgLyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgY2FzZSA3OiAgICAgICAgIHB0cls3XSA9IHJlYWRfZGVidWcocmVnLCA3KTsgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2gg
-Ki8gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDY6ICAgICAg
-ICAgcHRyWzZdID0gcmVhZF9kZWJ1ZyhyZWcsIDYpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgNTogICAgICAgICBwdHJbNV0gPSByZWFkX2Rl
-YnVnKHJlZywgNSk7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgLyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgY2FzZSA0OiAgICAgICAgIHB0cls0XSA9IHJlYWRfZGVidWcocmVnLCA0KTsgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2gg
-Ki8gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDM6ICAgICAg
-ICAgcHRyWzNdID0gcmVhZF9kZWJ1ZyhyZWcsIDMpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMjogICAgICAgICBwdHJbMl0gPSByZWFkX2Rl
-YnVnKHJlZywgMik7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgLyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgY2FzZSAxOiAgICAgICAgIHB0clsxXSA9IHJlYWRfZGVidWcocmVnLCAxKTsgICAgICAg
-ICAgICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2gg
-Ki8gICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBkZWZhdWx0OiAgICAg
-ICAgcHRyWzBdID0gcmVhZF9kZWJ1ZyhyZWcsIDApOyAgICAgICAgICAgICAgICAgICAgXAo+ID4g
-ICAgICAgfQo+ID4KPiA+ICAjZGVmaW5lIHJlc3RvcmVfZGVidWcocHRyLHJlZyxucikgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBzd2l0Y2ggKG5yKSB7ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgY2FzZSAxNTogICAgICAgIHdyaXRlX2RlYnVnKHB0clsxNV0sIHJlZywgMTUpOyAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDE0OiAgICAgICAg
-d3JpdGVfZGVidWcocHRyWzE0XSwgcmVnLCAxNCk7ICAgICAgICAgICAgICAgICAgXAo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMTM6ICAgICAgICB3cml0ZV9kZWJ1ZyhwdHJbMTNd
-LCByZWcsIDEzKTsgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-LyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgY2FzZSAxMjogICAgICAgIHdyaXRlX2RlYnVnKHB0clsxMl0sIHJlZywgMTIpOyAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDExOiAgICAgICAg
-d3JpdGVfZGVidWcocHRyWzExXSwgcmVnLCAxMSk7ICAgICAgICAgICAgICAgICAgXAo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMTA6ICAgICAgICB3cml0ZV9kZWJ1ZyhwdHJbMTBd
-LCByZWcsIDEwKTsgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-LyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgY2FzZSA5OiAgICAgICAgIHdyaXRlX2RlYnVnKHB0cls5XSwgcmVnLCA5KTsgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDg6ICAgICAgICAg
-d3JpdGVfZGVidWcocHRyWzhdLCByZWcsIDgpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgNzogICAgICAgICB3cml0ZV9kZWJ1ZyhwdHJbN10s
-IHJlZywgNyk7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-LyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgY2FzZSA2OiAgICAgICAgIHdyaXRlX2RlYnVnKHB0cls2XSwgcmVnLCA2KTsgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDU6ICAgICAgICAg
-d3JpdGVfZGVidWcocHRyWzVdLCByZWcsIDUpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgNDogICAgICAgICB3cml0ZV9kZWJ1ZyhwdHJbNF0s
-IHJlZywgNCk7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-LyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgY2FzZSAzOiAgICAgICAgIHdyaXRlX2RlYnVnKHB0clszXSwgcmVnLCAzKTsgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICsgICAgICAgICAgICAgICAgICAgICAvKiBGYWxsIHRocm91Z2ggKi8g
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gPiAgICAgICBjYXNlIDI6ICAgICAgICAg
-d3JpdGVfZGVidWcocHRyWzJdLCByZWcsIDIpOyAgICAgICAgICAgICAgICAgICAgXAo+ID4gKyAg
-ICAgICAgICAgICAgICAgICAgIC8qIEZhbGwgdGhyb3VnaCAqLyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIGNhc2UgMTogICAgICAgICB3cml0ZV9kZWJ1ZyhwdHJbMV0s
-IHJlZywgMSk7ICAgICAgICAgICAgICAgICAgICBcCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-LyogRmFsbCB0aHJvdWdoICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAo+ID4gICAg
-ICAgZGVmYXVsdDogICAgICAgIHdyaXRlX2RlYnVnKHB0clswXSwgcmVnLCAwKTsgICAgICAgICAg
-ICAgICAgICAgIFwKPiA+ICAgICAgIH0KPiA+Cj4gPiAtLQo+ID4gMi4yMC4xCj4gPgo+Cj4gLS0K
-PiBKYXp6IGlzIG5vdCBkZWFkLCBpdCBqdXN0IHNtZWxscyBmdW5ueS4KX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
+to report_info after enabling the timer and before the wfi instruction. The
+uart that printf uses is emulated by userspace and is slow, which makes it
+more likely that the timer interrupt will fire before executing the wfi
+instruction, which leads to a deadlock.
+
+An interrupt can wake up a CPU out of wfi, regardless of the
+PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
+before enabling the timer and unmasking them after the wfi returns so the
+CPU can execute the timer interrupt handler.
+
+Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ arm/timer.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arm/timer.c b/arm/timer.c
+index 6f2ad1d76ab2..f2f60192ba62 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
+ 	/* Test TVAL and IRQ trigger */
+ 	info->irq_received = false;
+ 	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
++	local_irq_disable();
+ 	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+ 	report_info("waiting for interrupt...");
+ 	wfi();
++	local_irq_enable();
+ 	left = info->read_tval();
+ 	report("interrupt received after TVAL/WFI", info->irq_received);
+ 	report("timer has expired (%d)", left < 0, left);
+-- 
+2.7.4
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
