@@ -6,54 +6,60 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A684C0650F
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Jul 2019 09:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EDAC0650F
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Jul 2019 10:12:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7F5F20665
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Jul 2019 09:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7F5F20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 6B2FC206E0
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Jul 2019 10:12:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B2FC206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE2A64A4FB;
-	Tue, 30 Jul 2019 05:31:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1B0F4A4F4;
+	Tue, 30 Jul 2019 06:12:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6uzIMFrjKDW9; Tue, 30 Jul 2019 05:31:09 -0400 (EDT)
+	with ESMTP id qd6MShV+Dcyh; Tue, 30 Jul 2019 06:12:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9001E4A4FD;
-	Tue, 30 Jul 2019 05:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A815F4A4F7;
+	Tue, 30 Jul 2019 06:12:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D13A4A4EB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jul 2019 05:31:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2426E4A4FB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jul 2019 06:12:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mK+rMcdyPWe5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Jul 2019 05:31:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C57D4A4E1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jul 2019 05:31:06 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 057E9344;
- Tue, 30 Jul 2019 02:31:06 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48C403F575;
- Tue, 30 Jul 2019 02:31:05 -0700 (PDT)
+ with ESMTP id sBAB8QUQyyvb for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Jul 2019 06:12:20 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F37D44A4F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jul 2019 06:12:19 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2A29ADF26;
+ Tue, 30 Jul 2019 10:12:19 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F2860922;
+ Tue, 30 Jul 2019 10:12:17 +0000 (UTC)
+Date: Tue, 30 Jul 2019 12:12:15 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
  waiting for interrupt
-To: Andrew Jones <drjones@redhat.com>
+Message-ID: <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
 References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
  <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
-Date: Tue, 30 Jul 2019 10:30:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Tue, 30 Jul 2019 10:12:19 +0000 (UTC)
 Cc: marc.zyngier@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -67,62 +73,147 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gNy8yOS8xOSAxMjoyMyBQTSwgQW5kcmV3IEpvbmVzIHdyb3RlOgo+IE9uIE1vbiwgSnVsIDI5
-LCAyMDE5IGF0IDEwOjI4OjUyQU0gKzAxMDAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+IENv
-bW1pdCAyMDRlODVhYTkzNTIgKCJhcm02NDogdGltZXI6IGEgZmV3IHRlc3QgaW1wcm92ZW1lbnRz
-IikgYWRkZWQgYSBjYWxsCj4+IHRvIHJlcG9ydF9pbmZvIGFmdGVyIGVuYWJsaW5nIHRoZSB0aW1l
-ciBhbmQgYmVmb3JlIHRoZSB3ZmkgaW5zdHJ1Y3Rpb24uIFRoZQo+PiB1YXJ0IHRoYXQgcHJpbnRm
-IHVzZXMgaXMgZW11bGF0ZWQgYnkgdXNlcnNwYWNlIGFuZCBpcyBzbG93LCB3aGljaCBtYWtlcyBp
-dAo+PiBtb3JlIGxpa2VseSB0aGF0IHRoZSB0aW1lciBpbnRlcnJ1cHQgd2lsbCBmaXJlIGJlZm9y
-ZSBleGVjdXRpbmcgdGhlIHdmaQo+PiBpbnN0cnVjdGlvbiwgd2hpY2ggbGVhZHMgdG8gYSBkZWFk
-bG9jay4KPj4KPj4gQW4gaW50ZXJydXB0IGNhbiB3YWtlIHVwIGEgQ1BVIG91dCBvZiB3ZmksIHJl
-Z2FyZGxlc3Mgb2YgdGhlCj4+IFBTVEFURS57QSwgSSwgRn0gYml0cy4gRml4IHRoZSBkZWFkbG9j
-ayBieSBtYXNraW5nIGludGVycnVwdHMgb24gdGhlIENQVQo+PiBiZWZvcmUgZW5hYmxpbmcgdGhl
-IHRpbWVyIGFuZCB1bm1hc2tpbmcgdGhlbSBhZnRlciB0aGUgd2ZpIHJldHVybnMgc28gdGhlCj4+
-IENQVSBjYW4gZXhlY3V0ZSB0aGUgdGltZXIgaW50ZXJydXB0IGhhbmRsZXIuCj4+Cj4+IFN1Z2dl
-c3RlZC1ieTogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPj4gU2lnbmVkLW9m
-Zi1ieTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+PiAtLS0K
-Pj4gIGFybS90aW1lci5jIHwgMiArKwo+PiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygr
-KQo+Pgo+PiBkaWZmIC0tZ2l0IGEvYXJtL3RpbWVyLmMgYi9hcm0vdGltZXIuYwo+PiBpbmRleCA2
-ZjJhZDFkNzZhYjIuLmYyZjYwMTkyYmE2MiAxMDA2NDQKPj4gLS0tIGEvYXJtL3RpbWVyLmMKPj4g
-KysrIGIvYXJtL3RpbWVyLmMKPj4gQEAgLTI0Miw5ICsyNDIsMTEgQEAgc3RhdGljIHZvaWQgdGVz
-dF90aW1lcihzdHJ1Y3QgdGltZXJfaW5mbyAqaW5mbykKPj4gIAkvKiBUZXN0IFRWQUwgYW5kIElS
-USB0cmlnZ2VyICovCj4+ICAJaW5mby0+aXJxX3JlY2VpdmVkID0gZmFsc2U7Cj4+ICAJaW5mby0+
-d3JpdGVfdHZhbChyZWFkX3N5c3JlZyhjbnRmcnFfZWwwKSAvIDEwMCk7CS8qIDEwIG1zICovCj4+
-ICsJbG9jYWxfaXJxX2Rpc2FibGUoKTsKPj4gIAlpbmZvLT53cml0ZV9jdGwoQVJDSF9USU1FUl9D
-VExfRU5BQkxFKTsKPj4gIAlyZXBvcnRfaW5mbygid2FpdGluZyBmb3IgaW50ZXJydXB0Li4uIik7
-Cj4+ICAJd2ZpKCk7Cj4+ICsJbG9jYWxfaXJxX2VuYWJsZSgpOwo+PiAgCWxlZnQgPSBpbmZvLT5y
-ZWFkX3R2YWwoKTsKPj4gIAlyZXBvcnQoImludGVycnVwdCByZWNlaXZlZCBhZnRlciBUVkFML1dG
-SSIsIGluZm8tPmlycV9yZWNlaXZlZCk7Cj4+ICAJcmVwb3J0KCJ0aW1lciBoYXMgZXhwaXJlZCAo
-JWQpIiwgbGVmdCA8IDAsIGxlZnQpOwo+PiAtLSAKPj4gMi43LjQKPj4KPiBSZXZpZXdlZC1ieTog
-QW5kcmV3IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+Cj4KPiBUaGFua3MgQWxleGFuZHJ1LiBJ
-dCBub3cgbWFrZXMgbW9yZSBzZW5zZSB0byBtZSB0aGF0IHdmaSB3YWtlcyB1cCBvbgo+IGFuIGlu
-dGVycnVwdCwgZXZlbiB3aGVuIGludGVycnVwdHMgYXJlIG1hc2tlZCwgYXMgaXQncyBjbGVhcmx5
-IHRvCj4gYXZvaWQgdGhlc2UgdHlwZXMgb2YgcmFjZXMuIEkgc2VlIHdlIGhhdmUgdGhlIHNhbWUg
-dHlwZSBvZiByYWNlIGluCj4gYXJtL2dpYy5jLiBJJ2xsIHRyeSB0byBnZXQgYXJvdW5kIHRvIGZp
-eGluZyB0aGF0IGF0IHNvbWUgcG9pbnQsIHVubGVzcwo+IHNvbWVib2R5IGJlYXRzIG1lIHRvIGl0
-IDopCgpTb21ldGhpbmcgbGlrZSB0aGlzPyBUZXN0ZWQgd2l0aCBnaWN2My1pcGkuCgpkaWZmIC0t
-Z2l0IGEvYXJtL2dpYy5jIGIvYXJtL2dpYy5jCmluZGV4IGVkNTY0MmU3NGY3MC4uZjBiZDU3Mzk4
-NDJhIDEwMDY0NAotLS0gYS9hcm0vZ2ljLmMKKysrIGIvYXJtL2dpYy5jCkBAIC0yMjAsMTIgKzIy
-MCwxMiBAQCBzdGF0aWMgdm9pZCBpcGlfZW5hYmxlKHZvaWQpCsKgI2Vsc2UKwqDCoMKgwqDCoMKg
-wqAgaW5zdGFsbF9pcnFfaGFuZGxlcihFTDFIX0lSUSwgaXBpX2hhbmRsZXIpOwrCoCNlbmRpZgot
-wqDCoMKgwqDCoMKgIGxvY2FsX2lycV9lbmFibGUoKTsKwqB9CsKgCsKgc3RhdGljIHZvaWQgaXBp
-X3NlbmQodm9pZCkKwqB7CsKgwqDCoMKgwqDCoMKgIGlwaV9lbmFibGUoKTsKK8KgwqDCoMKgwqDC
-oCBsb2NhbF9pcnFfZW5hYmxlKCk7CsKgwqDCoMKgwqDCoMKgIHdhaXRfb25fcmVhZHkoKTsKwqDC
-oMKgwqDCoMKgwqAgaXBpX3Rlc3Rfc2VsZigpOwrCoMKgwqDCoMKgwqDCoCBpcGlfdGVzdF9zbXAo
-KTsKQEAgLTIzNiw5ICsyMzYsMTMgQEAgc3RhdGljIHZvaWQgaXBpX3NlbmQodm9pZCkKwqBzdGF0
-aWMgdm9pZCBpcGlfcmVjdih2b2lkKQrCoHsKwqDCoMKgwqDCoMKgwqAgaXBpX2VuYWJsZSgpOwor
-wqDCoMKgwqDCoMKgIGxvY2FsX2lycV9kaXNhYmxlKCk7CsKgwqDCoMKgwqDCoMKgIGNwdW1hc2tf
-c2V0X2NwdShzbXBfcHJvY2Vzc29yX2lkKCksICZyZWFkeSk7Ci3CoMKgwqDCoMKgwqAgd2hpbGUg
-KDEpCivCoMKgwqDCoMKgwqAgd2hpbGUgKDEpIHsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgbG9jYWxfaXJxX2Rpc2FibGUoKTsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdm
-aSgpOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBsb2NhbF9pcnFfZW5hYmxlKCk7CivC
-oMKgwqDCoMKgwqAgfQrCoH0KwqAKwqBzdGF0aWMgdm9pZCBpcGlfdGVzdCh2b2lkICpkYXRhIF9f
-dW51c2VkKQo+Cj4gZHJldwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Tue, Jul 30, 2019 at 10:30:50AM +0100, Alexandru Elisei wrote:
+> On 7/29/19 12:23 PM, Andrew Jones wrote:
+> > On Mon, Jul 29, 2019 at 10:28:52AM +0100, Alexandru Elisei wrote:
+> >> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a =
+call
+> >> to report_info after enabling the timer and before the wfi instruction=
+. The
+> >> uart that printf uses is emulated by userspace and is slow, which make=
+s it
+> >> more likely that the timer interrupt will fire before executing the wfi
+> >> instruction, which leads to a deadlock.
+> >>
+> >> An interrupt can wake up a CPU out of wfi, regardless of the
+> >> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the C=
+PU
+> >> before enabling the timer and unmasking them after the wfi returns so =
+the
+> >> CPU can execute the timer interrupt handler.
+> >>
+> >> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >> ---
+> >>  arm/timer.c | 2 ++
+> >>  1 file changed, 2 insertions(+)
+> >>
+> >> diff --git a/arm/timer.c b/arm/timer.c
+> >> index 6f2ad1d76ab2..f2f60192ba62 100644
+> >> --- a/arm/timer.c
+> >> +++ b/arm/timer.c
+> >> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
+> >>  	/* Test TVAL and IRQ trigger */
+> >>  	info->irq_received =3D false;
+> >>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
+> >> +	local_irq_disable();
+> >>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+> >>  	report_info("waiting for interrupt...");
+> >>  	wfi();
+> >> +	local_irq_enable();
+> >>  	left =3D info->read_tval();
+> >>  	report("interrupt received after TVAL/WFI", info->irq_received);
+> >>  	report("timer has expired (%d)", left < 0, left);
+> >> -- =
+
+> >> 2.7.4
+> >>
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> >
+> > Thanks Alexandru. It now makes more sense to me that wfi wakes up on
+> > an interrupt, even when interrupts are masked, as it's clearly to
+> > avoid these types of races. I see we have the same type of race in
+> > arm/gic.c. I'll try to get around to fixing that at some point, unless
+> > somebody beats me to it :)
+> =
+
+> Something like this? Tested with gicv3-ipi.
+> =
+
+> diff --git a/arm/gic.c b/arm/gic.c
+> index ed5642e74f70..f0bd5739842a 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -220,12 +220,12 @@ static void ipi_enable(void)
+> =A0#else
+> =A0=A0=A0=A0=A0=A0=A0 install_irq_handler(EL1H_IRQ, ipi_handler);
+> =A0#endif
+> -=A0=A0=A0=A0=A0=A0 local_irq_enable();
+> =A0}
+> =A0
+> =A0static void ipi_send(void)
+> =A0{
+> =A0=A0=A0=A0=A0=A0=A0 ipi_enable();
+> +=A0=A0=A0=A0=A0=A0 local_irq_enable();
+> =A0=A0=A0=A0=A0=A0=A0 wait_on_ready();
+> =A0=A0=A0=A0=A0=A0=A0 ipi_test_self();
+> =A0=A0=A0=A0=A0=A0=A0 ipi_test_smp();
+> @@ -236,9 +236,13 @@ static void ipi_send(void)
+> =A0static void ipi_recv(void)
+> =A0{
+> =A0=A0=A0=A0=A0=A0=A0 ipi_enable();
+> +=A0=A0=A0=A0=A0=A0 local_irq_disable();
+> =A0=A0=A0=A0=A0=A0=A0 cpumask_set_cpu(smp_processor_id(), &ready);
+> -=A0=A0=A0=A0=A0=A0 while (1)
+> +=A0=A0=A0=A0=A0=A0 while (1) {
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 local_irq_disable();
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 wfi();
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 local_irq_enable();
+> +=A0=A0=A0=A0=A0=A0 }
+> =A0}
+> =A0
+> =A0static void ipi_test(void *data __unused)
+
+I'm not sure we need to worry about enabling/disabling interrupts around
+the wfi, since we're just doing a tight loop on it. I think something like
+this (untested), which is quite similar to your approach, should work
+
+diff --git a/arm/gic.c b/arm/gic.c
+index ed5642e74f70..cdbb4134b0af 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -214,18 +214,19 @@ static void ipi_test_smp(void)
+ =
+
+ static void ipi_enable(void)
+ {
++       local_irq_disable();
+        gic_enable_defaults();
+ #ifdef __arm__
+        install_exception_handler(EXCPTN_IRQ, ipi_handler);
+ #else
+        install_irq_handler(EL1H_IRQ, ipi_handler);
+ #endif
+-       local_irq_enable();
+ }
+ =
+
+ static void ipi_send(void)
+ {
+        ipi_enable();
++       local_irq_enable();
+        wait_on_ready();
+        ipi_test_self();
+        ipi_test_smp();
+@@ -237,6 +238,7 @@ static void ipi_recv(void)
+ {
+        ipi_enable();
+        cpumask_set_cpu(smp_processor_id(), &ready);
++       local_irq_enable();
+        while (1)
+                wfi();
+ }
+
+What do you think?
+
+Thanks,
+drew
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
