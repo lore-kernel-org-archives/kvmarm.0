@@ -2,85 +2,61 @@ Return-Path: <SRS0=eGRX=V6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C88C433FF
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB218C32750
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:56:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9C90B204EC
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lca.pw header.i=@lca.pw header.b="ClkjwnuA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C90B204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lca.pw
+	by mail.kernel.org (Postfix) with ESMTP id 6B64F20B7C
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:56:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B64F20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 174DC4A532;
-	Fri,  2 Aug 2019 11:15:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4B244A51C;
+	Fri,  2 Aug 2019 11:56:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@lca.pw
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eY7LyQzbYK2D; Fri,  2 Aug 2019 11:14:58 -0400 (EDT)
+	with ESMTP id RdN3bDzRjLo8; Fri,  2 Aug 2019 11:56:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E250F4A541;
-	Fri,  2 Aug 2019 11:14:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CB064A540;
+	Fri,  2 Aug 2019 11:56:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E71FA4A4FD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 10:23:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9868C4A51C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 11:56:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BplcBb3kXfv3 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Aug 2019 10:23:38 -0400 (EDT)
-Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com
- [209.85.222.193])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C46A94A4DF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 10:23:38 -0400 (EDT)
-Received: by mail-qk1-f193.google.com with SMTP id r4so54812767qkm.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Aug 2019 07:23:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lca.pw; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=CWdgiiN/Z+VeLUxPy5NDLjA/glfsWptWvE0Hk0bA4Qc=;
- b=ClkjwnuAjyQX4RFGsqAZhTjqGMDy7ocP/0TCroEDlhL07SsQmlRYVGn8aIHaHRwUCf
- utzbV9Rw0J2YHV76T0ve3706m4aR1IZDfRam5C9funveugiRgC8FUpWqlxtq2tFKy7Hd
- VfsToKr4T96EcEkZOa1EYCPGLYzko/sCPdVXxdcyEjThSesEn1Yukp4qAFEBL8pv9AD7
- cQ+rtCtxrN7cT7v5yWDPwKLFyjF7Rnrrjf2zLhORo1f2RRy4znki0byJia/elQpyLyRH
- W9Kr1qkd/1ceoeZGcwQI6LhEwYkuiNtZoZc8nOVzH9lX4xcZnaGp0ETvzemP5soQs71N
- fvgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=CWdgiiN/Z+VeLUxPy5NDLjA/glfsWptWvE0Hk0bA4Qc=;
- b=LsLVB4ib8W0MIQDwfz8NzeSZp7BDLrr+Dv+ecTLOlR5tlbmnVrFuifma5AZ1QjFhu9
- FcL4cRa4cCQaaEARWwQm4dnrarMDBsuijmsZSQ14ob6SF7jJsogyDyhAwVD9R3kp+XQr
- fZ+ta/Z87zw+RRdk6rvVwZdarRtIp7Xx7NrrW/omtrR92+bzMHnJ/xiycrLkUL56TGwK
- LYZoNaF2U/HoXnHu2YNoPA3jrU5zp/SQmmPE+syS76QNebLvrY3G5J1sQBhw6sGhbBZG
- 6qYsa7YWdGqa4nGX+L/3f2gZF/n8ZEnnZADNxI+fNT20KGxAIPPZwFMtJfb+4qip6YsB
- fnPA==
-X-Gm-Message-State: APjAAAUID0MD+/C3udTHmLsp0VvuuLnqZ7PuqsIrgtjgjLom6Qa1m53k
- Gh8G1lFzLJtslm5jGaQedBwGqA==
-X-Google-Smtp-Source: APXvYqz+KxEnFgHjSy1G4Be0JgFETmApxP1tkP5flW/+UvCcQ+n9HdUVJ9MvLVxmfppI//mnB3tdag==
-X-Received: by 2002:a37:2c46:: with SMTP id s67mr92776362qkh.396.1564755818363; 
- Fri, 02 Aug 2019 07:23:38 -0700 (PDT)
-Received: from qcai.nay.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
- by smtp.gmail.com with ESMTPSA id v84sm33042439qkb.0.2019.08.02.07.23.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 02 Aug 2019 07:23:37 -0700 (PDT)
-From: Qian Cai <cai@lca.pw>
-To: maz@kernel.org
-Subject: [PATCH] arm64/kvm: fix -Wimplicit-fallthrough warnings
-Date: Fri,  2 Aug 2019 10:23:08 -0400
-Message-Id: <1564755788-28485-1-git-send-email-cai@lca.pw>
-X-Mailer: git-send-email 1.8.3.1
-X-Mailman-Approved-At: Fri, 02 Aug 2019 11:14:58 -0400
-Cc: linux-kernel@vger.kernel.org, christoffer.dall@linaro.org,
- Qian Cai <cai@lca.pw>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id tLug+TQZC+JC for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Aug 2019 11:56:27 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C224A51B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 11:56:27 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD6F61596;
+ Fri,  2 Aug 2019 08:56:26 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
+ AC41C3F575; Fri,  2 Aug 2019 08:56:25 -0700 (PDT)
+Subject: Re: kvm-unit-tests: psci_cpu_on_test FAILed
+To: Zenghui Yu <yuzenghui@huawei.com>, drjones@redhat.com,
+ James Morse <james.morse@arm.com>, julien.thierry.kdev@gmail.com,
+ suzuki.poulose@arm.com
+References: <3ddf8766-6f02-b655-1b80-d8a7fd016509@huawei.com>
+From: Marc Zyngier <maz@kernel.org>
+Organization: Approximate
+Message-ID: <48a18685-ee81-83a7-9eea-63fe26690903@kernel.org>
+Date: Fri, 2 Aug 2019 16:56:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <3ddf8766-6f02-b655-1b80-d8a7fd016509@huawei.com>
+Content-Language: en-US
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,137 +68,117 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The commit a892819560c4 ("KVM: arm64: Prepare to handle deferred
-save/restore of 32-bit registers") introduced vcpu_write_spsr32() but
-seems forgot to add "break" between the switch statements and generates
-compilation warnings below. Also, adding a default statement as in
-vcpu_read_spsr32().
+On 02/08/2019 11:56, Zenghui Yu wrote:
+> Hi folks,
+> 
+> Running kvm-unit-tests with Linux 5.3.0-rc2 on Kunpeng 920, we will get
+> the following fail info:
+> 
+> 	[...]
+> 	FAIL psci (4 tests, 1 unexpected failures)
+> 	[...]
+> and
+> 	[...]
+> 	INFO: unexpected cpu_on return value: caller=CPU9, ret=-2
+> 	FAIL: cpu-on
+> 	SUMMARY: 4 tests, 1 unexpected failures
+> 
+> 
+> I think this is an issue had been fixed once by commit 6c7a5dce22b3
+> ("KVM: arm/arm64: fix races in kvm_psci_vcpu_on"), which makes use of
+> kvm->lock mutex to fix the race between two PSCI_CPU_ON calls - one
+> does reset on the MPIDR register whilst another reads it.
+> 
+> But commit 358b28f09f0 ("arm/arm64: KVM: Allow a VCPU to fully reset
+> itself") later moves the reset work into check_vcpu_requests(), by
+> making a KVM_REQ_VCPU_RESET request in PSCI code. Thus the reset work
+> has not been protected by kvm->lock mutex anymore, and the race shows up
+> again...
+> 
+> Do we need a fix for this issue? At least achieve a mutex execution
+> between the reset of MPIDR and kvm_mpidr_to_vcpu()?
 
-In file included from ./arch/arm64/include/asm/kvm_emulate.h:19,
-                 from arch/arm64/kvm/regmap.c:13:
-arch/arm64/kvm/regmap.c: In function 'vcpu_write_spsr32':
-./arch/arm64/include/asm/kvm_hyp.h:31:3: warning: this statement may
-fall through [-Wimplicit-fallthrough=]
-   asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"), \
-   ^~~
-./arch/arm64/include/asm/kvm_hyp.h:46:31: note: in expansion of macro
-'write_sysreg_elx'
- #define write_sysreg_el1(v,r) write_sysreg_elx(v, r, _EL1, _EL12)
-                               ^~~~~~~~~~~~~~~~
-arch/arm64/kvm/regmap.c:180:3: note: in expansion of macro
-'write_sysreg_el1'
-   write_sysreg_el1(v, SYS_SPSR);
-   ^~~~~~~~~~~~~~~~
-arch/arm64/kvm/regmap.c:181:2: note: here
-  case KVM_SPSR_ABT:
-  ^~~~
-In file included from ./arch/arm64/include/asm/cputype.h:132,
-                 from ./arch/arm64/include/asm/cache.h:8,
-                 from ./include/linux/cache.h:6,
-                 from ./include/linux/printk.h:9,
-                 from ./include/linux/kernel.h:15,
-                 from ./include/asm-generic/bug.h:18,
-                 from ./arch/arm64/include/asm/bug.h:26,
-                 from ./include/linux/bug.h:5,
-                 from ./include/linux/mmdebug.h:5,
-                 from ./include/linux/mm.h:9,
-                 from arch/arm64/kvm/regmap.c:11:
-./arch/arm64/include/asm/sysreg.h:837:2: warning: this statement may
-fall through [-Wimplicit-fallthrough=]
-  asm volatile("msr " __stringify(r) ", %x0"  \
-  ^~~
-arch/arm64/kvm/regmap.c:182:3: note: in expansion of macro
-'write_sysreg'
-   write_sysreg(v, spsr_abt);
-   ^~~~~~~~~~~~
-arch/arm64/kvm/regmap.c:183:2: note: here
-  case KVM_SPSR_UND:
-  ^~~~
-In file included from ./arch/arm64/include/asm/cputype.h:132,
-                 from ./arch/arm64/include/asm/cache.h:8,
-                 from ./include/linux/cache.h:6,
-                 from ./include/linux/printk.h:9,
-                 from ./include/linux/kernel.h:15,
-                 from ./include/asm-generic/bug.h:18,
-                 from ./arch/arm64/include/asm/bug.h:26,
-                 from ./include/linux/bug.h:5,
-                 from ./include/linux/mmdebug.h:5,
-                 from ./include/linux/mm.h:9,
-                 from arch/arm64/kvm/regmap.c:11:
-./arch/arm64/include/asm/sysreg.h:837:2: warning: this statement may
-fall through [-Wimplicit-fallthrough=]
-  asm volatile("msr " __stringify(r) ", %x0"  \
-  ^~~
-arch/arm64/kvm/regmap.c:184:3: note: in expansion of macro
-'write_sysreg'
-   write_sysreg(v, spsr_und);
-   ^~~~~~~~~~~~
-arch/arm64/kvm/regmap.c:185:2: note: here
-  case KVM_SPSR_IRQ:
-  ^~~~
-In file included from ./arch/arm64/include/asm/cputype.h:132,
-                 from ./arch/arm64/include/asm/cache.h:8,
-                 from ./include/linux/cache.h:6,
-                 from ./include/linux/printk.h:9,
-                 from ./include/linux/kernel.h:15,
-                 from ./include/asm-generic/bug.h:18,
-                 from ./arch/arm64/include/asm/bug.h:26,
-                 from ./include/linux/bug.h:5,
-                 from ./include/linux/mmdebug.h:5,
-                 from ./include/linux/mm.h:9,
-                 from arch/arm64/kvm/regmap.c:11:
-./arch/arm64/include/asm/sysreg.h:837:2: warning: this statement may
-fall through [-Wimplicit-fallthrough=]
-  asm volatile("msr " __stringify(r) ", %x0"  \
-  ^~~
-arch/arm64/kvm/regmap.c:186:3: note: in expansion of macro
-'write_sysreg'
-   write_sysreg(v, spsr_irq);
-   ^~~~~~~~~~~~
-arch/arm64/kvm/regmap.c:187:2: note: here
-  case KVM_SPSR_FIQ:
-  ^~~~
+The thing is that the way we reset registers is marginally insane.
+Yes, it catches most reset bugs. It also introduces many more in
+the rest of the paths.
 
-Fixes: a892819560c4 ("KVM: arm64: Prepare to handle deferred save/restore of 32-bit registers")
-Signed-off-by: Qian Cai <cai@lca.pw>
----
- arch/arm64/kvm/regmap.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+The fun part is that there is hardly a need for resetting MPIDR.
+It has already been set when we've created the vcpu. It is the
+poisoning of the sysreg array that creates a situation where
+the MPIDR is temporarily invalid.
 
-diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-index 0d60e4f0af66..c94e9bc3e8eb 100644
---- a/arch/arm64/kvm/regmap.c
-+++ b/arch/arm64/kvm/regmap.c
-@@ -178,13 +178,20 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
- 	switch (spsr_idx) {
- 	case KVM_SPSR_SVC:
- 		write_sysreg_el1(v, SYS_SPSR);
-+		break;
- 	case KVM_SPSR_ABT:
- 		write_sysreg(v, spsr_abt);
-+		break;
- 	case KVM_SPSR_UND:
- 		write_sysreg(v, spsr_und);
-+		break;
- 	case KVM_SPSR_IRQ:
- 		write_sysreg(v, spsr_irq);
-+		break;
- 	case KVM_SPSR_FIQ:
- 		write_sysreg(v, spsr_fiq);
-+		break;
-+	default:
-+		BUG();
- 	}
+So instead of poisoning the array, how about we just keep
+track of the registers for which we've called a reset function?
+It should be enough to track the most obvious bugs... I've
+cobbled the following patch together, which seems to fix the
+issue on my TX2 with 64 vcpus.
+
+Thoughts?
+
+	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f26e181d881c..17f46ee7dc83 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2254,13 +2254,17 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
  }
--- 
-1.8.3.1
+ 
+ static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+-			      const struct sys_reg_desc *table, size_t num)
++				const struct sys_reg_desc *table, size_t num,
++				unsigned long *bmap)
+ {
+ 	unsigned long i;
+ 
+ 	for (i = 0; i < num; i++)
+-		if (table[i].reset)
++		if (table[i].reset) {
+ 			table[i].reset(vcpu, &table[i]);
++			if (bmap)
++				set_bit(i, bmap);
++		}
+ }
+ 
+ /**
+@@ -2772,21 +2776,23 @@ void kvm_sys_reg_table_init(void)
+  */
+ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+ {
++	unsigned long *bmap;
+ 	size_t num;
+ 	const struct sys_reg_desc *table;
+ 
+-	/* Catch someone adding a register without putting in reset entry. */
+-	memset(&vcpu->arch.ctxt.sys_regs, 0x42, sizeof(vcpu->arch.ctxt.sys_regs));
++	bmap = bitmap_alloc(NR_SYS_REGS, GFP_KERNEL);
+ 
+ 	/* Generic chip reset first (so target could override). */
+-	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
++	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
+ 
+ 	table = get_target_table(vcpu->arch.target, true, &num);
+-	reset_sys_reg_descs(vcpu, table, num);
++	reset_sys_reg_descs(vcpu, table, num, bmap);
+ 
+ 	for (num = 1; num < NR_SYS_REGS; num++) {
+-		if (WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
++		if (WARN(bmap && !test_bit(num, bmap),
+ 			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
+ 			break;
+ 	}
++
++	kfree(bmap);
+ }
 
+
+-- 
+Jazz is not dead, it just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
