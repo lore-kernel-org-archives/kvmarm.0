@@ -1,62 +1,79 @@
-Return-Path: <SRS0=eGRX=V6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=TbXc=V7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB218C32750
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9273C31E40
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Aug 2019 06:03:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B64F20B7C
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Aug 2019 15:56:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B64F20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 31E942073D
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Aug 2019 06:03:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E942073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4B244A51C;
-	Fri,  2 Aug 2019 11:56:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8B2B4A511;
+	Sat,  3 Aug 2019 02:03:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RdN3bDzRjLo8; Fri,  2 Aug 2019 11:56:30 -0400 (EDT)
+	with ESMTP id 7TqxDmjADOp8; Sat,  3 Aug 2019 02:03:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CB064A540;
-	Fri,  2 Aug 2019 11:56:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BD414A500;
+	Sat,  3 Aug 2019 02:03:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9868C4A51C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 11:56:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B9D54A500
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Aug 2019 02:03:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tLug+TQZC+JC for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Aug 2019 11:56:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C224A51B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Aug 2019 11:56:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD6F61596;
- Fri,  2 Aug 2019 08:56:26 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- AC41C3F575; Fri,  2 Aug 2019 08:56:25 -0700 (PDT)
-Subject: Re: kvm-unit-tests: psci_cpu_on_test FAILed
-To: Zenghui Yu <yuzenghui@huawei.com>, drjones@redhat.com,
- James Morse <james.morse@arm.com>, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com
-References: <3ddf8766-6f02-b655-1b80-d8a7fd016509@huawei.com>
-From: Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <48a18685-ee81-83a7-9eea-63fe26690903@kernel.org>
-Date: Fri, 2 Aug 2019 16:56:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ with ESMTP id ceFlPfUv2LYR for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  3 Aug 2019 02:03:07 -0400 (EDT)
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com
+ [209.85.128.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BB684A4F4
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  3 Aug 2019 02:03:07 -0400 (EDT)
+Received: by mail-wm1-f65.google.com with SMTP id l2so68200969wmg.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Aug 2019 23:03:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/bB8Tbrp6SJ+FGTr4csz+1D60Rf87D30EGS4/Cd4pOQ=;
+ b=DXGGEJulYr067JIEcr20JZzPb63wmyv+jP0bQzkmlw4gOzctVEoKHWyq9maKwegyim
+ wUGVlIlA0vtC1dqfAwBEYsIfePyEUR3g+p4oBLpd8FuzP3sSKHw7Emd6sbEs2oiq6Zl9
+ 0YIbTHoRzQnEzQ9G+QyKV4DPHB0J+K0d1800FJYe3CX/R87CBoCaPiHATuEWLIv9Iw2o
+ K5hHBt5CITU4fh4JFV/RaVDj41csJgJOOQaV0sdS25uT4/zCmma0RKa3YiAtj+F1PmXx
+ bZ6mPrERRBt/q05CQ+nWa92K8dfvHuLYxVWQ/HvBi4xBf8Z62MbfyhV9ImGOoYWFG4ov
+ vpZQ==
+X-Gm-Message-State: APjAAAVNxfwBnDbhzD9n10MgUfqTinqlZ+Em/WrkUC9/zkYxL3gSe+uq
+ +Ymu9SoMEV0gMT3FS6gMh3YS+Q==
+X-Google-Smtp-Source: APXvYqzmXtzAIcuj5yKJypFgHWm6U9OgstcVcB6Y5ltzAT+GHKA1HqHuRFuXPJ+KmmZti0tSUDoYrA==
+X-Received: by 2002:a1c:5f55:: with SMTP id t82mr7517714wmb.111.1564812186238; 
+ Fri, 02 Aug 2019 23:03:06 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff?
+ ([2001:b07:6468:f312:4013:e920:9388:c3ff])
+ by smtp.gmail.com with ESMTPSA id f7sm77310740wrv.38.2019.08.02.23.03.04
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 02 Aug 2019 23:03:05 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
+ waiting for interrupt
+To: Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <edcac547-58e1-4031-6ee0-e8f7daef0d15@redhat.com>
+Date: Sat, 3 Aug 2019 08:03:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <3ddf8766-6f02-b655-1b80-d8a7fd016509@huawei.com>
+In-Reply-To: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
 Content-Language: en-US
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,112 +90,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 02/08/2019 11:56, Zenghui Yu wrote:
-> Hi folks,
+On 29/07/19 11:28, Alexandru Elisei wrote:
+> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
+> to report_info after enabling the timer and before the wfi instruction. The
+> uart that printf uses is emulated by userspace and is slow, which makes it
+> more likely that the timer interrupt will fire before executing the wfi
+> instruction, which leads to a deadlock.
 > 
-> Running kvm-unit-tests with Linux 5.3.0-rc2 on Kunpeng 920, we will get
-> the following fail info:
+> An interrupt can wake up a CPU out of wfi, regardless of the
+> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
+> before enabling the timer and unmasking them after the wfi returns so the
+> CPU can execute the timer interrupt handler.
 > 
-> 	[...]
-> 	FAIL psci (4 tests, 1 unexpected failures)
-> 	[...]
-> and
-> 	[...]
-> 	INFO: unexpected cpu_on return value: caller=CPU9, ret=-2
-> 	FAIL: cpu-on
-> 	SUMMARY: 4 tests, 1 unexpected failures
+> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/timer.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 6f2ad1d76ab2..f2f60192ba62 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
+>  	/* Test TVAL and IRQ trigger */
+>  	info->irq_received = false;
+>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
+> +	local_irq_disable();
+>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+>  	report_info("waiting for interrupt...");
+>  	wfi();
+> +	local_irq_enable();
+>  	left = info->read_tval();
+>  	report("interrupt received after TVAL/WFI", info->irq_received);
+>  	report("timer has expired (%d)", left < 0, left);
 > 
-> I think this is an issue had been fixed once by commit 6c7a5dce22b3
-> ("KVM: arm/arm64: fix races in kvm_psci_vcpu_on"), which makes use of
-> kvm->lock mutex to fix the race between two PSCI_CPU_ON calls - one
-> does reset on the MPIDR register whilst another reads it.
-> 
-> But commit 358b28f09f0 ("arm/arm64: KVM: Allow a VCPU to fully reset
-> itself") later moves the reset work into check_vcpu_requests(), by
-> making a KVM_REQ_VCPU_RESET request in PSCI code. Thus the reset work
-> has not been protected by kvm->lock mutex anymore, and the race shows up
-> again...
-> 
-> Do we need a fix for this issue? At least achieve a mutex execution
-> between the reset of MPIDR and kvm_mpidr_to_vcpu()?
 
-The thing is that the way we reset registers is marginally insane.
-Yes, it catches most reset bugs. It also introduces many more in
-the rest of the paths.
+Queued, thanks.
 
-The fun part is that there is hardly a need for resetting MPIDR.
-It has already been set when we've created the vcpu. It is the
-poisoning of the sysreg array that creates a situation where
-the MPIDR is temporarily invalid.
-
-So instead of poisoning the array, how about we just keep
-track of the registers for which we've called a reset function?
-It should be enough to track the most obvious bugs... I've
-cobbled the following patch together, which seems to fix the
-issue on my TX2 with 64 vcpus.
-
-Thoughts?
-
-	M.
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f26e181d881c..17f46ee7dc83 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2254,13 +2254,17 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
- }
- 
- static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
--			      const struct sys_reg_desc *table, size_t num)
-+				const struct sys_reg_desc *table, size_t num,
-+				unsigned long *bmap)
- {
- 	unsigned long i;
- 
- 	for (i = 0; i < num; i++)
--		if (table[i].reset)
-+		if (table[i].reset) {
- 			table[i].reset(vcpu, &table[i]);
-+			if (bmap)
-+				set_bit(i, bmap);
-+		}
- }
- 
- /**
-@@ -2772,21 +2776,23 @@ void kvm_sys_reg_table_init(void)
-  */
- void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- {
-+	unsigned long *bmap;
- 	size_t num;
- 	const struct sys_reg_desc *table;
- 
--	/* Catch someone adding a register without putting in reset entry. */
--	memset(&vcpu->arch.ctxt.sys_regs, 0x42, sizeof(vcpu->arch.ctxt.sys_regs));
-+	bmap = bitmap_alloc(NR_SYS_REGS, GFP_KERNEL);
- 
- 	/* Generic chip reset first (so target could override). */
--	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
- 
- 	table = get_target_table(vcpu->arch.target, true, &num);
--	reset_sys_reg_descs(vcpu, table, num);
-+	reset_sys_reg_descs(vcpu, table, num, bmap);
- 
- 	for (num = 1; num < NR_SYS_REGS; num++) {
--		if (WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
-+		if (WARN(bmap && !test_bit(num, bmap),
- 			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
- 			break;
- 	}
-+
-+	kfree(bmap);
- }
-
-
--- 
-Jazz is not dead, it just smells funny...
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
