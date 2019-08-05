@@ -1,71 +1,63 @@
-Return-Path: <SRS0=Parr=WA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=4dlz=WB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3650C41517
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Aug 2019 09:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F108BC19759
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 02:39:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3D1A8206C1
-	for <kvmarm@archiver.kernel.org>; Sun,  4 Aug 2019 09:54:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D1A8206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7FAB820B1F
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 02:39:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FAB820B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F644A525;
-	Sun,  4 Aug 2019 05:54:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D36CF4A54C;
+	Sun,  4 Aug 2019 22:39:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VevrofOAIW5Q; Sun,  4 Aug 2019 05:54:14 -0400 (EDT)
+	with ESMTP id drDpLh0-XsjT; Sun,  4 Aug 2019 22:39:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45C774A54D;
-	Sun,  4 Aug 2019 05:54:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A22AE4A539;
+	Sun,  4 Aug 2019 22:39:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A100F4A563
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Aug 2019 05:54:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 438854A539
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Aug 2019 22:39:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IH1wRrSBlzt9 for <kvmarm@lists.cs.columbia.edu>;
- Sun,  4 Aug 2019 05:54:11 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19C0A4A525
- for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Aug 2019 05:54:11 -0400 (EDT)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why)
- by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
- (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1huDDA-0003Vy-Mt; Sun, 04 Aug 2019 11:53:59 +0200
-Date: Sun, 4 Aug 2019 10:53:53 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH 9/9] arm64: Retrieve stolen time as paravirtualized guest
-Message-ID: <20190804105353.5e9824dc@why>
-In-Reply-To: <20190802145017.42543-10-steven.price@arm.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
- <20190802145017.42543-10-steven.price@arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id rpi2F35hFfJq for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  4 Aug 2019 22:39:21 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3808F4A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Aug 2019 22:39:21 -0400 (EDT)
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 0FD94F7136EB34DA2E07;
+ Mon,  5 Aug 2019 10:39:18 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Mon, 5 Aug 2019
+ 10:39:07 +0800
+Subject: Re: kvm-unit-tests: psci_cpu_on_test FAILed
+To: Marc Zyngier <maz@kernel.org>
+References: <3ddf8766-6f02-b655-1b80-d8a7fd016509@huawei.com>
+ <48a18685-ee81-83a7-9eea-63fe26690903@kernel.org>
+ <f58de1d7-a6ca-bd6d-8423-01d27326e078@huawei.com>
+ <20190803111047.11493907@why>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <5cad62ed-a119-e6b8-8e68-839fd2cd1f1f@huawei.com>
+Date: Mon, 5 Aug 2019 10:38:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: steven.price@arm.com, catalin.marinas@arm.com,
- pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk,
- will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+In-Reply-To: <20190803111047.11493907@why>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -78,240 +70,181 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri,  2 Aug 2019 15:50:17 +0100
-Steven Price <steven.price@arm.com> wrote:
+Hi Marc,
 
-> Enable paravirtualization features when running under a hypervisor
-> supporting the PV_TIME_ST hypercall.
+On 2019/8/3 18:10, Marc Zyngier wrote:
+> On Sat, 3 Aug 2019 17:27:41 +0800
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> For each (v)CPU, we ask the hypervisor for the location of a shared
-> page which the hypervisor will use to report stolen time to us. We set
-> pv_time_ops to the stolen time function which simply reads the stolen
-> value from the shared page for a VCPU. We guarantee single-copy
-> atomicity using READ_ONCE which means we can also read the stolen
-> time for another VCPU than the currently running one while it is
-> potentially being updated by the hypervisor.
+>> Hi Marc,
+>>
+>> On 2019/8/2 23:56, Marc Zyngier wrote:
+>>> On 02/08/2019 11:56, Zenghui Yu wrote:
+>>>> Hi folks,
+>>>>
+>>>> Running kvm-unit-tests with Linux 5.3.0-rc2 on Kunpeng 920, we will get
+>>>> the following fail info:
+>>>>
+>>>> 	[...]
+>>>> 	FAIL psci (4 tests, 1 unexpected failures)
+>>>> 	[...]
+>>>> and
+>>>> 	[...]
+>>>> 	INFO: unexpected cpu_on return value: caller=CPU9, ret=-2
+>>>> 	FAIL: cpu-on
+>>>> 	SUMMARY: 4 tests, 1 unexpected failures
+>>>>
+>>>>
+>>>> I think this is an issue had been fixed once by commit 6c7a5dce22b3
+>>>> ("KVM: arm/arm64: fix races in kvm_psci_vcpu_on"), which makes use of
+>>>> kvm->lock mutex to fix the race between two PSCI_CPU_ON calls - one
+>>>> does reset on the MPIDR register whilst another reads it.
+>>>>
+>>>> But commit 358b28f09f0 ("arm/arm64: KVM: Allow a VCPU to fully reset
+>>>> itself") later moves the reset work into check_vcpu_requests(), by
+>>>> making a KVM_REQ_VCPU_RESET request in PSCI code. Thus the reset work
+>>>> has not been protected by kvm->lock mutex anymore, and the race shows up
+>>>> again...
+>>>>
+>>>> Do we need a fix for this issue? At least achieve a mutex execution
+>>>> between the reset of MPIDR and kvm_mpidr_to_vcpu()?
+>>>
+>>> The thing is that the way we reset registers is marginally insane.
+>>> Yes, it catches most reset bugs. It also introduces many more in
+>>> the rest of the paths.
+>>>
+>>> The fun part is that there is hardly a need for resetting MPIDR.
+>>> It has already been set when we've created the vcpu. It is the
+>>
+>> (That means we can let reset_mpidr() do nothing?)
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/kernel/Makefile |   1 +
->  arch/arm64/kernel/kvm.c    | 155 +++++++++++++++++++++++++++++++++++++
+> It should ever be only written once, as MPIDR is a constant from the
+> guest perspective. So it is not that it can do nothing. It is just that
+> there should never be any other value written to it.
 
-nit: Why not using paravirt.c, which clearly states what it does? The
-alternative would be to name it kvm-pv.c.
+Thanks for this explanation.
 
->  include/linux/cpuhotplug.h |   1 +
->  3 files changed, 157 insertions(+)
->  create mode 100644 arch/arm64/kernel/kvm.c
+>>
+>>> poisoning of the sysreg array that creates a situation where
+>>> the MPIDR is temporarily invalid.
+>>>
+>>> So instead of poisoning the array, how about we just keep
+>>> track of the registers for which we've called a reset function?
+>>> It should be enough to track the most obvious bugs... I've
+>>
+>> The reset of DBG{BCR,BVR,WVR,WCR}n_EL1 registers will also be tracked.
+>> It may affect our judgment?
 > 
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index 478491f07b4f..eb36edf9b930 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -63,6 +63,7 @@ obj-$(CONFIG_CRASH_CORE)		+= crash_core.o
->  obj-$(CONFIG_ARM_SDE_INTERFACE)		+= sdei.o
->  obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
->  obj-$(CONFIG_ARM64_PTR_AUTH)		+= pointer_auth.o
-> +obj-$(CONFIG_PARAVIRT)			+= kvm.o
->  
->  obj-y					+= vdso/ probes/
->  obj-$(CONFIG_COMPAT_VDSO)		+= vdso32/
-> diff --git a/arch/arm64/kernel/kvm.c b/arch/arm64/kernel/kvm.c
-> new file mode 100644
-> index 000000000000..245398c79dae
-> --- /dev/null
-> +++ b/arch/arm64/kernel/kvm.c
-> @@ -0,0 +1,155 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (C) 2019 Arm Ltd.
-> +
-> +#define pr_fmt(fmt) "kvmarm-pv: " fmt
-> +
-> +#include <linux/arm-smccc.h>
-> +#include <linux/cpuhotplug.h>
-> +#include <linux/io.h>
-> +#include <linux/printk.h>
-> +#include <linux/psci.h>
-> +#include <linux/reboot.h>
-> +#include <linux/slab.h>
-> +
-> +#include <asm/paravirt.h>
-> +#include <asm/pvclock-abi.h>
-> +#include <asm/smp_plat.h>
-> +
-> +struct kvmarm_stolen_time_region {
-> +	struct pvclock_vcpu_stolen_time_info *kaddr;
-> +};
-> +
-> +static DEFINE_PER_CPU(struct kvmarm_stolen_time_region, stolen_time_region);
-> +
-> +static bool steal_acc = true;
-> +static int __init parse_no_stealacc(char *arg)
-> +{
-> +	steal_acc = false;
-> +	return 0;
-> +}
-> +early_param("no-steal-acc", parse_no_stealacc);
-> +
-> +/* return stolen time in ns by asking the hypervisor */
-> +static u64 kvm_steal_clock(int cpu)
-> +{
-> +	struct kvmarm_stolen_time_region *reg;
-> +
-> +	reg = per_cpu_ptr(&stolen_time_region, cpu);
-> +	if (!reg->kaddr) {
-> +		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
-> +			     cpu);
-> +		return 0;
-> +	}
-> +
-> +	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
-> +}
-> +
-> +static int disable_stolen_time_current_cpu(void)
-> +{
-> +	struct kvmarm_stolen_time_region *reg;
-> +
-> +	reg = this_cpu_ptr(&stolen_time_region);
-> +	if (!reg->kaddr)
-> +		return 0;
-> +
-> +	memunmap(reg->kaddr);
-> +	memset(reg, 0, sizeof(*reg));
-> +
-> +	return 0;
-> +}
-> +
-> +static int stolen_time_dying_cpu(unsigned int cpu)
-> +{
-> +	return disable_stolen_time_current_cpu();
-> +}
-> +
-> +static int init_stolen_time_cpu(unsigned int cpu)
-> +{
-> +	struct kvmarm_stolen_time_region *reg;
-> +	struct arm_smccc_res res;
-> +
-> +	reg = this_cpu_ptr(&stolen_time_region);
-> +
-> +	if (reg->kaddr)
-> +		return 0;
+> How so?
 
-Can this actually happen? It'd take two CPU_UP calls from the HP
-notifiers to get in that situation...
+bmap[0..15] will be set multiple times. But it also will not affect
+anything now (it's safe).
 
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_ST, &res);
-> +
-> +	if ((long)res.a0 < 0)
-> +		return -EINVAL;
-> +
-> +	reg->kaddr = memremap(res.a0,
-> +			sizeof(struct pvclock_vcpu_stolen_time_info),
-> +			MEMREMAP_WB);
-> +
-> +	if (reg->kaddr == NULL) {
-> +		pr_warn("Failed to map stolen time data structure\n");
-> +		return -EINVAL;
+>>
+>>> cobbled the following patch together, which seems to fix the
+>>> issue on my TX2 with 64 vcpus.
+>>>
+>>> Thoughts?
+>>>
+>>> 	M.
+>>>
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index f26e181d881c..17f46ee7dc83 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -2254,13 +2254,17 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+>>>    }
+>>>    >   static void reset_sys_reg_descs(struct kvm_vcpu *vcpu,
+>>> -			      const struct sys_reg_desc *table, size_t num)
+>>> +				const struct sys_reg_desc *table, size_t num,
+>>> +				unsigned long *bmap)
+>>>    {
+>>>    	unsigned long i;
+>>>    >   	for (i = 0; i < num; i++)
+>>> -		if (table[i].reset)
+>>> +		if (table[i].reset) {
+>>>    			table[i].reset(vcpu, &table[i]);
+>>> +			if (bmap)
+>>> +				set_bit(i, bmap);
+>>
+>> I think this should be:
+>> 	set_bit(table[i].reg, bmap);
+>>
+>> Am I wrong?
+> 
+> No, you're absolutely right.
+> 
+>>
+>>> +		}
+>>>    }
+>>>    >   /**
+>>> @@ -2772,21 +2776,23 @@ void kvm_sys_reg_table_init(void)
+>>>     */
+>>>    void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>>>    {
+>>> +	unsigned long *bmap;
+>>>    	size_t num;
+>>>    	const struct sys_reg_desc *table;
+>>>    > -	/* Catch someone adding a register without putting in reset entry. */
+>>> -	memset(&vcpu->arch.ctxt.sys_regs, 0x42, sizeof(vcpu->arch.ctxt.sys_regs));
+>>> +	bmap = bitmap_alloc(NR_SYS_REGS, GFP_KERNEL);
+>>
+>> LOCKDEP kernel will be not happy with this bitmap_alloc:
+>>
+>> " BUG: sleeping function called from invalid context at mm/slab.h:501
+>>     in_atomic(): 1, irqs_disabled(): 0, pid: 8710, name: qemu-system-aar "
+> 
+> Well spotted. I guess GFP_ATOMIC is in order.
+> 
+>>
+>>>    >   	/* Generic chip reset first (so target could override). */
+>>> -	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+>>> +	reset_sys_reg_descs(vcpu, sys_reg_descs, ARRAY_SIZE(sys_reg_descs), bmap);
+>>>    >   	table = get_target_table(vcpu->arch.target, true, &num);
+>>> -	reset_sys_reg_descs(vcpu, table, num);
+>>> +	reset_sys_reg_descs(vcpu, table, num, bmap);
+>>>    >   	for (num = 1; num < NR_SYS_REGS; num++) {
+>>> -		if (WARN(__vcpu_sys_reg(vcpu, num) == 0x4242424242424242,
+>>> +		if (WARN(bmap && !test_bit(num, bmap),
+>>>    			 "Didn't reset __vcpu_sys_reg(%zi)\n", num))
+>>>    			break;
+>>>    	}
+>>> +
+>>> +	kfree(bmap);
+>>>    }
+>>>
+>>>    
+>>
+>> Some other minor questions about the sys reg resetting:
+>> 1. Pointer Authentication Registers haven't have reset entry yet,
+>>      do they need? The same for ACTLR_EL1.
+> 
+> Pointer auth registers definitely have a reset function, set to
+> reset_unknown. So does ACTLR_EL1, which resets to the host's value.
 
--ENOMEM is the expected return code.
+I find them now :-)
 
-> +	}
-> +
-> +	if (le32_to_cpu(reg->kaddr->revision) != 0 ||
-> +			le32_to_cpu(reg->kaddr->attributes) != 0) {
-> +		pr_warn("Unexpected revision or attributes in stolen time data\n");
-> +		return -ENXIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_arm_init_stolen_time(void)
-> +{
-> +	int ret;
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
-> +				"hypervisor/kvmarm/pv:starting",
-> +				init_stolen_time_cpu, stolen_time_dying_cpu);
-> +	if (ret < 0)
-> +		return ret;
-> +	return 0;
-> +}
-> +
-> +static bool has_kvm_steal_clock(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* To detect the presence of PV time support we require SMCCC 1.1+ */
-> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +			     ARM_SMCCC_HV_PV_FEATURES, &res);
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_FEATURES,
-> +			     ARM_SMCCC_HV_PV_TIME_ST, &res);
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static int __init kvm_guest_init(void)
-> +{
-> +	int ret = 0;
-> +
-> +	if (!has_kvm_steal_clock())
-> +		return 0;
-> +
-> +	ret = kvm_arm_init_stolen_time();
-> +	if (ret)
-> +		return ret;
-> +
-> +	pv_ops.time.steal_clock = kvm_steal_clock;
-> +
-> +	static_key_slow_inc(&paravirt_steal_enabled);
-> +	if (steal_acc)
-> +		static_key_slow_inc(&paravirt_steal_rq_enabled);
-> +
-> +	pr_info("using stolen time PV\n");
-> +
-> +	return 0;
-> +}
-> +early_initcall(kvm_guest_init);
-
-Is there any reason why we wouldn't directly call into this rather than
-using an initcall?
-
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index 068793a619ca..89d75edb5750 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -136,6 +136,7 @@ enum cpuhp_state {
->  	/* Must be the last timer callback */
->  	CPUHP_AP_DUMMY_TIMER_STARTING,
->  	CPUHP_AP_ARM_XEN_STARTING,
-> +	CPUHP_AP_ARM_KVMPV_STARTING,
->  	CPUHP_AP_ARM_CORESIGHT_STARTING,
->  	CPUHP_AP_ARM64_ISNDEP_STARTING,
->  	CPUHP_AP_SMPCFD_DYING,
-
+> 
+>> 2. Why does PMCR_EL0 register have no "reg" field, in sys_reg_descs[]?
+> 
+> This looks like a (very minor) bug. reset_pmcr writes directly to the
+> PMCR_EL0 shadow register without using r->reg as the register number.
+> But in the light of the reset tracking we want to add, this needs
+> fixing.
+> 
+>> I will test this patch with kvm-unit-tests next week!
+> 
+> Well, wait until I repost something a bit less buggy...
 
 Thanks,
+zenghui
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
