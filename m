@@ -2,64 +2,63 @@ Return-Path: <SRS0=4dlz=WB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06570C32751
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 14:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13818C41514
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 16:10:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9C00621738
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 14:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C00621738
+	by mail.kernel.org (Postfix) with ESMTP id 8F7E1208C3
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 16:10:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7E1208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22CCF4A4E8;
-	Mon,  5 Aug 2019 10:18:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54754A545;
+	Mon,  5 Aug 2019 12:10:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MrICO7h7knus; Mon,  5 Aug 2019 10:18:10 -0400 (EDT)
+	with ESMTP id 5+D8XubFYYhA; Mon,  5 Aug 2019 12:10:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 977CA4A4F7;
-	Mon,  5 Aug 2019 10:18:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5803A4A51D;
+	Mon,  5 Aug 2019 12:10:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86DA44A4BE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 10:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C43504A4E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 12:10:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H8MNICPjtjfs for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Aug 2019 10:18:07 -0400 (EDT)
+ with ESMTP id 8N4eQq58N7Hk for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Aug 2019 12:10:38 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC6334A389
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 10:18:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E74774A4E8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 12:10:37 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67451337;
- Mon,  5 Aug 2019 07:18:07 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74DFF344;
+ Mon,  5 Aug 2019 09:10:37 -0700 (PDT)
 Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F43B3F706;
- Mon,  5 Aug 2019 07:18:05 -0700 (PDT)
-Subject: Re: [PATCH 4/9] KVM: arm64: Support stolen time reporting via shared
- structure
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD0323F694;
+ Mon,  5 Aug 2019 09:10:35 -0700 (PDT)
+Subject: Re: [PATCH 6/9] KVM: arm64: Provide a PV_TIME device to user space
 To: Marc Zyngier <maz@kernel.org>
 References: <20190802145017.42543-1-steven.price@arm.com>
- <20190802145017.42543-5-steven.price@arm.com> <20190803185817.11285b2a@why>
- <20190803191303.02e9bcc9@why>
+ <20190802145017.42543-7-steven.price@arm.com> <20190803135113.6cdf500c@why>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <4a373dc5-4a6b-efc6-4309-e7180eb0c696@arm.com>
-Date: Mon, 5 Aug 2019 15:18:04 +0100
+Message-ID: <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
+Date: Mon, 5 Aug 2019 17:10:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190803191303.02e9bcc9@why>
+In-Reply-To: <20190803135113.6cdf500c@why>
 Content-Language: en-GB
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,185 +75,306 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 03/08/2019 19:13, Marc Zyngier wrote:
-> On Sat, 3 Aug 2019 18:58:17 +0100
-> Marc Zyngier <maz@kernel.org> wrote:
+On 03/08/2019 13:51, Marc Zyngier wrote:
+> On Fri,  2 Aug 2019 15:50:14 +0100
+> Steven Price <steven.price@arm.com> wrote:
 > 
->> On Fri,  2 Aug 2019 15:50:12 +0100
->> Steven Price <steven.price@arm.com> wrote:
+>> Allow user space to inform the KVM host where in the physical memory
+>> map the paravirtualized time structures should be located.
 >>
->>> Implement the service call for configuring a shared structre between a
->>> VCPU and the hypervisor in which the hypervisor can write the time
->>> stolen from the VCPU's execution time by other tasks on the host.
->>>
->>> The hypervisor allocates memory which is placed at an IPA chosen by user
->>> space. The hypervisor then uses WRITE_ONCE() to update the shared
->>> structre ensuring single copy atomicity of the 64-bit unsigned value
->>> that reports stolen time in nanoseconds.
->>>
->>> Whenever stolen time is enabled by the guest, the stolen time counter is
->>> reset.
->>>
->>> The stolen time itself is retrieved from the sched_info structure
->>> maintained by the Linux scheduler code. We enable SCHEDSTATS when
->>> selecting KVM Kconfig to ensure this value is meaningful.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>  arch/arm64/include/asm/kvm_host.h | 13 +++++-
->>>  arch/arm64/kvm/Kconfig            |  1 +
->>>  include/kvm/arm_hypercalls.h      |  1 +
->>>  include/linux/kvm_types.h         |  2 +
->>>  virt/kvm/arm/arm.c                | 18 ++++++++
->>>  virt/kvm/arm/hypercalls.c         | 70 +++++++++++++++++++++++++++++++
->>>  6 files changed, 104 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index f656169db8c3..78f270190d43 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -44,6 +44,7 @@
->>>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->>>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
->>> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>>  
->>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>>  
->>> @@ -83,6 +84,11 @@ struct kvm_arch {
->>>  
->>>  	/* Mandated version of PSCI */
->>>  	u32 psci_version;
->>> +
->>> +	struct kvm_arch_pvtime {
->>> +		void *st;
->>> +		gpa_t st_base;
->>> +	} pvtime;
->>>  };
->>>  
->>>  #define KVM_NR_MEM_OBJS     40
->>> @@ -338,8 +344,13 @@ struct kvm_vcpu_arch {
->>>  	/* True when deferrable sysregs are loaded on the physical CPU,
->>>  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->>>  	bool sysregs_loaded_on_cpu;
->>> -};
->>>  
->>> +	/* Guest PV state */
->>> +	struct {
->>> +		u64 steal;
->>> +		u64 last_steal;
->>> +	} steal;
->>> +};
->>>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->>>  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
->>>  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
->>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->>> index a67121d419a2..d8b88e40d223 100644
->>> --- a/arch/arm64/kvm/Kconfig
->>> +++ b/arch/arm64/kvm/Kconfig
->>> @@ -39,6 +39,7 @@ config KVM
->>>  	select IRQ_BYPASS_MANAGER
->>>  	select HAVE_KVM_IRQ_BYPASS
->>>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
->>> +	select SCHEDSTATS
->>>  	---help---
->>>  	  Support hosting virtualized guest machines.
->>>  	  We don't support KVM with 16K page tables yet, due to the multiple
->>> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
->>> index 35a5abcc4ca3..9f0710ab4292 100644
->>> --- a/include/kvm/arm_hypercalls.h
->>> +++ b/include/kvm/arm_hypercalls.h
->>> @@ -7,6 +7,7 @@
->>>  #include <asm/kvm_emulate.h>
->>>  
->>>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
->>> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu);
->>>  
->>>  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
->>>  {
->>> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
->>> index bde5374ae021..1c88e69db3d9 100644
->>> --- a/include/linux/kvm_types.h
->>> +++ b/include/linux/kvm_types.h
->>> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->>>  typedef u64            gpa_t;
->>>  typedef u64            gfn_t;
->>>  
->>> +#define GPA_INVALID	(~(gpa_t)0)
->>> +
->>>  typedef unsigned long  hva_t;
->>>  typedef u64            hpa_t;
->>>  typedef u64            hfn_t;
->>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>> index f645c0fbf7ec..ebd963d2580b 100644
->>> --- a/virt/kvm/arm/arm.c
->>> +++ b/virt/kvm/arm/arm.c
->>> @@ -40,6 +40,10 @@
->>>  #include <asm/kvm_coproc.h>
->>>  #include <asm/sections.h>
->>>  
->>> +#include <kvm/arm_hypercalls.h>
->>> +#include <kvm/arm_pmu.h>
->>> +#include <kvm/arm_psci.h>
->>> +
->>>  #ifdef REQUIRES_VIRT
->>>  __asm__(".arch_extension	virt");
->>>  #endif
->>> @@ -135,6 +139,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>>  	kvm->arch.max_vcpus = vgic_present ?
->>>  				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->>>  
->>> +	kvm->arch.pvtime.st_base = GPA_INVALID;
->>>  	return ret;
->>>  out_free_stage2_pgd:
->>>  	kvm_free_stage2_pgd(kvm);
->>> @@ -371,6 +376,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>>  	kvm_vcpu_load_sysregs(vcpu);
->>>  	kvm_arch_vcpu_load_fp(vcpu);
->>>  	kvm_vcpu_pmu_restore_guest(vcpu);
->>> +	kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->>>  
->>>  	if (single_task_running())
->>>  		vcpu_clear_wfe_traps(vcpu);
->>> @@ -617,6 +623,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->>>  	smp_rmb();
->>>  }
->>>  
->>> +static void vcpu_req_record_steal(struct kvm_vcpu *vcpu)
->>> +{
->>> +	int idx;
->>> +
->>> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
->>> +	kvm_update_stolen_time(vcpu);
->>> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->>> +}
->>> +
->>>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
->>>  {
->>>  	return vcpu->arch.target >= 0;
->>> @@ -636,6 +651,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->>>  		 * that a VCPU sees new virtual interrupts.
->>>  		 */
->>>  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
->>> +
->>> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
->>> +			vcpu_req_record_steal(vcpu);  
+>> A device is created which provides the base address of an array of
+>> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+>> total number of VCPUs) bytes of memory available at this location.
 >>
->> Something troubles me. Here, you've set the request on load. But you
->> can be preempted at any time (preemption gets disabled just after).
->>
->> I have the feeling that should you get preempted right here, you'll
->> end-up having accumulated the wrong amount of steal time, as the
->> request put via load when you'll get scheduled back in will only get
->> processed after a full round of entry/exit/entry, which doesn't look
->> great.
+>> The address is given in terms of the physical address visible to
+>> the guest and must be 64 byte aligned. The memory should be marked as
+>> reserved to the guest to stop it allocating it for other purposes.
 > 
-> Ah, no. We're saved by the check for pending requests right before we
-> jump in the guest, causing an early exit and the whole shebang to be
-> restarted.
+> Why? You seem to be allocating the memory from the kernel, so as far as
+> the guest is concerned, this isn't generally usable memory.
 
-Yes, that's my understanding. Obviously not ideal if it happens in that
-small window, but everything is redone to get the right values in the end.
+I obviously didn't word it very well - that's what I meant. The "memory"
+that represents the stolen time structure shouldn't be shown to the
+guest as normal memory, but "reserved" for the purpose of stolen time.
+
+To be honest it looks like I forgot to rewrite this commit message -
+which 64 byte alignment is all that the guest can rely on (because each
+vCPU has it's own structure), the actual array of structures needs to be
+page aligned to ensure we can safely map it into the guest.
+
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_mmu.h  |   2 +
+>>  arch/arm64/include/uapi/asm/kvm.h |   6 +
+>>  arch/arm64/kvm/Makefile           |   1 +
+>>  include/uapi/linux/kvm.h          |   2 +
+>>  virt/kvm/arm/mmu.c                |  44 +++++++
+>>  virt/kvm/arm/pvtime.c             | 190 ++++++++++++++++++++++++++++++
+>>  6 files changed, 245 insertions(+)
+>>  create mode 100644 virt/kvm/arm/pvtime.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index befe37d4bc0e..88c8a4b2836f 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -157,6 +157,8 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm);
+>>  void kvm_free_stage2_pgd(struct kvm *kvm);
+>>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  			  phys_addr_t pa, unsigned long size, bool writable);
+>> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>> +			  phys_addr_t pa, unsigned long size, bool writable);
+>>  
+>>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 9a507716ae2f..95516a4198ea 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -367,6 +367,12 @@ struct kvm_vcpu_events {
+>>  #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+>>  #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
+>>  
+>> +/* Device Control API: PV_TIME */
+>> +#define KVM_DEV_ARM_PV_TIME_PADDR	0
+>> +#define  KVM_DEV_ARM_PV_TIME_ST		0
+>> +#define KVM_DEV_ARM_PV_TIME_STATE_SIZE	1
+>> +#define KVM_DEV_ARM_PV_TIME_STATE	2
+>> +
+>>  #endif
+>>  
+>>  #endif /* __ARM_KVM_H__ */
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 73dce4d47d47..5ffbdc39e780 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -14,6 +14,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/pvtime.o
+>>  
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index a7c19540ce21..04bffafa0708 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1222,6 +1222,8 @@ enum kvm_device_type {
+>>  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+>>  	KVM_DEV_TYPE_XIVE,
+>>  #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+>> +	KVM_DEV_TYPE_ARM_PV_TIME,
+>> +#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+>>  	KVM_DEV_TYPE_MAX,
+>>  };
+>>  
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 38b4c910b6c3..be28a4aee451 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1368,6 +1368,50 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  	return ret;
+>>  }
+>>  
+>> +/**
+>> + * kvm_phys_addr_memremap - map a memory range to guest IPA
+>> + *
+>> + * @kvm:	The KVM pointer
+>> + * @guest_ipa:	The IPA at which to insert the mapping
+>> + * @pa:		The physical address of the memory
+>> + * @size:	The size of the mapping
+>> + */
+>> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>> +			  phys_addr_t pa, unsigned long size, bool writable)
+>> +{
+>> +	phys_addr_t addr, end;
+>> +	int ret = 0;
+>> +	unsigned long pfn;
+>> +	struct kvm_mmu_memory_cache cache = { 0, };
+>> +
+>> +	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
+>> +	pfn = __phys_to_pfn(pa);
+>> +
+>> +	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
+>> +		pte_t pte = pfn_pte(pfn, PAGE_S2);
+>> +
+>> +		if (writable)
+>> +			pte = kvm_s2pte_mkwrite(pte);
+>> +
+>> +		ret = mmu_topup_memory_cache(&cache,
+>> +					     kvm_mmu_cache_min_pages(kvm),
+>> +					     KVM_NR_MEM_OBJS);
+>> +		if (ret)
+>> +			goto out;
+>> +		spin_lock(&kvm->mmu_lock);
+>> +		ret = stage2_set_pte(kvm, &cache, addr, &pte, 0);
+>> +		spin_unlock(&kvm->mmu_lock);
+>> +		if (ret)
+>> +			goto out;
+>> +
+>> +		pfn++;
+>> +	}
+>> +
+>> +out:
+>> +	mmu_free_memory_cache(&cache);
+>> +	return ret;
+>> +}
+> 
+> This is an exact copy of kvm_phys_addr_ioremap(), with only the memory
+> attributes changing. Surely we can have a shared implementation that
+> takes the memory attribute as a parameter.
+
+Good point - although due to below I'm going to need something which can
+deal with non-contiguous memory...
+
+>> +
+>>  static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+>>  {
+>>  	kvm_pfn_t pfn = *pfnp;
+>> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+>> new file mode 100644
+>> index 000000000000..9051bc07eae1
+>> --- /dev/null
+>> +++ b/virt/kvm/arm/pvtime.c
+>> @@ -0,0 +1,190 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +// Copyright (C) 2019 Arm Ltd.
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/kvm_mmu.h>
+>> +
+>> +/* We currently only support PV time on ARM64 */
+>> +#ifdef CONFIG_ARM64
+> 
+> And we're only compiling it on arm64, so why the #ifdef?
+
+Another good point - will remove.
+
+>> +
+>> +#include <asm/pvclock-abi.h>
+>> +
+>> +static int max_stolen_size(void)
+>> +{
+>> +	int size = KVM_MAX_VCPUS * sizeof(struct pvclock_vcpu_stolen_time_info);
+> 
+> So we're always allocating enough memory for 512 CPUs? That's an
+> additional 32kB of contiguous memory...
+> 
+>> +
+>> +	return ALIGN(size, PAGE_SIZE);
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_create(struct kvm_device *dev, u32 type)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +
+>> +	pvtime->st = alloc_pages_exact(max_stolen_size(),
+>> +				       GFP_KERNEL | __GFP_ZERO);
+>> +	if (!pvtime->st)
+>> +		return -ENOMEM;
+> 
+> Is there any chance we could use a vmalloc allocation instead? This
+> would lift the requirement on having physically contiguous memory.
+
+Yes I think it should be possible to use non-contiguous memory and vmalloc.
+
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +
+>> +	pvtime->st_base = GPA_INVALID;
+>> +	free_pages_exact(pvtime->st, max_stolen_size());
+>> +	kfree(dev);
+>> +}
+>> +
+>> +static int pvtime_map_pages(struct kvm *kvm, gpa_t guest_paddr,
+>> +			    void *kaddr, int size)
+>> +{
+>> +	return kvm_phys_addr_memremap(kvm, guest_paddr,
+>> +			virt_to_phys(kaddr),
+>> +			size, false);
+>> +}
+>> +
+>> +static int pvtime_save_state(struct kvm *kvm, u64 type, void __user *user)
+>> +{
+>> +	void *source;
+>> +	size_t size;
+>> +
+>> +	switch (type) {
+>> +	case KVM_DEV_ARM_PV_TIME_ST:
+>> +		source = kvm->arch.pvtime.st;
+>> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+>> +			atomic_read(&kvm->online_vcpus);
+>> +		break;
+>> +	default:
+>> +		return -ENXIO;
+>> +	}
+>> +
+>> +	if (copy_to_user(user, source, size))
+>> +		return -EFAULT;
+>> +	return 0;
+>> +}
+>> +
+>> +static int pvtime_restore_state(struct kvm *kvm, u64 type, void __user *user)
+>> +{
+>> +	void *dest;
+>> +	size_t size;
+>> +
+>> +	switch (type) {
+>> +	case KVM_DEV_ARM_PV_TIME_ST:
+>> +		dest = kvm->arch.pvtime.st;
+>> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+>> +			atomic_read(&kvm->online_vcpus);
+>> +		break;
+>> +	default:
+>> +		return -ENXIO;
+>> +	}
+>> +
+>> +	if (copy_from_user(dest, user, size))
+>> +		return -EFAULT;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+>> +				   struct kvm_device_attr *attr)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +	u64 __user *user = (u64 __user *)attr->addr;
+>> +	u64 paddr;
+>> +	int ret;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+>> +		if (get_user(paddr, user))
+>> +			return -EFAULT;
+>> +		if (paddr & 63)
+>> +			return -EINVAL;
+> 
+> You should check whether the device fits into the IPA space for this
+> guest, and whether it overlaps with anything else.
+
+pvtime_map_pages() should fail in the case of overlap. That seems
+sufficient to me - do you think we need something stronger?
+
+>> +		switch (attr->attr) {
+>> +		case KVM_DEV_ARM_PV_TIME_ST:
+>> +			if (pvtime->st_base != GPA_INVALID)
+>> +				return -EEXIST;
+>> +			ret = pvtime_map_pages(dev->kvm, paddr, pvtime->st,
+>> +					max_stolen_size());
+> 
+> Consider moving the size directly into pvtime_map_pages(), and dropping
+> the pvtime->st parameter. All you need is kvm and paddr.
+
+Will do.
+
+Thanks,
 
 Steve
 _______________________________________________
