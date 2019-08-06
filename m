@@ -1,65 +1,61 @@
-Return-Path: <SRS0=4dlz=WB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=iFZl=WC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D84C433FF
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 16:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 832AEC31E40
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Aug 2019 06:32:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D8CA12173B
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Aug 2019 16:29:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CA12173B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 0A413206A2
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Aug 2019 06:32:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A413206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 571FB4A4E9;
-	Mon,  5 Aug 2019 12:29:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657FF4A54A;
+	Tue,  6 Aug 2019 02:32:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KhZ3wuTGdgcL; Mon,  5 Aug 2019 12:29:03 -0400 (EDT)
+	with ESMTP id 244Ym4C6zh5T; Tue,  6 Aug 2019 02:32:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AD2B4A51D;
-	Mon,  5 Aug 2019 12:29:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 794914A548;
+	Tue,  6 Aug 2019 02:32:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBC524A4E9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 12:29:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA604A548
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Aug 2019 02:32:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GTSgNysJHhLI for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Aug 2019 12:29:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C50314A4C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Aug 2019 12:29:00 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5058A344;
- Mon,  5 Aug 2019 09:29:00 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 96E5D3F694; Mon,  5 Aug 2019 09:28:58 -0700 (PDT)
-Subject: Re: [PATCH 6/9] KVM: arm64: Provide a PV_TIME device to user space
-To: Steven Price <steven.price@arm.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
- <20190802145017.42543-7-steven.price@arm.com> <20190803135113.6cdf500c@why>
- <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
-From: Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <c18f9d74-48eb-3e03-dca8-ad44e6d6b682@kernel.org>
-Date: Mon, 5 Aug 2019 17:28:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ with ESMTP id WAghlMS378go for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Aug 2019 02:32:01 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BC6F4A4F4
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Aug 2019 02:32:00 -0400 (EDT)
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id E3131677EF7A9412FF53;
+ Tue,  6 Aug 2019 14:31:56 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 6 Aug 2019
+ 14:31:46 +0800
+Subject: Re: [PATCH 1/2] KVM: arm64: Don't write junk to sysregs on reset
+To: Marc Zyngier <maz@kernel.org>, <kvm@vger.kernel.org>,
+ <kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>
+References: <20190805121555.130897-1-maz@kernel.org>
+ <20190805121555.130897-2-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <01b74492-c59f-dfd9-e439-752e6b1c53dc@huawei.com>
+Date: Tue, 6 Aug 2019 14:29:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
+In-Reply-To: <20190805121555.130897-2-maz@kernel.org>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,88 +67,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 05/08/2019 17:10, Steven Price wrote:
-> On 03/08/2019 13:51, Marc Zyngier wrote:
->> On Fri,  2 Aug 2019 15:50:14 +0100
->> Steven Price <steven.price@arm.com> wrote:
->>
->>> Allow user space to inform the KVM host where in the physical memory
->>> map the paravirtualized time structures should be located.
->>>
->>> A device is created which provides the base address of an array of
->>> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
->>> total number of VCPUs) bytes of memory available at this location.
->>>
->>> The address is given in terms of the physical address visible to
->>> the guest and must be 64 byte aligned. The memory should be marked as
->>> reserved to the guest to stop it allocating it for other purposes.
->>
->> Why? You seem to be allocating the memory from the kernel, so as far as
->> the guest is concerned, this isn't generally usable memory.
-> 
-> I obviously didn't word it very well - that's what I meant. The "memory"
-> that represents the stolen time structure shouldn't be shown to the
-> guest as normal memory, but "reserved" for the purpose of stolen time.
-> 
-> To be honest it looks like I forgot to rewrite this commit message -
-> which 64 byte alignment is all that the guest can rely on (because each
-> vCPU has it's own structure), the actual array of structures needs to be
-> page aligned to ensure we can safely map it into the guest.
-> 
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>  arch/arm64/include/asm/kvm_mmu.h  |   2 +
->>>  arch/arm64/include/uapi/asm/kvm.h |   6 +
->>>  arch/arm64/kvm/Makefile           |   1 +
->>>  include/uapi/linux/kvm.h          |   2 +
->>>  virt/kvm/arm/mmu.c                |  44 +++++++
->>>  virt/kvm/arm/pvtime.c             | 190 ++++++++++++++++++++++++++++++
->>>  6 files changed, 245 insertions(+)
->>>  create mode 100644 virt/kvm/arm/pvtime.c
+Hi Marc,
 
-[...]
-
->>> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
->>> +				   struct kvm_device_attr *attr)
->>> +{
->>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
->>> +	u64 __user *user = (u64 __user *)attr->addr;
->>> +	u64 paddr;
->>> +	int ret;
->>> +
->>> +	switch (attr->group) {
->>> +	case KVM_DEV_ARM_PV_TIME_PADDR:
->>> +		if (get_user(paddr, user))
->>> +			return -EFAULT;
->>> +		if (paddr & 63)
->>> +			return -EINVAL;
->>
->> You should check whether the device fits into the IPA space for this
->> guest, and whether it overlaps with anything else.
+On 2019/8/5 20:15, Marc Zyngier wrote:
+> At the moment, the way we reset system registers is mildly insane:
+> We write junk to them, call the reset functions, and then check that
+> we have something else in them.
 > 
-> pvtime_map_pages() should fail in the case of overlap. That seems
-> sufficient to me - do you think we need something stronger?
+> The "fun" thing is that this can happen while the guest is running
+> (PSCI, for example). If anything in KVM has to evaluate the state
+> of a system register while junk is in there, bad thing may happen.
+> 
+> Let's stop doing that. Instead, we track that we have called a
+> reset function for that register, and assume that the reset
+> function has done something. This requires fixing a couple of
+> sysreg refinition in the trap table.
+> 
+> In the end, the very need of this reset check is pretty dubious,
+> as it doesn't check everything (a lot of the sysregs leave outside of
+> the sys_regs[] array). It may well be axed in the near future.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Definitely. stage2_set_pte() won't fail for a non-IO overlapping
-mapping, and will just treat it as guest memory. If this overlaps with a
-memslot, we'll never be able to fault that page in, ending up with
-interesting memory corruption... :-/
+(Regardless of whether this check is needed or not,) I tested this patch
+with kvm-unit-tests:
 
-That's one of the reasons why I think option (2) in your earlier email
-is an interesting one, as it sidesteps a whole lot of ugly and hard to
-test corner cases.
+for i in {1..100}; do QEMU=/path/to/qemu-system-aarch64 accel=kvm 
+arch=arm64 ./run_tests.sh; done
+
+And all the tests passed!
+
 
 Thanks,
+zenghui
 
-	M.
--- 
-Jazz is not dead, it just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
