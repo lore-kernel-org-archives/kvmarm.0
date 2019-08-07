@@ -1,55 +1,56 @@
-Return-Path: <SRS0=iFZl=WC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=czFP=WD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7842C433FF
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Aug 2019 15:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FD9C433FF
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Aug 2019 09:53:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 43BD021872
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Aug 2019 15:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43BD021872
+	by mail.kernel.org (Postfix) with ESMTP id E8F1F21BE6
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Aug 2019 09:53:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F1F21BE6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C81E4A567;
-	Tue,  6 Aug 2019 11:57:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 389084A56A;
+	Wed,  7 Aug 2019 05:53:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HXYGYY8o8FhB; Tue,  6 Aug 2019 11:57:52 -0400 (EDT)
+	with ESMTP id lAxgUjfwqwmh; Wed,  7 Aug 2019 05:53:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3796D4A526;
-	Tue,  6 Aug 2019 11:57:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E688D4A56C;
+	Wed,  7 Aug 2019 05:53:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7DE84A526
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Aug 2019 11:57:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91D394A568
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Aug 2019 05:53:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7BxoiKgWkBm8 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Aug 2019 11:57:49 -0400 (EDT)
+ with ESMTP id Od83sp5B7iB5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Aug 2019 05:53:52 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CEB84A4F4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Aug 2019 11:57:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 255CC4A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Aug 2019 05:53:52 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1D65344;
- Tue,  6 Aug 2019 08:57:48 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C30353F575;
- Tue,  6 Aug 2019 08:57:47 -0700 (PDT)
-From: Mark Rutland <mark.rutland@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH] arm64/kvm: remove VMID rollover I-cache maintenance
-Date: Tue,  6 Aug 2019 16:57:37 +0100
-Message-Id: <20190806155737.39307-1-mark.rutland@arm.com>
-X-Mailer: git-send-email 2.11.0
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 938E128;
+ Wed,  7 Aug 2019 02:53:51 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
+ [10.1.196.217])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8D1D83F575;
+ Wed,  7 Aug 2019 02:53:50 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts
+ on enable
+Date: Wed,  7 Aug 2019 10:53:20 +0100
+Message-Id: <1565171600-11082-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: maz@kernel.org, andre.przywara@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,79 +68,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For VPIPT I-caches, we need I-cache maintenance on VMID rollover to
-avoid an ABA problem. Consider a single vCPU VM, with a pinned stage-2,
-running with an idmap VA->IPA and idmap IPA->PA. If we don't do
-maintenance on rollover:
+A HW mapped level sensitive interrupt asserted by a device will not be put
+into the ap_list if it is disabled at the VGIC level. When it is enabled
+again, it will be inserted into the ap_list and written to a list register
+on guest entry regardless of the state of the device.
 
-        // VMID A
-        Writes insn X to PA 0xF
-        Invalidates PA 0xF (for VMID A)
+We could argue that this can also happen on real hardware, when the command
+to enable the interrupt reached the GIC before the device had the chance to
+de-assert the interrupt signal; however, we emulate the distributor and
+redistributors in software and we can do better than that.
 
-        I$ contains [{A,F}->X]
-
-        [VMID ROLLOVER]
-
-        // VMID B
-        Writes insn Y to PA 0xF
-        Invalidates PA 0xF (for VMID B)
-
-        I$ contains [{A,F}->X, {B,F}->Y]
-
-        [VMID ROLLOVER]
-
-        // VMID A
-        I$ contains [{A,F}->X, {B,F}->Y]
-
-        Unexpectedly hits stale I$ line {A,F}->X.
-
-However, for PIPT and VIPT I-caches, the VMID doesn't affect lookup or
-constrain maintenance. Given the VMID doesn't affect PIPT and VIPT
-I-caches, and given VMID rollover is independent of changes to stage-2
-mappings, I-cache maintenance cannot be necessary on VMID rollover for
-PIPT or VIPT I-caches.
-
-This patch removes the maintenance on rollover for VIPT and PIPT
-I-caches. At the same time, the unnecessary colons are removed from the
-asm statement to make it more legible.
-
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/kvm/hyp/tlb.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index d49a14497715..c466060b76d6 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -193,6 +193,18 @@ void __hyp_text __kvm_flush_vm_context(void)
- {
- 	dsb(ishst);
- 	__tlbi(alle1is);
--	asm volatile("ic ialluis" : : );
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 3ba7278fb533..44efc2ff863f 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -113,6 +113,22 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+ 
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
++		if (vgic_irq_is_mapped_level(irq)) {
++			bool was_high = irq->line_level;
 +
-+	/*
-+	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
-+	 * is necessary across a VMID rollover.
-+	 *
-+	 * VPIPT caches constrain lookup and maintenance to the active VMID,
-+	 * so we need to invalidate lines with a stale VMID to avoid an ABA
-+	 * race after multiple rollovers.
-+	 *
-+	 */
-+	if (icache_is_vpipt())
-+		asm volatile("ic ialluis");
-+
- 	dsb(ish);
- }
++			/*
++			 * We need to update the state of the interrupt because
++			 * the guest might have changed the state of the device
++			 * while the interrupt was disabled at the VGIC level.
++			 */
++			irq->line_level = vgic_get_phys_line_level(irq);
++			/*
++			 * Deactivate the physical interrupt so the GIC will let
++			 * us know when it is asserted again.
++			 */
++			if (!irq->active && was_high && !irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
+ 		irq->enabled = true;
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+ 
 -- 
-2.11.0
+2.7.4
 
 _______________________________________________
 kvmarm mailing list
