@@ -1,65 +1,66 @@
-Return-Path: <SRS0=uVDJ=WE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=zTnl=WF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19287C433FF
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Aug 2019 15:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F27C31E40
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Aug 2019 07:09:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A47E82173E
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Aug 2019 15:49:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A47E82173E
+	by mail.kernel.org (Postfix) with ESMTP id A56322171F
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Aug 2019 07:09:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56322171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 081EB4A588;
-	Thu,  8 Aug 2019 11:49:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D3D14A4E6;
+	Fri,  9 Aug 2019 03:09:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x-k7RZvoqA7y; Thu,  8 Aug 2019 11:49:50 -0400 (EDT)
+	with ESMTP id yq7CL21c7jq0; Fri,  9 Aug 2019 03:09:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFA1D4A57B;
-	Thu,  8 Aug 2019 11:49:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C2054A51E;
+	Fri,  9 Aug 2019 03:09:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBCB14A57A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Aug 2019 11:49:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 822A14A51E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Aug 2019 03:09:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nh3w2pGG-H85 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Aug 2019 11:49:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC9B24A53D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Aug 2019 11:49:48 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 593D01596;
- Thu,  8 Aug 2019 08:49:48 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- A5E283F706; Thu,  8 Aug 2019 08:49:46 -0700 (PDT)
-Subject: Re: [PATCH 9/9] arm64: Retrieve stolen time as paravirtualized guest
-To: Steven Price <steven.price@arm.com>
-References: <20190802145017.42543-1-steven.price@arm.com>
- <20190802145017.42543-10-steven.price@arm.com> <20190804105353.5e9824dc@why>
- <dc8a1e56-7b52-cc8f-265d-27eb5f458613@arm.com>
+ with ESMTP id j8PDk+gVULUC for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Aug 2019 03:09:02 -0400 (EDT)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79D014A4FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Aug 2019 03:09:02 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why)
+ by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+ (Exim 4.80) (envelope-from <maz@kernel.org>)
+ id 1hvz1H-0002zE-LG; Fri, 09 Aug 2019 09:08:59 +0200
+Date: Fri, 9 Aug 2019 08:08:56 +0100
 From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic: Reevaluate level sensitive
+ interrupts on enable
+Message-ID: <20190809080856.61ab570b@why>
+In-Reply-To: <1565171600-11082-1-git-send-email-alexandru.elisei@arm.com>
+References: <1565171600-11082-1-git-send-email-alexandru.elisei@arm.com>
 Organization: Approximate
-Message-ID: <7108a70b-dafd-507b-8509-f4a092ef24af@kernel.org>
-Date: Thu, 8 Aug 2019 16:49:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <dc8a1e56-7b52-cc8f-265d-27eb5f458613@arm.com>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,64 +77,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 08/08/2019 16:29, Steven Price wrote:
-> On 04/08/2019 10:53, Marc Zyngier wrote:
->> On Fri,  2 Aug 2019 15:50:17 +0100
->> Steven Price <steven.price@arm.com> wrote:
->>
->>> Enable paravirtualization features when running under a hypervisor
->>> supporting the PV_TIME_ST hypercall.
->>>
->>> For each (v)CPU, we ask the hypervisor for the location of a shared
->>> page which the hypervisor will use to report stolen time to us. We set
->>> pv_time_ops to the stolen time function which simply reads the stolen
->>> value from the shared page for a VCPU. We guarantee single-copy
->>> atomicity using READ_ONCE which means we can also read the stolen
->>> time for another VCPU than the currently running one while it is
->>> potentially being updated by the hypervisor.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>  arch/arm64/kernel/Makefile |   1 +
->>>  arch/arm64/kernel/kvm.c    | 155 +++++++++++++++++++++++++++++++++++++
+On Wed,  7 Aug 2019 10:53:20 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-[...]
-
->>> +static int __init kvm_guest_init(void)
->>> +{
->>> +	int ret = 0;
->>> +
->>> +	if (!has_kvm_steal_clock())
->>> +		return 0;
->>> +
->>> +	ret = kvm_arm_init_stolen_time();
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	pv_ops.time.steal_clock = kvm_steal_clock;
->>> +
->>> +	static_key_slow_inc(&paravirt_steal_enabled);
->>> +	if (steal_acc)
->>> +		static_key_slow_inc(&paravirt_steal_rq_enabled);
->>> +
->>> +	pr_info("using stolen time PV\n");
->>> +
->>> +	return 0;
->>> +}
->>> +early_initcall(kvm_guest_init);
->>
->> Is there any reason why we wouldn't directly call into this rather than
->> using an initcall?
+> A HW mapped level sensitive interrupt asserted by a device will not be put
+> into the ap_list if it is disabled at the VGIC level. When it is enabled
+> again, it will be inserted into the ap_list and written to a list register
+> on guest entry regardless of the state of the device.
 > 
-> I'm not sure where the direct call would go - any pointers?
+> We could argue that this can also happen on real hardware, when the command
+> to enable the interrupt reached the GIC before the device had the chance to
+> de-assert the interrupt signal; however, we emulate the distributor and
+> redistributors in software and we can do better than that.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+> index 3ba7278fb533..44efc2ff863f 100644
+> --- a/virt/kvm/arm/vgic/vgic-mmio.c
+> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
+> @@ -113,6 +113,22 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
+>  		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>  
+>  		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +		if (vgic_irq_is_mapped_level(irq)) {
+> +			bool was_high = irq->line_level;
+> +
+> +			/*
+> +			 * We need to update the state of the interrupt because
+> +			 * the guest might have changed the state of the device
+> +			 * while the interrupt was disabled at the VGIC level.
+> +			 */
+> +			irq->line_level = vgic_get_phys_line_level(irq);
+> +			/*
+> +			 * Deactivate the physical interrupt so the GIC will let
+> +			 * us know when it is asserted again.
+> +			 */
+> +			if (!irq->active && was_high && !irq->line_level)
+> +				vgic_irq_set_phys_active(irq, false);
+> +		}
+>  		irq->enabled = true;
+>  		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+>  
 
-I'd be temped to say arch/arm64/kernel/time.c:time_init(), provided that
-there is no issue with the CPU hotplug lock (I remember hitting that a
-while ago).
+
+Applied, thanks.
 
 	M.
 -- 
-Jazz is not dead, it just smells funny...
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
