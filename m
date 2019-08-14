@@ -2,64 +2,90 @@ Return-Path: <SRS0=Z53j=WK=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C256C0650F
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Aug 2019 06:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A16C32757
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Aug 2019 13:02:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7A2A20843
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Aug 2019 06:54:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A2A20843
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 58B75206C1
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Aug 2019 13:02:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QeVkZCd2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B75206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8744A558;
-	Wed, 14 Aug 2019 02:54:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B51EC4A4BE;
+	Wed, 14 Aug 2019 09:02:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@amazon.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Jp7t4PMKXbVt; Wed, 14 Aug 2019 02:54:22 -0400 (EDT)
+	with ESMTP id F5y915OTXjXU; Wed, 14 Aug 2019 09:02:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B865C4A535;
-	Wed, 14 Aug 2019 02:54:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8959B4A4E1;
+	Wed, 14 Aug 2019 09:02:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63A6F4A52F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Aug 2019 02:54:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 208544A4E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Aug 2019 09:02:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zi2whWcFWAOX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Aug 2019 02:54:20 -0400 (EDT)
-Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A61E14A4AA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Aug 2019 02:54:20 -0400 (EDT)
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 90E81FB5E09DDF8FBDBD;
- Wed, 14 Aug 2019 14:54:16 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Wed, 14 Aug 2019
- 14:54:06 +0800
-Subject: Re: Can we boot a 512U kvm guest?
-To: Marc Zyngier <marc.zyngier@arm.com>
-References: <86aa9609-7dc9-1461-ae47-f50897cd0875@huawei.com>
- <86d0h9no9j.wl-marc.zyngier@arm.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <1685337f-fc4e-c783-638c-a764270b8006@huawei.com>
-Date: Wed, 14 Aug 2019 14:51:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+ with ESMTP id 5WnhyEbvTEEX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Aug 2019 09:02:32 -0400 (EDT)
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B700A4A4A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Aug 2019 09:02:32 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+ t=1565787752; x=1597323752;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=ahedc4jUDKTjKYr/t9LKGSVGXplFx3U807P6YTr2BXY=;
+ b=QeVkZCd2rxiA5LnNmWsUck7ZdMr/SvnkBhFmIewjlAWFqT6aD/IiwBqS
+ 0WqLDiJE4VyalyyUhDET4WkWQevYbbaCIFLLF+TFlt18QC0I1KNUDbzRP
+ R+eLfZevx1x12UbMfNPmw8FpYe6D6/nbH5nzXiDLXqak7diPGWaiiE0H3 w=;
+X-IronPort-AV: E=Sophos;i="5.64,385,1559520000"; d="scan'208";a="409587587"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-2a-8549039f.us-west-2.amazon.com) ([10.124.125.6])
+ by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
+ 14 Aug 2019 13:02:30 +0000
+Received: from EX13MTAUWC001.ant.amazon.com
+ (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+ by email-inbound-relay-2a-8549039f.us-west-2.amazon.com (Postfix) with ESMTPS
+ id C0243A227C; Wed, 14 Aug 2019 13:02:29 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 14 Aug 2019 13:02:29 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.211) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 14 Aug 2019 13:02:26 +0000
+Subject: Re: [PATCH 0/9] arm64: Stolen time support
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+References: <20190802145017.42543-1-steven.price@arm.com>
+ <20190803190522.5fec8f7d@why> <6789f477-8ab5-cc54-1ad2-8627917b07c9@arm.com>
+From: Alexander Graf <graf@amazon.com>
+Message-ID: <8ca5c106-7c12-4c6e-6d81-a90f281a9894@amazon.com>
+Date: Wed, 14 Aug 2019 15:02:25 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <86d0h9no9j.wl-marc.zyngier@arm.com>
+In-Reply-To: <6789f477-8ab5-cc54-1ad2-8627917b07c9@arm.com>
 Content-Language: en-US
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
-Cc: zhang.zhanghailiang@huawei.com, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- kvmarm@lists.cs.columbia.edu
+X-Originating-IP: [10.43.160.211]
+X-ClientProxiedBy: EX13D03UWA002.ant.amazon.com (10.43.160.144) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
-Precedence: list
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -73,154 +99,113 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2019/8/13 22:17, Marc Zyngier wrote:
-> On Tue, 13 Aug 2019 09:50:27 +0100,
-> Zenghui Yu <yuzenghui@huawei.com> wrote:
-> 
-> Hi Zenghui,
-> 
->>
->> Hi folks,
->>
->> Since commit e25028c8ded0 ("KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to
->> 512"), we seemed to be allowed to boot a 512U guest.  But I failed to
->> start it up with the latest QEMU.  I guess there are at least *two*
->> reasons (limitations).
->>
->> First I got a QEMU abort:
->> 	"kvm_set_irq: Invalid argument"
->>
->> Enable the trace_kvm_irq_line() under debugfs, when it comed with
->> vcpu-256, I got:
->> 	"Inject UNKNOWN interrupt (3), vcpu->idx: 0, num: 23, level: 0"
->> and kvm_vm_ioctl_irq_line() returns -EINVAL to user-space...
->>
->> So the thing is that we only have 8 bits for vcpu_index field ([23:16])
->> in KVM_IRQ_LINE ioctl.  irq_type field will be corrupted if we inject a
->> PPI to vcpu-256, whose vcpu_index will take 9 bits.
-> 
-> Irk. Not great indeed. Clearly, we have a couple of holes in the way
-> we test these ABI changes (/me eyes Eric...).
-> 
->>
->> I temporarily patched the KVM and QEMU with the following diff:
->>
->> ---8<---
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h
->> b/arch/arm64/include/uapi/asm/kvm.h
->> index 95516a4..39a0fb1 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -325,10 +325,10 @@ struct kvm_vcpu_events {
->>   #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
->>
->>   /* KVM_IRQ_LINE irq field index values */
->> -#define KVM_ARM_IRQ_TYPE_SHIFT		24
->> -#define KVM_ARM_IRQ_TYPE_MASK		0xff
->> +#define KVM_ARM_IRQ_TYPE_SHIFT		28
->> +#define KVM_ARM_IRQ_TYPE_MASK		0xf
->>   #define KVM_ARM_IRQ_VCPU_SHIFT		16
->> -#define KVM_ARM_IRQ_VCPU_MASK		0xff
->> +#define KVM_ARM_IRQ_VCPU_MASK		0xfff
->>   #define KVM_ARM_IRQ_NUM_SHIFT		0
->>   #define KVM_ARM_IRQ_NUM_MASK		0xffff
->>
->> ---8<---
->>
->> It makes things a bit better, it also immediately BREAKs the api with
->> old versions.
-> 
-> Yes, and we can't have that (specially if you consider that this API
-> is shared between 32 and 64bit). One "get out of jail card" is to
-> steal a few bits from the top of the word, and encode things there:
-> 
-> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-> index 4602464ebdfb..86db092e4c2f 100644
-> --- a/arch/arm/include/uapi/asm/kvm.h
-> +++ b/arch/arm/include/uapi/asm/kvm.h
-> @@ -254,8 +254,10 @@ struct kvm_vcpu_events {
->   #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
->   
->   /* KVM_IRQ_LINE irq field index values */
-> +#define KVM_ARM_IRQ_VCPU2_SHIFT		28
-> +#define KVM_ARM_IRQ_VCPU2_MASK		0xf
->   #define KVM_ARM_IRQ_TYPE_SHIFT		24
-> -#define KVM_ARM_IRQ_TYPE_MASK		0xff
-> +#define KVM_ARM_IRQ_TYPE_MASK		0xf
->   #define KVM_ARM_IRQ_VCPU_SHIFT		16
->   #define KVM_ARM_IRQ_VCPU_MASK		0xff
->   #define KVM_ARM_IRQ_NUM_SHIFT		0
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 7b7ac0f6cec9..44cb25bfc95e 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -308,8 +308,10 @@ struct kvm_vcpu_events {
->   #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
->   
->   /* KVM_IRQ_LINE irq field index values */
-> +#define KVM_ARM_IRQ_VCPU2_SHIFT		28
-> +#define KVM_ARM_IRQ_VCPU2_MASK		0xf
->   #define KVM_ARM_IRQ_TYPE_SHIFT		24
-> -#define KVM_ARM_IRQ_TYPE_MASK		0xff
-> +#define KVM_ARM_IRQ_TYPE_MASK		0xf
->   #define KVM_ARM_IRQ_VCPU_SHIFT		16
->   #define KVM_ARM_IRQ_VCPU_MASK		0xff
->   #define KVM_ARM_IRQ_NUM_SHIFT		0
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 90cedebaeb94..fb685c1c0514 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -889,6 +889,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->   
->   	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
->   	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
-> +	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
->   	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
->   
->   	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
-> 
-> It should work because we've been careful not to allow value outside
-> of {0, 1, 2} for irq_type. I don't like it, but I really don't feel
-> like adding another IRQ related ioctl. We still have 16 irq types
-> (which is already a waste of space), and we can go up to 4096 vcpu.
-
-Hi Marc,
-
-Thanks for this. I can test it on my machine once user-space agrees with
-this change.
-
-> Peter, what do you think?
-> 
->> Next comes one more QEMU abort (with the "fix" above):
->> 	"Failed to set device address: No space left on device"
->>
->> We register two io devices (rd_dev and sgi_dev) on KVM_MMIO_BUS for
->> each redistributor. 512 vcpus take 1024 io devices, which is beyond the
->> maximum limitation of the current kernel - NR_IOBUS_DEVS (1000).
->> So we get a ENOSPC error here.
-> 
-> I can reproduce that issue here ("499 vcpus on my Chromebook,
-> baby"). Not an ABI problem though, and we can bump it up if that's
-> needed.
-> 
->> I don't know if the similar problems have been discussed before in ML.
->> Is it time to really support the 512U guest?
-> 
-> The real question is "why the hell would you want to do that?" ;-)
-> Seriously, I'm very interested in finding out what is the use case for
-> these gigantic VMs, other than debugging the kernel for big machines.
-
-To be honest, I haven't seen any use case yet. In a typical production
-environment, *I think* we will not let the guest to have more CPUs than
-the host (and currently the maximum we have for host is 128).
-
-(It's just that someone complained that "why can't I start a VM with the
-  max supported number of vcpus", and I started investigating yesterday.)
 
 
-Thanks,
-Zenghui
+On 05.08.19 15:06, Steven Price wrote:
+> On 03/08/2019 19:05, Marc Zyngier wrote:
+>> On Fri,  2 Aug 2019 15:50:08 +0100
+>> Steven Price <steven.price@arm.com> wrote:
+>>
+>> Hi Steven,
+>>
+>>> This series add support for paravirtualized time for arm64 guests and
+>>> KVM hosts following the specification in Arm's document DEN 0057A:
+>>>
+>>> https://developer.arm.com/docs/den0057/a
+>>>
+>>> It implements support for stolen time, allowing the guest to
+>>> identify time when it is forcibly not executing.
+>>>
+>>> It doesn't implement support for Live Physical Time (LPT) as there are
+>>> some concerns about the overheads and approach in the above
+>>> specification, and I expect an updated version of the specification to
+>>> be released soon with just the stolen time parts.
+>>
+>> Thanks for posting this.
+>>
+>> My current concern with this series is around the fact that we allocate
+>> memory from the kernel on behalf of the guest. It is the first example
+>> of such thing in the ARM port, and I can't really say I'm fond of it.
+>>
+>> x86 seems to get away with it by having the memory allocated from
+>> userspace, why I tend to like more. Yes, put_user is more
+>> expensive than a straight store, but this isn't done too often either.
+>>
+>> What is the rational for your current approach?
+> 
+> As I see it there are 3 approaches that can be taken here:
+> 
+> 1. Hypervisor allocates memory and adds it to the virtual machine. This
+> means that everything to do with the 'device' is encapsulated behind the
+> KVM_CREATE_DEVICE / KVM_[GS]ET_DEVICE_ATTR ioctls. But since we want the
+> stolen time structure to be fast it cannot be a trapping region and has
+> to be backed by real memory - in this case allocated by the host kernel.
+> 
+> 2. Host user space allocates memory. Similar to above, but this time
+> user space needs to manage the memory region as well as the usual
+> KVM_CREATE_DEVICE dance. I've no objection to this, but it means
+> kvmtool/QEMU needs to be much more aware of what is going on (e.g. how
+> to size the memory region).
 
+You ideally want to get the host overhead for a VM to as little as you 
+can. I'm not terribly fond of the idea of reserving a full page just 
+because we're too afraid of having the guest donate memory.
+
+> 
+> 3. Guest kernel "donates" the memory to the hypervisor for the
+> structure. As far as I'm aware this is what x86 does. The problems I see
+> this approach are:
+> 
+>   a) kexec becomes much more tricky - there needs to be a disabling
+> mechanism for the guest to stop the hypervisor scribbling on memory
+> before starting the new kernel.
+
+I wouldn't call "quiesce a device" much more tricky. We have to do that 
+for other devices as well today.
+
+>   b) If there is more than one entity that is interested in the
+> information (e.g. firmware and kernel) then this requires some form of
+> arbitration in the guest because the hypervisor doesn't want to have to
+> track an arbitrary number of regions to update.
+
+Why would FW care?
+
+>   c) Performance can suffer if the host kernel doesn't have a suitably
+> aligned/sized area to use. As you say - put_user() is more expensive.
+
+Just define the interface to always require natural alignment when 
+donating a memory location?
+
+> The structure is updated on every return to the VM.
+
+If you really do suffer from put_user(), there are alternatives. You 
+could just map the page on the registration hcall and then leave it 
+pinned until the vcpu gets destroyed again.
+
+> Of course x86 does prove the third approach can work, but I'm not sure
+> which is actually better. Avoid the kexec cancellation requirements was
+> the main driver of the current approach. Although many of the
+
+I really don't understand the problem with kexec cancellation. Worst 
+case, let guest FW set it up for you and propagate only the address down 
+via ACPI/DT. That way you can mark the respective memory as reserved too.
+
+But even with a Linux only mechanism, just take a look at 
+arch/x86/kernel/kvmclock.c. All they do to remove the map is to hook 
+into machine_crash_shutdown() and machine_shutdown().
+
+
+Alex
+
+> conversations about this were also tied up with Live Physical Time which
+> adds its own complications.
+> 
+> Steve
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
