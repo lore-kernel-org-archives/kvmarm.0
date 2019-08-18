@@ -2,59 +2,65 @@ Return-Path: <SRS0=LHWX=WO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB307C3A59F
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 14:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71155C3A589
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:42:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 65A802087E
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 14:07:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65A802087E
+	by mail.kernel.org (Postfix) with ESMTP id E81132086C
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:42:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81132086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4DBC4A57F;
-	Sun, 18 Aug 2019 10:07:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 551B64A5C1;
+	Sun, 18 Aug 2019 13:42:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CM3zwUFxEQUJ; Sun, 18 Aug 2019 10:07:30 -0400 (EDT)
+	with ESMTP id LJBxPD8WGdEp; Sun, 18 Aug 2019 13:42:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2864A557;
-	Sun, 18 Aug 2019 10:07:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 508AA4A5B3;
+	Sun, 18 Aug 2019 13:42:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAADD4A557
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 10:07:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ED154A5B3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:42:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W-lVxAfN4Fot for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Aug 2019 10:07:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F4B64A556
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 10:07:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC8F7337;
- Sun, 18 Aug 2019 07:07:26 -0700 (PDT)
-Received: from big-swifty.lan (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AAF13F246;
- Sun, 18 Aug 2019 07:07:24 -0700 (PDT)
+ with ESMTP id TTWULTtDKAg0 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Aug 2019 13:42:47 -0400 (EDT)
+Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
+ [213.251.177.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 511504A5AB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:42:47 -0400 (EDT)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
+ helo=why)
+ by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+ (Exim 4.80) (envelope-from <maz@kernel.org>)
+ id 1hzPCU-0007Qm-QH; Sun, 18 Aug 2019 19:42:43 +0200
+Date: Sun, 18 Aug 2019 18:42:40 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Maydell <peter.maydell@linaro.org>,
- James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm/arm64: vgic: Allow more than 256 vcpus for
- KVM_IRQ_LINE
-Date: Sun, 18 Aug 2019 15:07:10 +0100
-Message-Id: <20190818140710.23920-1-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] arm64/kvm: remove VMID rollover I-cache maintenance
+Message-ID: <20190818184240.507e0716@why>
+In-Reply-To: <1dca0489-9e85-cb8f-b846-b6da65f41773@arm.com>
+References: <20190806155737.39307-1-mark.rutland@arm.com>
+ <1dca0489-9e85-cb8f-b846-b6da65f41773@arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, mark.rutland@arm.com,
+ linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com,
+ christoffer.dall@arm.com, kvmarm@lists.cs.columbia.edu,
+ julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,95 +72,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-V2hpbGUgcGFydHMgb2YgdGhlIFZHSUMgc3VwcG9ydCBhIGxhcmdlIG51bWJlciBvZiB2Y3B1cyAo
-d2UKYnJhdmVseSBhbGxvdyB1cCB0byA1MTIpLCBvdGhlciBwYXJ0cyBhcmUgbW9yZSBsaW1pdGVk
-LgoKT25lIG9mIHRoZXNlIGxpbWl0cyBpcyB2aXNpYmxlIGluIHRoZSBLVk1fSVJRX0xJTkUgaW9j
-dGwsIHdoaWNoCm9ubHkgYWxsb3dzIDI1NiB2Y3B1cyB0byBiZSBzaWduYWxsZWQgd2hlbiB1c2lu
-ZyB0aGUgQ1BVIG9yIFBQSQp0eXBlcy4gVW5mb3J0dW5hdGVseSwgd2UndmUgY29ybmVyZWQgb3Vy
-c2VsdmVzIGJhZGx5IGJ5IGFsbG9jYXRpbmcKYWxsIHRoZSBiaXRzIGluIHRoZSBpcnEgZmllbGQu
-CgpTaW5jZSB0aGUgaXJxX3R5cGUgc3ViZmllbGQgKDggYml0IHdpZGUpIGlzIGN1cnJlbnRseSBv
-bmx5IHRha2luZwp0aGUgdmFsdWVzIDAsIDEgYW5kIDIgKGFuZCB3ZSBoYXZlIGJlZW4gY2FyZWZ1
-bCBub3QgdG8gYWxsb3cgYW55dGhpbmcKZWxzZSksIGxldCdzIHJlZHVjZSB0aGlzIGZpZWxkIHRv
-IG9ubHkgNCBiaXRzLCBhbmQgYWxsb2NhdGUgdGhlCnJlbWFpbmluZyA0IGJpdHMgdG8gYSB2Y3B1
-Ml9pbmRleCwgd2hpY2ggYWN0cyBhcyBhIG11bHRpcGxpZXI6CgogIHZjcHVfaWQgPSAyNTYgKiB2
-Y3B1Ml9pbmRleCArIHZjcHVfaW5kZXgKCldpdGggdGhhdCwgYW5kIGEgbmV3IGNhcGFiaWxpdHkg
-KEtWTV9DQVBfQVJNX0lSUV9MSU5FX0xBWU9VVF8yKQphbGxvd2luZyB0aGlzIHRvIGJlIGRpc2Nv
-dmVyZWQsIGl0IGJlY29tZXMgcG9zc2libGUgdG8gaW5qZWN0ClBQSXMgdG8gdXAgdG8gNDA5NiB2
-Y3B1cy4gQnV0IHBsZWFzZSBqdXN0IGRvbid0LgoKUmVwb3J0ZWQtYnk6IFplbmdodWkgWXUgPHl1
-emVuZ2h1aUBodWF3ZWkuY29tPgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJu
-ZWwub3JnPgotLS0KIERvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnR4dCAgICB8IDggKysrKysr
-LS0KIGFyY2gvYXJtL2luY2x1ZGUvdWFwaS9hc20va3ZtLmggICB8IDQgKysrLQogYXJjaC9hcm02
-NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oIHwgNCArKystCiBpbmNsdWRlL3VhcGkvbGludXgva3Zt
-LmggICAgICAgICAgfCAxICsKIHZpcnQva3ZtL2FybS9hcm0uYyAgICAgICAgICAgICAgICB8IDIg
-KysKIDUgZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS50eHQgYi9Eb2N1bWVudGF0aW9u
-L3ZpcnQva3ZtL2FwaS50eHQKaW5kZXggMmQwNjc3NjdiNjE3Li44NTUxOGJmYjJhOTkgMTAwNjQ0
-Ci0tLSBhL0RvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnR4dAorKysgYi9Eb2N1bWVudGF0aW9u
-L3ZpcnQva3ZtL2FwaS50eHQKQEAgLTc1Myw4ICs3NTMsOCBAQCBpbi1rZXJuZWwgaXJxY2hpcCAo
-R0lDKSwgYW5kIGZvciBpbi1rZXJuZWwgaXJxY2hpcCBjYW4gdGVsbCB0aGUgR0lDIHRvCiB1c2Ug
-UFBJcyBkZXNpZ25hdGVkIGZvciBzcGVjaWZpYyBjcHVzLiAgVGhlIGlycSBmaWVsZCBpcyBpbnRl
-cnByZXRlZAogbGlrZSB0aGlzOgogCi0gwqBiaXRzOiAgfCAzMSAuLi4gMjQgfCAyMyAgLi4uIDE2
-IHwgMTUgICAgLi4uICAgIDAgfAotICBmaWVsZDogfCBpcnFfdHlwZSAgfCB2Y3B1X2luZGV4IHwg
-ICAgIGlycV9pZCAgICAgfAorIMKgYml0czogIHwgIDMxIC4uLiAyOCAgfCAyNyAuLi4gMjQgfCAy
-MyAgLi4uIDE2IHwgMTUgLi4uIDAgfAorICBmaWVsZDogfCB2Y3B1Ml9pbmRleCB8IGlycV90eXBl
-ICB8IHZjcHVfaW5kZXggfCAgaXJxX2lkICB8CiAKIFRoZSBpcnFfdHlwZSBmaWVsZCBoYXMgdGhl
-IGZvbGxvd2luZyB2YWx1ZXM6CiAtIGlycV90eXBlWzBdOiBvdXQtb2Yta2VybmVsIEdJQzogaXJx
-X2lkIDAgaXMgSVJRLCBpcnFfaWQgMSBpcyBGSVEKQEAgLTc2Niw2ICs3NjYsMTAgQEAgVGhlIGly
-cV90eXBlIGZpZWxkIGhhcyB0aGUgZm9sbG93aW5nIHZhbHVlczoKIAogSW4gYm90aCBjYXNlcywg
-bGV2ZWwgaXMgdXNlZCB0byBhc3NlcnQvZGVhc3NlcnQgdGhlIGxpbmUuCiAKK1doZW4gS1ZNX0NB
-UF9BUk1fSVJRX0xJTkVfTEFZT1VUXzIgaXMgc3VwcG9ydGVkLCB0aGUgdGFyZ2V0IHZjcHUgaXMK
-K2lkZW50aWZpZWQgYXMgKDI1NiAqIHZjcHUyX2luZGV4ICsgdmNwdV9pbmRleCkuIE90aGVyd2lz
-ZSwgdmNwdTJfaW5kZXgKK211c3QgYmUgemVyby4KKwogc3RydWN0IGt2bV9pcnFfbGV2ZWwgewog
-CXVuaW9uIHsKIAkJX191MzIgaXJxOyAgICAgLyogR1NJICovCmRpZmYgLS1naXQgYS9hcmNoL2Fy
-bS9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oIGIvYXJjaC9hcm0vaW5jbHVkZS91YXBpL2FzbS9rdm0u
-aAppbmRleCBhNDIxN2MxYTVkMDEuLjI3NjkzNjBmMTk1YyAxMDA2NDQKLS0tIGEvYXJjaC9hcm0v
-aW5jbHVkZS91YXBpL2FzbS9rdm0uaAorKysgYi9hcmNoL2FybS9pbmNsdWRlL3VhcGkvYXNtL2t2
-bS5oCkBAIC0yNjYsOCArMjY2LDEwIEBAIHN0cnVjdCBrdm1fdmNwdV9ldmVudHMgewogI2RlZmlu
-ZSAgIEtWTV9ERVZfQVJNX0lUU19DVFJMX1JFU0VUCQk0CiAKIC8qIEtWTV9JUlFfTElORSBpcnEg
-ZmllbGQgaW5kZXggdmFsdWVzICovCisjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFUyX1NISUZUCQky
-OAorI2RlZmluZSBLVk1fQVJNX0lSUV9WQ1BVMl9NQVNLCQkweGYKICNkZWZpbmUgS1ZNX0FSTV9J
-UlFfVFlQRV9TSElGVAkJMjQKLSNkZWZpbmUgS1ZNX0FSTV9JUlFfVFlQRV9NQVNLCQkweGZmCisj
-ZGVmaW5lIEtWTV9BUk1fSVJRX1RZUEVfTUFTSwkJMHhmCiAjZGVmaW5lIEtWTV9BUk1fSVJRX1ZD
-UFVfU0hJRlQJCTE2CiAjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFVfTUFTSwkJMHhmZgogI2RlZmlu
-ZSBLVk1fQVJNX0lSUV9OVU1fU0hJRlQJCTAKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVk
-ZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAppbmRl
-eCA5YTUwNzcxNmFlMmYuLjY3YzIxZjliZGJhZCAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNs
-dWRlL3VhcGkvYXNtL2t2bS5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0u
-aApAQCAtMzI1LDggKzMyNSwxMCBAQCBzdHJ1Y3Qga3ZtX3ZjcHVfZXZlbnRzIHsKICNkZWZpbmUg
-ICBLVk1fQVJNX1ZDUFVfVElNRVJfSVJRX1BUSU1FUgkJMQogCiAvKiBLVk1fSVJRX0xJTkUgaXJx
-IGZpZWxkIGluZGV4IHZhbHVlcyAqLworI2RlZmluZSBLVk1fQVJNX0lSUV9WQ1BVMl9TSElGVAkJ
-MjgKKyNkZWZpbmUgS1ZNX0FSTV9JUlFfVkNQVTJfTUFTSwkJMHhmCiAjZGVmaW5lIEtWTV9BUk1f
-SVJRX1RZUEVfU0hJRlQJCTI0Ci0jZGVmaW5lIEtWTV9BUk1fSVJRX1RZUEVfTUFTSwkJMHhmZgor
-I2RlZmluZSBLVk1fQVJNX0lSUV9UWVBFX01BU0sJCTB4ZgogI2RlZmluZSBLVk1fQVJNX0lSUV9W
-Q1BVX1NISUZUCQkxNgogI2RlZmluZSBLVk1fQVJNX0lSUV9WQ1BVX01BU0sJCTB4ZmYKICNkZWZp
-bmUgS1ZNX0FSTV9JUlFfTlVNX1NISUZUCQkwCmRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGlu
-dXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKaW5kZXggNWUzZjEyZDUzNTllLi41
-NDE0YjY1ODhmYmIgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAorKysgYi9p
-bmNsdWRlL3VhcGkvbGludXgva3ZtLmgKQEAgLTk5Niw2ICs5OTYsNyBAQCBzdHJ1Y3Qga3ZtX3Bw
-Y19yZXNpemVfaHB0IHsKICNkZWZpbmUgS1ZNX0NBUF9BUk1fUFRSQVVUSF9BRERSRVNTIDE3MQog
-I2RlZmluZSBLVk1fQ0FQX0FSTV9QVFJBVVRIX0dFTkVSSUMgMTcyCiAjZGVmaW5lIEtWTV9DQVBf
-UE1VX0VWRU5UX0ZJTFRFUiAxNzMKKyNkZWZpbmUgS1ZNX0NBUF9BUk1fSVJRX0xJTkVfTEFZT1VU
-XzIgMTc0CiAKICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HCiAKZGlmZiAtLWdpdCBhL3ZpcnQv
-a3ZtL2FybS9hcm0uYyBiL3ZpcnQva3ZtL2FybS9hcm0uYwppbmRleCAzNWEwNjk4MTViYWYuLmMx
-Mzg1OTExZGU2OSAxMDA2NDQKLS0tIGEvdmlydC9rdm0vYXJtL2FybS5jCisrKyBiL3ZpcnQva3Zt
-L2FybS9hcm0uYwpAQCAtMTgyLDYgKzE4Miw3IEBAIGludCBrdm1fdm1faW9jdGxfY2hlY2tfZXh0
-ZW5zaW9uKHN0cnVjdCBrdm0gKmt2bSwgbG9uZyBleHQpCiAJaW50IHI7CiAJc3dpdGNoIChleHQp
-IHsKIAljYXNlIEtWTV9DQVBfSVJRQ0hJUDoKKwljYXNlIEtWTV9DQVBfQVJNX0lSUV9MSU5FX0xB
-WU9VVF8yOgogCQlyID0gdmdpY19wcmVzZW50OwogCQlicmVhazsKIAljYXNlIEtWTV9DQVBfSU9F
-VkVOVEZEOgpAQCAtODg4LDYgKzg4OSw3IEBAIGludCBrdm1fdm1faW9jdGxfaXJxX2xpbmUoc3Ry
-dWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX2lycV9sZXZlbCAqaXJxX2xldmVsLAogCiAJaXJxX3R5
-cGUgPSAoaXJxID4+IEtWTV9BUk1fSVJRX1RZUEVfU0hJRlQpICYgS1ZNX0FSTV9JUlFfVFlQRV9N
-QVNLOwogCXZjcHVfaWR4ID0gKGlycSA+PiBLVk1fQVJNX0lSUV9WQ1BVX1NISUZUKSAmIEtWTV9B
-Uk1fSVJRX1ZDUFVfTUFTSzsKKwl2Y3B1X2lkeCArPSAoKGlycSA+PiBLVk1fQVJNX0lSUV9WQ1BV
-Ml9TSElGVCkgJiBLVk1fQVJNX0lSUV9WQ1BVMl9NQVNLKSAqIChLVk1fQVJNX0lSUV9WQ1BVX01B
-U0sgKyAxKTsKIAlpcnFfbnVtID0gKGlycSA+PiBLVk1fQVJNX0lSUV9OVU1fU0hJRlQpICYgS1ZN
-X0FSTV9JUlFfTlVNX01BU0s7CiAKIAl0cmFjZV9rdm1faXJxX2xpbmUoaXJxX3R5cGUsIHZjcHVf
-aWR4LCBpcnFfbnVtLCBpcnFfbGV2ZWwtPmxldmVsKTsKLS0gCjIuMjAuMQoKX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdApr
-dm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, 16 Aug 2019 14:39:31 +0100
+James Morse <james.morse@arm.com> wrote:
+
+> Hi Mark,
+> 
+> On 06/08/2019 16:57, Mark Rutland wrote:
+> > For VPIPT I-caches, we need I-cache maintenance on VMID rollover to
+> > avoid an ABA problem. Consider a single vCPU VM, with a pinned stage-2,
+> > running with an idmap VA->IPA and idmap IPA->PA. If we don't do
+> > maintenance on rollover:
+> > 
+> >         // VMID A
+> >         Writes insn X to PA 0xF
+> >         Invalidates PA 0xF (for VMID A)
+> > 
+> >         I$ contains [{A,F}->X]
+> > 
+> >         [VMID ROLLOVER]
+> > 
+> >         // VMID B
+> >         Writes insn Y to PA 0xF
+> >         Invalidates PA 0xF (for VMID B)
+> > 
+> >         I$ contains [{A,F}->X, {B,F}->Y]
+> > 
+> >         [VMID ROLLOVER]
+> > 
+> >         // VMID A
+> >         I$ contains [{A,F}->X, {B,F}->Y]
+> > 
+> >         Unexpectedly hits stale I$ line {A,F}->X.
+> > 
+> > However, for PIPT and VIPT I-caches, the VMID doesn't affect lookup or
+> > constrain maintenance. Given the VMID doesn't affect PIPT and VIPT
+> > I-caches, and given VMID rollover is independent of changes to stage-2
+> > mappings, I-cache maintenance cannot be necessary on VMID rollover for
+> > PIPT or VIPT I-caches.
+> > 
+> > This patch removes the maintenance on rollover for VIPT and PIPT
+> > I-caches. At the same time, the unnecessary colons are removed from the
+> > asm statement to make it more legible.  
+> 
+> Makes sense!
+> 
+> Reviewed-by: James Morse <james.morse@arm.com>
+
+Queued for 5.4. Thanks both.
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
