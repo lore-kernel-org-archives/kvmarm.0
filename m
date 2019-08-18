@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 871B7C3A59E
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B60F1C3A589
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:53:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 161282086C
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:44:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161282086C
+	by mail.kernel.org (Postfix) with ESMTP id 4336F20B7C
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Aug 2019 17:53:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4336F20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1C104A58E;
-	Sun, 18 Aug 2019 13:44:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B9ED4A5B6;
+	Sun, 18 Aug 2019 13:53:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V6aGZBIbRGzN; Sun, 18 Aug 2019 13:44:32 -0400 (EDT)
+	with ESMTP id 2Z59MCejw6Or; Sun, 18 Aug 2019 13:53:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 940A24A5B6;
-	Sun, 18 Aug 2019 13:44:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 772724A571;
+	Sun, 18 Aug 2019 13:53:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C56F4A591
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:44:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 635004A56C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:53:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lewdXQBIlw80 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Aug 2019 13:44:31 -0400 (EDT)
+ with ESMTP id x5UeVV8UDneW for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Aug 2019 13:53:40 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51BB24A58E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:44:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D7234A567
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Aug 2019 13:53:40 -0400 (EDT)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
  helo=why)
  by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
  (Exim 4.80) (envelope-from <maz@kernel.org>)
- id 1hzPED-0007S9-Tg; Sun, 18 Aug 2019 19:44:30 +0200
-Date: Sun, 18 Aug 2019 18:44:27 +0100
+ id 1hzPMv-0007XI-97; Sun, 18 Aug 2019 19:53:29 +0200
+Date: Sun, 18 Aug 2019 18:53:26 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Make function comments match
- function declarations
-Message-ID: <20190818184427.0fc263ad@why>
-In-Reply-To: <1565862982-9787-1-git-send-email-alexandru.elisei@arm.com>
-References: <1565862982-9787-1-git-send-email-alexandru.elisei@arm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: Call kvm_arch_vcpu_blocking early into the
+ blocking sequence
+Message-ID: <20190818185326.63f3ea9d@why>
+In-Reply-To: <a7250b9a-60e9-b04c-5515-e506aea46515@redhat.com>
+References: <20190802103709.70148-1-maz@kernel.org>
+ <20190802103709.70148-3-maz@kernel.org>
+ <a7250b9a-60e9-b04c-5515-e506aea46515@redhat.com>
 Organization: Approximate
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
- suzuki.poulose@arm.com, julien.grall@arm.com, andre.przywara@arm.com,
- eric.auger@redhat.com
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com,
+ julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, james.morse@arm.com,
+ joro@8bytes.org, Suravee.Suthikulpanit@amd.com, tangnianyao@huawei.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, andre.przywara@arm.com, julien.grall@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,65 +80,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 15 Aug 2019 10:56:22 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, 2 Aug 2019 12:46:33 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> Since commit 503a62862e8f ("KVM: arm/arm64: vgic: Rely on the GIC driver to
-> parse the firmware tables"), the vgic_v{2,3}_probe functions stopped using
-> a DT node. Commit 909777324588 ("KVM: arm/arm64: vgic-new: vgic_init:
-> implement kvm_vgic_hyp_init") changed the functions again, and now they
-> require exactly one argument, a struct gic_kvm_info populated by the GIC
-> driver. Unfortunately the comments regressed and state that a DT node is
-> used instead. Change the function comments to reflect the current
-> prototypes.
+> On 02/08/19 12:37, Marc Zyngier wrote:
+> > When a vpcu is about to block by calling kvm_vcpu_block, we call
+> > back into the arch code to allow any form of synchronization that
+> > may be required at this point (SVN stops the AVIC, ARM synchronises
+> > the VMCR and enables GICv4 doorbells). But this synchronization
+> > comes in quite late, as we've potentially waited for halt_poll_ns
+> > to expire.
+> > 
+> > Instead, let's move kvm_arch_vcpu_blocking() to the beginning of
+> > kvm_vcpu_block(), which on ARM has several benefits:
+> > 
+> > - VMCR gets synchronised early, meaning that any interrupt delivered
+> >   during the polling window will be evaluated with the correct guest
+> >   PMR
+> > - GICv4 doorbells are enabled, which means that any guest interrupt
+> >   directly injected during that window will be immediately recognised
+> > 
+> > Tang Nianyao ran some tests on a GICv4 machine to evaluate such
+> > change, and reported up to a 10% improvement for netperf:
+> > 
+> > <quote>
+> > 	netperf result:
+> > 	D06 as server, intel 8180 server as client
+> > 	with change:
+> > 	package 512 bytes - 5500 Mbits/s
+> > 	package 64 bytes - 760 Mbits/s
+> > 	without change:
+> > 	package 512 bytes - 5000 Mbits/s
+> > 	package 64 bytes - 710 Mbits/s
+> > </quote>
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/kvm_main.c | 7 +++----
+> >  1 file changed, 3 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 887f3b0c2b60..90d429c703cb 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2322,6 +2322,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> >  	bool waited = false;
+> >  	u64 block_ns;
+> >  
+> > +	kvm_arch_vcpu_blocking(vcpu);
+> > +
+> >  	start = cur = ktime_get();
+> >  	if (vcpu->halt_poll_ns && !kvm_arch_no_poll(vcpu)) {
+> >  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+> > @@ -2342,8 +2344,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> >  		} while (single_task_running() && ktime_before(cur, stop));
+> >  	}
+> >  
+> > -	kvm_arch_vcpu_blocking(vcpu);
+> > -
+> >  	for (;;) {
+> >  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
+> >  
+> > @@ -2356,9 +2356,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> >  
+> >  	finish_swait(&vcpu->wq, &wait);
+> >  	cur = ktime_get();
+> > -
+> > -	kvm_arch_vcpu_unblocking(vcpu);
+> >  out:
+> > +	kvm_arch_vcpu_unblocking(vcpu);
+> >  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+> >  
+> >  	if (!vcpu_valid_wakeup(vcpu))
+> >   
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic-v2.c | 7 ++++---
->  virt/kvm/arm/vgic/vgic-v3.c | 7 ++++---
->  2 files changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-> index 96aab77d0471..27b1ddf71aa0 100644
-> --- a/virt/kvm/arm/vgic/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic/vgic-v2.c
-> @@ -354,10 +354,11 @@ int vgic_v2_map_resources(struct kvm *kvm)
->  DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
->  
->  /**
-> - * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
-> - * @node:	pointer to the DT node
-> + * vgic_v2_probe - probe for a VGICv2 compatible interrupt controller
-> + * @info:	pointer to the GIC description
->   *
-> - * Returns 0 if a GICv2 has been found, returns an error code otherwise
-> + * Returns 0 if the VGICv2 has been probed successfully, returns an error code
-> + * otherwise
->   */
->  int vgic_v2_probe(const struct gic_kvm_info *info)
->  {
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 0c653a1e5215..4874f3266bea 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -570,10 +570,11 @@ static int __init early_gicv4_enable(char *buf)
->  early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
->  
->  /**
-> - * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-> - * @node:	pointer to the DT node
-> + * vgic_v3_probe - probe for a VGICv3 compatible interrupt controller
-> + * @info:	pointer to the GIC description
->   *
-> - * Returns 0 if a GICv3 has been found, returns an error code otherwise
-> + * Returns 0 if the VGICv3 has been probed successfully, returns an error code
-> + * otherwise
->   */
->  int vgic_v3_probe(const struct gic_kvm_info *info)
->  {
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-
-Queued, thanks.
+Thanks for that. I've pushed this patch into -next so that it gets a
+bit of exposure (I haven't heard from the AMD folks, and I'd like to
+make sure it doesn't regress their platforms).
 
 	M.
 -- 
