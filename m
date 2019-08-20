@@ -1,64 +1,69 @@
-Return-Path: <SRS0=xA+Y=WP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=avC1=WQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EB9C3A5A0
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Aug 2019 16:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 739EDC3A589
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Aug 2019 14:18:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DF25022CEA
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Aug 2019 16:40:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF25022CEA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id EB026214DA
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Aug 2019 14:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB026214DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE134A5D7;
-	Mon, 19 Aug 2019 12:40:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 407D54A57D;
+	Tue, 20 Aug 2019 10:18:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m6bimGR-0UC0; Mon, 19 Aug 2019 12:40:28 -0400 (EDT)
+	with ESMTP id YDj+a02YWJgh; Tue, 20 Aug 2019 10:18:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D16E24A5BF;
-	Mon, 19 Aug 2019 12:40:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9C904A5B6;
+	Tue, 20 Aug 2019 10:18:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E4094A5AF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Aug 2019 12:40:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6CB4A5AF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Aug 2019 10:18:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OkzqRTiDZ4ai for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Aug 2019 12:40:26 -0400 (EDT)
+ with ESMTP id z34Bo8fqFJ9t for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Aug 2019 10:18:46 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 867844A5A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Aug 2019 12:40:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F374A55F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Aug 2019 10:18:46 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECBC2344;
- Mon, 19 Aug 2019 09:40:25 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 28E023F718; Mon, 19 Aug 2019 09:40:24 -0700 (PDT)
-Subject: Re: [PATCH v2 4/9] KVM: arm64: Support stolen time reporting via
- shared structure
-To: Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-References: <20190819140436.12207-1-steven.price@arm.com>
- <20190819140436.12207-5-steven.price@arm.com>
-From: Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <f6fad4fa-323d-306c-c582-de07464f4d00@kernel.org>
-Date: Mon, 19 Aug 2019 17:40:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8488E28;
+ Tue, 20 Aug 2019 07:18:45 -0700 (PDT)
+Received: from [10.1.196.50] (e108454-lin.cambridge.arm.com [10.1.196.50])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 493033F246;
+ Tue, 20 Aug 2019 07:18:44 -0700 (PDT)
+Subject: Re: KVM Arm64 and Linux-RT issues
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <cd310858-2c0f-6af1-bf82-ee1e01a2cfb8@arm.com>
+ <alpine.DEB.2.21.1907270053360.1791@nanos.tec.linutronix.de>
+ <86zhkzn319.wl-maz@kernel.org> <960b5ed1-6d0f-3cee-da37-6061b4946c1a@arm.com>
+ <20190813125835.5v26s4iuv44lw2xg@linutronix.de>
+ <adc0b2e2-3a2e-5685-8eb5-2ce927d2139e@arm.com> <865zn1nidx.wl-maz@kernel.org>
+ <1f76c277-665a-e962-8cbe-b3c4ecad41b0@arm.com>
+ <20190816152317.pbhctfiyurjrepju@linutronix.de>
+ <e9a77a95-ce0e-27a4-acb0-e997eb656e14@arm.com>
+ <20190819073321.b3q2bxnslwwmdssn@linutronix.de>
+From: Julien Grall <julien.grall@arm.com>
+Message-ID: <35fd274a-08ae-8bfd-3484-83676af00328@arm.com>
+Date: Tue, 20 Aug 2019 15:18:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190819140436.12207-5-steven.price@arm.com>
+In-Reply-To: <20190819073321.b3q2bxnslwwmdssn@linutronix.de>
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "linux-rt-users@vger.kernel.org" <linux-rt-users@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, anna-maria@linutronix.de,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,340 +75,53 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Steven,
-
-On 19/08/2019 15:04, Steven Price wrote:
-> Implement the service call for configuring a shared structure between a
-> VCPU and the hypervisor in which the hypervisor can write the time
-> stolen from the VCPU's execution time by other tasks on the host.
-> 
-> The hypervisor allocates memory which is placed at an IPA chosen by user
-> space. The hypervisor then uses WRITE_ONCE() to update the shared
-> structure ensuring single copy atomicity of the 64-bit unsigned value
-> that reports stolen time in nanoseconds.
-> 
-> Whenever stolen time is enabled by the guest, the stolen time counter is
-> reset.
-> 
-> The stolen time itself is retrieved from the sched_info structure
-> maintained by the Linux scheduler code. We enable SCHEDSTATS when
-> selecting KVM Kconfig to ensure this value is meaningful.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   | 15 +++++++
->  arch/arm64/include/asm/kvm_host.h | 16 ++++++-
->  arch/arm64/kvm/Kconfig            |  1 +
->  include/linux/kvm_types.h         |  2 +
->  virt/kvm/arm/arm.c                | 19 +++++++++
->  virt/kvm/arm/hypercalls.c         |  3 ++
->  virt/kvm/arm/pvtime.c             | 71 +++++++++++++++++++++++++++++++
->  7 files changed, 126 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 369b5d2d54bf..14d61a84c270 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -39,6 +39,7 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
-> @@ -77,6 +78,12 @@ struct kvm_arch {
->  
->  	/* Mandated version of PSCI */
->  	u32 psci_version;
-> +
-> +	struct kvm_arch_pvtime {
-> +		struct gfn_to_hva_cache st_ghc;
-> +		gpa_t st_base;
-> +		u64 st_size;
-> +	} pvtime;
-
-It'd be good if we could avoid having this in the 32bit vcpu structure,
-given that it serves no real purpose (other than being able to compile
-things).
-
->  };
->  
->  #define KVM_NR_MEM_OBJS     40
-> @@ -328,6 +335,14 @@ static inline int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  {
->  	return SMCCC_RET_NOT_SUPPORTED;
->  }
-> +static inline int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
-> +{
-> +	return SMCCC_RET_NOT_SUPPORTED;
-> +}
-> +static inline int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
-> +{
-> +	return -ENOTSUPP;
-> +}
->  
->  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->  
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 583b3639062a..627ecbdd0c59 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -44,6 +44,7 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
-> @@ -83,6 +84,12 @@ struct kvm_arch {
->  
->  	/* Mandated version of PSCI */
->  	u32 psci_version;
-> +
-> +	struct kvm_arch_pvtime {
-> +		struct gfn_to_hva_cache st_ghc;
-> +		gpa_t st_base;
-> +		u64 st_size;
-> +	} pvtime;
->  };
->  
->  #define KVM_NR_MEM_OBJS     40
-> @@ -338,8 +345,13 @@ struct kvm_vcpu_arch {
->  	/* True when deferrable sysregs are loaded on the physical CPU,
->  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->  	bool sysregs_loaded_on_cpu;
-> -};
->  
-> +	/* Guest PV state */
-> +	struct {
-> +		u64 steal;
-> +		u64 last_steal;
-> +	} steal;
-> +};
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
->  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-> @@ -479,6 +491,8 @@ int kvm_perf_init(void);
->  int kvm_perf_teardown(void);
->  
->  int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
-> +int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
->  
->  void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
->  
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index a67121d419a2..d8b88e40d223 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ config KVM
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> +	select SCHEDSTATS
->  	---help---
->  	  Support hosting virtualized guest machines.
->  	  We don't support KVM with 16K page tables yet, due to the multiple
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index bde5374ae021..1c88e69db3d9 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->  typedef u64            gpa_t;
->  typedef u64            gfn_t;
->  
-> +#define GPA_INVALID	(~(gpa_t)0)
-> +
->  typedef unsigned long  hva_t;
->  typedef u64            hpa_t;
->  typedef u64            hfn_t;
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 35a069815baf..53cc80e98d8b 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -40,6 +40,10 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/sections.h>
->  
-> +#include <kvm/arm_hypercalls.h>
-> +#include <kvm/arm_pmu.h>
-> +#include <kvm/arm_psci.h>
-> +
->  #ifdef REQUIRES_VIRT
->  __asm__(".arch_extension	virt");
->  #endif
-> @@ -135,6 +139,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.max_vcpus = vgic_present ?
->  				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->  
-> +	kvm->arch.pvtime.st_base = GPA_INVALID;
->  	return ret;
->  out_free_stage2_pgd:
->  	kvm_free_stage2_pgd(kvm);
-> @@ -379,6 +384,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_vcpu_load_sysregs(vcpu);
->  	kvm_arch_vcpu_load_fp(vcpu);
->  	kvm_vcpu_pmu_restore_guest(vcpu);
-> +	if (vcpu->kvm->arch.pvtime.st_base != GPA_INVALID)
-> +		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->  
->  	if (single_task_running())
->  		vcpu_clear_wfe_traps(vcpu);
-> @@ -625,6 +632,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->  	smp_rmb();
->  }
->  
-> +static void vcpu_req_record_steal(struct kvm_vcpu *vcpu)
-> +{
-> +	int idx;
-> +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +	kvm_update_stolen_time(vcpu, false);
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +}
-> +
->  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
->  {
->  	return vcpu->arch.target >= 0;
-> @@ -644,6 +660,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		 * that a VCPU sees new virtual interrupts.
->  		 */
->  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
-> +
-> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
-> +			vcpu_req_record_steal(vcpu);
->  	}
->  }
->  
-> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> index 63ae629c466a..ac678eabf15f 100644
-> --- a/virt/kvm/arm/hypercalls.c
-> +++ b/virt/kvm/arm/hypercalls.c
-> @@ -56,6 +56,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  	case ARM_SMCCC_HV_PV_FEATURES:
->  		val = kvm_hypercall_pv_features(vcpu);
->  		break;
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
-> +		val = kvm_hypercall_stolen_time(vcpu);
-> +		break;
->  	default:
->  		return kvm_psci_call(vcpu);
->  	}
-> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-> index 6201d71cb1f8..f169184e4076 100644
-> --- a/virt/kvm/arm/pvtime.c
-> +++ b/virt/kvm/arm/pvtime.c
-> @@ -3,8 +3,55 @@
->  
->  #include <linux/arm-smccc.h>
->  
-> +#include <asm/pvclock-abi.h>
-> +
->  #include <kvm/arm_hypercalls.h>
->  
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_arch_pvtime *pvtime = &kvm->arch.pvtime;
-> +	u64 steal;
-> +	u64 steal_le;
-> +	u64 offset;
-> +	int idx;
-> +	const int stride = sizeof(struct pvclock_vcpu_stolen_time);
-> +
-> +	if (pvtime->st_base == GPA_INVALID)
-> +		return -ENOTSUPP;
-> +
-> +	/* Let's do the local bookkeeping */
-> +	steal = vcpu->arch.steal.steal;
-> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +	vcpu->arch.steal.steal = steal;
-> +
-> +	offset = stride * kvm_vcpu_get_idx(vcpu);
-> +
-> +	if (unlikely(offset + stride > pvtime->st_size))
-> +		return -EINVAL;
-> +
-> +	steal_le = cpu_to_le64(steal);
-> +	pagefault_disable();
-
-What's the reason for doing a pagefault_disable()? What I'd expect is
-for the userspace page to be faulted in and written to, and doing a
-pagefault_disable() seems to be going against this idea.
-
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	if (init) {
-> +		struct pvclock_vcpu_stolen_time init_values = {
-> +			.revision = 0,
-> +			.attributes = 0
-> +		};
-> +		kvm_write_guest_offset_cached(kvm,
-> +				&pvtime->st_ghc,
-> +				&init_values, offset, sizeof(init_values));
-> +	}
-> +	offset += offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
-> +	kvm_write_guest_offset_cached(kvm, &pvtime->st_ghc,
-> +			&steal_le, offset, sizeof(steal_le));
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +	pagefault_enable();
-> +
-> +	return 0;
-> +}
-> +
->  int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  {
->  	u32 feature = smccc_get_arg1(vcpu);
-> @@ -12,6 +59,7 @@ int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  
->  	switch (feature) {
->  	case ARM_SMCCC_HV_PV_FEATURES:
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
->  		val = SMCCC_RET_SUCCESS;
->  		break;
->  	}
-> @@ -19,3 +67,26 @@ int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  	return val;
->  }
->  
-> +int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 ret;
-> +	int err;
-> +
-> +	/*
-> +	 * Start counting stolen time from the time the guest requests
-> +	 * the feature enabled.
-> +	 */
-> +	vcpu->arch.steal.steal = 0;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +
-> +	err = kvm_update_stolen_time(vcpu, true);
-> +
-> +	if (err)
-> +		ret = SMCCC_RET_NOT_SUPPORTED;
-> +	else
-> +		ret = vcpu->kvm->arch.pvtime.st_base +
-> +			(sizeof(struct pvclock_vcpu_stolen_time) *
-> +			 kvm_vcpu_get_idx(vcpu));
-> +
-> +	return ret;
-> +}
-> 
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead, it just smells funny...
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgU2ViYXN0aWFuLAoKT24gMTkvMDgvMjAxOSAwODozMywgU2ViYXN0aWFuIEFuZHJ6ZWogU2ll
+d2lvciB3cm90ZToKPiBPbiAyMDE5LTA4LTE2IDE3OjMyOjM4IFsrMDEwMF0sIEp1bGllbiBHcmFs
+bCB3cm90ZToKPj4gSGkgU2ViYXN0aWFuLAo+IEhpIEp1bGllbiwKPiAKPj4gaHJ0aW1lcl9jYWxs
+YmFja19ydW5uaW5nKCkgd2lsbCBiZSByZXR1cm5pbmcgdHJ1ZSBhcyB0aGUgY2FsbGJhY2sgaXMK
+Pj4gcnVubmluZyBzb21ld2hlcmUgZWxzZS4gVGhpcyBtZWFucyBocnRpbWVyX3RyeV90b19jYW5j
+ZWwoKQo+PiB3b3VsZCByZXR1cm4gLTEuIFRoZXJlZm9yZSBocnRpbWVyX2dyYWJfZXhwaXJ5X2xv
+Y2soKSB3b3VsZAo+PiBiZSBjYWxsZWQuCj4+Cj4+IERpZCBJIG1pc3MgYW55dGhpbmc/Cj4gCj4g
+bm9wZSwgeW91IGFyZSByaWdodC4gSSBhc3N1bWVkIHRoYXQgd2UgaGFkIGNvZGUgdG8gZGVhbCB3
+aXRoIHRoaXMgYnV0Cj4gZGlkbid0IGZpbmQgaXTigKYKPiAKPiBkaWZmIC0tZ2l0IGEva2VybmVs
+L3RpbWUvaHJ0aW1lci5jIGIva2VybmVsL3RpbWUvaHJ0aW1lci5jCj4gaW5kZXggN2Q3ZGI4ODAy
+MTMxMS4uNDBkODNjNzA5NTAzZSAxMDA2NDQKPiAtLS0gYS9rZXJuZWwvdGltZS9ocnRpbWVyLmMK
+PiArKysgYi9rZXJuZWwvdGltZS9ocnRpbWVyLmMKPiBAQCAtOTM0LDcgKzkzNCw3IEBAIHZvaWQg
+aHJ0aW1lcl9ncmFiX2V4cGlyeV9sb2NrKGNvbnN0IHN0cnVjdCBocnRpbWVyICp0aW1lcikKPiAg
+IHsKPiAgIAlzdHJ1Y3QgaHJ0aW1lcl9jbG9ja19iYXNlICpiYXNlID0gdGltZXItPmJhc2U7Cj4g
+ICAKPiAtCWlmIChiYXNlICYmIGJhc2UtPmNwdV9iYXNlKSB7Cj4gKwlpZiAoYmFzZSAmJiBiYXNl
+LT5jcHVfYmFzZSAmJiBiYXNlLT5pbmRleCA8IE1BU0tfU0hJRlQpIHsKCkxvd2VyIGluZGV4ZXMg
+YXJlIHVzZWQgZm9yIGhhcmQgaW50ZXJydXB0LiBTbyB0aGlzIHdvdWxkIG5lZWQgdG8gYmUgYmFz
+ZS0+aW5kZXggCiA+PSBNQVNLX1NISUZULgoKQnV0IEkgd2FzIHdvbmRlcmluZyB3aGV0aGVyIGNo
+ZWNraW5nIHRpbWVyLT5pc19zb2Z0IHdvdWxkIG1ha2UgdGhlIGNvZGUgbW9yZSAKcmVhZGFibGU/
+CgpXaGlsZSBpbnZlc3RpZ2F0aW9uIGhvdyB0aGlzIGlzIG1lYW50IHRvIHdvcmssIEkgbm90aWNl
+ZCBhIGZldyBvdGhlcnMgdGhpbmdzLgoKdGltZXItPmJhc2UgY291bGQgcG90ZW50aWFsbHkgY2hh
+bmdlIHVuZGVyIG91ciBmZWV0IGF0IGFueSBwb2ludCBvZiB0aW1lICh3ZSAKZG9uJ3QgaG9sZCBh
+bnkgbG9jaykuIFNvIGl0IHdvdWxkIGJlIHZhbGlkIHRvIGhhdmUgYmFzZSA9PSBtaWdyYXRpb25f
+YmFzZS4KCm1pZ3JhdGlvbl9jcHVfYmFzZSBkb2VzIG5vdCBoYXZlIHNvZnRpcnFfZXhwaXJ5X2xv
+Y2sgaW5pdGlhbGl6ZWQuIFNvIHdlIHdvdWxkIAplbmQgdXAgdG8gdXNlIGFuIHVuaW5pdGlhbGl6
+ZWQgbG9jay4gTm90ZSB0aGF0IG1pZ3JhdGlvbl9iYXNlLT5pbmRleCBpcyBhbHdheXMgCjAsIHNv
+IHRoZSBjaGVjayBiYXNlLT5pbmRleCA+IE1BU0tfU0hJRlQgd291bGQgaGlkZSBpdC4KCkFsdGVy
+bmF0aXZlbHksIHdlIGNvdWxkIGluaXRpYWxpemUgdGhlIHNwaW4gbG9jayBmb3IgbWlncmF0aW9u
+X2NwdV9iYXNlIGF2b2lkaW5nIAp0byByZWx5IG9uIHNpZGUgZWZmZWN0IG9mIHRoZSBjaGVjay4K
+CkFub3RoZXIgcG90ZW50aWFsIGlzc3VlIGlzIHRoZSBjb21waWxlciBpcyBmcmVlIHRvIHJlbG9h
+ZCB0aW1lci0+YmFzZSBhdCBhbnkgCnRpbWUuIFNvIEkgdGhpbmsgd2Ugd2FudCBhbiBBQ0NFU1Nf
+T05DRSguLi4pLgoKTGFzdGx5IHRpbWVyLT5iYXNlIGNhbm5vdCBiZSBOVUxMLiBGcm9tIHRoZSBj
+b21tZW50IG9uIHRvcCBvZiAKbWlncmF0aW9uX2NwdV9iYXNlLCB0aW1lci0+YmFzZS0+Y3B1X2Jh
+c2Ugd2lsbCBhcyB3ZWxsIG5vdCBiZSBOVUxMLgoKU28gSSB0aGluayB0aGUgZnVuY3Rpb24gY2Fu
+IGJlIHJld29ya2VkIGFzOgoKdm9pZCBocnRpbWVyX2dyYWJfZXhwaXJ0eV9sb2NrKGNvbnN0IHN0
+cnVjdCBocnRpbWVyICp0aW1lcikKewogICAgICAgICBzdHJ1Y3QgaHJ0aW1lcl9jbG9ja19iYXNl
+ICpiYXNlID0gQUNDRVNTX09OQ0UodGltZXItPmJhc2UpOwoKICAgICAgICAgaWYgKCF0aW1lci0+
+aXNfc29mdCAmJiBiYXNlICE9IG1pZ3JhdGlvbl9iYXNlICkgewogICAgICAgICAgIHNwaW5fbG9j
+aygpOwogICAgICAgICAgIHNwaW5fdW5sb2NrKCk7CiAgICAgICAgIH0KfQoKCj4gICAJCXNwaW5f
+bG9jaygmYmFzZS0+Y3B1X2Jhc2UtPnNvZnRpcnFfZXhwaXJ5X2xvY2spOwo+ICAgCQlzcGluX3Vu
+bG9jaygmYmFzZS0+Y3B1X2Jhc2UtPnNvZnRpcnFfZXhwaXJ5X2xvY2spOwo+ICAgCX0KPiAKPiBU
+aGlzIHNob3VsZCBkZWFsIHdpdGggaXQuCj4gCj4+IENoZWVycywKPiAKPiBTZWJhc3RpYW4KPiAK
+Ci0tIApKdWxpZW4gR3JhbGwKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
