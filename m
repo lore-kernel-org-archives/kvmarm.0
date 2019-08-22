@@ -4,64 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC653C3A59D
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 10:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B9EC3A59D
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 10:57:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 614A2205ED
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 10:42:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 614A2205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 57A46233FD
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 10:57:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57A46233FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAFF34A5BD;
-	Thu, 22 Aug 2019 06:42:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84084A58C;
+	Thu, 22 Aug 2019 06:57:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2St9QibaTcyT; Thu, 22 Aug 2019 06:42:08 -0400 (EDT)
+	with ESMTP id AgBAnVyjLMcL; Thu, 22 Aug 2019 06:57:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BA884A599;
-	Thu, 22 Aug 2019 06:42:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C7F24A596;
+	Thu, 22 Aug 2019 06:57:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08BEE4A597
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 06:42:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C13104A58C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 06:57:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L5tNIRvC8YLw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Aug 2019 06:42:05 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71B374A596
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 06:42:05 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9CCCA3007C5E;
- Thu, 22 Aug 2019 10:42:04 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8942D600CD;
- Thu, 22 Aug 2019 10:42:03 +0000 (UTC)
-Date: Thu, 22 Aug 2019 12:42:01 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] arm64: KVM: Only skip MMIO insn once
-Message-ID: <20190822104201.czgbse2ffww6vzvl@kamzik.brq.redhat.com>
-References: <20190821195030.2569-1-drjones@redhat.com>
- <177091d5-2d2c-6a75-472c-92702ee98e86@kernel.org>
- <20190822092514.5opwahkjjpqbbayd@kamzik.brq.redhat.com>
- <bcf8fd9c-3784-5c03-bb34-d8e7fdcd9a06@kernel.org>
+ with ESMTP id RcMarZkdCmyI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Aug 2019 06:57:42 -0400 (EDT)
+Received: from huawei.com (szxga05-in.huawei.com [45.249.212.191])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76A114A55B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 06:57:41 -0400 (EDT)
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id DC7189DA9D936A007E2D;
+ Thu, 22 Aug 2019 18:57:36 +0800 (CST)
+Received: from localhost (10.202.226.61) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 22 Aug 2019
+ 18:57:35 +0800
+Date: Thu, 22 Aug 2019 11:57:22 +0100
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v3 07/10] KVM: arm64: Provide a PV_TIME device to user
+ space
+Message-ID: <20190822115722.00005aa7@huawei.com>
+In-Reply-To: <20190821153656.33429-8-steven.price@arm.com>
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-8-steven.price@arm.com>
+Organization: Huawei
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <bcf8fd9c-3784-5c03-bb34-d8e7fdcd9a06@kernel.org>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 22 Aug 2019 10:42:04 +0000 (UTC)
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-Originating-IP: [10.202.226.61]
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Russell
+ King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,189 +77,234 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 22, 2019 at 10:38:52AM +0100, Marc Zyngier wrote:
-> On 22/08/2019 10:25, Andrew Jones wrote:
-> > On Thu, Aug 22, 2019 at 09:30:44AM +0100, Marc Zyngier wrote:
-> >> Hi Drew,
-> >>
-> >> On 21/08/2019 20:50, Andrew Jones wrote:
-> >>> If after an MMIO exit to userspace a VCPU is immediately run with an
-> >>> immediate_exit request, such as when a signal is delivered or an MMIO
-> >>> emulation completion is needed, then the VCPU completes the MMIO
-> >>> emulation and immediately returns to userspace. As the exit_reason
-> >>> does not get changed from KVM_EXIT_MMIO in these cases we have to
-> >>> be careful not to complete the MMIO emulation again, when the VCPU is
-> >>> eventually run again, because the emulation does an instruction skip
-> >>> (and doing too many skips would be a waste of guest code :-) We need
-> >>> to use additional VCPU state to track if the emulation is complete.
-> >>> As luck would have it, we already have 'mmio_needed', which even
-> >>> appears to be used in this way by other architectures already.
-> >>>
-> >>> Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
-> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> >>> ---
-> >>>  virt/kvm/arm/arm.c  | 3 ++-
-> >>>  virt/kvm/arm/mmio.c | 1 +
-> >>>  2 files changed, 3 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> >>> index 35a069815baf..322cf9030bbe 100644
-> >>> --- a/virt/kvm/arm/arm.c
-> >>> +++ b/virt/kvm/arm/arm.c
-> >>> @@ -669,7 +669,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >>>  	if (ret)
-> >>>  		return ret;
-> >>>  
-> >>> -	if (run->exit_reason == KVM_EXIT_MMIO) {
-> >>> +	if (vcpu->mmio_needed) {
-> >>> +		vcpu->mmio_needed = 0;
-> >>>  		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
-> >>>  		if (ret)
-> >>>  			return ret;
-> >>> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> >>> index a8a6a0c883f1..2d9b5e064ae0 100644
-> >>> --- a/virt/kvm/arm/mmio.c
-> >>> +++ b/virt/kvm/arm/mmio.c
-> >>> @@ -201,6 +201,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >>>  	if (is_write)
-> >>>  		memcpy(run->mmio.data, data_buf, len);
-> >>>  	vcpu->stat.mmio_exit_user++;
-> >>> +	vcpu->mmio_needed	= 1;
-> >>>  	run->exit_reason	= KVM_EXIT_MMIO;
-> >>>  	return 0;
-> >>>  }
-> >>>
-> >>
-> >> Thanks for this. That's quite embarrassing. Out of curiosity,
-> >> how was this spotted?
-> > 
-> > avocado has a guest execution state snapshotting feature. The feature
-> > simply periodically uses QEMU's 'info registers' monitor command while
-> > a guest is running. The monitor command kicks the vcpu to userspace with
-> > a signal, and since avocado's snapshot rate was set relatively high that
-> > increased the probability of causing a noticeable (weird things / guest
-> > crashes) event during guest boot (when MMIO activity is also high). The
-> > signals correlated with guest crashes lead me to this code.
+On Wed, 21 Aug 2019 16:36:53 +0100
+Steven Price <steven.price@arm.com> wrote:
+
+> Allow user space to inform the KVM host where in the physical memory
+> map the paravirtualized time structures should be located.
 > 
-> Nice one. I guess I could try and reproduce it with the kvmtool debug
-> feature that does a similar thing.
-
-Since we don't even need the signals, we can just use kselftests to send a
-few KVM_RUN ioctls. Here's one
-
-From: Andrew Jones <drjones@redhat.com>
-Date: Thu, 22 Aug 2019 06:38:26 -0400
-Subject: [PATCH] KVM: selftests: Demonstrate AArch64 extra instruction skip
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../testing/selftests/kvm/aarch64/vcpu-skip.c | 40 +++++++++++++++++++
- 2 files changed, 41 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu-skip.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ba7849751989..1b90b99bc351 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -28,6 +28,7 @@ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- 
-+TEST_GEN_PROGS_aarch64 += aarch64/vcpu-skip
- TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/aarch64/vcpu-skip.c b/tools/testing/selftests/kvm/aarch64/vcpu-skip.c
-new file mode 100644
-index 000000000000..f3a747739d36
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/vcpu-skip.c
-@@ -0,0 +1,40 @@
-+#include "kvm_util.h"
-+#include "../lib/kvm_util_internal.h"
-+
-+#define MMIO 0xb000000
-+
-+static uint64_t result;
-+
-+static void guest_code(void)
-+{
-+	asm volatile(
-+		"mov	x0, #1\n"
-+		"str	x0, [%0]\n"
-+		"str	x0, [%1]\n"
-+		"str	x0, [%0]\n"
-+	: : "r" (MMIO), "r" (&result) : "x0");
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	int fd;
-+
-+	vm = vm_create_default(1, 0, guest_code);
-+	virt_pg_map(vm, MMIO, MMIO, 0);
-+	run = vcpu_state(vm, 1);
-+	fd = vcpu_find(vm, 1)->fd;
-+
-+	ioctl(fd, KVM_RUN, NULL);
-+
-+	run->immediate_exit = 1;
-+	ioctl(fd, KVM_RUN, NULL);
-+
-+	run->immediate_exit = 0;
-+	ioctl(fd, KVM_RUN, NULL);
-+
-+	sync_global_from_guest(vm, result);
-+	TEST_ASSERT(result, "Skipped instruction");
-+	return 0;
-+}
--- 
-2.18.1
-
+> A device is created which provides the base address of an array of
+> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+> total number of VCPUs) bytes of memory available at this location.
 > 
-> >> Patch wise, I'd have a small preference for the following (untested)
-> >> patch, as it keeps the mmio_needed accesses close together, making
-> >> it easier to read (at least for me). What do you think?
-> >>
-> >> 	M.
-> >>
-> >> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> >> index a8a6a0c883f1..6af5c91337f2 100644
-> >> --- a/virt/kvm/arm/mmio.c
-> >> +++ b/virt/kvm/arm/mmio.c
-> >> @@ -86,6 +86,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >>  	unsigned int len;
-> >>  	int mask;
-> >>  
-> >> +	/* Detect an already handled MMIO return */
-> >> +	if (unlikely(!vcpu->mmio_needed))
-> >> +		return 0;
-> >> +
-> >> +	vcpu->mmio_needed = 0;
-> >> +
-> >>  	if (!run->mmio.is_write) {
-> >>  		len = run->mmio.len;
-> >>  		if (len > sizeof(unsigned long))
-> >> @@ -188,6 +194,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >>  	run->mmio.is_write	= is_write;
-> >>  	run->mmio.phys_addr	= fault_ipa;
-> >>  	run->mmio.len		= len;
-> >> +	vcpu->mmio_needed	= 1;
-> >>  
-> >>  	if (!ret) {
-> >>  		/* We handled the access successfully in the kernel. */
-> > 
-> > That looks good to me. Should I repost?
+> The address is given in terms of the physical address visible to
+> the guest and must be page aligned. The guest will discover the address
+> via a hypercall.
 > 
-> Yes please. I'll try to get Paolo to pick it as quickly as possible.
+> Signed-off-by: Steven Price <steven.price@arm.com>
 
-On it's way
+Hi Steven,
 
-Thanks,
-drew
+One general question inline.  I'm not particularly familiar with this area
+of the kernel, so maybe I'm missing something obvious, but having
+.destroy free the kvm_device which wasn't created in .create seems
+'unusual'. 
+
+Otherwise, FWIW looks good to me.
+
+Jonathan
+
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  4 ++
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/include/uapi/asm/kvm.h |  8 +++
+>  include/uapi/linux/kvm.h          |  2 +
+>  virt/kvm/arm/arm.c                |  1 +
+>  virt/kvm/arm/pvtime.c             | 94 +++++++++++++++++++++++++++++++
+>  6 files changed, 110 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 47d2ced99421..b6c8dbc0556b 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -325,6 +325,10 @@ static inline int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  int kvm_perf_init(void);
+>  int kvm_perf_teardown(void);
+>  
+> +static inline void kvm_pvtime_init(void)
+> +{
+> +}
+> +
+>  static inline int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+>  {
+>  	return SMCCC_RET_NOT_SUPPORTED;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b6fa7beffd8a..7b2147f62c16 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -489,6 +489,7 @@ void handle_exit_early(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>  int kvm_perf_init(void);
+>  int kvm_perf_teardown(void);
+>  
+> +void kvm_pvtime_init(void);
+>  int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
+>  int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
+>  int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 9a507716ae2f..209c4de67306 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -367,6 +367,14 @@ struct kvm_vcpu_events {
+>  #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+>  #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
+>  
+> +/* Device Control API: PV_TIME */
+> +#define KVM_DEV_ARM_PV_TIME_REGION	0
+> +#define  KVM_DEV_ARM_PV_TIME_ST		0
+> +struct kvm_dev_arm_st_region {
+> +	__u64 gpa;
+> +	__u64 size;
+> +};
+> +
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 5e3f12d5359e..265156a984f2 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1222,6 +1222,8 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+>  	KVM_DEV_TYPE_XIVE,
+>  #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+> +	KVM_DEV_TYPE_ARM_PV_TIME,
+> +#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+>  	KVM_DEV_TYPE_MAX,
+>  };
+>  
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 5e8343e2dd62..bfb5a842e6ab 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1494,6 +1494,7 @@ static int init_subsystems(void)
+>  
+>  	kvm_perf_init();
+>  	kvm_coproc_table_init();
+> +	kvm_pvtime_init();
+>  
+>  out:
+>  	on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
+> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+> index 28603689f6e0..3e55c1fb6a49 100644
+> --- a/virt/kvm/arm/pvtime.c
+> +++ b/virt/kvm/arm/pvtime.c
+> @@ -2,7 +2,9 @@
+>  // Copyright (C) 2019 Arm Ltd.
+>  
+>  #include <linux/arm-smccc.h>
+> +#include <linux/kvm_host.h>
+>  
+> +#include <asm/kvm_mmu.h>
+>  #include <asm/pvclock-abi.h>
+>  
+>  #include <kvm/arm_hypercalls.h>
+> @@ -86,3 +88,95 @@ int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
+>  
+>  	return ret;
+>  }
+> +
+> +static int kvm_arm_pvtime_create(struct kvm_device *dev, u32 type)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
+> +{
+> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+> +
+> +	pvtime->st_base = GPA_INVALID;
+> +	kfree(dev);
+
+Nothing to do with your patch as such... All users do the same.
+
+This seems miss balanced. Why do we need to free the device by hand
+when we didn't create it in the create function?  I appreciate
+the comments say this is needed, but as far as I can see every
+single callback does kfree(dev) at the end which seems an
+odd thing to do.
+
+> +}
+> +
+> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	struct kvm *kvm = dev->kvm;
+> +	struct kvm_arch_pvtime *pvtime = &kvm->arch.pvtime;
+> +	u64 __user *user = (u64 __user *)attr->addr;
+> +	struct kvm_dev_arm_st_region region;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_REGION:
+> +		if (copy_from_user(&region, user, sizeof(region)))
+> +			return -EFAULT;
+> +		if (region.gpa & ~PAGE_MASK)
+> +			return -EINVAL;
+> +		if (region.size & ~PAGE_MASK)
+> +			return -EINVAL;
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			if (pvtime->st_base != GPA_INVALID)
+> +				return -EEXIST;
+> +			pvtime->st_base = region.gpa;
+> +			pvtime->st_size = region.size;
+> +			return 0;
+> +		}
+> +		break;
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pvtime_get_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+> +	u64 __user *user = (u64 __user *)attr->addr;
+> +	struct kvm_dev_arm_st_region region;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_REGION:
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			region.gpa = pvtime->st_base;
+> +			region.size = pvtime->st_size;
+> +			if (copy_to_user(user, &region, sizeof(region)))
+> +				return -EFAULT;
+> +			return 0;
+> +		}
+> +		break;
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pvtime_has_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_REGION:
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			return 0;
+> +		}
+> +		break;
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static const struct kvm_device_ops pvtime_ops = {
+> +	"Arm PV time",
+> +	.create = kvm_arm_pvtime_create,
+> +	.destroy = kvm_arm_pvtime_destroy,
+> +	.set_attr = kvm_arm_pvtime_set_attr,
+> +	.get_attr = kvm_arm_pvtime_get_attr,
+> +	.has_attr = kvm_arm_pvtime_has_attr
+> +};
+> +
+> +void kvm_pvtime_init(void)
+> +{
+> +	kvm_register_device_ops(&pvtime_ops, KVM_DEV_TYPE_ARM_PV_TIME);
+> +}
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
