@@ -2,89 +2,60 @@ Return-Path: <SRS0=1Vfj=WT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBF1C3A5A3
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 17:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39620C3A5A4
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 17:33:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A1AF422CE3
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 17:08:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1AF422CE3
+	by mail.kernel.org (Postfix) with ESMTP id D1606206DD
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 17:33:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1606206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0910A4A60E;
-	Fri, 23 Aug 2019 13:08:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC3144A5BC;
+	Fri, 23 Aug 2019 13:33:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5pv9aBDvmSYm; Fri, 23 Aug 2019 13:08:05 -0400 (EDT)
+	with ESMTP id Fmp2FP2lyBDJ; Fri, 23 Aug 2019 13:33:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05FE84A602;
-	Fri, 23 Aug 2019 13:08:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64E7B4A608;
+	Fri, 23 Aug 2019 13:33:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36D6A4A5FC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 13:08:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C21C4A5BC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 13:33:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rZCaBGr3-EhU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Aug 2019 13:08:03 -0400 (EDT)
+ with ESMTP id X9gz-pYpPHl1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Aug 2019 13:33:48 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A4524A5B1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 13:08:03 -0400 (EDT)
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D284D4A56D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 13:33:48 -0400 (EDT)
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1AA5D4E4E6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 17:08:02 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f14so3148955wmh.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Aug 2019 10:08:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=L7CFzFZcBTFDB9gXZjKJlWNHgFbguv8P194zUY7iBjo=;
- b=QQ03KUoBi3Q7igwQXb5sW+1jBLIltIy0D+3eIun4Jv6M4qvtrMBYWcLusfPJp5UPab
- U0ybRuQw/c/ZqM2yA6X/OIyXM5F1OkBTNNn166noDzg4mj5JjXadLbhH7b64y84Sc6hI
- 2E+mPTlpOn+Y7lWgAPSuhJXu2Ws+SdxrVNOammoBe7pWMsEwdC6+iy6bAPkPfmWIU6fs
- AuUwtCMLym9p85pfieU2TgJK9kgBcV0yhyCLCrFxZASveoSGjJQo5MUAPkb8623BUm96
- +2WO0MdPike1Rn7zpqfRFfszp+aKZNLmEMUTWhtgX3+wh6ju0YDC7a2K2H1ff8lhv3Oa
- maCw==
-X-Gm-Message-State: APjAAAXvo1Hq1U84i3T0bS/kLmcEj95wsYhiW5QhAZk4Ud1cgK6sHVc0
- bnqNVbiuG/rIj2QstIp/ubGAlSdBI3NiMjlGcxsreXwFN14Izq/CIReLVLm2wWkl+sLEzQxIns8
- vo03muurV4aTp2BVf1LWKnC5G
-X-Received: by 2002:a1c:6145:: with SMTP id v66mr6820126wmb.42.1566580080623; 
- Fri, 23 Aug 2019 10:08:00 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz2VfVqVmbNSKh60msz2D85O4kPeYbsxyx65VFv1ZLWWCCH6sSVLhBJZ0JI2ziJHjDOK7yijA==
-X-Received: by 2002:a1c:6145:: with SMTP id v66mr6820078wmb.42.1566580080242; 
- Fri, 23 Aug 2019 10:08:00 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n8sm3065205wrw.28.2019.08.23.10.07.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Aug 2019 10:07:59 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm updates for 5.3-rc6
-To: Marc Zyngier <maz@kernel.org>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?=
- <rkrcmar@redhat.com>
-References: <20190823163516.179768-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <21ae69a2-2546-29d0-bff6-2ea825e3d968@redhat.com>
-Date: Fri, 23 Aug 2019 19:07:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id C7002308624A;
+ Fri, 23 Aug 2019 17:33:47 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD8255D9CA;
+ Fri, 23 Aug 2019 17:33:41 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm/arm64: vgic: Use a single IO device per redistributor
+Date: Fri, 23 Aug 2019 19:33:30 +0200
+Message-Id: <20190823173330.23342-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190823163516.179768-1-maz@kernel.org>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, Christian Borntraeger <borntraeger@de.ibm.com>,
- Julien Grall <julien.grall@arm.com>, linux-arm-kernel@lists.infradead.org,
- Dave Martin <dave.martin@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 23 Aug 2019 17:33:48 +0000 (UTC)
+Cc: zhang.zhanghailiang@huawei.com, andre.przywara@arm.com, qemu-arm@nongnu.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,52 +72,224 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 23/08/19 18:35, Marc Zyngier wrote:
-> Paolo, Radim,
-> 
-> One (hopefully last) set of fixes for KVM/arm for 5.3: an embarassing
-> MMIO emulation regression, and a UBSAN splat. Oh well...
-> 
-> Please pull,
+At the moment we use 2 IO devices per GICv3 redistributor: one
+one for the RD_base frame and one for the SGI_base frame.
 
-Please send this (and any other changes until the release) through the
-ARM tree---same for s390 if need be.
+Instead we can use a single IO device per redistributor (the 2
+frames are contiguous). This saves slots on the KVM_MMIO_BUS
+which is currently limited to NR_IOBUS_DEVS (1000).
 
-This way Radim can concentrate on pending 5.4 patches while I am away.
+This change allows to instantiate up to 512 redistributors and may
+speed the guest boot with a large number of VCPUs.
 
-Paolo
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ include/kvm/arm_vgic.h           |  1 -
+ virt/kvm/arm/vgic/vgic-init.c    |  1 -
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 81 ++++++++++----------------------
+ 3 files changed, 24 insertions(+), 59 deletions(-)
 
->        M.
-> 
-> The following changes since commit 16e604a437c89751dc626c9e90cf88ba93c5be64:
-> 
->   KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable (2019-08-09 08:07:26 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.3-3
-> 
-> for you to fetch changes up to 2e16f3e926ed48373c98edea85c6ad0ef69425d1:
-> 
->   KVM: arm/arm64: VGIC: Properly initialise private IRQ affinity (2019-08-23 17:23:01 +0100)
-> 
-> ----------------------------------------------------------------
-> KVM/arm fixes for 5.3, take #3
-> 
-> - Don't overskip instructions on MMIO emulation
-> - Fix UBSAN splat when initializing PPI priorities
-> 
-> ----------------------------------------------------------------
-> Andre Przywara (1):
->       KVM: arm/arm64: VGIC: Properly initialise private IRQ affinity
-> 
-> Andrew Jones (1):
->       KVM: arm/arm64: Only skip MMIO insn once
-> 
->  virt/kvm/arm/mmio.c           |  7 +++++++
->  virt/kvm/arm/vgic/vgic-init.c | 30 ++++++++++++++++++++----------
->  2 files changed, 27 insertions(+), 10 deletions(-)
-> 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 7a30524a80ee..004f6e9d3b05 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -311,7 +311,6 @@ struct vgic_cpu {
+ 	 * parts of the redistributor.
+ 	 */
+ 	struct vgic_io_device	rd_iodev;
+-	struct vgic_io_device	sgi_iodev;
+ 	struct vgic_redist_region *rdreg;
+ 
+ 	/* Contains the attributes and gpa of the LPI pending tables. */
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index bdbc297d06fb..eaff7031a089 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -192,7 +192,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	int i;
+ 
+ 	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+-	vgic_cpu->sgi_iodev.base_addr = VGIC_ADDR_UNDEF;
+ 
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ 	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index c45e2d7e942f..400067085cab 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -515,7 +515,8 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 		VGIC_ACCESS_32bit),
+ };
+ 
+-static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
++static const struct vgic_register_region vgic_v3_rd_registers[] = {
++	/* RD_base registers */
+ 	REGISTER_DESC_WITH_LENGTH(GICR_CTLR,
+ 		vgic_mmio_read_v3r_ctlr, vgic_mmio_write_v3r_ctlr, 4,
+ 		VGIC_ACCESS_32bit),
+@@ -540,44 +541,42 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
+ 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48,
+ 		VGIC_ACCESS_32bit),
+-};
+-
+-static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
+-	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
++	/* SGI_base registers */
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IGROUPR0,
+ 		vgic_mmio_read_group, vgic_mmio_write_group, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_ISENABLER0,
+ 		vgic_mmio_read_enable, vgic_mmio_write_senable, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_ICENABLER0,
+ 		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISPENDR0,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISPENDR0,
+ 		vgic_mmio_read_pending, vgic_mmio_write_spending,
+ 		vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICPENDR0,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICPENDR0,
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+ 		vgic_mmio_read_raz, vgic_mmio_uaccess_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ISACTIVER0,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISACTIVER0,
+ 		vgic_mmio_read_active, vgic_mmio_write_sactive,
+ 		NULL, vgic_mmio_uaccess_write_sactive,
+ 		4, VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH_UACCESS(GICR_ICACTIVER0,
++	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICACTIVER0,
+ 		vgic_mmio_read_active, vgic_mmio_write_cactive,
+ 		NULL, vgic_mmio_uaccess_write_cactive,
+ 		4, VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IPRIORITYR0,
+ 		vgic_mmio_read_priority, vgic_mmio_write_priority, 32,
+ 		VGIC_ACCESS_32bit | VGIC_ACCESS_8bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_ICFGR0,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_ICFGR0,
+ 		vgic_mmio_read_config, vgic_mmio_write_config, 8,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_IGRPMODR0,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_IGRPMODR0,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+-	REGISTER_DESC_WITH_LENGTH(GICR_NSACR,
++	REGISTER_DESC_WITH_LENGTH(SZ_64K + GICR_NSACR,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4,
+ 		VGIC_ACCESS_32bit),
+ };
+@@ -607,9 +606,8 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+-	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+ 	struct vgic_redist_region *rdreg;
+-	gpa_t rd_base, sgi_base;
++	gpa_t rd_base;
+ 	int ret;
+ 
+ 	if (!IS_VGIC_ADDR_UNDEF(vgic_cpu->rd_iodev.base_addr))
+@@ -631,52 +629,31 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
+ 	vgic_cpu->rdreg = rdreg;
+ 
+ 	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
+-	sgi_base = rd_base + SZ_64K;
+ 
+ 	kvm_iodevice_init(&rd_dev->dev, &kvm_io_gic_ops);
+ 	rd_dev->base_addr = rd_base;
+ 	rd_dev->iodev_type = IODEV_REDIST;
+-	rd_dev->regions = vgic_v3_rdbase_registers;
+-	rd_dev->nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
++	rd_dev->regions = vgic_v3_rd_registers;
++	rd_dev->nr_regions = ARRAY_SIZE(vgic_v3_rd_registers);
+ 	rd_dev->redist_vcpu = vcpu;
+ 
+ 	mutex_lock(&kvm->slots_lock);
+ 	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, rd_base,
+-				      SZ_64K, &rd_dev->dev);
++				      2 * SZ_64K, &rd_dev->dev);
+ 	mutex_unlock(&kvm->slots_lock);
+ 
+ 	if (ret)
+ 		return ret;
+ 
+-	kvm_iodevice_init(&sgi_dev->dev, &kvm_io_gic_ops);
+-	sgi_dev->base_addr = sgi_base;
+-	sgi_dev->iodev_type = IODEV_REDIST;
+-	sgi_dev->regions = vgic_v3_sgibase_registers;
+-	sgi_dev->nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers);
+-	sgi_dev->redist_vcpu = vcpu;
+-
+-	mutex_lock(&kvm->slots_lock);
+-	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, sgi_base,
+-				      SZ_64K, &sgi_dev->dev);
+-	if (ret) {
+-		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+-					  &rd_dev->dev);
+-		goto out;
+-	}
+-
+ 	rdreg->free_index++;
+-out:
+-	mutex_unlock(&kvm->slots_lock);
+-	return ret;
++	return 0;
+ }
+ 
+ static void vgic_unregister_redist_iodev(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_io_device *rd_dev = &vcpu->arch.vgic_cpu.rd_iodev;
+-	struct vgic_io_device *sgi_dev = &vcpu->arch.vgic_cpu.sgi_iodev;
+ 
+ 	kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &rd_dev->dev);
+-	kvm_io_bus_unregister_dev(vcpu->kvm, KVM_MMIO_BUS, &sgi_dev->dev);
+ }
+ 
+ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
+@@ -826,8 +803,8 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+ 		iodev.base_addr = 0;
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:{
+-		iodev.regions = vgic_v3_rdbase_registers;
+-		iodev.nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
++		iodev.regions = vgic_v3_rd_registers;
++		iodev.nr_regions = ARRAY_SIZE(vgic_v3_rd_registers);
+ 		iodev.base_addr = 0;
+ 		break;
+ 	}
+@@ -985,21 +962,11 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			   int offset, u32 *val)
+ {
+ 	struct vgic_io_device rd_dev = {
+-		.regions = vgic_v3_rdbase_registers,
+-		.nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers),
++		.regions = vgic_v3_rd_registers,
++		.nr_regions = ARRAY_SIZE(vgic_v3_rd_registers),
+ 	};
+ 
+-	struct vgic_io_device sgi_dev = {
+-		.regions = vgic_v3_sgibase_registers,
+-		.nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers),
+-	};
+-
+-	/* SGI_base is the next 64K frame after RD_base */
+-	if (offset >= SZ_64K)
+-		return vgic_uaccess(vcpu, &sgi_dev, is_write, offset - SZ_64K,
+-				    val);
+-	else
+-		return vgic_uaccess(vcpu, &rd_dev, is_write, offset, val);
++	return vgic_uaccess(vcpu, &rd_dev, is_write, offset, val);
+ }
+ 
+ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-- 
+2.20.1
 
 _______________________________________________
 kvmarm mailing list
