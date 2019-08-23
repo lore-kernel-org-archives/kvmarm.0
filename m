@@ -1,59 +1,63 @@
-Return-Path: <SRS0=16Xb=WS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=1Vfj=WT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5261FC3A5A1
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 19:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7C1C3A5A1
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 02:25:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C576521848
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Aug 2019 19:30:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C576521848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id CAF7023404
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Aug 2019 02:25:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF7023404
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 041284A5DA;
-	Thu, 22 Aug 2019 15:30:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02D034A59A;
+	Thu, 22 Aug 2019 22:25:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id frrd+essTMBh; Thu, 22 Aug 2019 15:30:02 -0400 (EDT)
+	with ESMTP id Rhzxfney9dkf; Thu, 22 Aug 2019 22:25:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF504A5A0;
-	Thu, 22 Aug 2019 15:30:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8831F4A5F7;
+	Thu, 22 Aug 2019 22:25:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 520A84A589
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 15:30:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F31F34A589
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 22:25:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4-fwufeIOBD1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Aug 2019 15:29:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA5704A574
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 15:29:59 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 40773337;
- Thu, 22 Aug 2019 12:29:59 -0700 (PDT)
-Received: from why (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14A783F706;
- Thu, 22 Aug 2019 12:29:57 -0700 (PDT)
-Date: Thu, 22 Aug 2019 20:29:54 +0100
-From: Marc Zyngier <marc.zyngier@arm.com>
-To: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2] KVM: arm: VGIC: properly initialise private IRQ
- affinity
-Message-ID: <20190822202954.48239e0e@why>
-In-Reply-To: <20190822170510.167076-1-andre.przywara@arm.com>
-References: <20190822170510.167076-1-andre.przywara@arm.com>
-Organization: ARM Ltd
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ with ESMTP id 3XVBwY84peA9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Aug 2019 22:25:10 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE3DD4A590
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Aug 2019 22:25:09 -0400 (EDT)
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id F1D7B3D5F4C4697DD8F9;
+ Fri, 23 Aug 2019 10:25:04 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Fri, 23 Aug 2019
+ 10:24:57 +0800
+Subject: Re: Can we boot a 512U kvm guest?
+To: Auger Eric <eric.auger@redhat.com>, <kvmarm@lists.cs.columbia.edu>,
+ <qemu-arm@nongnu.org>
+References: <86aa9609-7dc9-1461-ae47-f50897cd0875@huawei.com>
+ <da5c87d6-8b66-75f9-e720-9f1d80a76d7d@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <d248e304-9004-02e6-d535-c69bc15d2b41@huawei.com>
+Date: Fri, 23 Aug 2019 10:21:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-Cc: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Dave Martin <dave.martin@arm.com>
+In-Reply-To: <da5c87d6-8b66-75f9-e720-9f1d80a76d7d@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
+Cc: zhang.zhanghailiang@huawei.com, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,136 +69,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 22 Aug 2019 18:05:10 +0100
-Andre Przywara <andre.przywara@arm.com> wrote:
-
-> At the moment we initialise the target *mask* of a virtual IRQ to the
-> VCPU it belongs to, even though this mask is only defined for GICv2 and
-> quickly runs out of bits for many GICv3 guests.
-> This behaviour triggers an UBSAN complaint for more than 32 VCPUs:
-> ------
-> [ 5659.462377] UBSAN: Undefined behaviour in virt/kvm/arm/vgic/vgic-init.c:223:21
-> [ 5659.471689] shift exponent 32 is too large for 32-bit type 'unsigned int'
-> ------
-> Also for GICv3 guests the reporting of TARGET in the "vgic-state" debugfs
-> dump is wrong, due to this very same problem.
-> 
-> Because there is no requirement to create the VGIC device before the
-> VCPUs (and QEMU actually does it the other way round), we can't safely
-> initialise mpidr or targets in kvm_vgic_vcpu_init(). But since we touch
-> every private IRQ for each VCPU anyway later (in vgic_init()), we can
-> just move the initialisation of those fields into there, where we
-> definitely know the VGIC type.
-> 
-> On the way make sure we really have either a VGICv2 or a VGICv3 device,
-> since the former checks was just checking for "VGICv3 or not", silently
-> ignoring the uninitialised case.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Reported-by: Dave Martin <dave.martin@arm.com>
-> ---
-> Hi,
-> 
-> tested with 4, 8 and 33 VCPUs with kvmtool and QEMU, on a GICv2 and a
-> GICv3 machine.
-> Also briefly tested localhost migration on the GICv3 machine w/ 33
-> VCPUs, although I think all IRQs are group 1.
-> 
-> Cheers,
-> Andre
-> 
->  virt/kvm/arm/vgic/vgic-init.c | 28 ++++++++++++++++++----------
->  1 file changed, 18 insertions(+), 10 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 80127ca9269f..413fb6a5525c 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -8,6 +8,7 @@
->  #include <linux/cpu.h>
->  #include <linux/kvm_host.h>
->  #include <kvm/arm_vgic.h>
-> +#include <asm/kvm_emulate.h>
->  #include <asm/kvm_mmu.h>
->  #include "vgic.h"
->  
-> @@ -165,12 +166,17 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
->  		irq->vcpu = NULL;
->  		irq->target_vcpu = vcpu0;
->  		kref_init(&irq->refcount);
-> -		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +		switch (dist->vgic_model) {
-> +		case KVM_DEV_TYPE_ARM_VGIC_V2:
->  			irq->targets = 0;
->  			irq->group = 0;
-> -		} else {
-> +			break;
-> +		case KVM_DEV_TYPE_ARM_VGIC_V3:
->  			irq->mpidr = 0;
->  			irq->group = 1;
-> +			break;
-> +		default:
-> +			BUG_ON(1);
->  		}
->  	}
->  	return 0;
-> @@ -210,7 +216,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->  		irq->intid = i;
->  		irq->vcpu = NULL;
->  		irq->target_vcpu = vcpu;
-> -		irq->targets = 1U << vcpu->vcpu_id;
->  		kref_init(&irq->refcount);
->  		if (vgic_irq_is_sgi(i)) {
->  			/* SGIs */
-> @@ -220,11 +225,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->  			/* PPIs */
->  			irq->config = VGIC_CONFIG_LEVEL;
->  		}
-> -
-> -		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> -			irq->group = 1;
-> -		else
-> -			irq->group = 0;
->  	}
->  
->  	if (!irqchip_in_kernel(vcpu->kvm))
-> @@ -287,10 +287,18 @@ int vgic_init(struct kvm *kvm)
->  
->  		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
->  			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
-> -			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> +			switch (dist->vgic_model) {
-> +			case KVM_DEV_TYPE_ARM_VGIC_V3:
->  				irq->group = 1;
-> -			else
-> +				irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +				break;
-> +			case KVM_DEV_TYPE_ARM_VGIC_V2:
->  				irq->group = 0;
-> +				irq->targets = 1U << idx;
-> +				break;
-> +			default:
-> +				BUG_ON(1);
-> +			}
->  		}
->  	}
->  
-
-Please drop the BUG_ON()s. If something is unexpected, just fail to
-init the guest, but don't kill the box.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgRXJpYywKCk9uIDIwMTkvOC8yMiAxNzowOCwgQXVnZXIgRXJpYyB3cm90ZToKPiBIaSBaZW5n
+aHVpLAo+IAo+IE9uIDgvMTMvMTkgMTA6NTAgQU0sIFplbmdodWkgWXUgd3JvdGU6Cj4+IEhpIGZv
+bGtzLAo+Pgo+PiBTaW5jZSBjb21taXQgZTI1MDI4YzhkZWQwICgiS1ZNOiBhcm0vYXJtNjQ6IEJ1
+bXAgVkdJQ19WM19NQVhfQ1BVUyB0bwo+PiA1MTIiKSwgd2Ugc2VlbWVkIHRvIGJlIGFsbG93ZWQg
+dG8gYm9vdCBhIDUxMlUgZ3Vlc3QuwqAgQnV0IEkgZmFpbGVkIHRvCj4+IHN0YXJ0IGl0IHVwIHdp
+dGggdGhlIGxhdGVzdCBRRU1VLsKgIEkgZ3Vlc3MgdGhlcmUgYXJlIGF0IGxlYXN0ICp0d28qCj4+
+IHJlYXNvbnMgKGxpbWl0YXRpb25zKS4KPj4KPj4gRmlyc3QgSSBnb3QgYSBRRU1VIGFib3J0Ogo+
+PiAgwqDCoMKgwqAia3ZtX3NldF9pcnE6IEludmFsaWQgYXJndW1lbnQiCj4+Cj4+IEVuYWJsZSB0
+aGUgdHJhY2Vfa3ZtX2lycV9saW5lKCkgdW5kZXIgZGVidWdmcywgd2hlbiBpdCBjb21lZCB3aXRo
+Cj4+IHZjcHUtMjU2LCBJIGdvdDoKPj4gIMKgwqDCoMKgIkluamVjdCBVTktOT1dOIGludGVycnVw
+dCAoMyksIHZjcHUtPmlkeDogMCwgbnVtOiAyMywgbGV2ZWw6IDAiCj4+IGFuZCBrdm1fdm1faW9j
+dGxfaXJxX2xpbmUoKSByZXR1cm5zIC1FSU5WQUwgdG8gdXNlci1zcGFjZS4uLgo+Pgo+PiBTbyB0
+aGUgdGhpbmcgaXMgdGhhdCB3ZSBvbmx5IGhhdmUgOCBiaXRzIGZvciB2Y3B1X2luZGV4IGZpZWxk
+IChbMjM6MTZdKQo+PiBpbiBLVk1fSVJRX0xJTkUgaW9jdGwuwqAgaXJxX3R5cGUgZmllbGQgd2ls
+bCBiZSBjb3JydXB0ZWQgaWYgd2UgaW5qZWN0IGEKPj4gUFBJIHRvIHZjcHUtMjU2LCB3aG9zZSB2
+Y3B1X2luZGV4IHdpbGwgdGFrZSA5IGJpdHMuCj4+Cj4+IEkgdGVtcG9yYXJpbHkgcGF0Y2hlZCB0
+aGUgS1ZNIGFuZCBRRU1VIHdpdGggdGhlIGZvbGxvd2luZyBkaWZmOgo+Pgo+PiAtLS04PC0tLQo+
+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+IGIvYXJj
+aC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+IGluZGV4IDk1NTE2YTQuLjM5YTBmYjEg
+MTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+PiArKysg
+Yi9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKPj4gQEAgLTMyNSwxMCArMzI1LDEw
+IEBAIHN0cnVjdCBrdm1fdmNwdV9ldmVudHMgewo+PiAgwqAjZGVmaW5lwqDCoCBLVk1fQVJNX1ZD
+UFVfVElNRVJfSVJRX1BUSU1FUsKgwqDCoMKgwqDCoMKgIDEKPj4KPj4gIMKgLyogS1ZNX0lSUV9M
+SU5FIGlycSBmaWVsZCBpbmRleCB2YWx1ZXMgKi8KPj4gLSNkZWZpbmUgS1ZNX0FSTV9JUlFfVFlQ
+RV9TSElGVMKgwqDCoMKgwqDCoMKgIDI0Cj4+IC0jZGVmaW5lIEtWTV9BUk1fSVJRX1RZUEVfTUFT
+S8KgwqDCoMKgwqDCoMKgIDB4ZmYKPj4gKyNkZWZpbmUgS1ZNX0FSTV9JUlFfVFlQRV9TSElGVMKg
+wqDCoMKgwqDCoMKgIDI4Cj4+ICsjZGVmaW5lIEtWTV9BUk1fSVJRX1RZUEVfTUFTS8KgwqDCoMKg
+wqDCoMKgIDB4Zgo+PiAgwqAjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFVfU0hJRlTCoMKgwqDCoMKg
+wqDCoCAxNgo+PiAtI2RlZmluZSBLVk1fQVJNX0lSUV9WQ1BVX01BU0vCoMKgwqDCoMKgwqDCoCAw
+eGZmCj4+ICsjZGVmaW5lIEtWTV9BUk1fSVJRX1ZDUFVfTUFTS8KgwqDCoMKgwqDCoMKgIDB4ZmZm
+Cj4+ICDCoCNkZWZpbmUgS1ZNX0FSTV9JUlFfTlVNX1NISUZUwqDCoMKgwqDCoMKgwqAgMAo+PiAg
+wqAjZGVmaW5lIEtWTV9BUk1fSVJRX05VTV9NQVNLwqDCoMKgwqDCoMKgwqAgMHhmZmZmCj4+Cj4+
+IC0tLTg8LS0tCj4+Cj4+IEl0IG1ha2VzIHRoaW5ncyBhIGJpdCBiZXR0ZXIsIGl0IGFsc28gaW1t
+ZWRpYXRlbHkgQlJFQUtzIHRoZSBhcGkgd2l0aAo+PiBvbGQgdmVyc2lvbnMuCj4+Cj4+Cj4+IE5l
+eHQgY29tZXMgb25lIG1vcmUgUUVNVSBhYm9ydCAod2l0aCB0aGUgImZpeCIgYWJvdmUpOgo+PiAg
+wqDCoMKgwqAiRmFpbGVkIHRvIHNldCBkZXZpY2UgYWRkcmVzczogTm8gc3BhY2UgbGVmdCBvbiBk
+ZXZpY2UiCj4+Cj4+IFdlIHJlZ2lzdGVyIHR3byBpbyBkZXZpY2VzIChyZF9kZXYgYW5kIHNnaV9k
+ZXYpIG9uIEtWTV9NTUlPX0JVUyBmb3IKPj4gZWFjaCByZWRpc3RyaWJ1dG9yLiA1MTIgdmNwdXMg
+dGFrZSAxMDI0IGlvIGRldmljZXMsIHdoaWNoIGlzIGJleW9uZCB0aGUKPj4gbWF4aW11bSBsaW1p
+dGF0aW9uIG9mIHRoZSBjdXJyZW50IGtlcm5lbCAtIE5SX0lPQlVTX0RFVlMgKDEwMDApLgo+PiBT
+byB3ZSBnZXQgYSBFTk9TUEMgZXJyb3IgaGVyZS4KPiAKPiBEbyB5b3UgcGxhbiB0byBzZW5kIGEg
+cGF0Y2ggZm9yIGluY3JlYXNpbmcgdGhlIE5SX0lPQlVTX0RFVlM/IE90aGVyd2lzZQo+IEkgY2Fu
+IGRvIGl0LgoKWy4uLl0KCj4gWW91IG1lbnRpb25lZCB5b3Ugc3RhcnRlZCB3b3JraW5nIG9uIHRo
+ZSBRRU1VIGZpeC4gRG8geW91IHBsYW4gdG8gc3VibWl0Cj4gcGF0Y2hlcyB0byB0aGUgTUwgb3Ig
+ZG8geW91IHdhbnQgbWUgdG8gYXR0ZW1wdCB0byBmaXggdGhlIHNpdHVhdGlvbiBvbgo+IHVzZXJz
+cGFjZT8KQWN0dWFsbHksIEkgaGF2ZW4ndCBzdGFydGVkIGFueXRoaW5nIHlldC4gIEl0IHdvdWxk
+IGJlIGdyZWF0IGlmIHlvdSBjYW4KaGVscCB0byBmaXggdGhpcyBpbiBRRU1VLiAgWWVzLCBwbGVh
+c2UgaGVscC4gOikKCkFuZCBwbGVhc2UgY2MgbWUgd2hlbiB5b3Ugc2VuZCB0aGUgcGF0Y2ggc28g
+dGhhdCBJIGNhbiBkbyBzb21lIHRlc3RzIGluCnRoZSBmcmVlIHRpbWUuCgoKTWFueSB0aGFua3Ms
+CnplbmdodWkKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
+L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
