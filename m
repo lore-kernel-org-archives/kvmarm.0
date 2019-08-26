@@ -2,85 +2,56 @@ Return-Path: <SRS0=oEtv=WW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77437C3A59F
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Aug 2019 12:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44CEC3A59F
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Aug 2019 16:41:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2DF12070B
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Aug 2019 12:00:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C3CIXYqg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2DF12070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 29A53206BA
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Aug 2019 16:41:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A53206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5D64A369;
-	Mon, 26 Aug 2019 08:00:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63F874A5BF;
+	Mon, 26 Aug 2019 12:41:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xDXEePSJ2U80; Mon, 26 Aug 2019 08:00:17 -0400 (EDT)
+	with ESMTP id tjZMeW3Nqqti; Mon, 26 Aug 2019 12:41:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B0F04A5A8;
-	Mon, 26 Aug 2019 08:00:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B9AD4A5C1;
+	Mon, 26 Aug 2019 12:41:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B1194A594
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Aug 2019 08:00:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA7C4A5BF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Aug 2019 12:41:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gGuktF+xvyig for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Aug 2019 08:00:14 -0400 (EDT)
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com
- [209.85.167.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2F944A592
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Aug 2019 08:00:14 -0400 (EDT)
-Received: by mail-oi1-f169.google.com with SMTP id v12so11851762oic.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Aug 2019 05:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SdfQ2/ZiXA4SobFkMH75D5kQJweG7eEDOUjmz6EtaQw=;
- b=C3CIXYqgt/x1iuJpoA5Lc5ckpFWRGFrU1aJfpYupHRh6f4CjaFi8Rpj32tmfteZZg3
- J1icu/Ng3guq1UjfOQ5frV+kwOApx8tvymyNMH14DzgKLrRvUjl7mnhBX40tBnKPfkSj
- 7RcdVmOXb+VbZS6wW0417B6B/GLheBjtz6RszI1lCzUWWGgL73egpSqNrYOx8mnVrJWD
- LnvRERiNMJPYwo0y5G8pCtQGVS2QdbraOLjvjz9nj2rG37gOOeO3of+81MYiYsMIEajH
- 8udVuZKBCl5g84SHHZ28Dxe6g4GVOknpYYx4CqAIFRj7E7izVDiNwNgAMNhs811q7gUM
- wgAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SdfQ2/ZiXA4SobFkMH75D5kQJweG7eEDOUjmz6EtaQw=;
- b=h6bP/VpIh1Mt2XYUBQdHSdpj7xMjE/1h9oSVQG9ZhCtb72stL7PU88ZxLp3j0IPvtQ
- o/3SBOhG3/QVq8IhN9hvFuBkWPsueHpv3dZuYkKRj8CDn6y7SKtdqkFWEhy/U4qeE37Y
- CKoJ4J4kLHVYerOZ7Becz9NYWaussu+C0NrrG2UQTE/+hEI6gwgy2+s19ZAkWJw+Pq+O
- hx6Q5p50raspcKMRNSfDmsnW09415+khS/2oLOjQcV4gW5W7MLkCESnct3F15hvmqGgb
- br0TAP3EPpaOkIIAsE7a5nCF7iK/nO/mQWQM9JRLnA4cfDVwkciFDNIqswyuiW+Vt4xz
- X18w==
-X-Gm-Message-State: APjAAAXJaO1dY001oTv8/CNkW4m1ZsVy4EUu7s8QqiAmvzolS05H0Z6X
- PZ5CrEpXfz6DgVrqdTzrO5imSteSpa5puY4km8trxg==
-X-Google-Smtp-Source: APXvYqwLked0T5pqTrSBL7PmdICrZaA/CS6ycR/k0FpWc871ogXXJKjUSOPrHE9nXYjPm34iAtYF+Xe96bO/Y7f8cDw=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr12134850oia.98.1566820814025; 
- Mon, 26 Aug 2019 05:00:14 -0700 (PDT)
+ with ESMTP id oRZmLLPdutgF for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Aug 2019 12:41:17 -0400 (EDT)
+Received: from huawei.com (szxga07-in.huawei.com [45.249.212.35])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D46234A5BB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Aug 2019 12:40:55 -0400 (EDT)
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 52465C224D703FD301BC;
+ Tue, 27 Aug 2019 00:40:29 +0800 (CST)
+Received: from linux-lLwqrf.huawei.com (10.175.104.237) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 27 Aug 2019 00:40:20 +0800
+From: Heyi Guo <guoheyi@huawei.com>
+To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-kernel@vger.kernel.org>
+Subject: [PATCH] kvm/arm/vgic: fix potential deadlock when ap_list is long
+Date: Tue, 27 Aug 2019 00:39:12 +0800
+Message-ID: <1566837552-127854-1-git-send-email-guoheyi@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
- <20190629234232.484ca3c0@why>
- <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
- <3f6ea07b-975b-3d66-e12d-f0a9cadb83a9@web.de>
- <20190826083806.GA12352@e113682-lin.lund.arm.com>
-In-Reply-To: <20190826083806.GA12352@e113682-lin.lund.arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Aug 2019 13:00:02 +0100
-Message-ID: <CAFEAcA-eshVRaAMpdNkjbBXtiwHpkjVgUbnH5mkoXqTCkFD-FA@mail.gmail.com>
-Subject: Re: KVM works on RPi4
-To: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Jan Kiszka <jan.kiszka@web.de>,
- kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
+X-Originating-IP: [10.175.104.237]
+X-CFilter-Loop: Reflected
+Cc: Marc Zyngier <maz@kernel.org>, Heyi Guo <guoheyi@huawei.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,45 +68,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 26 Aug 2019 at 09:38, Christoffer Dall <christoffer.dall@arm.com> wrote:
-> On Sun, Jun 30, 2019 at 12:18:59PM +0200, Jan Kiszka wrote:
-> > Hmm, looking at what KVM_ARM_TARGET_CORTEX_A7 and ..._A15 differentiates, I
-> > found nothing so far:
-> >
-> > kvm_reset_vcpu:
-> >         switch (vcpu->arch.target) {
-> >         case KVM_ARM_TARGET_CORTEX_A7:
-> >         case KVM_ARM_TARGET_CORTEX_A15:
-> >                 reset_regs = &cortexa_regs_reset;
-> >                 vcpu->arch.midr = read_cpuid_id();
-> >                 break;
-> >
-> > And arch/arm/kvm/coproc_a15.c looks like a copy of coproc_a7.c, just with some
-> > symbols renamed.
-> >
-> > What's the purpose of all that? Planned for something bigger but never
-> > implemented? From that perspective, there seems to be no need to arch.target and
-> > kvm_coproc_target_table at all.
-> >
->
-> There was some speculation involved here, and we needed to figure out
-> how we would deal with implementation defined behavior, so we built this
-> support for each type of CPU etc.
->
-> In reality, most CPUs that we support are pretty similar and that's why
-> we did the generic CPU type instead.  In practice, there might be a more
-> light-weight appraoch to handling the minor differences between CPU
-> implementations than what we have here.
+If ap_list is longer than 256, merge_final() in sort_list() will call
+comparison function with the same element just as below:
 
-The other future-direction I think we were thinking about was that
-one day we'd want to support showing the guest a CPU other than
-what the host is, at which point you would want to be able to
-say specifically "give me a Cortex-A7" and have it work even if the
-host was a Cortex-A15. But there are significant unresolved design
-issues if we ever did want to go in that direction...
+    do {
+        /*
+         * If the merge is highly unbalanced (e.g. the input is
+         * already sorted), this loop may run many iterations.
+         * Continue callbacks to the client even though no
+         * element comparison is needed, so the client's cmp()
+         * routine can invoke cond_resched() periodically.
+         */
+        if (unlikely(!++count))
+            cmp(priv, b, b);
 
-thanks
--- PMM
+This will definitely cause deadlock in vgic_irq_cmp() and the call trace
+is:
+
+[ 2667.130283] Call trace:
+[ 2667.130284] queued_spin_lock_slowpath+0x64/0x2a8
+[ 2667.130284] vgic_irq_cmp+0xfc/0x130
+[ 2667.130284] list_sort.part.0+0x1c0/0x268
+[ 2667.130285] list_sort+0x18/0x28
+[ 2667.130285] vgic_flush_lr_state+0x158/0x518
+[ 2667.130285] kvm_vgic_flush_hwstate+0x70/0x108
+[ 2667.130286] kvm_arch_vcpu_ioctl_run+0x114/0xa50
+[ 2667.130286] kvm_vcpu_ioctl+0x490/0x8c8
+[ 2667.130286] do_vfs_ioctl+0xc4/0x8c0
+[ 2667.130287] ksys_ioctl+0x8c/0xa0
+[ 2667.130287] __arm64_sys_ioctl+0x28/0x38
+[ 2667.130287] el0_svc_common+0x78/0x130
+[ 2667.130288] el0_svc_handler+0x38/0x78
+[ 2667.130288] el0_svc+0x8/0xc
+
+So return 0 immediately when a==b.
+
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ virt/kvm/arm/vgic/vgic.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 13d4b38..64ed0dc 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -254,6 +254,13 @@ static int vgic_irq_cmp(void *priv, struct list_head *a, struct list_head *b)
+ 	bool penda, pendb;
+ 	int ret;
+ 
++	/*
++	 * list_sort may call this function with the same element when the list
++	 * is farely long.
++	 */
++	if (unlikely(a == b))
++		return 0;
++
+ 	raw_spin_lock(&irqa->irq_lock);
+ 	raw_spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
+ 
+-- 
+1.8.3.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
