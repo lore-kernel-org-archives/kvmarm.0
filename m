@@ -4,61 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9153AC3A5A3
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 08:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD0CC3A5A3
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 12:46:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 302AB2173E
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 08:57:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 302AB2173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id D2B0E206BF
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 12:46:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B0E206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68C664A5D2;
-	Tue, 27 Aug 2019 04:57:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB634A586;
+	Tue, 27 Aug 2019 08:46:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SRMLu0Uhk7TW; Tue, 27 Aug 2019 04:57:12 -0400 (EDT)
+	with ESMTP id IaebH-V1EsHt; Tue, 27 Aug 2019 08:46:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB5E04A581;
-	Tue, 27 Aug 2019 04:57:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB0A64A561;
+	Tue, 27 Aug 2019 08:46:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1F84A581
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 04:57:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 161714A540
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 08:46:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bsYtkvyIRBng for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Aug 2019 04:57:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 320124A580
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 04:57:09 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32F00337;
- Tue, 27 Aug 2019 01:57:08 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B86673F246;
- Tue, 27 Aug 2019 01:57:07 -0700 (PDT)
-Date: Tue, 27 Aug 2019 10:57:06 +0200
-From: Christoffer Dall <christoffer.dall@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
-Message-ID: <20190827085706.GB6541@e113682-lin.lund.arm.com>
+ with ESMTP id t+oONkuu4WR0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Aug 2019 08:46:02 -0400 (EDT)
+Received: from huawei.com (szxga04-in.huawei.com [45.249.212.190])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 201484A534
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 08:46:02 -0400 (EDT)
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 041F6D3CA078F0D5976C;
+ Tue, 27 Aug 2019 20:45:57 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
+ 20:45:45 +0800
+Subject: Re: [PATCH v3 10/10] arm64: Retrieve stolen time as paravirtualized
+ guest
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>, "Will
+ Deacon" <will@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.cs.columbia.edu>
 References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-2-steven.price@arm.com>
+ <20190821153656.33429-11-steven.price@arm.com>
+ <6040a45c-fc39-a33e-c6a4-7baa586c247c@huawei.com>
+ <29cd1304-6b4d-05ef-3c08-6b4ba769c8fa@arm.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <21c73195-4cf7-8e3f-f188-ba8bfcb4dd41@huawei.com>
+Date: Tue, 27 Aug 2019 20:43:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20190821153656.33429-2-steven.price@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <29cd1304-6b4d-05ef-3c08-6b4ba769c8fa@arm.com>
+Content-Language: en-US
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>, Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,162 +74,140 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
-> Introduce a paravirtualization interface for KVM/arm64 based on the
-> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
-> 
-> This only adds the details about "Stolen Time" as the details of "Live
-> Physical Time" have not been fully agreed.
-> 
-> User space can specify a reserved area of memory for the guest and
-> inform KVM to populate the memory with information on time that the host
-> kernel has stolen from the guest.
-> 
-> A hypercall interface is provided for the guest to interrogate the
-> hypervisor's support for this interface and the location of the shared
-> memory structures.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
->  1 file changed, 100 insertions(+)
->  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
-> 
-> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
-> new file mode 100644
-> index 000000000000..1ceb118694e7
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/pvtime.txt
-> @@ -0,0 +1,100 @@
-> +Paravirtualized time support for arm64
-> +======================================
-> +
-> +Arm specification DEN0057/A defined a standard for paravirtualised time
-> +support for AArch64 guests:
-> +
-> +https://developer.arm.com/docs/den0057/a
-> +
-> +KVM/arm64 implements the stolen time part of this specification by providing
-> +some hypervisor service calls to support a paravirtualized guest obtaining a
-> +view of the amount of time stolen from its execution.
-> +
-> +Two new SMCCC compatible hypercalls are defined:
-> +
-> +PV_FEATURES 0xC5000020
-> +PV_TIME_ST  0xC5000022
-> +
-> +These are only available in the SMC64/HVC64 calling convention as
-> +paravirtualized time is not available to 32 bit Arm guests. The existence of
-> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
-> +mechanism before calling it.
-> +
-> +PV_FEATURES
-> +    Function ID:  (uint32)  : 0xC5000020
-> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
-> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-> +                              PV-time feature is supported by the hypervisor.
-> +
-> +PV_TIME_ST
-> +    Function ID:  (uint32)  : 0xC5000022
-> +    Return value: (int64)   : IPA of the stolen time data structure for this
-> +                              (V)CPU. On failure:
-> +                              NOT_SUPPORTED (-1)
-> +
-> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
-> +with inner and outer write back caching attributes, in the inner shareable
-> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
-> +meaningfully filled by the hypervisor (see structure below).
-> +
-> +PV_TIME_ST returns the structure for the calling VCPU.
-> +
-> +Stolen Time
-> +-----------
-> +
-> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
-> +
-> +  Field       | Byte Length | Byte Offset | Description
-> +  ----------- | ----------- | ----------- | --------------------------
-> +  Revision    |      4      |      0      | Must be 0 for version 0.1
-> +  Attributes  |      4      |      4      | Must be 0
-> +  Stolen time |      8      |      8      | Stolen time in unsigned
-> +              |             |             | nanoseconds indicating how
-> +              |             |             | much time this VCPU thread
-> +              |             |             | was involuntarily not
-> +              |             |             | running on a physical CPU.
-> +
-> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
-> +will be present within a reserved region of the normal memory given to the
-> +guest. The guest should not attempt to write into this memory. There is a
-> +structure per VCPU of the guest.
-> +
-> +User space interface
-> +====================
-> +
-> +User space can request that KVM provide the paravirtualized time interface to
-> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
-> +
-> +    struct kvm_create_device pvtime_device = {
-> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
-> +            .attr = 0,
-> +            .flags = 0,
-> +    };
-> +
-> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
-> +
-> +Creation of the device should be done after creating the vCPUs of the virtual
-> +machine.
-> +
-> +The IPA of the structures must be given to KVM. This is the base address
-> +of an array of stolen time structures (one for each VCPU). The base address
-> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
-> +multiple of PAGE_SIZE.
-> +
-> +The memory for these structures should be added to the guest in the usual
-> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
-> +
-> +For example:
-> +
-> +    struct kvm_dev_arm_st_region region = {
-> +            .gpa = <IPA of guest base address>,
-> +            .size = <size in bytes>
-> +    };
-
-This feel fragile; how are you handling userspace creating VCPUs after
-setting this up, the GPA overlapping guest memory, etc.  Is the
-philosophy here that the VMM can mess up the VM if it wants, but that
-this should never lead attacks on the host (we better hope not) and so
-we don't care?
-
-It seems to me setting the IPA per vcpu throught the VCPU device would
-avoid a lot of these issues.  See
-Documentation/virt/kvm/devices/vcpu.txt.
-
-
-Thanks,
-
-    Christoffer
-
-> +
-> +    struct kvm_device_attr st_base = {
-> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
-> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
-> +            .addr = (u64)&region
-> +    };
-> +
-> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
-> -- 
-> 2.20.1
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMjAxOS84LzIzIDIyOjIyLCBTdGV2ZW4gUHJpY2Ugd3JvdGU6Cj4gT24gMjMvMDgvMjAxOSAx
+Mjo0NSwgWmVuZ2h1aSBZdSB3cm90ZToKPj4gSGkgU3RldmVuLAo+Pgo+PiBPbiAyMDE5LzgvMjEg
+MjM6MzYsIFN0ZXZlbiBQcmljZSB3cm90ZToKPj4+IEVuYWJsZSBwYXJhdmlydHVhbGl6YXRpb24g
+ZmVhdHVyZXMgd2hlbiBydW5uaW5nIHVuZGVyIGEgaHlwZXJ2aXNvcgo+Pj4gc3VwcG9ydGluZyB0
+aGUgUFZfVElNRV9TVCBoeXBlcmNhbGwuCj4+Pgo+Pj4gRm9yIGVhY2ggKHYpQ1BVLCB3ZSBhc2sg
+dGhlIGh5cGVydmlzb3IgZm9yIHRoZSBsb2NhdGlvbiBvZiBhIHNoYXJlZAo+Pj4gcGFnZSB3aGlj
+aCB0aGUgaHlwZXJ2aXNvciB3aWxsIHVzZSB0byByZXBvcnQgc3RvbGVuIHRpbWUgdG8gdXMuIFdl
+IHNldAo+Pj4gcHZfdGltZV9vcHMgdG8gdGhlIHN0b2xlbiB0aW1lIGZ1bmN0aW9uIHdoaWNoIHNp
+bXBseSByZWFkcyB0aGUgc3RvbGVuCj4+PiB2YWx1ZSBmcm9tIHRoZSBzaGFyZWQgcGFnZSBmb3Ig
+YSBWQ1BVLiBXZSBndWFyYW50ZWUgc2luZ2xlLWNvcHkKPj4+IGF0b21pY2l0eSB1c2luZyBSRUFE
+X09OQ0Ugd2hpY2ggbWVhbnMgd2UgY2FuIGFsc28gcmVhZCB0aGUgc3RvbGVuCj4+PiB0aW1lIGZv
+ciBhbm90aGVyIFZDUFUgdGhhbiB0aGUgY3VycmVudGx5IHJ1bm5pbmcgb25lIHdoaWxlIGl0IGlz
+Cj4+PiBwb3RlbnRpYWxseSBiZWluZyB1cGRhdGVkIGJ5IHRoZSBoeXBlcnZpc29yLgo+Pj4KPj4+
+IFNpZ25lZC1vZmYtYnk6IFN0ZXZlbiBQcmljZSA8c3RldmVuLnByaWNlQGFybS5jb20+Cj4+PiAt
+LS0KPj4+ICDCoCBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3BhcmF2aXJ0LmggfMKgwqAgOSArLQo+
+Pj4gIMKgIGFyY2gvYXJtNjQva2VybmVsL3BhcmF2aXJ0LmPCoMKgwqDCoMKgIHwgMTQ4ICsrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKwo+Pj4gIMKgIGFyY2gvYXJtNjQva2VybmVsL3RpbWUu
+Y8KgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoCAzICsKPj4+ICDCoCBpbmNsdWRlL2xpbnV4L2NwdWhv
+dHBsdWcuaMKgwqDCoMKgwqDCoMKgIHzCoMKgIDEgKwo+Pj4gIMKgIDQgZmlsZXMgY2hhbmdlZCwg
+MTYwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPj4+Cj4+PiBkaWZmIC0tZ2l0IGEvYXJj
+aC9hcm02NC9pbmNsdWRlL2FzbS9wYXJhdmlydC5oCj4+PiBiL2FyY2gvYXJtNjQvaW5jbHVkZS9h
+c20vcGFyYXZpcnQuaAo+Pj4gaW5kZXggNzk5ZDlkZDZmN2NjLi4xMjVjMjZjNDI5MDIgMTAwNjQ0
+Cj4+PiAtLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3BhcmF2aXJ0LmgKPj4+ICsrKyBiL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20vcGFyYXZpcnQuaAo+Pj4gQEAgLTIxLDYgKzIxLDEzIEBAIHN0
+YXRpYyBpbmxpbmUgdTY0IHBhcmF2aXJ0X3N0ZWFsX2Nsb2NrKGludCBjcHUpCj4+PiAgwqAgewo+
+Pj4gIMKgwqDCoMKgwqAgcmV0dXJuIHB2X29wcy50aW1lLnN0ZWFsX2Nsb2NrKGNwdSk7Cj4+PiAg
+wqAgfQo+Pj4gLSNlbmRpZgo+Pj4gKwo+Pj4gK2ludCBfX2luaXQga3ZtX2d1ZXN0X2luaXQodm9p
+ZCk7Cj4+PiArCj4+PiArI2Vsc2UKPj4+ICsKPj4+ICsjZGVmaW5lIGt2bV9ndWVzdF9pbml0KCkK
+Pj4+ICsKPj4+ICsjZW5kaWYgLy8gQ09ORklHX1BBUkFWSVJUCj4+PiAgwqAgwqAgI2VuZGlmCj4+
+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rZXJuZWwvcGFyYXZpcnQuYyBiL2FyY2gvYXJtNjQv
+a2VybmVsL3BhcmF2aXJ0LmMKPj4+IGluZGV4IDRjZmVkOTFmZTI1Ni4uZWE4ZGJiYmQzMjkzIDEw
+MDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvcGFyYXZpcnQuYwo+Pj4gKysrIGIvYXJj
+aC9hcm02NC9rZXJuZWwvcGFyYXZpcnQuYwo+Pj4gQEAgLTYsMTMgKzYsMTYxIEBACj4+PiAgwqDC
+oCAqIEF1dGhvcjogU3RlZmFubyBTdGFiZWxsaW5pIDxzdGVmYW5vLnN0YWJlbGxpbmlAZXUuY2l0
+cml4LmNvbT4KPj4+ICDCoMKgICovCj4+PiAgwqAgKyNkZWZpbmUgcHJfZm10KGZtdCkgImt2bWFy
+bS1wdjogIiBmbXQKPj4+ICsKPj4+ICsjaW5jbHVkZSA8bGludXgvYXJtLXNtY2NjLmg+Cj4+PiAr
+I2luY2x1ZGUgPGxpbnV4L2NwdWhvdHBsdWcuaD4KPj4+ICDCoCAjaW5jbHVkZSA8bGludXgvZXhw
+b3J0Lmg+Cj4+PiArI2luY2x1ZGUgPGxpbnV4L2lvLmg+Cj4+PiAgwqAgI2luY2x1ZGUgPGxpbnV4
+L2p1bXBfbGFiZWwuaD4KPj4+ICsjaW5jbHVkZSA8bGludXgvcHJpbnRrLmg+Cj4+PiArI2luY2x1
+ZGUgPGxpbnV4L3BzY2kuaD4KPj4+ICsjaW5jbHVkZSA8bGludXgvcmVib290Lmg+Cj4+PiArI2lu
+Y2x1ZGUgPGxpbnV4L3NsYWIuaD4KPj4+ICDCoCAjaW5jbHVkZSA8bGludXgvdHlwZXMuaD4KPj4+
+ICsKPj4+ICDCoCAjaW5jbHVkZSA8YXNtL3BhcmF2aXJ0Lmg+Cj4+PiArI2luY2x1ZGUgPGFzbS9w
+dmNsb2NrLWFiaS5oPgo+Pj4gKyNpbmNsdWRlIDxhc20vc21wX3BsYXQuaD4KPj4+ICDCoCDCoCBz
+dHJ1Y3Qgc3RhdGljX2tleSBwYXJhdmlydF9zdGVhbF9lbmFibGVkOwo+Pj4gIMKgIHN0cnVjdCBz
+dGF0aWNfa2V5IHBhcmF2aXJ0X3N0ZWFsX3JxX2VuYWJsZWQ7Cj4+PiAgwqAgwqAgc3RydWN0IHBh
+cmF2aXJ0X3BhdGNoX3RlbXBsYXRlIHB2X29wczsKPj4+ICDCoCBFWFBPUlRfU1lNQk9MX0dQTChw
+dl9vcHMpOwo+Pj4gKwo+Pj4gK3N0cnVjdCBrdm1hcm1fc3RvbGVuX3RpbWVfcmVnaW9uIHsKPj4+
+ICvCoMKgwqAgc3RydWN0IHB2Y2xvY2tfdmNwdV9zdG9sZW5fdGltZSAqa2FkZHI7Cj4+PiArfTsK
+Pj4+ICsKPj4+ICtzdGF0aWMgREVGSU5FX1BFUl9DUFUoc3RydWN0IGt2bWFybV9zdG9sZW5fdGlt
+ZV9yZWdpb24sCj4+PiBzdG9sZW5fdGltZV9yZWdpb24pOwo+Pj4gKwo+Pj4gK3N0YXRpYyBib29s
+IHN0ZWFsX2FjYyA9IHRydWU7Cj4+PiArc3RhdGljIGludCBfX2luaXQgcGFyc2Vfbm9fc3RlYWxh
+Y2MoY2hhciAqYXJnKQo+Pj4gK3sKPj4+ICvCoMKgwqAgc3RlYWxfYWNjID0gZmFsc2U7Cj4+PiAr
+wqDCoMKgIHJldHVybiAwOwo+Pj4gK30KPj4+ICsKPj4+ICtlYXJseV9wYXJhbSgibm8tc3RlYWwt
+YWNjIiwgcGFyc2Vfbm9fc3RlYWxhY2MpOwo+Pj4gKwo+Pj4gKy8qIHJldHVybiBzdG9sZW4gdGlt
+ZSBpbiBucyBieSBhc2tpbmcgdGhlIGh5cGVydmlzb3IgKi8KPj4+ICtzdGF0aWMgdTY0IGt2bV9z
+dGVhbF9jbG9jayhpbnQgY3B1KQo+Pj4gK3sKPj4+ICvCoMKgwqAgc3RydWN0IGt2bWFybV9zdG9s
+ZW5fdGltZV9yZWdpb24gKnJlZzsKPj4+ICsKPj4+ICvCoMKgwqAgcmVnID0gcGVyX2NwdV9wdHIo
+JnN0b2xlbl90aW1lX3JlZ2lvbiwgY3B1KTsKPj4+ICvCoMKgwqAgaWYgKCFyZWctPmthZGRyKSB7
+Cj4+PiArwqDCoMKgwqDCoMKgwqAgcHJfd2Fybl9vbmNlKCJzdG9sZW4gdGltZSBlbmFibGVkIGJ1
+dCBub3QgY29uZmlndXJlZCBmb3IgY3B1Cj4+PiAlZFxuIiwKPj4+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBjcHUpOwo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybiAwOwo+Pj4g
+K8KgwqDCoCB9Cj4+PiArCj4+PiArwqDCoMKgIHJldHVybiBsZTY0X3RvX2NwdShSRUFEX09OQ0Uo
+cmVnLT5rYWRkci0+c3RvbGVuX3RpbWUpKTsKPj4+ICt9Cj4+PiArCj4+PiArc3RhdGljIGludCBk
+aXNhYmxlX3N0b2xlbl90aW1lX2N1cnJlbnRfY3B1KHZvaWQpCj4+PiArewo+Pj4gK8KgwqDCoCBz
+dHJ1Y3Qga3ZtYXJtX3N0b2xlbl90aW1lX3JlZ2lvbiAqcmVnOwo+Pj4gKwo+Pj4gK8KgwqDCoCBy
+ZWcgPSB0aGlzX2NwdV9wdHIoJnN0b2xlbl90aW1lX3JlZ2lvbik7Cj4+PiArwqDCoMKgIGlmICgh
+cmVnLT5rYWRkcikKPj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gMDsKPj4+ICsKPj4+ICvCoMKg
+wqAgbWVtdW5tYXAocmVnLT5rYWRkcik7Cj4+PiArwqDCoMKgIG1lbXNldChyZWcsIDAsIHNpemVv
+ZigqcmVnKSk7Cj4+PiArCj4+PiArwqDCoMKgIHJldHVybiAwOwo+Pj4gK30KPj4+ICsKPj4+ICtz
+dGF0aWMgaW50IHN0b2xlbl90aW1lX2R5aW5nX2NwdSh1bnNpZ25lZCBpbnQgY3B1KQo+Pj4gK3sK
+Pj4+ICvCoMKgwqAgcmV0dXJuIGRpc2FibGVfc3RvbGVuX3RpbWVfY3VycmVudF9jcHUoKTsKPj4+
+ICt9Cj4+PiArCj4+PiArc3RhdGljIGludCBpbml0X3N0b2xlbl90aW1lX2NwdSh1bnNpZ25lZCBp
+bnQgY3B1KQo+Pj4gK3sKPj4+ICvCoMKgwqAgc3RydWN0IGt2bWFybV9zdG9sZW5fdGltZV9yZWdp
+b24gKnJlZzsKPj4+ICvCoMKgwqAgc3RydWN0IGFybV9zbWNjY19yZXMgcmVzOwo+Pj4gKwo+Pj4g
+K8KgwqDCoCByZWcgPSB0aGlzX2NwdV9wdHIoJnN0b2xlbl90aW1lX3JlZ2lvbik7Cj4+PiArCj4+
+PiArwqDCoMKgIGFybV9zbWNjY18xXzFfaW52b2tlKEFSTV9TTUNDQ19IVl9QVl9USU1FX1NULCAm
+cmVzKTsKPj4+ICsKPj4+ICvCoMKgwqAgaWYgKChsb25nKXJlcy5hMCA8IDApCj4+PiArwqDCoMKg
+wqDCoMKgwqAgcmV0dXJuIC1FSU5WQUw7Cj4+PiArCj4+PiArwqDCoMKgIHJlZy0+a2FkZHIgPSBt
+ZW1yZW1hcChyZXMuYTAsCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBz
+aXplb2Yoc3RydWN0IHB2Y2xvY2tfdmNwdV9zdG9sZW5fdGltZSksCj4+PiArwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBNRU1SRU1BUF9XQik7Cj4+Cj4+IGNwdWhwIGNhbGxiYWNr
+cyBjYW4gYmUgaW52b2tlZCBpbiBhdG9taWMgY29udGV4dCAoc2VlOgo+PiAgwqDCoMKgwqBzZWNv
+bmRhcnlfc3RhcnRfa2VybmVsIC0+Cj4+ICDCoMKgwqDCoG5vdGlmeV9jcHVfc3RhcnRpbmcgLT4K
+Pj4gIMKgwqDCoMKgaW52b2tlIGNhbGxiYWNrcyksCj4+IGJ1dCBtZW1yZW1hcCBtaWdodCBzbGVl
+cC4uLgo+Pgo+PiBUcnkgdG8gcnVuIGEgREVCVUdfQVRPTUlDX1NMRUVQIGVuYWJsZWQgUFYgZ3Vl
+c3QsIEkgZ3Vlc3Mgd2Ugd2lsbCBiZQo+PiBncmVldGVkIGJ5IHRoZSBTbGVlcC1pbi1BdG9taWMt
+Q29udGV4dCBCVUcuwqAgV2UgbmVlZCBhbiBhbHRlcm5hdGl2ZQo+PiBoZXJlPwo+IAo+IEFjdHVh
+bGx5IEkgaGFkIHJ1biBERUJVR19BVE9NSUNfU0xFRVAgYW5kIG5vdCBzZWVuIGFueSBpc3N1ZS4g
+QnV0IEkKPiB0aGluayB0aGF0J3MgYmVjYXVzZSBvZiB0aGUgd2F5IEkndmUgY29uZmlndXJlZCB0
+aGUgcmVnaW9uIGluIG15IGt2bXRvb2wKPiBjaGFuZ2VzLiBJJ20gaGl0dGluZyB0aGUgcGF0aCB3
+aGVyZSB0aGUgbWVtb3J5IHJlZ2lvbiBpcyBpbiB0aGUgbGluZWFyCj4gbWFwIG9mIHRoZSBrZXJu
+ZWwgYW5kIHNvIG5vIGFjdHVhbCByZW1hcHBpbmcgaXMgbmVlZGVkIGFuZCBoZW5jZQo+IG1lbXJl
+bWFwIGRvZXNuJ3Qgc2xlZXAgKHRoZSBzaGFyZWQgc3RydWN0dXJlIGlzIGluIGEgcmVzZXJ2ZWQg
+cmVnaW9uIG9mCj4gUkFNKS4KPiAKPiBCdXQgZXZlbiBjaGFuZ2luZyB0aGUgbWVtb3J5IGxheW91
+dCBvZiB0aGUgZ3Vlc3Qgc28gdGhlIGNhbGwgZ29lcyBpbnRvCj4gaW9yZW1hcF9wYWdlX3Jhbmdl
+KCkgKHdoaWNoIGNvbnRhaW5zIGEgbWlnaHRfc2xlZXAoKSkgSSdtIG5vdCBzZWVpbmcgYW55Cj4g
+cHJvYmxlbXMuCgpFbW0sIEkgaGl0IHRoaXMgU0FDIEJVRyB3aGVuIHRlc3RpbmcgeW91ciBWMSB3
+aXRoIHRoZSBrdm10b29sIGNoYW5nZXMKeW91J3ZlIHByb3ZpZGVkLCBidXQgZm9yZ290IHRvIHJl
+cG9ydCBpdCBhdCB0aGF0IHRpbWUuICBJIGdvIGJhY2sgdG8gVjEKYW5kIGdldCB0aGUgZm9sbG93
+aW5nIGNhbGwgdHJhY2U6CgpbICAgIDAuMTIwMTEzXSBCVUc6IHNsZWVwaW5nIGZ1bmN0aW9uIGNh
+bGxlZCBmcm9tIGludmFsaWQgY29udGV4dCBhdCAKbW0vc2xhYi5oOjUwMQpbICAgIDAuMTIwMTE4
+XSBpbl9hdG9taWMoKTogMSwgaXJxc19kaXNhYmxlZCgpOiAxMjgsIHBpZDogMCwgbmFtZTogc3dh
+cHBlci8xClsgICAgMC4xMjAxMjJdIG5vIGxvY2tzIGhlbGQgYnkgc3dhcHBlci8xLzAuClsgICAg
+MC4xMjAxMjZdIGlycSBldmVudCBzdGFtcDogMApbICAgIDAuMTIwMTM1XSBoYXJkaXJxcyBsYXN0
+ICBlbmFibGVkIGF0ICgwKTogWzwwMDAwMDAwMDAwMDAwMDAwPl0gMHgwClsgICAgMC4xMjAxNDVd
+IGhhcmRpcnFzIGxhc3QgZGlzYWJsZWQgYXQgKDApOiBbPGZmZmYyMDAwMTAxMTNiNDA+XSAKY29w
+eV9wcm9jZXNzKzB4ODcwLzB4Mjg3OApbICAgIDAuMTIwMTUyXSBzb2Z0aXJxcyBsYXN0ICBlbmFi
+bGVkIGF0ICgwKTogWzxmZmZmMjAwMDEwMTEzYjQwPl0gCmNvcHlfcHJvY2VzcysweDg3MC8weDI4
+NzgKWyAgICAwLjEyMDE1N10gc29mdGlycXMgbGFzdCBkaXNhYmxlZCBhdCAoMCk6IFs8MDAwMDAw
+MDAwMDAwMDAwMD5dIDB4MApbICAgIDAuMTIwMTY0XSBDUFU6IDEgUElEOiAwIENvbW06IHN3YXBw
+ZXIvMSBOb3QgdGFpbnRlZCA1LjMuMC1yYzYrICMyClsgICAgMC4xMjAxNjhdIEhhcmR3YXJlIG5h
+bWU6IGxpbnV4LGR1bW15LXZpcnQgKERUKQpbICAgIDAuMTIwMTczXSBDYWxsIHRyYWNlOgpbICAg
+IDAuMTIwMTc5XSAgZHVtcF9iYWNrdHJhY2UrMHgwLzB4MjUwClsgICAgMC4xMjAxODRdICBzaG93
+X3N0YWNrKzB4MjQvMHgzMApbICAgIDAuMTIwMTkyXSAgZHVtcF9zdGFjaysweDEyMC8weDE3NApb
+ICAgIDAuMTIwMTk4XSAgX19fbWlnaHRfc2xlZXArMHgxYjAvMHgyODAKWyAgICAwLjEyMDIwM10g
+IF9fbWlnaHRfc2xlZXArMHg4MC8weGYwClsgICAgMC4xMjAyMDldICBrbWVtX2NhY2hlX2FsbG9j
+X25vZGVfdHJhY2UrMHgzMGMvMHgzYzgKWyAgICAwLjEyMDIxNl0gIF9fZ2V0X3ZtX2FyZWFfbm9k
+ZSsweDljLzB4MjA4ClsgICAgMC4xMjAyMjFdICBnZXRfdm1fYXJlYV9jYWxsZXIrMHg1OC8weDY4
+ClsgICAgMC4xMjAyMjddICBfX2lvcmVtYXBfY2FsbGVyKzB4NzgvMHgxMjAKWyAgICAwLjEyMDIz
+M10gIGlvcmVtYXBfY2FjaGUrMHhmMC8weDFhOApbICAgIDAuMTIwMjQwXSAgbWVtcmVtYXArMHgx
+NTQvMHgzYjgKWyAgICAwLjEyMDI0NV0gIGluaXRfc3RvbGVuX3RpbWVfY3B1KzB4OTQvMHgxNTAK
+WyAgICAwLjEyMDI1MV0gIGNwdWhwX2ludm9rZV9jYWxsYmFjaysweDEyYy8weDEyZjgKWyAgICAw
+LjEyMDI1N10gIG5vdGlmeV9jcHVfc3RhcnRpbmcrMHhhMC8weGMwClsgICAgMC4xMjAyNjNdICBz
+ZWNvbmRhcnlfc3RhcnRfa2VybmVsKzB4MWQ0LzB4MzI4CgpCdXQgdGhpbmdzIG1heSBoYXZlIGNo
+YW5nZWQgYmVjYXVzZSB3ZSdyZSB0YWxraW5nIGFib3V0IFYzIG5vdy4uLgpJIHdpbGwgZGlnIGl0
+IGEgYml0IGRlZXBlci4KCj4gQW0gSSBtaXNzaW5nIHNvbWV0aGluZz8gSSBoYXZlIHRvIGFkbWl0
+IEkgZG9uJ3QgZW50aXJlbHkgZm9sbG93IHRoZQo+IGVhcmx5IHN0YXJ0IHVwIC0gcGVyaGFwcyBp
+dCdzIGEgc2ltcGxlIGFzIERFQlVHX0FUT01JQ19TTEVFUCBkb2Vzbid0Cj4gd29yayB0aGlzIGVh
+cmx5IGluIGJvb3Q/CgpJIHRoaW5rIGl0IHNob3VsZCB3b3JrLgoKClRoYW5rcywKemVuZ2h1aQoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
