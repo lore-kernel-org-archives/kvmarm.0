@@ -2,69 +2,63 @@ Return-Path: <SRS0=Zu31=WX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D797C41514
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 07:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CCBC3A5A3
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 08:44:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CB408206BA
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 07:53:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB408206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C87B2206BF
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Aug 2019 08:44:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C87B2206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 255144A571;
-	Tue, 27 Aug 2019 03:53:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DDCD4A583;
+	Tue, 27 Aug 2019 04:44:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BDjWJMGtUgCu; Tue, 27 Aug 2019 03:53:32 -0400 (EDT)
+	with ESMTP id M5O6TWii8kl4; Tue, 27 Aug 2019 04:44:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58D14A599;
-	Tue, 27 Aug 2019 03:53:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B44124A5A5;
+	Tue, 27 Aug 2019 04:44:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8DB44A599
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 03:53:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB97C4A5BB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 04:44:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U4oohdBh9l5E for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Aug 2019 03:53:30 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FDC84A571
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 03:53:30 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5B6E43082E25;
- Tue, 27 Aug 2019 07:53:29 +0000 (UTC)
-Received: from [10.36.116.105] (ovpn-116-105.ams2.redhat.com [10.36.116.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B010C600D1;
- Tue, 27 Aug 2019 07:53:25 +0000 (UTC)
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Use a single IO device per
- redistributor
-To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
- maz@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-References: <20190823173330.23342-1-eric.auger@redhat.com>
- <f5b47614-de48-f3cb-0e6f-8a667cb951c0@redhat.com>
- <5cdcfe9e-98d8-454e-48e7-992fe3ee5eae@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ccb49856-f958-8bea-4b27-9a808415c43d@redhat.com>
-Date: Tue, 27 Aug 2019 09:53:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ with ESMTP id TbUd5xGKUT6e for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Aug 2019 04:44:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2044A5A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Aug 2019 04:44:09 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF7B9337;
+ Tue, 27 Aug 2019 01:44:08 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6222B3F246;
+ Tue, 27 Aug 2019 01:44:08 -0700 (PDT)
+Date: Tue, 27 Aug 2019 10:44:07 +0200
+From: Christoffer Dall <christoffer.dall@arm.com>
+To: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
+Message-ID: <20190827084407.GA6541@e113682-lin.lund.arm.com>
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-2-steven.price@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <5cdcfe9e-98d8-454e-48e7-992fe3ee5eae@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 27 Aug 2019 07:53:29 +0000 (UTC)
-Cc: zhang.zhanghailiang@huawei.com, andre.przywara@arm.com, qemu-arm@nongnu.org
+Content-Disposition: inline
+In-Reply-To: <20190821153656.33429-2-steven.price@arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,51 +70,151 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgWmVuZ2h1aSwKT24gOC8yNy8xOSA5OjQ5IEFNLCBaZW5naHVpIFl1IHdyb3RlOgo+IEhpIEVy
-aWMsCj4gCj4gVGhhbmtzIGZvciB0aGlzIHBhdGNoIQo+IAo+IE9uIDIwMTkvOC8yNCAxOjUyLCBB
-dWdlciBFcmljIHdyb3RlOgo+PiBIaSBaZW5naHVpLCBNYXJjLAo+Pgo+PiBPbiA4LzIzLzE5IDc6
-MzMgUE0sIEVyaWMgQXVnZXIgd3JvdGU6Cj4+PiBBdCB0aGUgbW9tZW50IHdlIHVzZSAyIElPIGRl
-dmljZXMgcGVyIEdJQ3YzIHJlZGlzdHJpYnV0b3I6IG9uZQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBeXl4KPj4+IG9uZSBm
-b3IgdGhlIFJEX2Jhc2UgZnJhbWUgYW5kIG9uZSBmb3IgdGhlIFNHSV9iYXNlIGZyYW1lLgo+IMKg
-IF5eXgo+Pj4KPj4+IEluc3RlYWQgd2UgY2FuIHVzZSBhIHNpbmdsZSBJTyBkZXZpY2UgcGVyIHJl
-ZGlzdHJpYnV0b3IgKHRoZSAyCj4+PiBmcmFtZXMgYXJlIGNvbnRpZ3VvdXMpLiBUaGlzIHNhdmVz
-IHNsb3RzIG9uIHRoZSBLVk1fTU1JT19CVVMKPj4+IHdoaWNoIGlzIGN1cnJlbnRseSBsaW1pdGVk
-IHRvIE5SX0lPQlVTX0RFVlMgKDEwMDApLgo+Pj4KPj4+IFRoaXMgY2hhbmdlIGFsbG93cyB0byBp
-bnN0YW50aWF0ZSB1cCB0byA1MTIgcmVkaXN0cmlidXRvcnMgYW5kIG1heQo+Pj4gc3BlZWQgdGhl
-IGd1ZXN0IGJvb3Qgd2l0aCBhIGxhcmdlIG51bWJlciBvZiBWQ1BVcy4KPj4+Cj4+PiBTaWduZWQt
-b2ZmLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+Cj4+Cj4+IEkgdGVzdGVk
-IHRoaXMgcGF0Y2ggd2l0aCBiZWxvdyBrZXJuZWwgYW5kIFFFTVUgYnJhbmNoZXM6Cj4+IGtlcm5l
-bDogaHR0cHM6Ly9naXRodWIuY29tL2VhdWdlci9saW51eC90cmVlLzI1NmZpeC12MQo+PiAoTWFy
-YydzIHBhdGNoICsgdGhpcyBwYXRjaCkKPj4gaHR0cHM6Ly9naXRodWIuY29tL2VhdWdlci9xZW11
-L3RyZWUvdjQuMS4wLTI1NmZpeC1yZmMxLXJjMAo+PiAoaGVhZGVyIHVwZGF0ZSArIGt2bV9hcm1f
-Z2ljX3NldF9pcnEgbW9kaWZpY2F0aW9uKQo+IAo+IEkgYWxzbyB0ZXN0ZWQgdGhlc2UgdGhyZWUg
-Y2hhbmdlcyBvbiBIaVNpIEQwNSAod2l0aCA2NCBwY3B1cyksIGFuZCB5ZXMsCj4gSSBjYW4gZ2V0
-IGEgNTEyVSBndWVzdCB0byBib290IHByb3Blcmx5IG5vdy4KCk1hbnkgdGhhbmtzIGZvciB0aGUg
-dGVzdGluZyAoYW5kIHRoZSBidWcgcmVwb3J0KS4gSSB3aWxsIGZvcm1hbGx5IHBvc3QKdGhlIFFF
-TVUgY2hhbmdlcyBhc2FwLgoKVGhhbmtzCgpFcmljCj4gCj4gVGVzdGVkLWJ5OiBaZW5naHVpIFl1
-IDx5dXplbmdodWlAaHVhd2VpLmNvbT4KPiAKPj4gT24gYSBtYWNoaW5lIHdpdGggMjI0IHBjcHVz
-LCBJIHdhcyBhYmxlIHRvIGJvb3QgYSA1MTIgdmNwdSBndWVzdC4KPj4KPj4gQXMgZXhwZWN0ZWQs
-IHFlbXUgb3V0cHV0cyB3YXJuaW5nczoKPj4KPj4gcWVtdS1zeXN0ZW0tYWFyY2g2NDogd2Fybmlu
-ZzogTnVtYmVyIG9mIFNNUCBjcHVzIHJlcXVlc3RlZCAoNTEyKSBleGNlZWRzCj4+IHRoZSByZWNv
-bW1lbmRlZCBjcHVzIHN1cHBvcnRlZCBieSBLVk0gKDIyNCkKPj4gcWVtdS1zeXN0ZW0tYWFyY2g2
-NDogd2FybmluZzogTnVtYmVyIG9mIGhvdHBsdWdnYWJsZSBjcHVzIHJlcXVlc3RlZAo+PiAoNTEy
-KSBleGNlZWRzIHRoZSByZWNvbW1lbmRlZCBjcHVzIHN1cHBvcnRlZCBieSBLVk0gKDIyNCkKPj4K
-Pj4gb24gdGhlIGd1ZXN0OiBnZXRjb25mIF9OUFJPQ0VTU09SU19PTkxOIHJldHVybnMgNTEyCj4+
-Cj4+IFRoZW4gSSBoYXZlIG5vIGNsdWUgYWJvdXQgd2hhdCBjYW4gYmUgZXhwZWN0ZWQgb2Ygc3Vj
-aCBvdmVyY29tbWl0IGNvbmZpZwo+PiBhbmQgSSBoYXZlIG5vdCBmdXJ0aGVyIGV4ZXJjaXNlZCB0
-aGUgZ3Vlc3QgYXQgdGhlIG1vbWVudC4gQnV0IGF0IGxlYXN0Cj4+IGl0IHNlZW1zIHRvIGJvb3Qg
-cHJvcGVybHkuIEkgYWxzbyB0ZXN0ZWQgd2l0aG91dCBvdmVyY29tbWl0IGFuZCBpdCBzZWVtcwo+
-PiB0byBiZWhhdmUgYXMgYmVmb3JlIChib290LCBtaWdyYXRpb24pLgo+Pgo+PiBJIHN0aWxsIG5l
-ZWQgdG8gbG9vayBhdCB0aGUgbWlncmF0aW9uIG9mID4gMjU2dmNwdSBndWVzdCBhdCBxZW11IGxl
-dmVsLgo+IAo+IExldCB1cyBrbm93IGlmIGZ1cnRoZXIgdGVzdHMgYXJlIG5lZWRlZC4KPiAKPiAK
-PiBUaGFua3MsCj4gemVuZ2h1aQo+IApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
+> Introduce a paravirtualization interface for KVM/arm64 based on the
+> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+> 
+> This only adds the details about "Stolen Time" as the details of "Live
+> Physical Time" have not been fully agreed.
+> 
+> User space can specify a reserved area of memory for the guest and
+> inform KVM to populate the memory with information on time that the host
+> kernel has stolen from the guest.
+> 
+> A hypercall interface is provided for the guest to interrogate the
+> hypervisor's support for this interface and the location of the shared
+> memory structures.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
+>  1 file changed, 100 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+> 
+> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+> new file mode 100644
+> index 000000000000..1ceb118694e7
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+> @@ -0,0 +1,100 @@
+> +Paravirtualized time support for arm64
+> +======================================
+> +
+> +Arm specification DEN0057/A defined a standard for paravirtualised time
+> +support for AArch64 guests:
+> +
+> +https://developer.arm.com/docs/den0057/a
+> +
+> +KVM/arm64 implements the stolen time part of this specification by providing
+> +some hypervisor service calls to support a paravirtualized guest obtaining a
+> +view of the amount of time stolen from its execution.
+> +
+> +Two new SMCCC compatible hypercalls are defined:
+> +
+> +PV_FEATURES 0xC5000020
+> +PV_TIME_ST  0xC5000022
+> +
+> +These are only available in the SMC64/HVC64 calling convention as
+> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+> +mechanism before calling it.
+> +
+> +PV_FEATURES
+> +    Function ID:  (uint32)  : 0xC5000020
+> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> +                              PV-time feature is supported by the hypervisor.
+> +
+> +PV_TIME_ST
+> +    Function ID:  (uint32)  : 0xC5000022
+> +    Return value: (int64)   : IPA of the stolen time data structure for this
+> +                              (V)CPU. On failure:
+> +                              NOT_SUPPORTED (-1)
+> +
+> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+> +with inner and outer write back caching attributes, in the inner shareable
+> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+> +meaningfully filled by the hypervisor (see structure below).
+> +
+> +PV_TIME_ST returns the structure for the calling VCPU.
+> +
+> +Stolen Time
+> +-----------
+> +
+> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+> +
+> +  Field       | Byte Length | Byte Offset | Description
+> +  ----------- | ----------- | ----------- | --------------------------
+> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+> +  Attributes  |      4      |      4      | Must be 0
+> +  Stolen time |      8      |      8      | Stolen time in unsigned
+> +              |             |             | nanoseconds indicating how
+> +              |             |             | much time this VCPU thread
+> +              |             |             | was involuntarily not
+> +              |             |             | running on a physical CPU.
+> +
+> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+> +will be present within a reserved region of the normal memory given to the
+> +guest. The guest should not attempt to write into this memory. There is a
+> +structure per VCPU of the guest.
+> +
+> +User space interface
+> +====================
+> +
+> +User space can request that KVM provide the paravirtualized time interface to
+> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
+> +
+
+I feel it would be more consistent to have the details of this in
+Documentation/virt/kvm/devices/arm-pv-time.txt and refer to this
+document from here.
+
+> +    struct kvm_create_device pvtime_device = {
+> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
+> +            .attr = 0,
+> +            .flags = 0,
+> +    };
+> +
+> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+> +
+> +Creation of the device should be done after creating the vCPUs of the virtual
+> +machine.
+> +
+> +The IPA of the structures must be given to KVM. This is the base address
+> +of an array of stolen time structures (one for each VCPU). The base address
+> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
+> +multiple of PAGE_SIZE.
+> +
+> +The memory for these structures should be added to the guest in the usual
+> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
+> +
+> +For example:
+> +
+> +    struct kvm_dev_arm_st_region region = {
+> +            .gpa = <IPA of guest base address>,
+> +            .size = <size in bytes>
+> +    };
+> +
+> +    struct kvm_device_attr st_base = {
+> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
+> +            .addr = (u64)&region
+> +    };
+> +
+> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+> -- 
+> 2.20.1
+> 
+
+Thanks,
+
+    Christoffer
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
