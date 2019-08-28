@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E1EC41514
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E1DC3A5A6
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C7B8D22CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7B8D22CF5
+	by mail.kernel.org (Postfix) with ESMTP id 19A542339E
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A542339E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F3724A558;
-	Wed, 28 Aug 2019 09:39:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3FF14A59C;
+	Wed, 28 Aug 2019 09:39:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id msbOC8DO1MjI; Wed, 28 Aug 2019 09:39:06 -0400 (EDT)
+	with ESMTP id eCB32CQcaVdI; Wed, 28 Aug 2019 09:39:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25C284A5DD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4658F4A5DB;
 	Wed, 28 Aug 2019 09:39:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 89D394A5A2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12B784A599
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rxHplX2lcR2J for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Aug 2019 09:39:02 -0400 (EDT)
+ with ESMTP id u2m+dDmlMRqX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Aug 2019 09:39:03 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 941944A557
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD4BB4A5B3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:03 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4770528;
- Wed, 28 Aug 2019 06:39:02 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A408815AB;
+ Wed, 28 Aug 2019 06:39:03 -0700 (PDT)
 Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
  [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2031E3F246;
- Wed, 28 Aug 2019 06:39:01 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7CE493F246;
+ Wed, 28 Aug 2019 06:39:02 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests RFC PATCH 09/16] lib: arm/arm64: Invalidate TLB
- before enabling MMU
-Date: Wed, 28 Aug 2019 14:38:24 +0100
-Message-Id: <1566999511-24916-10-git-send-email-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 10/16] lib: Add UL and ULL definitions to
+ linux/const.h
+Date: Wed, 28 Aug 2019 14:38:25 +0100
+Message-Id: <1566999511-24916-11-git-send-email-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
 References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
@@ -70,45 +70,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Let's invalidate the TLB before enabling the MMU, not after, so we don't
-accidently use a stale TLB mapping. For arm64, we already do that in
-asm_mmu_enable, and we issue an extra invalidation after the function
-returns. Invalidate the TLB in asm_mmu_enable for arm also, and remove the
-redundant call to tlb_flush_all.
+The UL macro was previously defined in lib/arm64/asm/pgtable-hwdef.h. Move
+it to lib/linux/const.h so it can be used in other files. To keep things
+consistent, also add an ULL macro.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/arm/mmu.c | 1 -
- arm/cstart.S  | 4 ++++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ lib/linux/const.h             | 7 +++++--
+ lib/arm64/asm/pgtable-hwdef.h | 2 --
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 161f7a8e607c..66a05d789386 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -57,7 +57,6 @@ void mmu_enable(pgd_t *pgtable)
- 	struct thread_info *info = current_thread_info();
+diff --git a/lib/linux/const.h b/lib/linux/const.h
+index c872bfd25e13..e3c7fec3f4b8 100644
+--- a/lib/linux/const.h
++++ b/lib/linux/const.h
+@@ -21,7 +21,10 @@
+ #define _AT(T,X)	((T)(X))
+ #endif
  
- 	asm_mmu_enable(__pa(pgtable));
--	flush_tlb_all();
- 
- 	info->pgtable = pgtable;
- 	mmu_mark_enabled(info->cpu);
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 5d4fe4b1570b..316672545551 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -160,6 +160,10 @@ halt:
- .equ	NMRR,	0xff000004		@ MAIR1 (from Linux kernel)
- .globl asm_mmu_enable
- asm_mmu_enable:
-+	/* TLBIALL */
-+	mcr	p15, 0, r2, c8, c7, 0
-+	dsb	ish
+-#define _BITUL(x)	(_AC(1,UL) << (x))
+-#define _BITULL(x)	(_AC(1,ULL) << (x))
++#define UL(x) 		_AC(x, UL)
++#define ULL(x)		_AC(x, ULL)
 +
- 	/* TTBCR */
- 	mrc	p15, 0, r2, c2, c0, 2
- 	orr	r2, #(1 << 31)		@ TTB_EAE
++#define _BITUL(x)	(UL(1) << (x))
++#define _BITULL(x)	(ULL(1) << (x))
+ 
+ #endif /* !(_LINUX_CONST_H) */
+diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+index 045a3ce12645..e6f02fae4075 100644
+--- a/lib/arm64/asm/pgtable-hwdef.h
++++ b/lib/arm64/asm/pgtable-hwdef.h
+@@ -9,8 +9,6 @@
+  * This work is licensed under the terms of the GNU GPL, version 2.
+  */
+ 
+-#define UL(x) _AC(x, UL)
+-
+ #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
+ 
+ /*
 -- 
 2.7.4
 
