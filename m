@@ -2,68 +2,66 @@ Return-Path: <SRS0=VgM6=WY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC2BC3A5A1
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 16:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 783E1C3A5A6
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 17:32:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BEB4E2173E
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 16:19:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB4E2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id F207A22DA7
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 17:32:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="a3rf4aOl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F207A22DA7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 394914A52F;
-	Wed, 28 Aug 2019 12:19:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FA824A578;
+	Wed, 28 Aug 2019 13:32:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jpasKS8Cao7W; Wed, 28 Aug 2019 12:19:29 -0400 (EDT)
+	with ESMTP id NrBfH7XOSIuk; Wed, 28 Aug 2019 13:32:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E46E4A54B;
-	Wed, 28 Aug 2019 12:19:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40C8A4A51D;
+	Wed, 28 Aug 2019 13:32:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E0C34A537
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 12:19:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A75054A511
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 13:32:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MMh2li774Cbm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Aug 2019 12:19:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43BA44A4E6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 12:19:26 -0400 (EDT)
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 17B255AFDE;
- Wed, 28 Aug 2019 16:19:25 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D8F05D9C9;
- Wed, 28 Aug 2019 16:19:23 +0000 (UTC)
-Date: Wed, 28 Aug 2019 18:19:20 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 10/16] lib: Add UL and ULL definitions
- to linux/const.h
-Message-ID: <20190828161920.6w7jfl7gcofozun7@kamzik.brq.redhat.com>
-References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
- <1566999511-24916-11-git-send-email-alexandru.elisei@arm.com>
- <20190828151006.x6bfxlseqp5s55su@kamzik.brq.redhat.com>
- <c476a2cc-98d7-6315-a742-df252ff56be5@arm.com>
+ with ESMTP id UpKqCfTWZkSa for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Aug 2019 13:32:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9386C4A50F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 13:32:39 -0400 (EDT)
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id E5F3222CF8;
+ Wed, 28 Aug 2019 17:32:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1567013558;
+ bh=g4OCrTwVa9bGHj9tnxdp3jF6CcqJ8f1XiF9bSopoU3g=;
+ h=Date:From:To:Cc:Subject:From;
+ b=a3rf4aOlbouRot3H7YWNOPjdMdjcSi4kuaOwn9XEDNdNwloLChRW0NRPbuHXR9PXS
+ C6MgP0i2QWJTMl2Pk08Rc1N/ScAAM4oPGmcweVwXtZ/63yqisTC31BDdQGAwJFmL4V
+ GPPOqjrUiOAnRHK07SzjdAwi+63PljkdrwKkNN/A=
+Date: Wed, 28 Aug 2019 18:32:33 +0100
+From: Will Deacon <will@kernel.org>
+To: torvalds@linux-foundation.org
+Subject: [GIT PULL] arm64: Fixes for -rc7
+Message-ID: <20190828173233.zqwm5nd4p5xa4jxi@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <c476a2cc-98d7-6315-a742-df252ff56be5@arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 28 Aug 2019 16:19:25 +0000 (UTC)
-Cc: kvm@vger.kernel.org, maz@kernel.org, andre.przywara@arm.com,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+User-Agent: NeoMutt/20170113 (1.7.2)
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,73 +78,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 28, 2019 at 04:46:04PM +0100, Alexandru Elisei wrote:
-> On 8/28/19 4:10 PM, Andrew Jones wrote:
-> > On Wed, Aug 28, 2019 at 02:38:25PM +0100, Alexandru Elisei wrote:
-> >> The UL macro was previously defined in lib/arm64/asm/pgtable-hwdef.h. Move
-> >> it to lib/linux/const.h so it can be used in other files. To keep things
-> >> consistent, also add an ULL macro.
-> >>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  lib/linux/const.h             | 7 +++++--
-> >>  lib/arm64/asm/pgtable-hwdef.h | 2 --
-> >>  2 files changed, 5 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/lib/linux/const.h b/lib/linux/const.h
-> >> index c872bfd25e13..e3c7fec3f4b8 100644
-> >> --- a/lib/linux/const.h
-> >> +++ b/lib/linux/const.h
-> >> @@ -21,7 +21,10 @@
-> >>  #define _AT(T,X)	((T)(X))
-> >>  #endif
-> >>  
-> >> -#define _BITUL(x)	(_AC(1,UL) << (x))
-> >> -#define _BITULL(x)	(_AC(1,ULL) << (x))
-> >> +#define UL(x) 		_AC(x, UL)
-> >> +#define ULL(x)		_AC(x, ULL)
-> >> +
-> >> +#define _BITUL(x)	(UL(1) << (x))
-> >> +#define _BITULL(x)	(ULL(1) << (x))
-> > I don't mind this, but if we want to keep this file consistent with
-> > Linux's include/uapi/linux/const.h, which is actually the goal, then we
-> > should be adding _UL and _ULL instead. But in that case we'd probably
-> > want to leave the define below.
-> >
-> > Thanks,
-> > drew
-> 
-> Hm... The next patch needs the UL define. Consistency is good, so if we want to
-> keep it consistent with include/uapi/linux/const.h, then I will change the
-> defines (and the uses) to _UL and _ULL, if that's fine with you.
+Hi Linus,
 
-Yeah, I think that's best.
+Hot on the heels of our last set of fixes are a few more for -rc7. Two
+of them are fixing issues with our virtual interrupt controller
+implementation in KVM/arm, while the other is a longstanding but
+straightforward kallsyms fix which was been acked by Masami and resolves
+an initialisation failure in kprobes observed on arm64.
 
-Thanks,
-drew
+Please pull, thanks.
 
-> 
-> Thanks,
-> Alex
-> >
-> >>  
-> >>  #endif /* !(_LINUX_CONST_H) */
-> >> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
-> >> index 045a3ce12645..e6f02fae4075 100644
-> >> --- a/lib/arm64/asm/pgtable-hwdef.h
-> >> +++ b/lib/arm64/asm/pgtable-hwdef.h
-> >> @@ -9,8 +9,6 @@
-> >>   * This work is licensed under the terms of the GNU GPL, version 2.
-> >>   */
-> >>  
-> >> -#define UL(x) _AC(x, UL)
-> >> -
-> >>  #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
-> >>  
-> >>  /*
-> >> -- 
-> >> 2.7.4
-> >>
+Will
+
+--->8
+
+The following changes since commit b6143d10d23ebb4a77af311e8b8b7f019d0163e6:
+
+  arm64: ftrace: Ensure module ftrace trampoline is coherent with I-side (2019-08-16 17:40:03 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git tags/arm64-fixes
+
+for you to fetch changes up to 82e40f558de566fdee214bec68096bbd5e64a6a4:
+
+  KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI (2019-08-28 11:21:42 +0100)
+
+----------------------------------------------------------------
+arm64 fixes for -rc7
+
+- Fix GICv2 emulation bug (KVM)
+
+- Fix deadlock in virtual GIC interrupt injection code (KVM)
+
+- Fix kprobes blacklist init failure due to broken kallsyms lookup
+
+----------------------------------------------------------------
+Heyi Guo (1):
+      KVM: arm/arm64: vgic: Fix potential deadlock when ap_list is long
+
+Marc Zyngier (2):
+      kallsyms: Don't let kallsyms_lookup_size_offset() fail on retrieving the first symbol
+      KVM: arm/arm64: vgic-v2: Handle SGI bits in GICD_I{S,C}PENDR0 as WI
+
+ kernel/kallsyms.c             |  6 ++++--
+ virt/kvm/arm/vgic/vgic-mmio.c | 18 ++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c   |  5 ++++-
+ virt/kvm/arm/vgic/vgic-v3.c   |  5 ++++-
+ virt/kvm/arm/vgic/vgic.c      |  7 +++++++
+ 5 files changed, 37 insertions(+), 4 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
