@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 465DFC3A5A4
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7D2C3A5A4
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 06BB623403
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06BB623403
+	by mail.kernel.org (Postfix) with ESMTP id 608C623403
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608C623403
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE08B4A5B3;
-	Wed, 28 Aug 2019 09:39:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18BBD4A5AC;
+	Wed, 28 Aug 2019 09:39:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NlI9xM-9QXZf; Wed, 28 Aug 2019 09:39:11 -0400 (EDT)
+	with ESMTP id rZx701UHI8OK; Wed, 28 Aug 2019 09:39:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F53B4A5E6;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94FB84A5EA;
 	Wed, 28 Aug 2019 09:39:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E7BD4A5C1
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1AD24A594
  for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SCI5KeYXsx4z for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id RJZDz2Vah1mv for <kvmarm@lists.cs.columbia.edu>;
  Wed, 28 Aug 2019 09:39:08 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03BD44A594
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B00AB4A599
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:06 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C30A328;
- Wed, 28 Aug 2019 06:39:07 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71E42360;
+ Wed, 28 Aug 2019 06:39:06 -0700 (PDT)
 Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
  [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A55983F246;
- Wed, 28 Aug 2019 06:39:06 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5319C3F246;
+ Wed, 28 Aug 2019 06:39:05 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests RFC PATCH 13/16] arm64: selftest: Add basic test for
- EL2
-Date: Wed, 28 Aug 2019 14:38:28 +0100
-Message-Id: <1566999511-24916-14-git-send-email-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 12/16] arm64: timer: Add test for EL2 timers
+Date: Wed, 28 Aug 2019 14:38:27 +0100
+Message-Id: <1566999511-24916-13-git-send-email-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
 References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
@@ -71,126 +70,270 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a rudimentary test for EL2 that checks that we are indeed running with
-VHE enabled and that we are using SMC for issuing PSCI calls.
+When VHE is available, EL2 has two extra timers, the physical and virtual
+EL2 timers. Extend the timer test to include them.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/arm64/asm/processor.h |  6 ++++++
- arm/selftest.c            | 36 +++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg         |  8 ++++++++
- 3 files changed, 49 insertions(+), 1 deletion(-)
+I'm seeing three failed tests when running at EL2, I'm investigating those
+to figure out if it's KVM or kvm-unit-tests related.
 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 4d81a4941959..b9058f140039 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -110,5 +110,11 @@ static inline u32 get_cntfrq(void)
- 	return read_sysreg(cntfrq_el0);
- }
+ lib/arm64/asm/sysreg.h |   8 +++
+ arm/timer.c            | 150 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 154 insertions(+), 4 deletions(-)
+
+diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+index ed407f93330d..02054fbe2763 100644
+--- a/lib/arm64/asm/sysreg.h
++++ b/lib/arm64/asm/sysreg.h
+@@ -19,6 +19,14 @@
+ #define SYS_CNTV_CTL_EL02	sys_reg(3, 5, 14, 3, 1)
+ #define SYS_CNTV_CVAL_EL02	sys_reg(3, 5, 14, 3, 2)
  
-+static inline bool vhe_enabled(void)
-+{
-+	unsigned long hcr = read_sysreg(hcr_el2);
-+	return (hcr & HCR_EL2_E2H) && (hcr & HCR_EL2_TGE);
-+}
++#define SYS_CNTHP_TVAL_EL2	sys_reg(3, 4, 14, 2, 0)
++#define SYS_CNTHP_CTL_EL2	sys_reg(3, 4, 14, 2, 1)
++#define SYS_CNTHP_CVAL_EL2	sys_reg(3, 4, 14, 2, 2)
 +
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PROCESSOR_H_ */
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 9ebf4c6051b4..211bc8a5642b 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -19,6 +19,9 @@
- #include <asm/mmu.h>
- #include <asm/pgtable.h>
++#define SYS_CNTHV_TVAL_EL2	sys_reg(3, 4, 14, 3, 0)
++#define SYS_CNTHV_CTL_EL2	sys_reg(3, 4, 14, 3, 1)
++#define SYS_CNTHV_CVAL_EL2	sys_reg(3, 4, 14, 3, 2)
++
+ #ifdef __ASSEMBLY__
+ 	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+ 	.equ	.L__reg_num_x\num, \num
+diff --git a/arm/timer.c b/arm/timer.c
+index 29477ee65878..faab671d0fb1 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -23,6 +23,8 @@ static void *gic_icenabler;
  
-+#define ID_AA64MMFR1_VHE_MASK		(0xf << 8)
-+#define ID_AA64MMFR1_VHE_SUPPORTED	(1 << 8)
+ static bool ptimer_unsupported;
+ 
++static int current_el;
 +
- static void __user_psci_system_off(void)
+ static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
  {
- 	psci_system_off();
-@@ -223,6 +226,11 @@ static void check_pabt(void)
- 	test_exception("mov r2, #0x0", "bx r2", "");
- 	__builtin_unreachable();
+ 	ptimer_unsupported = true;
+@@ -159,6 +161,66 @@ static void write_ptimer_ctl_vhe(u64 val)
+ 	write_sysreg_s(val, SYS_CNTP_CTL_EL02);
  }
-+
-+static void check_el2(void)
-+{
-+	report("EL2 only available on arm64", false);
-+}
- #elif defined(__aarch64__)
  
- /*
-@@ -372,6 +380,29 @@ static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
++static u64 read_hvtimer_cval(void)
++{
++	return read_sysreg_s(SYS_CNTHV_CVAL_EL2);
++}
++
++static void write_hvtimer_cval(u64 val)
++{
++	write_sysreg_s(val, SYS_CNTHV_CVAL_EL2);
++}
++
++static s32 read_hvtimer_tval(void)
++{
++	return read_sysreg_s(SYS_CNTHV_TVAL_EL2);
++}
++
++static void write_hvtimer_tval(s32 val)
++{
++	write_sysreg_s(val, SYS_CNTHV_TVAL_EL2);
++}
++
++static u64 read_hvtimer_ctl(void)
++{
++	return read_sysreg_s(SYS_CNTHV_CTL_EL2);
++}
++
++static void write_hvtimer_ctl(u64 val)
++{
++	write_sysreg_s(val, SYS_CNTHV_CTL_EL2);
++}
++
++static u64 read_hptimer_cval(void)
++{
++	return read_sysreg_s(SYS_CNTHP_CVAL_EL2);
++}
++
++static void write_hptimer_cval(u64 val)
++{
++	write_sysreg_s(val, SYS_CNTHP_CVAL_EL2);
++}
++
++static s32 read_hptimer_tval(void)
++{
++	return read_sysreg_s(SYS_CNTHP_TVAL_EL2);
++}
++
++static void write_hptimer_tval(s32 val)
++{
++	write_sysreg_s(val, SYS_CNTHP_TVAL_EL2);
++}
++
++static u64 read_hptimer_ctl(void)
++{
++	return read_sysreg_s(SYS_CNTHP_CTL_EL2);
++}
++
++static void write_hptimer_ctl(u64 val)
++{
++	write_sysreg_s(val, SYS_CNTHP_CTL_EL2);
++}
++
+ struct timer_info {
+ 	u32 irq;
+ 	u32 irq_flags;
+@@ -216,7 +278,29 @@ static struct timer_info ptimer_info_vhe = {
+ 	.write_ctl = write_ptimer_ctl_vhe,
+ };
+ 
+-static struct timer_info *vtimer, *ptimer;
++static struct timer_info hvtimer_info = {
++	.irq_received = false,
++	.read_counter = read_vtimer_counter,
++	.read_cval = read_hvtimer_cval,
++	.write_cval = write_hvtimer_cval,
++	.read_tval = read_hvtimer_tval,
++	.write_tval = write_hvtimer_tval,
++	.read_ctl = read_hvtimer_ctl,
++	.write_ctl = write_hvtimer_ctl,
++};
++
++static struct timer_info hptimer_info = {
++	.irq_received = false,
++	.read_counter = read_ptimer_counter,
++	.read_cval = read_hptimer_cval,
++	.write_cval = write_hptimer_cval,
++	.read_tval = read_hptimer_tval,
++	.write_tval = write_hptimer_tval,
++	.read_ctl = read_hptimer_ctl,
++	.write_ctl = write_hptimer_ctl,
++};
++
++static struct timer_info *vtimer, *ptimer, *hvtimer, *hptimer;
+ 
+ static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
  {
- 	__user_psci_system_off();
- }
-+
-+static bool vhe_supported(void)
-+{
-+	u64 aa64mmfr1 = read_sysreg(id_aa64mmfr1_el1);
-+
-+	return (aa64mmfr1 & ID_AA64MMFR1_VHE_MASK) == ID_AA64MMFR1_VHE_SUPPORTED;
-+}
-+
-+static void check_el2_cpu(void *data __unused)
-+{
-+	int cpu = smp_processor_id();
-+
-+	report("CPU(%3d) Running at EL2", current_level() == CurrentEL_EL2, cpu);
-+	report("CPU(%3d) VHE supported and enabled",
-+			vhe_supported() && vhe_enabled(), cpu);
-+}
-+
-+static bool psci_check(void);
-+static void check_el2(void)
-+{
-+	report("PSCI conduit", psci_check());
-+	on_cpus(check_el2_cpu, NULL);
-+}
- #endif
- 
- static void check_vectors(void *arg __unused)
-@@ -423,7 +454,6 @@ static bool psci_check(void)
- 		printf("psci method must be smc\n");
- 		return false;
- 	}
--
- 	if (current_level() == CurrentEL_EL1 &&
- 	    strcmp(method->data, "hvc") != 0) {
- 		printf("psci method must be hvc\n");
-@@ -474,6 +504,10 @@ int main(int argc, char **argv)
- 		report("PSCI version", psci_check());
- 		on_cpus(cpu_report, NULL);
- 
-+	} else if (strcmp(argv[1], "el2") == 0) {
-+
-+		check_el2();
-+
+@@ -241,6 +325,10 @@ static void irq_handler(struct pt_regs *regs)
+ 		info = vtimer;
+ 	} else if (irqnr == PPI(ptimer->irq)) {
+ 		info = ptimer;
++	} else if (current_el == CurrentEL_EL2 && irqnr == PPI(hptimer->irq)) {
++		info = hptimer;
++	} else if (current_el == CurrentEL_EL2 && irqnr == PPI(hvtimer->irq)) {
++		info = hvtimer;
  	} else {
- 		printf("Unknown subtest\n");
- 		abort();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 6d3df92a4e28..c632f4e75382 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -55,6 +55,14 @@ smp = $MAX_SMP
- extra_params = -append 'smp'
- groups = selftest
+ 		report_info("Unexpected interrupt: %d\n", irqnr);
+ 		return;
+@@ -362,6 +450,20 @@ static void test_ptimer(void)
+ 	report_prefix_pop();
+ }
  
-+# Test EL2 support
-+[selftest-el2]
-+file = selftest.flat
-+smp = 2
-+extra_params = -append 'el2'
-+groups = selftest
-+arch = arm64
++static void test_hvtimer(void)
++{
++	report_prefix_push("hvtimer-busy-loop");
++	test_timer(hvtimer);
++	report_prefix_pop();
++}
 +
- # Test PCI emulation
- [pci-test]
- file = pci-test.flat
++static void test_hptimer(void)
++{
++	report_prefix_push("hptimer-busy-loop");
++	test_timer(hptimer);
++	report_prefix_pop();
++}
++
+ static void test_init(void)
+ {
+ 	const struct fdt_property *prop;
+@@ -369,12 +471,14 @@ static void test_init(void)
+ 	int node, len;
+ 	u32 *data;
+ 
+-	if (current_level() == CurrentEL_EL1) {
++	if (current_el == CurrentEL_EL1) {
+ 		vtimer = &vtimer_info;
+ 		ptimer = &ptimer_info;
+ 	} else {
+ 		vtimer = &vtimer_info_vhe;
+ 		ptimer = &ptimer_info_vhe;
++		hvtimer = &hvtimer_info;
++		hptimer = &hptimer_info;
+ 	}
+ 
+ 	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
+@@ -390,6 +494,19 @@ static void test_init(void)
+ 	vtimer->irq = fdt32_to_cpu(data[7]);
+ 	vtimer->irq_flags = fdt32_to_cpu(data[8]);
+ 
++	if (current_el == CurrentEL_EL2) {
++		assert(fdt32_to_cpu(data[9]) == 1);
++		hptimer->irq = fdt32_to_cpu(data[10]);
++		hptimer->irq_flags = fdt32_to_cpu(data[11]);
++		/* The hvtimer is not in the DT, assume KVM default. */
++		hvtimer->irq = 28;
++		/*
++		 * With VHE, accesses to the vtimer are redirected to the
++		 * hvtimer. They should have the same interrupt properties.
++		 */
++		hvtimer->irq_flags = vtimer->irq_flags;
++	}
++
+ 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+ 	ptimer->read_ctl();
+ 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
+@@ -433,12 +550,22 @@ static void print_timer_info(void)
+ 	printf("CNTVCT_EL0   : 0x%016lx\n", vtimer->read_counter());
+ 	printf("CNTV_CTL_EL0 : 0x%016lx\n", vtimer->read_ctl());
+ 	printf("CNTV_CVAL_EL0: 0x%016lx\n", vtimer->read_cval());
++
++	if (current_el == CurrentEL_EL2) {
++		printf("CNTHP_CTL_EL0 : 0x%016lx\n", hptimer->read_ctl());
++		printf("CNTHP_CVAL_EL0: 0x%016lx\n", hptimer->read_cval());
++
++		printf("CNTHV_CTL_EL0 : 0x%016lx\n", hvtimer->read_ctl());
++		printf("CNTHV_CVAL_EL0: 0x%016lx\n", hvtimer->read_cval());
++	}
+ }
+ 
+ int main(int argc, char **argv)
+ {
+ 	int i;
+ 
++	current_el = current_level();
++
+ 	test_init();
+ 
+ 	print_timer_info();
+@@ -446,13 +573,28 @@ int main(int argc, char **argv)
+ 	if (argc == 1) {
+ 		test_vtimer();
+ 		test_ptimer();
++		if (current_el == CurrentEL_EL2) {
++			test_hvtimer();
++			test_hptimer();
++		}
+ 	}
+ 
+ 	for (i = 1; i < argc; ++i) {
+-		if (strcmp(argv[i], "vtimer") == 0)
++		if (strcmp(argv[i], "vtimer") == 0) {
+ 			test_vtimer();
+-		if (strcmp(argv[i], "ptimer") == 0)
++		} if (strcmp(argv[i], "ptimer") == 0) {
+ 			test_ptimer();
++		} if (strcmp(argv[i], "hvtimer") == 0) {
++			if (current_el == CurrentEL_EL1)
++				report_info("Skipping hvtimer tests. Boot at EL2 to enable.");
++			else
++				test_hvtimer();
++		} if (strcmp(argv[i], "hptimer") == 0) {
++			if (current_el == CurrentEL_EL1)
++				report_info("Skipping hptimer tests. Boot at EL2 to enable.");
++			else
++				test_hptimer();
++		}
+ 	}
+ 
+ 	return report_summary();
 -- 
 2.7.4
 
