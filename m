@@ -2,65 +2,54 @@ Return-Path: <SRS0=VgM6=WY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D45C3A5A4
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 12:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79FA9C3A5A6
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:38:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E21020856
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 12:09:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E21020856
+	by mail.kernel.org (Postfix) with ESMTP id 0240120828
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:38:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0240120828
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8CCE4A56E;
-	Wed, 28 Aug 2019 08:09:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4E84A558;
+	Wed, 28 Aug 2019 09:38:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vdy4ZzLDGD6k; Wed, 28 Aug 2019 08:09:21 -0400 (EDT)
+	with ESMTP id 1BMdVvS7BG2U; Wed, 28 Aug 2019 09:38:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F464A57B;
-	Wed, 28 Aug 2019 08:09:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFEE04A584;
+	Wed, 28 Aug 2019 09:38:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41A974A540
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 08:09:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EB754A559
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:38:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CLWUdcF0eBIj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Aug 2019 08:09:18 -0400 (EDT)
+ with ESMTP id NoPqnvib+5vx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Aug 2019 09:38:50 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 853AD4A332
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 08:09:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 937CF4A520
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:38:50 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CA1D344;
- Wed, 28 Aug 2019 05:09:18 -0700 (PDT)
-Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE7EA3F246;
- Wed, 28 Aug 2019 05:09:16 -0700 (PDT)
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
-To: Christoffer Dall <christoffer.dall@arm.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-2-steven.price@arm.com>
- <20190827085706.GB6541@e113682-lin.lund.arm.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <37eaf54b-8a22-8483-a372-419bfa1475f1@arm.com>
-Date: Wed, 28 Aug 2019 13:09:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190827085706.GB6541@e113682-lin.lund.arm.com>
-Content-Language: en-GB
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14E4628;
+ Wed, 28 Aug 2019 06:38:50 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
+ [10.1.196.217])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E8D313F246;
+ Wed, 28 Aug 2019 06:38:48 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [kvm-unit-tests RFC PATCH 00/16] arm64: Run at EL2
+Date: Wed, 28 Aug 2019 14:38:15 +0100
+Message-Id: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
+Cc: maz@kernel.org, andre.przywara@arm.com, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,179 +61,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/08/2019 09:57, Christoffer Dall wrote:
-> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
->> Introduce a paravirtualization interface for KVM/arm64 based on the
->> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
->>
->> This only adds the details about "Stolen Time" as the details of "Live
->> Physical Time" have not been fully agreed.
->>
->> User space can specify a reserved area of memory for the guest and
->> inform KVM to populate the memory with information on time that the host
->> kernel has stolen from the guest.
->>
->> A hypercall interface is provided for the guest to interrogate the
->> hypervisor's support for this interface and the location of the shared
->> memory structures.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
->>  1 file changed, 100 insertions(+)
->>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
->>
->> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
->> new file mode 100644
->> index 000000000000..1ceb118694e7
->> --- /dev/null
->> +++ b/Documentation/virt/kvm/arm/pvtime.txt
->> @@ -0,0 +1,100 @@
->> +Paravirtualized time support for arm64
->> +======================================
->> +
->> +Arm specification DEN0057/A defined a standard for paravirtualised time
->> +support for AArch64 guests:
->> +
->> +https://developer.arm.com/docs/den0057/a
->> +
->> +KVM/arm64 implements the stolen time part of this specification by providing
->> +some hypervisor service calls to support a paravirtualized guest obtaining a
->> +view of the amount of time stolen from its execution.
->> +
->> +Two new SMCCC compatible hypercalls are defined:
->> +
->> +PV_FEATURES 0xC5000020
->> +PV_TIME_ST  0xC5000022
->> +
->> +These are only available in the SMC64/HVC64 calling convention as
->> +paravirtualized time is not available to 32 bit Arm guests. The existence of
->> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
->> +mechanism before calling it.
->> +
->> +PV_FEATURES
->> +    Function ID:  (uint32)  : 0xC5000020
->> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
->> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-time feature is supported by the hypervisor.
->> +
->> +PV_TIME_ST
->> +    Function ID:  (uint32)  : 0xC5000022
->> +    Return value: (int64)   : IPA of the stolen time data structure for this
->> +                              (V)CPU. On failure:
->> +                              NOT_SUPPORTED (-1)
->> +
->> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
->> +with inner and outer write back caching attributes, in the inner shareable
->> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
->> +meaningfully filled by the hypervisor (see structure below).
->> +
->> +PV_TIME_ST returns the structure for the calling VCPU.
->> +
->> +Stolen Time
->> +-----------
->> +
->> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
->> +
->> +  Field       | Byte Length | Byte Offset | Description
->> +  ----------- | ----------- | ----------- | --------------------------
->> +  Revision    |      4      |      0      | Must be 0 for version 0.1
->> +  Attributes  |      4      |      4      | Must be 0
->> +  Stolen time |      8      |      8      | Stolen time in unsigned
->> +              |             |             | nanoseconds indicating how
->> +              |             |             | much time this VCPU thread
->> +              |             |             | was involuntarily not
->> +              |             |             | running on a physical CPU.
->> +
->> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
->> +will be present within a reserved region of the normal memory given to the
->> +guest. The guest should not attempt to write into this memory. There is a
->> +structure per VCPU of the guest.
->> +
->> +User space interface
->> +====================
->> +
->> +User space can request that KVM provide the paravirtualized time interface to
->> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
->> +
->> +    struct kvm_create_device pvtime_device = {
->> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
->> +            .attr = 0,
->> +            .flags = 0,
->> +    };
->> +
->> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
->> +
->> +Creation of the device should be done after creating the vCPUs of the virtual
->> +machine.
->> +
->> +The IPA of the structures must be given to KVM. This is the base address
->> +of an array of stolen time structures (one for each VCPU). The base address
->> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
->> +multiple of PAGE_SIZE.
->> +
->> +The memory for these structures should be added to the guest in the usual
->> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
->> +
->> +For example:
->> +
->> +    struct kvm_dev_arm_st_region region = {
->> +            .gpa = <IPA of guest base address>,
->> +            .size = <size in bytes>
->> +    };
-> 
-> This feel fragile; how are you handling userspace creating VCPUs after
-> setting this up,
+ARMv8.3 added support for nested virtualization, which makes it possible
+for a hypervisor to run another hypervisor as a guest. Support for nested
+virtualization is being worked on in KVM [1].
 
-In this case as long as the structures all fit within the region created
-VCPUs can be created/destroyed at will. If the VCPU index is too high
-then the kernel will bail out in kvm_update_stolen_time() so the
-structure will not be written. I consider this case as user space
-messing up, so beyond protecting the host from the mess, user space gets
-to keep the pieces.
+This patch series aims to make it possible for kvm-unit-tests to run at EL2
+under KVM. The focus has been on having all the infrastructure in place to
+run at EL2, and not on adding comprehensive tests for this Exception Level.
+All existing tests that fulfill KVM's requirements for a nested guest (the
+architecture is arm64 and they use GICv3) will be able to be run at EL2.
 
-> the GPA overlapping guest memory, etc.
+To keep the changes minimal, kvm-unit-tests will run with VHE enabled when
+it detects that has been booted at EL2. Functions for enabling and
+disabling VHE have been added, with the aim to let the user specify to
+disable VHE for a given test via command-line parameters. At the moment,
+only the timer test has been modified to run with VHE disabled.
 
-Again, the (host) kernel is protected against this, but clearly this
-will end badly for the guest.
+The series are firmly an RFC because:
+* The patches that implement KVM nested support are themselves in the RFC
+  phase.
+* Some tests don't complete because of bugs in the current version of the
+  KVM patches. Where appropriate, I will provide fixes to allow the tests
+  to finish, however those fixes are my own have not been reviewed in any
+  way. Use at your own risk.
 
-> Is the
-> philosophy here that the VMM can mess up the VM if it wants, but that
-> this should never lead attacks on the host (we better hope not) and so
-> we don't care?
+To run the tests, one obviously needs KVM with nested virtualization
+support from [2]. These patches have been tested from commit
+78c66132035c ("arm64: KVM: nv: Allow userspace to request
+KVM_ARM_VCPU_NESTED_VIRT"), on top of which the following patches have been
+cherry-picked from upstream Linux:
+* b4a1583abc83 ("KVM: arm/arm64: Fix emulated ptimer irq injection")
+* 16e604a437c8 ("KVM: arm/arm64: vgic: Reevaluate level sensitive
+  interrupts on enable")
 
-Yes. For things like GPA overlapping guest memory it's not really the
-host's position to work out what is "guest memory". It's quite possible
-that user space could decide to place the stolen time structures right
-in the middle of guest memory - it's just up to user space to inform the
-guest what memory is usable. Obviously the expectation is that the
-shared structures would be positioned "out of the way" in GPA space in
-any normal arrangement.
+Without those two patches some timer tests will fail.
 
-> It seems to me setting the IPA per vcpu throught the VCPU device would
-> avoid a lot of these issues.  See
-> Documentation/virt/kvm/devices/vcpu.txt.
+A version of kvmtool that knows about nested virtualization is also
+needed [3]. The kvmtool --nested parameter is required for releasing a
+guest at EL2. For example, to run the newly added selftest-el2 test:
 
-That is certainly a possibility, I'm not really sure what the benefit is
-though? It would still lead to corner cases:
+lkvm -f selftest.flat -c 2 -m 128 -p el2 --nested --console serial \
+	--irqchip gicv3
 
- * What if only some VCPUs had stolen time setup on them?
- * What if multiple VCPUs pointed to the same location?
- * The structures can still overlap with guest memory
+Summary of the patches:
+* Patches 1-10 are various fixes or enhancements and can be merged without
+  the rest of the series.
+* Patches 11-13 add support for running at EL2. A basic selftest-el2 test
+  is added that targets EL2.
+* Patches 14-16 add support for disabling VHE. The timer and selftest-el2
+  tests are modified to use this feature.
 
-It's also more work to setup in user space with the only "benefit" being
-that user space could choose to organise the structures however it sees
-fit (e.g. no need for them to be contiguous in memory). But I'm not sure
-I see a use case for that flexibility.
+[1] https://www.spinics.net/lists/arm-kernel/msg736687.html
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-wip-5.2-rc5
+[3] git://linux-arm.org/kvmtool.git nv/nv-wip-5.2-rc5
 
-Perhaps there's some benefit I'm not seeing?
+Alexandru Elisei (16):
+  arm: selftest.c: Remove redundant check for Exception Level
+  arm/arm64: psci: Don't run C code without stack or vectors
+  lib: arm/arm64: Add missing include for alloc_page.h in pgtable.h
+  arm/arm64: selftest: Add prefetch abort test
+  arm64: timer: Write to ICENABLER to disable timer IRQ
+  arm64: timer: EOIR the interrupt after masking the timer
+  arm64: timer: Test behavior when timer disabled or masked
+  lib: arm/arm64: Refuse to disable the MMU with non-identity stack
+    pointer
+  lib: arm/arm64: Invalidate TLB before enabling MMU
+  lib: Add UL and ULL definitions to linux/const.h
+  lib: arm64: Run existing tests at EL2
+  arm64: timer: Add test for EL2 timers
+  arm64: selftest: Add basic test for EL2
+  lib: arm64: Add support for disabling and re-enabling VHE
+  arm64: selftest: Expand EL2 test to disable and re-enable VHE
+  arm64: timer: Run tests with VHE disabled
 
-Steve
+ lib/linux/const.h             |   7 +-
+ lib/arm/asm/gic-v3.h          |   1 +
+ lib/arm/asm/gic.h             |   1 +
+ lib/arm/asm/pgtable.h         |   1 +
+ lib/arm/asm/processor.h       |   8 +
+ lib/arm/asm/psci.h            |   1 +
+ lib/arm64/asm/esr.h           |   5 +
+ lib/arm64/asm/mmu.h           |  11 +-
+ lib/arm64/asm/pgtable-hwdef.h |  55 +++++--
+ lib/arm64/asm/pgtable.h       |   1 +
+ lib/arm64/asm/processor.h     |  53 +++++++
+ lib/arm64/asm/sysreg.h        |  28 ++++
+ lib/arm/mmu.c                 |   5 +-
+ lib/arm/processor.c           |  11 ++
+ lib/arm/psci.c                |  43 +++++-
+ lib/arm/setup.c               |   6 +
+ lib/arm64/processor.c         |  69 ++++++++-
+ arm/cstart.S                  |  11 ++
+ arm/cstart64.S                | 221 ++++++++++++++++++++++++++-
+ arm/micro-bench.c             |  17 ++-
+ arm/psci.c                    |   5 +-
+ arm/selftest.c                | 175 ++++++++++++++++++++--
+ arm/timer.c                   | 340 +++++++++++++++++++++++++++++++++++++-----
+ arm/unittests.cfg             |   8 +
+ 24 files changed, 1010 insertions(+), 73 deletions(-)
+
+-- 
+2.7.4
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
