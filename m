@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A88A5C3A5A7
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 11:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D45C3A5A4
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 12:09:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 331C32173E
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 11:23:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331C32173E
+	by mail.kernel.org (Postfix) with ESMTP id 7E21020856
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 12:09:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E21020856
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CAFD4A551;
-	Wed, 28 Aug 2019 07:23:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8CCE4A56E;
+	Wed, 28 Aug 2019 08:09:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z9a1Wv3JJ9u1; Wed, 28 Aug 2019 07:23:56 -0400 (EDT)
+	with ESMTP id Vdy4ZzLDGD6k; Wed, 28 Aug 2019 08:09:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28CD24A557;
-	Wed, 28 Aug 2019 07:23:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F464A57B;
+	Wed, 28 Aug 2019 08:09:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F41E4A551
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 07:23:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41A974A540
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 08:09:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A-W6YqN73789 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Aug 2019 07:23:53 -0400 (EDT)
+ with ESMTP id CLWUdcF0eBIj for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Aug 2019 08:09:18 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A432C4A4F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 07:23:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 853AD4A332
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 08:09:18 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DAD1344;
- Wed, 28 Aug 2019 04:23:53 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CA1D344;
+ Wed, 28 Aug 2019 05:09:18 -0700 (PDT)
 Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC9EB3F246;
- Wed, 28 Aug 2019 04:23:51 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE7EA3F246;
+ Wed, 28 Aug 2019 05:09:16 -0700 (PDT)
 Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
 To: Christoffer Dall <christoffer.dall@arm.com>
 References: <20190821153656.33429-1-steven.price@arm.com>
  <20190821153656.33429-2-steven.price@arm.com>
- <20190827084407.GA6541@e113682-lin.lund.arm.com>
+ <20190827085706.GB6541@e113682-lin.lund.arm.com>
 From: Steven Price <steven.price@arm.com>
-Message-ID: <28c3248e-1d63-dac6-d2b0-4422025c1376@arm.com>
-Date: Wed, 28 Aug 2019 12:23:50 +0100
+Message-ID: <37eaf54b-8a22-8483-a372-419bfa1475f1@arm.com>
+Date: Wed, 28 Aug 2019 13:09:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190827084407.GA6541@e113682-lin.lund.arm.com>
+In-Reply-To: <20190827085706.GB6541@e113682-lin.lund.arm.com>
 Content-Language: en-GB
 Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
  Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
@@ -77,7 +77,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/08/2019 09:44, Christoffer Dall wrote:
+On 27/08/2019 09:57, Christoffer Dall wrote:
 > On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
 >> Introduce a paravirtualization interface for KVM/arm64 based on the
 >> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
@@ -172,17 +172,6 @@ On 27/08/2019 09:44, Christoffer Dall wrote:
 >> +User space can request that KVM provide the paravirtualized time interface to
 >> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
 >> +
-> 
-> I feel it would be more consistent to have the details of this in
-> Documentation/virt/kvm/devices/arm-pv-time.txt and refer to this
-> document from here.
-
-Fair point - I'll move this lower part of the document and add a reference.
-
-Thanks,
-
-Steve
-
 >> +    struct kvm_create_device pvtime_device = {
 >> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
 >> +            .attr = 0,
@@ -208,23 +197,54 @@ Steve
 >> +            .gpa = <IPA of guest base address>,
 >> +            .size = <size in bytes>
 >> +    };
->> +
->> +    struct kvm_device_attr st_base = {
->> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
->> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
->> +            .addr = (u64)&region
->> +    };
->> +
->> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
->> -- 
->> 2.20.1
->>
 > 
-> Thanks,
-> 
->     Christoffer
-> 
+> This feel fragile; how are you handling userspace creating VCPUs after
+> setting this up,
 
+In this case as long as the structures all fit within the region created
+VCPUs can be created/destroyed at will. If the VCPU index is too high
+then the kernel will bail out in kvm_update_stolen_time() so the
+structure will not be written. I consider this case as user space
+messing up, so beyond protecting the host from the mess, user space gets
+to keep the pieces.
+
+> the GPA overlapping guest memory, etc.
+
+Again, the (host) kernel is protected against this, but clearly this
+will end badly for the guest.
+
+> Is the
+> philosophy here that the VMM can mess up the VM if it wants, but that
+> this should never lead attacks on the host (we better hope not) and so
+> we don't care?
+
+Yes. For things like GPA overlapping guest memory it's not really the
+host's position to work out what is "guest memory". It's quite possible
+that user space could decide to place the stolen time structures right
+in the middle of guest memory - it's just up to user space to inform the
+guest what memory is usable. Obviously the expectation is that the
+shared structures would be positioned "out of the way" in GPA space in
+any normal arrangement.
+
+> It seems to me setting the IPA per vcpu throught the VCPU device would
+> avoid a lot of these issues.  See
+> Documentation/virt/kvm/devices/vcpu.txt.
+
+That is certainly a possibility, I'm not really sure what the benefit is
+though? It would still lead to corner cases:
+
+ * What if only some VCPUs had stolen time setup on them?
+ * What if multiple VCPUs pointed to the same location?
+ * The structures can still overlap with guest memory
+
+It's also more work to setup in user space with the only "benefit" being
+that user space could choose to organise the structures however it sees
+fit (e.g. no need for them to be contiguous in memory). But I'm not sure
+I see a use case for that flexibility.
+
+Perhaps there's some benefit I'm not seeing?
+
+Steve
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
