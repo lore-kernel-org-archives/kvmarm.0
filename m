@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7D2C3A5A4
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BDEC3A5A1
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 608C623403
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608C623403
+	by mail.kernel.org (Postfix) with ESMTP id 7972222CF8
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Aug 2019 13:39:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7972222CF8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18BBD4A5AC;
-	Wed, 28 Aug 2019 09:39:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 302C14A587;
+	Wed, 28 Aug 2019 09:39:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rZx701UHI8OK; Wed, 28 Aug 2019 09:39:12 -0400 (EDT)
+	with ESMTP id b3vTttq3DgTJ; Wed, 28 Aug 2019 09:39:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94FB84A5EA;
-	Wed, 28 Aug 2019 09:39:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBD9C4A58D;
+	Wed, 28 Aug 2019 09:39:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1AD24A594
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A02C4A5A1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RJZDz2Vah1mv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Aug 2019 09:39:08 -0400 (EDT)
+ with ESMTP id 6lu0ZISYlmgL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Aug 2019 09:39:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B00AB4A599
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ECD54A58C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Aug 2019 09:39:09 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71E42360;
- Wed, 28 Aug 2019 06:39:06 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2244D1570;
+ Wed, 28 Aug 2019 06:39:09 -0700 (PDT)
 Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com
  [10.1.196.217])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5319C3F246;
- Wed, 28 Aug 2019 06:39:05 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 042AD3F246;
+ Wed, 28 Aug 2019 06:39:07 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu
-Subject: [kvm-unit-tests RFC PATCH 12/16] arm64: timer: Add test for EL2 timers
-Date: Wed, 28 Aug 2019 14:38:27 +0100
-Message-Id: <1566999511-24916-13-git-send-email-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 14/16] lib: arm64: Add support for
+ disabling and re-enabling VHE
+Date: Wed, 28 Aug 2019 14:38:29 +0100
+Message-Id: <1566999511-24916-15-git-send-email-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
 References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
@@ -70,270 +71,593 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When VHE is available, EL2 has two extra timers, the physical and virtual
-EL2 timers. Extend the timer test to include them.
+Add a function to disable VHE and another one to re-enable VHE. Both
+functions work under the assumption that the CPU had VHE mode enabled at
+boot.
+
+Minimal support to run with VHE has been added to the TLB invalidate
+functions and to the exception handling code.
+
+Since we're touch the assembly enable/disable MMU code, let's take this
+opportunity to replace a magic number with the proper define.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
-I'm seeing three failed tests when running at EL2, I'm investigating those
-to figure out if it's KVM or kvm-unit-tests related.
+ lib/arm/asm/processor.h       |   8 ++
+ lib/arm64/asm/mmu.h           |  11 ++-
+ lib/arm64/asm/pgtable-hwdef.h |  53 +++++++++---
+ lib/arm64/asm/processor.h     |  44 +++++++++-
+ lib/arm/processor.c           |  11 +++
+ lib/arm/setup.c               |   2 +
+ lib/arm64/processor.c         |  67 ++++++++++++++-
+ arm/cstart64.S                | 186 +++++++++++++++++++++++++++++++++++++++++-
+ 8 files changed, 364 insertions(+), 18 deletions(-)
 
- lib/arm64/asm/sysreg.h |   8 +++
- arm/timer.c            | 150 +++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 154 insertions(+), 4 deletions(-)
-
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index ed407f93330d..02054fbe2763 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -19,6 +19,14 @@
- #define SYS_CNTV_CTL_EL02	sys_reg(3, 5, 14, 3, 1)
- #define SYS_CNTV_CVAL_EL02	sys_reg(3, 5, 14, 3, 2)
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index a8c4628da818..d5df869b2e6f 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -9,6 +9,11 @@
+ #include <asm/sysreg.h>
+ #include <asm/barrier.h>
  
-+#define SYS_CNTHP_TVAL_EL2	sys_reg(3, 4, 14, 2, 0)
-+#define SYS_CNTHP_CTL_EL2	sys_reg(3, 4, 14, 2, 1)
-+#define SYS_CNTHP_CVAL_EL2	sys_reg(3, 4, 14, 2, 2)
++#define CTR_DMINLINE_SHIFT	16
++#define CTR_DMINLINE_MASK	(0xf << 16)
++#define CTR_DMINLINE(x)	\
++	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
 +
-+#define SYS_CNTHV_TVAL_EL2	sys_reg(3, 4, 14, 3, 0)
-+#define SYS_CNTHV_CTL_EL2	sys_reg(3, 4, 14, 3, 1)
-+#define SYS_CNTHV_CVAL_EL2	sys_reg(3, 4, 14, 3, 2)
-+
- #ifdef __ASSEMBLY__
- 	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
- 	.equ	.L__reg_num_x\num, \num
-diff --git a/arm/timer.c b/arm/timer.c
-index 29477ee65878..faab671d0fb1 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -23,6 +23,8 @@ static void *gic_icenabler;
+ enum vector {
+ 	EXCPTN_RST,
+ 	EXCPTN_UND,
+@@ -26,6 +31,9 @@ extern void install_exception_handler(enum vector v, exception_fn fn);
  
- static bool ptimer_unsupported;
+ extern void show_regs(struct pt_regs *regs);
  
-+static int current_el;
++extern unsigned int dcache_line_size;
++extern void set_dcache_line_size(void);
 +
- static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
+ static inline unsigned long current_cpsr(void)
  {
- 	ptimer_unsupported = true;
-@@ -159,6 +161,66 @@ static void write_ptimer_ctl_vhe(u64 val)
- 	write_sysreg_s(val, SYS_CNTP_CTL_EL02);
+ 	unsigned long cpsr;
+diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
+index fa554b0c20ae..6ce6c8958910 100644
+--- a/lib/arm64/asm/mmu.h
++++ b/lib/arm64/asm/mmu.h
+@@ -6,6 +6,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ #include <asm/barrier.h>
++#include <asm/processor.h>
+ 
+ #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
+ #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
+@@ -13,7 +14,10 @@
+ static inline void flush_tlb_all(void)
+ {
+ 	dsb(ishst);
+-	asm("tlbi	vmalle1is");
++	if (current_level() == CurrentEL_EL2 && !cpu_el2_e2h_is_set())
++		asm("tlbi	alle2is");
++	else
++		asm("tlbi	vmalle1is");
+ 	dsb(ish);
+ 	isb();
+ }
+@@ -22,7 +26,10 @@ static inline void flush_tlb_page(unsigned long vaddr)
+ {
+ 	unsigned long page = vaddr >> 12;
+ 	dsb(ishst);
+-	asm("tlbi	vaae1is, %0" :: "r" (page));
++	if (current_level() == CurrentEL_EL2 && !cpu_el2_e2h_is_set())
++		asm("tlbi	vae2is, %0" :: "r" (page));
++	else
++		asm("tlbi	vaae1is, %0" :: "r" (page));
+ 	dsb(ish);
  }
  
-+static u64 read_hvtimer_cval(void)
-+{
-+	return read_sysreg_s(SYS_CNTHV_CVAL_EL2);
-+}
-+
-+static void write_hvtimer_cval(u64 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHV_CVAL_EL2);
-+}
-+
-+static s32 read_hvtimer_tval(void)
-+{
-+	return read_sysreg_s(SYS_CNTHV_TVAL_EL2);
-+}
-+
-+static void write_hvtimer_tval(s32 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHV_TVAL_EL2);
-+}
-+
-+static u64 read_hvtimer_ctl(void)
-+{
-+	return read_sysreg_s(SYS_CNTHV_CTL_EL2);
-+}
-+
-+static void write_hvtimer_ctl(u64 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHV_CTL_EL2);
-+}
-+
-+static u64 read_hptimer_cval(void)
-+{
-+	return read_sysreg_s(SYS_CNTHP_CVAL_EL2);
-+}
-+
-+static void write_hptimer_cval(u64 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHP_CVAL_EL2);
-+}
-+
-+static s32 read_hptimer_tval(void)
-+{
-+	return read_sysreg_s(SYS_CNTHP_TVAL_EL2);
-+}
-+
-+static void write_hptimer_tval(s32 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHP_TVAL_EL2);
-+}
-+
-+static u64 read_hptimer_ctl(void)
-+{
-+	return read_sysreg_s(SYS_CNTHP_CTL_EL2);
-+}
-+
-+static void write_hptimer_ctl(u64 val)
-+{
-+	write_sysreg_s(val, SYS_CNTHP_CTL_EL2);
-+}
-+
- struct timer_info {
- 	u32 irq;
- 	u32 irq_flags;
-@@ -216,7 +278,29 @@ static struct timer_info ptimer_info_vhe = {
- 	.write_ctl = write_ptimer_ctl_vhe,
- };
+diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
+index e6f02fae4075..83364ccc28da 100644
+--- a/lib/arm64/asm/pgtable-hwdef.h
++++ b/lib/arm64/asm/pgtable-hwdef.h
+@@ -93,18 +93,42 @@
+ /*
+  * TCR flags.
+  */
+-#define TCR_TxSZ(x)		(((UL(64) - (x)) << 16) | ((UL(64) - (x)) << 0))
+-#define TCR_IRGN_NC		((UL(0) << 8) | (UL(0) << 24))
+-#define TCR_IRGN_WBWA		((UL(1) << 8) | (UL(1) << 24))
+-#define TCR_IRGN_WT		((UL(2) << 8) | (UL(2) << 24))
+-#define TCR_IRGN_WBnWA		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_IRGN_MASK		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_ORGN_NC		((UL(0) << 10) | (UL(0) << 26))
+-#define TCR_ORGN_WBWA		((UL(1) << 10) | (UL(1) << 26))
+-#define TCR_ORGN_WT		((UL(2) << 10) | (UL(2) << 26))
+-#define TCR_ORGN_WBnWA		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_ORGN_MASK		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_SHARED		((UL(3) << 12) | (UL(3) << 28))
++#define TCR_T0SZ(x)		((UL(64) - (x)) << 0)
++#define TCR_T1SZ(x)		((UL(64) - (x)) << 16)
++#define TCR_TxSZ(x)		(TCR_T0SZ(x) | TCR_T1SZ(x))
++#define TCR_IRGN0_NC		(UL(0) << 8)
++#define TCR_IRGN1_NC		(UL(0) << 24)
++#define TCR_IRGN_NC		(TCR_IRGN0_NC | TCR_IRGN1_NC)
++#define TCR_IRGN0_WBWA		(UL(1) << 8)
++#define TCR_IRGN1_WBWA		(UL(1) << 24)
++#define TCR_IRGN_WBWA		(TCR_IRGN0_WBWA | TCR_IRGN1_WBWA)
++#define TCR_IRGN0_WT		(UL(2) << 8)
++#define TCR_IRGN1_WT		(UL(2) << 24)
++#define TCR_IRGN_WT		(TCR_IRGN0_WT | TCR_IRGN1_WT)
++#define TCR_IRGN0_WBnWA		(UL(3) << 8)
++#define TCR_IRGN1_WBnWA		(UL(3) << 24)
++#define TCR_IRGN_WBnWA		(TCR_IRGN0_WBnWA | TCR_IRGN1_WBnWA)
++#define TCR_IRGN0_MASK		(UL(3) << 8)
++#define TCR_IRGN1_MASK		(UL(3) << 24)
++#define TCR_IRGN_MASK		(TCR_IRGN0_MASK | TCR_IRGN1_MASK)
++#define TCR_ORGN0_NC		(UL(0) << 10)
++#define TCR_ORGN1_NC		(UL(0) << 26)
++#define TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
++#define TCR_ORGN0_WBWA		(UL(1) << 10)
++#define TCR_ORGN1_WBWA		(UL(1) << 26)
++#define TCR_ORGN_WBWA		(TCR_ORGN0_WBWA | TCR_ORGN1_WBWA)
++#define TCR_ORGN0_WT		(UL(2) << 10)
++#define TCR_ORGN1_WT		(UL(2) << 26)
++#define TCR_ORGN_WT		(TCR_ORGN0_WT | TCR_ORGN1_WT)
++#define TCR_ORGN0_WBnWA		(UL(3) << 8)
++#define TCR_ORGN1_WBnWA		(UL(3) << 24)
++#define TCR_ORGN_WBnWA		(TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
++#define TCR_ORGN0_MASK		(UL(3) << 10)
++#define TCR_ORGN1_MASK		(UL(3) << 26)
++#define TCR_ORGN_MASK		(TCR_ORGN0_MASK | TCR_ORGN1_MASK)
++#define TCR_SH0_IS		(UL(3) << 12)
++#define TCR_SH1_IS		(UL(3) << 28)
++#define TCR_SHARED		(TCR_SH0_IS | TCR_SH1_IS)
+ #define TCR_TG0_4K		(UL(0) << 14)
+ #define TCR_TG0_64K		(UL(1) << 14)
+ #define TCR_TG0_16K		(UL(2) << 14)
+@@ -114,6 +138,11 @@
+ #define TCR_ASID16		(UL(1) << 36)
+ #define TCR_TBI0		(UL(1) << 37)
  
--static struct timer_info *vtimer, *ptimer;
-+static struct timer_info hvtimer_info = {
-+	.irq_received = false,
-+	.read_counter = read_vtimer_counter,
-+	.read_cval = read_hvtimer_cval,
-+	.write_cval = write_hvtimer_cval,
-+	.read_tval = read_hvtimer_tval,
-+	.write_tval = write_hvtimer_tval,
-+	.read_ctl = read_hvtimer_ctl,
-+	.write_ctl = write_hvtimer_ctl,
-+};
++#define TCR_EL1_IPS_SHIFT	32
 +
-+static struct timer_info hptimer_info = {
-+	.irq_received = false,
-+	.read_counter = read_ptimer_counter,
-+	.read_cval = read_hptimer_cval,
-+	.write_cval = write_hptimer_cval,
-+	.read_tval = read_hptimer_tval,
-+	.write_tval = write_hptimer_tval,
-+	.read_ctl = read_hptimer_ctl,
-+	.write_ctl = write_hptimer_ctl,
-+};
++#define TCR_EL2_RES1		((UL(1) << 31) | (UL(1) << 23))
++#define TCR_EL2_PS_SHIFT	16
 +
-+static struct timer_info *vtimer, *ptimer, *hvtimer, *hptimer;
+ /*
+  * Memory types available.
+  */
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index b9058f140039..4d12913ca01f 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -18,8 +18,20 @@
+ #define SCTLR_EL1_A	(1 << 1)
+ #define SCTLR_EL1_M	(1 << 0)
  
- static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
+-#define HCR_EL2_TGE	(1 << 27)
+-#define HCR_EL2_E2H	(UL(1) << 34)
++#define CTR_EL0_DMINLINE_SHIFT	16
++#define CTR_EL0_DMINLINE_MASK	(0xf << 16)
++#define CTR_EL0_DMINLINE(x)	\
++	(((x) & CTR_EL0_DMINLINE_MASK) >> CTR_EL0_DMINLINE_SHIFT)
++
++#define HCR_EL2_TGE		(1 << 27)
++#define HCR_EL2_E2H_SHIFT	34
++#define HCR_EL2_E2H		(UL(1) << 34)
++
++#define SCTLR_EL2_RES1		(3 << 28 | 3 << 22 | 1 << 18 |	\
++				 1 << 16 | 1 << 11 | 3 << 4)
++#define SCTLR_EL2_I		SCTLR_EL1_I
++#define SCTLR_EL2_C		SCTLR_EL1_C
++#define SCTLR_EL2_M		SCTLR_EL1_M
+ 
+ #ifndef __ASSEMBLY__
+ #include <asm/ptrace.h>
+@@ -66,6 +78,12 @@ extern void vector_handlers_default_init(vector_fn *handlers);
+ extern void show_regs(struct pt_regs *regs);
+ extern bool get_far(unsigned int esr, unsigned long *far);
+ 
++extern unsigned int dcache_line_size;
++extern void set_dcache_line_size(void);
++
++extern void disable_vhe(void);
++extern void enable_vhe(void);
++
+ static inline unsigned long current_level(void)
  {
-@@ -241,6 +325,10 @@ static void irq_handler(struct pt_regs *regs)
- 		info = vtimer;
- 	} else if (irqnr == PPI(ptimer->irq)) {
- 		info = ptimer;
-+	} else if (current_el == CurrentEL_EL2 && irqnr == PPI(hptimer->irq)) {
-+		info = hptimer;
-+	} else if (current_el == CurrentEL_EL2 && irqnr == PPI(hvtimer->irq)) {
-+		info = hvtimer;
- 	} else {
- 		report_info("Unexpected interrupt: %d\n", irqnr);
- 		return;
-@@ -362,6 +450,20 @@ static void test_ptimer(void)
- 	report_prefix_pop();
+ 	unsigned long el;
+@@ -116,5 +134,27 @@ static inline bool vhe_enabled(void)
+ 	return (hcr & HCR_EL2_E2H) && (hcr & HCR_EL2_TGE);
  }
  
-+static void test_hvtimer(void)
++static inline bool cpu_el2_e2h_is_set(void)
 +{
-+	report_prefix_push("hvtimer-busy-loop");
-+	test_timer(hvtimer);
-+	report_prefix_pop();
++	return read_sysreg(hcr_el2) & HCR_EL2_E2H;
 +}
 +
-+static void test_hptimer(void)
-+{
-+	report_prefix_push("hptimer-busy-loop");
-+	test_timer(hptimer);
-+	report_prefix_pop();
-+}
++#define dcache_by_line_op(op, start, end)	\
++	asm volatile(	"1:\n"			\
++			"dc	" #op ", %0\n"	\
++			"add	%0, %0, %2\n"	\
++			"cmp	%0, %1\n"	\
++			"b.lo	1b\n"		\
++			"dsb	ish\n"		\
++			:: "r" (start),		\
++			   "r" (end),		\
++			   "r" (dcache_line_size))
 +
- static void test_init(void)
++#define dcache_inval_range(start, end)		\
++	dcache_by_line_op(ivac, start, end)
++
++#define dcache_clean_inval_range(start, end)	\
++	dcache_by_line_op(civac, start, end)
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM64_PROCESSOR_H_ */
+diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+index 773337e6d3b7..927b77041e29 100644
+--- a/lib/arm/processor.c
++++ b/lib/arm/processor.c
+@@ -10,6 +10,8 @@
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
+ 
++unsigned int dcache_line_size;
++
+ static const char *processor_modes[] = {
+ 	"USER_26", "FIQ_26" , "IRQ_26" , "SVC_26" ,
+ 	"UK4_26" , "UK5_26" , "UK6_26" , "UK7_26" ,
+@@ -145,3 +147,12 @@ bool is_user(void)
  {
- 	const struct fdt_property *prop;
-@@ -369,12 +471,14 @@ static void test_init(void)
- 	int node, len;
- 	u32 *data;
- 
--	if (current_level() == CurrentEL_EL1) {
-+	if (current_el == CurrentEL_EL1) {
- 		vtimer = &vtimer_info;
- 		ptimer = &ptimer_info;
- 	} else {
- 		vtimer = &vtimer_info_vhe;
- 		ptimer = &ptimer_info_vhe;
-+		hvtimer = &hvtimer_info;
-+		hptimer = &hptimer_info;
- 	}
- 
- 	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
-@@ -390,6 +494,19 @@ static void test_init(void)
- 	vtimer->irq = fdt32_to_cpu(data[7]);
- 	vtimer->irq_flags = fdt32_to_cpu(data[8]);
- 
-+	if (current_el == CurrentEL_EL2) {
-+		assert(fdt32_to_cpu(data[9]) == 1);
-+		hptimer->irq = fdt32_to_cpu(data[10]);
-+		hptimer->irq_flags = fdt32_to_cpu(data[11]);
-+		/* The hvtimer is not in the DT, assume KVM default. */
-+		hvtimer->irq = 28;
-+		/*
-+		 * With VHE, accesses to the vtimer are redirected to the
-+		 * hvtimer. They should have the same interrupt properties.
-+		 */
-+		hvtimer->irq_flags = vtimer->irq_flags;
-+	}
+ 	return current_thread_info()->flags & TIF_USER_MODE;
+ }
 +
- 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
- 	ptimer->read_ctl();
- 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, NULL);
-@@ -433,12 +550,22 @@ static void print_timer_info(void)
- 	printf("CNTVCT_EL0   : 0x%016lx\n", vtimer->read_counter());
- 	printf("CNTV_CTL_EL0 : 0x%016lx\n", vtimer->read_ctl());
- 	printf("CNTV_CVAL_EL0: 0x%016lx\n", vtimer->read_cval());
++void set_dcache_line_size(void)
++{
++	u32 ctr;
 +
-+	if (current_el == CurrentEL_EL2) {
-+		printf("CNTHP_CTL_EL0 : 0x%016lx\n", hptimer->read_ctl());
-+		printf("CNTHP_CVAL_EL0: 0x%016lx\n", hptimer->read_cval());
-+
-+		printf("CNTHV_CTL_EL0 : 0x%016lx\n", hvtimer->read_ctl());
-+		printf("CNTHV_CVAL_EL0: 0x%016lx\n", hvtimer->read_cval());
-+	}
++	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
++	/* DminLine is log2 of the number of words in the smallest cache line */
++	dcache_line_size = (1 << CTR_DMINLINE(ctr)) * 4;
++}
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 9253d2f886d9..1d4f35429740 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -22,6 +22,7 @@
+ #include <asm/page.h>
+ #include <asm/psci.h>
+ #include <asm/smp.h>
++#include <asm/processor.h>
+ 
+ #include "io.h"
+ 
+@@ -64,6 +65,7 @@ static void cpu_init(void)
+ 	ret = dt_for_each_cpu_node(cpu_set, NULL);
+ 	assert(ret == 0);
+ 	set_cpu_online(0, true);
++	set_dcache_line_size();
  }
  
- int main(int argc, char **argv)
- {
- 	int i;
+ static void mem_init(phys_addr_t freemem_start)
+diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+index 1ff997112314..d343798f7613 100644
+--- a/lib/arm64/processor.c
++++ b/lib/arm64/processor.c
+@@ -10,6 +10,8 @@
+ #include <asm/processor.h>
+ #include <asm/thread_info.h>
  
-+	current_el = current_level();
++unsigned int dcache_line_size;
 +
- 	test_init();
+ static const char *vector_names[] = {
+ 	"el1t_sync",
+ 	"el1t_irq",
+@@ -84,7 +86,10 @@ bool get_far(unsigned int esr, unsigned long *far)
+ {
+ 	unsigned int ec = esr >> ESR_EL1_EC_SHIFT;
  
- 	print_timer_info();
-@@ -446,13 +573,28 @@ int main(int argc, char **argv)
- 	if (argc == 1) {
- 		test_vtimer();
- 		test_ptimer();
-+		if (current_el == CurrentEL_EL2) {
-+			test_hvtimer();
-+			test_hptimer();
-+		}
- 	}
+-	asm volatile("mrs %0, far_el1": "=r" (*far));
++	if (current_level() == CurrentEL_EL2 && !cpu_el2_e2h_is_set())
++		asm volatile("mrs %0, far_el2": "=r" (*far));
++	else
++		asm volatile("mrs %0, far_el1": "=r" (*far));
  
- 	for (i = 1; i < argc; ++i) {
--		if (strcmp(argv[i], "vtimer") == 0)
-+		if (strcmp(argv[i], "vtimer") == 0) {
- 			test_vtimer();
--		if (strcmp(argv[i], "ptimer") == 0)
-+		} if (strcmp(argv[i], "ptimer") == 0) {
- 			test_ptimer();
-+		} if (strcmp(argv[i], "hvtimer") == 0) {
-+			if (current_el == CurrentEL_EL1)
-+				report_info("Skipping hvtimer tests. Boot at EL2 to enable.");
-+			else
-+				test_hvtimer();
-+		} if (strcmp(argv[i], "hptimer") == 0) {
-+			if (current_el == CurrentEL_EL1)
-+				report_info("Skipping hptimer tests. Boot at EL2 to enable.");
-+			else
-+				test_hptimer();
-+		}
- 	}
+ 	switch (ec) {
+ 	case ESR_EL1_EC_IABT_EL0:
+@@ -259,3 +264,63 @@ bool is_user(void)
+ {
+ 	return current_thread_info()->flags & TIF_USER_MODE;
+ }
++
++void set_dcache_line_size(void)
++{
++	u64 ctr;
++
++	ctr = read_sysreg(ctr_el0);
++	/* DminLine is log2 of the number of words in the smallest cache line */
++	dcache_line_size = (1 << CTR_EL0_DMINLINE(ctr)) * 4;
++}
++
++extern void asm_disable_vhe(void);
++void disable_vhe(void)
++{
++	u64 sp, sp_phys, sp_base, sp_base_phys;
++
++	assert(current_level() == CurrentEL_EL2 && vhe_enabled());
++
++	sp = current_stack_pointer;
++	sp_phys = __virt_to_phys(sp);
++	sp_base = sp & THREAD_MASK;
++	sp_base_phys = sp_phys & THREAD_MASK;
++
++	/*
++	 * We will disable, then enable the MMU, make sure the exception
++	 * handling code works during the small window of time when the MMU is
++	 * off.
++	 */
++	dcache_clean_inval_range(sp_base, sp_base + THREAD_SIZE);
++	dcache_inval_range(sp_base_phys, sp_base_phys + THREAD_SIZE);
++	asm volatile(	"mov	sp, %0\n" : :"r" (sp_phys));
++
++	asm_disable_vhe();
++
++	dcache_clean_inval_range(sp_base_phys, sp_base_phys + THREAD_SIZE);
++	dcache_inval_range(sp_base, sp_base + THREAD_SIZE);
++	asm volatile(	"mov	sp, %0\n" : :"r" (sp));
++}
++
++extern void asm_enable_vhe(void);
++void enable_vhe(void)
++{
++	u64 sp, sp_phys, sp_base, sp_base_phys;
++
++	assert(current_level() == CurrentEL_EL2 && !vhe_enabled());
++
++	sp = current_stack_pointer;
++	sp_phys = __virt_to_phys(sp);
++	sp_base = sp & THREAD_MASK;
++	sp_base_phys = sp_phys & THREAD_MASK;
++
++	dcache_clean_inval_range(sp_base, sp_base + THREAD_SIZE);
++	dcache_inval_range(sp_base_phys, sp_base_phys + THREAD_SIZE);
++	asm volatile(	"mov	sp, %0\n" : :"r" (sp_phys));
++
++	asm_enable_vhe();
++
++	dcache_clean_inval_range(sp_base_phys, sp_base_phys + THREAD_SIZE);
++	dcache_inval_range(sp_base, sp_base + THREAD_SIZE);
++	asm volatile(	"mov	sp, %0\n" : :"r" (sp));
++}
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index d4b20267a7a6..dc9e634e2307 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -104,6 +104,13 @@ exceptions_init:
  
- 	return report_summary();
+ .text
+ 
++exceptions_init_nvhe:
++	adrp	x0, vector_table_nvhe
++	add	x0, x0, :lo12:vector_table_nvhe
++	msr	vbar_el2, x0
++	isb
++	ret
++
+ .globl get_mmu_off
+ get_mmu_off:
+ 	adrp	x0, auxinfo
+@@ -204,7 +211,7 @@ asm_mmu_enable:
+ 		     TCR_IRGN_WBWA | TCR_ORGN_WBWA |	\
+ 		     TCR_SHARED
+ 	mrs	x2, id_aa64mmfr0_el1
+-	bfi	x1, x2, #32, #3
++	bfi	x1, x2, #TCR_EL1_IPS_SHIFT, #3
+ 	msr	tcr_el1, x1
+ 
+ 	/* MAIR */
+@@ -229,6 +236,33 @@ asm_mmu_enable:
+ 
+ 	ret
+ 
++asm_mmu_enable_nvhe:
++	ic      iallu
++	tlbi    alle2is
++	dsb     ish
++
++        /* TCR */
++	ldr	x1, =TCR_EL2_RES1 | 			\
++		     TCR_T0SZ(VA_BITS) |		\
++		     TCR_TG0_64K |                      \
++		     TCR_IRGN0_WBWA | TCR_ORGN0_WBWA |	\
++		     TCR_SH0_IS
++	mrs	x2, id_aa64mmfr0_el1
++	bfi	x1, x2, #TCR_EL2_PS_SHIFT, #3
++	msr	tcr_el2, x1
++
++	/* Same MAIR and TTBR0 as in VHE mode */
++
++	/* SCTLR */
++	ldr	x1, =SCTLR_EL2_RES1 |			\
++		     SCTLR_EL2_C | 			\
++		     SCTLR_EL2_I | 			\
++		     SCTLR_EL2_M
++	msr	sctlr_el2, x1
++	isb
++
++	ret
++
+ .globl asm_mmu_disable
+ asm_mmu_disable:
+ 	mrs	x0, sctlr_el1
+@@ -237,6 +271,48 @@ asm_mmu_disable:
+ 	isb
+ 	ret
+ 
++asm_mmu_disable_nvhe:
++	mrs	x0, sctlr_el2
++	bic	x0, x0, SCTLR_EL2_M
++	msr	sctlr_el2, x0
++	isb
++	ret
++
++.globl asm_disable_vhe
++asm_disable_vhe:
++	str	x30, [sp, #-16]!
++
++	bl	asm_mmu_disable
++	/*
++	 * This goes *before* disabling VHE because using the _EL2 registers is
++	 * always correct, but using _EL1 registers is not when VHE is off.
++	 */
++	bl	exceptions_init_nvhe
++	msr	hcr_el2, xzr
++	isb
++	bl	asm_mmu_enable_nvhe
++
++	ldr	x30, [sp], #16
++	ret
++
++.globl asm_enable_vhe
++asm_enable_vhe:
++	str	x30, [sp, #-16]!
++
++	bl	asm_mmu_disable_nvhe
++	ldr	x0, =(HCR_EL2_E2H | HCR_EL2_TGE)
++	msr	hcr_el2, x0
++	isb
++	/* This goes *after* enabling VHE because it uses the _EL1 registers */
++	bl	exceptions_init
++	/* Make asm_mmu_enable happy by having TTBR0 value in x0 */
++	mrs	x0, ttbr0_el2
++	isb
++	bl	asm_mmu_enable
++
++	ldr	x30, [sp], #16
++	ret
++
+ /*
+  * Vectors
+  * Adapted from arch/arm64/kernel/entry.S
+@@ -327,6 +403,92 @@ vector_stub	el0_irq_32,   13
+ vector_stub	el0_fiq_32,   14
+ vector_stub	el0_error_32, 15
+ 
++.macro vector_stub_nvhe, name, vec
++\name:
++	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
++	stp	 x2,  x3, [sp,  #16]
++	stp	 x4,  x5, [sp,  #32]
++	stp	 x6,  x7, [sp,  #48]
++	stp	 x8,  x9, [sp,  #64]
++	stp	x10, x11, [sp,  #80]
++	stp	x12, x13, [sp,  #96]
++	stp	x14, x15, [sp, #112]
++	stp	x16, x17, [sp, #128]
++	stp	x18, x19, [sp, #144]
++	stp	x20, x21, [sp, #160]
++	stp	x22, x23, [sp, #176]
++	stp	x24, x25, [sp, #192]
++	stp	x26, x27, [sp, #208]
++	stp	x28, x29, [sp, #224]
++
++	str	x30, [sp, #S_LR]
++
++	.if \vec >= 8
++	mrs	x1, sp_el1
++	.else
++	add	x1, sp, #S_FRAME_SIZE
++	.endif
++	str	x1, [sp, #S_SP]
++
++	mrs	x1, elr_el2
++	mrs	x2, spsr_el2
++	stp	x1, x2, [sp, #S_PC]
++
++	mov	x0, \vec
++	mov	x1, sp
++	mrs	x2, esr_el2
++	bl	do_handle_exception
++
++	ldp	x1, x2, [sp, #S_PC]
++	msr	spsr_el2, x2
++	msr	elr_el2, x1
++
++	.if \vec >= 8
++	ldr	x1, [sp, #S_SP]
++	msr	sp_el1, x1
++	.endif
++
++	ldr	x30, [sp, #S_LR]
++
++	ldp	x28, x29, [sp, #224]
++	ldp	x26, x27, [sp, #208]
++	ldp	x24, x25, [sp, #192]
++	ldp	x22, x23, [sp, #176]
++	ldp	x20, x21, [sp, #160]
++	ldp	x18, x19, [sp, #144]
++	ldp	x16, x17, [sp, #128]
++	ldp	x14, x15, [sp, #112]
++	ldp	x12, x13, [sp,  #96]
++	ldp	x10, x11, [sp,  #80]
++	ldp	 x8,  x9, [sp,  #64]
++	ldp	 x6,  x7, [sp,  #48]
++	ldp	 x4,  x5, [sp,  #32]
++	ldp	 x2,  x3, [sp,  #16]
++	ldp	 x0,  x1, [sp], #S_FRAME_SIZE
++
++	eret
++.endm
++
++vector_stub_nvhe	el2t_sync,     0
++vector_stub_nvhe	el2t_irq,      1
++vector_stub_nvhe	el2t_fiq,      2
++vector_stub_nvhe	el2t_error,    3
++
++vector_stub_nvhe	el2h_sync,     4
++vector_stub_nvhe	el2h_irq,      5
++vector_stub_nvhe	el2h_fiq,      6
++vector_stub_nvhe	el2h_error,    7
++
++vector_stub_nvhe	el1_sync_64,   8
++vector_stub_nvhe	el1_irq_64,    9
++vector_stub_nvhe	el1_fiq_64,   10
++vector_stub_nvhe	el1_error_64, 11
++
++vector_stub_nvhe	el1_sync_32,  12
++vector_stub_nvhe	el1_irq_32,   13
++vector_stub_nvhe	el1_fiq_32,   14
++vector_stub_nvhe	el1_error_32, 15
++
+ .section .text.ex
+ 
+ .macro ventry, label
+@@ -355,3 +517,25 @@ vector_table:
+ 	ventry	el0_irq_32			// IRQ 32-bit EL0
+ 	ventry	el0_fiq_32			// FIQ 32-bit EL0
+ 	ventry	el0_error_32			// Error 32-bit EL0
++
++.align 11
++vector_table_nvhe:
++	ventry	el2t_sync			// Synchronous EL2t
++	ventry	el2t_irq			// IRQ EL2t
++	ventry	el2t_fiq			// FIQ EL2t
++	ventry	el2t_error			// Error EL2t
++
++	ventry	el2h_sync			// Synchronous EL2h
++	ventry	el2h_irq			// IRQ EL2h
++	ventry	el2h_fiq			// FIQ EL2h
++	ventry	el2h_error			// Error EL2h
++
++	ventry	el1_sync_64			// Synchronous 64-bit EL1
++	ventry	el1_irq_64			// IRQ 64-bit EL1
++	ventry	el1_fiq_64			// FIQ 64-bit EL1
++	ventry	el1_error_64			// Error 64-bit EL1
++
++	ventry	el1_sync_32			// Synchronous 32-bit EL1
++	ventry	el1_irq_32			// IRQ 32-bit EL1
++	ventry	el1_fiq_32			// FIQ 32-bit EL1
++	ventry	el1_error_32			// Error 32-bit EL1
 -- 
 2.7.4
 
