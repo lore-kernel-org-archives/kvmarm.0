@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6125C3A59F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 10:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 022F1C3A59F
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 10:51:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F54723426
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 10:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACABA2173E
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Aug 2019 10:51:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="htMLhq3m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F54723426
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/F3+Ys8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACABA2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=kvmarm-bounces@lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56F024A4F4;
-	Thu, 29 Aug 2019 06:51:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 650444A4F4;
+	Thu, 29 Aug 2019 06:51:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q1iDD9iJBC8y; Thu, 29 Aug 2019 06:51:12 -0400 (EDT)
+	with ESMTP id GyXsdkbBD779; Thu, 29 Aug 2019 06:51:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B79F4A54B;
-	Thu, 29 Aug 2019 06:51:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E2B54A540;
+	Thu, 29 Aug 2019 06:51:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 511554A4F4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 06:51:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C0B14A4F4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 06:51:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kKkzTOSbC8M5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Aug 2019 06:51:10 -0400 (EDT)
+ with ESMTP id T2NuBy1g7-v6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Aug 2019 06:51:18 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CF4D4A54B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 06:51:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54A444A51E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Aug 2019 06:51:18 -0400 (EDT)
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net
  [73.47.72.35])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 70A012341B;
- Thu, 29 Aug 2019 10:51:08 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B85C723427;
+ Thu, 29 Aug 2019 10:51:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1567075869;
- bh=TRr3eqjeN9vKj8xC4jj12Yb6FOLAm7jqEyir9I4h9EI=;
+ s=default; t=1567075877;
+ bh=LUbZq5RNgQvDztv0DBqWpD+rrSm6QAldMQFxXL2DynQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=htMLhq3mpErmlb4lz7Nt5+vtdCNNxDXEoJmC2xd9byVlDhc3j0iL2/k2DjwQL3765
- sa7xvqPr72wZXgsQDIBqzONw2QL+SMZGeWUslsjS6RwbTjJjScUh2kZWbjbQHbh4oK
- rAJlwamAToVKHOyjIm1Xf3TFwJtJujZoF/LpkJUg=
+ b=Y/F3+Ys8Zu3e5HDY6eVsmMMWyv4g6ksGcW1goytWpkTel3CpViG+frfyQfjJCUCrW
+ yrWgZVnhKbvhSmnwALgLP4wr0IhR/CN7Id96w60FOUY35vdwfK5xhj2FBVaZR7Gqk9
+ EOeU/V6OBvb1lVe4zEhR/NoV9NhmfxfZsb05fMLM=
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 7/8] KVM: arm/arm64: Only skip MMIO insn once
-Date: Thu, 29 Aug 2019 06:50:59 -0400
-Message-Id: <20190829105100.2649-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 5/6] KVM: arm/arm64: Only skip MMIO insn once
+Date: Thu, 29 Aug 2019 06:51:09 -0400
+Message-Id: <20190829105110.2748-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829105100.2649-1-sashal@kernel.org>
-References: <20190829105100.2649-1-sashal@kernel.org>
+In-Reply-To: <20190829105110.2748-1-sashal@kernel.org>
+References: <20190829105110.2748-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -108,7 +108,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 08443a15e6be8..3caee91bca089 100644
+index ae61e2ea7255b..d2efc033ef8b4 100644
 --- a/arch/arm/kvm/mmio.c
 +++ b/arch/arm/kvm/mmio.c
 @@ -98,6 +98,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
@@ -124,7 +124,7 @@ index 08443a15e6be8..3caee91bca089 100644
  	if (!run->mmio.is_write) {
  		len = run->mmio.len;
  		if (len > sizeof(unsigned long))
-@@ -200,6 +206,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+@@ -206,6 +212,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
  	run->mmio.is_write	= is_write;
  	run->mmio.phys_addr	= fault_ipa;
  	run->mmio.len		= len;
